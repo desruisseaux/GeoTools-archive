@@ -16,15 +16,13 @@
  */
 package org.geotools.data.mif;
 
-import java.util.HashMap;
-
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import java.util.HashMap;
 
 
 /**
@@ -69,7 +67,7 @@ public class MIFFileTest extends TestCase {
     public void testMIFFileOpen() {
         try {
             mif = new MIFFile(MIFTestUtils.getDataPath() + "mixed", // .mif
-                    MIFTestUtils.getParams("mif", ""));
+                    MIFTestUtils.getParams("mif", "", null));
             assertEquals("450",
                 mif.getHeaderClause(MIFDataStore.HCLAUSE_VERSION));
 
@@ -103,12 +101,20 @@ public class MIFFileTest extends TestCase {
      * Test a MIF file copy using input FeatureReader, createSchema and output FeatureWriter
      */
     public void testFileCopy() {
+        MIFFile in = null;
+        MIFFile out = null;
+        FeatureReader inFR = null;
+        FeatureReader outFR = null;
+        FeatureWriter outFW = null;
+        int maxAttr = 0;
+
         try {
             // Input file
-            MIFFile in = new MIFFile(dataPath + "grafo", null); // .mif
+            in = new MIFFile(dataPath + "grafo", null); // .mif
+
             FeatureType ft = in.getSchema();
 
-            int maxAttr = ft.getAttributeCount() - 1;
+            maxAttr = ft.getAttributeCount() - 1;
 
             // Params for output file
             HashMap params = new HashMap();
@@ -127,10 +133,14 @@ public class MIFFileTest extends TestCase {
             params.put(MIFDataStore.HCLAUSE_DELIMITER, ",");
 
             // Output file
-            MIFFile out = new MIFFile(dataPath + "grafo_out", ft, params); // .mif
+            out = new MIFFile(dataPath + "grafo_out", ft, params); // .mif
+        } catch (Exception e) {
+            fail("Can't create grafo_out: " + e.getMessage());
+        }
 
-            FeatureReader inFR = in.getFeatureReader();
-            FeatureWriter outFW = out.getFeatureWriter();
+        try {
+            inFR = in.getFeatureReader();
+            outFW = out.getFeatureWriter();
 
             Feature inF;
             Feature outF;
@@ -140,8 +150,9 @@ public class MIFFileTest extends TestCase {
                 inF = inFR.next();
                 outF = outFW.next();
 
-                for (int i = 0; i < outF.getNumberOfAttributes(); i++)
+                for (int i = 0; i < outF.getNumberOfAttributes(); i++) {
                     outF.setAttribute(i, inF.getAttribute(i));
+                }
 
                 outFW.write();
                 counter++;
@@ -149,10 +160,14 @@ public class MIFFileTest extends TestCase {
 
             inFR.close();
             outFW.close();
+        } catch (Exception e) {
+            fail("Can't copy features: " + e.getMessage());
+        }
 
+        try {
             inFR = in.getFeatureReader();
 
-            FeatureReader outFR = out.getFeatureReader();
+            outFR = out.getFeatureReader();
 
             int n = 0;
 
@@ -172,7 +187,7 @@ public class MIFFileTest extends TestCase {
             inFR.close();
             outFR.close();
         } catch (Exception e) {
-            fail(e.getMessage());
+            fail("Can't compare features: " + e.getMessage());
         }
     }
 
@@ -181,11 +196,10 @@ public class MIFFileTest extends TestCase {
      */
     public void testFeatureWriter() {
         try {
-            
             MIFTestUtils.copyMif("mixed", "mixed_wri");
 
             MIFFile in = new MIFFile(dataPath + "mixed_wri", // .mif
-                    MIFTestUtils.getParams("", ""));
+                    MIFTestUtils.getParams("", "", null));
             FeatureWriter fw = in.getFeatureWriter();
 
             Feature f;
@@ -196,7 +210,7 @@ public class MIFFileTest extends TestCase {
                 ++counter;
 
                 if (counter == 5) {
-                    fw.remove(); // removes last 2 features
+                    fw.remove(); // removes multilinestring line
                 } else if (counter == 7) {
                     f.setAttribute("DESCRIPTION", "fubar");
                     fw.write();
@@ -243,12 +257,10 @@ public class MIFFileTest extends TestCase {
                 }
             }
 
+            fr.close();
             assertEquals(9, counter);
-
-            // Now checks results
         } catch (Exception e) {
-            e.printStackTrace();
-            fail();
+            fail(e.getMessage());
         }
     }
 }

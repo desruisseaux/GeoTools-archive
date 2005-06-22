@@ -16,14 +16,14 @@
  */
 package org.geotools.data.mif;
 
-import java.io.IOException;
-
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.feature.FeatureType;
+import java.io.IOException;
+import java.net.URI;
 
 
 /**
@@ -33,6 +33,7 @@ import org.geotools.data.DataStoreFactorySpi.Param;
  */
 public class MIFDataStoreFactoryTest extends TestCase {
     private MIFDataStoreFactory dsFactory = null;
+    private URI uri = null;
 
     /**
      */
@@ -46,6 +47,7 @@ public class MIFDataStoreFactoryTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         dsFactory = new MIFDataStoreFactory();
+        uri = null;
     }
 
     /*
@@ -70,13 +72,14 @@ public class MIFDataStoreFactoryTest extends TestCase {
 
         try {
             ds = DataStoreFinder.getDataStore(MIFTestUtils.getParams("mif",
-                        MIFTestUtils.getDataPath()));
+                        MIFTestUtils.getDataPath(), uri));
         } catch (IOException e) {
             fail(e.getMessage());
         }
 
-        assertNotNull(ds);
-        assertEquals(true, ds.getClass() == MIFDataStore.class);
+        assertNotNull("Can't create datastore using DSFinder", ds);
+        assertEquals("Bad class: " + ds.getClass(), true,
+            ds.getClass() == MIFDataStore.class);
     }
 
     /**
@@ -85,9 +88,14 @@ public class MIFDataStoreFactoryTest extends TestCase {
         DataStore ds = null;
 
         try {
+            String strURI = "root-mifdatastore";
+            uri = new URI(strURI);
             ds = dsFactory.createDataStore(MIFTestUtils.getParams("mif",
-                        MIFTestUtils.getDataPath()));
-        } catch (IOException e) {
+                        MIFTestUtils.getDataPath(), uri));
+
+            FeatureType ft = ds.getSchema("grafo");
+            assertEquals("Bad URI", new URI(strURI), ft.getNamespace());
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -111,7 +119,7 @@ public class MIFDataStoreFactoryTest extends TestCase {
 
         // Opens the test-data directory
         assertEquals(true,
-            dsFactory.canProcess(MIFTestUtils.getParams("mif", dataPath)));
+            dsFactory.canProcess(MIFTestUtils.getParams("mif", dataPath, uri)));
     }
 
     /**
@@ -121,7 +129,8 @@ public class MIFDataStoreFactoryTest extends TestCase {
 
         // fails because dbtype != "mif"
         assertEquals(false,
-            dsFactory.canProcess(MIFTestUtils.getParams("miffooobar", dataPath)));
+            dsFactory.canProcess(MIFTestUtils.getParams("miffooobar", dataPath,
+                    uri)));
     }
 
     /**
@@ -132,13 +141,13 @@ public class MIFDataStoreFactoryTest extends TestCase {
         // Opens a single mif file; works with or without extension, and regardless the extension's case.
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    dataPath + "grafo")));
+                    dataPath + "grafo", uri)));
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    dataPath + "grafo.MIF")));
+                    dataPath + "grafo.MIF", uri)));
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    dataPath + "grafo.mif")));
+                    dataPath + "grafo.mif", uri)));
     }
 
     /**
@@ -149,12 +158,12 @@ public class MIFDataStoreFactoryTest extends TestCase {
         // Fails because an extension other than ".mif" was specified
         assertEquals(false,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    dataPath + "grafo.zip")));
+                    dataPath + "grafo.zip", uri)));
 
         // fails because the path is non-existent
         assertEquals(false,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    dataPath + "some/non/existent/path/")));
+                    dataPath + "some/non/existent/path/", uri)));
     }
 
     /**
@@ -168,7 +177,7 @@ public class MIFDataStoreFactoryTest extends TestCase {
     public void testGetParametersInfo() {
         Param[] pars = dsFactory.getParametersInfo();
         assertNotNull(pars);
-        assertEquals(pars[2].key, MIFDataStore.PARAM_FIELDCASE);
+        assertEquals(pars[3].key, MIFDataStore.PARAM_FIELDCASE);
     }
 
     /**

@@ -35,6 +35,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
+import org.geotools.xml.gml.GMLSchema;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +44,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date; // TODO use java.sql.Date?
@@ -75,7 +77,7 @@ import java.util.logging.Logger;
  *
  * @author Luca S. Percich, AMA-MI
  * @author Paolo Rizzi, AMA-MI
- * @version $Id: MIFFile.java,v 1.11 2005/06/16 15:57:43 lpercich Exp $
+ * @version $Id: MIFFile.java,v 1.12 2005/06/22 16:53:49 lpercich Exp $
  */
 public class MIFFile {
     // Geometry type identifier constants 
@@ -136,6 +138,7 @@ public class MIFFile {
     private FeatureType featureType = null;
     private int numAttribs = 0;
     private int geomFieldIndex = -1;
+    private URI namespace = null;
 
     // Parameters for coordinate transformation during file i/o
     private boolean useTransform = false;
@@ -161,6 +164,9 @@ public class MIFFile {
      * </p>
      * 
      * <ul>
+     * <li>
+     * "namespace" = URI of the namespace prefix for FeatureTypes
+     * </li>
      * <li>
      * PARAM_GEOMFACTORY = GeometryFactory object to be used for creating
      * geometries;
@@ -340,6 +346,9 @@ public class MIFFile {
 
         geometryClass = ((String) getParam(MIFDataStore.PARAM_GEOMTYPE,
                 "untyped", false, params)).toLowerCase();
+
+        namespace = (URI) getParam("namespace", GMLSchema.NAMESPACE, false,
+                params);
     }
 
     /**
@@ -590,7 +599,8 @@ public class MIFFile {
             return "Char(" + l + ")";
         } else if (at.getType() == Integer.class) {
             return "Integer";
-        } else if (at.getType() == Double.class || at.getType() == Float.class) {
+        } else if ((at.getType() == Double.class)
+                || (at.getType() == Float.class)) {
             return "Float";
         } else if (at.getType() == Boolean.class) {
             return "Logical";
@@ -862,6 +872,8 @@ public class MIFFile {
 
                         FeatureTypeBuilder builder = FeatureTypeBuilder
                             .newInstance(typeName);
+
+                        builder.setNamespace(namespace);
 
                         for (int i = 0; i < columns.length; i++)
                             builder.addType(columns[i]);

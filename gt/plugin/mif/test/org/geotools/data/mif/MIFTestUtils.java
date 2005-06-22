@@ -24,12 +24,16 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.ExpressionBuilder;
+import org.geotools.filter.Filter;
+import org.geotools.filter.parser.ParseException;
 import org.geotools.resources.TestData;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.logging.Logger;
@@ -136,7 +140,9 @@ public class MIFTestUtils {
         safeDeleteMif("grafo_new");
         safeDeleteMif("grafo_out");
         safeDeleteMif("mixed_wri");
+        safeDeleteMif("grafo_append");
         safeDeleteMif("newschema");
+        safeDeleteMif("mixed_fs");
     }
 
     /**
@@ -182,14 +188,19 @@ public class MIFTestUtils {
      *
      * @param dbtype DOCUMENT ME!
      * @param path DOCUMENT ME!
+     * @param uri DOCUMENT ME!
      *
      * @return DOCUMENT ME!
      */
-    protected static HashMap getParams(String dbtype, String path) {
+    protected static HashMap getParams(String dbtype, String path, URI uri) {
         HashMap params = new HashMap();
 
         params.put("dbtype", dbtype);
         params.put("path", path);
+
+        if (uri != null) {
+            params.put("namespace", uri);
+        }
 
         params.put(MIFDataStore.PARAM_FIELDCASE, "upper");
         params.put(MIFDataStore.PARAM_GEOMNAME, "the_geom");
@@ -218,5 +229,20 @@ public class MIFTestUtils {
         }
 
         return builder.getFeatureType();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param expression DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    protected static Filter parseFilter(String expression) {
+        try {
+            return (Filter) ExpressionBuilder.parse(expression);
+        } catch (ParseException e) {
+            return Filter.ALL;
+        }
     }
 }

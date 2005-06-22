@@ -22,14 +22,16 @@ import junit.framework.TestSuite;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.Filter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.HashMap;
@@ -80,7 +82,7 @@ public class MIFDataStoreTest extends TestCase {
      */
     protected boolean initDS(String initPath) {
         try {
-            HashMap params = MIFTestUtils.getParams("mif", initPath);
+            HashMap params = MIFTestUtils.getParams("mif", initPath, null);
             ds = new MIFDataStore(initPath, params);
             assertNotNull(ds);
 
@@ -220,14 +222,16 @@ public class MIFDataStoreTest extends TestCase {
     public void testFeatureWriter() {
         initDS(dataPath);
 
+        String outmif = "grafo_new";
+
         try {
             FeatureType newFT = MIFTestUtils.duplicateSchema(ds.getSchema(
-                        "grafo"), "grafo_new");
+                        "grafo"), outmif);
             ds.createSchema(newFT);
 
             int maxAttr = newFT.getAttributeCount() - 1;
 
-            FeatureWriter fw = ds.getFeatureWriterAppend("grafo_new",
+            FeatureWriter fw = ds.getFeatureWriterAppend(outmif,
                     Transaction.AUTO_COMMIT);
             Feature f;
             FeatureReader fr = getFeatureReader("grafo",
@@ -248,12 +252,13 @@ public class MIFDataStoreTest extends TestCase {
                 fw.write();
             }
 
+            fr.close();
             fw.close();
 
             assertEquals(counter, 2);
 
-            fw = ds.getFeatureWriter("grafo_new",
-                    (Filter) ExpressionBuilder.parse("ID == 71045"),
+            fw = ds.getFeatureWriter(outmif,
+                    MIFTestUtils.parseFilter("ID == 71045"),
                     Transaction.AUTO_COMMIT);
 
             assertEquals(true, fw.hasNext());
@@ -262,7 +267,7 @@ public class MIFDataStoreTest extends TestCase {
 
             fw.close();
 
-            fw = ds.getFeatureWriterAppend("grafo_new", Transaction.AUTO_COMMIT);
+            fw = ds.getFeatureWriterAppend(outmif, Transaction.AUTO_COMMIT);
 
             f = fw.next();
             f.setAttribute("ID", "99998");
@@ -271,7 +276,7 @@ public class MIFDataStoreTest extends TestCase {
 
             fw.close();
 
-            fr = getFeatureReader("grafo_new");
+            fr = getFeatureReader(outmif);
 
             counter = 0;
 
@@ -280,8 +285,8 @@ public class MIFDataStoreTest extends TestCase {
                 counter++;
             }
 
-            assertEquals(counter, 2);
             fr.close();
+            assertEquals(counter, 2);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -292,30 +297,38 @@ public class MIFDataStoreTest extends TestCase {
      */
     public void testFeatureWriterAppendTransaction() {
         try {
-            MIFTestUtils.copyMif("grafo", "grafo_new");
+            String outmif = "grafo_append";
+            MIFTestUtils.copyMif("grafo", outmif);
             initDS(dataPath);
 
             Feature f;
-            Transaction transaction = new DefaultTransaction();
+            Transaction transaction = new DefaultTransaction("mif");
 
-            FeatureWriter fw = ds.getFeatureWriterAppend("grafo_new",
-                    transaction);
+            try {
+                FeatureWriter fw = ds.getFeatureWriterAppend(outmif, transaction);
 
-            f = fw.next();
-            f = fw.next();
-            f.setAttribute("ID", "80001");
-            f.setAttribute("NOMECOMUNE", "foo");
-            fw.write();
+                f = fw.next();
+                f = fw.next();
+                f.setAttribute("ID", "80001");
+                f.setAttribute("NOMECOMUNE", "foo");
+                fw.write();
 
-            f = fw.next();
-            f.setAttribute("ID", "80002");
-            f.setAttribute("NOMECOMUNE", "bar");
-            fw.write();
+                f = fw.next();
+                f.setAttribute("ID", "80002");
+                f.setAttribute("NOMECOMUNE", "bar");
+                fw.write();
 
-            fw.close();
-            transaction.commit();
+                fw.close();
 
-            FeatureReader fr = getFeatureReader("grafo_new",
+                transaction.commit();
+            } catch (Exception e) {
+                transaction.rollback();
+                fail(e.getMessage());
+            } finally {
+                transaction.close();
+            }
+
+            FeatureReader fr = getFeatureReader(outmif,
                     "ID > 80000 && ID <80003");
 
             int counter = 0;
@@ -325,9 +338,71 @@ public class MIFDataStoreTest extends TestCase {
                 counter++;
             }
 
+            fr.close();
+
             assertEquals(counter, 2);
         } catch (Exception e) {
             fail(e.getMessage());
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void testFeatureSource() {
+        String outmif = "mixed_fs";
+
+        try {
+            MIFTestUtils.copyMif("mixed", outmif);
+        } catch (FileNotFoundException e) {
+            fail(e.getMessage());
+        }
+
+        initDS(dataPath);
+
+        FeatureSource fs = null;
+        FeatureType featureType = null;
+
+        try {
+            featureType = ds.getSchema(outmif);
+            assertNotNull("Cannot get FeatureType", featureType);
+        } catch (Exception e) {
+            fail("Cannot get FeatureType: " + e.getMessage());
+        }
+
+        try {
+            fs = ds.getFeatureSource(outmif);
+            assertNotNull("Cannot get FeatureSource.", fs);
+        } catch (IOException e) {
+            fail("Cannot get FeatureSource: " + e.getMessage());
+        }
+
+        try {
+            ((FeatureStore) fs).modifyFeatures(featureType.getAttributeType(
+                    "DESCRIPTION"), "FOO", Filter.NONE);
+        } catch (Exception e) {
+            fail("Cannot update Features: " + e.getMessage());
+        }
+
+        try {
+            ((FeatureStore) fs).removeFeatures(MIFTestUtils.parseFilter(
+                    "GEOMTYPE != 'NULL'"));
+        } catch (IOException e) {
+            fail("Cannot delete Features: " + e.getMessage());
+        }
+
+        try {
+            FeatureReader fr = getFeatureReader(outmif);
+
+            assertEquals(true, fr.hasNext());
+
+            Feature f = fr.next();
+            assertEquals("FOO", f.getAttribute("DESCRIPTION"));
+            assertEquals(false, fr.hasNext());
+
+            fr.close();
+        } catch (Exception e) {
+            fail("Cannot check feature: " + e.getMessage());
         }
     }
 
@@ -338,19 +413,15 @@ public class MIFDataStoreTest extends TestCase {
      * @param filter
      *
      * @return
+     *
+     * @throws Exception
      */
     protected FeatureReader getFeatureReader(String featureTypeName,
-        String filter) {
-        try {
-            DefaultQuery q = new DefaultQuery(featureTypeName,
-                    (Filter) ExpressionBuilder.parse(filter));
+        String filter) throws Exception {
+        DefaultQuery q = new DefaultQuery(featureTypeName,
+                MIFTestUtils.parseFilter(filter));
 
-            return ds.getFeatureReader(q, Transaction.AUTO_COMMIT);
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            return null;
-        }
+        return ds.getFeatureReader(q, Transaction.AUTO_COMMIT);
     }
 
     /**
@@ -359,8 +430,11 @@ public class MIFDataStoreTest extends TestCase {
      * @param featureTypeName
      *
      * @return
+     *
+     * @throws Exception
      */
-    protected FeatureReader getFeatureReader(String featureTypeName) {
+    protected FeatureReader getFeatureReader(String featureTypeName)
+        throws Exception {
         return getFeatureReader(featureTypeName, "1=1");
     }
 }
