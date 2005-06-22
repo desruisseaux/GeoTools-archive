@@ -20,14 +20,35 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.util.logging.Logger;
 
 import javax.media.jai.ImageMIPMap;
 
+import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.RenderedCoverage;
+import org.geotools.coverage.operation.Resampler2D;
+import org.geotools.coverage.processing.GridCoverageProcessor2D;
+import org.geotools.factory.Hints;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.DefaultCoordinateOperationFactory;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
@@ -92,8 +113,55 @@ public final class GridCoverageRenderer {
      *
      * @param gridCoverage DOCUMENT ME!
      */
-    public GridCoverageRenderer(GridCoverage gridCoverage) {
-        this.gridCoverage = gridCoverage;
+    public GridCoverageRenderer(GridCoverage gridCoverage, CoordinateReferenceSystem destinationCrs) throws Exception {
+        CoordinateReferenceSystem sourceCrs = gridCoverage.getCoordinateReferenceSystem();
+        
+        if(sourceCrs != null && sourceCrs != destinationCrs) {
+        	GridCoverage2D gcOp = null;
+            try {
+            	/**
+            	 * Just an example on creation of crs by EPSG codes ... (maybe deprecated)
+            	 *
+            	 * CRSAuthorityFactory factory=FactoryFinder.getCRSAuthorityFactory("EPSG",new Hints(Hints.CRS_AUTHORITY_FACTORY,EPSGCRSAuthorityFactory.class));
+            	 * CoordinateReferenceSystem crs=(CoordinateReferenceSystem) factory.createCoordinateReferenceSystem("EPSG:4904");
+            	 */
+				DefaultCoordinateOperationFactory operationFactory=new DefaultCoordinateOperationFactory();
+				CoordinateOperation operation=operationFactory.createOperation(sourceCrs, destinationCrs);
+				MathTransform transform=operation.getMathTransform();
+				//reprojecting the envelope
+				GeneralEnvelope oldEnvelope=(GeneralEnvelope) gridCoverage.getEnvelope(),
+					newEnvelope=null;
+				newEnvelope=new GeneralEnvelope(
+						(GeneralDirectPosition )transform.transform(oldEnvelope.getLowerCorner(),null),
+						(GeneralDirectPosition )transform.transform(oldEnvelope.getUpperCorner(),null)
+						);
+				
+				//creating the new grid range keeping the old range
+				GeneralGridRange newGridrange = new GeneralGridRange(new int[] { 0, 0 },
+				        new int[] { gridCoverage.getGridGeometry().getGridRange().getLength(0),  gridCoverage.getGridGeometry().getGridRange().getLength(1) });
+				GridGeometry2D newGridGeometry = new GridGeometry2D(newGridrange,
+				        newEnvelope, new boolean[] { false, true });
+
+				//getting the needed operation
+				Resampler2D.Operation op = new Resampler2D.Operation();
+
+				//getting parameters
+				ParameterValueGroup group = op.getParameters();
+				group.parameter("Source").setValue(gridCoverage);
+				group.parameter("CoordinateReferenceSystem").setValue(destinationCrs);
+				group.parameter("GridGeometry").setValue(newGridGeometry);
+
+				GridCoverageProcessor2D processor2D = GridCoverageProcessor2D.getDefault();
+				gcOp = (GridCoverage2D) processor2D.doOperation(op, group);
+			} catch (Exception e) {
+				throw new Exception(e.getMessage());
+			}
+
+			this.gridCoverage = gcOp;
+        } else {
+            this.gridCoverage = gridCoverage;
+        }
+        
         if (gridCoverage instanceof GridCoverage2D) {
         	image = ((GridCoverage2D) gridCoverage).geophysics(false).getRenderedImage();
         }else if (gridCoverage instanceof RenderedCoverage) {

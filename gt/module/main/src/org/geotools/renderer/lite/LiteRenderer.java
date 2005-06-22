@@ -77,6 +77,7 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.renderer.Renderer;
 import org.geotools.renderer.Renderer2D;
 import org.geotools.styling.Displacement;
@@ -972,7 +973,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
             } else if (symbolizers[m] instanceof TextSymbolizer) {
                 renderText(feature, (TextSymbolizer) symbolizers[m]);
             } else if (symbolizers[m] instanceof RasterSymbolizer) {
-                renderRaster(feature, (RasterSymbolizer) symbolizers[m]);
+                renderRaster(feature, (RasterSymbolizer) symbolizers[m], null);
             }
         }
     }
@@ -2678,10 +2679,15 @@ public class LiteRenderer implements Renderer, Renderer2D {
      *
      * @task make it follow the symbolizer
      */
-    private void renderRaster(Feature feature, RasterSymbolizer symbolizer) {
+    private void renderRaster(Feature feature, RasterSymbolizer symbolizer, CoordinateReferenceSystem destinationCrs) {
         GridCoverage grid = (GridCoverage) feature.getAttribute("grid");
-        GridCoverageRenderer gcr = new GridCoverageRenderer(grid);
-        gcr.paint(graphics);
+        GridCoverageRenderer gcr;
+		try {
+			gcr = new GridCoverageRenderer(grid, destinationCrs);
+			gcr.paint(graphics);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         LOGGER.finest("Raster rendered");
     }
 
