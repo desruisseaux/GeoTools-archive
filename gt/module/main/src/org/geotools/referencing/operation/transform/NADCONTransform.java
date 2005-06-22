@@ -16,10 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.referencing.operation.transform;
 
@@ -65,6 +61,7 @@ import org.geotools.resources.cts.Resources;
 
 
 /**
+ * Transform backed by the North American Datum Conversion grid.
  * The North American Datum Conversion (NADCON) Transform (EPSG code 9613) is a
  * two dimentional datum shift method, created by the National Geodetic Survey
  * (NGS), that uses interpolated values from two grid shift files. This
@@ -74,11 +71,11 @@ import org.geotools.resources.cts.Resources;
  * (HARN).  NADCON shfts from NAD27 (and some others) to NAD83 while HARN
  * shifts from  the NADCON NAD83 to an improved NAD83. Both sets of grid shift
  * files may be  downloaded from  <a href="http://www.ngs.noaa.gov/PC_PROD/NADCON/">www.ngs.noaa.gov/PC_PROD/NADCON/</a>.
- * <br><br>
+ * <p>
  *
  * Some of the NADCON grids, their areas of use, and source datums are shown
  * in the following table. 
- * <br><br>
+ * <p>
  * 
  * <table>
  *   <tr><th>Shift File Name</td><th>Area</td><th>Source Datum</td><th>Accuracy at 67% confidence (m)</td></tr>
@@ -90,20 +87,21 @@ import org.geotools.resources.cts.Resources;
  *   <tr><td>STGEORGE</td><td>St. George Is., AK</td><td>St. George Island (4138)</td><td>--</td></tr>
  *   <tr><td>PRVI</td><td>Puerto Rico and the Virgin Islands</td><td>Puerto Rico (4139)</td><td>0.05</td></tr>
  * </table>
- * <br><br>
+ * <p>
  *
- * Grid shift files come in two formats: binary and text. The files from  the
- * NGS are binary and have .las (latitude shift) and .los (longitude shift)
+ * Grid shift files come in two formats: binary and text. The files from the NGS are
+ * binary and have {@code .las} (latitude shift) and {@code .los} (longitude shift)
  * extentions. Text grids may be created with the NGS nadgrd program and have
- * .laa (latitude shift) and .loa (longitude shift) file extentions. Both
- * types of  files may be used here. 
- * <br><br>
+ * {@code .laa} (latitude shift) and {@code .loa} (longitude shift) file extentions.
+ * Both types of  files may be used here. 
+ * <p>
  *
  * The grid names to use for transforming are parameters of this
  * MathTransform.  This parameter may be the full name and path to the grids
  * or just the name  of the grids if the default location of the grids was set
  * as a preference.  This preference may be set with the main method of this
- * class. <br><br>
+ * class.
+ * <p>
  *
  * Transformations here have been tested to be within 0.00001 seconds of
  * values  given by the NGS ndcon210 program for NADCON grids. American Samoa
@@ -116,9 +114,9 @@ import org.geotools.resources.cts.Resources;
  *       Application of Minimum-Curvature-Derived  Surfaces in the Transformation of
  *       Positional Data From the North American  Datum of 1927 to the North
  *       American Datum of 1983</a> - NOAA TM.</li>
- *   <li>ndcon210.for - NGS fortran source code for NADCON conversions. See the
+ *   <li>{@code ndcon210.for} - NGS fortran source code for NADCON conversions. See the
  *       following subroutines: TRANSF, TO83, FGRID, INTRP, COEFF and SURF</li>
- *   <li>nadgrd.for - NGS fortran source code to export/import binary and text grid
+ *   <li>{@code nadgrd.for} - NGS fortran source code to export/import binary and text grid
  *       formats</li>
  *   <li>EPSG Geodesy Parameters database version 6.5</li>
  * </ul>

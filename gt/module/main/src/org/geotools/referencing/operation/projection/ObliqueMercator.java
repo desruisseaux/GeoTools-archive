@@ -73,7 +73,7 @@ import org.geotools.resources.cts.Resources;
  * line is along the equator or a meridian, respectively. The Oblique Mercator 
  * projection has been used in Switzerland, Hungary, Madagascar, 
  * Malaysia, Borneo and the panhandle of Alaska.
- * <br><br>
+ * <p>
  * 
  * The Oblique Mercator projection uses a (U,V) coordinate system, with the 
  * U axis along the central line. During the forward projection, coordinates 
@@ -84,7 +84,7 @@ import org.geotools.resources.cts.Resources;
  * The rotation value is usually the same as the projection azimuth (the angle, 
  * east of north, of the central line), but some cases allow a separate 
  * rotation parameter. 
- * <br><br>
+ * <p>
  * 
  * There are two forms of the oblique mercator, differing in the origin of
  * their grid coordinates. The Hotine_Oblique_Mercator (EPSG code 9812) has grid 
@@ -94,7 +94,7 @@ import org.geotools.resources.cts.Resources;
  * central line intersect). ESRI separates these two case by appending
  * "Natural_Origin" (for the Hotine_Oblique_Mercator) and "Center" 
  * (for the Obique_Mercator) to the projection names.
- * <br><br>
+ * <p>
  * 
  * Two different methods are used to specify the central line for the 
  * oblique mercator: 1) a central point and an azimuth, 
@@ -105,7 +105,7 @@ import org.geotools.resources.cts.Resources;
  * parameter crosses the central line as the projection's central point. 
  * The central meridian is not a projection parameter, and is instead calculated 
  * as the intersection between the central line and the equator of the aposphere. 
- * <br><br>
+ * <p>
  *
  * For the azimuth method, the central latitude cannot be +- 90.0 degrees
  * and the central line cannot be at a maximum or minimum latitude at the central point.
@@ -116,13 +116,13 @@ import org.geotools.resources.cts.Resources;
  * 10^-7 radians can allow calculation at these special cases. Snyder's restriction
  * of the central latitude being 0.0 has been removed, since the equaitons appear
  * to work correctly in this case.
- * <br><br>
+ * <p>
  *
  * Azimuth values of 0.0 and +- 90.0 degrees are allowed (and used in Hungary
  * and Switzerland), though these cases would usually use a Mercator or 
  * Transverse Mercator projection instead. Azimuth values > 90 degrees cause
  * errors in the equations.
- * <br><br>
+ * <p>
  * 
  * The oblique mercator is also called the "Rectified Skew Orthomorphic" (RSO). 
  * It appears is that the only difference from the oblique mercator is that
@@ -132,7 +132,7 @@ import org.geotools.resources.cts.Resources;
  * for the Oblique Mercator and Hotine Oblique Mercator. 
  * The rotation parameter is optional in all the non-two point projections and will be
  * set to the azimuth if not specified.
- * <br><br>
+ * <p>
  * 
  * Projection cases and aliases implemented by the {@link ObliqueMercator} are:
  * <ul>
@@ -270,6 +270,324 @@ public class ObliqueMercator extends MapProjection {
      * for the oblique mercator case. 
      */
     private final boolean hotine;
+    
+    /**
+     * Constructs a new map projection from the supplied parameters.
+     *
+     * @param  parameters The parameter values in standard units.
+     * @param  expected The expected parameter descriptors.
+     * @throws ParameterNotFoundException if a mandatory parameter is missing.
+     */
+    ObliqueMercator(final ParameterValueGroup parameters, final Collection expected,
+                    final boolean hotine, final boolean twoPoint) 
+            throws ParameterNotFoundException 
+    {
+        //Fetch parameters 
+        super(parameters, expected);
+        
+        this.hotine = hotine;
+        this.twoPoint = twoPoint;
+        
+        //NaN for safety (centralMeridian calculated below)
+        latitudeOfOrigin = Double.NaN;
+        centralMeridian  = Double.NaN;
+
+        latitudeOfCentre = doubleValue(expected, Provider.LAT_OF_CENTRE, parameters);
+        //checks that latitudeOfCentre is not +- 90 degrees
+        //not checking if latitudeOfCentere is 0, since equations behave correctly
+        ensureLatitudeInRange(Provider.LAT_OF_CENTRE, latitudeOfCentre, false);
+        
+        if (twoPoint) {
+            longitudeOfCentre  = Double.NaN;
+            latitudeOf1stPoint = doubleValue(expected, Provider_TwoPoint.LAT_OF_1ST_POINT, parameters);
+            //checks that latOf1stPoint is not +-90 degrees
+            ensureLatitudeInRange(Provider_TwoPoint.LAT_OF_1ST_POINT, latitudeOf1stPoint, false);
+            longitudeOf1stPoint = doubleValue(expected, Provider_TwoPoint.LONG_OF_1ST_POINT, parameters);
+            ensureLongitudeInRange(Provider_TwoPoint.LONG_OF_1ST_POINT, longitudeOf1stPoint, true);
+            latitudeOf2ndPoint = doubleValue(expected, Provider_TwoPoint.LAT_OF_2ND_POINT, parameters);
+            ensureLatitudeInRange(Provider_TwoPoint.LAT_OF_2ND_POINT, latitudeOf2ndPoint, true);
+            longitudeOf2ndPoint = doubleValue(expected, Provider_TwoPoint.LONG_OF_2ND_POINT, parameters);
+            ensureLongitudeInRange(Provider_TwoPoint.LONG_OF_2ND_POINT, longitudeOf2ndPoint, true);
+            
+            double con = Math.abs(latitudeOf1stPoint);
+            if (Math.abs(latitudeOf1stPoint - latitudeOf2ndPoint) < TOL) {
+                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_LAT1_EQ_LAT2));
+            }
+            if (Math.abs(latitudeOf1stPoint) < TOL) {
+                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_LAT1_EQ_ZERO));
+            }
+            if (Math.abs(latitudeOf2ndPoint + Math.PI/2.0) < TOL) {
+                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_LAT2_EQ_NEG_90));
+            }
+        } else {
+	    latitudeOf1stPoint  = Double.NaN;
+            longitudeOf1stPoint = Double.NaN;
+            latitudeOf2ndPoint  = Double.NaN;
+            longitudeOf2ndPoint = Double.NaN;
+                       
+            longitudeOfCentre = doubleValue(expected, Provider.LONG_OF_CENTRE, parameters);
+            ensureLongitudeInRange(Provider.LONG_OF_CENTRE, longitudeOfCentre, true);
+            
+            alpha_c = doubleValue(expected, Provider.AZIMUTH, parameters);
+            //already checked for +-360 deg. above. 
+            if ((alpha_c > -1.5*Math.PI && alpha_c < -0.5*Math.PI) ||
+                (alpha_c > 0.5*Math.PI && alpha_c < 1.5*Math.PI)) {
+                    throw new IllegalArgumentException(
+                        Resources.format(ResourceKeys.ERROR_VALUE_OUT_OF_BOUNDS_$3,
+                        new Double(Math.toDegrees(alpha_c)), new Double(-90), new Double(90)));
+            }
+            
+            rectGridAngle = doubleValue(expected, Provider.RECTIFIED_GRID_ANGLE, parameters);
+            if (Double.isNaN(rectGridAngle)) {
+                rectGridAngle = alpha_c;
+            }
+        }    
+		       
+        double com = Math.sqrt(1.0-excentricitySquared);
+        double sinphi0 = Math.sin(latitudeOfCentre);
+        double cosphi0 = Math.cos(latitudeOfCentre);
+        B = cosphi0 * cosphi0;
+        B = Math.sqrt(1.0 + excentricitySquared * B * B / (1.0-excentricitySquared));
+        double con = 1.0 - excentricitySquared * sinphi0 * sinphi0;
+        A = B * com / con;
+        double D = B * com / (cosphi0 * Math.sqrt(con));
+        double F = D * D - 1.0;
+        if (F < 0.0) {
+            F = 0.0;
+        } else {
+            F = Math.sqrt(F);
+            if (latitudeOfCentre < 0.0) {  //taking sign of latOfCentre
+                F = -F;
+            }
+        }
+        F = F += D;
+        E = F* Math.pow(tsfn(latitudeOfCentre, sinphi0), B);          
+        
+        double gamma0;
+        if (twoPoint) {
+            double H = Math.pow(tsfn(latitudeOf1stPoint, Math.sin(latitudeOf1stPoint)), B);
+            double L = Math.pow(tsfn(latitudeOf2ndPoint, Math.sin(latitudeOf2ndPoint)), B);
+            double Fp = E / H;
+            double P = (L - H) / (L + H);
+            double J = E * E;
+            J = (J - L * H) / (J + L * H);        
+            double diff = longitudeOf1stPoint - longitudeOf2ndPoint;
+            if (diff < -Math.PI) {
+                longitudeOf2ndPoint -= 2.0* Math.PI;
+            } else if (diff > Math.PI) {
+                longitudeOf2ndPoint += 2.0* Math.PI;
+            }
+            
+            centralMeridian = rollLongitude(0.5 * (longitudeOf1stPoint + longitudeOf2ndPoint) -
+                              Math.atan(J * Math.tan(0.5 * B * (longitudeOf1stPoint - longitudeOf2ndPoint)) / P) / B);
+            gamma0 = Math.atan(2.0 * Math.sin(B * rollLongitude(longitudeOf1stPoint - centralMeridian)) /
+                     (Fp - 1.0 / Fp));
+            alpha_c = Math.asin(D * Math.sin(gamma0));
+            rectGridAngle = alpha_c;
+        } else {
+            gamma0 = Math.asin(Math.sin(alpha_c) / D);
+            //check for asin(+-1.00000001)
+            double temp = 0.5 * (F - 1.0 / F) * Math.tan(gamma0);
+            if (Math.abs(temp) > 1.0) {
+                if (Math.abs(Math.abs(temp) - 1.0) > EPS) {
+                    throw new IllegalArgumentException("Tolerance condition error");
+                }
+                temp = (temp > 0) ? 1.0 : -1.0;
+            }
+            centralMeridian = longitudeOfCentre - Math.asin(temp) / B; 
+        }
+        
+        singamma0 = Math.sin(gamma0);
+        cosgamma0 = Math.cos(gamma0);
+	sinrot = Math.sin(rectGridAngle);
+	cosrot = Math.cos(rectGridAngle);
+        ArB = A/B;
+        AB = A*B;
+        BrA = B/A;
+        v_pole_n = ArB * Math.log(Math.tan(0.5 * (Math.PI/2.0 - gamma0)));
+        v_pole_s = ArB * Math.log(Math.tan(0.5 * (Math.PI/2.0 + gamma0)));
+ 
+        if (hotine) {
+            u_c = 0.0;
+        } else {
+            if (Math.abs(Math.abs(alpha_c) - Math.PI/2.0) < TOL) {
+                //longitudeOfCentre = NaN in twopoint, but alpha_c cannot be 90 here (lat1 != lat2)
+                u_c = A * (longitudeOfCentre - centralMeridian);
+            } else {
+                u_c = Math.abs(ArB * Math.atan2(Math.sqrt(D * D - 1.0), Math.cos(alpha_c)));
+                if (latitudeOfCentre < 0.0) {
+                    u_c = -u_c;
+                }
+            }
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        if (hotine) {
+            return (twoPoint) ? Provider_Hotine_TwoPoint.PARAMETERS : Provider_Hotine.PARAMETERS;
+        } else {
+            return (twoPoint) ? Provider_TwoPoint.PARAMETERS : Provider.PARAMETERS;
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public ParameterValueGroup getParameterValues() {
+        final ParameterValueGroup values = super.getParameterValues();
+        final Collection expected = getParameterDescriptors().descriptors();
+        if (twoPoint) {
+            set(expected, Provider_TwoPoint.LAT_OF_CENTRE, values, latitudeOfCentre);
+            set(expected, Provider_TwoPoint.LAT_OF_1ST_POINT, values, latitudeOf1stPoint);
+            set(expected, Provider_TwoPoint.LONG_OF_1ST_POINT, values, longitudeOf1stPoint);
+            set(expected, Provider_TwoPoint.LAT_OF_2ND_POINT, values, latitudeOf2ndPoint);
+            set(expected, Provider_TwoPoint.LONG_OF_2ND_POINT, values, longitudeOf2ndPoint);
+        } else {
+            set(expected, Provider.LAT_OF_CENTRE, values, latitudeOfCentre);
+            set(expected, Provider.LONG_OF_CENTRE, values, longitudeOfCentre);
+            set(expected, Provider.AZIMUTH, values, alpha_c );
+            set(expected, Provider.RECTIFIED_GRID_ANGLE, values, rectGridAngle);
+        }
+        return values;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected Point2D transformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException 
+    {
+        double u, v;
+        if (Math.abs(Math.abs(y) - Math.PI/2.0) > EPS) {
+            double Q = E / Math.pow(tsfn(y, Math.sin(y)), B);
+            double temp = 1.0 / Q;
+            double S = 0.5 * (Q - temp);
+            double V = Math.sin(B * x);
+            double U = (S * singamma0 - V * cosgamma0) / (0.5 * (Q + temp));
+            if (Math.abs(Math.abs(U) - 1.0) < EPS) {
+                throw new ProjectionException(Resources.format(ResourceKeys.ERROR_V_INFINITE));
+            }
+            v = 0.5 * ArB * Math.log((1.0 - U) / (1.0 + U));
+            temp = Math.cos(B * x);
+            if (Math.abs(temp) < TOL) {
+                u = AB * x;
+            } else {
+                u = ArB * Math.atan2((S * cosgamma0 + V * singamma0), temp);
+            }   
+        } else {
+            v = y > 0 ? v_pole_n : v_pole_s;
+	    u = ArB * y;
+        }
+        
+        u -= u_c;
+	x = v * cosrot + u * sinrot;
+	y = u * cosrot - v * sinrot;
+
+        if (ptDst != null) {
+            ptDst.setLocation(x,y);
+            return ptDst;
+        }
+        return new Point2D.Double(x,y);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
+            throws ProjectionException 
+    {
+	double v = x * cosrot - y * sinrot;
+        double u = y * cosrot + x * sinrot + u_c;
+        
+        double Qp = Math.exp(-BrA * v);
+        double temp = 1.0 / Qp;
+        double Sp = 0.5 * (Qp - temp);
+        double Vp = Math.sin(BrA * u);
+        double Up = (Vp * cosgamma0 + Sp * singamma0) / (0.5 * (Qp + temp));
+        if (Math.abs(Math.abs(Up) - 1.0) < EPS) {
+            x = 0.0;
+            y = Up < 0.0 ? -Math.PI / 2.0 : Math.PI / 2.0;
+        } else {
+            y = Math.pow(E / Math.sqrt((1. + Up) / (1. - Up)), 1.0 / B);  //calculate t
+            y = cphi2(y);
+            x = -Math.atan2((Sp * cosgamma0 - Vp * singamma0), Math.cos(BrA * u)) / B;
+        }
+
+        if (ptDst != null) {
+            ptDst.setLocation(x,y);
+            return ptDst;
+        }
+        return new Point2D.Double(x,y);
+    }    
+
+    /**
+     * Maximal error (in metres) tolerated for assertion, if enabled.
+     *
+     * @param  longitude The longitude in degrees.
+     * @param  latitude The latitude in degrees.
+     * @return The tolerance level for assertions, in meters.
+     */
+    protected double getToleranceForAssertions(final double longitude, final double latitude) {
+        if (Math.abs(longitude - centralMeridian)/2 +
+            Math.abs(latitude  - latitudeOfCentre) > 10)
+        {
+            // When far from the valid area, use a larger tolerance.
+            return 1;
+        }
+        return super.getToleranceForAssertions(longitude, latitude);
+    }
+    
+    /**
+     * Returns a hash value for this projection.
+     */
+    public int hashCode() {
+        long code =      Double.doubleToLongBits(latitudeOfCentre);
+        code = code*37 + Double.doubleToLongBits(longitudeOfCentre);
+        code = code*37 + Double.doubleToLongBits(alpha_c);
+        code = code*37 + Double.doubleToLongBits(rectGridAngle);
+        code = code*37 + Double.doubleToLongBits(latitudeOf1stPoint);
+        code = code*37 + Double.doubleToLongBits(latitudeOf2ndPoint);
+        return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
+    }
+
+    /**
+     * Compares the specified object with this map projection for equality.
+     */
+    public boolean equals(final Object object) {
+        if (object == this) {
+            // Slight optimization
+            return true;
+        }
+        if (super.equals(object)) {
+            final ObliqueMercator that = (ObliqueMercator) object;
+            return equals(this.latitudeOfCentre   , that.latitudeOfCentre   ) &&
+                   equals(this.longitudeOfCentre  , that.longitudeOfCentre  ) &&
+                   equals(this.alpha_c            , that.alpha_c            ) &&
+                   equals(this.rectGridAngle      , that.rectGridAngle      ) &&
+                   equals(this.u_c                , that.u_c                ) &&
+		   equals(this.latitudeOf1stPoint , that.latitudeOf1stPoint ) &&
+	           equals(this.longitudeOf1stPoint, that.longitudeOf1stPoint) &&
+		   equals(this.latitudeOf2ndPoint , that.latitudeOf2ndPoint ) &&
+		   equals(this.longitudeOf2ndPoint, that.longitudeOf2ndPoint) &&
+                   this.twoPoint == that.twoPoint &&
+                   this.hotine   == that.hotine;
+        }
+        return false;
+    }
+    
+    
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
     
     /**
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
@@ -620,313 +938,5 @@ public class ObliqueMercator extends MapProjection {
             final Collection descriptors = PARAMETERS.descriptors();
             return new ObliqueMercator(parameters, descriptors, true, true);
         }
-
-    }
-    
-    /**
-     * Constructs a new map projection from the supplied parameters.
-     *
-     * @param  parameters The parameter values in standard units.
-     * @param  expected The expected parameter descriptors.
-     * @throws ParameterNotFoundException if a mandatory parameter is missing.
-     */
-    ObliqueMercator(final ParameterValueGroup parameters, final Collection expected,
-                    final boolean hotine, final boolean twoPoint) 
-            throws ParameterNotFoundException 
-    {
-        //Fetch parameters 
-        super(parameters, expected);
-        
-        this.hotine = hotine;
-        this.twoPoint = twoPoint;
-        
-        //NaN for safety (centralMeridian calculated below)
-        latitudeOfOrigin = Double.NaN;
-        centralMeridian  = Double.NaN;
-
-        latitudeOfCentre = doubleValue(expected, Provider.LAT_OF_CENTRE, parameters);
-        //checks that latitudeOfCentre is not +- 90 degrees
-        //not checking if latitudeOfCentere is 0, since equations behave correctly
-        ensureLatitudeInRange(Provider.LAT_OF_CENTRE, latitudeOfCentre, false);
-        
-        if (twoPoint) {
-            longitudeOfCentre  = Double.NaN;
-            latitudeOf1stPoint = doubleValue(expected, Provider_TwoPoint.LAT_OF_1ST_POINT, parameters);
-            //checks that latOf1stPoint is not +-90 degrees
-            ensureLatitudeInRange(Provider_TwoPoint.LAT_OF_1ST_POINT, latitudeOf1stPoint, false);
-            longitudeOf1stPoint = doubleValue(expected, Provider_TwoPoint.LONG_OF_1ST_POINT, parameters);
-            ensureLongitudeInRange(Provider_TwoPoint.LONG_OF_1ST_POINT, longitudeOf1stPoint, true);
-            latitudeOf2ndPoint = doubleValue(expected, Provider_TwoPoint.LAT_OF_2ND_POINT, parameters);
-            ensureLatitudeInRange(Provider_TwoPoint.LAT_OF_2ND_POINT, latitudeOf2ndPoint, true);
-            longitudeOf2ndPoint = doubleValue(expected, Provider_TwoPoint.LONG_OF_2ND_POINT, parameters);
-            ensureLongitudeInRange(Provider_TwoPoint.LONG_OF_2ND_POINT, longitudeOf2ndPoint, true);
-            
-            double con = Math.abs(latitudeOf1stPoint);
-            if (Math.abs(latitudeOf1stPoint - latitudeOf2ndPoint) < TOL) {
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_LAT1_EQ_LAT2));
-            }
-            if (Math.abs(latitudeOf1stPoint) < TOL) {
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_LAT1_EQ_ZERO));
-            }
-            if (Math.abs(latitudeOf2ndPoint + Math.PI/2.0) < TOL) {
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_LAT2_EQ_NEG_90));
-            }
-        } else {
-	    latitudeOf1stPoint  = Double.NaN;
-            longitudeOf1stPoint = Double.NaN;
-            latitudeOf2ndPoint  = Double.NaN;
-            longitudeOf2ndPoint = Double.NaN;
-                       
-            longitudeOfCentre = doubleValue(expected, Provider.LONG_OF_CENTRE, parameters);
-            ensureLongitudeInRange(Provider.LONG_OF_CENTRE, longitudeOfCentre, true);
-            
-            alpha_c = doubleValue(expected, Provider.AZIMUTH, parameters);
-            //already checked for +-360 deg. above. 
-            if ((alpha_c > -1.5*Math.PI && alpha_c < -0.5*Math.PI) ||
-                (alpha_c > 0.5*Math.PI && alpha_c < 1.5*Math.PI)) {
-                    throw new IllegalArgumentException(
-                        Resources.format(ResourceKeys.ERROR_VALUE_OUT_OF_BOUNDS_$3,
-                        new Double(Math.toDegrees(alpha_c)), new Double(-90), new Double(90)));
-            }
-            
-            rectGridAngle = doubleValue(expected, Provider.RECTIFIED_GRID_ANGLE, parameters);
-            if (Double.isNaN(rectGridAngle)) {
-                rectGridAngle = alpha_c;
-            }
-        }    
-		       
-        double com = Math.sqrt(1.0-excentricitySquared);
-        double sinphi0 = Math.sin(latitudeOfCentre);
-        double cosphi0 = Math.cos(latitudeOfCentre);
-        B = cosphi0 * cosphi0;
-        B = Math.sqrt(1.0 + excentricitySquared * B * B / (1.0-excentricitySquared));
-        double con = 1.0 - excentricitySquared * sinphi0 * sinphi0;
-        A = B * com / con;
-        double D = B * com / (cosphi0 * Math.sqrt(con));
-        double F = D * D - 1.0;
-        if (F < 0.0) {
-            F = 0.0;
-        } else {
-            F = Math.sqrt(F);
-            if (latitudeOfCentre < 0.0) {  //taking sign of latOfCentre
-                F = -F;
-            }
-        }
-        F = F += D;
-        E = F* Math.pow(tsfn(latitudeOfCentre, sinphi0), B);          
-        
-        double gamma0;
-        if (twoPoint) {
-            double H = Math.pow(tsfn(latitudeOf1stPoint, Math.sin(latitudeOf1stPoint)), B);
-            double L = Math.pow(tsfn(latitudeOf2ndPoint, Math.sin(latitudeOf2ndPoint)), B);
-            double Fp = E / H;
-            double P = (L - H) / (L + H);
-            double J = E * E;
-            J = (J - L * H) / (J + L * H);        
-            double diff = longitudeOf1stPoint - longitudeOf2ndPoint;
-            if (diff < -Math.PI) {
-                longitudeOf2ndPoint -= 2.0* Math.PI;
-            } else if (diff > Math.PI) {
-                longitudeOf2ndPoint += 2.0* Math.PI;
-            }
-            
-            centralMeridian = rollLongitude(0.5 * (longitudeOf1stPoint + longitudeOf2ndPoint) -
-                              Math.atan(J * Math.tan(0.5 * B * (longitudeOf1stPoint - longitudeOf2ndPoint)) / P) / B);
-            gamma0 = Math.atan(2.0 * Math.sin(B * rollLongitude(longitudeOf1stPoint - centralMeridian)) /
-                     (Fp - 1.0 / Fp));
-            alpha_c = Math.asin(D * Math.sin(gamma0));
-            rectGridAngle = alpha_c;
-        } else {
-            gamma0 = Math.asin(Math.sin(alpha_c) / D);
-            //check for asin(+-1.00000001)
-            double temp = 0.5 * (F - 1.0 / F) * Math.tan(gamma0);
-            if (Math.abs(temp) > 1.0) {
-                if (Math.abs(Math.abs(temp) - 1.0) > EPS) {
-                    throw new IllegalArgumentException("Tolerance condition error");
-                }
-                temp = (temp > 0) ? 1.0 : -1.0;
-            }
-            centralMeridian = longitudeOfCentre - Math.asin(temp) / B; 
-        }
-        
-        singamma0 = Math.sin(gamma0);
-        cosgamma0 = Math.cos(gamma0);
-	sinrot = Math.sin(rectGridAngle);
-	cosrot = Math.cos(rectGridAngle);
-        ArB = A/B;
-        AB = A*B;
-        BrA = B/A;
-        v_pole_n = ArB * Math.log(Math.tan(0.5 * (Math.PI/2.0 - gamma0)));
-        v_pole_s = ArB * Math.log(Math.tan(0.5 * (Math.PI/2.0 + gamma0)));
- 
-        if (hotine) {
-            u_c = 0.0;
-        } else {
-            if (Math.abs(Math.abs(alpha_c) - Math.PI/2.0) < TOL) {
-                //longitudeOfCentre = NaN in twopoint, but alpha_c cannot be 90 here (lat1 != lat2)
-                u_c = A * (longitudeOfCentre - centralMeridian);
-            } else {
-                u_c = Math.abs(ArB * Math.atan2(Math.sqrt(D * D - 1.0), Math.cos(alpha_c)));
-                if (latitudeOfCentre < 0.0) {
-                    u_c = -u_c;
-                }
-            }
-        }
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public ParameterDescriptorGroup getParameterDescriptors() {
-        if (hotine) {
-            return (twoPoint) ? Provider_Hotine_TwoPoint.PARAMETERS : Provider_Hotine.PARAMETERS;
-        } else {
-            return (twoPoint) ? Provider_TwoPoint.PARAMETERS : Provider.PARAMETERS;
-        }
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public ParameterValueGroup getParameterValues() {
-        final ParameterValueGroup values = super.getParameterValues();
-        final Collection expected = getParameterDescriptors().descriptors();
-        if (twoPoint) {
-            set(expected, Provider_TwoPoint.LAT_OF_CENTRE, values, latitudeOfCentre);
-            set(expected, Provider_TwoPoint.LAT_OF_1ST_POINT, values, latitudeOf1stPoint);
-            set(expected, Provider_TwoPoint.LONG_OF_1ST_POINT, values, longitudeOf1stPoint);
-            set(expected, Provider_TwoPoint.LAT_OF_2ND_POINT, values, latitudeOf2ndPoint);
-            set(expected, Provider_TwoPoint.LONG_OF_2ND_POINT, values, longitudeOf2ndPoint);
-        } else {
-            set(expected, Provider.LAT_OF_CENTRE, values, latitudeOfCentre);
-            set(expected, Provider.LONG_OF_CENTRE, values, longitudeOfCentre);
-            set(expected, Provider.AZIMUTH, values, alpha_c );
-            set(expected, Provider.RECTIFIED_GRID_ANGLE, values, rectGridAngle);
-        }
-        return values;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected Point2D transformNormalized(double x, double y, Point2D ptDst)
-            throws ProjectionException 
-    {
-        double u, v;
-        if (Math.abs(Math.abs(y) - Math.PI/2.0) > EPS) {
-            double Q = E / Math.pow(tsfn(y, Math.sin(y)), B);
-            double temp = 1.0 / Q;
-            double S = 0.5 * (Q - temp);
-            double V = Math.sin(B * x);
-            double U = (S * singamma0 - V * cosgamma0) / (0.5 * (Q + temp));
-            if (Math.abs(Math.abs(U) - 1.0) < EPS) {
-                throw new ProjectionException(Resources.format(ResourceKeys.ERROR_V_INFINITE));
-            }
-            v = 0.5 * ArB * Math.log((1.0 - U) / (1.0 + U));
-            temp = Math.cos(B * x);
-            if (Math.abs(temp) < TOL) {
-                u = AB * x;
-            } else {
-                u = ArB * Math.atan2((S * cosgamma0 + V * singamma0), temp);
-            }   
-        } else {
-            v = y > 0 ? v_pole_n : v_pole_s;
-	    u = ArB * y;
-        }
-        
-        u -= u_c;
-	x = v * cosrot + u * sinrot;
-	y = u * cosrot - v * sinrot;
-
-        if (ptDst != null) {
-            ptDst.setLocation(x,y);
-            return ptDst;
-        }
-        return new Point2D.Double(x,y);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
-    {
-	double v = x * cosrot - y * sinrot;
-        double u = y * cosrot + x * sinrot + u_c;
-        
-        double Qp = Math.exp(-BrA * v);
-        double temp = 1.0 / Qp;
-        double Sp = 0.5 * (Qp - temp);
-        double Vp = Math.sin(BrA * u);
-        double Up = (Vp * cosgamma0 + Sp * singamma0) / (0.5 * (Qp + temp));
-        if (Math.abs(Math.abs(Up) - 1.0) < EPS) {
-            x = 0.0;
-            y = Up < 0.0 ? -Math.PI / 2.0 : Math.PI / 2.0;
-        } else {
-            y = Math.pow(E / Math.sqrt((1. + Up) / (1. - Up)), 1.0 / B);  //calculate t
-            y = cphi2(y);
-            x = -Math.atan2((Sp * cosgamma0 - Vp * singamma0), Math.cos(BrA * u)) / B;
-        }
-
-        if (ptDst != null) {
-            ptDst.setLocation(x,y);
-            return ptDst;
-        }
-        return new Point2D.Double(x,y);
-    }    
-
-    /**
-     * Maximal error (in metres) tolerated for assertion, if enabled.
-     *
-     * @param  longitude The longitude in degrees.
-     * @param  latitude The latitude in degrees.
-     * @return The tolerance level for assertions, in meters.
-     */
-    protected double getToleranceForAssertions(final double longitude, final double latitude) {
-        if (Math.abs(longitude - centralMeridian)/2 +
-            Math.abs(latitude  - latitudeOfCentre) > 10)
-        {
-            // When far from the valid area, use a larger tolerance.
-            return 1;
-        }
-        return super.getToleranceForAssertions(longitude, latitude);
-    }
-    
-    /**
-     * Returns a hash value for this projection.
-     */
-    public int hashCode() {
-        long code =      Double.doubleToLongBits(latitudeOfCentre);
-        code = code*37 + Double.doubleToLongBits(longitudeOfCentre);
-        code = code*37 + Double.doubleToLongBits(alpha_c);
-        code = code*37 + Double.doubleToLongBits(rectGridAngle);
-        code = code*37 + Double.doubleToLongBits(latitudeOf1stPoint);
-        code = code*37 + Double.doubleToLongBits(latitudeOf2ndPoint);
-        return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
-    }
-
-    /**
-     * Compares the specified object with this map projection for equality.
-     */
-    public boolean equals(final Object object) {
-        if (object == this) {
-            // Slight optimization
-            return true;
-        }
-        if (super.equals(object)) {
-            final ObliqueMercator that = (ObliqueMercator) object;
-            return equals(this.latitudeOfCentre   , that.latitudeOfCentre   ) &&
-                   equals(this.longitudeOfCentre  , that.longitudeOfCentre  ) &&
-                   equals(this.alpha_c            , that.alpha_c            ) &&
-                   equals(this.rectGridAngle      , that.rectGridAngle      ) &&
-                   equals(this.u_c                , that.u_c                ) &&
-		   equals(this.latitudeOf1stPoint , that.latitudeOf1stPoint ) &&
-	           equals(this.longitudeOf1stPoint, that.longitudeOf1stPoint) &&
-		   equals(this.latitudeOf2ndPoint , that.latitudeOf2ndPoint ) &&
-		   equals(this.longitudeOf2ndPoint, that.longitudeOf2ndPoint) &&
-                   this.twoPoint == that.twoPoint &&
-                   this.hotine   == that.hotine;
-        }
-        return false;
     }
 }

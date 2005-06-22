@@ -54,13 +54,13 @@ import org.geotools.resources.cts.Resources;
  * It is also often used for maritime navigation because all the straight lines on the chart are
  * <em>loxodrome</em> lines, i.e. a ship following this line would keep a constant azimuth on its
  * compass.
- * <br><br>
+ * <p>
  *
  * This implementation handles both the 1 and 2 stardard parallel cases.
  * For {@code Mercator_1SP} (EPSG code 9804), the line of contact is the equator. 
  * For {@code Mercator_2SP} (EPSG code 9805) lines of contact are symmetrical 
  * about the equator.
- * <br><br>
+ * <p>
  *
  * <strong>References:</strong><ul>
  *   <li>John P. Snyder (Map Projections - A Working Manual,<br>
@@ -86,140 +86,6 @@ public class Mercator extends MapProjection {
      * Set to {@link Double#NaN} for the {@code Mercator_1SP} case.
      */
     protected final double standardParallel;
-
-    /**
-     * The {@link MathTransformProvider} for a {@link Mercator} 1SP projection.
-     *
-     * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on Remote Sensing</A>
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     * @author Rueben Schulz
-     */
-    public static final class Provider1SP extends AbstractProvider {
-        /**
-         * The parameters group.
-         */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Mercator_1SP"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Mercator (1SP)"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9804"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
-            }, new ParameterDescriptor[] {
-                SEMI_MAJOR,       SEMI_MINOR,
-                CENTRAL_MERIDIAN, SCALE_FACTOR,
-                FALSE_EASTING,    FALSE_NORTHING
-            });
-
-        /**
-         * Constructs a new provider. 
-         */
-        public Provider1SP() {
-            super(PARAMETERS);
-        }
-
-        /**
-         * Returns the operation type for this map projection.
-         */
-        protected Class getOperationType() {
-            return CylindricalProjection.class;
-        }
-
-        /**
-         * Creates a transform from the specified group of parameter values.
-         *
-         * @param  parameters The group of parameter values.
-         * @return The created math transform.
-         * @throws ParameterNotFoundException if a required parameter was not found.
-         */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters)
-                throws ParameterNotFoundException
-        {
-            final Collection descriptors = PARAMETERS.descriptors();
-            if (isSpherical(parameters)) {
-                return new Spherical(parameters, descriptors);
-            } else {
-                return new Mercator (parameters, descriptors);
-            }
-        }
-    }
-
-    /**
-     * The {@link MathTransformProvider} for a {@link Mercator} 2SP projection.
-     *
-     * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on Remote Sensing</A>
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     * @author Rueben Schulz
-     */
-    public static final class Provider2SP extends AbstractProvider {
-        /**
-         * The operation parameter descriptor for the {@link #standardParallel standard parallel}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
-         */
-        public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
-                },
-                0, -90, 90, NonSI.DEGREE_ANGLE);
-
-        /**
-         * The parameters group.
-         */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Mercator_2SP"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Mercator (2SP)"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9805"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Mercator"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
-            }, new ParameterDescriptor[] {
-                SEMI_MAJOR,       SEMI_MINOR,
-                CENTRAL_MERIDIAN, STANDARD_PARALLEL,
-                FALSE_EASTING,    FALSE_NORTHING
-            });
-
-        /**
-         * Constructs a new provider. 
-         */
-        public Provider2SP() {
-            super(PARAMETERS);
-        }
-
-        /**
-         * Returns the operation type for this map projection.
-         */
-        protected Class getOperationType() {
-            return CylindricalProjection.class;
-        }
-
-        /**
-         * Creates a transform from the specified group of parameter values.
-         *
-         * @param  parameters The group of parameter values.
-         * @return The created math transform.
-         * @throws ParameterNotFoundException if a required parameter was not found.
-         */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters)
-                throws ParameterNotFoundException
-        {
-            final Collection descriptors = PARAMETERS.descriptors();
-            if (isSpherical(parameters)) {
-                return new Spherical(parameters, descriptors);
-            } else {
-                return new Mercator (parameters, descriptors);
-            }
-        }
-    }
-
 
     /**
      * Constructs a new map projection from the supplied parameters.
@@ -431,4 +297,148 @@ public class Mercator extends MapProjection {
         }
         return false;
     } 
+    
+    
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The {@link MathTransformProvider} for a {@link Mercator} 1SP projection.
+     *
+     * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on Remote Sensing</A>
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     * @author Rueben Schulz
+     */
+    public static final class Provider1SP extends AbstractProvider {
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
+                new NamedIdentifier(CitationImpl.OGC,      "Mercator_1SP"),
+                new NamedIdentifier(CitationImpl.EPSG,     "Mercator (1SP)"),
+                new NamedIdentifier(CitationImpl.EPSG,     "9804"),
+                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
+            }, new ParameterDescriptor[] {
+                SEMI_MAJOR,       SEMI_MINOR,
+                CENTRAL_MERIDIAN, SCALE_FACTOR,
+                FALSE_EASTING,    FALSE_NORTHING
+            });
+
+        /**
+         * Constructs a new provider. 
+         */
+        public Provider1SP() {
+            super(PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return CylindricalProjection.class;
+        }
+
+        /**
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  parameters The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+                throws ParameterNotFoundException
+        {
+            final Collection descriptors = PARAMETERS.descriptors();
+            if (isSpherical(parameters)) {
+                return new Spherical(parameters, descriptors);
+            } else {
+                return new Mercator (parameters, descriptors);
+            }
+        }
+    }
+
+    /**
+     * The {@link MathTransformProvider} for a {@link Mercator} 2SP projection.
+     *
+     * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on Remote Sensing</A>
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     * @author Rueben Schulz
+     */
+    public static final class Provider2SP extends AbstractProvider {
+        /**
+         * The operation parameter descriptor for the {@link #standardParallel standard parallel}
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         */
+        public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
+                new NamedIdentifier[] {
+                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
+                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
+                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
+                },
+                0, -90, 90, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
+                new NamedIdentifier(CitationImpl.OGC,      "Mercator_2SP"),
+                new NamedIdentifier(CitationImpl.EPSG,     "Mercator (2SP)"),
+                new NamedIdentifier(CitationImpl.EPSG,     "9805"),
+                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
+                new NamedIdentifier(CitationImpl.ESRI,     "Mercator"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
+            }, new ParameterDescriptor[] {
+                SEMI_MAJOR,       SEMI_MINOR,
+                CENTRAL_MERIDIAN, STANDARD_PARALLEL,
+                FALSE_EASTING,    FALSE_NORTHING
+            });
+
+        /**
+         * Constructs a new provider. 
+         */
+        public Provider2SP() {
+            super(PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return CylindricalProjection.class;
+        }
+
+        /**
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  parameters The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+                throws ParameterNotFoundException
+        {
+            final Collection descriptors = PARAMETERS.descriptors();
+            if (isSpherical(parameters)) {
+                return new Spherical(parameters, descriptors);
+            } else {
+                return new Mercator (parameters, descriptors);
+            }
+        }
+    }
 }

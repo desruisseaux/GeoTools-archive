@@ -33,6 +33,7 @@ import java.sql.SQLException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.ref.SoftReference;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -56,6 +57,7 @@ import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.EvaluationMethodType;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -117,6 +119,7 @@ import org.geotools.referencing.operation.DefaultTransformation;
 import org.geotools.referencing.operation.DefaultConversion;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.referencing.operation.projection.MapProjection;
+import org.geotools.referencing.operation.transform.MolodenskiTransform;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.cts.Resources;
@@ -224,12 +227,11 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             default:   throw new FactoryException("Unexpected parameter code: "+code);
                        // TODO: localize.
         }
-        /*
-         * NOTE: THERE IS A FEW MORE HARD-CODED CONSTANTS IN createBursaWolfParameters(...).
-         *       Namely: minimum and maximum operation method code (9603 and 9607 respectively)
-         *       and coordinate rotation frame operation method code (9607).
-         */
     }
+    /// Datum shift operation methods
+    /** First Bursa-Wolf method. */ private static final int BURSA_WOLF_MIN_CODE = 9603;
+    /**  Last Bursa-Wolf method. */ private static final int BURSA_WOLF_MAX_CODE = 9607;
+    /**   Rotation frame method. */ private static final int ROTATION_FRAME_CODE = 9607;
 
     /**
      * List of tables and columns to test for codes values.
@@ -303,6 +305,28 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                       "COORD_OP_METHOD_NAME",
                       null, null, null)
     };
+
+    /**
+     * Implicit parameters for projections. The EPSG database do not provides explicit values
+     * for them, since they are inferred from the CRS ellipsoid.
+     */
+    private static final List IMPLICIT_PROJECTION_PARAMETERS = Arrays.asList(new ParameterDescriptor[] {
+            MapProjection.AbstractProvider.SEMI_MAJOR,
+            MapProjection.AbstractProvider.SEMI_MINOR
+    });
+
+    /**
+     * Implicit parameters for datum shift. The EPSG database do not provides explicit values
+     * for them, since they are inferred from the CRS ellipsoid.
+     */
+    private static final List IMPLICIT_DATUM_SHIFT_PARAMETERS = Arrays.asList(new ParameterDescriptor[] {
+            MolodenskiTransform.Provider.SRC_DIM,
+            MolodenskiTransform.Provider.TGT_DIM,
+            MolodenskiTransform.Provider.SRC_SEMI_MAJOR,
+            MolodenskiTransform.Provider.SRC_SEMI_MINOR,
+            MolodenskiTransform.Provider.TGT_SEMI_MAJOR,
+            MolodenskiTransform.Provider.TGT_SEMI_MINOR
+    });
 
     ///////////////////////////////////////////////////////////////////////////////
     ////////                                                               ////////
@@ -540,10 +564,6 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * @throws FactoryException if access to the underlying database failed.
      *
      * @since 2.2
-     *
-     * @todo Current implementation do not differentiate {@link Projection} from {@link Conversion}.
-     *       We would need some callback mechanism for invoking the private {@code isProjection}
-     *       method.
      */
     public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
         return getAuthorityCodes0(type);
@@ -1326,27 +1346,32 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         List list = null;
         PreparedStatement stmt;
         stmt = prepareStatement("BursaWolfParametersSet",
-                                         "SELECT MIN(CO.COORD_OP_CODE),"
-                                 +             " MIN(CO.COORD_OP_METHOD_CODE),"
+                                         "SELECT CO.COORD_OP_CODE,"
+                                 +             " CO.COORD_OP_METHOD_CODE,"
                                  +             " CRS2.DATUM_CODE"
                                  +      " FROM ([Coordinate_Operation] AS CO"
                                  + " INNER JOIN [Coordinate Reference System] AS CRS1"
                                  +          " ON CO.SOURCE_CRS_CODE = CRS1.COORD_REF_SYS_CODE)"
                                  + " INNER JOIN [Coordinate Reference System] AS CRS2"
                                  +          " ON CO.TARGET_CRS_CODE = CRS2.COORD_REF_SYS_CODE"
-                                 +       " WHERE CO.COORD_OP_METHOD_CODE >= 9603"
-                                 +         " AND CO.COORD_OP_METHOD_CODE <= 9607"
+                                 +       " WHERE CO.COORD_OP_METHOD_CODE >= " + BURSA_WOLF_MIN_CODE
+                                 +         " AND CO.COORD_OP_METHOD_CODE <= " + BURSA_WOLF_MAX_CODE
                                  +         " AND CRS1.DATUM_CODE = ?"
-                                 +    " GROUP BY CRS2.DATUM_CODE");
+                                 +    " ORDER BY CRS2.DATUM_CODE, CO.COORD_OP_ACCURACY");
         stmt.setString(1, code);
         ResultSet result = stmt.executeQuery();
+        String last = code;
         while (result.next()) {
-            if (list == null) {
-                list = new ArrayList();
+            final String operation = getString(result, 1, code);
+            final int    method    = getInt   (result, 2, code);
+            final String datum     = getString(result, 3, code);
+            if (!datum.equals(last)) {
+                if (list == null) {
+                    list = new ArrayList();
+                }
+                list.add(new Info(operation, method, datum));
+                last = datum;
             }
-            list.add(new Info(getString(result, 1, code),
-                              getInt   (result, 2, code),
-                              getString(result, 3, code)));
         }
         result.close();
         if (list == null) {
@@ -1386,8 +1411,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                   buffered.createUnit(getString(result, 3, info.operation)));
             }
             result.close();
-            if (info.method == 9607) {
-                // Coordinate frame rotation: same as 9606,
+            if (info.method == ROTATION_FRAME_CODE) {
+                // Coordinate frame rotation (9607): same as 9606,
                 // except for the sign of rotation parameters.
                 parameters.ex = -parameters.ex;
                 parameters.ey = -parameters.ey;
@@ -1789,8 +1814,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                         final String opScope   = result.getString( 3);
                         final String opCode    = getString(result, 4, conversion);
                         final String opRemarks = result.getString( 5);
-                        method = (OperationMethod) ensureSingleton(createOperationMethod(
-                                                   opCode, conversion, 2, 2, true), method, code);
+                        method = (OperationMethod) ensureSingleton(createOperationMethod(opCode,
+                                 conversion, 2, 2, IMPLICIT_PROJECTION_PARAMETERS), method, code);
                         properties = createProperties(name, epsg, area, scope, remarks);
                         assert prefix.length() == 0 : prefix;
                         try {
@@ -1902,19 +1927,18 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      *
      * @param  method       The EPSG code for the operation method.
      * @param  operation    The EPSG code for the operation (conversion or transformation).
-     * @param  isProjection {@code true} if we should automatically add "semi_major" and
-     *                      "semi_minor" parameters to the list of parameters to be returned.
+     * @param  implicit     List of implicit parameters to add (e.g. "semi_major" and
+     *                      "semi_minor"), or {@code null} if none.
      * @return The parameter descriptors.
      */
-    private ParameterDescriptor[] createParameters(final String  method,
-                                                   final String  operation,
-                                                   final boolean isProjection)
+    private ParameterDescriptor[] createParameters(final String method,
+                                                   final String operation,
+                                                   final List   implicit)
             throws SQLException, FactoryException
     {
         final List descriptors = new ArrayList();
-        if (isProjection) {
-            descriptors.add(MapProjection.AbstractProvider.SEMI_MAJOR);
-            descriptors.add(MapProjection.AbstractProvider.SEMI_MINOR);
+        if (implicit != null) {
+            descriptors.addAll(implicit);
         }
         final PreparedStatement stmt;
         stmt = prepareStatement("Parameters",
@@ -1968,15 +1992,15 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * @param  operation        The EPSG code for the operation (conversion or transformation).
      * @param  sourceDimensions The source dimensions for the coordinate operation to be created.
      * @param  targetDimensions The target dimensions for the coordinate operation to be created.
-     * @param  isProjection     {@code true} if we should automatically add "semi_major" and
-     *                          "semi_minor" parameters to the list of parameters to be returned.
+     * @param  implicit         List of implicit parameters to add (e.g. "semi_major" and
+     *                          "semi_minor"), or {@code null} if none.
      * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
      */
     private OperationMethod createOperationMethod(final String code,
                                                   final String operation,
                                                   final int sourceDimensions,
                                                   final int targetDimensions,
-                                                  final boolean isProjection)
+                                                  final List implicit)
             throws SQLException, FactoryException
     {
         OperationMethod returnValue = null;
@@ -1995,7 +2019,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             final String formula = result.getString( 2);
             final String remarks = result.getString( 3);
             if (descriptors == null) {
-                descriptors = createParameters(code, operation, isProjection);
+                descriptors = createParameters(code, operation, implicit);
             }
             final Map properties = createProperties(name, code, remarks);
             if (formula != null) {
@@ -2104,7 +2128,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 targetCRS = (targetCode!=null) ? buffered.createCoordinateReferenceSystem(targetCode) : null;
                 /*
                  * Creates common properties. While 'version' and 'accuracy' should be defined
-                 * for transformations only, we still checks them for all operation just in case.
+                 * for transformations only, we still checks them for all operations just in case.
                  */
                 final Map properties = createProperties(name, epsg, area, scope, remarks);
                 if (version!=null && (version=version.trim()).length()!=0) {
@@ -2139,7 +2163,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     method = createOperationMethod(methodCode, epsg,
                              (sourceCRS!=null) ? sourceCRS.getCoordinateSystem().getDimension() : 2,
                              (targetCRS!=null) ? targetCRS.getCoordinateSystem().getDimension() : 2,
-                             isConversion ? isProjection(epsg) : false);
+                             isConversion && isProjection(epsg) ? IMPLICIT_PROJECTION_PARAMETERS : null);
                     parameters = (ParameterValueGroup) method.getParameters().createValue();
                     // ParameterDescriptor's default values are actual parameter values.
                 } else {
@@ -2147,8 +2171,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     parameters = null;
                 }
                 /*
-                 * Creates the operation. Conversions are the only operations allowed to have null
-                 * source and target CRS.
+                 * Creates the operation. Conversions should be the only operations allowed to
+                 * have null source and target CRS. In such case, the operation is a defining
+                 * conversion (usually to be used later as part of a ProjectedCRS creation).
                  */
                 final CoordinateOperation operation;
                 if (isConversion && (sourceCRS==null || targetCRS==null)) {
@@ -2160,6 +2185,44 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     ((ConcatenatedOperationFactory) operationFactory).init(properties, sourceCode, targetCode);
                     operation = operationFactory.createOperation(sourceCRS, targetCRS);
                 } else {
+                    /*
+                     * Needs to create a math transform. A special processing is performed for
+                     * datum shift methods, since the conversion from ellipsoid to geocentric
+                     * for "geocentric translations" is implicit in the EPSG database. Even in
+                     * the case of Molodenski transforms, the axis length to set are the same.
+                     */
+                    final int asNumeric;
+                    try {
+                        asNumeric = Integer.parseInt(methodCode);
+                    } catch (NumberFormatException exception) {
+                        result.close();
+                        throw new FactoryException(exception);
+                    }
+                    if (asNumeric>=BURSA_WOLF_MIN_CODE && asNumeric<=BURSA_WOLF_MIN_CODE) try {
+                        Ellipsoid ellipsoid = CRSUtilities.getHeadGeoEllipsoid(sourceCRS);
+                        if (ellipsoid != null) {
+                            final Unit axisUnit = ellipsoid.getAxisUnit();
+                            parameters.parameter("src_semi_major").setValue(ellipsoid.getSemiMajorAxis(), axisUnit);
+                            parameters.parameter("src_semi_minor").setValue(ellipsoid.getSemiMinorAxis(), axisUnit);
+                            parameters.parameter("src_dim").setValue(sourceCRS.getCoordinateSystem().getDimension());
+                        }
+                        ellipsoid = CRSUtilities.getHeadGeoEllipsoid(targetCRS);
+                        if (ellipsoid != null) {
+                            final Unit axisUnit = ellipsoid.getAxisUnit();
+                            parameters.parameter("tgt_semi_major").setValue(ellipsoid.getSemiMajorAxis(), axisUnit);
+                            parameters.parameter("tgt_semi_minor").setValue(ellipsoid.getSemiMinorAxis(), axisUnit);
+                            parameters.parameter("tgt_dim").setValue(targetCRS.getCoordinateSystem().getDimension());
+                        }
+                    } catch (ParameterNotFoundException exception) {
+                        // TODO: localize
+                        result.close();
+                        throw new FactoryException("Geotools extensions required for \""+
+                                method.getName().getCode()+"\" method.", exception);
+                    }
+                    /*
+                     * At this stage, the parameters are ready for use. Creates the math transform
+                     * and wraps it in the final operation (a Conversion or a Transformation).
+                     */
                     final MathTransform mt;
                     mt = factories.createBaseToDerived(sourceCRS, parameters,
                                                        targetCRS.getCoordinateSystem(), null);
@@ -2205,38 +2268,57 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         final String pair = sourceCode + " \u21E8 " + targetCode;
         final Set set = new LinkedHashSet();
         try {
-            final PreparedStatement stmt;
             final String sourceKey = toPrimaryKey(sourceCode);
             final String targetKey = toPrimaryKey(targetCode);
-            stmt = prepareStatement("FromCRS", "SELECT COORD_OP_CODE"
-                                          +    " FROM [Coordinate_Operation]"
-                                          +    " WHERE SOURCE_CRS_CODE = ? "
-                                          +      " AND TARGET_CRS_CODE = ? "
-                                          + " ORDER BY COORD_TFM_VERSION");
-            stmt.setString(1, sourceKey);
-            stmt.setString(2, targetKey);
-            final ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                final String code = getString(result, 1, pair);
-                final CoordinateOperation operation;
-                try {
-                    operation = buffered.createCoordinateOperation(code);
-                } catch (NoSuchIdentifierException exception) {
-                    /*
-                     * The operation uses an unsupported math transform.
-                     * Log as a warning and search for other operations.
-                     * TODO: localize
-                     */
-                    final LogRecord record = new LogRecord(Level.WARNING,
-                            "Operation \""+code+"\" uses an unsupported method.");
-                    record.setSourceClassName("FactoryUsingSQL");
-                    record.setSourceMethodName("createFromCoordinateReferenceSystemCodes");
-                    record.setThrown(exception);
-                    LOGGER.log(record);
-                    continue;
+            boolean searchTransformations = false;
+            do {
+                /*
+                 * This 'do' loop is executed twice: the first time for searching defining
+                 * conversions, and the second time for searching all other kind of operations.
+                 * Defining conversions are searched first because they are, by definition, the
+                 * most accurate operations.
+                 */
+                final String key, sql;
+                if (searchTransformations) {
+                    key = "TransformationFromCRS";
+                    sql = "SELECT COORD_OP_CODE"
+                        +    " FROM [Coordinate_Operation]"
+                        +    " WHERE SOURCE_CRS_CODE = ?"
+                        +      " AND TARGET_CRS_CODE = ?"
+                        + " ORDER BY COORD_TFM_VERSION";
+                } else {
+                    key = "ConversionFromCRS";
+                    sql = "SELECT PROJECTION_CONV_CODE"
+                        +    " FROM [Coordinate Reference System]"
+                        +    " WHERE SOURCE_GEOGCRS_CODE = ?"
+                        +      " AND COORD_REF_SYS_CODE = ?";
                 }
-                set.add(operation);
-            }
+                final PreparedStatement stmt = prepareStatement(key, sql);
+                stmt.setString(1, sourceKey);
+                stmt.setString(2, targetKey);
+                final ResultSet result = stmt.executeQuery();
+                while (result.next()) {
+                    final String code = getString(result, 1, pair);
+                    final CoordinateOperation operation;
+                    try {
+                        operation = buffered.createCoordinateOperation(code);
+                    } catch (NoSuchIdentifierException exception) {
+                        /*
+                         * The operation uses an unsupported math transform.
+                         * Log as a warning and search for other operations.
+                         * TODO: localize
+                         */
+                        final LogRecord record = new LogRecord(Level.WARNING,
+                                "Operation \""+code+"\" uses an unsupported method.");
+                        record.setSourceClassName("FactoryUsingSQL");
+                        record.setSourceMethodName("createFromCoordinateReferenceSystemCodes");
+                        record.setThrown(exception);
+                        LOGGER.log(record);
+                        continue;
+                    }
+                    set.add(operation);
+                }
+            } while ((searchTransformations = !searchTransformations) == true);
         } catch (SQLException exception) {
             throw databaseFailure(CoordinateOperation.class, pair, exception);
         }

@@ -38,6 +38,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.parameter.ParameterWriter;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.resources.Arguments;
 
 
 /**
@@ -50,10 +51,10 @@ import org.geotools.referencing.FactoryFinder;
  */
 public class ProjectionTest extends TestCase {
     /**
-     * Set to <code>true</code> for printing some informations to standard output
-     * while performing tests.
+     * Set to <code>true</code> for printing some informations to standard output while
+     * performing tests. Consider this field as constants after the application launch.
      */
-    private static final boolean VERBOSE = false;
+    private static boolean VERBOSE = false;
     
     /** tolerance for test when units are degrees*/
     private final static double[] TOL_DEG = {1E-6,1E-6};
@@ -67,7 +68,7 @@ public class ProjectionTest extends TestCase {
     /**
      * Construct a test with the given name.
      */
-    public ProjectionTest(String name) {
+    public ProjectionTest(final String name) {
         super(name);
     }
     
@@ -82,7 +83,10 @@ public class ProjectionTest extends TestCase {
     /**
      * Runs the tests with the textual test runner.
      */
-    public static void main(String args[]) {
+    public static void main(final String args[]) {
+        final Arguments arguments = new Arguments(args);
+        VERBOSE = arguments.getFlag("-verbose");
+        arguments.getRemainingArguments(0);
         junit.textui.TestRunner.run(suite());
     }
     

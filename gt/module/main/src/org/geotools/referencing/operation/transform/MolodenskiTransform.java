@@ -539,7 +539,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * NOTE: If this default value is modified, then the handling of the 3D cases
          * must be adjusted.
          */
-        static final int DEFAULT_DIM = GeocentricAffineTransform.Provider.DEFAULT_DIM;
+        static final int DEFAULT_DIM = GeocentricTranslation.Provider.DEFAULT_DIM;
 
         /**
          * The number of geographic dimension (2 or 3). This argument applies on
@@ -554,42 +554,42 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * The number of source geographic dimension (2 or 3).
          * This is a Geotools-specific argument.
          *
-         * @todo Not yet used. See GEOT-411.
+         * @todo Not yet used by this provider. See GEOT-411.
          */
-        static final ParameterDescriptor SRC_DIM = GeocentricAffineTransform.Provider.SRC_DIM;
+        public static final ParameterDescriptor SRC_DIM = GeocentricTranslation.Provider.SRC_DIM;
 
         /**
          * The number of target geographic dimension (2 or 3).
          * This is a Geotools-specific argument.
          *
-         * @todo Not yet used. See GEOT-411
+         * @todo Not yet used by this provider. See GEOT-411.
          */
-        static final ParameterDescriptor TGT_DIM = GeocentricAffineTransform.Provider.TGT_DIM;
+        public static final ParameterDescriptor TGT_DIM = GeocentricTranslation.Provider.TGT_DIM;
 
         /**
          * The operation parameter descriptor for the <cite>X-axis translation</cite> ("dx")
          * parameter value. Valid values range from -infinity to infinity. Units are meters.
          */
-        public static final ParameterDescriptor DX = GeocentricAffineTransform.Provider.DX;
+        public static final ParameterDescriptor DX = GeocentricTranslation.Provider.DX;
 
         /**
          * The operation parameter descriptor for the <cite>Y-axis translation</cite> ("dy")
          * parameter value. Valid values range from -infinity to infinity. Units are meters.
          */
-        public static final ParameterDescriptor DY = GeocentricAffineTransform.Provider.DY;
+        public static final ParameterDescriptor DY = GeocentricTranslation.Provider.DY;
 
         /**
          * The operation parameter descriptor for the <cite>Z-axis translation</cite> ("dz")
          * parameter value. Valid values range from -infinity to infinity. Units are meters.
          */
-        public static final ParameterDescriptor DZ = GeocentricAffineTransform.Provider.DZ;
+        public static final ParameterDescriptor DZ = GeocentricTranslation.Provider.DZ;
 
         /**
          * The operation parameter descriptor for the "src_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
         public static final ParameterDescriptor SRC_SEMI_MAJOR = createDescriptor(
-                identifiers(GeocentricAffineTransform.Provider.SRC_SEMI_MAJOR),
+                identifiers(GeocentricTranslation.Provider.SRC_SEMI_MAJOR),
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
@@ -597,7 +597,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * Valid values range from 0 to infinity.
          */
         public static final ParameterDescriptor SRC_SEMI_MINOR = createDescriptor(
-                identifiers(GeocentricAffineTransform.Provider.SRC_SEMI_MINOR),
+                identifiers(GeocentricTranslation.Provider.SRC_SEMI_MINOR),
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
@@ -605,7 +605,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * Valid values range from 0 to infinity.
          */
         public static final ParameterDescriptor TGT_SEMI_MAJOR = createDescriptor(
-                identifiers(GeocentricAffineTransform.Provider.TGT_SEMI_MAJOR),
+                identifiers(GeocentricTranslation.Provider.TGT_SEMI_MAJOR),
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
@@ -613,7 +613,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * Valid values range from 0 to infinity.
          */
         public static final ParameterDescriptor TGT_SEMI_MINOR = createDescriptor(
-                identifiers(GeocentricAffineTransform.Provider.TGT_SEMI_MINOR),
+                identifiers(GeocentricTranslation.Provider.TGT_SEMI_MINOR),
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /** Helper method for parameter descriptor creation. */

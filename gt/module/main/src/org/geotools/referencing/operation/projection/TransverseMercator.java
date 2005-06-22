@@ -23,7 +23,7 @@
  *    This package contains formulas from the PROJ package of USGS.
  *    USGS's work is fully acknowledged here.
  */
-/* 
+/*
  * Some parts Copyright (c) 2000, Frank Warmerdam
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -47,10 +47,12 @@
 package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -61,6 +63,8 @@ import org.opengis.referencing.operation.MathTransform;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
@@ -72,16 +76,16 @@ import org.geotools.resources.cts.Resources;
  * are going futher from the central meridian. The Transverse Mercator
  * projection is appropriate for region wich have a greater extent north-south
  * than east-west.
- * <br><br>
+ * <p>
  *
  * The elliptical equations used here are series approximations, and their accuracy
  * decreases as points move farther from the central meridian of the projection.
- * The forward equations here are accurate to a less than a mm +- 10 degrees from 
- * the central meridian, a few mm +- 15 degrees from the 
- * central meridian and a few cm +- 20 degrees from the central meridian.
+ * The forward equations here are accurate to a less than a mm &plusmn;10 degrees from 
+ * the central meridian, a few mm &plusmn;15 degrees from the 
+ * central meridian and a few cm &plusmn;20 degrees from the central meridian.
  * The spherical equations are not approximations and should always give the 
  * correct values.
- * <br><br>
+ * <p>
  *
  * There are a number of versions of the transverse mercator projection 
  * including the Universal (UTM) and Modified (MTM) Transverses Mercator 
@@ -92,12 +96,12 @@ import org.geotools.resources.cts.Resources;
  * and the latitude of origin is the equator. A scale factor of 0.9996 and 
  * false easting of 500000m is used for all zones and a false northing of 10000000m
  * is used for zones in the southern hemisphere.
- * <br><br>
+ * <p>
  *
  * NOTE: formulas used below are not those of Snyder, but rather those
  *       from the {@code proj4} package of the USGS survey, which
  *       have been reproduced verbatim. USGS work is acknowledged here.
- * <br><br>
+ * <p>
  *
  * <strong>References:</strong><ul>
  *   <li> Proj-4.4.6 available at <A HREF="http://www.remotesensing.org/proj">www.remotesensing.org/proj</A><br>
@@ -173,71 +177,6 @@ public class TransverseMercator extends MapProjection {
      * overrides the value in the MapProjection class.
      */
     private static final double TOL = 1E-11;
-
-    /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for a {@link TransverseMercator} projection.
-     *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     * @author Rueben Schulz
-     */
-    public static final class Provider extends AbstractProvider {
-        /**
-         * The parameters group.
-         * @task REVISIT: should we set some default UTM parameter values
-         */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Transverse_Mercator"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Transverse Mercator"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Gauss-Kruger"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9807"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_TransverseMercator"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Transverse_Mercator"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.TRANSVERSE_MERCATOR_PROJECTION))
-            }, new ParameterDescriptor[] {
-                SEMI_MAJOR,       SEMI_MINOR,
-                CENTRAL_MERIDIAN, LATITUDE_OF_ORIGIN,
-                SCALE_FACTOR,     FALSE_EASTING,
-                FALSE_NORTHING
-            });
-
-        /**
-         * Constructs a new provider. 
-         */
-        public Provider() {
-            super(PARAMETERS);
-        }
-
-        /**
-         * Returns the operation type for this map projection.
-         */
-        protected Class getOperationType() {
-            return CylindricalProjection.class;
-        }
-
-        /**
-         * Creates a transform from the specified group of parameter values.
-         *
-         * @param  parameters The group of parameter values.
-         * @return The created math transform.
-         * @throws ParameterNotFoundException if a required parameter was not found.
-         */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters)
-                throws ParameterNotFoundException
-        {
-            final Collection descriptors = PARAMETERS.descriptors();
-            if (isSpherical(parameters)) {
-                return new Spherical(parameters, descriptors);
-            } else {
-                return new TransverseMercator(parameters, descriptors);
-            }
-        }
-    }
-    
     
     /**
      * Constructs a new map projection from the supplied parameters.
@@ -573,7 +512,7 @@ public class TransverseMercator extends MapProjection {
         t -= 360*Math.floor((t+180)/360); // Bring back into [-180..+180] range.
         return t;
     }
-    
+
     /**
      * Convenience method computing the zone code from the central meridian.
      *
@@ -584,16 +523,16 @@ public class TransverseMercator extends MapProjection {
     public int getZone() {
         //UTM
         if (scaleFactor == 0.9996 && falseEasting == 500000.0) {
-            return(getZone(-177, 6));
+            return getZone(-177, 6);
         }
         //MTM
         if (scaleFactor == 0.9999 && falseEasting == 304800.0){
-            return(getZone(-52.5, -3));
+            return getZone(-52.5, -3);
         }
         //unknown (TODO: localize the error message)
         throw new IllegalStateException("Unknow projection type.");
     }
-    
+
     /**
      * Convenience method returning the meridian in the middle of
      * current zone. This meridian is typically the central meridian.
@@ -607,16 +546,16 @@ public class TransverseMercator extends MapProjection {
     public double getCentralMeridian() {
         //UTM
         if (scaleFactor == 0.9996 && falseEasting == 500000.0) {
-            return(getCentralMedirian(-177, 6));
+            return getCentralMedirian(-177, 6);
         }
         //MTM
         if (scaleFactor == 0.9999 && falseEasting == 304800.0){
-            return(getCentralMedirian(-52.5, -3));
+            return getCentralMedirian(-52.5, -3);
         }
         //unknown (TODO: localize the error message)
         throw new IllegalStateException("Unknow projection type.");
-    } 
-    
+    }
+
     /**
      * Returns a hash value for this projection.
      */
@@ -624,10 +563,9 @@ public class TransverseMercator extends MapProjection {
         final long code = Double.doubleToLongBits(ml0);
         return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
     }
-    
+
     /**
-     * Compares the specified object with
-     * this map projection for equality.
+     * Compares the specified object with this map projection for equality.
      */
     public boolean equals(final Object object) {
         if (object == this) {
@@ -636,5 +574,163 @@ public class TransverseMercator extends MapProjection {
         }
         // Relevant parameters are already compared in MapProjection
         return super.equals(object);
+    }
+    
+    
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDER                                 ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The {@link org.geotools.referencing.operation.MathTransformProvider}
+     * for a {@link TransverseMercator} projection.
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     * @author Rueben Schulz
+     *
+     * @since 2.1
+     */
+    public static class Provider extends AbstractProvider {
+        /**
+         * Returns a descriptor group for the specified parameters.
+         */
+        static ParameterDescriptorGroup createDescriptorGroup(final Identifier[] identifiers) {
+            return createDescriptorGroup(identifiers, new ParameterDescriptor[] {
+                SEMI_MAJOR,       SEMI_MINOR,
+                CENTRAL_MERIDIAN, LATITUDE_OF_ORIGIN,
+                SCALE_FACTOR,     FALSE_EASTING,
+                FALSE_NORTHING
+            });
+        }
+
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
+                new NamedIdentifier(CitationImpl.OGC,      "Transverse_Mercator"),
+                new NamedIdentifier(CitationImpl.EPSG,     "Transverse Mercator"),
+                new NamedIdentifier(CitationImpl.EPSG,     "Gauss-Kruger"),
+                new NamedIdentifier(CitationImpl.EPSG,     "9807"),
+                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_TransverseMercator"),
+                new NamedIdentifier(CitationImpl.ESRI,     "Transverse_Mercator"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.TRANSVERSE_MERCATOR_PROJECTION))
+            });
+
+        /**
+         * Constructs a new provider.
+         */
+        public Provider() {
+            super(PARAMETERS);
+        }
+
+        /**
+         * Constructs a new provider with the specified parameters.
+         */
+        Provider(final ParameterDescriptorGroup descriptor) {
+            super(descriptor);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return CylindricalProjection.class;
+        }
+
+        /**
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  parameters The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+                throws ParameterNotFoundException
+        {
+            final Collection descriptors = PARAMETERS.descriptors();
+            if (isSpherical(parameters)) {
+                return new Spherical(parameters, descriptors);
+            } else {
+                return new TransverseMercator(parameters, descriptors);
+            }
+        }
+    }
+
+    /**
+     * The {@link org.geotools.referencing.operation.MathTransformProvider} for a South Orientated
+     * {@link TransverseMercator} projection (EPSG code 9808). Note that at the contrary of what
+     * this class name suggest, the projected coordinates are still increasing toward North. This
+     * is because all {@link MapProjection}s must complies with standard axis orientations. The
+     * real axis flip is performed by the CRS framework outside this package.
+     * See "<cite>Axis units and orientation</cite>" in
+     * {@linkplain org.geotools.referencing.operation.projection package description} for details.
+     * <p>
+     * The usual Transverse Mercator formulas are:
+     * <p>
+     * <ul>
+     *   <li><var>easting</var> = <var>{@linkplain #falseEasting false easting}</var> + <var>px</var></li>
+     *   <li><var>northing</var> = <var>{@linkplain #falseNorthing false northing}</var> + <var>py</var></li>
+     * </ul>
+     * <p>
+     * The Transverse Mercator South Orientated Projection formulas are:
+     * <p>
+     * <ul>
+     *   <li><var>westing</var> = <var>{@linkplain #falseEasting false easting}</var> - <var>px</var></li>
+     *   <li><var>southing</var> = <var>{@linkplain #falseNorthing false northing}</var> - <var>py</var></li>
+     * </ul>
+     * <p>
+     * Where the <var>px</var> and <var>py</var> terms are the same in both cases.
+     * Transforms created by this provider actually computes
+     * (<var>easting</var>,<var>northing</var>) = (-<var>westing</var>,-<var>southing</var>).
+     * This is equivalent to a {@link TransverseMercator} projection with
+     * {@link #falseEasting falseEasting} and {@link #falseNorthing falseNorthing} sign reverted.
+     * This operation is implemented as a concatenation of a North-orientated transverse mercator
+     * projection with an affine transform for (<var>false easting</var>,<var>false northing</var>)
+     * correction.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     *
+     * @since 2.2
+     */
+    public static final class Provider_SouthOrientated extends Provider {
+        /**
+         * Constructs a new provider.
+         */
+        public Provider_SouthOrientated() {
+            super(createDescriptorGroup(new NamedIdentifier[] {
+                new NamedIdentifier(CitationImpl.EPSG, "Transverse Mercator (South Orientated)"),
+                new NamedIdentifier(CitationImpl.EPSG, "9808")
+            }));
+        }
+
+        /**
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  parameters The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+                throws ParameterNotFoundException
+        {
+            final MapProjection projection = (MapProjection) super.createMathTransform(parameters);
+            if (projection.falseEasting==0 && projection.falseNorthing==0) {
+                return projection;
+            }
+            final AffineTransform step = AffineTransform.getTranslateInstance(
+                    -2*projection.falseEasting, -2*projection.falseNorthing);
+            return ConcatenatedTransform.create(ProjectiveTransform.create(step), projection);
+        }
     }
 }

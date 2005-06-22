@@ -48,7 +48,7 @@ import org.geotools.resources.cts.Resources;
  * but the areas and the lengths become increasingly deformed as one moves away from
  * the center.  This projection is used to represent polar areas.  It can be adapted
  * for other areas having a circular form.
- * <br><br>
+ * <p>
  *
  * This implementation, and its subclasses, provides transforms for six cases of the  
  * stereographic projection:
@@ -67,31 +67,31 @@ import org.geotools.resources.cts.Resources;
  * transformation of the geographic coordinates to a sphere and 2) a spherical
  * Stereographic projection. The EPSG considers both methods to be valid, but 
  * considers them to be a different coordinate operation methods.
- * <br><br>
+ * <p>
  *
  * The <code>"Stereographic"</code> case uses the USGS equations of Snyder.
  * This employs a simplified conversion to the conformal sphere that computes 
  * the conformal latitude of each point on the sphere.
- * <br><br>
+ * <p>
  *
  * The <code>"Oblique_Stereographic"</code> case uses equations from the EPSG.
  * This uses a more generalized form of the conversion to the conformal sphere; using only 
  * a single conformal sphere at the origin point. Since this is a "double" projection,
  * it is sometimes called the "Double Stereographic". The <code>"Oblique_Stereographic"</code>
  * is used in New Brunswick (Canada) and the Netherlands.
- * <br><br>
+ * <p>
  *
  * The <code>"Stereographic"</code> and <code>"Double Stereographic"</code> names are used in
  * ESRI's ArcGIS 8.x product. The <code>"Oblique_Stereographic"</code> name is the EPSG name
  * for the later only.
- * <br><br>
+ * <p>
  *
  * <strong>WARNING:</strong> Tests points calculated with ArcGIS's "Double Stereographic" are
  * not always equal to points calculated with the <code>"Oblique_Stereographic"</code>.
  * However, where there are differences, two different implementations of these equations
  * (EPSG guidence note 7 and libproj) calculate the same values as we do. Until these 
  * differences are resolved, please be careful when using this projection.
- * <br><br>
+ * <p>
  *
  * If a <code>"latitude_of_origin"</code> parameter is supplied and is not consistent with the
  * projection classification (for example a latitude different from &plusmn;90° for the polar case),
@@ -99,20 +99,20 @@ import org.geotools.resources.cts.Resources;
  * words, the latitude of origin has precedence on the projection classification. If ommited,
  * then the default value is 90°N for <code>"Polar_Stereographic"</code> and 0° for
  * <code>"Oblique_Stereographic"</code>.
- * <br><br>
+ * <p>
  *
  * Polar projections that use the series equations for the inverse calculation will
  * be little bit faster, but may be a little bit less accurate. If a polar 
  * "latitude_of_origin" is used for the "Oblique_Stereographic" or "Stereographic",
  * the itterative equations will be used for inverse polar calculations.
- * <br><br>
+ * <p>
  *
  * The "Polar Stereographic (variant B)", "Stereographic_North_Pole", and 
  * "Stereographic_South_Pole" cases include a "standard_parallel_1" parameter.
  * This parameter sets the latitude with a scale factor equal to the supplied
  * scale factor. The "Polar Stereographic (variant B)" recieves its "latitude_of_origin"
  * paramater value from the hemisphere of the "standard_parallel_1" value.
- * <br><br>
+ * <p>
  *
  * <strong>References:</strong><ul>
  *   <li>John P. Snyder (Map Projections - A Working Manual,<br>
@@ -161,6 +161,54 @@ public abstract class Stereographic extends MapProjection {
      * The type of stereographic projection, used for wkt parameters.
      */
     protected short stereoType;
+    
+    /**
+     * Creates a transform from the specified group of parameter values.
+     *
+     * @param  parameters The group of parameter values.
+     * @param  expected The expected parameter descriptors.
+     * @return The created math transform.
+     * @throws ParameterNotFoundException if a required parameter was not found.
+     */
+    Stereographic(final ParameterValueGroup parameters, final Collection expected) 
+            throws ParameterNotFoundException
+    {
+        //Fetch parameters 
+        super(parameters, expected);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        switch (stereoType) {
+            case EPSG: 
+                return Provider_Oblique.PARAMETERS;
+            case USGS:
+                return Provider_USGS.PARAMETERS;
+            case POLAR_A:
+                return Provider_Polar_A.PARAMETERS;
+            case POLAR_B:
+                return Provider_Polar_B.PARAMETERS;
+            case POLAR_NORTH:
+                return Provider_North_Pole.PARAMETERS;
+            case POLAR_SOUTH:
+                return Provider_South_Pole.PARAMETERS;
+            default:
+                assert false; return null;
+        }
+    }
+    
+    
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
     
     /**
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
@@ -594,44 +642,6 @@ public abstract class Stereographic extends MapProjection {
                     return new StereographicOblique(parameters, descriptors, USGS);
                 }
             }
-        }
-    }
-    
-    
-    /**
-     * Creates a transform from the specified group of parameter values.
-     *
-     * @param  parameters The group of parameter values.
-     * @param  expected The expected parameter descriptors.
-     * @return The created math transform.
-     * @throws ParameterNotFoundException if a required parameter was not found.
-     */
-    Stereographic(final ParameterValueGroup parameters, final Collection expected) 
-            throws ParameterNotFoundException
-    {
-        //Fetch parameters 
-        super(parameters, expected);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public ParameterDescriptorGroup getParameterDescriptors() {
-        switch (stereoType) {
-            case EPSG: 
-                return Provider_Oblique.PARAMETERS;
-            case USGS:
-                return Provider_USGS.PARAMETERS;
-            case POLAR_A:
-                return Provider_Polar_A.PARAMETERS;
-            case POLAR_B:
-                return Provider_Polar_B.PARAMETERS;
-            case POLAR_NORTH:
-                return Provider_North_Pole.PARAMETERS;
-            case POLAR_SOUTH:
-                return Provider_South_Pole.PARAMETERS;
-            default:
-                assert false; return null;
         }
     }
 } 

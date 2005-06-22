@@ -47,9 +47,12 @@ import org.geotools.resources.cts.Resources;
 
 /**
  * An affine transform applied on {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric}
- * coordinates. This include the following:
+ * coordinates. While "geocentric translation" is a little bit more restrictive name, it describes
+ * the part which is common to all instances of this class. A rotation may also be performed in
+ * addition of the translation, but the rotation sign is operation-dependent (EPSG 9606 and 9607
+ * have opposite sign). This transform is used for the following operations:
  * <p>
- * <table>
+ * <table border="1">
  *   <tr><th>EPSG name</th>                               <th>EPSG code</th></tr>
  *   <tr><td>Geocentric translations</td>                 <td>9603</td></tr>
  *   <tr><td>Position Vector 7-param. transformation</td> <td>9606</td></tr>
@@ -58,7 +61,7 @@ import org.geotools.resources.cts.Resources;
  * <p>
  * The conversion between geographic and geocentric coordinates is usually not <strong>not</strong>
  * part of this transform. However, the Geotools implementation of the
- * {@linkplain GeocentricAffineTransform.Provider provider} accepts the following extensions:
+ * {@linkplain GeocentricTranslation.Provider provider} accepts the following extensions:
  * <p>
  * <ul>
  *   <li>If {@code "src_semi_major"} and {@code "src_semi_minor"} parameters are provided, then
@@ -72,7 +75,7 @@ import org.geotools.resources.cts.Resources;
  *
  * @since 2.2
  */
-public class GeocentricAffineTransform extends ProjectiveTransform {
+public class GeocentricTranslation extends ProjectiveTransform {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -88,7 +91,7 @@ public class GeocentricAffineTransform extends ProjectiveTransform {
      * then this transform will be of kind "<cite>Geocentric translations</cite>". Otherwise, it
      * will be of kind "<cite>Position Vector 7-param. transformation</cite>".
      */
-    public GeocentricAffineTransform(final BursaWolfParameters parameters) {
+    public GeocentricTranslation(final BursaWolfParameters parameters) {
         this(parameters, parameters.isTranslation() ?
                          Provider.PARAMETERS : SevenParamProvider.PARAMETERS);
     }
@@ -96,8 +99,8 @@ public class GeocentricAffineTransform extends ProjectiveTransform {
     /**
      * Creates a new geocentric affine transform using the specified parameter descriptor.
      */
-    GeocentricAffineTransform(final BursaWolfParameters      parameters,
-                              final ParameterDescriptorGroup descriptor)
+    GeocentricTranslation(final BursaWolfParameters      parameters,
+                          final ParameterDescriptorGroup descriptor)
     {
         super(parameters.getAffineTransform());
         this.descriptor = descriptor;
@@ -106,8 +109,8 @@ public class GeocentricAffineTransform extends ProjectiveTransform {
     /**
      * Creates a new geocentric affine transform using the specified parameter descriptor.
      */
-    private GeocentricAffineTransform(final Matrix matrix,
-                                      final ParameterDescriptorGroup descriptor)
+    private GeocentricTranslation(final Matrix matrix,
+                                  final ParameterDescriptorGroup descriptor)
     {
         super(matrix);
         this.descriptor = descriptor;
@@ -149,7 +152,7 @@ public class GeocentricAffineTransform extends ProjectiveTransform {
      * Creates an inverse transform using the specified matrix.
      */
     MathTransform createInverse(final Matrix matrix) {
-        return new GeocentricAffineTransform(matrix, descriptor);
+        return new GeocentricTranslation(matrix, descriptor);
     }
 
     /**
@@ -166,14 +169,14 @@ public class GeocentricAffineTransform extends ProjectiveTransform {
      */
     public boolean equals(final Object object) {
         if (super.equals(object)) {
-            final GeocentricAffineTransform that = (GeocentricAffineTransform) object;
+            final GeocentricTranslation that = (GeocentricTranslation) object;
             return Utilities.equals(this.descriptor, that.descriptor);
         }
         return false;
     }
 
     /**
-     * Base class for {@linkplain GeocentricAffineTransform geocentric affine transform} providers.
+     * Base class for {@linkplain GeocentricTranslation geocentric affine transform} providers.
      * This base class is the provider for the "<cite>Geocentric translations</cite>" operation
      * (EPSG code 9603). The translation terms are the same for the 2 derived operations,
      * "<cite>Position Vector 7-param. transformation</cite>" and
@@ -338,7 +341,7 @@ public class GeocentricAffineTransform extends ProjectiveTransform {
         {
             final BursaWolfParameters parameters = new BursaWolfParameters(null);
             fill(parameters, values);
-            return concatenate(concatenate(new GeocentricAffineTransform(parameters),
+            return concatenate(concatenate(new GeocentricTranslation(parameters),
                                values, SRC_SEMI_MAJOR, SRC_SEMI_MINOR, SRC_DIM),
                                values, TGT_SEMI_MAJOR, TGT_SEMI_MINOR, TGT_DIM);
         }
@@ -398,7 +401,7 @@ public class GeocentricAffineTransform extends ProjectiveTransform {
     }
 
     /**
-     * Base class for {@linkplain GeocentricAffineTransform geocentric affine transform} providers
+     * Base class for {@linkplain GeocentricTranslation geocentric affine transform} providers
      * with rotation terms. This base class is the provider for the "<cite>Position Vector 7-param.
      * transformation</cite>".
      *
@@ -511,7 +514,7 @@ public class GeocentricAffineTransform extends ProjectiveTransform {
     }
 
     /**
-     * {@linkplain GeocentricAffineTransform Feocentric affine transform} provider for
+     * {@linkplain GeocentricTranslation Geocentric affine transform} provider for
      * "<cite>Coordinate Frame rotation</cite>".
      *
      * @version $Id$

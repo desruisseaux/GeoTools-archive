@@ -324,12 +324,12 @@ public class StereographicOblique extends Stereographic {
      * The formulas used below are not from the EPSG, but rather those of the 
      * "Oblique Stereographic Alternative" in the {@code libproj4} package 
      * written by Gerald Evenden. His work is acknowledged here and greatly appreciated. 
-     * <br><br>
+     * <p>
      * 
      * The forward equations used in libproj4 are the same as those given in the 
      * UNB reports for the Double Stereographic. The inverse equations are similar,
      * but use different methods to itterate for the lattitude.
-     * <br><br>
+     * <p>
      * 
      * <strong>References:</strong><ul>
      *   <li>{@code libproj4} is available at

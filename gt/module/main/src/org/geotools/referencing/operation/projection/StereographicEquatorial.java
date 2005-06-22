@@ -208,6 +208,5 @@ public class StereographicEquatorial extends StereographicOblique {
             }
             return new Point2D.Double(x,y);
         }
-    }
-    
+    }    
 }

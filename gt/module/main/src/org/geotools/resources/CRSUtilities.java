@@ -435,7 +435,7 @@ public final class CRSUtilities {
             }
             return null;
         }
-        // Remove first cast when covariance will be allowed.
+        // Remove first cast when covariance will be allowed (J2SE 1.5).
         return ((GeodeticDatum) ((GeographicCRS) crs).getDatum()).getEllipsoid();
     }
 

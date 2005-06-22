@@ -1,9 +1,9 @@
 org.geotools.referencing.operation.transform.LogarithmicTransform1D$Provider
 org.geotools.referencing.operation.transform.ExponentialTransform1D$Provider
 org.geotools.referencing.operation.transform.ProjectiveTransform$Provider
-org.geotools.referencing.operation.transform.GeocentricAffineTransform$Provider
-org.geotools.referencing.operation.transform.GeocentricAffineTransform$SevenParamProvider
-org.geotools.referencing.operation.transform.GeocentricAffineTransform$FrameRotationProvider
+org.geotools.referencing.operation.transform.GeocentricTranslation$Provider
+org.geotools.referencing.operation.transform.GeocentricTranslation$SevenParamProvider
+org.geotools.referencing.operation.transform.GeocentricTranslation$FrameRotationProvider
 org.geotools.referencing.operation.transform.GeocentricTransform$Provider
 org.geotools.referencing.operation.transform.GeocentricTransform$ProviderInverse
 org.geotools.referencing.operation.transform.MolodenskiTransform$Provider
@@ -13,6 +13,7 @@ org.geotools.referencing.operation.transform.WarpTransform2D$Provider
 org.geotools.referencing.operation.projection.Mercator$Provider1SP
 org.geotools.referencing.operation.projection.Mercator$Provider2SP
 org.geotools.referencing.operation.projection.TransverseMercator$Provider
+org.geotools.referencing.operation.projection.TransverseMercator$Provider_SouthOrientated
 org.geotools.referencing.operation.projection.ObliqueMercator$Provider
 org.geotools.referencing.operation.projection.ObliqueMercator$Provider_Hotine
 org.geotools.referencing.operation.projection.ObliqueMercator$Provider_TwoPoint

@@ -370,7 +370,7 @@ public class StereographicPolar extends Stereographic {
      * <code>"latitude_true_scale"<code> parameter to be used, but this
      * parameter is not listed by the EPSG and is not given as a parameter
      * by the provider.
-     * <br><br>
+     * <p>
      * Compared to the default {@link PolarStereographic} implementation, the series
      * implementation is a little bit faster at the expense of a little bit less
      * accuracy. The default {@link PolarStereographic} implementation implementation

@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -349,7 +350,8 @@ public class ParametersTest extends TestCase {
     /**
      * Test parameter values group.
      */
-    public void testGroup() {
+    public void testGroup() throws IOException {
+        final ParameterWriter writer = new ParameterWriter(new StringWriter());
         final Integer ONE = new Integer(1);
         final ParameterDescriptor p1, p2, p3, p4;
         p1 = new DefaultParameterDescriptor(Collections.singletonMap("name", "1"), Integer.class, null, ONE, null, null, null, true);
@@ -392,6 +394,7 @@ public class ParametersTest extends TestCase {
         group      = new ParameterGroup(properties, new Parameter[] {v1, v2, v3});
         descriptor = (ParameterDescriptorGroup) group.getDescriptor();
         content    = descriptor.descriptors();
+        writer.format(group); // Ensure there is no exception there.
         assertEquals("name", "group", descriptor.getName().getCode());
         assertEquals("descriptors", 3, content.size());
         assertTrue  ("contains(p1)",  content.contains(p1));
@@ -461,6 +464,7 @@ public class ParametersTest extends TestCase {
         descriptor = (ParameterDescriptorGroup) group.getDescriptor();
         content    = group.values();
         automatic  = (Parameter) v3.getDescriptor().createValue(); // Remove cast with J2SE 1.5
+        writer.format(group); // Ensure there is no exception there.
         assertEquals   ("values.size()", 2, content.size());
         assertTrue     ("contains(v1)",     content.contains(v1 ));
         assertTrue     ("contains(v2)",     content.contains(v2 ));
@@ -526,6 +530,7 @@ public class ParametersTest extends TestCase {
         descriptor = (ParameterDescriptorGroup) group.getDescriptor();
         content    = group.values();
         automatic  = (Parameter) v3.getDescriptor().createValue(); // Remove cast with J2SE 1.5
+        writer.format(group); // Ensure there is no exception there.
         assertEquals   ("values.size()", 4, content.size());
         assertTrue     ("contains(v1)",     content.contains(v1 ));
         assertFalse    ("contains(v2)",     content.contains(v2 ));
@@ -573,6 +578,7 @@ public class ParametersTest extends TestCase {
         group      = new ParameterGroup(properties, new Parameter[] {v1, v2});
         descriptor = (ParameterDescriptorGroup) group.getDescriptor();
         content    = descriptor.descriptors();
+        writer.format(group); // Ensure there is no exception there.
         assertEquals("name", "group", descriptor.getName().getCode());
         assertEquals("descriptors.size()", 2, content.size());
         assertTrue  ("contains(p1)",          content.contains(p1));
@@ -614,6 +620,7 @@ public class ParametersTest extends TestCase {
         group      = new ParameterGroup(properties, new Parameter[] {v1, v3});
         descriptor = (ParameterDescriptorGroup) group.getDescriptor();
         content    = descriptor.descriptors();
+        writer.format(group); // Ensure there is no exception there.
         assertEquals("name", "group", descriptor.getName().getCode());
         assertEquals("descriptors.size()", 2, content.size());
         assertTrue  ("contains(p1)",       content.contains(p1));
@@ -651,6 +658,7 @@ public class ParametersTest extends TestCase {
          * Construction tests
          * --------------------------------------------- */
         group = new ParameterGroup(properties, new Parameter[] {v1, v2, v3, v4, v4b});
+        writer.format(group); // Ensure there is no exception there.
         assertEquals("values.size()", 5, group.values().size());
         try {
             new ParameterGroup(properties, new Parameter[] {v1, v2, v3, v3b});

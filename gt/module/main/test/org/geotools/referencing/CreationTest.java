@@ -219,8 +219,17 @@ public class CreationTest extends TestCase {
                 continue;
             }
             if (mt instanceof MapProjection) {
+                /*
+                 * Tests map projection properties. Some tests are ommitted for south-oriented
+                 * map projections, since they are implemented as a concatenation of their North-
+                 * oriented variants with an affine transform.
+                 */
                 out.println(classification);
-                assertEquals(classification, ((MapProjection) mt).getParameterDescriptors().getName().getCode());
+                final boolean southOrientated =
+                        (classification.equalsIgnoreCase("Transverse Mercator (South Orientated)"));
+                if (!southOrientated) {
+                    assertEquals(classification, ((MapProjection) mt).getParameterDescriptors().getName().getCode());
+                }
                 final ProjectedCRS projCRS =
                         new DefaultProjectedCRS("Test", method,
                             DefaultGeographicCRS.WGS84, mt, DefaultCartesianCS.PROJECTED);

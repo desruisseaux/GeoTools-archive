@@ -47,11 +47,11 @@ import org.geotools.resources.cts.Resources;
  * a perspectiove projection from infinite distance. While not useful for 
  * accurate measurements, this projection is useful for pictorial views of the
  * world. Only the spherical form is given here.
- * <br><br>
+ * <p>
  * 
  * NOTE: formulae used below are from a port, to java, of the 
  *       'proj' package of the USGS survey. USGS work is acknowledged here.
- * <br><br>
+ * <p>
  *
  * <strong>References:</strong><ul>
  *   <li> Proj-4.4.7 available at <A HREF="http://www.remotesensing.org/proj">www.remotesensing.org/proj</A><br>
@@ -69,6 +69,51 @@ import org.geotools.resources.cts.Resources;
  * @since 2.1
  */
 public abstract class Orthographic extends MapProjection {
+    /**
+     * Creates a transform from the specified group of parameter values.
+     *
+     * @param  parameters The group of parameter values.
+     * @param  expected The expected parameter descriptors.
+     * @return The created math transform.
+     * @throws ParameterNotFoundException if a required parameter was not found.
+     */
+    Orthographic(final ParameterValueGroup parameters, final Collection expected) 
+            throws ParameterNotFoundException
+    {
+        //Fetch parameters 
+        super(parameters, expected);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return Provider.PARAMETERS;
+    }
+    
+    /**
+     * Compares the specified object with this map projection for equality.
+     */
+    public boolean equals(final Object object) {
+        if (object == this) {
+            // Slight optimization
+            return true;
+        }
+        // Relevant parameters are already compared in MapProjection
+        return super.equals(object);
+    }
+    
+    
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDER                                 ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for a {@link Orthographic} projection.
@@ -143,39 +188,5 @@ public abstract class Orthographic extends MapProjection {
                     ResourceKeys.ERROR_ELLIPTICAL_NOT_SUPPORTED));
             }
         }    
-    }
-    
-    /**
-     * Creates a transform from the specified group of parameter values.
-     *
-     * @param  parameters The group of parameter values.
-     * @param  expected The expected parameter descriptors.
-     * @return The created math transform.
-     * @throws ParameterNotFoundException if a required parameter was not found.
-     */
-    Orthographic(final ParameterValueGroup parameters, final Collection expected) 
-            throws ParameterNotFoundException
-    {
-        //Fetch parameters 
-        super(parameters, expected);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public ParameterDescriptorGroup getParameterDescriptors() {
-        return Provider.PARAMETERS;
-    }
-    
-    /**
-     * Compares the specified object with this map projection for equality.
-     */
-    public boolean equals(final Object object) {
-        if (object == this) {
-            // Slight optimization
-            return true;
-        }
-        // Relevant parameters are already compared in MapProjection
-        return super.equals(object);
     }
 }

@@ -82,7 +82,7 @@ import org.geotools.resources.Utilities;
  * exists for the given code. If such an object exists, it is returned. Otherwise,
  * the object creation is delegated to the {@linkplain AbstractAuthorityFactory authority factory}
  * specified at creation time, and the result is cached in this buffered factory. 
- * <br><br>
+ * <p>
  * Objects are cached by strong references, up to the amount of objects specified at
  * construction time. If a greater amount of objects are cached, the oldest ones will
  * be retained through a {@linkplain WeakReference weak reference} instead of a strong
@@ -286,13 +286,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final IdentifiedObject object;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof IdentifiedObject) {
             object = (IdentifiedObject) cached;
         } else {
             object = getBackingStore().createObject(code);
         }
-        put(code, object);
+        put(key, object);
         return object;
     }
 
@@ -303,13 +304,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final Datum datum;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof Datum) {
             datum = (Datum) cached;
         } else {
             datum = getBackingStore().createDatum(code);
         }
-        put(code, datum);
+        put(key, datum);
         return datum;
     }
 
@@ -320,13 +322,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final EngineeringDatum datum;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof EngineeringDatum) {
             datum = (EngineeringDatum) cached;
         } else {
             datum = getBackingStore().createEngineeringDatum(code);
         }
-        put(code, datum);
+        put(key, datum);
         return datum;
     }
 
@@ -337,13 +340,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final ImageDatum datum;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof ImageDatum) {
             datum = (ImageDatum) cached;
         } else {
             datum = getBackingStore().createImageDatum(code);
         }
-        put(code, datum);
+        put(key, datum);
         return datum;
     }
 
@@ -354,13 +358,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final VerticalDatum datum;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof VerticalDatum) {
             datum = (VerticalDatum) cached;
         } else {
             datum = getBackingStore().createVerticalDatum(code);
         }
-        put(code, datum);
+        put(key, datum);
         return datum;
     }
 
@@ -371,13 +376,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final TemporalDatum datum;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof TemporalDatum) {
             datum = (TemporalDatum) cached;
         } else {
             datum = getBackingStore().createTemporalDatum(code);
         }
-        put(code, datum);
+        put(key, datum);
         return datum;
     }
 
@@ -388,13 +394,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final GeodeticDatum datum;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof GeodeticDatum) {
             datum = (GeodeticDatum) cached;
         } else {
             datum = getBackingStore().createGeodeticDatum(code);
         }
-        put(code, datum);
+        put(key, datum);
         return datum;
     }
 
@@ -405,13 +412,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final Ellipsoid ellipsoid;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof Ellipsoid) {
             ellipsoid = (Ellipsoid) cached;
         } else {
             ellipsoid = getBackingStore().createEllipsoid(code);
         }
-        put(code, ellipsoid);
+        put(key, ellipsoid);
         return ellipsoid;
     }
 
@@ -422,13 +430,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final PrimeMeridian meridian;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof PrimeMeridian) {
             meridian = (PrimeMeridian) cached;
         } else {
             meridian = getBackingStore().createPrimeMeridian(code);
         }
-        put(code, meridian);
+        put(key, meridian);
         return meridian;
     }
 
@@ -439,13 +448,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final Extent extent;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof Extent) {
             extent = (Extent) cached;
         } else {
             extent = getBackingStore().createExtent(code);
         }
-        put(code, extent);
+        put(key, extent);
         return extent;
     }
 
@@ -456,13 +466,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final CoordinateSystem cs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof CoordinateSystem) {
             cs = (CoordinateSystem) cached;
         } else {
             cs = getBackingStore().createCoordinateSystem(code);
         }
-        put(code, cs);
+        put(key, cs);
         return cs;
     }
 
@@ -473,13 +484,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final CartesianCS cs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof CartesianCS) {
             cs = (CartesianCS) cached;
         } else {
             cs = getBackingStore().createCartesianCS(code);
         }
-        put(code, cs);
+        put(key, cs);
         return cs;
     }
 
@@ -490,13 +502,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final PolarCS cs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof PolarCS) {
             cs = (PolarCS) cached;
         } else {
             cs = getBackingStore().createPolarCS(code);
         }
-        put(code, cs);
+        put(key, cs);
         return cs;
     }
 
@@ -507,13 +520,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final CylindricalCS cs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof CylindricalCS) {
             cs = (CylindricalCS) cached;
         } else {
             cs = getBackingStore().createCylindricalCS(code);
         }
-        put(code, cs);
+        put(key, cs);
         return cs;
     }
 
@@ -524,13 +538,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final SphericalCS cs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof SphericalCS) {
             cs = (SphericalCS) cached;
         } else {
             cs = getBackingStore().createSphericalCS(code);
         }
-        put(code, cs);
+        put(key, cs);
         return cs;
     }
 
@@ -541,13 +556,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final EllipsoidalCS cs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof EllipsoidalCS) {
             cs = (EllipsoidalCS) cached;
         } else {
             cs = getBackingStore().createEllipsoidalCS(code);
         }
-        put(code, cs);
+        put(key, cs);
         return cs;
     }
 
@@ -558,13 +574,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final VerticalCS cs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof VerticalCS) {
             cs = (VerticalCS) cached;
         } else {
             cs = getBackingStore().createVerticalCS(code);
         }
-        put(code, cs);
+        put(key, cs);
         return cs;
     }
 
@@ -575,13 +592,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final TimeCS cs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof TimeCS) {
             cs = (TimeCS) cached;
         } else {
             cs = getBackingStore().createTimeCS(code);
         }
-        put(code, cs);
+        put(key, cs);
         return cs;
     }
 
@@ -592,13 +610,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final CoordinateSystemAxis axis;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof CoordinateSystemAxis) {
             axis = (CoordinateSystemAxis) cached;
         } else {
             axis = getBackingStore().createCoordinateSystemAxis(code);
         }
-        put(code, axis);
+        put(key, axis);
         return axis;
     }
 
@@ -609,13 +628,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final Unit unit;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof Unit) {
             unit = (Unit) cached;
         } else {
             unit = getBackingStore().createUnit(code);
         }
-        put(code, unit);
+        put(key, unit);
         return unit;
     }
 
@@ -626,13 +646,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final CoordinateReferenceSystem crs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof CoordinateReferenceSystem) {
             crs = (CoordinateReferenceSystem) cached;
         } else {
             crs = getBackingStore().createCoordinateReferenceSystem(code);
         }
-        put(code, crs);
+        put(key, crs);
         return crs;
     }
 
@@ -643,13 +664,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final CompoundCRS crs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof CompoundCRS) {
             crs = (CompoundCRS) cached;
         } else {
             crs = getBackingStore().createCompoundCRS(code);
         }
-        put(code, crs);
+        put(key, crs);
         return crs;
     }
 
@@ -660,13 +682,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final DerivedCRS crs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof DerivedCRS) {
             crs = (DerivedCRS) cached;
         } else {
             crs = getBackingStore().createDerivedCRS(code);
         }
-        put(code, crs);
+        put(key, crs);
         return crs;
     }
     
@@ -677,13 +700,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final EngineeringCRS crs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof EngineeringCRS) {
             crs = (EngineeringCRS) cached;
         } else {
             crs = getBackingStore().createEngineeringCRS(code);
         }
-        put(code, crs);
+        put(key, crs);
         return crs;
     }
 
@@ -694,13 +718,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final GeographicCRS crs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof GeographicCRS) {
             crs = (GeographicCRS) cached;
         } else {
             crs = getBackingStore().createGeographicCRS(code);
         }
-        put(code, crs);
+        put(key, crs);
         return crs;
     }
 
@@ -711,13 +736,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final GeocentricCRS crs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof GeocentricCRS) {
             crs = (GeocentricCRS) cached;
         } else {
             crs = getBackingStore().createGeocentricCRS(code);
         }
-        put(code, crs);
+        put(key, crs);
         return crs;
     }
 
@@ -728,13 +754,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final ImageCRS crs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof ImageCRS) {
             crs = (ImageCRS) cached;
         } else {
             crs = getBackingStore().createImageCRS(code);
         }
-        put(code, crs);
+        put(key, crs);
         return crs;
     }
 
@@ -745,13 +772,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final ProjectedCRS crs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof ProjectedCRS) {
             crs = (ProjectedCRS) cached;
         } else {
             crs = getBackingStore().createProjectedCRS(code);
         }
-        put(code, crs);
+        put(key, crs);
         return crs;
     }
 
@@ -762,13 +790,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final TemporalCRS crs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof TemporalCRS) {
             crs = (TemporalCRS) cached;
         } else {
             crs = getBackingStore().createTemporalCRS(code);
         }
-        put(code, crs);
+        put(key, crs);
         return crs;
     }
 
@@ -779,13 +808,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final VerticalCRS crs;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof VerticalCRS) {
             crs = (VerticalCRS) cached;
         } else {
             crs = getBackingStore().createVerticalCRS(code);
         }
-        put(code, crs);
+        put(key, crs);
         return crs;
     }
 
@@ -798,13 +828,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final CoordinateOperation operation;
-        final Object cached = get(code);
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
         if (cached instanceof CoordinateOperation) {
             operation = (CoordinateOperation) cached;
         } else {
             operation = getBackingStore().createCoordinateOperation(code);
         }
-        put(code, operation);
+        put(key, operation);
         return operation;
     }
 
@@ -818,7 +849,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final Set/*<CoordinateOperation>*/ operations;
-        final CodePair key = new CodePair(sourceCode, targetCode);
+        final CodePair key = new CodePair(trimAuthority(sourceCode), trimAuthority(targetCode));
         final Object cached = get(key);
         if (cached instanceof CoordinateOperation) {
             operations = (Set/*<CoordinateOperation>*/) cached;
@@ -881,8 +912,8 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      *
      * @todo Consider logging a message here to the finer or finest level.
      */
-    private Object get(final Object code) {
-        Object object = pool.get(code);
+    private Object get(final Object key) {
+        Object object = pool.get(key);
         if (object instanceof Reference) {
             object = ((Reference) object).get();
         }
@@ -896,8 +927,8 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * and 2) Alters the linked hash set order, so that this object is declared as the last
      * one used.
      */
-    private void put(final Object code, final Object object) {
-        pool.put(code, object);
+    private void put(final Object key, final Object object) {
+        pool.put(key, object);
         int toReplace = maxStrongReferences - pool.size();
         if (toReplace > 0) {
             for (final Iterator it=pool.entrySet().iterator(); it.hasNext();) {

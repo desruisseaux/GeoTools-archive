@@ -72,16 +72,16 @@ import org.geotools.resources.cts.Resources;
  * closely spaced at north and south edges of the map. Merideans
  * are equally spaced radii of the same circles and intersect parallels at right 
  * angles. As the name implies, this projection minimizes distortion in areas.
- * <br><br>
+ * <p>
  *
  * The "standard_parallel_2" parameter is optional and will be given the 
  * same value as "standard_parallel_1" if not set (creating a 1 standard parallel
  * projection). 
- * <br><br>
+ * <p>
  *
  * NOTE: formulae used below are from a port, to java, of the 
  *       'proj4' package of the USGS survey. USGS work is acknowledged here.
- * <br><br>
+ * <p>
  *
  * <strong>References:</strong><ul>
  *   <li> Proj-4.4.7 available at <A HREF="http://www.remotesensing.org/proj">www.remotesensing.org/proj</A><br>
@@ -122,89 +122,6 @@ public class AlbersEqualArea extends MapProjection {
      * Standards parallel 2 in radians, for {@link #getParameterValues} implementation.
      */
     private double phi2;
-    
-    /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for a {@link AlbersEqualArea} projection.
-     *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
-     * @version $Id$
-     * @author Rueben Schulz
-     */
-    public static final class Provider extends AbstractProvider {
-        /**
-         * The operation parameter descriptor for the {@link #phi1 standard parallel 1}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
-         */
-        public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
-                },
-                0, -90, 90, NonSI.DEGREE_ANGLE);
-                
-        /**
-         * The operation parameter descriptor for the {@link #phi2 standard parallel 2}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
-         */
-        public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_2"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel2")
-                },
-                -90, 90, NonSI.DEGREE_ANGLE);
-
-        /**
-         * The parameters group.
-         */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Albers_Conic_Equal_Area"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Albers Equal Area"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9822"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_AlbersEqualArea"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Albers"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Albers Equal Area Conic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.ALBERS_EQUAL_AREA_PROJECTION))
-            }, new ParameterDescriptor[] {
-                SEMI_MAJOR,          SEMI_MINOR,
-                CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
-                STANDARD_PARALLEL_1, STANDARD_PARALLEL_2,
-                FALSE_EASTING,       FALSE_NORTHING
-            });
-
-        /**
-         * Constructs a new provider. 
-         */
-        public Provider() {
-            super(PARAMETERS);
-        }
-
-        /**
-         * Returns the operation type for this map projection.
-         */
-        protected Class getOperationType() {
-            return ConicProjection.class;
-        }
-
-        /**
-         * Creates a transform from the specified group of parameter values.
-         *
-         * @param  parameters The group of parameter values.
-         * @return The created math transform.
-         * @throws ParameterNotFoundException if a required parameter was not found.
-         */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters)
-                throws ParameterNotFoundException
-        {
-            final Collection descriptors = PARAMETERS.descriptors();
-            return new AlbersEqualArea(parameters, descriptors);
-        }
-    }
-    
     
     /**
      * Constructs a new map projection from the supplied parameters.
@@ -430,5 +347,98 @@ public class AlbersEqualArea extends MapProjection {
                    equals(this.phi2 , that.phi2);
         }
         return false;
+    }
+    
+    
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDER                                 ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * The {@link org.geotools.referencing.operation.MathTransformProvider}
+     * for a {@link AlbersEqualArea} projection.
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
+     *
+     * @version $Id$
+     * @author Rueben Schulz
+     */
+    public static final class Provider extends AbstractProvider {
+        /**
+         * The operation parameter descriptor for the {@link #phi1 standard parallel 1}
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         */
+        public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
+                new NamedIdentifier[] {
+                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
+                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
+                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
+                },
+                0, -90, 90, NonSI.DEGREE_ANGLE);
+                
+        /**
+         * The operation parameter descriptor for the {@link #phi2 standard parallel 2}
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         */
+        public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
+                new NamedIdentifier[] {
+                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_2"),
+                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
+                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel2")
+                },
+                -90, 90, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
+                new NamedIdentifier(CitationImpl.OGC,      "Albers_Conic_Equal_Area"),
+                new NamedIdentifier(CitationImpl.EPSG,     "Albers Equal Area"),
+                new NamedIdentifier(CitationImpl.EPSG,     "9822"),
+                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_AlbersEqualArea"),
+                new NamedIdentifier(CitationImpl.ESRI,     "Albers"),
+                new NamedIdentifier(CitationImpl.ESRI,     "Albers Equal Area Conic"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.ALBERS_EQUAL_AREA_PROJECTION))
+            }, new ParameterDescriptor[] {
+                SEMI_MAJOR,          SEMI_MINOR,
+                CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
+                STANDARD_PARALLEL_1, STANDARD_PARALLEL_2,
+                FALSE_EASTING,       FALSE_NORTHING
+            });
+
+        /**
+         * Constructs a new provider. 
+         */
+        public Provider() {
+            super(PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return ConicProjection.class;
+        }
+
+        /**
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  parameters The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+                throws ParameterNotFoundException
+        {
+            final Collection descriptors = PARAMETERS.descriptors();
+            return new AlbersEqualArea(parameters, descriptors);
+        }
     }
 }

@@ -65,7 +65,7 @@ import org.geotools.resources.cts.Resources;
  *   <li>{@link #transformNormalized}</li>
  *   <li>{@link #inverseTransformNormalized}</li>
  * </ul>
- * <br><br>
+ * <p>
  * <strong>NOTE:</strong>Serialization of this class is appropriate for short-term storage
  * or RMI use, but will probably not be compatible with future version. For long term storage,
  * WKT (Well Know Text) or XML (not yet implemented) are more appropriate.
@@ -504,7 +504,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * This method returns longitude as <var>x</var> values in the range {@code [-PI..PI]}
      * and latitude as <var>y</var> values in the range {@code [-PI/2..PI/2]}. It will be
      * checked by the caller, so this method doesn't need to performs this check.
-     * <br><br>
+     * <p>
      *
      * Input coordinates are also guarenteed to have the {@link #falseEasting} 
      * and {@link #falseNorthing} removed and be divided by {@link #globalScale}
@@ -512,7 +512,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * {@link #centralMeridian} is added to the {@code x} results 
      * in {@code ptDst}. This means that projections that implement this method 
      * are performed on an ellipse (or sphere) with a semiMajor axis of 1.0.
-     * <br><br>
+     * <p>
      *
      * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same
      * standardization, described above, is handled by {@code pj_inv.c}.
@@ -544,7 +544,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * Transforms the specified coordinate and stores the result in {@code ptDst}.
      * This method is guaranteed to be invoked with values of <var>x</var> in the range
      * {@code [-PI..PI]} and values of <var>y</var> in the range {@code [-PI/2..PI/2]}.
-     * <br><br>
+     * <p>
      * 
      * Coordinates are also guaranteed to have the {@link #centralMeridian} 
      * removed from <var>x</var> before this method is invoked. After this method 
@@ -552,7 +552,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * and the {@link #falseEasting} and {@link #falseNorthing} are added.
      * This means that projections that implement this method are performed on an
      * ellipse (or sphere) with a semiMajor axis of 1.0. 
-     * <br><br>
+     * <p>
      *
      * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same
      * standardization, described above, is handled by {@code pj_fwd.c}.
@@ -581,7 +581,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     
     /**
      * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
-     * <br><br>
+     * <p>
      *
      * This method standardizes the source {@code x} coordinate
      * by removing the {@link #centralMeridian}, before invoking
@@ -743,9 +743,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         }
 
         /**
-         * Inverse transforms the specified {@code ptSrc}
-         * and stores the result in {@code ptDst}.
-         * <br><br>
+         * Inverse transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
+         * <p>
          *
          * This method standardizes the {@code ptSrc} by removing the 
          * {@link #falseEasting} and {@link #falseNorthing} and dividing by 
