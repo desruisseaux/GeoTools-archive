@@ -1,9 +1,10 @@
 org.geotools.referencing.operation.transform.LogarithmicTransform1D$Provider
 org.geotools.referencing.operation.transform.ExponentialTransform1D$Provider
-org.geotools.referencing.operation.transform.ProjectiveTransform$Provider
+org.geotools.referencing.operation.transform.ProjectiveTransform$ProviderAffine
+org.geotools.referencing.operation.transform.ProjectiveTransform$ProviderLongitudeRotation
 org.geotools.referencing.operation.transform.GeocentricTranslation$Provider
-org.geotools.referencing.operation.transform.GeocentricTranslation$SevenParamProvider
-org.geotools.referencing.operation.transform.GeocentricTranslation$FrameRotationProvider
+org.geotools.referencing.operation.transform.GeocentricTranslation$ProviderSevenParam
+org.geotools.referencing.operation.transform.GeocentricTranslation$ProviderFrameRotation
 org.geotools.referencing.operation.transform.GeocentricTransform$Provider
 org.geotools.referencing.operation.transform.GeocentricTransform$ProviderInverse
 org.geotools.referencing.operation.transform.MolodenskiTransform$Provider

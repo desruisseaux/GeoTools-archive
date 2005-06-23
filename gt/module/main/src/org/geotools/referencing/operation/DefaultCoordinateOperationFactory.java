@@ -628,11 +628,11 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * parameters are identical except the following ones:
      * <BR>
      * <UL>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.Provider#SCALE_FACTOR   scale_factor}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.Provider#SEMI_MAJOR     semi_major}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.Provider#SEMI_MINOR     semi_minor}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.Provider#FALSE_EASTING  false_easting}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.Provider#FALSE_NORTHING false_northing}</LI>
+     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SCALE_FACTOR   scale_factor}</LI>
+     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SEMI_MAJOR     semi_major}</LI>
+     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SEMI_MINOR     semi_minor}</LI>
+     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#FALSE_EASTING  false_easting}</LI>
+     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#FALSE_NORTHING false_northing}</LI>
      * </UL>
      *
      * <P>Then the conversion between two projected CRS can sometime be represented as a linear

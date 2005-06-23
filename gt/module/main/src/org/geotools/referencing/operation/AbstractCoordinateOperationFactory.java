@@ -268,13 +268,15 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * accuracy.
      *
      * @todo In the datum shift case, an operation version is mandatory but unknow at this time.
+     *       However, we noticed that the EPSG database do not always defines a version neither.
+     *       Concequently, the Geotools implementation relax the rule requirying an operation
+     *       version and we do not try to provide this information here for now.
      */
     private static Map getProperties(final Identifier name) {
         final Map properties;
         if (name==DATUM_SHIFT || name==ELLIPSOID_SHIFT) {
             properties = new HashMap(4);
             properties.put(NAME_KEY, name);
-            properties.put(CoordinateOperation.OPERATION_VERSION_KEY, "(unknow)");
             properties.put(CoordinateOperation.POSITIONAL_ACCURACY_KEY,
                   new org.opengis.metadata.quality.PositionalAccuracy[] {
                       name==DATUM_SHIFT ? PositionalAccuracyImpl.DATUM_SHIFT_APPLIED
@@ -311,8 +313,8 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
         final Class type = properties.containsKey(CoordinateOperation.POSITIONAL_ACCURACY_KEY)
                            ? Transformation.class : Conversion.class;
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
-                ProjectiveTransform.Provider.getMethod(transform.getSourceDimensions(),
-                                                       transform.getTargetDimensions()), type);
+                ProjectiveTransform.ProviderAffine.getMethod(transform.getSourceDimensions(),
+                                                             transform.getTargetDimensions()), type);
     }
 
     /**

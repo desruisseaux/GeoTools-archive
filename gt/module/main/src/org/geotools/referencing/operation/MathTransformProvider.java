@@ -66,7 +66,7 @@ import org.geotools.referencing.wkt.Formatter;
  * Implementations of this class should be listed in the following file:
  *
  * <blockquote>
- * <P>{@code META-INF/services/org.geotools.referencing.operation.OperationProvider}</P>
+ * <P>{@code META-INF/services/org.geotools.referencing.operation.MathTransformProvider}</P>
  * </blockquote>
  * <P>
  * The {@linkplain DefaultMathTransformFactory math transform factory} will parse this file in order

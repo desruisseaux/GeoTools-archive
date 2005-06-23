@@ -31,6 +31,7 @@ import java.util.Map;
 // OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -274,6 +275,16 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     }
 
     /**
+     * Returns the operation type. Current implementation returns {@code Projection.class} for
+     * proper WKT formatting using an unknow implementation. But the {@link MathTransformProvider}
+     * subclass (with protected access) will overrides this method with a more conservative default
+     * value.
+     */
+    Class getOperationType() {
+        return Projection.class;
+    }
+
+    /**
      * Compare this operation method with the specified object for equality.
      * If {@code compareMetadata} is {@code true}, then all available
      * properties are compared including {@linkplain #getFormula formula}.
@@ -319,7 +330,10 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
-        return "PROJECTION";
+        if (Projection.class.isAssignableFrom(getOperationType())) {
+            return "PROJECTION";
+        }
+        return super.formatWKT(formatter);
     }
 
     /**

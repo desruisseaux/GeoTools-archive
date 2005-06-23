@@ -417,6 +417,9 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     protected String formatWKT(final Formatter formatter) {
         formatter.append(sourceCRS.getName().getCode());
         formatter.append(targetCRS.getName().getCode());
+        if (transform != null) {
+            formatter.append(transform);
+        }
         return super.formatWKT(formatter);
     }
 }

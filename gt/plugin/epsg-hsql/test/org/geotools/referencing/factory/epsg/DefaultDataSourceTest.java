@@ -55,6 +55,7 @@ import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -300,7 +301,7 @@ public class DefaultDataSourceTest extends TestCase {
     }
 
     /**
-     * Tests creations.
+     * Tests creations of CRS objects.
      */
     public void testCreation() throws FactoryException {
         if (factory == null) return;
@@ -366,7 +367,7 @@ public class DefaultDataSourceTest extends TestCase {
         assertSame(targetCRS, factory.createCoordinateReferenceSystem(" EPSG : 4979 "));
 
         /*
-         * Test closing the factory after the timeout.
+         * Tests closing the factory after the timeout.
          */
         factory.setTimeout(200);
         try {
@@ -435,5 +436,52 @@ public class DefaultDataSourceTest extends TestCase {
         in.close();
         assertEquals(object,            read);
         assertEquals(object.hashCode(), read.hashCode());
+    }
+
+    /**
+     * Tests the creation of {@link CoordinateOperation} objects.
+     */
+    public void testCoordinateOperations() throws FactoryException {
+        if (factory == null) return;
+        /*
+         * ED50 (4230)  -->  WGS 84 (4326)  using
+         * Geocentric translations (9603).
+         * Accuracy = 999
+         */
+        final CoordinateOperation      operation1 = factory.createCoordinateOperation("1087");
+        final CoordinateReferenceSystem sourceCRS = operation1.getSourceCRS();
+        final CoordinateReferenceSystem targetCRS = operation1.getTargetCRS();
+        final MathTransform             transform = operation1.getMathTransform();
+        assertTrue   (operation1 instanceof Transformation);
+        assertNotSame(sourceCRS, targetCRS);
+        assertFalse  (operation1.getMathTransform().isIdentity());
+        /*
+         * ED50 (4230)  -->  WGS 84 (4326)  using
+         * Position Vector 7-param. transformation (9606).
+         * Accuracy = 1.5
+         */
+        CoordinateOperation operation = factory.createCoordinateOperation("1631");
+        assertTrue (operation instanceof Transformation);
+        assertSame (sourceCRS, operation.getSourceCRS());
+        assertSame (targetCRS, operation.getTargetCRS());
+        assertFalse(operation.getMathTransform().isIdentity());
+        assertFalse(transform.equals(operation.getMathTransform()));
+        /*
+         * ED50 (4230)  -->  WGS 84 (4326)  using
+         * Coordinate Frame rotation (9607).
+         * Accuracy = 1.0
+         */
+        operation = factory.createCoordinateOperation("1989");
+        assertTrue (operation instanceof Transformation);
+        assertSame (sourceCRS, operation.getSourceCRS());
+        assertSame (targetCRS, operation.getTargetCRS());
+        assertFalse(operation.getMathTransform().isIdentity());
+        assertFalse(transform.equals(operation.getMathTransform()));
+        if (false) {
+            System.out.println(operation);
+            System.out.println(operation.getSourceCRS());
+            System.out.println(operation.getTargetCRS());
+            System.out.println(operation.getMathTransform());
+        }
     }
 }

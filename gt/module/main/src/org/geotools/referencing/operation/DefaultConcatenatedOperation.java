@@ -331,10 +331,10 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
+        final String name = super.formatWKT(formatter);
         for (final Iterator it=operations.iterator(); it.hasNext();) {
             formatter.append((SingleOperation) it.next());
         }
-        formatter.setInvalidWKT();
-        return Utilities.getShortClassName(this);
+        return name;
     }
 }

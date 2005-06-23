@@ -31,8 +31,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javax.vecmath.SingularMatrixException;
+import javax.units.NonSI;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -197,7 +199,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * Returns the parameter descriptors for this math transform.
      */
     public ParameterDescriptorGroup getParameterDescriptors() {
-        return Provider.PARAMETERS;
+        return ProviderAffine.PARAMETERS;
     }
 
     /**
@@ -210,7 +212,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      */
     static ParameterValueGroup getParameterValues(final Matrix matrix) {
         final MatrixParameters values;
-        values = (MatrixParameters) Provider.PARAMETERS.createValue();        
+        values = (MatrixParameters) ProviderAffine.PARAMETERS.createValue();        
         values.setMatrix(matrix);
         return values;
     }
@@ -467,7 +469,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         }
         return false;
     }
-    
+
     /**
      * The provider for the "<cite>Affine general parametric transformation</cite>" (EPSG 9624).
      * The OGC's name is {@code "Affine"}. The default matrix size is
@@ -479,7 +481,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static final class Provider extends MathTransformProvider {
+    public static final class ProviderAffine extends MathTransformProvider {
         /**
          * Serial number for interoperability with different versions.
          */
@@ -513,7 +515,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         /**
          * Creates a provider for affine transform with a default matrix size.
          */
-        public Provider() {
+        public ProviderAffine() {
             this(MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-1,
                  MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-1);
             methods[MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-2] = this;
@@ -522,7 +524,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         /**
          * Creates a provider for affine transform with the specified dimensions.
          */
-        private Provider(final int sourceDimensions, final int targetDimensions) {
+        private ProviderAffine(final int sourceDimensions, final int targetDimensions) {
             super(sourceDimensions, targetDimensions, PARAMETERS);
         }
 
@@ -567,12 +569,72 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                 if (i>=0 && i<methods.length) {
                     OperationMethod method = methods[i];
                     if (method == null) {
-                        methods[i] = method = new Provider(sourceDimensions, targetDimensions);
+                        methods[i] = method = new ProviderAffine(sourceDimensions, targetDimensions);
                     }
                     return method;
                 }
             }
-            return new Provider(sourceDimensions, targetDimensions);
+            return new ProviderAffine(sourceDimensions, targetDimensions);
+        }
+    }
+
+    /**
+     * The provider for the "<cite>Longitude rotation</cite>" (EPSG 9601).
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    public static final class ProviderLongitudeRotation extends MathTransformProvider {
+        /**
+         * Serial number for interoperability with different versions.
+         */
+//        private static final long serialVersionUID = 649555815622129472L;
+
+        /**
+         * The longitude offset.
+         */
+        public static final ParameterDescriptor OFFSET = createDescriptor(
+                new NamedIdentifier[] {
+                    new NamedIdentifier(CitationImpl.EPSG, "Longitude offset")
+                },
+                Double.NaN, -180, +180, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
+                    new NamedIdentifier(CitationImpl.EPSG, "Longitude rotation"),
+                    new NamedIdentifier(CitationImpl.EPSG, "9601")
+                }, new ParameterDescriptor[] {
+                    OFFSET
+                });
+
+        /**
+         * Constructs a provider with default parameters.
+         */
+        public ProviderLongitudeRotation() {
+            super(2, 2, PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type.
+         */
+        protected Class getOperationType() {
+            return Conversion.class;
+        }
+        
+        /**
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  values The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup values)
+                throws ParameterNotFoundException
+        {
+            final double offset = doubleValue(OFFSET, values);
+            return create(AffineTransform.getTranslateInstance(offset, 0));
         }
     }
 }

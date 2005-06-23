@@ -536,10 +536,10 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
 
         /**
          * The default value for source and target geographic dimensions, which is 2.
-         * NOTE: If this default value is modified, then the handling of the 3D cases
-         * must be adjusted.
          */
-        static final int DEFAULT_DIM = GeocentricTranslation.Provider.DEFAULT_DIM;
+        // NOTE: If this default value is modified, then
+        // the handling of the 3D cases must be adjusted.
+        static final int DEFAULT_DIMENSION = GeocentricTranslation.Provider.DEFAULT_DIMENSION;
 
         /**
          * The number of geographic dimension (2 or 3). This argument applies on
@@ -548,7 +548,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         public static final ParameterDescriptor DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_KEY,
                         new NamedIdentifier(CitationImpl.OGC, "dim")),
-                    DEFAULT_DIM, 2, 3, false);
+                    DEFAULT_DIMENSION, 2, 3, false);
 
         /**
          * The number of source geographic dimension (2 or 3).
@@ -647,7 +647,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * Constructs a provider.
          */
         public Provider() {
-            super(DEFAULT_DIM, DEFAULT_DIM, PARAMETERS);
+            super(DEFAULT_DIMENSION, DEFAULT_DIMENSION, PARAMETERS);
         }
 
         /**
@@ -685,9 +685,9 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
             final boolean hasHeight;
             final int dim = intValue(DIM, values);
             switch (dim) {
-                case 0:            // Default value: fall through
-                case DEFAULT_DIM:  hasHeight=false; break;
-                case 3:            hasHeight=true;  break;
+                case 0:                 // Default value: fall through
+                case DEFAULT_DIMENSION: hasHeight=false; break;
+                case 3:                 hasHeight=true;  break;
                 default: throw new IllegalArgumentException(Resources.format(
                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dim", new Integer(dim)));
             }
@@ -717,7 +717,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                     }
                     return withHeight;
                 }
-                case DEFAULT_DIM: return this;
+                case DEFAULT_DIMENSION: return this;
                 default: throw new IllegalArgumentException();
             }
         }
@@ -778,7 +778,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * Constructs a provider.
          */
         public ProviderAbridged() {
-            super(DEFAULT_DIM, DEFAULT_DIM, PARAMETERS);
+            super(DEFAULT_DIMENSION, DEFAULT_DIMENSION, PARAMETERS);
         }
         
         /**

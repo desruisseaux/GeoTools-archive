@@ -115,7 +115,7 @@ public class LinearTransform1D extends AbstractMathTransform
      * Returns the parameter descriptors for this math transform.
      */
     public ParameterDescriptorGroup getParameterDescriptors() {
-        return ProjectiveTransform.Provider.PARAMETERS;
+        return ProjectiveTransform.ProviderAffine.PARAMETERS;
     }
 
     /**

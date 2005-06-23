@@ -219,7 +219,16 @@ public class Formattable {
      */
     protected String formatWKT(final Formatter formatter) {
         formatter.setInvalidWKT();
-        return Utilities.getShortClassName(this);
+        Class type = getClass();
+        Class[] interfaces = type.getInterfaces();
+        for (int i=0; i<interfaces.length; i++) {
+            final Class candidate = interfaces[i];
+            if (candidate.getName().startsWith("org.opengis.referencing.")) {
+                type = candidate;
+                break;
+            }
+        }
+        return Utilities.getShortName(type);
     }
 
     /**

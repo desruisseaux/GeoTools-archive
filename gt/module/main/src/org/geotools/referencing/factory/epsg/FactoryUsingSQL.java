@@ -119,7 +119,7 @@ import org.geotools.referencing.operation.DefaultTransformation;
 import org.geotools.referencing.operation.DefaultConversion;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.referencing.operation.projection.MapProjection;
-import org.geotools.referencing.operation.transform.MolodenskiTransform;
+import org.geotools.referencing.operation.transform.GeocentricTranslation;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.cts.Resources;
@@ -320,12 +320,12 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * for them, since they are inferred from the CRS ellipsoid.
      */
     private static final List IMPLICIT_DATUM_SHIFT_PARAMETERS = Arrays.asList(new ParameterDescriptor[] {
-            MolodenskiTransform.Provider.SRC_DIM,
-            MolodenskiTransform.Provider.TGT_DIM,
-            MolodenskiTransform.Provider.SRC_SEMI_MAJOR,
-            MolodenskiTransform.Provider.SRC_SEMI_MINOR,
-            MolodenskiTransform.Provider.TGT_SEMI_MAJOR,
-            MolodenskiTransform.Provider.TGT_SEMI_MINOR
+            GeocentricTranslation.Provider.SRC_DIM,
+            GeocentricTranslation.Provider.TGT_DIM,
+            GeocentricTranslation.Provider.SRC_SEMI_MAJOR,
+            GeocentricTranslation.Provider.SRC_SEMI_MINOR,
+            GeocentricTranslation.Provider.TGT_SEMI_MAJOR,
+            GeocentricTranslation.Provider.TGT_SEMI_MINOR
     });
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -2044,14 +2044,14 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      */
     final boolean isProjection(final String code) throws SQLException {
         assert Thread.holdsLock(this);
-        final PreparedStatement stmt = prepareStatement("isProjection",
-                      "SELECT COORD_REF_SYS_CODE"           +
-                      " FROM [Coordinate Reference System]" +
-                     " WHERE PROJECTION_CONV_CODE = ?"      +
-                       " AND COORD_REF_SYS_KIND LIKE 'projected%'");
+        final PreparedStatement stmt;
+        stmt = prepareStatement("isProjection", "SELECT COORD_REF_SYS_CODE"
+                                              +  " FROM [Coordinate Reference System]"
+                                              + " WHERE PROJECTION_CONV_CODE = ?"
+                                              +   " AND COORD_REF_SYS_KIND LIKE 'projected%'");
         stmt.setString(1, code);
         final ResultSet result = stmt.executeQuery();
-        boolean found = result.next();
+        final boolean found = result.next();
         result.close();
         return found;
     }
@@ -2094,9 +2094,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             stmt.setString(1, code);
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                final String epsg  = getString(result, 1, code);
-                final String name  = getString(result, 2, code);
-                final String type  = getString(result, 3, code).trim().toLowerCase();
+                final String epsg = getString(result, 1, code);
+                final String name = getString(result, 2, code);
+                final String type = getString(result, 3, code).trim().toLowerCase();
                 final boolean isTransformation = type.equals("transformation");
                 final boolean isConversion     = type.equals("conversion");
                 final boolean isConcatenated   = type.equals("concatenated operation");
@@ -2121,16 +2121,34 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 String scope    = result.getString(10);
                 String remarks  = result.getString(11);
                 /*
-                 * Gets the source and target CRS. They are mandatory for transformations (is was
-                 * checked above in this method) and optional for conversions. Conversions are
-                 * usually "defining conversions" and don't define source and target CRS.
+                 * Gets the source and target CRS. They are mandatory for transformations (it
+                 * was checked above in this method) and optional for conversions. Conversions
+                 * are usually "defining conversions" and don't define source and target CRS.
+                 * In EPSG database 6.7, all defining conversions are projections and their
+                 * dimensions are always 2. However, this is not generalizable to other kind
+                 * of operation methods. For example the "Geocentric translation" operation
+                 * method has 3-dimensional source and target.
                  */
+                final int sourceDimension, targetDimension;
                 final CoordinateReferenceSystem sourceCRS, targetCRS;
-                sourceCRS = (sourceCode!=null) ? buffered.createCoordinateReferenceSystem(sourceCode) : null;
-                targetCRS = (targetCode!=null) ? buffered.createCoordinateReferenceSystem(targetCode) : null;
+                if (sourceCode != null) {
+                    sourceCRS = buffered.createCoordinateReferenceSystem(sourceCode);
+                    sourceDimension = sourceCRS.getCoordinateSystem().getDimension();
+                } else {
+                    sourceCRS = null;
+                    sourceDimension = 2; // Acceptable default for projections only.
+                }
+                if (targetCode != null) {
+                    targetCRS = buffered.createCoordinateReferenceSystem(targetCode);
+                    targetDimension = targetCRS.getCoordinateSystem().getDimension();
+                } else {
+                    targetCRS = null;
+                    targetDimension = 2; // Acceptable default for projections only.
+                }
                 /*
-                 * Creates common properties. While 'version' and 'accuracy' should be defined
-                 * for transformations only, we still checks them for all operations just in case.
+                 * Creates common properties. The 'version' and 'accuracy' are usually defined
+                 * for transformations only. However, we check them for all kind of operations
+                 * (including conversions) and copy the information inconditionnaly if present.
                  */
                 final Map properties = createProperties(name, epsg, area, scope, remarks);
                 if (version!=null && (version=version.trim()).length()!=0) {
@@ -2156,26 +2174,47 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 /*
                  * Gets the operation method. This is mandatory for conversions and transformations
                  * (it was checked above in this method) but optional for concatenated operations.
-                 *
-                 * TODO: When no CRS is specified, current implementation assumes a 2D CRS.
+                 * Note that some parameters required for MathTransform creation are implicit in
+                 * the EPSG database. Special processing is required for them.
                  */
-                final OperationMethod method;
+                final boolean             isBursaWolf;
+                final OperationMethod     method;
                 final ParameterValueGroup parameters;
-                if (methodCode != null) {
+                if (methodCode == null) {
+                    isBursaWolf = false;
+                    method      = null;
+                    parameters  = null;
+                } else {
+                    final int num;
+                    try {
+                        num = Integer.parseInt(methodCode);
+                    } catch (NumberFormatException exception) {
+                        result.close();
+                        throw new FactoryException(exception);
+                    }
+                    isBursaWolf = (num>=BURSA_WOLF_MIN_CODE && num<=BURSA_WOLF_MAX_CODE);
+                    final List/*<ParameterDescriptor>*/ implicit;
+                    if (isConversion && isProjection(epsg)) {
+                        implicit = IMPLICIT_PROJECTION_PARAMETERS;
+                    } else if (isBursaWolf) {
+                        implicit = IMPLICIT_DATUM_SHIFT_PARAMETERS;
+                    } else {
+                        implicit = null;
+                    }
+                    // Reminder: The source and target dimensions MUST be computed when
+                    //           the information is available. Dimension is not always 2!!
                     method = createOperationMethod(methodCode, epsg,
-                             (sourceCRS!=null) ? sourceCRS.getCoordinateSystem().getDimension() : 2,
-                             (targetCRS!=null) ? targetCRS.getCoordinateSystem().getDimension() : 2,
-                             isConversion && isProjection(epsg) ? IMPLICIT_PROJECTION_PARAMETERS : null);
+                                                   sourceDimension, targetDimension, implicit);
                     parameters = (ParameterValueGroup) method.getParameters().createValue();
                     // ParameterDescriptor's default values are actual parameter values.
-                } else {
-                    method     = null;
-                    parameters = null;
                 }
                 /*
                  * Creates the operation. Conversions should be the only operations allowed to
                  * have null source and target CRS. In such case, the operation is a defining
-                 * conversion (usually to be used later as part of a ProjectedCRS creation).
+                 * conversion (usually to be used later as part of a ProjectedCRS creation),
+                 * and always a projection in the specific case of the EPSG database (which
+                 * allowed us to assume 2-dimensional operation method in the code above for
+                 * this specific case - not to be generalized to the whole EPSG database).
                  */
                 final CoordinateOperation operation;
                 if (isConversion && (sourceCRS==null || targetCRS==null)) {
@@ -2193,14 +2232,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                      * for "geocentric translations" is implicit in the EPSG database. Even in
                      * the case of Molodenski transforms, the axis length to set are the same.
                      */
-                    final int asNumeric;
-                    try {
-                        asNumeric = Integer.parseInt(methodCode);
-                    } catch (NumberFormatException exception) {
-                        result.close();
-                        throw new FactoryException(exception);
-                    }
-                    if (asNumeric>=BURSA_WOLF_MIN_CODE && asNumeric<=BURSA_WOLF_MIN_CODE) try {
+                    if (isBursaWolf) try {
                         Ellipsoid ellipsoid = CRSUtilities.getHeadGeoEllipsoid(sourceCRS);
                         if (ellipsoid != null) {
                             final Unit axisUnit = ellipsoid.getAxisUnit();
