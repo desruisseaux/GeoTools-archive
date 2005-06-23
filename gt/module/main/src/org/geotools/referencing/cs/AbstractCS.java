@@ -312,37 +312,9 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      * Matrix step3 = swapAndScaleAxis(standard(targetCS), targetCS);
      * </pre></blockquote>
      * <p>
-     * <strong>Background</strong><br>
-     * Many {@linkplain org.opengis.referencing.crs.GeographicCRS geographic coordinate reference
-     * systems} use axis in (<var>latitude</var>,<var>longitude</var>) order, but not all. Axis
-     * order, orientation and units are CRS-dependent. For example some CRS use longitude values
-     * increasing toward {@linkplain AxisDirection#EAST East}, while some others use longitude
-     * values increasing toward {@linkplain AxisDirection#WEST West}. The axis order must be
-     * specified in all CRS, and any method working with them should take their axis order and
-     * units in account. However, in the few cases where the the coordinates order and units is
-     * hard-coded in the API, we use the convention used for
-     * {@link org.opengis.referencing.operation.MathTransform} projections in OGC 01-009
-     * specification. This specification said (quoting section 10.6 at page 34):
-     *
-     * <blockquote>
-     * "Cartographic projection transforms are used by projected coordinate systems to map
-     * geographic coordinates (e.g. Longitude and Latitude) into (X,Y) coordinates. These
-     * (X,Y) coordinates can be imagined to lie on a plane, such as a paper map or a screen.
-     * All cartographic projection transforms will have the following properties:
-     * <ul>
-     *   <li>Converts from (<var>Longitude</var>, <var>Latitude</var>) coordinates to
-     *       (<var>X</var>,<var>Y</var>).</li>
-     *   <li>All angles are assumed to be degrees, and all distances are assumed to be meters.</li>
-     *   <li>The domain should be a subset of {[-180,180)&times;(-90,90)}.</li>
-     * </ul>
-     * Although all cartographic projection transforms must have the properties listed above, many
-     * projected coordinate systems have different properties. For example, in Europe some projected
-     * coordinate systems use grads instead of degrees, and often the base geographic coordinate
-     * system is (<var>Latitude</var>, <var>Longitude</var>) instead of (<var>Longitude</var>,
-     * <var>Latitude</var>). This means that the cartographic projected transform is often used
-     * as a single step in a series of transforms, where the other steps change units and swap
-     * ordinates."
-     * </blockquote>
+     * A rational for standard axis order and units is explained in the <cite>Axis units and
+     * orientation</cite> section in the {@linkplain org.geotools.referencing.operation.projection
+     * description of map projection package}.
      *
      * @param  cs The coordinate system.
      * @return A constant similar to the specified {@code cs} with standard axis.

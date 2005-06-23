@@ -71,6 +71,12 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      */
     public static final DefaultEllipsoid WGS84 =
             createFlattenedSphere("WGS84", 6378137.0, 298.257223563, SI.METER);
+    
+    /**
+     * International 1924 ellipsoid with axis in {@linkplain SI#METER metres}.
+     */
+    public static final DefaultEllipsoid INTERNATIONAL_1924 =
+            createFlattenedSphere("International 1924", 6378388.0, 297.0, SI.METER);
 
     /**
      * A sphere with a radius of 6371000 {@linkplain SI#METER metres}. Spheres use a simplier

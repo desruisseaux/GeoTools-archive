@@ -341,7 +341,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
         {
             final BursaWolfParameters parameters = new BursaWolfParameters(null);
             fill(parameters, values);
-            return concatenate(concatenate(new GeocentricTranslation(parameters),
+            return concatenate(concatenate(new GeocentricTranslation(parameters, getParameters()),
                                values, SRC_SEMI_MAJOR, SRC_SEMI_MINOR, SRC_DIM),
                                values, TGT_SEMI_MAJOR, TGT_SEMI_MINOR, TGT_DIM);
         }

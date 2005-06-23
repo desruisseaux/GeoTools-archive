@@ -871,8 +871,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                            new NamedIdentifier(authority, name.trim()));
         }
         if (code != null) {
+            final InternationalString edition = authority.getEdition();
+            final String version = (edition!=null) ? edition.toString() : null;
             properties.put(prepend(IdentifiedObject.IDENTIFIERS_KEY),
-                           new NamedIdentifier(authority, code.trim()));
+                           new NamedIdentifier(authority, code.trim(), version));
         }
         if (remarks!=null && (remarks=remarks.trim()).length()!=0) {
             properties.put(prepend(IdentifiedObject.REMARKS_KEY), remarks);
