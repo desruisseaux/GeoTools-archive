@@ -31,7 +31,6 @@ import java.util.HashMap;
  * @author Luca S. Percich, AMA-MI
  */
 public class MIFFileTest extends TestCase {
-    private String dataPath = MIFTestUtils.getDataPath();
     private MIFFile mif = null;
 
     /**
@@ -66,7 +65,7 @@ public class MIFFileTest extends TestCase {
      */
     public void testMIFFileOpen() {
         try {
-            mif = new MIFFile(MIFTestUtils.getDataPath() + "mixed", // .mif
+            mif = new MIFFile(MIFTestUtils.fileName("mixed"), // .mif
                     MIFTestUtils.getParams("mif", "", null));
             assertEquals("450",
                 mif.getHeaderClause(MIFDataStore.HCLAUSE_VERSION));
@@ -110,7 +109,7 @@ public class MIFFileTest extends TestCase {
 
         try {
             // Input file
-            in = new MIFFile(dataPath + "grafo", null); // .mif
+            in = new MIFFile(MIFTestUtils.fileName("grafo"), null); // .mif
 
             FeatureType ft = in.getSchema();
 
@@ -133,7 +132,7 @@ public class MIFFileTest extends TestCase {
             params.put(MIFDataStore.HCLAUSE_DELIMITER, ",");
 
             // Output file
-            out = new MIFFile(dataPath + "grafo_out", ft, params); // .mif
+            out = new MIFFile(MIFTestUtils.fileName("grafo_out"), ft, params); // .mif
         } catch (Exception e) {
             fail("Can't create grafo_out: " + e.getMessage());
         }
@@ -198,7 +197,7 @@ public class MIFFileTest extends TestCase {
         try {
             MIFTestUtils.copyMif("mixed", "mixed_wri");
 
-            MIFFile in = new MIFFile(dataPath + "mixed_wri", // .mif
+            MIFFile in = new MIFFile(MIFTestUtils.fileName("mixed_wri"), // .mif
                     MIFTestUtils.getParams("", "", null));
             FeatureWriter fw = in.getFeatureWriter();
 

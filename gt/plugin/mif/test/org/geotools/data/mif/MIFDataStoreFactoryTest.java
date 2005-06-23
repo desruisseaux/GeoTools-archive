@@ -72,7 +72,7 @@ public class MIFDataStoreFactoryTest extends TestCase {
 
         try {
             ds = DataStoreFinder.getDataStore(MIFTestUtils.getParams("mif",
-                        MIFTestUtils.getDataPath(), uri));
+                        MIFTestUtils.fileName(""), uri));
         } catch (IOException e) {
             fail(e.getMessage());
         }
@@ -91,7 +91,7 @@ public class MIFDataStoreFactoryTest extends TestCase {
             String strURI = "root-mifdatastore";
             uri = new URI(strURI);
             ds = dsFactory.createDataStore(MIFTestUtils.getParams("mif",
-                        MIFTestUtils.getDataPath(), uri));
+                    MIFTestUtils.fileName(""), uri));
 
             FeatureType ft = ds.getSchema("grafo");
             assertEquals("Bad URI", new URI(strURI), ft.getNamespace());
@@ -115,55 +115,50 @@ public class MIFDataStoreFactoryTest extends TestCase {
      * parameters
      */
     public void testCanProcessPath() {
-        String dataPath = MIFTestUtils.getDataPath();
-
         // Opens the test-data directory
         assertEquals(true,
-            dsFactory.canProcess(MIFTestUtils.getParams("mif", dataPath, uri)));
+            dsFactory.canProcess(MIFTestUtils.getParams("mif", MIFTestUtils.fileName(""), uri)));
     }
 
     /**
      */
     public void testCanProcessWrongDBType() {
-        String dataPath = MIFTestUtils.getDataPath();
 
         // fails because dbtype != "mif"
         assertEquals(false,
-            dsFactory.canProcess(MIFTestUtils.getParams("miffooobar", dataPath,
+            dsFactory.canProcess(MIFTestUtils.getParams("miffooobar", MIFTestUtils.fileName(""),
                     uri)));
     }
 
     /**
      */
     public void testCanProcessMIF() {
-        String dataPath = MIFTestUtils.getDataPath();
 
         // Opens a single mif file; works with or without extension, and regardless the extension's case.
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    dataPath + "grafo", uri)));
+                    MIFTestUtils.fileName("grafo"), uri)));
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    dataPath + "grafo.MIF", uri)));
+                    MIFTestUtils.fileName("grafo.MIF"), uri)));
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    dataPath + "grafo.mif", uri)));
+                    MIFTestUtils.fileName("grafo.mif"), uri)));
     }
 
     /**
      */
     public void testCanProcessWrongPath() {
-        String dataPath = MIFTestUtils.getDataPath();
 
         // Fails because an extension other than ".mif" was specified
         assertEquals(false,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    dataPath + "grafo.zip", uri)));
+                    MIFTestUtils.fileName("grafo.zip"), uri)));
 
         // fails because the path is non-existent
         assertEquals(false,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    dataPath + "some/non/existent/path/", uri)));
+                    MIFTestUtils.fileName("some_non_existent_file"), uri)));
     }
 
     /**

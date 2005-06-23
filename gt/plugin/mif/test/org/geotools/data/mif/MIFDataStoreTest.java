@@ -31,6 +31,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.filter.Filter;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Date;
@@ -44,7 +46,6 @@ import java.util.HashMap;
  */
 public class MIFDataStoreTest extends TestCase {
     private MIFDataStore ds;
-    private String dataPath = MIFTestUtils.getDataPath();
 
     /**
      * DOCUMENT ME!
@@ -82,6 +83,8 @@ public class MIFDataStoreTest extends TestCase {
      */
     protected boolean initDS(String initPath) {
         try {
+            initPath = MIFTestUtils.fileName(initPath);
+                    
             HashMap params = MIFTestUtils.getParams("mif", initPath, null);
             ds = new MIFDataStore(initPath, params);
             assertNotNull(ds);
@@ -98,7 +101,7 @@ public class MIFDataStoreTest extends TestCase {
      * See if all the MIF in data dir are recognized
      */
     public void testOpenDir() {
-        initDS(dataPath);
+        initDS("");
 
         try {
             assertNotNull(ds.getSchema("grafo"));
@@ -112,7 +115,8 @@ public class MIFDataStoreTest extends TestCase {
     /**
      */
     public void testCreateSchema() {
-        initDS(dataPath);
+        
+        initDS("");
 
         try {
             FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(
@@ -148,7 +152,7 @@ public class MIFDataStoreTest extends TestCase {
     /**
      */
     public void testCreateSchemaBadGeometry() {
-        initDS(dataPath);
+        initDS("");
 
         try {
             FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(
@@ -171,7 +175,8 @@ public class MIFDataStoreTest extends TestCase {
     /**
      */
     public void testCreateSchemaTwoGeometry() {
-        initDS(dataPath);
+        
+        initDS("");
 
         try {
             FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(
@@ -196,7 +201,7 @@ public class MIFDataStoreTest extends TestCase {
     /**
      */
     public void testFeatureReaderFilter() {
-        initDS(dataPath + "grafo"); // .mif
+        initDS("grafo"); // .mif
 
         try {
             FeatureReader fr = getFeatureReader("grafo", "ID = 33755");
@@ -220,7 +225,7 @@ public class MIFDataStoreTest extends TestCase {
      * Tests createSchema & FeatureWriter
      */
     public void testFeatureWriter() {
-        initDS(dataPath);
+        initDS("");
 
         String outmif = "grafo_new";
 
@@ -299,7 +304,7 @@ public class MIFDataStoreTest extends TestCase {
         try {
             String outmif = "grafo_append";
             MIFTestUtils.copyMif("grafo", outmif);
-            initDS(dataPath);
+            initDS(outmif);
 
             Feature f;
             Transaction transaction = new DefaultTransaction("mif");
@@ -358,7 +363,7 @@ public class MIFDataStoreTest extends TestCase {
             fail(e.getMessage());
         }
 
-        initDS(dataPath);
+        initDS(outmif);
 
         FeatureSource fs = null;
         FeatureType featureType = null;

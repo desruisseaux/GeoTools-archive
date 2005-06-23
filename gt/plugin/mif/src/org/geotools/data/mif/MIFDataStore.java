@@ -39,7 +39,7 @@ import java.util.Iterator;
  * </p>
  *
  * @author Luca S. Percich, AMA-MI
- * @version $Id: MIFDataStore.java,v 1.9 2005/06/22 16:53:49 lpercich Exp $
+ * @version $Id: MIFDataStore.java,v 1.10 2005/06/23 16:59:27 lpercich Exp $
  */
 public class MIFDataStore extends AbstractDataStore {
     // MIF Header clause names
@@ -157,8 +157,10 @@ public class MIFDataStore extends AbstractDataStore {
         }
 
         try {
-            MIFFile mf = new MIFFile(this.filePath.getAbsolutePath() + "\\"
-                    + featureType.getTypeName() + ".mif", featureType, params);
+            File newFile = new File(filePath, featureType.getTypeName()
+                    + ".mif");
+            MIFFile mf = new MIFFile(newFile.getAbsolutePath(), featureType,
+                    params);
             MIFFileHolder mfh = new MIFFileHolder(mf);
             mifFileHolders.put(mf.getSchema().getTypeName(), mfh);
         } catch (Exception e) {

@@ -55,12 +55,11 @@ public class MIFTestUtils {
      *
      * @return DOCUMENT ME!
      */
-    public static String getDataPath() {
+    private static File getDataPath() {
         try {
-            return TestData.file(MIFTestUtils.class, null).getAbsolutePath()
-            + "/";
+            return TestData.file(MIFTestUtils.class, null);
         } catch (IOException e) {
-            return "";
+            return null;
         }
     }
 
@@ -74,12 +73,12 @@ public class MIFTestUtils {
      */
     public static void copyMif(String inMif, String outMif)
         throws FileNotFoundException {
-        File path = new File(getDataPath());
+        File path = getDataPath();
 
         copyFileUsingChannels(MIFFile.getFileHandler(path, inMif, ".mif", true),
-            new File(getDataPath() + outMif + ".mif"));
+            new File(path, outMif + ".mif"));
         copyFileUsingChannels(MIFFile.getFileHandler(path, inMif, ".mid", true),
-            new File(getDataPath() + outMif + ".mid"));
+            new File(path, outMif + ".mid"));
     }
 
     /**
@@ -116,15 +115,13 @@ public class MIFTestUtils {
         File f;
 
         try {
-            f = MIFFile.getFileHandler(new File(getDataPath()), mifName,
-                    ".mif", false);
+            f = MIFFile.getFileHandler(getDataPath(), mifName, ".mif", false);
 
             if (f.exists()) {
                 f.delete();
             }
 
-            f = MIFFile.getFileHandler(new File(getDataPath()), mifName,
-                    ".mid", false);
+            f = MIFFile.getFileHandler(getDataPath(), mifName, ".mid", false);
 
             if (f.exists()) {
                 f.delete();
@@ -244,5 +241,22 @@ public class MIFTestUtils {
         } catch (ParseException e) {
             return Filter.ALL;
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param fileName DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    protected static String fileName(String fileName) {
+        if (fileName.equals("")) {
+            return getDataPath().getAbsolutePath();
+        }
+
+        File file = new File(getDataPath(), fileName);
+
+        return file.getAbsolutePath();
     }
 }

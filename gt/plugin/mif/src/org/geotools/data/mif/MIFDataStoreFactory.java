@@ -45,7 +45,7 @@ import java.util.Map;
  * </p>
  *
  * @author Luca S. Percich, AMA-MI
- * @version $Id: MIFDataStoreFactory.java,v 1.8 2005/06/22 16:53:49 lpercich Exp $
+ * @version $Id: MIFDataStoreFactory.java,v 1.9 2005/06/23 16:59:27 lpercich Exp $
  *
  * @see MIFDataStore#MIFDataStore(String, HashMap);
  */

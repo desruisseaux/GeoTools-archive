@@ -50,8 +50,7 @@ public class MIFFileTokenizerTest extends TestCase {
         super.setUp();
         tok = new MIFFileTokenizer(new BufferedReader(
                     new FileReader(
-                        new File(MIFTestUtils.getDataPath()
-                            + "MIFFileTokenizer.txt"))));
+                        new File(MIFTestUtils.fileName("MIFFileTokenizer.txt")))));
     }
 
     /*
