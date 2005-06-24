@@ -236,7 +236,7 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      */
     private static Datum getDatum(final CoordinateReferenceSystem base) {
         ensureNonNull("base",  base);
-        return (base instanceof AbstractSingleCRS) ? ((AbstractSingleCRS) base).getDatum() : null;
+        return (base instanceof SingleCRS) ? ((SingleCRS) base).getDatum() : null;
     }
 
     /**

@@ -38,6 +38,7 @@ import junit.framework.TestSuite;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.datum.Datum;
@@ -63,6 +64,7 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.factory.epsg.DefaultFactory;
 import org.geotools.util.MonolineFormatter;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Arguments;
 
 
@@ -78,6 +80,11 @@ import org.geotools.resources.Arguments;
  * @author Vadim Semenov
  */
 public class DefaultDataSourceTest extends TestCase {
+    /**
+     * Small value for parameter value comparaisons.
+     */
+    private static final double EPS = 1E-6;
+
     /**
      * The EPSG factory to test.
      */
@@ -308,6 +315,7 @@ public class DefaultDataSourceTest extends TestCase {
         final CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory(null);
         CoordinateReferenceSystem sourceCRS, targetCRS;
         CoordinateOperation operation;
+        ParameterValueGroup parameters;
         
         sourceCRS = factory.createCoordinateReferenceSystem("4274");
         assertEquals("4274", getIdentifier(sourceCRS));
@@ -323,11 +331,23 @@ public class DefaultDataSourceTest extends TestCase {
         assertEquals("2027", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof ProjectedCRS);
         assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
+        parameters = ((ProjectedCRS) sourceCRS).getConversionFromBase().getParameterValues();
+        assertEquals(   -93, parameters.parameter("central_meridian"  ).doubleValue(), EPS);
+        assertEquals(     0, parameters.parameter("latitude_of_origin").doubleValue(), EPS);
+        assertEquals(0.9996, parameters.parameter("scale_factor"      ).doubleValue(), EPS);
+        assertEquals(500000, parameters.parameter("false_easting"     ).doubleValue(), EPS);
+        assertEquals(     0, parameters.parameter("false_northing"    ).doubleValue(), EPS);
         
         sourceCRS = factory.createCoordinateReferenceSystem(" EPSG : 2442 ");
         assertEquals("2442", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof ProjectedCRS);
         assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
+        parameters = ((ProjectedCRS) sourceCRS).getConversionFromBase().getParameterValues();
+        assertEquals(   135, parameters.parameter("central_meridian"  ).doubleValue(), EPS);
+        assertEquals(     0, parameters.parameter("latitude_of_origin").doubleValue(), EPS);
+        assertEquals(     1, parameters.parameter("scale_factor"      ).doubleValue(), EPS);
+        assertEquals(500000, parameters.parameter("false_easting"     ).doubleValue(), EPS);
+        assertEquals(     0, parameters.parameter("false_northing"    ).doubleValue(), EPS);
         
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:4915");
         assertEquals("4915", getIdentifier(sourceCRS));
@@ -439,10 +459,55 @@ public class DefaultDataSourceTest extends TestCase {
     }
 
     /**
-     * Tests the creation of {@link CoordinateOperation} objects.
+     * Tests the creation of {@link Conversion} objects.
      */
-    public void testCoordinateOperations() throws FactoryException {
+    public void testConversions() throws FactoryException {
         if (factory == null) return;
+        /*
+         * UTM zone 10N
+         */
+        final CoordinateOperation operation = factory.createCoordinateOperation("16010");
+        assertTrue(operation instanceof Conversion);
+        assertNull(operation.getSourceCRS());
+        assertNull(operation.getTargetCRS());
+        assertNull(operation.getMathTransform());
+        /*
+         * WGS 72 / UTM zone 10N
+         */
+        final ProjectedCRS crs = factory.createProjectedCRS("32210");
+        final CoordinateOperation projection = crs.getConversionFromBase();
+        /*
+         * TODO: Current EPSG factory implementation creates Conversion object, not Projection,
+         *       because the OperationMethod declared is not one of the build-in ones: it doesn't
+         *       have a 'getOperationType()' method. We need to find a fix at some later stage.
+         */
+//      assertTrue(projection instanceof Projection);
+        assertNotNull(projection.getSourceCRS());
+        assertNotNull(projection.getTargetCRS());
+        assertNotNull(projection.getMathTransform());
+        assertNotSame(projection, operation);
+        assertSame(((Conversion) operation).getMethod(), ((Conversion) projection).getMethod());
+        /*
+         * WGS 72BE / UTM zone 10N
+         */
+        assertFalse(CRSUtilities.equalsIgnoreMetadata(crs, factory.createProjectedCRS("32410")));
+        /*
+         * Creates a projected CRS from base and projected CRS codes.
+         */
+        final Set all = factory.createFromCoordinateReferenceSystemCodes("4322", "32210");
+        assertEquals(1, all.size());
+        assertTrue(all.contains(projection));
+    }
+
+    /**
+     * Tests the creation of {@link Transformation} objects.
+     */
+    public void testTransformations() throws FactoryException {
+        if (factory == null) return;
+        /*
+         * Longitude rotation
+         */
+        assertTrue(factory.createCoordinateOperation("1764") instanceof Transformation);
         /*
          * ED50 (4230)  -->  WGS 84 (4326)  using
          * Geocentric translations (9603).
@@ -460,28 +525,36 @@ public class DefaultDataSourceTest extends TestCase {
          * Position Vector 7-param. transformation (9606).
          * Accuracy = 1.5
          */
-        CoordinateOperation operation = factory.createCoordinateOperation("1631");
-        assertTrue (operation instanceof Transformation);
-        assertSame (sourceCRS, operation.getSourceCRS());
-        assertSame (targetCRS, operation.getTargetCRS());
-        assertFalse(operation.getMathTransform().isIdentity());
-        assertFalse(transform.equals(operation.getMathTransform()));
+        final CoordinateOperation operation2 = factory.createCoordinateOperation("1631");
+        assertTrue (operation2 instanceof Transformation);
+        assertSame (sourceCRS, operation2.getSourceCRS());
+        assertSame (targetCRS, operation2.getTargetCRS());
+        assertFalse(operation2.getMathTransform().isIdentity());
+        assertFalse(transform.equals(operation2.getMathTransform()));
         /*
          * ED50 (4230)  -->  WGS 84 (4326)  using
          * Coordinate Frame rotation (9607).
          * Accuracy = 1.0
          */
-        operation = factory.createCoordinateOperation("1989");
-        assertTrue (operation instanceof Transformation);
-        assertSame (sourceCRS, operation.getSourceCRS());
-        assertSame (targetCRS, operation.getTargetCRS());
-        assertFalse(operation.getMathTransform().isIdentity());
-        assertFalse(transform.equals(operation.getMathTransform()));
+        final CoordinateOperation operation3 = factory.createCoordinateOperation("1989");
+        assertTrue (operation3 instanceof Transformation);
+        assertSame (sourceCRS, operation3.getSourceCRS());
+        assertSame (targetCRS, operation3.getTargetCRS());
+        assertFalse(operation3.getMathTransform().isIdentity());
+        assertFalse(transform.equals(operation3.getMathTransform()));
         if (false) {
-            System.out.println(operation);
-            System.out.println(operation.getSourceCRS());
-            System.out.println(operation.getTargetCRS());
-            System.out.println(operation.getMathTransform());
+            System.out.println(operation3);
+            System.out.println(operation3.getSourceCRS());
+            System.out.println(operation3.getTargetCRS());
+            System.out.println(operation3.getMathTransform());
         }
+        /*
+         * Creates from CRS codes.
+         */
+        final Set all = factory.createFromCoordinateReferenceSystemCodes("4230", "4326");
+        assertTrue(all.size() >= 3);
+        assertTrue(all.contains(operation1));
+        assertTrue(all.contains(operation2));
+        assertTrue(all.contains(operation3));
     }
 }

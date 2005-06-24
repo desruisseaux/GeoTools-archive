@@ -239,9 +239,9 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
             ensureNonNull("sourceCRS", transform);
             ensureNonNull("targetCRS", transform);
             ensureNonNull("transform", transform);
+            checkDimension("sourceCRS", sourceCRS, transform.getSourceDimensions());
+            checkDimension("targetCRS", targetCRS, transform.getTargetDimensions());
         }
-        checkDimension("sourceCRS", sourceCRS, transform.getSourceDimensions());
-        checkDimension("targetCRS", targetCRS, transform.getTargetDimensions());
     }
 
     /**
@@ -255,13 +255,11 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                                        final CoordinateReferenceSystem crs,
                                        final int expected)
     {
-        if (crs != null) {
-            final int actual = crs.getCoordinateSystem().getDimension();
-            if (actual != expected) {
-                throw new IllegalArgumentException(Resources.format(
-                          ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
-                          name, new Integer(actual), new Integer(expected)));
-            }
+        final int actual = crs.getCoordinateSystem().getDimension();
+        if (actual != expected) {
+            throw new IllegalArgumentException(Resources.format(
+                      ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
+                      name, new Integer(actual), new Integer(expected)));
         }
     }
 
@@ -415,11 +413,9 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
-        formatter.append(sourceCRS.getName().getCode());
-        formatter.append(targetCRS.getName().getCode());
-        if (transform != null) {
-            formatter.append(transform);
-        }
+        if (sourceCRS != null) formatter.append(sourceCRS.getName().getCode());
+        if (targetCRS != null) formatter.append(targetCRS.getName().getCode());
+        if (transform != null) formatter.append(transform);
         return super.formatWKT(formatter);
     }
 }

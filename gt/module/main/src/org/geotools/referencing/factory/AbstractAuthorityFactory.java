@@ -33,6 +33,7 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
@@ -69,6 +70,7 @@ import org.opengis.referencing.datum.ImageDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
@@ -731,6 +733,42 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
             return (VerticalCRS) crs;
         } catch (ClassCastException exception) {
             throw noSuchAuthorityCode(VerticalCRS.class, code, exception);
+        }
+    }
+
+    /**
+     * Creates a parameter descriptor from a code. 
+     *
+     * @param code Value allocated by authority.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
+     * @throws FactoryException if the object creation failed for some other reason.
+     *
+     * @since 2.2
+     */
+    public ParameterDescriptor createParameterDescriptor(final String code) throws FactoryException {
+        final IdentifiedObject operation = createObject(code);
+        try {
+            return (ParameterDescriptor) operation;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(ParameterDescriptor.class, code, exception);
+        }
+    }
+
+    /**
+     * Creates an operation method from a code. 
+     *
+     * @param code Value allocated by authority.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
+     * @throws FactoryException if the object creation failed for some other reason.
+     *
+     * @since 2.2
+     */
+    public OperationMethod createOperationMethod(final String code) throws FactoryException {
+        final IdentifiedObject operation = createObject(code);
+        try {
+            return (OperationMethod) operation;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(OperationMethod.class, code, exception);
         }
     }
 

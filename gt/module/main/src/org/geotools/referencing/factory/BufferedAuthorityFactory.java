@@ -38,6 +38,7 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CompoundCRS;
@@ -67,6 +68,7 @@ import org.opengis.referencing.datum.ImageDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.util.InternationalString;
 
@@ -820,6 +822,46 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
+     * Returns a parameter descriptor from a code. 
+     *
+     * @since 2.2
+     */
+    public synchronized ParameterDescriptor createParameterDescriptor(final String code)
+            throws FactoryException
+    {
+        final ParameterDescriptor parameter;
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
+        if (cached instanceof ParameterDescriptor) {
+            parameter = (ParameterDescriptor) cached;
+        } else {
+            parameter = getBackingStore().createParameterDescriptor(code);
+        }
+        put(key, parameter);
+        return parameter;
+    }
+
+    /**
+     * Returns an operation method from a code. 
+     *
+     * @since 2.2
+     */
+    public synchronized OperationMethod createOperationMethod(final String code)
+            throws FactoryException
+    {
+        final OperationMethod method;
+        final String key = trimAuthority(code);
+        final Object cached = get(key);
+        if (cached instanceof OperationMethod) {
+            method = (OperationMethod) cached;
+        } else {
+            method = getBackingStore().createOperationMethod(code);
+        }
+        put(key, method);
+        return method;
+    }
+
+    /**
      * Returns an operation from a single operation code. 
      *
      * @since 2.2
@@ -844,8 +886,8 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      *
      * @since 2.2
      */
-    public Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
-                                        final String sourceCode, final String targetCode)
+    public synchronized Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
+                        final String sourceCode, final String targetCode)
             throws FactoryException
     {
         final Set/*<CoordinateOperation>*/ operations;

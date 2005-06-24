@@ -18,6 +18,8 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.geotools.referencing.operation.transform;
+
+// J2SE dependencies and extensions
 import java.util.Collections;
 import javax.units.NonSI;
 import javax.units.SI;

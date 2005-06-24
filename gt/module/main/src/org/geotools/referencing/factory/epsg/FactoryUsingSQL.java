@@ -33,7 +33,6 @@ import java.sql.SQLException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.ref.SoftReference;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -55,10 +54,13 @@ import javax.units.SI;
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.EvaluationMethodType;
+import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchIdentifierException;
@@ -87,7 +89,6 @@ import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Transformation;
@@ -118,8 +119,6 @@ import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.DefaultTransformation;
 import org.geotools.referencing.operation.DefaultConversion;
 import org.geotools.referencing.operation.DefiningConversion;
-import org.geotools.referencing.operation.projection.MapProjection;
-import org.geotools.referencing.operation.transform.GeocentricTranslation;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.cts.Resources;
@@ -269,7 +268,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         new TableInfo(CoordinateSystemAxis.class,
                       "[Coordinate Axis]",
                       "COORD_AXIS_CODE",
-                      null, null, null, null),
+                      null),
 
         new TableInfo(Datum.class,
                       "[Datum]",
@@ -282,13 +281,12 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         new TableInfo(Ellipsoid.class,
                       "[Ellipsoid]",
                       "ELLIPSOID_CODE",
-                      "ELLIPSOID_NAME",
-                      null, null, null),
+                      "ELLIPSOID_NAME"),
+
         new TableInfo(PrimeMeridian.class,
                       "[Prime Meridian]",
                       "PRIME_MERIDIAN_CODE",
-                      "PRIME_MERIDIAN_NAME",
-                      null, null, null),
+                      "PRIME_MERIDIAN_NAME"),
 
         new TableInfo(CoordinateOperation.class,
                       "[Coordinate_Operation]",
@@ -302,31 +300,13 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         new TableInfo(OperationMethod.class,
                       "[Coordinate_Operation Method]",
                       "COORD_OP_METHOD_CODE",
-                      "COORD_OP_METHOD_NAME",
-                      null, null, null)
+                      "COORD_OP_METHOD_NAME"),
+
+        new TableInfo(ParameterDescriptor.class,
+                      "[Coordinate_Operation Parameter]",
+                      "PARAMETER_CODE",
+                      "PARAMETER_NAME")
     };
-
-    /**
-     * Implicit parameters for projections. The EPSG database do not provides explicit values
-     * for them, since they are inferred from the CRS ellipsoid.
-     */
-    private static final List IMPLICIT_PROJECTION_PARAMETERS = Arrays.asList(new ParameterDescriptor[] {
-            MapProjection.AbstractProvider.SEMI_MAJOR,
-            MapProjection.AbstractProvider.SEMI_MINOR
-    });
-
-    /**
-     * Implicit parameters for datum shift. The EPSG database do not provides explicit values
-     * for them, since they are inferred from the CRS ellipsoid.
-     */
-    private static final List IMPLICIT_DATUM_SHIFT_PARAMETERS = Arrays.asList(new ParameterDescriptor[] {
-            GeocentricTranslation.Provider.SRC_DIM,
-            GeocentricTranslation.Provider.TGT_DIM,
-            GeocentricTranslation.Provider.SRC_SEMI_MAJOR,
-            GeocentricTranslation.Provider.SRC_SEMI_MINOR,
-            GeocentricTranslation.Provider.TGT_SEMI_MAJOR,
-            GeocentricTranslation.Provider.TGT_SEMI_MINOR
-    });
 
     ///////////////////////////////////////////////////////////////////////////////
     ////////                                                               ////////
@@ -409,12 +389,6 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     private final Map properties = new HashMap();
 
     /**
-     * The prefix to prepend to each properties, or an empty buffer if none.
-     * This is used by {@code createProperties} internal methods.
-     */
-    private final StringBuffer prefix = new StringBuffer();
-
-    /**
      * A safety guard for preventing never-ending loops in recursive calls to
      * {@link #createDatum}. This is used by {@link #createBursaWolfParameters},
      * which need to create a target datum. The target datum could have its own
@@ -428,12 +402,6 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * buffered factory wrapping this {@code FactoryUsingSQL} for efficienty.
      */
     AbstractAuthorityFactory buffered = this;
-
-    /**
-     * A coordinate operation factory, or {@code null} if none.
-     * Will be created only when first needed.
-     */
-    private transient CoordinateOperationFactory operationFactory;
 
     /**
      * The connection to the EPSG database.
@@ -835,20 +803,6 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     }
 
     /**
-     * Prepend the prefix to the specified key, if needed.
-     * This is used by {@code createProperties} internal methods.
-     */
-    private String prepend(String key) {
-        final int base = prefix.length();
-        if (base != 0) {
-            prefix.append(key);
-            key = prefix.toString();
-            prefix.setLength(base);
-        }
-        return key;
-    }
-
-    /**
      * Returns the name for the {@link IdentifiedObject} to construct.
      * This method also search for alias.
      *
@@ -860,24 +814,20 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     private Map createProperties(final String name, final String code, String remarks)
             throws SQLException, FactoryException
     {
-        final Citation authority  = getAuthority();
-        if (prefix.length() == 0) {
-            // Do not clear if we are adding "conversion.XXX"
-            // properties to the existing set.
-            properties.clear();
-        }
+        properties.clear();
+        final Citation authority = getAuthority();
         if (name != null) {
-            properties.put(prepend(IdentifiedObject.NAME_KEY),
+            properties.put(IdentifiedObject.NAME_KEY,
                            new NamedIdentifier(authority, name.trim()));
         }
         if (code != null) {
             final InternationalString edition = authority.getEdition();
             final String version = (edition!=null) ? edition.toString() : null;
-            properties.put(prepend(IdentifiedObject.IDENTIFIERS_KEY),
+            properties.put(IdentifiedObject.IDENTIFIERS_KEY,
                            new NamedIdentifier(authority, code.trim(), version));
         }
         if (remarks!=null && (remarks=remarks.trim()).length()!=0) {
-            properties.put(prepend(IdentifiedObject.REMARKS_KEY), remarks);
+            properties.put(IdentifiedObject.REMARKS_KEY, remarks);
         }
         /*
          * Search for alias.
@@ -912,7 +862,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         }
         result.close();
         if (alias != null) {
-            properties.put(prepend(IdentifiedObject.ALIAS_KEY),
+            properties.put(IdentifiedObject.ALIAS_KEY,
                            (GenericName[]) alias.toArray(new GenericName[alias.size()]));
         }
         return properties;
@@ -936,10 +886,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         final Map properties = createProperties(name, code, remarks);
         if (area != null  &&  (area=area.trim()).length() != 0) {
             final Extent extent = buffered.createExtent(area);
-            properties.put(prepend(Datum.VALID_AREA_KEY), extent);
+            properties.put(Datum.VALID_AREA_KEY, extent);
         }
         if (scope != null &&  (scope=scope.trim()).length() != 0) {
-            properties.put(prepend(Datum.SCOPE_KEY), scope);
+            properties.put(Datum.SCOPE_KEY, scope);
         }
         return properties;
     }
@@ -1046,7 +996,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 case 4:  return buffered.createEllipsoid                (code);
                 case 5:  return buffered.createPrimeMeridian            (code);
                 case 6:  return buffered.createCoordinateOperation      (code);
-                case 7:  break; // return buffered.createOperationMethod(code);
+                case 7:  return buffered.createOperationMethod          (code);
+                case 8:  return buffered.createParameterDescriptor      (code);
                 default: throw new AssertionError(index); // Should not happen
             }
         }
@@ -1359,7 +1310,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                  +       " WHERE CO.COORD_OP_METHOD_CODE >= " + BURSA_WOLF_MIN_CODE
                                  +         " AND CO.COORD_OP_METHOD_CODE <= " + BURSA_WOLF_MAX_CODE
                                  +         " AND CRS1.DATUM_CODE = ?"
-                                 +    " ORDER BY CRS2.DATUM_CODE, CO.COORD_OP_ACCURACY");
+                                 +    " ORDER BY CRS2.DATUM_CODE,"
+                                 +             " ABS(CO.DEPRECATED), CO.COORD_OP_ACCURACY");
         stmt.setString(1, code);
         ResultSet result = stmt.executeQuery();
         String last = code;
@@ -1462,7 +1414,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             while (result.next()) {
                 final String epsg    = getString(result, 1, code);
                 final String name    = getString(result, 2, code);
-                final String type    = getString(result, 3, code);
+                final String type    = getString(result, 3, code).trim().toLowerCase();
                 final String anchor  = result.getString( 4);
                 final int    epoch   = result.getInt   ( 5);
                 final String area    = result.getString( 6);
@@ -1491,7 +1443,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                  *     we must close the result set if Bursa-Wolf parameters are found. In this
                  *     case, we lost our paranoiac check for duplication.
                  */
-                if (type.equalsIgnoreCase("geodetic")) {
+                if (type.equals("geodetic")) {
                     properties = new HashMap(properties); // Protect from changes
                     final Ellipsoid         ellipsoid = buffered.createEllipsoid    (getString(result,  9, code));
                     final PrimeMeridian      meridian = buffered.createPrimeMeridian(getString(result, 10, code));
@@ -1501,10 +1453,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                         properties.put(DefaultGeodeticDatum.BURSA_WOLF_KEY, param);
                     }
                     datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
-                } else if (type.equalsIgnoreCase("vertical")) {
+                } else if (type.equals("vertical")) {
                     // TODO: Find the right datum type.
                     datum = factory.createVerticalDatum(properties, VerticalDatumType.GEOIDAL);
-                } else if (type.equalsIgnoreCase("engineering")) {
+                } else if (type.equals("engineering")) {
                     datum = factory.createEngineeringDatum(properties);
                 } else {
                     result.close();
@@ -1653,44 +1605,44 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             while (result.next()) {
                 final String    epsg = getString(result, 1, code);
                 final String    name = getString(result, 2, code);
-                final String    type = getString(result, 3, code);
+                final String    type = getString(result, 3, code).trim().toLowerCase();
                 final int  dimension = getInt   (result, 4, code);
                 final String remarks = result.getString( 5);
                 final CoordinateSystemAxis[] axis = createCoordinateSystemAxis(code, dimension);
                 final Map properties = createProperties(name, epsg, remarks); // Must be after axis
                 final CSFactory factory = factories.getCSFactory();
                 CoordinateSystem cs = null;
-                if (type.equalsIgnoreCase("ellipsoidal")) {
+                if (type.equals("ellipsoidal")) {
                     switch (dimension) {
                         case 2: cs=factory.createEllipsoidalCS(properties, axis[0], axis[1]); break;
                         case 3: cs=factory.createEllipsoidalCS(properties, axis[0], axis[1], axis[2]); break;
                     }
-                } else if (type.equalsIgnoreCase("cartesian")) {
+                } else if (type.equals("cartesian")) {
                     switch (dimension) {
                         case 2: cs=factory.createCartesianCS(properties, axis[0], axis[1]); break;
                         case 3: cs=factory.createCartesianCS(properties, axis[0], axis[1], axis[2]); break;
                     }
-                } else if (type.equalsIgnoreCase("spherical")) {
+                } else if (type.equals("spherical")) {
                     switch (dimension) {
                         case 3: cs=factory.createSphericalCS(properties, axis[0], axis[1], axis[2]); break;
                     }
-                } else if (type.equalsIgnoreCase("gravity-related")) {
+                } else if (type.equals("gravity-related")) {
                     switch (dimension) {
                         case 1: cs=factory.createVerticalCS(properties, axis[0]); break;
                     }
-                } else if (type.equalsIgnoreCase("linear")) {
+                } else if (type.equals("linear")) {
                     switch (dimension) {
                         case 1: cs=factory.createLinearCS(properties, axis[0]); break;
                     }
-                } else if (type.equalsIgnoreCase("polar")) {
+                } else if (type.equals("polar")) {
                     switch (dimension) {
                         case 2: cs=factory.createPolarCS(properties, axis[0], axis[1]); break;
                     }
-                } else if (type.equalsIgnoreCase("cylindrical")) {
+                } else if (type.equals("cylindrical")) {
                     switch (dimension) {
                         case 3: cs=factory.createCylindricalCS(properties, axis[0], axis[1], axis[2]); break;
                     }
-                } else if (type.equalsIgnoreCase("affine")) {
+                } else if (type.equals("affine")) {
                     switch (dimension) {
                         case 2: cs=factory.createAffineCS(properties, axis[0], axis[1]); break;
                         case 3: cs=factory.createAffineCS(properties, axis[0], axis[1], axis[2]); break;
@@ -1722,7 +1674,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * This method is used both by {@link #createCoordinateReferenceSystem}
      * and {@link #createFromCoordinateReferenceSystemCodes}
      */
-    private String toPrimaryKey(final String code) throws SQLException, FactoryException {
+    private String toPrimaryKeyCRS(final String code) throws SQLException, FactoryException {
         return toPrimaryKey(code, "[Coordinate Reference System]",
                                   "COORD_REF_SYS_CODE", "COORD_REF_SYS_NAME");
     }
@@ -1742,8 +1694,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         ensureNonNull("code", code);
         CoordinateReferenceSystem returnValue = null;
         try {
-            final String primaryKey = toPrimaryKey(code);
-            PreparedStatement stmt;
+            final String primaryKey = toPrimaryKeyCRS(code);
+            final PreparedStatement stmt;
             stmt = prepareStatement("CoordinateReferenceSystem",
                                             "SELECT COORD_REF_SYS_CODE,"
                                           +       " COORD_REF_SYS_NAME,"
@@ -1768,6 +1720,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 final String scope   = result.getString( 4);
                 final String remarks = result.getString( 5);
                 final String type    = getString(result, 6, code);
+                // Note: Do not invoke 'createProperties' now, even if we have all required
+                //       informations, because the 'properties' map is going to overwritten
+                //       by calls to 'createDatum', 'createCoordinateSystem', etc.
                 final CRSFactory factory = factories.getCRSFactory();
                 final CoordinateReferenceSystem crs;
                 /* ----------------------------------------------------------------------
@@ -1783,8 +1738,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     final String dmCode       = getString(result, 8, code);
                     final EllipsoidalCS cs    = buffered.createEllipsoidalCS(csCode);
                     final GeodeticDatum datum = buffered.createGeodeticDatum(dmCode);
-                    crs = factory.createGeographicCRS(
-                          createProperties(name, epsg, area, scope, remarks), datum, cs);
+                    final Map properties = createProperties(name, epsg, area, scope, remarks);
+                    crs = factory.createGeographicCRS(properties, datum, cs);
                 }
                 /* ----------------------------------------------------------------------
                  *   PROJECTED CRS
@@ -1793,52 +1748,20 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                  *         Concequently, we can't use 'result' anymore. We must close it here.
                  * ---------------------------------------------------------------------- */
                 else if (type.equalsIgnoreCase("projected")) {
-                    final String csCode     = getString(result,  7, code);
-                    final String geoCode    = getString(result,  9, code);
-                    final String conversion = getString(result, 10, code);
+                    final String csCode  = getString(result,  7, code);
+                    final String geoCode = getString(result,  9, code);
+                    final String opCode  = getString(result, 10, code);
                     result.close(); // Must be close before createGeographicCRS
-                    final CartesianCS   cs     = buffered.createCartesianCS(csCode);
-                    final GeographicCRS geoCRS = buffered.createGeographicCRS(geoCode);
-                    stmt = prepareStatement("Projection", "SELECT COORD_OP_NAME,"
-                                                        +       " AREA_OF_USE_CODE,"
-                                                        +       " COORD_OP_SCOPE,"
-                                                        +       " COORD_OP_METHOD_CODE,"
-                                                        +       " REMARKS"
-                                                        + " FROM [Coordinate_Operation]"
-                                                        + " WHERE COORD_OP_CODE = ?");
-                    stmt.setString(1, conversion);
-                    result = stmt.executeQuery();
-                    OperationMethod method = null;
-                    Map properties = null;
-                    while (result.next()) {
-                        final String opName    = getString(result, 1, conversion);
-                        final String opArea    = result.getString( 2);
-                        final String opScope   = result.getString( 3);
-                        final String opCode    = getString(result, 4, conversion);
-                        final String opRemarks = result.getString( 5);
-                        method = (OperationMethod) ensureSingleton(createOperationMethod(opCode,
-                                 conversion, 2, 2, IMPLICIT_PROJECTION_PARAMETERS), method, code);
-                        properties = createProperties(name, epsg, area, scope, remarks);
-                        assert prefix.length() == 0 : prefix;
-                        try {
-                            prefix.append("conversion.");
-                            properties = createProperties(opName, conversion, opArea, opScope, opRemarks);
-                        } finally {
-                            prefix.setLength(0);
-                        }
-                    }
-                    if (method == null) {
-                         throw noSuchAuthorityCode(Projection.class, conversion);
-                    }
-                    result.close();
                     result = null;
-                    // TODO: remove cast below when we will be allowed to compile for J2SE 1.5.
-                    final ParameterValueGroup parameters = (ParameterValueGroup) method.getParameters().createValue();
-                    final Ellipsoid ellipsoid = ((GeodeticDatum) geoCRS.getDatum()).getEllipsoid();
-                    final Unit axisUnit = ellipsoid.getAxisUnit();
-                    parameters.parameter("semi-major axis").setValue(ellipsoid.getSemiMajorAxis(), axisUnit);
-                    parameters.parameter("semi-minor axis").setValue(ellipsoid.getSemiMinorAxis(), axisUnit);
-                    crs = factories.createProjectedCRS(properties, geoCRS, method, parameters, cs);
+                    final CartesianCS         cs = buffered.createCartesianCS(csCode);
+                    final GeographicCRS   geoCRS = buffered.createGeographicCRS(geoCode);
+                    final CoordinateOperation op = buffered.createCoordinateOperation(opCode);
+                    if (op instanceof Conversion) {
+                        final Map properties = createProperties(name, epsg, area, scope, remarks);
+                        crs = factories.createProjectedCRS(properties, geoCRS, (Conversion)op, cs);
+                    } else {
+                         throw noSuchAuthorityCode(Projection.class, opCode);
+                    }
                 }
                 /* ----------------------------------------------------------------------
                  *   VERTICAL CRS
@@ -1848,8 +1771,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     final String        dmCode = getString(result, 8, code);
                     final VerticalCS    cs     = buffered.createVerticalCS   (csCode);
                     final VerticalDatum datum  = buffered.createVerticalDatum(dmCode);
-                    crs = factory.createVerticalCRS(
-                          createProperties(name, epsg, area, scope, remarks), datum, cs);
+                    final Map properties = createProperties(name, epsg, area, scope, remarks);
+                    crs = factory.createVerticalCRS(properties, datum, cs);
                 }
                 /* ----------------------------------------------------------------------
                  *   COMPOUND CRS
@@ -1865,8 +1788,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     final CoordinateReferenceSystem crs1, crs2;
                     crs1 = buffered.createCoordinateReferenceSystem(code1);
                     crs2 = buffered.createCoordinateReferenceSystem(code2);
-                    crs  = factory.createCompoundCRS(
-                           createProperties(name, epsg, area, scope, remarks),
+                    // Note: Don't invoke 'createProperties' sooner.
+                    final Map properties = createProperties(name, epsg, area, scope, remarks);
+                    crs  = factory.createCompoundCRS(properties,
                            new CoordinateReferenceSystem[] {crs1, crs2});
                 }
                 /* ----------------------------------------------------------------------
@@ -1896,8 +1820,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     final String           dmCode = getString(result, 8, code);
                     final CoordinateSystem cs     = buffered.createCoordinateSystem(csCode);
                     final EngineeringDatum datum  = buffered.createEngineeringDatum(dmCode);
-                    crs = factory.createEngineeringCRS(
-                          createProperties(name, epsg, area, scope, remarks), datum, cs);
+                    final Map properties = createProperties(name, epsg, area, scope, remarks);
+                    crs = factory.createEngineeringCRS(properties, datum, cs);
                 }
                 /* ----------------------------------------------------------------------
                  *   UNKNOW CRS
@@ -1924,33 +1848,129 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns parameter descriptors from a code. The default value is
-     * set to the actual value declared in the parameter value table.
+     * Returns a parameter descriptor from a code.
      *
-     * @param  method       The EPSG code for the operation method.
-     * @param  operation    The EPSG code for the operation (conversion or transformation).
-     * @param  implicit     List of implicit parameters to add (e.g. "semi_major" and
-     *                      "semi_minor"), or {@code null} if none.
-     * @return The parameter descriptors.
+     * @param  code The parameter descriptor code allocated by EPSG authority.
+     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
+     * @throws FactoryException if some other kind of failure occured in the backing
+     *         store. This exception usually have {@link SQLException} as its cause.
+     *
+     * @since 2.2
      */
-    private ParameterDescriptor[] createParameters(final String method,
-                                                   final String operation,
-                                                   final List   implicit)
-            throws SQLException, FactoryException
+    public synchronized ParameterDescriptor createParameterDescriptor(final String code)
+            throws FactoryException
     {
-        final List descriptors = new ArrayList();
-        if (implicit != null) {
-            descriptors.addAll(implicit);
-        }
+        ensureNonNull("code", code);
+        ParameterDescriptor returnValue = null;
         final PreparedStatement stmt;
-        stmt = prepareStatement("Parameters",
+        try {
+            final String primaryKey = toPrimaryKey(code,
+                    "[Coordinate_Operation Parameter]", "PARAMETER_CODE", "PARAMETER_NAME");
+            stmt = prepareStatement("ParameterDescriptor", // Must be singular form.
+                                        "SELECT PARAMETER_CODE,"
+                                      +       " PARAMETER_NAME,"
+                                      +       " DESCRIPTION"
+                                      + " FROM [Coordinate_Operation Parameter]"
+                                      + " WHERE PARAMETER_CODE = ?");
+            stmt.setString(1, primaryKey);
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                final String epsg    = getString(result, 1, code);
+                final String name    = getString(result, 2, code);
+                final String remarks = result.getString( 3);
+                final Unit   unit;
+                final Class  type;
+                /*
+                 * Search for units. We will choose the most commonly used one in parameter values.
+                 * If the parameter appears to have at least one non-null value in the "Parameter
+                 * File Name" column, then the type is assumed to be URI. Otherwise, the type is a
+                 * floating point number.
+                 */
+                final PreparedStatement units = prepareStatement("ParameterUnit",
+                                                  "SELECT MIN(UOM_CODE) AS UOM,"
+                                                 +      " MIN(PARAM_VALUE_FILE_REF) AS FILE"
+                                                 +    " FROM [Coordinate_Operation Parameter Value]"
+                                                 +   " WHERE (PARAMETER_CODE = ?)"
+                                                 + " GROUP BY UOM_CODE"
+                                                 + " ORDER BY COUNT(UOM_CODE) DESC");
+                units.setString(1, epsg);
+                final ResultSet resultUnits = units.executeQuery();
+                if (resultUnits.next()) {
+                    String element = resultUnits.getString(1);
+                    unit = (element!=null) ? buffered.createUnit(element) : null;
+                    element = resultUnits.getString(2);
+                    type = (element!=null && element.trim().length()!=0) ? URI.class : double.class;
+                } else {
+                    unit = null;
+                    type = double.class;
+                }
+                resultUnits.close();
+                /*
+                 * Now creates the parameter descriptor.
+                 */
+                final ParameterDescriptor descriptor;
+                final Map properties = createProperties(name, epsg, remarks);
+                descriptor = new DefaultParameterDescriptor(properties, type,
+                                    null, null, null, null, unit, true);
+                returnValue = (ParameterDescriptor) ensureSingleton(descriptor, returnValue, code);
+            }            
+        } catch (SQLException exception) {
+            throw databaseFailure(OperationMethod.class, code, exception);
+        }            
+        if (returnValue == null) {
+             throw noSuchAuthorityCode(OperationMethod.class, code);
+        }
+        return returnValue;
+    }
+
+    /**
+     * Returns all parameter descriptors for the specified method.
+     *
+     * @param  method The operation method code.
+     * @return The parameter descriptors.
+     * @throws SQLException if a SQL statement failed.
+     */
+    private ParameterDescriptor[] createParameterDescriptors(final String method)
+            throws FactoryException, SQLException
+    {
+        final PreparedStatement stmt;
+        stmt = prepareStatement("ParameterDescriptors", // Must be plural form.
+                                        "SELECT PARAMETER_CODE"
+                                   +    " FROM [Coordinate_Operation Parameter Usage]"
+                                   +    " WHERE COORD_OP_METHOD_CODE = ?"
+                                   + " ORDER BY SORT_ORDER");
+        stmt.setString(1, method);
+        final ResultSet results = stmt.executeQuery();
+        final List  descriptors = new ArrayList();
+        while (results.next()) {
+            final String param = getString(results, 1, method);
+            descriptors.add(buffered.createParameterDescriptor(param));
+        }
+        results.close();
+        return (ParameterDescriptor[]) descriptors.toArray(new ParameterDescriptor[descriptors.size()]);
+    }
+
+    /**
+     * Fill parameter values in the specified group.
+     *
+     * @param  method    The EPSG code for the operation method.
+     * @param  operation The EPSG code for the operation (conversion or transformation).
+     * @param  value     The parameter values to fill.
+     * @throws SQLException if a SQL statement failed.
+     */
+    private void fillParameterValues(final String method,
+                                     final String operation,
+                                     final ParameterValueGroup parameters)
+            throws FactoryException, SQLException
+    {
+        final PreparedStatement stmt;
+        stmt = prepareStatement("ParameterValues",
                                         "SELECT CP.PARAMETER_NAME,"
-                                +             " CP.DESCRIPTION,"
                                 +             " CV.PARAMETER_VALUE,"
                                 +             " CV.PARAM_VALUE_FILE_REF,"
                                 +             " CV.UOM_CODE"
-                                +      " FROM ([Coordinate_Operation Parameter] AS CP"
-                                + " INNER JOIN [Coordinate_Operation Parameter Value] AS CV"
+                                +      " FROM ([Coordinate_Operation Parameter Value] AS CV"
+                                + " INNER JOIN [Coordinate_Operation Parameter] AS CP"
                                 +          " ON CV.PARAMETER_CODE = CP.PARAMETER_CODE)"
                                 + " INNER JOIN [Coordinate_Operation Parameter Usage] AS CU"
                                 +         " ON (CP.PARAMETER_CODE = CU.PARAMETER_CODE)"
@@ -1962,79 +1982,162 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         stmt.setString(2, operation);
         final ResultSet result = stmt.executeQuery();
         while (result.next()) {
-            final ParameterDescriptor parameter;
-            final String name    = getString(result, 1, operation);
-            final String remarks = result.getString( 2);
-            final double value   = result.getDouble( 3);
-            if (!result.wasNull()) {
-                final Unit unit = buffered.createUnit(getString(result, 5, operation));
-                final Map properties = createProperties(name, null, remarks);
-                parameter = new DefaultParameterDescriptor(properties,
-                            value, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, unit, true);
-            } else {
-                Object ref = getString(result, 4, operation);
+            final String name  = getString(result, 1, operation);
+            final double value = result.getDouble( 2);
+            final Unit   unit;
+            Object reference;
+            if (result.wasNull()) {
+                /*
+                 * If no numeric values were provided in the database, then the values must
+                 * appears in some external file. It may be a file to download from FTP.
+                 */
+                reference = getString(result, 3, operation);
                 try {
-                    ref = new URI((String) ref);
+                    reference = new URI((String) reference);
                 } catch (URISyntaxException exception) {
                     // Ignore: we will stores the reference as a file.
-                    ref = new File((String) ref);
+                    reference = new File((String) reference);
                 }
-                parameter = new DefaultParameterDescriptor(name, remarks, ref, true);
+                unit = null;
+            } else {
+                reference = null;
+                final String unitCode = result.getString(4);
+                unit = (unitCode!=null) ? buffered.createUnit(unitCode) : null;
             }
-            descriptors.add(parameter);
+            final ParameterValue param = parameters.parameter(name);
+            if (reference != null) {
+                param.setValue(reference);
+            } else if (unit != null) {
+                param.setValue(value, unit);
+            } else {
+                param.setValue(value);
+            }
         }
         result.close();
-        return (ParameterDescriptor[]) descriptors.toArray(new ParameterDescriptor[descriptors.size()]);
     }
 
     /**
      * Returns an operation method from a code.
      *
-     * @param  code             The operation method code allocated by EPSG authority.
-     * @param  operation        The EPSG code for the operation (conversion or transformation).
-     * @param  sourceDimensions The source dimensions for the coordinate operation to be created.
-     * @param  targetDimensions The target dimensions for the coordinate operation to be created.
-     * @param  implicit         List of implicit parameters to add (e.g. "semi_major" and
-     *                          "semi_minor"), or {@code null} if none.
+     * @param  code The operation method code allocated by EPSG authority.
      * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
+     * @throws FactoryException if some other kind of failure occured in the backing
+     *         store. This exception usually have {@link SQLException} as its cause.
+     *
+     * @since 2.2
      */
-    private OperationMethod createOperationMethod(final String code,
-                                                  final String operation,
-                                                  final int sourceDimensions,
-                                                  final int targetDimensions,
-                                                  final List implicit)
-            throws SQLException, FactoryException
+    public synchronized OperationMethod createOperationMethod(final String code)
+            throws FactoryException
     {
+        ensureNonNull("code", code);
         OperationMethod returnValue = null;
         final PreparedStatement stmt;
-        stmt = prepareStatement("OperationMethod", "SELECT COORD_OP_METHOD_NAME,"
-                                                 +       " FORMULA,"
-                                                 +       " REMARKS"
-                                                 +  " FROM [Coordinate_Operation Method]"
-                                                 + " WHERE COORD_OP_METHOD_CODE = ?");
-        stmt.setString(1, code);
-        final ResultSet result = stmt.executeQuery();
-        ParameterDescriptor[] descriptors = null;
-        OperationMethod method = null;
-        while (result.next()) {
-            final String name    = getString(result, 1, code);
-            final String formula = result.getString( 2);
-            final String remarks = result.getString( 3);
-            if (descriptors == null) {
-                descriptors = createParameters(code, operation, implicit);
+        try {
+            final String primaryKey = toPrimaryKey(code,
+                    "[Coordinate_Operation Method]", "COORD_OP_METHOD_CODE", "COORD_OP_METHOD_NAME");
+            stmt = prepareStatement("OperationMethod", "SELECT COORD_OP_METHOD_CODE,"
+                                                     +       " COORD_OP_METHOD_NAME,"
+                                                     +       " FORMULA,"
+                                                     +       " REMARKS"
+                                                     +  " FROM [Coordinate_Operation Method]"
+                                                     + " WHERE COORD_OP_METHOD_CODE = ?");
+            stmt.setString(1, primaryKey);
+            final ResultSet result = stmt.executeQuery();
+            OperationMethod method = null;
+            while (result.next()) {
+                final String epsg    = getString(result, 1, code);
+                final String name    = getString(result, 2, code);
+                final String formula = result.getString( 3);
+                final String remarks = result.getString( 4);
+                final int encoded = getDimensionsForMethod(epsg);
+                final int sourceDimensions = encoded >>> 16;
+                final int targetDimensions = encoded & 0xFFFF;
+                final ParameterDescriptor[] descriptors = createParameterDescriptors(epsg);
+                final Map properties = createProperties(name, epsg, remarks);
+                if (formula != null) {
+                    properties.put(OperationMethod.FORMULA_KEY, formula);
+                }
+                method = new DefaultOperationMethod(properties, sourceDimensions, targetDimensions,
+                         new DefaultParameterDescriptorGroup(properties, descriptors));
+                returnValue = (OperationMethod) ensureSingleton(method, returnValue, code);
             }
-            final Map properties = createProperties(name, code, remarks);
-            if (formula != null) {
-                properties.put(OperationMethod.FORMULA_KEY, formula);
-            }
-            method = new DefaultOperationMethod(properties, sourceDimensions, targetDimensions,
-                     new DefaultParameterDescriptorGroup(properties, descriptors));
-            returnValue = (OperationMethod) ensureSingleton(method, returnValue, code);
-        }
+        } catch (SQLException exception) {
+            throw databaseFailure(OperationMethod.class, code, exception);
+        }            
         if (returnValue == null) {
              throw noSuchAuthorityCode(OperationMethod.class, code);
         }
         return returnValue;
+    }
+
+    /**
+     * Returns the must common source and target dimensions for the specified method.
+     * Source dimension is encoded in the 16 highest bits and target dimension is encoded
+     * in the 16 lowest bits. If this method can't infers the dimensions from the "Coordinate
+     * Operation" table, then the operation method is probably a projection, which always have
+     * (2,2) dimensions in the EPSG database.
+     */
+    private int getDimensionsForMethod(final String code) throws SQLException {
+        final PreparedStatement stmt;
+        stmt = prepareStatement("MethodDimensions", "SELECT SOURCE_CRS_CODE,"
+                                                +         " TARGET_CRS_CODE"
+                                                +  " FROM [Coordinate_Operation]"
+                                                + " WHERE COORD_OP_METHOD_CODE = ?"
+                                                +   " AND SOURCE_CRS_CODE IS NOT NULL"
+                                                +   " AND TARGET_CRS_CODE IS NOT NULL");
+        stmt.setString(1, code);
+        final ResultSet result = stmt.executeQuery();
+        final Map   dimensions = new HashMap();
+        final Dimensions  temp = new Dimensions((2 << 16) | 2); // Default to (2,2) dimensions.
+        Dimensions max = temp;
+        while (result.next()) {
+            final short sourceDimensions = getDimensionForCRS(result.getString(1));
+            final short targetDimensions = getDimensionForCRS(result.getString(2));
+            temp.encoded = (sourceDimensions << 16) | (targetDimensions);
+            Dimensions candidate = (Dimensions) dimensions.get(temp);
+            if (candidate == null) {
+                candidate = new Dimensions(temp.encoded);
+                dimensions.put(candidate, candidate);
+            }
+            if (++candidate.occurences > max.occurences) {
+                max = candidate;
+            }
+        }
+        result.close();
+        return max.encoded;
+    }
+
+    /** A counter for source and target dimensions (to be kept together). */
+    private static final class Dimensions {
+        /** The dimensions as an encoded value. */ int encoded;
+        /** The occurences of this dimensions.  */ int occurences;
+        Dimensions(final int e) {encoded = e;}
+        public int hashCode() {return encoded;}
+        public boolean equals(final Object object) { // MUST ignore 'occurences'.
+            return (object instanceof Dimensions) && ((Dimensions) object).encoded == encoded;
+        }
+        public String toString() {
+            return "[(" + (encoded >>> 16) + ',' + (encoded & 0xFFFF) + ")\u00D7" + occurences + ']';
+        }
+    }
+
+    /**
+     * Returns the dimension of the specified CRS. If the CRS is not found (which should not
+     * happen, but we don't need to be strict here), then this method assumes a two-dimensional
+     * CRS.
+     */
+    private short getDimensionForCRS(final String code) throws SQLException {
+        final PreparedStatement stmt;
+        stmt = prepareStatement("Dimension", "SELECT COUNT(CA.COORD_AXIS_CODE)"
+                                     +       " FROM [Coordinate Axis] AS CA"
+                                     + " INNER JOIN [Coordinate Reference System] AS CRS"
+                                     +       "   ON (CA.COORD_SYS_CODE = CRS.COORD_SYS_CODE)"
+                                     +      " WHERE (CRS.COORD_REF_SYS_CODE = ?)");
+        stmt.setString(1, code);
+        final ResultSet result = stmt.executeQuery();
+        final short dimension = result.next() ? result.getShort(1) : 2;
+        result.close();
+        return dimension;
     }
 
     /**
@@ -2043,7 +2146,6 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * the designed operation is a {@linkplain Conversion conversion} before to invoke this method.
      */
     final boolean isProjection(final String code) throws SQLException {
-        assert Thread.holdsLock(this);
         final PreparedStatement stmt;
         stmt = prepareStatement("isProjection", "SELECT COORD_REF_SYS_CODE"
                                               +  " FROM [Coordinate Reference System]"
@@ -2129,26 +2231,70 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                  * of operation methods. For example the "Geocentric translation" operation
                  * method has 3-dimensional source and target.
                  */
-                final int sourceDimension, targetDimension;
+                final int sourceDimensions, targetDimensions;
                 final CoordinateReferenceSystem sourceCRS, targetCRS;
                 if (sourceCode != null) {
                     sourceCRS = buffered.createCoordinateReferenceSystem(sourceCode);
-                    sourceDimension = sourceCRS.getCoordinateSystem().getDimension();
+                    sourceDimensions = sourceCRS.getCoordinateSystem().getDimension();
                 } else {
                     sourceCRS = null;
-                    sourceDimension = 2; // Acceptable default for projections only.
+                    sourceDimensions = 2; // Acceptable default for projections only.
                 }
                 if (targetCode != null) {
                     targetCRS = buffered.createCoordinateReferenceSystem(targetCode);
-                    targetDimension = targetCRS.getCoordinateSystem().getDimension();
+                    targetDimensions = targetCRS.getCoordinateSystem().getDimension();
                 } else {
                     targetCRS = null;
-                    targetDimension = 2; // Acceptable default for projections only.
+                    targetDimensions = 2; // Acceptable default for projections only.
+                }
+                /*
+                 * Gets the operation method. This is mandatory for conversions and transformations
+                 * (it was checked above in this method) but optional for concatenated operations.
+                 * Fetching parameter values is part of this block.
+                 */
+                final boolean             isBursaWolf;
+                OperationMethod           method;
+                final ParameterValueGroup parameters;
+                if (methodCode == null) {
+                    isBursaWolf = false;
+                    method      = null;
+                    parameters  = null;
+                } else {
+                    final int num;
+                    try {
+                        num = Integer.parseInt(methodCode);
+                    } catch (NumberFormatException exception) {
+                        result.close();
+                        throw new FactoryException(exception);
+                    }
+                    isBursaWolf = (num>=BURSA_WOLF_MIN_CODE && num<=BURSA_WOLF_MAX_CODE);
+                    // Reminder: The source and target dimensions MUST be computed when
+                    //           the information is available. Dimension is not always 2!!
+                    method = buffered.createOperationMethod(methodCode);
+                    if (method.getSourceDimensions() != sourceDimensions ||
+                        method.getTargetDimensions() != targetDimensions)
+                    {
+                        method = new DefaultOperationMethod(method, sourceDimensions, targetDimensions);
+                    }
+                    /*
+                     * Note that some parameters required for MathTransform creation are implicit in
+                     * the EPSG database (e.g. semi-major and semi-minor axis length in the case of
+                     * map projections). We ask the parameter value group straight from the math
+                     * transform factory instead of from the operation method in order to get all
+                     * required parameter descriptors, including implicit ones.
+                     */
+                    final String classe = method.getName().getCode();
+                    parameters = factories.getMathTransformFactory().getDefaultParameters(classe);
+                    fillParameterValues(methodCode, epsg, parameters);
                 }
                 /*
                  * Creates common properties. The 'version' and 'accuracy' are usually defined
                  * for transformations only. However, we check them for all kind of operations
                  * (including conversions) and copy the information inconditionnaly if present.
+                 *
+                 * NOTE: This block must be executed last before object creations below, because
+                 *       methods like createCoordinateReferenceSystem and createOperationMethod
+                 *       overwrite the properties map.
                  */
                 final Map properties = createProperties(name, epsg, area, scope, remarks);
                 if (version!=null && (version=version.trim()).length()!=0) {
@@ -2169,44 +2315,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     accuracyElement.setMeasureDescription(TRANSFORMATION_ACCURACY);
                     accuracyElement.setEvaluationMethodType(EvaluationMethodType.DIRECT_EXTERNAL);
                     properties.put(CoordinateOperation.POSITIONAL_ACCURACY_KEY,
-                                   accuracyElement.unmodifiable());
-                }
-                /*
-                 * Gets the operation method. This is mandatory for conversions and transformations
-                 * (it was checked above in this method) but optional for concatenated operations.
-                 * Note that some parameters required for MathTransform creation are implicit in
-                 * the EPSG database. Special processing is required for them.
-                 */
-                final boolean             isBursaWolf;
-                final OperationMethod     method;
-                final ParameterValueGroup parameters;
-                if (methodCode == null) {
-                    isBursaWolf = false;
-                    method      = null;
-                    parameters  = null;
-                } else {
-                    final int num;
-                    try {
-                        num = Integer.parseInt(methodCode);
-                    } catch (NumberFormatException exception) {
-                        result.close();
-                        throw new FactoryException(exception);
-                    }
-                    isBursaWolf = (num>=BURSA_WOLF_MIN_CODE && num<=BURSA_WOLF_MAX_CODE);
-                    final List/*<ParameterDescriptor>*/ implicit;
-                    if (isConversion && isProjection(epsg)) {
-                        implicit = IMPLICIT_PROJECTION_PARAMETERS;
-                    } else if (isBursaWolf) {
-                        implicit = IMPLICIT_DATUM_SHIFT_PARAMETERS;
-                    } else {
-                        implicit = null;
-                    }
-                    // Reminder: The source and target dimensions MUST be computed when
-                    //           the information is available. Dimension is not always 2!!
-                    method = createOperationMethod(methodCode, epsg,
-                                                   sourceDimension, targetDimension, implicit);
-                    parameters = (ParameterValueGroup) method.getParameters().createValue();
-                    // ParameterDescriptor's default values are actual parameter values.
+                                   new PositionalAccuracy[] {
+                                       (PositionalAccuracy)accuracyElement.unmodifiable()
+                                   });
                 }
                 /*
                  * Creates the operation. Conversions should be the only operations allowed to
@@ -2218,13 +2329,11 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                  */
                 final CoordinateOperation operation;
                 if (isConversion && (sourceCRS==null || targetCRS==null)) {
+                    // Note: we usually can't resolve sourceCRS and targetCRS because there
+                    // is many of them for the same coordinate operation (projection) code.
                     operation = new DefiningConversion(properties, method, parameters);
                 } else if (isConcatenated) {
-                    if (operationFactory == null) {
-                        operationFactory = new ConcatenatedOperationFactory(factories, this);
-                    }
-                    ((ConcatenatedOperationFactory) operationFactory).init(properties, sourceCode, targetCode);
-                    operation = operationFactory.createOperation(sourceCRS, targetCRS);
+                    throw new FactoryException("TODO");
                 } else {
                     /*
                      * Needs to create a math transform. A special processing is performed for
@@ -2302,8 +2411,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         final String pair = sourceCode + " \u21E8 " + targetCode;
         final Set set = new LinkedHashSet();
         try {
-            final String sourceKey = toPrimaryKey(sourceCode);
-            final String targetKey = toPrimaryKey(targetCode);
+            final String sourceKey = toPrimaryKeyCRS(sourceCode);
+            final String targetKey = toPrimaryKeyCRS(targetCode);
             boolean searchTransformations = false;
             do {
                 /*
@@ -2319,7 +2428,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                         +    " FROM [Coordinate_Operation]"
                         +    " WHERE SOURCE_CRS_CODE = ?"
                         +      " AND TARGET_CRS_CODE = ?"
-                        + " ORDER BY COORD_TFM_VERSION";
+                        + " ORDER BY ABS(DEPRECATED), COORD_OP_ACCURACY";
                 } else {
                     key = "ConversionFromCRS";
                     sql = "SELECT PROJECTION_CONV_CODE"
@@ -2332,26 +2441,46 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 stmt.setString(2, targetKey);
                 final ResultSet result = stmt.executeQuery();
                 while (result.next()) {
+                    LogRecord record;
+                    Exception failure;
                     final String code = getString(result, 1, pair);
-                    final CoordinateOperation operation;
                     try {
-                        operation = buffered.createCoordinateOperation(code);
+                        final CoordinateOperation operation;
+                        if (searchTransformations) {
+                            operation = buffered.createCoordinateOperation(code);
+                        } else {
+                            operation = buffered.createProjectedCRS(targetKey).getConversionFromBase();
+                        }
+                        set.add(operation);
+                        continue;
                     } catch (NoSuchIdentifierException exception) {
                         /*
                          * The operation uses an unsupported math transform.
                          * Log as a warning and search for other operations.
                          * TODO: localize
                          */
-                        final LogRecord record = new LogRecord(Level.WARNING,
-                                "Operation \""+code+"\" uses an unsupported method.");
-                        record.setSourceClassName("FactoryUsingSQL");
-                        record.setSourceMethodName("createFromCoordinateReferenceSystemCodes");
-                        record.setThrown(exception);
-                        LOGGER.log(record);
-                        continue;
+                        failure = exception;
+                        record = new LogRecord(Level.WARNING, "Operation \"" + code +
+                                               "\" uses an unsupported method.");
+                    } catch (FactoryException exception) {
+                        /*
+                         * The operation can't be created for a reason not
+                         * related to a database failure. Log and continue.
+                         * TODO: localize
+                         */
+                        if (exception.getCause() instanceof SQLException) {
+                            throw exception;
+                        }
+                        failure = exception;
+                        record = new LogRecord(Level.WARNING, "Can't create an operation "+
+                                                              "for code \"" + code + "\".");
                     }
-                    set.add(operation);
+                    record.setSourceClassName("FactoryUsingSQL");
+                    record.setSourceMethodName("createFromCoordinateReferenceSystemCodes");
+                    record.setThrown(failure);
+                    LOGGER.log(record);
                 }
+                result.close();
             } while ((searchTransformations = !searchTransformations) == true);
         } catch (SQLException exception) {
             throw databaseFailure(CoordinateOperation.class, pair, exception);

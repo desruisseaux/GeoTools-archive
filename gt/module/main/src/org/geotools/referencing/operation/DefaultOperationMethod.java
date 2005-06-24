@@ -137,6 +137,42 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     }
 
     /**
+     * Constructs a new operation method with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     */
+    public DefaultOperationMethod(final OperationMethod method) {
+        super(method);
+        formula          = method.getFormula();
+        parameters       = method.getParameters();
+        sourceDimensions = method.getSourceDimensions();
+        targetDimensions = method.getTargetDimensions();
+    }
+
+    /**
+     * Constructs a new operation method with the same values than the specified one
+     * except the dimensions.
+     *
+     * @param method The operation method to copy.
+     * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
+     * @param targetDimensions Number of dimensions in the target CRS of this operation method.
+     */
+    public DefaultOperationMethod(final OperationMethod method,
+                                  final int sourceDimensions,
+                                  final int targetDimensions)
+    {
+        super(method);
+        this.formula    = method.getFormula();
+        this.parameters = method.getParameters();
+        this.sourceDimensions = sourceDimensions;
+        this.targetDimensions = targetDimensions;
+        ensurePositive("sourceDimensions", sourceDimensions);
+        ensurePositive("targetDimensions", targetDimensions);
+    }
+
+    /**
      * Constructs an operation method from a set of properties and an array of parameter
      * descriptors. The properties given in argument follow the same rules than for the
      * {@linkplain #DefaultOperationMethod(Map, int, int, ParameterDescriptorGroup) constructor
