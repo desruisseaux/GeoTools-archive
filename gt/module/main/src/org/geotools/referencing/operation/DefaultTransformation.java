@@ -74,7 +74,7 @@ public class DefaultTransformation extends DefaultOperation implements Transform
         super(properties, sourceCRS, targetCRS, transform, method);
         if (false) {
             // The EPSG database do not always defines an operation version.
-            // Concequently, we relax the rule saying that version is mandatory.
+            // Consequently, we relax the rule saying that version is mandatory.
             ensureNonNull(OPERATION_VERSION_KEY, operationVersion);
         }
     }

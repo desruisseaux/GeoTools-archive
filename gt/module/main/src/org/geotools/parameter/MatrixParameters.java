@@ -49,7 +49,7 @@ import org.geotools.resources.XArray;
  * The values for a group of {@linkplain MatrixParameterDescriptors matrix parameters}. This value
  * group is extensible, i.e. the number of <code>"elt_<var>row</var>_<var>col</var>"</code>
  * parameters depends on the <code>"num_row"</code> and <code>"num_col"</code> parameter values.
- * Concequently, this {@linkplain ParameterGroup parameter value group} is also its own mutable
+ * Consequently, this {@linkplain ParameterGroup parameter value group} is also its own mutable
  * {@linkplain ParameterDescriptorGroup operation parameter group}.
  *
  * @version $Id$

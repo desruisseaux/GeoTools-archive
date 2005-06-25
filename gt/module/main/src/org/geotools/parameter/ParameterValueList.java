@@ -136,7 +136,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
             for (final Iterator it=descriptors.iterator(); it.hasNext();) {
                 if (AbstractIdentifiedObject.nameMatches((GeneralParameterDescriptor) it.next(), name)) {
                     /*
-                     * Found a matching name. Concequently, the operation failed because
+                     * Found a matching name. Consequently, the operation failed because
                      * the descriptor was illegal.
                      */
                     throw new IllegalArgumentException(Resources.format(
@@ -144,7 +144,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
                 }
             }
             /*
-             * Found no matching name. Concequently, the operation failed because the name
+             * Found no matching name. Consequently, the operation failed because the name
              * was invalid.
              */
             final Object value;

@@ -886,7 +886,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
             return code;
         }
         if (CitationImpl.titleMatches(getAuthority(), scope.toString())) {
-            return name.asLocalName().toString();
+            return name.asLocalName().toString().trim();
         }
         final InternationalString authority = getAuthority().getTitle();
         throw new NoSuchAuthorityCodeException("\"" + scope.toInternationalString() + 

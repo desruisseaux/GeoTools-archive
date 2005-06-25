@@ -105,7 +105,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
      * </ul>
      */
     public int getPriority() {
-        return NORMAL_PRIORITY-10;
+        return NORMAL_PRIORITY - 30;
     }
 
     /**

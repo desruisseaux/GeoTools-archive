@@ -57,6 +57,7 @@ import org.geotools.referencing.factory.FactoryGroup;
  * @author Rueben Schulz
  * @author Martin Desruisseaux
  * @author Didier Richard
+ * @author John Grange
  *
  * @since 2.1
  */
@@ -74,6 +75,7 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
         "[Coordinate_Operation Parameter]",         "epsg_coordoperationparam",
         "[Coordinate_Operation Parameter Usage]",   "epsg_coordoperationparamusage",
         "[Coordinate_Operation Parameter Value]",   "epsg_coordoperationparamvalue",
+        "[Coordinate_Operation Path]",              "epsg_coordoperationpath",
         "[Coordinate Reference System]",            "epsg_coordinatereferencesystem",
         "[Coordinate System]",                      "epsg_coordinatesystem",
         "[Datum]",                                  "epsg_datum",
@@ -101,6 +103,7 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
      *   <tr><td>[Coordinate_Operation Parameter]</td>         <td>epsg_coordoperationparam</td></tr>
      *   <tr><td>[Coordinate_Operation Parameter Usage]</td>   <td>epsg_coordoperationparamusage</td></tr>
      *   <tr><td>[Coordinate_Operation Parameter Value]</td>   <td>epsg_coordoperationparamvalue</td></tr>
+     *   <tr><td>[Coordinate_Operation Path]</td>              <td>epsg_coordoperationpath</td></tr>
      *   <tr><td>[Coordinate Reference System]</td>            <td>epsg_coordinatereferencesystem</td></tr>
      *   <tr><td>[Coordinate System]</td>                      <td>epsg_coordinatesystem</td></tr>
      *   <tr><td>[Datum]</td>                                  <td>epsg_datum</td></tr>
@@ -115,6 +118,12 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
      * mapping.
      */
     protected final Map map = new LinkedHashMap();
+
+    /**
+     * The prefix before any table name. May be replaced by a schema if {@link #setSchema}
+     * is invoked.
+     */
+    private String prefix = "epsg_";
 
     /**
      * Constructs an authority factory using the specified connection.
@@ -148,6 +157,43 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
     }
 
     /**
+     * Replaces the {@code "epsg_"} prefix by the specified schema name. If the removal
+     * of the {@code "epsg_"} prefix is not wanted, append it to the schema name
+     * (e.g. {@code "myschema.epsg_"}). This method should be invoked at construction
+     * time only.
+     *
+     * @param schema The database schema in which the epsg tables are stored.
+     *
+     * @since 2.2
+     */
+    protected void setSchema(String schema) {
+        schema = schema.trim();
+        final int length = schema.length();
+        if (length == 0) {
+            throw new IllegalArgumentException(schema);
+        }
+        final char separator = schema.charAt(length-1);
+        if (separator!='.' && separator!='_') {
+            schema += '.';
+        } else if (length == 1) {
+            throw new IllegalArgumentException(schema);
+        }
+        for (final Iterator it=map.entrySet().iterator(); it.hasNext();) {
+            final Map.Entry  entry = (Map.Entry) it.next();
+            final String tableName = (String) entry.getValue();
+            /**
+             * Update the map, prepending the schema name to the table name
+             * so long as the value is a table name and not a field. This
+             * algorithm assumes that all old table names start with "epsg_".
+             */
+            if (tableName.startsWith(prefix)) {
+                entry.setValue(schema + tableName.substring(prefix.length()));
+            }
+        }
+        prefix = schema;
+    }
+
+    /**
      * Modifies the given SQL string to be suitable for non MS-Access databases.
      * This replaces table and field names in the SQL with the new names 
      * in the SQL DDL scripts provided with EPSG database.
@@ -162,7 +208,7 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
             final String  oldName = (String) entry.getKey();
             final String  newName = (String) entry.getValue();
             /*
-             * Replace all occurences of 'oldName' by 'newName'.
+             * Replaces all occurences of 'oldName' by 'newName'.
              */
             int start = 0;
             while ((start=modified.indexOf(oldName, start)) >= 0) {

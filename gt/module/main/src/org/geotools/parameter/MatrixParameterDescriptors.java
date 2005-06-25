@@ -91,7 +91,7 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
 
     /**
      * The cached descriptors for each elements in a matrix. Descriptors do not depends
-     * on matrix element values. Concequently, the same descriptors can be reused for all
+     * on matrix element values. Consequently, the same descriptors can be reused for all
      * {@link MatrixParameters} instances.
      */
     private final ParameterDescriptor[] parameters = new ParameterDescriptor[CACHE_SIZE*CACHE_SIZE];

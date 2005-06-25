@@ -39,7 +39,7 @@ import org.geotools.referencing.factory.FactoryGroup;
  *
  * @todo Since this class is constructed through the service provider API rather than directly
  *       instantiated by the user, we need some way to pass the schema information to this class.
- *       one possible approach is to set the schema if preferences. Maybe a better was is to look
+ *       one possible approach is to set the schema in preferences. Maybe a better was is to look
  *       for a place in the Oracle {@link javax.sql.DataSource} for that.
  */
 public class FactoryUsingOracleSQL extends FactoryUsingAnsiSQL {

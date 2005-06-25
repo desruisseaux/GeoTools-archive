@@ -269,7 +269,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      *
      * @todo In the datum shift case, an operation version is mandatory but unknow at this time.
      *       However, we noticed that the EPSG database do not always defines a version neither.
-     *       Concequently, the Geotools implementation relax the rule requirying an operation
+     *       Consequently, the Geotools implementation relax the rule requirying an operation
      *       version and we do not try to provide this information here for now.
      */
     private static Map getProperties(final Identifier name) {
@@ -565,11 +565,21 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     }
 
     /**
-     * Returns the name of the specified object.
+     * Returns the name of the GeoAPI interface implemented by the specified object.
+     * In addition, the name may be added between brackets.
      */
     private static String getClassName(final IdentifiedObject object) {
         if (object != null) {
-            String name = Utilities.getShortClassName(object);
+            Class type = object.getClass();
+            final Class[] interfaces = type.getInterfaces();
+            for (int i=0; i<interfaces.length; i++) {
+                final Class candidate = interfaces[i];
+                if (candidate.getName().startsWith("org.opengis.referencing.")) {
+                    type = candidate;
+                    break;
+                }
+            }
+            String name = Utilities.getShortName(type);
             final Identifier id = object.getName();
             if (id != null) {
                 name = name + '[' + id.getCode() + ']';

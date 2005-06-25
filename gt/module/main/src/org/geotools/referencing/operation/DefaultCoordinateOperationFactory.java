@@ -1366,7 +1366,7 @@ search: for (int j=0; j<targets.length; j++) {
             }
             /*
              * No source CRS was found for current target CRS.
-             * Concequently, we can't get a transformation path.
+             * Consequently, we can't get a transformation path.
              */
             throw new OperationNotFoundException(getErrorMessage(sourceCRS, targetCRS), cause);
         }

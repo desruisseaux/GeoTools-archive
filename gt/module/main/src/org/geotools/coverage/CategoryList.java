@@ -821,7 +821,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * <br><br>
      * NOTE: this method is private because {@link GeophysicsCategoryList} should not inherit it.
      *       {@link GeophysicsCategoryList} is never serialized alone; it is always encapsulated
-     *       in a {@code CategoryList}. Concequently, if {@code CategoryList} has been
+     *       in a {@code CategoryList}. Consequently, if {@code CategoryList} has been
      *       canonicalized, then {@link GeophysicsCategoryList} has been canonicalized too.
      *
      * @return A canonical instance of this object.
@@ -839,7 +839,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * <br><br>
      * NOTE: this method is private because {@link GeophysicsCategoryList} should not inherit it.
      *       {@link GeophysicsCategoryList} is never serialized alone; it is always encapsulated
-     *       in a {@code CategoryList}. Concequently, if {@code CategoryList} has been
+     *       in a {@code CategoryList}. Consequently, if {@code CategoryList} has been
      *       canonicalized, then {@link GeophysicsCategoryList} has been canonicalized too.
      *
      * @return The object to serialize (usually {@code this}).

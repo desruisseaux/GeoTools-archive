@@ -272,7 +272,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
         if (parameters.equals(descriptor)) {
             /*
              * Since the "official" parameter descriptor was used, the descriptor should
-             * have already enforced argument validity. Concequently, there is no need to
+             * have already enforced argument validity. Consequently, there is no need to
              * performs the check and we will avoid it as a performance enhancement.
              */
             return values;

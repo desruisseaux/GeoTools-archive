@@ -945,7 +945,7 @@ public class Category implements Serializable {
      *   <li>The user may have created a mutable subclass. Since the need to subclass this class
      *       should be exceptional, it is better to play safe.</li>
      *   <li>{@code GeophysicsCategory} should not inherit it. {@code GeophysicsCategory} is never
-     *       serialized alone; it is always encapsulated in a {@code Category}. Concequently,
+     *       serialized alone; it is always encapsulated in a {@code Category}. Consequently,
      *       if {@code Category} has been canonicalized, then {@code GeophysicsCategory} has
      *       been canonicalized too.</li>
      * </ul>
@@ -968,7 +968,7 @@ public class Category implements Serializable {
      *   <li>The user may have created a mutable subclass. Since the need to subclass this class
      *       should be exceptional, it is better to play safe.</li>
      *   <li>{@code GeophysicsCategory} should not inherit it. {@code GeophysicsCategory} is never
-     *       serialized alone; it is always encapsulated in a {@code Category}. Concequently,
+     *       serialized alone; it is always encapsulated in a {@code Category}. Consequently,
      *       if {@code Category} has been canonicalized, then {@code GeophysicsCategory} has
      *       been canonicalized too.</li>
      * </ul>

@@ -40,13 +40,10 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import javax.units.NonSI;
 import javax.units.Unit;
 import javax.units.SI;
@@ -63,11 +60,11 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.GeocentricCRS;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
@@ -89,6 +86,7 @@ import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.operation.ConcatenatedOperation;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Transformation;
@@ -115,6 +113,7 @@ import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
+import org.geotools.referencing.operation.DefaultConcatenatedOperation;
 import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.DefaultTransformation;
 import org.geotools.referencing.operation.DefaultConversion;
@@ -347,7 +346,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
 
     /**
      * The last table in which object name were looked for. This is for internal use
-     * by {@link #getNumericalIdentifier} only.
+     * by {@link #toPrimaryKey} only.
      */
     private transient String lastTableForName;
 
@@ -1416,7 +1415,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 final String name    = getString(result, 2, code);
                 final String type    = getString(result, 3, code).trim().toLowerCase();
                 final String anchor  = result.getString( 4);
-                final int    epoch   = result.getInt   ( 5);
+                final String epoch   = result.getString( 5);
                 final String area    = result.getString( 6);
                 final String scope   = result.getString( 7);
                 final String remarks = result.getString( 8);
@@ -1424,10 +1423,14 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 if (anchor != null) {
                     properties.put(Datum.ANCHOR_POINT_KEY, anchor);
                 }
-                if (epoch != 0) {
+                if (epoch!=null && epoch.length()!=0) try {
                     calendar.clear();
-                    calendar.set(epoch, 0, 1);
+                    calendar.set(Integer.parseInt(epoch), 0, 1);
                     properties.put(Datum.REALIZATION_EPOCH_KEY, calendar.getTime());
+                } catch (NumberFormatException exception) {
+                    // Not a fatal error...
+                    Utilities.unexpectedException(LOGGER.getName(), "FactoryUsingSQL",
+                                                  "createDatum", exception);
                 }
                 final DatumFactory factory = factories.getDatumFactory();
                 final Datum datum;
@@ -1745,7 +1748,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                  *   PROJECTED CRS
                  *
                  *   NOTE: This method invokes itself indirectly, through createGeographicCRS.
-                 *         Concequently, we can't use 'result' anymore. We must close it here.
+                 *         Consequently, we can't use 'result' anymore. We must close it here.
                  * ---------------------------------------------------------------------- */
                 else if (type.equalsIgnoreCase("projected")) {
                     final String csCode  = getString(result,  7, code);
@@ -1754,11 +1757,11 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     result.close(); // Must be close before createGeographicCRS
                     result = null;
                     final CartesianCS         cs = buffered.createCartesianCS(csCode);
-                    final GeographicCRS   geoCRS = buffered.createGeographicCRS(geoCode);
+                    final GeographicCRS  baseCRS = buffered.createGeographicCRS(geoCode);
                     final CoordinateOperation op = buffered.createCoordinateOperation(opCode);
                     if (op instanceof Conversion) {
                         final Map properties = createProperties(name, epsg, area, scope, remarks);
-                        crs = factories.createProjectedCRS(properties, geoCRS, (Conversion)op, cs);
+                        crs = factories.createProjectedCRS(properties, baseCRS, (Conversion)op, cs);
                     } else {
                          throw noSuchAuthorityCode(Projection.class, opCode);
                     }
@@ -1778,7 +1781,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                  *   COMPOUND CRS
                  *
                  *   NOTE: This method invokes itself recursively.
-                 *         Concequently, we can't use 'result' anymore.
+                 *         Consequently, we can't use 'result' anymore.
                  * ---------------------------------------------------------------------- */
                 else if (type.equalsIgnoreCase("compound")) {
                     final String code1 = getString(result, 11, code);
@@ -1786,8 +1789,14 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     result.close();
                     result = null;
                     final CoordinateReferenceSystem crs1, crs2;
-                    crs1 = buffered.createCoordinateReferenceSystem(code1);
-                    crs2 = buffered.createCoordinateReferenceSystem(code2);
+                    if (!safetyGuard.add(epsg)) {
+                        throw recursiveCall(CompoundCRS.class, epsg);
+                    } try {
+                        crs1 = buffered.createCoordinateReferenceSystem(code1);
+                        crs2 = buffered.createCoordinateReferenceSystem(code2);
+                    } finally {
+                        safetyGuard.remove(epsg);
+                    }
                     // Note: Don't invoke 'createProperties' sooner.
                     final Map properties = createProperties(name, epsg, area, scope, remarks);
                     crs  = factory.createCompoundCRS(properties,
@@ -2194,7 +2203,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                                          + " FROM [Coordinate_Operation]"
                                                          + " WHERE COORD_OP_CODE = ?");
             stmt.setString(1, code);
-            final ResultSet result = stmt.executeQuery();
+            ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg = getString(result, 1, code);
                 final String name = getString(result, 2, code);
@@ -2333,7 +2342,40 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     // is many of them for the same coordinate operation (projection) code.
                     operation = new DefiningConversion(properties, method, parameters);
                 } else if (isConcatenated) {
-                    throw new FactoryException("TODO");
+                    /*
+                     * Concatenated operation: we need to close the current result set, because
+                     * we are going to invoke this method recursively in the following lines.
+                     *
+                     * Note: we instantiate directly the Geotools's implementation of
+                     * ConcatenatedOperation instead of using CoordinateOperationFactory in order
+                     * to avoid loading the quite large Geotools's implementation of this factory,
+                     * and also because it is not part of FactoryGroup anyway.
+                     */
+                    result.close();
+                    result = null;
+                    final PreparedStatement cstmt = prepareStatement("ConcatenatedOperation",
+                                                        "SELECT SINGLE_OPERATION_CODE"
+                                                   +    " FROM [Coordinate_Operation Path]"
+                                                   +   " WHERE (CONCAT_OPERATION_CODE = ?)"
+                                                   + " ORDER BY OP_PATH_STEP");
+                    cstmt.setString(1, epsg);
+                    final ResultSet cr = cstmt.executeQuery();
+                    final List codes = new ArrayList();
+                    while (cr.next()) {
+                        codes.add(cr.getString(1));
+                    }
+                    cr.close();
+                    final CoordinateOperation[] operations = new CoordinateOperation[codes.size()];
+                    if (!safetyGuard.add(epsg)) {
+                        throw recursiveCall(ConcatenatedOperation.class, epsg);
+                    } try {
+                        for (int i=0; i<operations.length; i++) {
+                            operations[i] = buffered.createCoordinateOperation((String) codes.get(i));
+                        }
+                    } finally {
+                        safetyGuard.remove(epsg);
+                    }
+                    return new DefaultConcatenatedOperation(properties, operations);
                 } else {
                     /*
                      * Needs to create a math transform. A special processing is performed for
@@ -2381,6 +2423,11 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     }
                 }
                 returnValue = (CoordinateOperation) ensureSingleton(operation, returnValue, code);
+                if (result == null) {
+                    // Bypass the 'result.close()' line below:
+                    // the ResultSet has already been closed.
+                    return returnValue;
+                }
             }
             result.close();
         } catch (SQLException exception) {
@@ -2409,7 +2456,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         ensureNonNull("sourceCode", sourceCode);
         ensureNonNull("targetCode", targetCode);
         final String pair = sourceCode + " \u21E8 " + targetCode;
-        final Set set = new LinkedHashSet();
+        final CoordinateOperationSet set = new CoordinateOperationSet(buffered);
         try {
             final String sourceKey = toPrimaryKeyCRS(sourceCode);
             final String targetKey = toPrimaryKeyCRS(targetCode);
@@ -2441,51 +2488,43 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 stmt.setString(2, targetKey);
                 final ResultSet result = stmt.executeQuery();
                 while (result.next()) {
-                    LogRecord record;
-                    Exception failure;
                     final String code = getString(result, 1, pair);
-                    try {
-                        final CoordinateOperation operation;
-                        if (searchTransformations) {
-                            operation = buffered.createCoordinateOperation(code);
-                        } else {
-                            operation = buffered.createProjectedCRS(targetKey).getConversionFromBase();
-                        }
-                        set.add(operation);
-                        continue;
-                    } catch (NoSuchIdentifierException exception) {
-                        /*
-                         * The operation uses an unsupported math transform.
-                         * Log as a warning and search for other operations.
-                         * TODO: localize
-                         */
-                        failure = exception;
-                        record = new LogRecord(Level.WARNING, "Operation \"" + code +
-                                               "\" uses an unsupported method.");
-                    } catch (FactoryException exception) {
-                        /*
-                         * The operation can't be created for a reason not
-                         * related to a database failure. Log and continue.
-                         * TODO: localize
-                         */
-                        if (exception.getCause() instanceof SQLException) {
-                            throw exception;
-                        }
-                        failure = exception;
-                        record = new LogRecord(Level.WARNING, "Can't create an operation "+
-                                                              "for code \"" + code + "\".");
-                    }
-                    record.setSourceClassName("FactoryUsingSQL");
-                    record.setSourceMethodName("createFromCoordinateReferenceSystemCodes");
-                    record.setThrown(failure);
-                    LOGGER.log(record);
+                    set.addCode(code, searchTransformations ? null : targetKey);
                 }
                 result.close();
             } while ((searchTransformations = !searchTransformations) == true);
         } catch (SQLException exception) {
             throw databaseFailure(CoordinateOperation.class, pair, exception);
         }
+        /*
+         * Before to return the set, tests the creation of 1 object in order to report early
+         * (i.e. now) any problems with SQL statements. Remaining operations will be created
+         * only when first needed.
+         */
+        set.resolve(1);
         return set;
+    }
+
+    /**
+     * Constructs an exception for recursive calls.
+     *
+     * @todo localize
+     */
+    private static FactoryException recursiveCall(final Class type, final String code) {
+        return new FactoryException("Recursivity detected while constructing a " +
+                Utilities.getShortName(type) + " for code \""+code+"\".");
+    }
+
+    /**
+     * Constructs an exception for a database failure.
+     *
+     * @todo localize
+     */
+    private static FactoryException databaseFailure(final Class type, final String code,
+                                                    final SQLException cause)
+    {
+        return new FactoryException("Database failure while constructing a " +
+                Utilities.getShortName(type) + " for code \""+code+"\".", cause);
     }
 
     /**
@@ -2649,17 +2688,5 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     protected final void finalize() throws Throwable {
         dispose();
         super.finalize();
-    }
-
-    /**
-     * Constructs an exception for a database failure.
-     *
-     * @todo localize
-     */
-    private static FactoryException databaseFailure(final Class type, final String code,
-                                                    final SQLException cause)
-    {
-        return new FactoryException("Database failure will constructing a " +
-                Utilities.getShortName(type) + " for code \""+code+"\".", cause);
     }
 }

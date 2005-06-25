@@ -523,7 +523,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *       to be created is probably not endorsed by the original authority.</li>
      * </ul>
      * <p>
-     * This method returns a mutable map. Concequently, callers can add their own identifiers
+     * This method returns a mutable map. Consequently, callers can add their own identifiers
      * directly to this map if they wish.
      *
      * @param  info The identified object to view as a properties map.
@@ -731,7 +731,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *
      * @param  object The object to check.
      * @param  alias  The list of alias in {@code object} (may be {@code null}).
-     *                This method will never modify this list. Concequently, it may be a
+     *                This method will never modify this list. Consequently, it may be a
      *                direct reference to an internal array.
      * @param  name The name.
      * @return {@code true} if the primary name of at least one alias

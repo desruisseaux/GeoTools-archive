@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-epsg-postgresql</name>
+  <id>epsg-postgresql</id>
+  <currentVersion>2.2.x</currentVersion>
+  <package>org.geotools.referencing</package>
+  <shortDescription>EPSG Authoriy Service using PostgreSQL database</shortDescription>
+  <gumpRepositoryId>geotools</gumpRepositoryId>
+  <description>
+    Connection to an EPSG postgreSQL database.
+    This is database is built from the SQL scripts delivered by EPSG.
+  </description>
+  <developers>
+    <developer>
+      <name>Didier Richard</name>
+      <email>dgr@libertysurf.fr</email>
+      <organization>Institut Géographique National - France</organization>
+      <roles>
+        <role>Contributor</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Institut de Recherche pour le Développement</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
+      <artifactId>postgresql</artifactId>
+      <groupId>postgresql</groupId>
+      <version>74.213</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>

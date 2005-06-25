@@ -79,7 +79,7 @@ import org.geotools.resources.XArray;
 
 /**
  * A set of utilities methods working on factories. Many of those methods requires more than
- * one factory. Concequently, they can't be a method in a single factory. Furthermore, since
+ * one factory. Consequently, they can't be a method in a single factory. Furthermore, since
  * they are helper methods and somewhat implementation-dependent, they are not part of GeoAPI.
  *
  * @version $Id$

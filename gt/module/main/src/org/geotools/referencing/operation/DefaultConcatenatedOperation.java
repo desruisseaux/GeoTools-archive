@@ -47,7 +47,6 @@ import org.opengis.referencing.operation.SingleOperation;
 // Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -320,21 +319,5 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      */
     public int hashCode() {
         return operations.hashCode() ^ (int)serialVersionUID;
-    }
-    
-    /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
-     */
-    protected String formatWKT(final Formatter formatter) {
-        final String name = super.formatWKT(formatter);
-        for (final Iterator it=operations.iterator(); it.hasNext();) {
-            formatter.append((SingleOperation) it.next());
-        }
-        return name;
     }
 }

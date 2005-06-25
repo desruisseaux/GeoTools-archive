@@ -24,7 +24,10 @@ import java.util.Set;
 import java.util.AbstractSet;
 import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
+import java.io.Serializable;
+import java.io.ObjectStreamException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,13 +44,16 @@ import org.geotools.resources.Utilities;
  * A set of EPSG authority codes. This set requires a living connection to the EPSG database.
  * All {@link #iterator} method call creates a new {@link ResultSet} holding the codes. However,
  * call to {@link #contains} map directly to a SQL call.
+ * <p>
+ * Serialization of this class store a copy of all authority codes. The serialization
+ * do not preserve any connection to the database.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
  * @since 2.2
  */
-final class AuthorityCodes extends AbstractSet {
+final class AuthorityCodes extends AbstractSet implements Serializable {
     /**
      * The factory which is the owner of this set. One purpose of this field (even if it were not
      * used directly by this class) is to avoid garbage collection of the factory as long as this
@@ -299,6 +305,15 @@ final class AuthorityCodes extends AbstractSet {
     }
 
     /**
+     * Returns a serializable copy of this set. This method is invoked automatically during
+     * serialization. The serialised set of authority code is disconnected from the underlying
+     * database.
+     */
+    protected Object writeReplace() throws ObjectStreamException {
+        return new LinkedHashSet(this);
+    }
+
+    /**
      * Closes the underlying statements. Note: this method is also invoked directly
      * by {@link FactoryUsingSQL#dispose}, which is okay in this particular case since
      * the implementation of this method can be executed an arbitrary amount of times.
@@ -336,7 +351,7 @@ final class AuthorityCodes extends AbstractSet {
     /**
      * The iterator over the codes. This inner class must kept a reference toward the enclosing
      * {@link AuthorityCodes} in order to prevent a call to {@link AuthorityCodes#finalize}
-     * before the iteration is finished. Concequently, this inner class should not be static
+     * before the iteration is finished. Consequently, this inner class should not be static
      * even if adding a "static" keyword do not introduces any compilation error.
      */
     private final class Iterator implements java.util.Iterator {

@@ -105,7 +105,7 @@ public class Symbols {
      * The object to use for parsing and formatting numbers.
      *
      * <STRONG>Note:</STRONG> {@link NumberFormat} object are usually not thread safe.
-     * Concequently, each instances of {@link Parser} or {@link Formatter} must use a
+     * Consequently, each instances of {@link Parser} or {@link Formatter} must use a
      * clone of this object, not this object directly (unless they synchronize on it).
      */
     final NumberFormat numberFormat;

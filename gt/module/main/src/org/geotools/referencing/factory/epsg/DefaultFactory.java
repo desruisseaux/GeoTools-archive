@@ -427,6 +427,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         final boolean     printMT = arguments.getFlag("-transform");
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);
         final PrintWriter out = arguments.out;
+        final char[] separator = new char[79];
+        Arrays.fill(separator, '_');
         /*
          * Constructs and prints each object. In the process, keep all coordinate reference systems.
          * They will be used later for printing math transforms. This is usefull in order to check
@@ -446,8 +448,9 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                         }
                     }
                     final Object object = factory.createObject(args[i]);
-                    out.println(object);
+                    out.println(separator);
                     out.println();
+                    out.println(object);
                     if (object instanceof CoordinateReferenceSystem) {
                         crs[count++] = (CoordinateReferenceSystem) object;
                     }
@@ -458,7 +461,9 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                 }
             }
         } catch (Exception exception) {
+            out.flush();
             exception.printStackTrace(arguments.err);
+            return;
         }
         /*
          * If the user asked for math transforms, prints them now.
@@ -468,14 +473,15 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                     FactoryFinder.getCoordinateOperationFactory(HINTS);
             for (int i=0; i<count; i++) {
                 for (int j=i+1; j<count; j++) {
+                    out.println(separator);
+                    out.println();
                     try {
-                        out.println(factory.createOperation(crs[i], crs[j]).getMathTransform());
+                        out.println(factory.createOperation(crs[i], crs[j]));
                     } catch (OperationNotFoundException exception) {
                         out.println(exception.getLocalizedMessage());
                     } catch (FactoryException exception) {
                         exception.printStackTrace(arguments.err);
                     }
-                    out.println();
                 }
             }
         }

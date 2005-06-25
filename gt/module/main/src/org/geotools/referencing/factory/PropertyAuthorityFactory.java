@@ -170,7 +170,7 @@ public class PropertyAuthorityFactory extends AbstractAuthorityFactory {
     /**
      * The set of codes for a specific type of CRS. This set filter the codes set in the
      * enclosing {@link PropertyAuthorityFactory} in order to keep only the codes for the
-     * specified type. Filtering is performed on the fly. Concequently, this set is cheap
+     * specified type. Filtering is performed on the fly. Consequently, this set is cheap
      * if the user just want to check for the existence of a particular code.
      */
     private static final class Codes extends DerivedSet {
