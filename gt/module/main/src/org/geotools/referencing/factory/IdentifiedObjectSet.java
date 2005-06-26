@@ -25,6 +25,7 @@ import java.io.ObjectStreamException;
 import java.sql.SQLException;
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -62,7 +63,7 @@ import org.geotools.resources.Utilities;
  * <h3>Exception handling</h3>
  * If the underlying factory failed to creates an object because of an unsupported
  * operation method ({@link NoSuchIdentifierException}), the exception is logged with
- * the {@linkplain Level#FINE FINE} level (because this is a recoverable failure) and
+ * the {@link Level#FINE FINE} level (because this is a recoverable failure) and
  * the iteration continue. If the operation creation failed for any other kind of
  * reason ({@link FactoryException}), then the exception is rethrown as an unchecked
  * {@link BackingStoreException}. This default behavior can be changed if a subclass
@@ -127,7 +128,7 @@ public class IdentifiedObjectSet extends AbstractSet implements Serializable {
      * code only when first needed. This method returns {@code true} if this set changed as a
      * result of this call.
      */
-    public boolean addCode(final String code) {
+    public boolean addAuthorityCode(final String code) {
         final boolean already = objects.containsKey(code);
         final IdentifiedObject old = (IdentifiedObject) objects.put(code, null);
         if (old != null) {
@@ -140,12 +141,13 @@ public class IdentifiedObjectSet extends AbstractSet implements Serializable {
 
     /**
      * Ensures that this collection contains the specified object. This set do not allows multiple
-     * objects for the same {@linkplain #getCode authority code}. If this set already contains an
-     * object using the same {@linkplain #getCode authority code} than the specified one, then the
-     * old object is replaced by the new one even if the objects are not otherwise identical.
+     * objects for the same {@linkplain #getAuthorityCode authority code}. If this set already
+     * contains an object using the same {@linkplain #getAuthorityCode authority code} than the
+     * specified one, then the old object is replaced by the new one even if the objects are not
+     * otherwise identical.
      */
     public boolean add(final Object object) {
-        final String code = getCode((IdentifiedObject) object);
+        final String code = getAuthorityCode((IdentifiedObject) object);
         return !Utilities.equals(objects.put(code, object), object);
     }
 
@@ -176,7 +178,7 @@ public class IdentifiedObjectSet extends AbstractSet implements Serializable {
      * Returns {@code true} if this collection contains the specified object.
      */
     public boolean contains(final Object object) {
-        final String code = getCode((IdentifiedObject) object);
+        final String code = getAuthorityCode((IdentifiedObject) object);
         final IdentifiedObject current = get(code);
         return object.equals(current);
     }
@@ -186,7 +188,7 @@ public class IdentifiedObjectSet extends AbstractSet implements Serializable {
      * if it is present.
      */
     public boolean remove(final Object object) {
-        final String code = getCode((IdentifiedObject) object);
+        final String code = getAuthorityCode((IdentifiedObject) object);
         final IdentifiedObject current = get(code);
         if (object.equals(current)) {
             objects.remove(code);
@@ -220,11 +222,11 @@ public class IdentifiedObjectSet extends AbstractSet implements Serializable {
 
     /**
      * Ensures that the <var>n</var> first objects in this set are created. This method is
-     * typically invoked after some calls to {@link #addCode} in order to make sure that the
-     * {@linkplain #factory underlying factory} is really capable to create at least one object.
-     * {@link FactoryException} (except the ones accepted as {@linkplain #isRecoverableFailure
-     * recoverable failures}) are thrown as if they were never wrapped into
-     * {@link BackingStoreException}.
+     * typically invoked after some calls to {@link #addAuthorityCode} in order to make sure
+     * that the {@linkplain #factory underlying factory} is really capable to create at least
+     * one object. {@link FactoryException} (except the ones accepted as
+     * {@linkplain #isRecoverableFailure recoverable failures}) are thrown as if they were never
+     * wrapped into {@link BackingStoreException}.
      *
      * @param n The number of object to resolve. If this number is equals or greater than the
      *          {@linkplain #size set's size}, then the creation of all objects is garantee
@@ -249,12 +251,47 @@ public class IdentifiedObjectSet extends AbstractSet implements Serializable {
     }
 
     /**
+     * Returns the {@linkplain #getAuthorityCode authority code} of all objects in this set.
+     * The returned array contains the codes in iteration order. This method do not trig the
+     * {@linkplain #createObject creation} of any new object.
+     * <p>
+     * This method is typically used together with {@link #setAuthorityCodes} for altering the
+     * iteration order on the basis of authority codes.
+     */
+    public String[] getAuthorityCodes() {
+        final Set codes = objects.keySet();
+        return (String[]) codes.toArray(new String[codes.size()]);
+    }
+
+    /**
+     * Set the content of this set as an array of authority codes. For any code in the given list,
+     * this method will preserve the corresponding {@linkplain IdentifiedObject identified object}
+     * if it was already created. Other objects will be {@linkplain #createObject created} only
+     * when first needed, as usual in this {@code IdentifiedObjectSet} implementation.
+     * <p>
+     * This method is typically used together with {@link #getAuthorityCodes} for altering the
+     * iteration order on the basis of authority codes. If the specified {@code codes} array
+     * contains the same elements than {@link #getAuthorityCodes} in a different order, then
+     * this method just set the new ordering.
+     *
+     * @see #addAuthorityCode
+     */
+    public void setAuthorityCodes(final String[] codes) {
+        final Map copy = new HashMap(objects);
+        objects.clear();
+        for (int i=0; i<codes.length; i++) {
+            final String code = codes[i];
+            objects.put(code, (IdentifiedObject) copy.get(code));
+        }
+    }
+
+    /**
      * Returns the code to uses as a key for the specified object. The default implementation
      * returns the code of the first {@linkplain IdentifiedObject#getIdentifiers identifier},
      * if any, or the code of the{@linkplain IdentifiedObject#getName primary name} otherwise.
      * Subclasses may overrides this method if they want to use a different key for this set.
      */
-    protected String getCode(final IdentifiedObject object) {
+    protected String getAuthorityCode(final IdentifiedObject object) {
         final Identifier id;
         final Set identifiers = object.getIdentifiers();
         if (identifiers!=null && !identifiers.isEmpty()) {
@@ -280,7 +317,7 @@ public class IdentifiedObjectSet extends AbstractSet implements Serializable {
      * This method is invoked during the iteration process if the factory failed to create some
      * object. If this method returns {@code true} for the given exception, then the exception
      * will be logged in the {@linkplain AbstractAuthorityFactory#LOGGER Geotools factory logger}
-     * with the {@linkplain Level#FINE FINE} level. If this method returns {@code false}, then the
+     * with the {@link Level#FINE FINE} level. If this method returns {@code false}, then the
      * exception will be retrown as a {@link BackingStoreException}. The default implementation
      * returns {@code true} only for {@link NoSuchIdentifierException} (not to be confused with
      * {@link NoSuchAuthorityCodeException}).

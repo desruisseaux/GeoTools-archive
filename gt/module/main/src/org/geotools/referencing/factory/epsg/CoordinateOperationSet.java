@@ -65,14 +65,14 @@ final class CoordinateOperationSet extends IdentifiedObjectSet {
      * @param crs  The code for the CRS is create instead of the operation,
      *             or {@code null} if none.
      */
-    public boolean addCode(final String code, final String crs) {
+    public boolean addAuthorityCode(final String code, final String crs) {
         if (crs != null) {
             if (projections == null) {
                 projections = new HashMap();
             }
             projections.put(code, crs);
         }
-        return super.addCode(code);
+        return super.addAuthorityCode(code);
     }
 
     /**

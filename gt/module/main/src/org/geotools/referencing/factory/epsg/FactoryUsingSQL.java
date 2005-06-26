@@ -1256,20 +1256,6 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         return returnValue;
     }
 
-    /**
-     * Private usage for {@link #createBursaWolfParameters}.
-     */
-    private static final class Info {
-        /** CO.COORD_OP_CODE        */ final String operation;
-        /** CO.COORD_OP_METHOD_CODE */ final int    method;
-        /** CRS1.DATUM_CODE         */ final String target;
-        Info(final String operation, final int method, final String target) {
-            this.operation = operation;
-            this.method    = method;
-            this.target    = target;
-        }
-    }
-
     /** 
      * Returns Bursa-Wolf parameters for a geodetic datum. If the specified datum has
      * no conversion informations, then this method will returns {@code null}.
@@ -1295,7 +1281,6 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
              */
             return null;
         }
-        List list = null;
         PreparedStatement stmt;
         stmt = prepareStatement("BursaWolfParametersSet",
                                          "SELECT CO.COORD_OP_CODE,"
@@ -1313,24 +1298,41 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                  +             " ABS(CO.DEPRECATED), CO.COORD_OP_ACCURACY");
         stmt.setString(1, code);
         ResultSet result = stmt.executeQuery();
-        String last = code;
+        List bwInfos = null;
         while (result.next()) {
             final String operation = getString(result, 1, code);
             final int    method    = getInt   (result, 2, code);
             final String datum     = getString(result, 3, code);
-            if (!datum.equals(last)) {
-                if (list == null) {
-                    list = new ArrayList();
-                }
-                list.add(new Info(operation, method, datum));
-                last = datum;
+            if (bwInfos == null) {
+                bwInfos = new ArrayList();
             }
+            bwInfos.add(new BursaWolfInfo(operation, method, datum));
         }
         result.close();
-        if (list == null) {
+        if (bwInfos == null) {
+            // Don't close the connection here.
             return null;
         }
         toClose.close();
+        /*
+         * Sorts the infos in preference order. The "ORDER BY" clause above was not enough;
+         * we also need to take the "supersession" table in account. Once the sorting is done,
+         * keep only one Bursa-Wolf parameters for each datum.
+         */
+        int size = bwInfos.size();
+        if (size > 1) {
+            final BursaWolfInfo[] codes = (BursaWolfInfo[]) bwInfos.toArray(new BursaWolfInfo[size]);
+            sort(codes);
+            bwInfos.clear();
+            final Set added = new HashSet();
+            for (int i=0; i<codes.length; i++) {
+                final BursaWolfInfo candidate = codes[i];
+                if (added.add(candidate.target)) {
+                    bwInfos.add(candidate);
+                }
+            }
+            size = bwInfos.size();
+        }
         /*
          * We got all the needed informations before to built Bursa-Wolf parameters because the
          * 'createDatum(...)' call below may invokes 'createBursaWolfParameters(...)' recursively,
@@ -1343,9 +1345,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                                      + " FROM [Coordinate_Operation Parameter Value]"
                                                      + " WHERE COORD_OP_CODE = ?"
                                                      +   " AND COORD_OP_METHOD_CODE = ?");
-        final int size = list.size();
         for (int i=0; i<size; i++) {
-            final Info info = (Info) list.get(i);
+            final BursaWolfInfo info = (BursaWolfInfo) bwInfos.get(i);
             final GeodeticDatum datum;
             try {
                 safetyGuard.add(code);
@@ -1371,9 +1372,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 parameters.ey = -parameters.ey;
                 parameters.ey = -parameters.ey;
             }
-            list.set(i, parameters);
+            bwInfos.set(i, parameters);
         }            
-        return (BursaWolfParameters[]) list.toArray(new BursaWolfParameters[size]);
+        return (BursaWolfParameters[]) bwInfos.toArray(new BursaWolfParameters[size]);
     }
 
     /**
@@ -2448,6 +2449,13 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * @throws FactoryException if the object creation failed.
      *
      * @since 2.2
+     *
+     * @todo The ordering is not consistent among all database software, because the "accuracy"
+     *       column may contains null values. When used in an "ORDER BY" clause, PostgreSQL put
+     *       null values last, while Access and HSQL put them first. The PostgreSQL's behavior is
+     *       better for what we want (put operations with unknow accuracy last). Unfortunatly,
+     *       I don't know yet how to instruct Access to put null values last using standard SQL
+     *       ("IIF" is not standard, and Access doesn't seem to understand "CASE ... THEN" clauses).
      */
     public synchronized Set createFromCoordinateReferenceSystemCodes(final String sourceCode,
                                                                      final String targetCode)
@@ -2489,10 +2497,18 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 final ResultSet result = stmt.executeQuery();
                 while (result.next()) {
                     final String code = getString(result, 1, pair);
-                    set.addCode(code, searchTransformations ? null : targetKey);
+                    set.addAuthorityCode(code, searchTransformations ? null : targetKey);
                 }
                 result.close();
             } while ((searchTransformations = !searchTransformations) == true);
+            /*
+             * Search finished. We may have a lot of coordinate operations
+             * (e.g. about 40 for "ED50" (EPSG:4230) to "WGS 84" (EPSG:4326)).
+             * Alter the ordering using the information supplied in the supersession table.
+             */
+            final String[] codes = set.getAuthorityCodes();
+            sort(codes);
+            set.setAuthorityCodes(codes);
         } catch (SQLException exception) {
             throw databaseFailure(CoordinateOperation.class, pair, exception);
         }
@@ -2503,6 +2519,59 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
          */
         set.resolve(1);
         return set;
+    }
+
+    /**
+     * Sorts an array of codes in preference order. This method orders pairwise the codes according
+     * the information provided in the supersession table. If the same object is superseded by more
+     * than one object, then the most recent one is inserted first. Except for the codes moved as a
+     * result of pairwise ordering, this method try to preserve the old ordering of the supplied
+     * codes (since deprecated operations should already be last). The ordering is performed in
+     * place.
+     *
+     * @param codes The codes, usually as an array of {@link String}. If the array do not contains
+     *              string objects, then the {@link Object#toString} method must returns the code
+     *              for each element.
+     */
+    // TODO: Use generic type for "Object[] codes" with J2SE 1.5.
+    private void sort(final Object[] codes) throws SQLException, FactoryException {
+        if (codes.length <= 1) {
+            return; // Nothing to sort.
+        }
+        final PreparedStatement stmt;
+        stmt = prepareStatement("Supersession", "SELECT SUPERSEDED_BY"
+                                              + " FROM [Supersession]"
+                                              + " WHERE OBJECT_CODE = ?"
+                                              + " ORDER BY SUPERSESSION_YEAR DESC");
+        int maxIterations = 15; // For avoiding never-ending loop.
+        do {
+            boolean changed = false;
+            for (int i=0; i<codes.length; i++) {
+                final String code = codes[i].toString();
+                stmt.setString(1, code);
+                final ResultSet result = stmt.executeQuery();
+                while (result.next()) {
+                    final String replacement = getString(result, 1, code);
+                    for (int j=i+1; j<codes.length; j++) {
+                        final Object candidate = codes[j];
+                        if (replacement.equals(candidate.toString())) {
+                            /*
+                             * Found a code to move in front of the superceded one.
+                             */
+                            System.arraycopy(codes, i, codes, i+1, j-i);
+                            codes[i++] = candidate;
+                            changed = true;
+                        }
+                    }
+                }
+                result.close();
+            }
+            if (!changed) {
+                return;
+            }
+        }
+        while (--maxIterations != 0);
+        LOGGER.finer("Possible recursivity in supersessions.");
     }
 
     /**

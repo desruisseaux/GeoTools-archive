@@ -21,6 +21,7 @@ package org.geotools.referencing.factory.epsg;
 // J2SE dependencies
 import java.util.Set;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
@@ -467,6 +468,7 @@ public class DefaultDataSourceTest extends TestCase {
          * UTM zone 10N
          */
         final CoordinateOperation operation = factory.createCoordinateOperation("16010");
+        assertEquals("16010", getIdentifier(operation));
         assertTrue(operation instanceof Conversion);
         assertNull(operation.getSourceCRS());
         assertNull(operation.getTargetCRS());
@@ -476,6 +478,8 @@ public class DefaultDataSourceTest extends TestCase {
          */
         final ProjectedCRS crs = factory.createProjectedCRS("32210");
         final CoordinateOperation projection = crs.getConversionFromBase();
+        assertEquals("32210", getIdentifier(crs));
+        assertEquals("16010", getIdentifier(projection));
         /*
          * TODO: Current EPSG factory implementation creates Conversion object, not Projection,
          *       because the OperationMethod declared is not one of the build-in ones: it doesn't
@@ -517,6 +521,9 @@ public class DefaultDataSourceTest extends TestCase {
         final CoordinateReferenceSystem sourceCRS = operation1.getSourceCRS();
         final CoordinateReferenceSystem targetCRS = operation1.getTargetCRS();
         final MathTransform             transform = operation1.getMathTransform();
+        assertEquals("1087", getIdentifier(operation1));
+        assertEquals("4230", getIdentifier(sourceCRS));
+        assertEquals("4326", getIdentifier(targetCRS));
         assertTrue   (operation1 instanceof Transformation);
         assertNotSame(sourceCRS, targetCRS);
         assertFalse  (operation1.getMathTransform().isIdentity());
@@ -526,6 +533,7 @@ public class DefaultDataSourceTest extends TestCase {
          * Accuracy = 1.5
          */
         final CoordinateOperation operation2 = factory.createCoordinateOperation("1631");
+        assertEquals("1631", getIdentifier(operation2));
         assertTrue (operation2 instanceof Transformation);
         assertSame (sourceCRS, operation2.getSourceCRS());
         assertSame (targetCRS, operation2.getTargetCRS());
@@ -537,6 +545,7 @@ public class DefaultDataSourceTest extends TestCase {
          * Accuracy = 1.0
          */
         final CoordinateOperation operation3 = factory.createCoordinateOperation("1989");
+        assertEquals("1989", getIdentifier(operation3));
         assertTrue (operation3 instanceof Transformation);
         assertSame (sourceCRS, operation3.getSourceCRS());
         assertSame (targetCRS, operation3.getTargetCRS());
@@ -549,12 +558,26 @@ public class DefaultDataSourceTest extends TestCase {
             System.out.println(operation3.getMathTransform());
         }
         /*
-         * Creates from CRS codes.
+         * Creates from CRS codes. There is 40 such operations in EPSG version 6.7.
+         * The preferred one (according the "supersession" table) is EPSG:1612.
+         *
+         * Note: the above assertion fails on PostgreSQL because its "ORDER BY" clause put null
+         * values last, while Access and HSQL put them first. The PostgreSQL behavior is better
+         * for what we want (operations with unknow accuracy last). Unfortunatly, I don't know
+         * yet how to instructs Access to put null values last using standard SQL ("IIF" is not
+         * standard, and Access doesn't seem to understand "CASE ... THEN" clauses).
          */
         final Set all = factory.createFromCoordinateReferenceSystemCodes("4230", "4326");
         assertTrue(all.size() >= 3);
         assertTrue(all.contains(operation1));
         assertTrue(all.contains(operation2));
         assertTrue(all.contains(operation3));
+        final CoordinateOperation first = (CoordinateOperation) all.iterator().next();
+        assertEquals("1612", getIdentifier(first)); // see comment above.
+        for (final Iterator it=all.iterator(); it.hasNext();) {
+            final CoordinateOperation check = (CoordinateOperation) it.next();
+            assertSame(sourceCRS, check.getSourceCRS());
+            assertSame(targetCRS, check.getTargetCRS());
+        }
     }
 }

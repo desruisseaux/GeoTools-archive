@@ -1,6 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2004, Geotools Project Management Committee (PMC)
+ * (C) 2005, Geotools Project Managment Committee (PMC)
+ * (C) 2005, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,41 +17,31 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.resources;
-
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
+package org.geotools.referencing.factory.epsg;
 
 
 /**
- * Performs all tests for the <code>org.geotools.resources</code> packages.
- *
+ * Private structure for {@link FactoryUsingSQL#createBursaWolfParameters} usage.
+ * 
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class AllTests {
-    /** No need to construct this class. */
-    private AllTests() {
+final class BursaWolfInfo {
+    /** CO.COORD_OP_CODE        */ final String operation;
+    /** CO.COORD_OP_METHOD_CODE */ final int    method;
+    /** CRS1.DATUM_CODE         */ final String target;
+
+    /** Fill a structure with the specified values. */
+    BursaWolfInfo(final String operation, final int method, final String target) {
+        this.operation = operation;
+        this.method    = method;
+        this.target    = target;
     }
 
     /**
-     * Run the suite from the command line.
+     * MUST returns the operation code. This is required by {@link FactoryUsingSQL#sort}.
      */
-    public static void main(final String[] args) {
-        org.geotools.util.MonolineFormatter.initGeotools();
-        TestRunner.run(suite());
-    }
-
-    /**
-     * Returns all suites.
-     */
-    public static Test suite() {
-        final TestSuite suite = new TestSuite("org.geotools.resources");
-        suite.addTest(XMathTest       .suite());
-        suite.addTest(UtilitiesTest   .suite());
-        suite.addTest(NumberParserTest.suite());
-        return suite;
+    public String toString() {
+        return operation;
     }
 }

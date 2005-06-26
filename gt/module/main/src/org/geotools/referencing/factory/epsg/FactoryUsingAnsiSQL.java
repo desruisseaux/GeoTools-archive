@@ -82,6 +82,7 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
         "[Ellipsoid]",                              "epsg_ellipsoid",
         "[Naming System]",                          "epsg_namingsystem",
         "[Prime Meridian]",                         "epsg_primemeridian",
+        "[Supersession]",                           "epsg_supersession",
         "[Unit of Measure]",                        "epsg_unitofmeasure",
         "[Version History]",                        "epsg_versionhistory",
         "[CA.ORDER]",                               "coord_axis_order" //a field in epsg_coordinateaxis
@@ -110,6 +111,7 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
      *   <tr><td>[Naming System]</td>                          <td>epsg_namingsystem</td></tr>
      *   <tr><td>[Ellipsoid]</td>                              <td>epsg_ellipsoid</td></tr>
      *   <tr><td>[Prime Meridian]</td>                         <td>epsg_primemeridian</td></tr>
+     *   <tr><td>[Supersession]</td>                           <td>epsg_supersession</td></tr>
      *   <tr><td>[Unit of Measure]</td>                        <td>epsg_unitofmeasure</td></tr>
      *   <tr><td>[CA.ORDER]</td>                               <td>coord_axis_order</td></tr>
      * </table></pre>

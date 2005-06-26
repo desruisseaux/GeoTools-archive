@@ -35,7 +35,7 @@ import junit.textui.TestRunner;
 public class AllTests extends TestCase {
     /** No need to construct this class. */
     private AllTests() {
-    }        
+    }
 
     /**
      * Run the suite from the command line.
