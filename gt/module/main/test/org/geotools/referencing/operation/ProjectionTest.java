@@ -132,7 +132,7 @@ public class ProjectionTest extends TestCase {
     }
     
     /**
-     * Helper method to test trasnform from a source to a target point.
+     * Helper method to test transform from a source to a target point.
      * Coordinate points are (x,y) or (long, lat)
      */
     private static void doTransform(DirectPosition source,

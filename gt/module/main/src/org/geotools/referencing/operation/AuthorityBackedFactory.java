@@ -21,6 +21,8 @@ package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
@@ -167,6 +169,19 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                  * Ignores the exception and fallback on the generic algorithm provided by
                  * the super-class.
                  */
+            } catch (FactoryException exception) {
+                /*
+                 * Other kind of error. It may be more serious, but the super-class is capable
+                 * to provides a raisonable default behavior. Log as a warning and lets continue.
+                 *
+                 * TODO: localize.
+                 */
+                final LogRecord record = new LogRecord(Level.WARNING,
+                      "Failure while creating a coordinate operation from the authority factory.");
+                record.setSourceClassName("AuthorityBackedFactory");
+                record.setSourceMethodName("createOperation");
+                record.setThrown(exception);
+                LOGGER.log(record);
             }
         }
         return super.createOperation(sourceCRS, targetCRS);

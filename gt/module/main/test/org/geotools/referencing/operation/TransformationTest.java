@@ -51,6 +51,18 @@ import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 
 /**
  * Test transformation factory.
+ * <p>
+ * <strong>NOTE:</strong> Some tests are disabled in the particular case when the
+ * {@link CoordinateOperationFactory} is actually an {@link AuthorityBackedFactory}
+ * instance. This is because the later can replace source or target CRS by some CRS
+ * found in the EPSG authority factory, causing {@code assertSame} to fails. It may
+ * also returns a more accurate operation than the one expected from the WKT in the
+ * code below, causing transformation checks to fail as well. This situation occurs
+ * only if some EPSG authority factory like {@code plugin/epsg-hsql} is found in the
+ * classpath while the test are running. It should not occurs during Maven build, so
+ * all tests should be executed with Maven. It may occurs during an execution from
+ * the IDE however, in which case the tests are disabled in order to allows normal
+ * execution of other tests.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -225,9 +237,10 @@ public class TransformationTest extends TestTransform {
                 "  AXIS[\"Lat\", NORTH]]");
 
         final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
-        assertSame(sourceCRS, operation.getSourceCRS());
-        assertSame(targetCRS, operation.getTargetCRS());
-
+        if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+            assertSame(sourceCRS, operation.getSourceCRS());
+            assertSame(targetCRS, operation.getTargetCRS());
+        }
         final MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
         assertTransformEquals2_2(transform, -180, -88.21076182660325, -180, -88.21076182655470);
@@ -265,11 +278,12 @@ public class TransformationTest extends TestTransform {
                 "  AXIS[\"Latitude\",NORTH]]");
 
         final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
-        assertSame(sourceCRS, operation.getSourceCRS());
-        assertSame(targetCRS, operation.getTargetCRS());
-        assertTrue (operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
-        assertFalse(operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
-
+        if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+            assertSame(sourceCRS, operation.getSourceCRS());
+            assertSame(targetCRS, operation.getTargetCRS());
+            assertTrue (operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
+            assertFalse(operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
+        }
         final MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
         assertTransformEquals2_2(transform,  0,   0,  2.3367521703619816, 0.0028940088671177986);
@@ -382,24 +396,30 @@ public class TransformationTest extends TestTransform {
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
             assertTrue(op instanceof Transformation);
-            assertSame(sourceCRS, op.getSourceCRS());
-            assertSame(targetCRS, op.getTargetCRS());
+            if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+                assertSame(sourceCRS, op.getSourceCRS());
+                assertSame(targetCRS, op.getTargetCRS());
+            }
             assertFalse(mt.isIdentity());
             assertInterfaced(mt);
-            // Note: Expected values below were computed with Geotools (not an external library).
-            //       However, it was tested with both Molodenski and Geocentric transformations.
-            assertTransformEquals2_2(mt, 0.0,                   0.0,
-                                         0.001654978796746043,  0.0012755944235822696);
-            assertTransformEquals2_2(mt, 5.0,                   8.0,
-                                         5.001262960018587,     8.001271733843957);
+            if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+                // Note: Expected values below were computed with Geotools (not an external library).
+                //       However, it was tested with both Molodenski and Geocentric transformations.
+                assertTransformEquals2_2(mt, 0.0,                   0.0,
+                                             0.001654978796746043,  0.0012755944235822696);
+                assertTransformEquals2_2(mt, 5.0,                   8.0,
+                                             5.001262960018587,     8.001271733843957);
+            }
         }
         if (true) {
             sourceCRS = crsFactory.createFromWKT(Z);
             targetCRS = crsFactory.createFromWKT(Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertSame(sourceCRS, op.getSourceCRS());
-            assertSame(targetCRS, op.getTargetCRS());
+            if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+                assertSame(sourceCRS, op.getSourceCRS());
+                assertSame(targetCRS, op.getTargetCRS());
+            }
             assertTrue(op instanceof Conversion);
             assertTrue(mt.isIdentity());
             assertInterfaced(mt);
@@ -409,8 +429,10 @@ public class TransformationTest extends TestTransform {
             targetCRS = crsFactory.createFromWKT(H);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertSame(sourceCRS, op.getSourceCRS());
-            assertSame(targetCRS, op.getTargetCRS());
+            if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+                assertSame(sourceCRS, op.getSourceCRS());
+                assertSame(targetCRS, op.getTargetCRS());
+            }
             assertTrue(op instanceof Conversion);
             assertTrue(mt.isIdentity());
             assertInterfaced(mt);
@@ -478,8 +500,10 @@ public class TransformationTest extends TestTransform {
             targetCRS = crsFactory.createFromWKT(WGS84);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertNotSame(sourceCRS, op.getSourceCRS());
-            assertSame(targetCRS, op.getTargetCRS());
+            if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+                assertNotSame(sourceCRS, op.getSourceCRS());
+                assertSame   (targetCRS, op.getTargetCRS());
+            }
             assertFalse(mt.isIdentity());
             assertInterfaced(mt);
             // Note: Expected values below were computed with Geotools (not an external library).
@@ -496,8 +520,10 @@ public class TransformationTest extends TestTransform {
             targetCRS = crsFactory.createFromWKT(Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertSame(sourceCRS, op.getSourceCRS());
-            assertSame(targetCRS, op.getTargetCRS());
+            if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+                assertSame(sourceCRS, op.getSourceCRS());
+                assertSame(targetCRS, op.getTargetCRS());
+            }
             assertFalse(mt.isIdentity());
             assertInterfaced(mt);
             assertTransformEquals3_1(mt,  0,  0, 0,   0);
@@ -509,8 +535,10 @@ public class TransformationTest extends TestTransform {
             targetCRS = crsFactory.createFromWKT(WGS84_Z);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertSame   (sourceCRS, op.getSourceCRS());
-            assertNotSame(targetCRS, op.getTargetCRS());
+            if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+                assertSame   (sourceCRS, op.getSourceCRS());
+                assertNotSame(targetCRS, op.getTargetCRS());
+            }
             assertFalse(mt.isIdentity());
             assertInterfaced(mt);
             // Note: Expected values below were computed with Geotools (not an external library).
@@ -551,8 +579,10 @@ public class TransformationTest extends TestTransform {
             targetCRS = crsFactory.createFromWKT(WGS84_H);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertSame   (sourceCRS, op.getSourceCRS());
-            assertNotSame(targetCRS, op.getTargetCRS());
+            if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+                assertSame   (sourceCRS, op.getSourceCRS());
+                assertNotSame(targetCRS, op.getTargetCRS());
+            }
             assertFalse(mt.isIdentity());
             assertInterfaced(mt);
             fail("Should fails unless GEOT-352 has been fixed");
@@ -564,8 +594,10 @@ public class TransformationTest extends TestTransform {
             targetCRS = crsFactory.createFromWKT(H);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            assertSame(sourceCRS, op.getSourceCRS());
-            assertSame(targetCRS, op.getTargetCRS());
+            if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
+                assertSame(sourceCRS, op.getSourceCRS());
+                assertSame(targetCRS, op.getTargetCRS());
+            }
             assertFalse(mt.isIdentity());
             assertInterfaced(mt);
             assertTransformEquals3_1(mt,  0,  0, 0,   0);

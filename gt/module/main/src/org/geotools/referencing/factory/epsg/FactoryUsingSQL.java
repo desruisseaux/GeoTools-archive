@@ -60,6 +60,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
@@ -2014,7 +2015,27 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 final String unitCode = result.getString(4);
                 unit = (unitCode!=null) ? buffered.createUnit(unitCode) : null;
             }
-            final ParameterValue param = parameters.parameter(name);
+            final ParameterValue param;
+            try {
+                param = parameters.parameter(name);
+            } catch (ParameterNotFoundException exception) {
+                /*
+                 * Wraps the unchecked ParameterNotFoundException into the checked
+                 * NoSuchIdentifierException, which is a FactoryException subclass.
+                 * Note that this exception is in principle for MathTransforms  rather than
+                 * parameters. However, we are close in spirit here since we are setting up
+                 * MathTransform's parameters. Using NoSuchIdentifierException allows users
+                 * (including CoordinateOperationSet) to know that the failure is probably
+                 * caused by a MathTransform not yet supported in Geotools (or only partially
+                 * supported) rather than some more serious failure in the database side.
+                 * CoordinateOperationSet uses this information in order to determine if it
+                 * should try the next coordinate operation or propagate the exception.
+                 */
+                final NoSuchIdentifierException e = new NoSuchIdentifierException(
+                        "Can't set parameter values for operation \"" + operation + "\".", name);
+                e.initCause(exception);
+                throw e;
+            }
             if (reference != null) {
                 param.setValue(reference);
             } else if (unit != null) {

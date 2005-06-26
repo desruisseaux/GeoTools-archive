@@ -31,6 +31,7 @@ import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.URL;
+import java.net.MalformedURLException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
@@ -47,12 +48,15 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.Arguments;
@@ -65,12 +69,13 @@ import org.geotools.resources.cts.Resources;
  * The North American Datum Conversion (NADCON) Transform (EPSG code 9613) is a
  * two dimentional datum shift method, created by the National Geodetic Survey
  * (NGS), that uses interpolated values from two grid shift files. This
- * method is used  to transform NAD27 (EPSG code 4267) datum coordinates (and
- * some others) to  NAD83 (EPSG code 4267) within the United States. There are
- * two sent of grid  shift files: NADCON and High Accuracy Reference Networks
+ * method is used to transform NAD27 (EPSG code 4267) datum coordinates (and
+ * some others) to NAD83 (EPSG code 4267) within the United States. There are
+ * two set of grid shift files: NADCON and High Accuracy Reference Networks
  * (HARN).  NADCON shfts from NAD27 (and some others) to NAD83 while HARN
- * shifts from  the NADCON NAD83 to an improved NAD83. Both sets of grid shift
- * files may be  downloaded from  <a href="http://www.ngs.noaa.gov/PC_PROD/NADCON/">www.ngs.noaa.gov/PC_PROD/NADCON/</a>.
+ * shifts from the NADCON NAD83 to an improved NAD83. Both sets of grid shift
+ * files may be downloaded from
+ * <a href="http://www.ngs.noaa.gov/PC_PROD/NADCON/">www.ngs.noaa.gov/PC_PROD/NADCON/</a>.
  * <p>
  *
  * Some of the NADCON grids, their areas of use, and source datums are shown
@@ -91,21 +96,21 @@ import org.geotools.resources.cts.Resources;
  *
  * Grid shift files come in two formats: binary and text. The files from the NGS are
  * binary and have {@code .las} (latitude shift) and {@code .los} (longitude shift)
- * extentions. Text grids may be created with the NGS nadgrd program and have
+ * extentions. Text grids may be created with the <cite>NGS nadgrd</cite> program and have
  * {@code .laa} (latitude shift) and {@code .loa} (longitude shift) file extentions.
  * Both types of  files may be used here. 
  * <p>
  *
  * The grid names to use for transforming are parameters of this
- * MathTransform.  This parameter may be the full name and path to the grids
- * or just the name  of the grids if the default location of the grids was set
+ * {@link MathTransform}.  This parameter may be the full name and path to the grids
+ * or just the name of the grids if the default location of the grids was set
  * as a preference.  This preference may be set with the main method of this
  * class.
  * <p>
  *
  * Transformations here have been tested to be within 0.00001 seconds of
- * values  given by the NGS ndcon210 program for NADCON grids. American Samoa
- * and HARN  shifts have not yet been tested.  <strong>References:</strong>
+ * values given by the <cite>NGS ndcon210</cite> program for NADCON grids. American Samoa
+ * and HARN shifts have not yet been tested.  <strong>References:</strong>
  * 
  * <ul>
  *   <li><a href="http://www.ngs.noaa.gov/PC_PROD/NADCON/Readme.htm">NADCONreadme</a></li>
@@ -131,18 +136,19 @@ import org.geotools.resources.cts.Resources;
  *
  * @todo the transform code does not deal with the case where grids cross +- 180 degrees.
  */
-public class NADCONTransform extends AbstractMathTransform implements Serializable {
-
-    /** Serial number for interoperability with different versions. */
+public class NADCONTransform extends AbstractMathTransform implements MathTransform2D, Serializable {
+    /**
+     * Serial number for interoperability with different versions.
+     */
     private static final long serialVersionUID = -4707304160205218546L;
 
     /**
-     * Preference node for the grid shift file location, and its default value.
+     * Preference node for the grid shift file location.
      */
     private static final String GRID_LOCATION = "Grid location";
 
     /**
-     * Preference node for the grid shift file location, and its default value.
+     * The default value for the grid shift file location.
      */
     private static final String DEFAULT_GRID_LOCATION = ".";
 
@@ -152,89 +158,98 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      */
     private static final double TOL = 5.0E-10;
 
-    /** Maximum number of itterations for iterative computations. */
+    /**
+     * Maximum number of iterations for iterative computations.
+     */
     private static final int MAX_ITER = 10;
 
-    /** Conversion factor from seconds to degrees. */
+    /**
+     * Conversion factor from seconds to degrees.
+     */
     private static final double SEC_2_DEG = 3600.0;
 
-    /** latitude and longitude grid shift file names. Output in WKT. */
+    /**
+     * Latitude grid shift file names. Output in WKT.
+     */
     private final String latGridName;
 
-    /** latitude and longitude grid shift file names. Output in WKT. */
+    /**
+     * Longitude grid shift file names. Output in WKT.
+     */
     private final String longGridName;
 
-    /*
-     * the minimum longitude value covered by this grid (degrees)
+    /**
+     * The minimum longitude value covered by this grid (degrees)
      */
     private double xmin;
 
-    /*
-     * the minimum latiude value covered by this grid (degrees)
+    /**
+     * The minimum latitude value covered by this grid (degrees)
      */
     private double ymin;
 
-    /*
-     * the maximum longitude value covered by this grid (degrees)
+    /**
+     * The maximum longitude value covered by this grid (degrees)
      */
     private double xmax;
 
-    /*
-     * the maximum latitude value covered by this grid (degrees)
+    /**
+     * The maximum latitude value covered by this grid (degrees)
      */
     private double ymax;
 
-    /*
-     * the difference between longitude grid points (degrees)
+    /**
+     * The difference between longitude grid points (degrees)
      */
     private double dx;
 
-    /*
-     * the difference between latitude grid points (degrees)
+    /**
+     * The difference between latitude grid points (degrees)
      */
     private double dy;
 
     /**
-     * longitude and latitude grid shift values. Values are organized from  low
+     * Longitude and latitude grid shift values. Values are organized from low
      * to high longitude (low x index to high) and low to high latitude (low y
      * index to high).
      */
-    private LocalizationGrid gridShift = null;
+    private LocalizationGrid gridShift;
 
     /**
      * The {@link #gridShift} values as a {@code LocalizationGridTransform2D}.
      * Used for interpolating shift values.
      */
-    private MathTransform gridShiftTransform = null;
+    private MathTransform gridShiftTransform;
 
-    /** The inverse of this transform. Will be created only when needed. */
+    /**
+     * The inverse of this transform. Will be created only when needed.
+     */
     private transient MathTransform inverse;
 
     /**
-     * Constructs a NADCONTransform from the specified grid shift files.
+     * Constructs a {@code NADCONTransform} from the specified grid shift files.
      *
      * @param latGridName path and name (or just name if {@link #GRID_LOCATION}
-     *        is set) to the latitude difference file. This will have a .las or
-     *        .laa file extention.
+     *        is set) to the latitude difference file. This will have a {@code .las} or
+     *        {@code .laa} file extention.
      * @param longGridName path and name (or just name if {@link #GRID_LOCATION}
-     *        is set) to the longitude difference file. This will have a .los
-     *        or .loa file extention.
+     *        is set) to the longitude difference file. This will have a {@code .los}
+     *        or {@code .loa} file extention.
      *
-     * @throws ParameterNotFoundException if a math transform parameter cannot 
-     *         be found.
+     * @throws ParameterNotFoundException if a math transform parameter cannot be found.
      * @throws FactoryException if there is a problem creating this math transform
      *         (ie file extentions are unknown or there is an error reading the
      *          grid files)
      */
-    public NADCONTransform(String latGridName, String longGridName)
+    public NADCONTransform(final String latGridName, final String longGridName)
             throws ParameterNotFoundException, FactoryException 
     {
-        this.latGridName = latGridName;
+        this.latGridName  = latGridName;
         this.longGridName = longGridName;
 
         //decide if text or binary grid will be used
         try {
-            final URL latGridURL = makeURL(latGridName);
+            final URL latGridURL  = makeURL(latGridName);
             final URL longGridURL = makeURL(longGridName);
 
             if ((latGridName.endsWith(".las") && longGridName.endsWith(".los")) 
@@ -246,8 +261,10 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
             } else {
                 throw new FactoryException(Resources.format(
                         ResourceKeys.ERROR_UNSUPPORTED_FILE_TYPE_$2,
-                        latGridName.substring(latGridName.lastIndexOf('.')),
-                        longGridName.substring(longGridName.lastIndexOf('.'))));
+                        latGridName.substring(latGridName.lastIndexOf('.') + 1),
+                        longGridName.substring(longGridName.lastIndexOf('.') + 1)));
+                // Note: the +1 above hide the dot, but also make sure that the code is
+                //       valid even if the path do not contains '.' at all (-1 + 1 == 0).
             }
 
             gridShiftTransform = gridShift.getMathTransform();
@@ -274,16 +291,13 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      * @return A copy of the parameter values for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
-        final ParameterValue lat_diff_file =
-                new org.geotools.parameter.Parameter(Provider.LAT_DIFF_FILE);
+        final ParameterValue lat_diff_file = new Parameter(Provider.LAT_DIFF_FILE);
         lat_diff_file.setValue(latGridName);
 
-        final ParameterValue long_diff_file =
-                new org.geotools.parameter.Parameter(Provider.LONG_DIFF_FILE);
+        final ParameterValue long_diff_file = new Parameter(Provider.LONG_DIFF_FILE);
         long_diff_file.setValue(longGridName);
 
-        return new org.geotools.parameter.ParameterGroup(
-            getParameterDescriptors(),
+        return new ParameterGroup(getParameterDescriptors(),
             new GeneralParameterValue[] { lat_diff_file, long_diff_file }
         );
     }
@@ -291,7 +305,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
     /**
      * Gets the dimension of input points (always 2).
      *
-     * @return the source dimention.
+     * @return the source dimensions.
      */
     public int getSourceDimensions() {
         return 2;
@@ -300,30 +314,28 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
     /**
      * Gets the dimension of output points (always 2).
      *
-     * @return the target dimention.
+     * @return the target dimensions.
      */
     public int getTargetDimensions() {
         return 2;
     }
 
     /**
-     * Returns a URL from the string representation. If the string has  no
+     * Returns a URL from the string representation. If the string has no
      * path, the default path preferece is added.
      *
      * @param str a string representation of a URL
      * @return a URL created from the string representation
-     * @throws java.net.MalformedURLException if the URL cannot be created
+     * @throws MalformedURLException if the URL cannot be created
      */
-    private URL makeURL(String str) throws java.net.MalformedURLException {
+    private URL makeURL(final String str) throws MalformedURLException {
         //has '/' or '\' or ':', so probably full path to file
-        if ((str.indexOf("\\") != -1) || (str.indexOf("/") != -1)
-                || (str.indexOf(":") != -1)) {
+        if ((str.indexOf('\\') >= 0) || (str.indexOf('/') >= 0) || (str.indexOf(':') >= 0)) {
             return makeURLfromString(str);
         } else {
-            //just a file name , prepend base location
+            // just a file name , prepend base location
             final Preferences prefs = Preferences.userNodeForPackage(NADCONTransform.class);
-            final String baseLocation = prefs.get(GRID_LOCATION,
-                    DEFAULT_GRID_LOCATION);
+            final String baseLocation = prefs.get(GRID_LOCATION, DEFAULT_GRID_LOCATION);
             return makeURLfromString(baseLocation + "/" + str);
         }
     }
@@ -334,14 +346,12 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      *
      * @param str a string representation of a URL
      * @return a URL created from the string representation
-     * @throws java.net.MalformedURLException if the URL cannot be created
+     * @throws MalformedURLException if the URL cannot be created
      */
-    private URL makeURLfromString(String str)
-            throws java.net.MalformedURLException 
-    {
+    private URL makeURLfromString(final String str) throws MalformedURLException {
         try {
             return new URL(str);
-        } catch (java.net.MalformedURLException e) {
+        } catch (MalformedURLException e) {
             //try making this with a file protocal
             return new URL("file", "", str);
         }
@@ -361,14 +371,12 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      * columns are orderd from low longitude to high.  Everything is written
      * in low byte order.
      *
-     * @param latGridUrl URL to the binary latitude shift file (.las
-     *        extention).
-     * @param longGridUrl URL to the binary longitude shift file (.los
-     *        extention).
+     * @param latGridUrl URL to the binary latitude shift file (.las extention).
+     * @param longGridUrl URL to the binary longitude shift file (.los extention).
      * @throws IOException if the data files cannot be read.
      * @throws FactoryException if there is an inconsistency in the data
      */
-    private void loadBinaryGrid(URL latGridUrl, URL longGridUrl)
+    private void loadBinaryGrid(final URL latGridUrl, final URL longGridUrl)
             throws IOException, FactoryException 
     {
         final int HEADER_BYTES = 96;
@@ -399,9 +407,9 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
         int nz = latBuffer.getInt();
 
         xmin = latBuffer.getFloat();
-        dx = latBuffer.getFloat();
+        dx   = latBuffer.getFloat();
         ymin = latBuffer.getFloat();
-        dy = latBuffer.getFloat();
+        dy   = latBuffer.getFloat();
 
         float angle = latBuffer.getFloat();
         xmax = xmin + ((nc - 1) * dx);
@@ -411,12 +419,13 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
         longBuffer.position(longBuffer.position() + DESCRIPTION_LENGTH);
 
         //check that latitude grid header is the same as for latitude grid
-        if ((nc != longBuffer.getInt()) || (nr != longBuffer.getInt())
-                || (nz != longBuffer.getInt())
-                || (xmin != longBuffer.getFloat())
-                || (dx != longBuffer.getFloat())
-                || (ymin != longBuffer.getFloat())
-                || (dy != longBuffer.getFloat())
+        if (       (nc    != longBuffer.getInt())
+                || (nr    != longBuffer.getInt())
+                || (nz    != longBuffer.getInt())
+                || (xmin  != longBuffer.getFloat())
+                || (dx    != longBuffer.getFloat())
+                || (ymin  != longBuffer.getFloat())
+                || (dy    != longBuffer.getFloat())
                 || (angle != longBuffer.getFloat())) {
             throw new FactoryException(Resources.format(
                     ResourceKeys.ERROR_GRID_LOCATIONS_UNEQUAL));
@@ -606,13 +615,13 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
         }
 
         //check that latitude grid header is the same as for latitude grid
-        if ((nc != Integer.parseInt(longSt.nextToken()))
-                || (nr != Integer.parseInt(longSt.nextToken()))
-                || (nz != Integer.parseInt(longSt.nextToken()))
-                || (xmin != Float.parseFloat(longSt.nextToken()))
-                || (dx != Float.parseFloat(longSt.nextToken()))
-                || (ymin != Float.parseFloat(longSt.nextToken()))
-                || (dy != Float.parseFloat(longSt.nextToken()))
+        if (       (nc    != Integer.parseInt(longSt.nextToken()))
+                || (nr    != Integer.parseInt(longSt.nextToken()))
+                || (nz    != Integer.parseInt(longSt.nextToken()))
+                || (xmin  != Float.parseFloat(longSt.nextToken()))
+                || (dx    != Float.parseFloat(longSt.nextToken()))
+                || (ymin  != Float.parseFloat(longSt.nextToken()))
+                || (dy    != Float.parseFloat(longSt.nextToken()))
                 || (angle != Float.parseFloat(longSt.nextToken()))) {
             throw new FactoryException(Resources.format(
                     ResourceKeys.ERROR_GRID_LOCATIONS_UNEQUAL));
@@ -823,8 +832,8 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
                 && (Double.doubleToLongBits(this.ymin) == Double.doubleToLongBits(that.ymin))
                 && (Double.doubleToLongBits(this.xmax) == Double.doubleToLongBits(that.xmax))
                 && (Double.doubleToLongBits(this.ymax) == Double.doubleToLongBits(that.ymax))
-                && (Double.doubleToLongBits(this.dx) == Double.doubleToLongBits(that.dx))
-                && (Double.doubleToLongBits(this.dy) == Double.doubleToLongBits(that.dy))
+                && (Double.doubleToLongBits(this.dx)   == Double.doubleToLongBits(that.dx))
+                && (Double.doubleToLongBits(this.dy)   == Double.doubleToLongBits(that.dy))
                 && (this.gridShiftTransform).equals(that.gridShiftTransform);
         }
 
@@ -838,7 +847,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      * Path values may be simple file system paths or more complex
      * text representations of a url. A value of "default" resets this
      * preference to its default value. 
-     * <br><br>
+     * <p>
      *
      * Example:
      * <blockquote>
@@ -955,7 +964,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          */
         public static final ParameterDescriptor LAT_DIFF_FILE = new DefaultParameterDescriptor(
                 "Latitude_difference_file", String.class, null, "conus.las");
-        
+
         /**
          * The operation parameter descriptor for the "Longitude_difference_file" 
          * parameter value. The default value is "conus.los".
