@@ -880,8 +880,7 @@ public class ObliqueMercator extends MapProjection {
         {
             final Collection descriptors = PARAMETERS.descriptors();
             return new ObliqueMercator(parameters, descriptors, false, true);
-        }
-        
+        }        
     }
 
 

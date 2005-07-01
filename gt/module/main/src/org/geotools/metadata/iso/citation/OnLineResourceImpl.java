@@ -89,7 +89,15 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
      * The online resources for <A HREF="http://www.oracle.com">Oracle</A>.
      */
     public static final OnLineResource ORACLE;
-    
+
+    /**
+     * The online resources for <A HREF="http://java.sun.com/">Sun Microsystems</A>.
+     * This online resources point to the Java developper site.
+     *
+     * @since 2.2
+     */
+    public static final OnLineResource SUN_MICROSYSTEMS;
+
     /**
      * The online resources for the <A HREF="http://www.geotools.org">Geotools</A> project.
      */
@@ -119,6 +127,10 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
 
             ORACLE = r = new OnLineResourceImpl(new URI("http://www.oracle.com"));
             r.setFunction(OnLineFunction.INFORMATION);
+            r.freeze();
+
+            SUN_MICROSYSTEMS = r = new OnLineResourceImpl(new URI("http://java.sun.com"));
+            r.setFunction(OnLineFunction.DOWNLOAD);
             r.freeze();
 
             GEOTOOLS = r = new OnLineResourceImpl(new URI("http://www.geotools.org"));

@@ -490,7 +490,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         /**
          * The set of predefined providers.
          */
-        private static OperationMethod[] methods = new OperationMethod[8];
+        private static final ProviderAffine[] methods = new ProviderAffine[8];
 
         /**
          * The parameters group.
@@ -545,29 +545,23 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         protected MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            return create(((MatrixParameterDescriptors) getParameters()).getMatrix(values));
-        }
-
-        /**
-         * Returns the operation method for the specified math transform.
-         * This method provides different methods for different matrix sizes.
-         */
-        protected OperationMethod getMethod(final MathTransform mt) {
-            return getMethod(mt.getSourceDimensions(),
-                             mt.getTargetDimensions());
+            final MathTransform transform;
+            transform = create(((MatrixParameterDescriptors) getParameters()).getMatrix(values));
+            return new Delegate(transform, getProvider(transform.getSourceDimensions(),
+                                                       transform.getTargetDimensions()));
         }
 
         /**
          * Returns the operation method for the specified source and target dimensions.
          * This method provides different methods for different matrix sizes.
          */
-        public static OperationMethod getMethod(final int sourceDimensions,
-                                                final int targetDimensions)
+        public static ProviderAffine getProvider(final int sourceDimensions,
+                                                 final int targetDimensions)
         {
             if (sourceDimensions == targetDimensions) {
                 final int i = sourceDimensions - 1;
                 if (i>=0 && i<methods.length) {
-                    OperationMethod method = methods[i];
+                    ProviderAffine method = methods[i];
                     if (method == null) {
                         methods[i] = method = new ProviderAffine(sourceDimensions, targetDimensions);
                     }
@@ -588,7 +582,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         /**
          * Serial number for interoperability with different versions.
          */
-//        private static final long serialVersionUID = 649555815622129472L;
+        private static final long serialVersionUID = -2104496465933824935L;
 
         /**
          * The longitude offset.

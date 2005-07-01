@@ -123,7 +123,21 @@ public class ContactImpl extends MetadataEntity implements Contact {
         c.freeze();
         ORACLE = c;
     }
-    
+
+    /**
+     * Contact informations for <A HREF="http://www.sun.com/">Sun Microsystems</A>.
+     *
+     * @see OnLineResourceImpl#SUN_MICROSYSTEMS
+     *
+     * @since 2.2
+     */
+    public static final Contact SUN_MICROSYSTEMS;
+    static {
+        final ContactImpl c = new ContactImpl(OnLineResourceImpl.SUN_MICROSYSTEMS);
+        c.freeze();
+        SUN_MICROSYSTEMS = c;
+    }
+
     /**
      * Contact informations for the <A HREF="http://www.geotools.org">Geotools</A> project.
      *

@@ -681,15 +681,25 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         protected MathTransform createMathTransform(final ParameterValueGroup values) 
                 throws ParameterNotFoundException 
         {
-            final boolean abridged = isAbridged();
             final boolean hasHeight;
             final int dim = intValue(DIM, values);
             switch (dim) {
-                case 0:                 // Default value: fall through
-                case DEFAULT_DIMENSION: hasHeight=false; break;
-                case 3:                 hasHeight=true;  break;
-                default: throw new IllegalArgumentException(Resources.format(
+                case 0: // Default value: fall through
+                case DEFAULT_DIMENSION: {
+                    hasHeight = false;
+                    break;
+                }
+                case 3: {
+                    hasHeight = true;
+                    if (withHeight == null) {
+                        withHeight = create3D();
+                    }
+                    break;
+                }
+                default: {
+                    throw new IllegalArgumentException(Resources.format(
                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dim", new Integer(dim)));
+                }
             }
             final double  a = doubleValue(SRC_SEMI_MAJOR, values);
             final double  b = doubleValue(SRC_SEMI_MINOR, values);
@@ -698,27 +708,12 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
             final double dx = doubleValue(DX,             values);
             final double dy = doubleValue(DY,             values);
             final double dz = doubleValue(DZ,             values);
+            final boolean abridged = isAbridged();
             if (!hasHeight) {
                 return new As2D(abridged, a, b, ta, tb, dx, dy, dz);
-            }
-            return new MolodenskiTransform(abridged, a, b, hasHeight, ta, tb, hasHeight, dx, dy, dz);
-        }
-
-        /**
-         * Returns the operation method for the specified math transform. This method is invoked
-         * automatically after {@code createMathTransform}. The default implementation returns
-         * an operation with dimensions that matches the math transform dimensions.
-         */
-        protected OperationMethod getMethod(final MathTransform mt) {
-            switch (mt.getSourceDimensions()) {
-                case 3: {
-                    if (withHeight == null) {
-                        withHeight = create3D();
-                    }
-                    return withHeight;
-                }
-                case DEFAULT_DIMENSION: return this;
-                default: throw new IllegalArgumentException();
+            } else {
+                return new Delegate(new MolodenskiTransform(
+                        abridged, a, b, hasHeight, ta, tb, hasHeight, dx, dy, dz), withHeight);
             }
         }
 

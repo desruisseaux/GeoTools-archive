@@ -73,6 +73,7 @@ import org.geotools.coverage.processing.Operation2D;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.FactoryFinder;
@@ -694,36 +695,60 @@ public final class Resampler2D extends GridCoverage2D {
      *
      * @version $Id$
      * @author Martin Desruisseaux
+     *
+     * @since 2.1
      */
     public static final class Operation extends Operation2D {
         /**
          * The parameter descriptor for the interpolation type.
          */
         public static final ParameterDescriptor INTERPOLATION_TYPE =
-                new DefaultParameterDescriptor(
-                "InterpolationType", Object.class, null, "NearestNeighbor");
+                new DefaultParameterDescriptor(CitationImpl.OGC, "InterpolationType",
+                    Object.class,                       // Value class (mandatory)
+                    null,                               // Array of valid values
+                    "NearestNeighbor",                  // Default value
+                    null,                               // Minimal value
+                    null,                               // Maximal value
+                    null,                               // Unit of measure
+                    false);                             // Parameter is optional
 
         /**
          * The parameter descriptor for the coordinate reference system.
          */
         public static final ParameterDescriptor COORDINATE_REFERENCE_SYSTEM =
-                new DefaultParameterDescriptor(
-                "CoordinateReferenceSystem", CoordinateReferenceSystem.class, null, null);
+                new DefaultParameterDescriptor(CitationImpl.OGC, "CoordinateReferenceSystem",
+                    CoordinateReferenceSystem.class,    // Value class (mandatory)
+                    null,                               // Array of valid values
+                    null,                               // Default value
+                    null,                               // Minimal value
+                    null,                               // Maximal value
+                    null,                               // Unit of measure
+                    false);                             // Parameter is optional
 
         /**
          * The parameter descriptor for the grid geometry.
          */
         public static final ParameterDescriptor GRID_GEOMETRY =
-                new DefaultParameterDescriptor(
-                "GridGeometry", GridGeometry2D.class, null, null);
+                new DefaultParameterDescriptor(CitationImpl.OGC, "GridGeometry",
+                    GridGeometry2D.class,               // Value class (mandatory)
+                    null,                               // Array of valid values
+                    null,                               // Default value
+                    null,                               // Minimal value
+                    null,                               // Maximal value
+                    null,                               // Unit of measure
+                    false);                             // Parameter is optional
 
         /**
-         * Construct a "Resample" operation.
+         * Constructs a "Resample" operation.
          */
         public Operation() {
-            super(new DefaultParameterDescriptorGroup("Resample",
-                  new ParameterDescriptor[] {SOURCE_0, INTERPOLATION_TYPE,
-                          COORDINATE_REFERENCE_SYSTEM, GRID_GEOMETRY}));
+            super(new DefaultParameterDescriptorGroup(CitationImpl.OGC, "Resample",
+                  new ParameterDescriptor[] {
+                        SOURCE_0,
+                        INTERPOLATION_TYPE,
+                        COORDINATE_REFERENCE_SYSTEM,
+                        GRID_GEOMETRY
+            }));
         }
         
         /**

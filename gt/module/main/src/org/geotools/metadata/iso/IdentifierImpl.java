@@ -77,6 +77,16 @@ public class IdentifierImpl extends MetadataEntity implements Identifier {
     }
 
     /**
+     * Creates an identifier initialized to the given authority and code.
+     *
+     * @since 2.2
+     */
+    public IdentifierImpl(final Citation authority, final String code) {
+        setAuthority(authority);
+        setCode(code);
+    }
+
+    /**
      * Alphanumeric value identifying an instance in the namespace.
      *
      * @return The code.

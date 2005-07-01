@@ -313,8 +313,8 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
         final Class type = properties.containsKey(CoordinateOperation.POSITIONAL_ACCURACY_KEY)
                            ? Transformation.class : Conversion.class;
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
-                ProjectiveTransform.ProviderAffine.getMethod(transform.getSourceDimensions(),
-                                                             transform.getTargetDimensions()), type);
+               ProjectiveTransform.ProviderAffine.getProvider(transform.getSourceDimensions(),
+                                                              transform.getTargetDimensions()), type);
     }
 
     /**

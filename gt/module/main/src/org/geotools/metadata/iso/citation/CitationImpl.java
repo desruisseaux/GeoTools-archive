@@ -25,15 +25,10 @@ package org.geotools.metadata.iso.citation;
 // J2SE direct dependencies
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
@@ -90,14 +85,14 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * The WMS 1.1.1 "Automatic Projections" Authority.
      * Source: <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1</A> (01-068r3)
      * <p>
-     * Here is the assumptions used by the {@code CRSAuthorityFactory} to locate an
-     * authority on AUTO data:
+     * Here is the assumptions used by the {@link org.opengis.referencing.crs.CRSAuthorityFactory}
+     * to locate an authority on AUTO data:
      * <ul>
-     *   <li>{@code getTitle()} returns something human readable</li>
-     *   <li>{@code getIdentifiers().contains( "AUTO" )}</li>
+     *   <li>{@link #getTitle()} returns something human readable.</li>
+     *   <li>{@link #getIdentifiers()} contains "AUTO".</li>
      * </ul>
      * <p>
-     * Warning: different from AUTO2 used for WMS 1.3.0.
+     * <strong>Warning:</strong> different from {@link #AUTO2} used for WMS 1.3.0.
      *
      * @see <A HREF="http://www.opengeospatial.org/">Open Geospatial Consortium</A>
      * @see <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1 specification</A>
@@ -106,20 +101,18 @@ public class CitationImpl extends MetadataEntity implements Citation {
     public static final Citation AUTO;
     static { // Sanity check ensure that all @see tags are actually available in the metadata
         final CitationImpl c = new CitationImpl("Automatic Projections");
-        c.setPresentationForm(Collections.singleton(PresentationForm.MODEL_DIGITAL));
+        c.getPresentationForm().add(PresentationForm.MODEL_DIGITAL);
 
-        final List titles = new ArrayList(3);
+        final Collection titles = c.getAlternateTitles();
         titles.add(new SimpleInternationalString("AUTO"));        
         titles.add(new SimpleInternationalString("WMS 1.1.1"));
         titles.add(new SimpleInternationalString("OGC 01-068r2"));                
-        c.setAlternateTitles(titles);
 
-        final Set parties = new HashSet(4);
+        final Collection parties = c.getCitedResponsibleParties();
         parties.add(OGC(Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/"));
         parties.add(OGC(Role.OWNER, OnLineFunction.INFORMATION, "http://www.opengis.org/docs/01-068r3.pdf"));
-        c.setCitedResponsibleParties(parties);
 
-        c.setIdentifiers(Collections.singleton("AUTO"));
+        c.getIdentifiers().add("AUTO");
         c.freeze();
         AUTO = c;
     }
@@ -128,14 +121,14 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * The WMS 1.3.0 "Automatic Projections" Authority.
      * Source: <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0</A> (01-068r3)
      * <p>
-     * Here is the assumptions used by the CRSAuthorityFactory to locate an
-     * authority on AUTO2 data:
+     * Here is the assumptions used by the {@link org.opengis.referencing.crs.CRSAuthorityFactory}
+     * to locate an authority on AUTO2 data:
      * <ul>
-     *   <li>{@code getTitle()} returns something human readable</li>
-     *   <li>{@code getIdentifiers().contains( "AUTO2" )}</li>
+     *   <li>{@link #getTitle()} returns something human readable.</li>
+     *   <li>{@link #getIdentifiers()} contains "AUTO2".</li>
      * </ul>
      * <p>
-     * Warning: different from AUTO used for WMS 1.1.1. and earlier.
+     * <strong>Warning:</strong> different from {@link #AUTO} used for WMS 1.1.1. and earlier.
      *
      * @see <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0 specification</A>
      * @see ResponsiblePartyImpl#OGC
@@ -143,20 +136,18 @@ public class CitationImpl extends MetadataEntity implements Citation {
     public static final Citation AUTO2;
     static {
         final CitationImpl c = new CitationImpl("Automatic Projections");
-        c.setPresentationForm(Collections.singleton(PresentationForm.MODEL_DIGITAL));
+        c.getPresentationForm().add(PresentationForm.MODEL_DIGITAL);
 
-        final List titles = new ArrayList(3);
+        final Collection titles = c.getAlternateTitles();
         titles.add(new SimpleInternationalString("AUTO2"));        
         titles.add(new SimpleInternationalString("WMS 1.3.0"));
         titles.add(new SimpleInternationalString("OGC 04-024"));                
-        c.setAlternateTitles(titles);
 
-        final Set parties = new HashSet(4);
+        final Collection parties = c.getCitedResponsibleParties();
         parties.add(OGC(Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/"));
         parties.add(OGC(Role.OWNER, OnLineFunction.INFORMATION, "http://portal.opengis.org/files/?artifact_id=5316"));
-        c.setCitedResponsibleParties( parties );
 
-        c.setIdentifiers(Collections.singleton("AUTO2"));
+        c.getIdentifiers().add("AUTO2");
         c.freeze();
         AUTO2 = c;
     }
@@ -164,15 +155,16 @@ public class CitationImpl extends MetadataEntity implements Citation {
     /**
      * The <A HREF="http://www.opengeospatial.org">Open Geospatial consortium</A> authority.
      * "Open Geospatial consortium" is the new name for "OpenGIS consortium".
+     * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "OGC"
+     * (according ISO 19115, alternate titles often contains abreviation).
      *
      * @see ResponsiblePartyImpl#OGC
      */
     public static final Citation OGC;
     static {
-        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.OGC_NAME);
-        c.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
-        c.setAlternateTitles(Collections.singletonList(new SimpleInternationalString("OGC")));
-        c.setCitedResponsibleParties(Collections.singleton(ResponsiblePartyImpl.OGC));
+        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.OGC);
+        c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL);
+        c.getAlternateTitles().add(new SimpleInternationalString("OGC"));
         c.freeze();
         OGC = c;
     }
@@ -185,33 +177,33 @@ public class CitationImpl extends MetadataEntity implements Citation {
      */
     public static final Citation OPEN_GIS;
     static {
-        final CitationImpl c = new CitationImpl("OpenGIS consortium");
-        c.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
-        c.setAlternateTitles(Collections.singletonList(new SimpleInternationalString("OpenGIS")));
-        c.setCitedResponsibleParties(Collections.singleton(ResponsiblePartyImpl.OPEN_GIS));
+        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.OPEN_GIS);
+        c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL);
+        c.getAlternateTitles().add(new SimpleInternationalString("OpenGIS"));
         c.freeze();
         OPEN_GIS = c;
     }
 
     /**
      * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> authority.
+     * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "EPSG"
+     * (according ISO 19115, alternate titles often contains abreviation).
      * <p>
-     * Here is the assumptions used by the CRSAuthorityFactory to locate an
-     * authority on EPSG data:
+     * Here is the assumptions used by the {@link org.opengis.referencing.crs.CRSAuthorityFactory}
+     * to locate an authority on EPSG data:
      * <ul>
-     * <li>getTitle() returns something human readable
-     * <li>getIdentifiers().contains( "EPSG" )
+     *   <li>{@link #getTitle()} returns something human readable.</li>
+     *   <li>{@link #getIdentifiers()} contains "EPSG".</li>
      * </ul>
-     * </p>
+     *
      * @see ResponsiblePartyImpl#EPSG
      */    
     public static final Citation EPSG;
     static {
-        final CitationImpl c = new CitationImpl("European Petroleum Survey Group");
-        c.setPresentationForm(Collections.singleton(PresentationForm.TABLE_DIGITAL));
-        c.setAlternateTitles(Collections.singletonList(new SimpleInternationalString("EPSG")));
-        c.setCitedResponsibleParties(Collections.singleton(ResponsiblePartyImpl.EPSG));
-        c.setIdentifiers(Collections.singleton("EPSG"));
+        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.EPSG);
+        c.getPresentationForm().add(PresentationForm.TABLE_DIGITAL);
+        c.getAlternateTitles().add(new SimpleInternationalString("EPSG"));
+        c.getIdentifiers().add("EPSG");
         c.freeze();
         EPSG = c;
     }
@@ -223,9 +215,8 @@ public class CitationImpl extends MetadataEntity implements Citation {
      */
     public static final Citation GEOTIFF;
     static {
-        final CitationImpl c = new CitationImpl("GeoTIFF");
-        c.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
-        c.setCitedResponsibleParties(Collections.singleton(ResponsiblePartyImpl.GEOTIFF));
+        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.GEOTIFF);
+        c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL);
         c.freeze();
         GEOTIFF = c;
     }
@@ -237,8 +228,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
      */
     public static final Citation ESRI;
     static {
-        final CitationImpl c = new CitationImpl("ESRI");
-        c.setCitedResponsibleParties(Collections.singleton(ResponsiblePartyImpl.ESRI));
+        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.ESRI);
         c.freeze();
         ESRI = c;
     }
@@ -250,10 +240,27 @@ public class CitationImpl extends MetadataEntity implements Citation {
      */
     public static final Citation ORACLE;
     static {
-        final CitationImpl c = new CitationImpl("Oracle");
-        c.setCitedResponsibleParties(Collections.singleton(ResponsiblePartyImpl.ORACLE));
+        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.ORACLE);
         c.freeze();
         ORACLE = c;
+    }
+
+    /**
+     * The <A HREF="http://java.sun.com/products/java-media/jai">Java Advanced Imaging</A> library.
+     * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "JAI"
+     * (according ISO 19115, alternate titles often contains abreviation).
+     *
+     * @see ResponsiblePartyImpl#SUN_MICROSYSTEMS
+     *
+     * @since 2.2
+     */
+    public static final Citation JAI;
+    static {
+        final CitationImpl c = new CitationImpl("Java Advanced Imaging");
+        c.getAlternateTitles().add(new SimpleInternationalString("JAI"));
+        c.getCitedResponsibleParties().add(ResponsiblePartyImpl.SUN_MICROSYSTEMS);
+        c.freeze();
+        JAI = c;
     }
 
     /**
@@ -263,8 +270,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
      */
     public static final Citation GEOTOOLS;
     static {
-        final CitationImpl c = new CitationImpl("Geotools");
-        c.setCitedResponsibleParties(Collections.singleton(ResponsiblePartyImpl.GEOTOOLS));
+        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.GEOTOOLS);
         c.freeze();
         GEOTOOLS = c;
     }
@@ -273,7 +279,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * List of authorities declared in this class.
      */
     private static final Citation[] AUTHORITIES = {
-        OPEN_GIS, EPSG, GEOTIFF, ESRI, ORACLE, GEOTOOLS, AUTO, AUTO2
+        OPEN_GIS, EPSG, GEOTIFF, ESRI, ORACLE, JAI, GEOTOOLS, AUTO, AUTO2
     };
 
     /**
@@ -328,20 +334,20 @@ public class CitationImpl extends MetadataEntity implements Citation {
 
     /**
      * Information about the series, or aggregate dataset, of which the dataset is a part.
-     * Returns {@code null} if none.
+     * May be {@code null} if none.
      */
     private Series series;
 
     /**
      * Other information required to complete the citation that is not recorded elsewhere.
-     * Returns {@code null} if none.
+     * May be {@code null} if none.
      */
     private InternationalString otherCitationDetails;
 
     /**
      * Common title with holdings note. Note: title identifies elements of a series
      * collectively, combined with information about what volumes are available at the
-     * source cited. Returns {@code null} if there is no title.
+     * source cited. May be {@code null} if there is no title.
      */
     private InternationalString collectiveTitle;
 
@@ -365,25 +371,24 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * Constructs a new citation initialized to the values specified by the given object.
      * This constructor performs a shallow copy (i.e. each source attributes are reused
      * without copying them).
-     *
-     * @todo Create a {@code copy(Citation, Citation)} method if {@code setXXX} methods
-     *       are added to GeoAPI interfaces.
      */
     public CitationImpl(final Citation source) {
-        setTitle                  (source.getTitle());
-        setAlternateTitles        (source.getAlternateTitles());
-        setDates                  (source.getDates());
-        setEdition                (source.getEdition());
-        setEditionDate            (source.getEditionDate());
-        setIdentifiers            (source.getIdentifiers());
-        setIdentifierTypes        (source.getIdentifierTypes());
-        setCitedResponsibleParties(source.getCitedResponsibleParties());
-        setPresentationForm       (source.getPresentationForm());
-        setSeries                 (source.getSeries());
-        setOtherCitationDetails   (source.getOtherCitationDetails());
-        setCollectiveTitle        (source.getCollectiveTitle());
-        setISBN                   (source.getISBN());
-        setISSN                   (source.getISSN());
+        if (source != null) {
+            setTitle                  (source.getTitle());
+            setAlternateTitles        (source.getAlternateTitles());
+            setDates                  (source.getDates());
+            setEdition                (source.getEdition());
+            setEditionDate            (source.getEditionDate());
+            setIdentifiers            (source.getIdentifiers());
+            setIdentifierTypes        (source.getIdentifierTypes());
+            setCitedResponsibleParties(source.getCitedResponsibleParties());
+            setPresentationForm       (source.getPresentationForm());
+            setSeries                 (source.getSeries());
+            setOtherCitationDetails   (source.getOtherCitationDetails());
+            setCollectiveTitle        (source.getCollectiveTitle());
+            setISBN                   (source.getISBN());
+            setISSN                   (source.getISSN());
+        }
     }
 
     /**
@@ -399,6 +404,30 @@ public class CitationImpl extends MetadataEntity implements Citation {
             t = new SimpleInternationalString(title.toString());
         }
         setTitle(t);
+    }
+
+    /**
+     * Constructs a citation with the specified responsible party. This convenience constructor
+     * initialize the citation title to the first non-null of the following properties:
+     * {@linkplain ResponsibleParty#getOrganisationName organisation name},
+     * {@linkplain ResponsibleParty#getPositionName position name} or
+     * {@linkplain ResponsibleParty#getIndividualName individual name}.
+     *
+     * @since 2.2
+     */
+    public CitationImpl(final ResponsibleParty party) {
+        InternationalString title = party.getOrganisationName();
+        if (title == null) {
+            title = party.getPositionName();
+            if (title == null) {
+                String name = party.getIndividualName();
+                if (name != null) {
+                    title = new SimpleInternationalString(name);
+                }
+            }
+        }
+        setTitle(title);
+        getCitedResponsibleParties().add(party);
     }
 
     /**

@@ -190,9 +190,9 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     /**
      * Constructs an object from a set of properties. Keys are strings from the table below.
      * Key are case-insensitive, and leading and trailing spaces are ignored. The map given in
-     * argument shall contains at least a <code>"name"</code> property. Other properties listed
+     * argument shall contains at least a {@code "name"} property. Other properties listed
      * in the table below are optional.
-     * <br><br>
+     * <p>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
      *     <th nowrap>Property name</th>
@@ -231,16 +231,14 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      *     <td nowrap>&nbsp;{@link #getRemarks}</td>
      *   </tr>
      * </table>
-     *
-     * <P>Additionally, all localizable attributes like <code>"remarks"</code>
-     * may have a language and country code suffix. For example the <code>"remarks_fr"</code>
-     * property stands for remarks in {@linkplain java.util.Locale#FRENCH French} and the
-     * <code>"remarks_fr_CA"</code> property stands for remarks in
-     * {@linkplain java.util.Locale#CANADA_FRENCH French Canadian}.</P>
-     *
-     * <P>Note that the <code>"authority"</code> and <code>"version"</code> properties are
-     * ignored if the <code>"name"</code> property is already a {@link Citation} object
-     * instead of a {@link String}.</P>
+     * <P>
+     * Additionally, all localizable attributes like {@code "remarks"} may have a language and
+     * country code suffix. For example the {@code "remarks_fr"} property stands for remarks in
+     * {@linkplain java.util.Locale#FRENCH French} and the {@code "remarks_fr_CA"} property stands
+     * for remarks in {@linkplain java.util.Locale#CANADA_FRENCH French Canadian}.
+     * <P>
+     * Note that the {@code "authority"} and {@code "version"} properties are ignored if the
+     * {@code "name"} property is already a {@link Citation} object instead of a {@link String}.
      *
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
@@ -262,7 +260,7 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      * properties are stored in the {@code subProperties} map as {@link InternationalString}
      * objects.</P>
      *
-     * @param properties    Set of properties. Should contains at least <code>"name"</code>.
+     * @param properties    Set of properties. Should contains at least {@code "name"}.
      * @param subProperties The map in which to copy unrecognized properties.
      * @param localizables  Optional list of localized properties.
      *
@@ -784,12 +782,11 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * the identity transform, no matter what {@link #getName()} saids.
      * <P>
      * Some subclasses (especially {@link org.geotools.referencing.datum.AbstractDatum}
-     * and {@link org.geotools.parameter.AbstractParameterDescriptor}) will test for
-     * the {@linkplain #getName() name}, since objects with different name have
-     * completly different meaning. For example nothing differentiate the
-     * <code>"semi_major"</code> and <code>"semi_minor"</code> parameters
-     * except the name. The name comparaison may be loose however, i.e. we may
-     * accept a name matching an alias.
+     * and {@link org.geotools.parameter.AbstractParameterDescriptor}) will test for the
+     * {@linkplain #getName() name}, since objects with different name have completly
+     * different meaning. For example nothing differentiate the {@code "semi_major"} and
+     * {@code "semi_minor"} parameters except the name. The name comparaison may be loose
+     * however, i.e. we may accept a name matching an alias.
      *
      * @param  object The object to compare to {@code this}.
      * @param  compareMetadata {@code true} for performing a strict comparaison, or

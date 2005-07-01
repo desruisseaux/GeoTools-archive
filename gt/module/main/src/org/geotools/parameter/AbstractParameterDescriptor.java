@@ -65,7 +65,7 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
      * Constructs a parameter from a set of properties. The properties map is given unchanged to the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param properties Set of properties. Should contains at least {@code "name"}.
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}
      *        that values for this parameter group or parameter are required.
      * @param maximumOccurs The {@linkplain #getMaximumOccurs maximum number of times}

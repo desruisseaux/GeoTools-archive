@@ -127,12 +127,6 @@ public class OperationJAI extends Operation2D {
     private static final int PRIMARY_SOURCE_INDEX = 0;
 
     /**
-     * The mapping from JAI's source type to Grid Coverage source type.
-     */
-    private static final Map SOURCE_TYPE_MAP =
-            Collections.singletonMap(RenderedImage.class, GridCoverage2D.class);
-
-    /**
      * The JAI's operation descriptor.
      */
     protected final OperationDescriptor operation;
@@ -156,8 +150,7 @@ public class OperationJAI extends Operation2D {
      * @param operation The operation descriptor.
      */
     public OperationJAI(final OperationDescriptor operation) {
-        this(operation, 
-             new ImagingParameterDescriptors(operation, SOURCE_TYPE_MAP, RENDERED_MODE));
+        this(operation, new ImagingParameterDescriptors(operation));
     }
 
     /**
@@ -885,7 +878,7 @@ public class OperationJAI extends Operation2D {
      * @param  hints The rendering hints, or {@code null} if none.
      * @return The JAI instance to use (never {@code null}).
      */
-    protected static JAI getJAI(final RenderingHints hints) {
+    public static JAI getJAI(final RenderingHints hints) {
         if (hints != null) {
             final Object value = hints.get(Hints.JAI_INSTANCE);
             if (value instanceof JAI) {

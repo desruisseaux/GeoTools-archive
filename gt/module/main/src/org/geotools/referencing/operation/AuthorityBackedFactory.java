@@ -42,6 +42,7 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.resources.CRSUtilities;
 
 
 /**
@@ -158,10 +159,24 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         if (sourceCode != null) {
             final Identifier targetCode = AbstractIdentifiedObject.getIdentifier(targetCRS, authority);
             if (targetCode != null) try {
-                final CoordinateOperation candidate =
-                        createFromCoordinateReferenceSystemCodes(sourceCode.getCode(), targetCode.getCode());
+                final CoordinateOperation candidate;
+                candidate = createFromCoordinateReferenceSystemCodes(sourceCode.getCode(),
+                                                                     targetCode.getCode());
                 if (candidate != null) {
-                    return candidate;
+                    /*
+                     * It is possible that the Identifier in user's CRS is not quite right.   For
+                     * example the user may have created his source and target CRS from WKT using
+                     * a different axis order than the official one and still call it "EPSG:xxxx"
+                     * as if it were the official CRS.   It is possible also that the user simply
+                     * doesn't understand authority codes and just gave bogus identifiers. Checks
+                     * if the source and target CRS for the operation just created are really the
+                     * same (ignoring metadata) than the one specified by the user.
+                     */
+                    if (CRSUtilities.equalsIgnoreMetadata(sourceCRS, candidate.getSourceCRS()) &&
+                        CRSUtilities.equalsIgnoreMetadata(targetCRS, candidate.getTargetCRS()))
+                    {
+                        return candidate;
+                    }
                 }
             } catch (NoSuchAuthorityCodeException exception) {
                 /*

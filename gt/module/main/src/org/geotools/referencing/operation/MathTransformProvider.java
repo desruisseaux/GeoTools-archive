@@ -57,6 +57,7 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.operation.transform.MathTransformProxy;
 
 
 /**
@@ -146,6 +147,33 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
     protected Class getOperationType() {
         return Operation.class;
     }
+
+    /**
+     * Creates a math transform from the specified group of parameter values.
+     * Subclasses can implements this method as in the example below:
+     *
+     * <blockquote><pre>
+     * double semiMajor = values.parameter("semi_major").doubleValue(SI.METER);
+     * double semiMinor = values.parameter("semi_minor").doubleValue(SI.METER);
+     * // etc...
+     * return new MyTransform(semiMajor, semiMinor, ...);
+     * </pre></blockquote>
+     *
+     * @param  values The group of parameter values.
+     * @return The created math transform.
+     * @throws InvalidParameterNameException if the values contains an unknow parameter.
+     * @throws ParameterNotFoundException if a required parameter was not found.
+     * @throws InvalidParameterValueException if a parameter has an invalid value.
+     * @throws FactoryException if the math transform can't be created for some other reason
+     *         (for example a required file was not found).
+     *
+     * @see MathTransformProvider.Delegate
+     */
+    protected abstract MathTransform createMathTransform(ParameterValueGroup values)
+            throws InvalidParameterNameException,
+                   ParameterNotFoundException,
+                   InvalidParameterValueException,
+                   FactoryException;
 
     /**
      * Constructs a parameter descriptor from a set of alias. The parameter is
@@ -495,40 +523,6 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
     }
 
     /**
-     * Creates a math transform from the specified group of parameter values.
-     * Subclasses should implements this method as in the example below:
-     *
-     * <blockquote><pre>
-     * double semiMajor = values.parameter("semi_major").doubleValue(SI.METER);
-     * double semiMinor = values.parameter("semi_minor").doubleValue(SI.METER);
-     * // etc...
-     * </pre></blockquote>
-     *
-     * @param  values The group of parameter values.
-     * @return The created math transform.
-     * @throws InvalidParameterNameException if the values contains an unknow parameter.
-     * @throws ParameterNotFoundException if a required parameter was not found.
-     * @throws InvalidParameterValueException if a parameter has an invalid value.
-     * @throws FactoryException if the math transform can't be created for some other reason
-     *         (for example a required file was not found).
-     */
-    protected abstract MathTransform createMathTransform(ParameterValueGroup values)
-            throws InvalidParameterNameException,
-                   ParameterNotFoundException,
-                   InvalidParameterValueException,
-                   FactoryException;
-
-    /**
-     * Returns the operation method for the specified math transform. This method is invoked
-     * automatically after {@code createMathTransform}. The default implementation returns
-     * {@code this}, which is appropriate for the vast majority of cases. An exception is
-     * affine transform, which provides different methods for different matrix sizes.
-     */
-    protected OperationMethod getMethod(final MathTransform mt) {
-        return this;
-    }
-    
-    /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
      * Known Text</cite> (WKT)</A> element.
@@ -543,5 +537,50 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
         }
         formatter.setInvalidWKT();
         return "OperationMethod";
+    }
+
+    /**
+     * The result of a call to {@link MathTransformProvider#createMathTransform createMathTransform}.
+     * This class encapsulates a reference to the {@linkplain #method originating provider}
+     * as well as the {@linkplain #transform created math transform}. This information is needed
+     * when a provider delegates the work to an other provider according the parameter values.
+     * For example a generic instance of
+     * {@link org.geotools.referencing.operation.transform.ProjectiveTransform.ProviderAffine
+     * ProviderAffine} may delegates the creation of an <cite>affine transform</cite> to an other
+     * {@code ProviderAffine} instance with <cite>source</cite> and <cite>target</cite> dimensions
+     * matching the supplied parameters, because those dimensions determine the set of legal
+     * <code>"elt_<var>j</var>_<var>i</var>"</code> parameters.
+     * <p>
+     * Most {@linkplain MathTransformProvider math transform provider} do not delegate their work
+     * to an other one, and consequently do not need this class.
+     * <p>
+     * Future Geotools version may extends this class for handling more information than just the
+     * {@linkplain #transform transform} creator. This class is more convenient than adding new
+     * methods right into {@link MathTransformProvider}, because it is sometime difficult for a
+     * provider to infer all the conditions prevaling when
+     * {@link MathTransformProvider#createMathTransform createMathTransform} was executed.
+     * Furthermore, it avoid to pollute {@code MathTransformProvider} with methods unused
+     * for the vast majority of providers.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     *
+     * @since 2.2
+     */
+    protected static final class Delegate extends MathTransformProxy {
+        /**
+         * The provider for the {@linkplain #transform transform}.
+         */
+        public final OperationMethod method;
+
+        /**
+         * Encapsulates the math transform created by the specified provider.
+         */
+        public Delegate(final MathTransform transform, final OperationMethod method) {
+            super(transform);
+            this.method = method;
+            ensureNonNull("transform", transform);
+            ensureNonNull("method",    method);
+        }
     }
 }

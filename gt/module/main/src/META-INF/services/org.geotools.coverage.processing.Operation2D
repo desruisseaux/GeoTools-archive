@@ -1,2 +1,3 @@
 org.geotools.coverage.operation.Interpolator2D$Operation
 org.geotools.coverage.operation.Resampler2D$Operation
+org.geotools.coverage.operation.BandSelect2D$Operation

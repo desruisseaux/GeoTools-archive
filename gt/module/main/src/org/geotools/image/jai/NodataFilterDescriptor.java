@@ -35,7 +35,7 @@ import javax.media.jai.util.Range;
  */
 public class NodataFilterDescriptor extends OperationDescriptorImpl {
     /**
-     * The operation name.
+     * The operation name, which is {@value}.
      */
     public static final String OPERATION_NAME = "org.geotools.NodataFilter";
 
@@ -50,7 +50,7 @@ public class NodataFilterDescriptor extends OperationDescriptorImpl {
     public NodataFilterDescriptor() {
         super(new String[][]{{"GlobalName",  OPERATION_NAME},
                              {"LocalName",   OPERATION_NAME},
-                             {"Vendor",      "Geotools 2"},
+                             {"Vendor",      "org.geotools"},
                              {"Description", "Replace NaN values by a weighted average of neighbor values."},
                              {"DocURL",      "http://www.geotools.org/"}, // TODO: provides more accurate URL
                              {"Version",     "1.0"},

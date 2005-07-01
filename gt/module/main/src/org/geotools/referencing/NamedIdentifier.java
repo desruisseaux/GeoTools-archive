@@ -60,7 +60,7 @@ import org.geotools.util.WeakValueHashMap;
  * <P>
  * The {@linkplain GenericName generic name} will be infered from {@linkplain Identifier identifier}
  * attributes. More specifically, a {@linkplain ScopedName scoped name} will be constructed using
- * the the shortest authority's {@linkplain Citation#getAlternateTitles alternate titles} (or
+ * the shortest authority's {@linkplain Citation#getAlternateTitles alternate titles} (or
  * the {@linkplain Citation#getTitle main title} if there is no alternate titles) as the
  * {@linkplain ScopedName#getScope scope}, and the {@linkplain #getCode code} as the
  * {@linkplain ScopedName#asLocalName head}. This heuristic rule seems raisonable

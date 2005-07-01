@@ -46,7 +46,7 @@ import org.geotools.resources.gcs.Resources;
  */
 public class CombineDescriptor extends OperationDescriptorImpl {
     /**
-     * The operation name.
+     * The operation name, which is {@value}.
      */
     public static final String OPERATION_NAME = "org.geotools.Combine";
 
@@ -56,7 +56,7 @@ public class CombineDescriptor extends OperationDescriptorImpl {
     public CombineDescriptor() {
         super(new String[][]{{"GlobalName",  OPERATION_NAME},
                              {"LocalName",   OPERATION_NAME},
-                             {"Vendor",      "Geotools 2"},
+                             {"Vendor",      "org.geotools"},
                              {"Description", "Combine rendered images using a linear relation."},
                              {"DocURL",      "http://www.geotools.org/"}, // TODO: provides more accurate URL
                              {"Version",     "1.0"},

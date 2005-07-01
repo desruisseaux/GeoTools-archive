@@ -34,6 +34,7 @@ import java.util.Set;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterNameException;
@@ -43,6 +44,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
+import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.cts.ResourceKeys;
@@ -95,7 +97,24 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
     public DefaultParameterDescriptorGroup(final String name,
                                            final GeneralParameterDescriptor[] parameters)
     {
-        this(Collections.singletonMap("name", name), parameters);
+        this(Collections.singletonMap(NAME_KEY, name), parameters);
+    }
+
+    /**
+     * Constructs a parameter group from a name and an authority.
+     * This parameter group will be required exactly once.
+     *
+     * @param authority The authority (e.g.
+     *        {@link org.geotools.metadata.iso.citation.CitationImpl#OGC OGC}).
+     * @param name The parameter group name.
+     * @param parameters The {@linkplain #descriptors() parameter descriptors} for this group.
+     *
+     * @since 2.2
+     */
+    public DefaultParameterDescriptorGroup(final Citation authority, final String name,
+                                           final GeneralParameterDescriptor[] parameters)
+    {
+        this(Collections.singletonMap(NAME_KEY, new IdentifierImpl(authority, name)), parameters);
     }
 
     /**
@@ -103,7 +122,7 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
      * This parameter group will be required exactly once. The properties map is given unchanged to
      * the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param properties Set of properties. Should contains at least {@code "name"}.
      * @param parameters The {@linkplain #descriptors() parameter descriptors} for this group.
      */
     public DefaultParameterDescriptorGroup(final Map properties,
@@ -117,7 +136,7 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
      * unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}.
      *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param properties Set of properties. Should contains at least {@code "name"}.
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}
      *        that values for this parameter group are required.
      * @param maximumOccurs The {@linkplain #getMaximumOccurs maximum number of times}

@@ -37,7 +37,7 @@ import org.opengis.util.Cloneable;
  *
  * @todo Provides synchronization facility on arbitrary lock, for use with the metadata package.
  *       The lock would be the metadata that owns this collection. Be carefull to update the lock
- *       after a clone (this work my be done in {@code MetadataEntity.unmodifiable(Object)}).
+ *       after a clone (this work may be done in {@code MetadataEntity.unmodifiable(Object)}).
  */
 public class CheckedArrayList extends ArrayList implements Cloneable {
     /**

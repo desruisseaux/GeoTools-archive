@@ -305,7 +305,7 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
 
     /**
      * Creates a transform from a group of parameters and add the method used to a list.
-     * This variant of {@code createParameterizedTransform(...)} provide a way for
+     * This variant of {@code createParameterizedTransform(...)} provides a way for
      * the client to keep trace of any {@linkplain OperationMethod operation method}
      * used by this factory. 
      *
@@ -321,27 +321,32 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
                                                       Collection          methods)
             throws NoSuchIdentifierException, FactoryException
     {
-        final String method = parameters.getDescriptor().getName().getCode();
-        final MathTransformProvider provider = getProvider(method);
-        MathTransform tr;
+        final String classification = parameters.getDescriptor().getName().getCode();
+        final MathTransformProvider provider = getProvider(classification);
+        OperationMethod method = provider;
+        MathTransform transform;
         try {
             parameters = provider.ensureValidValues(parameters);
-            tr = provider.createMathTransform(parameters);
+            transform  = provider.createMathTransform(parameters);
         } catch (IllegalArgumentException exception) {
             /*
              * Catch only exceptions which may be the result of improper parameter
              * usage (e.g. a value out of range). Do not catch exception caused by
-             * programming errors (e.g. null pointer).
+             * programming errors (e.g. null pointer exception).
              */
             throw new FactoryException(exception);
         }
-        if (methods != null) {
-            methods.add(provider.getMethod(tr));
+        if (transform instanceof MathTransformProvider.Delegate) {
+            final MathTransformProvider.Delegate delegate = (MathTransformProvider.Delegate) transform;
+            method    = delegate.method;
+            transform = delegate.transform;
         }
-        tr = (MathTransform) pool.canonicalize(tr);
-        return tr;
-    }    
-    
+        if (methods != null) {
+            methods.add(method);
+        }
+        return (MathTransform) pool.canonicalize(transform);
+    }
+
     /**
      * Creates an affine transform from a matrix.
      * If the transform's input dimension is {@code M}, and output dimension

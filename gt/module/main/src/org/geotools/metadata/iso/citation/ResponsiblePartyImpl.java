@@ -134,7 +134,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
     public static ResponsibleParty EPSG;
     static {
         final ResponsiblePartyImpl r = new ResponsiblePartyImpl(Role.PRINCIPAL_INVESTIGATOR);
-        r.setOrganisationName(new SimpleInternationalString("EPSG"));
+        r.setOrganisationName(new SimpleInternationalString("European Petroleum Survey Group"));
         r.setContactInfo(ContactImpl.EPSG);
         r.freeze();
         EPSG = r;
@@ -182,7 +182,23 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
         r.freeze();
         ORACLE = r;
     }
-    
+
+    /**
+     * The <A HREF="http://www.sun.com/">Sun Microsystems</A> party.
+     *
+     * @see ContactImpl#SUN_MICROSYSTEMS
+     *
+     * @since 2.2
+     */
+    public static ResponsibleParty SUN_MICROSYSTEMS;
+    static {
+        final ResponsiblePartyImpl r = new ResponsiblePartyImpl(Role.PRINCIPAL_INVESTIGATOR);
+        r.setOrganisationName(new SimpleInternationalString("Sun Microsystems"));
+        r.setContactInfo(ContactImpl.SUN_MICROSYSTEMS);
+        r.freeze();
+        SUN_MICROSYSTEMS = r;
+    }
+
     /**
      * The <A HREF="http://www.geotools.org">Geotools</A> project.
      *
@@ -226,6 +242,23 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
      * Constructs an initially empty responsible party.
      */
     public ResponsiblePartyImpl() {
+    }
+
+    /**
+     * Constructs a new responsible party initialized to the values specified by the given object.
+     * This constructor performs a shallow copy (i.e. each source attributes are reused without
+     * copying them).
+     *
+     * @since 2.2
+     */
+    public ResponsiblePartyImpl(final ResponsibleParty source) {
+        if (source != null) {
+            setIndividualName  (source.getIndividualName());
+            setOrganisationName(source.getOrganisationName());
+            setPositionName    (source.getPositionName());
+            setContactInfo     (source.getContactInfo());
+            setRole            (source.getRole());
+        }
     }
 
     /**

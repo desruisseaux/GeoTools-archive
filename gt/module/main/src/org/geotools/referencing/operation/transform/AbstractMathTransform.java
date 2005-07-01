@@ -731,6 +731,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      *
      * @version $Id$
      * @author Martin Desruisseaux
+     *
+     * @since 2.0
      */
     protected abstract class Inverse extends AbstractMathTransform implements Serializable {
         /**
@@ -812,11 +814,9 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         }
         
         /**
-         * Compares the specified object with this inverse math
-         * transform for equality. The default implementation tests
-         * if {@code object} in an instance of the same class
-         * than {@code this}, and then test their enclosing
-         * math transforms.
+         * Compares the specified object with this inverse math transform for equality.
+         * The default implementation tests if {@code object} in an instance of the same
+         * class than {@code this}, and then test their enclosing math transforms.
          */
         public boolean equals(final Object object) {
             if (object == this) {

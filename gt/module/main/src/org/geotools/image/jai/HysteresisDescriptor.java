@@ -34,7 +34,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
  */
 public class HysteresisDescriptor extends OperationDescriptorImpl {
     /**
-     * The operation name.
+     * The operation name, which is {@value}.
      */
     public static final String OPERATION_NAME = "org.geotools.Hysteresis";
 
@@ -44,7 +44,7 @@ public class HysteresisDescriptor extends OperationDescriptorImpl {
     public HysteresisDescriptor() {
         super(new String[][]{{"GlobalName",  OPERATION_NAME},
                              {"LocalName",   OPERATION_NAME},
-                             {"Vendor",      "Geotools 2"},
+                             {"Vendor",      "org.geotools"},
                              {"Description", "Thresholding by hysteresis"},
                              {"DocURL",      "http://www.geotools.org/"}, // TODO: provides more accurate URL
                              {"Version",     "1.0"},

@@ -23,7 +23,7 @@
  */
 package org.geotools.coverage.processing;
 
-// Collections
+// J2SE dependencies
 import java.awt.RenderingHints;
 import java.io.IOException;
 import java.io.Writer;

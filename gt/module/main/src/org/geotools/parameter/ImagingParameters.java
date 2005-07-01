@@ -112,11 +112,11 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      * Constructs a parameter group wrapping the specified JAI parameters.
      * A default {@link ImagingParameterDescriptors} is created.
      * 
-     * @param name The parameter group name (usually the operation name).
+     * @param properties Set of properties. Should contains at least {@code "name"}.
      * @param parameters The JAI's parameters.
      */
-    public ImagingParameters(final String name, final ParameterList parameters) {
-        super(new ImagingParameterDescriptors(name, parameters.getParameterListDescriptor()));
+    public ImagingParameters(final Map properties, final ParameterList parameters) {
+        super(new ImagingParameterDescriptors(properties, parameters.getParameterListDescriptor()));
         this.parameters = parameters;
         ensureNonNull("parameters", parameters);
     }

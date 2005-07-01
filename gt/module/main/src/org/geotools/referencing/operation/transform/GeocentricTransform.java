@@ -586,7 +586,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The number of geographic dimension (2 or 3). This is a Geotools-specific argument.
          * The default value is 3, which is the value implied in OGC's WKT.
          */
-        private static final ParameterDescriptor DIM = new DefaultParameterDescriptor(
+        static final ParameterDescriptor DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_KEY,
                         new NamedIdentifier(CitationImpl.GEOTOOLS, "dim")),
                     3, 2, 3, false);
@@ -619,8 +619,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         }
 
         /**
-         * The provider for the 2D case. Will be constructed by {@link #getMethod}
-         * when first needed.
+         * The provider for the 2D case. Will be constructed when first needed.
          */
         transient Provider noHeight;
 
@@ -665,27 +664,15 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             final int dimGeographic =    intValue(DIM,        values);
             final double  semiMajor = doubleValue(SEMI_MAJOR, values);
             final double  semiMinor = doubleValue(SEMI_MINOR, values);
-            return new GeocentricTransform(semiMajor, semiMinor, SI.METER, dimGeographic!=2);
-            // Note: 'dimGeographic' may be 0 if no value were user-specified.
-            //       0 value shall be treated as 3.
-        }
-
-        /**
-         * Returns the operation method for the specified math transform. This method is invoked
-         * automatically after {@code createMathTransform}. The default implementation returns
-         * an operation with source dimensions that matches the math transform source dimensions.
-         */
-        protected OperationMethod getMethod(final MathTransform mt) {
-            switch (mt.getSourceDimensions()) {
-                case 2: {
-                    if (noHeight == null) {
-                        noHeight = new Provider(2, 3, PARAMETERS);
-                    }
-                    return noHeight;
+            final boolean hasHeight = (dimGeographic != 2); // Value may be 0, which default as 3.
+            MathTransform transform = new GeocentricTransform(semiMajor, semiMinor, SI.METER, hasHeight);
+            if (!hasHeight) {
+                if (noHeight == null) {
+                    noHeight = new Provider(2, 3, PARAMETERS);
                 }
-                case 3: return this;
-                default: throw new IllegalArgumentException();
+                transform = new Delegate(transform, noHeight);
             }
+            return transform;
         }
     }
 
@@ -746,25 +733,18 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         public MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            return ((GeocentricTransform) super.createMathTransform(values)).inverse();
-        }
-
-        /**
-         * Returns the operation method for the specified math transform. This method is invoked
-         * automatically after {@code createMathTransform}. The default implementation returns
-         * an operation with target dimensions that matches the math transform target dimensions.
-         */
-        protected OperationMethod getMethod(final MathTransform mt) {
-            switch (mt.getTargetDimensions()) {
-                case 2: {
-                    if (noHeight == null) {
-                        noHeight = new ProviderInverse(3, 2, PARAMETERS);
-                    }
-                    return noHeight;
+            final int dimGeographic =    intValue(DIM,        values);
+            final double  semiMajor = doubleValue(SEMI_MAJOR, values);
+            final double  semiMinor = doubleValue(SEMI_MINOR, values);
+            final boolean hasHeight = (dimGeographic != 2); // Value may be 0, which default as 3.
+            MathTransform transform = new GeocentricTransform(semiMajor, semiMinor, SI.METER, hasHeight).inverse();
+            if (!hasHeight) {
+                if (noHeight == null) {
+                    noHeight = new ProviderInverse(3, 2, PARAMETERS);
                 }
-                case 3: return this;
-                default: throw new IllegalArgumentException();
+                transform = new Delegate(transform, noHeight);
             }
+            return transform;
         }
     }
 }

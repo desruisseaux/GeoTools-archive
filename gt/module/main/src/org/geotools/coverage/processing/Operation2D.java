@@ -43,7 +43,9 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.factory.Hints;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
@@ -73,8 +75,8 @@ public abstract class Operation2D implements Operation, Serializable {
     public static final ParameterDescriptor SOURCE_0;
     static {
         final Map properties = new HashMap();
-        properties.put(IdentifiedObject.NAME_KEY, "Source");
-        properties.put(IdentifiedObject.ALIAS_KEY, "source0");
+        properties.put(IdentifiedObject.NAME_KEY,  new NamedIdentifier(CitationImpl.OGC, "Source"));
+        properties.put(IdentifiedObject.ALIAS_KEY, new NamedIdentifier(CitationImpl.JAI, "source0"));
         SOURCE_0 = new DefaultParameterDescriptor(properties, GridCoverage2D.class,
                         null, null, null, null, null, true);
     }
@@ -209,7 +211,7 @@ public abstract class Operation2D implements Operation, Serializable {
         }
         return GridCoverageProcessor2D.getDefault();
     }
-    
+
     /**
      * Makes sure that an argument is non-null. This is a
      * convenience method for subclass constructors.

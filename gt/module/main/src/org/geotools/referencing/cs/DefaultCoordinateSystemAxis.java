@@ -49,6 +49,15 @@ import org.geotools.util.NameFactory;
 /**
  * Definition of a coordinate system axis. This is used to label axes, and indicate the orientation.
  * See {@linkplain org.opengis.referencing.cs#AxisNames axis name constraints}.
+ * <p>
+ * In some case, the axis name is constrained by ISO 19111 depending on the
+ * {@linkplain org.opengis.referencing.crs.CoordinateReferenceSystem coordinate reference system}
+ * type. These constraints are identified in the javadoc by "<cite>ISO 19111 name is...</cite>"
+ * sentences. This constraint works in two directions; for example the names
+ * "<cite>geodetic latitude</cite>" and "<cite>geodetic longitude</cite>" shall be used to
+ * designate the coordinate axis names associated with a
+ * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic coordinate reference system}.
+ * Conversely, these names shall not be used in any other context.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -66,38 +75,47 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for longitudes.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
      * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
-     * The abbreviation is "&phi;" (phi). This axis is usually part of a
-     * {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
+     *
+     * The abbreviation is "&lambda;" (lambda).
+     *
+     * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
      *
      * @see #GEODETIC_LONGITUDE
      * @see #SPHERICAL_LONGITUDE
      * @see #LATITUDE
      */
     public static final DefaultCoordinateSystemAxis LONGITUDE = new DefaultCoordinateSystemAxis(
-            ResourceKeys.LONGITUDE, "\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
+            ResourceKeys.LONGITUDE, "\u03BB", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
     
     /**
      * Default axis info for latitudes.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
      * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
-     * The abbreviation is "&lambda;" (lambda). This axis is usually part of a
-     * {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
+     *
+     * The abbreviation is "&phi;" (phi).
+     * 
+     * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
      *
      * @see #GEODETIC_LATITUDE
      * @see #SPHERICAL_LATITUDE
      * @see #LONGITUDE
      */
     public static final DefaultCoordinateSystemAxis LATITUDE = new DefaultCoordinateSystemAxis(
-            ResourceKeys.LATITUDE, "\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
+            ResourceKeys.LATITUDE, "\u03C6", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
     
     /**
      * The default axis for altitude values.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#UP up}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is lower case "h". This axis is usually part of a
-     * {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
+     *
+     * The abbreviation is lower case "<var>h</var>".
+     * 
+     * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
      *
      * @see #ELLIPSOIDAL_HEIGHT
      * @see #GEOCENTRIC_RADIUS
@@ -109,8 +127,11 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * The default axis for depth.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#DOWN down}
      * and units are {@linkplain SI#METER metres}.
+     *
+     * The ISO 19111 name is "<cite>depth</cite>".
      *
      * @see #ALTITUDE
      * @see #ELLIPSOIDAL_HEIGHT
@@ -122,41 +143,55 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for geodetic longitudes in a
-     * {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic CRS}.
+     * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
      * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
-     * The abbreviation is "&phi;" (phi). This axis is usually part of a
-     * {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE}, {@link #ELLIPSOIDAL_HEIGHT} set.
+     *
+     * The ISO 19111 name is "<cite>geodetic longitude</cite>" and the abbreviation is "&lambda;"
+     * (lambda).
+     * 
+     * This axis is usually part of a {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE},
+     * {@link #ELLIPSOIDAL_HEIGHT} set.
      *
      * @see #LONGITUDE
      * @see #SPHERICAL_LONGITUDE
      * @see #GEODETIC_LATITUDE
      */
     public static final DefaultCoordinateSystemAxis GEODETIC_LONGITUDE = new DefaultCoordinateSystemAxis(
-            ResourceKeys.GEODETIC_LONGITUDE, "\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
+            ResourceKeys.GEODETIC_LONGITUDE, "\u03BB", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
     
     /**
      * Default axis info for geodetic latitudes in a
-     * {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic CRS}.
+     * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
      * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
-     * The abbreviation is "&lambda;" (lambda). This axis is usually part of a
-     * {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE}, {@link #ELLIPSOIDAL_HEIGHT} set.
+     *
+     * The ISO 19111 name is "<cite>geodetic latitude</cite>" and the abbreviation is "&phi;" (phi).
+     * 
+     * This axis is usually part of a {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE},
+     * {@link #ELLIPSOIDAL_HEIGHT} set.
      *
      * @see #LATITUDE
      * @see #SPHERICAL_LATITUDE
      * @see #GEODETIC_LONGITUDE
      */
     public static final DefaultCoordinateSystemAxis GEODETIC_LATITUDE = new DefaultCoordinateSystemAxis(
-            ResourceKeys.GEODETIC_LATITUDE, "\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
+            ResourceKeys.GEODETIC_LATITUDE, "\u03C6", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
     
     /**
      * The default axis for height values above the ellipsoid in a
-     * {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic CRS}.
+     * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#UP up}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is lower case "h". This axis is usually part of a
-     * {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE}, {@link #ELLIPSOIDAL_HEIGHT} set.
+     *
+     * The ISO 19111 name is "<cite>ellipsoidal heigt</cite>" and the abbreviation is lower case
+     * "<var>h</var>".
+     * 
+     * This axis is usually part of a {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE},
+     * {@link #ELLIPSOIDAL_HEIGHT} set.
      *
      * @see #ALTITUDE
      * @see #GEOCENTRIC_RADIUS
@@ -168,9 +203,12 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * The default axis for height values measured from gravity.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#UP up}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is lower case "h".
+     *
+     * The ISO 19111 name is "<cite>gravity-related height</cite>" and the abbreviation is lower
+     * case "<var>h</var>".
      *
      * @see #ALTITUDE
      * @see #ELLIPSOIDAL_HEIGHT
@@ -181,45 +219,18 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
             ResourceKeys.GRAVITY_RELATED_HEIGHT, "h", AxisDirection.UP, SI.METER);
     
     /**
-     * Default axis info for longitudes in a
-     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
-     * {@linkplain DefaultSphericalCS spherical CS}.
-     * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
-     * The abbreviation is "&phi;" (phi). This axis is usually part of a
-     * {@link #SPHERICAL_LONGITUDE}, {@link #SPHERICAL_LATITUDE}, {@link #GEOCENTRIC_RADIUS} set.
-     *
-     * @see #LONGITUDE
-     * @see #GEODETIC_LONGITUDE
-     * @see #SPHERICAL_LATITUDE
-     */
-    public static final DefaultCoordinateSystemAxis SPHERICAL_LONGITUDE = new DefaultCoordinateSystemAxis(
-            ResourceKeys.SPHERICAL_LONGITUDE, "\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
-    
-    /**
-     * Default axis info for latitudes in a
-     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
-     * {@linkplain DefaultSphericalCS spherical CS}.
-     * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
-     * The abbreviation is "&lambda;" (lambda). This axis is usually part of a
-     * {@link #SPHERICAL_LONGITUDE}, {@link #SPHERICAL_LATITUDE}, {@link #GEOCENTRIC_RADIUS} set.
-     *
-     * @see #LATITUDE
-     * @see #GEODETIC_LATITUDE
-     * @see #SPHERICAL_LONGITUDE
-     */
-    public static final DefaultCoordinateSystemAxis SPHERICAL_LATITUDE = new DefaultCoordinateSystemAxis(
-            ResourceKeys.SPHERICAL_LATITUDE, "\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
-    
-    /**
      * Default axis info for radius in a
-     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
-     * {@linkplain DefaultSphericalCS spherical CS}.
+     * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.opengis.referencing.cs.SphericalCS spherical CS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#UP up}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is lower case "h". This axis is usually part of a
-     * {@link #SPHERICAL_LONGITUDE}, {@link #SPHERICAL_LATITUDE}, {@link #GEOCENTRIC_RADIUS} set.
+     *
+     * The ISO 19111 name is "<cite>geocentric radius</cite>" and the abbreviation is lower case
+     * "<var>r</var>".
+     * 
+     * This axis is usually part of a {@link #SPHERICAL_LONGITUDE}, {@link #SPHERICAL_LATITUDE},
+     * {@link #GEOCENTRIC_RADIUS} set.
      *
      * @see #ALTITUDE
      * @see #ELLIPSOIDAL_HEIGHT
@@ -230,11 +241,57 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
             ResourceKeys.GEOCENTRIC_RADIUS, "r", AxisDirection.UP, SI.METER);
     
     /**
-     * Default axis info for <var>x</var> values in a {@linkplain DefaultCartesianCS cartesian CS}.
+     * Default axis info for longitudes in a
+     * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.opengis.referencing.crs.SphericalCS spherical CS}.
+     *
+     * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
+     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     *
+     * The ISO 19111 name is "<cite>spherical longitude</cite>" and the abbreviation is "&Omega;"
+     * (omega).
+     *
+     * This axis is usually part of a {@link #SPHERICAL_LONGITUDE}, {@link #SPHERICAL_LATITUDE},
+     * {@link #GEOCENTRIC_RADIUS} set.
+     *
+     * @see #LONGITUDE
+     * @see #GEODETIC_LONGITUDE
+     * @see #SPHERICAL_LATITUDE
+     */
+    public static final DefaultCoordinateSystemAxis SPHERICAL_LONGITUDE = new DefaultCoordinateSystemAxis(
+            ResourceKeys.SPHERICAL_LONGITUDE, "\u03A9", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
+    
+    /**
+     * Default axis info for latitudes in a
+     * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.opengis.referencing.cs.SphericalCS spherical CS}.
+     *
+     * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
+     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     *
+     * The ISO 19111 name is "<cite>spherical latitude</cite>" and the abbreviation is "&Theta;"
+     * (theta).
+     * 
+     * This axis is usually part of a {@link #SPHERICAL_LONGITUDE}, {@link #SPHERICAL_LATITUDE},
+     * {@link #GEOCENTRIC_RADIUS} set.
+     *
+     * @see #LATITUDE
+     * @see #GEODETIC_LATITUDE
+     * @see #SPHERICAL_LONGITUDE
+     */
+    public static final DefaultCoordinateSystemAxis SPHERICAL_LATITUDE = new DefaultCoordinateSystemAxis(
+            ResourceKeys.SPHERICAL_LATITUDE, "\u03B8", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
+    
+    /**
+     * Default axis info for <var>x</var> values in a
+     * {@linkplain org.opengis.referencing.cs.CartesianCS cartesian CS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is lower case "x". This axis is usually part of a
-     * {@link #X}, {@link #Y}, {@link #Z} set.
+     *
+     * The abbreviation is lower case "<var>x</var>".
+     * 
+     * This axis is usually part of a {@link #X}, {@link #Y}, {@link #Z} set.
      *
      * @see #EASTING
      * @see #WESTING
@@ -243,11 +300,15 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
                         "x", AxisDirection.EAST, SI.METER);
     
     /**
-     * Default axis info for <var>y</var> values in a {@linkplain DefaultCartesianCS cartesian CS}.
+     * Default axis info for <var>y</var> values in a
+     * {@linkplain org.opengis.referencing.cs.CartesianCS cartesian CS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is lower case "y". This axis is usually part of a
-     * {@link #X}, {@link #Y}, {@link #Z} set.
+     *
+     * The abbreviation is lower case "<var>y</var>".
+     * 
+     * This axis is usually part of a {@link #X}, {@link #Y}, {@link #Z} set.
      *
      * @see #NORTHING
      * @see #SOUTHING
@@ -256,58 +317,81 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
                         "y", AxisDirection.NORTH, SI.METER);
     
     /**
-     * Default axis info for <var>z</var> values in a {@linkplain DefaultCartesianCS cartesian CS}.
+     * Default axis info for <var>z</var> values in a
+     * {@linkplain org.opengis.referencing.cs.CartesianCS cartesian CS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#UP up}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is lower case "z". This axis is usually part of a
-     * {@link #X}, {@link #Y}, {@link #Z} set.
+     *
+     * The abbreviation is lower case "<var>z</var>".
+     * 
+     * This axis is usually part of a {@link #X}, {@link #Y}, {@link #Z} set.
      */
     public static final DefaultCoordinateSystemAxis Z = new DefaultCoordinateSystemAxis(
                         "z", AxisDirection.UP, SI.METER);
     
     /**
      * Default axis info for <var>x</var> values in a
-     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
-     * {@linkplain DefaultCartesianCS cartesian CS}.
+     * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.opengis.referencing.cs.CartesianCS cartesian CS}.
+     *
      * Increasing ordinates values go toward prime meridian
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is upper case "X". This axis is usually part of a
-     * {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y}, {@link #GEOCENTRIC_Z} set.
+     *
+     * The ISO 19111 name is "<cite>geocentric X</cite>" and the abbreviation is upper case
+     * "<var>X</var>".
+     * 
+     * This axis is usually part of a {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y},
+     * {@link #GEOCENTRIC_Z} set.
      */
     public static final DefaultCoordinateSystemAxis GEOCENTRIC_X = new DefaultCoordinateSystemAxis(
             ResourceKeys.GEOCENTRIC_X, "X", AxisDirection.OTHER, SI.METER);
     
     /**
      * Default axis info for <var>y</var> values in a
-     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
-     * {@linkplain DefaultCartesianCS cartesian CS}.
+     * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.opengis.referencing.cs.CartesianCS cartesian CS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is upper case "Y". This axis is usually part of a
-     * {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y}, {@link #GEOCENTRIC_Z} set.
+     *
+     * The ISO 19111 name is "<cite>geocentric Y</cite>" and the abbreviation is upper case
+     * "<var>Y</var>".
+     * 
+     * This axis is usually part of a {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y},
+     * {@link #GEOCENTRIC_Z} set.
      */
     public static final DefaultCoordinateSystemAxis GEOCENTRIC_Y = new DefaultCoordinateSystemAxis(
             ResourceKeys.GEOCENTRIC_Y, "Y", AxisDirection.EAST, SI.METER);
     
     /**
      * Default axis info for <var>z</var> values in a
-     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
-     * {@linkplain DefaultCartesianCS cartesian CS}.
+     * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.opengis.referencing.cs.CartesianCS cartesian CS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is upper case "Z". This axis is usually part of a
-     * {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y}, {@link #GEOCENTRIC_Z} set.
+     *
+     * The ISO 19111 name is "<cite>geocentric Z</cite>" and the abbreviation is upper case
+     * "<var>Z</var>".
+     * 
+     * This axis is usually part of a {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y},
+     * {@link #GEOCENTRIC_Z} set.
      */
     public static final DefaultCoordinateSystemAxis GEOCENTRIC_Z = new DefaultCoordinateSystemAxis(
             ResourceKeys.GEOCENTRIC_Z, "Z", AxisDirection.NORTH, SI.METER);
     
     /**
      * Default axis info for Easting values in a
-     * {@linkplain org.geotools.referencing.crs.DefaultProjectedCRS projected CRS}.
+     * {@linkplain org.opengis.referencing.crs.ProjectedCRS projected CRS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is upper case "E". This axis is usually part of a
-     * {@link #EASTING}, {@link #NORTHING} set.
+     *
+     * The ISO 19111 name is "<cite>easting</cite>" and the abbreviation is upper case
+     * "<var>E</var>".
+     * 
+     * This axis is usually part of a {@link #EASTING}, {@link #NORTHING} set.
      *
      * @see #X
      * @see #EASTING
@@ -318,10 +402,13 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for Westing values in a
-     * {@linkplain org.geotools.referencing.crs.DefaultProjectedCRS projected CRS}.
+     * {@linkplain org.opengis.referencing.crs.ProjectedCRS projected CRS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#WEST West}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is upper case "W".
+     *
+     * The ISO 19111 name is "<cite>westing</cite>" and the abbreviation is upper case
+     * "<var>W</var>".
      *
      * @see #X
      * @see #EASTING
@@ -332,11 +419,15 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for Northing values in a
-     * {@linkplain org.geotools.referencing.crs.DefaultProjectedCRS projected CRS}.
+     * {@linkplain org.opengis.referencing.crs.ProjectedCRS projected CRS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is upper case "N". This axis is usually part of a
-     * {@link #EASTING}, {@link #NORTHING} set.
+     *
+     * The ISO 19111 name is "<cite>northing</cite>" and the abbreviation is upper case
+     * "<var>N</var>".
+     * 
+     * This axis is usually part of a {@link #EASTING}, {@link #NORTHING} set.
      *
      * @see #Y
      * @see #NORTHING
@@ -347,10 +438,13 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for Southing values in a
-     * {@linkplain org.geotools.referencing.crs.DefaultProjectedCRS projected CRS}.
+     * {@linkplain org.opengis.referencing.crs.ProjectedCRS projected CRS}.
+     *
      * Increasing ordinates values go {@linkplain AxisDirection#SOUTH South}
      * and units are {@linkplain SI#METER metres}.
-     * The abbreviation is upper case "S".
+     *
+     * The ISO 19111 name is "<cite>southing</cite>" and the abbreviation is upper case
+     * "<var>S</var>".
      *
      * @see #Y
      * @see #NORTHING
@@ -360,10 +454,12 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
             ResourceKeys.SOUTHING, "S", AxisDirection.SOUTH, SI.METER);
     
     /**
-     * A default axis for time values in a {@linkplain DefaultTimeCS time CS}.
+     * A default axis for time values in a {@linkplain org.opengis.referencing.cs.TimeCS time CS}.
+     *
      * Increasing time go toward {@linkplain AxisDirection#FUTURE future}
      * and units are {@linkplain NonSI#DAY days}.
-     * The abbreviation is lower case "t".
+     *
+     * The abbreviation is lower case "<var>t</var>".
      */
     public static final DefaultCoordinateSystemAxis TIME = new DefaultCoordinateSystemAxis(
             ResourceKeys.TIME, "t", AxisDirection.FUTURE, NonSI.DAY);
@@ -371,7 +467,9 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     /**
      * A default axis for column indices in a {@linkplain org.opengis.coverage.grid.GridCoverage
      * grid coverage}. Increasing values go toward {@linkplain AxisDirection#COLUMN_POSITIVE
-     * positive column number}. The abbreviation is lower case "i".
+     * positive column number}.
+     * 
+     * The abbreviation is lower case "<var>i</var>".
      */
     public static final DefaultCoordinateSystemAxis COLUMN = new DefaultCoordinateSystemAxis(
             ResourceKeys.COLUMN, "i", AxisDirection.COLUMN_POSITIVE, Unit.ONE);
@@ -379,7 +477,9 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     /**
      * A default axis for row indices in a {@linkplain org.opengis.coverage.grid.GridCoverage grid
      * coverage}. Increasing values go toward {@linkplain AxisDirection#ROW_POSITIVE positive row
-     * number}. The abbreviation is lower case "j".
+     * number}.
+     * 
+     * The abbreviation is lower case "<var>j</var>".
      */
     public static final DefaultCoordinateSystemAxis ROW = new DefaultCoordinateSystemAxis(
             ResourceKeys.ROW, "j", AxisDirection.ROW_POSITIVE, Unit.ONE);
@@ -611,20 +711,34 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         }
         if (super.equals(object, compareMetadata)) {
             final DefaultCoordinateSystemAxis that = (DefaultCoordinateSystemAxis) object;
-            if (!compareMetadata) {
+            if (compareMetadata) {
+                if (!Utilities.equals(this.abbreviation, that.abbreviation)) {
+                    return false;
+                }
+            } else {
                 /*
-                 * We compare the code since it is the only way to differentiate axes with the same
-                 * abbreviation, for example LONGITUDE and GEODETIC_LONGITUDE constants. However,
-                 * we don't need to perform this check if 'compareMetadata' is true since in such
-                 * case, the comparaison will already have been done in the super-class.
+                 * Checking the abbreviation is not suffisient. For example the polar angle and the
+                 * spherical latitude have the same abbreviation (theta).  Geotools extensions like
+                 * "Longitude" (in addition of ISO 19111 "Geodetic longitude") bring more potential
+                 * confusion. Furthermore, not all implementors will use the greek letters (even if
+                 * they are part of ISO 19111).    For example most CRS in WKT format use the "Lat"
+                 * abbreviation instead of the greek letter phi. For comparaisons without metadata,
+                 * we ignore the unreliable abbreviation and check the axis name instead. These
+                 * names are constrained by ISO 19111 specification (see class javadoc), so they
+                 * should be reliable enough.
+                 *
+                 * Note: there is no need to execute this block if 'compareMetadata' is true,
+                 *       because in this case a stricter check has already been performed by
+                 *       the 'equals' method in the superclass.
                  */
-                if (!Utilities.equals(this.getName().getCode(), that.getName().getCode())) {
+                if (!nameMatches(that. getName().getCode()) &&
+                    !nameMatches(that, getName().getCode()))
+                {
                     return false;
                 }
             }
-            return Utilities.equals(this.abbreviation, that.abbreviation) &&
-                   Utilities.equals(this.direction,    that.direction)    &&
-                   Utilities.equals(this.unit,         that.unit);
+            return Utilities.equals(this.direction, that.direction) &&
+                   Utilities.equals(this.unit,      that.unit);
         }
         return false;
     }

@@ -24,11 +24,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Locale;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.awt.image.RenderedImage;
 
 // JAI dependencies
 import javax.media.jai.util.Range;
@@ -40,14 +43,21 @@ import javax.media.jai.registry.RenderedRegistryMode;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.util.InternationalString;
+import org.opengis.util.GenericName;
 
 // Geotools dependencies
+import org.geotools.util.NameFactory;
 import org.geotools.resources.Utilities;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.metadata.iso.citation.ContactImpl;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.citation.OnLineResourceImpl;
@@ -73,7 +83,25 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
     private static final long serialVersionUID = 2127050865911951239L;
 
     /**
-     * The registry mode. Usually {@value RenderedRegistryMode#MODE_NAME}.
+     * Mapping between values of the "Vendor" resource (in OperationDescriptor)
+     * and the citation for know authorities.
+     */
+    private static final Object[] AUTHORITIES = {
+            "com.sun.media.jai", CitationImpl.JAI,
+            "org.geotools",      CitationImpl.GEOTOOLS
+    };
+
+    /**
+     * The default <cite>source type map</cite> as a (<code>{@linkplain RenderedImage}.class</code>,
+     * <code>{@linkplain GridCoverage}.class</code>) key-value pair. This is the default argument
+     * for wrapping a JAI operation in the {@link RenderedRegistryMode#MODE_NAME "rendered"}
+     * registry mode.
+     */
+    public static final Map DEFAULT_SOURCE_TYPE_MAP =
+            Collections.singletonMap(GridCoverage.class, RenderedImage.class);
+
+    /**
+     * The registry mode, usually {@link RenderedRegistryMode#MODE_NAME "rendered"}.
      * This field is {@code null} if {@link #operation} is null.
      */
     final String registryMode;
@@ -99,51 +127,58 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
 
     /**
      * Constructs a parameter descriptor wrapping the specified JAI operation, including sources.
+     * The {@linkplain #getName name for this parameter group} will be inferred from the
+     * {@linkplain RegistryElementDescriptor#getName name of the supplied registry element}
+     * using the {@link #properties properties} method.
+     *
+     * The <cite>source type map</cite> default to a (<code>{@linkplain RenderedImage}.class</code>,
+     * <code>{@linkplain GridCoverage}.class</code>) key-value pair and the <cite>registry
+     * mode</cite> default to {@link RenderedRegistryMode#MODE_NAME "rendered"}.
      *
      * @param operation The JAI's operation descriptor, usually as an instance of
      *        {@link OperationDescriptor}.
-     * @param sourceTypeMap Mapping from JAI source type to this group source type. Typically a
-     *        singleton with the (<code>{@linkplain java.awt.image.RenderedImage}.class</code>,
-     *        <code>{@linkplain org.opengis.coverage.grid.GridCoverage}.class</code>) key-value
-     *        pair.
-     * @param registryMode The JAI's registry mode (usually {@value RenderedRegistryMode#MODE_NAME}).
      */
-    public ImagingParameterDescriptors(final RegistryElementDescriptor operation,
+    public ImagingParameterDescriptors(final RegistryElementDescriptor operation) {
+        this(properties(operation), operation, DEFAULT_SOURCE_TYPE_MAP,
+                RenderedRegistryMode.MODE_NAME);
+    }
+
+    /**
+     * Constructs a parameter descriptor wrapping the specified JAI operation, including sources.
+     * The properties map is given unchanged to the
+     * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
+     *
+     * @param properties Set of properties. Should contains at least {@code "name"}.
+     * @param operation The JAI's operation descriptor, usually as an instance of
+     *        {@link OperationDescriptor}.
+     * @param sourceTypeMap Mapping from JAI source type to this group source type. Typically a
+     *        singleton with the (<code>{@linkplain RenderedImage}.class</code>,
+     *        <code>{@linkplain GridCoverage}.class</code>) key-value pair.
+     * @param registryMode The JAI's registry mode (usually
+     *        {@link RenderedRegistryMode#MODE_NAME "rendered"}).
+     */
+    public ImagingParameterDescriptors(final Map properties,
+                                       final RegistryElementDescriptor operation,
                                        final Map/*<Class,Class>*/ sourceTypeMap,
                                        final String registryMode)
     {
-        this(getName(operation),
+        this(properties,
              operation.getParameterListDescriptor(registryMode),
              operation, sourceTypeMap, registryMode);
     }
 
     /**
-     * Returns a name from the specified operation descriptor. If the name begins
-     * with the {@code "org.geotools"} prefix, then the prefix will be ignored.
-     *
-     * @todo Should be inlined in the constructor if only Sun was to fix RFE #4093999
-     *       ("Relax constraint on placement of this()/super() call in constructors").
-     *
-     * @todo We could do a more general work and ommit the vendor prefix instead of the
-     *       hard-coded "org.geotools." prefix.
-     */
-    private static String getName(final RegistryElementDescriptor operation) {
-        final String prefix = "org.geotools.";
-        String name = operation.getName();
-        if (name.startsWith(prefix)) {
-            name = name.substring(prefix.length());
-        }
-        return name;
-    }
-
-    /**
      * Constructs a parameter descriptor wrapping the specified JAI parameter list descriptor.
+     * The properties map is given unchanged to the
+     * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      *
-     * @param name The parameter descriptor name.
+     * @param properties Set of properties. Should contains at least {@code "name"}.
      * @param descriptor The JAI descriptor.
      */
-    public ImagingParameterDescriptors(final String name, final ParameterListDescriptor descriptor) {
-        this(name, descriptor, null, null, null);
+    public ImagingParameterDescriptors(final Map properties,
+                                       final ParameterListDescriptor descriptor)
+    {
+        this(properties, descriptor, null, null, null);
     }
 
     /**
@@ -151,13 +186,13 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
      * This constructor is a work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private ImagingParameterDescriptors(final String name,
+    private ImagingParameterDescriptors(final Map properties,
                                         final ParameterListDescriptor descriptor,
                                         final RegistryElementDescriptor operation,
                                         final Map/*<Class,Class>*/ sourceTypeMap,
                                         final String registryMode)
     {
-        super(properties(name, operation), 1, 1,
+        super(properties, 1, 1,
               asDescriptors(descriptor, operation, sourceTypeMap, registryMode));
         this.descriptor   = descriptor;
         this.operation    = operation;
@@ -165,40 +200,135 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
     }
 
     /**
-     * Returns the properties for the parameter descriptor group.
-     * This method try to extract a maximum of informations from
-     * the supplied operation.
-     * Note: this method is a work around for RFE #4093999 in Sun's bug database
-     * ("Relax constraint on placement of this()/super() call in constructors").
+     * Infers from the specified JAI operation a set of properties that can be given to the
+     * {@linkplain #ImagingParameterDescriptors(Map,RegistryElementDescriptor,Map,String)
+     * constructor}. The returned map includes values (when available) for the following keys:
+     * <p>
+     * <table border="1">
+     *  <tr>
+     *   <th nowrap>Key</th>
+     *   <th nowrap>Inferred from</th>
+     *  </tr>
+     *  <tr>
+     *   <td>{@link #NAME_KEY NAME_KEY}</td>
+     *   <td>{@linkplain RegistryElementDescriptor#getName descriptor name}</td>
+     *  </tr>
+     *  <tr>
+     *   <td>{@link #ALIAS_KEY ALIAS_KEY}</td>
+     *   <td>{@code "Vendor"} (for the {@linkplain GenericName#getScope scope}) and
+     *       {@code "LocalName"} {@linkplain OperationDescriptor#getResources resources}</td>
+     *  </tr>
+     *  <tr>
+     *   <td>{@link Identifier#AUTHORITY_KEY AUTHORITY_KEY}</td>
+     *   <td>{@linkplain CitationImpl#JAI JAI} or {@linkplain CitationImpl#GEOTOOLS Geotools}
+     *       inferred from the vendor, extented with {@code "DocURL"}
+     *       {@linkplain OperationDescriptor#getResources resources} as
+     *       {@linkplain ResponsibleParty#getContactInfo contact information}.</td></td>
+     *  </tr>
+     *  <tr>
+     *   <td>{@link Identifier#VERSION_KEY VERSION_KEY}</td>
+     *   <td>{@code "Version"} {@linkplain OperationDescriptor#getResources resources}</td>
+     *  </tr>
+     *  <tr>
+     *   <td>{@link #REMARKS_KEY REMARKS_KEY}</td>
+     *   <td>{@code "Description"} {@linkplain OperationDescriptor#getResources resources}</td>
+     *  </tr>
+     * </table>
+     * <p>
+     * For JAI image operation (for example {@code "Add"}, the end result is fully-qualified name
+     * like {@code "JAI:Add"} and one alias like {@code "com.sun.media.jai.Add"}.
+     * <p>
+     * This method returns a modifiable map. Users can safely changes its content in order to
+     * select for example a different name.
      */
-    private static Map properties(final String name, final RegistryElementDescriptor operation) {
+    public static Map properties(final RegistryElementDescriptor operation) {
+        String name = operation.getName();
+        final Map properties = new HashMap();
         if (operation instanceof OperationDescriptor) {
+            /*
+             * Gets the vendor name (if available) using US locale in order to get something as
+             * close as possible to a kind of "locale-independent" string.  This string will be
+             * used in order to remove the prefix (if any) from the global name, for example in
+             * "org.geotools.Combine" operation name.  We can remove the prefix because it will
+             * appears in the GenericName's scope below (as an alias).
+             */
             final OperationDescriptor op = (OperationDescriptor) operation;
-            final ResourceBundle  bundle = op.getResourceBundle(Locale.getDefault());
-            final Map properties = new HashMap();
-            properties.put(NAME_KEY, name);
-            properties.put(ALIAS_KEY,   new ImagingParameterDescription(op, "LocalName"));
-            properties.put(REMARKS_KEY, new ImagingParameterDescription(op, "Description"));
-            properties.put(Identifier.VERSION_KEY, bundle.getString("Version"));
+            final ResourceBundle bundle = op.getResourceBundle(Locale.getDefault());
+            String vendor = op.getResourceBundle(Locale.US).getString("Vendor");
+            Citation authority = null;
+            if (vendor != null) {
+                vendor = vendor.trim();
+                final int offset = vendor.length();
+                if (offset != 0) {
+                    if (name.startsWith(vendor)) {
+                        final int length = name.length();
+                        if (offset<length && name.charAt(offset)=='.') {
+                            name = name.substring(offset + 1);
+                        }
+                    }
+                    for (int i=0; i<AUTHORITIES.length; i+=2) {
+                        if (vendor.equalsIgnoreCase((String) AUTHORITIES[i])) {
+                            authority = (Citation) AUTHORITIES[i+1];
+                            break;
+                        }
+                    }
+                }
+            }
+            /*
+             * If we are able to construct an URI, replaces the contact info for the first (and only
+             * the first) responsible party. Exactly one responsible party should be presents, since
+             * the authority is one of the hard-coded AUTHORITIES list above.  We replace completely
+             * the contact info;  for example we do not retain any telephone number because it would
+             * be a mismatch with the new URI purpose (this new URI do not links to information that
+             * can be used to contact the individual or organisation - it is information about an
+             * image operation, and I'm not sure that anyone wants to phone to an image operation).
+             */
+            final InternationalString description = new ImagingParameterDescription(op, "Description");
             try {
-                final URI                     uri = new URI(bundle.getString("DocURL"));
+                final URI                uri      = new URI(bundle.getString("DocURL"));
                 final OnLineResourceImpl resource = new OnLineResourceImpl(uri);
-                final ContactImpl         contact = new ContactImpl(resource);
-                final InternationalString  vendor = new ImagingParameterDescription(op, "Vendor");
-                final ResponsiblePartyImpl  party = new ResponsiblePartyImpl(Role.RESOURCE_PROVIDER);
-                final CitationImpl       citation = new CitationImpl(vendor);
-                party.setOrganisationName(vendor);
-                party.setContactInfo(contact);
-                citation.setCitedResponsibleParties(Collections.singleton(party));
-                properties.put(Identifier.AUTHORITY_KEY, citation.unmodifiable());
+                resource.setFunction(OnLineFunction.INFORMATION);
+                resource.setDescription(description);
+                final CitationImpl citation = new CitationImpl(authority);
+                final Collection   parties  = citation.getCitedResponsibleParties();
+                final ResponsibleParty oldParty;
+                if (true) {
+                    final Iterator it = parties.iterator();
+                    if (it.hasNext()) {
+                        oldParty = (ResponsibleParty) it.next();
+                        it.remove(); // This party will be re-injected with a new URI below.
+                    }
+                    else {
+                        oldParty = null;
+                    }
+                }
+                final ResponsiblePartyImpl party = new ResponsiblePartyImpl(oldParty);
+                party.setRole(Role.RESOURCE_PROVIDER);
+                party.setContactInfo(new ContactImpl(resource));
+                parties.add(party);
+                authority = (Citation) citation.unmodifiable();
             } catch (URISyntaxException exception) {
                 // Invalid URI syntax. Ignore, since this property
                 // was really just for information purpose.
             }
-            return properties;
-        } else {
-            return Collections.singletonMap(NAME_KEY, name);
+            /*
+             * At this point, all properties have been created. Stores them in the map.
+             * The name should be stored as a String (not as an Identifier), otherwise
+             * the version and the authority would be ignored. For JAI image operation,
+             * the end result is fully-qualified name like "JAI:Add" and one alias like
+             * "com.sun.media.jai.Add".
+             */
+            final GenericName alias = NameFactory.create(new InternationalString[] {
+                new ImagingParameterDescription(op, "Vendor"),      // Scope name
+                new ImagingParameterDescription(op, "LocalName")    // Local name
+            }, '.');
+            properties.put(ALIAS_KEY,   alias);
+            properties.put(REMARKS_KEY, description);
+            properties.put(Identifier.VERSION_KEY, bundle.getString("Version"));
+            properties.put(Identifier.AUTHORITY_KEY, authority);
         }
+        properties.put(NAME_KEY, name);
+        return properties;
     }
 
     /**

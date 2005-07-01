@@ -13,11 +13,14 @@
 #
 # 1. To register descriptors :
 #
-#	descriptor <descriptor-class-name>
+#      descriptor <descriptor-class-name>
 #
 # 2. To register factory objects under a product against a specific mode :
 #
-#	<registry-mode-name>	<factory-class-name>	<descriptor-name>
+#      <registry-mode-name>  <factory-class-name>  <product-name>  <descriptor-name>  <local-name>
+#
+#    The <local-name> is (only) used later on in this file to set preferences
+#    between factory objects, if wanted.
 #
 ############################################################################
 #

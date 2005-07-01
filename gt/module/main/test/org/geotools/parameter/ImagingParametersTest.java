@@ -36,9 +36,14 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // OpenGIS dependencies
+import org.opengis.util.GenericName;
+import org.opengis.metadata.citation.Citation;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
+
+// Geotools dependencies
+import org.geotools.metadata.iso.citation.CitationImpl;
 
 
 /**
@@ -74,20 +79,22 @@ public class ImagingParametersTest extends TestCase {
      * Tests {@link ImagingParameters}.
      */
     public void testDescriptors() {
+        final String author = CitationImpl.JAI.getTitle().toString();
         final String vendor = "com.sun.media.jai";
-        final String   mode = RenderedRegistryMode.MODE_NAME;
-        final Map   typeMap = Collections.singletonMap(RenderedImage.class, GridCoverage.class);
+        final String mode   = RenderedRegistryMode.MODE_NAME;
         final RegistryElementDescriptor   descriptor;
         final ImagingParameterDescriptors parameters;
         descriptor = JAI.getDefaultInstance().getOperationRegistry().getDescriptor(mode, "AddConst");
-        parameters = new ImagingParameterDescriptors(descriptor, typeMap, mode);
+        parameters = new ImagingParameterDescriptors(descriptor);
+        final GenericName alias = (GenericName) parameters.getAlias().iterator().next();
         /*
          * Tests the operation-wide properties.
          */
         assertEquals   ("Name",  "AddConst", parameters.getName().getCode());
-        assertEquals   ("Authority", vendor, parameters.getName().getAuthority().getTitle().toString());
+        assertEquals   ("Authority", author, parameters.getName().getAuthority().getTitle().toString());
+        assertEquals   ("Vendor",    vendor, alias     .getScope().toString());
         assertNotNull  ("Version",           parameters.getName().getVersion());
-        assertLocalized("Authority",         parameters.getName().getAuthority().getTitle());
+        assertLocalized("Vendor",            alias     .getScope().toInternationalString());
         assertLocalized("Remarks",           parameters.getRemarks());
         assertTrue     ("Remarks",           parameters.getRemarks().toString().trim().length() > 0);
         /*

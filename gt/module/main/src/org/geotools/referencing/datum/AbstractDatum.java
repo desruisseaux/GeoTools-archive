@@ -256,8 +256,8 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
             }
             final AbstractDatum that = (AbstractDatum) object;
             return this.realizationEpoch == that.realizationEpoch &&
-                   Utilities.equals(this.validArea,   that.validArea      ) &&
-                   Utilities.equals(this.anchorPoint, that.anchorPoint    ) &&
+                   Utilities.equals(this.validArea,   that.validArea  ) &&
+                   Utilities.equals(this.anchorPoint, that.anchorPoint) &&
                    Utilities.equals(this.scope,       that.scope);
         }
         return false;

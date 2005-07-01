@@ -33,10 +33,12 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.util.CodeList;
 import org.opengis.util.InternationalString;
+import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
+import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Utilities;
@@ -49,10 +51,14 @@ import org.geotools.resources.rsc.Resources;
  * For {@linkplain org.opengis.referencing.crs.CoordinateReferenceSystem Coordinate
  * Reference Systems} most parameter values are numeric, but other types
  * of parameter values are possible.
- *
- * <P>For numeric values, the {@linkplain #getValueClass value class} is usually
+ * <P>
+ * For numeric values, the {@linkplain #getValueClass value class} is usually
  * <code>{@linkplain Double}.class</code>, <code>{@linkplain Integer}.class</code> or
- * some other Java wrapper class.</P>
+ * some other Java wrapper class.
+ * <P>
+ * This class contains numerous convenience constructors. But all of them ultimately invoke
+ * {@linkplain #DefaultParameterDescriptor(Map,Class,Object[],Object,Comparable,Comparable,Unit,boolean)
+ * a single, full-featured constructor}. All other constructors are just shortcuts.
  *  
  * @version $Id$
  * @author Martin Desruisseaux
@@ -161,7 +167,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
                                       final double defaultValue,
                                       final double minimum,
                                       final double maximum,
-                               final Unit   unit)
+                                      final Unit   unit)
     {
         this(Collections.singletonMap(NAME_KEY, name),
              defaultValue, minimum, maximum, unit, true);
@@ -289,6 +295,39 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
     {
         this(Collections.singletonMap(NAME_KEY, name),
              valueClass, validValues, defaultValue, null, null, null, true);
+    }
+
+    /**
+     * Constructs a parameter from an authority and a name.
+     *
+     * @param authority The authority (e.g.
+     *        {@link org.geotools.metadata.iso.citation.CitationImpl#OGC OGC}).
+     * @param name The parameter name.
+     * @param valueClass The class that describe the type of the parameter.
+     * @param validValues A finite set of valid values (usually from a
+     *        {linkplain org.opengis.util.CodeList code list}) or {@code null}
+     *        if it doesn't apply.
+     * @param defaultValue The default value for the parameter, or {@code null}.
+     * @param minimum  The minimum parameter value, or {@code null}.
+     * @param maximum  The maximum parameter value, or {@code null}.
+     * @param unit     The unit for default, minimum and maximum values.
+     * @param required {@code true} if this parameter is required,
+     *                 or {@code false} if it is optional.
+     *
+     * @since 2.2
+     */
+    public DefaultParameterDescriptor(final Citation   authority,
+                                      final String     name,
+                                      final Class      valueClass,
+                                      final Object[]   validValues,
+                                      final Object     defaultValue,
+                                      final Comparable minimum,
+                                      final Comparable maximum,
+                                      final Unit       unit,
+                                      final boolean    required)
+    {
+        this(Collections.singletonMap(NAME_KEY, new IdentifierImpl(authority, name)),
+             valueClass, validValues, defaultValue, minimum, maximum, unit, required);
     }
 
     /**
