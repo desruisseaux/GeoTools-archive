@@ -98,7 +98,7 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
      * registry mode.
      */
     public static final Map DEFAULT_SOURCE_TYPE_MAP =
-            Collections.singletonMap(GridCoverage.class, RenderedImage.class);
+            Collections.singletonMap(RenderedImage.class, GridCoverage.class);
 
     /**
      * The registry mode, usually {@link RenderedRegistryMode#MODE_NAME "rendered"}.
@@ -446,11 +446,15 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
     final Set getParameterNames() {
         if (parameterNames == null) {
             final String[] names = descriptor.getParamNames();
-            parameterNames = new HashSet((int)(names.length/0.75f) + 1);
-            for (int i=0; i<names.length; i++) {
-                parameterNames.add(names[i].trim().toLowerCase());
+            if (names != null) {
+                parameterNames = new HashSet((int)(names.length/0.75f) + 1);
+                for (int i=0; i<names.length; i++) {
+                    parameterNames.add(names[i].trim().toLowerCase());
+                }
+                parameterNames = Collections.unmodifiableSet(parameterNames);
+            } else {
+                parameterNames = Collections.EMPTY_SET;
             }
-            parameterNames = Collections.unmodifiableSet(parameterNames);
         }
         return parameterNames;
     }

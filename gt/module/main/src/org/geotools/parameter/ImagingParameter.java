@@ -219,6 +219,10 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
         try {
             return parameters.getObjectParameter(name);
         } catch (IllegalStateException ignore) {
+            /*
+             * Thrown when the value still ParameterListDescriptor.NO_PARAMETER_DEFAULT.
+             * In this framework, the desired behavior in this case is to returns null.
+             */
             return null;
         }
     }
@@ -321,5 +325,15 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
             code += value.hashCode();
         }
         return code ^ (int)serialVersionUID;
+    }
+
+    /**
+     * Returns a clone of this parameter. Actually returns a different classes, since this
+     * parameter is not really cloneable (it would requires a clone of {@link #parameters} first).
+     */
+    public Object clone() {
+        final Parameter parameter = new Parameter((ParameterDescriptor) descriptor);
+        parameter.setValue(getValue());
+        return parameter;
     }
 }

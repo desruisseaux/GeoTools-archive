@@ -1,0 +1,3 @@
+org.geotools.coverage.processing.operation.Interpolate
+org.geotools.coverage.processing.operation.Resample
+org.geotools.coverage.processing.operation.SelectSampleDimension

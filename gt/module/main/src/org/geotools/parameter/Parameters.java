@@ -236,7 +236,7 @@ public class Parameters {
      */
     public static void copy(final ParameterValueGroup source, final ParameterValueGroup target) {
         for (final Iterator it=source.values().iterator(); it.hasNext();) {
-            final GeneralParameterValue param = (GeneralParameterValue) source;
+            final GeneralParameterValue param = (GeneralParameterValue) it.next();
             final String name = param.getDescriptor().getName().getCode();
             if (param instanceof ParameterValueGroup) {
                 copy((ParameterValueGroup) param, target.addGroup(name));

@@ -52,7 +52,8 @@ import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.coverage.processing.GridCoverageProcessor2D;
+import org.geotools.coverage.processing.AbstractProcessor;
+import org.geotools.coverage.processing.Operations;
 import org.geotools.coverage.FactoryFinder;
 
 
@@ -103,9 +104,7 @@ public final class ResampleTest extends GridCoverageTest {
      * This is invoked before to run the tests defined in the super-class.
      */
     protected GridCoverage2D transform(final GridCoverage2D coverage) {
-        final GridCoverageProcessor2D processor = GridCoverageProcessor2D.getDefault();
-        return (GridCoverage2D) processor.doOperation("Resample", coverage,
-                                "CoordinateReferenceSystem", getProjectedCRS(coverage));
+        return (GridCoverage2D) Operations.DEFAULT.resample(coverage, getProjectedCRS(coverage));
     }
 
     /**
@@ -167,7 +166,7 @@ public final class ResampleTest extends GridCoverageTest {
     private String projectTo(final CoordinateReferenceSystem crs,
                              final GridGeometry2D       geometry)
     {
-        final GridCoverageProcessor2D processor = GridCoverageProcessor2D.getDefault();
+        final AbstractProcessor processor = AbstractProcessor.getInstance();
         final String arg1; final Object value1;
         final String arg2; final Object value2;
         if (crs != null) {
@@ -182,14 +181,18 @@ public final class ResampleTest extends GridCoverageTest {
             arg2="InterpolationType"; value2="bilinear";
         }
         GridCoverage2D projected = coverage.geophysics(true);
-        projected = (GridCoverage2D) processor.doOperation("Resample", projected, arg1, value1, arg2, value2);
+        final ParameterValueGroup param = processor.getOperation("Resample").getParameters();
+        param.parameter("Source").setValue(projected);
+        param.parameter(arg1).setValue(value1);
+        param.parameter(arg2).setValue(value2);
+        projected = (GridCoverage2D) processor.doOperation(param);
         assertNotNull(projected.getRenderedImage().getData());
         final RenderedImage image = projected.getRenderedImage();
         projected = projected.geophysics(false);
         String operation = null;
         if (image instanceof RenderedOp) {
             operation = ((RenderedOp) image).getOperationName();
-            GridCoverageProcessor2D.LOGGER.fine("Applied \""+operation+"\" JAI operation.");
+            AbstractProcessor.LOGGER.fine("Applied \""+operation+"\" JAI operation.");
         }
         if (SHOW) {
             Viewer.show(projected, operation);
@@ -276,10 +279,8 @@ public final class ResampleTest extends GridCoverageTest {
         final AffineTransform at = AffineTransform.getScaleInstance(scaleX, scaleY);
         final MathTransform   tr = ProjectiveTransform.create(at);
         final GridGeometry2D geometry = new GridGeometry2D(null, tr);
-        grid = (GridCoverage2D) GridCoverageProcessor2D.getDefault().doOperation(
-                "Resample",                  grid,
-                "CoordinateReferenceSystem", grid.getCoordinateReferenceSystem(),
-                "GridGeometry",              geometry);
+        grid = (GridCoverage2D) Operations.DEFAULT.resample(grid,
+                grid.getCoordinateReferenceSystem(), geometry, null);
         assertEquals(at, getAffineTransform(grid));
         img = grid.getRenderedImage();
         expected.preConcatenate(at.createInverse());
@@ -309,7 +310,7 @@ public final class ResampleTest extends GridCoverageTest {
      */
     public static void main(final String[] args) {
         SHOW = true;
-        org.geotools.util.MonolineFormatter.initGeotools(GridCoverageProcessor2D.OPERATION);
+        org.geotools.util.MonolineFormatter.initGeotools(AbstractProcessor.OPERATION);
         junit.textui.TestRunner.run(suite());
     }
 }

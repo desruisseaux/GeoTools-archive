@@ -45,6 +45,7 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.util.InternationalString;
 import org.opengis.util.GenericName;
 
 // Geotools dependencies
@@ -106,7 +107,7 @@ public class ParameterWriter extends FilterWriter {
     }
 
     /**
-     * Print the elements of an operation to the
+     * Prints the elements of an operation to the
      * {@linkplain System#out default output stream}.
      * This is a convenience method for <code>new
      * ParameterWriter().{@linkplain #format(OperationMethod) format}(operation)</code>.
@@ -122,7 +123,7 @@ public class ParameterWriter extends FilterWriter {
     }
 
     /**
-     * Print the elements of a descriptor group to the
+     * Prints the elements of a descriptor group to the
      * {@linkplain System#out default output stream}.
      * This is a convenience method for <code>new
      * ParameterWriter().{@linkplain #format(ParameterDescriptorGroup)
@@ -139,7 +140,7 @@ public class ParameterWriter extends FilterWriter {
     }
 
     /**
-     * Print the elements of a parameter group to the
+     * Prints the elements of a parameter group to the
      * {@linkplain System#out default output stream}.
      * This is a convenience method for <code>new
      * ParameterWriter().{@linkplain #format(ParameterValueGroup)
@@ -156,7 +157,7 @@ public class ParameterWriter extends FilterWriter {
     }
 
     /**
-     * Print the elements of an operation to the output stream.
+     * Prints the elements of an operation to the output stream.
      *
      * @param  operation The operation method to format.
      * @throws IOException if an error occured will writing to the stream.
@@ -168,7 +169,7 @@ public class ParameterWriter extends FilterWriter {
     }
 
     /**
-     * Print the elements of a descriptor group to the output stream.
+     * Prints the elements of a descriptor group to the output stream.
      *
      * @param  descriptor The descriptor group to format.
      * @throws IOException if an error occured will writing to the stream.
@@ -180,7 +181,7 @@ public class ParameterWriter extends FilterWriter {
     }
 
     /**
-     * Print the elements of a parameter group to the output stream.
+     * Prints the elements of a parameter group to the output stream.
      *
      * @param  values The parameter group to format.
      * @throws IOException if an error occured will writing to the stream.
@@ -386,16 +387,17 @@ public class ParameterWriter extends FilterWriter {
      */
     public void summary(final Collection parameters, final Set/*<Sring>*/ scopes) throws IOException {
         /*
-         * Prepare the list of alias before any write to the output stream.
+         * Prepares the list of alias before any write to the output stream.
          * We need to prepare the list first, because not all identified objects
          * may have generic names with the same scopes in the same order.
          *
          *   titles    -  The column number for each column title.
          *   names     -  The names (including alias) for each line.
          */
-        final Map    titles = new LinkedHashMap/*<Object,Integer>*/();
-        final List    names = new ArrayList/*<String[]>*/();
-        final Locale locale = this.locale; // Protect from changes.
+        final Map      titles = new LinkedHashMap/*<Object,Integer>*/();
+        final List      names = new ArrayList/*<String[]>*/();
+        final Locale   locale = this.locale; // Protect from changes.
+        String[] descriptions = null;
         titles.put(null, new Integer(0)); // Special value for the identifier column.
         for (final Iterator it=parameters.iterator(); it.hasNext();) {
             final IdentifiedObject element = (IdentifiedObject) it.next();
@@ -403,6 +405,11 @@ public class ParameterWriter extends FilterWriter {
             String[] elementNames = new String[titles.size()];
             elementNames[0] = element.getName().getCode();
             if (aliases != null) {
+                /*
+                 * The primary name has been fetch (before this block) for one element, and we
+                 * determined that some alias may be available in addition. Add local alias
+                 * (i.e. names without their scope) to the 'elementNames' row.
+                 */
                 int count = 0;
                 for (final Iterator i=aliases.iterator(); i.hasNext();) {
                     final GenericName alias = (GenericName) i.next();
@@ -411,17 +418,35 @@ public class ParameterWriter extends FilterWriter {
                     final Object title;
                     if (scope != null) {
                         if (scopes!=null && !scopes.contains(scope.toString())) {
+                            /*
+                             * The user requested only a subset of alias (the 'scopes' argument),
+                             * and the current alias is not a member of this subset. Continue the
+                             * search to other alias.
+                             */
                             continue;
                         }
                         title = scope.toInternationalString().toString(locale);
                     } else {
                         title = new Integer(count++);
                     }
+                    /*
+                     * The alias scope is used as the column's title. If the alias has no scope,
+                     * then a sequencial number is used instead. Now check if the column already
+                     * exists. If it exists, fetch its position. If it doesn't exist, inserts the
+                     * new column at the end of existing columns.
+                     */
                     Integer position = (Integer) titles.get(title);
                     if (position == null) {
                         position = new Integer(titles.size());
                         titles.put(title, position);
                     }
+                    /*
+                     * Now stores the alias local name at the position we just determined above.
+                     * Note that more than one value may exist for the same column. For example
+                     * both "WGS 84" and "4326" may appear as EPSG alias (as EPSG name and EPSG
+                     * identifier respectively), depending how the parameters given by the user
+                     * were constructed.
+                     */
                     final int index = position.intValue();
                     if (index >= elementNames.length) {
                         elementNames = (String[]) XArray.resize(elementNames, index+1);
@@ -437,6 +462,17 @@ public class ParameterWriter extends FilterWriter {
                         elementNames[index] = newName;
                     }
                 }
+            }
+            /*
+             * Before to add the name and alias to the list, fetch the remarks (if any).
+             * They are stored in a separated list and will appear as the very last column.
+             */
+            final InternationalString remarks = element.getRemarks();
+            if (remarks != null) {
+                if (descriptions == null) {
+                    descriptions = new String[parameters.size()];
+                }
+                descriptions[names.size()] = remarks.toString(locale);
             }
             names.add(elementNames);
         }
@@ -462,14 +498,18 @@ trim:   for (int column=hide.length; --column>=1;) {
             hide[column] = true;
         }
         /*
-         * Write the table. The header will contains one column for each alias's
-         * scope (or authority) declared in 'titles', in the same order.
+         * Writes the table. The header will contains one column for each alias's
+         * scope (or authority) declared in 'titles', in the same order. It will
+         * also contains a "Description" column if there is some.
          */
         int column = 0;
         synchronized (lock) {
             final TableWriter table = new TableWriter(out, " \u2502 ");
             table.setMultiLinesCells(true);
             table.writeHorizontalSeparator();
+            /*
+             * Writes all column headers.
+             */
             for (final Iterator it=titles.keySet().iterator(); it.hasNext();) {
                 final Object element = it.next();
                 if (hide[column++]) {
@@ -486,7 +526,14 @@ trim:   for (int column=hide.length; --column>=1;) {
                 table.write(title);
                 table.nextColumn();
             }
+            if (descriptions != null) {
+                table.write("Description"); // TODO: localize
+            }
             table.writeHorizontalSeparator();
+            /*
+             * Writes all row.
+             */
+            int counter = 0;
             for (final Iterator it=names.iterator(); it.hasNext();) {
                 final String[] aliases = (String[]) it.next();
                 for (column=0; column<aliases.length; column++) {
@@ -498,6 +545,12 @@ trim:   for (int column=hide.length; --column>=1;) {
                         table.write(alias);
                     }
                     table.nextColumn();
+                }
+                if (descriptions != null) {
+                    final String remarks = descriptions[counter++];
+                    if (remarks != null) {
+                        table.write(remarks);
+                    }
                 }
                 table.nextLine();
             }

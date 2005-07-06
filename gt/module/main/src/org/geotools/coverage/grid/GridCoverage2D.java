@@ -97,7 +97,7 @@ import org.opengis.util.Cloneable;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.AbstractCoverage;
-import org.geotools.coverage.processing.AbstractGridCoverageProcessor;
+import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
@@ -1211,13 +1211,13 @@ testLinear: for (int i=0; i<numBands; i++) {
             param = param.add(sampleDimensions);
             operation = "org.geotools.SampleTranscode";
         }
-        if (LOGGER.isLoggable(AbstractGridCoverageProcessor.OPERATION)) {
-            // Log a message using the same level than GridCoverageProcessor.
+        if (LOGGER.isLoggable(AbstractProcessor.OPERATION)) {
+            // Log a message using the same level than grid coverage processor.
             final int        index = operation.lastIndexOf('.');
             final String shortName = (index>=0) ? operation.substring(index+1) : operation;
             final Locale    locale = getLocale();
             final LogRecord record = Resources.getResources(locale).getLogRecord(
-                                     AbstractGridCoverageProcessor.OPERATION,
+                                     AbstractProcessor.OPERATION,
                                      ResourceKeys.SAMPLE_TRANSCODE_$3, new Object[] {
                                      getName().toString(locale),
                                      new Integer(geo ? 1 : 0), shortName});

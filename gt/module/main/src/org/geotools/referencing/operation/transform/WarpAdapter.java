@@ -40,7 +40,7 @@ import org.geotools.resources.gcs.Resources;
 
 /**
  * Wraps an arbitrary {@link MathTransform2D} into an image warp operation.
- * This warp operation is used by {@link org.geotools.coverage.operation.Resampler2D}
+ * This warp operation is used by {@link org.geotools.coverage.processing.operation.Resample}
  * when no standard warp operation has been found applicable.
  *
  * @version $Id$

@@ -16,24 +16,15 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.coverage.processing;
 
 // Collections
-import java.util.Comparator;
+import java.util.Collection;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // JAI dependencies
 import javax.media.jai.PropertySource;
-import javax.media.jai.PropertySourceImpl;
-import javax.media.jai.util.CaselessStringKey;  // For javadoc
 
 // OpenGIS dependencies
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -60,16 +51,20 @@ import org.geotools.resources.gcs.Resources;
  * operations to change the way the grid is being accessed will not affect the state of the grid
  * coverage controlled by another operations. For example, changing the interpolation method
  * should not affect the number of sample dimensions currently being accessed or value sequence.
- * <br><br>
+ * <p>
  * This base class provides a default implementation for all methods except
  * {@link #doOperation(Operation, ParameterValueGroup)}.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @since 2.1
+ * @deprecated Replaced by {@link AbstractProcessor}, which is more general. There is no GeoAPI
+ *  interface right now for {@code AbstractProcessor}, but the {@code GridCoverageProcessor}
+ *  interface is not ready anyway. GeoAPI's Coverage interfaces are work in progress and not
+ *  yet aligned on ISO 19123.
  */
-public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
+public abstract class AbstractGridCoverageProcessor extends DefaultProcessor
                                                  implements GridCoverageProcessor
 {
     /**
@@ -78,84 +73,34 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
     private static final String[] NO_PROPERTIES = new String[0];
 
     /**
-     * The logger for grid coverage processing operations.
-     */
-    public static final Logger LOGGER = Logger.getLogger("org.geotools.coverage.processing");
-
-    /**
-     * The logging level for reporting grid coverage operations.
-     * This level is equals or slightly lower than {@link Level#INFO}.
-     */
-    public static final Level OPERATION = new LogLevel("OPERATION", 780);
-
-    /**
-     * The grid coverage logging level type.
-     */
-    private static final class LogLevel extends Level {
-        protected LogLevel(final String name, final int level) {
-            super(name, level);
-        }
-    }
-
-    /**
-     * The comparator for ordering of operation names.
-     */
-    private static final Comparator COMPARATOR = new Comparator() {
-        public int compare(final Object name1, final Object name2) {
-            return ((String) name1).toLowerCase().compareTo(
-                   ((String) name2).toLowerCase());
-        }
-    };
-
-    /**
-     * The set of operation for this grid coverage processor. Keys are operation's name.
-     * Values are operations and should not contains duplicated values.
-     */
-    final Map/*<String,Operation>*/ operations = new TreeMap(COMPARATOR);
-
-    /**
      * Operations as array. Will be constructed only when first needed.
      */
-    private transient Operation2D[] asArray;
+    private transient Operation[] asArray;
+    
+    /**
+     * Constructs a grid coverage processor.
+     */
+    public AbstractGridCoverageProcessor() {
+        super(null);
+    }
     
     /**
      * Constructs a grid coverage processor.
      *
      * @param source The source for this processor, or {@code null} if none.
      * @param properties The set of properties for this processor, or {@code null} if there is none.
-     *        "Properties" in <cite>Java Advanced Imaging</cite> is what OpenGIS calls "Metadata".
-     *        Keys are {@link String} objects ({@link CaselessStringKey} are accepted as well),
-     *        while values may be any {@link Object}.
+     *
+     * @deprecated This constructor ignores the properties.
      */
     public AbstractGridCoverageProcessor(final PropertySource source, final Map properties) {
-        super(properties, source);
-    }
-
-    /**
-     * Add the specified operation to this processor. This method is usually invoked
-     * at construction time before this processor is made accessible.
-     *
-     * @param  operation The operation to add.
-     * @throws IllegalStateException if an operation already exists
-     *         with the same name than {@code operation}.
-     */
-    protected synchronized void addOperation(final Operation operation) throws IllegalStateException {
-        final String name = operation.getName();
-        if (!operations.containsKey(name)) {
-            assert !operations.containsValue(operation);
-            operations.put(name, operation);
-            asArray = null;
-        } else {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_OPERATION_ALREADY_BOUND_$1, operation.getName()));
-        }
+        this();
     }
 
     /**
      * Returns the number of operations supported by this grid coverage processor.
      */
     public synchronized int getNumOperations() {
-        return operations.size();
+        return getOperations().size();
     }
 
     /**
@@ -168,25 +113,10 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      */
     public synchronized Operation getOperation(final int index) throws IndexOutOfBoundsException {
         if (asArray == null) {
-            asArray =(Operation2D[])operations.values().toArray(new Operation2D[operations.size()]);
+            final Collection operations = getOperations();
+            asArray =(Operation[])operations.toArray(new Operation[operations.size()]);
         }
         return asArray[index];
-    }
-
-    /**
-     * Returns the operation for the specified name.
-     *
-     * @param  name Name of the operation.
-     * @return The operation for the given name.
-     * @throws OperationNotFoundException if there is no operation for the specified name.
-     */
-    public synchronized Operation getOperation(final String name) throws OperationNotFoundException {
-        final Operation2D operation = (Operation2D) operations.get(name);
-        if (operation != null) {
-            return operation;
-        }
-        throw new OperationNotFoundException(Resources.format(
-                ResourceKeys.ERROR_OPERATION_NOT_FOUND_$1, name));
     }
 
     /**
@@ -329,9 +259,14 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      *         is to invoke <code>operation.{@link Operation#getParameters getParameters}()</code>
      *         and to modify the returned group.
      * @return The result as a grid coverage.
+     *
+     * @deprecated Replaced by {@link #doOperation(ParameterValueGroup)}.
      */
-    public abstract GridCoverage doOperation(final Operation operation,
-                                             final ParameterValueGroup parameters);
+    public GridCoverage doOperation(final Operation operation,
+                                    final ParameterValueGroup parameters)
+    {
+        return (GridCoverage) doOperation(parameters);
+    }
 
     /**
      * Converts a "parameter not found" exception into an "invalid parameter name".
@@ -354,30 +289,27 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
 
     /**
      * List of metadata keywords for a coverage. If no metadata is available, the sequence
-     * will be empty. The default implementation gets the list of metadata names from the
-     * {@link #getPropertyNames()} method.
+     * will be empty.
      *
      * @return the list of metadata keywords for a coverage.
+     *
+     * @deprecated This class do not stores any properties.
      */
     public String[] getMetadataNames() {
-        final String[] list = getPropertyNames();
-        return (list != null) ? list : NO_PROPERTIES;
+        return NO_PROPERTIES;
     }
 
     /**
-     * Retrieve the metadata value for a given metadata name. The default implementation query
-     * the {@link #getProperty(String)} method.
+     * Retrieve the metadata value for a given metadata name.
      *
      * @param name Metadata keyword for which to retrieve data.
      * @return the metadata value for a given metadata name.
      * @throws MetadataNameNotFoundException if there is no value for the specified metadata name.
+     *
+     * @deprecated This class do not stores any properties.
      */
     public String getMetadataValue(final String name) throws MetadataNameNotFoundException {
-        final Object value = getProperty(name);
-        if (value == java.awt.Image.UndefinedProperty) {
-            throw new MetadataNameNotFoundException(Resources.format(
-                    ResourceKeys.ERROR_UNDEFINED_PROPERTY_$1, name));
-        }
-        return (value!=null) ? value.toString() : null;
+        throw new MetadataNameNotFoundException(Resources.format(
+                ResourceKeys.ERROR_UNDEFINED_PROPERTY_$1, name));
     }    
 }

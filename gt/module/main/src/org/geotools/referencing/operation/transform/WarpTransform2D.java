@@ -64,7 +64,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * implies that source coordinates may be rounded to nearest integers before to the transformation
  * is applied.
  * <p>
- * This transform is typically used with {@linkplain org.geotools.coverage.operation.Resampler2D
+ * This transform is typically used with {@linkplain org.geotools.coverage.processing.operation.Resample
  * grid coverage "Resample" operation} for reprojecting an image. Source and destination coordinates
  * are usually pixel coordinates in source and target image, which is why this transform may use
  * integer arithmetic.

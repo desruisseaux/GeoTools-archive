@@ -19,8 +19,7 @@ package org.geotools.gce.arcgrid;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.operation.Resampler2D;
-import org.geotools.coverage.processing.GridCoverageProcessor2D;
+import org.geotools.coverage.processing.Operations;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.geometry.GeneralEnvelope;
@@ -235,7 +234,7 @@ public class ArcGridWriter implements GridCoverageWriter {
 			double W,
 			double H) {
         //resampling the image if needed
-		final RenderedImage image=gc.getRenderedImage();
+		final RenderedImage image = gc.getRenderedImage();
 		int Nx = image.getWidth();
 		int Ny = image.getHeight();
 		final double dx = W / Nx;
@@ -276,19 +275,8 @@ public class ArcGridWriter implements GridCoverageWriter {
         GridGeometry2D newGridGeometry = new GridGeometry2D(newGridrange,
                 gc.getEnvelope(), new boolean[] { false, true });
 
-        //getting the needed operation
-        Resampler2D.Operation op = new Resampler2D.Operation();
-
-        //getting parameters
-        ParameterValueGroup group = op.getParameters();
-        group.parameter("Source").setValue(gc);
-        group.parameter("CoordinateReferenceSystem").setValue(gc
-            .getCoordinateReferenceSystem());
-        group.parameter("GridGeometry").setValue(newGridGeometry);
-
-        GridCoverageProcessor2D processor2D = GridCoverageProcessor2D
-            .getDefault();
-        GridCoverage2D gcOp = (GridCoverage2D) processor2D.doOperation(op, group);
+        GridCoverage2D gcOp = (GridCoverage2D) Operations.DEFAULT.resample(gc,
+                              gc.getCoordinateReferenceSystem(), newGridGeometry, null);
 
         return gcOp;
     }

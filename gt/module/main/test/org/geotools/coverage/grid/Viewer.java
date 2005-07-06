@@ -38,9 +38,12 @@ import javax.swing.JPanel;
 import javax.media.jai.GraphicsJAI;
 import javax.media.jai.PlanarImage;
 
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
+
 // Geotools dependencies
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.processing.GridCoverageProcessor2D;
+import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 
@@ -259,7 +262,7 @@ public class Viewer extends JPanel {
             out.println();
             out.println("  -operation=[s]  An operation name to apply (e.g. \"GradientMagniture\").");
             out.println("                  For a list of available operations, run the following:");
-            out.println("                  java org.geotools.coverage.processing.GridCoverageProcessor2D");
+            out.println("                  java org.geotools.coverage.processing.DefaultProcessor");
             out.println("  -geophysics=[b] Set to 'true' or 'false' for requesting a \"geophysics\"");
             out.println("                  version of data or an indexed version, respectively.");
             out.println("  -palette        Dumps RGB codes to standard output.");
@@ -271,8 +274,10 @@ public class Viewer extends JPanel {
             coverage = coverage.geophysics(geophysics.booleanValue());
         }
         if (operation != null) {
-            final GridCoverageProcessor2D processor = GridCoverageProcessor2D.getDefault();
-            coverage = (GridCoverage2D) processor.doOperation(operation, coverage);
+            final AbstractProcessor processor = AbstractProcessor.getInstance();
+            final ParameterValueGroup param = processor.getOperation(operation).getParameters();
+            param.parameter("Source").setValue(coverage);
+            coverage = (GridCoverage2D) processor.doOperation(param);
         }
         Viewer viewer = new Viewer(coverage);
         viewer.setLocale(locale);

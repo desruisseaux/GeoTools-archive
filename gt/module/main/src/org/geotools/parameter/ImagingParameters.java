@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 // JAI dependencies
 import javax.media.jai.ParameterList;
@@ -39,11 +40,14 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.InvalidParameterNameException;
+import org.opengis.util.GenericName;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.referencing.AbstractIdentifiedObject;
 
 
 /**
@@ -83,15 +87,21 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
     public final ParameterList parameters;
 
     /**
-     * The wrappers around each elements in {@link #parameters}. Keys are parameter name
-     * in lower case. Will be created by {@link #createElements} only when first needed.
+     * The wrappers around each elements in {@link #parameters}. Will be created by
+     * {@link #createElements} only when first needed.
      */
-    private transient Map elements;
+    private transient List/*<ParameterValue>*/ values;
 
     /**
-     * The {@link #elements} array as a list. Will be created only when first needed.
+     * A view of {@link #values} as an immutable list. Will be constructed only when first
+     * needed. Note that while this list may be immutable, <strong>elements</strong> in this
+     * list stay modifiable. The goal is to allows the following idiom:
+     *
+     * <blockquote><pre>
+     * values().get(i).setValue(myValue);
+     * </pre></blockquote>
      */
-    private transient List asList;
+    private transient List/*<ParameterValue>*/ asList;
 
     /**
      * Constructs a parameter group for the specified descriptor.
@@ -122,16 +132,18 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
     }
 
     /**
-     * Creates and fill the {@link #elements} map.
+     * Creates and fill the {@link #values} list. Note: this method must creates elements
+     * inconditionnally and most not requires synchronization for proper working of the
+     * {@link #clone} method.
      */
     private void createElements() {
         final ImagingParameterDescriptors descriptor = (ImagingParameterDescriptors) this.descriptor;
         final List   descriptors = descriptor.descriptors();
         final Set parameterNames = descriptor.getParameterNames();
-        elements = new LinkedHashMap((int)(descriptors.size()/0.75f) + 1);
+        values = new ArrayList(descriptors.size());
         for (final Iterator it=descriptors.iterator(); it.hasNext();) {
             final ParameterDescriptor d = (ParameterDescriptor) it.next();
-            final String name = d.getName().getCode().trim().toLowerCase();
+            String name = d.getName().getCode().trim().toLowerCase();
             final ParameterValue value;
             if (parameterNames.contains(name)) {
                 /*
@@ -148,8 +160,30 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
                  */
                 value = new Parameter(d);
             }
-            elements.put(name, value);
+            values.add(value);
         }
+        /*
+         * Checks for name clashes.
+         */
+        final int size = values.size();
+        for (int j=0; j<size; j++) {
+            final String name;
+            name = ((ParameterValue) values.get(j)).getDescriptor().getName().getCode().trim();
+            for (int i=0; i<size; i++) {
+                if (i != j) {
+                    final ParameterDescriptor d = (ParameterDescriptor)
+                                                ((ParameterValue) values.get(i)).getDescriptor();
+                    if (AbstractIdentifiedObject.nameMatches(d, name)) {
+                        throw new InvalidParameterNameException(Resources.format(
+                                ResourceKeys.ERROR_PARAMETER_NAME_CLASH_$4,
+                                d.getName().getCode(), new Integer(j),   // The duplicated name
+                                name,                  new Integer(i)),  // The existing name
+                                name);
+                    }
+                }
+            }
+        }
+        asList = Collections.unmodifiableList(values);
     }
 
     /**
@@ -159,10 +193,7 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      */
     public synchronized List values() {
         if (asList == null) {
-            if (elements == null) {
-                createElements();
-            }
-            asList = Collections.unmodifiableList(new ArrayList(elements.values()));
+            createElements();
         }
         return asList;
     }
@@ -176,13 +207,20 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      * @return The parameter value for the given identifier code.
      * @throws ParameterNotFoundException if there is no parameter value for the given identifier code.
      */
-    public ParameterValue parameter(final String name) throws ParameterNotFoundException {
-        if (elements == null) {
+    public synchronized ParameterValue parameter(String name)
+            throws ParameterNotFoundException
+    {
+        ensureNonNull("name", name);
+        name = name.trim();
+        if (values == null) {
             createElements();
         }
-        final ParameterValue value = (ParameterValue) elements.get(name.trim().toLowerCase());
-        if (value != null) {
-            return value;
+        final int size = values.size();
+        for (int i=0; i<size; i++) {
+            final ParameterValue value = (ParameterValue) values.get(i);
+            if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+                return value;
+            }
         }
         throw new ParameterNotFoundException(Resources.format(
                   ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
@@ -229,5 +267,34 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      */
     public int hashCode() {
         return super.hashCode()*37 + parameters.hashCode();
+    }
+
+    /**
+     * Returns a deep copy of this group of parameter values.
+     */
+    public Object clone() {
+        final ImagingParameters copy = (ImagingParameters) super.clone();
+        try {
+            final Method cloneMethod = parameters.getClass().getMethod("clone", (Class[])null);
+            final Field  paramField  = ImagingParameters.class.getField("parameters");
+            paramField.setAccessible(true); // Will work only with J2SE 1.5 or above.
+            paramField.set(copy, cloneMethod.invoke(parameters, (Object[]) null));
+        } catch (Exception exception) {
+            // TODO: localize.
+            // TODO: Use constructor with Throwable when we will be allowed to compile for J2SE 1.5.
+            UnsupportedOperationException e = new UnsupportedOperationException("Clone not supported.");
+            e.initCause(exception);
+            throw e;
+        }
+        if (copy.values != null) {
+            copy.createElements();
+            for (int i=values.size(); --i>=0;) {
+                final ParameterValue value = (ParameterValue) values.get(i);
+                if (value instanceof Parameter) {
+                    copy.values.set(i, (ParameterValue) value.clone());
+                }
+            }
+        }
+        return copy;
     }
 }

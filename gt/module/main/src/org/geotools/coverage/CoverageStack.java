@@ -56,7 +56,7 @@ import org.opengis.spatialschema.geometry.Envelope;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.IIOReadProgressAdapter;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.operation.Interpolator2D;
+import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.CRSUtilities;
@@ -71,7 +71,7 @@ import org.geotools.util.NumberRange;
  * can wraps an array of {@link org.geotools.coverage.grid.GridCoverage2D} on the same geographic
  * area, but where each {@code GridCoverage2D} is for a different date. This {@code CoverageStack}
  * manages the two-dimensional coverages as if the whole set was a huge three-dimensional coverage.
- * <br><br>
+ * <p>
  * Each {@linkplain Element coverage element} in the stack usually covers the same
  * {@linkplain Coverage#getEnvelope geographic area}, but this is not a requirement. However,
  * they must use the same {@linkplain CoordinateReferenceSystem coordinate reference system}.
@@ -79,12 +79,12 @@ import org.geotools.util.NumberRange;
  * if the CRS is provided in the envelope, and at evaluation time if Java assertion are enabled.
  * If the CRS of coverage elements is uncertain, consider wrapping them in a
  * {@link TransformedCoverage} object.
- * <br><br>
+ * <p>
  * Coverage elements are often two-dimensional, but this is not a requirement. This stack will
  * simply append one more dimension to the coverage element's CRS dimensions. Coverage elements
  * may be other {@code CoverateStack} objects, thus allowing construction of coverages with four
  * or more dimensions.
- * <br><br>
+ * <p>
  * {@code GridCoverage2D} objects tend to be big. In order to keep memory usage raisonable, this
  * implementation doesn't requires all {@code GridCoverage} objects at once. Instead, it requires
  * an array of {@link Element} objects, which will load the coverage content only when first
@@ -94,12 +94,12 @@ import org.geotools.util.NumberRange;
  * caching is the responsability of {@link Element} implementations. Note that this simple
  * caching mechanism is suffisient if {@code evaluate(...)} methods are invoked with increasing
  * <var>z</var> values.
- * <br><br>
+ * <p>
  * Each coverage element is expected to extends over a range of <var>z</var> values (the new
  * dimensions appended by this {@code CoverageStack}). If an {@code evaluate(...)} method is
  * invoked with a <var>z</var> value not falling in the middle of a coverage element, a linear
  * interpolation is applied.
- * <br><br>
+ * <p>
  * <strong>Note:</strong> This implementation is thread-safe.
  *
  * @version $Id$
@@ -116,7 +116,7 @@ public class CoverageStack extends AbstractCoverage {
      * expensive loading is required, it should be delayed until the {@link #getCoverage} method
      * is invoked. If {@code getCoverage} is invoked more than once, caching (if desirable) is
      * implementor's responsability.
-     * <br><br>
+     * <p>
      * All methods declares {@link IOException} in their throws cause in case I/O operations are
      * required. Subclasses of {@code IOException} include {@link javax.imageio.IIOException} for
      * image I/O operations, or {@link java.rmi.RemoteOperation} for remote method invocation

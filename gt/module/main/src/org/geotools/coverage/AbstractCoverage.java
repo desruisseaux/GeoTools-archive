@@ -240,7 +240,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * {@link GridGeometry#getGridToCoordinateSystem}. A grid coverage can be accessed
      * (re-projected) with new coordinate reference system with the {@link GridCoverageProcessor}
      * component. In this case, a new instance of a grid coverage is created.
-     * <br><br>
+     * <p>
      * Note: If a coverage does not have an associated coordinate reference system, the returned
      * value will be {@code null}. The {@link GridGeometry#getGridToCoordinateSystem}) attribute
      * should also be {@code null} if the coordinate reference system is {@code null}.

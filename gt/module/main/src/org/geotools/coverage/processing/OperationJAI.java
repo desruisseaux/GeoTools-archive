@@ -38,6 +38,7 @@ import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.registry.RenderedRegistryMode;
 
 // OpenGIS dependencies
+import org.opengis.coverage.Coverage;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -84,7 +85,7 @@ import org.geotools.util.AbstractInternationalString;
  * The default implementation forward the call to other methods for different bits of tasks,
  * resulting in the following chain of calls:
  * <p>
- * <table>
+ * <blockquote><table>
  *   <tr><td>{@link #doOperation doOperation}:&nbsp;</td>
  *       <td>the entry point.</td></tr>
  *   <tr><td>{@link #resampleToCommonGeometry resampleToCommonGeometry}:&nbsp;</td>
@@ -99,8 +100,9 @@ import org.geotools.util.AbstractInternationalString;
  *       <td>gets the destination units.</td></tr>
  *   <tr><td>{@link #createRenderedImage createRenderedImage}:&nbsp;</td>
  *       <td>the actual call to {@link JAI#createNS JAI.createNS}.</td></tr>
- * </table>
+ * </table></blockquote>
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -158,12 +160,12 @@ public class OperationJAI extends Operation2D {
      * must supports the {@code "rendered"} mode (which is the case for most JAI operations).
      *
      * @param operation The operation descriptor.
-     * @param parameters The parameters descriptor.
+     * @param descriptor The parameters descriptor.
      */
     protected OperationJAI(final OperationDescriptor      operation,
-                           final ParameterDescriptorGroup parameters)
+                           final ParameterDescriptorGroup descriptor)
     {
-        super(parameters);
+        super(descriptor);
         this.operation = operation;
         ensureNonNull("operation", operation);
         /*
@@ -172,6 +174,7 @@ public class OperationJAI extends Operation2D {
         ensureRenderedImage(operation.getDestClass(RENDERED_MODE));
         final Class[] sourceClasses = operation.getSourceClasses(RENDERED_MODE);
         if (sourceClasses != null) {
+            assert sourceClasses.length == operation.getNumSources();
             for (int i=0; i<sourceClasses.length; i++) {
                 ensureRenderedImage(sourceClasses[i]);
             }
@@ -182,13 +185,13 @@ public class OperationJAI extends Operation2D {
     /**
      * Returns the operation descriptor for the specified JAI operation name. This method
      * uses the default {@link JAI} instance and looks for the {@code "rendered"} mode.
+     * <p>
+     * Should be inlined in the constructor if only Sun was to fix RFE #4093999
+     * ("Relax constraint on placement of this()/super() call in constructors").
      *
      * @param  name The operation name.
      * @return The operation descriptor for the given name.
      * @throws OperationNotFoundException if no JAI descriptor was found for the given name.
-     *
-     * @todo Should be inlined in the constructor if only Sun was to fix RFE #4093999
-     *       ("Relax constraint on placement of this()/super() call in constructors").
      */
     private static OperationDescriptor getOperationDescriptor(final String name)
             throws OperationNotFoundException
@@ -215,10 +218,21 @@ public class OperationJAI extends Operation2D {
     }
 
     /**
-     * Returns <code>true</code> if grid coverage should be transformed from sample values
-     * to geophysics value before to apply an operation.
+     * Returns {@code true} if grid coverage content should be converted from sample values
+     * to geophysics value before to apply an operation. This method is invoked automatically
+     * by {@link #doOperation doOperation}. If this method returns {@code true}, then the
+     * computation will be performed on the <cite>geophysics</cite> view as returned by
+     * <code>{@linkplain GridCoverage2D#geophysics GridCoverage2D.geophysics}(true)</code>.
+     * If this method returns {@code false}, then the view will <strong>not</strong> be changed
+     * before the operation is applied (i.e. the {@code geophysics} method is not invoked at all).
+     * The default implementation always returns {@code true}.
+     *
+     * @param  parameters The parameters supplied by the user to the {@code doOperation} method.
+     * @return {@code true} if this operation should be applied on geophysics values.
+     *
+     * @see GridCoverage2D#geophysics
      */
-    boolean computeOnGeophysicsValues() {
+    protected boolean computeOnGeophysicsValues(final ParameterValueGroup parameters) {
         return true;
     }
 
@@ -226,21 +240,27 @@ public class OperationJAI extends Operation2D {
      * Applies a process operation to a grid coverage.
      * The default implementation performs the following steps:
      *
-     * <ul>
+     * <ol>
      *   <li>Converts source grid coverages to their <cite>geophysics</cite> view using
      *       <code>{@linkplain GridCoverage2D#geophysics GridCoverage2D.geophysics}(true)</code>.
      *       This allow to performs all computation on geophysics values instead of encoded
-     *       samples.</li>
+     *       samples. <strong>Note:</strong> this step is disabled if
+     *       {@link #computeOnGeophysicsValues computeOnGeophysicsValues} returns
+     *       {@code false}.</li>
+     *
      *   <li>Ensures that every sources {@code GridCoverage2D}s use the same coordinate reference
      *       system (at least for the two-dimensional part) with the same
      *       {@link GridGeometry2D#getGridToCoordinateSystem2D gridToCRS} relationship.</li>
+     *
      *   <li>Invokes {@link #deriveGridCoverage}.
      *       The sources in the {@code ParameterBlock} are {@link RenderedImage} objects
      *       obtained from {@link GridCoverage2D#getRenderedImage()}.</li>
-     *   <li>If the source {@code GridCoverage2D}s was not a geophysics view, converts the
-     *       result back to the same type with
-     *       <code>{@linkplain GridCoverage2D#geophysics GridCoverage2D.geophysics}(false)</code>.</li>
-     * </ul>
+     *
+     *   <li>If a changes from non-geophysics to geophysics view were performed at step 1,
+     *       converts the result back to the original view using
+     *       <code>{@linkplain GridCoverage2D#geophysics GridCoverage2D.geophysics}(false)</code>.
+     *       </li>
+     * </ol>
      *
      * @param  parameters List of name value pairs for the parameters required for the operation.
      * @param  hints A set of rendering hints, or {@code null} if none.
@@ -248,17 +268,15 @@ public class OperationJAI extends Operation2D {
      *
      * @see #deriveGridCoverage
      */
-    protected GridCoverage2D doOperation(final ParameterValueGroup  parameters,
-                                         final RenderingHints       hints)
-    {
+    protected Coverage doOperation(final ParameterValueGroup parameters, final Hints hints) {
         /*
          * Copies parameter values from the 'ParameterValues' object to the 'ParameterBlockJAI',
          * except the sources. The sources GridCoverages are extracted now but will be set in the
          * ParameterBlockJAI (as RenderedImages) later.
          */
         final ParameterBlockJAI block;
-        if (parameters instanceof ParameterBlockJAI) {
-            block = (ParameterBlockJAI) parameters;
+        if (parameters instanceof ImagingParameters) {
+            block = (ParameterBlockJAI) ((ImagingParameters) parameters).parameters;
         } else {
             final ImagingParameters copy = (ImagingParameters) descriptor.createValue();
             block = (ParameterBlockJAI) copy.parameters;
@@ -267,9 +285,10 @@ public class OperationJAI extends Operation2D {
         Boolean  requireGeophysicsType = null;
         final String[]     sourceNames = operation.getSourceNames();
         final GridCoverage2D[] sources = new GridCoverage2D[sourceNames.length];
+        final boolean computeOnGeophysicsValues = computeOnGeophysicsValues(parameters);
         for (int i=0; i<sourceNames.length; i++) {
             GridCoverage2D source = (GridCoverage2D) parameters.parameter(sourceNames[i]).getValue();
-            if (computeOnGeophysicsValues()) {
+            if (computeOnGeophysicsValues) {
                 final GridCoverage2D old = source;
                 source = source.geophysics(true);
                 if (i == PRIMARY_SOURCE_INDEX) {
@@ -283,8 +302,7 @@ public class OperationJAI extends Operation2D {
          * After the reprojection, the method still checks all CRS in case the user overrided the
          * {@link #resampleToCommonGeometry} method.
          */
-        final Hints cHints = (hints instanceof Hints) ? (Hints) hints : new Hints(hints);
-        resampleToCommonGeometry(sources, null, null, cHints);
+        resampleToCommonGeometry(sources, null, null, hints);
         GridCoverage2D coverage = sources[PRIMARY_SOURCE_INDEX];
         final CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem2D();
         // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
@@ -305,7 +323,7 @@ public class OperationJAI extends Operation2D {
          * TODO: get the range specifier.
          */
         RangeSpecifier[] ranges = null;
-        coverage = deriveGridCoverage(sources, new Parameters(crs, gridToCRS, block, cHints, ranges));
+        coverage = deriveGridCoverage(sources, new Parameters(crs, gridToCRS, block, hints, ranges));
         if (requireGeophysicsType != null) {
             coverage = coverage.geophysics(requireGeophysicsType.booleanValue());
         }
@@ -422,7 +440,7 @@ public class OperationJAI extends Operation2D {
          * dimensions. For example it may have a time or a depth axis. In such case, their "head"
          * and "tail" CRS will be preserved before and after 'crs2D'.
          */
-        final GridCoverageProcessor2D processor = getGridCoverageProcessor(hints);
+        final AbstractProcessor processor = getProcessor(hints);
         for (int i=0; i<sources.length; i++) {
             final GridCoverage2D            source    = sources[i];
             final GridGeometry2D            geometry  = (GridGeometry2D) source.getGridGeometry();
@@ -511,10 +529,11 @@ public class OperationJAI extends Operation2D {
                 }
             }
             final GridGeometry2D targetGeom = new GridGeometry2D(null, toTarget);
-            sources[i] = (GridCoverage2D) processor.doOperation(
-                            "Resample",                  source,
-                            "GridGeometry",              targetGeom,
-                            "CoordinateReferenceSystem", targetCRS);
+            final ParameterValueGroup param = processor.getOperation("Resample").getParameters();
+            param.parameter("Source")                   .setValue(source);
+            param.parameter("GridGeometry")             .setValue(targetGeom);
+            param.parameter("CoordinateReferenceSystem").setValue(targetCRS);
+            sources[i] = (GridCoverage2D) processor.doOperation(param);
         }
     }
 
@@ -686,8 +705,8 @@ public class OperationJAI extends Operation2D {
             }
         }
         /*
-         * Iterate among all bands. The 'result' array will contains SampleDimensions created
-         * during the iteration for each individual band. The 'XS' suffix designate temporary
+         * Iterates among all bands. The 'result' array will contains SampleDimensions created
+         * during the iteration for each individual band. The 'XS' suffix designates temporary
          * arrays of categories and units accross all sources for one particular band.
          */
         final GridSampleDimension[] result = new GridSampleDimension[numBands];
@@ -755,8 +774,7 @@ public class OperationJAI extends Operation2D {
      *         like {@code "GradientMagnitude"}, this array has a length of 1. For binary
      *         operations like {@code "add"} and {@code "multiply"}, this array has a length of 2.
      * @param  parameters Parameters, rendering hints and coordinate reference system to use.
-     * @return The quantative category to use in the destination image,
-     *         or {@code null} if unknow.
+     * @return The quantative category to use in the destination image, or {@code null} if unknow.
      */
     protected Category deriveCategory(final Category[] categories, final Parameters parameters) {
         return null;
@@ -805,7 +823,9 @@ public class OperationJAI extends Operation2D {
     {
         final InternationalString[] names;
         if (primarySourceIndex >= 0) {
-            names = new InternationalString[] {sources[primarySourceIndex].getName()};
+            names = new InternationalString[] {
+                sources[primarySourceIndex].getName()
+            };
         } else {
             names = new InternationalString[sources.length];
             for (int i=0; i<names.length; i++) {
@@ -908,9 +928,9 @@ public class OperationJAI extends Operation2D {
      * This parameter is given to the following methods:
      *
      * <ul>
-     *   <li>{@link OperationJAI#deriveSampleDimension}</li>
-     *   <li>{@link OperationJAI#deriveCategory}</li>
-     *   <li>{@link OperationJAI#deriveUnit}</li>
+     *   <li>{@link OperationJAI#deriveSampleDimension deriveSampleDimension}</li>
+     *   <li>{@link OperationJAI#deriveCategory deriveCategory}</li>
+     *   <li>{@link OperationJAI#deriveUnit deriveUnit}</li>
      * </ul>
      *
      * @version $Id$

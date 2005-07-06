@@ -117,11 +117,10 @@ public final class ImageUtilities {
     }
 
     /**
-     * Returns an {@link ImageLayout} for the specified image.
-     * If {@code initToImage} is {@code true}, then
-     * All parameters are initially set equal to those of the
-     * given {@link RenderedImage} and the returned layout is
-     * never {@code null}.
+     * Returns an {@link ImageLayout} for the specified image. If {@code initToImage} is
+     * {@code true}, then all parameters are initially set equal to those of the given
+     * {@link RenderedImage} and the returned layout is never {@code null} (except if
+     * the image is null).
      */
     private static ImageLayout getImageLayout(final RenderedImage image, final boolean initToImage) {
         if (image == null) {
@@ -342,7 +341,7 @@ public final class ImageUtilities {
      * type, bilinear interpolation and an {@link ImageLayout} rendering hint cause an exception in
      * medialib native code. Disabling the native acceleration (i.e using the pure Java version) is
      * a convenient workaround until Sun fix the bug.
-     * <br><br>
+     * <p>
      * <strong>Implementation note:</strong> the current implementation assume that factories
      * for native implementations are declared in the {@code com.sun.media.jai.mlib}
      * package, while factories for pure java implementations are declared in the
@@ -394,7 +393,7 @@ public final class ImageUtilities {
                 record.setSourceMethodName("allowNativeAcceleration");
                 Logger.getLogger("org.geotools.coverage").log(record);
                 // We used the "org.geotools.coverage" logger since this method is usually
-                // invoked from the GridCoverageProcessor or one of its operations.
+                // invoked from the grid coverage processor or one of its operations.
             }
         }
     }
@@ -404,7 +403,7 @@ public final class ImageUtilities {
      * image I/O extension for JAI provides native acceleration for PNG and JPEG. Unfortunatly,
      * those native codec has bug in their 1.0 version. Invoking this method will force the use
      * of standard codec provided in J2SE 1.4.
-     * <br><br>
+     * <p>
      * <strong>Implementation note:</strong> the current implementation assume that JAI codec
      * class name start with "CLib". It work for Sun's 1.0 implementation, but may change in
      * future versions. If this method doesn't recognize the class name, it does nothing.

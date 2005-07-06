@@ -51,9 +51,9 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.operation.Resampler2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.TestData;
 import org.geotools.util.NumberRange;
 
@@ -223,7 +223,7 @@ public class GridCoverageTest extends TestCase {
         if (sameCRS) {
             assertSame(image.getTile(0,0), coverage.getRenderedImage().getTile(0,0));
         } else {
-            assertTrue(coverage instanceof Resampler2D);
+            assertEquals("Resampler2D", Utilities.getShortClassName(coverage));
         }
 
         // Test the creation of a "geophysics" view.

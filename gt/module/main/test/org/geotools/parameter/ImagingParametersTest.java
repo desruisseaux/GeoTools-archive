@@ -23,6 +23,7 @@ package org.geotools.parameter;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.logging.Logger;
 import java.awt.image.RenderedImage;
 
 // JAI dependencies
@@ -126,6 +127,23 @@ public class ImagingParametersTest extends TestCase {
             assertSame(before, values.parameter("constants"));
         }
         assertNotNull(values.toString());
+        /*
+         * Tests clone. Requires J2SE 1.5 or above.
+         */
+        if (System.getProperty("java.version").compareTo("1.5") >= 0) {
+            final ImagingParameters copy = (ImagingParameters) values.clone();
+            assertNotSame("clone", values, copy);
+            assertNotSame("clone", values.parameters, copy.parameters);
+            if (false) {
+                // NOTE: As of J2SE 1.5 and JAI 1.1, ParameterBlockJAI
+                //       doesn't implements the 'equals' method.
+                assertEquals("clone", values.parameters, copy.parameters);
+                assertEquals("clone", values, copy);
+            }
+        } else {
+            Logger.getLogger("org.geotools.parameter")
+                       .fine("Clone test skipped for pre-1.5 Java version.");
+        }
     }
 
     /**

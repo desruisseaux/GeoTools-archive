@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.coverage.operation;
+package org.geotools.coverage.processing.operation;
 
 // J2SE dependencies
 import java.awt.RenderingHints;
@@ -33,16 +33,11 @@ import javax.media.jai.WritablePropertySource;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptor;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.processing.Operation2D;
 import org.geotools.coverage.processing.OperationJAI;
-import org.geotools.parameter.DefaultParameterDescriptor;
-import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.image.ColorUtilities;
 
@@ -58,7 +53,7 @@ import org.geotools.resources.image.ColorUtilities;
  *
  * @since 2.2
  */
-public final class BandSelect2D extends GridCoverage2D {
+final class BandSelector2D extends GridCoverage2D {
     /**
      * The mapping to bands in the source grid coverage.
      * May be {@code null} if all bands were keept.
@@ -80,17 +75,17 @@ public final class BandSelect2D extends GridCoverage2D {
      *       without the "Null" one. But as of JAI-1.1.1, "BandSelect" do not
      *       detect by itself the case were no copy is required.
      */
-    private BandSelect2D(final GridCoverage2D       source,
-                         final RenderedImage         image,
-                         final GridSampleDimension[] bands,
-                         final int[]           bandIndices)
+    private BandSelector2D(final GridCoverage2D       source,
+                           final RenderedImage         image,
+                           final GridSampleDimension[] bands,
+                           final int[]           bandIndices)
     {
         super(source.getName(),                      // The grid source name
               image,                                 // The underlying data
               source.getCoordinateReferenceSystem(), // The coordinate system.
               source.getGridGeometry().getGridToCoordinateSystem(),
               bands,                                 // The sample dimensions
-              new GridCoverage2D[]{source},          // The source grid coverages.
+              new GridCoverage2D[] {source},         // The source grid coverages.
               null);                                 // Properties
 
         this.bandIndices = bandIndices;
@@ -154,7 +149,7 @@ public final class BandSelect2D extends GridCoverage2D {
             if (bandIndices==null && visibleSourceBand==visibleTargetBand) {
                 return source;
             }
-            if (!(source instanceof BandSelect2D)) {
+            if (!(source instanceof BandSelector2D)) {
                 break;
             }
             /*
@@ -164,7 +159,7 @@ public final class BandSelect2D extends GridCoverage2D {
              * band. For example we could change the visible band from 0 to 1, and then come
              * back to 0 later.
              */
-            final int[] parentIndices = ((BandSelect2D)source).bandIndices;
+            final int[] parentIndices = ((BandSelector2D)source).bandIndices;
             if (parentIndices != null) {
                 if (bandIndices != null) {
                     for (int i=0; i<bandIndices.length; i++) {
@@ -227,7 +222,7 @@ public final class BandSelect2D extends GridCoverage2D {
         }
         image = OperationJAI.getJAI(hints).createNS(operation, params, hints);
         ((WritablePropertySource) image).setProperty("GC_VisibleBand", visibleBand);
-        return new BandSelect2D(source, image, targetBands, bandIndices);
+        return new BandSelector2D(source, image, targetBands, bandIndices);
     }
 
     /**
@@ -240,70 +235,5 @@ public final class BandSelect2D extends GridCoverage2D {
             }
         }
         return true;
-    }
-
-    /**
-     * The {@code "SelectSampleDimension"} operation.
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     */
-    public static final class Operation extends Operation2D {
-        /**
-         * Serial number for interoperability with different versions.
-         */
-        private static final long serialVersionUID = 6889502343896409135L;
-
-        /**
-         * The parameter descriptor for the sample dimension indices.
-         */
-        public static final ParameterDescriptor SAMPLE_DIMENSIONS =
-                new DefaultParameterDescriptor(CitationImpl.OGC, "SampleDimensions",
-                    int[].class,                        // Value class (mandatory)
-                    null,                               // Array of valid values
-                    null,                               // Default value
-                    null,                               // Minimal value
-                    null,                               // Maximal value
-                    null,                               // Unit of measure
-                    false);                             // Parameter is optional
-
-        /**
-         * The parameter descriptor for the visible dimension indice.
-         * This is a Geotools-specific parameter.
-         */
-        public static final ParameterDescriptor VISIBLE_SAMPLE_DIMENSION =
-                new DefaultParameterDescriptor(CitationImpl.GEOTOOLS, "VisibleSampleDimension",
-                    Integer.class,                      // Value class (mandatory)
-                    null,                               // Array of valid values
-                    null,                               // Default value
-                    new Integer(0),                     // Minimal value
-                    null,                               // Maximal value
-                    null,                               // Unit of measure
-                    false);                             // Parameter is optional
-
-        /**
-         * Constructs a default "SelectSampleDimension" operation.
-         */
-        public Operation() {
-            super(new DefaultParameterDescriptorGroup("SelectSampleDimension",
-                  new ParameterDescriptor[] {
-                        SOURCE_0,
-                        SAMPLE_DIMENSIONS,
-                        VISIBLE_SAMPLE_DIMENSION
-            }));
-        }
-
-        /**
-         * Applies the band select operation to a grid coverage.
-         *
-         * @param  parameters List of name value pairs for the parameters.
-         * @param  hints A set of rendering hints, or {@code null} if none.
-         * @return The result as a grid coverage.
-         */
-        protected GridCoverage2D doOperation(final ParameterValueGroup parameters,
-                                             final RenderingHints hints)
-        {
-            return BandSelect2D.create(parameters, hints);
-        }
     }
 }

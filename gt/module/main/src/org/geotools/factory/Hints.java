@@ -37,7 +37,7 @@ import org.geotools.resources.Utilities;
  * <blockquote><pre>
  * CoordinateOperationFactory myFactory = &hellip;
  * RenderingHints hints = new RenderingHints(Hints.{@link #COORDINATE_OPERATION_FACTORY}, myFactory);
- * GridCoverageProcessor processor = new GridCoverageProcessor2D(hints);
+ * AbstractProcessor processor = new DefaultProcessor(hints);
  * </pre></blockquote>
  * <p>
  * Any hint mentioned by this interface is considered to be API, failure to make use of a hint by
@@ -165,9 +165,13 @@ public final class Hints extends RenderingHints {
 
     /**
      * Hint for the {@link org.opengis.coverage.processing.GridCoverageProcessor} instance to use.
+     *
+     * @deprecated The {@code GridCoverageProcessor} interface is not yet stable.
+     *             Avoid dependencies if possible.
      */
     public static final Key GRID_COVERAGE_PROCESSOR =
-            new Key("org.opengis.coverage.processing.GridCoverageProcessor");
+            new Key("java.lang.Object");
+// TODO     new Key("org.opengis.coverage.processing.GridCoverageProcessor");
 
     /**
      * Hint for the {@link javax.media.jai.JAI} instance to use.

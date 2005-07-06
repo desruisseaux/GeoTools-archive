@@ -37,21 +37,23 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * Argument type for {@link GridCoverageProcessor2D} operations for specifying the range,
+ * Argument type for {@link DefaultProcessor} operations for specifying the range,
  * colors and units of a computation result. {@code RangeSpecifier} are used for tuning the
  * {@link Category} object to be constructed. For example the {@code "GradientMagnitude"}
  * operation will produces new {@link GridCoverage2D} with sample values ranging from 0 to some
  * maximal value which may be very different from the source {@link GridCoverage2D} range. By
- * default, most {@linkplain Operation2D operations} try to guess a raisonable range for output
+ * default, most {@linkplain OperationJAI operations} try to guess a raisonable range for output
  * values. This default behavior can be overriden with an explicit {@code RangeSpecifier}
  * argument.
  * <p>
  * All {@code RangeSpecifier}'s properties are optional; it is up to processor's
- * {@linkplain Operation2D operation} to replace {@code null} values by a default
+ * {@linkplain OperationJAI operation} to replace {@code null} values by a default
  * one.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.2
  */
 public class RangeSpecifier implements Serializable, Cloneable {
     /**

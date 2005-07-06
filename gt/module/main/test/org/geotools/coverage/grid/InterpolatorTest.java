@@ -33,7 +33,7 @@ import org.opengis.coverage.grid.GridRange;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
-import org.geotools.coverage.operation.Interpolator2D;
+import org.geotools.coverage.grid.Interpolator2D;
 
 
 /**

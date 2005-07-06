@@ -18,8 +18,7 @@ package org.geotools.gce.image;
 
 import junit.framework.*;
 import org.geotools.coverage.grid.*;
-import org.geotools.coverage.operation.Resampler2D;
-import org.geotools.coverage.processing.GridCoverageProcessor2D;
+import org.geotools.coverage.processing.Operations;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
@@ -251,23 +250,14 @@ public class WorldImageWriterTest extends TestCase {
         
         //creating the new grid range keeping the old range
         GeneralGridRange newGridrange = new GeneralGridRange(new int[] { 0, 0 },
-                new int[] { coverage.getGridGeometry().getGridRange().getLength(0),  coverage.getGridGeometry().getGridRange().getLength(1) });
+                new int[] { coverage.getGridGeometry().getGridRange().getLength(0),
+                            coverage.getGridGeometry().getGridRange().getLength(1) });
         GridGeometry2D newGridGeometry = new GridGeometry2D(newGridrange,
 				coverage.getEnvelope(), new boolean[] { false, true });
 
-        //getting the needed operation
-        Resampler2D.Operation op = new Resampler2D.Operation();
-
-        //getting parameters
-        ParameterValueGroup group = op.getParameters();
-        group.parameter("Source").setValue(coverage.geophysics(false));
-        group.parameter("CoordinateReferenceSystem").setValue(wgs84);
-        group.parameter("GridGeometry").setValue(newGridGeometry);
-
-        GridCoverageProcessor2D processor2D = new GridCoverageProcessor2D(GridCoverageProcessor2D
-            .getDefault(),new
-			Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
-        GridCoverage2D gcOp = (GridCoverage2D) processor2D.doOperation(op, group);
+        Operations processor2D = new Operations(new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
+        GridCoverage2D gcOp = (GridCoverage2D) processor2D.resample(coverage.geophysics(false),
+                              wgs84, newGridGeometry, null);
    	
         //displaying
         JFrame frame = new JFrame();

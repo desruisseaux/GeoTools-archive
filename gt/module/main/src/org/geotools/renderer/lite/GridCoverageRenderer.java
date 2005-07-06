@@ -28,8 +28,7 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.RenderedCoverage;
-import org.geotools.coverage.operation.Resampler2D;
-import org.geotools.coverage.processing.GridCoverageProcessor2D;
+import org.geotools.coverage.processing.Operations;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
@@ -55,7 +54,6 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * A helper class for rendering {@link GridCoverage} objects. Still doesn't
  * support grid coverage SLD stylers
  *
- * @author Martin Desruisseaux
  * @author Andrea Aime
  * @version $Id$
  *
@@ -138,21 +136,13 @@ public final class GridCoverageRenderer {
 				
 				//creating the new grid range keeping the old range
 				GeneralGridRange newGridrange = new GeneralGridRange(new int[] { 0, 0 },
-				        new int[] { gridCoverage.getGridGeometry().getGridRange().getLength(0),  gridCoverage.getGridGeometry().getGridRange().getLength(1) });
+				        new int[] { gridCoverage.getGridGeometry().getGridRange().getLength(0),
+                                    gridCoverage.getGridGeometry().getGridRange().getLength(1) });
 				GridGeometry2D newGridGeometry = new GridGeometry2D(newGridrange,
 				        newEnvelope, new boolean[] { false, true });
 
-				//getting the needed operation
-				Resampler2D.Operation op = new Resampler2D.Operation();
-
-				//getting parameters
-				ParameterValueGroup group = op.getParameters();
-				group.parameter("Source").setValue(gridCoverage);
-				group.parameter("CoordinateReferenceSystem").setValue(destinationCrs);
-				group.parameter("GridGeometry").setValue(newGridGeometry);
-
-				GridCoverageProcessor2D processor2D = GridCoverageProcessor2D.getDefault();
-				gcOp = (GridCoverage2D) processor2D.doOperation(op, group);
+				gcOp = (GridCoverage2D) Operations.DEFAULT.resample(gridCoverage, destinationCrs,
+                                                                    newGridGeometry, null);
 			} catch (Exception e) {
 				throw new Exception(e.getMessage());
 			}

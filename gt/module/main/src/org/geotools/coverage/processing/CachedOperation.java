@@ -38,10 +38,9 @@ import org.geotools.parameter.Parameters;
 
 /**
  * An {@link Operation}-{@link ParameterValueGroup} pair, used by
- * {@link GridCoverageProcessor2D#doOperation(Operation,ParameterValueGroup)}
- * for caching the result of operations. Reusing previous computation outputs
- * should be okay since grid coverage (both the sources and the result) are
- * immutable by default.
+ * {@link DefaultOperation#doOperation} for caching the result of operations.
+ * Reusing previous computation outputs should be okay since grid coverage
+ * (both the sources and the result) are immutable by default.
  *
  * @todo There is a tricky issue for grid coverage backed by a writable rendered
  *       image. The OpenGIS specification allows to change sample values. What
@@ -59,7 +58,7 @@ final class CachedOperation {
     private final Operation operation;
 
     /**
-     * The parameters names in alphabetical order, including source grid coverages.
+     * The parameters names in alphabetical order, including source coverages.
      */
     private final String[] names;
 

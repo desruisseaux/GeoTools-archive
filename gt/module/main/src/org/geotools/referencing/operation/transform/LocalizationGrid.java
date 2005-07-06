@@ -125,17 +125,15 @@ import org.geotools.coverage.grid.GridCoverage2D;                 // For javadoc
  * // localization was built from the orbit of some satellite, then the projected
  * // coverage will tpypically have a curved aspect.
  * //</FONT>
- * GridCoverageProcessor2D processor = GridCoverageProcessor2D.getDefault();
- * coverage = (Coverage2D) processor.doOperation("Resample", coverage, "CoordinateReferenceSystem", realCRS);
+ * coverage = (Coverage2D) Operations.DEFAULT.resample(coverage, realCRS);
  * coverage.show();
  * </pre></td></tr></table></blockquote>
  *
+ * @since 2.0
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  * @author Alessio Fabiani
- *
- * @since 2.0
  *
  * @see org.opengis.referencing.crs.DerivedCRS
  */
