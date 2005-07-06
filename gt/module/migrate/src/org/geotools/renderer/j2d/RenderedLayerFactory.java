@@ -505,7 +505,19 @@ public class RenderedLayerFactory {
      */
     private GridCoverage createRecoloredGrid(Feature feature, RasterSymbolizer symbolizer) {
         ColorMap colorMap = symbolizer.getColorMap();
-        GridCoverage grid = (GridCoverage) feature.getAttribute("grid");
+        GridCoverage grid;
+        if (true) {
+            // Work around for cohabitation of legacy and new grid coverage framework (GEOT-608).
+            Object candidate = feature.getAttribute("grid");
+            if (candidate instanceof org.opengis.coverage.grid.GridCoverage) {
+                grid = GridCoverage.fromGeoAPI((org.opengis.coverage.grid.GridCoverage) candidate);
+            } else {
+                grid = (GridCoverage) candidate;
+            }
+        } else {
+            // The normal code we should use if the workaround wasn't necessary.
+            grid = (GridCoverage) feature.getAttribute("grid");
+        }
 
         if (colorMap == null || colorMap.getColorMapEntries() == null || colorMap.getColorMapEntries().length == 0) {
             return grid;
