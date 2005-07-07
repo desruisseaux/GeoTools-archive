@@ -16,10 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.coverage.processing.operation;
 
@@ -83,10 +79,9 @@ import org.geotools.util.NumberRange;
  * separated class for two purpose: avoid loading this code before needed and provide some
  * way to recognize grid coverage which are the result of a resample operation.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 final class Resampler2D extends GridCoverage2D {
     /**

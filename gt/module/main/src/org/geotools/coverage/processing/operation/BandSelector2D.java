@@ -48,10 +48,9 @@ import org.geotools.resources.image.ColorUtilities;
  * is to select a different visible band. Consequently, the {@code "SelectSampleDimension"}
  * operation name still appropriate in this context.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 final class BandSelector2D extends GridCoverage2D {
     /**

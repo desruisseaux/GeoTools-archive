@@ -23,6 +23,10 @@
  */
 package org.geotools.coverage.processing.operation;
 
+// JAI dependencies (for javadoc)
+import javax.media.jai.operator.WarpDescriptor;
+import javax.media.jai.operator.AffineDescriptor;
+
 // J2SE dependencies
 import java.util.Locale;
 import java.util.logging.Level;
@@ -49,7 +53,6 @@ import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ImageUtilities;
-
 
 
 /**
@@ -81,8 +84,8 @@ import org.geotools.resources.image.ImageUtilities;
  * at construction time.
  *
  * <P><STRONG>Name:</STRONG>&nbsp;<CODE>"Resample"</CODE><BR>
- *    <STRONG>JAI operator:</STRONG>&nbsp;<CODE>"{@linkplain javax.media.jai.operator.AffineDescriptor Affine}"</CODE>
- *            or <CODE>"{@linkplain javax.media.jai.operator.WarpDescriptor Warp}"</CODE><BR>
+ *    <STRONG>JAI operator:</STRONG>&nbsp;<CODE>"{@linkplain AffineDescriptor Affine}"</CODE>
+ *            or <CODE>"{@linkplain WarpDescriptor Warp}"</CODE><BR>
  *    <STRONG>Parameters:</STRONG></P>
  * <table border='3' cellpadding='6' bgcolor='F4F8FF'>
  *   <tr bgcolor='#B9DCFF'>
@@ -122,12 +125,12 @@ import org.geotools.resources.image.ImageUtilities;
  *   </tr>
  * </table>
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @since 2.2
- *
  * @see org.geotools.coverage.processing.Operations#resample
+ * @see WarpDescriptor
  */
 public class Resample extends Operation2D {
     /**

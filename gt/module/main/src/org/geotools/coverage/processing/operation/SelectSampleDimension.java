@@ -16,8 +16,15 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *
+ *    This package contains documentation from OpenGIS specifications.
+ *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.coverage.processing.operation;
+
+// JAI dependencies (for javadoc)
+import javax.media.jai.operator.BandSelectDescriptor;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -30,7 +37,6 @@ import org.geotools.coverage.processing.Operation2D;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
-
 
 
 /**
@@ -49,9 +55,9 @@ import org.geotools.parameter.DefaultParameterDescriptorGroup;
  * using only 1 sample dimension at time. The {@code "VisibleSampleDimension"} parameter can be
  * used for selecting this sample dimension. If ommited, then the new grid coverage will inherit
  * its source's visible sample dimension.
- * 
+ *
  * <P><STRONG>Name:</STRONG>&nbsp;<CODE>"SelectSampleDimension"</CODE><BR>
- *    <STRONG>JAI operator:</STRONG>&nbsp;<CODE>"{@linkplain javax.media.jai.operator.BandSelectDescriptor BandSelect}"</CODE><BR>
+ *    <STRONG>JAI operator:</STRONG>&nbsp;<CODE>"{@linkplain BandSelectDescriptor BandSelect}"</CODE><BR>
  *    <STRONG>Parameters:</STRONG></P>
  * <table border='3' cellpadding='6' bgcolor='F4F8FF'>
  *   <tr bgcolor='#B9DCFF'>
@@ -84,12 +90,12 @@ import org.geotools.parameter.DefaultParameterDescriptorGroup;
  *   </tr>
  * </table>
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @since 2.2
- *
  * @see org.geotools.coverage.processing.Operations#selectSampleDimension
+ * @see BandSelectDescriptor
  */
 public class SelectSampleDimension extends Operation2D {
     /**

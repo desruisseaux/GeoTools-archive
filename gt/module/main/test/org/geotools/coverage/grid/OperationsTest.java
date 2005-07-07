@@ -33,7 +33,7 @@ import org.opengis.coverage.grid.GridCoverage;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.processing.AbstractProcessor;
+import org.geotools.coverage.processing.Operations;
 
 
 /**
@@ -42,11 +42,11 @@ import org.geotools.coverage.processing.AbstractProcessor;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class OperationJAI_Test extends GridCoverageTest {
+public final class OperationsTest extends GridCoverageTest {
     /**
      * The grid coverage processor.
      */
-    private AbstractProcessor processor;
+    private Operations processor;
 
     /**
      * Run the suite from the command line.
@@ -59,13 +59,13 @@ public final class OperationJAI_Test extends GridCoverageTest {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(OperationJAI_Test.class);
+        return new TestSuite(OperationsTest.class);
     }
 
     /**
      * Constructs a test case with the given name.
      */
-    public OperationJAI_Test(final String name) {
+    public OperationsTest(final String name) {
         super(name);
     }
 
@@ -73,7 +73,7 @@ public final class OperationJAI_Test extends GridCoverageTest {
      * Fetch the processor before each test.
      */
     protected void setUp() {
-        processor = AbstractProcessor.getInstance();
+        processor = Operations.DEFAULT;
     }
 
     /**
@@ -87,13 +87,12 @@ public final class OperationJAI_Test extends GridCoverageTest {
     }
 
     /**
-     * Tests operations requerying only one image.
+     * Tests {@link Operations#subtract}.
      */
-    public void test1Param() {
-        if (true) return; // TODO
-        String        operationName  = "SubtractConst";
+    public void testSubtract() {
+        double[]      constants      = new double[] {18.75};
         GridCoverage  sourceCoverage = getRandomCoverage().geophysics(true);
-        GridCoverage  targetCoverage = null; // TODO processor.doOperation(operationName, sourceCoverage);
+        GridCoverage  targetCoverage = (GridCoverage) processor.subtract(sourceCoverage, constants);
         RenderedImage sourceImage    = sourceCoverage.getRenderableImage(0,1).createDefaultRendering();
         RenderedImage targetImage    = targetCoverage.getRenderableImage(0,1).createDefaultRendering();
         Raster        sourceRaster   = sourceImage.getData();
@@ -110,13 +109,17 @@ public final class OperationJAI_Test extends GridCoverageTest {
         assertEquals (sourceRaster  .getHeight(),                    targetRaster  .getHeight());
         assertEquals (0, sourceRaster.getMinX());
         assertEquals (0, sourceRaster.getMinY());
-        assertEquals (operationName, ((OperationNode) targetImage).getOperationName());
+        assertEquals ("SubtractConst", ((OperationNode) targetImage).getOperationName());
+        
+//        org.geotools.gui.swing.OperationTreeBrowser.show(targetImage);
+        if (true) return;
+        
         for (int y=sourceRaster.getHeight(); --y>=0;) {
             for (int x=sourceRaster.getWidth(); --x>=0;) {
                 final double s = sourceRaster.getSample(x, y, 0);
                 final double t = targetRaster.getSample(x, y, 0);
                 System.out.println(s + "\t" + t);
-                assertEquals(Math.abs(s), t, 1E-7);
+                assertEquals(s - constants[0], t, 1E-7);
             }
         }
     }

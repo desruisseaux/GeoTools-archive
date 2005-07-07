@@ -98,10 +98,9 @@ import org.geotools.resources.image.ImageUtilities;
  *   </tr>
  * </table>
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  *
  * @see org.geotools.coverage.processing.Operations#interpolate
  * @see Interpolator2D

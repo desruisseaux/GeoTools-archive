@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import java.awt.RenderingHints;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -98,7 +99,7 @@ public abstract class AbstractProcessor {
      */
     public static synchronized AbstractProcessor getInstance() {
         if (DEFAULT == null) {
-            DEFAULT = new BufferedProcessor(new DefaultProcessor(null));
+            DEFAULT = new BufferedProcessor((RenderingHints) null);
             DEFAULT.setAsDefault();
         }
         return DEFAULT;

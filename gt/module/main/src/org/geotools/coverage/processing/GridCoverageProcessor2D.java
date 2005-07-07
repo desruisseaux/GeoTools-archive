@@ -127,18 +127,10 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
             // JAI operations
             //
 //            DEFAULT.addOperation(new ConvolveOperation());
-//            DEFAULT.addOperation(new OperationJAI("Absolute"));
 //            DEFAULT.addOperation(new OperationJAI("Add"));
-//            DEFAULT.addOperation(new OperationJAI("AddConst"));
 //            DEFAULT.addOperation(new OperationJAI("Divide"));
-//            DEFAULT.addOperation(new OperationJAI("DivideByConst"));
-//            DEFAULT.addOperation(new OperationJAI("Exp"));
-//            DEFAULT.addOperation(new OperationJAI("Invert"));
 //            DEFAULT.addOperation(new OperationJAI("Multiply"));
-//            DEFAULT.addOperation(new OperationJAI("MultiplyConst"));
 //            DEFAULT.addOperation(new OperationJAI("Subtract"));
-//            DEFAULT.addOperation(new OperationJAI("SubtractConst"));
-//            DEFAULT.addOperation(new OperationJAI("Rescale"));
 //            //
 //            // Custom (Geotools) operations
 //            //

@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
@@ -33,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import javax.swing.JTree;
 import javax.swing.JPanel;
+import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 import javax.swing.BorderFactory;
@@ -135,7 +127,7 @@ public class OperationTreeBrowser extends JPanel {
     private final Container cards = new JPanel(new CardLayout());
 
     /**
-     * Construct a new browser for the given rendered image.
+     * Constructs a new browser for the given rendered image.
      *
      * @param source The last image from the rendering chain to browse.
      */
@@ -144,7 +136,7 @@ public class OperationTreeBrowser extends JPanel {
     }
 
     /**
-     * Construct a new browser for the given renderable image.
+     * Constructs a new browser for the given renderable image.
      *
      * @param source The last image from the rendering chain to browse.
      */
@@ -153,7 +145,7 @@ public class OperationTreeBrowser extends JPanel {
     }
 
     /**
-     * Construct a new browser for the tree.
+     * Constructs a new browser for the tree.
      *
      * @param model The tree model built from the rendering chain to browse.
      */
@@ -171,6 +163,22 @@ public class OperationTreeBrowser extends JPanel {
         add(split, BorderLayout.CENTER);
 
         setPreferredSize(new Dimension(600,250));
+    }
+
+    /**
+     * Show the operation tree for the specified rendered image in a frame.
+     * This convenience method is mostly a helper for debugging purpose.
+     */
+    public static void show(final RenderedImage image) {
+        new OperationTreeBrowser(image).showFrame(image);
+    }
+
+    /**
+     * Show the operation tree for the specified renderable image in a frame.
+     * This convenience method is mostly a helper for debugging purpose.
+     */
+    public static void show(final RenderableImage image) {
+        new OperationTreeBrowser(image).showFrame(image);
     }
 
     /**
@@ -425,5 +433,16 @@ public class OperationTreeBrowser extends JPanel {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Implementation of public {@link #show} methods.
+     */
+    private void showFrame(final Object image) {
+        final JFrame frame = new JFrame(Utilities.getShortClassName(this) + " - " + getName(image));
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.getContentPane().add(this);
+        frame.pack();
+        frame.setVisible(true);
     }
 }

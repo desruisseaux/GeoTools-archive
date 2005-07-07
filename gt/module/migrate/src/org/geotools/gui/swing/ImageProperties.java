@@ -159,13 +159,6 @@ public class ImageProperties extends JPanel {
         final JTabbedPane     tabs = new JTabbedPane();
         final GridBagConstraints c = new GridBagConstraints();
         /*
-         * Build the image preview tab.
-         */
-        if (true) {
-            viewer = new Viewer();
-            tabs.addTab(resources.getString(ResourceKeys.PREVIEW), viewer);
-        }
-        /*
          * Build the informations tab.
          */
         if (true) {
@@ -203,6 +196,13 @@ public class ImageProperties extends JPanel {
             properties = new Table(resources);
             final JTable table = new JTable(properties);
             tabs.addTab(resources.getString(ResourceKeys.PROPERTIES), new JScrollPane(table));
+        }
+        /*
+         * Build the image preview tab.
+         */
+        if (true) {
+            viewer = new Viewer();
+            tabs.addTab(resources.getString(ResourceKeys.PREVIEW), viewer);
         }
         add(tabs, BorderLayout.CENTER);
         setPreferredSize(new Dimension(400,250));

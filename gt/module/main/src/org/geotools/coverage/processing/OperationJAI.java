@@ -933,6 +933,7 @@ public class OperationJAI extends Operation2D {
      *   <li>{@link OperationJAI#deriveUnit deriveUnit}</li>
      * </ul>
      *
+     * @since 2.2
      * @version $Id$
      * @author Martin Desruisseaux
      */

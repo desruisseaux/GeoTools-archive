@@ -60,7 +60,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.coverage.grid.GridCoverageTest    .suite());
         suite.addTest(org.geotools.coverage.grid.InterpolatorTest    .suite());
         suite.addTest(org.geotools.coverage.grid.ResampleTest        .suite());
-        suite.addTest(org.geotools.coverage.grid.OperationJAI_Test   .suite());
+        suite.addTest(org.geotools.coverage.grid.OperationsTest      .suite());
         suite.addTest(org.geotools.coverage.io.MetadataBuilderTest   .suite());
         return suite;
     }

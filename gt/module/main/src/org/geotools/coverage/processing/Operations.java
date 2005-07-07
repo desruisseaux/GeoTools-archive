@@ -67,7 +67,7 @@ public class Operations {
      * @todo Uses the GeoAPI's interface instead once it will be ready.
      */
     private AbstractProcessor processor;
-    
+
     /**
      * Creates a new instance using the specified hints.
      *
@@ -75,9 +75,126 @@ public class Operations {
      */
     public Operations(final RenderingHints hints) {
         if (hints != null && !hints.isEmpty()) {
-            processor = new BufferedProcessor(new DefaultProcessor(hints));
+            processor = new BufferedProcessor(hints);
         }
         // Otherwise, will creates the processor only when first needed.
+    }
+
+    /**
+     * Adds constants (one for each band) to every sample values of the source coverage.
+     *
+     * @param source The source coverage.
+     * @param constants The constants to add to each band.
+     *
+     * @see org.geotools.coverage.processing.operation.AddConst
+     */
+    public Coverage add(final Coverage source, final double[] constants) {
+        return doOperation("AddConst", source, "constants", constants);
+    }
+
+    /**
+     * Subtracts constants (one for each band) from every sample values of the source coverage.
+     *
+     * @param source The source coverage.
+     * @param constants The constants to subtract to each band.
+     *
+     * @see org.geotools.coverage.processing.operation.SubtractConst
+     */
+    public Coverage subtract(final Coverage source, final double[] constants) {
+        return doOperation("SubtractConst", source, "constants", constants);
+    }
+
+    /**
+     * Subtracts every sample values of the source coverage from constants (one for each band).
+     *
+     * @param source The source coverage.
+     * @param constants The constants to subtract from.
+     *
+     * @see org.geotools.coverage.processing.operation.SubtractFromConst
+     */
+    public Coverage subtractFrom(final Coverage source, final double[] constants) {
+        return doOperation("SubtractFromConst", source, "constants", constants);
+    }
+
+    /**
+     * Multiplies every sample values of the source coverage by constants (one for each band).
+     *
+     * @param source The source coverage.
+     * @param constants The constants to multiply to each band.
+     *
+     * @see org.geotools.coverage.processing.operation.MultiplyConst
+     */
+    public Coverage multiply(final Coverage source, final double[] constants) {
+        return doOperation("MultiplyConst", source, "constants", constants);
+    }
+
+    /**
+     * Divides every sample values of the source coverage by constants (one for each band).
+     *
+     * @param source The source coverage.
+     * @param constants The constants to divides by.
+     *
+     * @see org.geotools.coverage.processing.operation.DivideByConst
+     */
+    public Coverage divideBy(final Coverage source, final double[] constants) {
+        return doOperation("DivideByConst", source, "constants", constants);
+    }
+
+    /**
+     * Maps the sample values of a coverage from one range to another range.
+     *
+     * @param source The source coverage.
+     * @param constants The constants to multiply to each band.
+     * @param offsets The constants to add to each band.
+     *
+     * @see org.geotools.coverage.processing.operation.Rescale
+     */
+    public Coverage rescale(final Coverage source, final double[] constants, final double[] offsets) {
+        return doOperation("Rescale", source, "constants", constants, "offsets", offsets);
+    }
+
+    /**
+     * Inverts the sample values of a coverage.
+     *
+     * @param source The source coverage.
+     *
+     * @see org.geotools.coverage.processing.operation.Invert
+     */
+    public Coverage invert(final Coverage source) {
+        return doOperation("Invert", source);
+    }
+
+    /**
+     * Computes the mathematical absolute value of each sample value.
+     *
+     * @param source The source coverage.
+     *
+     * @see org.geotools.coverage.processing.operation.Absolute
+     */
+    public Coverage absolute(final Coverage source) {
+        return doOperation("Absolute", source);
+    }
+
+    /**
+     * Takes the natural logarithm of the sample values of a coverage.
+     *
+     * @param source The source coverage.
+     *
+     * @see org.geotools.coverage.processing.operation.Log
+     */
+    public Coverage log(final Coverage source) {
+        return doOperation("Log", source);
+    }
+
+    /**
+     * Takes the exponential of the sample values of a coverage.
+     *
+     * @param source The source coverage.
+     *
+     * @see org.geotools.coverage.processing.operation.Exp
+     */
+    public Coverage exp(final Coverage source) {
+        return doOperation("Exp", source);
     }
 
     /**

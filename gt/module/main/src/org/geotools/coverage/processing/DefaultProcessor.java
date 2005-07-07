@@ -65,11 +65,13 @@ import org.geotools.resources.gcs.ResourceKeys;
  *       redesigned).</li>
  *   <li>Most operations are backed by <cite>Java Advanced Imaging</cite>.</li>
  * </ul>
- *
- * @version $Id$
- * @author Martin Desruisseaux
+ * <p>
+ * <strong>Note:</strong> This implementation do not caches produced coverages. Since coverages
+ * may be big, consider wrapping {@code DefaultProcessor} instances in {@link BufferedProcessor}.
  *
  * @since 2.2
+ * @version $Id$
+ * @author Martin Desruisseaux
  */
 public class DefaultProcessor extends AbstractProcessor {
     /**
@@ -149,10 +151,24 @@ public class DefaultProcessor extends AbstractProcessor {
     }
 
     /**
-     * Removes the GRID_COVERAGE_PROCESSOR hint. It will avoid its serialization and a strong
-     * reference in RenderedImage's properties for the common case where we are using the
-     * default instance. The {@link AbstractOperation#getProcessor} method will automatically
-     * maps the null value to the default instance anyway.
+     * Sets the GRID_COVERAGE_PROCESSOR hint to the specified value.
+     * This is used by {@link BufferedProcessor} only.
+     */
+    final void setProcessor(final AbstractProcessor processor) {
+        hints.put(Hints.GRID_COVERAGE_PROCESSOR, processor);
+    }
+
+    /**
+     * Removes the GRID_COVERAGE_PROCESSOR hint. The {@link AbstractOperation#getProcessor} method
+     * will automatically returns the default instance when this hint is not defined. Removing this
+     * hint provides three advantages for the common case when the default processor is used:
+     *
+     * <ul>
+     *   <li>Avoid a strong reference to this processor in {@link RenderedImage} properties.</li>
+     *   <li>Avoid serialization of this processor when a {@link RenderedImage} is serialized.</li>
+     *   <li>Allows {@link AbstractOperation#getProcessor} to returns the {@link BufferedProcessor}
+     *       instance instead of this instance.</li>
+     * </ul>
      */
     void setAsDefault() {
         hints.remove(Hints.GRID_COVERAGE_PROCESSOR);

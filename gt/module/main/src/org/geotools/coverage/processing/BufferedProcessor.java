@@ -22,6 +22,7 @@ package org.geotools.coverage.processing;
 // J2SE dependencies
 import java.util.Map;
 import java.util.Collection;
+import java.awt.RenderingHints;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -42,10 +43,9 @@ import org.geotools.util.WeakValueHashMap;
  * is applied on the same coverage. Coverages are cached using
  * {@linkplain java.lang.ref.WeakReference weak references}.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 public class BufferedProcessor extends AbstractProcessor {
     /**
@@ -60,8 +60,21 @@ public class BufferedProcessor extends AbstractProcessor {
     private transient Map cache;
 
     /**
-     * Creates a new buffered processor which is going to caches the output produced
-     * by the specified processor.
+     * Creates a buffered processor backed by a {@linkplain DefaultProcessor default processor}
+     * using the specified hints. Null or empty hints are legal, but consider using the
+     * {@linkplain #getInstance default instance} in such case.
+     */
+    public BufferedProcessor(final RenderingHints hints) {
+        final DefaultProcessor processor = new DefaultProcessor(hints);
+        processor.setProcessor(this);
+        this.processor = processor;
+    }
+
+    /**
+     * Creates a new buffered processor backed by the specified processor. If the specified
+     * processor is an instance of {@link DefaultProcessor}, consider using the
+     * {@linkplain #BufferedProcessor(RenderingHints) constructor expecting hints} instead,
+     * for efficienty.
      */
     public BufferedProcessor(final AbstractProcessor processor) {
         ensureNonNull("processor", processor);
