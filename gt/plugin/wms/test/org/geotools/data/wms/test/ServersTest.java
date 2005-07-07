@@ -52,6 +52,7 @@ public class ServersTest extends TestCase {
     		}
     	}
     	*/
+        //servers.add(new URL("http://office.refractions.net/~chodgson/googlemaps/googlewms.php?request=getcapabilities"));
 
 //    	URL[] servers = new URL[50];
 //		servers[0] = new URL("http://wms.jpl.nasa.gov/wms.cgi?VERSION=1.1.1&SERVICE=WMS&REQUEST=GetCapabilities");
@@ -95,9 +96,10 @@ public class ServersTest extends TestCase {
             Random random = new Random();
             String dir = "tests";
             String filename = URLEncoder.encode(server.getHost()+random.nextInt(10000),"UTF-8");
-            File file = new File("C:\\"+dir+"\\"+filename+".txt");
-            file.createNewFile();
-            PrintStream out = new PrintStream(new FileOutputStream(file));
+//            File file = new File("C:\\"+dir+"\\"+filename+".txt");
+//            file.createNewFile();
+//            PrintStream out = new PrintStream(new FileOutputStream(file));
+            PrintStream out = System.out;
             boolean passed = serverTest(out, server);
             out.flush();
             out.close();
@@ -105,7 +107,7 @@ public class ServersTest extends TestCase {
             if (passed) {
                 System.out.println(server.toExternalForm() + " passed.");
                 passedCount++;
-                file.delete();
+//                file.delete();
             } else {
             	System.out.println(server.toExternalForm() + " failed.");
             }

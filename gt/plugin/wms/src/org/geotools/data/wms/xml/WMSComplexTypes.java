@@ -2502,7 +2502,9 @@ public class WMSComplexTypes {
 				if (sameName(elems[4], value[i])
 						|| sameName(elems[19], value[i])) {
 					String[] crss = ((String) value[i].getValue()).split(" ");
-					crs.addAll(Arrays.asList(crss));
+                    for (int j = 0; j < crss.length; j++) {
+                        crs.add(crss[j].toUpperCase());
+                    }
 				}
 
 				if (sameName(elems[5], value[i])
@@ -2920,7 +2922,7 @@ public class WMSComplexTypes {
 				}
 			}
 
-			bbox.setCrs(crs);
+			bbox.setCrs(crs.toUpperCase());
 			bbox.setMinX(Double.parseDouble(attrs.getValue("minx")));
 			bbox.setMaxX(Double.parseDouble(attrs.getValue("maxx")));
 			bbox.setMinY(Double.parseDouble(attrs.getValue("miny")));

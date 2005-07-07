@@ -98,7 +98,7 @@ defined. -->
 		<Layer>
 			<Title>World Map</Title>
 			<Abstract/>
-			<SRS>EPSG:4326 EPSG:4327</SRS>
+			<SRS>EpsG:4326 EPSG:4327</SRS>
 			<LatLonBoundingBox minx="-180" miny="-90" maxx="180" maxy="90"/>
 			<BoundingBox SRS="EPSG:4326" minx="-184" miny="-90.0000000017335" maxx="180" maxy="90"/>
 
