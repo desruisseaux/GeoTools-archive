@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
@@ -53,19 +44,21 @@ import java.util.Collection;
 
 // Miscellaneous
 import java.net.URL;
+import java.util.Locale;
 import java.util.Arrays;
 
 // Geotools dependencies
 import org.geotools.resources.XArray;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 
 
 /**
- * A widget showing selected and unselected items in two disjoint list.
- * The list on the right side shows items available for selection. The
- * list on the left side shows items already selected. User can move
- * items from one list to the other using buttons in the middle.
+ * A widget showing selected and unselected items in two disjoint list. The list on the left
+ * side shows items available for selection. The list on the right side shows items already
+ * selected. User can move items from one list to the other using buttons in the middle.
  *
+ * @since 2.0
  * @version $Id: DisjointLists.java,v 1.1 2003/06/25 12:57:41 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
@@ -125,7 +118,7 @@ public class DisjointLists extends JPanel {
         }
 
         /**
-         * Move elements in the specified range from this model to an other model.
+         * Moves elements in the specified range from this model to an other model.
          *
          * @param lower Lower index (inclusive) in this model.
          * @param upper Upper index (exclusive) in this model.
@@ -146,14 +139,14 @@ public class DisjointLists extends JPanel {
         }
 
         /**
-         * Fire when an interval has been appened to this object.
+         * Fired when an interval has been appened to this object.
          */
         private void fireIntervalAdded(final int length) {
             fireIntervalAdded(this, size-length, size-1);
         }
 
         /**
-         * Add all elements from the specified collection.
+         * Adds all elements from the specified collection.
          */
         public void addAll(final Collection items) {
             if (!items.isEmpty()) {
@@ -180,7 +173,7 @@ public class DisjointLists extends JPanel {
         private final JList source, target;
 
         /**
-         * <code>true</code> if we should move all items on action/
+         * {@code true} if we should move all items on action/
          */
         private final boolean all;
 
@@ -329,9 +322,24 @@ public class DisjointLists extends JPanel {
      *
      * @param  owner The owner (may be null).
      * @param  title The title to write in the window bar.
-     * @return <code>true</code> if the user pressed "okay", or <code>false</code> otherwise.
+     * @return {@code true} if the user pressed "okay", or {@code false} otherwise.
      */
     public boolean showDialog(final Component owner, final String title) {
         return SwingUtilities.showOptionDialog(owner, this, title);
+    }
+
+    /**
+     * Show the dialog box. This method is provided only as an easy
+     * way to test the dialog appearance from the command line.
+     */
+    public static void main(final String[] args) {
+        final DisjointLists list = new DisjointLists();
+        final Locale[] locales = Locale.getAvailableLocales();
+        final List names = new ArrayList(locales.length);
+        for (int i=0; i<locales.length; i++) {
+            names.add(locales[i].getDisplayName());
+        }
+        list.addElements(names);
+        list.showDialog(null, Utilities.getShortClassName(list));
     }
 }

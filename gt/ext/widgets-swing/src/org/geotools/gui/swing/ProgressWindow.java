@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing;
 
@@ -66,21 +53,16 @@ import org.geotools.resources.gui.ResourceKeys;
 
 
 /**
- * Informe l'utilisateur des progrès d'une opération à l'aide de messages dans une fenêtre.
- * Cette classe peut aussi écrire des avertissements, ce qui est utile entre autre lors de la
- * lecture d'un fichier de données durant laquelle on veut signaler les erreurs mais sans arrêter
- * la lecture pour autant.
+ * Reports progress of a lengthly operation in a window. This implementation can also format
+ * warnings. Its method can be invoked from any thread (it doesn't need to be the <cite>Swing</cite>
+ * thread), which make it easier to use it from some background thread. Such background thread
+ * should have a low priority in order to avoid delaying Swing repaint events.
  *
  * <p>&nbsp;</p>
  * <p align="center"><img src="doc-files/ProgressWindow.png"></p>
  * <p>&nbsp;</p>
  *
- * <p>Cette classe est conçue pour fonctionner correctement même si ses méthodes sont appellées
- * dans un autre thread que celui de <i>Swing</i>. Il est donc possible de faire la longue
- * opération en arrière plan et d'appeller les méthodes de cette classe sans se soucier des
- * problèmes de synchronisation. En général, faire l'opération en arrière plan est recommandé
- * afin de permettre le rafraichissement de l'écran par <i>Swing</i>.</p>
- *
+ * @since 2.0
  * @version $Id: ProgressWindow.java,v 1.3 2003/05/13 11:01:39 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
@@ -158,13 +140,10 @@ public class ProgressWindow implements ProgressListener {
     private String lastSource;
     
     /**
-     * Construit une fenêtre qui informera des progrès d'une opération.
-     * La fenêtre n'apparaîtra pas imédiatement. Elle n'apparaîtra que
-     * lorsque la méthode {@link #started} sera appelée.
+     * Creates a window for reporting progress. The window will not appears immediately.
+     * It will appears only when the {@link #started} method will be invoked.
      *
-     * @param parent Composante parente. La fenêtre des progrès sera
-     *        construite dans le même cadre que cette composante. Ce
-     *        paramètre peut être nul s'il n'y a pas de parent.
+     * @param parent The parent component, or {@code null} if none.
      */
     public ProgressWindow(final Component parent) {
         /*
@@ -233,57 +212,43 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Retourne le titre de la fenêtre. Il s'agira en général
-     * du titre de la boîte de dialogue. Par défaut, ce titre
-     * sera "Progression" dans la langue de l'utilisateur.
+     * Returns the window title. The default title is "Progress" localized in current locale.
      */
     public String getTitle() {
         return get(Caller.TITLE);
     }
 
     /**
-     * Définit le titre de la fenêtre des progrès. Un argument
-     * nul rétablira le titre par défaut de la fenêtre.
+     * Set the window title. A {@code null} value reset the default title.
      */
     public void setTitle(final String name) {
         set(Caller.TITLE, (name!=null) ? name : getString(ResourceKeys.PROGRESSION));
     }
 
     /**
-     * Retourne le message d'écrivant l'opération
-     * en cours. Si aucun message n'a été définie,
-     * retourne <code>null</code>.
+     * {@inheritDoc}
      */
     public String getDescription() {
         return get(Caller.LABEL);
     }
 
     /**
-     * Spécifie un message qui décrit l'opération en cours.
-     * Ce message est typiquement spécifiée avant le début
-     * de l'opération. Toutefois, cette méthode peut aussi
-     * être appelée à tout moment pendant l'opération sans
-     * que cela affecte le pourcentage accompli. La valeur
-     * <code>null</code> signifie qu'on ne souhaite plus
-     * afficher de description.
+     * {@inheritDoc}
      */
     public void setDescription(final String description) {
         set(Caller.LABEL, description);
     }
 
     /**
-     * Indique que l'opération a commencée. L'appel de cette
-     * méthode provoque l'apparition de la fenêtre si elle
-     * n'était pas déjà visible.
+     * Notifies that the operation begins. This method display the windows if it was
+     * not already visible.
      */
     public void started() {
         call(Caller.STARTED);
     }
 
     /**
-     * Indique l'état d'avancement de l'opération. Le progrès est représenté par un
-     * pourcentage variant de 0 à 100 inclusivement. Si la valeur spécifiée est en
-     * dehors de ces limites, elle sera automatiquement ramenée entre 0 et 100.
+     * {@inheritDoc}
      */
     public void progress(final float percent) {
         int p=(int) percent; // round toward 0
@@ -293,36 +258,23 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Indique que l'opération est terminée. L'indicateur visuel informant des
-     * progrès disparaîtra, sauf si des messages d'erreurs ou d'avertissements
-     * ont été affichés.
+     * Notifies that the operation has finished. The window will disaspears, except
+     * if it contains warning or exception stack traces.
      */
     public void complete() {
         call(Caller.COMPLETE);
     }
 
     /**
-     * Libère les ressources utilisées par l'état d'avancement. Si l'état
-     * d'avancement était affichée dans une fenêtre, cette fenêtre peut être
-     * détruite.
+     * Releases any resource holds by this window. Invoking this method destroy the window.
      */
     public void dispose() {
         call(Caller.DISPOSE);
     }
 
     /**
-     * Écrit un message d'avertissement. Les messages apparaîtront dans
-     * une zone de texte sous la barre des progrès. Cette zone de texte
-     * ne deviendra visible qu'après l'écriture d'au moins un message.
-     *
-     * @param source Chaîne de caractère décrivant la source de l'avertissement.
-     *        Il s'agira par exemple du nom du fichier dans lequel une anomalie
-     *        a été détectée. Peut être nul si la source n'est pas connue.
-     * @param margin Texte à placer dans la marge de l'avertissement <code>warning</code>,
-     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numéro
-     *        de ligne où s'est produite l'erreur dans le fichier <code>source</code>. Ce
-     *        texte sera automatiquement placé entre parenthèses.
-     * @param warning Message d'avertissement à écrire.
+     * Display a warning message under the progres bar. The text area for warning messages
+     * will appears only the first time this method is invoked.
      */
     public synchronized void warningOccurred(final String source, String margin,
                                              final String warning)
@@ -357,9 +309,7 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Indique qu'une exception est survenue pendant le traitement de l'opération.
-     * L'implémentation par défaut fait apparaître le message de l'exception dans
-     * une fenêtre séparée.
+     * Display an exception stack trace.
      */
     public void exceptionOccurred(final Throwable exception) {
         ExceptionMonitor.show(window, exception);

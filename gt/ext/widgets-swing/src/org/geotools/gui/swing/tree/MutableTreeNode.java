@@ -16,36 +16,21 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
-package org.geotools.gui.swing.event;
-
-// Events
-import java.util.EventListener;
+package org.geotools.gui.swing.tree;
 
 
 /**
- * Defines an object which listens for zoom change events. Zoom changes
- * are indicated by an {@link java.awt.geom.AffineTransform}.
+ * Defines the requirements for a tree node object that can change. It may changes by adding or
+ * removing child nodes, or by changing the contents of a user object stored in the node. This
+ * interface inherits the {@link #getUserObject getUserObject()} method from Geotools's
+ * {@link TreeNode}. This is needed because the Swing's {@link javax.swing.tree.MutableTreeNode}
+ * interface defines a {@link #setUserObject(Object) setUserObject(Object)} method but doesn't
+ * define or inherit any {@code getUserObject()}.
  *
- * @version $Id: ZoomChangeListener.java,v 1.4 2003/05/13 11:01:39 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id: MutableTreeNode.java,v 1.2 2004/04/30 19:40:16 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
-public interface ZoomChangeListener extends EventListener {
-    /**
-     * Invoked when a zoom changes.
-     */
-    public abstract void zoomChanged(final ZoomChangeEvent event);
+public interface MutableTreeNode extends javax.swing.tree.MutableTreeNode, TreeNode {
 }

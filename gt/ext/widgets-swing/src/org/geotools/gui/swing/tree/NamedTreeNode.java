@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing.tree;
 
@@ -38,6 +29,8 @@ import javax.swing.JTree;
  * overrides the default implementation (<code>{@link #getUserObject userObject}.toString</code>)
  * with a custom label.
  *
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class NamedTreeNode extends DefaultMutableTreeNode {
@@ -52,8 +45,7 @@ public class NamedTreeNode extends DefaultMutableTreeNode {
     private final String name;
 
     /**
-     * Creates a tree node that has no parent and no children, but which
-     * allows children.
+     * Creates a tree node that has no parent and no children, but which allows children.
      *
      * @param name The node name to be returned by {@link #toString}.
      */
@@ -67,23 +59,21 @@ public class NamedTreeNode extends DefaultMutableTreeNode {
      * children, and initializes it with the specified user object.
      *
      * @param name The node name to be returned by {@link #toString}.
-     * @param userObject an Object provided by the user that constitutes
-     *                   the node's data
+     * @param userObject an Object provided by the user that constitutes the node's data
      */
-    public NamedTreeNode(final String name, Object userObject) {
+    public NamedTreeNode(final String name, final Object userObject) {
         super(userObject);
         this.name = name;
     }
 
     /**
      * Creates a tree node with no parent, no children, initialized with
-     * the specified user object, and that allows children only if
-     * specified.
+     * the specified user object, and that allows children only if specified.
      *
      * @param name The node name to be returned by {@link #toString}.
      * @param userObject an Object provided by the user that constitutes the node's data
-     * @param allowsChildren if true, the node is allowed to have child
-     *        nodes -- otherwise, it is always a leaf node
+     * @param allowsChildren if true, the node is allowed to have child nodes -- otherwise,
+     *        it is always a leaf node
      */
     public NamedTreeNode(final String name, Object userObject, boolean allowsChildren) {
         super(userObject, allowsChildren);

@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing.tree;
 
@@ -43,6 +34,7 @@ import org.geotools.resources.XArray;
 /**
  * Convenience static methods for trees operations.
  *
+ * @since 2.0
  * @version $Id: Trees.java,v 1.1 2003/05/29 16:04:31 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
@@ -54,18 +46,16 @@ public final class Trees {
     }
 
     /**
-     * Retourne les chemins vers l'objet spécifié. Cette méthode suppose que l'arborescence
-     * est constituée de noeuds {@link org.geotools.gui.swing.tree.TreeNode} et comparera
-     * <code>value</code> avec les objets retournés par la méthode
-     * {@link org.geotools.gui.swing.tree.TreeNode#getUserObject}. Les noeuds qui ne sont
-     * pas des objets {@link org.geotools.gui.swing.tree.TreeNode} ne seront pas
-     * comparés à <code>value</code>.
+     * Returns the path to the specified
+     * {@linkplain org.geotools.gui.swing.tree.TreeNode#getUserObject user object}. For each tree
+     * node which are actually instance of Geotools {@link org.geotools.gui.swing.tree.TreeNode},
+     * this method compares the specified {@code value} against the user object returned by the
+     * {@link org.geotools.gui.swing.tree.TreeNode#getUserObject} method.
      *
-     * @param  model Modèle dans lequel rechercher le chemin.
-     * @param  value Objet à rechercher dans
+     * @param  model The tree model to inspect.
+     * @param  value User object to compare to
      *         {@link org.geotools.gui.swing.tree.TreeNode#getUserObject}.
-     * @return Chemins vers l'objet spécifié. Ce tableau peut avoir une
-     *         longueur de 0, mais ne sera jamais <code>null</code>.
+     * @return The paths to the specified value, or an empty array if none.
      */
     public static TreePath[] getPathsToUserObject(final TreeModel model, final Object value) {
         final List paths = new ArrayList(8);
@@ -116,10 +106,8 @@ public final class Trees {
      * @param node   Noeud de l'arborescence à écrire.
      * @param buffer Buffer dans lequel écrire le noeud.
      * @param level  Niveau d'indentation (à partir de 0).
-     * @param last   Indique si les niveaux précédents sont
-     *               en train d'écrire leurs derniers items.
-     * @return       Le tableau <code>last</code>, qui peut
-     *               éventuellement avoir été agrandit.
+     * @param last   Indique si les niveaux précédents sont en train d'écrire leurs derniers items.
+     * @return       Le tableau <code>last</code>, qui peut éventuellement avoir été agrandit.
      */
     private static boolean[] toString(final TreeModel model, final Object node,
                                       final StringBuffer buffer, final int level, boolean[] last)
@@ -147,15 +135,13 @@ public final class Trees {
     }
 
     /**
-     * Retourne une chaîne de caractères qui contiendra une
-     * représentation graphique de l'arborescence spécifiée.
-     * Cette arborescence apparaître correctement si elle
-     * est écrite avec une police mono-espacée.
+     * Returns a graphical representation  of the specified tree model. This representation can
+     * be printed to the {@linkplain System#out standard output stream} (for example) if it uses
+     * a monospaced font and supports unicode.
      *
-     * @param  tree Arborescence à écrire.
-     * @param  root Noeud à partir d'où commencer à tracer l'arborescence.
-     * @return Chaîne de caractères représentant l'arborescence, ou
-     *         <code>null</code> si <code>root</code> était nul.
+     * @param  tree The tree to format.
+     * @param  root First node to format.
+     * @return A string representation of the tree, or {@code null} if it doesn't contain any node.
      */
     private static String toString(final TreeModel tree, final Object root) {
         if (root == null) {
@@ -167,27 +153,24 @@ public final class Trees {
     }
 
     /**
-     * Retourne une chaîne de caractères qui contiendra une
-     * représentation graphique de l'arborescence spécifiée.
-     * Cette arborescence apparaître correctement si elle
-     * est écrite avec une police mono-espacée.
+     * Returns a graphical representation of the specified tree model. This representation can
+     * be printed to the {@linkplain System#out standard output stream} (for example) if it uses
+     * a monospaced font and supports unicode.
      *
-     * @param  tree Arborescence à écrire.
-     * @return Chaîne de caractères représentant l'arborescence, ou
-     *         <code>null</code> si l'arborescence ne contenait aucun noeud.
+     * @param  tree The tree to format.
+     * @return A string representation of the tree, or {@code null} if it doesn't contain any node.
      */
     public static String toString(final TreeModel tree) {
         return toString(tree, tree.getRoot());
     }
 
     /**
-     * Retourne une chaîne de caractères qui contiendra une
-     * représentation graphique de l'arborescence spécifiée.
-     * Cette arborescence apparaître correctement si elle
-     * est écrite avec une police mono-espacée.
+     * Returns a graphical representation of the specified tree. This representation can be
+     * printed to the {@linkplain System#out standard output stream} (for example) if it uses
+     * a monospaced font and supports unicode.
      *
-     * @param  node Noeud à partir d'où écrire l'arborescence.
-     * @return Chaîne de caractères représentant l'arborescence.
+     * @param  node The root node of the tree to format.
+     * @return A string representation of the tree, or {@code null} if it doesn't contain any node.
      */
     public static String toString(final TreeNode node) {
         return toString(new DefaultTreeModel(node, true));

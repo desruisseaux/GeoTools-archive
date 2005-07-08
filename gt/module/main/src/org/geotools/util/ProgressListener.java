@@ -51,10 +51,9 @@ package org.geotools.util;
  * is used for reducing the amount of calls to {@link #progress} (only once every 256 steps).
  * This is not mandatory, but may speed up the process.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see org.geotools.gui.headless.ProgressPrinter
  * @see org.geotools.gui.headless.ProgressMailer
@@ -63,68 +62,59 @@ package org.geotools.util;
  */
 public interface ProgressListener {
     /**
-     * Retourne le message d'écrivant l'opération
-     * en cours. Si aucun message n'a été définie,
-     * retourne {@code null}.
+     * Returns the description for the lengthly operation to be reported, or {@code null} if none.
      */
     public abstract String getDescription();
 
     /**
-     * Spécifie un message qui décrit l'opération en cours.
-     * Ce message est typiquement spécifiée avant le début
-     * de l'opération. Toutefois, cette méthode peut aussi
-     * être appelée à tout moment pendant l'opération sans
-     * que cela affecte le pourcentage accompli. La valeur
-     * {@code null} signifie qu'on ne souhaite plus
-     * afficher de description.
+     * Set the description for the lenghtly operation to be reported. This method is usually
+     * invoked before any progress begins. However, it is legal to invoke this method at any
+     * time during the operation, in which case the description display is updated without
+     * any change to the percentage accomplished.
+     *
+     * @param description The new description, or {@code null} if none.
      */
     public abstract void setDescription(final String description);
 
     /**
-     * Indique que l'opération a commencée.
+     * Notifies this listener that the operation begins.
      */
     public abstract void started();
 
     /**
-     * Indique l'état d'avancement de l'opération. Le progrès est représenté par un
-     * pourcentage variant de 0 à 100 inclusivement. Si la valeur spécifiée est en
-     * dehors de ces limites, elle sera automatiquement ramenée entre 0 et 100.
+     * Notifies this listener of progress in the lengthly operation. Progress are reported
+     * as a value between 0 and 100 inclusive. Values out of bounds will be clamped.
      */
     public abstract void progress(final float percent);
 
     /**
-     * Indique que l'opération est terminée. L'indicateur visuel informant des
-     * progrès sera ramené à 100% ou disparaîtra, selon l'implémentation de la
-     * classe dérivée. Si des messages d'erreurs ou d'avertissements étaient
-     * en attente, ils seront écrits.
+     * Notifies this listener that the operation has finished. The progress indicator will
+     * shows 100% or disaspears, at implementor choice. If warning messages were pending,
+     * they will be displayed now.
      */
     public abstract void complete();
 
     /**
-     * Libère les ressources utilisées par cet objet. Si l'état d'avancement
-     * était affiché dans une fenêtre, cette fenêtre peut être détruite.
+     * Release any resources used by this listener. If the progress were reported in a window,
+     * this window may be disposed.
      */
     public abstract void dispose();
 
     /**
-     * Envoie un message d'avertissement. Ce message pourra être envoyé vers le
-     * périphérique d'erreur standard, apparaître dans une fenêtre ou être tout
-     * simplement ignoré.
+     * Reports a warning. This warning may be printed to the {@linkplain System#err standard error
+     * stream}, appears in a windows or be ignored, at implementor choice.
      *
-     * @param source Chaîne de caractère décrivant la source de l'avertissement.
-     *        Il s'agira par exemple du nom du fichier dans lequel une anomalie
-     *        a été détectée. Peut être nul si la source n'est pas connue.
-     * @param margin Texte à placer dans la marge de l'avertissement {@code warning},
-     *        ou {@code null} s'il n'y en a pas. Il s'agira le plus souvent du numéro
-     *        de ligne où s'est produite l'erreur dans le fichier {@code source}.
-     * @param warning Message d'avertissement à écrire.
+     * @param source The source of the warning, or {@code null} if none. This is typically the
+     *        filename in process of being parsed.
+     * @param margin Text to write on the left side of the warning message, or {@code null} if none.
+     *        This is typically the line number where the error occured in the {@code source} file.
+     * @param warning The warning message.
      */
     public abstract void warningOccurred(String source, String margin, String warning);
 
     /**
-     * Indique qu'une exception est survenue pendant le traitement de l'opération.
-     * Cette méthode peut afficher la trace de l'exception dans une fenêtre ou à
-     * la console, dépendemment de la classe dérivée.
+     * Reports an exception. This method may prints the stack trace to the {@linkplain System#err
+     * standard error stream} or display it in a dialog box, at implementor choice.
      */
     public abstract void exceptionOccurred(final Throwable exception);
 }

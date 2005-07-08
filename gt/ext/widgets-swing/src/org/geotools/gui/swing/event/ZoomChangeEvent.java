@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing.event;
 
@@ -41,34 +28,29 @@ import java.awt.geom.AffineTransform;
  * An event which indicates that a zoom occurred in a component.
  * This event is usually fired by {@link org.geotools.gui.swing.ZoomPane}.
  *
+ * @since 2.0
  * @version $Id: ZoomChangeEvent.java,v 1.5 2003/05/13 11:01:39 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
 public class ZoomChangeEvent extends EventObject {
     /**
-     * An affine transform indicating the zoom change.
-     * If <code>oldZoom</code> and <code>newZoom</code> are the affine
-     * transform before and after the change respectively, then the
-     * following relation must hold (within the limits of rounding error):
+     * An affine transform indicating the zoom change. If {@code oldZoom} and {@code newZoom}
+     * are the affine transforms before and after the change respectively, then the following
+     * relation must hold (within the limits of rounding error):
      *
-     * <code>newZoom=oldZoom.{@link AffineTransform#concatenate concatenate}
-     * (change)</code>
+     * <code>newZoom = oldZoom.{@link AffineTransform#concatenate concatenate}(change)</code>
      */
     private final AffineTransform change;
 
     /**
-     * Constructs a new event.
+     * Constructs a new event. If {@code oldZoom} and {@code newZoom} are the affine transforms
+     * before and after the change respectively, then the following relation must hold (within
+     * the limits of rounding error):
      *
-     * @param source The event source
-     *               (usually a {@link org.geotools.gui.swing.ZoomPane}).
+     * <code>newZoom = oldZoom.{@link AffineTransform#concatenate concatenate}(change)</code>
+     *
+     * @param source The event source (usually a {@link org.geotools.gui.swing.ZoomPane}).
      * @param change An affine transform indicating the zoom change.
-     *               If <code>oldZoom</code> and <code>newZoom</code> are the
-     *               affine transform before and after the change respectively,
-     *               then the following relation must hold (within the limits
-     *               of rounding error):
-     *
-     * <code>newZoom=oldZoom.{@link AffineTransform#concatenate concatenate}
-     * (change)</code>
      */
     public ZoomChangeEvent(final Object source, final AffineTransform change) {
         super(source);
@@ -77,7 +59,7 @@ public class ZoomChangeEvent extends EventObject {
 
     /**
      * Returns the affine transform indicating the zoom change.
-     * Note: for performance reasons, this method does not clone
+     * <strong>Note:</strong> for performance reasons, this method does not clone
      * the returned transform. Do not change!
      */
     public AffineTransform getChange() {

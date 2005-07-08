@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
@@ -125,7 +116,7 @@ public class MiscellaneousWidgetTest extends TestCase {
             frame.getContentPane().add(component);
             frame.setLocation(location, location);
             frame.pack();
-            frame.show();
+            frame.setVisible(true);
             if (!keep) {
                 widgets.add(frame);
             }

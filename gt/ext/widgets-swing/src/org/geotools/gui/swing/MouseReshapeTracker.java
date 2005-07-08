@@ -174,45 +174,41 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     private double ymax = Double.POSITIVE_INFINITY;
 
     /**
-     * The rectangle to control.  The coordinates of this rectangle must be
-     * logical coordinates (for example, coordinates in metres), and not
-     * screen pixel coordinates. An empty rectangle means that no region is
-     * currently selected.
+     * The rectangle to control.  The coordinates of this rectangle must be logical coordinates
+     * (for example, coordinates in metres), and not screen pixel coordinates. An empty rectangle
+     * means that no region is currently selected.
      */
     private final RectangularShape logicalShape;
 
     /**
-     * Rectangle to be drawn in the component.  This rectange can be different
-     * to {@link #logicalShape} and the latter is so small that it is 
-     * preferable to draw it a little bit bigger than the user has requested.
-     * In this case, <code>drawnShape</code> will serve as a temporary
-     * rectangle with extended coordinates.
+     * Rectangle to be drawn in the component.  This rectange can be different to
+     * {@link #logicalShape} and the latter is so small that it is preferable to draw it a little
+     * bit bigger than the user has requested. In this case, <code>drawnShape</code> will serve as
+     * a temporary rectangle with extended coordinates.
+     *
      * Note: this rectangle should be read only, except in the case of 
      * {@link #update} which is the only method permitted to update it.
      */
     private transient RectangularShape drawnShape;
 
     /**
-     * Affine transform which changes logical coordinates into pixel
-     * coordinates.  It is guaranteed that no method except 
-     * {@link #setTransform} will modify this transformation.
+     * Affine transform which changes logical coordinates into pixel coordinates. It is guaranteed
+     * that no method except {@link #setTransform} will modify this transformation.
      */
     private final AffineTransform transform = new AffineTransform();
 
     /**
-     * Last <em>relative</em> mouse coordinates. This information is
-     * expressed in logical coordinates (according to the
-     * {@link #getTransform} inverse affine transform). The coordinates are
-     * relative to (<var>x</var>,<var>y</var>) corner of the rectangle.
+     * Last <em>relative</em> mouse coordinates. This information is expressed in logical
+     * coordinates (according to the {@link #getTransform} inverse affine transform). The
+     * coordinates are relative to (<var>x</var>,<var>y</var>) corner of the rectangle.
      */
     private transient double mouseDX, mouseDY;
 
     /**
-     * <code>x</code>, <code>y</code>, <code>width</code> and <code>height</code>
-     * coordinates of a box which completely encloses {@link #drawnShape}. These
-     * coordinates must be expressed in <strong>pixels</strong>. If need be, the
-     * affine transform {@link #getTransform} can be used to change pixel coordinates
-     * into logical coordinates and vice versa.
+     * <code>x</code>, <code>y</code>, <code>width</code> and <code>height</code> coordinates of a
+     * box which completely encloses {@link #drawnShape}. These coordinates must be expressed in
+     * <strong>pixels</strong>. If need be, the affine transform {@link #getTransform} can be used
+     * to change pixel coordinates into logical coordinates and vice versa.
      */
     private transient int x, y, width, height;
 
@@ -367,8 +363,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     }
 
     /**
-     * Updates the internal fields of this object.
-     * The adjusted fields will be:
+     * Updates the internal fields of this object. The adjusted fields will be:
      *
      * <ul>
      *   <li>{@link #drawnShape} for the rectangle to be drawn.</li>
@@ -489,7 +484,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * Declares the affine transform which will transform the logical
      * coordinates into pixel coordinates.  This is the affine transform
      * specified in {@link java.awt.Graphics2D#transform} at the moment that
-     * <code>this</code> is drawn. The information contained in this affine
+     * {@code this} is drawn. The information contained in this affine
      * transform is necessary for several of this class's methods to work.
      * It is the programmer's responsability to ensure that this
      * information is always up-to-date.  By default,
@@ -899,7 +894,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * These constants designate the edge which is visible on screen. For
      * example, <code>NORTH</code> always designates the top edge on the
      * screen.  However, this could correspond to another edge of the logical
-     * shape <code>this</code> depending on the affine transform which was 
+     * shape {@code this} depending on the affine transform which was 
      * specified during the last call to {@link #setTransform}. For example,
      * <code>AffineTransform.getScaleInstance(+1,-1)</code> has the effect of
      * inverting the y axis so that the <var>y</var><sub>max</sub> values
@@ -924,7 +919,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * These constants designate the edge which is visible on screen. For
      * example, <code>NORTH</code> always designates the top edge on the
      * screen.  However, this could correspond to another edge of the logical
-     * shape <code>this</code> depending on the affine transform which was 
+     * shape {@code this} depending on the affine transform which was 
      * specified during the last call to {@link #setTransform}. For example,
      * <code>AffineTransform.getScaleInstance(+1,-1)</code> has the effect of
      * inverting the y axis so that the <var>y</var><sub>max</sub> values
@@ -1311,14 +1306,14 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * These constants designate the edge visible on screen.  For example,
      * <code>NORTH</code> always designates the top edge on the screen.
      * However, this could correspond to another edge of the logical
-     * shape <code>this</code> depending on the affine transform which was 
+     * shape {@code this} depending on the affine transform which was 
      * specified during the last call to {@link #setTransform}. For example,
      * <code>AffineTransform.getScaleInstance(+1,-1)</code> has the effect of
      * inverting the y axis so that the <var>y</var><sub>max</sub> values
      * appear to the North rather than the <var>y</var><sub>min</sub> values.
      *
      * @param toRepaint Component to repaint after a field has been edited,
-     *                  or <code>null</code> if there isn't one.
+     *                  or {@code null} if there isn't one.
      *
      * @return       An editor in which the user can specify the position of
      *               one of the edges of the geometric shape.
@@ -1500,7 +1495,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
         private final int side;
 
         /**
-         * Component to repaint after the field is edited, or <code>null</code>
+         * Component to repaint after the field is edited, or {@code null}
          * if there isn't one.
          */
         private final Component toRepaint;
@@ -1524,7 +1519,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
          *        appear to the "North" rather than the
          *        <var>y</var><sub>min</sub> values.
          * @param toRepaint Component to repaint after the field has been
-         *        edited, or <code>null</code> if there isn't one.
+         *        edited, or {@code null} if there isn't one.
          */
         public Control(final JFormattedTextField editor,
                        final boolean             isDate,

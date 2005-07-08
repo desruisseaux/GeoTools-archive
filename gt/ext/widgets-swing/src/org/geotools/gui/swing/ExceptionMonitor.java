@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing;
 
@@ -75,62 +62,51 @@ import org.geotools.resources.GraphicsUtilities;
 
 
 /**
- * Utility which enables exception messages to be displayed in a 
- * <i>Swing</i> component. The standard {@link java.lang.Exception} class
- * contains methods which write the exception to the error console.
- * This <code>ExceptionMonitor</code> class adds static methods which make
- * the message, and eventually the exception trace, appear in a viewer
- * component.
+ * Utility which enables exception messages to be displayed in a <cite>Swing</cite> component. The
+ * standard {@link java.lang.Exception} class contains methods which write the exception to the
+ * error console. This {@code ExceptionMonitor} class adds static methods which make the message,
+ * and eventually the exception trace, appear in a viewer component.
  *
  * <p>&nbsp;</p>
  * <p align="center"><img src="doc-files/ExceptionMonitor.png"></p>
  * <p>&nbsp;</p>
  *
+ * @since 2.0
  * @version $Id: ExceptionMonitor.java,v 1.7 2003/05/13 11:01:39 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
 public final class ExceptionMonitor {
     /**
-     * The creation of <code>ExceptionMonitor</code> class objects is
-     * forbidden.
+     * The creation of {@code ExceptionMonitor} class objects is forbidden.
      */
     private ExceptionMonitor() {
     }
 
     /**
-     * Displays an error message for the specified <code>exception</code>.
-     * Note that this method can be called from any thread (not necessarily
-     * the <i>Swing</i>) thread.
+     * Displays an error message for the specified exception. Note that this method can
+     * be called from any thread (not necessarily the <cite>Swing</cite> thread).
      *
-     * @param owner Component in which the exception is produced, or
-     *        <code>null</code> if component unknown.
-     * @param exception Exception which has been thrown and is to be
-     *        reported to the user.
+     * @param owner Component in which the exception is produced, or {@code null} if unknown.
+     * @param exception Exception which has been thrown and is to be reported to the user.
      */
     public static void show(final Component owner, final Throwable exception) {
         show(owner, exception, null);
     }
 
     /**
-     * Displays an error message for the specified <code>exception</code>.
-     * Note that this method can be called from any thread (not necessarily
-     * the <i>Swing</i>) thread.
+     * Displays an error message for the specified exception. Note that this method can
+     * be called from any thread (not necessarily the <cite>Swing</cite> thread).
      *
-     * @param owner Component in which the exception is produced, or
-     *        <code>null</code> if component unknown.
-     * @param exception Exception which has been thrown and is to be
-     *        reported to the user.
-     * @param message Message to display.  If this parameter is null, 
-     *        {@link Exception#getLocalizedMessage} will be called to obtain
-     *        the message.
+     * @param owner Component in which the exception is produced, or {@code null} if unknown.
+     * @param exception Exception which has been thrown and is to be reported to the user.
+     * @param message Message to display. If this parameter is null, then
+     *        {@link Exception#getLocalizedMessage} will be called to obtain the message.
      */
-    public static void show(final Component owner, final Throwable exception, final String message)
-    {
+    public static void show(final Component owner, final Throwable exception, final String message) {
         if (EventQueue.isDispatchThread()) {
             Pane.show(owner, exception, message);
         } else {
-            final Runnable monitor = new Runnable()
-            {
+            final Runnable monitor = new Runnable() {
                 public void run() {
                     Pane.show(owner, exception, message);
                 }
@@ -138,7 +114,7 @@ public final class ExceptionMonitor {
             try {
                 EventQueue.invokeAndWait(monitor);
             } catch (InterruptedException error) {
-                // We don't want to be allowed to sleep.  Back to work.
+                // Some doesn't want to let us sleep.  Back to work.
             } catch (InvocationTargetException error) {
                 final Throwable e = error.getTargetException();
                 if (e instanceof RuntimeException) throw (RuntimeException)     e;
@@ -149,16 +125,14 @@ public final class ExceptionMonitor {
     }
 
     /**
-     * Writes the specified exception trace in the specified graphics
-     * context.  This method is useful when an exception has occurred
-     * inside a {@link Component#paint} method and we want to write it
-     * rather than leaving an empty window.
+     * Writes the specified exception trace in the specified graphics context.  This method is
+     * useful when an exception has occurred inside a {@link Component#paint} method and we want
+     * to write it rather than leaving an empty window.
      *
-     * @param exception Exception whose trace we want to write.
-     * @param graphics Graphics context in which to write exception.  The
-     *        graphics context should be in its initial state (default affine
-     *        transform, default colour, etc...)
+     * @param graphics Graphics context in which to write exception.  The graphics context should
+     *        be in its initial state (default affine transform, default colour, etc...)
      * @param widgetBounds Size of the trace which was being drawn.
+     * @param exception Exception whose trace we want to write.
      */
     public static void paintStackTrace(final Graphics2D graphics,
                                        final Rectangle  widgetBounds,
@@ -168,13 +142,12 @@ public final class ExceptionMonitor {
     }
 
     /**
-     * Class in charge of displaying any exception messages and eventually
-     * their traces. The message will appear in a dialog box or in an
-     * internal window, depending on the parent.
-     * <strong>Note:</strong> All methods in this class must be called in the
-     * same thread as the <i>Swing</i> thread.
+     * Class in charge of displaying any exception messages and eventually their traces.
+     * The message will appear in a dialog box or in an internal window, depending on the
+     * parent. <strong>Note:</strong> All methods in this class must be called in the
+     * same thread as the <cite>Swing</cite> thread.
      *
-     * @version 1.0
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Pane extends JOptionPane implements ActionListener {
@@ -185,8 +158,7 @@ public final class ExceptionMonitor {
         private static final int WIDTH = 40;
 
         /**
-         * Minimum height (in pixels) of the dialog box when it also displays
-         * the trace.
+         * Minimum height (in pixels) of the dialog box when it also displays the trace.
          */
         private static final int HEIGHT = 300;
     
@@ -197,24 +169,21 @@ public final class ExceptionMonitor {
         private final Component dialog;
 
         /**
-         * Exception to display in the dialog box.
-         * The method {@link Throwable#getLocalizedMessage}
+         * Exception to display in the dialog box. The method {@link Throwable#getLocalizedMessage}
          * will be called to obtain the message to display.
          */
         private final Throwable exception;
     
         /**
-         * Box which will contain the "message" part of the constructed dialog
-         * box.  This box will be expanded if the user asks to see the
-         * exception trace.  It will arrange the components using
-         * {@link BorderLayout}.
+         * Box which will contain the "message" part of the constructed dialog box.  This box
+         * will be expanded if the user asks to see the exception trace.  It will arrange the
+         * components using {@link BorderLayout}.
          */
         private final Container message;
 
         /**
-         * Component displaying the exception trace. Initially, this
-         * component will be null.  It will only be created if the trace
-         * is requested by the user.
+         * Component displaying the exception trace. Initially, this component will be null.
+         * It will only be created if the trace is requested by the user.
          */
         private Component trace;
 
@@ -230,9 +199,8 @@ public final class ExceptionMonitor {
         private final AbstractButton traceButton;
 
         /**
-         * Initial size of the dialog box {@link #dialog}.
-         * This information will be used to return the box to its initial size
-         * when the trace disappears.
+         * Initial size of the dialog box {@link #dialog}. This information will be used to
+         * return the box to its initial size when the trace disappears.
          */
         private final Dimension initialSize;
 
@@ -244,8 +212,7 @@ public final class ExceptionMonitor {
         /**
          * Constructs a pane which will display the specified error message.
          *
-         * @param owner     Parent Component of the dialog box to be
-         *                  created.
+         * @param owner     Parent Component of the dialog box to be created.
          * @param exception Exception we want to report.
          * @param message   Message to display.
          * @param buttons   Buttons to place under the message.  These buttons
@@ -264,10 +231,8 @@ public final class ExceptionMonitor {
             buttons[0].addActionListener(this);
             buttons[1].addActionListener(this);
             /*
-             * Constructs the dialog box.  Automatically detects if we can use
-             * {@link InternalFrame} or if we should be happy with
-             * {@link JDialog}. The exception trace will not be written
-             * immediately.
+             * Constructs the dialog box.  Automatically detects if we can use InternalFrame or if
+             * we should be happy with JDialog. The exception trace will not be written immediately.
              */
             final String classname = Utilities.getShortClassName(exception);
             final String title = resources.getString(ResourceKeys.ERROR_$1, classname);
@@ -292,7 +257,7 @@ public final class ExceptionMonitor {
         /**
          * Constructs and displays a dialog box which informs the user that an
          * exception has been produced.  This method should be called in the
-         * same thread as the <i>Swing</i> thread.
+         * same thread as the Swing thread.
          */
         public static void show(final Component owner, final Throwable exception, String message) {
             final Resources resources = Resources.getResources((owner != null) ? owner.getLocale() : null);
@@ -316,8 +281,7 @@ public final class ExceptionMonitor {
              */
             final JComponent messageBox = new JPanel(new BorderLayout());
             messageBox.add(textArea, BorderLayout.NORTH);
-            final Pane pane = new Pane(owner, exception, messageBox, new AbstractButton[]
-            {
+            final Pane pane = new Pane(owner, exception, messageBox, new AbstractButton[] {
                 new JButton(resources.getString(ResourceKeys.DEBUG)),
                 new JButton(resources.getString(ResourceKeys.CLOSE))
             }, resources);
@@ -408,5 +372,13 @@ public final class ExceptionMonitor {
                 ((JInternalFrame) dialog).dispose();
             }
         }
+    }
+
+    /**
+     * Display a dummy exception. This method is provided only as an easy
+     * way to test the dialog appearance from the command line.
+     */
+    public static void main(final String[] args) {
+        show(null, new Exception());
     }
 }

@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assist�e par Satellite
- *             Institut de Recherche pour le D�veloppement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
@@ -41,7 +32,8 @@ import org.geotools.util.ProgressListener;
 
 
 /**
- * Test {@link ProgressWindow}.
+ * Test {@link ProgressWindow}. The window will be displayed only if this test
+ * is executed through its {@link #main main} method.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -51,6 +43,7 @@ public class ProgressWindowTest extends TestCase {
     /** The source, if any.                */ private static String source;
     /** Text to put in the margin, if any. */ private static String margin;
     /** Warning to print, if any.          */ private static String warning;
+    /** {@code true} for enabling display. */ private static boolean display;
 
     /**
      * Construct the test case.
@@ -69,6 +62,11 @@ public class ProgressWindowTest extends TestCase {
         source      = arguments.getOptionalString("-source");
         margin      = arguments.getOptionalString("-margin");
         warning     = arguments.getOptionalString("-warning");
+        display     = true;
+        if (description == null) description = "Some description";
+        if (source      == null) source      = "Some source";
+        if (margin      == null) margin      = "(1)";
+        if (warning     == null) warning     = "Some warning";
         junit.textui.TestRunner.run(suite());
     }
 
@@ -84,20 +82,20 @@ public class ProgressWindowTest extends TestCase {
      * Test the progress listener with a progress ranging from 0 to 100%
      */
     public void testProgress() throws InterruptedException {
-        try{
-        Thread.currentThread().setPriority(Thread.NORM_PRIORITY-2);
-        final ProgressListener progress = new ProgressWindow(null);
-        progress.setDescription(description);
-        progress.started();
-        for (int i=0; i<=100; i++) {
-            progress.progress(i);
-            Thread.currentThread().sleep(20);
-            if ((i==40 || i==80) && warning!=null) {
-                progress.warningOccurred(source, margin, warning);
+        if (display) try {
+            Thread.currentThread().setPriority(Thread.NORM_PRIORITY-2);
+            final ProgressListener progress = new ProgressWindow(null);
+            progress.setDescription(description);
+            progress.started();
+            for (int i=0; i<=100; i++) {
+                progress.progress(i);
+                Thread.currentThread().sleep(20);
+                if ((i==40 || i==80) && warning!=null) {
+                    progress.warningOccurred(source, margin, warning);
+                }
             }
-        }
-        progress.complete();
-        }catch(HeadlessException e){
+            progress.complete();
+        } catch (HeadlessException e) {
             // do nothing
         }
     }

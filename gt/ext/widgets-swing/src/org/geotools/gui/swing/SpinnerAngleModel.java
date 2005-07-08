@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing;
 
@@ -64,6 +51,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see JSpinner
  * @see SpinnerNumberModel
  *
+ * @since 2.0
  * @version $Id: SpinnerAngleModel.java,v 1.1 2003/07/28 22:41:32 desruisseaux Exp $
  * @author Adapted from Hans Muller
  * @author Martin Desruisseaux
@@ -85,9 +73,8 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
     private double stepSize = 1;
 
     /**
-     * Constructs a <code>SpinnerAngleModel</code> that represents a closed sequence
-     * of angles. Initial minimum and maximum values are choosen according the
-     * <code>value</code> type:
+     * Constructs a {@code SpinnerAngleModel} that represents a closed sequence of angles.
+     * Initial minimum and maximum values are choosen according the {@code value} type:
      *
      * <table>
      *   <tr><td>{@link Longitude}&nbsp;</td> <td>-180° to 180°</td></tr>
@@ -95,8 +82,8 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
      *   <tr><td>{@link Angle}&nbsp;</td>     <td>0° to 360°</td>   </tr>
      * </table>
      *
-     * @param  value the current (non <code>null</code>) value of the model
-     * @throws IllegalArgumentException if <code>value</code> is null.
+     * @param  value the current (non {@code null}) value of the model
+     * @throws IllegalArgumentException if {@code value} is null.
      */
     public SpinnerAngleModel(final Angle value) {
         this.value = value;
@@ -149,9 +136,8 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
     }
 
     /**
-     * Changes the size of the value change computed by the
-     * <code>getNextValue</code> and <code>getPreviousValue</code>
-     * methods.
+     * Changes the size of the value change computed by the {@code getNextValue}
+     * and {@code getPreviousValue} methods.
      */
     public void setStepSize(final double stepSize) {
         if (this.stepSize != stepSize) {
@@ -162,7 +148,7 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
 
     /**
      * Returns the size of the value change computed by the
-     * <code>getNextValue</code> and <code>getPreviousValue</code> methods.
+     * {@code getNextValue} and {@code getPreviousValue} methods.
      */
     public double getStepSize() {
         return stepSize;
@@ -178,7 +164,7 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
     }
 
     /**
-     * Returns <code>value+factor*stepSize</code>.
+     * Returns {@code value + factor * stepSize}.
      */
     private Angle getNextValue(final int factor) {
         final double newValue = value.degrees() + stepSize*factor;
@@ -254,8 +240,7 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
         }
 
         /**
-         * Returns the {@link Object} representation
-         * of the {@link String} <code>text</code>.
+         * Returns the {@link Object} representation of the {@link String} {@code text}.
          */
         public Object stringToValue(final String text) throws ParseException {
             final Object value = super.stringToValue(text);

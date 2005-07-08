@@ -110,15 +110,14 @@ import org.geotools.resources.gui.ResourceKeys;
 
 
 /**
- * Base class for widget with a zoomable content. User can perform zooms using
- * keyboard, menu or mouse. <code>ZoomPane</code> is an abstract class.
- * Subclass must override at least two methods:
- *
+ * Base class for widget with a zoomable content. User can perform zooms using keyboard, menu
+ * or mouse. {@code ZoomPane} is an abstract class. Subclass must override at least two methods:
+ * <p>
  * <ul>
- *   <li>{@link #getArea()}, which must return a bounding box for the content
- *       to paint. This area can be expressed in arbitrary units. For example,
- *       an object wanting to display a geographic map with a content ranging
- *       from 10° to 15°E and 40° to 45°N should override this method as follows:
+ *   <li>{@link #getArea()}, which must return a bounding box for the content to paint. This
+ *       area can be expressed in arbitrary units. For example, an object wanting to display a
+ *       geographic map with a content ranging from 10° to 15°E and 40° to 45°N should override
+ *       this method as follows:
  *
  *       <pre>
  *       &nbsp;public Rectangle2D getArea() {
@@ -131,13 +130,11 @@ import org.geotools.resources.gui.ResourceKeys;
  *
  *                    <code>graphics.transform({link #zoom})</code>
  *
- *       somewhere in its code in order to perform the zoom. Note that, by
- *       default, the {@linkplain #zoom} is initialized in such a way that
- *       the <var>y</var> axis points upwards, like the convention in
- *       geometry. This is as opposed to the default Java2D axis orientation,
- *       where the <var>y</var> axis points downwards. If the implementation
- *       wants to paint text, it should do this with the default transform.
- *       Example:
+ *       somewhere in its code in order to perform the zoom. Note that, by default, the
+ *       {@linkplain #zoom} is initialized in such a way that the <var>y</var> axis points upwards,
+ *       like the convention in geometry. This is as opposed to the default Java2D axis orientation,
+ *       where the <var>y</var> axis points downwards. If the implementation wants to paint text,
+ *       it should do this with the default transform. Example:
  *
  *       <pre>
  *       &nbsp;protected void paintComponent(final Graphics2D graphics) {
@@ -155,22 +152,20 @@ import org.geotools.resources.gui.ResourceKeys;
  *       &nbsp;}
  *       </pre></li>
  * </ul>
- *
- * Subclass can also override {@link #reset}, which sets up the initial
- * {@linkplain #zoom}. The default implementation sets up the initial zoom
- * in such a way that the following relations are approximately held:
+ * <p>
+ * Subclass can also override {@link #reset}, which sets up the initial {@linkplain #zoom}. The
+ * default implementation sets up the initial zoom in such a way that the following relations are
+ * approximately held:
  *
  * <blockquote><cite>
- * Logical coordinates provided by {@link #getPreferredArea()},
- * after an affine transform described by {@link #zoom},
- * match pixel coordinates provided by {@link #getZoomableBounds(Rectangle)}.
+ * Logical coordinates provided by {@link #getPreferredArea()}, after an affine transform described
+ * by {@link #zoom}, match pixel coordinates provided by {@link #getZoomableBounds(Rectangle)}.
  * </cite></blockquote>
  *
- * The "preferred area" is initially the same as {@link #getArea()}. The user
- * can specify a different preferred area with {@link #setPreferredArea}. The
- * user can also reduce zoomable bounds by inserting an empty border around the
- * widget,
- * e.g.:
+ * <p>
+ * The "preferred area" is initially the same as {@link #getArea()}. The user can specify a
+ * different preferred area with {@link #setPreferredArea}. The user can also reduce zoomable
+ * bounds by inserting an empty border around the widget, e.g.:
  *
  * <pre>
  * &nbsp;setBorder(BorderFactory.createEmptyBorder(top, left, bottom, right));
@@ -178,11 +173,10 @@ import org.geotools.resources.gui.ResourceKeys;
  *
  * <p>&nbsp;</p>
  * <h2>Zoom actions</h2>
- * Whatever action is performed by the user, all zoom commands are translated
- * by calls to {@link #transform}. Derived classes can redefine this method
- * if they want to take particular actions during zooms, for example, modifying
- * the minimum and maximum of a graph's axes.  The table below shows the 
- * keyboard presses assigned to each zoom:
+ * Whatever action is performed by the user, all zoom commands are translated as calls to
+ * {@link #transform}. Derived classes can redefine this method if they want to take particular
+ * actions during zooms, for example, modifying the minimum and maximum of a graph's axes.
+ * The table below shows the keyboard presses assigned to each zoom:
  *
  * <P><TABLE ALIGN="CENTER" BORDER="2">
  * <TR BGCOLOR="#CCCCFF"><TH>Key</TH>                      <TH>Purpose</TH>     <TH>{@link Action} name</TH></TR>
@@ -199,16 +193,16 @@ import org.geotools.resources.gui.ResourceKeys;
  * <TR><TD>Ctrl+<IMG SRC="doc-files/keyboard/right.png"></TD><TD>Clockwise rotation</TD>     <TD><code>"RotateRight"</code></TD></TR>
  * </TABLE></P>
  *
- * In this table, the last column gives the Strings by which the different
- * actions which manage the zooms. For example, to zoom in, we must write
+ * In this table, the last column gives the Strings by which the different actions
+ * which manage the zooms. For example, to zoom in, we must write
  * <code>{@link #getActionMap() getActionMap()}.get("ZoomIn")</code>.
  *
- * <p><strong>Note: {@link JScrollPane} objects are not suitable for adding
- * scrollbars to a <code>ZoomPane</code>object.</strong>
- * Instead, use {@link #createScrollPane}. Once more, all movements performed
- * by the user through the scrollbars will be translated by calls to
+ * <p><strong>Note: {@link JScrollPane} objects are not suitable for adding scrollbars to a
+ * {@code ZoomPane}object.</strong> Instead, use {@link #createScrollPane}. Once again, all
+ * movements performed by the user through the scrollbars will be translated by calls to
  * {@link #transform}.</p>
  *
+ * @since 2.0
  * @version $Id: ZoomPane.java,v 1.16 2004/02/16 20:49:35 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
@@ -249,12 +243,10 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     public static final int SCALE_Y = (1 << 1);
 
     /**
-     * Constant indicating the scale changes on the <var>x</var> and
-     * <var>y</var> axes, with the added condition that these changes
-     * must be uniform.  This flag combines {@link #SCALE_X} and
-     * {@link #SCALE_Y}. The inverse, however, 
-     * (<code>{@link #SCALE_X}|{@link #SCALE_Y}</code>) doesn't involve
-     * <code>UNIFORM_SCALE</code>.
+     * Constant indicating the scale changes on the <var>x</var> and <var>y</var> axes, with the
+     * added condition that these changes must be uniform.  This flag combines {@link #SCALE_X}
+     * and {@link #SCALE_Y}. The inverse, however, (<code>{@link #SCALE_X}|{@link #SCALE_Y}</code>)
+     * doesn't imply <code>UNIFORM_SCALE</code>.
      */
     public static final int UNIFORM_SCALE = SCALE_X | SCALE_Y | (1 << 2);
 
@@ -274,16 +266,15 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     public static final int ROTATE  = (1 << 5);
 
     /**
-     * Constant indicating the resetting of scale, rotation and translation
-     * to a default value which makes the whole graphic appear in a window.
-     * This command is translated by a call to {@link #reset}.
+     * Constant indicating the resetting of scale, rotation and translation to a default value
+     * which makes the whole graphic appear in a window. This command is translated by a call
+     * to {@link #reset}.
      */
     public static final int RESET = (1 << 6);
 
     /**
-     * Constant indicating default zoom close to the maximum permitted zoom.
-     * This zoom should allow details of the graphic to be seen without being
-     * overly big.
+     * Constant indicating default zoom close to the maximum permitted zoom. This zoom should
+     * allow details of the graphic to be seen without being overly big.
      * Note: this flag will only have any effect if at least one of the
      * {@link #SCALE_X} and {@link #SCALE_Y} flags is not also specified.
      */
@@ -292,11 +283,11 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     /**
      * Mask representing the combination of all flags.
      */
-    private static final int MASK = SCALE_X | SCALE_Y | UNIFORM_SCALE | TRANSLATE_X | TRANSLATE_Y | ROTATE | RESET | DEFAULT_ZOOM;
+    private static final int MASK = SCALE_X | SCALE_Y | UNIFORM_SCALE | TRANSLATE_X | TRANSLATE_Y |
+                                    ROTATE | RESET | DEFAULT_ZOOM;
 
     /**
-     * Number of pixels by which to move the content of
-     * <code>ZoomPane</code> during translations.
+     * Number of pixels by which to move the content of {@code ZoomPane} during translations.
      */
     private static final double AMOUNT_TRANSLATE = 10;
 
@@ -332,9 +323,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     private static final int IS_PRINTING = 2;
 
     /**
-     * List of keys which will identify the zoom actions.
-     * These keys also identify the resources to use in order to make the 
-     * description appear in the user's language.
+     * List of keys which will identify the zoom actions. These keys also identify the resources
+     * to use in order to make the description appear in the user's language.
      */
     private static final String[] ACTION_ID = {
         /*[0] Left        */ "Left",
@@ -350,8 +340,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     };
 
     /**
-     * List of resource keys, to construct the menus
-     * in the user's language.
+     * List of resource keys, to construct the menus in the user's language.
      */
     private static final int[] RESOURCE_ID = {
         /*[0] Left        */ ResourceKeys.LEFT,
@@ -372,11 +361,10 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.gui.swing");
 
     /**
-     * List of default keystrokes used to perform zooms.
-     * The elements of this table go in pairs.  The even indexes indicate
-     * the keystroke whilst the odd indexes indicate the modifier
-     * (CTRL or SHIFT for example). To obtain the {@link KeyStroke} object
-     * for a numbered action <var>i</var>, we can use the following code:
+     * List of default keystrokes used to perform zooms. The elements of this table go in pairs.
+     * The even indexes indicate the keystroke whilst the odd indexes indicate the modifier
+     * (CTRL or SHIFT for example). To obtain the {@link KeyStroke} object for a numbered action
+     * <var>i</var>, we can use the following code:
      * 
      * <blockquote><pre>
      * final int key=DEFAULT_KEYBOARD[(i << 1)+0];
@@ -398,8 +386,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     };
 
     /**
-     * Connstants indicating the type of action to perform:
-     * translation, zoom or rotation.
+     * Connstants indicating the type of action to perform: translation, zoom or rotation.
      */
     private static final short[] ACTION_TYPE = {
         /*[0] Left        */ (short) TRANSLATE_X,
@@ -415,8 +402,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     };
 
     /**
-     * Amounts by which to translate, zoom or rotate
-     * the contents of the window.
+     * Amounts by which to translate, zoom or rotate the contents of the window.
      */
     private static final double[] ACTION_AMOUNT = {
         /*[0] Left        */  +AMOUNT_TRANSLATE,
@@ -442,8 +428,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     };
 
     /**
-     * <code>ComponentUI</code> object in charge of obtaining the preferred
-     * size of a <code>ZoomPane</code> object as well as drawing it.
+     * {@code ComponentUI} object in charge of obtaining the preferred
+     * size of a {@code ZoomPane} object as well as drawing it.
      */
     private static final ComponentUI UI = new ComponentUI() {
         /**
@@ -539,11 +525,10 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     };
 
     /**
-     * Class responsible for listening out for the different events necessary
-     * for the smooth working of {@link ZoomPane}. This class will listen out
-     * for mouse clicks (in order to eventually claim the focus or make a
-     * contextual menu appear).  It will listen out for changes in the size
-     * of the component (to adjust the zoom), etc.
+     * Class responsible for listening out for the different events necessary for the smooth
+     * working of {@link ZoomPane}. This class will listen out for mouse clicks (in order to
+     * eventually claim the focus or make a contextual menu appear).  It will listen out for
+     * changes in the size of the component (to adjust the zoom), etc.
      *
      * @version $Id: ZoomPane.java,v 1.16 2004/02/16 20:49:35 desruisseaux Exp $
      * @author Martin Desruisseaux
@@ -561,9 +546,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Affine transform containing zoom factors, translations and rotations.
-     * During the painting of a component, this affine transform should be
-     * combined with a call to 
+     * Affine transform containing zoom factors, translations and rotations. During the
+     * painting of a component, this affine transform should be combined with a call to 
      * <code>{@link Graphics2D#transform(AffineTransform) Graphics2D.transform}(zoom)</code>.
      */
     protected final AffineTransform zoom = new AffineTransform();
@@ -574,29 +558,26 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     private boolean zoomIsReset;
 
     /**
-     * Types of zoom permitted.  This field should be a combination of the
-     * constants {@link #SCALE_X}, {@link #SCALE_Y}, {@link #TRANSLATE_X},
-     * {@link #TRANSLATE_Y}, {@link #ROTATE}, {@link #RESET} and
-     * {@link #DEFAULT_ZOOM}.
+     * Types of zoom permitted.  This field should be a combination of the constants
+     * {@link #SCALE_X}, {@link #SCALE_Y}, {@link #TRANSLATE_X}, {@link #TRANSLATE_Y},
+     * {@link #ROTATE}, {@link #RESET} and {@link #DEFAULT_ZOOM}.
      */
     private final int type;
 
     /**
-     * Strategy to follow in order to calculate the initial affine transform.
-     * The value <code>true</code> indicates that the content should fill the
-     * entire panel, even if it means losing some of the edges. The value
-     * <code>false</code> indicates, on the contrary, that we should display
-     * the entire contents, even if it means leaving blank spaces in the panel.
+     * Strategy to follow in order to calculate the initial affine transform. The value
+     * {@code true} indicates that the content should fill the entire panel, even if it
+     * means losing some of the edges. The value {@code false} indicates, on the contrary,
+     * that we should display the entire contents, even if it means leaving blank spaces in
+     * the panel.
      */
     private boolean fillPanel = false;
 
     /**
-     * Rectangle representing the logical coordinates of the visible region.
-     * This information is used to keep the same region when the size or 
-     * position of the component changes.  Initially, this rectangle is empty.
-     * It will only stop being empty if {@link #reset} is called and 
-     * {@link #getPreferredArea} and {@link #getZoomableBounds} have both 
-     * returned valid coordinates.
+     * Rectangle representing the logical coordinates of the visible region. This information is
+     * used to keep the same region when the size or position of the component changes. Initially,
+     * this rectangle is empty. It will only stop being empty if {@link #reset} is called and 
+     * {@link #getPreferredArea} and {@link #getZoomableBounds} have both returned valid coordinates.
      *
      * @see #getVisibleArea
      * @see #setVisibleArea
@@ -604,9 +585,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     private final Rectangle2D visibleArea = new Rectangle2D.Double();
 
     /**
-     * Rectangle representing the logical coordinates of the region to 
-     * display initially, the first time that the window is displayed.
-     * The value <code>null</code> indicates a call to {@link #getArea}.
+     * Rectangle representing the logical coordinates of the region to display initially, the first
+     * time that the window is displayed. The value {@code null} indicates a call to {@link #getArea}.
      *
      * @see #getPreferredArea
      * @see #setPreferredArea
@@ -614,25 +594,23 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     private Rectangle2D preferredArea;
 
     /**
-     * Menu to display when the user right clicks with their mouse.  This menu
-     * will contain the navigation options.
+     * Menu to display when the user right clicks with their mouse.
+     * This menu will contain the navigation options.
      *
      * @see #getPopupMenu
      */
     private transient PointPopupMenu navigationPopupMenu;
 
     /**
-     * Flag indicating which part of the paint is in progress.  The permitted
-     * values are {@link #IS_PAINTING}, {@link #IS_PAINTING_MAGNIFIER} and
-     * {@link #IS_PRINTING}.
+     * Flag indicating which part of the paint is in progress.  The permitted values are
+     * {@link #IS_PAINTING}, {@link #IS_PAINTING_MAGNIFIER} and {@link #IS_PRINTING}.
      */
     private transient int flag;
 
     /**
-     * Indicates if this <code>ZoomPane</code> object should be repainted when
-     * the user adjusts the scrollbars.  The default value is <code>false</code>,
-     * which means that <code>ZoomPane</code> will wait until the user has 
-     * released the scrollbar before repainting the component.
+     * Indicates if this {@code ZoomPane} object should be repainted when the user adjusts the
+     * scrollbars.  The default value is {@code false}, which means that {@code ZoomPane} will
+     * wait until the user has released the scrollbar before repainting the component.
      *
      * @see #isPaintingWhileAdjusting
      * @see #setPaintingWhileAdjusting
@@ -640,35 +618,31 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     private boolean paintingWhileAdjusting;
 
     /**
-     * Rectangle in which to place the coordinates returned by
-     * {@link #getZoomableBounds}. This object is defined in order to avoid
-     * allocating objects too often {@link Rectangle}.
+     * Rectangle in which to place the coordinates returned by {@link #getZoomableBounds}. This
+     * object is defined in order to avoid allocating objects too often {@link Rectangle}.
      */
     private transient Rectangle cachedBounds;
 
     /**
-     * Object in which to record the result of {@link #getInsets}.
-     * Used in order to avoid {@link #getZoomableBounds} allocating
-     * {@link Insets} objects too often.
+     * Object in which to record the result of {@link #getInsets}. Used in order to avoid
+     * {@link #getZoomableBounds} allocating {@link Insets} objects too often.
      */
     private transient Insets cachedInsets;
 
     /**
-     * Indicates whether the user is authorised to display
-     * the magnifying glass.  The default value is <code>true</code>.
+     * Indicates whether the user is authorised to display the magnifying glass.
+     * The default value is {@code true}.
      */
     private boolean magnifierEnabled = true;
 
     /**
-     * Magnification factor inside the magnifying glass.
-     * This factor must be greater than 1.
+     * Magnification factor inside the magnifying glass. This factor must be greater than 1.
      */
     private double magnifierPower = 4;
 
     /**
-     * Geometric shape in which to magnify.  The coordinates of this
-     * shape should be expressed in pixels.  The value <code>null</code>
-     * means that no magnifying glass will be drawn.
+     * Geometric shape in which to magnify.  The coordinates of this shape should be expressed
+     * in pixels.  The value {@code null} means that no magnifying glass will be drawn.
      */
     private transient MouseReshapeTracker magnifier;
 
@@ -683,14 +657,12 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     private Paint magnifierBorder = DEFAULT_MAGNIFIER_BORDER;
 
     /**
-     * Construct a <code>ZoomPane</code>.
+     * Construct a {@code ZoomPane}.
      *
-     * @param  type Allowed zoom type. It can be a bitwise combination of the
-     *         following constants:
-     *             {@link #SCALE_X}, {@link #SCALE_Y}, {@link #UNIFORM_SCALE},
-     *             {@link #TRANSLATE_X}, {@link #TRANSLATE_Y},
-     *             {@link #ROTATE}, {@link #RESET} and {@link #DEFAULT_ZOOM}.
-     * @throws IllegalArgumentException If <code>type</code> is invalid.
+     * @param  type Allowed zoom type. It can be a bitwise combination of the following constants:
+     *             {@link #SCALE_X}, {@link #SCALE_Y}, {@link #UNIFORM_SCALE}, {@link #TRANSLATE_X},
+     *             {@link #TRANSLATE_Y}, {@link #ROTATE}, {@link #RESET} and {@link #DEFAULT_ZOOM}.
+     * @throws IllegalArgumentException If {@code type} is invalid.
      */
     public ZoomPane(final int type) throws IllegalArgumentException {
         if ((type & ~MASK) != 0) {
@@ -710,8 +682,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
                 final KeyStroke stroke = KeyStroke.getKeyStroke(keyboard, modifier);
                 final Action    action = new AbstractAction() {
                     /*
-                     * Action to perform when a key has been hit
-                     * or the mouse clicked.
+                     * Action to perform when a key has been hit or the mouse clicked.
                      */
                     public void actionPerformed(final ActionEvent event) {
                         Point          point = null;
@@ -746,11 +717,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
             }
         }
         /*
-         * Adds an object which will be in charge of listening
-         * for mouse clicks in order to display a contextual
-         * menu, as well as an object which will be in charge of
-         * listening for mouse movements in order to perform
-         * zooms.
+         * Adds an object which will be in charge of listening for mouse clicks in order to
+         * display a contextual menu, as well as an object which will be in charge of listening
+         * for mouse movements in order to perform zooms.
          */
         final Listeners listeners = new Listeners();
         addComponentListener  (listeners);
@@ -766,35 +735,30 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Reinitializes the affine transform {@link #zoom} in order to cancel
-     * any zoom, rotation or translation.  The default implementation 
-     * initializes the affine transform {@link #zoom} in order to make the
-     * <var>y</var> axis point upwards and make the whole of the region covered
+     * Reinitializes the affine transform {@link #zoom} in order to cancel any zoom, rotation or
+     * translation.  The default implementation initializes the affine transform {@link #zoom} in
+     * order to make the <var>y</var> axis point upwards and make the whole of the region covered
      * by the {@link #getPreferredArea} logical coordinates appear in the panel.
-     *<br><br>
-     * Note: for the derived classes: <code>reset()</code> is <u>the only</u>
-     * method of <code>ZoomPane</code> which doesn't have to pass through
-     * {@link #transform(AffineTransform)} to modify the zoom.  This exception
-     * is necessary to avoid falling into an infinite loop.
+     * <p>
+     * Note: for the derived classes: {@code reset()} is <u>the only</u> method of {@code ZoomPane}
+     * which doesn't have to pass through {@link #transform(AffineTransform)} to modify the zoom.
+     * This exception is necessary to avoid falling into an infinite loop.
      */
     public void reset() {
         reset(getZoomableBounds(), true);
     }
 
     /**
-     * Reinitializes the affine transform {@link #zoom} in order to cancel
-     * any zoom, rotation or translation. The argument <code>yAxisUpward</code>
-     * indicates whether the <var>y</var> axis should point upwards.  The value
-     * <code>false</code> lets it point downwards. This method is offered
-     * for convenience sake for derived classes which want to redefine
-     * {@link #reset()}.
+     * Reinitializes the affine transform {@link #zoom} in order to cancel any zoom, rotation or
+     * translation. The argument {@code yAxisUpward} indicates whether the <var>y</var> axis should
+     * point upwards.  The value {@code false} lets it point downwards. This method is offered
+     * for convenience sake for derived classes which want to redefine {@link #reset()}.
      *
-     * @param zoomableBounds Coordinates, in pixels, of the screen space in
-     *                       which to draw.  This argument will usually be
-     *                       <code>{@link #getZoomableBounds(Rectangle)
-     *                                     getZoomableBounds}(null)</code>.
-     * @param yAxisUpward    <code>true</code> if the <var>y</var> axis should
-     *                       point upwards rather than downwards.
+     * @param zoomableBounds Coordinates, in pixels, of the screen space in which to draw.
+     *        This argument will usually be
+     *        <code>{@link #getZoomableBounds(Rectangle) getZoomableBounds}(null)</code>.
+     * @param yAxisUpward {@code true} if the <var>y</var> axis should point upwards rather than
+     *        downwards.
      */
     protected final void reset(final Rectangle zoomableBounds,
                                final boolean yAxisUpward) {
@@ -836,46 +800,41 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Set the policy for the zoom when the content is initially drawn
-     * or when the user resets the zoom. Value <code>true</code> means that
-     * the panel should initially be completely filled, even if the content
-     * partially falls outside the panel's bounds. Value <code>false</code>
-     * means that the full content should appear in the panel, even if some
-     * space is not used. Default value is <code>false</code>.
+     * Set the policy for the zoom when the content is initially drawn or when the user resets the
+     * zoom. Value {@code true} means that the panel should initially be completely filled, even if
+     * the content partially falls outside the panel's bounds. Value {@code false} means that the
+     * full content should appear in the panel, even if some space is not used. Default value is
+     * {@code false}.
      */
     protected void setResetPolicy(final boolean fill) {
         fillPanel = fill;
     }
 
     /**
-     * Returns a bounding box that contains the logical coordinates of all
-     * data that may be displayed in this <code>ZoomPane</code>. For example,
-     * if this <code>ZoomPane</code> is to display a geographic map, then
-     * this method should return the map's bounds in degrees of latitude
-     * and longitude. This bounding box is completely independent of any
-     * current zoom setting and will change only if the content changes.
+     * Returns a bounding box that contains the logical coordinates of all data that may be
+     * displayed in this {@code ZoomPane}. For example, if this {@code ZoomPane} is to display
+     * a geographic map, then this method should return the map's bounds in degrees of latitude
+     * and longitude. This bounding box is completely independent of any current zoom setting and
+     * will change only if the content changes.
      *
-     * @return A bounding box for the logical coordinates of all contents
-     *         that are going to be drawn in this <code>ZoomPane</code>. If
-     *         this bounding box is unknown, then this method can return
-     *         <code>null</code> (but this is not recommended).
+     * @return A bounding box for the logical coordinates of all contents that are going to be
+     *         drawn in this {@code ZoomPane}. If this bounding box is unknown, then this method
+     *         can return {@code null} (but this is not recommended).
      */
     public abstract Rectangle2D getArea();
 
     /**
-     * Indicates whether the logical coordinates of a region have been defined.
-     * This method returns <code>true</code> if {@link #setPreferredArea} has
-     * been called with a non null argument.
+     * Indicates whether the logical coordinates of a region have been defined. This method returns
+     * {@code true} if {@link #setPreferredArea} has been called with a non null argument.
      */
     public final boolean hasPreferredArea() {
         return preferredArea != null;
     }
 
     /**
-     * Returns the logical coordinates of the region that we want to see
-     * displayed the first time that <code>ZoomPane</code> appears on the
-     * screen.  This region will also be displayed each time the method
-     * {link #reset} is called. The default implementation goes as follows:
+     * Returns the logical coordinates of the region that we want to see displayed the first time
+     * that {@code ZoomPane} appears on the screen.  This region will also be displayed each time
+     * the method {link #reset} is called. The default implementation goes as follows:
      *
      * <ul>
      *   <li>If a region has already been defined by a call to
@@ -884,17 +843,16 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * </ul>
      *
      * @return The logical coordinates of the region to be initially displayed,
-     *         or <code>null</code> if these coordinates are unknown.
+     *         or {@code null} if these coordinates are unknown.
      */
     public final Rectangle2D getPreferredArea() {
         return (preferredArea != null) ? (Rectangle2D) preferredArea.clone() : getArea();
     }
 
     /**
-     * Specifies the logical coordinates of the region that we want to see
-     * displayed the first time that <code>ZoomPane</code> appears on the screen.
-     * This region will also be displayed the first time that the method
-     * {link #reset} is called.
+     * Specifies the logical coordinates of the region that we want to see displayed the first time
+     * that {@code ZoomPane} appears on the screen. This region will also be displayed the first
+     * time that the method {link #reset} is called.
      */
     public final void setPreferredArea(final Rectangle2D area) {
         if (area != null) {
@@ -916,10 +874,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Returns the logical coordinates of the region visible on the screen.
-     * In the case of a geographic map, for example, the logical coordinates
-     * can be expressed in degrees of latitude/longitude or even in metres
-     * if a cartographic projection has been defined.
+     * Returns the logical coordinates of the region visible on the screen. In the case of a
+     * geographic map, for example, the logical coordinates can be expressed in degrees of
+     * latitude/longitude or even in metres if a cartographic projection has been defined.
      */
     public final Rectangle2D getVisibleArea() {
         return getVisibleArea(getZoomableBounds());
@@ -945,41 +902,38 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Defines the limits of the visible part, in logical coordinates.  This
-     * method will modify the zoom and the translation in order to display the
-     * specified region. If {@link #zoom} contains a rotation, this rotation
-     * will not be modified.
+     * Defines the limits of the visible part, in logical coordinates.  This method will modify the
+     * zoom and the translation in order to display the specified region. If {@link #zoom} contains
+     * a rotation, this rotation will not be modified.
      *
      * @param  logicalBounds Logical coordinates of the region to be displayed.
-     * @throws IllegalArgumentException if <code>source</code> is empty.
+     * @throws IllegalArgumentException if {@code source} is empty.
      */
-    public void setVisibleArea(final Rectangle2D logicalBounds) 
-           throws IllegalArgumentException {
+    public void setVisibleArea(final Rectangle2D logicalBounds) throws IllegalArgumentException {
         log("setVisibleArea", logicalBounds);
         transform(setVisibleArea(logicalBounds, getZoomableBounds(), 0));
     }
 
     /**
-     * Defines the limits of the visible part, in logical coordinates.  This
-     * method will modify the zoom and the translation in order to display the
-     * specified region.  If {@link #zoom} contains a rotation, this rotation
-     * will not be modified.
+     * Defines the limits of the visible part, in logical coordinates.  This method will modify the
+     * zoom and the translation in order to display the specified region. If {@link #zoom} contains
+     * a rotation, this rotation will not be modified.
      *
      * @param  source Logical coordinates of the region to be displayed.
-     * @param  dest Pixel coordinates of the region of the window in which to 
+     * @param  dest Pixel coordinates of the region of the window in which to
      *         draw (normally {@link #getZoomableBounds()}).
      * @param  mask A mask to <code>OR</code> with the {@link #type} for determining which
      *         kind of transformation are allowed. The {@link #type} is not modified.
      * @return Change to apply to the affine transform {@link #zoom}.
-     * @throws IllegalArgumentException if <code>source</code> is empty.
+     * @throws IllegalArgumentException if {@code source} is empty.
      */
     private AffineTransform setVisibleArea(Rectangle2D source, Rectangle2D dest, int mask)
-                                           throws IllegalArgumentException {
+                                           throws IllegalArgumentException
+    {
         /*
-         * Verifies the validity of the rectangle <code>source</code>. An
-         * invalid rectangle will be rejected. However, we will be more
-         * flexible for <code>dest</code> since the window could have been
-         * reduced by the user.
+         * Verifies the validity of the source rectangle. An invalid rectangle will be rejected.
+         * However, we will be more flexible for dest since the window could have been reduced by
+         * the user.
          */
         if (!isValid(source)) {
             throw new IllegalArgumentException(Resources.format(
@@ -989,9 +943,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
             return new AffineTransform();
         }
         /*
-         * Converts the destination into logical coordinates.  We can
-         * then perform a zoom and a translation which would put
-         * <code>source</code> in <code>dest</code>.
+         * Converts the destination into logical coordinates.  We can then perform
+         * a zoom and a translation which would put {@code source} in {@code dest}.
          */
         try {
             dest = XAffineTransform.inverseTransform(zoom, dest, null);
@@ -1040,11 +993,11 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * Returns the bounding box (in pixel coordinates) of the zoomable area.
      * <strong>For performance reasons, this method reuses an internal cache.
      * Never modify the returned rectangle!</strong>. This internal method
-     * is invoked by every method looking for this <code>ZoomPane</code>
+     * is invoked by every method looking for this {@code ZoomPane}
      * dimension.
      *
      * @return The bounding box of the zoomable area, in pixel coordinates
-     *         relative to this <code>ZoomPane</code> widget. <strong>Do not
+     *         relative to this {@code ZoomPane} widget. <strong>Do not
      *         change the returned rectangle!</strong>
      */
     private final Rectangle getZoomableBounds() {
@@ -1052,31 +1005,27 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
     
     /**
-     * Returns the bounding box (in pixel coordinates) of the zoomable area.
-     * This method is similar to {@link #getBounds(Rectangle)}, except that
-     * the zoomable area may be smaller than the whole widget area.
-     * For example, a chart needs to keep some space for axes around the
-     * zoomable area. Another difference is that pixel coordinates are
-     * relative to the widget, i.e. the (0,0) coordinate lies on the
-     * <code>ZoomPane</code> upper left corner, no matter what its location
-     * on screen.<br>
-     * <br>
-     * <code>ZoomPane</code> invokes <code>getZoomableBounds</code> when it
-     * needs to set up an initial {@link #zoom} value. Subclasses should also
-     * set the clip area to this bounding box in their
-     * {@link #paintComponent(Graphics2D)} method <em>before</em> setting the
-     * graphics transform. For example:
+     * Returns the bounding box (in pixel coordinates) of the zoomable area. This method is similar
+     * to {@link #getBounds(Rectangle)}, except that the zoomable area may be smaller than the whole
+     * widget area. For example, a chart needs to keep some space for axes around the zoomable area.
+     * Another difference is that pixel coordinates are relative to the widget, i.e. the (0,0)
+     * coordinate lies on the {@code ZoomPane} upper left corner, no matter what its location on
+     * screen.
+     * <p>
+     * {@code ZoomPane} invokes {@code getZoomableBounds} when it needs to set up an initial
+     * {@link #zoom} value. Subclasses should also set the clip area to this bounding box in their
+     * {@link #paintComponent(Graphics2D)} method <em>before</em> setting the graphics transform.
+     * For example:
      *
      * <blockquote><pre>
      * graphics.clip(getZoomableBounds(null));
      * graphics.transform({@link #zoom});
      * </pre></blockquote>
      *
-     * @param  bounds An optional pre-allocated rectangle, or <code>null</code>
-     *                to create a new one. This argument is useful if the caller
-     *                wants to avoid allocating a new object on the heap.
+     * @param  bounds An optional pre-allocated rectangle, or {@code null} to create a new one. This
+     *         argument is useful if the caller wants to avoid allocating a new object on the heap.
      * @return The bounding box of the zoomable area, in pixel coordinates
-     *         relative to this <code>ZoomPane</code> widget.
+     *         relative to this {@code ZoomPane} widget.
      */
     protected Rectangle getZoomableBounds(Rectangle bounds) {
         Insets insets;
@@ -1095,9 +1044,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Returns the default size for this component.  This is the size
-     * returned by {@link #getPreferredSize} if no preferred size has
-     * been explicitly set with {@link #setPreferredSize}.
+     * Returns the default size for this component.  This is the size returned by
+     * {@link #getPreferredSize} if no preferred size has been explicitly set with
+     * {@link #setPreferredSize}.
      *
      * @return The default size for this component.
      */
@@ -1106,11 +1055,10 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Returns the preferred pixel size for a close zoom. For image rendering,
-     * the preferred pixel size is the image's pixel size in logical units. For
-     * other kinds of rendering, this "pixel" size should be some reasonable
-     * resolution. The default implementation computes a default value from
-     * {@link #getArea}.
+     * Returns the preferred pixel size for a close zoom. For image rendering, the preferred pixel
+     * size is the image's pixel size in logical units. For other kinds of rendering, this "pixel"
+     * size should be some reasonable resolution. The default implementation computes a default
+     * value from {@link #getArea}.
      */
     protected Dimension2D getPreferredPixelSize() {
         final Rectangle2D area = getArea();
@@ -1124,20 +1072,18 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Returns the current {@linkplain #zoom} scale factor. A value of
-     * 1/100 means that 100 metres are displayed as 1 pixel (provided
-     * that the logical coordinates of {@link #getArea} are expressed
-     * in metres). Scale factors for X and Y axes can be computed
-     * separately using the following equations:
+     * Returns the current {@linkplain #zoom} scale factor. A value of 1/100 means that 100 metres
+     * are displayed as 1 pixel (provided that the logical coordinates of {@link #getArea} are
+     * expressed in metres). Scale factors for X and Y axes can be computed separately using the
+     * following equations:
      *
      * <table cellspacing=3><tr>
      * <td width=50%><IMG src="doc-files/scaleX.png"></td>
      * <td width=50%><IMG src="doc-files/scaleY.png"></td>
      * </tr></table>
      *
-     * This method combines scale along both axes, which is correct
-     * if this <code>ZoomPane</code> has been constructed with the
-     * {@link #UNIFORM_SCALE} type.
+     * This method combines scale along both axes, which is correct if this {@code ZoomPane} has
+     * been constructed with the {@link #UNIFORM_SCALE} type.
      */
     public double getScaleFactor() {
         final double m00 = zoom.getScaleX();
@@ -1148,10 +1094,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Changes the {@linkplain #zoom} by applying an affine transform. The
-     * <code>change</code> transform must express a change in logical units,
-     * for example, a translation in metres. This method is conceptually
-     * similar to the following code:
+     * Changes the {@linkplain #zoom} by applying an affine transform. The {@code change} transform
+     * must express a change in logical units, for example, a translation in metres. This method is
+     * conceptually similar to the following code:
      *
      * <pre>
      * {@link #zoom}.{@link AffineTransform#concatenate(AffineTransform) concatenate}(change);
@@ -1159,9 +1104,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * {@link #repaint() repaint}({@link #getZoomableBounds getZoomableBounds}(null));
      * </pre>
      *
-     * @param  change The zoom change, as an affine transform in logical
-     *         coordinates. If <code>change</code> is the identity transform,
-     *         then this method does nothing and listeners are not notified.
+     * @param  change The zoom change, as an affine transform in logical coordinates. If
+     *         {@code change} is the identity transform, then this method does nothing and
+     *         listeners are not notified.
      */
     public void transform(final AffineTransform change) {
         if (!change.isIdentity()) {
@@ -1174,10 +1119,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Changes the {@linkplain #zoom} by applying an affine transform. The
-     * <code>change</code> transform must express a change in pixel units,
-     * for example, a scrolling of 6 pixels toward right. This method is
-     * conceptually similar to the following code:
+     * Changes the {@linkplain #zoom} by applying an affine transform. The {@code change} transform
+     * must express a change in pixel units, for example, a scrolling of 6 pixels toward right. This
+     * method is conceptually similar to the following code:
      *
      * <pre>
      * {@link #zoom}.{@link AffineTransform#preConcatenate(AffineTransform) preConcatenate}(change);
@@ -1185,9 +1129,11 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * {@link #repaint() repaint}({@link #getZoomableBounds getZoomableBounds}(null));
      * </pre>
      *
-     * @param  change The zoom change, as an affine transform in pixel
-     *         coordinates. If <code>change</code> is the identity transform,
-     *         then this method does nothing and listeners are not notified.
+     * @param  change The zoom change, as an affine transform in pixel coordinates. If
+     *         {@code change} is the identity transform, then this method does nothing
+     *         and listeners are not notified.
+     *
+     * @since 2.1
      */
     public void transformPixels(final AffineTransform change) {
         if (!change.isIdentity()) {
@@ -1206,46 +1152,37 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Carries out a zoom, a translation or a rotation on the contents of
-     * <code>ZoomPane</code>. The type of operation to carry out depends on the
-     * <code>operation</code> argument:
+     * Carries out a zoom, a translation or a rotation on the contents of {@code ZoomPane}. The
+     * type of operation to carry out depends on the {@code operation} argument:
      *
      * <ul>
-     *   <li>{@link #TRANSLATE_X} carries out a translation along the
-     *       <var>x</var> axis. The <code>amount</code> argument specifies the
-     *       transformation to perform in number of pixels. A negative value
-     *       moves to the left whilst a positive value moves to the right.</li>
-     *   <li>{@link #TRANSLATE_Y} carries out a translation along the 
-     *       <var>y</var> axis. The <code>amount</code> argument specifies the
-     *       transformation to perform in number of pixels. A negative value
-     *       moves upwards whilst a positive value moves downwards.</li>
-     *   <li>{@link #UNIFORM_SCALE} carries out a zoom. The <code>zoom</code>
-     *       argument specifies the type of zoom to perform. A value greater
-     *       than 1 will perform a zoom in whilst a value between 0 and 1 will
-     *       perform a zoom out.</li>
-     *   <li>{@link #ROTATE} carries out a rotation. The <code>zoom</code>
-     *       argument specifies the rotation angle in radians.</li>
-     *   <li>{@link #RESET} Redefines the zoom to a default scale, rotation
-     *       and translation. This operation displays all, or almost all, the
-     *       contents of <code>ZoomPane</code>.</li>
-     *   <li>{@link #DEFAULT_ZOOM} Carries out a default zoom, close to the
-     *       maximum zoom, which shows the details of the contents of 
-     *       <code>ZoomPane</code> but without enlarging them too much.</li>
+     *   <li>{@link #TRANSLATE_X} carries out a translation along the <var>x</var> axis.
+     *       The {@code amount} argument specifies the transformation to perform in number
+     *       of pixels. A negative value moves to the left whilst a positive value moves to
+     *       the right.</li>
+     *   <li>{@link #TRANSLATE_Y} carries out a translation along the <var>y</var> axis. The
+     *       {@code amount} argument specifies the transformation to perform in number of pixels.
+     *       A negative valuemoves upwards whilst a positive value moves downwards.</li>
+     *   <li>{@link #UNIFORM_SCALE} carries out a zoom. The {@code amount} argument specifies the
+     *       type of zoom to perform. A value greater than 1 will perform a zoom in whilst a value
+     *       between 0 and 1 will perform a zoom out.</li>
+     *   <li>{@link #ROTATE} carries out a rotation. The {@code amount} argument specifies the
+     *       rotation angle in radians.</li>
+     *   <li>{@link #RESET} Redefines the zoom to a default scale, rotation and translation. This
+     *       operation displays all, or almost all, the contents of {@code ZoomPane}.</li>
+     *   <li>{@link #DEFAULT_ZOOM} Carries out a default zoom, close to the maximum zoom, which
+     *       shows the details of the contents of {@code ZoomPane} but without enlarging them too
+     *       much.</li>
      * </ul>
      *
      * @param  operation Type of operation to perform.
-     * @param  amount ({@link #TRANSLATE_X} and
-     *         {@link #TRANSLATE_Y}) translation in pixels, ({@link #SCALE_X}
-     *         and {@link #SCALE_Y}) scale factor or ({@link #ROTATE}) rotation
-     *         angle in radians.
-     *         In other cases, this argument is ignored and can be 
-     *         {@link Double#NaN}.
-     * @param  center Zoom centre ({@link #SCALE_X} and {@link #SCALE_Y}) or
-     *         rotation centre ({@link #ROTATE}), in pixel coordinates. The
-     *         value <code>null</code> indicates a default value, more often
-     *         not the centre of the window.
-     * @throws UnsupportedOperationException if the <code>operation</code>
-     *         <code>operation</code> argument isn't recognized.
+     * @param  amount ({@link #TRANSLATE_X} and {@link #TRANSLATE_Y}) translation in pixels,
+     *         ({@link #SCALE_X} and {@link #SCALE_Y}) scale factor or ({@link #ROTATE}) rotation
+     *         angle in radians. In other cases, this argument is ignored and can be {@link Double#NaN}.
+     * @param  center Zoom centre ({@link #SCALE_X} and {@link #SCALE_Y}) or rotation centre
+     *         ({@link #ROTATE}), in pixel coordinates. The value {@code null} indicates a default
+     *         value, more often not the centre of the window.
+     * @throws UnsupportedOperationException if the {@code operation} argument isn't recognized.
      */
     private void transform(final int operation,
                            final double amount,
@@ -1294,10 +1231,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
                     return;
                 }
                 /*
-                 * Zero lengths and widths are accepted.  If, however, the
-                 * rectangle isn't valid (negative length or width) then the
-                 * method will end without doing anything. No zoom will be
-                 * performed.
+                 * Zero lengths and widths are accepted.  If, however, the rectangle isn't valid
+                 * (negative length or width) then the method will end without doing anything. No
+                 * zoom will be performed.
                  */
             }
             if ((operation & (ROTATE)) != 0) {
@@ -1349,24 +1285,21 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Adds an object to the list of objects interested in being notified
-     * about zoom changes.
+     * Adds an object to the list of objects interested in being notified about zoom changes.
      */
     public void addZoomChangeListener(final ZoomChangeListener listener) {
         listenerList.add(ZoomChangeListener.class, listener);
     }
 
     /**
-     * Removes an object from the list of objects interested in being notified
-     * about zoom changes.
+     * Removes an object from the list of objects interested in being notified about zoom changes.
      */
     public void removeZoomChangeListener(final ZoomChangeListener listener) {
         listenerList.remove(ZoomChangeListener.class, listener);
     }
 
     /**
-     * Adds an object to the list of objects interested in being notified
-     * about mouse events.
+     * Adds an object to the list of objects interested in being notified about mouse events.
      */
     public void addMouseListener(final MouseListener listener) {
         super.removeMouseListener(mouseSelectionTracker);
@@ -1375,20 +1308,16 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Signals that a zoom change has taken place. Every object registered by
-     * the {@link #addZoomChangeListener} method will be notified of the change
-     * as soon as possible.
+     * Signals that a zoom change has taken place. Every object registered by the
+     * {@link #addZoomChangeListener} method will be notified of the change as soon as possible.
      *
-     * @param change Affine transform which represents the change in the zoom.
-     *               That is <code>oldZoom</code> and <code>newZoom</code> are
-     *               the affine transforms of the old and new zoom respectively.
-     *               Therefore, the relation
+     * @param change Affine transform which represents the change in the zoom. That is
+     *       {@code oldZoom} and {@code newZoom} are the affine transforms of the old and new zoom
+     *       respectively. Therefore, the relation
      * <code>newZoom=oldZoom.{@link AffineTransform#concatenate concatenate}(change)</code>
-     *               must be respected (to within rounding errors).
-     *               <strong>Note: This method can modify 
-     *               <code>change</code></strong> to combine several
-     *               consecutive calls of 
-     *               <code>fireZoomChanged</code> in a single transformation.
+     *       must be respected (to within rounding errors). <strong>Note: This method can modify 
+     *       {@code change}</strong> to combine several consecutive calls of {@code fireZoomChanged}
+     *       in a single transformation.
      */
     protected void fireZoomChanged(final AffineTransform change) {
         visibleArea.setRect(getVisibleArea());
@@ -1396,19 +1325,17 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Notifies derived classes that the zoom has changed. Unlike the
-     * protected {@link #fireZoomChanged} method, this private method doesn't
-     * modify any internal field and doesn't attempt to call other
-     * <code>ZoomPane> methods such as {@link #getVisibleArea}. An infinite
-     * loop is thereby avoided as this method is called by {@link #reset}.
+     * Notifies derived classes that the zoom has changed. Unlike the protected
+     * {@link #fireZoomChanged} method, this private method doesn't modify any internal field and
+     * doesn't attempt to call other {@code ZoomPane} methods such as {@link #getVisibleArea}. An
+     * infinite loop is thereby avoided as this method is called by {@link #reset}.
      */
     private void fireZoomChanged0(final AffineTransform change) {
         /*
-         * Note: the event must be fired even if the transformation 
-         *       is the identity matrix, because certain classes use
-         *       this to update scrollbars.
+         * Note: the event must be fired even if the transformation is the identity matrix,
+         *       because certain classes use this to update scrollbars.
          */
-        if (change==null) {
+        if (change == null) {
             throw new NullPointerException();
         }
         ZoomChangeEvent event = null;
@@ -1428,10 +1355,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Method called automatically after the user selects an area with the
-     * mouse. The default implementation zooms to the selected
-     * <code>area</code>. Derived classes can redefine this method in order 
-     * to carry out another action. 
+     * Method called automatically after the user selects an area with the mouse. The default
+     * implementation zooms to the selected {@code area}. Derived classes can redefine this method
+     * in order to carry out another action. 
      *
      * @param area Area selected by the user, in logical coordinates.
      */
@@ -1443,31 +1369,25 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Returns the geometric shape to be used to delimitate an area.
-     * This shape is generally a rectangle but could also be an ellipse,
-     * an arrow or another shape. The coordinates of the returned shape
-     * won't be taken into account. In fact, these coordinates will often
-     * be destroyed. The only things which count are the class of the
-     * returned shape (e.g. {@link java.awt.geom.Ellipse2D} vs
-     * {@link java.awt.geom.Rectangle2D}) and any of its parameters not
-     * related to its position (e.g. corner rounding in a rectangle
+     * Returns the geometric shape to be used to delimitate an area. This shape is generally a
+     * rectangle but could also be an ellipse, an arrow or another shape. The coordinates of the
+     * returned shape won't be taken into account. In fact, these coordinates will often be
+     * destroyed. The only things which count are the class of the returned shape (e.g.
+     * {@link java.awt.geom.Ellipse2D} vs {@link java.awt.geom.Rectangle2D}) and any of its
+     * parameters not related to its position (e.g. corner rounding in a rectangle
      * {@link java.awt.geom.RoundRectangle2D}).
-     *
-     * The returned shape will generally be from a class derived from
-     * {@link RectangularShape}, but can also be from the class
-     * {@link Line2D}. <strong>Any other class risks firing a
+     * <p>
+     * The returned shape will generally be from a class derived from {@link RectangularShape},
+     * but can also be from the class {@link Line2D}. <strong>Any other class risks firing a
      * {@link ClassCastException} at execution</strong>.
      *
-     * The default implementation always returns a
-     * {@link java.awt.geom.Rectangle2D} object.
+     * The default implementation always returns a {@link java.awt.geom.Rectangle2D} object.
      *
-     * @param  point Logical coordinates of the mouse at the moment the button
-     *         is pressed. This information can be used by derived classes
-     *         that wish to consider the mouse position before choosing a
-     *         geometric shape.
-     * @return Shape from the class {link RectangularShape} or {link Line2D},
-     *         or <code>null</code> to indicate that we do not want to select
-     *         with the mouse.
+     * @param  point Logical coordinates of the mouse at the moment the button is pressed. This
+     *         information can be used by derived classes that wish to consider the mouse position
+     *         before choosing a geometric shape.
+     * @return Shape from the class {link RectangularShape} or {link Line2D}, or {@code null} to
+     *         indicate that we do not want to select with the mouse.
      */
     protected Shape getMouseSelectionShape(final Point2D point) {
         return new Rectangle2D.Float();
@@ -1482,12 +1402,10 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Specifies whether or not the magnifying glass is allowed to be displayed
-     * on this component. Calling this method with the value <code>false</code>
-     * will hide the magnifying glass, delete the choice "Display magnifying
-     * glass" from the contextual menu and lead to all calls to 
-     * <code>{@link #setMagnifierVisible setMagnifierVisible}(true)</code>
-     * being ignored.
+     * Specifies whether or not the magnifying glass is allowed to be displayed on this component.
+     * Calling this method with the value {@code false} will hide the magnifying glass, delete the
+     * choice "Display magnifying glass" from the contextual menu and lead to all calls to 
+     * <code>{@link #setMagnifierVisible setMagnifierVisible}(true)</code> being ignored.
      */
     public void setMagnifierEnabled(final boolean enabled) {
         magnifierEnabled=enabled;
@@ -1498,18 +1416,17 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Indicates whether or not the magnifying glass is visible.  By default,
-     * it is not visible. Call {@link #setMagnifierVisible(boolean)} to make it
-     * appear.
+     * Indicates whether or not the magnifying glass is visible.  By default, it is not visible.
+     * Call {@link #setMagnifierVisible(boolean)} to make it appear.
      */
     public boolean isMagnifierVisible() {
         return magnifier != null;
     }
 
     /**
-     * Displays or hides the magnifying glass. If the magnifying glass is not
-     * visible and this method is called with the argument <code>true</code>,
-     * the magnifying glass will appear at the centre of the window.
+     * Displays or hides the magnifying glass. If the magnifying glass is not visible and this
+     * method is called with the argument {@code true}, the magnifying glass will appear at the
+     * centre of the window.
      */
     public void setMagnifierVisible(final boolean visible) {
         setMagnifierVisible(visible, null);
@@ -1548,38 +1465,21 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Corrects a pixel's coordinates to take into account the presence of the
-     * magnifying glass. The point <code>point</code> must contain the
-     * coordinates of a pixel on the screen. If the magnifying glass is visible
-     * and <code>point</code> falls within it, point's coordinates will be
-     * corrected to make as if it pointed at the pixel itself, but in the
-     * absence of the magnifying glass. In effect, the presence of the
-     * magnifying glass can move the apparent position of the pixels.
-     *
-     * @deprecated Use {@link #correctApparentPixelPosition} instead.
-     *             This is use a method's name change; the behavior is the same.
-     */
-    public final void correctPointForMagnifier(final Point2D point) {
-        correctApparentPixelPosition(point);
-    }
-
-    /**
-     * Corrects a pixel's coordinates for removing the effect of the magnifying glass.
-     * Without this method, transformations from pixels to geographic coordinates would
-     * not give accurate results for pixels inside the magnifier since the magnifier moves
-     * the pixel's apparent position. Invoking this method will remove deformation
-     * effects using the following steps:
+     * Corrects a pixel's coordinates for removing the effect of the magnifying glass. Without this
+     * method, transformations from pixels to geographic coordinates would not give accurate results
+     * for pixels inside the magnifier since the magnifier moves the pixel's apparent position.
+     * Invoking this method will remove deformation effects using the following steps:
+     * <p>
      * <ul>
-     *   <li>If the pixel's coordinate <code>point</code> is outside the magnifier,
-     *       then this method do nothing.</li>
-     *   <li>Otherwise, if the pixel's coordinate is inside the magnifier, then this
-     *       method update <code>point</code> in such a way that it contains the
-     *       position that the exact same pixel would have in the absence of magnifier.</li>
+     *   <li>If the pixel's coordinate {@code point} is outside the magnifier, then this method do
+     *       nothing.</li>
+     *   <li>Otherwise, if the pixel's coordinate is inside the magnifier, then this method update
+     *       {@code point} in such a way that it contains the position that the exact same pixel
+     *       would have in the absence of magnifier.</li>
      * </ul>
      *
-     * @param point In input, a pixel's coordinate as it appears on the screen.
-     *              In output, the coordinate that the same pixel would have if
-     *              the magnifier wasn't presents.
+     * @param point In input, a pixel's coordinate as it appears on the screen. In output, the
+     *              coordinate that the same pixel would have if the magnifier wasn't presents.
      */
     public final void correctApparentPixelPosition(final Point2D point) {
         if (magnifier != null && magnifier.contains(point)) {
@@ -1602,20 +1502,16 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Displays or hides the magnifying glass. If the magnifying glass isn't
-     * visible and this method is called with the argument <code>true</code>,
-     * the magnifying glass will be displayed centred on the specified
-     * coordinate.
+     * Displays or hides the magnifying glass. If the magnifying glass isn't visible and this
+     * method is called with the argument {@code true}, the magnifying glass will be displayed
+     * centred on the specified coordinate.
      *
-     * @param visible <code>true</code> to display the magnifying glass or
-     *                <code>false</code> to hide it.
-     * @param center  Central coordinate on which to display the magnifying
-     *                glass.  If the magnifying glass was initially invisible,
-     *                it will appear centred on this coordinate (or in the
-     *                centre of the screen if <code>center</code> is null). If
-     *                the magnifying glass was already visible and
-     *                <code>center</code> is not null, it will be moved to 
-     *                centre it on the specified coordinate.
+     * @param visible {@code true} to display the magnifying glass or {@code false} to hide it.
+     * @param center  Central coordinate on which to display the magnifying glass.  If the
+     *        magnifying glass was initially invisible, it will appear centred on this coordinate
+     *        (or in the centre of the screen if {@code center} is null). If the magnifying glass
+     *        was already visible and {@code center} is not null, it will be moved to centre it on
+     *        the specified coordinate.
      */
     private void setMagnifierVisible(final boolean visible, final Point center) {
         if (visible && magnifierEnabled) {
@@ -1666,18 +1562,16 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Adds navigation options to the specified menu. Menus such as
-     * "Zoom in" and "Zoom out" will be automatically added to the menu
-     * together with the appropriate short-cut keys.
+     * Adds navigation options to the specified menu. Menus such as "Zoom in" and "Zoom out" will
+     * be automatically added to the menu together with the appropriate short-cut keys.
      */
     public void buildNavigationMenu(final JMenu menu) {
         buildNavigationMenu(menu, null);
     }
 
     /**
-     * Adds navigation options to the specified menu. Menus such as
-     * "Zoom in" and "Zoom out" will be automatically added to the menu
-     * together with the appropriate short-cut keys.
+     * Adds navigation options to the specified menu. Menus such as "Zoom in" and "Zoom out" will
+     * be automatically added to the menu together with the appropriate short-cut keys.
      */
     private void buildNavigationMenu(final JMenu menu, final JPopupMenu popup) {
         int groupIndex = 0;
@@ -1744,14 +1638,12 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Method called automatically when the user clicks on the right mouse
-     * button.  The default implementation displays a contextual menu 
-     * containing navigation options.
+     * Method called automatically when the user clicks on the right mouse button.  The default
+     * implementation displays a contextual menu containing navigation options.
      *
      * @param  event Mouse event. This object contains the mouse coordinates
      *         in geographic coordinates (as well as pixel coordinates).
-     * @return The contextual menu, or <code>null</code> to avoid displaying
-     *         the menu.
+     * @return The contextual menu, or {@code null} to avoid displaying the menu.
      */
     protected JPopupMenu getPopupMenu(final MouseEvent event) {
         if (getZoomableBounds().contains(event.getX(), event.getY())) {
@@ -1784,7 +1676,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * a contextual menu which contains magnifying glass options.
      *
      * @param  event Mouse event containing amongst others, the mouse position.
-     * @return The contextual menu, or <code>null</code> to avoid displaying the menu.
+     * @return The contextual menu, or {@code null} to avoid displaying the menu.
      */
     protected JPopupMenu getMagnifierMenu(final MouseEvent event) {
         final Resources resources = Resources.getResources(getLocale());
@@ -1811,7 +1703,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
         }
         if (event.isPopupTrigger()) {
             final Point point      = event.getPoint();
-            final JPopupMenu popup = (magnifier != null && magnifier.contains(point)) ? getMagnifierMenu(event) : getPopupMenu(event);
+            final JPopupMenu popup = (magnifier != null && magnifier.contains(point)) ?
+                                     getMagnifierMenu(event) : getPopupMenu(event);
             if (popup != null) {
                 final Component source  = event.getComponent();
                 final Window    window  = SwingUtilities.getWindowAncestor(source);
@@ -1876,11 +1769,10 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
             magnifier.setClip(getZoomableBounds());
         }
         /*
-         * {@link #repaint} isn't called because there is already a 
-         * {@link #repaint} command in the queue.  Therefore, the redraw will
-         * be twice as quick under JDK 1.3. {@link #transform} isn't called
-         * either because the zoom hasn't really changed; we have simply
-         * discovered a part of the window which was hidden before. However,
+         * {@link #repaint} isn't called because there is already a {@link #repaint} command in
+         * the queue.  Therefore, the redraw will be twice as quick under JDK 1.3.
+         * {@link #transform} isn't called either because the zoom hasn't really changed;
+         * we have simply discovered a part of the window which was hidden before. However,
          * we still need to adjust the scrollbars.
          */
         final Object[] listeners = listenerList.getListenerList();
@@ -1896,8 +1788,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Returns an object which displays this <code>ZoomPane</code>
-     * with the scrollbars.
+     * Returns an object which displays this {@code ZoomPane} with the scrollbars.
      */
     public JComponent createScrollPane() {
         return new ScrollPane();
@@ -1913,12 +1804,12 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      */
     private final class ScrollPane extends JComponent implements PropertyChangeListener {
         /**
-         * The horizontal scrollbar, or <code>null</code> if none.
+         * The horizontal scrollbar, or {@code null} if none.
          */
         private final JScrollBar scrollbarX;
 
         /**
-         * The vertical scrollbar, or <code>null</code> if none.
+         * The vertical scrollbar, or {@code null} if none.
          */
         private final JScrollBar scrollbarY;
 
@@ -1976,18 +1867,16 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
         }
 
         /**
-         * Convenience method which fetches a scrollbar model.
-         * Should be a static method, but compiler doesn't
-         * allow this.
+         * Convenience method which fetches a scrollbar model. Should be a static method,
+         * but compiler doesn't allow this.
          */
         private /*static*/ BoundedRangeModel getModel(final JScrollBar bar) {
             return (bar != null) ? bar.getModel() : null;
         }
 
         /**
-         * Invoked when this <code>ScrollPane</code>  is added in
-         * a {@link Container}. This method registers all required
-         * listeners.
+         * Invoked when this {@code ScrollPane} is added in a {@link Container}.
+         * This method registers all required listeners.
          */
         public void addNotify() {
             super.addNotify();
@@ -1996,8 +1885,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
         }
 
         /**
-         * Invoked when this <code>ScrollPane</code> is removed from
-         * a {@link Container}. This method unregisters all listeners.
+         * Invoked when this {@code ScrollPane} is removed from a {@link Container}.
+         * This method unregisters all listeners.
          */
         public void removeNotify() {
             ZoomPane.this.removePropertyChangeListener("zoom.insets", this);
@@ -2006,13 +1895,11 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
         }
 
         /**
-         * Invoked when the zoomable area changes. This method will adjust
-         * scrollbar's insets in order to keep scrollbars aligned in front
-         * of the zoomable area.
+         * Invoked when the zoomable area changes. This method will adjust scrollbar's
+         * insets in order to keep scrollbars aligned in front of the zoomable area.
          *
-         * Note: in the current version, this is an undocumented capability.
-         *       Class {@link RangeBar} uses it, but it is experimental.
-         *       It may change in a future version.
+         * Note: in the current version, this is an undocumented capability. Class {@link RangeBar}
+         *       uses it, but it is experimental. It may change in a future version.
          */
         public void propertyChange(final PropertyChangeEvent event) {
             final Insets old    = (Insets) event.getOldValue();
@@ -2036,17 +1923,14 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Synchronises the position and the range of the models <var>x</var> and
-     * <var>y</var> with the position of the zoom.  The models <var>x</var>
-     * and <var>y</var> are generally associated with horizontal and vertical
-     * scrollbars.  When the position of a scrollbar is adjusted, the zoom is
-     * consequently adjusted. Inversely, when the zoom is modified, the
-     * positions and ranges of the scrollbars are consequently adjusted.
+     * Synchronises the position and the range of the models <var>x</var> and <var>y</var> with the
+     * position of the zoom. The models <var>x</var> and <var>y</var> are generally associated with
+     * horizontal and vertical scrollbars.  When the position of a scrollbar is adjusted, the zoom
+     * is consequently adjusted. Inversely, when the zoom is modified, the positions and ranges of
+     * the scrollbars are consequently adjusted.
      *
-     * @param x Model of the horizontal scrollbar or <code>null</code> if there
-     *          isn't one.
-     * @param y Model of the vertical scrollbar or <code>null</code> if there
-     *          isn't one.
+     * @param x Model of the horizontal scrollbar or {@code null} if there isn't one.
+     * @param y Model of the vertical scrollbar or {@code null} if there isn't one.
      */
     public void tieModels(final BoundedRangeModel x, final BoundedRangeModel y) {
         if (x != null || y != null) {
@@ -2058,15 +1942,12 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Cancels the synchronisation between the specified <var>x</var> and
-     * <var>y</var> models and the zoom of this <code>ZoomPane</code> object.
-     * The {@link ChangeListener} and {@link ZoomChangeListener} objects that
-     * were created are deleted.
+     * Cancels the synchronisation between the specified <var>x</var> and <var>y</var> models
+     * and the zoom of this {@code ZoomPane} object. The {@link ChangeListener} and
+     * {@link ZoomChangeListener} objects that were created are deleted.
      *
-     * @param x Model of the horizontal scrollbar or <code>null</code> if there
-     *          isn't one.
-     * @param y Model of the vertical scrollbar or <code>null</code> if there
-     *          isn't one.
+     * @param x Model of the horizontal scrollbar or {@code null} if there isn't one.
+     * @param y Model of the vertical scrollbar or {@code null} if there isn't one.
      */
     public void untieModels(final BoundedRangeModel x, final BoundedRangeModel y) {
         final EventListener[] listeners = getListeners(ZoomChangeListener.class);
@@ -2083,10 +1964,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Object responsible for synchronizing a {@link JScrollPane} object with
-     * scrollbars.  Whilst not generally useful, it would be possible to 
-     * synchronize several pairs of {@link BoundedRangeModel} objects on one
-     * <code>ZoomPane</code> object.
+     * Object responsible for synchronizing a {@link JScrollPane} object with scrollbars.
+     * Whilst not generally useful, it would be possible to synchronize several pairs of
+     * {@link BoundedRangeModel} objects on one {@code ZoomPane} object.
      *
      * @author Martin Desruisseaux
      * @version $Id: ZoomPane.java,v 1.16 2004/02/16 20:49:35 desruisseaux Exp $
@@ -2098,22 +1978,20 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
         public final BoundedRangeModel xm, ym;
 
         /**
-         * Indicates whether the scrollbars are being adjusted in
-         * response to {@link #zoomChanged}.
-         * If this is the case, {@link #stateChanged} mustn't make any
-         * other adjustments.
+         * Indicates whether the scrollbars are being adjusted in response to {@link #zoomChanged}.
+         * If this is the case, {@link #stateChanged} mustn't make any other adjustments.
          */
         private transient boolean isAdjusting;
 
         /**
-         * Cached <code>ZoomPane</code> bounds. Used in order
-         * to avoid too many object allocations on the heap.
+         * Cached {@code ZoomPane} bounds. Used in order to avoid too many object allocations
+         * on the heap.
          */
         private transient Rectangle bounds;
 
         /**
-         * Constructs an object which synchronises a pair of 
-         * {@link BoundedRangeModel} with {@link ZoomPane}.
+         * Constructs an object which synchronises a pair of {@link BoundedRangeModel} with
+         * {@link ZoomPane}.
          */
         public Synchronizer(final BoundedRangeModel xm, final BoundedRangeModel ym) {
             this.xm = xm;
@@ -2121,16 +1999,14 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
         }
 
         /**
-         * Method called automatically each time the position of one of the
-         * scrollbars changes.
+         * Method called automatically each time the position of one of the scrollbars changes.
          */
         public void stateChanged(final ChangeEvent event) {
             if (!isAdjusting) {
                 final boolean valueIsAdjusting = ((BoundedRangeModel) event.getSource()).getValueIsAdjusting();
                 if (paintingWhileAdjusting || !valueIsAdjusting) {
                     /*
-                     * Scroll view coordinates are computed using the
-                     * following steps:
+                     * Scroll view coordinates are computed using the following steps:
                      *
                      *   1) Get the logical coordinates for the whole area.
                      *   2) Transform to pixel space using current zoom.
@@ -2180,8 +2056,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
         /**
          * Method called each time the zoom changes.
          *
-         * @param change Ignored. Can be null and will effectively sometimes
-         *               be null.
+         * @param change Ignored. Can be null and will effectively sometimes be null.
          */
         public void zoomChanged(final ZoomChangeEvent change) {
             if (!isAdjusting) {
@@ -2202,10 +2077,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Adjusts the values of a model.  The minimums and maximums are adjusted 
-     * as needed in order to include the value and its range. This adjustment
-     * is necessary in order to avoid chaotic behaviour when the user 
-     * drags the slider whilst a part of the graphic is outside the zone
+     * Adjusts the values of a model. The minimums and maximums are adjusted as needed in order to
+     * include the value and its range. This adjustment is necessary in order to avoid chaotic
+     * behaviour when the user drags the slider whilst a part of the graphic is outside the zone
      * initially planned for {@link #getArea}.
      */
     private static void setRangeProperties(final BoundedRangeModel model,
@@ -2219,19 +2093,16 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Modifies the position in pixels of the visible part of
-     * <code>ZoomPane</code>. <code>viewSize</code> is the size 
-     * <code>ZoomPane</code> would be (in pixels) if its visible surface
-     * covered the whole of the {@link #getArea} region with the current
-     * zoom (Note: <code>viewSize</code> can be obtained by {@link
-     * #getPreferredSize} if {@link #setPreferredSize} hasn't been called
-     * with a non-null value). Therefore, by definition, the region
-     * {@link #getArea} converted into pixel space would give the rectangle
+     * Modifies the position in pixels of the visible part of {@code ZoomPane}. {@code viewSize}
+     * is the size {@code ZoomPane} would be (in pixels) if its visible surface covered the whole
+     * of the {@link #getArea} region with the current zoom (Note: {@code viewSize} can be obtained
+     * by {@link #getPreferredSize} if {@link #setPreferredSize} hasn't been called with a non-null
+     * value). Therefore, by definition, the region {@link #getArea} converted into pixel space
+     * would give the rectangle
      * <code>bounds=Rectangle(0,&nbsp;0,&nbsp;,viewSize.width,&nbsp;,viewSize.height)</code>.
-     *
-     * This <code>scrollRectToVisible</code> method allows us to define the 
-     * sub-region of <code>bounds</code> which must appear in the
-     * <code>ZoomPane</code> window.
+     * <p>
+     * This {@code scrollRectToVisible} method allows us to define the sub-region of {@code bounds}
+     * which must appear in the {@code ZoomPane} window.
      */
     public void scrollRectToVisible(final Rectangle rect) {
         Rectangle2D area = getArea();
@@ -2248,32 +2119,29 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Indicates whether or not this <code>ZoomPane</code> object should be
-     * repainted when the user moves the scrollbar slider. The scrollbars (or
-     * other models) involved are those which have been synchronised with
-     * this <code>ZoomPane</code> object through the {@link #tieModels} method.
-     * The default value is <code>false</code>, which means that
-     * <code>ZoomPane</code> will wait until the user releases the slider
-     * before repainting.
+     * Indicates whether or not this {@code ZoomPane} object should be repainted when the user
+     * moves the scrollbar slider. The scrollbars (or other models) involved are those which have
+     * been synchronised with this {@code ZoomPane} object through the {@link #tieModels} method.
+     * The default value is {@code false}, which means that {@code ZoomPane} will wait until the
+     * user releases the slider before repainting.
      */
     public boolean isPaintingWhileAdjusting() {
         return paintingWhileAdjusting;
     }
 
     /**
-     * Defines whether or not this <code>ZoomPane</code> object should repaint
-     * the map when the user moves the scrollbar slider. 
-     * A fast computer is recommended if this flag is to be set to
-     * <code>true</code>.
+     * Defines whether or not this {@code ZoomPane} object should repaint the map when the user
+     * moves the scrollbar slider. A fast computer is recommended if this flag is to be set to
+     * {@code true}.
      */
     public void setPaintingWhileAdjusting(final boolean flag) {
         paintingWhileAdjusting = flag;
     }
 
     /**
-     * Declares that a part of this pane needs to be repainted. This method
-     * simply redefines the method of the parent class in order to take into
-     * account a case where the magnifying glass is displayed.
+     * Declares that a part of this pane needs to be repainted. This method simply redefines the
+     * method of the parent class in order to take into account a case where the magnifying glass
+     * is displayed.
      */
     public void repaint(final long tm, final int x, final int y,
                         final int width, final int height) {
@@ -2287,10 +2155,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Declares that the magnifying glass needs to be repainted. A
-     * {@link #repaint()} command is sent with the bounds of the
-     * magnifying glass as coordinates (taking into account its
-     * outline).
+     * Declares that the magnifying glass needs to be repainted. A {@link #repaint()} command is
+     * sent with the bounds of the magnifying glass as coordinates (taking into account its outline).
      */
     private void repaintMagnifier() {
         final Rectangle bounds = magnifier.getBounds();
@@ -2303,8 +2169,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
 
     /**
      * Paints the magnifying glass. This method is invoked after
-     * {@link #paintComponent(Graphics2D)} if a magnifying glass
-     * is visible.
+     * {@link #paintComponent(Graphics2D)} if a magnifying glass is visible.
      */
     protected void paintMagnifier(final Graphics2D graphics) {
         final double centerX = magnifier.getCenterX();
@@ -2328,40 +2193,34 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Paints this component. Subclass must override this method in order to
-     * draw the <code>ZoomPane</code> content. For most implementations, the
-     * first line in this method will be
-     *
+     * Paints this component. Subclass must override this method in order to draw the
+     * {@code ZoomPane} content. For most implementations, the first line in this method will be
      * <code>graphics.transform({@link #zoom})</code>.
      */
     protected abstract void paintComponent(final Graphics2D graphics);
 
     /**
-     * Prints this component. The default implementation
-     * invokes {@link #paintComponent(Graphics2D)}.
+     * Prints this component. The default implementation invokes
+     * {@link #paintComponent(Graphics2D)}.
      */
     protected void printComponent(final Graphics2D graphics) {
         paintComponent(graphics);
     }
 
     /**
-     * Paints this component. This method is declared <code>final</code>
-     * in order to avoid unintentional overriding. Override
-     * {@link #paintComponent(Graphics2D)} instead.
+     * Paints this component. This method is declared final in order to avoid unintentional
+     * overriding. Override {@link #paintComponent(Graphics2D)} instead.
      */
     protected final void paintComponent(final Graphics graphics) {
         flag = IS_PAINTING;
         super.paintComponent(graphics);
         /*
-         * The <code>JComponent.paintComponent(...)</code> method creates a
-         * temporary <code>Graphics2D</code> object, then calls 
-         * <code>ComponentUI.update(...)</code> with this graphic as a
-         * parameter.  This method clears the screen background then calls
-         * <code>ComponentUI.paint(...)</code>.
-         * This last method has been redefined further up (our {@link #UI})
-         * object in such a way that it calls itself
-         * {@link #paintComponent(Graphics2D)}. A complicated path, but we
-         * don't have much choice and it is, after all, quite efficient.
+         * The JComponent.paintComponent(...) method creates a temporary Graphics2D object, then
+         * calls ComponentUI.update(...) with this graphic as a parameter. This method clears the
+         * screen background then calls ComponentUI.paint(...). This last method has been redefined
+         * further up (our {@link #UI}) object in such a way that it calls itself
+         * paintComponent(Graphics2D). A complicated path, but we don't have much
+         * choice and it is, after all, quite efficient.
          */
         if (magnifier != null) {
             flag = IS_PAINTING_MAGNIFIER;
@@ -2370,9 +2229,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Prints this component. This method is declared <code>final</code>
-     * in order to avoid unintentional overriding. Override
-     * {@link #printComponent(Graphics2D)} instead.
+     * Prints this component. This method is declared final in order to avoid unintentional
+     * overriding. Override {@link #printComponent(Graphics2D)} instead.
      */
     protected final void printComponent(final Graphics graphics) {
         flag = IS_PRINTING;
@@ -2384,13 +2242,11 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Returns the size (in pixels) that <code>ZoomPane</code> would have if 
-     * it displayed the whole of the {@link #getArea} region with the current
-     * zoom ({@link #zoom}). This method is practical for determining the
-     * maximum values to assign to the scrollbars. For example, the horizontal
-     * bar could cover the range <code>[0..viewSize.width]</code>
-     * whilst the vertical bar could cover the range
-     * <code>[0..viewSize.height]</code>.
+     * Returns the size (in pixels) that {@code ZoomPane} would have if it displayed the whole of
+     * the {@link #getArea} region with the current zoom ({@link #zoom}). This method is practical
+     * for determining the maximum values to assign to the scrollbars. For example, the horizontal
+     * bar could cover the range {@code [0..viewSize.width]} whilst the vertical bar could cover
+     * the range {@code [0..viewSize.height]}.
      */
     private final Dimension getViewSize() {
         if (!visibleArea.isEmpty()) {
@@ -2406,27 +2262,25 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Returns the Insets of this component. This method works like 
-     * <code>super.getInsets(insets)</code>, but accepts a null argument. This
-     * method can be redefined if it is necessary to perform zooms on a
-     * part of the graphic rather than the whole thing.
+     * Returns the Insets of this component. This method works like {@code super.getInsets(insets)},
+     * but accepts a null argument. This method can be redefined if it is necessary to perform zooms
+     * on a part of the graphic rather than the whole thing.
      */
     public Insets getInsets(final Insets insets) {
         return super.getInsets((insets != null) ? insets : new Insets(0, 0, 0, 0));
     }
 
     /**
-     * Returns the Insets of this component.  This method is declared final in
-     * order to avoid confusion. If you want to return other Insets you must 
-     * redefine {@link #getInsets(Insets)}.
+     * Returns the Insets of this component.  This method is declared final in order to avoid
+     * confusion. If you want to return other Insets you must redefine {@link #getInsets(Insets)}.
      */
     public final Insets getInsets() {
         return getInsets(null);
     }
 
     /**
-     * Informs <code>ZoomPane</code> that the GUI has changed. The user
-     * doesn't have to call this method directly.
+     * Informs {@code ZoomPane} that the GUI has changed.
+     * The user doesn't have to call this method directly.
      */
     public void updateUI() {
         navigationPopupMenu = null;
@@ -2464,34 +2318,31 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Convenience method logging an area setting from the
-     * <code>ZoomPane</code> class. This method is invoked
-     * from {@link #setPreferredArea} and {@link #setVisibleArea}.
+     * Convenience method logging an area setting from the {@code ZoomPane} class. This
+     * method is invoked from {@link #setPreferredArea} and {@link #setVisibleArea}.
      *
-     * @param methodName The caller's method name
-     *                  (e.g. <code>"setArea"</code>).
-     * @param area The coordinates to log (may be <code>null</code>).
+     * @param methodName The caller's method name (e.g. <code>"setArea"</code>).
+     * @param area The coordinates to log (may be {@code null}).
      */
     private static void log(final String methodName, final Rectangle2D area) {
         log("ZoomPane", methodName, area);
     }
 
     /**
-     * Convenience method for logging events related to area setting.
-     * Events are logged in the <code>"org.geotools.gui"</code> logger
-     * with {@link Level#FINER}. <code>ZoomPane</code> invokes this method
-     * for logging any [@link #setPreferredArea} and {@link #setVisibleArea}
-     * invocations. Subclasses may invoke this method for logging some other
-     * kinds of area changes.
+     * Convenience method for logging events related to area setting. Events are logged in the
+     * {@code "org.geotools.gui"} logger with {@link Level#FINER}. {@code ZoomPane} invokes this
+     * method for logging any [@link #setPreferredArea} and {@link #setVisibleArea} invocations.
+     * Subclasses may invoke this method for logging some other kinds of area changes.
      *
      * @param  className The fully qualified caller's class name
-     *                   (e.g. <code>"org.geotools.swing.ZoomPane"</code>).
-     * @param methodName The caller's method name (e.g. <code>"setArea"</code>).
-     * @param       area The coordinates to log (may be <code>null</code>).
+     *                   (e.g. {@code "org.geotools.swing.ZoomPane"}).
+     * @param methodName The caller's method name (e.g. {@code "setArea"}).
+     * @param       area The coordinates to log (may be {@code null}).
      */
     static void log(final String className,
                     final String methodName,
-                    final Rectangle2D area) {
+                    final Rectangle2D area)
+    {
         if (LOGGER.isLoggable(Level.FINER)) {
             final Double[] areaBounds;
             if (area != null) {

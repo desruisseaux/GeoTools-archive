@@ -16,34 +16,30 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing.tree;
 
 
 /**
  * General-purpose node in a tree data structure. This default implementation implements
- * Geotools's {@link MutableTreeNode} interface, which inherit a <code>getUserObject()</code>
- * method. This method is provided in Swing's <code>DefaultMutableTreeNode</code> implementation
- * but seems to have been forgotten in interfaces.
+ * Geotools {@link MutableTreeNode} interface, which inherits a {@code getUserObject()}
+ * method. This method is provided in Swing {@link javax.swing.tree.DefaultMutableTreeNode}
+ * implementation but seems to have been forgotten in all Swing interfaces.
  *
+ * @since 2.0
  * @version $Id: DefaultMutableTreeNode.java,v 1.2 2004/04/30 19:40:16 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
 public class DefaultMutableTreeNode extends javax.swing.tree.DefaultMutableTreeNode
-        implements MutableTreeNode
+                                 implements MutableTreeNode
 {
     /**
-     * Creates a tree node that has no parent and no children, but which
-     * allows children.
+     * Serial number for compatibility with different versions.
+     */
+    private static final long serialVersionUID = -8782548896062360341L;
+
+    /**
+     * Creates a tree node that has no parent and no children, but which allows children.
      */
     public DefaultMutableTreeNode() {
         super();
@@ -53,8 +49,7 @@ public class DefaultMutableTreeNode extends javax.swing.tree.DefaultMutableTreeN
      * Creates a tree node with no parent, no children, but which allows
      * children, and initializes it with the specified user object.
      *
-     * @param userObject an Object provided by the user that constitutes
-     *                   the node's data
+     * @param userObject an Object provided by the user that constitutes the node's data
      */
     public DefaultMutableTreeNode(Object userObject) {
         super(userObject);
@@ -62,13 +57,11 @@ public class DefaultMutableTreeNode extends javax.swing.tree.DefaultMutableTreeN
 
     /**
      * Creates a tree node with no parent, no children, initialized with
-     * the specified user object, and that allows children only if
-     * specified.
+     * the specified user object, and that allows children only if specified.
      *
-     * @param userObject an Object provided by the user that constitutes
-     *        the node's data
-     * @param allowsChildren if true, the node is allowed to have child
-     *        nodes -- otherwise, it is always a leaf node
+     * @param userObject an Object provided by the user that constitutes the node's data
+     * @param allowsChildren if true, the node is allowed to have child nodes -- otherwise,
+     *        it is always a leaf node
      */
     public DefaultMutableTreeNode(Object userObject, boolean allowsChildren) {
         super(userObject, allowsChildren);

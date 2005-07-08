@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing;
 
@@ -111,6 +98,7 @@ import org.geotools.resources.geometry.XDimension2D;
  * <p align="center"><img src="doc-files/CoordinateChooser.png"></p>
  * <p>&nbsp;</p>
  *
+ * @since 2.0
  * @version $Id: CoordinateChooser.java,v 1.8 2003/10/29 11:32:31 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
@@ -195,8 +183,7 @@ public class CoordinateChooser extends JPanel {
     private final AbstractButton radioPrefRes;
 
     /**
-     * Composante facultative à afficher à la droite
-     * du paneau <code>CoordinateChooser</code>.
+     * Composante facultative à afficher à la droite du paneau {@code CoordinateChooser}.
      */
     private JComponent accessory;
 
@@ -213,7 +200,7 @@ public class CoordinateChooser extends JPanel {
         private final JComponent[] toggle;
 
         /**
-         * Construct a <code>Listeners</code> object.
+         * Constructs a {@code Listeners} object.
          */
         public Listeners(final JComponent[] toggle) {
             this.toggle=toggle;
@@ -363,8 +350,7 @@ public class CoordinateChooser extends JPanel {
 
     /**
      * Définit la largeur (en nombre de colonnes) d'un champ.
-     * Eventuellement, cette méthode peut aussi redéfinir le
-     * format.
+     * Eventuellement, cette méthode peut aussi redéfinir le format.
      */
     private static void setup(final JSpinner spinner, final int width, final Format format) {
         final JFormattedTextField field=((JSpinner.DefaultEditor)spinner.getEditor()).getTextField();
@@ -376,7 +362,7 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Tells if a selector is currently visible or not. The default <code>CoordinateChooser</code>
+     * Tells if a selector is currently visible or not. The default {@code CoordinateChooser}
      * contains three selectors: one for geographic area, one for time range and one for the
      * preferred resolution.
      *
@@ -384,9 +370,8 @@ public class CoordinateChooser extends JPanel {
      *                 {@link #GEOGRAPHIC_AREA},
      *                 {@link #TIME_RANGE} or
      *                 {@link #RESOLUTION}.
-     * @return <code>true</code> if the specified selector is visible,
-     *         or <code>false</code> otherwise.
-     * @throws IllegalArgumentException if <code>selector</code> is not legal.
+     * @return {@code true} if the specified selector is visible, or {@code false} otherwise.
+     * @throws IllegalArgumentException if {@code selector} is not legal.
      */
     public boolean isSelectorVisible(final int selector) {
         switch (selector) {
@@ -406,9 +391,8 @@ public class CoordinateChooser extends JPanel {
      *                  {@link #GEOGRAPHIC_AREA},
      *                  {@link #TIME_RANGE} and/or
      *                  {@link #RESOLUTION}.
-     * @param visible <code>true</code> to show the selectors, or
-     *                <code>false</code> to hide them.
-     * @throws IllegalArgumentException if <code>selectors</code> contains illegal bits.
+     * @param visible {@code true} to show the selectors, or {@code false} to hide them.
+     * @throws IllegalArgumentException if {@code selectors} contains illegal bits.
      */
     public void setSelectorVisible(final int selectors, final boolean visible) {
         ensureValidSelectors(selectors);
@@ -424,9 +408,9 @@ public class CoordinateChooser extends JPanel {
      *                  {@link #GEOGRAPHIC_AREA},
      *                  {@link #TIME_RANGE} and/or
      *                  {@link #RESOLUTION}.
-     * @throws IllegalArgumentException if <code>selectors</code> contains illegal bits.
+     * @throws IllegalArgumentException if {@code selectors} contains illegal bits.
      *
-     * @task TODO: Provide a better error message.
+     * @todo Provide a better error message.
      */
     private static void ensureValidSelectors(final int selectors) throws IllegalArgumentException {
         if ((selectors & ~(GEOGRAPHIC_AREA | TIME_RANGE | RESOLUTION)) != 0) {
@@ -435,8 +419,7 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Returns the value for the specified number,
-     * or NaN if <code>value</code> is not a number.
+     * Returns the value for the specified number, or NaN if {@code value} is not a number.
      */
     private static double doubleValue(final JSpinner spinner) {
         final Object value = spinner.getValue();
@@ -444,8 +427,7 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Returns the value for the specified angle,
-     * or NaN if <code>value</code> is not an angle.
+     * Returns the value for the specified angle, or NaN if {@code value} is not an angle.
      */
     private static double degrees(final JSpinner spinner, final boolean expectLatitude) {
         final Object value = spinner.getValue();
@@ -481,9 +463,8 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Returns the preferred resolution. A <code>null</code>
-     * value means that the best available resolution should
-     * be used.
+     * Returns the preferred resolution. A {@code null} value means that the
+     * best available resolution should be used.
      */
     public Dimension2D getPreferredResolution() {
         if (radioPrefRes.isSelected()) {
@@ -493,9 +474,8 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Sets the preferred resolution. A <code>null</code>
-     * value means that the best available resolution should
-     * be used.
+     * Sets the preferred resolution. A {@code null} value means that the best
+     * available resolution should be used.
      */
     public void setPreferredResolution(final Dimension2D resolution) {
         if (resolution!=null) {
@@ -524,7 +504,7 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Update the time zone in text fields. This method is automatically invoked
+     * Updates the time zone in text fields. This method is automatically invoked
      * by {@link JComboBox} on user's selection. It is also (indirectly) invoked
      * on {@link #setTimeZone} call.
      */
@@ -546,8 +526,7 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Run each ChangeListeners stateChanged()
-     * method for the specified spinner model.
+     * Run each {@link ChangeListener#stateChanged()} method for the specified spinner model.
      */
     private static void fireStateChanged(final AbstractSpinnerModel model) {
         final ChangeEvent   changeEvent = new ChangeEvent(model);
@@ -558,14 +537,14 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Returns the start time, or <code>null</code> if there is none.
+     * Returns the start time, or {@code null} if there is none.
      */
     public Date getStartTime() {
         return (Date) tmin.getValue();
     }
 
     /**
-     * Returns the end time, or <code>null</code> if there is none.
+     * Returns the end time, or {@code null} if there is none.
      */
     public Date getEndTime() {
         return (Date) tmax.getValue();
@@ -588,9 +567,7 @@ public class CoordinateChooser extends JPanel {
     /**
      * Returns the accessory component.
      *
-     * @return The accessory component, or <code>null</code> if there is none.
-     *
-     * @deprecated Depracated together with {@link #setAccessory}.
+     * @return The accessory component, or {@code null} if there is none.
      */
     public JComponent getAccessory() {
         return accessory;
@@ -600,22 +577,11 @@ public class CoordinateChooser extends JPanel {
      * Sets the accessory component. An accessory is often used to show available data.
      * However, it can be used for anything that the programmer wishes, such as extra
      * custom coordinate chooser controls.
-     * <br><br>
-     * Note: If there was a previous accessory, you should unregister
-     * any listeners that the accessory might have registered with the
-     * coordinate chooser.
+     * <p>
+     * <strong>Note:</strong> If there was a previous accessory, you should unregister any
+     * listeners that the accessory might have registered with the coordinate chooser.
      *
-     * @param accessory The accessory component, or <code>null</code>
-     *        to remove any previous accessory.
-     *
-     * @deprecated This method doesn't bring any new feature. You can do
-     *             the same with better results using the following code:
-     *
-     *             <blockquote><pre>
-     *             JPanel panel = new JPanel(new BorderLayout());
-     *             panel.add(coordinateChooser, BorderLayout.WEST);
-     *             panel.add(accessory, BorderLayout.CENTER);
-     *             </pre></blockquote>
+     * @param accessory The accessory component, or {@code null} to remove any previous accessory.
      */
     public void setAccessory(final JComponent accessory) {
         synchronized (getTreeLock()) {
@@ -643,8 +609,7 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Check if an angle is of expected
-     * type (latitude or longitude).
+     * Check if an angle is of expected type (latitude or longitude).
      */
     private void checkAngle(final JSpinner field, final boolean expectLatitude) throws ParseException {
         final Object angle=field.getValue();
@@ -655,11 +620,10 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Commits the currently edited values. If commit
-     * fails, focus will be set on the offending field.
+     * Commits the currently edited values. If commit fails, focus will be set on the offending
+     * field.
      *
-     * @throws ParseException If at least one of currently
-     *         edited value couldn't be commited.
+     * @throws ParseException If at least one of currently edited value couldn't be commited.
      */
     public void commitEdit() throws ParseException {
         JSpinner focus=null;
@@ -686,10 +650,10 @@ public class CoordinateChooser extends JPanel {
     /**
      * Prend en compte les valeurs des champs édités par l'utilisateur.
      * Si les entrés ne sont pas valide, affiche un message d'erreur en
-     * utilisant la fenêtre parente <code>owner</code> spécifiée.
+     * utilisant la fenêtre parente {@code owner} spécifiée.
      *
      * @param  owner Fenêtre dans laquelle faire apparaître d'eventuels messages d'erreur.
-     * @return <code>true</code> si la prise en compte des paramètres à réussie.
+     * @return {@code true} si la prise en compte des paramètres à réussie.
      */
     private boolean commitEdit(final Component owner) {
         try {
@@ -706,13 +670,13 @@ public class CoordinateChooser extends JPanel {
     /**
      * Adds a change listener to the listener list. This change listener will be notify when
      * a value changed. The change may be in a geographic coordinate field, a date field, a
-     * resolution field, etc. The watched values depend on the <code>selectors</code> arguments:
+     * resolution field, etc. The watched values depend on the {@code selectors} arguments:
      * {@link #GEOGRAPHIC_AREA} will watches for the bounding box (East, West, North and South
      * value); {@link #TIME_RANGE} watches for start time and end time; {@link #RESOLUTION}
      * watches for the resolution along East-West and North-South axis. Bitwise combinaisons
      * are allowed. For example, <code>GEOGRAPHIC_AREA | TIME_RANGE</code> will register a
      * listener for both geographic area and time range.
-     * <br><br>
+     * <p>
      * The source of {@link ChangeEvent}s delivered to {@link ChangeListener}s will be in most
      * case the {@link SpinnerModel} for the edited field.
      *
@@ -750,7 +714,7 @@ public class CoordinateChooser extends JPanel {
      *                   {@link #TIME_RANGE} and/or
      *                   {@link #RESOLUTION}.
      * @param  listener The listener to remove from the specified selectors.
-     * @throws IllegalArgumentException if <code>selectors</code> contains illegal bits.
+     * @throws IllegalArgumentException if {@code selectors} contains illegal bits.
      */
     public void removeChangeListener(final int selectors, final ChangeListener listener) {
         ensureValidSelectors(selectors);
@@ -773,16 +737,14 @@ public class CoordinateChooser extends JPanel {
 
     /**
      * Shows a dialog box requesting input from the user. The dialog box will be
-     * parented to <code>owner</code>. If <code>owner</code> is contained into a
+     * parented to {@code owner}. If {@code owner} is contained into a
      * {@link javax.swing.JDesktopPane}, the dialog box will appears as an internal
      * frame. This method can be invoked from any thread (may or may not be the
-     * <i>Swing</i> thread).
+     * <cite>Swing</cite> thread).
      *
-     * @param  owner The parent component for the dialog box,
-     *         or <code>null</code> if there is no parent.
-     * @return <code>true</code> if user pressed the "Ok" button, or
-     *         <code>false</code> otherwise (e.g. pressing "Cancel"
-     *         or closing the dialog box from the title bar).
+     * @param  owner The parent component for the dialog box, or {@code null} if there is no parent.
+     * @return {@code true} if user pressed the "Ok" button, or {@code false} otherwise
+     *         (e.g. pressing "Cancel" or closing the dialog box from the title bar).
      */
     public boolean showDialog(final Component owner) {
         return showDialog(owner, getResources().format(ResourceKeys.COORDINATES_SELECTION));
@@ -790,17 +752,15 @@ public class CoordinateChooser extends JPanel {
 
     /**
      * Shows a dialog box requesting input from the user. The dialog box will be
-     * parented to <code>owner</code>. If <code>owner</code> is contained into a
+     * parented to {@code owner}. If {@code owner} is contained into a
      * {@link javax.swing.JDesktopPane}, the dialog box will appears as an internal
      * frame. This method can be invoked from any thread (may or may not be the
      * <i>Swing</i> thread).
      *
-     * @param  owner The parent component for the dialog box,
-     *         or <code>null</code> if there is no parent.
+     * @param  owner The parent component for the dialog box, or {@code null} if there is no parent.
      * @param  title The dialog box title.
-     * @return <code>true</code> if user pressed the "Ok" button, or
-     *         <code>false</code> otherwise (e.g. pressing "Cancel"
-     *         or closing the dialog box from the title bar).
+     * @return {@code true} if user pressed the "Ok" button, or {@code false} otherwise
+     *         (e.g. pressing "Cancel" or closing the dialog box from the title bar).
      */
     public boolean showDialog(final Component owner, final String title) {
         while (SwingUtilities.showOptionDialog(owner, this, title)) {
@@ -814,11 +774,8 @@ public class CoordinateChooser extends JPanel {
     /**
      * Show the dialog box. This method is provided only as an easy
      * way to test the dialog appearance from the command line.
-     *
-     * @param args The command line arguments.
      */
     public static void main(final String[] args) {
         new CoordinateChooser().showDialog(null);
-        System.exit(0);
     }
 }

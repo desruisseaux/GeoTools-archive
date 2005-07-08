@@ -16,33 +16,24 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
-package org.geotools.gui.swing.tree;
+package org.geotools.gui.swing.event;
+
+// Events
+import java.util.EventListener;
 
 
 /**
- * Defines the requirements for an object that can be used as a
- * tree node in a {@link javax.swing.JTree}. This interface add
- * the <code>getUserObject()</code> to Swing's interface, which
- * seems to have been forgotten in J2SE.
+ * Defines an object which listens for zoom change events. Zoom changes
+ * are indicated by an {@link java.awt.geom.AffineTransform}.
  *
- * @version $Id: TreeNode.java,v 1.2 2004/04/30 19:40:16 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id: ZoomChangeListener.java,v 1.4 2003/05/13 11:01:39 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
-public interface TreeNode extends javax.swing.tree.TreeNode {
+public interface ZoomChangeListener extends EventListener {
     /**
-     * Returns this node's user object.
-     *
-     * @return the Object stored at this node by the user
+     * Invoked when a zoom changes.
      */
-    public abstract Object getUserObject();
+    public abstract void zoomChanged(final ZoomChangeEvent event);
 }

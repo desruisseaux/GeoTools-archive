@@ -17,23 +17,10 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.headless;
 
-// Gestion des entrés/sorties
+// J2SE Input/output
 import java.lang.System;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -42,11 +29,11 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.UnsupportedCharsetException;
 
-// Gestion du texte
+// Text
 import java.text.NumberFormat;
 import java.text.BreakIterator;
 
-// Divers
+// Geotools dependencies
 import org.geotools.util.ProgressListener;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
@@ -55,12 +42,11 @@ import org.geotools.resources.gui.ResourceKeys;
 
 
 /**
- * Informe l'utilisateur des progrès d'une opération à l'aide de messages envoyé vers un
- * flot. L'avancement de l'opération sera affiché en pourcentage sur une ligne (généralement
- * le périphérique de sortie standard). Cette classe peut aussi écrire des avertissements,
- * ce qui est utile entre autre lors de la lecture d'un fichier de données durant laquelle
- * on veut signaler des anomalies mais sans arrêter la lecture pour autant.
+ * Prints progress report of a lengtly operation to an output stream. Progress are reported
+ * as percentage on a single line. This class can also prints warning, which is useful for
+ * notifications without stoping the lenghtly task.
  *
+ * @since 2.0
  * @version $Id: ProgressPrinter.java,v 1.2 2003/05/13 11:01:39 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
@@ -136,36 +122,33 @@ public class ProgressPrinter implements ProgressListener {
     private String lastSource;
 
     /**
-     * Construit un objet qui écrira sur le périphérique de sortie standard
-     * ({@link java.lang.System#out}) l'état d'avancement d'une opération.
-     * La longueur par défaut des lignes sera de 80 caractères.
+     * Constructs a new object sending progress reports to the
+     * {@linkplain java.lang.System#out standard output stream}.
+     * The maximal line length is assumed 80 characters.
      */
     public ProgressPrinter() {
         this(new PrintWriter(Arguments.getWriter(System.out)));
     }
 
     /**
-     * Construit un objet qui écrira sur le périphérique de
-     * sortie spécifié l'état d'avancement d'une opération.
-     * La longueur par défaut des lignes sera de 80 caractères.
+     * Constructs a new object sending progress reports to the specified stream.
+     * The maximal line length is assumed 80 characters.
      */
     public ProgressPrinter(final PrintWriter out) {
         this(out, 80);
     }
 
     /**
-     * Construit un objet qui écrira sur le périphérique de
-     * sortie spécifié l'état d'avancement d'une opération.
+     * Constructs a new object sending progress reports to the specified stream.
      *
-     * @param out périphérique de sortie à utiliser pour écrire l'état d'avancement.
-     * @param maxLength Longueur maximale des lignes. Cette information est utilisée
-     *        par {@link #warningOccurred} pour répartir sur plusieurs lignes des
-     *        messages qui ferait plus que la longueur <code>lineLength</code>.
+     * @param out The output stream.
+     * @param maxLength The maximal line length. This is used by {@link #warningOccurred}
+     *        for splitting longer lines into many lines.
      */
     public ProgressPrinter(final PrintWriter out, final int maxLength) {
         this.out = out;
         this.maxLength = maxLength;
-        final String lineSeparator = System.getProperty("line.separator");
+        final String lineSeparator = System.getProperty("line.separator", "\n");
         CR_supported=(lineSeparator!=null && lineSeparator.equals("\r\n"));
     }
 
@@ -212,29 +195,21 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Retourne le message d'écrivant l'opération
-     * en cours. Si aucun message n'a été définie,
-     * retourne <code>null</code>.
+     * {@inheritDoc}
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * Spécifie un message qui décrit l'opération en cours.
-     * Ce message est typiquement spécifiée avant le début
-     * de l'opération. Toutefois, cette méthode peut aussi
-     * être appelée à tout moment pendant l'opération sans
-     * que cela affecte le pourcentage accompli. La valeur
-     * <code>null</code> signifie qu'on ne souhaite plus
-     * afficher de description.
+     * {@inheritDoc}
      */
     public synchronized void setDescription(final String description) {
         this.description = description;
     }
 
     /**
-     * Indique que l'opération a commencée.
+     * {@inheritDoc}
      */
     public synchronized void started() {
         int length = 0;
@@ -253,9 +228,7 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Indique l'état d'avancement de l'opération. Le progrès est représenté par un
-     * pourcentage variant de 0 à 100 inclusivement. Si la valeur spécifiée est en
-     * dehors de ces limites, elle sera automatiquement ramenée entre 0 et 100.
+     * {@inheritDoc}
      */
     public synchronized void progress(float percent) {
         if (percent<0  ) percent=0;
@@ -298,9 +271,8 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Indique que l'opération est terminée. L'indicateur visuel informant des
-     * progrès sera ramené à 100% ou disparaîtra. Si des messages d'erreurs ou
-     * d'avertissements étaient en attente, ils seront écrits.
+     * Notifies this listener that the operation has finished. The progress indicator will
+     * shows 100% or disaspears. If warning messages were pending, they will be printed now.
      */
     public synchronized void complete() {
         if (!CR_supported) {
@@ -311,30 +283,24 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Libère les ressources utilisées par cet objet.
-     * L'implémentation par défaut ne fait rien.
+     * Release any resource hold by this object.
      */
     public void dispose() {
     }
 
     /**
-     * Envoie un message d'avertissement. La première fois que cette méthode est appellée, le mot
-     * "AVERTISSEMENTS" sera écrit en lettres majuscules au milieu d'une boîte. Si une source est
-     * spécifiée (argument <code>source</code>), elle ne sera écrite qu'à la condition qu'elle
-     * n'est pas la même que celle du dernier avertissement. Si une note de marge est spécifiée
-     * (argument <code>margin</code>), elle sera écrite entre parenthèses à la gauche de
-     * l'avertissement <code>warning</code>.
+     * Prints a warning. The first time this method is invoked, the localized word "WARNING" will
+     * be printed in the middle of a box. If a source is specified, it will be printed only if it
+     * is not the same one than the source of the last warning. If a marging is specified, it will
+     * be printed of the left side of the first line of the warning message.
      *
-     * @param source Chaîne de caractère décrivant la source de l'avertissement.
-     *        Il s'agira par exemple du nom du fichier dans lequel une anomalie
-     *        a été détectée. Peut être nul si la source n'est pas connue.
-     * @param margin Texte à placer dans la marge de l'avertissement <code>warning</code>,
-     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numéro
-     *        de ligne où s'est produite l'erreur dans le fichier <code>source</code>.
-     * @param warning Message d'avertissement à écrire. Si ce message est
-     *        plus long que la largeur de l'écran (telle que spécifiée au
-     *        moment de la construction, alors il sera automatiquement
-     *        distribué sur plusieurs lignes correctements indentées.
+     * @param source The source of the warning, or {@code null} if none. This is typically the
+     *        filename in process of being parsed.
+     * @param margin Text to write on the left side of the warning message, or {@code null} if none.
+     *        This is typically the line number where the error occured in the {@code source} file.
+     * @param warning The warning message. If this string is longer than the maximal length
+     *        specified at construction time (80 characters by default), then it will be splitted
+     *        in as many lines as needed and indented according the marging width.
      */
     public synchronized void warningOccurred(final String source, String margin,
                                              final String warning)
@@ -397,9 +363,7 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Indique qu'une exception est survenue pendant le traitement de l'opération.
-     * L'implémentation par défaut écrit "Exception" dans une boîte, puis envoie
-     * la trace vers le périphérique de sortie spécifiée au constructeur.
+     * Prints an exception stack trace in a box.
      */
     public synchronized void exceptionOccurred(final Throwable exception) {
         carriageReturn(0);
