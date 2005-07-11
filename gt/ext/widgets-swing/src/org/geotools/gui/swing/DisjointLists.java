@@ -180,7 +180,7 @@ public class DisjointLists extends JPanel {
                 System.arraycopy(visibles, insertAt, visibles, insertAt+length, size-insertAt);
                 System.arraycopy(source.visibles, subLower, visibles, insertAt, length);
                 size += length;
-                assert isSorted() : Arrays.toString(visibles); // TODO: uncomment for J2SE 1.5.
+                assert isSorted(); // : Arrays.toString(visibles); // TODO: uncomment for J2SE 1.5.
                 fireIntervalAdded(this, insertAt, insertAt+length-1);
             }
             source.hide(lower, upper);
