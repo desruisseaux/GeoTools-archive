@@ -38,8 +38,7 @@ import java.util.HashMap;
  * A simple implementation of the Arc Grid Format.
  *
  * @author jeichar
- * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini
- *         (simboss)</a>
+ * @author simone giannecchini</a>
  */
 public class ArcGridFormat extends AbstractGridFormat implements Format {
     public static final DefaultParameterDescriptor CRS = new DefaultParameterDescriptor("crs",
@@ -108,7 +107,6 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
      */
     public boolean accepts(Object input) {
         boolean compress = false;
-        boolean GRASS = false;
         Reader fakeReader = null;
         IOExchange mExchange = IOExchange.getIOExchange();
 
@@ -121,17 +119,14 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
             pathname = ((File) input).getName();
         } else if (input instanceof URL) {
             URL url = (URL) input;
-
             pathname = url.getFile();
-        } else { //not acceptable!
-
+        } else  
+//        	not acceptable!
             return false;
-        }
 
         //trying to check the header
         try {
             fakeReader = mExchange.getGZIPReader(input);
-
             //it is compressed
             compress = true;
         } catch (Exception e) {
