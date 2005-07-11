@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.axis;
 
@@ -40,6 +27,7 @@ import java.awt.RenderingHints;
 /**
  * Rendering hints for tick's graduation.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -58,8 +46,7 @@ final class RenderingHintKey extends RenderingHints.Key {
     }
 
     /**
-     * Returns <code>true</code> if the specified
-     * object is a valid value for this key.
+     * Returns {@code true} if the specified object is a valid value for this key.
      */
     public boolean isCompatibleValue(final Object value) {
         return value!=null && type.isAssignableFrom(value.getClass());

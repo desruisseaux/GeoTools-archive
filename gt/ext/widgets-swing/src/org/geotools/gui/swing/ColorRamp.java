@@ -49,8 +49,13 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.coverage.Coverage;
+import org.opengis.coverage.SampleDimension;
+import org.opengis.coverage.PaletteInterpretation;
+import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 
 // Axis
@@ -61,33 +66,30 @@ import org.geotools.axis.AbstractGraduation;
 import org.geotools.axis.LogarithmicNumberGraduation;
 
 // Geotools dependencies
-import org.geotools.ct.MathTransform1D;
-import org.geotools.cv.Category;
-import org.geotools.cv.SampleDimension;
-import org.geotools.gc.GridCoverage;
-import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.LegacyGCSUtilities;
-
-// Resources (Note: CTS resources are okay for this class).
+import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * A color bar with a graduation. The colors can be specified with a {@link SampleDimension},
- * an array of {@link Color}s or an {@link IndexColorModel} bject, and the graduation is
- * specified with a {@link Graduation} object. The resulting <code>ColorBar</code> object
+ * A color ramp with a graduation. The colors can be specified with a {@link SampleDimension},
+ * an array of {@link Color}s or an {@link IndexColorModel} object, and the graduation is
+ * specified with a {@link Graduation} object. The resulting {@code ColorRamp} object
  * is usually painted together with a remote sensing image, for example in a
  * {@link org.geotools.gui.swing.MapPane} object.
  *
- * @version $Id: ColorBar.java,v 1.9 2004/02/13 14:29:37 desruisseaux Exp $
- * @author Martin Desruisseaux
+ * <p>&nbsp;</p>
+ * <p align="center"><img src="doc-files/ColorRamp.png"></p>
+ * <p>&nbsp;</p>
  *
- * @deprecated Use {@link ColorRamp} instead.
+ * @since 2.2
+ * @version $Id: ColorRamp.java,v 1.9 2004/02/13 14:29:37 desruisseaux Exp $
+ * @author Martin Desruisseaux
  */
-public class ColorBar extends JComponent {
+public class ColorRamp extends JComponent {
     /**
      * Margin (in pixel) on each sides: top, left, right and bottom of the color ramp.
      */
@@ -110,25 +112,24 @@ public class ColorBar extends JComponent {
     private String units;
 
     /**
-     * The colors to paint (never <code>null</code>).
+     * The colors to paint (never {@code null}).
      */
     private Color[] colors = EMPTY;
 
     /**
-     * <code>true</code> if tick label must be display.
+     * {@code true} if tick label must be display.
      */
     private boolean labelVisibles = true;
 
     /**
-     * <code>true</code> if tick label can be display with an automatic
-     * color. The automatic color will be white or black depending the
-     * background color.
+     * {@code true} if tick label can be display with an automatic color. The
+     * automatic color will be white or black depending the background color.
      */
     private boolean autoForeground = true;
 
     /**
-     * <code>true</code> if the color bar should be drawn horizontally,
-     * or <code>false</code> if it should be drawn vertically.
+     * {@code true} if the color bar should be drawn horizontally,
+     * or {@code false} if it should be drawn vertically.
      */
     private boolean horizontal = true;
 
@@ -139,9 +140,8 @@ public class ColorBar extends JComponent {
     private transient RenderingHints hints;
 
     /**
-     * The tick iterator used during the last painting.
-     * This iterator will be reused as mush as possible
-     * in order to reduce garbage-collections.
+     * The tick iterator used during the last painting. This iterator will be reused as mush
+     * as possible in order to reduce garbage-collections.
      */
     private transient TickIterator reuse;
 
@@ -158,27 +158,28 @@ public class ColorBar extends JComponent {
     private final UI ui = new UI();
 
     /**
-     * Construct an initially empty color bar. Colors can be
-     * set using one of the <code>setColors(...)</code> methods.
+     * Constructs an initially empty color bar. Colors can be
+     * set using one of the {@code setColors(...)} methods.
      */
-    public ColorBar() {
+    public ColorRamp() {
         setOpaque(true);
         setUI(ui);
     }
 
     /**
-     * Construct a color bar for the specified grid coverage.
+     * Constructs a color bar for the specified coverage.
      *
      * @param coverage The grid coverage.
      */
-    public ColorBar(final GridCoverage coverage) {
-        this();
-        setColors(coverage);
-    }
+// TODO
+//    public ColorRamp(final Coverage coverage) {
+//        this();
+//        setColors(coverage);
+//    }
 
     /**
      * Returns the graduation to paint over colors. If the graduation is
-     * not yet defined, then this method returns <code>null</code>.
+     * not yet defined, then this method returns {@code null}.
      */
     public Graduation getGraduation() {
         return graduation;
@@ -187,10 +188,10 @@ public class ColorBar extends JComponent {
     /**
      * Set the graduation to paint on top of the color bar. The graduation can be set also
      * by a call to {@link #setColors(SampleDimension)} and {@link #setColors(GridCoverage)}.
-     * This method will fire a property change event with the <code>"graduation"</code> name.
+     * This method will fire a property change event with the {@code "graduation"} name.
      *
-     * @param  graduation The new graduation, or <code>null</code> if none.
-     * @return <code>true</code> if this object changed as a result of this call.
+     * @param  graduation The new graduation, or {@code null} if none.
+     * @return {@code true} if this object changed as a result of this call.
      */
     public boolean setGraduation(final Graduation graduation) {
         final Graduation oldGraduation = this.graduation;
@@ -204,7 +205,7 @@ public class ColorBar extends JComponent {
             this.graduation = graduation;
             units = null;
             if (graduation != null) {
-                final Unit unit = null; // TODO graduation.getUnit();
+                final Unit unit = graduation.getUnit();
                 if (unit != null) {
                     units = unit.toString();
                 }
@@ -219,9 +220,9 @@ public class ColorBar extends JComponent {
     }
 
     /**
-     * Returns the colors painted by this <code>ColorBar</code>.
+     * Returns the colors painted by this {@code ColorRamp}.
      * 
-     * @return The colors (never <code>null</code>).
+     * @return The colors (never {@code null}).
      */
     public Color[] getColors() {
         return (colors.length!=0) ? (Color[])colors.clone() : colors;
@@ -229,11 +230,10 @@ public class ColorBar extends JComponent {
 
     /**
      * Sets the colors to paint.
-     * This method will fire a property change event with the <code>"colors"</code> name.
+     * This method will fire a property change event with the {@code "colors"} name.
      *
      * @param colors The colors to paint.
-     * @return <code>true</code> if the state of this <code>ColorBar</code>
-     *         changed as a result of this call.
+     * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
      * @see #setColors(GridCoverage)
      * @see #setColors(SampleDimension)
@@ -253,11 +253,11 @@ public class ColorBar extends JComponent {
     }
 
     /**
-     * Sets the colors to paint from an {@link IndexColorModel}.
+     * Sets the colors to paint from an {@link IndexColorModel}. The default implementation
+     * fetches the colors from the index color model and invokes {@link #setColors(Color[])}.
      *
      * @param model The colors to paint.
-     * @return <code>true</code> if the state of this <code>ColorBar</code>
-     *         changed as a result of this call.
+     * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
      * @see #setColors(GridCoverage)
      * @see #setColors(SampleDimension)
@@ -266,140 +266,126 @@ public class ColorBar extends JComponent {
      * @see #getGraduation()
      */
     public boolean setColors(final IndexColorModel model) {
-        return (model!=null) ? setColors(model, 0, model.getMapSize()) : setColors(EMPTY);
-    }
-
-    /**
-     * Sets the colors to paint from an {@link IndexColorModel}. Only indexed colors in the
-     * range <code>lower</code> inclusive to <code>upper</code> exclusive will be painted.
-     *
-     * @param model The colors to paint.
-     * @param lower First color index to paint, inclusive.
-     * @param upper Last  color index to paint, exclusive.
-     * @return <code>true</code> if the state of this <code>ColorBar</code>
-     *         changed as a result of this call.
-     *
-     * @see #setColors(GridCoverage)
-     * @see #setColors(SampleDimension)
-     * @see #setColors(Color[])
-     * @see #getColors()
-     * @see #getGraduation()
-     */
-    private boolean setColors(final IndexColorModel model, final int lower, final int upper) {
+        final Color[] colors;
         if (model == null) {
-            return setColors(EMPTY);
-        }
-        final Color[] colors = new Color[upper-lower];
-        for (int i=0; i<colors.length; i++) {
-            final int j = i+lower;
-            colors[i] = new Color(model.getRed  (j),
-                                  model.getGreen(j),
-                                  model.getBlue (j),
-                                  model.getAlpha(j));
+            colors = EMPTY;
+        } else {
+            colors = new Color[model.getMapSize()];
+            for (int i=0; i<colors.length; i++) {
+                colors[i] = new Color(model.getRed  (i),
+                                      model.getGreen(i),
+                                      model.getBlue (i),
+                                      model.getAlpha(i));
+            }
         }
         return setColors(colors);
     }
 
     /**
-     * Sets the colors to paint. The range of indexed colors and the
-     * minimum and maximum values are fetched from the supplied band.
+     * Sets the graduation and the colors to paint from a sample dimension. The default
+     * implementation fetched the range of indexed colors and the minimum and maximum values
+     * from the supplied band, and then invokes {@link #setColors(Color[])} and
+     * {@link #setGraduation}.
      *
-     * @param  band The band.
-     * @param  colors The colors to paint.
-     * @return <code>true</code> if the state of this <code>ColorBar</code>
-     *         changed as a result of this call.
+     * @param band The band, or {@code null}.
+     * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
      * @see #setColors(GridCoverage)
      * @see #setColors(SampleDimension)
-     * @see #setColors(IndexColorModel)
-     * @see #setColors(Color[])
-     * @see #getColors()
-     * @see #getGraduation()
-     */
-    private boolean setColors(final SampleDimension band, final IndexColorModel colors) {
-        /*
-         * Looks for what seems to be the "main" category. We look for the
-         * quantitative category (if there is one) with the widest sample range.
-         */
-        double maxRange = 0;
-        Category category = null;
-        final List categories = band.getCategories();
-        for (int i=categories.size(); --i>=0;) {
-            final Category candidate = ((Category) categories.get(i)).geophysics(false);
-            if (candidate!=null && candidate.isQuantitative()) {
-                final NumberRange range = candidate.getRange();
-                final double rangeValue = range.getMaximum() - range.getMinimum();
-                if (rangeValue >= maxRange) {
-                    maxRange = rangeValue;
-                    category = candidate;
-                }
-            }
-        }
-        if (category == null) {
-            return setGraduation(null) | setColors(EMPTY); // Realy |, not ||
-        }
-        /*
-         * Now that we know what seems to be the "main" category,
-         * construct a graduation for it.
-         */
-        final NumberRange range = category.getRange();
-        final int lower = ((Number)range.getMinValue()).intValue();
-        final int upper = ((Number)range.getMaxValue()).intValue();
-        double min,max;
-        try {
-            final MathTransform1D tr = category.getSampleToGeophysics();
-            min = tr.transform(lower);
-            max = tr.transform(upper);
-        } catch (TransformException cause) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "category", category));
-            e.initCause(cause);
-            throw e;
-        }
-        if (min > max) {
-            // This case occurs typically when displaying a color ramp for
-            // sea bathymetry, for which floor level are negative numbers.
-            min = -min;
-            max = -max;
-        }
-        if (!(min <= max)) {
-            throw new IllegalStateException(Resources.format(ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                                                             "category", category));
-        }
-        AbstractGraduation graduation = (this.graduation instanceof AbstractGraduation) ?
-                                        (AbstractGraduation) this.graduation : null;
-        graduation = createGraduation(graduation, category, band.getUnits());
-        graduation.setMinimum(min);
-        graduation.setMaximum(max);
-        return setGraduation(graduation) | setColors(colors, lower, upper); // Realy |, not ||
-    }
-
-    /**
-     * Sets the graduation and the colors to paint from a {@link SampleDimension}.
-     * The range of indexed colors and the minimum and maximum values are fetched
-     * from the supplied band.
-     *
-     * @param band The band, or <code>null</code>.
-     * @return <code>true</code> if the state of this <code>ColorBar</code>
-     *         changed as a result of this call.
-     *
-     * @see #setColors(GridCoverage)
      * @see #setColors(IndexColorModel)
      * @see #setColors(Color[])
      * @see #getColors()
      * @see #getGraduation()
      */
     public boolean setColors(SampleDimension band) {
-        if (band == null) {
-            return setGraduation(null) | setColors(EMPTY); // Really |, not ||
+        /*
+         * Looks for what seems to be the "main" category. We look for the
+         * quantitative category (if there is one) with the widest sample range.
+         */
+        double maxRange = 0;
+        if (band instanceof GridSampleDimension) {
+            band = ((GridSampleDimension) band).geophysics(false);
         }
-        band = band.geophysics(false);
-        final ColorModel colors = band.getColorModel();
-        if (colors instanceof IndexColorModel) {
-            return setColors(band, (IndexColorModel) colors);
+        final Color[] colors;
+        final int[][] palette = band.getPalette();
+        AbstractGraduation graduation;
+        if (palette == null) {
+            colors     = EMPTY;
+            graduation = null;
         } else {
-            throw new UnsupportedOperationException("Only IndexColorModel are currently supported");
+            /*
+             * Search for the largest range of valid values, ignoring "nodata" values.
+             */
+            int lower = 0;
+            int upper = 0;
+            double[] nodata = band.getNoDataValues();
+            if (nodata != null) {
+                nodata = (double[]) nodata.clone();
+                Arrays.sort(nodata);
+                for (int i=1; i<nodata.length; i++) {
+                    final int lo = (int) Math.ceil (nodata[i-1]);
+                    final int hi = (int) Math.floor(nodata[i  ]);
+                    if (lo>=0 && hi<=palette.length && (hi-lo)>(upper-lower)) {
+                        lower = lo;
+                        upper = hi;
+                    }
+                }
+            }
+            if (upper == 0) {
+                upper = palette.length;
+            }
+            /*
+             * Creates the colors from the palette.
+             */
+            if (PaletteInterpretation.RGB.equals(band.getPaletteInterpretation())) {
+                colors = new Color[upper-lower];
+                for (int i=0; i<colors.length; i++) {
+                    int r=0, g=0, b=0, a=255;
+                    final int[] c = palette[i+lower];
+                    if (c!=null) switch (c.length) {
+                        default:        // Fall through
+                        case 4: a=c[3]; // Fall through
+                        case 3: b=c[2]; // Fall through
+                        case 2: g=c[1]; // Fall through
+                        case 1: r=c[0]; // Fall through
+                        case 0: break;
+                    }
+                    colors[i] = new Color(r,g,b,a);
+                }
+            } else {
+                colors = EMPTY;
+            }
+            /*
+             * Now creates the gratuation.
+             */
+            double min,max;
+            try {
+                final MathTransform1D tr = band.getSampleToGeophysics();
+                min = tr.transform(lower);
+                max = tr.transform(upper);
+            } catch (TransformException cause) {
+                IllegalArgumentException e = new IllegalArgumentException(Resources.format(
+                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "band", band));
+                e.initCause(cause);
+                throw e;
+            }
+            if (min > max) {
+                // This case occurs typically when displaying a color ramp for
+                // sea bathymetry, for which floor level are negative numbers.
+                min = -min;
+                max = -max;
+            }
+            if (!(min <= max)) {
+                throw new IllegalArgumentException(Resources.format(
+                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "band", band));
+            }
+            graduation = (this.graduation instanceof AbstractGraduation) ?
+                         (AbstractGraduation) this.graduation : null;
+// TODO            graduation = createGraduation(graduation, category, band.getUnits());
+            graduation.setMinimum(min);
+            graduation.setMaximum(max);
         }
+        return setGraduation(graduation) | setColors(colors); // Realy |, not ||
     }
 
     /**
@@ -407,28 +393,28 @@ public class ColorBar extends JComponent {
      * The range of indexed colors and the minimum and maximum values are fetched
      * from the supplied grid coverage.
      *
-     * @param coverage The grid coverage, or <code>null</code>.
-     * @return <code>true</code> if the state of this <code>ColorBar</code>
-     *         changed as a result of this call.
+     * @param coverage The grid coverage, or {@code null}.
+     * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
      * @see #setColors(IndexColorModel)
      * @see #setColors(SampleDimension)
      * @see #getColors()
      * @see #getGraduation()
      */
-    public boolean setColors(GridCoverage coverage) {
-        SampleDimension band = null;
-        if (coverage != null) {
-            coverage = coverage.geophysics(false);
-            final RenderedImage image = coverage.getRenderedImage();
-            band = coverage.getSampleDimensions()[LegacyGCSUtilities.getVisibleBand(image)];
-            final ColorModel colors = image.getColorModel();
-            if (colors instanceof IndexColorModel) {
-                return setColors(band, (IndexColorModel) colors);
-            }
-        }
-        return setColors(band);
-    }
+// TODO
+//    public boolean setColors(GridCoverage coverage) {
+//        SampleDimension band = null;
+//        if (coverage != null) {
+//            coverage = coverage.geophysics(false);
+//            final RenderedImage image = coverage.getRenderedImage();
+//            band = coverage.getSampleDimension(GCSUtilities.getVisibleBand(image));
+//            final ColorModel colors = image.getColorModel();
+//            if (colors instanceof IndexColorModel) {
+//                return setColors(band, (IndexColorModel) colors);
+//            }
+//        }
+//        return setColors(band);
+//    }
 
     /**
      * Returns the component's orientation (horizontal or vertical).
@@ -442,8 +428,7 @@ public class ColorBar extends JComponent {
     /**
      * Set the component's orientation (horizontal or vertical).
      *
-     * @param orient {@link SwingConstants#HORIZONTAL}
-     *        or {@link SwingConstants#VERTICAL}.
+     * @param orient {@link SwingConstants#HORIZONTAL} or {@link SwingConstants#VERTICAL}.
      */
     public void setOrientation(final int orient) {
         switch (orient) {
@@ -455,23 +440,21 @@ public class ColorBar extends JComponent {
 
     /**
      * Tests if graduation labels are paint on top of the
-     * colors ramp. Default value is <code>true</code>.
+     * colors ramp. Default value is {@code true}.
      */
     public boolean isLabelVisibles() {
         return labelVisibles;
     }
 
     /**
-     * Sets whatever the graduation labels should
-     * be painted on top of the colors ramp.
+     * Sets whatever the graduation labels should be painted on top of the colors ramp.
      */
     public void setLabelVisibles(final boolean visible) {
         labelVisibles = visible;
     }
 
     /**
-     * Sets the label colors. A <code>null</code>
-     * value reset the automatic color.
+     * Sets the label colors. A {@code null} value reset the automatic color.
      *
      * @see #getForeground
      */
@@ -481,9 +464,8 @@ public class ColorBar extends JComponent {
     }
 
     /**
-     * Returns a color for label at the specified index.
-     * The default color will be black or white, depending
-     * of the background color at the specified index.
+     * Returns a color for label at the specified index. The default color will be
+     * black or white, depending of the background color at the specified index.
      */
     private Color getForeground(final int colorIndex) {
         final Color color = colors[colorIndex];
@@ -497,9 +479,8 @@ public class ColorBar extends JComponent {
      *
      * @param  graphics The graphic context in which to paint.
      * @param  bounds   The bounding box where to paint the color ramp.
-     * @return Bounding box of graduation labels (NOT takind in account
-     *         the color ramp in behind them), or <code>null</code> if
-     *         no label has been painted.
+     * @return Bounding box of graduation labels (NOT takind in account the color ramp
+     *                  behind them), or {@code null} if no label has been painted.
      */
     private Rectangle2D paint(final Graphics2D graphics, final Rectangle bounds) {
         final int length = colors.length;
@@ -562,8 +543,7 @@ public class ColorBar extends JComponent {
             /*
              * Prépare l'écriture de la graduation. On vérifie quelle longueur
              * (en pixels) a la rampe de couleurs et on calcule les coéfficients
-             * qui permettront de convertir les valeurs logiques en coordonnées
-             * pixels.
+             * qui permettront de convertir les valeurs logiques en coordonnées pixels.
              */
             double x = bounds.getCenterX();
             double y = bounds.getCenterY();
@@ -651,9 +631,9 @@ public class ColorBar extends JComponent {
      * a graduation of the appropriate class (e.g. {@link NumberGraduation} or
      * {@link LogarithmicNumberGraduation}), but doesn't have to set any graduation's
      * properties like minimum and maximum values. This will be handle by the caller.
-     * <br><br>
-     * If the supplied <code>reuse</code> object is non-null and is of the appropriate
-     * class, then this method can returns <code>reuse</code> without creating a new
+     * <p>
+     * If the supplied {@code reuse} object is non-null and is of the appropriate
+     * class, then this method can returns {@code reuse} without creating a new
      * graduation. This help to reduce garbage collection.
      *
      * @param  reuse The graduation to reuse if possible.
@@ -662,50 +642,51 @@ public class ColorBar extends JComponent {
      * @return A graduation for the supplied category. The minimum, maximum
      *         and units doesn't need to bet set at this stage.
      */
-    protected AbstractGraduation createGraduation(final AbstractGraduation reuse,
-                                                  final Category category, final Unit units)
-    {
-        MathTransform1D tr = category.geophysics(false).getSampleToGeophysics();
-        boolean linear      = false;
-        boolean logarithmic = false;
-        try {
-            /*
-             * An heuristic approach to determine if the transform is linear or logarithmic.
-             * We look at the derivative, which should be constant everywhere for a linear
-             * scale and be proportional to the inverse of 'x' for a logarithmic one.
-             */
-            tr = (MathTransform1D) tr.inverse();
-            final double     EPS = 1E-6; // For rounding error.
-            final NumberRange range = category.geophysics(true).getRange();
-            final double minimum = range.getMinimum();
-            final double maximum = range.getMaximum();
-            final double ratio   = tr.derivative(minimum) / tr.derivative(maximum);
-            if (Math.abs(ratio-1) <= EPS) {
-                linear = true;
-            }
-            if (Math.abs(ratio*(minimum/maximum) - 1) <= EPS) {
-                logarithmic = true;
-            }
-        } catch (TransformException exception) {
-            // Transformation failed. We don't know if the scale is linear or logarithmic.
-            // Continue anyway...
-        }
-        if (linear) {
-            if (reuse==null || !reuse.getClass().equals(NumberGraduation.class)) {
-                return new NumberGraduation(null /* TODO units */);
-            }
-        } else if (logarithmic) {
-            if (reuse==null || !reuse.getClass().equals(LogarithmicNumberGraduation.class)) {
-                return new LogarithmicNumberGraduation(null /* TODO units */);
-            }
-        } else {
-            // TODO: Should we localize this message? (it should not occurs often)
-            Logger.getLogger("org.geotools.gui.swing").warning("Unknow scale type: \""+
-                             Utilities.getShortClassName(tr)+"\". Default to linear.");
-            return new NumberGraduation(null /* TODO units */);
-        }
-        return reuse;
-    }
+// TODO
+//    protected AbstractGraduation createGraduation(final AbstractGraduation reuse,
+//                                                  final Category category, final Unit units)
+//    {
+//        MathTransform1D tr  = category.geophysics(false).getSampleToGeophysics();
+//        boolean linear      = false;
+//        boolean logarithmic = false;
+//        try {
+//            /*
+//             * An heuristic approach to determine if the transform is linear or logarithmic.
+//             * We look at the derivative, which should be constant everywhere for a linear
+//             * scale and be proportional to the inverse of 'x' for a logarithmic one.
+//             */
+//            tr = (MathTransform1D) tr.inverse();
+//            final double     EPS = 1E-6; // For rounding error.
+//            final NumberRange range = category.geophysics(true).getRange();
+//            final double minimum = range.getMinimum();
+//            final double maximum = range.getMaximum();
+//            final double ratio   = tr.derivative(minimum) / tr.derivative(maximum);
+//            if (Math.abs(ratio-1) <= EPS) {
+//                linear = true;
+//            }
+//            if (Math.abs(ratio*(minimum/maximum) - 1) <= EPS) {
+//                logarithmic = true;
+//            }
+//        } catch (TransformException exception) {
+//            // Transformation failed. We don't know if the scale is linear or logarithmic.
+//            // Continue anyway...
+//        }
+//        if (linear) {
+//            if (reuse==null || !reuse.getClass().equals(NumberGraduation.class)) {
+//                return new NumberGraduation(units);
+//            }
+//        } else if (logarithmic) {
+//            if (reuse==null || !reuse.getClass().equals(LogarithmicNumberGraduation.class)) {
+//                return new LogarithmicNumberGraduation(units);
+//            }
+//        } else {
+//            // TODO: Should we localize this message? (it should not occurs often)
+//            Logger.getLogger("org.geotools.gui.swing").warning("Unknow scale type: \""+
+//                             Utilities.getShortClassName(tr)+"\". Default to linear.");
+//            return new NumberGraduation(units);
+//        }
+//        return reuse;
+//    }
 
     /**
      * Returns a string representation for this color ramp.
@@ -727,9 +708,8 @@ public class ColorBar extends JComponent {
     }
 
     /**
-     * Notifies this component that it now has a parent component.
-     * This method is invoked by <em>Swing</em> and shouldn't be
-     * directly used.
+     * Notifies this component that it now has a parent component. This method
+     * is invoked by <cite>Swing</cite> and shouldn't be directly used.
      */
     public void addNotify() {
         super.addNotify();
@@ -759,7 +739,7 @@ public class ColorBar extends JComponent {
      * de calculer l'espace qu'elle occupe. Cette classe peut aussi réagir
      * à certains événements.
      *
-     * @version $Id: ColorBar.java,v 1.9 2004/02/13 14:29:37 desruisseaux Exp $
+     * @version $Id: ColorRamp.java,v 1.9 2004/02/13 14:29:37 desruisseaux Exp $
      * @author Martin Desruisseaux
      */
     private final class UI extends ComponentUI implements PropertyChangeListener {
@@ -767,7 +747,7 @@ public class ColorBar extends JComponent {
          * Retourne la dimension minimale de cette rampe de couleurs.
          */
         public Dimension getMinimumSize(final JComponent c) {
-            return (((ColorBar) c).horizontal) ? new Dimension(2*MARGIN,16)
+            return (((ColorRamp) c).horizontal) ? new Dimension(2*MARGIN,16)
                                                : new Dimension(16,2*MARGIN);
         }
 
@@ -775,7 +755,7 @@ public class ColorBar extends JComponent {
          * Retourne la dimension préférée de cette rampe de couleurs.
          */
         public Dimension getPreferredSize(final JComponent c) {
-            return (((ColorBar) c).horizontal) ? new Dimension(256,16)
+            return (((ColorRamp) c).horizontal) ? new Dimension(256,16)
                                                : new Dimension(16,256);
         }
 
@@ -788,7 +768,7 @@ public class ColorBar extends JComponent {
          * {@link JComponent#paintComponent}.
          */
         public void paint(final Graphics graphics, final JComponent component) {
-            final ColorBar ramp = (ColorBar) component;
+            final ColorRamp ramp = (ColorRamp) component;
             if (ramp.colors != null) {
                 final Rectangle bounds=ramp.getBounds();
                 bounds.x = 0;
@@ -798,8 +778,7 @@ public class ColorBar extends JComponent {
         }
 
         /**
-         * Méthode appelée automatiquement chaque
-         * fois qu'une propriété de l'axe a changée.
+         * Méthode appelée automatiquement chaque fois qu'une propriété de l'axe a changée.
          */
         public void propertyChange(final PropertyChangeEvent event) {
             repaint();

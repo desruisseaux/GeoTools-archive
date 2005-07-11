@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.axis;
 
@@ -39,13 +26,16 @@ import java.text.Format;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.geotools.units.Unit;
-import org.geotools.units.UnitException;
+// Units dependencies
+import javax.units.Unit;
+import javax.units.Converter;
+import javax.units.ConversionException;
 
 
 /**
  * A graduation using numbers on a linear axis.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -68,7 +58,7 @@ public class NumberGraduation extends AbstractGraduation {
     /**
      * Construct a graduation with the supplied units.
      *
-     * @param unit The axis's units, or <code>null</code> if unknow.
+     * @param unit The axis's units, or {@code null} if unknow.
      */
     public NumberGraduation(final Unit unit) {
         super(unit);
@@ -80,10 +70,10 @@ public class NumberGraduation extends AbstractGraduation {
      * greater than or equals to the minimum.
      *
      * @param  value The new minimum in {@link #getUnit} units.
-     * @return <code>true</code> if the state of this graduation changed
-     *         as a result of this call, or <code>false</code> if the new
+     * @return {@code true} if the state of this graduation changed
+     *         as a result of this call, or {@code false} if the new
      *         value is identical to the previous one.
-     * @throws IllegalArgumentException Si <code>value</code> is NaN ou infinite.
+     * @throws IllegalArgumentException Si {@code value} is NaN ou infinite.
      *
      * @see #getMinimum
      * @see #setMaximum(double)
@@ -104,15 +94,13 @@ public class NumberGraduation extends AbstractGraduation {
     }
 
     /**
-     * Set the maximum value for this graduation. If the new maximum is less
-     * than the current minimum, then the minimum will also be set to a value
-     * less than or equals to the maximum.
+     * Set the maximum value for this graduation. If the new maximum is less than the current
+     * minimum, then the minimum will also be set to a value less than or equals to the maximum.
      *
      * @param  value The new maximum in {@link #getUnit} units.
-     * @return <code>true</code> if the state of this graduation changed
-     *         as a result of this call, or <code>false</code> if the new
-     *         value is identical to the previous one.
-     * @throws IllegalArgumentException If <code>value</code> is NaN ou infinite.
+     * @return {@code true} if the state of this graduation changed as a result of this call,
+     *         or {@code false} if the new value is identical to the previous one.
+     * @throws IllegalArgumentException If {@code value} is NaN ou infinite.
      *
      * @see #getMaximum
      * @see #setMinimum(double)
@@ -133,7 +121,8 @@ public class NumberGraduation extends AbstractGraduation {
     }
 
     /**
-     * Returns the minimal value for this graduation.
+     * Returns the minimal value for this graduation 
+     *
      * @return The minimal value in {@link #getUnit} units.
      *
      * @see #setMinimum(double)
@@ -146,6 +135,7 @@ public class NumberGraduation extends AbstractGraduation {
 
     /**
      * Returns the maximal value for this graduation.
+     *
      * @return The maximal value in {@link #getUnit} units.
      *
      * @see #setMaximum(double)
@@ -165,10 +155,8 @@ public class NumberGraduation extends AbstractGraduation {
     }
 
     /**
-     * Sets the graduation's minimum, maximum and units.
-     * This method will fire property change events for
-     * <code>"minimum"</code>, <code>"maximum"</code>
-     * and <code>"unit"</code> property names.
+     * Sets the graduation's minimum, maximum and units. This method will fire property change
+     * events for {@code "minimum"}, {@code "maximum"} and {@code "unit"} property names.
      */
     public void setRange(final double min, final double max, final Unit unit) {
         final Double oldMin;
@@ -185,21 +173,21 @@ public class NumberGraduation extends AbstractGraduation {
     }
 
     /**
-     * Changes the graduation's units. This method will automatically
-     * convert minimum and maximum values from the old units to the
-     * new one.
+     * Changes the graduation's units. This method will automatically convert minimum and
+     * maximum values from the old units to the new one.
      *
-     * @param newUnit The new units, or <code>null</code> if unknow.
+     * @param newUnit The new units, or {@code null} if unknow.
      *        If null, minimum and maximum values are not converted.
-     * @throws UnitException if units are not convertible.
+     * @throws ConversionException if units are not convertible.
      */
-    public synchronized void setUnit(final Unit newUnit) throws UnitException {
+    public synchronized void setUnit(final Unit newUnit) throws ConversionException {
         double min = minimum;
         double max = maximum;
         final Unit unit = getUnit();
         if (unit!=null && newUnit!=null) {
-            min = newUnit.convert(min, unit);
-            max = newUnit.convert(max, unit);
+            final Converter converter = unit.getConverterTo(newUnit);
+            min = converter.convert(min);
+            max = converter.convert(max);
         }
         setRange(min, max, newUnit);
     }
@@ -214,18 +202,17 @@ public class NumberGraduation extends AbstractGraduation {
     }
     
     /**
-     * Returns an iterator object that iterates along the graduation ticks
-     * and provides access to the graduation values. If an optional {@link
-     * RenderingHints} is specified, tick locations are adjusted according
-     * values for {@link #VISUAL_AXIS_LENGTH} and {@link #VISUAL_TICK_SPACING}
+     * Returns an iterator object that iterates along the graduation ticks and provides access to
+     * the graduation values. If an optional {@link RenderingHints} is specified, tick locations are
+     * adjusted according values for {@link #VISUAL_AXIS_LENGTH} and {@link #VISUAL_TICK_SPACING}
      * keys.
      *
-     * @param  hints Rendering hints, or <code>null</code> for the default hints.
-     * @param  reuse An iterator to reuse if possible, or <code>null</code>
-     *         to create a new one. A non-null object may help to reduce the
-     *         number of object garbage-collected when rendering the axis.
+     * @param  hints Rendering hints, or {@code null} for the default hints.
+     * @param  reuse An iterator to reuse if possible, or {@code null} to create a new one. A
+     *         non-null object may help to reduce the number of object garbage-collected when
+     *         rendering the axis.
      * @return A iterator to use for iterating through the graduation. This
-     *         iterator may or may not be the <code>reuse</code> object.
+     *         iterator may or may not be the {@code reuse} object.
      */
     public synchronized TickIterator getTickIterator(final RenderingHints hints,
                                                      final TickIterator reuse)
@@ -244,8 +231,8 @@ public class NumberGraduation extends AbstractGraduation {
     }
 
     /**
-     * Construct or reuse an iterator. This method is
-     * overriden by {@link LogarithmicNumberGraduation}.
+     * Constructs or reuses an iterator. This method is overriden by
+     * {@link LogarithmicNumberGraduation}.
      */
     NumberIterator getTickIterator(final TickIterator reuse, final Locale locale) {
         if (reuse!=null && reuse.getClass().equals(NumberIterator.class)) {
@@ -258,7 +245,7 @@ public class NumberGraduation extends AbstractGraduation {
     }
 
     /**
-     * Compare this graduation with the specified object for equality.
+     * Compares this graduation with the specified object for equality.
      * This method do not compare registered listeners.
      */
     public boolean equals(final Object object) {

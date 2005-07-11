@@ -17,26 +17,14 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.axis;
 
-// Miscellaneous
+// J2SE dependencies
 import java.text.NumberFormat;
 import java.util.Locale;
 
+// Geotools dependencies
 import org.geotools.resources.XMath;
 
 
@@ -241,7 +229,7 @@ class NumberIterator implements TickIterator {
     }
 
     /**
-     * Indique s'il reste des graduations à retourner. Cette méthode retourne <code>true</code>
+     * Indique s'il reste des graduations à retourner. Cette méthode retourne {@code true}
      * tant que {@link #currentValue} ou {@link #currentLabel} peuvent être appelées.
      */
     public boolean hasNext() {
@@ -251,8 +239,8 @@ class NumberIterator implements TickIterator {
     /**
      * Indique si la graduation courante est une graduation majeure.
      *
-     * @return <code>true</code> si la graduation courante est une
-     *         graduation majeure, ou <code>false</code> si elle
+     * @return {@code true} si la graduation courante est une
+     *         graduation majeure, ou {@code false} si elle
      *         est une graduation mineure.
      */
     public boolean isMajorTick() {
@@ -281,7 +269,7 @@ class NumberIterator implements TickIterator {
      * Retourne l'étiquette de la graduation courante. On n'appele généralement
      * cette méthode que pour les graduations majeures, mais elle peut aussi
      * être appelée pour les graduations mineures. Cette méthode retourne
-     * <code>null</code> s'il n'y a pas d'étiquette pour la graduation courante.
+     * {@code null} s'il n'y a pas d'étiquette pour la graduation courante.
      */
     public String currentLabel() {
         if (!formatValid) {

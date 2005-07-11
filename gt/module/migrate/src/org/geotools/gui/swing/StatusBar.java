@@ -63,7 +63,6 @@ import javax.imageio.ImageReader;
 import javax.imageio.event.IIOReadProgressListener;
 
 // Geotools dependencies
-import org.geotools.pt.CoordinatePoint;
 import org.geotools.renderer.j2d.GeoMouseEvent;
 import org.geotools.renderer.j2d.MouseCoordinateFormat;
 import org.geotools.resources.XArray;

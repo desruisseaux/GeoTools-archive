@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.axis;
 
@@ -45,11 +32,10 @@ import java.util.TimeZone;
 
 
 /**
- * Itérateur balayant les barres et étiquettes de graduation d'un axe
- * du temps.   Cet itérateur retourne les positions des graduations à
- * partir de la date la plus ancienne jusqu'à la date la plus récente.
- * Il choisit les intervalles de graduation en supposant qu'on utilise
- * un calendrier grégorien.
+ * Itérateur balayant les barres et étiquettes de graduation d'un axe du temps. Cet itérateur
+ * retourne les positions des graduations à partir de la date la plus ancienne jusqu'à la date
+ * la plus récente. Il choisit les intervalles de graduation en supposant qu'on utilise un
+ * calendrier grégorien.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -68,8 +54,8 @@ final class DateIterator implements TickIterator {
     /**
      * Liste des intervales souhaités pour la graduation. Les éléments de
      * cette table doivent obligatoirement apparaître en ordre croissant.
-     * Voici un exemple d'interprétation: la présence de <code>5*MIN</code>
-     * suivit de <code>10*MIN</code> implique que si le pas estimé se trouve
+     * Voici un exemple d'interprétation: la présence de {@@code 5*MIN}
+     * suivit de {@code 10*MIN} implique que si le pas estimé se trouve
      * entre 5 et 10 minutes, ce sera le pas de 10 minutes qui sera sélectionné.
      */
     private static final long[] INTERVAL = {
@@ -129,16 +115,14 @@ final class DateIterator implements TickIterator {
     };
 
     /**
-     * Nombre de colonne dans le tableau {@link ROLL}. Le tableau {@link ROLL} doit
-     * être interprété comme une matrice de 4 colonnes et d'un nombre indéterminé de
-     * lignes.
+     * Nombre de colonne dans le tableau {@link ROLL}. Le tableau {@link ROLL} doit être
+     * interprété comme une matrice de 4 colonnes et d'un nombre indéterminé de lignes.
      */
     private static final int ROLL_WIDTH = 4;
 
     /**
-     * Liste des champs de dates qui apparaissent dans le tableau {@link ROLL}.
-     * Cette liste doit être du champ le plus grand (YEAR) vers le champ le plus
-     * petit (MILLISECOND).
+     * Liste des champs de dates qui apparaissent dans le tableau {@link ROLL}. Cette liste
+     * doit être du champ le plus grand (YEAR) vers le champ le plus petit (MILLISECOND).
      */
     private static final int[] FIELD = {
         Calendar.YEAR,
@@ -152,8 +136,7 @@ final class DateIterator implements TickIterator {
 
     /**
      * Liste des noms des champs (à des fins de déboguage seulement).
-     * Cette liste doit être dans le même ordre que les éléments de
-     * {@link #FIELD}.
+     * Cette liste doit être dans le même ordre que les éléments de {@link #FIELD}.
      */
     private static final String[] FIELD_NAME = {
         "YEAR",
@@ -166,30 +149,25 @@ final class DateIterator implements TickIterator {
     };
 
     /**
-     * Date de la première graduation principale.
-     * Cette valeur est fixée par {@link #init}.
+     * Date de la première graduation principale. Cette valeur est fixée par {@link #init}.
      */
     private long minimum;
 
     /**
-     * Date limite des graduations. La dernière
-     * graduation ne sera pas nécessairement à
-     * cette date. Cette valeur est fixée par
-     * {@link #init}.
+     * Date limite des graduations. La dernière graduation ne sera pas nécessairement à
+     * cette date. Cette valeur est fixée par {@link #init}.
      */
     private long maximum;
 
     /**
-     * Estimation de l'intervalle entre deux graduations
-     * principales. Cette valeur est fixée par {@link #init}.
+     * Estimation de l'intervalle entre deux graduations principales.
+     * Cette valeur est fixée par {@link #init}.
      */
     private long increment;
 
     /**
-     * Longueur de l'axe (en points). Cette information
-     * est conservée afin d'éviter de refaire toute la
-     * procédure {@link #init} si les paramètres n'ont
-     * pas changés.
+     * Longueur de l'axe (en points). Cette information est conservée afin d'éviter de
+     * refaire toute la procédure {@link #init} si les paramètres n'ont pas changés.
      */
     private float visualLength;
 
@@ -203,28 +181,26 @@ final class DateIterator implements TickIterator {
     /**
      * Nombre de fois qu'il faut incrémenter le champ {@link #tickField} du
      * calendrier pour passer à la graduation suivante. Cette opération peut
-     * se faire avec <code>calendar.add(tickField, tickAdd)</code>.
+     * se faire avec {@code calendar.add(tickField, tickAdd)}.
      */
     private int tickAdd;
 
     /**
-     * Champ du calendrier qu'il faut incrémenter pour passer à
-     * la graduation suivante. Cette opération peut se faire avec
-     * <code>calendar.add(tickField, tickAdd)</code>.
+     * Champ du calendrier qu'il faut incrémenter pour passer à la graduation suivante.
+     * Cette opération peut se faire avec {@code calendar.add(tickField, tickAdd)}.
      */
     private int tickField;
 
     /**
-     * Nombre de fois qu'il faut incrémenter le champ {@link #tickField} du
-     * calendrier pour passer à la sous-graduation suivante. Cette opération
-     * peut se faire avec <code>calendar.add(tickField, tickAdd)</code>.
+     * Nombre de fois qu'il faut incrémenter le champ {@link #tickField} du calendrier pour
+     * passer à la sous-graduation suivante. Cette opération peut se faire avec
+     * {@code calendar.add(tickField, tickAdd)}.
      */
     private int subTickAdd;
 
     /**
-     * Champ du calendrier qu'il faut incrémenter pour passer à la
-     * sous-graduation suivante. Cette opération peut se faire avec
-     * <code>calendar.add(tickField, tickAdd)</code>.
+     * Champ du calendrier qu'il faut incrémenter pour passer à la sous-graduation suivante.
+     * Cette opération peut se faire avec {@code calendar.add(tickField, tickAdd)}.
      */
     private int subTickField;
 
@@ -247,8 +223,7 @@ final class DateIterator implements TickIterator {
     private long nextSubTick;
 
     /**
-     * Indique si {@link #value} représente
-     * une graduation principale.
+     * Indique si {@link #value} représente une graduation principale.
      */
     private boolean isMajorTick;
 
@@ -259,8 +234,7 @@ final class DateIterator implements TickIterator {
     private long value0, nextTick0, nextSubTick0;
 
     /**
-     * Valeur de {@link #isMajorTick} immédiatement
-     * après l'appel de {@link #rewind}.
+     * Valeur de {@link #isMajorTick} immédiatement après l'appel de {@link #rewind}.
      */
     private boolean isMajorTick0;
 
@@ -301,23 +275,20 @@ final class DateIterator implements TickIterator {
     private transient int timeFormat = -1;
 
     /**
-     * Indique si {@link #format} est valide. Le format peut
-     * devenir invalide si {@link #init} a été appelée. Dans
-     * ce cas, il peut falloir changer le nombre de chiffres
-     * après la virgule qu'il écrit.
+     * Indique si {@link #format} est valide. Le format peut devenir invalide si {@link #init} a
+     * été appelée. Dans ce cas, il peut falloir changer le nombre de chiffres après la virgule
+     * qu'il écrit.
      */
     private transient boolean formatValid;
 
     /**
-     * Conventions à utiliser pour
-     * le formatage des nombres.
+     * Conventions à utiliser pour le formatage des nombres.
      */
     private Locale locale;
 
     /**
-     * Construit un itérateur pour la graduation d'un axe du temps.
-     * La méthode {@link #init} <u>doit</u> être appelée avant que
-     * l'itérateur ne soit utilisable.
+     * Construit un itérateur pour la graduation d'un axe du temps. La méthode {@link #init}
+     * <u>doit</u> être appelée avant que l'itérateur ne soit utilisable.
      *
      * @param timezone Fuseau horaire des dates.
      * @param locale   Conventions à utiliser pour le formatage des dates.
@@ -406,8 +377,7 @@ final class DateIterator implements TickIterator {
 
     /**
      * Arrondi {@link #increment} à un nombre qui se lit bien. Le nombre
-     * choisit sera un de ceux de la suite 1, 2, 5, 10, 20, 50, 100, 200,
-     * 500, etc.
+     * choisit sera un de ceux de la suite 1, 2, 5, 10, 20, 50, 100, 200, 500, etc.
      */
     private void round(final int field) {
         int factor=1;
@@ -429,9 +399,8 @@ final class DateIterator implements TickIterator {
     }
 
     /**
-     * Replace l'itérateur sur la première graduation. La position de la
-     * première graduation sera calculée et retenue pour un positionnement
-     * plus rapide à l'avenir.
+     * Replace l'itérateur sur la première graduation. La position de la première graduation
+     * sera calculée et retenue pour un positionnement plus rapide à l'avenir.
      */
     private void findFirstTick() {
         calendar.clear();
@@ -460,11 +429,9 @@ final class DateIterator implements TickIterator {
             calendar.add(subTickField, subTickAdd);
             nextSubTick = calendar.getTime().getTime();
         }
-        /* 'calendar' a maintenant la valeur 'nextSubTick',
-         * comme le veut la spécification de ce champ.  On
-         * appelle maintenant 'next' pour transférer cette
-         * valeur 'nextSubTick' vers 'value'.    Notez que
-         * 'next' peut être appelée même si value>maximum.
+        /* 'calendar' a maintenant la valeur 'nextSubTick', comme le veut la spécification de
+         * ce champ. On appelle maintenant 'next' pour transférer cette valeur 'nextSubTick'
+         * vers 'value'. Notez que 'next' peut être appelée même si value>maximum.
          */
         next();
 
@@ -478,7 +445,7 @@ final class DateIterator implements TickIterator {
     }
 
     /**
-     * Met à 0 tous les champs du calendrier inférieur au champ <code>field</code>
+     * Met à 0 tous les champs du calendrier inférieur au champ {@code field}
      * spécifié. Note: si le calendrier spécifié est {@link #calendar},  il est de
      * la responsabilité de l'appelant de restituer {@link #calendar} dans son état
      * correct après l'appel de cette méthode.
@@ -497,9 +464,8 @@ final class DateIterator implements TickIterator {
     }
 
     /**
-     * Indique s'il reste des graduations à retourner. Cette méthode retourne
-     * <code>true</code> tant que {@link #currentValue} ou {@link #currentLabel}
-     * peuvent être appelées.
+     * Indique s'il reste des graduations à retourner. Cette méthode retourne {@code true}
+     * tant que {@link #currentValue} ou {@link #currentLabel} peuvent être appelées.
      */
     public boolean hasNext() {
         return value<=maximum;
@@ -508,9 +474,8 @@ final class DateIterator implements TickIterator {
     /**
      * Indique si la graduation courante est une graduation majeure.
      *
-     * @return <code>true</code> si la graduation courante est une
-     *         graduation majeure, ou <code>false</code> si elle
-     *         est une graduation mineure.
+     * @return {@code true} si la graduation courante est une graduation majeure, ou
+     *         {@code false} si elle est une graduation mineure.
      */
     public boolean isMajorTick() {
         return isMajorTick;
@@ -537,7 +502,7 @@ final class DateIterator implements TickIterator {
      * Retourne l'étiquette de la graduation courante. On n'appele généralement
      * cette méthode que pour les graduations majeures, mais elle peut aussi
      * être appelée pour les graduations mineures. Cette méthode retourne
-     * <code>null</code> s'il n'y a pas d'étiquette pour la graduation courante.
+     * {@code null} s'il n'y a pas d'étiquette pour la graduation courante.
      */
     public String currentLabel() {
         if (!formatValid) {
@@ -595,10 +560,8 @@ final class DateIterator implements TickIterator {
             isMajorTick = false;
             value = nextSubTick;
             /*
-             * IMPORTANT: On suppose ici que 'calendar' a déjà
-             *            la date 'nextSubTick'. Si ce n'était
-             *            pas le cas, il faudrait ajouter les
-             *            lignes suivantes:
+             * IMPORTANT: On suppose ici que 'calendar' a déjà la date 'nextSubTick'. Si ce
+             *            n'était pas le cas, il faudrait ajouter les lignes suivantes:
              */
             if (false) {
                 date.setTime(value);
@@ -650,24 +613,21 @@ final class DateIterator implements TickIterator {
     }
 
     /**
-     * Retourne les conventions à utiliser pour
-     * écrire les étiquettes de graduation.
+     * Retourne les conventions à utiliser pour écrire les étiquettes de graduation.
      */
     public Locale getLocale() {
         return locale;
     }
 
     /**
-     * Modifie les conventions à utiliser pour
-     * écrire les étiquettes de graduation.
+     * Modifie les conventions à utiliser pour écrire les étiquettes de graduation.
      */
     public void setLocale(final Locale locale) {
         if (!locale.equals(this.locale)) {
             calendar    = Calendar.getInstance(getTimeZone(), locale);
             format      = null;
             formatValid = false;
-            // Pour être en accord avec la spécification
-            // du champs {@link #calendar}...
+            // Pour être en accord avec la spécification du champs {@link #calendar}...
             date.setTime(nextSubTick);
             calendar.setTime(date);
         }
@@ -675,16 +635,14 @@ final class DateIterator implements TickIterator {
     }
 
     /**
-     * Retourne le fuseau horaire utilisé pour
-     * exprimer les dates dans la graduation.
+     * Retourne le fuseau horaire utilisé pour exprimer les dates dans la graduation.
      */
     public TimeZone getTimeZone() {
         return calendar.getTimeZone();
     }
 
     /**
-     * Modifie le fuseau horaire utilisé pour
-     * exprimer les dates dans la graduation.
+     * Modifie le fuseau horaire utilisé pour exprimer les dates dans la graduation.
      */
     public void setTimeZone(final TimeZone timezone) {
         if (!timezone.equals(getTimeZone())) {
@@ -700,8 +658,7 @@ final class DateIterator implements TickIterator {
     }
 
     /**
-     * Retourne le nom du champ de {@link Calendar}
-     * correspondant à la valeur spécifiée.
+     * Retourne le nom du champ de {@link Calendar} correspondant à la valeur spécifiée.
      */
     private static String getFieldName(final int field) {
         for (int i=0; i<FIELD.length; i++) {
@@ -713,8 +670,7 @@ final class DateIterator implements TickIterator {
     }
 
     /**
-     * Returns a string representation of this iterator.
-     * Used for debugging purpose only.
+     * Returns a string representation of this iterator. Used for debugging purpose only.
      */
     public String toString() {
         if (true) {

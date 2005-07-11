@@ -63,7 +63,7 @@ import javax.swing.event.MouseInputAdapter;
  * </pre></blockquote>
  *
  * @since 2.0
- * @version $Id: MouseSelectionTracker.java,v 1.4 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 abstract class MouseSelectionTracker extends MouseInputAdapter {
@@ -122,8 +122,8 @@ abstract class MouseSelectionTracker extends MouseInputAdapter {
 
     /**
      * Specifies the colours to be used for drawing the outline of a box when
-     * the user selects a region.  All <code>a</code> colours will be replaced
-     * by <code>b</code> colours and vice versa.
+     * the user selects a region.  All {@code a} colours will be replaced
+     * by {@code b} colours and vice versa.
      */
     public void setXORColors(final Color a, final Color b) {
         backXORColor = a;

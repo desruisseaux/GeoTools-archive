@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
@@ -90,24 +81,25 @@ import org.geotools.resources.gui.ResourceKeys;
  * <ul>
  *   <li>Individual {@linkplain String string}, {@linkplain Number number}, {@linkplain Date date}
  *       or {@linkplain Angle angle}.</li>
- *   <li>Table of any primitive type (<code>int[]</code>, <code>float[]</code>, etc.).</li>
- *   <li>Matrix of any primitive type (<code>int[][]</code>, <code>float[][]</code>, etc.).</li>
+ *   <li>Table of any primitive type ({@code int[]}, {@code float[]}, etc.).</li>
+ *   <li>Matrix of any primitive type ({@code int[][]}, {@code float[][]}, etc.).</li>
  *   <li>JAI {@linkplain LookupTableJAI lookup table}, which are display in tabular format.</li>
  *   <li>{@linkplain AffineTransform Affine transform} and {@linkplain PerspectiveTransform
  *       perspective transform}, which are display like a matrix.</li>
  *   <li>Convolution {@linkplain KernelJAI kernel}, which are display in a {@link KernelEditor}.</li>
  * </ul>
  *
- * @version $Id: ParameterEditor.java,v 1.4 2003/08/07 16:03:24 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see KernelEditor
  * @see ImageProperties
  * @see OperationTreeBrowser
  *
- * @task TODO: This class do not yet support the edition of parameter value.
- *             We will allow that in a future version. This work is already
- *             partially done with the 'editable' boolean value.
+ * @todo This class do not yet support the edition of parameter value.
+ *       We will allow that in a future version. This work is already
+ *       partially done with the 'editable' boolean value.
  */
 public class ParameterEditor extends JPanel {
     /** Key for {@link String} node.    */  private static final String STRING  = "String";
@@ -164,14 +156,12 @@ public class ParameterEditor extends JPanel {
     private Editor model;
 
     /**
-     * <code>true</code> if this widget is editable.
-     *
-     * @task TODO: This
+     * {@code true} if this widget is editable.
      */
     private static final boolean editable = false;
 
     /**
-     * Construct an initially empty parameter editor.
+     * Constructs an initially empty parameter editor.
      */
     public ParameterEditor() {
         super(new BorderLayout());
@@ -181,7 +171,7 @@ public class ParameterEditor extends JPanel {
     }
 
     /**
-     * Returns the parameter value currently edited, or <code>null</code> if none.
+     * Returns the parameter value currently edited, or {@code null} if none.
      */
     public Object getParameterValue() {
         return (model!=null) ? model.getValue() : value;
@@ -205,7 +195,7 @@ public class ParameterEditor extends JPanel {
     }
 
     /**
-     * Returns the description currently shown, or <code>null</code> if none.
+     * Returns the description currently shown, or {@code null} if none.
      */
     public String getDescription() {
         String text = description.getText();
@@ -236,7 +226,7 @@ public class ParameterEditor extends JPanel {
      * Convenience method for setting the parameter description from an operation node.
      *
      * @param operation The operation node for the current parameter.
-     * @param index The parameter index, or <code>-1</code> if unknow.
+     * @param index The parameter index, or {@code -1} if unknow.
      */
     final void setDescription(final OperationNode operation, final int index) {
         String description = null;
@@ -303,7 +293,7 @@ public class ParameterEditor extends JPanel {
      * an instance of {@link KernelEditor}, {@link JTable}, {@link JTextField}, {@link JList} or
      * any other suitable component.
      *
-     * @return The editor, or <code>null</code> if no value has been set.
+     * @return The editor, or {@code null} if no value has been set.
      */
     public Component getEditor() {
         return editor;
@@ -312,11 +302,11 @@ public class ParameterEditor extends JPanel {
     /**
      * Returns the editor for the given name. If an editor is found, it will be bring
      * on top of the card layout (i.e. will become the visible editor). Otherwise, this
-     * method returns <code>null</code>.
+     * method returns {@code null}.
      *
      * @param  name The editor name. Should be one of {@link #NUMBER}, {@link #KERNEL} and
      *         similar constants.
-     * @return The editor, or <code>null</code>.
+     * @return The editor, or {@code null}.
      */
     private Component getEditor(final String name) {
         final Component panel = (Component) editors.get(name);
@@ -332,7 +322,7 @@ public class ParameterEditor extends JPanel {
      * @param  name The editor name. Should be one of {@link #NUMBER}, {@link #KERNEL} and
      *         similar constants.
      * @param  editor The editor.
-     * @param  scroll <code>true</code> if the editor should be wrapped into a {@link JScrollPane}
+     * @param  scroll {@code true} if the editor should be wrapped into a {@link JScrollPane}
      *         prior its addition to the container.
      */
     private void addEditor(final String name, Component editor, final boolean scroll) {
@@ -527,10 +517,10 @@ public class ParameterEditor extends JPanel {
     /**
      * The interface for editor capable to returns the edited value.
      *
-     * @version $Id: ParameterEditor.java,v 1.4 2003/08/07 16:03:24 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      *
-     * @task TODO: This interface should have a 'setEditable(boolean)' method.
+     * @todo This interface should have a 'setEditable(boolean)' method.
      */
     private static interface Editor {
         /**
@@ -548,11 +538,11 @@ public class ParameterEditor extends JPanel {
      * An editor panel for editing a single value. The value if usually an instance of
      * {@link Number}, {@link Date}, {@link Angle} or {@link String}.
      *
-     * @version $Id: ParameterEditor.java,v 1.4 2003/08/07 16:03:24 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      *
-     * @task TODO: This editor should use <code>JSpinner</code>, but we need to gets
-     *             the minimum and maximum values first since spinner needs bounds.
+     * @todo This editor should use {@code JSpinner}, but we need to gets
+     *       the minimum and maximum values first since spinner needs bounds.
      */
     private static final class Singleton extends JPanel implements Editor {
         /**
@@ -673,12 +663,12 @@ public class ParameterEditor extends JPanel {
      * Table model for table parameters (including {@link LookupTableJAI}.
      * Instance of this class are created by {@link #updateEditor} when first needed.
      *
-     * @version $Id: ParameterEditor.java,v 1.4 2003/08/07 16:03:24 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Table extends AbstractTableModel implements Editor {
         /**
-         * The table (usually an instance of <code>double[][]</code>).
+         * The table (usually an instance of {@code double[][]}).
          */
         private final Object[] table;
 
@@ -688,16 +678,16 @@ public class ParameterEditor extends JPanel {
         private final int offset;
 
         /**
-         * <code>true</code> if the table values are unsigned.
+         * {@code true} if the table values are unsigned.
          */
         private final boolean unsigned;
 
         /**
          * Construct a model for the given table.
          *
-         * @param table    The table (usually an instance of <code>double[][]</code>).
+         * @param table    The table (usually an instance of {@code double[][]}).
          * @param offset   The offset parameter (a {@link LookupTableJAI} property).
-         * @param unsigned <code>true</code> if the table values are unsigned.
+         * @param unsigned {@code true} if the table values are unsigned.
          */
         public Table(final Object[] table, final int offset, final boolean unsigned) {
             this.table    = table;
@@ -793,19 +783,19 @@ public class ParameterEditor extends JPanel {
      * Table model for matrix parameters. Instance of this class
      * are created by {@link #updateEditor} when first needed.
      *
-     * @version $Id: ParameterEditor.java,v 1.4 2003/08/07 16:03:24 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Matrix extends AbstractTableModel implements Editor {
         /**
-         * The matrix (usually an instance of <code>double[][]</code>).
+         * The matrix (usually an instance of {@code double[][]}).
          */
         private final Object[] matrix;
 
         /**
          * Construct a model for the given matrix.
          *
-         * @param matrix The matrix (usually an instance of <code>double[][]</code>).
+         * @param matrix The matrix (usually an instance of {@code double[][]}).
          */
         public Matrix(final Object[] matrix) {
             this.matrix = matrix;

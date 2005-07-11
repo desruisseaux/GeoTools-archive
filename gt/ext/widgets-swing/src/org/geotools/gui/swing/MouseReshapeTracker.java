@@ -120,7 +120,7 @@ import org.geotools.resources.Utilities;
  * }
  * </pre></blockquote>
  *
- * @version $Id: MouseReshapeTracker.java,v 1.7 2003/05/15 08:45:31 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 class MouseReshapeTracker extends MouseInputAdapter implements Shape {
@@ -183,7 +183,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     /**
      * Rectangle to be drawn in the component.  This rectange can be different to
      * {@link #logicalShape} and the latter is so small that it is preferable to draw it a little
-     * bit bigger than the user has requested. In this case, <code>drawnShape</code> will serve as
+     * bit bigger than the user has requested. In this case, {@code drawnShape} will serve as
      * a temporary rectangle with extended coordinates.
      *
      * Note: this rectangle should be read only, except in the case of 
@@ -205,7 +205,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     private transient double mouseDX, mouseDY;
 
     /**
-     * <code>x</code>, <code>y</code>, <code>width</code> and <code>height</code> coordinates of a
+     * {@code x}, {@code y}, {@code width} and {@code height} coordinates of a
      * box which completely encloses {@link #drawnShape}. These coordinates must be expressed in
      * <strong>pixels</strong>. If need be, the affine transform {@link #getTransform} can be used
      * to change pixel coordinates into logical coordinates and vice versa.
@@ -225,7 +225,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
 
     /**
      * Indicates if the user is currently dragging the rectangle.
-     * For this field to become <code>true</code>, the mouse must
+     * For this field to become {@code true}, the mouse must
      * have been over the rectangle as the user pressed the mouse button.
      */
     private transient boolean isDragging;
@@ -263,7 +263,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * When the position of the left or right-hand edge of the rectangle
      * is manually edited, this indicates whether the position of the
      * opposite edge should be automatically adjusted.  The default value is
-     * <code>false</code>.
+     * {@code false}.
      */
     private boolean synchronizeX;
 
@@ -271,7 +271,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * When the position of the top or bottom edge of the rectangle is
      * manually edited, this indicates whether the position of the 
      * opposite edge should be automatically adjusted.  The default value is
-     * <code>false</code>.
+     * {@code false}.
      */
     private boolean synchronizeY;
 
@@ -342,7 +342,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      *        Note that the constructor retains a direct reference to this
      *        shape, without creating a clone.  As a consequence, any 
      *        modification carried out on the geometric shape will have
-     *        repercussions for this objet <code>MouseReshapeTracker</code>
+     *        repercussions for this objet {@code MouseReshapeTracker}
      *        and vice versa.
      */
     public MouseReshapeTracker(final RectangularShape shape) {
@@ -445,7 +445,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     }
 
     /**
-     * Returns the transform of <code>adjusting</code>.
+     * Returns the transform of {@code adjusting}.
      * @param adjusting to transform (generally {@link #adjustingSides}).
      */
     private int inverseTransform(int adjusting)
@@ -488,7 +488,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * transform is necessary for several of this class's methods to work.
      * It is the programmer's responsability to ensure that this
      * information is always up-to-date.  By default,
-     * <code>MouseReshapeTracker</code> uses an identity transform.
+     * {@code MouseReshapeTracker} uses an identity transform.
      */
     public void setTransform(final AffineTransform newTransform) {
         if (!this.transform.equals(newTransform)) {
@@ -502,7 +502,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     /**
      * Returns the position and the bounds of the rectangle.  These
      * bounds can be slightly bigger than those returned by 
-     * {@link #getFrame} since <code>getBounds2D()</code> returns the
+     * {@link #getFrame} since {@code getBounds2D()} returns the
      * bounds of the rectangle visible on screen, which can have certain
      * minimum bounds.
      */
@@ -513,7 +513,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     /**
      * Returns the position and the bounds of the rectangle.  These
      * bounds can be slightly bigger than those returned by 
-     * {@link #getFrame} since <code>getBounds2D()</code> returns the
+     * {@link #getFrame} since {@code getBounds2D()} returns the
      * bounds of the rectangle visible on screen, which can have certain
      * minimum bounds.
      */
@@ -543,7 +543,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * limited by a call to {@link #setClip}, the rectangle will be
      * moved and resized as needed to fit into the permitted region.
      *
-     * @return <code>true</code> if the rectangle's coordinates have changed.
+     * @return {@code true} if the rectangle's coordinates have changed.
      *
      * @see #getFrame
      */
@@ -558,7 +558,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * limited by a call to {@link #setClip}, the rectangle will be
      * moved and resized as needed to fit into the permitted region.
      *
-     * @return <code>true</code> if the rectangle's coordinates have changed.
+     * @return {@code true} if the rectangle's coordinates have changed.
      *
      * @see #setX
      * @see #setY
@@ -712,7 +712,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * Indicates whether the rectangular shape contains the specified
      * rectangle.  This rectangle should be expressed in logical
      * coordinates.  This method can conservatively return
-     * <code>false</code> as permitted by the {@link Shape} specification.
+     * {@code false} as permitted by the {@link Shape} specification.
      */
     public boolean contains(final Rectangle2D rect) {
         return logicalShape.contains(rect);
@@ -722,7 +722,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * Indicates whether the rectangular shape contains the specified
      * rectangle.  This rectangle must be expressed in logical
      * coordinates.  This method can conservatively return
-     * <code>false</code> as permitted by the {@link Shape} specification.
+     * {@code false} as permitted by the {@link Shape} specification.
      */
     public boolean contains(double x, double y, double width, double height) {
         return logicalShape.contains(x, y, width, height);
@@ -731,7 +731,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     /**
      * Indicates whether the rectangular shape intersects the specified
      * rectangle.  This rectangle must be expressed in logical coordinates.
-     * This method can conservatively return <code>true</code> as permitted by
+     * This method can conservatively return {@code true} as permitted by
      * the {@link Shape} specification.
      */
     public boolean intersects(final Rectangle2D rect) {
@@ -741,7 +741,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     /**
      * Indicates whether the rectangular shape intersects the specified
      * rectangle.  This rectangle must be expressed in logical coordinates.
-     * This method can conservatively return <code>true</code> as permitted by
+     * This method can conservatively return {@code true} as permitted by
      * the {@link Shape} specification.
      */
     public boolean intersects(double x, double y, double width, double height) {
@@ -773,8 +773,8 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     /**
      * Defines the bounds between which the rectangle can move.
      * This method manages infinities correctly if the specified
-     * rectangle has redefined its <code>getMaxX()</code>
-     * and <code>getMaxY()</code> methods correctly.
+     * rectangle has redefined its {@code getMaxX()}
+     * and {@code getMaxY()} methods correctly.
      *
      * @see #setClipMinMax
      */
@@ -790,7 +790,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * specify infinite values (in order to widen the visor's bounds to all
      * possible values along certain axes), you <u>must</u> use
      * {@link #setClipMinMax setClipMinMax(...)} rather than 
-     * <code>setClip(...)</code>.
+     * {@code setClip(...)}.
      */
     public final void setClip(final double x, final double y, final double width,
                               final double height) {
@@ -802,11 +802,11 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * method's arguments don't correspond to the normal arguments of 
      * {@link java.awt.geom.Rectangle2D}. <em>Java2D</em> convention demands
      * that we specify a rectangle using a quadruplet 
-     * (<code>x</code>,<code>y</code>,<code>width</code>,<code>height</code>)
+     * ({@code x},{@code y},{@code width},{@code height})
      * However, this is a bad choice in the context of almost all the methods
      * in our library.  As well as complicating most calculations (if you need
      * convincing, just count the number of occurrences of the expression
-     * <code>x+width</code> even in the geometric classes of <em>Java2D</em>),
+     * {@code x+width} even in the geometric classes of <em>Java2D</em>),
      * it is incapable of correctly representing a rectangle which has one or
      * more coordinates stretching to infinity.  A better convention would
      * have been to use the minimum and maximum values according to
@@ -872,7 +872,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
 
     /**
      * Specifies whether the rectangle can be moved with the mouse.  The value
-     * <code>false</code> indicates that the rectangle cannot be moved, but can
+     * {@code false} indicates that the rectangle cannot be moved, but can
      * still be resized if {@link #setAdjustable} has been called with the 
      * appropriate parameters.
      */
@@ -892,11 +892,11 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * </table>
      *
      * These constants designate the edge which is visible on screen. For
-     * example, <code>NORTH</code> always designates the top edge on the
+     * example, {@code NORTH} always designates the top edge on the
      * screen.  However, this could correspond to another edge of the logical
      * shape {@code this} depending on the affine transform which was 
      * specified during the last call to {@link #setTransform}. For example,
-     * <code>AffineTransform.getScaleInstance(+1,-1)</code> has the effect of
+     * {@code AffineTransform.getScaleInstance(+1,-1)} has the effect of
      * inverting the y axis so that the <var>y</var><sub>max</sub> values
      * appear to the North rather than the <var>y</var><sub>min</sub> values.
      */
@@ -917,11 +917,11 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * </table>
      *
      * These constants designate the edge which is visible on screen. For
-     * example, <code>NORTH</code> always designates the top edge on the
+     * example, {@code NORTH} always designates the top edge on the
      * screen.  However, this could correspond to another edge of the logical
      * shape {@code this} depending on the affine transform which was 
      * specified during the last call to {@link #setTransform}. For example,
-     * <code>AffineTransform.getScaleInstance(+1,-1)</code> has the effect of
+     * {@code AffineTransform.getScaleInstance(+1,-1)} has the effect of
      * inverting the y axis so that the <var>y</var><sub>max</sub> values
      * appear to the North rather than the <var>y</var><sub>min</sub> values.
      */
@@ -1193,7 +1193,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     /**
      * Method called automatically when the user releases the mouse button.
      * The default implementation calls {@link #stateChanged} with the
-     * argument <code>false</code>, in order to inform the derived classes
+     * argument {@code false}, in order to inform the derived classes
      * that the changes are finished.
      */
     public void mouseReleased(final MouseEvent event) {
@@ -1220,15 +1220,15 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     /**
      * Method called automatically <strong>before</strong> the position
      * or the size of the visor has changed. A call to 
-     * <code>stateWillChange</code> is normally followed by a call to
+     * {@code stateWillChange} is normally followed by a call to
      * {@link #stateChanged}, <u>except</u> if the expected change
      * didn't ultimately occur.  The derived classes can redefine this method
      * to take the necessary actions when a change is on the point of being
      * actioned.  They must not, however, call any method which risks modifying
      * the state of this object.  The default implementation does nothing.
      *
-     * @param isAdjusting <code>true</code> if the user is still
-     *        modifying the position of the visor, <code>false</code>
+     * @param isAdjusting {@code true} if the user is still
+     *        modifying the position of the visor, {@code false}
      *        if they have released the mouse button.
      */
     protected void stateWillChange(final boolean isAdjusting) {
@@ -1236,15 +1236,15 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
 
     /**
      * Method called automatically <strong>after</strong> the position and
-     * size of the visor has changed.  The call to <code>stateChanged</code>
+     * size of the visor has changed.  The call to {@code stateChanged}
      * must have been preceded by a call to {@link #stateWillChange}. The
      * derived classes can redefine this method to take the necessary
      * actions when a change has just been actioned.  They must not, however,
      * call any method which risks modifying the state of this object.  The
      * default implementation does nothing.
      *
-     * @param isAdjusting <code>true</code> if the user is still
-     *        modifying the position of the visor, <code>false</code>
+     * @param isAdjusting {@code true} if the user is still
+     *        modifying the position of the visor, {@code false}
      *        if they have released the mouse button.
      */
     protected void stateChanged(final boolean isAdjusting) {
@@ -1304,11 +1304,11 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * </table>
      *
      * These constants designate the edge visible on screen.  For example,
-     * <code>NORTH</code> always designates the top edge on the screen.
+     * {@code NORTH} always designates the top edge on the screen.
      * However, this could correspond to another edge of the logical
      * shape {@code this} depending on the affine transform which was 
      * specified during the last call to {@link #setTransform}. For example,
-     * <code>AffineTransform.getScaleInstance(+1,-1)</code> has the effect of
+     * {@code AffineTransform.getScaleInstance(+1,-1)} has the effect of
      * inverting the y axis so that the <var>y</var><sub>max</sub> values
      * appear to the North rather than the <var>y</var><sub>min</sub> values.
      *
@@ -1317,7 +1317,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      *
      * @return       An editor in which the user can specify the position of
      *               one of the edges of the geometric shape.
-     * @throws       IllegalArgumentException if <code>side</code> isn't one
+     * @throws       IllegalArgumentException if {@code side} isn't one
      *               of the recognised codes.
      */
     public synchronized JComponent addEditor(final Format format, final int side,
@@ -1414,9 +1414,9 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      *             synchronisation of the left and right edges, or
      *             {@link SwingConstants#VERTICAL} to change the 
      *             synchronisation of the top and bottom edges.
-     * @param state <code>true</code> to synchronise the edges, or
-     *              <code>false</code> to desynchronise.
-     * @throws IllegalArgumentException if <code>axis</code>
+     * @param state {@code true} to synchronise the edges, or
+     *              {@code false} to desynchronise.
+     * @throws IllegalArgumentException if {@code axis}
      *         isn't one of the valid codes.
      */
     public void setEditorsSynchronized(final int axis, final boolean state)
@@ -1438,9 +1438,9 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      *             synchronisation of the left and right edges, or
      *             {@link SwingConstants#VERTICAL} to determine the
      *             synchronisation of the top and bottom edges.
-     * @return <code>true</code> if the specified edges are synchronised,
-     *         or <code>false</code> if not
-     * @throws IllegalArgumentException if <code>axis</code>
+     * @return {@code true} if the specified edges are synchronised,
+     *         or {@code false} if not
+     * @throws IllegalArgumentException if {@code axis}
      *         isn't one of the valid codes.
      */
     public boolean isEditorsSynchronized(final int axis) throws IllegalArgumentException {
@@ -1474,20 +1474,20 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
         public final JFormattedTextField editor;
 
         /**
-         * <code>true</code> if the field {@link #editor} formats dates,
-         * or <code>false</code> if it formats numbers.
+         * {@code true} if the field {@link #editor} formats dates,
+         * or {@code false} if it formats numbers.
          */
         private final boolean isDate;
 
         /**
          * Side of the rectangle to be controlled. This field designates the
-         * edge which is visible on screen.  For example, <code>NORTH</code>
+         * edge which is visible on screen.  For example, {@code NORTH}
          * always designates the top edge on the screen.  However, this could
          * correspond to another edge of the logical shape 
          * {@link MouseReshapeTracker} depending on the affine transform that
          * was specified during the last call to 
          * {@link MouseReshapeTracker#setTransform}. For example,
-         * <code>AffineTransform.getScaleInstance(+1,-1)</code> has the effect
+         * {@code AffineTransform.getScaleInstance(+1,-1)} has the effect
          * of inverting the y axis so that the <var>y</var><sub>max</sub>
          * values appear to the North rather than the
          * <var>y</var><sub>min</sub> values.
@@ -1505,16 +1505,16 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
          *
          * @param editor Field which will contain the coordinate of the
          *        rectangle's edge.
-         * @param isDate <code>true</code> if the field {@link #editor} formats
-         *        dates, or <code>false</code> if it formats numbers.
+         * @param isDate {@code true} if the field {@link #editor} formats
+         *        dates, or {@code false} if it formats numbers.
          * @param side Edge of the rectangle to control.  This argument
          *        designates the edge visible on screen.  For example,
-         *        <code>NORTH</code> always designates the top edge on the
+         *        {@code NORTH} always designates the top edge on the
          *        screen.  However, it can correspond to another edge of the
          *        logical shape {@link MouseReshapeTracker} depending on the 
          *        affine transform which was specified during the last call
          *        to {@link MouseReshapeTracker#setTransform}. For example,
-         *        <code>AffineTransform.getScaleInstance(+1,-1)</code> has the
+         *        {@code AffineTransform.getScaleInstance(+1,-1)} has the
          *        effect of making the <var>y</var><sub>max</sub> values 
          *        appear to the "North" rather than the
          *        <var>y</var><sub>min</sub> values.

@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
@@ -95,21 +86,22 @@ import org.geotools.resources.gui.ResourceKeys;
  * An "About" dialog box. This dialog box contains the application's title and some
  * system informations (Java and OS version, free memory, image readers and writers, running
  * threads, etc.). The application version can be fetched from a {@link Manifest} object,
- * usually build from the <code>META-INF/Manifest.mf</code> file. This manifest should contains
- * entries for <code>Implementation-Title</code>, <code>Implementation-Version</code> and
- * <code>Implementation-Vendor</code> values, as suggested in the
+ * usually build from the {@code META-INF/Manifest.mf} file. This manifest should contains
+ * entries for {@code Implementation-Title}, {@code Implementation-Version} and
+ * {@code Implementation-Vendor} values, as suggested in the
  * <A HREF="http://java.sun.com/docs/books/tutorial/jar/basics/manifest.html#versioning">Java
  * tutorial</A>.
- * In addition to the above-cited standard entries, the <code>About</code> class understand also
- * an optional <code>Implementation-Date</code> entry. This entry can contains the product date
- *  in the <code>"yyyy-MM-dd HH:mm:ss"</code> patter. If presents, this date will be localized
+ * In addition to the above-cited standard entries, the {@code About} class understand also
+ * an optional {@code Implementation-Date} entry. This entry can contains the product date
+ * in the <code>"yyyy-MM-dd HH:mm:ss"</code> patter. If presents, this date will be localized
  * according user's locale and appended to the version number.
  *
  * <p>&nbsp;</p>
  * <p align="center"><img src="doc-files/About.png"></p>
  * <p>&nbsp;</p>
  *
- * @version $Id: About.java,v 1.3 2003/11/12 14:14:24 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class About extends JPanel {
@@ -125,7 +117,7 @@ public class About extends JPanel {
 
     /**
      * Thread qui aura la charge de faire des mises à jour en arrière-plan.
-     * Ce champ sera <code>null</code> s'il n'y en a pas.
+     * Ce champ sera {@code null} s'il n'y en a pas.
      */
     private final ThreadList updater;
 
@@ -142,43 +134,43 @@ public class About extends JPanel {
     }
 
     /**
-     * Construct a new dialog box for the specified application class.  This constructor
-     * use the class loader for loading the manifest file. It also use the class package
+     * Constructs a new dialog box for the specified application class. This constructor
+     * uses the class loader for loading the manifest file. It also use the class package
      * to find the right entry into the manifest.
      *
      * @param logo        The application's logo. It may be a {@link JComponent}, an
      *                    {@link Icon} object or an resource path (i.e. a file to be
      *                    fetch in the classpath) as a {@link String}.
      * @param application The application's class. Application name will be fetch
-     *                    from the manifest file (<code>META-INF/Manifest.mf</code>).
-     * @param tasks       Group of running threads, or <code>null</code> if there is none.
+     *                    from the manifest file ({@code META-INF/Manifest.mf}).
+     * @param tasks       Group of running threads, or {@code null} if there is none.
      */
     public About(final Object logo, final Class application, final ThreadGroup tasks) {
         this(logo, getAttributes(application), application.getClassLoader(), tasks);
     }
 
     /**
-     * Construct a new dialog box from the specified manifest attributes.
+     * Constructs a new dialog box from the specified manifest attributes.
      *
      * @param logo        The application's logo. It may be a {@link JComponent}, an
      *                    {@link Icon} object or an resource path (i.e. a file to be
      *                    fetch in the classpath) as a {@link String}.
      * @param attributes  The manifest attributes containing application name and version number.
-     * @param tasks       Group of running threads, or <code>null</code> if there is none.
+     * @param tasks       Group of running threads, or {@code null} if there is none.
      */
     public About(final Object logo, final Attributes attributes, final ThreadGroup tasks) {
         this(logo, attributes, null, tasks);
     }
 
     /**
-     * Construct a new dialog box.
+     * Constructs a new dialog box.
      *
      * @param logo        The application's logo. It may be a {@link JComponent}, an
      *                    {@link Icon} object or an resource path (i.e. a file to be
      *                    fetch in the classpath) as a {@link String}.
      * @param attributes  The manifest attributes containing application name and version number.
      * @param loader      The application's class loader.
-     * @param tasks       Group of running threads, or <code>null</code> if there is none.
+     * @param tasks       Group of running threads, or {@code null} if there is none.
      */
     private About(final Object logo, final Attributes attributes,
                   ClassLoader loader, final ThreadGroup tasks)
@@ -431,15 +423,13 @@ public class About extends JPanel {
      * Modèle représentant la liste des processus actif dans un {@link ThreadGroup}.
      * Cette liste se mettre automatiquement à jour de façon périodique.
      *
-     * @version $Id: About.java,v 1.3 2003/11/12 14:14:24 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class ThreadList extends AbstractListModel implements Runnable {
         /**
-         * Processus qui met à jour <code>ThreadList</code>,
-         * ou <code>null</code> s'il n'y en a pas. On peut
-         * tuer le processus actif en donnant la valeur
-         * <code>null</code> à cette variable.
+         * Processus qui met à jour {@code ThreadList}, ou {@code null} s'il n'y en a pas.
+         * On peut tuer le processus actif en donnant la valeur {@code null} à cette variable.
          */
         public transient Thread worker;
 
@@ -449,8 +439,7 @@ public class About extends JPanel {
         private final ThreadGroup tasks;
 
         /**
-         * Liste des noms des processus en cours. Cette
-         * liste sera mises à jour périodiquement.
+         * Liste des noms des processus en cours. Cette liste sera mises à jour périodiquement.
          */
         private String[] names=new String[0];
 
@@ -470,8 +459,7 @@ public class About extends JPanel {
         private final Resources resources;
 
         /**
-         * Construit une liste des processus actifs
-         * dans le groupe <code>tasks</code> spécifié.
+         * Construit une liste des processus actifs dans le groupe {@code tasks} spécifié.
          */
         public ThreadList(final ThreadGroup tasks, final JLabel totalMemory,
                           final JLabel percentUsed, final Resources resources)
@@ -611,8 +599,8 @@ public class About extends JPanel {
     /**
      * Start a daemon thread updating dialog box information. Updated information include
      * available memory and the list of running tasks. <strong>You <u>must</u> invoke the
-     * {@link #stop} method after <code>start()</code></strong> (typically in a <code>try..finally</code>
-     * construct) in order to free resources. <code>stop()</code> is not automatically
+     * {@link #stop} method after {@code start()}</strong> (typically in a {@code try..finally}
+     * construct) in order to free resources. {@code stop()} is not automatically
      * invoked by the garbage collector.
      */
     protected void start() {
@@ -624,7 +612,7 @@ public class About extends JPanel {
 
     /**
      * Free any resources used by this dialog box.  <strong>This method must be invoked
-     * after {@link #start}</strong> in order to free resources. <code>stop()</code> is
+     * after {@link #start}</strong> in order to free resources. {@code stop()} is
      * not automatically invoked by the garbage collector.
      */
     protected void stop() {
@@ -636,7 +624,7 @@ public class About extends JPanel {
     }
 
     /**
-     * Convenience method for setting the <code>Implementation-Date</code>
+     * Convenience method for setting the {@code Implementation-Date}
      * attributes to the current date.
      *
      * @param attributes Attributes in which setting the compilation date.

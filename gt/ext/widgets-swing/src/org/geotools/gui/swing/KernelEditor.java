@@ -24,6 +24,7 @@ import javax.media.jai.KernelJAI;
 import javax.media.jai.operator.ConvolveDescriptor; // For Javadoc
 
 // Graphical user interface
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -63,14 +64,16 @@ import java.util.Locale;
 
 // Geotools dependencies
 import org.geotools.resources.XArray;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.gui.Resources;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.SwingUtilities;
 
 
 /**
  * A widget for selecting and/or editing a {@link KernelJAI} object. Kernels are used for
- * {@linkplain ConvolveDescriptor image convolutions}. <code>KernelEditor</code> widgets
- * are initially empty, but a set of default kernels can be added with {@link #addDefaultKernels}
+ * {@linkplain ConvolveDescriptor image convolutions}. {@code KernelEditor} widgets are
+ * initially empty, but a set of default kernels can be added with {@link #addDefaultKernels}
  * including (but not limited to)
  *
  * {@linkplain KernelJAI#ERROR_FILTER_FLOYD_STEINBERG Floyd & Steinberg (1975)},
@@ -84,12 +87,13 @@ import org.geotools.resources.gui.ResourceKeys;
  * <p align="center"><img src="doc-files/KernelEditor.png"></p>
  * <p>&nbsp;</p>
  *
- * @version $Id: KernelEditor.java,v 1.4 2003/05/13 11:01:39 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see GradientKernelEditor
  * @see ConvolveDescriptor
- * @see org.geotools.gp.GridCoverageProcessor
+ * @see org.geotools.coverage.processor.operation.GradientMagnitude
  */
 public class KernelEditor extends JComponent {
     /**
@@ -118,7 +122,7 @@ public class KernelEditor extends JComponent {
     private final JSpinner heightSelector = new JSpinner();
 
     /**
-     * Construct a new kernel editor. No kernel will be initially shown. The method
+     * Constructs a new kernel editor. No kernel will be initially shown. The method
      * {@link #setKernel} must be invoked, or the user must performs a selection in
      * a combo box, in order to make a kernel visible.
      */
@@ -259,7 +263,7 @@ public class KernelEditor extends JComponent {
     }
 
     /**
-     * Add a 3x3 kernel to the list of available kernels.
+     * Adds a 3x3 kernel to the list of available kernels.
      */
     private void addKernel(final String name, final float[] data) {
         double sum = 0;
@@ -275,11 +279,11 @@ public class KernelEditor extends JComponent {
     }
 
     /**
-     * Add a kernel to the list of available kernels. The widget list kernels in the same order
+     * Adds a kernel to the list of available kernels. The widget list kernels in the same order
      * they were added, unless {@link #sortKernelNames} has been invoked. Each kernel can belong
      * to an optional category. Example of categories includes "Error filters" and "Gradient masks".
      *
-     * @param category The kernel's category name, or <code>null</code> if none.
+     * @param category The kernel's category name, or {@code null} if none.
      * @param name The kernel name. Kernels will be displayed in alphabetic order.
      * @param kernel The kernel. If an other kernel was registered with the same
      *        name, the previous kernel will be discarted.
@@ -292,7 +296,7 @@ public class KernelEditor extends JComponent {
     }
 
     /**
-     * Add a new category if not already present.
+     * Adds a new category if not already present.
      */
     private void addCategory(final String category) {
         final ComboBoxModel categories = categorySelector.getModel();
@@ -305,7 +309,7 @@ public class KernelEditor extends JComponent {
     }
 
     /**
-     * Remove a kernel. If the kernel was the only one in
+     * Removes a kernel. If the kernel was the only one in
      * its category, the category is removed as well.
      */
     public void removeKernel(final KernelJAI kernel) {
@@ -313,7 +317,7 @@ public class KernelEditor extends JComponent {
     }
 
     /**
-     * Remove a kernel by its name. If the kernel was the only
+     * Removes a kernel by its name. If the kernel was the only
      * one in its category, the category is removed as well.
      */
     public void removeKernel(final String kernel) {
@@ -321,7 +325,7 @@ public class KernelEditor extends JComponent {
     }
 
     /**
-     * Remove all kernels and categories.
+     * Removes all kernels and categories.
      */
     public void removeAllKernels() {
         model.removeAllKernels();
@@ -342,7 +346,7 @@ public class KernelEditor extends JComponent {
 
     /**
      * Set the kernel by its name. It must be one of the name registered with {@link #addKernel}.
-     * If <code>name</code> is not found, then nothing is done.
+     * If {@code name} is not found, then nothing is done.
      *
      * @param name The name of the kernel to select.
      */
@@ -372,11 +376,11 @@ public class KernelEditor extends JComponent {
     }
 
     /**
-     * Returns the category for the current kernel. This is the <code>category</code> argument
+     * Returns the category for the current kernel. This is the {@code category} argument
      * given to <code>{@linkplain #addKernel addKernel}(category, name, kernel)</code>, where
-     * <code>kernel</code> is the {@linkplain #getKernel current kernel}.
+     * {@code kernel} is the {@linkplain #getKernel current kernel}.
      *
-     * @return The category for the current kernel, or <code>null</code> if none.
+     * @return The category for the current kernel, or {@code null} if none.
      */
     public String getKernelCategory() {
         // Category at index 0 is "all", which need a special handling.
@@ -387,7 +391,7 @@ public class KernelEditor extends JComponent {
     /**
      * Sort all kernel names according the specified comparator.
      *
-     * @param comparator The comparator, or <code>null</code> for the natural ordering.
+     * @param comparator The comparator, or {@code null} for the natural ordering.
      */
     public void sortKernelNames(final Comparator comparator) {
         model.sortKernelNames(comparator);
@@ -395,7 +399,7 @@ public class KernelEditor extends JComponent {
 
     /**
      * Returns an array of kernel names in the current category.
-     * Changes in the returned array will not affect the <code>KernelEditor</code> state.
+     * Changes in the returned array will not affect the {@code KernelEditor} state.
      *
      * @return The name of all kernels in the current category.
      */
@@ -428,7 +432,7 @@ public class KernelEditor extends JComponent {
      * currently selected kernel. This object is also a listener for various
      * events (like changing the size of the table).
      *
-     * @version $Id: KernelEditor.java,v 1.4 2003/05/13 11:01:39 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class Model extends AbstractTableModel implements ComboBoxModel,
@@ -447,7 +451,7 @@ public class KernelEditor extends JComponent {
         private final Map categories = new LinkedHashMap();
 
         /**
-         * <code>true</code> if the keys into {@link #categories}
+         * {@code true} if the keys into {@link #categories}
          * are sorted according their <em>natural</em> ordering.
          */
         private boolean sorted;
@@ -459,7 +463,7 @@ public class KernelEditor extends JComponent {
         private String[] names;
 
         /**
-         * Name of the current kernel, or <code>null</code>
+         * Name of the current kernel, or {@code null}
          * if the user is editing a custom kernel.
          */
         private String name;
@@ -494,7 +498,7 @@ public class KernelEditor extends JComponent {
         }
 
         /**
-         * Returns <code>true</code> regardless of row and column index
+         * Returns {@code true} regardless of row and column index
          * Used by the table of kernel values.
          */
         public boolean isCellEditable(final int rowIndex, final int columnIndex) {
@@ -502,7 +506,7 @@ public class KernelEditor extends JComponent {
         }
 
         /**
-         * Returns <code>Float.class</code> regardless of column index
+         * Returns {@code Float.class} regardless of column index
          * Used by the table of kernel values.
          */
         public Class getColumnClass(final int columnIndex) {
@@ -510,7 +514,7 @@ public class KernelEditor extends JComponent {
         }
 
         /**
-         * Returns the value for the cell at <code>columnIndex</code> and <code>rowIndex</code>.
+         * Returns the value for the cell at {@code columnIndex} and {@code rowIndex}.
          * This method is automatically invoked in order to paint the kernel as a table.
          */
         public Object getValueAt(final int rowIndex, final int columnIndex) {
@@ -518,7 +522,7 @@ public class KernelEditor extends JComponent {
         }
 
         /**
-         * Set the value for the cell at <code>columnIndex</code> and <code>rowIndex</code>.
+         * Set the value for the cell at {@code columnIndex} and {@code rowIndex}.
          * This method is automatically invoked when the user edited one of kernel values.
          */
         public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
@@ -536,7 +540,7 @@ public class KernelEditor extends JComponent {
         }
 
         /**
-         * Returns the selected kernel name (never <code>null</code>).
+         * Returns the selected kernel name (never {@code null}).
          * Used by the combox box of kernel names.
          */
         public Object getSelectedItem() {
@@ -544,7 +548,7 @@ public class KernelEditor extends JComponent {
         }
 
         /**
-         * Set the selected kernel by its name (never <code>null</code>).
+         * Set the selected kernel by its name (never {@code null}).
          * Used by the combox box of kernel names.
          */
         public void setSelectedItem(final Object item) {
@@ -637,7 +641,7 @@ public class KernelEditor extends JComponent {
          *
          * @param category The kernel category. Only kernels in this category will
          *        be taken in account. This argument is usually provided by
-         *        {@link KernelEditor#getKernelCategory}. <code>null</code>
+         *        {@link KernelEditor#getKernelCategory}. {@code null}
          *        is a special value taking all categories in account.
          * @param toSearch The name of the kernel to search.
          */
@@ -667,11 +671,11 @@ public class KernelEditor extends JComponent {
         }
 
         /**
-         * Add a kernel to the list of available kernels. Each kernel can belong to an optional
+         * Adds a kernel to the list of available kernels. Each kernel can belong to an optional
          * category. Example of categories includes "Error filters" and "Gradient masks".
          *
          * @param category The kernel's category name, which <strong>must not</strong> be
-         *        <code>null</code>. The public method in {@link KernelEditor} is responsible
+         *        {@code null}. The public method in {@link KernelEditor} is responsible
          *        for substituing a string (usually "Others" or "Personalized") in place of the
          *        null value.
          * @param name The kernel name. Kernels will be displayed in alphabetic order.
@@ -703,7 +707,7 @@ public class KernelEditor extends JComponent {
         }
 
         /**
-         * Remove a kernel. If the kernel was the only one in
+         * Removes a kernel. If the kernel was the only one in
          * its category, the category is removed as well.
          *
          * @see KernelEditor#removeKernel
@@ -732,7 +736,7 @@ public class KernelEditor extends JComponent {
         }
 
         /**
-         * Remove all kernels and categories.
+         * Removes all kernels and categories.
          *
          * @see KernelEditor#removeAllKernels
          */
@@ -750,7 +754,7 @@ public class KernelEditor extends JComponent {
          * Returns a kernel by its name.
          *
          * @param  name The kernel name.
-         * @return The kernel, or <code>null</code> if there is no kernel for the specified name.
+         * @return The kernel, or {@code null} if there is no kernel for the specified name.
          */
         public KernelJAI getKernel(final String name) {
             return (KernelJAI) kernels.get(name);
@@ -816,9 +820,9 @@ public class KernelEditor extends JComponent {
         }
 
         /**
-         * Sort all kernel names according the specified comparator.
+         * Sorts all kernel names according the specified comparator.
          *
-         * @param comparator The comparator, or <code>null</code> for the natural ordering.
+         * @param comparator The comparator, or {@code null} for the natural ordering.
          *
          * @see KernelEditor#sortKernelNames
          */
@@ -903,5 +907,29 @@ public class KernelEditor extends JComponent {
                 }
             }
         }
+    }
+
+    /**
+     * Shows a dialog box requesting input from the user. If {@code owner} is contained into a
+     * {@link javax.swing.JDesktopPane}, the dialog box will appears as an internal frame. This
+     * method can be invoked from any thread (may or may not be the <cite>Swing</cite> thread).
+     *
+     * @param  owner The parent component for the dialog box, or {@code null} if there is no parent.
+     * @param  title The dialog box title.
+     * @return {@code true} if user pressed the "Ok" button, or {@code false} otherwise
+     *         (e.g. pressing "Cancel" or closing the dialog box from the title bar).
+     */
+    public boolean showDialog(final Component owner, final String title) {
+        return SwingUtilities.showOptionDialog(owner, this, title);
+    }
+
+    /**
+     * Show the dialog box. This method is provided only as an easy
+     * way to test the dialog appearance from the command line.
+     */
+    public static void main(final String[] args) {
+        final KernelEditor editor = new KernelEditor();
+        editor.addDefaultKernels();
+        editor.showDialog(null, Utilities.getShortClassName(editor));
     }
 }

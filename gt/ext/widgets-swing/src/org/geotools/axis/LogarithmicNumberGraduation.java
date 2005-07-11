@@ -17,31 +17,18 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.axis;
 
 // Dependencies
 import java.util.Locale;
-
-import org.geotools.units.Unit;
+import javax.units.Unit;
 
 
 /**
  * A graduation using numbers on a logarithmic axis.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -52,14 +39,14 @@ public class LogarithmicNumberGraduation extends NumberGraduation {
     private static final long serialVersionUID = -8514854171546232887L;
 
     /**
-     * Contruct a new logarithmic graduation with the supplied units.
+     * Contructs a new logarithmic graduation with the supplied units.
      */
     public LogarithmicNumberGraduation(final Unit unit) {
         super(unit);
     }
 
     /**
-     * Construct or reuse an iterator. This method override
+     * Constructs or reuses an iterator. This method override
      * the default {@link NumberGraduation} implementation.
      */
     NumberIterator getTickIterator(final TickIterator reuse, final Locale locale) {

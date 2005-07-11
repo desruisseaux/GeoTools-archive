@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
@@ -39,7 +30,15 @@ import java.util.ResourceBundle;
 import java.util.MissingResourceException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.net.URL;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.BorderLayout;
+import java.awt.image.renderable.ParameterBlock; // For javadoc
+import java.awt.image.renderable.RenderedImageFactory;
+import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.Box;
 import javax.swing.JTree;
 import javax.swing.JLabel;
@@ -50,15 +49,12 @@ import javax.swing.JScrollPane;
 import javax.swing.BorderFactory;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeModel;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.text.JTextComponent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import java.awt.image.renderable.ParameterBlock; // For javadoc
-import java.awt.image.renderable.RenderedImageFactory;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 
 // JAI dependencies
 import javax.media.jai.JAI;
@@ -101,7 +97,8 @@ import org.geotools.resources.gui.Resources;
  *       is relevant.</li>
  * </ul>
  *
- * @version $Id: RegisteredOperationBrowser.java,v 1.5 2003/11/12 14:14:24 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class RegisteredOperationBrowser extends JPanel {
@@ -116,14 +113,14 @@ public class RegisteredOperationBrowser extends JPanel {
     private final JLabel version = new JLabel(" ");
     
     /**
-     * Construct a new operation browser for the default {@link JAI} instance.
+     * Constructs a new operation browser for the default {@link JAI} instance.
      */
     public RegisteredOperationBrowser() {
         this(getTree());
     }
     
     /**
-     * Construct a new operation browser for the specified operation registry.
+     * Constructs a new operation browser for the specified operation registry.
      *
      * @param registry The operation registry to use for fetching operations.
      */
@@ -132,7 +129,7 @@ public class RegisteredOperationBrowser extends JPanel {
     }
 
     /**
-     * Construct a new operation browser for operations from the specified tree.
+     * Constructs a new operation browser for operations from the specified tree.
      *
      * @param model The tree model built by one of {@link #getTree} methods.
      */
@@ -158,13 +155,17 @@ public class RegisteredOperationBrowser extends JPanel {
                 selected(event.getNewLeadSelectionPath());
             }
         });
+        /*
+         * Set icons (optional)
+         */
+        tree.setCellRenderer(new CellRenderer());
     }
 
     /**
      * Invoked when the user selected a new operation in the tree. This method find the
      * {@link OperationDescriptor} for the selected node and invokes {@link #selected}.
      *
-     * @param path The selected tree path, or <code>null</code> if none.
+     * @param path The selected tree path, or {@code null} if none.
      */
     private void selected(final TreePath path) {
         if (path != null) {
@@ -206,9 +207,9 @@ public class RegisteredOperationBrowser extends JPanel {
      * Invoked when the user selected a new operation in the tree. The default implementation
      * display the operation or parameter description in the text area.
      *
-     * @param operation The selected operation, or <code>null</code> if no operation is
+     * @param operation The selected operation, or {@code null} if no operation is
      *        selected.
-     * @param param Index of the selected parameter, or <code>-1</code> if no parameter
+     * @param param Index of the selected parameter, or {@code -1} if no parameter
      *        is selected.
      */
     protected void selected(final OperationDescriptor operation, final int param) {
@@ -277,7 +278,7 @@ public class RegisteredOperationBrowser extends JPanel {
         for (int i=0; i<modes.length; i++) {
             final String mode = modes[i];
             final DefaultMutableTreeNode modeNode = new DefaultMutableTreeNode(mode);
-            final List descriptors = registry.getDescriptors(mode);
+            final List descriptors/*<RegistryElementDescriptor>*/ = registry.getDescriptors(mode);
             Collections.sort(descriptors, new Comparator() {
                 public int compare(final Object obj1, final Object obj2) {
                     final RegistryElementDescriptor desc1 = (RegistryElementDescriptor) obj1;
@@ -300,6 +301,8 @@ public class RegisteredOperationBrowser extends JPanel {
                     if (names != null) {
                         // No sorting; the order is relevant
                         for (int j=0; j<names.length; j++) {
+                            // Should not be NamedTreeNode, because the later is used for
+                            // differentiating parameters and implementations (see below).
                             descriptorNode.add(new DefaultMutableTreeNode(names[j], false));
                         }
                     }
@@ -308,7 +311,7 @@ public class RegisteredOperationBrowser extends JPanel {
                  * Add the implementing products and the factories, if any.
                  */
                 final String operationName = descriptor.getName();
-                final List products = registry.getOrderedProductList(mode, operationName);
+                final List/*<String>*/ products = registry.getOrderedProductList(mode, operationName);
                 if (products != null) {
                     final DefaultMutableTreeNode productsNode;
                     productsNode = new DefaultMutableTreeNode(
@@ -325,6 +328,9 @@ public class RegisteredOperationBrowser extends JPanel {
                                 final Object factory = itf.next();
                                 productNode.add(new NamedTreeNode(
                                         Utilities.getShortClassName(factory), factory, false));
+                                // The node class (NamedTreeNode) should be different from the
+                                // node for parameters (see above), in order to differentiate
+                                // those leafs in the cell renderer.
                             }
                         }
                         productsNode.add(productNode);
@@ -357,9 +363,70 @@ public class RegisteredOperationBrowser extends JPanel {
     }
 
     /**
+     * The tree cell renderer, which select icons according the selected object type.
+     */
+    private static final class CellRenderer extends DefaultTreeCellRenderer {
+        /** The icon for folder. */
+        private final Icon open, closed;
+
+        /** The icon for an operation, or {@code null} if none. */
+        private static Icon operation;
+
+        /** The icon for parameters, or {@code null} if none. */
+        private static Icon parameter;
+
+        /** The icon for implementations, or {@code null} if none. */
+        private static Icon implementation;
+
+        /**
+         * Creates a cell renderer.
+         */
+        private CellRenderer() {
+            open   = getDefaultOpenIcon();
+            closed = getDefaultClosedIcon();
+            if (operation == null) {
+                final ClassLoader loader = CellRenderer.class.getClassLoader();
+                URL url = loader.getResource("toolbarButtonGraphics/general/Information16.gif");
+                if (url!=null) operation = new ImageIcon(url);
+                url = loader.getResource("toolbarButtonGraphics/general/Preferences16.gif");
+                if (url!=null) parameter = new ImageIcon(url);
+                url = loader.getResource("toolbarButtonGraphics/general/About16.gif");
+                if (url!=null) implementation = new ImageIcon(url);
+            }
+        }
+
+        /**
+         * Configures the renderer based on the passed in components.
+         */
+        public Component getTreeCellRendererComponent(final JTree tree, final Object value,
+                                                      final boolean selelected,
+                                                      final boolean expanded,
+                                                      final boolean leaf, final int row,
+                                                      final boolean hasFocus)
+        {
+            final boolean isOp;
+            isOp = ((TreeNode) value).getUserObject() instanceof RegistryElementDescriptor;
+            Icon icon = isOp ? operation : open;
+            if (icon != null) {
+                setOpenIcon(icon);
+            }
+            icon = isOp ? operation : closed;
+            if (icon != null) {
+                setClosedIcon(icon);
+            }
+            icon = (value instanceof NamedTreeNode ? implementation : parameter);
+            if (icon != null) {
+                setLeafIcon(icon);
+            }
+            return super.getTreeCellRendererComponent(tree, value, selected, expanded,
+                                                      leaf, row, hasFocus);
+        }
+    }
+
+    /**
      * Display the operation browser from the command line. This method is usefull for checking
      * the widget appearance and the list of registered {@link JAI} operations. If this method
-     * is launch with the <code>-print</code> argument, then the tree of operations will be sent
+     * is launch with the {@code -print} argument, then the tree of operations will be sent
      * to standard output.
      *
      * @param args the command line arguments
@@ -374,7 +441,7 @@ public class RegisteredOperationBrowser extends JPanel {
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             frame.getContentPane().add(new RegisteredOperationBrowser());
             frame.pack();
-            frame.show();
+            frame.setVisible(true);
         }
     }
 }

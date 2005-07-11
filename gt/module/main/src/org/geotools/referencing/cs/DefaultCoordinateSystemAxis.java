@@ -59,10 +59,9 @@ import org.geotools.util.NameFactory;
  * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic coordinate reference system}.
  * Conversely, these names shall not be used in any other context.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see AbstractCS
  * @see Unit

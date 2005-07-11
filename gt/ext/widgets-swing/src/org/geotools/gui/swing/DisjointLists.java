@@ -41,6 +41,7 @@ import java.awt.GridBagConstraints;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 // Miscellaneous
 import java.net.URL;
@@ -59,7 +60,7 @@ import org.geotools.resources.SwingUtilities;
  * selected. User can move items from one list to the other using buttons in the middle.
  *
  * @since 2.0
- * @version $Id: DisjointLists.java,v 1.1 2003/06/25 12:57:41 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class DisjointLists extends JPanel {
@@ -70,26 +71,52 @@ public class DisjointLists extends JPanel {
      */
     private static final class Model extends AbstractListModel {
         /**
-         * The list of elements shared by both lists.
-         * Not all elements in this list will be displayed.
+         * The list of elements shared by both lists. Not all elements in this list will be
+         * displayed. The index of elements to shown are enumerated in the {@link #visibles}
+         * array.
          */
         private final List choices;
 
         /**
-         * The index of valids elements in the list.
+         * The index of valids elements in the {@link #choice} list. This array will growth
+         * as needed. Elements in this array should always be in strictly increasing order.
          */
         private int[] visibles = new int[12];
 
         /**
-         * The number of valid elements in {@link #visibles}.
+         * The number of valid elements in the {@link #visibles} array.
          */
         private int size;
 
         /**
-         * Construct a model for the specified list of elements.
+         * Constructs a model for the specified list of elements.
          */
         public Model(final List choices) {
             this.choices = choices;
+        }
+
+        /**
+         * Returns {@code true} if all elements in the {@link #visible} array
+         * are in strictly increasing order. This is used for assertions.
+         */
+        private boolean isSorted() {
+            for (int i=1; i<size; i++) {
+                if (visibles[i] <= visibles[i-1]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * Searchs the insertion point. We should use Arrays.binarySearch(...), but
+         * unfortunatly J2SE 1.4 do not provides an API for searching in a subarray.
+         */
+        private static int search(final int[] array, int lower, final int upper, final int value) {
+            while (lower<upper && value>array[lower]) {
+                lower++;
+            }
+            return lower;
         }
 
         /**
@@ -109,7 +136,7 @@ public class DisjointLists extends JPanel {
         }
 
         /**
-         * Makes sure that {@link #visibles} has the specified capacity.
+         * Makes sure that the {@link #visibles} array has the specified capacity.
          */
         private void ensureCapacity(final int capacity) {
             if (visibles.length < capacity) {
@@ -118,31 +145,45 @@ public class DisjointLists extends JPanel {
         }
 
         /**
-         * Moves elements in the specified range from this model to an other model.
-         *
-         * @param lower Lower index (inclusive) in this model.
-         * @param upper Upper index (exclusive) in this model.
-         * @param dest  The destination model.
+         * Removes a range of visible elements. The {@code lower} and {@code upper}
+         * indices are index (not values) in the {@link #visibles} array.
          */
-        public void move(final int lower, final int upper, final Model dest) {
-            if (upper > lower) {
-                assert lower>=0 && upper<=size;
-                final int length = upper-lower;
-                dest.ensureCapacity(dest.size + length);
-                System.arraycopy(visibles, lower, dest.visibles, dest.size, length);
-                System.arraycopy(visibles, upper, visibles, lower, size-upper);
-                dest.size += length;
-                this.size -= length;
-                this.fireIntervalRemoved(this, lower, upper-1);
-                dest.fireIntervalAdded(length);
-            }
+        private void hide(final int lower, final int upper) {
+            System.arraycopy(visibles, upper, visibles, lower, size-upper);
+            size -= (upper-lower);
+            fireIntervalRemoved(this, lower, upper-1);
+            assert isSorted();
         }
 
         /**
-         * Fired when an interval has been appened to this object.
+         * Moves elements in the specified range from the specified model to this model.
+         *
+         * @param source The source model.
+         * @param lower  Lower index (inclusive) in the source model.
+         * @param upper  Upper index (exclusive) in the source model.
          */
-        private void fireIntervalAdded(final int length) {
-            fireIntervalAdded(this, size-length, size-1);
+        public void move(final Model source, final int lower, final int upper) {
+            assert lower>=0 && upper<=source.size;
+            ensureCapacity(size + (upper-lower));
+            int insertAt = 0;
+            int subUpper = lower;
+            while (subUpper < upper) {
+                final int subLower = subUpper;
+                assert isSorted();
+                insertAt = search(visibles, insertAt, size, source.visibles[subLower]);
+                if (insertAt == size) {
+                    subUpper = upper;
+                } else {
+                    subUpper = search(source.visibles, subLower, upper, visibles[insertAt]);
+                }
+                final int length = subUpper - subLower;
+                System.arraycopy(visibles, insertAt, visibles, insertAt+length, size-insertAt);
+                System.arraycopy(source.visibles, subLower, visibles, insertAt, length);
+                size += length;
+                assert isSorted() : Arrays.toString(visibles); // TODO: uncomment for J2SE 1.5.
+                fireIntervalAdded(this, insertAt, insertAt+length-1);
+            }
+            source.hide(lower, upper);
         }
 
         /**
@@ -157,7 +198,8 @@ public class DisjointLists extends JPanel {
                 for (int i=max-length; i<max; i++) {
                     visibles[size++] = i;
                 }
-                fireIntervalAdded(length);
+                assert isSorted();
+                fireIntervalAdded(this, size-length, size-1);
             }
         }
     }
@@ -193,7 +235,7 @@ public class DisjointLists extends JPanel {
             final Model source = (Model)this.source.getModel();
             final Model target = (Model)this.target.getModel();
             if (all) {
-                source.move(0, source.getSize(), target);
+                target.move(source, 0, source.getSize());
                 return;
             }
             final int[] indices = this.source.getSelectedIndices();
@@ -202,11 +244,14 @@ public class DisjointLists extends JPanel {
                 int lower = indices[i];
                 int upper = lower+1;
                 while (++i<indices.length && indices[i]==upper) {
+                    // Collapses consecutive indices in a single move operation.
                     upper++;
                 }
-                source.move(lower, upper, target);
+                target.move(source, lower, upper);
                 final int length = (upper-lower);
                 for (int j=i; j<indices.length; j++) {
+                    // Adjusts the remaining indices. Since we just moved previous
+                    // elements, the indices of remaining elements are shifted.
                     indices[j] -= length;
                 }
             }
@@ -214,13 +259,13 @@ public class DisjointLists extends JPanel {
     }
 
     /**
-     * The list on the left side. This list is initially empty.
+     * The list on the left side. This is the list that contains
+     * the element selectable by the user.
      */
     private final JList left;
 
     /**
-     * The list on the right side. This is the list that contains
-     * the element selectable by the user.
+     * The list on the right side. This list is initially empty.
      */
     private final JList right;
 
@@ -294,21 +339,19 @@ public class DisjointLists extends JPanel {
     }
 
     /**
-     * Add all elements from the specified collection into the list on the right side.
+     * Add all elements from the specified collection into the list on the left side.
      *
      * @param items Items to add.
      */
     public void addElements(final Collection items) {
-        ((Model)right.getModel()).addAll(items);
+        ((Model)left.getModel()).addAll(items);
     }
 
     /**
-     * Returns all elements in the list on the left side.
-     *
-     * @return All elements on the left side.
+     * Returns all elements in the list on the right side.
      */
     public Collection getSelectedElements() {
-        final Model model = (Model) left.getModel();
+        final Model model = (Model) right.getModel();
         final Object[] list = new Object[model.getSize()];
         for (int i=0; i<list.length; i++) {
             list[i] = model.getElementAt(i);
@@ -339,6 +382,7 @@ public class DisjointLists extends JPanel {
         for (int i=0; i<locales.length; i++) {
             names.add(locales[i].getDisplayName());
         }
+        Collections.sort(names);
         list.addElements(names);
         list.showDialog(null, Utilities.getShortClassName(list));
     }

@@ -92,7 +92,8 @@ import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
  * <p align="center"><img src="doc-files/OperationTreeBrowser.png"></p>
  * <p>&nbsp;</p>
  *
- * @version $Id: OperationTreeBrowser.java,v 1.7 2003/11/12 14:14:24 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  * @author Lionel Flahaut 
  *
@@ -106,13 +107,13 @@ public class OperationTreeBrowser extends JPanel {
 
     /**
      * The image properties panel. Will be constructed only when first needed,
-     * and the added to the card layout with the <code>IMAGE</code> name.
+     * and the added to the card layout with the {@code IMAGE} name.
      */
     private ImageProperties imageProperties;
 
     /**
      * The parameter properties panel. Will be constructed only when first needed,
-     * and the added to the card layout with the <code>PARAMETER</code> name.
+     * and the added to the card layout with the {@code PARAMETER} name.
      */
     private ParameterEditor parameterEditor;
 
@@ -304,15 +305,15 @@ public class OperationTreeBrowser extends JPanel {
     /**
      * The listener for various event in the {@link OperationTreeBrowser} widget.
      *
-     * @version $Id: OperationTreeBrowser.java,v 1.7 2003/11/12 14:14:24 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class Listeners implements TreeSelectionListener {
         /** 
          * Called whenever the value of the selection changes. This method uses the
          * {@link TreeNode#getAllowsChildren} in order to determines if the selection
-         * is a source (allows children = <code>true</code>) or a parameter
-         * (allows children = <code>false</code>).
+         * is a source (allows children = {@code true}) or a parameter
+         * (allows children = {@code false}).
          */
         public void valueChanged(final TreeSelectionEvent event) {
             Object        selection  = null;   // The selected tree element.
@@ -370,8 +371,8 @@ public class OperationTreeBrowser extends JPanel {
      *
      * @param  selection The user selection. This object is usually an instance of
      *         {@link RenderedImage}, {@link RenderableImage} or {@link PropertySource}.
-     * @return <code>true</code> if this method has been able to find an editor, or
-     *         <code>false</code> otherwise.
+     * @return {@code true} if this method has been able to find an editor, or
+     *         {@code false} otherwise.
      */
     protected boolean showSourceEditor(final Object selection) {
         if (imageProperties == null) {
@@ -403,8 +404,8 @@ public class OperationTreeBrowser extends JPanel {
      * @param  selection The user selection. This object is usually an instance of
      *         {@link Number}, {@link KernelJAI}, {@link LookupTableJAI} or some other
      *         parameter object.
-     * @return <code>true</code> if this method has been able to find an editor, or
-     *         <code>false</code> otherwise.
+     * @return {@code true} if this method has been able to find an editor, or
+     *         {@code false} otherwise.
      */
     protected boolean showParameterEditor(final Object selection) {
         if (parameterEditor == null) {
@@ -419,9 +420,9 @@ public class OperationTreeBrowser extends JPanel {
     /**
      * Show the operation chain in the given owner.
      *
-     * @param  owner The owner widget, or <code>null</code> if none.
-     * @param  title The widget title, or <code>null</code> for a default one.
-     * @return <code>true</code> if the user clicked on the "Ok" button.
+     * @param  owner The owner widget, or {@code null} if none.
+     * @param  title The widget title, or {@code null} for a default one.
+     * @return {@code true} if the user clicked on the "Ok" button.
      */
     public boolean showDialog(final Component owner, String title) {
         if (title == null) {

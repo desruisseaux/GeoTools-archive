@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.axis;
 
@@ -41,16 +28,20 @@ import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.Locale;
 
+// Units dependencies
+import javax.units.Unit;
+import javax.units.ConversionException;
+
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.geotools.units.Unit;
-import org.geotools.units.UnitException;
 
 
 /**
  * Base class for graduation.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -61,7 +52,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     private static final long serialVersionUID = 5215728323932315112L;
 
     /**
-     * The axis's units, or <code>null</code> if unknow.
+     * The axis's units, or {@code null} if unknow.
      */
     private Unit unit;
 
@@ -83,7 +74,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     /**
      * Construct a graduation with the supplied units.
      *
-     * @param unit The axis's units, or <code>null</code> if unknow.
+     * @param unit The axis's units, or {@code null} if unknow.
      */
     public AbstractGraduation(final Unit unit) {
         listenerList = new PropertyChangeSupport(this);
@@ -91,15 +82,13 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Set the minimum value for this graduation. If the new minimum is greater
-     * than the current maximum, then the maximum will also be set to a value
-     * greater than or equals to the minimum.
+     * Set the minimum value for this graduation. If the new minimum is greater than the current
+     * maximum, then the maximum will also be set to a value greater than or equals to the minimum.
      *
      * @param  value The new minimum in {@link #getUnit} units.
-     * @return <code>true</code> if the state of this graduation changed
-     *         as a result of this call, or <code>false</code> if the new
-     *         value is identical to the previous one.
-     * @throws IllegalArgumentException If <code>value</code> is NaN ou infinite.
+     * @return {@code true} if the state of this graduation changed as a result of this call, or
+     *         {@code false} if the new value is identical to the previous one.
+     * @throws IllegalArgumentException If {@code value} is NaN ou infinite.
      *
      * @see #getMinimum
      * @see #setMaximum(double)
@@ -107,15 +96,13 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     public abstract boolean setMinimum(final double value) throws IllegalArgumentException;
 
     /**
-     * Set the maximum value for this graduation. If the new maximum is less
-     * than the current minimum, then the minimum will also be set to a value
-     * less than or equals to the maximum.
+     * Set the maximum value for this graduation. If the new maximum is less than the current
+     * minimum, then the minimum will also be set to a value less than or equals to the maximum.
      *
      * @param  value The new maximum in {@link #getUnit} units.
-     * @return <code>true</code> if the state of this graduation changed
-     *         as a result of this call, or <code>false</code> if the new
-     *         value is identical to the previous one.
-     * @throws IllegalArgumentException If <code>value</code> is NaN ou infinite.
+     * @return {@code true} if the state of this graduation changed as a result of this call, or
+     *         {@code false} if the new value is identical to the previous one.
+     * @throws IllegalArgumentException If {@code value} is NaN ou infinite.
      *
      * @see #getMaximum
      * @see #setMinimum(double)
@@ -123,11 +110,10 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     public abstract boolean setMaximum(final double value) throws IllegalArgumentException;
     
     /**
-     * Returns the axis title. If <code>includeUnits</code> is <code>true</code>,
-     * then the returned string will includes units as in "Temperature (°C)". The
-     * exact formatting is local-dependent.
+     * Returns the axis title. If {@code includeUnits} is {@code true}, then the returned string
+     * will includes units as in "Temperature (°C)". The exact formatting is local-dependent.
      *
-     * @param  includeSymbol <code>true</code> to format unit symbol after the name.
+     * @param  includeSymbol {@code true} to format unit symbol after the name.
      * @return The graduation name (also to be use as axis title).
      */
     public synchronized String getTitle(final boolean includeSymbol) {
@@ -143,9 +129,9 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
 
     /**
      * Set the axis title, not including unit symbol. This method will fire a
-     * property change event with the <code>"title"</code> property name.
+     * property change event with the {@code "title"} property name.
      *
-     * @param title New axis title, or <code>null</code> to remove any previous setting.
+     * @param title New axis title, or {@code null} to remove any previous setting.
      */
     public void setTitle(final String title) {
         final String old;
@@ -157,7 +143,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Returns a string representation of axis's units, or <code>null</code>
+     * Returns a string representation of axis's units, or {@code null}
      * if there is none. The default implementation returns the string
      * representation of {@link #getUnit}.
      */
@@ -167,24 +153,23 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Returns the graduation's units, or <code>null</code> if unknow.
+     * Returns the graduation's units, or {@code null} if unknow.
      */
     public Unit getUnit() {
         return unit;
     }
 
     /**
-     * Changes the graduation's units. Subclasses will automatically
-     * convert minimum and maximum values from the old units to the
-     * new one. This method fires a property change event with the
-     * <code>"unit"</code> property name.
+     * Changes the graduation's units. Subclasses will automatically convert minimum and maximum
+     * values from the old units to the new one. This method fires a property change event with the
+     * {@code "unit"} property name.
      *
-     * @param  unit The new units, or <code>null</code> if unknow.
-     *         If null, minimum and maximum values are not converted.
-     * @throws UnitException if units are not convertible, or if the
+     * @param  unit The new units, or {@code null} if unknow. If null, minimum and maximum values
+     *         are not converted.
+     * @throws ConversionException if units are not convertible, or if the
      *         specified units is illegal for this graduation.
      */
-    public void setUnit(final Unit unit) throws UnitException {
+    public void setUnit(final Unit unit) throws ConversionException {
         final Unit oldUnit;
         synchronized (this) {
             oldUnit = this.unit;
@@ -202,8 +187,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
 
     /**
      * Set the locale to use for formatting labels.
-     * This will fire a property change event with
-     * the <code>"locale"</code> property name.
+     * This will fire a property change event with the {@code "locale"} property name.
      */
     public synchronized void setLocale(final Locale locale) {
         final Locale old;
@@ -282,8 +266,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
     
     /**
-     * Vérifie que le nombre spécifié est réel. S'il
-     * est NaN ou infini, une exception sera lancée.
+     * Vérifie que le nombre spécifié est réel. S'il est NaN ou infini, une exception sera lancée.
      *
      * @param  name Nom de l'argument.
      * @param  n Nombre à vérifier.
@@ -297,8 +280,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Vérifie que le nombre spécifié est réel. S'il
-     * est NaN ou infini, une exception sera lancée.
+     * Vérifie que le nombre spécifié est réel. S'il est NaN ou infini, une exception sera lancée.
      *
      * @param  name Nom de l'argument.
      * @param  n Nombre à vérifier.
@@ -312,7 +294,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Compare this graduation with the specified object for equality.
+     * Compares this graduation with the specified object for equality.
      * This method do not compare listeners registered in {@link #listenerList}.
      */
     public boolean equals(final Object object) {

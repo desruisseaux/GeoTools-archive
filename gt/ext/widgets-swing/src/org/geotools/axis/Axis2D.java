@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.axis;
 
@@ -46,24 +33,33 @@ import java.awt.geom.IllegalPathStateException;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+
+// Other J2SE dependencies and extensions
+import java.util.Map;
+import java.util.Locale;
+import java.util.Collections;
+import java.util.ConcurrentModificationException;
+import java.io.Serializable;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.Serializable;
-import java.util.ConcurrentModificationException;
-import java.util.Locale;
-import java.util.Map;
+import javax.units.Unit;
 
-import org.geotools.cs.AxisInfo;
-import org.geotools.cs.AxisOrientation;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.XMath;
-import org.geotools.resources.geometry.XAffineTransform;
-import org.geotools.resources.geometry.XDimension2D;
+// OpenGIS dependencies
 import org.opengis.util.Cloneable;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+
+// Geotools dependencies
+import org.geotools.resources.XMath;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 
 
 /**
- * An axis as a graduated line. <code>Axis2D</code> objets are really {@link Line2D}
+ * An axis as a graduated line. {@code Axis2D} objets are really {@link Line2D}
  * objects with a {@link Graduation}. Because axis are {@link Line2D}, they can be
  * located anywhere in a widget with any orientation. Lines are drawn from starting
  * point
@@ -80,13 +76,14 @@ import org.opengis.util.Cloneable;
  * opposite, graduation can have any arbitrary units, which is given by
  * {@link Graduation#getUnit}. The static method {@link #createAffineTransform} can
  * be used for mapping logical coordinates to pixels coordinates for an arbitrary
- * pair of <code>Axis2D</code> objects, which doesn't need to be perpendicular.
+ * pair of {@code Axis2D} objects, which doesn't need to be perpendicular.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see AxisInfo
- * @see AxisOrientation
+ * @see DefaultCoordinateSystemAxis
+ * @see AxisDirection
  * @see Graduation
  */
 public class Axis2D extends Line2D implements Cloneable, Serializable {
@@ -104,7 +101,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
     /**
      * Longueur des graduations, en points. Chaque graduations sera tracée à partir de
-     * <code>[sub]TickStart</code> (généralement 0) jusqu'à <code>[sub]TickEnd</code>.
+     * {@code [sub]TickStart} (généralement 0) jusqu'à {@code [sub]TickEnd}.
      * Par convention, des valeurs positives désignent l'intérieur du graphique et des
      * valeurs négatives l'extérieur.
      */
@@ -124,10 +121,10 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     private final Graduation graduation;
 
     /**
-     * The {@link AxisInfo} object associated to this axis, or <code>null</code> if it has
+     * The coordinate system axis object associated to this axis, or {@code null} if it has
      * not been created yet.
      */
-    private transient AxisInfo information;
+    private transient DefaultCoordinateSystemAxis information;
 
     /**
      * Compte le nombre de modifications apportées à l'axe,
@@ -138,7 +135,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
     /**
      * Indique si {@link #getPathIterator} doit retourner {@link #iterator}.
-     * Ce champ prend temporairement la valeur de <code>true</code> pendant
+     * Ce champ prend temporairement la valeur de {@code true} pendant
      * l'exécution de {@link #paint}.
      */
     private transient boolean isPainting;
@@ -182,7 +179,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
     /**
      * Largeur et hauteur maximales des étiquettes de la graduation, ou
-     * <code>null</code> si cette dimension n'a pas encore été déterminée.
+     * {@code null} si cette dimension n'a pas encore été déterminée.
      */
     private transient Dimension2D maximumSize;
 
@@ -198,14 +195,14 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     private RenderingHints hints;
 
     /**
-     * Construct an axis with a default {@link NumberGraduation}.
+     * Constructs an axis with a default {@link NumberGraduation}.
      */
     public Axis2D() {
         this(new NumberGraduation(null));
     }
 
     /**
-     * Construct an axis with the specified graduation.
+     * Constructs an axis with the specified graduation.
      */
     public Axis2D(final Graduation graduation) {
         this.graduation = graduation;
@@ -224,35 +221,6 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      */
     public Graduation getGraduation() {
         return graduation;
-    }
-
-    /**
-     * Returns this axis name and orientation. Informations include a name (usually
-     * the {@linkplain Graduation#getTitle graduation title}) and an orientation.
-     * The orientation is usually {@linkplain AxisOrientation#NORTH North} or
-     * {@linkplain AxisOrientation#SOUTH South} for vertical axis,
-     * {@linkplain AxisOrientation#EAST East} or {@linkplain AxisOrientation#WEST West}
-     * for horizontal axis, or "{@linkplain AxisOrientation#OTHER other}" otherwise.
-     */
-    public synchronized AxisInfo getAxisInfo() {
-        if (information == null) {
-            AxisOrientation orientation = AxisOrientation.OTHER;
-            if (x1 == x2) {
-                if (y1 < y2) {
-                    orientation = AxisOrientation.NORTH;
-                } else if (y1 > y2) {
-                    orientation = AxisOrientation.SOUTH;
-                }
-            } else if (y1 == y2) {
-                if (x1 < x2) {
-                    orientation = AxisOrientation.EAST;
-                } else if (x1 > x2) {
-                    orientation = AxisOrientation.WEST;
-                }
-            }
-            information = new AxisInfo(graduation.getTitle(false), orientation);
-        }
-        return information;
     }
 
     /**
@@ -335,9 +303,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     }
 
     /**
-     * Returns a bounding box for this axis. The bounding box includes
-     * the axis's line ({@link #getP1 P1}) to ({@link #getP2 P2}), the
-     * axis's ticks and all labels.
+     * Returns a bounding box for this axis. The bounding box includes the axis's line
+     * ({@link #getP1 P1}) to ({@link #getP2 P2}), the axis's ticks and all labels.
      *
      * @see #getX1
      * @see #getY1
@@ -355,7 +322,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     }
 
     /**
-     * Sets the location of the endpoints of this <code>Axis2D</code> to the specified
+     * Sets the location of the endpoints of this {@code Axis2D} to the specified
      * coordinates. Coordinates should be in pixels (for screen rendering) or points
      * (for paper rendering). Using points units make it easy to render labels with
      * a raisonable font size, no matter the screen resolution or the axis graduation.
@@ -364,7 +331,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      * @param y1 Coordinate <var>y</var> of starting point
      * @param x2 Coordinate <var>x</var> of end point.
      * @param y2 Coordinate <var>y</var> of end point.
-     * @throws IllegalArgumentException If a coordinate is <code>NaN</code> or infinite.
+     * @throws IllegalArgumentException If a coordinate is {@code NaN} or infinite.
      *
      * @see #getX1
      * @see #getY1
@@ -388,7 +355,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     }
 
     /**
-     * Returns <code>true</code> if the axis would have to rotate clockwise in order to
+     * Returns {@code true} if the axis would have to rotate clockwise in order to
      * overlaps its graduation.
      */
     public boolean isLabelClockwise() {
@@ -396,9 +363,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     }
 
     /**
-     * Sets the label's locations relative to this axis. Value <code>true</code> means
+     * Sets the label's locations relative to this axis. Value {@code true} means
      * that the axis would have to rotate clockwise in order to overlaps its graduation.
-     * Value <code>false</code> means that the axis would have to rotate counter-clockwise
+     * Value {@code false} means that the axis would have to rotate counter-clockwise
      * in order to overlaps its graduation.
      */
     public synchronized void setLabelClockwise(final boolean c) {
@@ -410,7 +377,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      * Returns a default font to use when no rendering hint were provided for
      * the {@link Graduation#TICK_LABEL_FONT} key.
      *
-     * @return A default font (never <code>null</code>).
+     * @return A default font (never {@code null}).
      */
     private synchronized Font getDefaultFont() {
         if (defaultFont == null) {
@@ -420,7 +387,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     }
 
     /**
-     * Returns an iterator object that iterates along the <code>Axis2D</code> boundary
+     * Returns an iterator object that iterates along the {@code Axis2D} boundary
      * and provides access to the geometry of the shape outline. The shape includes
      * the axis line, graduation and labels. If an optional {@link AffineTransform}
      * is specified, the coordinates returned in the iteration are transformed accordingly.
@@ -430,7 +397,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     }
 
     /**
-     * Returns an iterator object that iterates along the <code>Axis2D</code> boundary
+     * Returns an iterator object that iterates along the {@code Axis2D} boundary
      * and provides access to the geometry of the shape outline. The shape includes
      * the axis line, graduation and labels. If an optional {@link AffineTransform}
      * is specified, the coordinates returned in the iteration are transformed accordingly.
@@ -451,7 +418,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
     /**
      * Draw this axis in the specified graphics context. This method is equivalents
-     * to <code>Graphics2D.draw(this)</code>.  However, this method may be slightly
+     * to {@code Graphics2D.draw(this)}.  However, this method may be slightly
      * faster and produce better quality output.
      *
      * @param graphics The graphics context to use for drawing.
@@ -583,7 +550,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      * are defined in the {@link Graduation} interface.
      *
      * @param  key The key corresponding to the hint to get. 
-     * @return An object representing the value for the specified hint key, or <code>null</code>
+     * @return An object representing the value for the specified hint key, or {@code null}
      *         if no value is associated to the specified key.
      *
      * @see Graduation#TICK_LABEL_FONT
@@ -600,7 +567,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      *
      * @param key The key of the hint to be set.
      * @param value The value indicating preferences for the specified hint category.
-     *              A <code>null</code> value removes any hint for the specified key.
+     *              A {@code null} value removes any hint for the specified key.
      *
      * @see Graduation#TICK_LABEL_FONT
      * @see Graduation#AXIS_TITLE_FONT
@@ -650,17 +617,51 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     }
 
     /**
+     * Returns this axis name and direction. Information include a name (usually the
+     * {@linkplain Graduation#getTitle graduation title}) and an direction. The direction is usually
+     * {@linkplain AxisDirection#DISPLAY_UP up} or {@linkplain AxisDirection#DISPLAY_DOWN down}
+     * for vertical axis, {@linkplain AxisDirection#DISPLAY_RIGHT right} or
+     * {@linkplain AxisDirection#DISPLAY_LEFT left} for horizontal axis, or
+     * {@linkplain AxisDirection#OTHER other} otherwise.
+     */
+    public synchronized DefaultCoordinateSystemAxis toCoordinateSystemAxis() {
+        if (information == null) {
+            String abbreviation = "z";
+            AxisDirection direction = AxisDirection.OTHER;
+            if (x1 == x2) {
+                if (y1 < y2) {
+                    direction = AxisDirection.DISPLAY_UP;
+                } else if (y1 > y2) {
+                    direction = AxisDirection.DISPLAY_DOWN;
+                }
+                abbreviation = "y";
+            } else if (y1 == y2) {
+                if (x1 < x2) {
+                    direction = AxisDirection.DISPLAY_RIGHT;
+                } else if (x1 > x2) {
+                    direction = AxisDirection.DISPLAY_LEFT;
+                }
+                abbreviation = "x";
+            }
+            information = new DefaultCoordinateSystemAxis(
+                    Collections.singletonMap(IdentifiedObject.NAME_KEY, graduation.getTitle(false)),
+                    abbreviation, direction, graduation.getUnit());
+        }
+        return information;
+    }
+
+    /**
      * Creates an affine transform mapping logical to pixels coordinates for a pair
      * of axis. The affine transform will maps coordinates in the following way:
      *
      * <ul>
      *   <li>For each input coordinates (<var>x</var>,<var>y</var>), the <var>x</var> and
-     *       <var>y</var> values are expressed in the same units than the <code>xAxis</code>
-     *       and <code>yAxis</code> graduations, respectively.</li>
+     *       <var>y</var> values are expressed in the same units than the {@code xAxis}
+     *       and {@code yAxis} graduations, respectively.</li>
      *   <li>The output point is the pixel's coordinates for the (<var>x</var>,<var>y</var>)
      *       values. Changing the <var>x</var> value move the pixel location in parallel with
-     *       the <code>xAxis</code>, which may or may not be horizontal. Changing the <var>y</var>
-     *       value move the pixel location in parallel with the <code>yAxis</code>, which may or
+     *       the {@code xAxis}, which may or may not be horizontal. Changing the <var>y</var>
+     *       value move the pixel location in parallel with the {@code yAxis}, which may or
      *       may not be vertical.</li>
      * </ul>
      *
@@ -730,16 +731,15 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
 
     /**
-     * Iterator object that iterates along the graduation ticks and provides
-     * access to the graduation values. Each <code>Axis2D.TickIterator</code>
-     * object traverses the graduation of the underlying {@link Axis2D} object
-     * independently from any other {@link TickIterator} objects in use at
-     * the same time. If a change occurs in the underlying {@link Axis2D} object
-     * during the iteration, then {@link #refresh} must be invoked in order to
-     * reset the iterator as if a new instance was created. Except for {@link #refresh}
-     * method, using the iterator after a change in the underlying {@link Axis2D}
-     * may thrown a {@link ConcurrentModificationException}.
+     * Iterates along the graduation ticks and provides access to the graduation values. Each
+     * {@code Axis2D.TickIterator} object traverses the graduation of the unclosing {@link Axis2D}
+     * object independently from any other {@link TickIterator} objects in use at the same time.
+     * If a change occurs in the underlying {@link Axis2D} object during the iteration, then
+     * {@link #refresh} must be invoked in order to reset the iterator as if a new instance was
+     * created. Except for {@link #refresh} method, using the iterator after a change in the
+     * underlying {@link Axis2D} may thrown a {@link ConcurrentModificationException}.
      *
+     * @since 2.0
      * @version $Id$
      * @author Martin Desruisseaux
      */
@@ -754,12 +754,12 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * (especially {@link Graduation#VISUAL_AXIS_LENGTH} and
          * {@link Graduation#VISUAL_TICK_SPACING}) are going to be overwriten. This set may also
          * contains additional hints provided by {@link Graphics2D} in the {@link Axis2D#paint}
-         * method. This object will never be <code>null</code>.
+         * method. This object will never be {@code null}.
          */
         private final RenderingHints hints;
 
         /**
-         * <code>scaleX</code> and <code>scaleY</code> are used for scaling
+         * {@code scaleX} and {@code scaleY} are used for scaling
          * logical coordinates to pixel coordinates. Those scale factors
          * <strong>must</strong> be the same than the one that appears in
          * {@link Axis2D#createAffineTransform}.
@@ -767,7 +767,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         private double scaleX, scaleY;
 
         /**
-         * <code>(tickX, tickY)</code> is a unitary vector perpendicular to the axis.
+         * {@code (tickX, tickY)} is a unitary vector perpendicular to the axis.
          */
         private double tickX, tickY;
 
@@ -800,7 +800,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
         /**
          * The font context from {@link Graphics2D#getFontContext},
-         * or <code>null</code> for a default one.
+         * or {@code null} for a default one.
          */
         private transient FontRenderContext fontContext;
 
@@ -815,7 +815,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * Construct an iterator.
          *
          * @param fontContext Information needed to correctly measure text, or
-         *        <code>null</code> if unknow. This object is usually given by
+         *        {@code null} if unknow. This object is usually given by
          *        {@link Graphics2D#getFontRenderContext}.
          */
         public TickIterator(final FontRenderContext fontContext) {
@@ -847,8 +847,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         /**
          * Tests if the current tick is a major one.
          *
-         * @return <code>true</code> if current tick is a major tick,
-         *         or <code>false</code> if it is a minor tick.
+         * @return {@code true} if current tick is a major tick,
+         *         or {@code false} if it is a minor tick.
          */
         public boolean isMajorTick() {
             return iterator.isMajorTick();
@@ -880,8 +880,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * This is usually pixels.
          *
          * @param  dest A destination point that stores the intersection coordinates,
-         *         or <code>null</code> to create a new {@link Point2D} object.
-         * @return <code>dest</code>, or a new {@link Point2D} object if <code>dest</code> was null.
+         *         or {@code null} to create a new {@link Point2D} object.
+         * @return {@code dest}, or a new {@link Point2D} object if {@code dest} was null.
          */
         public Point2D currentPosition(final Point2D dest) {
             final double     position = currentPosition()-minimum;
@@ -904,8 +904,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * This is usually pixels.
          *
          * @param  dest A destination line that stores the current tick coordinates,
-         *         or <code>null</code> to create a new {@link Line2D} object.
-         * @return <code>dest</code>, or a new {@link Line2D} object if <code>dest</code> was null.
+         *         or {@code null} to create a new {@link Line2D} object.
+         * @return {@code dest}, or a new {@link Line2D} object if {@code dest} was null.
          */
         public Line2D currentTick(final Line2D dest) {
             final boolean isMajorTick = isMajorTick();
@@ -929,7 +929,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         /**
          * Returns the label for current tick. This method is usually invoked
          * only for major ticks, but may be invoked for minor ticks as well.
-         * This method returns <code>null</code> if it can't produces a label
+         * This method returns {@code null} if it can't produces a label
          * for current tick.
          */
         public String currentLabel() {
@@ -943,7 +943,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * Returns the label for current tick as a glyphs vector. This method is used
          * together with {@link #currentLabelBounds} for labels rendering. <strong>Do
          * not change the returned {@link GlyphVector}</strong>, since the glyphs vector
-         * is not cloned for performance raisons. This method returns <code>null</code>
+         * is not cloned for performance raisons. This method returns {@code null}
          * if it can't produces a glyph vector for current tick.
          */
         public GlyphVector currentLabelGlyphs() {
@@ -974,7 +974,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * }
          * </pre>
          *
-         * This method returns <code>null</code> if it can't compute bounding box for current tick.
+         * This method returns {@code null} if it can't compute bounding box for current tick.
          */
         public Rectangle2D currentLabelBounds() {
             final GlyphVector glyphs = currentLabelGlyphs();
@@ -999,7 +999,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * Returns the font for tick labels. This is the font used for drawing the tick label
          * formatted by {@link TickIterator#currentLabel}.
          *
-         * @return The font (never <code>null</code>).
+         * @return The font (never {@code null}).
          */
         private Font getTickFont() {
             if (font == null) {
@@ -1017,7 +1017,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * Returns the font for axis title. This is the font used for drawing the title
          * formatted by {@link Graduation#getTitle}.
          *
-         * @return The font (never <code>null</code>).
+         * @return The font (never {@code null}).
          */
         final Font getTitleFont() {
             Object candidate = hints.get(Graduation.AXIS_TITLE_FONT);
@@ -1055,7 +1055,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * @param maximumSize Largeur et hauteur maximales des étiquettes de graduation. Cette
          *                 information est utilisée pour écarter l'étiquette de l'axe suffisament
          *                 pour qu'elle n'écrase pas les étiquettes de graduation.
-         * @return Le rectangle <code>bounds</code>, modifié pour être centré sur l'axe.
+         * @return Le rectangle {@code bounds}, modifié pour être centré sur l'axe.
          */
         final Rectangle2D centerAxisLabel(final Rectangle2D     bounds,
                                           final AffineTransform toRotate,
@@ -1129,9 +1129,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Moves the iterator to the next major tick. This move
-         * ignore any minor ticks between current position and
-         * the next major tick.
+         * Moves the iterator to the next major tick. This move ignore any minor ticks
+         * between current position and the next major tick.
          */
         public void nextMajor() {
             this.label  = null;
@@ -1140,8 +1139,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Reset the iterator on its first tick.
-         * All other properties are left unchanged.
+         * Reset the iterator on its first tick. All other properties are left unchanged.
          */
         public void rewind() {
             this.label  = null;
@@ -1150,10 +1148,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Reset the iterator on its first tick. If some axis properies have
-         * changed (e.g. minimum and/or maximum values), then the new settings
-         * are taken in account. This {@link #refresh} method help to reduce
-         * garbage-collection by constructing an <code>Axis2D.TickIterator</code>
+         * Reset the iterator on its first tick. If some axis properies have changed (e.g. minimum
+         * and/or maximum values), then the new settings are taken in account. This {@link #refresh}
+         * method help to reduce garbage-collection by constructing an {@code Axis2D.TickIterator}
          * object only once and reuse it for each axis's rendering.
          */
         public void refresh() {
@@ -1188,7 +1185,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
         /**
          * Retourne le contexte utilisé pour dessiner les caractères.
-         * Cette méthode ne retourne jamais <code>null</code>.
+         * Cette méthode ne retourne jamais {@code null}.
          */
         final FontRenderContext getFontRenderContext() {
             if (fontContext == null) {
@@ -1199,7 +1196,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
         /**
          * Spécifie le contexte à utiliser pour dessiner les caractères,
-         * ou <code>null</code> pour utiliser un contexte par défaut.
+         * ou {@code null} pour utiliser un contexte par défaut.
          */
         final void setFontRenderContext(final FontRenderContext context) {
             fontContext = context;
@@ -1221,40 +1218,39 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
 
     /**
-     * Itérateur balayant l'axe et ses barres de graduations pour leur traçage.
-     * Cet itérateur ne balaye pas les étiquettes de graduations.  Puisque cet
-     * itérateur ne retourne que des droites et jamais de courbes, il ne prend
-     * pas d'argument <code>flatness</code>.
+     * Itérateur balayant l'axe et ses barres de graduations pour leur traçage. Cet itérateur ne
+     * balaye pas les étiquettes de graduations. Puisque cet itérateur ne retourne que des droites
+     * et jamais de courbes, il ne prend pas d'argument {@code flatness}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private class TickPathIterator extends TickIterator implements java.awt.geom.PathIterator {
         /**
-         * Transformation affine à appliquer sur les données. Il doit s'agir
-         * d'une transformation affine appropriée pour l'écriture de texte
-         * (généralement en pixels ou en points). Il ne s'agit <u>pas</u> de
-         * la transformation affine créée par {@link Axis2D#createAffineTransform}.
+         * Transformation affine à appliquer sur les données. Il doit s'agir d'une transformation
+         * affine appropriée pour l'écriture de texte (généralement en pixels ou en points). Il ne
+         * s'agit <u>pas</u> de la transformation affine créée par
+         * {@link Axis2D#createAffineTransform}.
          */
         protected AffineTransform transform;
 
         /**
          * Coordonnées de la prochaine graduation à retourner par une des méthodes
-         * <code>currentSegment(...)</code>. Ces coordonnées n'auront <u>pas</u>
+         * {@code currentSegment(...)}. Ces coordonnées n'auront <u>pas</u>
          * été transformées selon la transformation affine {@link #transform}.
          */
         private final Line2D.Double line = new Line2D.Double();
 
         /**
          * Coordonnées du prochain point à retourner par une des méthodes
-         * <code>currentSegment(...)</code>. Ces coordonnées auront été
+         * {@code currentSegment(...)}. Ces coordonnées auront été
          * transformées selon la transformation affine {@link #transform}.
          */
         private final Point2D.Double point = new Point2D.Double();
 
         /**
          * Type du prochain segment. Ce type est retourné par les méthodes
-         * <code>currentSegment(...)</code>. Il doit s'agir en général d'une
+         * {@code currentSegment(...)}. Il doit s'agir en général d'une
          * des constantes {@link #SEG_MOVETO} ou {@link #SEG_LINETO}.
          */
         private int type = SEG_MOVETO;
@@ -1288,9 +1284,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Initialise cet itérateur.  Cette méthode peut être appelée
-         * pour réutiliser un itérateur qui a déjà servit, plutôt que
-         * d'en construire un autre.
+         * Initialise cet itérateur. Cette méthode peut être appelée pour réutiliser un itérateur
+         * qui a déjà servit, plutôt que d'en construire un autre.
          *
          * @param transform Transformation affine à appliquer sur les données. Il doit
          *        s'agir d'une transformation affine appropriée pour l'écriture de
@@ -1344,7 +1339,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         /**
          * Returns the coordinates and type of the current path segment
          * in the iteration. The return value is the path segment type:
-         * <code>SEG_MOVETO</code> or <code>SEG_LINETO</code>.
+         * {@code SEG_MOVETO} or {@code SEG_LINETO}.
          */
         public int currentSegment(final float[] coords) {
             coords[0] = (float) point.x;
@@ -1355,7 +1350,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         /**
          * Returns the coordinates and type of the current path segment
          * in the iteration. The return value is the path segment type:
-         * <code>SEG_MOVETO</code> or <code>SEG_LINETO</code>.
+         * {@code SEG_MOVETO} or {@code SEG_LINETO}.
          */
         public int currentSegment(final double[] coords) {
             coords[0] = point.x;
@@ -1452,20 +1447,17 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         private Rectangle2D labelBounds;
 
         /**
-         * Valeur maximale de <code>labelBounds.getWidth()</code>
-         * trouvée jusqu'à maintenant.
+         * Valeur maximale de {@code labelBounds.getWidth()} trouvée jusqu'à maintenant.
          */
         private double maxWidth=0;
 
         /**
-         * Valeur maximale de <code>labelBounds.getHeight()</code>
-         * trouvée jusqu'à maintenant.
+         * Valeur maximale de {@code labelBounds.getHeight()} trouvée jusqu'à maintenant.
          */
         private double maxHeight=0;
 
         /**
-         * Prend la valeur <code>true</code> lorsque
-         * la légende de l'axe a été écrite.
+         * Prend la valeur {@code true} lorsque la légende de l'axe a été écrite.
          */
         private boolean isDone;
 
@@ -1485,8 +1477,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Retourne un itérateur balayant
-         * la forme géométrique spécifiée.
+         * Retourne un itérateur balayant la forme géométrique spécifiée.
          */
         private java.awt.geom.PathIterator getPathIterator(final Shape shape) {
             return java.lang.Double.isNaN(flatness) ? shape.getPathIterator(transform)
@@ -1494,8 +1485,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Lance une exception; cet itérateur n'est conçu
-         * pour n'être utilisé qu'une seule fois.
+         * Lance une exception; cet itérateur n'est conçu pour n'être utilisé qu'une seule fois.
          */
         public void rewind(final AffineTransform transform) {
             throw new UnsupportedOperationException();
@@ -1509,25 +1499,22 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Returns the coordinates and type of
-         * the current path segment in the iteration.
+         * Returns the coordinates and type of the current path segment in the iteration.
          */
         public int currentSegment(final float[] coords) {
             return (path!=null) ? path.currentSegment(coords) : super.currentSegment(coords);
         }
 
         /**
-         * Returns the coordinates and type of
-         * the current path segment in the iteration.
+         * Returns the coordinates and type of the current path segment in the iteration.
          */
         public int currentSegment(final double[] coords) {
             return (path!=null) ? path.currentSegment(coords) : super.currentSegment(coords);
         }
 
         /**
-         * Moves the iterator to the next segment of the path forwards
-         * along the primary direction of traversal as long as there are
-         * more points in that direction.
+         * Moves the iterator to the next segment of the path forwards along the primary
+         * direction of traversal as long as there are more points in that direction.
          */
         public void next() {
             if (path != null) {
@@ -1551,8 +1538,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
                 super.next();
                 if (isDone()) {
                     /*
-                     * Quand tout le reste est terminé, prépare
-                     * l'écriture de la légende de l'axe.
+                     * Quand tout le reste est terminé, prépare l'écriture de la légende de l'axe.
                      */
                     isDone = true;
                     final String title = graduation.getTitle(true);

@@ -17,34 +17,20 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.axis;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.awt.Font;
 import java.awt.RenderingHints;
 import java.beans.PropertyChangeListener;
 import java.text.Format;
 import java.util.Locale;
-
-import org.geotools.units.Unit;
+import javax.units.Unit;
 
 
 /**
- * An axis's graduation. A <code>Graduation</code> object encompass minimal
+ * An axis's graduation. A {@code Graduation} object encompass minimal
  * and maximal values for an axis in arbitrary units, and allow access to
  * tick locations and labels through a {@link TickIterator} object.
  *
@@ -52,6 +38,7 @@ import org.geotools.units.Unit;
  * For example a graduation for dates is handled in a different way than a
  * graduation for numbers.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -96,6 +83,7 @@ public interface Graduation {
 
     /**
      * Returns the minimal value for this graduation.
+     *
      * @return The minimal value in {@link #getUnit} units.
      *
      * @see #getMaximum
@@ -105,6 +93,7 @@ public interface Graduation {
 
     /**
      * Returns the maximal value for this graduation.
+     *
      * @return The maximal value in {@link #getUnit} units.
      *
      * @see #getMinimum
@@ -114,24 +103,23 @@ public interface Graduation {
 
     /**
      * Returns the graduation's range. This is equivalents to computing
-     * <code>{@link #getMaximum}-{@link #getMinimum}</code>. However,
-     * some implementation may optimize this computation in order to
-     * avoid rounding errors.
+     * <code>{@link #getMaximum}-{@link #getMinimum}</code>. However, some
+     * implementation may optimize this computation in order to avoid rounding errors.
      */
     public abstract double getRange();
 
     /**
-     * Returns the axis title. If <code>includeUnits</code> is <code>true</code>,
-     * then the returned string will includes units as in "Temperature (°C)", or
-     * time zone as in "Start time (UTC)". The exact formatting is local-dependent.
+     * Returns the axis title. If {@code includeUnits} is {@code true}, then the returned string
+     * will includes units as in "Temperature (°C)", or time zone as in "Start time (UTC)". The
+     * exact formatting is local-dependent.
      *
-     * @param  includeSymbol <code>true</code> to format the unit or timezone symbol after the name.
+     * @param  includeSymbol {@code true} to format the unit or timezone symbol after the name.
      * @return The graduation name (also to be use as axis title).
      */
     public abstract String getTitle(final boolean includeSymbol);
 
     /**
-     * Returns the graduation's units, or <code>null</code> if unknow.
+     * Returns the graduation's units, or {@code null} if unknow.
      */
     public abstract Unit getUnit();
 
@@ -148,19 +136,17 @@ public interface Graduation {
     public abstract Format getFormat();
 
     /**
-     * Returns an iterator object that iterates along the graduation ticks
-     * and provides access to the graduation values. If an optional {@link
-     * RenderingHints} is specified, tick locations are adjusted according
-     * values for {@link #VISUAL_AXIS_LENGTH} and {@link #VISUAL_TICK_SPACING}
+     * Returns an iterator object that iterates along the graduation ticks and provides access to
+     * the graduation values. If an optional {@link RenderingHints} is specified, tick locations are
+     * adjusted according values for {@link #VISUAL_AXIS_LENGTH} and {@link #VISUAL_TICK_SPACING}
      * keys.
      *
-     * @param  hints Rendering hints for the axis, or <code>null</code> for
-     *         the default hints.
-     * @param  reuse An iterator to reuse if possible, or <code>null</code>
-     *         to create a new one. A non-null object may help to reduce the
-     *         number of object garbage-collected when rendering the axis.
+     * @param  hints Rendering hints for the axis, or {@code null} for the default hints.
+     * @param  reuse An iterator to reuse if possible, or {@code null} to create a new one. A
+     *         non-null object may help to reduce the number of object garbage-collected when
+     *         rendering the axis.
      * @return A iterator to use for iterating through the graduation. This
-     *         iterator may or may not be the <code>reuse</code> object.
+     *         iterator may or may not be the {@code reuse} object.
      */
     public abstract TickIterator getTickIterator(RenderingHints hints, TickIterator reuse);
 

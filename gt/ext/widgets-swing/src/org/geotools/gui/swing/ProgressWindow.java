@@ -63,7 +63,7 @@ import org.geotools.resources.gui.ResourceKeys;
  * <p>&nbsp;</p>
  *
  * @since 2.0
- * @version $Id: ProgressWindow.java,v 1.3 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ProgressWindow implements ProgressListener {
@@ -316,7 +316,7 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Retourne la chaîne <code>margin</code> sans les
+     * Retourne la chaîne {@code margin} sans les
      * éventuelles parenthèses qu'elle pourrait avoir
      * de part et d'autre.
      */
@@ -393,7 +393,7 @@ public class ProgressWindow implements ProgressListener {
      * tandis qu'une valeur négative signifie que l'on interroge l'état de la comosante
      * (dans ce cas, il faudra extrait l'état du champ {@link #text}).
      *
-     * @version $Id: ProgressWindow.java,v 1.3 2003/05/13 11:01:39 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private class Caller implements Runnable {
@@ -459,7 +459,7 @@ public class ProgressWindow implements ProgressListener {
         public int value;
 
         /**
-         * Construit un objet qui effectura la tâche identifiée par la constante <code>task</code>.
+         * Construit un objet qui effectura la tâche identifiée par la constante {@code task}.
          * Cette constantes doit être une valeur telle que {@link #TITLE} et {@link #LABEL}, ou une
          * de leurs valeurs négatives.
          */

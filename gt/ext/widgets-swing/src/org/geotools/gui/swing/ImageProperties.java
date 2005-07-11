@@ -16,15 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
@@ -80,12 +71,13 @@ import org.geotools.resources.gui.ResourceKeys;
  * needed. If the source implements also the {@link PropertyChangeEmitter} interface,
  * then this widget will register a listener for property changes. The changes can be
  * emitted from any thread, which may or may not be the <cite>Swing</cite> thread.
- * <br><br>
+ * <p>
  * If the image is an instance of {@link RenderedImage}, then this panel will also show
  * informations about the {@linkplain ColorModel color model}, {@linkplain SampleModel
  * sample model}, image size, tile size, etc.
  *
- * @version $Id: ImageProperties.java,v 1.2 2003/07/28 22:36:53 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see ParameterEditor
@@ -136,7 +128,7 @@ public class ImageProperties extends JPanel {
     /**
      * The color bar for {@link IndexColorModel}.
      */
-    private final ColorBar colorBar = new ColorBar();
+    private final ColorRamp colorRamp = new ColorRamp();
 
     /**
      * The table model for image's properties.
@@ -149,7 +141,7 @@ public class ImageProperties extends JPanel {
     private final Viewer viewer;
 
     /**
-     * Create a new instance of <code>ImageProperties</code> with no image.
+     * Create a new instance of {@code ImageProperties} with no image.
      * One of {@link #setImage(PropertySource) setImage(...)} methods must
      * be invoked in order to set the property source.
      */
@@ -186,7 +178,7 @@ public class ImageProperties extends JPanel {
             c.gridy++; panel.add(colorModel,  c);
             c.gridy++; c.anchor=c.CENTER; c.insets.right=6;
 
-            panel.add(colorBar, c);
+            panel.add(colorRamp, c);
             tabs.addTab(resources.getString(ResourceKeys.INFORMATIONS), panel);
         }
         /*
@@ -216,10 +208,10 @@ public class ImageProperties extends JPanel {
     }
 
     /**
-     * Create a new instance of <code>ImageProperties</code> for the specified
+     * Create a new instance of {@code ImageProperties} for the specified
      * rendered image.
      *
-     * @param image The image, or <code>null</code> if none.
+     * @param image The image, or {@code null} if none.
      */
     public ImageProperties(final RenderedImage image) {
         this();
@@ -233,7 +225,7 @@ public class ImageProperties extends JPanel {
      * an instance of {@link OperationNode}, then a description of the operation will be fetch
      * from its resources bundle.
      *
-     * @param image The image, or <code>null</code> if none.
+     * @param image The image, or {@code null} if none.
      */
     private void setDescription(final Object image) {
         String name        = " ";
@@ -268,7 +260,7 @@ public class ImageProperties extends JPanel {
     }
 
     /**
-     * Set all text fields to <code>null</code>. This method do not set the {@link #properties}
+     * Set all text fields to {@code null}. This method do not set the {@link #properties}
      * table; this is left to the caller.
      */
     private void clear() {
@@ -277,16 +269,16 @@ public class ImageProperties extends JPanel {
         dataType   .setText(null);
         sampleModel.setText(null);
         colorModel .setText(null);
-        colorBar   .setColors((IndexColorModel)null);
+        colorRamp  .setColors((IndexColorModel)null);
     }
 
     /**
      * Set the {@linkplain PropertySource property source} for this widget. If the source is a
      * {@linkplain RenderedImage rendered} or a {@linkplain RenderableImage renderable} image,
-     * then the widget will be set as if the most specific flavor of <code>setImage(...)</code>
+     * then the widget will be set as if the most specific flavor of {@code setImage(...)}
      * was invoked.
      *
-     * @param image The image, or <code>null</code> if none.
+     * @param image The image, or {@code null} if none.
      */
     public void setImage(final PropertySource image) {
         if (image instanceof RenderedImage) {
@@ -306,7 +298,7 @@ public class ImageProperties extends JPanel {
     /**
      * Set the specified {@linkplain RenderableImage renderable image} as the properties source.
      *
-     * @param image The image, or <code>null</code> if none.
+     * @param image The image, or {@code null} if none.
      */
     public void setImage(final RenderableImage image) {
         clear();
@@ -324,7 +316,7 @@ public class ImageProperties extends JPanel {
     /**
      * Set the specified {@linkplain RenderedImage rendered image} as the properties source.
      *
-     * @param image The image, or <code>null</code> if none.
+     * @param image The image, or {@code null} if none.
      */
     public void setImage(final RenderedImage image) {
         if (image == null) {
@@ -346,9 +338,9 @@ public class ImageProperties extends JPanel {
             sampleModel.setText(formatClassName(sm, resources));
             colorModel .setText(formatClassName(cm, resources));
             if (cm instanceof IndexColorModel) {
-                colorBar.setColors((IndexColorModel) cm);
+                colorRamp.setColors((IndexColorModel) cm);
             } else {
-                colorBar.setColors((IndexColorModel) null);
+                colorRamp.setColors((IndexColorModel) null);
             }
         }
         setDescription(image);
@@ -434,11 +426,10 @@ public class ImageProperties extends JPanel {
      * as a listener for property changes. The changes can be emitted from any thread,
      * which may or may not be the <cite>Swing</cite> thread.
      *
-     * @version $Id: ImageProperties.java,v 1.2 2003/07/28 22:36:53 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      *
-     * @task TODO: Check for <code>WritablePropertySource</code> and make cells editable
-     *             accordingly.
+     * @todo Check for {@code WritablePropertySource} and make cells editable accordingly.
      */
     private static final class Table extends AbstractTableModel implements PropertyChangeListener {
         /**
@@ -448,18 +439,18 @@ public class ImageProperties extends JPanel {
 
         /**
          * The property sources. Usually (but not always) the same object than
-         * {@link #changeEmitter}. May be <code>null</code> if no source has been set.
+         * {@link #changeEmitter}. May be {@code null} if no source has been set.
          */
         private PropertySource source;
 
         /**
-         * The property change emitter, or <code>null</code> if none. Usually (but not always)
+         * The property change emitter, or {@code null} if none. Usually (but not always)
          * the same object than {@link #source}.
          */
         private PropertyChangeEmitter changeEmitter;
 
         /**
-         * The properties names, or <code>null</code> if none.
+         * The properties names, or {@code null} if none.
          */
         private String[] names;
 
@@ -523,7 +514,7 @@ public class ImageProperties extends JPanel {
          * interface, then this table will be registered as a listener for property changes.
          * The changes can be emitted from any thread (may or may not be the Swing thread).
          *
-         * @param image The properties source, or <code>null</code> for removing any source.
+         * @param image The properties source, or {@code null} for removing any source.
          */
         public void setSource(final Object image) {
             if (image == source) {
@@ -664,7 +655,7 @@ public class ImageProperties extends JPanel {
      * immediately, while renderable image will be rendered in a background thread when first
      * requested.
      *
-     * @version $Id: ImageProperties.java,v 1.2 2003/07/28 22:36:53 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Viewer extends ZoomPane implements Runnable {
@@ -676,20 +667,20 @@ public class ImageProperties extends JPanel {
         private static final int RENDERED_SIZE = 512;
 
         /**
-         * The renderable image, or <code>null</code> if none. If non-null, then the {@link #run}
+         * The renderable image, or {@code null} if none. If non-null, then the {@link #run}
          * method will transform this renderable image into a rendered one when first requested.
-         * Once the image is rendered, this field is set to <code>null</code>.
+         * Once the image is rendered, this field is set to {@code null}.
          */
         private RenderableImage renderable;
 
         /**
-         * The rendered image, or <code>null</code> if none. This image may be explicitly set
+         * The rendered image, or {@code null} if none. This image may be explicitly set
          * by {@link #setImage(RenderedImage)}, or computed by {@link #run}.
          */
         private RenderedImage rendered;
 
         /**
-         * <code>true</code> if the {@link #run} method has been invoked for the current image.
+         * {@code true} if the {@link #run} method has been invoked for the current image.
          * This field is used in order to avoid to start more than one thread for the same
          * {@linkplain #renderable} image.
          */
@@ -744,7 +735,7 @@ public class ImageProperties extends JPanel {
         }
 
         /**
-         * Returns the image bounds, or <code>null</code> if none. This is used by
+         * Returns the image bounds, or {@code null} if none. This is used by
          * {@link ZoomPane} in order to set the initial zoom.
          */
         public Rectangle2D getArea() {

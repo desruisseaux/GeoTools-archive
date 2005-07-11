@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.axis;
 
@@ -46,6 +33,7 @@ import java.util.Locale;
  * may use a slightly variable increment between differents months, since
  * all months doesn't have the same number of days.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -58,8 +46,8 @@ public interface TickIterator {
     /**
      * Tests if the current tick is a major one.
      *
-     * @return <code>true</code> if current tick is a major tick,
-     *         or <code>false</code> if it is a minor tick.
+     * @return {@code true} if current tick is a major tick,
+     *         or {@code false} if it is a minor tick.
      */
     public abstract boolean isMajorTick();
 
@@ -72,15 +60,14 @@ public interface TickIterator {
     public abstract double currentPosition();
 
     /**
-     * Returns the value for current tick. The
-     * current tick may be major or minor.
+     * Returns the value for current tick. The current tick may be major or minor.
      */
     public abstract double currentValue();
 
     /**
      * Returns the label for current tick. This method is usually invoked
      * only for major ticks, but may be invoked for minor ticks as well.
-     * This method returns <code>null</code> if it can't produces a label
+     * This method returns {@code null} if it can't produces a label
      * for current tick.
      */
     public abstract String currentLabel();

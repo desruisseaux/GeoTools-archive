@@ -203,7 +203,7 @@ import org.geotools.resources.gui.ResourceKeys;
  * {@link #transform}.</p>
  *
  * @since 2.0
- * @version $Id: ZoomPane.java,v 1.16 2004/02/16 20:49:35 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class ZoomPane extends JComponent implements DeformableViewer {
@@ -246,7 +246,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * Constant indicating the scale changes on the <var>x</var> and <var>y</var> axes, with the
      * added condition that these changes must be uniform.  This flag combines {@link #SCALE_X}
      * and {@link #SCALE_Y}. The inverse, however, (<code>{@link #SCALE_X}|{@link #SCALE_Y}</code>)
-     * doesn't imply <code>UNIFORM_SCALE</code>.
+     * doesn't imply {@code UNIFORM_SCALE}.
      */
     public static final int UNIFORM_SCALE = SCALE_X | SCALE_Y | (1 << 2);
 
@@ -530,7 +530,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * eventually claim the focus or make a contextual menu appear).  It will listen out for
      * changes in the size of the component (to adjust the zoom), etc.
      *
-     * @version $Id: ZoomPane.java,v 1.16 2004/02/16 20:49:35 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class Listeners extends MouseAdapter implements MouseWheelListener,
@@ -922,7 +922,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * @param  source Logical coordinates of the region to be displayed.
      * @param  dest Pixel coordinates of the region of the window in which to
      *         draw (normally {@link #getZoomableBounds()}).
-     * @param  mask A mask to <code>OR</code> with the {@link #type} for determining which
+     * @param  mask A mask to {@code OR} with the {@link #type} for determining which
      *         kind of transformation are allowed. The {@link #type} is not modified.
      * @return Change to apply to the affine transform {@link #zoom}.
      * @throws IllegalArgumentException if {@code source} is empty.
@@ -1621,7 +1621,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * place the user clicked when this menu was invoked.
      *
      * @author Martin Desruisseaux
-     * @version $Id: ZoomPane.java,v 1.16 2004/02/16 20:49:35 desruisseaux Exp $
+     * @version $Id$
      */
     private static final class PointPopupMenu extends JPopupMenu {
         /**
@@ -1799,7 +1799,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * class is not used because it is difficult to get {@link JViewport} to
      * cooperate with transformations already handled by {@link ZoomPane#zoom}.
      *
-     * @version $Id: ZoomPane.java,v 1.16 2004/02/16 20:49:35 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class ScrollPane extends JComponent implements PropertyChangeListener {
@@ -1969,7 +1969,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * {@link BoundedRangeModel} objects on one {@code ZoomPane} object.
      *
      * @author Martin Desruisseaux
-     * @version $Id: ZoomPane.java,v 1.16 2004/02/16 20:49:35 desruisseaux Exp $
+     * @version $Id$
      */
     private final class Synchronizer implements ChangeListener, ZoomChangeListener {
         /**
@@ -2365,7 +2365,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Checks whether the rectangle <code>rect</code> is valid.  The rectangle
+     * Checks whether the rectangle {@code rect} is valid.  The rectangle
      * is considered invalid if its length or width is less than or equal to 0,
      * or if one of its coordinates is infinite or NaN.
      */

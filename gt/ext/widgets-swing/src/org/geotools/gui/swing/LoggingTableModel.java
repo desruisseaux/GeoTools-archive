@@ -69,7 +69,7 @@ import org.geotools.resources.gui.ResourceKeys;
  * This model is used by {@link LoggingPanel} for displaying logging messages in
  * a {@link javax.swing.JTable}.
  *
- * @version $Id: LoggingTableModel.java,v 1.7 2003/06/25 12:58:06 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class LoggingTableModel extends Handler implements TableModel {
@@ -87,7 +87,7 @@ final class LoggingTableModel extends Handler implements TableModel {
     };
 
     /**
-     * Resource keys for column names. This is usuall the same array than <code>COLUMN_NAMES</code>.
+     * Resource keys for column names. This is usuall the same array than {@code COLUMN_NAMES}.
      * However, method {@link #setColumnVisible} may add or remove column in this list.
      */
     private int[] columnNames = COLUMN_NAMES;
@@ -109,14 +109,14 @@ final class LoggingTableModel extends Handler implements TableModel {
     /**
      * The total number of logging messages published by this panel. This number may be
      * greater than the amount of {@link LogRecord} actually memorized, since early records
-     * may have been discarted. The slot in <code>records</code> where to write the next
+     * may have been discarted. The slot in {@code records} where to write the next
      * message can be computed by <code>recordCount % capacity</code>.
      */
     private int recordCount;
 
     /**
      * String representations of latest required records. Keys are {@link LogRecord} objects
-     * and values are <code>String[]</code>. This is a cache for faster rendering.
+     * and values are {@code String[]}. This is a cache for faster rendering.
      */
     private final Map cache = new LinkedHashMap() {
         protected boolean removeEldestEntry(final Map.Entry eldest) {
@@ -162,11 +162,11 @@ final class LoggingTableModel extends Handler implements TableModel {
     }
 
     /**
-     * Returns <code>true</code> if the given column is visible.
+     * Returns {@code true} if the given column is visible.
      *
      * @param index One of {@link LoggingPanel} constants, which maps to entries in
-     *        {@link COLUMN_NAMES}. For example <code>0</code> for the logger,
-     *        <code>1</code> for the class, etc.
+     *        {@link COLUMN_NAMES}. For example {@code 0} for the logger,
+     *        {@code 1} for the class, etc.
      */
     final boolean isColumnVisible(int index) {
         final int key = COLUMN_NAMES[index];
@@ -182,8 +182,8 @@ final class LoggingTableModel extends Handler implements TableModel {
      * Show or hide the given column.
      *
      * @param index One of {@link LoggingPanel} constants, which maps to entries in
-     *        {@link COLUMN_NAMES}. For example <code>0</code> for the logger,
-     *        <code>1</code> for the class, etc.
+     *        {@link COLUMN_NAMES}. For example {@code 0} for the logger,
+     *        {@code 1} for the class, etc.
      * @param visible The visible state for the specified column.
      */
     final void setColumnVisible(final int index, final boolean visible) {
@@ -279,14 +279,14 @@ final class LoggingTableModel extends Handler implements TableModel {
     }
 
     /**
-     * Returns the name of the column at <code>columnIndex</code>.
+     * Returns the name of the column at {@code columnIndex}.
      */
     public String getColumnName(final int columnIndex) {
         return Resources.format(columnNames[columnIndex]);
     }
 
     /**
-     * Returns the value for the cell at <code>columnIndex</code> and <code>rowIndex</code>.
+     * Returns the value for the cell at {@code columnIndex} and {@code rowIndex}.
      */
     public synchronized Object getValueAt(final int rowIndex, final int columnIndex) {
         final LogRecord record = getLogRecord(rowIndex);
@@ -333,7 +333,7 @@ final class LoggingTableModel extends Handler implements TableModel {
     }
 
     /**
-     * Returns <code>false</code> since cells are not editable.
+     * Returns {@code false} since cells are not editable.
      */
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return false;
@@ -372,7 +372,7 @@ final class LoggingTableModel extends Handler implements TableModel {
     }
 
     /**
-     * Close the <code>Handler</code> and free all associated resources.
+     * Close the {@code Handler} and free all associated resources.
      */
     public void close() {
     }

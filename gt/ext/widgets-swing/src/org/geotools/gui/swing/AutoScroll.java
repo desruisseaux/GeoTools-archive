@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing;
 
@@ -59,7 +46,8 @@ import javax.swing.table.DefaultTableModel; // For JavaDoc only
  * table.addRow(...);
  * </pre></blockquote>
  *
- * @version $Id: AutoScroll.java,v 1.2 2003/05/13 11:01:39 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class AutoScroll implements ChangeListener, Serializable {
@@ -74,13 +62,12 @@ final class AutoScroll implements ChangeListener, Serializable {
     private final BoundedRangeModel model;
 
     /**
-     * Properties of the {@link BoundedRangeModel}
-     * the last time {@link #sync} has been invoked.
+     * Properties of the {@link BoundedRangeModel} the last time {@link #sync} has been invoked.
      */
     private int value, extent, maximum;
 
     /**
-     * Construct a new <code>AutoScroll</code> for the specified model.
+     * Constructs a new {@code AutoScroll} for the specified model.
      */
     public AutoScroll(final BoundedRangeModel model) {
         this.model = model;
@@ -89,7 +76,7 @@ final class AutoScroll implements ChangeListener, Serializable {
     }
 
     /**
-     * Dispose any resources hold by this object.
+     * Disposes any resources hold by this object.
      * This method deregisters any listeners.
      */
     public void dispose() {
@@ -97,7 +84,7 @@ final class AutoScroll implements ChangeListener, Serializable {
     }
 
     /**
-     * Copy current model's state into {@link #value},
+     * Copies current model's state into {@link #value},
      * {@link #extent} and {@link #maximum} fields.
      */
     private void sync() {

@@ -73,9 +73,9 @@ public final class Trees {
      * @param  value  Objet à rechercher dans
      *                {@link org.geotools.gui.swing.tree.TreeNode#getUserObject}.
      * @param  path   Chemin parcouru jusqu'à maintenant.
-     * @param  length Longueur valide de <code>path</code>.
+     * @param  length Longueur valide de {@code path}.
      * @param  list   Liste dans laquelle ajouter les {@link TreePath} trouvés.
-     * @return <code>path</code>, ou un nouveau tableau s'il a fallu l'agrandir.
+     * @return {@code path}, ou un nouveau tableau s'il a fallu l'agrandir.
      */
     private static Object[] getPathsToUserObject(final TreeModel model, final Object value,
                                                  Object[] path, final int length, final List list)
@@ -107,7 +107,7 @@ public final class Trees {
      * @param buffer Buffer dans lequel écrire le noeud.
      * @param level  Niveau d'indentation (à partir de 0).
      * @param last   Indique si les niveaux précédents sont en train d'écrire leurs derniers items.
-     * @return       Le tableau <code>last</code>, qui peut éventuellement avoir été agrandit.
+     * @return       Le tableau {@code last}, qui peut éventuellement avoir été agrandit.
      */
     private static boolean[] toString(final TreeModel model, final Object node,
                                       final StringBuffer buffer, final int level, boolean[] last)

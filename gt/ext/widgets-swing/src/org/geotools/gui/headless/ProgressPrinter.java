@@ -156,7 +156,7 @@ public class ProgressPrinter implements ProgressListener {
      * Efface le reste de la ligne (si nécessaire) puis repositionne le curseur au début
      * de la ligne. Si les retours chariot ne sont pas supportés, alors cette méthode va
      * plutôt passer à la ligne suivante. Dans tous les cas, le curseur se trouvera au
-     * début d'une ligne et la valeur <code>length</code> sera affecté au champ
+     * début d'une ligne et la valeur {@code length} sera affecté au champ
      * {@link #lastLength}.
      *
      * @param length Nombre de caractères qui ont été écrit jusqu'à maintenant sur cette ligne.
@@ -374,7 +374,7 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Retourne la chaîne <code>margin</code> sans les
+     * Retourne la chaîne {@code margin} sans les
      * éventuelles parenthèses qu'elle pourrait avoir
      * de part et d'autre.
      */

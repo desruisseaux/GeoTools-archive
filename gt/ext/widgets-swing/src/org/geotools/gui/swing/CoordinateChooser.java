@@ -99,7 +99,7 @@ import org.geotools.resources.geometry.XDimension2D;
  * <p>&nbsp;</p>
  *
  * @since 2.0
- * @version $Id: CoordinateChooser.java,v 1.8 2003/10/29 11:32:31 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class CoordinateChooser extends JPanel {
@@ -190,7 +190,7 @@ public class CoordinateChooser extends JPanel {
     /**
      * Class encompassing various listeners for users selections.
      *
-     * @version $Id: CoordinateChooser.java,v 1.8 2003/10/29 11:32:31 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class Listeners implements ActionListener, ChangeListener {
@@ -241,7 +241,7 @@ public class CoordinateChooser extends JPanel {
 
     /**
      * Constructs a coordinate chooser with date constrained in the specified range.
-     * Note that the <code>[minTime..maxTime]</code> range is not the same than the
+     * Note that the {@code [minTime..maxTime]} range is not the same than the
      * range given to {@link #setTimeRange}. The later set only the time range shown
      * in the widget, while this constructor set also the minimum and maximum dates
      * allowed.
@@ -685,7 +685,7 @@ public class CoordinateChooser extends JPanel {
      *                   {@link #TIME_RANGE} and/or
      *                   {@link #RESOLUTION}.
      * @param  listener The listener to add to the specified selectors.
-     * @throws IllegalArgumentException if <code>selectors</code> contains illegal bits.
+     * @throws IllegalArgumentException if {@code selectors} contains illegal bits.
      */
     public void addChangeListener(final int selectors, final ChangeListener listener) {
         ensureValidSelectors(selectors);
@@ -751,11 +751,9 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Shows a dialog box requesting input from the user. The dialog box will be
-     * parented to {@code owner}. If {@code owner} is contained into a
-     * {@link javax.swing.JDesktopPane}, the dialog box will appears as an internal
-     * frame. This method can be invoked from any thread (may or may not be the
-     * <i>Swing</i> thread).
+     * Shows a dialog box requesting input from the user. If {@code owner} is contained into a
+     * {@link javax.swing.JDesktopPane}, the dialog box will appears as an internal frame. This
+     * method can be invoked from any thread (may or may not be the <cite>Swing</cite> thread).
      *
      * @param  owner The parent component for the dialog box, or {@code null} if there is no parent.
      * @param  title The dialog box title.

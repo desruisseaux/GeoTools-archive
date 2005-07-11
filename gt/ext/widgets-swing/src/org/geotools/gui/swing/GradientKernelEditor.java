@@ -26,6 +26,7 @@ import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Component;
 import java.awt.Color;
 
 // JAI dependencies
@@ -33,6 +34,8 @@ import javax.media.jai.KernelJAI;
 import javax.media.jai.operator.GradientMagnitudeDescriptor; // For Javadoc
 
 // Seagis dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.gui.Resources;
 import org.geotools.resources.gui.ResourceKeys;
 
@@ -47,12 +50,13 @@ import org.geotools.resources.gui.ResourceKeys;
  * <p align="center"><img src="doc-files/GradientKernelEditor.png"></p>
  * <p>&nbsp;</p>
  *
- * @version $Id: GradientKernelEditor.java,v 1.4 2003/07/23 14:16:16 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see KernelEditor
  * @see GradientMagnitudeDescriptor
- * @see org.geotools.gp.GridCoverageProcessor
+ * @see org.geotools.coverage.processor.operation.GradientMagnitude
  */
 public class GradientKernelEditor extends JComponent {
     /**
@@ -123,7 +127,7 @@ public class GradientKernelEditor extends JComponent {
     /**
      * Vertical gradient mask according Kirsch.
      *
-     * @task REVISIT: Why positives numbers are on the first row? This is the opposite
+     * @todo Why positives numbers are on the first row? This is the opposite
      *       of other vertical gradient masks. Need to verify in J.J. Simpson (1990).
      */
     public static final KernelJAI KIRSCH_VERTICAL = new KernelJAI(3,3,new float[] {
@@ -143,12 +147,11 @@ public class GradientKernelEditor extends JComponent {
     private final KernelEditor kernelV = new Editor(false);
 
     /**
-     * Construct a new editor for gradient kernels.
+     * Constructs a new editor for gradient kernels.
      */
     public GradientKernelEditor() {
         setLayout(new GridBagLayout());
         final Resources resources = Resources.getResources(getDefaultLocale());
-
         final Border border = BorderFactory.createCompoundBorder(
                               BorderFactory.createLoweredBevelBorder(),
                               BorderFactory.createEmptyBorder(3,3,3,3));
@@ -169,7 +172,7 @@ public class GradientKernelEditor extends JComponent {
     }
 
     /**
-     * Add a set of predefined kernels. This convenience method invokes {@link
+     * Adds a set of predefined kernels. This convenience method invokes {@link
      * KernelEditor#addDefaultKernels()} on both {@linkplain #getHorizontalEditor
      * horizontal} and {@linkplain #getVerticalEditor vertical} kernel editors.
      * The default implementation for those editors will add a set of Sobel kernels.
@@ -196,13 +199,13 @@ public class GradientKernelEditor extends JComponent {
     /**
      * A kernel editor for horizontal or vertical gradient kernel.
      *
-     * @version $Id: GradientKernelEditor.java,v 1.4 2003/07/23 14:16:16 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Editor extends KernelEditor {
         /**
-         * <code>true</code> if this editor is for the horizontal component,
-         * or <code>false</code> for the vertical component.
+         * {@code true} if this editor is for the horizontal component,
+         * or {@code false} for the vertical component.
          */
         private final boolean horizontal;
 
@@ -261,8 +264,8 @@ public class GradientKernelEditor extends JComponent {
          * </pre></blockquote>
          *
          * @param size Taille de la matrice. Doit être un nombre positif et impair.
-         * @param horizontal <code>true</code> pour l'opérateur horizontal,
-         *        or <code>false</code> pour l'opérateur vertical.
+         * @param horizontal {@code true} pour l'opérateur horizontal,
+         *        or {@code false} pour l'opérateur vertical.
          */
         private static KernelJAI getSobel(final int size, final boolean horizontal) {
             final int key = size/2;
@@ -288,5 +291,29 @@ public class GradientKernelEditor extends JComponent {
             }
             return new KernelJAI(size, size, key, key, data);
         }
+    }
+
+    /**
+     * Shows a dialog box requesting input from the user. If {@code owner} is contained into a
+     * {@link javax.swing.JDesktopPane}, the dialog box will appears as an internal frame. This
+     * method can be invoked from any thread (may or may not be the <cite>Swing</cite> thread).
+     *
+     * @param  owner The parent component for the dialog box, or {@code null} if there is no parent.
+     * @param  title The dialog box title.
+     * @return {@code true} if user pressed the "Ok" button, or {@code false} otherwise
+     *         (e.g. pressing "Cancel" or closing the dialog box from the title bar).
+     */
+    public boolean showDialog(final Component owner, final String title) {
+        return SwingUtilities.showOptionDialog(owner, this, title);
+    }
+
+    /**
+     * Show the dialog box. This method is provided only as an easy
+     * way to test the dialog appearance from the command line.
+     */
+    public static void main(final String[] args) {
+        final GradientKernelEditor editor = new GradientKernelEditor();
+        editor.addDefaultKernels();
+        editor.showDialog(null, Utilities.getShortClassName(editor));
     }
 }

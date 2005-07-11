@@ -63,7 +63,8 @@ import org.geotools.resources.gui.ResourceKeys;
  * This widget can be used with one of {@link Format} objects working with pattern, like
  * {@link DecimalFormat}, {@link SimpleDateFormat} or {@link AngleFormat}.
  *
- * @version $Id: FormatChooser.java,v 1.2 2003/11/12 14:14:24 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class FormatChooser extends JPanel {
@@ -79,7 +80,7 @@ public class FormatChooser extends JPanel {
 
     /**
      * A set of default patterns for differents locales. Keys are {@link Locale} object
-     * and values are <code>String[][]</code> with arrays in the following order: number
+     * and values are {@code String[][]} with arrays in the following order: number
      * patterns, date patterns and angle patterns.
      */
     private static final Map PATTERNS = new HashMap();
@@ -100,7 +101,7 @@ public class FormatChooser extends JPanel {
     };
 
     /**
-     * The format to configure by this <code>FormatChooser</code>.
+     * The format to configure by this {@code FormatChooser}.
      */
     protected Format format;
 
@@ -115,12 +116,12 @@ public class FormatChooser extends JPanel {
     private final JComboBox choices = new JComboBox();
 
     /**
-     * The preview text. This is the <code>value</code> formated using <code>format</code>.
+     * The preview text. This is the {@code value} formated using {@code format}.
      */
     private final JLabel preview = new JLabel();
 
     /**
-     * Construct a pattern chooser for the given format.
+     * Constructs a pattern chooser for the given format.
      *
      * @param  format The format to configure. The default implementation accept instance of
      *                {@link DecimalFormat}, {@link SimpleDateFormat} or {@link AngleFormat}.
@@ -156,11 +157,10 @@ public class FormatChooser extends JPanel {
     }
 
     /**
-     * Returns a set of patterns for formatting in the given locale,
-     * or <code>null</code> if none.
+     * Returns a set of patterns for formatting in the given locale, or {@code null} if none.
      *
      * @param format for which to get a set of default patterns.
-     * @task TODO: Need a way to find the format locale.
+     * @todo Need a way to find the format locale.
      */
     private static synchronized String[] getPatterns(final Format format) {
         final Locale locale = Locale.getDefault();
@@ -248,11 +248,11 @@ public class FormatChooser extends JPanel {
     }
 
     /**
-     * Suggest a sample value for the given format, or <code>null</code> if this
+     * Suggest a sample value for the given format, or {@code null} if this
      * method has no suggestion.
      *
      * @param  format The format.
-     * @return A sample value for the specified format, or <code>null</code> if none.
+     * @return A sample value for the specified format, or {@code null} if none.
      */
     private static Object suggestSampleValue(final Format format) {
         if (format instanceof NumberFormat) {
@@ -278,8 +278,6 @@ public class FormatChooser extends JPanel {
 
     /**
      * Returns the current format.
-     *
-     * @return format The current format.
      */
     public Format getFormat() {
         return format;
@@ -316,7 +314,7 @@ public class FormatChooser extends JPanel {
 
     /**
      * Returns the sample value to format as a "preview" text.
-     * If no such object is defined, then this method returns <code>null</code>.
+     * If no such object is defined, then this method returns {@code null}.
      */
     public Object getSampleValue() {
         return value;
@@ -326,7 +324,7 @@ public class FormatChooser extends JPanel {
      * Sets the sample value to format as a "preview" text. The value should
      * be an object formatable with {@link #getFormat}.
      *
-     * @param  value The value to format, or <code>null</code>.
+     * @param  value The value to format, or {@code null}.
      * @throws IllegalArgumentException if the value can't be formatted.
      */
     public void setSampleValue(final Object value) throws IllegalArgumentException {
@@ -412,11 +410,11 @@ public class FormatChooser extends JPanel {
     }
 
     /**
-     * Apply the currently selected pattern. If <code>add</code> is <code>true</code>,
+     * Applies the currently selected pattern. If {@code add} is {@code true},
      * then the pattern is added to the combo box list.
      *
-     * @param  add <code>true</code> for adding the pattern to the combo box list.
-     * @return <code>true</code> if the pattern is valid.
+     * @param  add {@code true} for adding the pattern to the combo box list.
+     * @return {@code true} if the pattern is valid.
      */
     private boolean applyPattern(final boolean add) {
         String pattern = choices.getSelectedItem().toString();
@@ -457,16 +455,16 @@ public class FormatChooser extends JPanel {
 
     /**
      * Shows a dialog box requesting input from the user. The dialog box will be
-     * parented to <code>owner</code>. If <code>owner</code> is contained into a
+     * parented to {@code owner}. If {@code owner} is contained into a
      * {@link javax.swing.JDesktopPane}, the dialog box will appears as an internal
      * frame. This method can be invoked from any thread (may or may not be the
      * <i>Swing</i> thread).
      *
      * @param  owner The parent component for the dialog box,
-     *         or <code>null</code> if there is no parent.
+     *         or {@code null} if there is no parent.
      * @param  title The dialog box title.
-     * @return <code>true</code> if user pressed the "Ok" button, or
-     *         <code>false</code> otherwise (e.g. pressing "Cancel"
+     * @return {@code true} if user pressed the "Ok" button, or
+     *         {@code false} otherwise (e.g. pressing "Cancel"
      *         or closing the dialog box from the title bar).
      */
     public boolean showDialog(final Component owner, final String title) {

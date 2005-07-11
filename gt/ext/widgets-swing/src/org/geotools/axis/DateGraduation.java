@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.axis;
 
@@ -41,16 +28,22 @@ import java.text.Format;
 import java.util.Date;
 import java.util.TimeZone;
 
+// Units dependencies
+import javax.units.SI;
+import javax.units.Unit;
+import javax.units.Converter;
+import javax.units.ConversionException;
+
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.geotools.units.Unit;
-import org.geotools.units.UnitException;
 
 
 /**
  * A graduation using dates on a linear axis.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -59,6 +52,11 @@ public class DateGraduation extends AbstractGraduation {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -7590383805990568769L;
+
+    /**
+     * The unit for millisecond.
+     */
+    public static final Unit MILLISECOND = SI.MILLI(SI.SECOND);
 
     /**
      * The minimal value for this graduation, in milliseconds ellapsed since January 1st,
@@ -78,50 +76,88 @@ public class DateGraduation extends AbstractGraduation {
     private TimeZone timezone;
 
     /**
+     * The converter from {@link #MILLISECOND} to {@link #getUnit}.
+     * Will be created only when first needed.
+     */
+    private transient Converter fromMillis;
+
+    /**
+     * The converter from {@link #getUnit} to {@link #MILLISECOND}.
+     * Will be created only when first needed.
+     */
+    private transient Converter toMillis;
+
+    /**
      * Construct a graduation with the supplied time zone.
-     * Unit default to {@linkplain Unit#MILLISECOND millisecond}.
+     * Unit default to {@linkplain #MILLISECOND milliseconds}.
      *
      * @param  timezone The timezone.
      */
     public DateGraduation(final TimeZone timezone) {
-        this(timezone, Unit.MILLISECOND);
+        this(timezone, MILLISECOND);
     }
 
     /**
      * Construct a graduation with the supplied time zone and unit.
      *
      * @param  timezone The timezone.
-     * @param  unit The unit. Must be compatible with {@link Unit#MILLISECOND}.
-     * @throws UnitException if the supplied unit is not a time unit.
+     * @param  unit The unit. Must be compatible with {@linkplain #MILLISECOND milliseconds}.
+     * @throws ConversionException if the supplied unit is not a time unit.
      */
-    public DateGraduation(final TimeZone timezone, final Unit unit) throws UnitException {
+    public DateGraduation(final TimeZone timezone, final Unit unit) throws ConversionException {
         super(unit);
         ensureTimeUnit(unit);
         this.timezone = (TimeZone) timezone.clone();
     }
 
     /**
-     * Check if the specified unit is a time unit.
+     * Checks if the specified unit is a time unit.
      *
      * @param the unit to check.
-     * @throws UnitException if the specified unit is not a time unit.
+     * @throws ConversionException if the specified unit is not a time unit.
      */
-    private static void ensureTimeUnit(final Unit unit) throws UnitException {
-        if (unit==null || !Unit.MILLISECOND.canConvert(unit)) {
-            throw new UnitException(Resources.format(ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                                                     "unit", unit));
+    private static void ensureTimeUnit(final Unit unit) throws ConversionException {
+        if (unit==null || !MILLISECOND.isCompatible(unit)) {
+            throw new ConversionException(Resources.format(
+                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "unit", unit));
         }
     }
 
     /**
-     * Set the minimum value for this graduation. If the new minimum is greater
-     * than the current maximum, then the maximum will also be set to a value
-     * greater than or equals to the minimum.
+     * Returns the converter from {@link #MILLISECOND} to {@link #getUnit}.
+     */
+    private Converter fromMillis() {
+        if (fromMillis == null) {
+            Unit unit = getUnit();
+            if (unit == null) {
+                unit = MILLISECOND;
+            }
+            fromMillis = MILLISECOND.getConverterTo(unit);
+        }
+        return fromMillis;
+    }
+
+    /**
+     * Returns the converter from {@link #getUnit} to {@link #MILLISECOND}.
+     */
+    private Converter toMillis() {
+        if (toMillis == null) {
+            Unit unit = getUnit();
+            if (unit == null) {
+                unit = MILLISECOND;
+            }
+            toMillis = unit.getConverterTo(MILLISECOND);
+        }
+        return toMillis;
+    }
+
+    /**
+     * Set the minimum value for this graduation. If the new minimum is greater than the current
+     * maximum, then the maximum will also be set to a value greater than or equals to the minimum.
      *
      * @param  time The new minimum.
-     * @return <code>true</code> if the state of this graduation changed
-     *         as a result of this call, or <code>false</code> if the new
-     *         value is identical to the previous one.
+     * @return {@code true} if the state of this graduation changed as a result of this call, or
+     *         {@code false} if the new value is identical to the previous one.
      *
      * @see #setMaximum(Date)
      */
@@ -140,14 +176,12 @@ public class DateGraduation extends AbstractGraduation {
     }
 
     /**
-     * Set the maximum value for this graduation. If the new maximum is less
-     * than the current minimum, then the minimum will also be set to a value
-     * less than or equals to the maximum.
+     * Set the maximum value for this graduation. If the new maximum is less than the current
+     * minimum, then the minimum will also be set to a value less than or equals to the maximum.
      *
      * @param  time The new maximum.
-     * @return <code>true</code> if the state of this graduation changed
-     *         as a result of this call, or <code>false</code> if the new
-     *         value is identical to the previous one.
+     * @return {@code true} if the state of this graduation changed as a result of this call, or
+     *         {@code false} if the new value is identical to the previous one.
      *
      * @see #setMinimum(Date)
      */
@@ -167,11 +201,11 @@ public class DateGraduation extends AbstractGraduation {
 
     /**
      * Set the minimum value as a real number. This method converts the value to
-     * {@linkplain Unit#MILLISECOND milliseconds} and invokes {@link #setMinimum(Date)}.
+     * {@linkplain #MILLISECOND milliseconds} and invokes {@link #setMinimum(Date)}.
      */
     public final synchronized boolean setMinimum(final double value) {
         ensureFinite("minimum", value);
-        return setMinimum(new Date(Math.round(Unit.MILLISECOND.convert(value, getUnit()))));
+        return setMinimum(new Date(Math.round(toMillis().convert(value))));
     }
 
     /**
@@ -180,7 +214,7 @@ public class DateGraduation extends AbstractGraduation {
      */
     public final synchronized boolean setMaximum(final double value) {
         ensureFinite("maximum", value);
-        return setMaximum(new Date(Math.round(Unit.MILLISECOND.convert(value, getUnit()))));
+        return setMaximum(new Date(Math.round(toMillis().convert(value))));
     }
 
     /**
@@ -192,7 +226,7 @@ public class DateGraduation extends AbstractGraduation {
      * @see #getRange
      */
     public double getMinimum() {
-        return getUnit().convert(minimum, Unit.MILLISECOND);
+        return fromMillis().convert(minimum);
     }
 
     /**
@@ -204,23 +238,21 @@ public class DateGraduation extends AbstractGraduation {
      * @see #getRange
      */
     public double getMaximum() {
-        return getUnit().convert(maximum, Unit.MILLISECOND);
+        return fromMillis().convert(maximum);
     }
 
     /**
      * Returns the graduation's range. This is equivalents to computing
-     * <code>{@link #getMaximum}-{@link #getMinimum}</code>, but using
-     * integer arithmetic.
+     * <code>{@link #getMaximum}-{@link #getMinimum}</code>, but using integer arithmetic.
      */
     public synchronized double getRange() {
-        final Unit unit = getUnit();
-        if (unit == Unit.MILLISECOND) {
+        if (getUnit() == MILLISECOND) {
             return maximum - minimum;
         } else {
             // TODO: we would need something similar to AffineTransform.deltaTransform(...)
             //       here in order to performs the conversion in a more efficient way.
-            return unit.convert(maximum, Unit.MILLISECOND) -
-                   unit.convert(minimum, Unit.MILLISECOND);
+            final Converter toMillis = toMillis();
+            return toMillis.convert(maximum) - toMillis.convert(minimum);
         }
     }
 
@@ -232,8 +264,7 @@ public class DateGraduation extends AbstractGraduation {
     }
 
     /**
-     * Sets the time zone for this graduation. This
-     * affect only the way labels are displayed.
+     * Sets the time zone for this graduation. This affect only the way labels are displayed.
      */
     public void setTimeZone(final TimeZone timezone) {
         this.timezone = (TimeZone) timezone.clone();
@@ -247,16 +278,17 @@ public class DateGraduation extends AbstractGraduation {
     }
 
     /**
-     * Changes the graduation's units. This method will automatically
-     * convert minimum and maximum values from the old units to the
-     * new one.
+     * Changes the graduation's units. This method will automatically convert minimum and maximum
+     * values from the old units to the new one.
      *
-     * @param unit The new units, or <code>null</code> if unknow.
-     *        If null, minimum and maximum values are not converted.
-     * @throws UnitException if the specified unit is not a time unit.
+     * @param unit The new units, or {@code null} if unknow. If null, minimum and maximum values
+     *             are not converted.
+     * @throws ConversionException if the specified unit is not a time unit.
      */
-    public void setUnit(final Unit unit) throws UnitException {
+    public void setUnit(final Unit unit) throws ConversionException {
         ensureTimeUnit(unit);
+        fromMillis = null;
+        toMillis   = null;
         // Nothing to convert here. The conversions are performed
         // on the fly by 'getMinimum()' / 'getMaximum()'.
         super.setUnit(unit);
@@ -273,7 +305,7 @@ public class DateGraduation extends AbstractGraduation {
         format.setTimeZone(timezone);
         return format;
     }
-    
+
     /**
      * Returns an iterator object that iterates along the graduation ticks
      * and provides access to the graduation values. If an optional {@link
@@ -281,12 +313,12 @@ public class DateGraduation extends AbstractGraduation {
      * values for {@link #VISUAL_AXIS_LENGTH} and {@link #VISUAL_TICK_SPACING}
      * keys.
      *
-     * @param  hints Rendering hints, or <code>null</code> for the default hints.
-     * @param  reuse An iterator to reuse if possible, or <code>null</code>
+     * @param  hints Rendering hints, or {@code null} for the default hints.
+     * @param  reuse An iterator to reuse if possible, or {@code null}
      *         to create a new one. A non-null object may help to reduce the
      *         number of object garbage-collected when rendering the axis.
      * @return A iterator to use for iterating through the graduation. This
-     *         iterator may or may not be the <code>reuse</code> object.
+     *         iterator may or may not be the {@code reuse} object.
      */
     public synchronized TickIterator getTickIterator(final RenderingHints hints,
                                                      final TickIterator   reuse)
@@ -329,7 +361,7 @@ public class DateGraduation extends AbstractGraduation {
     }
 
     /**
-     * Compare this graduation with the specified object for equality.
+     * Compares this graduation with the specified object for equality.
      * This method do not compare registered listeners.
      */
     public boolean equals(final Object object) {

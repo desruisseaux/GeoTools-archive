@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing;
 
@@ -88,7 +75,8 @@ import org.geotools.resources.SwingUtilities;
  * This panel is initially set to listen to messages of level {@link Level#CONFIG} or higher.
  * This level can be changed with <code>{@link #getHandler}.setLevel(aLevel)</code>.
  *
- * @version $Id: LoggingPanel.java,v 1.10 2003/06/03 18:09:26 desruisseaux Exp $
+ * @since 2.0
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class LoggingPanel extends JPanel {
@@ -98,7 +86,7 @@ public class LoggingPanel extends JPanel {
      * {@link #METHOD METHOD}, {@link #TIME_OF_DAY TIME_OF_DAY}, {@link #LEVEL LEVEL}
      * and {@link #MESSAGE MESSAGE}.
      *
-     * @task TODO: Use the enum keyword once J2SE 1.5 will be available.
+     * @todo Use the enum keyword once J2SE 1.5 will be available.
      */
     public static final class Column {
         final int index;
@@ -134,9 +122,9 @@ public class LoggingPanel extends JPanel {
     private final JTable table = new JTable(model);
 
     /**
-     * The levels for colors enumerated in <code>levelColors</code>. This array
+     * The levels for colors enumerated in {@code levelColors}. This array
      * <strong>must</strong> be in increasing order. Logging messages of level
-     * <code>levelValues[i]</code> or higher will be displayed with foreground
+     * {@code levelValues[i]} or higher will be displayed with foreground
      * color <code>levelColors[i*2]</code> and background color <code>levelColors[i*2+1]</code>.
      *
      * @see Level#intValue
@@ -147,7 +135,7 @@ public class LoggingPanel extends JPanel {
 
     /**
      * Pairs of foreground and background colors to use for displaying logging messages.
-     * Logging messages of level <code>levelValues[i]</code> or higher will be displayed
+     * Logging messages of level {@code levelValues[i]} or higher will be displayed
      * with foreground color <code>levelColors[i*2]</code> and background color
      * <code>levelColors[i*2+1]</code>.
      *
@@ -157,7 +145,7 @@ public class LoggingPanel extends JPanel {
     private final List levelColors = new ArrayList();
 
     /**
-     * The logger specified at construction time, or <code>null</code> if none.
+     * The logger specified at construction time, or {@code null} if none.
      */
     private Logger logger;
 
@@ -199,7 +187,7 @@ public class LoggingPanel extends JPanel {
     /**
      * Constructs a new logging panel and register it to the specified logger.
      *
-     * @param logger The logger to listen to, or <code>null</code> for the root logger.
+     * @param logger The logger to listen to, or {@code null} for the root logger.
      */
     public LoggingPanel(Logger logger) {
         this();
@@ -213,7 +201,7 @@ public class LoggingPanel extends JPanel {
     /**
      * Construct a logging panel and register it to the specified logger.
      *
-     * @param logger The logger name to listen to, or <code>null</code> for the root logger.
+     * @param logger The logger name to listen to, or {@code null} for the root logger.
      */
     public LoggingPanel(final String logger) {
         this(Logger.getLogger(logger!=null ? logger : ""));
@@ -227,7 +215,7 @@ public class LoggingPanel extends JPanel {
     }
 
     /**
-     * Returns <code>true</code> if the given column is visible.
+     * Returns {@code true} if the given column is visible.
      *
      * @param column The column to show or hide. May be one of {@link #LOGGER}, {@link #CLASS},
      *               {@link #METHOD}, {@link #TIME_OF_DAY}, {@link #LEVEL} or {@link #MESSAGE}.
@@ -270,7 +258,7 @@ public class LoggingPanel extends JPanel {
      *
      * @param  record The record to get the foreground color.
      * @return The foreground color for the specified record,
-     *         or <code>null</code> for the default color.
+     *         or {@code null} for the default color.
      */
     public Color getForeground(final LogRecord record) {
         return getColor(record, 0);
@@ -283,7 +271,7 @@ public class LoggingPanel extends JPanel {
      *
      * @param  record The record to get the background color.
      * @return The background color for the specified record,
-     *         or <code>null</code> for the default color.
+     *         or {@code null} for the default color.
      */
     public Color getBackground(final LogRecord record) {
         return getColor(record, 1);
@@ -294,7 +282,7 @@ public class LoggingPanel extends JPanel {
      *
      * @param  record The record to get the color.
      * @param  offset 0 for the foreground color, or 1 for the background color.
-     * @return The color for the specified record, or <code>null</code> for the default color.
+     * @return The color for the specified record, or {@code null} for the default color.
      */
     private Color getColor(final LogRecord record, final int offset) {
         int i = Arrays.binarySearch(levelValues, record.getLevel().intValue());
@@ -309,12 +297,12 @@ public class LoggingPanel extends JPanel {
 
     /**
      * Set the foreground and background colors for messages of the specified level.
-     * The specified colors will apply on any messages of level <code>level</code> or
-     * greater, up to the next level set with an other call to <code>setLevelColor(...)</code>.
+     * The specified colors will apply on any messages of level {@code level} or
+     * greater, up to the next level set with an other call to {@code setLevelColor(...)}.
      *
      * @param level       The minimal level to set color for.
-     * @param foreground  The foreground color, or <code>null</code> for the default color.
-     * @param background  The background color, or <code>null</code> for the default color.
+     * @param foreground  The foreground color, or {@code null} for the default color.
+     * @param background  The background color, or {@code null} for the default color.
      */
     public void setLevelColor(final Level level, final Color foreground, final Color background) {
         final int value = level.intValue();
@@ -360,17 +348,17 @@ public class LoggingPanel extends JPanel {
 
     /**
      * Convenience method showing this logging panel into a frame.
-     * Different kinds of frame can be constructed according <code>owner</code> class:
+     * Different kinds of frame can be constructed according {@code owner} class:
      *
      * <ul>
-     *   <li>If <code>owner</code> or one of its parent is a {@link JDesktopPane},
-     *       then <code>panel</code> is added into a {@link JInternalFrame}.</li>
-     *   <li>If <code>owner</code> or one of its parent is a {@link Frame} or a {@link Dialog},
-     *       then <code>panel</code> is added into a {@link JDialog}.</li>
-     *   <li>Otherwise, <code>panel</code> is added into a {@link JFrame}.</li>
+     *   <li>If {@code owner} or one of its parent is a {@link JDesktopPane},
+     *       then {@code panel} is added into a {@link JInternalFrame}.</li>
+     *   <li>If {@code owner} or one of its parent is a {@link Frame} or a {@link Dialog},
+     *       then {@code panel} is added into a {@link JDialog}.</li>
+     *   <li>Otherwise, {@code panel} is added into a {@link JFrame}.</li>
      * </ul>
      *
-     * @param  owner The owner, or <code>null</code> to show
+     * @param  owner The owner, or {@code null} to show
      *         this logging panel in a top-level window.
      * @return The frame. May be a {@link JInternalFrame},
      *         a {@link JDialog} or a {@link JFrame}.
@@ -391,14 +379,14 @@ public class LoggingPanel extends JPanel {
     }
 
     /**
-     * Free any resources used by this <code>LoggingPanel</code>. If a {@link Logger} was
-     * specified at construction time, then this method unregister the <code>LoggingPanel</code>'s
+     * Free any resources used by this {@code LoggingPanel}. If a {@link Logger} was
+     * specified at construction time, then this method unregister the {@code LoggingPanel}'s
      * handler from the specified logger. Next, {@link Handler#close} is invoked.
      * <br><br>
      * This method is invoked automatically when the user close the windows created
-     * with {@link #show(Component)}. If this <code>LoggingPanel</code> is displayed
+     * with {@link #show(Component)}. If this {@code LoggingPanel} is displayed
      * by some other ways (for example if it has been added into a {@link JPanel}),
-     * then this <code>dispose()</code> should be invoked explicitely when the container
+     * then this {@code dispose()} should be invoked explicitely when the container
      * is being discarted.
      */
     public void dispose() {
