@@ -135,10 +135,9 @@ import org.geotools.util.WeakHashSet;
  * class. While serialization (usually on server side) should work on J2SE 1.4 and above,
  * deserialization (usually on client side) of {@code GridCoverage2D} instances requires J2SE 1.5.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class GridCoverage2D extends AbstractGridCoverage implements RenderedCoverage {
     /**

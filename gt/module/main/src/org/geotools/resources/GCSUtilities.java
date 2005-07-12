@@ -19,10 +19,11 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
+// J2SE and JAI dependencies
 import java.util.Collection;
 import java.util.Iterator;
 import java.awt.image.RenderedImage;
+import javax.media.jai.PropertySource;
 
 // OpenGIS dependencies
 import org.opengis.coverage.SampleDimension;
@@ -181,14 +182,20 @@ public final class GCSUtilities {
     }
 
     /**
-     * Returns the visible band in the specified image. This method fetch the "GC_VisibleBand"
-     * property. If this property is undefined, then the visible band default to the first one.
+     * Returns the visible band in the specified {@link RenderedImage} or {@link PropertySource}.
+     * This method fetch the {@code "GC_VisibleBand"} property. If this property is undefined,
+     * then the visible band default to the first one.
      *
-     * @param  image The image for which to fetch the visible band.
+     * @param  image The image for which to fetch the visible band, or {@code null}.
      * @return The visible band.
      */
-    public static int getVisibleBand(final RenderedImage image) {
-        final Object candidate = image.getProperty("GC_VisibleBand");
+    public static int getVisibleBand(final Object image) {
+        Object candidate = null;
+        if (image instanceof RenderedImage) {
+            candidate = ((RenderedImage) image).getProperty("GC_VisibleBand");
+        } else if (image instanceof PropertySource) {
+            candidate = ((PropertySource) image).getProperty("GC_VisibleBand");
+        }
         if (candidate instanceof Integer) {
             return ((Integer) candidate).intValue();
         }

@@ -81,7 +81,7 @@ import org.geotools.util.NumberRange;
  * while all others categories are qualitative. The difference between those two kinds of category
  * is that the {@link Category#getSampleToGeophysics} method returns a non-null transform if and
  * only if the category is quantitative.
- * <br><br>
+ * <p>
  * While this class can be used with arbitrary {@linkplain org.opengis.coverage.Coverage coverage},
  * the primary target for this implementation is {@linkplain org.opengis.coverage.grid.GridCoverage
  * grid coverage} storing their sample values as integers. This explain the "{@code Grid}" prefix
@@ -122,7 +122,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * method should returns an identity transform. Note that the opposite do not always hold:
      * an identity transform doesn't means that all categories are geophysics. For example,
      * some qualitative categories may map to some values differents than {@code NaN}.
-     * <br><br>
+     * <p>
      * Assertions:
      *  <ul>
      *    <li>{@code isGeophysics} == {@code categories.isScaled(true)}.</li>
@@ -144,7 +144,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * {@code true} if this sample dimension has at least one quantitative category.
      * An arbitrary number of quantitative categories is allowed, providing their sample
      * value ranges do not overlap.
-     * <br><br>
+     * <p>
      * If {@code sampleToGeophysics} is non-null, then {@code hasQuantitative}
      * <strong>must</strong> be true.  However, the opposite do not hold in all cases: a
      * {@code true} value doesn't means that {@code sampleToGeophysics} should
@@ -1096,7 +1096,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * transform, or {@code null} if no such transform existed in the first place. In
      * other words, the range of sample values in all category maps directly the "real world"
      * values without the need for any transformation.
-     * <br><br>
+     * <p>
      * {@code GridSampleDimension} objects live by pair: a <cite>geophysics</cite> one
      * (used for computation) and a <cite>non-geophysics</cite> one (used for packing data, usually
      * as integers). The {@code geo} argument specifies which object from the pair is wanted,
@@ -1191,7 +1191,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * model with 1 band using each category's colors as returned by {@link Category#getColors}.
      * The returned color model will typically use data type {@link DataBuffer#TYPE_FLOAT} if this
      * {@code GridSampleDimension} instance is "geophysics", or an integer data type otherwise.
-     * <br><br>
+     * <p>
      * Note that {@link org.geotools.coverage.grid.GridCoverage2D#getSampleDimension} returns
      * special implementations of {@code GridSampleDimension}. In this particular case,
      * the color model created by this {@code getColorModel()} method will have the same number of
@@ -1384,7 +1384,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      *       the only operation's argument is of type {@code GridSampleDimension[]}.
      *       Consequently, the image operation may be invoked at any time after class
      *       loading of {@link GridSampleDimension}.
-     *       <br><br>
+     *       <p>
      *       Additional note: moving the initialization into the
      *       {@code META-INF/registryFile.jai} file may not be the best idea neithter,
      *       since peoples using JAI without the GCS module may be stuck with the overhead

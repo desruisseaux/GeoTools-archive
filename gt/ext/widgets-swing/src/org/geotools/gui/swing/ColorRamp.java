@@ -49,6 +49,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.media.jai.PropertySource;
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -66,7 +67,6 @@ import org.geotools.axis.AbstractGraduation;
 import org.geotools.axis.LogarithmicNumberGraduation;
 
 // Geotools dependencies
-import org.geotools.util.NumberRange;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.GCSUtilities;
@@ -86,7 +86,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * <p>&nbsp;</p>
  *
  * @since 2.2
- * @version $Id: ColorRamp.java,v 1.9 2004/02/13 14:29:37 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ColorRamp extends JComponent {
@@ -168,14 +168,11 @@ public class ColorRamp extends JComponent {
 
     /**
      * Constructs a color bar for the specified coverage.
-     *
-     * @param coverage The grid coverage.
      */
-// TODO
-//    public ColorRamp(final Coverage coverage) {
-//        this();
-//        setColors(coverage);
-//    }
+    public ColorRamp(final Coverage coverage) {
+        this();
+        setColors(coverage);
+    }
 
     /**
      * Returns the graduation to paint over colors. If the graduation is
@@ -232,7 +229,7 @@ public class ColorRamp extends JComponent {
      * Sets the colors to paint.
      * This method will fire a property change event with the {@code "colors"} name.
      *
-     * @param colors The colors to paint.
+     * @param  colors The colors to paint.
      * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
      * @see #setColors(GridCoverage)
@@ -256,7 +253,7 @@ public class ColorRamp extends JComponent {
      * Sets the colors to paint from an {@link IndexColorModel}. The default implementation
      * fetches the colors from the index color model and invokes {@link #setColors(Color[])}.
      *
-     * @param model The colors to paint.
+     * @param  model The colors to paint.
      * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
      * @see #setColors(GridCoverage)
@@ -282,12 +279,12 @@ public class ColorRamp extends JComponent {
     }
 
     /**
-     * Sets the graduation and the colors to paint from a sample dimension. The default
-     * implementation fetched the range of indexed colors and the minimum and maximum values
-     * from the supplied band, and then invokes {@link #setColors(Color[])} and
-     * {@link #setGraduation}.
+     * Sets the graduation and the colors from a sample dimension.
+     * The default implementation fetchs the palette and the minimum and maximum values
+     * from the supplied band, and then invokes {@link #setColors(Color[]) setColors} and
+     * {@link #setGraduation setGraduation}.
      *
-     * @param band The band, or {@code null}.
+     * @param  band The sample dimension, or {@code null}.
      * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
      * @see #setColors(GridCoverage)
@@ -298,102 +295,101 @@ public class ColorRamp extends JComponent {
      * @see #getGraduation()
      */
     public boolean setColors(SampleDimension band) {
+        Color[] colors = EMPTY;
+        Graduation graduation = null;
         /*
-         * Looks for what seems to be the "main" category. We look for the
-         * quantitative category (if there is one) with the widest sample range.
+         * Gets the color palette, preferably from the "non-geophysics" view since it is usually
+         * the one backed by an IndexColorModel.  We assume that 'palette[i]' gives the color of
+         * sample value 'i'. We will search for the largest range of valid sample integer values,
+         * ignoring "nodata" values. Those "nodata" values appear usually at the begining or at
+         * the end of the whole palette range.
          */
-        double maxRange = 0;
-        if (band instanceof GridSampleDimension) {
-            band = ((GridSampleDimension) band).geophysics(false);
-        }
-        final Color[] colors;
-        final int[][] palette = band.getPalette();
-        AbstractGraduation graduation;
-        if (palette == null) {
-            colors     = EMPTY;
-            graduation = null;
-        } else {
-            /*
-             * Search for the largest range of valid values, ignoring "nodata" values.
-             */
-            int lower = 0;
-            int upper = 0;
-            double[] nodata = band.getNoDataValues();
-            if (nodata != null) {
-                nodata = (double[]) nodata.clone();
-                Arrays.sort(nodata);
-                for (int i=1; i<nodata.length; i++) {
-                    final int lo = (int) Math.ceil (nodata[i-1]);
-                    final int hi = (int) Math.floor(nodata[i  ]);
+        if (band != null) {
+            if (band instanceof GridSampleDimension) {
+                band = ((GridSampleDimension) band).geophysics(false);
+            }
+            final int[][] palette = band.getPalette();
+            if (palette != null) {
+                int lower = 0;
+                int upper = 0;
+                final double[] nodata = band.getNoDataValues();
+                final double[] sorted = new double[nodata!=null ? nodata.length + 2 : 2];
+                sorted[0] = -1;
+                sorted[sorted.length - 1] = palette.length;
+                if (nodata != null) {
+                    System.arraycopy(nodata, 0, sorted, 1, nodata.length);
+                }
+                Arrays.sort(sorted);
+                for (int i=1; i<sorted.length; i++) {
+                    // Note: Don't cast to integer now, because we
+                    // want to take NaN and infinity in account.
+                    final double lo = Math.floor(sorted[i-1])+1; // "Nodata" always excluded
+                    final double hi = Math.ceil (sorted[i  ]);   // "Nodata" included if integer
                     if (lo>=0 && hi<=palette.length && (hi-lo)>(upper-lower)) {
-                        lower = lo;
-                        upper = hi;
+                        lower = (int) lo;
+                        upper = (int) hi;
                     }
                 }
-            }
-            if (upper == 0) {
-                upper = palette.length;
-            }
-            /*
-             * Creates the colors from the palette.
-             */
-            if (PaletteInterpretation.RGB.equals(band.getPaletteInterpretation())) {
-                colors = new Color[upper-lower];
-                for (int i=0; i<colors.length; i++) {
-                    int r=0, g=0, b=0, a=255;
-                    final int[] c = palette[i+lower];
-                    if (c!=null) switch (c.length) {
-                        default:        // Fall through
-                        case 4: a=c[3]; // Fall through
-                        case 3: b=c[2]; // Fall through
-                        case 2: g=c[1]; // Fall through
-                        case 1: r=c[0]; // Fall through
-                        case 0: break;
+                /*
+                 * We now know the range of values to show on the palette. Creates the colors from
+                 * the palette. Only palette using RGB colors are understood at this time, but the
+                 * graduation (after this block) is still created for all kind of palette.
+                 */
+                if (PaletteInterpretation.RGB.equals(band.getPaletteInterpretation())) {
+                    colors = new Color[upper-lower];
+                    for (int i=0; i<colors.length; i++) {
+                        int r=0, g=0, b=0, a=255;
+                        final int[] c = palette[i+lower];
+                        if (c!=null) switch (c.length) {
+                            default:        // Fall through
+                            case 4: a=c[3]; // Fall through
+                            case 3: b=c[2]; // Fall through
+                            case 2: g=c[1]; // Fall through
+                            case 1: r=c[0]; // Fall through
+                            case 0: break;
+                        }
+                        colors[i] = new Color(r,g,b,a);
                     }
-                    colors[i] = new Color(r,g,b,a);
                 }
-            } else {
-                colors = EMPTY;
+                /*
+                 * Transforms the lower and upper sample values into minimum and maximum geophysics
+                 * values and creates the graduation.
+                 */
+                double min,max;
+                try {
+                    final MathTransform1D tr = band.getSampleToGeophysics();
+                    min = tr.transform(lower);
+                    max = tr.transform(upper);
+                } catch (TransformException cause) {
+                    IllegalArgumentException e = new IllegalArgumentException(Resources.format(
+                                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "band", band));
+                    e.initCause(cause);
+                    throw e;
+                }
+                if (min > max) {
+                    // This case occurs typically when displaying a color ramp for
+                    // sea bathymetry, for which floor level are negative numbers.
+                    min = -min;
+                    max = -max;
+                }
+                if (!(min <= max)) {
+                    // This case occurs if one or both values is NaN.
+                    throw new IllegalArgumentException(Resources.format(
+                                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "band", band));
+                }
+                graduation = createGraduation(this.graduation, band, min, max);
             }
-            /*
-             * Now creates the gratuation.
-             */
-            double min,max;
-            try {
-                final MathTransform1D tr = band.getSampleToGeophysics();
-                min = tr.transform(lower);
-                max = tr.transform(upper);
-            } catch (TransformException cause) {
-                IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "band", band));
-                e.initCause(cause);
-                throw e;
-            }
-            if (min > max) {
-                // This case occurs typically when displaying a color ramp for
-                // sea bathymetry, for which floor level are negative numbers.
-                min = -min;
-                max = -max;
-            }
-            if (!(min <= max)) {
-                throw new IllegalArgumentException(Resources.format(
-                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "band", band));
-            }
-            graduation = (this.graduation instanceof AbstractGraduation) ?
-                         (AbstractGraduation) this.graduation : null;
-// TODO            graduation = createGraduation(graduation, category, band.getUnits());
-            graduation.setMinimum(min);
-            graduation.setMaximum(max);
         }
         return setGraduation(graduation) | setColors(colors); // Realy |, not ||
     }
 
     /**
-     * Sets the graduation and the colors to paint from a {@link GridCoverage}.
-     * The range of indexed colors and the minimum and maximum values are fetched
-     * from the supplied grid coverage.
+     * Sets the graduation and the colors from a coverage.
+     * The default implementation fetchs the visible sample dimension from the specified coverage,
+     * and then invokes {@link #setColors(Color[]) setColors} and
+     * {@link #setGraduation setGraduation}.
      *
-     * @param coverage The grid coverage, or {@code null}.
+     * @param coverage The coverage, or {@code null}.
      * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
      * @see #setColors(IndexColorModel)
@@ -401,20 +397,13 @@ public class ColorRamp extends JComponent {
      * @see #getColors()
      * @see #getGraduation()
      */
-// TODO
-//    public boolean setColors(GridCoverage coverage) {
-//        SampleDimension band = null;
-//        if (coverage != null) {
-//            coverage = coverage.geophysics(false);
-//            final RenderedImage image = coverage.getRenderedImage();
-//            band = coverage.getSampleDimension(GCSUtilities.getVisibleBand(image));
-//            final ColorModel colors = image.getColorModel();
-//            if (colors instanceof IndexColorModel) {
-//                return setColors(band, (IndexColorModel) colors);
-//            }
-//        }
-//        return setColors(band);
-//    }
+    public boolean setColors(final Coverage coverage) {
+        SampleDimension band = null;
+        if (coverage != null) {
+            band = coverage.getSampleDimension(GCSUtilities.getVisibleBand(band));
+        }
+        return setColors(band);
+    }
 
     /**
      * Returns the component's orientation (horizontal or vertical).
@@ -627,66 +616,72 @@ public class ColorRamp extends JComponent {
     }
 
     /**
-     * Returns a graduation for the specified category. This method must returns
-     * a graduation of the appropriate class (e.g. {@link NumberGraduation} or
-     * {@link LogarithmicNumberGraduation}), but doesn't have to set any graduation's
-     * properties like minimum and maximum values. This will be handle by the caller.
-     * <p>
-     * If the supplied {@code reuse} object is non-null and is of the appropriate
-     * class, then this method can returns {@code reuse} without creating a new
-     * graduation. This help to reduce garbage collection.
+     * Returns a graduation for the specified sample dimension, minimum and maximum values. This
+     * method must returns a graduation of the appropriate class, usually {@link NumberGraduation}
+     * or {@link LogarithmicNumberGraduation}. If the supplied {@code reuse} object is non-null and
+     * is of the appropriate class, then this method can returns {@code reuse} without creating a
+     * new graduation object. This method must set graduations's
+     * {@linkplain AbstractGraduation#setMinimum minimum},
+     * {@linkplain AbstractGraduation#setMaximum maximum} and
+     * {@linkplain AbstractGraduation#setUnit unit} according the values given in arguments.
      *
-     * @param  reuse The graduation to reuse if possible.
-     * @param  category The category to create graduation for.
-     * @param  units The units for the graduation.
-     * @return A graduation for the supplied category. The minimum, maximum
-     *         and units doesn't need to bet set at this stage.
+     * @param  reuse   The graduation to reuse if possible.
+     * @param  band    The sample dimension to create graduation for.
+     * @param  minimum The minimal geophysics value to appears in the graduation.
+     * @param  maximum The maximal geophysics value to appears in the graduation.
+     * @return A graduation for the supplied sample dimension.
      */
-// TODO
-//    protected AbstractGraduation createGraduation(final AbstractGraduation reuse,
-//                                                  final Category category, final Unit units)
-//    {
-//        MathTransform1D tr  = category.geophysics(false).getSampleToGeophysics();
-//        boolean linear      = false;
-//        boolean logarithmic = false;
-//        try {
-//            /*
-//             * An heuristic approach to determine if the transform is linear or logarithmic.
-//             * We look at the derivative, which should be constant everywhere for a linear
-//             * scale and be proportional to the inverse of 'x' for a logarithmic one.
-//             */
-//            tr = (MathTransform1D) tr.inverse();
-//            final double     EPS = 1E-6; // For rounding error.
-//            final NumberRange range = category.geophysics(true).getRange();
-//            final double minimum = range.getMinimum();
-//            final double maximum = range.getMaximum();
-//            final double ratio   = tr.derivative(minimum) / tr.derivative(maximum);
-//            if (Math.abs(ratio-1) <= EPS) {
-//                linear = true;
-//            }
-//            if (Math.abs(ratio*(minimum/maximum) - 1) <= EPS) {
-//                logarithmic = true;
-//            }
-//        } catch (TransformException exception) {
-//            // Transformation failed. We don't know if the scale is linear or logarithmic.
-//            // Continue anyway...
-//        }
-//        if (linear) {
-//            if (reuse==null || !reuse.getClass().equals(NumberGraduation.class)) {
-//                return new NumberGraduation(units);
-//            }
-//        } else if (logarithmic) {
-//            if (reuse==null || !reuse.getClass().equals(LogarithmicNumberGraduation.class)) {
-//                return new LogarithmicNumberGraduation(units);
-//            }
-//        } else {
-//            // TODO: Should we localize this message? (it should not occurs often)
-//            Logger.getLogger("org.geotools.gui.swing").warning("Unknow scale type: \""+
-//                             Utilities.getShortClassName(tr)+"\". Default to linear.");
-//            return new NumberGraduation(units);
-//        }
-//        return reuse;
-//    }
+    protected Graduation createGraduation(final Graduation      reuse,
+                                          final SampleDimension band,
+                                          final double          minimum,
+                                          final double          maximum)
+    {
+        MathTransform1D tr  = band.getSampleToGeophysics();
+        boolean linear      = false;
+        boolean logarithmic = false;
+        try {
+            /*
+             * An heuristic approach to determine if the transform is linear or logarithmic.
+             * We look at the derivative, which should be constant everywhere for a linear
+             * scale and be proportional to the inverse of 'x' for a logarithmic one.
+             */
+            tr = (MathTransform1D) tr.inverse();
+            final double EPS   = 1E-6; // For rounding error.
+            final double ratio = tr.derivative(minimum) / tr.derivative(maximum);
+            if (Math.abs(ratio-1) <= EPS) {
+                linear = true;
+            }
+            if (Math.abs(ratio*(minimum/maximum) - 1) <= EPS) {
+                logarithmic = true;
+            }
+        } catch (TransformException exception) {
+            // Transformation failed. We don't know if the scale is linear or logarithmic.
+            // Continue anyway. A warning will be logged later in this method.
+        }
+        final Unit units = band.getUnits();
+        AbstractGraduation graduation = (reuse instanceof AbstractGraduation) ?
+                                        (AbstractGraduation) reuse : null;
+        if (linear) {
+            if (graduation==null || !graduation.getClass().equals(NumberGraduation.class)) {
+                graduation = new NumberGraduation(units);
+            }
+        } else if (logarithmic) {
+            if (graduation==null || !graduation.getClass().equals(LogarithmicNumberGraduation.class)) {
+                graduation = new LogarithmicNumberGraduation(units);
+            }
+        } else {
+            // TODO: localize
+            Logger.getLogger("org.geotools.gui.swing").warning("Unrecognized scale type: \""+
+                             Utilities.getShortClassName(tr)+"\". Default to linear.");
+            graduation = new NumberGraduation(units);
+        }
+        if (graduation == reuse) {
+            graduation.setUnit(units);
+        }
+        graduation.setMinimum(minimum);
+        graduation.setMaximum(maximum);
+        return graduation;
+    }
 
     /**
      * Returns a string representation for this color ramp.
@@ -704,7 +699,7 @@ public class ColorRamp extends JComponent {
                 }
             }
         }
-        return Utilities.getShortClassName(this)+'['+count+" colors]";
+        return Utilities.getShortClassName(this) + '[' + count + " colors]";
     }
 
     /**
@@ -739,7 +734,7 @@ public class ColorRamp extends JComponent {
      * de calculer l'espace qu'elle occupe. Cette classe peut aussi réagir
      * à certains événements.
      *
-     * @version $Id: ColorRamp.java,v 1.9 2004/02/13 14:29:37 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class UI extends ComponentUI implements PropertyChangeListener {

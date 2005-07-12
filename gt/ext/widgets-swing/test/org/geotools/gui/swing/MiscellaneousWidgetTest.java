@@ -26,52 +26,37 @@ import java.awt.Graphics2D;
 import java.awt.HeadlessException;
 import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.Window;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.RenderedImage;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-import java.util.Random;
+import javax.swing.JFrame;
 
+// JAI dependencies
 import javax.media.jai.operator.AddConstDescriptor;
 import javax.media.jai.operator.ConstantDescriptor;
 import javax.media.jai.operator.GradientMagnitudeDescriptor;
 import javax.media.jai.operator.MultiplyConstDescriptor;
-import javax.swing.JFrame;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+// Geotools dependencies
 import org.geotools.resources.Arguments;
 import org.geotools.resources.image.ColorUtilities;
 
 
 /**
- * Tests a set of widgets.
+ * Tests a set of widgets. Widgets will be displayed only if the test is run from the main
+ * method. Otherwise (i.e. if run from Maven), widgets are invisibles.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class MiscellaneousWidgetTest extends TestCase {
+public class MiscellaneousWidgetTest extends TestBase {
     /**
-     * Set to <code>true</code> if window should be keep once the test is completed.
-     */
-    private static boolean keep;
-
-    /**
-     * The location of the next frame to show.
-     */
-    private static volatile int location = 60;
-
-    /**
-     * The list of widget created up to date.
-     */
-    private final List widgets = new ArrayList();
-
-    /**
-     * Construct the test case.
+     * Constructs the test case.
      */
     public MiscellaneousWidgetTest(final String name) {
         super(name);
@@ -81,65 +66,25 @@ public class MiscellaneousWidgetTest extends TestCase {
      * Run the test case from the command line.
      */
     public static void main(final String[] args) {
-        final Arguments arguments = new Arguments(args);
-        Locale.setDefault(arguments.locale);
-        keep = arguments.getFlag("-keep");
-        junit.textui.TestRunner.run(suite());
+        main(args, suite());
     }
 
     /**
      * Returns the suite of tests.
      */
     public static Test suite() {
-        TestSuite suite = new TestSuite(MiscellaneousWidgetTest.class);
-        return suite;
+        return new TestSuite(MiscellaneousWidgetTest.class);
     }
 
     /**
-     * Dispose all widgets. This method is called after tests are executed.
-     */
-    protected void tearDown() throws Exception {
-        for (int i=widgets.size(); --i>=0;) {
-            final Window window = (Window)widgets.get(i);
-            window.dispose();
-        }
-        super.tearDown();
-    }
-
-    /**
-     * Show a component.
-     */
-    private void show(final Component component, final String title) {
-        try {
-            final JFrame frame = new JFrame(title);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.getContentPane().add(component);
-            frame.setLocation(location, location);
-            frame.pack();
-            frame.setVisible(true);
-            if (!keep) {
-                widgets.add(frame);
-            }
-            location += 30;
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException exception) {
-                // Ignore
-            }
-        } catch (HeadlessException exception) {
-            // The test is running on a machine without display. Ignore.
-        }
-    }
-
-    /**
-     * Test the {@link About} dialog.
+     * Tests the {@link About} dialog.
      */
     public void testAbout() {
         show(new About(), "About");
     }
 
     /**
-     * Test the {@link ExceptionMonitor}.
+     * Tests the {@link ExceptionMonitor}.
      */
     public void testExceptionMonitor() {
         if (false) {
@@ -150,7 +95,7 @@ public class MiscellaneousWidgetTest extends TestCase {
     }
 
     /**
-     * Test the {@link CoordinateChooser}.
+     * Tests the {@link CoordinateChooser}.
      */
     public void testCoordinateChooser() {
         CoordinateChooser test = new CoordinateChooser();
@@ -158,7 +103,7 @@ public class MiscellaneousWidgetTest extends TestCase {
     }
 
     /**
-     * Test the {@link KernelEditor}.
+     * Tests the {@link KernelEditor}.
      */
     public void testKernelEditor() {
         KernelEditor test = new KernelEditor();
@@ -167,7 +112,7 @@ public class MiscellaneousWidgetTest extends TestCase {
     }
 
     /**
-     * Test the {@link GradientKernelEditor}.
+     * Tests the {@link GradientKernelEditor}.
      */
     public void testGradientKernelEditor() {
         GradientKernelEditor test = new GradientKernelEditor();
@@ -176,58 +121,43 @@ public class MiscellaneousWidgetTest extends TestCase {
     }
 
     /**
-     * Test the {@link ColorBar}.
+     * Tests the {@link ColorRamp}.
      */
-    public void testColorBar() {
-        ColorBar test = new ColorBar();
+    public void testColorRamp() {
+        ColorRamp test = new ColorRamp();
         final int[] ARGB = new int[256];
         ColorUtilities.expand(new Color[] {Color.RED, Color.ORANGE, Color.YELLOW, Color.CYAN},
                               ARGB, 0, ARGB.length);
         test.setColors(ColorUtilities.getIndexColorModel(ARGB));
-        show(test, "ColorBar");
+        show(test, "ColorRamp");
     }
 
     /**
-     * Test the {@link ProgressWindow}.
+     * Tests the {@link Plot2D}.
      */
-    public void testProgress() throws InterruptedException {
-        if (!keep) {
-            return;
-        }
-        final ProgressWindow progress = new ProgressWindow(null);
-        progress.setDescription("Some progress");
-        progress.started();
-        progress.progress(75);
-        progress.warningOccurred("File foo.txt", "(47)", "Some warning");
-        progress.complete();
-    }
+//    public void testPlot2D() {
+//        final Random random = new Random();
+//        Plot2D test = new Plot2D(true, false);
+//        test.newAxis(0, "Some x values");
+//        test.newAxis(1, "Some y values");
+//        for (int j=0; j<2; j++) {
+//            final float[] x = new float[800];
+//            final float[] y = new float[800];
+//            for (int i=0; i<x.length; i++) {
+//                x[i] = i/10f;
+//                y[i] = (float)random.nextGaussian();
+//                if (i!=0) {
+//                    y[i] += y[i-1];
+//                }
+//            }
+//            test.addSeries("Random values", x, y);
+//        }
+//        test.setPaintingWhileAdjusting(true);
+//        show(test.createScrollPane(), "Plot2D");
+//    }
 
     /**
-     * Test the {@link Plot2D}.
-     */
-    public void testPlot2D() {
-        final Random random = new Random();
-        Plot2D test = new Plot2D(true, false);
-        test.newAxis(0, "Some x values");
-        test.newAxis(1, "Some y values");
-        for (int j=0; j<2; j++) {
-            final float[] x = new float[800];
-            final float[] y = new float[800];
-            for (int i=0; i<x.length; i++) {
-                x[i] = i/10f;
-                y[i] = (float)random.nextGaussian();
-                if (i!=0) {
-                    y[i] += y[i-1];
-                }
-            }
-            test.addSeries("Random values", x, y);
-        }
-        test.setPaintingWhileAdjusting(true);
-        show(test.createScrollPane(), "Plot2D");
-    }
-
-    /**
-     * Test the {@link ZoomPane}.
+     * Tests the {@link ZoomPane}.
      */
     public void testZoomPane() {
         final Rectangle rect = new Rectangle(100,200,100,93);
@@ -257,7 +187,7 @@ public class MiscellaneousWidgetTest extends TestCase {
     }
 
     /**
-     * Test the {@link OperationTreeBrowser}.
+     * Tests the {@link OperationTreeBrowser}.
      */
     public void testOperationTree() {
         RenderedImage image;

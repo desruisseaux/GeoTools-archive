@@ -27,30 +27,23 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTabbedPane;
 import javax.swing.JScrollPane;
-import javax.swing.BorderFactory;
 import javax.swing.table.AbstractTableModel;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
-import java.awt.geom.Rectangle2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.Dimension;
 
+// Image and JAI
 import java.awt.Image;
 import java.awt.image.DataBuffer;
 import java.awt.image.ColorModel;
 import java.awt.image.SampleModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.IndexColorModel;
-import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderableImage;
-
-// JAI dependencies
-import javax.media.jai.JAI;
 import javax.media.jai.OperationNode;
 import javax.media.jai.PropertySource;
 import javax.media.jai.PropertyChangeEmitter;
@@ -138,7 +131,7 @@ public class ImageProperties extends JPanel {
     /**
      * The viewer for an image quick look.
      */
-    private final Viewer viewer;
+    private final ImagePane viewer;
 
     /**
      * Create a new instance of {@code ImageProperties} with no image.
@@ -193,7 +186,7 @@ public class ImageProperties extends JPanel {
          * Build the image preview tab.
          */
         if (true) {
-            viewer = new Viewer();
+            viewer = new ImagePane();
             tabs.addTab(resources.getString(ResourceKeys.PREVIEW), viewer);
         }
         add(tabs, BorderLayout.CENTER);
@@ -645,143 +638,6 @@ public class ImageProperties extends JPanel {
             }
             if (first <= last) {
                 fireTableRowsUpdated(first, last);
-            }
-        }
-    }
-
-    /**
-     * The viewer for the "preview" tab. This producer accepts either {@linkplain RenderedImage
-     * rendered} or {@linkplain RenderableImage renderable} image. Rendered image are display
-     * immediately, while renderable image will be rendered in a background thread when first
-     * requested.
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     */
-    private static final class Viewer extends ZoomPane implements Runnable {
-        /**
-         * The default size for rendered image produced by a {@link RenderableImage}.
-         * This is also the maximum size for a {@link RenderedImage}; bigger image
-         * will be scaled down using JAI's "Scale" operation for faster rendering.
-         */
-        private static final int RENDERED_SIZE = 512;
-
-        /**
-         * The renderable image, or {@code null} if none. If non-null, then the {@link #run}
-         * method will transform this renderable image into a rendered one when first requested.
-         * Once the image is rendered, this field is set to {@code null}.
-         */
-        private RenderableImage renderable;
-
-        /**
-         * The rendered image, or {@code null} if none. This image may be explicitly set
-         * by {@link #setImage(RenderedImage)}, or computed by {@link #run}.
-         */
-        private RenderedImage rendered;
-
-        /**
-         * {@code true} if the {@link #run} method has been invoked for the current image.
-         * This field is used in order to avoid to start more than one thread for the same
-         * {@linkplain #renderable} image.
-         */
-        private boolean running;
-
-        /**
-         * Construct an initially empty viewer.
-         */
-        public Viewer() {
-            super(UNIFORM_SCALE | TRANSLATE_X | TRANSLATE_Y | ROTATE | RESET | DEFAULT_ZOOM);
-            setResetPolicy(true);
-        }
-
-        /**
-         * Set the source renderable image.
-         */
-        public void setImage(final RenderableImage image) {
-            renderable = image;
-            rendered   = null;
-            running    = false;
-            reset();
-            repaint();
-        }
-
-        /**
-         * Set the source rendered image.
-         */
-        public void setImage(RenderedImage image) {
-            if (image != null) {
-                final float scale = Math.min(((float)RENDERED_SIZE) / image.getWidth(),
-                                             ((float)RENDERED_SIZE) / image.getHeight());
-                if (scale < 1) {
-                    final Float sc = new Float(scale);
-                    image = JAI.create("Scale",
-                                       new ParameterBlock().addSource(image).add(sc).add(sc));
-                }
-            }
-            renderable = null;
-            rendered   = image;
-            running    = false;
-            reset();
-            repaint();
-        }
-
-        /**
-         * Reset the default zoom. This method overrides the default implementation in
-         * order to keep the <var>y</var> axis in its Java2D direction (<var>y</var>
-         * value increasing down), which is the usual direction of most image.
-         */
-        public void reset() {
-            reset(getZoomableBounds(null), false);
-        }
-
-        /**
-         * Returns the image bounds, or {@code null} if none. This is used by
-         * {@link ZoomPane} in order to set the initial zoom.
-         */
-        public Rectangle2D getArea() {
-            final RenderedImage rendered = this.rendered; // Protect from change in an other thread
-            if (rendered != null) {
-                return new Rectangle(rendered.getMinX(),  rendered.getMinY(),
-                                     rendered.getWidth(), rendered.getHeight());
-            }
-            return null;
-        }
-
-        /**
-         * Paint the image. If the image was a {@link RenderableImage}, then a
-         * {@link RenderedImage} will be computed in a background thread when
-         * this method is first invoked.
-         */
-        protected void paintComponent(final Graphics2D graphics) {
-            final RenderedImage rendered = this.rendered; // Protect from change in an other thread
-            if (rendered == null) {
-                if (renderable!=null && !running) {
-                    running = true;
-                    final Thread runner = new Thread(this, "Renderer");
-                    runner.setPriority(Thread.NORM_PRIORITY-2);
-                    runner.start();
-                }
-            } else {
-                graphics.drawRenderedImage(rendered, zoom);
-            }
-        }
-
-        /**
-         * Create a {@linkplain RenderedImage rendered} view of the {@linkplain RenderableImage
-         * renderable} image and notifies {@link ZoomPane} when the result is ready. This method
-         * is run in a background thread.
-         */
-        public void run() {
-            final RenderableImage producer = renderable; // Protect from change.
-            if (producer != null) {
-                final RenderedImage image = producer.createScaledRendering(RENDERED_SIZE, 0, null);
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        if (producer == renderable) {
-                            setImage(image);
-                        }
-                    }
-                });
             }
         }
     }

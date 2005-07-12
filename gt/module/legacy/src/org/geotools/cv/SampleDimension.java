@@ -1489,11 +1489,16 @@ public class SampleDimension implements Serializable {
         } else {
             colors = null;
         }
+        final CharSequence[] names = sd.getCategoryNames();
+        final String[] asString = new String[names.length];
+        for (int i=0; i<asString.length; i++) {
+            asString[i] = names[i].toString();
+        }
         return new SampleDimension(sd.getDescription().toString(),
                                    SampleDimensionType.getEnum(sd.getSampleDimensionType()),
                                    ColorInterpretation.getEnum(sd.getColorInterpretation()),
                                    colors,
-                                   sd.getCategoryNames(null),
+                                   asString,
                                    sd.getNoDataValues(),
                                    sd.getMinimumValue(),
                                    sd.getMaximumValue(),

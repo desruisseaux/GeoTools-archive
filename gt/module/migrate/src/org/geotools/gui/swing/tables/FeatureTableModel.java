@@ -29,6 +29,10 @@ import org.geotools.feature.*;
  *
  * @task TODO: It would be excellent if there were custom cell renderers
  *       available for Geometry types.
+ *
+ * @deprecated Moved to {@link org.geotools.gui.swing.tables.FeatureTableModel}
+ *             (i.e. {@code table} package instead of {@code tables}, since package naming
+ *             convention is to use the singular form).
  */
 public class FeatureTableModel extends javax.swing.table.AbstractTableModel
     implements javax.swing.table.TableModel {

@@ -176,8 +176,6 @@ public class About extends JPanel {
                   ClassLoader loader, final ThreadGroup tasks)
     {
         super(new GridBagLayout());
-        final GridBagConstraints gc = new GridBagConstraints();
-        gc.weightx=1; gc.weighty=1;
         final Locale locale = getDefaultLocale();
         resources = Resources.getResources(locale);
         if (loader == null) {
@@ -224,6 +222,7 @@ public class About extends JPanel {
          * If the user supplied a logo, load it and display it in the dialog's upper part (NORTH).
          * The tabbed pane will be added below the logo, in the dialog's central part (CENTER).
          */
+        final GridBagConstraints gc = new GridBagConstraints();
         if (logo != null) {
             final JComponent title;
             if (logo instanceof JComponent) {
@@ -247,13 +246,14 @@ public class About extends JPanel {
                             BorderFactory.createEmptyBorder(0/*top*/, 0/*left*/, 6/*bottom*/, 0/*right*/),
                             BorderFactory.createCompoundBorder(
                             BorderFactory.createLoweredBevelBorder(), title.getBorder())));
-            gc.gridx=0; gc.gridy=0; gc.insets.top=9;
+            gc.gridx=0; gc.gridy=0; gc.weightx=1;
+            gc.insets.top=9;
             add(title, gc);
         }
         final JTabbedPane        tabs = new JTabbedPane();
         final JLabel totalMemoryLabel = new JLabel(resources.getString(ResourceKeys.MEMORY_HEAP_SIZE_$1,  new Float(totalMemory)));
         final JLabel percentUsedLabel = new JLabel(resources.getString(ResourceKeys.MEMORY_HEAP_USAGE_$1, new Float(1-freeMemory/totalMemory)));
-        gc.gridx=0; gc.gridy=1; gc.fill=gc.BOTH;
+        gc.gridx=0; gc.gridy=1; gc.weightx=1; gc.weighty=1; gc.fill=gc.BOTH;
         add(tabs, gc);
         /*
          * MAIN TAB (Application name and version informations)
