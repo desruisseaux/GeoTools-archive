@@ -91,7 +91,7 @@ public class MIFDataStoreFactoryTest extends TestCase {
             String strURI = "root-mifdatastore";
             uri = new URI(strURI);
             ds = dsFactory.createDataStore(MIFTestUtils.getParams("mif",
-                    MIFTestUtils.fileName(""), uri));
+                        MIFTestUtils.fileName(""), uri));
 
             FeatureType ft = ds.getSchema("grafo");
             assertEquals("Bad URI", new URI(strURI), ft.getNamespace());
@@ -117,23 +117,22 @@ public class MIFDataStoreFactoryTest extends TestCase {
     public void testCanProcessPath() {
         // Opens the test-data directory
         assertEquals(true,
-            dsFactory.canProcess(MIFTestUtils.getParams("mif", MIFTestUtils.fileName(""), uri)));
+            dsFactory.canProcess(MIFTestUtils.getParams("mif",
+                    MIFTestUtils.fileName(""), uri)));
     }
 
     /**
      */
     public void testCanProcessWrongDBType() {
-
         // fails because dbtype != "mif"
         assertEquals(false,
-            dsFactory.canProcess(MIFTestUtils.getParams("miffooobar", MIFTestUtils.fileName(""),
-                    uri)));
+            dsFactory.canProcess(MIFTestUtils.getParams("miffooobar",
+                    MIFTestUtils.fileName(""), uri)));
     }
 
     /**
      */
     public void testCanProcessMIF() {
-
         // Opens a single mif file; works with or without extension, and regardless the extension's case.
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
@@ -149,7 +148,6 @@ public class MIFDataStoreFactoryTest extends TestCase {
     /**
      */
     public void testCanProcessWrongPath() {
-
         // Fails because an extension other than ".mif" was specified
         assertEquals(false,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
@@ -173,6 +171,7 @@ public class MIFDataStoreFactoryTest extends TestCase {
         Param[] pars = dsFactory.getParametersInfo();
         assertNotNull(pars);
         assertEquals(pars[3].key, MIFDataStore.PARAM_FIELDCASE);
+        assertEquals(pars.length, 15);
     }
 
     /**

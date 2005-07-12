@@ -77,7 +77,7 @@ import java.util.logging.Logger;
  *
  * @author Luca S. Percich, AMA-MI
  * @author Paolo Rizzi, AMA-MI
- * @version $Id: MIFFile.java,v 1.12 2005/06/22 16:53:49 lpercich Exp $
+ * @version $Id: MIFFile.java,v 1.13 2005/07/12 10:19:51 lpercich Exp $
  */
 public class MIFFile {
     // Geometry type identifier constants 
@@ -149,6 +149,7 @@ public class MIFFile {
 
     // Options & parameters
     private GeometryFactory geomFactory = null;
+    private Integer SRID = new Integer(0);
     private String fieldNameCase;
     private String geometryName;
     private String geometryClass;
@@ -169,7 +170,10 @@ public class MIFFile {
      * </li>
      * <li>
      * PARAM_GEOMFACTORY = GeometryFactory object to be used for creating
-     * geometries;
+     * geometries; alternatively, use PARAM_SRID;
+     * </li>
+     * <li>
+     * PARAM_SRID = SRID to be used for creating geometries;
      * </li>
      * <li>
      * PARAM_FIELDCASE = field names tranformation: "upper" to uppercase |
@@ -198,7 +202,8 @@ public class MIFFile {
      * </p>
      * <pre><code>
      *   HashMap params = new HashMap();
-     *   params.put(MIFFile.PARAM_GEOMFACTORY, new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING_SINGLE), SRID));
+     *   // params.put(MIFFile.PARAM_GEOMFACTORY, new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING_SINGLE), SRID));
+     *   params.put(MIFFile.PARAM_SRID, new Integer(SRID));
      *   params.put(MIFFile.PARAM_FIELDCASE, "upper");
      *   params.put(MIFFile.PARAM_GEOMNAME, "GEOM");
      *   params.put(MIFFile.PARAM_GEOMTYPE, "typed");
@@ -219,6 +224,7 @@ public class MIFFile {
      * @throws IOException If the specified mif file could not be opened
      */
     public MIFFile(String path, Map params) throws IOException {
+        // TODO use url instead of String
         super();
 
         parseParams(params);
@@ -279,6 +285,7 @@ public class MIFFile {
      */
     public MIFFile(String path, FeatureType featureType, HashMap params)
         throws IOException, SchemaException {
+        // TODO use url instead of String
         super();
 
         parseParams(params);
@@ -328,12 +335,15 @@ public class MIFFile {
         setHeaderClause(MIFDataStore.HCLAUSE_TRANSFORM,
             (String) getParam(MIFDataStore.HCLAUSE_TRANSFORM, "", false, params));
 
+        SRID = (Integer) getParam(MIFDataStore.PARAM_SRID, new Integer(0),
+                false, params);
+
         geomFactory = (GeometryFactory) getParam(MIFDataStore.PARAM_GEOMFACTORY,
                 null, false, params);
 
         if (geomFactory == null) {
             geomFactory = new GeometryFactory(new PrecisionModel(
-                        PrecisionModel.FLOATING), 0);
+                        PrecisionModel.FLOATING), SRID.intValue());
         }
 
         // TODO use null instead???

@@ -201,7 +201,10 @@ public class MIFTestUtils {
 
         params.put(MIFDataStore.PARAM_FIELDCASE, "upper");
         params.put(MIFDataStore.PARAM_GEOMNAME, "the_geom");
-        params.put(MIFDataStore.PARAM_GEOMFACTORY, MIFTestUtils.geomFactory);
+
+        // params.put(MIFDataStore.PARAM_GEOMFACTORY, MIFTestUtils.geomFactory);
+        params.put(MIFDataStore.PARAM_SRID, new Integer(SRID));
+
         params.put(MIFDataStore.HCLAUSE_COORDSYS, MIFTestUtils.coordsysClause);
 
         return params;

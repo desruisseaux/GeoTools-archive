@@ -45,7 +45,7 @@ import java.util.Map;
  * </p>
  *
  * @author Luca S. Percich, AMA-MI
- * @version $Id: MIFDataStoreFactory.java,v 1.9 2005/06/23 16:59:27 lpercich Exp $
+ * @version $Id: MIFDataStoreFactory.java,v 1.10 2005/07/12 10:19:51 lpercich Exp $
  *
  * @see MIFDataStore#MIFDataStore(String, HashMap);
  */
@@ -77,6 +77,10 @@ public class MIFDataStoreFactory implements DataStoreFactorySpi {
     public static final Param PARAM_GEOMTYPE = new Param(MIFDataStore.PARAM_GEOMTYPE,
             String.class, "Can be typed, untyped or multi (implies typed).",
             false, "untyped");
+    public static final Param PARAM_SRID = new Param(MIFDataStore.PARAM_SRID,
+            Integer.class,
+            "SRID code for Geometry, use as alternative for GEOMFACTORY",
+            false, new Integer(26591));
 
     // Header clauses
     public static final Param PARAM_COORDSYS = new Param(MIFDataStore.HCLAUSE_COORDSYS,
@@ -135,6 +139,7 @@ public class MIFDataStoreFactory implements DataStoreFactorySpi {
             addParamToMap(PARAM_GEOMNAME, params, parameters, null);
             addParamToMap(PARAM_GEOMTYPE, params, parameters, null);
             addParamToMap(PARAM_GEOMFACTORY, params, parameters, null);
+            addParamToMap(PARAM_SRID, params, parameters, null);
 
             // Header
             addParamToMap(PARAM_COORDSYS, params, parameters, null);
@@ -200,10 +205,13 @@ public class MIFDataStoreFactory implements DataStoreFactorySpi {
      */
     public Param[] getParametersInfo() {
         Param[] params = {
-                PARAM_DBTYPE, PARAM_PATH, PARAM_NAMESPACE, PARAM_FIELDCASE,
-                PARAM_COORDSYS, PARAM_GEOMNAME, PARAM_GEOMTYPE, PARAM_COORDSYS,
-                PARAM_CHARSET, PARAM_DELIMITER, PARAM_INDEX, PARAM_TRANSFORM,
-                PARAM_UNIQUE, PARAM_VERSION
+                PARAM_DBTYPE, PARAM_PATH, PARAM_NAMESPACE,
+                
+                PARAM_FIELDCASE, PARAM_GEOMNAME, PARAM_GEOMFACTORY,
+                PARAM_GEOMTYPE, PARAM_SRID,
+                
+                PARAM_COORDSYS, PARAM_CHARSET, PARAM_DELIMITER, PARAM_INDEX,
+                PARAM_TRANSFORM, PARAM_UNIQUE, PARAM_VERSION
             };
 
         return params;

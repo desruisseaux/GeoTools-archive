@@ -31,7 +31,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.filter.Filter;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -84,7 +83,7 @@ public class MIFDataStoreTest extends TestCase {
     protected boolean initDS(String initPath) {
         try {
             initPath = MIFTestUtils.fileName(initPath);
-                    
+
             HashMap params = MIFTestUtils.getParams("mif", initPath, null);
             ds = new MIFDataStore(initPath, params);
             assertNotNull(ds);
@@ -115,7 +114,6 @@ public class MIFDataStoreTest extends TestCase {
     /**
      */
     public void testCreateSchema() {
-        
         initDS("");
 
         try {
@@ -175,7 +173,6 @@ public class MIFDataStoreTest extends TestCase {
     /**
      */
     public void testCreateSchemaTwoGeometry() {
-        
         initDS("");
 
         try {
@@ -408,6 +405,27 @@ public class MIFDataStoreTest extends TestCase {
             fr.close();
         } catch (Exception e) {
             fail("Cannot check feature: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test that feature get the correct SRID
+     */
+    public void testSRID() {
+        initDS("");
+
+        FeatureReader fr;
+
+        try {
+            fr = getFeatureReader("grafo");
+
+            Feature f = fr.next();
+            assertEquals(f.getDefaultGeometry().getFactory().getSRID(),
+                MIFTestUtils.SRID);
+
+            fr.close();
+        } catch (Exception e) {
+            fail("Cannot check SRID: " + e.getMessage());
         }
     }
 

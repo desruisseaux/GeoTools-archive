@@ -39,7 +39,7 @@ import java.util.Iterator;
  * </p>
  *
  * @author Luca S. Percich, AMA-MI
- * @version $Id: MIFDataStore.java,v 1.10 2005/06/23 16:59:27 lpercich Exp $
+ * @version $Id: MIFDataStore.java,v 1.11 2005/07/12 10:19:51 lpercich Exp $
  */
 public class MIFDataStore extends AbstractDataStore {
     // MIF Header clause names
@@ -56,6 +56,7 @@ public class MIFDataStore extends AbstractDataStore {
     public static final String PARAM_GEOMFACTORY = "geometryFactory";
     public static final String PARAM_GEOMNAME = "geometryFieldName";
     public static final String PARAM_GEOMTYPE = "geometryType";
+    public static final String PARAM_SRID = "SRID";
 
     // The path in which MIF/MIDs are being stored, or the single MIF file 
     private File filePath;
@@ -86,6 +87,7 @@ public class MIFDataStore extends AbstractDataStore {
      * @see MIFFile#MIFFile(String, Map)
      */
     public MIFDataStore(String path, HashMap params) throws IOException {
+        // TODO use url instead of String
         super(true); // Is writable
 
         this.params = (params != null) ? params : new HashMap();
