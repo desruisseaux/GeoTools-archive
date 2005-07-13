@@ -19,13 +19,14 @@
  */
 package org.geotools.gui.swing;
 
-// Swing dependencies
+// Swing and AWT dependencies
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
 import javax.swing.AbstractListModel;
+import java.awt.IllegalComponentStateException;
 
 // Events
 import java.awt.event.ActionEvent;
@@ -149,9 +150,11 @@ public class DisjointLists extends JPanel {
          * indices are index (not values) in the {@link #visibles} array.
          */
         private void hide(final int lower, final int upper) {
-            System.arraycopy(visibles, upper, visibles, lower, size-upper);
-            size -= (upper-lower);
-            fireIntervalRemoved(this, lower, upper-1);
+            if (lower != upper) {
+                System.arraycopy(visibles, upper, visibles, lower, size-upper);
+                size -= (upper-lower);
+                fireIntervalRemoved(this, lower, upper-1);
+            }
             assert isSorted();
         }
 
@@ -202,6 +205,24 @@ public class DisjointLists extends JPanel {
                 fireIntervalAdded(this, size-length, size-1);
             }
         }
+
+        /**
+         * Copies all elements to the specified collection.
+         */
+        public void copy(final Collection save) {
+            save.addAll(choices);
+        }
+
+        /**
+         * Removes all elements from this model.
+         */
+        public void clear() {
+            choices.clear();
+            if (size != 0) {
+                fireIntervalRemoved(this, 0, size-1);
+                size = 0;
+            }
+        }
     }
 
     /**
@@ -215,12 +236,12 @@ public class DisjointLists extends JPanel {
         private final JList source, target;
 
         /**
-         * {@code true} if we should move all items on action/
+         * {@code true} if we should move all items on action.
          */
         private final boolean all;
 
         /**
-         * Construct a new "move" action.
+         * Constructs a new "move" action.
          */
         public Action(final JList source, final JList target, final boolean all) {
             this.source = source;
@@ -268,6 +289,11 @@ public class DisjointLists extends JPanel {
      * The list on the right side. This list is initially empty.
      */
     private final JList right;
+
+    /**
+     * {@code true} if elements should be automatically sorted.
+     */
+    private boolean autoSort = true;
 
     /**
      * Construct a new list.
@@ -339,12 +365,85 @@ public class DisjointLists extends JPanel {
     }
 
     /**
+     * Returns {@code true} if elements are automatically sorted when added to this list.
+     * The default value is {@code true}.
+     *
+     * @since 2.2
+     */
+    public boolean isAutoSortEnabled() {
+        return autoSort;
+    }
+
+    /**
+     * Sets to {@code true} if elements should be automatically sorted when added to this list.
+     *
+     * @since 2.2
+     */
+    public void setAutoSortEnabled(final boolean autoSort) {
+        if (autoSort != this.autoSort) {
+            this.autoSort = autoSort;
+            if (autoSort) {
+                final List elements = new ArrayList();
+                ((Model) left.getModel()).copy(elements);
+                clear();
+                addElements(elements);
+            }
+            firePropertyChange("autoSort", !autoSort, autoSort);
+        }
+    }
+
+    /**
+     * Removes all elements from this list.
+     *
+     * @since 2.2
+     */
+    public void clear() {
+        ((Model)left .getModel()).clear();
+        ((Model)right.getModel()).clear();
+    }
+
+    /**
      * Add all elements from the specified collection into the list on the left side.
+     * Elements are sorted if {@link #isAutoSortEnabled} returns {@code true}.
      *
      * @param items Items to add.
      */
     public void addElements(final Collection items) {
-        ((Model)left.getModel()).addAll(items);
+        addElements(items.toArray());
+    }
+
+    /**
+     * Add all elements from the specified array into the list on the left side.
+     * Elements are sorted if {@link #isAutoSortEnabled} returns {@code true}.
+     *
+     * @param items Items to add.
+     *
+     * @since 2.2
+     */
+    public void addElements(final Object[] items) {
+        Locale locale;
+        try {
+            locale = getLocale();
+        } catch (IllegalComponentStateException e) {
+            locale = getDefaultLocale();
+        }
+        final List list = new ArrayList(items.length);
+        for (int i=0; i<items.length; i++) {
+            Object candidate = items[i];
+            if (!(candidate instanceof String)) {
+                candidate = new ListElement(candidate, locale);
+            }
+            list.add(candidate);
+        }
+        final Model left  = (Model) this.left .getModel();
+        final Model right = (Model) this.right.getModel();
+        if (autoSort) {
+            left.copy(list);
+            Collections.sort(list);
+            left .clear();
+            right.clear();
+        }
+        left.addAll(list);
     }
 
     /**
@@ -354,7 +453,7 @@ public class DisjointLists extends JPanel {
         final Model model = (Model) right.getModel();
         final Object[] list = new Object[model.getSize()];
         for (int i=0; i<list.length; i++) {
-            list[i] = model.getElementAt(i);
+            list[i] = ListElement.unwrap(model.getElementAt(i));
         }
         return Arrays.asList(list);
     }
@@ -366,6 +465,8 @@ public class DisjointLists extends JPanel {
      * @param  owner The owner (may be null).
      * @param  title The title to write in the window bar.
      * @return {@code true} if the user pressed "okay", or {@code false} otherwise.
+     *
+     * @since 2.2
      */
     public boolean showDialog(final Component owner, final String title) {
         return SwingUtilities.showOptionDialog(owner, this, title);
@@ -374,16 +475,12 @@ public class DisjointLists extends JPanel {
     /**
      * Show the dialog box. This method is provided only as an easy
      * way to test the dialog appearance from the command line.
+     *
+     * @since 2.2
      */
     public static void main(final String[] args) {
         final DisjointLists list = new DisjointLists();
-        final Locale[] locales = Locale.getAvailableLocales();
-        final List names = new ArrayList(locales.length);
-        for (int i=0; i<locales.length; i++) {
-            names.add(locales[i].getDisplayName());
-        }
-        Collections.sort(names);
-        list.addElements(names);
+        list.addElements(Locale.getAvailableLocales());
         list.showDialog(null, Utilities.getShortClassName(list));
     }
 }

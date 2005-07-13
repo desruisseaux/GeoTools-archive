@@ -43,6 +43,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // Geotools dependencies
+import org.geotools.measure.AngleFormat;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.image.ColorUtilities;
 
@@ -80,18 +81,24 @@ public class MiscellaneousWidgetTest extends TestBase {
      * Tests the {@link About} dialog.
      */
     public void testAbout() {
-        show(new About(), "About");
+        show(new About());
     }
 
     /**
-     * Tests the {@link ExceptionMonitor}.
+     * Tests the {@link DisjointLists}.
      */
-    public void testExceptionMonitor() {
-        if (false) {
-            // Not tested because it block the application (waiting for a user input)
-            ExceptionMonitor.show(null, new javax.imageio.IIOException("Can't read the image",
-                                        new java.io.FileNotFoundException("File not found")));
-        }
+    public void testDisjointLists() {
+        final DisjointLists test = new DisjointLists();
+        test.addElements(Locale.getAvailableLocales());
+        show(test);
+    }
+
+    /**
+     * Tests the {@link FormatChooser}.
+     */
+    public void testFormatChooser() {
+        FormatChooser test = new FormatChooser(new AngleFormat());
+        show(test);
     }
 
     /**
@@ -99,7 +106,7 @@ public class MiscellaneousWidgetTest extends TestBase {
      */
     public void testCoordinateChooser() {
         CoordinateChooser test = new CoordinateChooser();
-        show(test, "CoordinateChooser");
+        show(test);
     }
 
     /**
@@ -108,7 +115,7 @@ public class MiscellaneousWidgetTest extends TestBase {
     public void testKernelEditor() {
         KernelEditor test = new KernelEditor();
         test.addDefaultKernels();
-        show(test, "KernelEditor");
+        show(test);
     }
 
     /**
@@ -117,7 +124,7 @@ public class MiscellaneousWidgetTest extends TestBase {
     public void testGradientKernelEditor() {
         GradientKernelEditor test = new GradientKernelEditor();
         test.addDefaultKernels();
-        show(test, "GradientKernelEditor");
+        show(test);
     }
 
     /**
@@ -129,7 +136,7 @@ public class MiscellaneousWidgetTest extends TestBase {
         ColorUtilities.expand(new Color[] {Color.RED, Color.ORANGE, Color.YELLOW, Color.CYAN},
                               ARGB, 0, ARGB.length);
         test.setColors(ColorUtilities.getIndexColorModel(ARGB));
-        show(test, "ColorRamp");
+        show(test);
     }
 
     /**
@@ -153,7 +160,7 @@ public class MiscellaneousWidgetTest extends TestBase {
 //            test.addSeries("Random values", x, y);
 //        }
 //        test.setPaintingWhileAdjusting(true);
-//        show(test.createScrollPane(), "Plot2D");
+//        show(test.createScrollPane());
 //    }
 
     /**
@@ -197,6 +204,6 @@ public class MiscellaneousWidgetTest extends TestBase {
         image = MultiplyConstDescriptor.create(image, new double[] {2}, null);
         image = GradientMagnitudeDescriptor.create(image, null, null, null);
         image = AddConstDescriptor.create(image, new double[] {35}, null);
-        show(new OperationTreeBrowser(image), "OperationTreeBrowser");
+        show(new OperationTreeBrowser(image));
     }
 }

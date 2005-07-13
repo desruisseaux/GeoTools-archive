@@ -30,6 +30,7 @@ import junit.framework.TestCase;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -74,6 +75,16 @@ public class TestBase extends TestCase {
      * is executed from the {@link #main main} method.
      *
      * @param component The component to show.
+     */
+    protected static void show(final Component component) {
+        show(component, Utilities.getShortClassName(component));
+    }    
+
+    /**
+     * Show a component in a frame. The component will be shown only if the test suite
+     * is executed from the {@link #main main} method.
+     *
+     * @param component The component to show.
      * @param title The window title.
      */
     protected static void show(final Component component, final String title) {
@@ -85,7 +96,7 @@ public class TestBase extends TestCase {
             frame.pack();
             frame.setVisible(true);
             location += 30;
-            try {
+            if (false) try {
                 Thread.sleep(500);
             } catch (InterruptedException exception) {
                 // Ignore

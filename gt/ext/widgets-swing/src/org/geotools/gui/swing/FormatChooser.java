@@ -39,6 +39,7 @@ import javax.swing.JFrame;
 import javax.swing.JComboBox;
 import javax.swing.MutableComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.BorderFactory;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagLayout;
@@ -143,17 +144,18 @@ public class FormatChooser extends JPanel {
         final Resources resources = Resources.getResources(null);
         final GridBagConstraints c = new GridBagConstraints();
         c.gridx=0; c.insets.right=6;
-        c.gridy=0; add(new JLabel(resources.getLabel(ResourceKeys.FORMAT )), c);
-        c.gridy++; add(new JLabel(resources.getLabel(ResourceKeys.PREVIEW)), c);
+        c.gridy=0;                 add(new JLabel(resources.getLabel(ResourceKeys.FORMAT )), c);
+        c.gridy++; c.insets.top=3; add(new JLabel(resources.getLabel(ResourceKeys.PREVIEW)), c);
         c.insets.right=0; c.gridx++; c.weightx=1; c.fill=c.HORIZONTAL;
-        c.gridy=0; add(choices, c);
-        c.gridy++; add(preview, c);
+        c.gridy=0; c.insets.top=0; add(choices, c);
+        c.gridy++; c.insets.top=3; add(preview, c);
         choices.getEditor().getEditorComponent().requestFocus();
         choices.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 applyPattern(false);
             }
         });
+        setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
     }
 
     /**
@@ -485,7 +487,7 @@ public class FormatChooser extends JPanel {
     public static void main(final String[] args) {
         final Arguments arguments = new Arguments(args);
         Locale.setDefault(arguments.locale);
-        new FormatChooser(new DecimalFormat())
+        new FormatChooser(new AngleFormat())
             .showDialog(null, Utilities.getShortName(FormatChooser.class));
         System.exit(0);
     }

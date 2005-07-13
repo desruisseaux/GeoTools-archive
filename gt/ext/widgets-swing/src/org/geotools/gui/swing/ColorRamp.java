@@ -184,7 +184,7 @@ public class ColorRamp extends JComponent {
 
     /**
      * Set the graduation to paint on top of the color bar. The graduation can be set also
-     * by a call to {@link #setColors(SampleDimension)} and {@link #setColors(GridCoverage)}.
+     * by a call to {@link #setColors(SampleDimension)} and {@link #setColors(Coverage)}.
      * This method will fire a property change event with the {@code "graduation"} name.
      *
      * @param  graduation The new graduation, or {@code null} if none.
@@ -232,7 +232,7 @@ public class ColorRamp extends JComponent {
      * @param  colors The colors to paint.
      * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
-     * @see #setColors(GridCoverage)
+     * @see #setColors(Coverage)
      * @see #setColors(SampleDimension)
      * @see #setColors(IndexColorModel)
      * @see #getColors()
@@ -256,7 +256,7 @@ public class ColorRamp extends JComponent {
      * @param  model The colors to paint.
      * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
-     * @see #setColors(GridCoverage)
+     * @see #setColors(Coverage)
      * @see #setColors(SampleDimension)
      * @see #setColors(Color[])
      * @see #getColors()
@@ -287,7 +287,7 @@ public class ColorRamp extends JComponent {
      * @param  band The sample dimension, or {@code null}.
      * @return {@code true} if the state of this {@code ColorRamp} changed as a result of this call.
      *
-     * @see #setColors(GridCoverage)
+     * @see #setColors(Coverage)
      * @see #setColors(SampleDimension)
      * @see #setColors(IndexColorModel)
      * @see #setColors(Color[])

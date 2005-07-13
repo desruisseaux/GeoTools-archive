@@ -210,7 +210,7 @@ public class DateGraduation extends AbstractGraduation {
 
     /**
      * Set the maximum value as a real number. This method converts the value to
-     * {@linkplain Unit#MILLISECOND milliseconds} and invokes {@link #setMaximum(Date)}.
+     * {@linkplain #MILLISECOND milliseconds} and invokes {@link #setMaximum(Date)}.
      */
     public final synchronized boolean setMaximum(final double value) {
         ensureFinite("maximum", value);
