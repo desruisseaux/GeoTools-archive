@@ -69,7 +69,7 @@ import org.geotools.renderer.lite.LabelCacheDefault;
 import org.geotools.renderer.lite.ListenerList;
 import org.geotools.renderer.lite.LiteCoordinateSequence;
 import org.geotools.renderer.lite.LiteCoordinateSequenceFactory;
-import org.geotools.renderer.lite.LiteRenderer2;
+import org.geotools.renderer.lite.LiteRenderer;
 import org.geotools.renderer.lite.LiteShape2;
 import org.geotools.renderer.lite.RenderListener;
 import org.geotools.renderer.style.SLDStyleFactory;
@@ -197,7 +197,7 @@ public class ShapefileRenderer {
 			try {
 				layerIndexInfo[i] = useIndex(sds);
 			} catch (Exception e) {
-				IndexInfo info = new IndexInfo(IndexInfo.TREE_NONE, null, null);
+				layerIndexInfo[i] = new IndexInfo(IndexInfo.TREE_NONE, null, null);
 				LOGGER.fine("Exception while trying to use index"
 						+ e.getLocalizedMessage());
 			}
@@ -234,7 +234,7 @@ public class ShapefileRenderer {
 		}
 
         try{
-        	setScaleDenominator(  LiteRenderer2.calculateScale(envelope,context.getCoordinateReferenceSystem(),paintArea.width,paintArea.height,90));// 90 = OGC standard DPI (see SLD spec page 37)
+        	setScaleDenominator(  LiteRenderer.calculateScale(envelope,context.getCoordinateReferenceSystem(),paintArea.width,paintArea.height,90));// 90 = OGC standard DPI (see SLD spec page 37)
         }
         catch (Exception e) // probably either (1) no CRS (2) error xforming
 		{
@@ -1118,6 +1118,10 @@ public class ShapefileRenderer {
 		if (geom.type == ShapeType.POLYGON || geom.type == ShapeType.POLYGONM
 				|| geom.type == ShapeType.POLYGONZ)
 			return new PolygonShape(geom);
+		if (geom.type == ShapeType.POINT || geom.type == ShapeType.POINTM
+				|| geom.type == ShapeType.POINTZ || geom.type == ShapeType.MULTIPOINT 
+				|| geom.type == ShapeType.MULTIPOINTM || geom.type == ShapeType.MULTIPOINTZ)
+			return new MultiPointShape(geom);
 		return null;
 	}
 
@@ -1180,7 +1184,7 @@ public class ShapefileRenderer {
 	 *            the screen size
 	 * @return a transform that maps from real world coordinates to the screen
 	 */
-	public AffineTransform worldToScreenTransform(Envelope mapExtent,
+	public static AffineTransform worldToScreenTransform(Envelope mapExtent,
 			Rectangle screenSize) {
         double scaleX = screenSize.getWidth() / mapExtent.getWidth();
         double scaleY = screenSize.getHeight() / mapExtent.getHeight();

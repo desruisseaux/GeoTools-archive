@@ -79,12 +79,11 @@ public class PolygonHandler implements ShapeHandler {
 			return null;
 		}
 
-		int dimensions = (type == ShapeType.ARCZ) ? 3 : 2;
 		Envelope geomBBox = GeometryHandlerUtilities.readBounds(buffer);
 
-//		if (!bbox.intersects(geomBBox)) {
-//			return null;
-//		}
+		if (!bbox.intersects(geomBBox)) {
+			return null;
+		}
 
 		boolean bboxdecimate = geomBBox.getWidth() <= spanx
 				&& geomBBox.getHeight() <= spany;

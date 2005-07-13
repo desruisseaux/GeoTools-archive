@@ -16,6 +16,8 @@
  */
 package org.geotools.data.shapefile.shp;
 
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.net.URL;
 
 import junit.framework.TestCase;
@@ -26,12 +28,16 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.shape.LabelingTest;
-import org.geotools.renderer.shape.MultiLineHandler;
+import org.geotools.renderer.shape.PointHandler;
+import org.geotools.renderer.shape.ShapefileRenderer;
 import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.resources.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -45,17 +51,23 @@ import com.vividsolutions.jts.geom.Envelope;
 public class PointHandlerTest extends TestCase {
 
 	public void testRead() throws Exception{
-		URL url=TestData.getResource(LabelingTest.class, "streams.shp");
+		URL url=TestData.getResource(LabelingTest.class, "pointtest.shp");
 		ShapefileDataStore ds=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(url);
 		
 		Envelope env=ds.getFeatureSource().getBounds();
 //		Envelope env=new Envelope(-180,180,-90,90);
-		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
-//		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
-		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, DefaultGeographicCRS.WGS84);
+//		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
+		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
+		MathTransform mt=CRS.transform(crs, DefaultGeographicCRS.WGS84);
+		
+		AffineTransform transform=ShapefileRenderer.worldToScreenTransform(env, new Rectangle(300,300));
+		GeneralMatrix matrix=new GeneralMatrix(transform);
+		MathTransform at=FactoryFinder.getMathTransformFactory(null).createAffineTransform(matrix);
+		mt=FactoryFinder.getMathTransformFactory(null).createConcatenatedTransform(mt,at);
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt));
+		reader.setHandler(new PointHandler(reader.getHeader().getShapeType(), env, mt));
+
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
 		assertTrue( shape instanceof SimpleGeometry);

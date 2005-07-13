@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.velocity.runtime.exception.NodeException;
 import org.geotools.filter.Filter;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;

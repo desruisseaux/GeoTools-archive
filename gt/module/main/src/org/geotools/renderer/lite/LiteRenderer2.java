@@ -102,6 +102,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  * @author James Macgill
  * @author Andrea Aime
  * @version $Id$
+ * @deprecated
  */
 public class LiteRenderer2 implements Renderer, Renderer2D {
     /** Tolerance used to compare doubles for equality */
@@ -816,7 +817,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         AffineTransform originTranslation=AffineTransform.getTranslateInstance(screenSize.x, screenSize.y);
         originTranslation.concatenate(at);
 
-        return originTranslation;
+        return originTranslation!=null?originTranslation:at;
     }
 
     /**
@@ -1122,7 +1123,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             if (symbolizers[m] instanceof RasterSymbolizer) {
                 AffineTransform tempTransform = graphics.getTransform();
                 graphics.setTransform(at);
-                renderRaster(graphics, feature, (RasterSymbolizer) symbolizers[m], destinationCrs);
+                renderRaster(graphics, feature, (RasterSymbolizer) symbolizers[m]);
                 graphics.setTransform(tempTransform);
             } else{
                 Geometry g = findGeometry(feature, symbolizers[m]);
@@ -1244,19 +1245,14 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * @param symbolizer The raster symbolizer
      * @task make it follow the symbolizer
      */
-    private void renderRaster( Graphics2D graphics, Feature feature, RasterSymbolizer symbolizer, CoordinateReferenceSystem destinationCrs) {
+    private void renderRaster( Graphics2D graphics, Feature feature, RasterSymbolizer symbolizer ) {
         LOGGER.fine("rendering Raster for feature " + feature.toString() + " - " + feature.getAttribute("grid") );
         float alpha = getOpacity(symbolizer);
         graphics.setComposite(AlphaComposite.getInstance(
         			AlphaComposite.SRC_OVER, alpha));
         GridCoverage grid = (GridCoverage) feature.getAttribute("grid");
-        GridCoverageRenderer gcr;
-		try {
-			gcr = new GridCoverageRenderer(grid, destinationCrs);
-			gcr.paint(graphics);
-		} catch (Exception e) {
-			fireErrorEvent(e);
-		}
+        GridCoverageRenderer gcr = new GridCoverageRenderer(grid);
+        gcr.paint(graphics);
         LOGGER.fine("Raster rendered");
     }
     

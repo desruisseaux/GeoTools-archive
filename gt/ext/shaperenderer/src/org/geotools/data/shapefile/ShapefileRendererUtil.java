@@ -24,6 +24,8 @@ import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.renderer.shape.MultiLineHandler;
+import org.geotools.renderer.shape.MultiPointHandler;
+import org.geotools.renderer.shape.PointHandler;
 import org.geotools.renderer.shape.PolygonHandler;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -56,6 +58,10 @@ public class ShapefileRendererUtil {
 			reader.setHandler(new MultiLineHandler(type, bbox, mt));
 		if( type==ShapeType.POLYGON||type==ShapeType.POLYGONM ||type==ShapeType.POLYGONZ)
 			reader.setHandler(new PolygonHandler(type, bbox, mt));
+		if( type==ShapeType.POINT||type==ShapeType.POINTM ||type==ShapeType.POINTZ)
+			reader.setHandler(new PointHandler(type, bbox, mt));
+		if( type==ShapeType.MULTIPOINT||type==ShapeType.MULTIPOINTM ||type==ShapeType.MULTIPOINTZ)
+			reader.setHandler(new MultiPointHandler(type, bbox, mt));
 		return reader;
 	}
 	public static DbaseFileReader getDBFReader(ShapefileDataStore ds) throws IOException{

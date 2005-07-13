@@ -177,7 +177,7 @@ public class Rendering2DTest extends TestCase {
 
     }
 
-    public void disabledtestSimplePointRender() throws Exception {
+    public void testSimplePointRender() throws Exception {
 
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
@@ -198,8 +198,6 @@ public class Rendering2DTest extends TestCase {
 
     public void testReprojection() throws Exception {
 
-        // same as the datasource test, load in some features into a table
-        System.err.println("starting testLiteRender2");
         
         DataStore ds=TestUtilites.getPolygons();
         FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
@@ -208,7 +206,6 @@ public class Rendering2DTest extends TestCase {
         MapContext map = new DefaultMapContext();
         map.addLayer(source, style);
         
-        final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
         ShapefileRenderer renderer = new ShapefileRenderer(map);
         CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
@@ -280,89 +277,7 @@ public class Rendering2DTest extends TestCase {
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
 
     }
-    public void disabledtestPointReprojection() throws Exception {
 
-        // same as the datasource test, load in some features into a table
-        System.err.println("starting testLiteRender2");
-        GeometryFactory geomFac = new GeometryFactory(
-                PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
-        DataStore ds=TestUtilites.getPoints();
-        FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
-        Style style = createTestStyle();
-
-        MapContext map = new DefaultMapContext();
-        map.addLayer(source, style);
-        
-        final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        ShapefileRenderer renderer = new ShapefileRenderer(map);
-        CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
-                        "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
-
-        MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
-        		DefaultGeographicCRS.WGS84, crs).getMathTransform();
-
-        Envelope env = map.getLayerBounds();
-
-        Envelope bounds = JTS.transform(env, t);
-        map.setAreaOfInterest(bounds, crs);
-
-        Rectangle rect = new Rectangle(400, 400);
-//        renderer.setOptimizedDataLoadingEnabled(true);
-
-        env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
-                bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
-        TestUtilites.showRender("testPointReprojection", renderer, 1000, env);
-
-        // System.in.read();
-
-    }
-
-    
-    private Style createDefQueryTestStyle() throws IllegalFilterException {
-        StyleFactory sFac = StyleFactory.createStyleFactory();
-
-        PointSymbolizer pointsym = sFac.createPointSymbolizer();
-        pointsym.setGraphic(sFac.getDefaultGraphic());
-        pointsym.setGeometryPropertyName("point");
-
-        Rule rulep = sFac.createRule();
-        rulep.setSymbolizers(new Symbolizer[]{pointsym});
-        FeatureTypeStyle ftsP = sFac.createFeatureTypeStyle();
-        ftsP.setRules(new Rule[]{rulep});
-        ftsP.setFeatureTypeName("querytest");
-
-        LineSymbolizer linesym = sFac.createLineSymbolizer();
-        linesym.setGeometryPropertyName("line");
-
-        Stroke myStroke = sFac.getDefaultStroke();
-        myStroke.setColor(TestUtilites.filterFactory.createLiteralExpression("#0000ff"));
-        myStroke.setWidth(TestUtilites.filterFactory.createLiteralExpression(new Integer(3)));
-        LOGGER.info("got new Stroke " + myStroke);
-        linesym.setStroke(myStroke);
-
-        Rule rule2 = sFac.createRule();
-        rule2.setSymbolizers(new Symbolizer[]{linesym});
-        FeatureTypeStyle ftsL = sFac.createFeatureTypeStyle();
-        ftsL.setRules(new Rule[]{rule2});
-        ftsL.setFeatureTypeName("querytest");
-
-        PolygonSymbolizer polysym = sFac.createPolygonSymbolizer();
-        polysym.setGeometryPropertyName("polygon");
-        Fill myFill = sFac.getDefaultFill();
-        myFill.setColor(TestUtilites.filterFactory.createLiteralExpression("#ff0000"));
-        polysym.setFill(myFill);
-        polysym.setStroke(sFac.getDefaultStroke());
-        Rule rule = sFac.createRule();
-        rule.setSymbolizers(new Symbolizer[]{polysym});
-        FeatureTypeStyle ftsPoly = sFac.createFeatureTypeStyle(new Rule[]{rule});
-        // ftsPoly.setRules(new Rule[]{rule});
-        ftsPoly.setFeatureTypeName("querytest");
-
-        Style style = sFac.createStyle();
-        style.setFeatureTypeStyles(new FeatureTypeStyle[]{ftsPoly, ftsL, ftsP});
-
-        return style;
-    }
     public void testEnvelopePerformance() throws Exception{
     	ShapefileRenderer renderer=createLineRenderer(TestUtilites.getLines());
     	MapContext context=renderer.getContext();

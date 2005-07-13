@@ -97,16 +97,22 @@ public class TestUtilites {
 	}
 
 	public static ShapefileDataStore getPoints() throws IOException{
-		URL url=TestData.getResource(Rendering2DTest.class, "Points.shp");
+		URL url=TestData.getResource(Rendering2DTest.class, "pointtest.shp");
 		ShapefileDataStoreFactory factory=new ShapefileDataStoreFactory();
 		return (ShapefileDataStore) factory.createDataStore(url);
 	}
 
 	public static Style createTestStyle(String polyName, String lineName) throws IllegalFilterException {
+		return createTestStyle(polyName, lineName, null);
+	}
+	
+	public static Style createTestStyle(String polyName, String lineName, String pointName) throws IllegalFilterException {
 		if( polyName==null )
 			polyName="lakes";
 		if( lineName==null )
 			lineName="streams";
+		if( pointName==null )
+			pointName="pointtest";
 	    StyleFactory sFac = StyleFactory.createStyleFactory();
 	    // The following is complex, and should be built from
 	    // an SLD document and not by hand
@@ -143,7 +149,7 @@ public class TestUtilites {
 	    rule3.setSymbolizers(new Symbolizer[]{pointsym});
 	    FeatureTypeStyle fts3 = sFac.createFeatureTypeStyle();
 	    fts3.setRules(new Rule[]{rule3});
-	    fts3.setFeatureTypeName("pointfeature");
+	    fts3.setFeatureTypeName(pointName);
 	
 	    Style style = sFac.createStyle();
 	    style.setFeatureTypeStyles(new FeatureTypeStyle[]{fts, fts2, fts3});

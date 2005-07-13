@@ -77,7 +77,7 @@ public class LabelingTest extends TestCase {
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(collection, style);
-        LiteRenderer2 renderer = new LiteRenderer2(map);
+        LiteRenderer renderer = new LiteRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
@@ -135,7 +135,7 @@ public class LabelingTest extends TestCase {
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(collection, style);
-        LiteRenderer2 renderer = new LiteRenderer2(map);
+        LiteRenderer renderer = new LiteRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary=10;
         Rendering2DTest.INTERACTIVE=INTERACTIVE;
@@ -184,7 +184,7 @@ public class LabelingTest extends TestCase {
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(collection, style);
-        LiteRenderer2 renderer = new LiteRenderer2(map);
+        LiteRenderer renderer = new LiteRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 

@@ -4,7 +4,7 @@
 package org.geotools.index.rtree.cachefs;
 
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +35,7 @@ public class NodeCache extends LinkedHashMap {
         this.maxElements = capacity;
     }
     
-    protected boolean removeEldestEntry(Entry eldest) {
+    protected boolean removeEldestEntry(Map.Entry eldest) {
         boolean ret = this.size() > this.maxElements;
         
         if (ret) {

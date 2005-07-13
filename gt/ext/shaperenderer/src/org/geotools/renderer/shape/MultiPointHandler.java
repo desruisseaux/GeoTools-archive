@@ -16,6 +16,10 @@
  */
 package org.geotools.renderer.shape;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.SampleModel;
+import java.awt.image.SinglePixelPackedSampleModel;
 import java.nio.ByteBuffer;
 
 import org.geotools.data.shapefile.shp.ShapeHandler;
@@ -35,6 +39,9 @@ public class MultiPointHandler implements ShapeHandler {
 	private ShapeType type;
 	private Envelope bbox;
 	private MathTransform mt;
+	private ScreenMap screenMap;
+	private double spanx;
+	private double spany;
 
 	/**
 	 * Create new instance
@@ -42,10 +49,28 @@ public class MultiPointHandler implements ShapeHandler {
 	 * @param env the area that is visible.  If shape is not in area then skip.
 	 * @param mt the transform to go from data to the envelope (and that should be used to transform the shape coords)
 	 */
-	public MultiPointHandler(ShapeType type, Envelope env, MathTransform mt) {
+	public MultiPointHandler(ShapeType type, Envelope env, MathTransform mt) 
+	throws TransformException {
 		this.type=type;
 		this.bbox=env;
 		this.mt=mt;
+		if( mt!=null ){
+			double[] worldSize=new double[]{
+					env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY()
+			};
+			double[] screenSize=new double[4];
+			mt.transform(worldSize, 0, screenSize, 0, 2);
+			int width=(int) (screenSize[1]-screenSize[0]);
+			int height=-1*(int) (screenSize[3]-screenSize[2]);
+			screenMap=new ScreenMap(width+1,height+1);
+			
+			MathTransform screenToWorld = mt.inverse();
+			double[] original = new double[] { 0, 0, 1, 1 };
+			double[] coords = new double[4];
+			screenToWorld.transform(original, 0, coords, 0, 2);
+			this.spanx = Math.abs(coords[0] - coords[2]);
+			this.spany = Math.abs(coords[1] - coords[3]);
+		}
 	}
 	
 	/**
@@ -55,7 +80,6 @@ public class MultiPointHandler implements ShapeHandler {
 		return type;
 	}
 
-
 	/* (non-Javadoc)
 	 * @see org.geotools.data.shapefile.shp.ShapeHandler#read(java.nio.ByteBuffer, org.geotools.data.shapefile.shp.ShapeType)
 	 */
@@ -64,56 +88,76 @@ public class MultiPointHandler implements ShapeHandler {
             return null;
         }
 
-        int dimensions = (type == ShapeType.MULTIPOINTZ) ? 3 : 2;
-        double[] tmpbbox=new double[4];
-        tmpbbox[0] = buffer.getDouble();
-        tmpbbox[1]= buffer.getDouble();
-        tmpbbox[2]= buffer.getDouble();
-        tmpbbox[3]= buffer.getDouble();
-        
-        if( !mt.isIdentity())
+		// read bounding box
+		Envelope geomBBox = GeometryHandlerUtilities.readBounds(buffer);
+
+		if (!bbox.intersects(geomBBox)) {
+			return null;
+		}
+
+		boolean bboxdecimate = geomBBox.getWidth() <= spanx
+				&& geomBBox.getHeight() <= spany;
+		int numParts = buffer.getInt();
+
+		double[][] coords= new double[numParts][];
+		double[][] transformed = new double[numParts][];
+
+		// if bbox is less than a pixel then decimate the geometry.  But orientation must
+		// remain the same so geometry data must be parsed.
+		if (bboxdecimate){
+			coords=new double[1][];
+			coords[0]=new double[2];
+			transformed=new double[1][];
+			transformed[0] = new double[2];
+			coords[0][0]=buffer.getDouble();
+			coords[0][1]=buffer.getDouble();
 			try {
-				mt.transform(tmpbbox,0,tmpbbox, 0, tmpbbox.length/2);
-			} catch (TransformException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				mt.transform(coords[0], 0, transformed[0], 0, 1);
+			} catch (Exception e) {
+				ShapefileRenderer.LOGGER
+						.severe("could not transform coordinates "
+								+ e.getLocalizedMessage());
+				transformed[0]=coords[0];
+			}		
+			}else{
+
+            int partsInBBox=0;
+			for (int part = 0; part < numParts; part++) {
+				coords[part] = new double[2];
+					coords[part][0] = buffer.getDouble();
+					coords[part][1] = buffer.getDouble();
+					
+				if( !bbox.contains(coords[part][0], coords[part][1]) )
+					continue;
+				
+				if (!mt.isIdentity()) {
+					try {
+						transformed[partsInBBox] = new double[2];
+						mt.transform(coords[part], 0, transformed[partsInBBox], 0, 1);
+					} catch (Exception e) {
+						ShapefileRenderer.LOGGER
+								.severe("could not transform coordinates "
+										+ e.getLocalizedMessage());
+						transformed[partsInBBox]=coords[part];
+					}
+				} else
+				{
+					transformed[partsInBBox] = new double[2];
+					System.arraycopy(coords[part], 0, transformed[partsInBBox], 0, 1);
+				}
+				if( !screenMap.get((int)transformed[partsInBBox][0], (int)transformed[partsInBBox][1]))
+					partsInBBox++;
 			}
-        Envelope geomBBox = new Envelope(tmpbbox[0], tmpbbox[2], tmpbbox[1], tmpbbox[3]);
-
-        if (!bbox.intersects(geomBBox)) {
-            skipMultiPointGeom(buffer, dimensions);
-            return null;
-        }
-
-        int numpoints = buffer.getInt();
-        double[][] coords = new double[numpoints][];
-        for( int t = 0; t < numpoints; t++ ) {
-            coords[t] = new double[]{buffer.getDouble(), buffer.getDouble()};
-            if( !mt.isIdentity() ){
-	            try {
-	                mt.transform(coords[t], 0, coords[t], 0, coords[t].length/2);
-	            } catch (Exception e) {
-	                ShapefileRenderer.LOGGER.severe("could not transform coordinates"
-	                        + e.getLocalizedMessage());
-	            }
-            }
-        }
-        if (type == ShapeType.MULTIPOINTZ) {
-            buffer.position(buffer.position() + 2 * 8 + numpoints * 8);
-        }
-
-        return new SimpleGeometry(type, coords, geomBBox);
-    }
-
-    private void skipMultiPointGeom( ByteBuffer buffer, int dimensions ) {
-
-        int numpoints = buffer.getInt();
-        // skip x y
-        buffer.position(buffer.position() + numpoints * 16);
-        // skip z
-        if (dimensions == 3)
-            buffer.position(buffer.position() + numpoints * 8);
-    }
+			if( partsInBBox==0 )
+				return null;
+			if( partsInBBox!=numParts ){
+				double[][] tmp=new double[partsInBBox][];
+				System.arraycopy(transformed, 0, tmp, 0, partsInBBox);
+				transformed=tmp;
+			}
+		}
+		return new SimpleGeometry(type, transformed, geomBBox);
+	}
 
 	/**
 	 * @see org.geotools.data.shapefile.shp.ShapeHandler#write(java.nio.ByteBuffer, java.lang.Object)

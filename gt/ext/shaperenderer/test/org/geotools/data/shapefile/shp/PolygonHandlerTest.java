@@ -85,8 +85,7 @@ public class PolygonHandlerTest extends TestCase {
 //		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform mt= CRS.transform(crs, DefaultGeographicCRS.WGS84);
-		ShapefileRenderer renderer=new ShapefileRenderer(null);
-		AffineTransform at=renderer.worldToScreenTransform(env,new Rectangle(300,300));
+		AffineTransform at=ShapefileRenderer.worldToScreenTransform(env,new Rectangle(300,300));
 		mt = FactoryFinder.getMathTransformFactory(null)
 		.createConcatenatedTransform(mt, FactoryFinder.getMathTransformFactory(null)
 				.createAffineTransform(new GeneralMatrix(at)));

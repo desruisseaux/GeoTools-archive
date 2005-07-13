@@ -48,7 +48,6 @@ public class GeometryHandlerUtilities {
 		return geomBBox;
 	}
 	public static void transform(ShapeType type, MathTransform mt, double[] src, double[] dest ) throws TransformException{
-		int numCoords=dest.length/2;
 		
 		boolean startPointTransformed=true;
 		for( int i=0; i<dest.length; i+=2){

@@ -54,6 +54,7 @@ public class MultiPointHandlerTest extends TestCase {
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
 		reader.setHandler(new MultiPointHandler(reader.getHeader().getShapeType(), env, mt));
+		ds.getSchema();
 //		Object shape=reader.nextRecord().shape();
 //		assertNotNull( shape );
 //		assertTrue( shape instanceof Geometry);

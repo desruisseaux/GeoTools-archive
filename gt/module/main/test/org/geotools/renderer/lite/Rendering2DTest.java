@@ -269,7 +269,7 @@ public class Rendering2DTest extends TestCase {
 
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
-        LiteRenderer2 renderer = new LiteRenderer2(map);
+        LiteRenderer renderer = new LiteRenderer(map);
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
                 .getMaxY() + 20);
@@ -305,7 +305,7 @@ public class Rendering2DTest extends TestCase {
 
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
-        LiteRenderer2 renderer = new LiteRenderer2(map);
+        LiteRenderer renderer = new LiteRenderer(map);
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
                 .getMaxY() + 20);
@@ -353,7 +353,7 @@ public class Rendering2DTest extends TestCase {
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        LiteRenderer2 renderer = new LiteRenderer2(map);
+        LiteRenderer renderer = new LiteRenderer(map);
         CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
@@ -397,7 +397,7 @@ public class Rendering2DTest extends TestCase {
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        LiteRenderer2 renderer = new LiteRenderer2(map);
+        LiteRenderer renderer = new LiteRenderer(map);
         CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
@@ -442,7 +442,7 @@ public class Rendering2DTest extends TestCase {
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        LiteRenderer2 renderer = new LiteRenderer2(map);
+        LiteRenderer renderer = new LiteRenderer(map);
         
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
@@ -492,7 +492,7 @@ public class Rendering2DTest extends TestCase {
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        LiteRenderer2 renderer = new LiteRenderer2(map);
+        LiteRenderer renderer = new LiteRenderer(map);
         CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
@@ -551,7 +551,7 @@ public class Rendering2DTest extends TestCase {
         layerQuery = new DefaultQuery("querytest", filter, 2, null, "handle");
         layer.setQuery(layerQuery);
 
-        results = renderer.queryLayer(layer, envelope);
+        results = renderer.queryLayer(layer, envelope, DefaultGeographicCRS.WGS84);
         assertEquals(2, results.getCount());
         // just the 3 geometric atts should get be loaded
         assertEquals(3, results.getSchema().getAttributeCount());
@@ -572,7 +572,7 @@ public class Rendering2DTest extends TestCase {
                 "handle");
         layer.setQuery(layerQuery);
 
-        results = renderer.queryLayer(layer, envelope);
+        results = renderer.queryLayer(layer, envelope, DefaultGeographicCRS.WGS84);
         assertEquals(1, results.getCount());
         // the 4 atts should be loaded since the definition query includes "id"
         assertEquals(4, results.getSchema().getAttributeCount());
@@ -608,7 +608,7 @@ public class Rendering2DTest extends TestCase {
         layerQuery = new DefaultQuery("querytest", filter, Integer.MAX_VALUE, null, "handle");
         layer.setQuery(layerQuery);
 
-        results = renderer.queryLayer(layer, envelope);
+        results = renderer.queryLayer(layer, envelope, DefaultGeographicCRS.WGS84);
         assertEquals(2, results.getCount());
         // the 4 atts should be loaded since the definition query includes "id"
         assertEquals(3, results.getSchema().getAttributeCount());
@@ -676,8 +676,8 @@ public class Rendering2DTest extends TestCase {
      * @param bounds
      */
     private static void render( Object obj, Graphics g, Rectangle rect, Envelope bounds ) {
-        if (obj instanceof LiteRenderer2) {
-            LiteRenderer2 renderer = (LiteRenderer2) obj;
+        if (obj instanceof LiteRenderer) {
+            LiteRenderer renderer = (LiteRenderer) obj;
             if (bounds == null)
                 renderer.paint((Graphics2D) g, rect, new AffineTransform());
             else
@@ -879,7 +879,7 @@ public class Rendering2DTest extends TestCase {
     	DefaultProjectedCRS crs  = (DefaultProjectedCRS) parser.parseObject(wkt);
 
     	
-    	double s = LiteRenderer2.calculateScale( envelope, crs,
+    	double s = LiteRenderer.calculateScale( envelope, crs,
     			       655, 368, 90.0) ;
     	
     	assertTrue( Math.abs(102355-s) < 10 ); //102355.1639202933

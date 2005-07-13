@@ -16,11 +16,13 @@
  */
 package org.geotools.renderer.shape;
 
+import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
 import org.geotools.data.shapefile.shp.ShapeHandler;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -34,6 +36,7 @@ public class PointHandler implements ShapeHandler {
 	private ShapeType type;
 	private Envelope bbox;
 	private MathTransform mt;
+	private ScreenMap screenMap;
 
 	/**
 	 * Create new instance
@@ -41,10 +44,21 @@ public class PointHandler implements ShapeHandler {
 	 * @param env the area that is visible.  If shape is not in area then skip.
 	 * @param mt the transform to go from data to the envelope (and that should be used to transform the shape coords)
 	 */
-	public PointHandler(ShapeType type, Envelope env, MathTransform mt) {
+	public PointHandler(ShapeType type, Envelope env, MathTransform mt) 
+	throws TransformException {
 		this.type=type;
 		this.bbox=env;
 		this.mt=mt;
+		if( mt!=null ){
+			double[] worldSize=new double[]{
+					env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY()
+			};
+			double[] screenSize=new double[4];
+			mt.transform(worldSize, 0, screenSize, 0, 2);
+			int width=(int) (screenSize[1]-screenSize[0]);
+			int height=-1*(int) (screenSize[3]-screenSize[2]);
+			screenMap=new ScreenMap(width+1,height+1);
+		}
 	}
 	
 	/**
@@ -64,29 +78,28 @@ public class PointHandler implements ShapeHandler {
 
         double[][] coords = new double[1][];
         coords[0] = new double[]{buffer.getDouble(),buffer.getDouble()};
-        double z = Double.NaN;
+        double[][] transformed=new double[1][];
+        transformed[0]=new double[2];
         Envelope geomBBox = new Envelope(coords[0][0], coords[0][0], coords[0][1], coords[0][1]);
         if( !mt.isIdentity() ){
             try {
-                mt.transform(coords[0], 0, coords[0], 0, coords[0].length/2);
+                mt.transform(coords[0], 0, transformed[0], 0, 1);
             } catch (Exception e) {
                 ShapefileRenderer.LOGGER.severe("could not transform coordinates"
                         + e.getLocalizedMessage());
             }
+        }else{
+        	transformed=coords;
         }
-
-        if (type == ShapeType.POINTM) {
-            buffer.getDouble();
-        }
-
-        if (type == ShapeType.POINTZ) {
-            buffer.getDouble();
-        }
-
+        
         if( !bbox.intersects(geomBBox) )
             return null;
-        
-        return new SimpleGeometry(type, coords, geomBBox);
+
+        if( screenMap.get((int)(transformed[0][0]), (int)transformed[0][1]) ){
+        	return null;
+        }
+        screenMap.set( (int)(transformed[0][0]), (int)(transformed[0][1]), true);
+        return new SimpleGeometry(type, transformed, geomBBox);
 	}
 
 	/**
@@ -104,6 +117,5 @@ public class PointHandler implements ShapeHandler {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
 
 }

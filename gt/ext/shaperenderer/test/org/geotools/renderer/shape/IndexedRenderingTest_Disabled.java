@@ -21,9 +21,10 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.data.shape.ShapeFileIndexer;
+import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
+import org.geotools.data.shapefile.indexed.ShapeFileIndexer;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
@@ -34,6 +35,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class IndexedRenderingTest_Disabled extends TestCase {
 	private static final boolean INTERACTIVE = false;
+	private Lock lock=new Lock();
 
 	protected void tearDown() {
 		try {
@@ -58,7 +60,7 @@ public class IndexedRenderingTest_Disabled extends TestCase {
 		ShapeFileIndexer indexer=new ShapeFileIndexer();
 		indexer.setIdxType(ShapeFileIndexer.QUADTREE);
 		indexer.setShapeFileName(TestData.file(IndexedRenderingTest_Disabled.class, "lakes.shp").getPath());
-		indexer.index(true);
+		indexer.index(true, lock);
 		
 		performRenderTest(IndexInfo.QUAD_TREE, 
 				TestUtilites.getDataStore("lakes.shp").getFeatureSource(),
@@ -71,7 +73,7 @@ public class IndexedRenderingTest_Disabled extends TestCase {
 
 		
 		indexer.setShapeFileName(TestData.file(IndexedRenderingTest_Disabled.class, "streams.shp").getPath());
-		indexer.index(true);
+		indexer.index(true, lock);
 		
 		performRenderTest(IndexInfo.QUAD_TREE, 
 				TestUtilites.getDataStore("streams.shp").getFeatureSource(),
@@ -118,7 +120,7 @@ public class IndexedRenderingTest_Disabled extends TestCase {
 		ShapeFileIndexer indexer=new ShapeFileIndexer();
 		indexer.setIdxType(ShapeFileIndexer.RTREE);
 		indexer.setShapeFileName(file);
-		indexer.index(true);
+		indexer.index(true, lock);
 		
 		performRenderTest(IndexInfo.R_TREE, 
 				TestUtilites.getDataStore("lakes.shp").getFeatureSource(),
@@ -131,7 +133,7 @@ public class IndexedRenderingTest_Disabled extends TestCase {
         		93);
 		
 		indexer.setShapeFileName(TestData.file(IndexedRenderingTest_Disabled.class, "streams.shp").getPath());
-		indexer.index(true);
+		indexer.index(true, lock);
 		
 		performRenderTest(IndexInfo.R_TREE, 
 				TestUtilites.getDataStore("streams.shp").getFeatureSource(),

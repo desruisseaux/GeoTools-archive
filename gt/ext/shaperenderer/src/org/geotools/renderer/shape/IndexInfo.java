@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.shape.shp.IndexFile;
+import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;

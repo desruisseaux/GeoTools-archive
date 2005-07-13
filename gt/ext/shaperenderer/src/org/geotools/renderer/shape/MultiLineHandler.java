@@ -25,7 +25,6 @@ import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 /**
  * Creates Geometry line objects for use by the ShapeRenderer.
@@ -43,8 +42,6 @@ public class MultiLineHandler implements ShapeHandler {
 
 	private MathTransform mt;
 	
-	private static final GeometryFactory geomfac = new GeometryFactory();
-
 	/**
 	 * Create new instance
 	 * 
@@ -89,13 +86,12 @@ public class MultiLineHandler implements ShapeHandler {
 			return null;
 		}
 
-		int dimensions = (type == ShapeType.ARCZ) ? 3 : 2;
 		// read bounding box
 		Envelope geomBBox = GeometryHandlerUtilities.readBounds(buffer);
 
-//		if (!bbox.intersects(geomBBox)) {
-//			return null;
-//		}
+		if (!bbox.intersects(geomBBox)) {
+			return null;
+		}
 
 		boolean bboxdecimate = geomBBox.getWidth() <= spanx
 				&& geomBBox.getHeight() <= spany;
@@ -109,7 +105,7 @@ public class MultiLineHandler implements ShapeHandler {
 		}
 		double[][] coords= new double[numParts][];
 		double[][] transformed = new double[numParts][];
-		LineString string;
+
 		int finish, start = 0;
 		int length = 0;
 		

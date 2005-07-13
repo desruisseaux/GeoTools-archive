@@ -38,6 +38,11 @@
 			<version>2.2.x</version>
 		</dependency>
 		<dependency>
+			<artifactId>shapefile</artifactId>
+			<groupId>gt2</groupId>
+			<version>2.2.x</version>
+		</dependency>
+		<dependency>
 		      <id>jdom</id>
 		      <version>1.0b10</version>
 		      <url>http://www.jdom.org/</url>
