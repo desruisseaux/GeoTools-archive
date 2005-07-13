@@ -6,9 +6,12 @@ import java.io.IOException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.Transaction;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public class PropertyFeatureWriter implements FeatureWriter {
     PropertyDataStore store;
@@ -97,10 +100,15 @@ public class PropertyFeatureWriter implements FeatureWriter {
         else {
             writeImplementation( live );
             if( origional != null){
-                store.fireChanged( origional, live );                                
+            	Envelope bounds = new Envelope();
+                bounds.expandToInclude(live.getBounds());
+                bounds.expandToInclude(origional.getBounds());
+                store.listenerManager.fireFeaturesChanged(live.getFeatureType().getTypeName(), Transaction.AUTO_COMMIT,
+                    bounds, false);                               
             }
             else {
-                store.fireAdded( live );
+                store.listenerManager.fireFeaturesAdded(live.getFeatureType().getTypeName(), Transaction.AUTO_COMMIT,
+                    live.getBounds(), false);
             }            
         }
         origional = null;
@@ -111,7 +119,8 @@ public class PropertyFeatureWriter implements FeatureWriter {
             throw new IOException( "No current feature to remove");
         }
         if( origional != null ){
-            store.fireRemoved( origional );
+            store.listenerManager.fireFeaturesRemoved(live.getFeatureType().getTypeName(), Transaction.AUTO_COMMIT,
+                    origional.getBounds(), false);
         }                     
         origional = null; 
         live = null; // prevent live and remove from being written out       
