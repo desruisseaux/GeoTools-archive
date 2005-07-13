@@ -67,23 +67,21 @@ public class WorldImageReaderTest extends TestCase {
 
         for (int i = 0; i < fileList.length; i++) {
             //url
-            url = TestData.getResource(this,fileList[i]);
+            url = TestData.getResource(this, fileList[i]);
+            this.read(url);
 
             //file
-            file = TestData.file(this,fileList[i]);
+            file = TestData.file(this, fileList[i]);
+            this.read(file);
 
             //inputstream
-            in = new FileInputStream(TestData.file(this,fileList[i]));
+            in = new FileInputStream(TestData.file(this, fileList[i]));
             this.read(in);
         }
 
-        //checking an http link
-        url = new URL("http://www.sun.com/im/homepage-powered_by_sun.gif");
-        this.read(url);
-
-        in = new URL("http://www.sun.com/im/homepage-powered_by_sun.gif")
-            .openStream();
-        this.read(in);
+        //checking a WMS get map
+//                url = new URL("http://localhost:8080/geoserver/wms?bbox=8.284,39.347,17.221,46.43&styles=raster&Format=image/png&request=GetMap&layers=OCP_BACKSCATT_MODIS_ACQUA_20050621&width=800&height=600&srs=EPSG:4326");
+//                this.read(url);
     }
 
     /**
@@ -108,6 +106,9 @@ public class WorldImageReaderTest extends TestCase {
         assertNotNull(coverage);
         assertNotNull(((GridCoverage2D) coverage).getRenderedImage());
         assertNotNull(coverage.getEnvelope());
+
+        System.out.println(((GridCoverage2D) coverage).getCoordinateReferenceSystem()
+                            .toWKT());
 
         JFrame frame = new JFrame();
         JLabel label = new JLabel(new ImageIcon(
