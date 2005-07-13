@@ -38,7 +38,7 @@ import org.geotools.data.DataStoreFactorySpi.Param;
  */
 public class JDBCDataStoreFactoryTest extends TestCase {
     static JDBCDataStoreFactory factory
-        = new JDBCDataStoreFactory();
+        = new JDBCDataStoreFactory(null);
     
     Map local;
     /*

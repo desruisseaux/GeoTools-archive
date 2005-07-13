@@ -222,17 +222,17 @@ public class CollectionDataStore extends AbstractDataStore {
 
             switch (tce.getEventType()) {
             case CollectionEvent.FEATURES_ADDED:
-                listenerManager.fireFeaturesAdded(typeName, Transaction.AUTO_COMMIT, bounds);
+                listenerManager.fireFeaturesAdded(typeName, Transaction.AUTO_COMMIT, bounds, false);
 
                 break;
 
             case CollectionEvent.FEATURES_CHANGED:
-                listenerManager.fireFeaturesChanged(typeName, Transaction.AUTO_COMMIT, bounds);
+                listenerManager.fireFeaturesChanged(typeName, Transaction.AUTO_COMMIT, bounds, false);
 
                 break;
 
             case CollectionEvent.FEATURES_REMOVED:
-                listenerManager.fireFeaturesRemoved(typeName, Transaction.AUTO_COMMIT, bounds);
+                listenerManager.fireFeaturesRemoved(typeName, Transaction.AUTO_COMMIT, bounds, false);
 
                 break;
             }

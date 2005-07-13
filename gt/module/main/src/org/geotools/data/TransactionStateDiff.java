@@ -190,7 +190,7 @@ public class TransactionStateDiff implements State {
 
                         // notify
                         store.listenerManager.fireFeaturesRemoved(typeName,
-                            transaction, feature.getBounds());
+                            transaction, feature.getBounds(), true);
                     } else {
                         try {
                             feature.setAttributes(update.getAttributes(null));
@@ -201,7 +201,7 @@ public class TransactionStateDiff implements State {
                             bounds.expandToInclude(feature.getBounds());
                             bounds.expandToInclude(update.getBounds());
                             store.listenerManager.fireFeaturesChanged(typeName,
-                                transaction, bounds);
+                                transaction, bounds, true);
                         } catch (IllegalAttributeException e) {
                             throw new DataSourceException("Could update " + fid,
                                 e);
@@ -232,7 +232,7 @@ public class TransactionStateDiff implements State {
 
                             // notify                        
                             store.listenerManager.fireFeaturesAdded(typeName,
-                                transaction, nextFeature.getBounds());
+                                transaction, nextFeature.getBounds(), true);
                         } catch (IllegalAttributeException e) {
                             throw new DataSourceException("Could update " + fid,
                                 e);
@@ -309,19 +309,19 @@ public class TransactionStateDiff implements State {
                     switch (eventType) {
                     case FeatureEvent.FEATURES_ADDED:
                         store.listenerManager.fireFeaturesAdded(typeName,
-                            transaction, bounds);
+                            transaction, bounds, false);
 
                         break;
 
                     case FeatureEvent.FEATURES_CHANGED:
                         store.listenerManager.fireFeaturesChanged(typeName,
-                            transaction, bounds);
+                            transaction, bounds, false);
 
                         break;
 
                     case FeatureEvent.FEATURES_REMOVED:
                         store.listenerManager.fireFeaturesRemoved(typeName,
-                            transaction, bounds);
+                            transaction, bounds, false);
 
                         break;
                     }

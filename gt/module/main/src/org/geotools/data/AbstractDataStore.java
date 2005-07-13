@@ -143,21 +143,21 @@ public abstract class AbstractDataStore implements DataStore {
         return new InProcessLockingManager();
     }
 
-    public void fireAdded( Feature newFeature ){
-        String typeName = newFeature.getFeatureType().getTypeName();
-        listenerManager.fireFeaturesAdded( typeName, Transaction.AUTO_COMMIT, newFeature.getBounds() );
-    }
-    public void fireRemoved( Feature removedFeature ){
-        String typeName = removedFeature.getFeatureType().getTypeName();
-        listenerManager.fireFeaturesRemoved( typeName, Transaction.AUTO_COMMIT, removedFeature.getBounds() );
-    }
-    public void fireChanged( Feature before, Feature after ){
-        String typeName = after.getFeatureType().getTypeName();
-        Envelope bounds = new Envelope();
-        bounds.expandToInclude( before.getBounds() );
-        bounds.expandToInclude( after.getBounds() );
-        listenerManager.fireFeaturesChanged( typeName, Transaction.AUTO_COMMIT, bounds );
-    }
+//    public void fireAdded( Feature newFeature ){
+//        String typeName = newFeature.getFeatureType().getTypeName();
+//        listenerManager.fireFeaturesAdded( typeName, Transaction.AUTO_COMMIT, newFeature.getBounds(), false );
+//    }
+//    public void fireRemoved( Feature removedFeature ){
+//        String typeName = removedFeature.getFeatureType().getTypeName();
+//        listenerManager.fireFeaturesRemoved( typeName, Transaction.AUTO_COMMIT, removedFeature.getBounds(), false );
+//    }
+//    public void fireChanged( Feature before, Feature after ){
+//        String typeName = after.getFeatureType().getTypeName();
+//        Envelope bounds = new Envelope();
+//        bounds.expandToInclude( before.getBounds() );
+//        bounds.expandToInclude( after.getBounds() );
+//        listenerManager.fireFeaturesChanged( typeName, Transaction.AUTO_COMMIT, bounds, false );
+//    }
 
     /** List of TypeEntry entries - one for each featureType provided by this Datastore */
     public List entries() {

@@ -158,7 +158,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
                 queryData.deleteCurrentRow();
                 listenerManager.fireFeaturesRemoved(getFeatureType()
                                                         .getTypeName(),
-                    queryData.getTransaction(), bounds);
+                    queryData.getTransaction(), bounds, false);
             } catch (SQLException sqle) {
                 String message = "problem deleting row";
 
@@ -208,7 +208,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
                 bounds.expandToInclude(current.getBounds());
                 listenerManager.fireFeaturesChanged(getFeatureType()
                                                         .getTypeName(),
-                    queryData.getTransaction(), bounds);
+                    queryData.getTransaction(), bounds, false);
                 live = null;
                 current = null;
             }
@@ -222,7 +222,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
             }
 
             listenerManager.fireFeaturesAdded(getFeatureType().getTypeName(),
-                queryData.getTransaction(), current.getBounds());
+                queryData.getTransaction(), current.getBounds(), false);
             current = null;
         }
     }

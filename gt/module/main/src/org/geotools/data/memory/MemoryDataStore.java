@@ -422,7 +422,7 @@ public class MemoryDataStore extends AbstractDataStore {
                         // remove existing content
                         iterator.remove();
                         listenerManager.fireFeaturesRemoved(typeName, Transaction.AUTO_COMMIT,
-                            live.getBounds());
+                            live.getBounds(), false);
                         live = null;
                         current = null;
                     } else {
@@ -460,7 +460,7 @@ public class MemoryDataStore extends AbstractDataStore {
                             bounds.expandToInclude(live.getBounds());
                             bounds.expandToInclude(current.getBounds());
                             listenerManager.fireFeaturesChanged(typeName, Transaction.AUTO_COMMIT,
-                                bounds);
+                                bounds, false);
                             live = null;
                             current = null;
                         }
@@ -469,7 +469,7 @@ public class MemoryDataStore extends AbstractDataStore {
                         //
                         contents.put(current.getID(), current);
                         listenerManager.fireFeaturesAdded(typeName, Transaction.AUTO_COMMIT,
-                            current.getBounds());
+                            current.getBounds(), false);
                         current = null;
                     }
                 }
@@ -514,7 +514,7 @@ public class MemoryDataStore extends AbstractDataStore {
             int count = 1;
             Filter filter = query.getFilter();
             Feature first = (Feature) iterator.next();
-            envelope = first.getDefaultGeometry().getEnvelopeInternal();
+            envelope = new Envelope(first.getDefaultGeometry().getEnvelopeInternal());
 
             while (iterator.hasNext() && (count < query.getMaxFeatures())) {
                 Feature feature = (Feature) iterator.next();

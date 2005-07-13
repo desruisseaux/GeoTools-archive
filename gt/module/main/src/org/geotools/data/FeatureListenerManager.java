@@ -169,24 +169,11 @@ public class FeatureListenerManager {
      *        unknown)
      */
     public void fireFeaturesAdded(String typeName, Transaction transaction,
-        Envelope bounds) {
-        Map.Entry entry;
-        FeatureSource featureSource;
-        FeatureListener[] listeners;
-        FeatureEvent event;
-
-        for (Iterator i = getListeners(typeName, transaction).entrySet().iterator();
-                i.hasNext();) {
-            entry = (Map.Entry) i.next();
-            featureSource = (FeatureSource) entry.getKey();
-            listeners = (FeatureListener[]) entry.getValue();
-
-            event = new FeatureEvent(featureSource,
-                    FeatureEvent.FEATURES_ADDED, bounds);
-
-            for (int l = 0; l < listeners.length; l++) {
-                listeners[l].changed(event);
-            }
+        Envelope bounds, boolean commit) {
+        if (commit) {
+            fireCommit(typeName, transaction, FeatureEvent.FEATURES_ADDED, bounds );
+        } else {
+            fireEvent(typeName, transaction, FeatureEvent.FEATURES_ADDED, bounds );
         }
     }
 
@@ -220,25 +207,13 @@ public class FeatureListenerManager {
      *        unknown)
      */
     public void fireFeaturesChanged(String typeName, Transaction transaction,
-        Envelope bounds) {
-        Map.Entry entry;
-        FeatureSource featureSource;
-        FeatureListener[] listeners;
-        FeatureEvent event;
-
-        for (Iterator i = getListeners(typeName, transaction).entrySet().iterator();
-                i.hasNext();) {
-            entry = (Map.Entry) i.next();
-            featureSource = (FeatureSource) entry.getKey();
-            listeners = (FeatureListener[]) entry.getValue();
-
-            event = new FeatureEvent(featureSource,
-                    FeatureEvent.FEATURES_CHANGED, bounds);
-
-            for (int l = 0; l < listeners.length; l++) {
-                listeners[l].changed(event);
-            }
+        Envelope bounds, boolean commit) {
+        if (commit) {
+            fireCommit(typeName, transaction, FeatureEvent.FEATURES_CHANGED, bounds );
+        } else {
+            fireEvent(typeName, transaction, FeatureEvent.FEATURES_CHANGED, bounds );
         }
+
     }
 
     /**
@@ -274,32 +249,65 @@ public class FeatureListenerManager {
         FeatureSource featureSource;
         FeatureListener[] listeners;
         FeatureEvent event;
-
         if (commit) {
-            Map map = getListeners(typeName, Transaction.AUTO_COMMIT);
-
-            for (Iterator i = map.entrySet().iterator(); i.hasNext();) {
-                entry = (Map.Entry) i.next();
-                featureSource = (FeatureSource) entry.getKey();
-                listeners = (FeatureListener[]) entry.getValue();
-
-                if (hasTransaction(featureSource)
-                        && (getTransaction(featureSource) == transaction)) {
-                    continue; // skip notify members of the same transaction
-                }
-
-                event = new FeatureEvent(featureSource,
-                        FeatureEvent.FEATURES_CHANGED, null);
-
-                for (int l = 0; l < listeners.length; l++) {
-                    listeners[l].changed(event);
-                }
-            }
+            fireCommit(typeName, transaction, FeatureEvent.FEATURES_CHANGED, null );
         } else {
-            fireFeaturesChanged(typeName, transaction, null);
+            fireEvent(typeName, transaction, FeatureEvent.FEATURES_CHANGED, null );
         }
     }
 
+    /**
+     * TODO summary sentence for fireEvent ...
+     * 
+     * @param typeName
+     * @param transaction
+     */
+    private void fireCommit( String typeName, Transaction transaction, int type, Envelope bounds) {
+        Map.Entry entry;
+        FeatureSource featureSource;
+        FeatureListener[] listeners;
+        FeatureEvent event;
+        Map map = getListeners(typeName, Transaction.AUTO_COMMIT);
+
+        for (Iterator i = map.entrySet().iterator(); i.hasNext();) {
+            entry = (Map.Entry) i.next();
+            featureSource = (FeatureSource) entry.getKey();
+            listeners = (FeatureListener[]) entry.getValue();
+
+            if (hasTransaction(featureSource)
+                    && (getTransaction(featureSource) == transaction)) {
+                continue; // skip notify members of the same transaction
+            }
+
+            event = new FeatureEvent(featureSource,
+                    type, bounds);
+
+            for (int l = 0; l < listeners.length; l++) {
+                listeners[l].changed(event);
+            }
+        }
+    }
+
+    private void fireEvent( String typeName, Transaction transaction, int type, Envelope bounds) {
+        Map.Entry entry;
+        FeatureSource featureSource;
+        FeatureListener[] listeners;
+        FeatureEvent event;
+        Map map = getListeners(typeName, transaction);
+
+        for (Iterator i = map.entrySet().iterator(); i.hasNext();) {
+            entry = (Map.Entry) i.next();
+            featureSource = (FeatureSource) entry.getKey();
+            listeners = (FeatureListener[]) entry.getValue();
+
+            event = new FeatureEvent(featureSource,
+                    type, bounds);
+
+            for (int l = 0; l < listeners.length; l++) {
+                listeners[l].changed(event);
+            }
+        }
+    }
     /**
      * Notify all listeners that have registered interest for notification on
      * this event type.
@@ -328,24 +336,11 @@ public class FeatureListenerManager {
      *        unknown)
      */
     public void fireFeaturesRemoved(String typeName, Transaction transaction,
-        Envelope bounds) {
-        Map.Entry entry;
-        FeatureSource featureSource;
-        FeatureListener[] listeners;
-        FeatureEvent event;
-
-        for (Iterator i = getListeners(typeName, transaction).entrySet().iterator();
-                i.hasNext();) {
-            entry = (Map.Entry) i.next();
-            featureSource = (FeatureSource) entry.getKey();
-            listeners = (FeatureListener[]) entry.getValue();
-
-            event = new FeatureEvent(featureSource,
-                    FeatureEvent.FEATURES_REMOVED, bounds);
-
-            for (int l = 0; l < listeners.length; l++) {
-                listeners[l].changed(event);
-            }
+        Envelope bounds, boolean commit ) {
+        if (commit) {
+            fireCommit(typeName, transaction, FeatureEvent.FEATURES_REMOVED, bounds );
+        } else {
+            fireEvent(typeName, transaction, FeatureEvent.FEATURES_REMOVED, bounds );
         }
     }
 }

@@ -355,18 +355,18 @@ final class ActiveTypeEntry implements TypeEntry {
     }    
     public void fireAdded( Feature newFeature, Transaction transaction ){
         Envelope bounds = newFeature != null ? newFeature.getBounds() : null;
-        listenerManager.fireFeaturesAdded( schema.getTypeName(), transaction, bounds );
+        listenerManager.fireFeaturesAdded( schema.getTypeName(), transaction, bounds, false );
     }
     public void fireRemoved( Feature removedFeature, Transaction transaction ){
         Envelope bounds = removedFeature != null ? removedFeature.getBounds() : null;
-        listenerManager.fireFeaturesRemoved( schema.getTypeName(), transaction, bounds );
+        listenerManager.fireFeaturesRemoved( schema.getTypeName(), transaction, bounds, false );
     }
     public void fireChanged( Feature before, Feature after, Transaction transaction ){
         String typeName = after.getFeatureType().getTypeName();
         Envelope bounds = new Envelope();
         bounds.expandToInclude( before.getBounds() );
         bounds.expandToInclude( after.getBounds() );
-        listenerManager.fireFeaturesChanged( typeName, transaction, bounds );
+        listenerManager.fireFeaturesChanged( typeName, transaction, bounds, false );
     }    
     //
     // Start of Overrides

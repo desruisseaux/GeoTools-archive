@@ -155,7 +155,7 @@ public class TypeDiffState implements State {
                         writer.remove();
 
                         // notify
-                        entry.listenerManager.fireFeaturesChanged( entry.getTypeName(), transaction, feature.getBounds());
+                        entry.listenerManager.fireFeaturesChanged( entry.getTypeName(), transaction, feature.getBounds(), true);
                     } else {
                         try {
                             feature.setAttributes(update.getAttributes(null));
@@ -166,7 +166,7 @@ public class TypeDiffState implements State {
                             bounds.expandToInclude(feature.getBounds());
                             bounds.expandToInclude(update.getBounds());
                             entry.listenerManager.fireFeaturesChanged( entry.getTypeName(),
-                                transaction, bounds);
+                                transaction, bounds, true);
                         } catch (IllegalAttributeException e) {
                             throw new DataSourceException("Could update " + fid,
                                 e);
@@ -196,7 +196,7 @@ public class TypeDiffState implements State {
                             writer.write();
 
                             // notify                        
-                            entry.listenerManager.fireFeaturesAdded( entry.getTypeName(),transaction, nextFeature.getBounds());
+                            entry.listenerManager.fireFeaturesAdded( entry.getTypeName(),transaction, nextFeature.getBounds(), true);
                         } catch (IllegalAttributeException e) {
                             throw new DataSourceException("Could update " + fid,
                                 e);
@@ -258,19 +258,19 @@ public class TypeDiffState implements State {
                 switch (eventType) {
                 case FeatureEvent.FEATURES_ADDED:
                     entry.listenerManager.fireFeaturesAdded( entry.getTypeName(),
-                        transaction, bounds);
+                        transaction, bounds, false);
 
                     break;
 
                 case FeatureEvent.FEATURES_CHANGED:
                     entry.listenerManager.fireFeaturesChanged(entry.getTypeName(),
-                        transaction, bounds);
+                        transaction, bounds, false);
 
                     break;
 
                 case FeatureEvent.FEATURES_REMOVED:
                     entry.listenerManager.fireFeaturesRemoved(entry.getTypeName(),
-                        transaction, bounds);
+                        transaction, bounds, false);
 
                     break;
                 }
