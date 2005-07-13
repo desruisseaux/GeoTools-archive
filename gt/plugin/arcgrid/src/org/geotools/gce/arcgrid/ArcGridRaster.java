@@ -87,7 +87,7 @@ public class ArcGridRaster {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public ArcGridRaster(URL srcURL) throws IOException {
+    public ArcGridRaster(URL srcURL)  {
         this.srcURL = srcURL;
 
         if (srcURL.getFile().endsWith(".gz")) {
@@ -104,8 +104,7 @@ public class ArcGridRaster {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public ArcGridRaster(Reader reader, boolean compress)
-        throws IOException {
+    public ArcGridRaster(Reader reader, boolean compress) {
         this.reader = reader;
         this.compress = compress;
     }
@@ -118,7 +117,7 @@ public class ArcGridRaster {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public ArcGridRaster(PrintWriter writer) throws IOException {
+    public ArcGridRaster(PrintWriter writer){
         this.writer = writer;
     }
 
@@ -203,6 +202,12 @@ public class ArcGridRaster {
         parseHeader(new StreamTokenizer(openReader()));
     }
 
+    /**
+     * Parse the header of an ascii grid file.
+     * 
+     * @param st StringTokenizer to be used to parse this header. 
+     * @throws IOException
+     */
     protected void parseHeader(StreamTokenizer st) throws IOException {
         // make sure tokenizer is set up right
         st.resetSyntax();
@@ -269,7 +274,7 @@ public class ArcGridRaster {
     /**
      * Obtain the best reader for the situation
      *
-     * @return DOCUMENT ME!
+     * @return A reader to read this file.
      *
      * @throws IOException DOCUMENT ME!
      */
@@ -329,8 +334,8 @@ public class ArcGridRaster {
     }
 
     /**
-     * Returns the WritableRaster of the raster. The fucntion first parse the
-     * header then
+     * Returns the WritableRaster of the raster. This method first parses the
+     * header then reads all the data.
      *
      * @return RenderedImage
      *
@@ -589,12 +594,12 @@ public class ArcGridRaster {
             map = null;
         }
 
-        void fill() throws IOException {
+        void fill(){
             decoder.decode(map, chars, false);
             chars.flip();
         }
 
-        public int read() throws IOException {
+        public int read(){
             if (chars.remaining() == 0) {
                 chars.flip();
                 fill();
@@ -609,7 +614,7 @@ public class ArcGridRaster {
 
         public int read(char[] cbuf, int off, int len)
             throws IOException {
-            throw new RuntimeException("Expected single character read");
+            throw new IOException("Expected single character read");
         }
     }
 }

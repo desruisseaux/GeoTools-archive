@@ -44,8 +44,8 @@ import javax.units.Unit;
  * the data.
  *
  * @author jeichar
- * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini
- *         (simboss)</a>
+ * @author Simone Giannecchini 
+ *  
  */
 public class ArcGridReader implements GridCoverageReader {
     /** Source object to read from. */
@@ -56,10 +56,12 @@ public class ArcGridReader implements GridCoverageReader {
 
     /** Format of the source to read from. */
     private Format format = new ArcGridFormat();
+    
+    /** Exchange object to be used to read the file.*/
     private IOExchange mExchange = IOExchange.getIOExchange();
 
     /** Default color ramp */
-    private Color[] demColors = new Color[] { Color.BLUE, Color.WHITE, Color.RED };
+    private Color[] demColors = new Color[] { Color.BLUE, Color.GREEN, Color.RED };
 
     /** The coordinate system associated to the returned GridCoverage. */
     private CoordinateReferenceSystem coordinateSystem = null;
@@ -70,7 +72,7 @@ public class ArcGridReader implements GridCoverageReader {
     /** The raster read from the data file. */
     private ArcGridRaster arcGridRaster = null;
 
-    /** A name for the grid coverage. */
+    /** A name for the grid coverage (this is a default name). */
     private String name = "ArcGrid";
 
     /**
@@ -101,18 +103,40 @@ public class ArcGridReader implements GridCoverageReader {
 
         if (aSource instanceof String) {
             pathname = (new File((String) aSource)).getName();
+            name=pathname;
         }
 
         if (aSource instanceof File) {
             pathname = ((File) aSource).getName();
+            name=pathname;
         }
 
         if (aSource instanceof URL) {
             URL url = (URL) aSource;
-
             pathname = url.getFile();
+            name=pathname;
         }
-
+        //setting the name if possible
+        int lastSeparatorIndex=name.lastIndexOf("\\");
+        if(lastSeparatorIndex!=-1){
+        	name=name.substring(lastSeparatorIndex);
+        	final int lastDotIndex=name.lastIndexOf(".");
+        	if(lastDotIndex!=-1){
+        		name=name.substring(lastDotIndex);
+        	}
+        }
+        else
+        {
+        	lastSeparatorIndex=name.lastIndexOf("/");
+            if(lastSeparatorIndex!=-1){
+            	name=name.substring(lastSeparatorIndex+1);
+            	final int lastDotIndex=name.lastIndexOf(".");
+            	if(lastDotIndex!=-1){
+            		name=name.substring(0,lastDotIndex);
+            	}
+            }
+        }
+        
         try {
             fakeReader = mExchange.getGZIPReader(mSource);
 
@@ -342,13 +366,20 @@ public class ArcGridReader implements GridCoverageReader {
      */
     private GridCoverage getGridCoverage() throws java.io.IOException {
         if ((gridCoverage == null) || (gridCoverage.get() == null)) {
-            gridCoverage = new java.lang.ref.SoftReference(createCoverage());
+            gridCoverage = new java.lang.ref.SoftReference(createCoverage(this.getColors()));
         }
 
         return (GridCoverage) gridCoverage.get();
     }
 
-    private GridCoverage createCoverage() throws java.io.IOException {
+    /**
+     * This method creates the GridCoverage2D from the underlying file.
+     * 
+     * @param colors Color ramp to be used for this coverage.
+     * @return
+     * @throws java.io.IOException
+     */
+    private GridCoverage createCoverage(Color [] colors) throws java.io.IOException {
         java.awt.image.WritableRaster raster = null;
 
         //  reading the raster of data from the specified source
@@ -372,17 +403,19 @@ public class ArcGridReader implements GridCoverageReader {
                     .getCellSize())
                 });
 
+        //setting the coordinate reference system for the envelope
         envelope.setCoordinateReferenceSystem(coordinateSystem);
 
         try {
-
+        	/**
+        	 * Creating the GridCoverage2D with all its components.
+        	 */
             Unit uom = null;
 
-   
-            Category values;
-            Category nan;
+            final Category values;
+            final Category nan;
             values = new Category("values",
-                    new Color[] { Color.BLUE, Color.GREEN, Color.RED },
+            		colors,
                     new NumberRange(1, 255),
                     new NumberRange((float) arcGridRaster.getMinValue(),
                         (float) arcGridRaster.getMaxValue()));

@@ -47,8 +47,7 @@ import java.net.URL;
  * with the IOExchange
  *
  * @author jeichar
- * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini
- *         (simboss)</a>
+ * @author simone giannecchini
  */
 public class ArcGridWriter implements GridCoverageWriter {
     /** Small number for comparaisons. */
@@ -288,8 +287,7 @@ public class ArcGridWriter implements GridCoverageWriter {
 	 * @throws org.opengis.referencing.NoSuchAuthorityCodeException
 	 */
     private void writeCRSInfo(CoordinateReferenceSystem crs)
-        throws IOException, 
-            org.opengis.referencing.NoSuchAuthorityCodeException {
+        throws IOException{
         //is it null?
         if (crs == null) {
             //default gcs wgs84

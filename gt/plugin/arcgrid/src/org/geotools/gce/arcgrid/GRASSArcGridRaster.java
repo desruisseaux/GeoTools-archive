@@ -228,11 +228,10 @@ public class GRASSArcGridRaster extends ArcGridRaster {
 
             if ((st.ttype == '*') || st.sval.equalsIgnoreCase(NO_DATA_MARKER)) {
                 st.nextToken();
-
                 return Double.NaN;
-            } else {
-                throw new IOException("Unknown token " + st.ttype);
-            }
+            } 
+            throw new IOException("Unknown token " + st.ttype);
+
         }
 
         // read another. May be an exponent of this number.
