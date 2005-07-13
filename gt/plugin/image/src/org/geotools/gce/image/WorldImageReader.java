@@ -370,7 +370,8 @@ public class WorldImageReader implements GridCoverageReader {
                         this.coverageName = kvp[1].replaceAll(",", "_");
                     }
                 }
-                //readuig the image
+                
+                //reading the image
                 readSourceImage();
             } catch (Exception e) {
                 //TODO how to handle this?
