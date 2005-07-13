@@ -23,6 +23,7 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
@@ -38,8 +39,11 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -128,7 +132,7 @@ public class WorldImageWriter implements GridCoverageWriter {
      *
      * @throws IllegalArgumentException DOCUMENT ME!
      * @throws IOException DOCUMENT ME!
-     * @see org.geotools.data.coverage.grid.GridCoverageWriter#write(org.geotools.gc.GridCoverage, org.opengis.parameter.GeneralParameterValue[])
+     * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.geotools.gc.GridCoverage, org.opengis.parameter.GeneralParameterValue[])
      */
     public void write(GridCoverage coverage, GeneralParameterValue[] parameters)
         throws IllegalArgumentException, IOException {
@@ -146,58 +150,43 @@ public class WorldImageWriter implements GridCoverageWriter {
         if (this.destination instanceof String) {
             destination = new File((String) destination);
         } else if (this.destination instanceof URL) {
-            destination = new File(((URL) destination).getPath());
+        	if(((URL)destination).getProtocol().equalsIgnoreCase("file"))
+        		destination = new File(((URL) destination).getPath());
+        	else
+        		throw new IOException("WorldImageWriter::write:It is not possible writing to an URL!");
         } else
         //OUTPUT STREAM HANDLING
-        if (destination instanceof OutputStream) {
-            this.encode((GridCoverage2D) coverage, (OutputStream) destination);
-        }
+	    if (destination instanceof OutputStream) {
+	    	this.encode((GridCoverage2D) coverage, (OutputStream) destination);
+	    }
 
+        /**
+         * 
+         * WorldFile and projection file.
+         * 
+         */
         if (destination instanceof File) {
-            //WRITING TO A FILE
-            RenderedImage image = ((PlanarImage) ((GridCoverage2D) coverage)
-                .getRenderedImage());
-            Envelope env = coverage.getEnvelope();
-            double xMin = env.getMinimum(0);
-            double yMin = env.getMinimum(1);
-            double xMax = env.getMaximum(0);
-            double yMax = env.getMaximum(1);
-
-            double xPixelSize = (xMax - xMin) / image.getWidth();
-            double rotation1 = 0;
-            double rotation2 = 0;
-            double yPixelSize = (yMax - yMin) / image.getHeight();
-            double xLoc = xMin;
-            double yLoc = yMax;
-            image = null;
-
             //files destinations
             File imageFile = (File) destination;
             String path = imageFile.getAbsolutePath();
             int index = path.lastIndexOf(".");
             String baseFile = path.substring(0, index);
-            File worldFile = new File(baseFile
-                    + WorldImageFormat.getWorldExtension(
-                        format.getWriteParameters().parameter("format")
-                              .stringValue()));
-
-            //create new files
+            
+            //envelope and image
+            RenderedImage image = ((PlanarImage) ((GridCoverage2D) coverage)
+                    .getRenderedImage());
+            
+            //world file
+            createWorldFile(coverage.getEnvelope(),image,baseFile);
+            
+            //projection file
+            createProjectionFile(baseFile,coverage.getCoordinateReferenceSystem());
+            
+            //create new file for the image
             imageFile = new File(baseFile + "."
                     + format.getWriteParameters().parameter("format")
                             .stringValue());
             imageFile.createNewFile();
-            worldFile.createNewFile();
-
-            //writing world file
-            PrintWriter out = new PrintWriter(new FileOutputStream(worldFile));
-
-            out.println(xPixelSize);
-            out.println(rotation1);
-            out.println(rotation2);
-            out.println("-" + yPixelSize);
-            out.println(xLoc);
-            out.println(yLoc);
-            out.close();
 
             BufferedOutputStream outBuf = new BufferedOutputStream(new FileOutputStream(
                         imageFile));
@@ -205,12 +194,72 @@ public class WorldImageWriter implements GridCoverageWriter {
             this.encode((GridCoverage2D) coverage, outBuf);
         }
     }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageWriter#dispose()
+    
+    /**
+     * This method is responsible for creating a projection file using the WKT representation
+     * of this coverage's coordinate reference system. We can reuse this file in order to
+     * rebuild later the crs.
+     * 
+     *  
+     * @param baseFile
+     * @param coordinateReferenceSystem
+     * @throws IOException
      */
+    private void createProjectionFile(final String baseFile, final CoordinateReferenceSystem coordinateReferenceSystem) throws IOException {
+    	final File prjFile = new File(baseFile
+                + ".prj");
+    	BufferedWriter out= new BufferedWriter(new FileWriter(prjFile));
+    	out.write(coordinateReferenceSystem.toWKT());
+    	out.close();
+    	
+		
+	}
 
     /**
+     * This method is responsible fro creating a world file to georeference an image
+     * given the image bounding box and the image geometry. The name of the file is composed
+     * by the name of the image file with a proper extension, depending on the format (see WorldImageFormat).
+     * The projection is in the world file.
+     * 
+     * @param env Envelope of this image.
+     * @param image Image to be used.
+     * @param baseFile Basename and path for this image.
+     * @throws IOException In case we cannot create the world file.
+     */
+	private void createWorldFile(final Envelope env,final RenderedImage image,final String baseFile) throws IOException {
+    	 final File worldFile = new File(baseFile
+                 + WorldImageFormat.getWorldExtension(
+                     format.getWriteParameters().parameter("format")
+                           .stringValue()));
+    	 final double xMin = env.getMinimum(0);
+    	 final double yMin = env.getMinimum(1);
+    	 final double xMax = env.getMaximum(0);
+    	 final double yMax = env.getMaximum(1);
+
+    	 final double xPixelSize = (xMax - xMin) / image.getWidth();
+    	 final double rotation1 = 0;
+    	 final double rotation2 = 0;
+    	 final double yPixelSize = (yMax - yMin) / image.getHeight();
+    	 final double xLoc = xMin;
+    	 final double yLoc = yMax;
+    	 
+         //create new files
+         worldFile.createNewFile();
+
+         //writing world file
+         final PrintWriter out = new PrintWriter(new FileOutputStream(worldFile));
+         out.println(xPixelSize);
+         out.println(rotation1);
+         out.println(rotation2);
+         out.println("-" + yPixelSize);
+         out.println(xLoc);
+         out.println(yLoc);
+         out.close();
+		
+	}
+
+
+	/**
      * Cleans up the writer. Currently does nothing.
      *
      * @throws IOException DOCUMENT ME!

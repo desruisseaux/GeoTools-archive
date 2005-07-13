@@ -16,7 +16,6 @@
  */
 package org.geotools.gce.image;
 
-import com.sun.media.imageio.stream.FileChannelImageInputStream;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
@@ -58,6 +57,7 @@ import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
+import com.sun.media.imageio.stream.FileChannelImageInputStream;
 
 
 /**
