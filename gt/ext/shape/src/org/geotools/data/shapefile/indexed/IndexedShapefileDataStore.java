@@ -1600,7 +1600,31 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                  *      during shp record writes
                  */
                 try {
-                    buildRTree();
+                	if( treeType==TREE_GRX){
+                		buildRTree();
+                		String filename = shpURL.getFile().substring(0, shpURL.getFile().length() - 4);
+                		File file=new File(filename+".qix");
+                		if(file.exists()){
+                			file.delete();
+                		}
+                	}else if( treeType==TREE_QIX){
+                		buildQuadTree();
+                		String filename = shpURL.getFile().substring(0, shpURL.getFile().length() - 4);
+                		File file=new File(filename+".grx");
+                		if(file.exists()){
+                			file.delete();
+                		}
+                	}else{
+                		String filename = shpURL.getFile().substring(0, shpURL.getFile().length() - 4);
+                		File file=new File(filename+".qix");
+                		if(file.exists()){
+                			file.delete();
+                		}
+                		file=new File(filename+".grx");
+                		if(file.exists()){
+                			file.delete();
+                		}
+                	}
                 } catch (TreeException e) {
                     LOGGER.log(Level.WARNING, "Error creating RTree", e);
                 }
