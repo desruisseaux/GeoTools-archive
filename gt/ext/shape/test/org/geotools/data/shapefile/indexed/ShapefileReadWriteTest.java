@@ -7,6 +7,8 @@
 package org.geotools.data.shapefile.indexed;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 
@@ -79,11 +81,18 @@ public void fail(String message, Throwable cause ) throws Throwable {
     String typeName = s.getTypeNames()[0];
     FeatureSource source = s.getFeatureSource( typeName );
     FeatureType type = source.getSchema();
-    FeatureResults one = source.getFeatures();
+    FeatureCollection one = source.getFeatures();
     File tmp = getTempFile();
     
     IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();    
-    s = (IndexedShapefileDataStore) maker.createDataStore( tmp.toURL() );    
+    test(type, one, tmp, maker, true);
+    test(type, one, tmp, maker, false);
+  }
+
+private void test(FeatureType type, FeatureCollection one, File tmp, IndexedShapefileDataStoreFactory maker, boolean memorymapped) throws IOException, MalformedURLException, Exception {
+	IndexedShapefileDataStore s;
+	String typeName;
+	s = (IndexedShapefileDataStore) maker.createDataStore( tmp.toURL(), memorymapped );    
     
     s.createSchema( type );
     FeatureStore store = (FeatureStore) s.getFeatureSource( type.getTypeName() );
@@ -95,11 +104,10 @@ public void fail(String message, Throwable cause ) throws Throwable {
     FeatureResults two = s.getFeatureSource( typeName ).getFeatures();
     
     compare(one.collection(),two.collection());
-  }
+}
   
   static void compare(FeatureCollection one,FeatureCollection two) throws Exception {
  
-    
     if (one.size() != two.size()) {
       throw new Exception("Number of Features unequal : " + one.size() + " != " + two.size());
     }

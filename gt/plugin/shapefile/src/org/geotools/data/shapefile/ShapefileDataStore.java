@@ -115,7 +115,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected Lock readWriteLock=new Lock();
     protected URI namespace =null; //namespace provided by the constructor's map
     protected FeatureType schema; // read only
-	private boolean useMemoryMappedBuffer;
+	protected boolean useMemoryMappedBuffer=true;
     /**
      * Creates a new instance of ShapefileDataStore.
      *
@@ -178,6 +178,22 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     {
        	this(url);
     	this.namespace = namespace;
+    }
+    
+    /**
+     *   this sets the datastore's namespace during construction
+     *   (so the schema - FeatureType - will have the correct value)
+     *   You can call this with namespace = null, but I suggest you give it an actual namespace.
+     * @param url
+     * @param namespace
+     * @param useMemoryMapped
+     * @throws java.net.MalformedURLException
+     */
+    public ShapefileDataStore(URL url,URI namespace, boolean useMemoryMapped) throws java.net.MalformedURLException
+    {
+       	this(url);
+    	this.namespace = namespace;
+    	this.useMemoryMappedBuffer=useMemoryMapped;
     }
     
     /**

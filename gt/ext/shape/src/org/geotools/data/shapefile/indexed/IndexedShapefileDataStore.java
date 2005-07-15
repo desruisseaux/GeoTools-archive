@@ -34,6 +34,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.channels.FileChannel.MapMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -119,7 +120,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     
     final URL treeURL;
     byte treeType;
-    final boolean useMemoryMappedBuffer;
     final boolean createIndex;
     final boolean useIndex;
 
@@ -316,6 +316,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             
             FileInputStream in = new FileInputStream(file);
             channel = in.getChannel();
+            if( useMemoryMappedBuffer || url.getFile().endsWith("shx") ||
+            		url.getFile().endsWith("qix") || url.getFile().endsWith("grx") ){
+            	((FileChannel) channel).map(MapMode.READ_ONLY, 0, ((FileChannel) channel).size() );
+            }
         } else {
             InputStream in = url.openConnection().getInputStream();
             channel = Channels.newChannel(in);
@@ -340,7 +344,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         throws IOException {
         WritableByteChannel channel;
 
-        if (url.getProtocol().equals("file") && useMemoryMappedBuffer) {
+        if (url.getProtocol().equals("file")) {
             File f = new File(url.getFile());
 
             if (!f.exists() && !f.createNewFile()) {
@@ -349,6 +353,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
             RandomAccessFile raf = new RandomAccessFile(f, "rw");
             channel = raf.getChannel();
+            if( useMemoryMappedBuffer || url.getFile().endsWith("shx") ||
+            		url.getFile().endsWith("qix") || url.getFile().endsWith("grx") ){
+            	((FileChannel) channel).map(MapMode.READ_WRITE, 0, ((FileChannel) channel).size() );
+            }
         } else {
             OutputStream out = url.openConnection().getOutputStream();
             channel = Channels.newChannel(out);
@@ -1719,4 +1727,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             currentFeature = null;
         }
     }
+
+	public boolean isMemoryMapped() {
+		return useMemoryMappedBuffer;
+	}
 }

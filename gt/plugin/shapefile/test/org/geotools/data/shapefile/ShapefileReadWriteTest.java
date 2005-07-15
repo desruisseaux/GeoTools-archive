@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 
@@ -139,7 +140,14 @@ public void fail(String message, Throwable cause ) throws Throwable {
     File tmp = getTempFile();
     
     ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();    
-    s = (ShapefileDataStore) maker.createDataStore( tmp.toURL() );    
+    test(type, one, tmp, maker, true);
+    test(type, one, tmp, maker, false);
+  }
+
+private void test(FeatureType type, FeatureResults one, File tmp, ShapefileDataStoreFactory maker, boolean memorymapped) throws IOException, MalformedURLException, Exception {
+	ShapefileDataStore s;
+	String typeName;
+	s = (ShapefileDataStore) maker.createDataStore( tmp.toURL(), memorymapped );    
     
     s.createSchema( type );
     FeatureStore store = (FeatureStore) s.getFeatureSource( type.getTypeName() );
@@ -151,7 +159,7 @@ public void fail(String message, Throwable cause ) throws Throwable {
     FeatureResults two = s.getFeatureSource( typeName ).getFeatures();
     
     compare(one.collection(),two.collection());
-  }
+}
   
   static void compare(FeatureCollection one,FeatureCollection two) throws Exception {
  

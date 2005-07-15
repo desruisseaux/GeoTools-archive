@@ -88,7 +88,7 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
 		assertEquals(treeType.byteValue(), ds.treeType);
 		assertEquals(treeType.byteValue()!=IndexedShapefileDataStore.TREE_NONE, ds.useIndex);
 		assertEquals(createIndex&&treeType.byteValue()!=IndexedShapefileDataStore.TREE_NONE, ds.createIndex);
-		assertEquals(memorymapped, ds.useMemoryMappedBuffer);
+		assertEquals(memorymapped, ds.isMemoryMapped());
 	}
 
 	/*

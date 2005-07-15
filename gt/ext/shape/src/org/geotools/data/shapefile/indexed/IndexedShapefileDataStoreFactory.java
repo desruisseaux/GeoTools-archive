@@ -258,15 +258,19 @@ public class IndexedShapefileDataStoreFactory
      * @see org.geotools.data.dir.FileDataStoreFactorySpi#createDataStore(java.net.URL)
      */
     public DataStore createDataStore(URL url)  throws IOException{
-        DataStore ds = null;
-        try {
-            ds = new IndexedShapefileDataStore(url,Boolean.TRUE.booleanValue());
-        } catch (MalformedURLException mue) {
-            throw new DataSourceException("Unable to attatch datastore to "
-                + url, mue);
-        } 
- 
-        return ds;
+    	Map params=new HashMap();
+    	params.put( URLP.key, url);
+        return createDataStore(params);
+    }
+
+    /**
+     * @see org.geotools.data.dir.FileDataStoreFactorySpi#createDataStore(java.net.URL)
+     */
+    public DataStore createDataStore(URL url, boolean memorymapped)  throws IOException{
+    	Map params=new HashMap();
+    	params.put( URLP.key, url);
+    	params.put( MEMORY_MAPPED.key, new Boolean(memorymapped) );
+        return createDataStore(params);
     }
 
     /**

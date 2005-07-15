@@ -20,8 +20,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.Map;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
@@ -41,7 +42,12 @@ public class ShapefileDataStoreFactory
     
     public static final Param NAMESPACEP = new Param("namespace", URI.class,
     "uri to a the namespace",false); //not required
+    
+    public static final Param MEMORY_MAPPED =
+        new Param("memory mapped buffer", Boolean.class,
+                  "enable/disable the use of memory-mapped io", false);
 
+	private Map liveStores=new HashMap();
     /**
      * Takes a list of params which describes how to access a restore and
      * determins if it can be read by the Shapefile Datastore.
@@ -80,6 +86,40 @@ public class ShapefileDataStoreFactory
      *         cannot be attached to the restore specified in params.
      */
     public DataStore createDataStore(Map params) throws IOException {
+    	DataStore ds = null;
+    	if ( !liveStores.containsKey(params) ){
+	
+	        URL url = null;
+	        try {
+	            url = (URL) URLP.lookUp(params);
+	            Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
+	            if (mm == null)
+	                mm = Boolean.TRUE;
+	            ds = new ShapefileDataStore(url, null, 
+	                                        mm.booleanValue());
+	            liveStores.put(params,ds);
+	        } catch (MalformedURLException mue) {
+	            throw new DataSourceException("Unable to attatch datastore to "
+	                + url, mue);
+	        } 
+    	}else
+    		ds=(DataStore) liveStores.get(params);
+        return ds;
+    }
+
+    /**
+     * Not implemented yet.
+     *
+     * @param params
+     *
+     * @return
+     * @throws IOException 
+     *
+     * @throws IOException DOCUMENT ME!
+     * @throws UnsupportedOperationException
+     */
+    public DataStore createNewDataStore(Map params) throws IOException{
+
         DataStore ds = null;
 
         URL url = null;
@@ -93,20 +133,6 @@ public class ShapefileDataStoreFactory
         } 
  
         return ds;
-    }
-
-    /**
-     * Not implemented yet.
-     *
-     * @param params
-     *
-     * @return
-     *
-     * @throws IOException DOCUMENT ME!
-     * @throws UnsupportedOperationException
-     */
-    public DataStore createNewDataStore(Map params){
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     public String getDisplayName() {
@@ -182,20 +208,26 @@ public class ShapefileDataStoreFactory
         return f.getFile().toUpperCase().endsWith("SHP");
     }
 
+
     /**
      * @see org.geotools.data.dir.FileDataStoreFactorySpi#createDataStore(java.net.URL)
      */
     public DataStore createDataStore(URL url)  throws IOException{
-        DataStore ds = null;
-        try {
-            ds = new ShapefileDataStore(url);
-        } catch (MalformedURLException mue) {
-            throw new DataSourceException("Unable to attatch datastore to "
-                + url, mue);
-        } 
- 
-        return ds;
+    	Map params=new HashMap();
+    	params.put( URLP.key, url);
+        return createDataStore(params);
     }
+
+    /**
+     * @see org.geotools.data.dir.FileDataStoreFactorySpi#createDataStore(java.net.URL)
+     */
+    public DataStore createDataStore(URL url, boolean memorymapped)  throws IOException{
+    	Map params=new HashMap();
+    	params.put( URLP.key, url);
+    	params.put( MEMORY_MAPPED.key, new Boolean(memorymapped) );
+        return createDataStore(params);
+    }
+
 
     /**
      * @see org.geotools.data.dir.FileDataStoreFactorySpi#getTypeName(java.net.URL)
