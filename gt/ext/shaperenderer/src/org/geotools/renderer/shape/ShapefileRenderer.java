@@ -507,7 +507,7 @@ public class ShapefileRenderer {
 			ShapefileDataStore datastore, Envelope bbox, MathTransform mt,
 			IndexInfo info, FeatureType type, List ruleList, List elseRuleList,
 			Set modifiedFIDs, NumberRange scaleRange) throws IOException {
-		int index = 1;
+		int index = 0;
 		DbaseFileReader dbfreader = null;
 		try {
 			dbfreader = ShapefileRendererUtil.getDBFReader(datastore);
@@ -525,6 +525,7 @@ public class ShapefileRenderer {
 		try {
 			while (true) {
 				try {
+					index++;
 
 					if (renderingStopRequested) {
 						break;
@@ -541,7 +542,6 @@ public class ShapefileRenderer {
 					}
 
 					if( modifiedFIDs.contains(type.getTypeName() +"."+ index) ){
-						index++;
 						shpreader.next();
 						continue;
 					}
@@ -555,7 +555,6 @@ public class ShapefileRenderer {
 					}
 					Feature feature = createFeature(type, record, dbfreader,
 							type.getTypeName() +"."+ index);
-					index++;
 
 					if (renderingStopRequested) {
 						break;
