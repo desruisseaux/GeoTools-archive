@@ -1512,13 +1512,18 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
          * @throws IOException DOCUMENT ME!
          */
         protected void copyAndDelete(URL src) throws IOException {
+
             File storage = getStorageFile(src);
             File dest = new File(src.getFile());
             FileChannel in = null;
             FileChannel out = null;
             try {
-                in = new FileInputStream(storage).getChannel();
+
+                readWriteLock.startWrite();
+            	in = new FileInputStream(storage).getChannel();
                 out = new FileOutputStream(dest).getChannel();
+
+
                 long len = in.size();
                 long copied = out.transferFrom(in, 0, in.size());
                 
@@ -1528,6 +1533,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                 
                 storage.delete();
             } finally {
+                readWriteLock.endWrite();
                 if( in != null ) in.close();
                 if( out != null ) out.close();
             }

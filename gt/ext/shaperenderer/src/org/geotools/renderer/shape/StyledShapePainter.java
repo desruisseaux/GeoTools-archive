@@ -17,11 +17,14 @@
 package org.geotools.renderer.shape;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Canvas;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
@@ -183,9 +186,16 @@ public class StyledShapePainter {
                         }
 
 //                        debugShape(shape);
+                        Stroke stroke=ls2d.getStroke();
+                        if( graphics.getRenderingHint(RenderingHints.KEY_ANTIALIASING)==RenderingHints.VALUE_ANTIALIAS_ON){
+                        	if( stroke instanceof BasicStroke ) {
+                        		BasicStroke bs=(BasicStroke) stroke;
+                        		stroke = new BasicStroke(bs.getLineWidth()+0.5f, bs.getEndCap(), bs.getLineJoin(), bs.getMiterLimit(), bs.getDashArray(), bs.getDashPhase());
+                        	}
+                        }
                         
                         graphics.setPaint(paint);
-                        graphics.setStroke(ls2d.getStroke());
+                        graphics.setStroke(stroke);
                         graphics.setComposite(ls2d.getContourComposite());
                         graphics.draw(shape);
                     }
