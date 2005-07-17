@@ -534,8 +534,8 @@ public class WFSDataStore extends AbstractDataStore {
                     } else {
                         // rest
                         if (request.getFilter() != Filter.NONE && request.getFilter() != Filter.ALL) {
-                            url += URLEncoder.encode("&FILTER="
-                                + printFilter(request.getFilter()), "UTF-8");
+                            url += "&FILTER=" + URLEncoder.encode(
+                                    printFilter(request.getFilter()), "UTF-8");
                         }
                     }
                 }
@@ -590,8 +590,9 @@ public class WFSDataStore extends AbstractDataStore {
                 .getLiteral()).getEnvelopeInternal();
         } else {
             if (gf.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
-                e = ((Geometry) ((LiteralExpression) gf.getRightGeometry())
-                    .getLiteral()).getEnvelopeInternal();
+                LiteralExpression literal = (LiteralExpression) gf.getRightGeometry();
+                Geometry geometry = (Geometry) literal.getLiteral();
+                e = geometry.getEnvelopeInternal();                
             } else {
                 throw new IOException("Cannot encode BBOX:" + gf);
             }
@@ -599,7 +600,12 @@ public class WFSDataStore extends AbstractDataStore {
         
         if(e == null || e.isNull())
             return null;
+                
+        // Cannot check against layer bbounding box because they may be in different CRS
+        // We could insert ReferencedEnvelope fun here - note a check is already performed
+        // as part clipping the request bounding box.
         
+        /*
         // find layer's bbox
         Envelope lbb = null;
         if(capabilities != null && capabilities.getFeatureTypes() != null && typename!=null && !"".equals(typename)){
@@ -614,9 +620,9 @@ public class WFSDataStore extends AbstractDataStore {
             }
         }
         if(lbb == null || lbb.contains(e))
-            return e.getMinX() + "," + e.getMinY() + "," + e.getMaxX() + ","
-            + e.getMaxY();
-        return null;
+        */
+        return e.getMinX() + "," + e.getMinY() + "," + e.getMaxX() + "," + e.getMaxY();
+        //return null;
     }
 
     //  protected for testing

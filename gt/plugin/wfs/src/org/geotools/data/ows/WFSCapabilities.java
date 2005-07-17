@@ -41,6 +41,17 @@ public class WFSCapabilities {
     private String vendorSpecificCapabilities;
     private FilterCapabilitiesMask filterCapabilities;
 
+    /**
+     * Makes a few assumptions about ":" in the name (prefix:typename). 
+     * 
+     * Although this case is uncommon, it may result in the occational error. 
+     * The specification is unclear as to the inclusion or exclusion of the 
+     * prefix (although most xml documents would support prefix exclusion). 
+     * 
+     * @param capabilities
+     * @param typename
+     * @return
+     */
     public static FeatureSetDescription getFeatureSetDescription(WFSCapabilities capabilities, String typename){
         List l = capabilities.getFeatureTypes();
         Iterator i = l.iterator();
@@ -48,7 +59,8 @@ public class WFSCapabilities {
 
         while (i.hasNext() && crsName==null) {
                 FeatureSetDescription fsd = (FeatureSetDescription) i.next();
-                if (typename.equals(fsd.getName()) || (fsd.getName()!=null && typename.equals(fsd.getName().substring(typename.indexOf(':')+1)))) {
+                String name = fsd.getName();
+                if (typename.equals( name ) || (name !=null && typename.equals(name.substring(name.indexOf(':')+1)))) {
                     return fsd;
                 }
         }
