@@ -153,13 +153,13 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
 		FeatureStore store = (FeatureStore) s.getFeatureSource(type
 				.getTypeName());
 		FeatureReader reader = one.reader();
-			store.addFeatures(reader);
+		store.addFeatures(reader);
 
-			s = new IndexedShapefileDataStore(tmp.toURL());
-			typeName = s.getTypeNames()[0];
-			FeatureResults two = s.getFeatureSource(typeName).getFeatures();
+		s = new IndexedShapefileDataStore(tmp.toURL());
+		typeName = s.getTypeNames()[0];
+		FeatureResults two = s.getFeatureSource(typeName).getFeatures();
 
-			compare(one.collection(), two.collection());
+		compare(one.collection(), two.collection());
 	}
 
 	static void compare(FeatureCollection one, FeatureCollection two)

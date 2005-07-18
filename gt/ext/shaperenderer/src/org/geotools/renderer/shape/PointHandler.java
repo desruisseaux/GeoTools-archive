@@ -16,7 +16,6 @@
  */
 package org.geotools.renderer.shape;
 
-import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
 import org.geotools.data.shapefile.shp.ShapeHandler;
@@ -95,6 +94,8 @@ public class PointHandler implements ShapeHandler {
         if( !bbox.intersects(geomBBox) )
             return null;
 
+        if( transformed[0][0]<0 || transformed[0][1]<0 )
+        	return null;
         if( screenMap.get((int)(transformed[0][0]), (int)transformed[0][1]) ){
         	return null;
         }
