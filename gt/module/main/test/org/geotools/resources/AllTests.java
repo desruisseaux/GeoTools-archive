@@ -48,9 +48,10 @@ public final class AllTests {
      */
     public static Test suite() {
         final TestSuite suite = new TestSuite("org.geotools.resources");
-        suite.addTest(XMathTest       .suite());
-        suite.addTest(UtilitiesTest   .suite());
-        suite.addTest(NumberParserTest.suite());
+        suite.addTest(XMathTest         .suite());
+        suite.addTest(UtilitiesTest     .suite());
+        suite.addTest(NumberParserTest  .suite());
+        suite.addTest(ResourceBundleTest.suite());
         return suite;
     }
 }

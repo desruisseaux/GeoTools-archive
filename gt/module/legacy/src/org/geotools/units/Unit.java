@@ -39,8 +39,8 @@ import java.util.Iterator;
 import javax.units.NonSI;
 import javax.units.SI;
 
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.units.Quantities;
 import org.geotools.resources.units.Units;
 import org.geotools.util.WeakHashSet;
@@ -349,8 +349,8 @@ public abstract class Unit implements Serializable {
         switch (power) {
             case 0:  return DerivedUnit.DIMENSIONLESS;
             case 1:  return this;
-            default: throw new UnitException(Resources.format(
-                                             ResourceKeys.ERROR_BAD_UNIT_POWER_$2,
+            default: throw new UnitException(Errors.format(
+                                             ErrorKeys.BAD_UNIT_POWER_$2,
                                              new Integer(power), this), this, null);
         }
     }
@@ -372,8 +372,8 @@ public abstract class Unit implements Serializable {
         if (integer==power) {
             return pow(integer);
         }
-        throw new UnitException(Resources.format(
-                                ResourceKeys.ERROR_BAD_UNIT_POWER_$2,
+        throw new UnitException(Errors.format(
+                                ErrorKeys.BAD_UNIT_POWER_$2,
                                 new Double(power), this), this, null);
     }
     
@@ -614,8 +614,8 @@ public abstract class Unit implements Serializable {
      * l'opération demandée n'est pas permise.
      */
     final UnitException illegalUnitOperationException(Unit that) {
-        return new UnitException(Resources.format(
-                                 ResourceKeys.ERROR_BAD_UNIT_OPERATION_$2, this, that), this, that);
+        return new UnitException(Errors.format(
+                                 ErrorKeys.BAD_UNIT_OPERATION_$2, this, that), this, that);
     }
     
     /**
@@ -623,8 +623,8 @@ public abstract class Unit implements Serializable {
      * les unités ne sont pas compatibles.
      */
     final UnitException incompatibleUnitsException(Unit that) {
-        return new UnitException(Resources.format(
-                                 ResourceKeys.ERROR_NON_CONVERTIBLE_UNITS_$2, this, that), this, that);
+        return new UnitException(Errors.format(
+                                 ErrorKeys.NON_CONVERTIBLE_UNITS_$2, this, that), this, that);
     }
     
     /**

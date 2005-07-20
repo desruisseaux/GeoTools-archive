@@ -25,8 +25,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -145,8 +145,8 @@ public class CoordinatePoint implements DirectPosition, Dimensioned, Cloneable, 
      */
     public void setLocation(final Point2D point) throws MismatchedDimensionException {
         if (ord.length != 2) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(ord.length)));
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(ord.length)));
         }
         ord[0] = point.getX();
         ord[1] = point.getY();
@@ -193,8 +193,8 @@ public class CoordinatePoint implements DirectPosition, Dimensioned, Cloneable, 
     {
         final int dimension = getDimension();
         if (dimension != expectedDimension) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(dimension), new Integer(expectedDimension)));
         }
     }
@@ -210,8 +210,8 @@ public class CoordinatePoint implements DirectPosition, Dimensioned, Cloneable, 
         if (ord.length == 2) {
             return new Point2D.Double(ord[0], ord[1]);
         } else {
-            throw new IllegalStateException(Resources.format(
-                        ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(ord.length)));
+            throw new IllegalStateException(Errors.format(
+                        ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(ord.length)));
         }
     }
     

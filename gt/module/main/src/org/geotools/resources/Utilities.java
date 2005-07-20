@@ -29,17 +29,15 @@ import java.util.logging.Logger;
 /**
  * A set of miscellaneous methods.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class Utilities {
     /**
-     * An array of strings containing only white spaces. Strings' lengths are
-     * equal to their index + 1 in the {@code spacesFactory} array.
-     * For example, {@code spacesFactory[4]} contains a string of
-     * length 5.  Strings are constructed only when first needed.
+     * An array of strings containing only white spaces. Strings' lengths are equal to their
+     * index + 1 in the {@code spacesFactory} array. For example, {@code spacesFactory[4]}
+     * contains a string of length 5. Strings are constructed only when first needed.
      */
     private static final String[] spacesFactory = new String[20];
 
@@ -50,8 +48,7 @@ public final class Utilities {
     }
 
     /**
-     * Convenience method for testing two objects for
-     * equality. One or both objects may be null.
+     * Convenience method for testing two objects for equality. One or both objects may be null.
      */
     public static boolean equals(final Object object1, final Object object2) {
         return (object1==object2) || (object1!=null && object1.equals(object2));

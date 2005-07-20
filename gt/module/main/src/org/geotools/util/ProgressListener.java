@@ -29,7 +29,7 @@ package org.geotools.util;
  * sent to some address ({@link org.geotools.gui.headless.ProgressMailer}).
  * Additionnaly, this interface provides support for non-fatal warning and
  * exception reports.
- * <br><br>
+ * <p>
  * All {@code ProgressListener} implementations are multi-thread safe,  even the
  * <cite>Swing</cite> implemention. {@code ProgressListener} can be invoked from
  * any thread, which never need to be the <cite>Swing</cite>'s thread. This is usefull

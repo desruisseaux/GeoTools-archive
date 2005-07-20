@@ -27,63 +27,64 @@ import javax.imageio.spi.RegisterableService;
 import javax.imageio.spi.ServiceRegistry;
 
 // Geotools dependencies
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
  * Skeletal implementation of factories. This base classe provides no {@code createFoo} methods,
  * (they must be provided by subclasses), but provides two convenience features:
- * <br>
+ * <p>
  * <ul>
  *   <li>An initially empty {@linkplain #hints map of hints} to be filled by subclasses
  *       constructors. They are the hints to be returned by {@link #getImplementationHints}.</li>
  *   <li>An automatic {@linkplain ServiceRegistry#setOrdering ordering} applied
  *       on the basis of subclasses-provided {@linkplain #priority} rank.</li>
  * </ul>
- *
- * <p>When more than one factory implementation is
+ * <p>
+ * When more than one factory implementation is
  * {@linkplain ServiceRegistry#registerServiceProvider registered} for the same category (i.e. they
  * implement the same {@link Factory} sub-interface), the actual instance to be used is selected
  * according their {@linkplain ServiceRegistry#setOrdering ordering} and user-supplied
  * {@linkplain Hints hints}. Hints have precedence. If more than one factory matches the hints
  * (including the common case where the user doesn't provide any hint at all), then ordering
- * matter.</p>
- *
- * <p>The ordering is unspecified for every pairs of factories with the same {@linkplain #priority}.
+ * matter.
+ * <p>
+ * The ordering is unspecified for every pairs of factories with the same {@linkplain #priority}.
  * This implies that the ordering is unspecified between all factories created with the
  * {@linkplain #AbstractFactory() default constructor}, since they all have the same
- * {@linkplain #NORMAL_PRIORITY default priority} level.</p>
+ * {@linkplain #NORMAL_PRIORITY default priority} level.
  *
  * <h3>How hints are set</h3>
- * <p>Hints are used for two purposes. The distinction is important because the set
- * of hints may not be identical in both cases:</p>
+ * Hints are used for two purposes. The distinction is important because the set
+ * of hints may not be identical in both cases:
+ * <p>
  * <ol>
  *   <li>Hints are used for creating new factories.</li>
  *   <li>Hints are used in order to check if an <em>existing</em> factory is suitable.</li>
  * </ol>
- *
- * <p>{@code AbstractFactory} do <strong>not</strong> provides any facility for the first case.
+ * <p>
+ * {@code AbstractFactory} do <strong>not</strong> provides any facility for the first case.
  * Factories implementations shall inspect themselves all relevant hints supplied by the user,
  * and pass them to any dependencies. Do <strong>not</strong> uses the {@link #hints} field for
  * that; uses the hints provided by the user in the constructor. If all dependencies are created
  * at construction time (<cite>constructor injection</cite>), there is no need to keep user's hints
- * once the construction is finished.</p>
- *
- * <p>The {@link #hints} field is for the second case only. Implementations shall copy in this
+ * once the construction is finished.
+ * <p>
+ * The {@link #hints} field is for the second case only. Implementations shall copy in this
  * field only the user's hints that are know to be relevant to this factory. Only direct
  * dependencies shall be put in the {@link #hints} map. Indirect dependencies (i.e. hints used
  * by other factories used by this factory) will be inspected automatically by
- * {@link FactoryRegistry} in a recursive way.</p>
- *
- * <p>The lack of constructor expecting a {@link Map} argument is intentional. Implementations
+ * {@link FactoryRegistry} in a recursive way.
+ * <p>
+ * The lack of constructor expecting a {@link Map} argument is intentional. Implementations
  * should not copy blindly all user-supplied hints into the {@link #hints} field. Instead, they
  * should pickup only the relevant hints and {@linkplain Map#put put} them in the {@link #hints}
  * field. An exception to this rule is when not all factories can be created at construction time.
- * In this case, all user-supplied hints must be kept.</p>
- *
- * <p><strong>Example:</strong> Lets two factories, A and B. Factory A need an instance of Factory B.
- * Factory A can be implemented as below:</p>
+ * In this case, all user-supplied hints must be kept.
+ * <p>
+ * <strong>Example:</strong> Lets two factories, A and B. Factory A need an instance of Factory B.
+ * Factory A can be implemented as below:
  *
  * <table><tr><td>
  * <blockquote><pre>
@@ -109,6 +110,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * </ul>
  * </td></tr></table>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -180,8 +182,8 @@ public class AbstractFactory implements Factory, RegisterableService {
     protected AbstractFactory(final int priority) {
     	this.priority = priority;
         if (priority<MINIMUM_PRIORITY || priority>MAXIMUM_PRIORITY) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "priority", new Integer(priority)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                               "priority", new Integer(priority)));
         }
     }
 

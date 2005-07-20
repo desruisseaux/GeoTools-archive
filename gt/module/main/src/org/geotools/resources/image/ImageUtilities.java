@@ -45,8 +45,10 @@ import javax.media.jai.registry.RenderedRegistryMode;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
@@ -58,10 +60,9 @@ import org.geotools.resources.gcs.Resources;
  *
  * It may change in incompatible way in any future version.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class ImageUtilities {
     /**
@@ -311,8 +312,7 @@ public final class ImageUtilities {
                 }
             }
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_UNKNOW_INTERPOLATION_$1, type));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.UNKNOW_INTERPOLATION_$1, type));
     }
 
     /**
@@ -386,9 +386,9 @@ public final class ImageUtilities {
                 RIFRegistry.setPreference(registry, operation, product,
                                           allowed ? nativeFactory : javaFactory,
                                           allowed ? javaFactory : nativeFactory);
-                final LogRecord record = Resources.getResources(null).getLogRecord(Level.CONFIG,
-                                                   ResourceKeys.NATIVE_ACCELERATION_STATE_$2,
-                                                   operation, new Integer(allowed ? 1 : 0));
+                final LogRecord record = Logging.getResources(null).getLogRecord(Level.CONFIG,
+                                                 LoggingKeys.NATIVE_ACCELERATION_STATE_$2,
+                                                 operation, new Integer(allowed ? 1 : 0));
                 record.setSourceClassName("ImageUtilities");
                 record.setSourceMethodName("allowNativeAcceleration");
                 Logger.getLogger("org.geotools.coverage").log(record);

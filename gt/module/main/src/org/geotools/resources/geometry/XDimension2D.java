@@ -29,10 +29,9 @@ import java.io.Serializable;
  * is only temporary; it will disappear if <em>JavaSoft</em> implements
  * {@code Dimension2D.Float} and {@code Dimension2D.Double}.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class XDimension2D {
     /**

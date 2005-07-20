@@ -45,10 +45,9 @@ import java.util.Set;
  *
  * Disjoint sets are thread-safe.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class DisjointSet extends AbstractSet {
     /**

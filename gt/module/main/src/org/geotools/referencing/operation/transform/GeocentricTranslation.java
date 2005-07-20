@@ -43,8 +43,8 @@ import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -72,10 +72,9 @@ import org.geotools.resources.cts.Resources;
  *       a {@code "Geocentric_To_Ellipsoid"} transform is concatenated after this transform.</li>
  * </ul>
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 public class GeocentricTranslation extends ProjectiveTransform {
     /**
@@ -381,8 +380,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
                 case 0: if (Double.isNaN(semiMajor) && Double.isNaN(semiMinor)) return transform;
                 case 2:        // Fall through for 0 and 2 cases.
                 case 3: break; // The dimension is a valid value.
-                default: throw new IllegalArgumentException(Resources.format(
-                               ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, dim.getName().getCode(),
+                default: throw new IllegalArgumentException(Errors.format(
+                               ErrorKeys.ILLEGAL_ARGUMENT_$2, dim.getName().getCode(),
                                new Integer(dimension)));
             }
             ensureValid(major, semiMajor);
@@ -402,8 +401,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         private static void ensureValid(final ParameterDescriptor param, double value) {
             if (!(value > 0)) {
-                throw new IllegalStateException(Resources.format(
-                          ResourceKeys.ERROR_MISSING_PARAMETER_$1, param.getName().getCode()));
+                throw new IllegalStateException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1,
+                                                param.getName().getCode()));
             }
         }
     }

@@ -61,8 +61,8 @@ import org.geotools.pt.Matrix;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.LegacyGCSUtilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.image.JAIUtilities;
 import org.geotools.util.NumberRange;
@@ -303,8 +303,8 @@ final class Resampler extends GridCoverage {
             }
         } else {
             if (sourceCS==null || targetCS==null) {
-                throw new CannotReprojectException(Resources.format(
-                        ResourceKeys.ERROR_UNSPECIFIED_COORDINATE_SYSTEM));
+                throw new CannotReprojectException(Errors.format(
+                        ErrorKeys.UNSPECIFIED_COORDINATE_SYSTEM));
             }
             final MathTransform step2r;
             step2x = factory.createFromCoordinateSystems(sourceCS, targetCS).getMathTransform();
@@ -321,8 +321,8 @@ final class Resampler extends GridCoverage {
             final Envelope targetEnvelope   = CTSUtilities.transform(step2x, sourceEnvelope  );
             final Envelope targetEnvelope2D = CTSUtilities.transform(step2r, sourceEnvelope2D);
             if (!targetEnvelope.getSubEnvelope(0,2).equals(targetEnvelope2D)) {
-                throw new TransformException(Resources.format(
-                        ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+                throw new TransformException(Errors.format(
+                        ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
             }
             /*
              * If the target GridGeometry is incomplete, provides default
@@ -378,8 +378,8 @@ final class Resampler extends GridCoverage {
         if (!(transform instanceof MathTransform2D)) {
             // Should not happen with Geotools implementations. May happen
             // with some external implementations, but should stay unusual.
-            throw new TransformException(Resources.format(
-                                         ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+            throw new TransformException(Errors.format(
+                                         ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
         }
         if (!LegacyGCSUtilities.hasGridRange(targetGG)) {
             final MathTransform xtr;
@@ -601,24 +601,6 @@ final class Resampler extends GridCoverage {
         assert targetCoverage.getGridGeometry().getGridRange().getSubGridRange(0,2).toRectangle()
                              .equals(targetImage.getBounds()) : targetGG;
 
-        if (LOGGER.isLoggable(Level.FINE)) {
-            final Locale locale = Locale.getDefault();
-            log(Resources.getResources(locale).getLogRecord(Level.FINE,
-                ResourceKeys.APPLIED_RESAMPLE_$11, new Object[] {
-                /*  {0} */ sourceCoverage.getName(locale),
-                /*  {1} */ sourceCoverage.getCoordinateSystem().getName().getCode(),
-                /*  {2} */ new Integer(sourceImage.getWidth()),
-                /*  {3} */ new Integer(sourceImage.getHeight()),
-                /*  {4} */ targetCoverage.getCoordinateSystem().getName().getCode(),
-                /*  {5} */ new Integer(targetImage.getWidth()),
-                /*  {6} */ new Integer(targetImage.getHeight()),
-                /*  {7} */ targetImage.getOperationName(),
-                /*  {8} */ new Integer(sourceCoverage == sourceCoverage.geophysics(true) ? 1 : 0),
-                /*  {9} */ Operation.getInterpolationName(interpolation),
-                /* {10} */ background.length==1 ? (Double.isNaN(background[0]) ? (Object) "NaN" :
-                                                  (Object) new Double(background[0])) :
-                                                  (Object) XArray.toString(background, locale)}));
-        }
         return targetCoverage;
     }
 
@@ -644,7 +626,7 @@ final class Resampler extends GridCoverage {
             transform = mtFactory.createFilterTransform(transform, inputDimensions);
             return (MathTransform2D) transform;
         }
-        throw new FactoryException(Resources.format(ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+        throw new FactoryException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
     }
 
     /**
@@ -760,12 +742,12 @@ final class Resampler extends GridCoverage {
             try {
                 coverage = reproject(source, cs, gridGeom, interp, hints);
             } catch (FactoryException exception) {
-                throw new CannotReprojectException(Resources.format(
-                        ResourceKeys.ERROR_CANT_REPROJECT_$1,
+                throw new CannotReprojectException(Errors.format(
+                        ErrorKeys.CANT_REPROJECT_$1,
                         source.getName(null)), exception);
             } catch (TransformException exception) {
-                throw new CannotReprojectException(Resources.format(
-                        ResourceKeys.ERROR_CANT_REPROJECT_$1,
+                throw new CannotReprojectException(Errors.format(
+                        ErrorKeys.CANT_REPROJECT_$1,
                         source.getName(null)), exception);
             }
             /*
@@ -785,11 +767,6 @@ final class Resampler extends GridCoverage {
                 if (LegacyGCSUtilities.hasTransform(gridGeom)) {
                     mismatche |= !gridGeom.getGridToCoordinateSystem().equals(
                                 actualGeom.getGridToCoordinateSystem());
-                }
-                if (mismatche) {
-                    final Locale locale = Locale.getDefault();
-                    log(Resources.getResources(locale).getLogRecord(Level.WARNING,
-                        ResourceKeys.WARNING_ADJUSTED_GRID_GEOMETRY_$1, coverage.getName(locale)));
                 }
             }
             return coverage;

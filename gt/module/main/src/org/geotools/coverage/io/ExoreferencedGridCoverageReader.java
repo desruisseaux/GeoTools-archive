@@ -35,7 +35,7 @@ import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
-import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -47,6 +47,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * text file. The text file is parsed by a {@link MetadataBuilder} object, while the pixel
  * values are read by a {@link ImageReader} object.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -122,7 +123,7 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      *         of a classe supported by this reader.
      */
     public synchronized void setInput(Object input, final boolean seekForwardOnly)
-        throws IOException
+            throws IOException
     {
         if (input instanceof File) {
             final File file = (File) input;
@@ -136,7 +137,7 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
             // TODO: invokes rename(String) here and rebuild the URL.
             throw new UnsupportedOperationException("URL support not yet implemented");
         } else {
-            throw new IllegalArgumentException(getString(ResourceKeys.ERROR_NO_IMAGE_READER));
+            throw new IllegalArgumentException(getString(ErrorKeys.NO_IMAGE_READER));
         }
         super.setInput(input, seekForwardOnly);
     }

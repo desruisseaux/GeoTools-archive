@@ -47,8 +47,8 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.UnmodifiableArrayList;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -165,8 +165,8 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
             for (int j=0; j<parameters.length; j++) {
                 if (i != j) {
                     if (nameMatches(parameters[j], name)) {
-                        throw new InvalidParameterNameException(Resources.format(
-                            ResourceKeys.ERROR_PARAMETER_NAME_CLASH_$4,
+                        throw new InvalidParameterNameException(Errors.format(
+                            ErrorKeys.PARAMETER_NAME_CLASH_$4,
                             parameters[j].getName().getCode(), new Integer(j),
                             name, new Integer(i)), name);
                     }
@@ -277,8 +277,8 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
             }
             parameters = ((DefaultParameterDescriptorGroup) subgroups.remove(0)).descriptors();
         }
-        throw new ParameterNotFoundException(Resources.format(
-                  ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+        throw new ParameterNotFoundException(Errors.format(
+                  ErrorKeys.MISSING_PARAMETER_$1, name), name);
     }
     
     /**

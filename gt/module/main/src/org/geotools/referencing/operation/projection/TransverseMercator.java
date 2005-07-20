@@ -65,8 +65,10 @@ import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 /**
  * Transverse Mercator Projection (EPSG code 9807). This
@@ -342,8 +344,7 @@ public class TransverseMercator extends MapProjection {
             double cosphi = Math.cos(y);
             double b = cosphi * Math.sin(x);
             if (Math.abs(Math.abs(b) - 1.0) <= EPS) {
-                throw new ProjectionException(Resources.format(
-                ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                throw new ProjectionException(Errors.format(ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
             
             //Using Snyder's equation for calculating y, instead of the one used in Proj4
@@ -444,8 +445,7 @@ public class TransverseMercator extends MapProjection {
 	phi = arg;
         for (i=MAX_ITER; true;) { // rarely goes over 5 iterations
             if (--i < 0) {
-                throw new ProjectionException(Resources.format(
-                            ResourceKeys.ERROR_NO_CONVERGENCE));
+                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
             }
             s = Math.sin(phi);
             t = 1.0 - excentricitySquared * s * s;
@@ -622,8 +622,8 @@ public class TransverseMercator extends MapProjection {
                 new NamedIdentifier(CitationImpl.EPSG,     "9807"),
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_TransverseMercator"),
                 new NamedIdentifier(CitationImpl.ESRI,     "Transverse_Mercator"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.TRANSVERSE_MERCATOR_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                    VocabularyKeys.TRANSVERSE_MERCATOR_PROJECTION))
             });
 
         /**

@@ -63,8 +63,8 @@ import org.geotools.measure.Longitude;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.util.UnsupportedImplementationException;
 
@@ -77,10 +77,9 @@ import org.geotools.util.UnsupportedImplementationException;
  * <strong>Do not rely on this API!</strong> It may change in incompatible way
  * in any future release.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class CRSUtilities {
     /**
@@ -225,9 +224,8 @@ public final class CRSUtilities {
     {
         int dimension = crs.getCoordinateSystem().getDimension();
         if (lower<0 || lower>upper || upper>dimension) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                            ResourceKeys.ERROR_INDEX_OUT_OF_BOUNDS_$1,
-                            new Integer(lower<0 ? lower : upper)));
+            throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.INDEX_OUT_OF_BOUNDS_$1,
+                                                new Integer(lower<0 ? lower : upper)));
         }
         while (lower!=0 || upper!=dimension) {
             if (!(crs instanceof CompoundCRS)) {
@@ -271,9 +269,9 @@ public final class CRSUtilities {
         if (crs != null) {
             while (crs.getCoordinateSystem().getDimension() != 2) {
                 if (!(crs instanceof CompoundCRS)) {
-                    throw new TransformException(Resources.format(
-                            ResourceKeys.ERROR_CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
-                            crs.getName().toString()));
+                    throw new TransformException(Errors.format(
+                              ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
+                              crs.getName().toString()));
                 }
                 final List/*<CoordinateReferenceSystem>*/ c =
                         ((CompoundCRS)crs).getCoordinateReferenceSystems();
@@ -502,8 +500,8 @@ public final class CRSUtilities {
         final int sourceDim = transform.getSourceDimensions();
         final int targetDim = transform.getTargetDimensions();
         if (envelope.getDimension() != sourceDim) {
-            throw new MismatchedDimensionException(Resources.format(
-                      ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                      ErrorKeys.MISMATCHED_DIMENSION_$2,
                       new Integer(sourceDim), new Integer(envelope.getDimension())));
         }
         int          coordinateNumber = 0;

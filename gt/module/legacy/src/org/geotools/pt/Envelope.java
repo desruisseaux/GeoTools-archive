@@ -24,8 +24,8 @@ import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -78,8 +78,8 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
         final int dimension = ord.length/2;
         for (int i=0; i<dimension; i++) {
             if (!(ord[i] <= ord[dimension+i])) { // Use '!' in order to catch 'NaN'.
-                throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_ILLEGAL_ENVELOPE_ORDINATE_$1, new Integer(i)));
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.ILLEGAL_ENVELOPE_ORDINATE_$1, new Integer(i)));
             }
         }
     }
@@ -123,8 +123,8 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
         throws MismatchedDimensionException
     {
         if (minCP.length != maxCP.length) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(minCP.length), new Integer(maxCP.length)));
         }
         ord = new double[minCP.length + maxCP.length];
@@ -169,8 +169,8 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
     void ensureDimensionMatch(final int expectedDimension) throws MismatchedDimensionException {
         final int dimension = getDimension();
         if (dimension != expectedDimension) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(dimension), new Integer(expectedDimension)));
         }
     }
@@ -406,12 +406,12 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
         final int curDim = ord.length/2;
         final int newDim = upper-lower;
         if (lower<0 || lower>curDim) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
         }
         if (newDim<0 || upper>curDim) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
         }
         final Envelope envelope = new Envelope(newDim);
         System.arraycopy(ord, lower,        envelope.ord, 0,      newDim);
@@ -432,12 +432,12 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
         final int curDim = ord.length/2;
         final int rmvDim = upper-lower;
         if (lower<0 || lower>curDim) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
         }
         if (rmvDim<0 || upper>curDim) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
         }
         final Envelope envelope = new Envelope(curDim - rmvDim);
         System.arraycopy(ord, 0,     envelope.ord, 0,            lower);
@@ -455,8 +455,8 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
         if (ord.length == 4) {
             return XRectangle2D.createFromExtremums(ord[0], ord[1], ord[2], ord[3]);
         } else {
-            throw new IllegalStateException(Resources.format(
-                    ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(getDimension())));
+            throw new IllegalStateException(Errors.format(
+                    ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(getDimension())));
         }
     }
     

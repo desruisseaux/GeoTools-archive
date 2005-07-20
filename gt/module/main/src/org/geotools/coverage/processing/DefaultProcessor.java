@@ -48,9 +48,10 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.Hints;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
-
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
@@ -95,7 +96,7 @@ public class DefaultProcessor extends AbstractProcessor {
          * for serious trouble.
          */
         if (cache.getMemoryCapacity() + (4*1024*1024) >= maxMemory) {
-            LOGGER.severe(Resources.format(ResourceKeys.WARNING_EXCESSIVE_TILE_CACHE_$1,
+            LOGGER.severe(Logging.format(LoggingKeys.EXCESSIVE_TILE_CACHE_$1,
                                            new Double(maxMemory/(1024*1024.0))));
         }
     }
@@ -198,8 +199,8 @@ public class DefaultProcessor extends AbstractProcessor {
         final Operation old = (Operation) operations.put(name, operation);
         if (old!=null && !old.equals(operation)) {
             operations.put(old.getName().trim(), old);
-            throw new IllegalStateException(Resources.getResources(getLocale()).getString(
-                      ResourceKeys.ERROR_OPERATION_ALREADY_BOUND_$1, operation.getName()));
+            throw new IllegalStateException(Errors.getResources(getLocale()).getString(
+                      ErrorKeys.OPERATION_ALREADY_BOUND_$1, operation.getName()));
         }
     }
 
@@ -231,8 +232,8 @@ public class DefaultProcessor extends AbstractProcessor {
         if (operation != null) {
             return operation;
         }
-        throw new OperationNotFoundException(Resources.getResources(getLocale()).getString(
-                ResourceKeys.ERROR_OPERATION_NOT_FOUND_$1, name));
+        throw new OperationNotFoundException(Errors.getResources(getLocale()).getString(
+                ErrorKeys.OPERATION_NOT_FOUND_$1, name));
     }
 
     /**
@@ -301,8 +302,8 @@ public class DefaultProcessor extends AbstractProcessor {
             op = (AbstractOperation) operation;
         } catch (ClassCastException cause) {
             final OperationNotFoundException exception = new OperationNotFoundException(
-                        Resources.getResources(getLocale()).getString(
-                        ResourceKeys.ERROR_OPERATION_NOT_FOUND_$1, operationName));
+                        Errors.getResources(getLocale()).getString(
+                        ErrorKeys.OPERATION_NOT_FOUND_$1, operationName));
             exception.initCause(cause);
             throw exception;
         }

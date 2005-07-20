@@ -52,8 +52,8 @@ import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.resources.XMath;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -314,9 +314,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             return;
         }
         y = Math.toDegrees(y);
-        throw new InvalidParameterValueException(Resources.format(
-                ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)),
-                name.getName().getCode(), y);
+        throw new InvalidParameterValueException(Errors.format(ErrorKeys.LATITUDE_OUT_OF_RANGE_$1,
+                                                 new Latitude(y)), name.getName().getCode(), y);
     }
     
     /**
@@ -337,9 +336,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             return;
         }
         x = Math.toDegrees(x);
-        throw new InvalidParameterValueException(Resources.format(
-                ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)),
-                name.getName().getCode(), x);
+        throw new InvalidParameterValueException(Errors.format(ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1,
+                                                 new Longitude(x)), name.getName().getCode(), x);
     }
 
     /**
@@ -601,12 +599,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         final double x = ptSrc.getX();
         final double y = ptSrc.getY();
         if (x<Longitude.MIN_VALUE-EPS || x>Longitude.MAX_VALUE+EPS) { // Do not fail for NaN values.
-            throw new PointOutsideEnvelopeException(Resources.format(
-                    ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
+            throw new PointOutsideEnvelopeException(Errors.format(
+                    ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
         }
         if (y<Latitude.MIN_VALUE-EPS || y>Latitude.MAX_VALUE+EPS) { // Do not fail for NaN values.
-            throw new PointOutsideEnvelopeException(Resources.format(
-                    ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+            throw new PointOutsideEnvelopeException(Errors.format(
+                    ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
         }
         /*
          * Makes sure that the longitude before conversion stay within +/- PI radians. As a
@@ -784,12 +782,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             ptDst.setLocation(x,y);
 
             if (x<Longitude.MIN_VALUE-EPS || x>Longitude.MAX_VALUE+EPS) { // Accept NaN values.
-                throw new PointOutsideEnvelopeException(Resources.format(
-                        ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
+                throw new PointOutsideEnvelopeException(Errors.format(
+                        ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
             }
             if (y<Latitude.MIN_VALUE-EPS || y>Latitude.MAX_VALUE+EPS) { // Accept NaN values.
-                throw new PointOutsideEnvelopeException(Resources.format(
-                        ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+                throw new PointOutsideEnvelopeException(Errors.format(
+                        ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
             }
             assert checkTransform(ptDst, (ptSrc!=ptDst) ? ptSrc : new Point2D.Double(x0, y0), false);
             return ptDst;
@@ -997,7 +995,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                 return phi;
             }
         }
-        throw new ProjectionException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE));
+        throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
     }
     
     /**

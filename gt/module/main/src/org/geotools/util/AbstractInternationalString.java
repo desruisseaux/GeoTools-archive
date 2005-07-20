@@ -29,8 +29,8 @@ import java.util.Locale;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -45,10 +45,9 @@ import org.geotools.resources.cts.Resources;
  * {@linkplain Locale#getDefault default locale}, as returned by {@link #toString()}.
  * This string also defines the {@linkplain CharSequence character sequence}.</P>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public abstract class AbstractInternationalString implements InternationalString {
     /**
@@ -81,8 +80,7 @@ public abstract class AbstractInternationalString implements InternationalString
             throws IllegalArgumentException
     {
         if (object == null) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
     }
     

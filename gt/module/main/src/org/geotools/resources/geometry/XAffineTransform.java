@@ -39,10 +39,9 @@ import org.geotools.resources.XMath;
  * defined to always throw an exception, then {@code XAffineTransform}
  * is immutable.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public abstract class XAffineTransform extends AffineTransform {
     /**

@@ -49,10 +49,9 @@ import org.geotools.resources.XArray;
  * <br><br>
  * The {@code WeakHashSet} class is thread-safe.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see WeakHashMap
  */

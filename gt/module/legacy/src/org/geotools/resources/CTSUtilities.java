@@ -46,8 +46,8 @@ import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Envelope;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -127,8 +127,8 @@ public final class CTSUtilities {
     public static CoordinateSystem getSubCoordinateSystem(CoordinateSystem cs, int lower, int upper)
     {
         if (lower<0 || lower>upper || upper>cs.getDimension()) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                            ResourceKeys.ERROR_INDEX_OUT_OF_BOUNDS_$1,
+            throw new IndexOutOfBoundsException(Errors.format(
+                            ErrorKeys.INDEX_OUT_OF_BOUNDS_$1,
                             new Integer(lower<0 ? lower : upper)));
         }
         while (lower!=0 || upper!=cs.getDimension()) {
@@ -166,8 +166,8 @@ public final class CTSUtilities {
         if (cs != null) {
             while (cs.getDimension() != 2) {
                 if (!(cs instanceof CompoundCoordinateSystem)) {
-                    throw new TransformException(Resources.format(
-                            ResourceKeys.ERROR_CANT_REDUCE_TO_TWO_DIMENSIONS_$1, cs.getName().toString()));
+                    throw new TransformException(Errors.format(
+                            ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1, cs.getName().toString()));
                 }
                 cs = ((CompoundCoordinateSystem) cs).getHeadCS();
             }
@@ -310,8 +310,8 @@ public final class CTSUtilities {
     {
         final int sourceDim = transform.getDimSource();
         if (envelope.getDimension() != sourceDim) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(sourceDim), new Integer(envelope.getDimension())));
         }
         int           coordinateNumber = 0;

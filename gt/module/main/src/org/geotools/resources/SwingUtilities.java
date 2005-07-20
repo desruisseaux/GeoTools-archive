@@ -30,6 +30,7 @@ import java.awt.event.WindowListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 
+// Swing dependencies
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -42,8 +43,9 @@ import javax.swing.JTextArea;
 import javax.swing.LookAndFeel;
 import javax.swing.event.InternalFrameListener;
 
-import org.geotools.resources.gui.ResourceKeys;
-import org.geotools.resources.gui.Resources;
+// Geotools dependencies
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -58,10 +60,9 @@ import org.geotools.resources.gui.Resources;
  *       internal frames instead of frames.</li>
  * </ul>
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class SwingUtilities {
     /**
@@ -177,8 +178,7 @@ public final class SwingUtilities {
                                            final String         title,
                                            final ActionListener reset)
     {
-        // Delegate to Swing thread if this method
-        // is invoked from an other thread.
+        // Delegates to Swing thread if this method is invoked from an other thread.
         if (!EventQueue.isDispatchThread()) {
             final boolean result[] = new boolean[1];
             invokeAndWait(new Runnable() {
@@ -188,28 +188,28 @@ public final class SwingUtilities {
             });
             return result[0];
         }
-        // Construct the buttons bar.
+        // Constructs the buttons bar.
         Object[]    options = null;
         Object initialValue = null;
         int okChoice = JOptionPane.OK_OPTION;
         if (reset != null) {
-            final Resources resources = Resources.getResources(owner!=null ? owner.getLocale() : null);
+            final Vocabulary resources = Vocabulary.getResources(owner!=null ? owner.getLocale() : null);
             final JButton button;
             if (reset instanceof Action) {
                 button = new JButton((Action)reset);
             } else {
-                button = new JButton(resources.getString(ResourceKeys.RESET));
+                button = new JButton(resources.getString(VocabularyKeys.RESET));
                 button.addActionListener(reset);
             }
             options = new Object[] {
-                resources.getString(ResourceKeys.OK),
-                resources.getString(ResourceKeys.CANCEL),
+                resources.getString(VocabularyKeys.OK),
+                resources.getString(VocabularyKeys.CANCEL),
                 button
             };
             initialValue = options[okChoice=0];
         }
 
-        // Bring ups the dialog box.
+        // Brings ups the dialog box.
         final int choice;
         if (JOptionPane.getDesktopPaneForComponent(owner)!=null) {
             choice=JOptionPane.showInternalOptionDialog(

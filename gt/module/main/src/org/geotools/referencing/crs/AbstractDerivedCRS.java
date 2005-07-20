@@ -50,8 +50,8 @@ import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -253,9 +253,8 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
         if ((dim1=dimSource) != (dim2=base.getCoordinateSystem().getDimension()) ||
             (dim1=dimTarget) != (dim2=derivedCS.getDimension()))
         {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
-                        new Integer(dim1), new Integer(dim2)));
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
+                                                   new Integer(dim1), new Integer(dim2)));
         }
     }
 

@@ -40,8 +40,8 @@ import org.geotools.parameter.FloatParameter;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 
 
 /**
@@ -56,10 +56,9 @@ import org.geotools.resources.cts.Resources;
  *
  * This transform is the inverse of {@link ExponentialTransform1D}.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see ExponentialTransform1D
  * @see LinearTransform1D
@@ -316,8 +315,8 @@ public class LogarithmicTransform1D extends AbstractMathTransform
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.LOGARITHMIC))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.LOGARITHMIC))
             }, new ParameterDescriptor[] {
                 BASE, OFFSET
             });

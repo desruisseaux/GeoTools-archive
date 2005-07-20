@@ -30,8 +30,8 @@
 package org.geotools.units;
 
 // Divers
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -108,11 +108,11 @@ final class OffsetUnit extends Unit {
         this.unit   = unit;
         
         if (unit==null) {
-            throw new NullPointerException(Resources.format(ResourceKeys.ERROR_NO_UNIT));
+            throw new NullPointerException(Errors.format(ErrorKeys.NO_UNIT));
         }
         if (Double.isNaN(offset) || Double.isInfinite(offset)) {
-            throw new IllegalArgumentException(Resources.format(
-                                               ResourceKeys.ERROR_NOT_A_NUMBER_$1,
+            throw new IllegalArgumentException(Errors.format(
+                                               ErrorKeys.NOT_A_NUMBER_$1,
                                                new Double(offset)));
         }
     }
@@ -197,7 +197,7 @@ final class OffsetUnit extends Unit {
     public static Unit getInstance(final double offset, final Unit unit, final String symbol, final PrefixSet prefix) {
         if (offset==0) {
             if (unit==null) {
-                throw new NullPointerException(Resources.format(ResourceKeys.ERROR_NO_UNIT));
+                throw new NullPointerException(Errors.format(ErrorKeys.NO_UNIT));
             }
             if (symbol!=null) {
                 // TODO: Que faire si le symbole spécifié

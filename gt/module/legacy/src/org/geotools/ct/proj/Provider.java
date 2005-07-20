@@ -29,7 +29,7 @@ import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransformProvider;
 import org.geotools.ct.MissingParameterException;
 import org.geotools.resources.DescriptorNaming;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Vocabulary;
 
     
 /**
@@ -110,7 +110,7 @@ public abstract class Provider extends MathTransformProvider {
      *       <code>MathTransformProvider</code> was protected.
      */
     public String getName(final Locale locale) {
-        return (nameKey>=0) ? Resources.getResources(locale).getString(nameKey)
+        return (nameKey>=0) ? Vocabulary.getResources(locale).getString(nameKey)
                             : super.getName(locale);
     }
 

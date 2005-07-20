@@ -30,8 +30,8 @@ import java.util.NoSuchElementException;
 
 import javax.media.jai.EnumeratedParameter;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.opengis.cs.CS_DatumType;
 
 
@@ -68,7 +68,7 @@ public abstract class DatumType extends EnumeratedParameter {
      *
      * @deprecated No replacement, since this is a horizontal datum type.
      */
-    public static final Horizontal CLASSIC = new Horizontal("CLASSIC", CS_DatumType.CS_HD_Classic, ResourceKeys.CLASSIC);
+    public static final Horizontal CLASSIC = new Horizontal("CLASSIC", CS_DatumType.CS_HD_Classic, VocabularyKeys.CLASSIC);
     
     /**
      * A geocentric datum is a "satellite age" modern geodetic datum
@@ -82,7 +82,7 @@ public abstract class DatumType extends EnumeratedParameter {
      *
      * @deprecated No replacement, since this is a horizontal datum type.
      */
-    public static final Horizontal GEOCENTRIC = new Horizontal("GEOCENTRIC", CS_DatumType.CS_HD_Geocentric, ResourceKeys.GEOCENTRIC);
+    public static final Horizontal GEOCENTRIC = new Horizontal("GEOCENTRIC", CS_DatumType.CS_HD_Geocentric, VocabularyKeys.GEOCENTRIC);
     
     /**
      * A vertical datum for orthometric heights
@@ -92,7 +92,7 @@ public abstract class DatumType extends EnumeratedParameter {
      *
      * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType#ORTHOMETRIC}.
      */
-    public static final Vertical ORTHOMETRIC = new Vertical("ORTHOMETRIC", CS_DatumType.CS_VD_Orthometric, ResourceKeys.ORTHOMETRIC);
+    public static final Vertical ORTHOMETRIC = new Vertical("ORTHOMETRIC", CS_DatumType.CS_VD_Orthometric, VocabularyKeys.ORTHOMETRIC);
     
     /**
      * A vertical datum for ellipsoidal heights that are measured along the
@@ -102,7 +102,7 @@ public abstract class DatumType extends EnumeratedParameter {
      *
      * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType#ELLIPSOIDAL}.
      */
-    public static final Vertical ELLIPSOIDAL = new Vertical("ELLIPSOIDAL", CS_DatumType.CS_VD_Ellipsoidal, ResourceKeys.ELLIPSOIDAL);
+    public static final Vertical ELLIPSOIDAL = new Vertical("ELLIPSOIDAL", CS_DatumType.CS_VD_Ellipsoidal, VocabularyKeys.ELLIPSOIDAL);
     
     /**
      * The vertical datum of altitudes or heights in the atmosphere.
@@ -116,14 +116,14 @@ public abstract class DatumType extends EnumeratedParameter {
      *
      * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType#BAROMETRIC}.
      */
-    public static final Vertical ALTITUDE_BAROMETRIC = new Vertical("ALTITUDE_BAROMETRIC", CS_DatumType.CS_VD_AltitudeBarometric, ResourceKeys.BAROMETRIC_ALTITUDE);
+    public static final Vertical ALTITUDE_BAROMETRIC = new Vertical("ALTITUDE_BAROMETRIC", CS_DatumType.CS_VD_AltitudeBarometric, VocabularyKeys.BAROMETRIC_ALTITUDE);
     
     /**
      * A normal height system.
      *
      * @see org.opengis.cs.CS_DatumType#CS_VD_Normal
      */
-    public static final Vertical NORMAL = new Vertical("NORMAL", CS_DatumType.CS_VD_Normal, ResourceKeys.NORMAL);
+    public static final Vertical NORMAL = new Vertical("NORMAL", CS_DatumType.CS_VD_Normal, VocabularyKeys.NORMAL);
     
     /**
      * A vertical datum of geoid model derived heights,
@@ -137,7 +137,7 @@ public abstract class DatumType extends EnumeratedParameter {
      *
      * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType#GEOIDAL}.
      */
-    public static final Vertical GEOID_MODEL_DERIVED = new Vertical("GEOID_MODEL_DERIVED", CS_DatumType.CS_VD_GeoidModelDerived, ResourceKeys.GEOID_MODEL_DERIVED);
+    public static final Vertical GEOID_MODEL_DERIVED = new Vertical("GEOID_MODEL_DERIVED", CS_DatumType.CS_VD_GeoidModelDerived, VocabularyKeys.GEOID_MODEL_DERIVED);
     
     /**
      * This attribute is used to support the set of datums generated
@@ -151,7 +151,7 @@ public abstract class DatumType extends EnumeratedParameter {
      *
      * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType#DEPTH}.
      */
-    public static final Vertical DEPTH = new Vertical("DEPTH", CS_DatumType.CS_VD_Depth, ResourceKeys.DEPTH);
+    public static final Vertical DEPTH = new Vertical("DEPTH", CS_DatumType.CS_VD_Depth, VocabularyKeys.DEPTH);
     
     /**
      * A temporal datum for Universal Time (UTC).
@@ -162,7 +162,7 @@ public abstract class DatumType extends EnumeratedParameter {
      *         change in an incompatible way if OpenGIS define an equivalent
      *         enum.</strong>
      */
-    public static final Temporal UTC = new Temporal("UTC", 3001, ResourceKeys.UTC);
+    public static final Temporal UTC = new Temporal("UTC", 3001, VocabularyKeys.UTC);
     
     /**
      * A temporal datum for Greenwich Mean Time (GMT).
@@ -173,7 +173,7 @@ public abstract class DatumType extends EnumeratedParameter {
      *         change in an incompatible way if OpenGIS define an equivalent
      *         enum.</strong>
      */
-    public static final Temporal GMT = new Temporal("GMT", 3002, ResourceKeys.GMT);
+    public static final Temporal GMT = new Temporal("GMT", 3002, VocabularyKeys.GMT);
 
     /**
      * A local datum for unknow coordinate system. Such coordinate system are usually
@@ -187,7 +187,7 @@ public abstract class DatumType extends EnumeratedParameter {
      * @see LocalCoordinateSystem#CARTESIAN
      * @see LocalCoordinateSystem#PROMISCUOUS
      */
-    public static final Local UNKNOW = new Local("UNKNOW", Local.MAXIMUM, ResourceKeys.UNKNOW);
+    public static final Local UNKNOW = new Local("UNKNOW", Local.MAXIMUM, VocabularyKeys.UNKNOW);
     
     /**
      * List of predefined enum types.
@@ -285,7 +285,7 @@ public abstract class DatumType extends EnumeratedParameter {
      */
     public static DatumType getEnum(String name, final Locale locale) {
         name = name.trim();
-        final Resources resources = Resources.getResources(locale);
+        final Vocabulary resources = Vocabulary.getResources(locale);
         for (int i=0; i<ENUMS.length; i++) {
             final DatumType candidate = ENUMS[i];
             if (name.equalsIgnoreCase(resources.getString(candidate.key))) {
@@ -322,7 +322,7 @@ public abstract class DatumType extends EnumeratedParameter {
      * Type may be "Horizontal", "Vertical", "Temporal" or "Local".
      */
     public String getType(final Locale locale) {
-        return Resources.getResources(locale).getString(getTypeKey());
+        return Vocabulary.getResources(locale).getString(getTypeKey());
     }
     
     /**
@@ -334,7 +334,7 @@ public abstract class DatumType extends EnumeratedParameter {
      * @return Enum's name in the specified locale.
      */
     public String getName(final Locale locale) {
-        return (key>=0) ? Resources.getResources(locale).getString(key) : getName();
+        return (key>=0) ? Vocabulary.getResources(locale).getString(key) : getName();
     }
 
     /**
@@ -406,7 +406,7 @@ public abstract class DatumType extends EnumeratedParameter {
          *
          * @see org.opengis.cs.CS_DatumType#CS_HD_Other
          */
-        public static final Horizontal OTHER = new Horizontal("OTHER", CS_DatumType.CS_HD_Other, ResourceKeys.OTHER);
+        public static final Horizontal OTHER = new Horizontal("OTHER", CS_DatumType.CS_HD_Other, VocabularyKeys.OTHER);
         
         /**
          * Constructs a new enum with the specified value.
@@ -429,7 +429,7 @@ public abstract class DatumType extends EnumeratedParameter {
         
         /** Gets the minimum value. */ final int getMinimum() {return MINIMUM;}
         /** Gets the maximum value. */ final int getMaximum() {return MAXIMUM;}
-        /** Returns the type key.   */ final int getTypeKey() {return ResourceKeys.HORIZONTAL;}
+        /** Returns the type key.   */ final int getTypeKey() {return VocabularyKeys.HORIZONTAL;}
     }
     
     /**
@@ -464,7 +464,7 @@ public abstract class DatumType extends EnumeratedParameter {
          *
          * @see org.opengis.cs.CS_DatumType#CS_VD_Other
          */
-        public static final Vertical OTHER = new Vertical("OTHER", CS_DatumType.CS_VD_Other, ResourceKeys.OTHER);
+        public static final Vertical OTHER = new Vertical("OTHER", CS_DatumType.CS_VD_Other, VocabularyKeys.OTHER);
         
         /**
          * Constructs a new enum with the specified value.
@@ -484,7 +484,7 @@ public abstract class DatumType extends EnumeratedParameter {
         
         /** Gets the minimum value. */ final int getMinimum() {return MINIMUM;}
         /** Gets the maximum value. */ final int getMaximum() {return MAXIMUM;}
-        /** Returns the type key.   */ final int getTypeKey() {return ResourceKeys.VERTICAL;}
+        /** Returns the type key.   */ final int getTypeKey() {return VocabularyKeys.VERTICAL;}
     }
     
     /**
@@ -538,7 +538,7 @@ public abstract class DatumType extends EnumeratedParameter {
         
         /** Gets the minimum value. */ final int getMinimum() {return MINIMUM;}
         /** Gets the maximum value. */ final int getMaximum() {return MAXIMUM;}
-        /** Returns the type key.   */ final int getTypeKey() {return ResourceKeys.TEMPORAL;}
+        /** Returns the type key.   */ final int getTypeKey() {return VocabularyKeys.TEMPORAL;}
     }
     
     /**
@@ -585,6 +585,6 @@ public abstract class DatumType extends EnumeratedParameter {
         
         /** Gets the minimum value. */ final int getMinimum() {return MINIMUM;}
         /** Gets the maximum value. */ final int getMaximum() {return MAXIMUM;}
-        /** Returns the type key.   */ final int getTypeKey() {return ResourceKeys.LOCAL;}
+        /** Returns the type key.   */ final int getTypeKey() {return VocabularyKeys.LOCAL;}
     }
 }

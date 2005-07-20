@@ -68,8 +68,10 @@ import org.geotools.referencing.operation.transform.WarpTransform2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.NumberRange;
 
@@ -256,8 +258,8 @@ final class Resampler2D extends GridCoverage2D {
             }
         } else {
             if (sourceCRS==null || targetCRS==null) {
-                throw new CannotReprojectException(Resources.format(
-                        ResourceKeys.ERROR_UNSPECIFIED_COORDINATE_SYSTEM));
+                throw new CannotReprojectException(Errors.format(
+                        ErrorKeys.UNSPECIFIED_COORDINATE_SYSTEM));
             }
             final MathTransform step2r;
             step2x = factory.createOperation(sourceCRS, targetCRS).getMathTransform();
@@ -277,8 +279,7 @@ final class Resampler2D extends GridCoverage2D {
             if (!new Envelope2D(targetEnvelope2D).boundsEquals(targetEnvelope,
                     sourceGG.axisDimensionX, sourceGG.axisDimensionY, 1E-8))
             {
-                throw new TransformException(Resources.format(
-                        ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+                throw new TransformException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
             }
             /*
              * If the target GridGeometry is incomplete, provides default
@@ -334,8 +335,7 @@ final class Resampler2D extends GridCoverage2D {
         if (!(transform instanceof MathTransform2D)) {
             // Should not happen with Geotools implementations. May happen
             // with some external implementations, but should stay unusual.
-            throw new TransformException(Resources.format(
-                                         ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+            throw new TransformException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
         }
         if (!GCSUtilities.hasGridRange(targetGG)) {
             final MathTransform xtr;
@@ -563,8 +563,8 @@ final class Resampler2D extends GridCoverage2D {
 
         if (AbstractProcessor.LOGGER.isLoggable(Level.FINE)) {
             final Locale locale = sourceCoverage.getLocale();
-            log(Resources.getResources(locale).getLogRecord(Level.FINE,
-                ResourceKeys.APPLIED_RESAMPLE_$11, new Object[] {
+            log(Logging.getResources(locale).getLogRecord(Level.FINE,
+                LoggingKeys.APPLIED_RESAMPLE_$11, new Object[] {
                 /*  {0} */ sourceCoverage.getName().toString(locale),
                 /*  {1} */ sourceCoverage.getCoordinateReferenceSystem().getName().getCode(),
                 /*  {2} */ new Integer(sourceImage.getWidth()),
@@ -608,7 +608,7 @@ final class Resampler2D extends GridCoverage2D {
         if (candidate instanceof MathTransform2D) {
             return (MathTransform2D) candidate;
         }
-        throw new FactoryException(Resources.format(ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+        throw new FactoryException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
     }
 
     /**

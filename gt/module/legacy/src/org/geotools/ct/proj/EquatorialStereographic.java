@@ -61,8 +61,8 @@ import java.awt.geom.Point2D;
 
 import org.geotools.cs.Projection;
 import org.geotools.ct.MissingParameterException;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -163,8 +163,8 @@ public class EquatorialStereographic extends ObliqueStereographic {
             final double coslat = Math.cos(y);
             double f = 1.0 + coslat*Math.cos(x);
             if (f < EPS) {
-                throw new ProjectionException(Resources.format(
-                          ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                throw new ProjectionException(Errors.format(
+                          ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
             f = k0/f;                     // (21-14)
             x = f * coslat * Math.sin(x); // (21-2)

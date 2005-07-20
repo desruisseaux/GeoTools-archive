@@ -40,8 +40,10 @@ import java.util.Locale;
 import org.geotools.cs.Projection;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MissingParameterException;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 
 /**
  * Orthographic Projection. This is a perspective azimuthal (planar) projection
@@ -85,7 +87,7 @@ public abstract class Orthographic extends PlanarProjection {
          * Construct a new provider. 
          */
         public Provider() {
-            super("Orthographic", ResourceKeys.ORTHOGRAPHIC_PROJECTION);
+            super("Orthographic", VocabularyKeys.ORTHOGRAPHIC_PROJECTION);
         }
         
         /**
@@ -115,8 +117,8 @@ public abstract class Orthographic extends PlanarProjection {
                     return new ObliqueOrthographic(parameters);
                 }
             } else {
-                throw new UnsupportedOperationException(Resources.format(
-                    ResourceKeys.ERROR_ELLIPTICAL_NOT_SUPPORTED));
+                throw new UnsupportedOperationException(Errors.format(
+                    ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
             }
         }
     }
@@ -137,7 +139,7 @@ public abstract class Orthographic extends PlanarProjection {
      * Returns a human readable name localized for the specified locale.
      */
     public String getName(final Locale locale) {
-        return Resources.getResources(locale).getString(ResourceKeys.ORTHOGRAPHIC_PROJECTION);
+        return Vocabulary.getResources(locale).getString(VocabularyKeys.ORTHOGRAPHIC_PROJECTION);
     }
     
     /**

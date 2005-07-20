@@ -78,8 +78,8 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -124,13 +124,13 @@ public class About extends JPanel {
     /**
      * The localized resources to use.
      */
-    private final Resources resources;
+    private final Vocabulary resources;
 
     /**
      * Construct a new dialog box with the Geotools's logo.
      */
     public About() {
-        this("org/geotools/resources/gui/Geotools.png", About.class, null);
+        this("org/geotools/resources/logo/Geotools.png", About.class, null);
     }
 
     /**
@@ -177,7 +177,7 @@ public class About extends JPanel {
     {
         super(new GridBagLayout());
         final Locale locale = getDefaultLocale();
-        resources = Resources.getResources(locale);
+        resources = Vocabulary.getResources(locale);
         if (loader == null) {
             loader = getClass().getClassLoader();
             // TODO: it would be nice to fetch the caller's class loader instead
@@ -251,8 +251,8 @@ public class About extends JPanel {
             add(title, gc);
         }
         final JTabbedPane        tabs = new JTabbedPane();
-        final JLabel totalMemoryLabel = new JLabel(resources.getString(ResourceKeys.MEMORY_HEAP_SIZE_$1,  new Float(totalMemory)));
-        final JLabel percentUsedLabel = new JLabel(resources.getString(ResourceKeys.MEMORY_HEAP_USAGE_$1, new Float(1-freeMemory/totalMemory)));
+        final JLabel totalMemoryLabel = new JLabel(resources.getString(VocabularyKeys.MEMORY_HEAP_SIZE_$1,  new Float(totalMemory)));
+        final JLabel percentUsedLabel = new JLabel(resources.getString(VocabularyKeys.MEMORY_HEAP_USAGE_$1, new Float(1-freeMemory/totalMemory)));
         gc.gridx=0; gc.gridy=1; gc.weightx=1; gc.weighty=1; gc.fill=gc.BOTH;
         add(tabs, gc);
         /*
@@ -265,30 +265,30 @@ public class About extends JPanel {
             c.gridy=0; c.insets.top=12;
             pane.add(new JLabel(application), c);
             c.gridy++; c.insets.top=0;
-            pane.add(new JLabel(resources.getString(ResourceKeys.VERSION_$1, version)), c);
+            pane.add(new JLabel(resources.getString(VocabularyKeys.VERSION_$1, version)), c);
             c.gridy++;
             pane.add(new JLabel(vendor), c);
             c.gridy++; c.insets.top=6;
-            pane.add(new JLabel(resources.getString(ResourceKeys.JAVA_VERSION_$1,
+            pane.add(new JLabel(resources.getString(VocabularyKeys.JAVA_VERSION_$1,
                                                     System.getProperty("java.version"))), c);
             c.gridy++; c.insets.top=0;
-            pane.add(new JLabel(resources.getString(ResourceKeys.JAVA_VENDOR_$1,
+            pane.add(new JLabel(resources.getString(VocabularyKeys.JAVA_VENDOR_$1,
                                                     System.getProperty("java.vendor" ))), c);
             c.gridy++; c.insets.top=6;
-            pane.add(new JLabel(resources.getString(ResourceKeys.OS_NAME_$1,
+            pane.add(new JLabel(resources.getString(VocabularyKeys.OS_NAME_$1,
                                                     System.getProperty("os.name"))), c);
             c.gridy++; c.insets.top=0;
-            pane.add(new JLabel(resources.getString(ResourceKeys.OS_VERSION_$2,
+            pane.add(new JLabel(resources.getString(VocabularyKeys.OS_VERSION_$2,
                                                     System.getProperty("os.version"),
                                                     System.getProperty("os.arch"))), c);
             c.gridy++; c.insets.top=12;
-            pane.add(new JLabel(resources.getString(ResourceKeys.TILE_CACHE_CAPACITY_$1, new Float(
+            pane.add(new JLabel(resources.getString(VocabularyKeys.TILE_CACHE_CAPACITY_$1, new Float(
                  JAI.getDefaultInstance().getTileCache().getMemoryCapacity()/HEAP_SIZE_UNIT))), c);
             c.gridy++; c.insets.top=0;
             pane.add(totalMemoryLabel, c);
             c.gridy++; c.insets.bottom=12;
             pane.add(percentUsedLabel, c);
-            tabs.addTab(resources.getString(ResourceKeys.SYSTEM), pane);
+            tabs.addTab(resources.getString(VocabularyKeys.SYSTEM), pane);
         }
         /*
          * RUNNING TASKS TAB
@@ -297,10 +297,10 @@ public class About extends JPanel {
             updater = new ThreadList(tasks, totalMemoryLabel, percentUsedLabel, resources);
             final JPanel pane = new JPanel(new BorderLayout());
             final JList  list = new JList(updater);
-            pane.add(new JLabel(resources.getString(ResourceKeys.RUNNING_TASKS)), BorderLayout.NORTH);
+            pane.add(new JLabel(resources.getString(VocabularyKeys.RUNNING_TASKS)), BorderLayout.NORTH);
             pane.add(new JScrollPane(list), BorderLayout.CENTER);
             pane.setBorder(BorderFactory.createEmptyBorder(9,9,9,9));
-            tabs.addTab(resources.getString(ResourceKeys.TASKS), pane);
+            tabs.addTab(resources.getString(VocabularyKeys.TASKS), pane);
         } else {
             updater = null;
         }
@@ -315,10 +315,10 @@ public class About extends JPanel {
                 final int   titleKey;
                 final Class category;
                 if (writer) {
-                    titleKey = ResourceKeys.ENCODERS;
+                    titleKey = VocabularyKeys.ENCODERS;
                     category = ImageWriterSpi.class;
                 } else {
-                    titleKey = ResourceKeys.DECODERS;
+                    titleKey = VocabularyKeys.DECODERS;
                     category = ImageReaderSpi.class;
                 }
                 String title = resources.getString(titleKey);
@@ -354,14 +354,14 @@ public class About extends JPanel {
             JComponent tree = new JTree(root);
             tree.setBorder(BorderFactory.createEmptyBorder(6,6,0,0));
             tree = new JScrollPane(tree);
-            tabs.addTab(resources.getString(ResourceKeys.IMAGES), setup(tree));
+            tabs.addTab(resources.getString(VocabularyKeys.IMAGES), setup(tree));
         }
         /*
          * JAI OPERATIONS TAB
          */
         if (true) {
             final JComponent tree = new RegisteredOperationBrowser();
-            tabs.addTab(resources.getString(ResourceKeys.OPERATIONS), setup(tree));
+            tabs.addTab(resources.getString(VocabularyKeys.OPERATIONS), setup(tree));
         }
     }
 
@@ -456,13 +456,13 @@ public class About extends JPanel {
         /**
          * The localized resources to use.
          */
-        private final Resources resources;
+        private final Vocabulary resources;
 
         /**
          * Construit une liste des processus actifs dans le groupe {@code tasks} spécifié.
          */
-        public ThreadList(final ThreadGroup tasks, final JLabel totalMemory,
-                          final JLabel percentUsed, final Resources resources)
+        public ThreadList(final ThreadGroup tasks,  final JLabel totalMemory,
+                          final JLabel percentUsed, final Vocabulary resources)
         {
             this.tasks       = tasks;
             this.totalMemory = totalMemory;
@@ -497,7 +497,7 @@ public class About extends JPanel {
          */
         public synchronized void start() {
             if (worker == null) {
-                worker=new Thread(this, Resources.format(ResourceKeys.ABOUT));
+                worker = new Thread(this, resources.getString(VocabularyKeys.ABOUT));
                 worker.setPriority(Thread.MIN_PRIORITY);
                 worker.setDaemon(true);
                 worker.start();
@@ -517,9 +517,9 @@ public class About extends JPanel {
                 final Runtime     system = Runtime.getRuntime();
                 final float  freeMemoryN = system.freeMemory()  / HEAP_SIZE_UNIT;
                 final float totalMemoryN = system.totalMemory() / HEAP_SIZE_UNIT;
-                String   totalMemoryText = resources.getString(ResourceKeys.MEMORY_HEAP_SIZE_$1,
+                String   totalMemoryText = resources.getString(VocabularyKeys.MEMORY_HEAP_SIZE_$1,
                                                             new Float(totalMemoryN));
-                String   percentUsedText = resources.getString(ResourceKeys.MEMORY_HEAP_USAGE_$1,
+                String   percentUsedText = resources.getString(VocabularyKeys.MEMORY_HEAP_USAGE_$1,
                                                             new Float(1-freeMemoryN/totalMemoryN));
 
                 Thread[] threadArray = new Thread[tasks.activeCount()];
@@ -590,7 +590,7 @@ public class About extends JPanel {
         try {
             start();
             SwingUtilities.showMessageDialog(owner, this,
-                           resources.getMenuLabel(ResourceKeys.ABOUT), JOptionPane.PLAIN_MESSAGE);
+                           resources.getMenuLabel(VocabularyKeys.ABOUT), JOptionPane.PLAIN_MESSAGE);
         } finally {
             stop();
         }

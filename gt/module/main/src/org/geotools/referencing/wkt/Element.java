@@ -30,8 +30,8 @@ import java.util.List;
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -46,11 +46,10 @@ import org.geotools.resources.cts.Resources;
  * The result is a tree, which can be printed with {@link #print}.
  * Elements can be pull in a <cite>first in, first out</cite> order.
  *
+ * @since 2.0
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class Element {    
     /**
@@ -285,9 +284,9 @@ public final class Element {
         }
         final String message;
         if (lower == length) {
-            message = Resources.format(ResourceKeys.ERROR_UNEXPECTED_END_OF_STRING);
+            message = Errors.format(ErrorKeys.UNEXPECTED_END_OF_STRING);
         } else {
-            message = Resources.format(ResourceKeys.ERROR_UNPARSABLE_STRING_$2,
+            message = Errors.format(ErrorKeys.UNPARSABLE_STRING_$2,
                       text.substring(position.getIndex()),
                       text.substring(lower, upper));
         }
@@ -302,8 +301,7 @@ public final class Element {
      */
     private ParseException missingCharacter(final char c, final int position) {
         return trim("missingCharacter", new ParseException(complete(
-                    Resources.format(ResourceKeys.ERROR_MISSING_CHARACTER_$1, new Character(c))),
-                    position));
+                    Errors.format(ErrorKeys.MISSING_CHARACTER_$1, new Character(c))), position));
     }
 
     /**
@@ -317,7 +315,7 @@ public final class Element {
             error += keyword.length();
         }
         return trim("missingParameter", new ParseException(complete(
-                    Resources.format(ResourceKeys.ERROR_MISSING_PARAMETER_$1, key)), error));
+                    Errors.format(ErrorKeys.MISSING_PARAMETER_$1, key)), error));
     }
 
     /**
@@ -328,7 +326,7 @@ public final class Element {
      */
     private String complete(String message) {
         if (keyword != null) {
-            message = Resources.format(ResourceKeys.ERROR_IN_$1, keyword) + ' ' + message;
+            message = Errors.format(ErrorKeys.IN_$1, keyword) + ' ' + message;
         }
         return message;
     }
@@ -399,8 +397,8 @@ public final class Element {
                 iterator.remove();
                 final Number number = (Number) object;
                 if (number instanceof Float || number instanceof Double) {
-                    throw new ParseException(complete(Resources.format(
-                            ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, key, number)), offset);
+                    throw new ParseException(complete(Errors.format(
+                            ErrorKeys.ILLEGAL_ARGUMENT_$2, key, number)), offset);
                 }
                 return number.intValue();
             }
@@ -504,9 +502,8 @@ public final class Element {
      */
     public void close() throws ParseException {
         if (list!=null && !list.isEmpty()) {
-            throw new ParseException(complete(Resources.format(
-                        ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, list.get(0))),
-                        offset+keyword.length());
+            throw new ParseException(complete(Errors.format(ErrorKeys.UNEXPECTED_PARAMETER_$1,
+                                              list.get(0))), offset+keyword.length());
         }
     }
 

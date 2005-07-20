@@ -40,8 +40,8 @@ import org.geotools.measure.AngleFormat;
 
 // Resources
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -52,7 +52,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see SpinnerNumberModel
  *
  * @since 2.0
- * @version $Id: SpinnerAngleModel.java,v 1.1 2003/07/28 22:41:32 desruisseaux Exp $
+ * @version $Id$
  * @author Adapted from Hans Muller
  * @author Martin Desruisseaux
  */
@@ -198,8 +198,8 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
      */
     public void setValue(final Object value) {
         if (!(value instanceof Angle)) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "value", value));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "value", value));
         }
         if (!Utilities.equals(value, this.value)) {
             this.value = (Angle)value;
@@ -211,7 +211,7 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
      * This subclass of {@link javax.swing.InternationalFormatter} maps the
      * minimum/maximum properties to a {@link SpinnerAngleModel}.
      *
-     * @version $Id: SpinnerAngleModel.java,v 1.1 2003/07/28 22:41:32 desruisseaux Exp $
+     * @version $Id$
      * @author Adapted from Hans Muller
      * @author Martin Desruisseaux
      */
@@ -294,7 +294,7 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
      * whose minimum and maximum properties are mapped to the
      * {@link SpinnerNumberModel}.
      *
-     * @version $Id: SpinnerAngleModel.java,v 1.1 2003/07/28 22:41:32 desruisseaux Exp $
+     * @version $Id$
      * @author Adapted from Hans Muller
      * @author Martin Desruisseaux
      */

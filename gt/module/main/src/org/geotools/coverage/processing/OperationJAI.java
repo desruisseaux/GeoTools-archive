@@ -66,8 +66,8 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.GCSUtilities;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.AbstractInternationalString;
 
@@ -199,8 +199,8 @@ public class OperationJAI extends Operation2D {
         final OperationDescriptor operation = (OperationDescriptor) JAI.getDefaultInstance().
                                     getOperationRegistry().getDescriptor(RENDERED_MODE, name);
         if (operation == null) {
-            throw new OperationNotFoundException(Resources.format(
-                      ResourceKeys.ERROR_OPERATION_NOT_FOUND_$1, name));
+            throw new OperationNotFoundException(Errors.format(
+                      ErrorKeys.OPERATION_NOT_FOUND_$1, name));
         }
         return operation;
     }
@@ -313,8 +313,7 @@ public class OperationJAI extends Operation2D {
                 !CRSUtilities.equalsIgnoreMetadata(gridToCRS,
                     ((GridGeometry2D) source.getGridGeometry()).getGridToCoordinateSystem2D()))
             {
-                throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_INCOMPATIBLE_GRID_GEOMETRY));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.INCOMPATIBLE_GRID_GEOMETRY));
             }
             block.setSource(sourceNames[i], source.getRenderedImage());
         }
@@ -524,8 +523,8 @@ public class OperationJAI extends Operation2D {
                         toTarget = factory.createConcatenatedTransform(toTarget, step);
                     }
                 } catch (FactoryException exception) {
-                    throw new CannotReprojectException(Resources.format(
-                            ResourceKeys.ERROR_CANT_REPROJECT_$1, source.getName()), exception);
+                    throw new CannotReprojectException(Errors.format(ErrorKeys.CANT_REPROJECT_$1,
+                                                       source.getName()), exception);
                 }
             }
             final GridGeometry2D targetGeom = new GridGeometry2D(null, toTarget);

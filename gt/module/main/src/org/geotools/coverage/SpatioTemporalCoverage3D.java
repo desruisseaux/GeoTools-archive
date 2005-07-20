@@ -60,6 +60,8 @@ import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -158,9 +160,8 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
         final CoordinateSystem cs = crs.getCoordinateSystem();
         final int dimension = cs.getDimension();
         if (dimension != 3) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                      org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
-                      new Integer(3), new Integer(dimension)));
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
+                                                   new Integer(3), new Integer(dimension)));
         }
         if (coverage instanceof SpatioTemporalCoverage3D) {
             final SpatioTemporalCoverage3D source = (SpatioTemporalCoverage3D) coverage;
@@ -175,7 +176,7 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
             temporalCRS = DefaultTemporalCRS.wrap(CRSUtilities.getTemporalCRS(crs));
             if (temporalCRS == null) {
                 throw new IllegalArgumentException( // TODO: localize
-                        /*Resources.format(ResourceKeys.ERROR_BAD_COORDINATE_SYSTEM)*/);
+                        /*Errors.format(ErrorKeys.BAD_COORDINATE_SYSTEM)*/);
             }
             temporalDimension = CRSUtilities.getDimensionOf(crs, temporalCRS.getClass());
             final int  xDimension = (temporalDimension!=0) ? 0 : 1;

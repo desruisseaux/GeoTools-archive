@@ -59,8 +59,8 @@ import java.util.ArrayList;
 
 // Resources
 import org.geotools.resources.XArray;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.SwingUtilities;
 
 
@@ -365,7 +365,7 @@ public class LoggingPanel extends JPanel {
      */
     public Component show(final Component owner) {
         final Component frame = SwingUtilities.toFrame(owner, this,
-                        Resources.format(ResourceKeys.EVENT_LOGGER),
+                        Vocabulary.format(VocabularyKeys.EVENT_LOGGER),
                         new WindowAdapter()
         {
             public void windowClosed(WindowEvent event) {

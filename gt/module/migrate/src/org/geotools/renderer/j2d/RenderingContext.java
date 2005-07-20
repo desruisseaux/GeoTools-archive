@@ -44,8 +44,8 @@ import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.CoordinateTransformationFactory;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.geometry.XAffineTransform;
 
 
@@ -324,9 +324,8 @@ public final class RenderingContext implements org.geotools.renderer.event.Rende
             return (AffineTransform) renderer.getMathTransform(sourceCS, targetCS,
                                          "RenderingContext","getAffineTransform");
         } catch (ClassCastException cause) {
-            throw new CannotCreateTransformException(
-                    org.geotools.resources.cts.Resources.format(
-                    org.geotools.resources.cts.ResourceKeys.ERROR_NOT_AN_AFFINE_TRANSFORM), cause);
+            throw new CannotCreateTransformException(Errors.format(
+                      ErrorKeys.NOT_AN_AFFINE_TRANSFORM), cause);
         }
     }
 

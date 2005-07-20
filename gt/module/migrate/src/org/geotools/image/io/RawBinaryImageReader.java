@@ -19,7 +19,7 @@
  */
 package org.geotools.image.io;
 
-// Input/output
+// J2SE and JAI dependencies
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Transparency;
@@ -43,7 +43,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
@@ -52,8 +51,11 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.util.Range;
 
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Descriptions;
+import org.geotools.resources.i18n.DescriptionKeys;
 import org.geotools.resources.image.ComponentColorModelJAI;
 
 
@@ -174,7 +176,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
         if (imageSize != null) {
             return imageSize.width;
         }
-        throw new IIOException(Resources.format(ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
+        throw new IIOException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
     }
     
     /**
@@ -188,7 +190,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
         if (imageSize != null) {
             return imageSize.height;
         }
-        throw new IIOException(Resources.format(ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
+        throw new IIOException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
     }
     
     /**
@@ -272,10 +274,10 @@ public class RawBinaryImageReader extends SimpleImageReader {
             }
         }
         if (streamImageSize == null) {
-            throw new IIOException(Resources.format(ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
+            throw new IIOException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
         }
         if (imageSize!=null && !streamImageSize.equals(imageSize)) {
-            throw new IIOException(Resources.format(ResourceKeys.ERROR_UNEXPECTED_IMAGE_SIZE));
+            throw new IIOException(Errors.format(ErrorKeys.UNEXPECTED_IMAGE_SIZE));
         }
         /*
          * Get the stream sample model (i.e. the sample model used to encode pixel data
@@ -440,7 +442,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
                     case DataBuffer.TYPE_INT:    input.readFully(((DataBufferInt)    buffer).getData(bank), offset, validLength); break;
                     case DataBuffer.TYPE_FLOAT:  input.readFully(((DataBufferFloat)  buffer).getData(bank), offset, validLength); break;
                     case DataBuffer.TYPE_DOUBLE: input.readFully(((DataBufferDouble) buffer).getData(bank), offset, validLength); break;
-                    default: throw new IIOException(Resources.format(ResourceKeys.ERROR_UNSUPPORTED_DATA_TYPE));
+                    default: throw new IIOException(Errors.format(ErrorKeys.UNSUPPORTED_DATA_TYPE));
                 }
                 /*
                  * Update progress.
@@ -539,7 +541,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
                     case DataBuffer.TYPE_INT:    range=new Range(Integer.class, new Integer(   (int)min), new Integer(   (int)max)); break;
                     case DataBuffer.TYPE_FLOAT:  range=new Range(  Float.class, new Float  ( (float)min), new Float  ( (float)max)); break;
                     case DataBuffer.TYPE_DOUBLE: range=new Range( Double.class, new Double((double)min), new Double((double)max)); break;
-                    default: throw new IOException(Resources.format(ResourceKeys.ERROR_UNSUPPORTED_DATA_TYPE));
+                    default: throw new IOException(Errors.format(ErrorKeys.UNSUPPORTED_DATA_TYPE));
                 }
                 ranges[band] = range;
             }
@@ -832,7 +834,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
          * @return A String containing a description of this service provider.
          */
         public String getDescription(final Locale locale) {
-            return Resources.getResources(locale).getString(ResourceKeys.CODEC_RAW);
+            return Descriptions.getResources(locale).getString(DescriptionKeys.CODEC_RAW);
         }
         
         /**

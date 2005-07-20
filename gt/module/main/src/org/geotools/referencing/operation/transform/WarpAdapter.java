@@ -34,8 +34,8 @@ import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -43,10 +43,9 @@ import org.geotools.resources.gcs.Resources;
  * This warp operation is used by {@link org.geotools.coverage.processing.operation.Resample}
  * when no standard warp operation has been found applicable.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 final class WarpAdapter extends Warp {
     /**
@@ -108,8 +107,8 @@ final class WarpAdapter extends Warp {
         } catch (TransformException exception) {
             // At least one transformation failed. In Geotools MapProjection
             // implementation, unprojected coordinates are set to (NaN,NaN).
-            RasterFormatException e = new RasterFormatException(Resources.format(
-                            ResourceKeys.ERROR_CANT_REPROJECT_$1, name));
+            RasterFormatException e = new RasterFormatException(Errors.format(
+                            ErrorKeys.CANT_REPROJECT_$1, name));
             e.initCause(exception);
             throw e;
         }
@@ -130,8 +129,8 @@ final class WarpAdapter extends Warp {
         try {
             result = inverse.transform(result, result);
         } catch (TransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_BAD_PARAMETER_$2, "destPt", destPt));
+            IllegalArgumentException e = new IllegalArgumentException(Errors.format(
+                            ErrorKeys.BAD_PARAMETER_$2, "destPt", destPt));
             e.initCause(exception);
             throw e;
         }
@@ -150,8 +149,8 @@ final class WarpAdapter extends Warp {
         try {
             result = ((MathTransform2D)inverse.inverse()).transform(result, result);
         } catch (TransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_BAD_PARAMETER_$2, "sourcePt", sourcePt));
+            IllegalArgumentException e = new IllegalArgumentException(Errors.format(
+                            ErrorKeys.BAD_PARAMETER_$2, "sourcePt", sourcePt));
             e.initCause(exception);
             throw e;
         }

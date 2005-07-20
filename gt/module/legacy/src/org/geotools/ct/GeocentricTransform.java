@@ -31,8 +31,9 @@ import java.io.Serializable;
 import javax.media.jai.ParameterList;
 
 import org.geotools.cs.Ellipsoid;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.referencing.operation.TransformException;
 
@@ -171,8 +172,8 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     {
         if (!(value>=0 && value<=max)) {
             // Use '!' in order to trap NaN
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Double(value)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, name, new Double(value)));
         }
     }
     
@@ -560,7 +561,7 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
          */
         public Provider(final boolean inverse) {
             super(inverse ? "Geocentric_To_Ellipsoid" : "Ellipsoid_To_Geocentric",
-                  ResourceKeys.GEOCENTRIC_TRANSFORM, null);
+                  VocabularyKeys.GEOCENTRIC_TRANSFORM, null);
             put("semi_major", Double.NaN, POSITIVE_RANGE);
             put("semi_minor", Double.NaN, POSITIVE_RANGE);
             putInt("dim_geoCS", 3, AbridgedMolodenskiTransform.Provider.DIM_RANGE);

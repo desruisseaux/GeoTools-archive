@@ -58,8 +58,8 @@ import javax.media.jai.ParameterListDescriptor;
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.gui.swing.tree.TreeNode;
 import org.geotools.gui.swing.tree.NamedTreeNode;
 import org.geotools.gui.swing.tree.MutableTreeNode;
@@ -284,7 +284,7 @@ public class OperationTreeBrowser extends JPanel {
             descriptor = operation.getRegistry().getDescriptor(mode, name)
                                                 .getParameterListDescriptor(mode);
         }
-        Resources resources = null;
+        Vocabulary resources = null;
         final String[] names = descriptor.getParamNames();
         final int n = param.getNumParameters();
         for (int i=0; i<n; i++) {
@@ -294,9 +294,9 @@ public class OperationTreeBrowser extends JPanel {
             }
             if (name == null) {
                 if (resources == null) {
-                    resources = Resources.getResources(locale);
+                    resources = Vocabulary.getResources(locale);
                 }
-                name = resources.getString(ResourceKeys.PARAMETER_$1, new Integer(i));
+                name = resources.getString(VocabularyKeys.PARAMETER_$1, new Integer(i));
             }
             root.add(new NamedTreeNode(name, param.getObjectParameter(i), false));
         }
@@ -426,8 +426,7 @@ public class OperationTreeBrowser extends JPanel {
      */
     public boolean showDialog(final Component owner, String title) {
         if (title == null) {
-            title = Resources.getResources(getLocale())
-                             .getString(ResourceKeys.OPERATIONS);
+            title = Vocabulary.getResources(getLocale()).getString(VocabularyKeys.OPERATIONS);
         }
         if (SwingUtilities.showOptionDialog(owner, this, title)) {
             // TODO: User clicked on "Ok".

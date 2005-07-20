@@ -26,8 +26,10 @@ import javax.imageio.IIOException;
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -287,7 +289,7 @@ final class RecordList {
         for (int i=1; i<count; i++) {
             float e=(array[i]-array[i-1])/delta;
             if (Math.abs(e-Math.rint(e)) > eps) {
-                throw new IIOException(Resources.format(ResourceKeys.ERROR_NOT_A_GRID));
+                throw new IIOException(Errors.format(ErrorKeys.NOT_A_GRID));
             }
         }
         return interval[column] = Float.isInfinite(delta) ? Float.NaN : delta;
@@ -332,7 +334,8 @@ final class RecordList {
             // Ignore.
         }
         final StringBuffer buffer = new StringBuffer();
-        buffer.append(Resources.format(ResourceKeys.POINT_COUNT_$3, new Integer(upper), new Float(xCount), new Float(yCount)));
+        buffer.append(Vocabulary.format(VocabularyKeys.POINT_COUNT_IN_GRID_$3,
+                      new Integer(upper), new Float(xCount), new Float(yCount)));
         return buffer.toString();
     }
     

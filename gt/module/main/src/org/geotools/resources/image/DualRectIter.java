@@ -33,10 +33,9 @@ import javax.media.jai.iterator.WritableRectIter;
  * {@link WritableRectIter}. This class is useful for implementing {@link OpImage#computeRect}
  * methods.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @todo This implementation is referenced in a public API.
  *       Consider moving it somewhere else.

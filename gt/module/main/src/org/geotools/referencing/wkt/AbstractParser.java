@@ -40,18 +40,17 @@ import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
  * Base class for <cite>Well Know Text</cite> (WKT) parser.
  *
+ * @since 2.0
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
@@ -118,8 +117,8 @@ public abstract class AbstractParser extends Format {
      */
     public void setAuthority(final Citation authority) {
         if (authority == null) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_NULL_ARGUMENT_$1, "authority"));
+            throw new IllegalArgumentException(Errors.format(
+                      ErrorKeys.NULL_ARGUMENT_$1, "authority"));
         }
         getFormatter().authority = authority;
     }
@@ -286,7 +285,7 @@ public abstract class AbstractParser extends Format {
                 reportError(err, line, exception.getErrorOffset());
             }
         } catch (InvalidParameterValueException exception) {
-            err.print(Resources.format(ResourceKeys.ERROR_IN_$1, exception.getParameterName()));
+            err.print(Errors.format(ErrorKeys.IN_$1, exception.getParameterName()));
             err.print(' ');
             err.println(exception.getLocalizedMessage());
         }

@@ -45,8 +45,8 @@ import org.opengis.util.GenericName;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.referencing.AbstractIdentifiedObject;
 
 
@@ -174,8 +174,8 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
                     final ParameterDescriptor d = (ParameterDescriptor)
                                                 ((ParameterValue) values.get(i)).getDescriptor();
                     if (AbstractIdentifiedObject.nameMatches(d, name)) {
-                        throw new InvalidParameterNameException(Resources.format(
-                                ResourceKeys.ERROR_PARAMETER_NAME_CLASH_$4,
+                        throw new InvalidParameterNameException(Errors.format(
+                                ErrorKeys.PARAMETER_NAME_CLASH_$4,
                                 d.getName().getCode(), new Integer(j),   // The duplicated name
                                 name,                  new Integer(i)),  // The existing name
                                 name);
@@ -222,8 +222,8 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
                 return value;
             }
         }
-        throw new ParameterNotFoundException(Resources.format(
-                  ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+        throw new ParameterNotFoundException(Errors.format(
+                  ErrorKeys.MISSING_PARAMETER_$1, name), name);
     }
 
     /**
@@ -231,8 +231,8 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      * don't have subgroups.
      */
     public List groups(final String name) throws ParameterNotFoundException {
-        throw new ParameterNotFoundException(Resources.format(
-                  ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+        throw new ParameterNotFoundException(Errors.format(
+                  ErrorKeys.MISSING_PARAMETER_$1, name), name);
     }
 
     /**
@@ -242,8 +242,8 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
     public ParameterValueGroup addGroup(final String name)
             throws ParameterNotFoundException, IllegalStateException
     {
-        throw new ParameterNotFoundException(Resources.format(
-                  ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+        throw new ParameterNotFoundException(Errors.format(
+                  ErrorKeys.MISSING_PARAMETER_$1, name), name);
     }
 
     /**

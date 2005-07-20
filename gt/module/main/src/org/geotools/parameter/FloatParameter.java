@@ -34,8 +34,8 @@ import org.opengis.parameter.ParameterValue;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -80,7 +80,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
         final Class type = descriptor.getValueClass();
         final Class expected = Double.class;
         if (!expected.equals(type) && !Double.TYPE.equals(type)) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_ILLEGAL_CLASS_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                       Utilities.getShortName(type), Utilities.getShortName(expected)));
         }
         final Number value = (Number) descriptor.getDefaultValue();
@@ -128,7 +128,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
         }
         final int expectedID = Parameter.getUnitMessageID(thisUnit);
         if (Parameter.getUnitMessageID(unit) != expectedID) {
-            throw new IllegalArgumentException(Resources.format(expectedID, unit));
+            throw new IllegalArgumentException(Errors.format(expectedID, unit));
         }
         return thisUnit.getConverterTo(unit).convert(value);
     }
@@ -215,7 +215,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * Format an error message for illegal method call for the current value type.
      */
     private static String getClassTypeError() {
-        return Resources.format(ResourceKeys.ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1, "Double");
+        return Errors.format(ErrorKeys.ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1, "Double");
     }
 
     /**
@@ -243,7 +243,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
         }
         final int expectedID = Parameter.getUnitMessageID(thisUnit);
         if (Parameter.getUnitMessageID(unit) != expectedID) {
-            throw new IllegalArgumentException(Resources.format(expectedID, unit));
+            throw new IllegalArgumentException(Errors.format(expectedID, unit));
         }
         value = unit.getConverterTo(thisUnit).convert(value);
         Parameter.ensureValidValue((ParameterDescriptor) descriptor, new Double(value));

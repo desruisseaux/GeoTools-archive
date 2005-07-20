@@ -54,8 +54,6 @@ import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.Hints;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.image.ImageUtilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.util.WeakValueHashMap;
 
 

@@ -34,8 +34,8 @@ import javax.media.jai.ParameterListImpl;
 import org.geotools.ct.MathTransformFactory;
 import org.geotools.resources.RemoteProxy;
 import org.geotools.resources.XArray;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.cs.CS_AngularUnit;
 import org.opengis.cs.CS_AxisInfo;
@@ -403,8 +403,8 @@ public class Adapters extends org.geotools.pt.Adapters {
     {
         final int dimension = cs.getDimension();
         if (dimension != expected) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_ILLEGAL_CS_DIMENSION_$1, new Integer(dimension)));
+            throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.ILLEGAL_CS_DIMENSION_$1, new Integer(dimension)));
         }
     }
     

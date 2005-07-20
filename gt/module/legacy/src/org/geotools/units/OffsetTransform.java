@@ -30,8 +30,8 @@
 package org.geotools.units;
 
 // Divers
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -65,8 +65,8 @@ final class OffsetTransform extends UnitTransform {
         super(fromUnit, toUnit);
         this.offset = offset;
         if (Double.isNaN(offset) || Double.isInfinite(offset)) {
-            throw new UnitException(Resources.format(
-                                    ResourceKeys.ERROR_NOT_A_NUMBER_$1,
+            throw new UnitException(Errors.format(
+                                    ErrorKeys.NOT_A_NUMBER_$1,
                                     new Double(offset)));
         }
     }

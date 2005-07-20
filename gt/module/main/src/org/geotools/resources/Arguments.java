@@ -37,8 +37,9 @@ import java.util.Locale;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -57,10 +58,9 @@ import org.geotools.resources.rsc.Resources;
  * The default implementation print the localized error message to standard output {@link #out}
  * and exits the virtual machine with a call to {@link System#exit} with error code 1.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class Arguments {
     /**
@@ -168,8 +168,8 @@ public class Arguments {
                 case 1:  return new Locale(s[0]);
                 case 2:  return new Locale(s[0], s[1]);
                 case 3:  return new Locale(s[0], s[1], s[2]);
-                default: illegalArgument(new IllegalArgumentException(Resources.format(
-                                         ResourceKeys.ERROR_BAD_LOCALE_$1, locale)));
+                default: illegalArgument(new IllegalArgumentException(Errors.format(
+                                         ErrorKeys.BAD_LOCALE_$1, locale)));
             }
         }
         return Locale.getDefault();
@@ -219,8 +219,8 @@ public class Arguments {
                         }
                         split = 0;
                     }
-                    illegalArgument(new IllegalArgumentException(Resources.getResources(locale).
-                                    getString(ResourceKeys.ERROR_MISSING_PARAMETER_VALUE_$1, arg)));
+                    illegalArgument(new IllegalArgumentException(Errors.getResources(locale).
+                                    getString(ErrorKeys.MISSING_PARAMETER_VALUE_$1, arg)));
                     return null;
                 }
             }
@@ -240,8 +240,8 @@ public class Arguments {
     public String getRequiredString(final String name) {
         final String value = getOptionalString(name);
         if (value == null) {
-            illegalArgument(new IllegalArgumentException(Resources.getResources(locale).
-                            getString(ResourceKeys.ERROR_MISSING_PARAMETER_$1, name)));
+            illegalArgument(new IllegalArgumentException(Errors.getResources(locale).
+                            getString(ErrorKeys.MISSING_PARAMETER_$1, name)));
         }
         return value;
     }
@@ -439,8 +439,8 @@ public class Arguments {
             final String arg = arguments[i];
             if (arg != null) {
                 if (count >= max) {
-                    illegalArgument(new IllegalArgumentException(Resources.getResources(locale).
-                                    format(ResourceKeys.ERROR_UNKNOW_PARAMETER_$1, arguments[i])));
+                    illegalArgument(new IllegalArgumentException(Errors.getResources(locale).
+                                    format(ErrorKeys.UNKNOW_PARAMETER_$1, arguments[i])));
                 }
                 left[count++] = arg;
             }

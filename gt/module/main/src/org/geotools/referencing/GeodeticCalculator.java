@@ -36,8 +36,8 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.measure.CoordinateFormat;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 
@@ -63,11 +63,10 @@ import com.vividsolutions.jts.geom.MultiLineString;
  * environment, create one instance of {@code GeodeticCalculator} for each thread even
  * if the computations are performed with the same ellipsoid.
  *
+ * @since 2.1
  * @version $Id$
  * @author Daniele Franzoni
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class GeodeticCalculator {
     /**
@@ -184,8 +183,8 @@ public class GeodeticCalculator {
         if (latitude>=Latitude.MIN_VALUE && latitude<=Latitude.MAX_VALUE) {
             return Math.toRadians(latitude);
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(latitude)));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.LATITUDE_OUT_OF_RANGE_$1,
+                                           new Latitude(latitude)));
     }
 
     /** 
@@ -202,8 +201,8 @@ public class GeodeticCalculator {
         if (longitude>=Longitude.MIN_VALUE && longitude<=Longitude.MAX_VALUE) {
             return Math.toRadians(longitude);
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(longitude)));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1,
+                                           new Longitude(longitude)));
     }
 
     /** 
@@ -220,8 +219,8 @@ public class GeodeticCalculator {
         if (azimuth>=-180.0 && azimuth<=180.0) {
             return Math.toRadians(azimuth);
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_AZIMUTH_OUT_OF_RANGE_$1, new Longitude(azimuth)));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.AZIMUTH_OUT_OF_RANGE_$1,
+                                           new Longitude(azimuth)));
     }
 
     /** 
@@ -236,8 +235,7 @@ public class GeodeticCalculator {
             throws IllegalArgumentException
     {
         if (!(distance>=0.0 && distance<=maxOrthodromicDistance)) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_DISTANCE_OUT_OF_RANGE_$4,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.DISTANCE_OUT_OF_RANGE_$4,
                     new Double(distance), new Double(0), new Double(maxOrthodromicDistance),
                     ellipsoid.getAxisUnit()));
         }
@@ -254,8 +252,7 @@ public class GeodeticCalculator {
             throws IllegalArgumentException
     {
         if (!(numberOfPoints >= 0)) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                         "numberOfPoints", new Integer(numberOfPoints)));
         }
     }
@@ -266,7 +263,7 @@ public class GeodeticCalculator {
      */
     private String getNoConvergenceErrorMessage() {
         final CoordinateFormat format = new CoordinateFormat();
-        return Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE_$2,
+        return Errors.format(ErrorKeys.NO_CONVERGENCE_$2,
                format.format(new GeneralDirectPosition(Math.toDegrees(long1), Math.toDegrees(lat1))),
                format.format(new GeneralDirectPosition(Math.toDegrees(long2), Math.toDegrees(lat2))));
     }

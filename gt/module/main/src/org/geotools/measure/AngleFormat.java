@@ -20,7 +20,7 @@
  */
 package org.geotools.measure;
 
-// Text format
+// J2SE dependencies
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.text.DecimalFormat;
@@ -31,10 +31,11 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Locale;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -371,7 +372,8 @@ public class AngleFormat extends Format {
                         setSuffix(PREFIX_FIELD, null);
                         widthDecimal=0;
                         decimalSeparator=true;
-                        throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_ILLEGAL_ANGLE_PATTERN_$1, pattern));
+                        throw new IllegalArgumentException(Errors.format(
+                                  ErrorKeys.ILLEGAL_ANGLE_PATTERN_$1, pattern));
                     }
                     if (c==upperCaseC) {
                         /*
@@ -395,8 +397,8 @@ public class AngleFormat extends Format {
                                 decimalSeparator=true;
                                 break;
                             }
-                            default: throw new IllegalArgumentException(Resources.format(
-                                         ResourceKeys.ERROR_ILLEGAL_ANGLE_PATTERN_$1, pattern));
+                            default: throw new IllegalArgumentException(Errors.format(
+                                         ErrorKeys.ILLEGAL_ANGLE_PATTERN_$1, pattern));
                         }
                         int w=1; while (++i<length && pattern.charAt(i)==c) w++;
                         widthDecimal=w;
@@ -503,7 +505,8 @@ public class AngleFormat extends Format {
             degrees = tmp;
             if (minutes<0 || minutes>60) {
                 // Erreur d'arrondissement (parce que l'angle est trop élevé)
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_ANGLE_OVERFLOW_$1, new Double(angle)));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.ANGLE_OVERFLOW_$1,
+                                                   new Double(angle)));
             }
             if (width2 != 0) {
                 tmp      = (int) minutes; // Arrondie vers 0 même si négatif.
@@ -511,7 +514,8 @@ public class AngleFormat extends Format {
                 minutes  = tmp;
                 if (secondes<0 || secondes>60) {
                     // Erreur d'arrondissement (parce que l'angle est trop élevé)
-                    throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_ANGLE_OVERFLOW_$1, new Double(angle)));
+                    throw new IllegalArgumentException(Errors.format(ErrorKeys.ANGLE_OVERFLOW_$1,
+                                                       new Double(angle)));
                 }
                 /*
                  * On applique maintenant une correction qui tiendra
@@ -659,8 +663,7 @@ public class AngleFormat extends Format {
             numberFormat.setMaximumFractionDigits(2);
             return numberFormat.format(obj, toAppendTo, (pos!=null) ? pos : dummy);
         }
-        throw new IllegalArgumentException(Resources.format(
-                                           ResourceKeys.ERROR_NOT_AN_ANGLE_OBJECT_$1,
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_AN_ANGLE_OBJECT_$1,
                                            Utilities.getShortClassName(obj)));
     }
     
@@ -1262,8 +1265,7 @@ BigBoss:    switch (skipSuffix(source, pos, DEGREES_FIELD)) {
                 while (upper<length && !Character.isWhitespace(source.charAt(upper))) {
                     upper++;
                 }
-                throw new ParseException(Resources.format(
-                            ResourceKeys.ERROR_UNPARSABLE_STRING_$2, source,
+                throw new ParseException(Errors.format(ErrorKeys.UNPARSABLE_STRING_$2, source,
                             source.substring(lower, Math.min(lower+10, upper))), index);
             }
         }

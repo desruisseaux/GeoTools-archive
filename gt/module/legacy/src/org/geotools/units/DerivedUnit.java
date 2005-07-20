@@ -30,8 +30,8 @@
 package org.geotools.units;
 
 // Divers
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -271,8 +271,8 @@ final class DerivedUnit extends SimpleUnit {
             if (integerPower==floatPower) {
                 newFactors[i]=Factor.getFactor(factors[i].baseUnit, integerPower);
             } else {
-                throw new UnitException(Resources.format(
-                                        ResourceKeys.ERROR_BAD_UNIT_POWER_$2,
+                throw new UnitException(Errors.format(
+                                        ErrorKeys.BAD_UNIT_POWER_$2,
                                         new Double(power), this), this, null);
             }
         }

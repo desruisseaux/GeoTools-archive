@@ -26,8 +26,8 @@ package org.geotools.cs;
 // OpenGIS dependencies
 import java.rmi.RemoteException;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.cs.CS_HorizontalCoordinateSystem;
 import org.opengis.cs.CS_HorizontalDatum;
@@ -130,8 +130,8 @@ public abstract class HorizontalCoordinateSystem extends CoordinateSystem {
         switch (dimension) {
             case 0:  return axis0;
             case 1:  return axis1;
-            default: throw new IndexOutOfBoundsException(Resources.format(
-                        ResourceKeys.ERROR_INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
+            default: throw new IndexOutOfBoundsException(Errors.format(
+                        ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
         }
     }
     

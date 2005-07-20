@@ -40,8 +40,8 @@ import org.geotools.ct.proj.Provider;
 import org.geotools.pt.Matrix;
 import org.geotools.resources.DescriptorNaming;
 import org.geotools.resources.XArray;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.JAIUtilities;
 import org.geotools.units.Unit;
 import org.geotools.util.WeakHashSet;
@@ -388,13 +388,13 @@ public class MathTransformFactory {
                                                     final int numTrailingOrdinates)
     {
         if (firstAffectedOrdinate < 0) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2,
                     "firstAffectedOrdinate", new Integer(firstAffectedOrdinate)));
         }
         if (numTrailingOrdinates < 0) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2,
                     "numTrailingOrdinates", new Integer(numTrailingOrdinates)));
         }
         if (firstAffectedOrdinate==0 && numTrailingOrdinates==0) {
@@ -468,13 +468,13 @@ public class MathTransformFactory {
         final int lower     = JAIUtilities.getMinimum(inputDimensions);
         final int upper     = JAIUtilities.getMaximum(inputDimensions)+1;
         if (lower<0 || lower>=upper) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2,
                     "minimum(inputDimensions)", new Integer(lower)));
         }
         if (upper > dimSource) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2,
                     "maximum(inputDimensions)", new Integer(upper-1)));
         }
         /*
@@ -578,7 +578,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
             // to any input dimension. But in this particuler case, our matrix has such
             // dependencies. REVISIT: is there anything we could do about that?
         }
-        throw new FactoryException(Resources.format(ResourceKeys.ERROR_INSEPARABLE_TRANSFORM));
+        throw new FactoryException(Errors.format(ErrorKeys.INSEPARABLE_TRANSFORM));
     }
     
     /**
@@ -608,13 +608,13 @@ reduce:     for (int j=0; j<rows.length; j++) {
         final int lower     = JAIUtilities.getMinimum(outputDimensions);
         final int upper     = JAIUtilities.getMaximum(outputDimensions)+1;
         if (lower<0 || lower>=upper) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2,
                     "minimum(outputDimensions)", new Integer(lower)));
         }
         if (upper > dimTarget) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2,
                     "maximum(outputDimensions)", new Integer(upper)));
         }
         if (dimOutput == dimTarget) {

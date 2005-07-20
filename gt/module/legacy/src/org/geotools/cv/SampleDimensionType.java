@@ -34,8 +34,10 @@ import java.util.NoSuchElementException;
 import javax.media.jai.EnumeratedParameter;
 import javax.media.jai.util.Range;
 
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.opengis.cv.CV_SampleDimensionType;
 
 
@@ -353,7 +355,7 @@ public final class SampleDimensionType extends EnumeratedParameter {
     {
         if (band<0 || band>=model.getNumBands()) {
             throw new IllegalArgumentException(
-                    Resources.format(ResourceKeys.ERROR_BAD_BAND_NUMBER_$1, new Integer(band)));
+                    Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
         }
         boolean signed = true;
         switch (model.getDataType()) {
@@ -386,7 +388,7 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * @return Enum's name in the specified locale.
      */
     public String getName(final Locale locale) {
-        return Resources.getResources(locale).getString(ResourceKeys.DATA_TYPE_$2,
+        return Vocabulary.getResources(locale).getString(VocabularyKeys.DATA_TYPE_$2,
                 new Integer(real ? 2 : signed ? 1 : 0), new Integer(size));
     }
 

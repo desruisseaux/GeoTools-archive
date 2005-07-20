@@ -39,10 +39,9 @@ import org.geotools.resources.Utilities;
  * English or "{@code _fr}" for French). This mechanism is explained in J2SE's javadoc for the
  * {@link ResourceBundle#getBundle(String,Locale,ClassLoader) getBundle} static method.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class ResourceInternationalString extends AbstractInternationalString implements Serializable {
     /**

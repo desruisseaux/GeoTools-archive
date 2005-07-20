@@ -52,8 +52,10 @@ import java.util.Locale;
 import org.geotools.cs.Projection;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MissingParameterException;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -199,7 +201,7 @@ public class TransverseMercator extends CylindricalProjection {
          *                southern case?
          */
         public Provider(final int type) {
-            super("Transverse_Mercator", ResourceKeys.TRANSVERSE_MERCATOR_PROJECTION);
+            super("Transverse_Mercator", VocabularyKeys.TRANSVERSE_MERCATOR_PROJECTION);
             switch (type) {
                 case UTM: {
                     put("false_easting", 500000.0, null);
@@ -253,8 +255,8 @@ public class TransverseMercator extends CylindricalProjection {
      * Returns a human readable name localized for the specified locale.
      */
     public String getName(final Locale locale) {
-        return Resources.getResources(locale).getString(
-               ResourceKeys.TRANSVERSE_MERCATOR_PROJECTION);
+        return Vocabulary.getResources(locale).getString(
+               VocabularyKeys.TRANSVERSE_MERCATOR_PROJECTION);
     }
     
     /**
@@ -369,8 +371,8 @@ public class TransverseMercator extends CylindricalProjection {
             double cosphi = Math.cos(y);
             double b = cosphi * Math.sin(x);
             if (Math.abs(Math.abs(b) - 1.0) <= EPS) {
-                throw new ProjectionException(Resources.format(
-                ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                throw new ProjectionException(Errors.format(
+                ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
             
             double yy = cosphi * Math.cos(x) / Math.sqrt(1.0-b*b);
@@ -378,8 +380,8 @@ public class TransverseMercator extends CylindricalProjection {
             
             if ((b=Math.abs(yy)) >= 1.0) {
                 if ((b-1.0) > EPS) {
-                    throw new ProjectionException(Resources.format(
-                        ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                    throw new ProjectionException(Errors.format(
+                        ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
                 } else {
                     yy = 0.0;
                 }
@@ -463,8 +465,8 @@ public class TransverseMercator extends CylindricalProjection {
 	phi = arg;
         for (i=MAX_ITER; true;) { // rarely goes over 5 iterations
             if (--i < 0) {
-                throw new ProjectionException(Resources.format(
-                            ResourceKeys.ERROR_NO_CONVERGENCE));
+                throw new ProjectionException(Errors.format(
+                            ErrorKeys.NO_CONVERGENCE));
             }
             s = Math.sin(phi);
             t = 1.0 - es * s * s;

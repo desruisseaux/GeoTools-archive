@@ -29,8 +29,8 @@ import java.rmi.RemoteException;
 import javax.media.jai.ParameterList;
 
 import org.geotools.ct.MissingParameterException;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.cs.CS_GeographicCoordinateSystem;
 import org.opengis.cs.CS_LinearUnit;
@@ -149,8 +149,8 @@ public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
             resetAxisLength = true;
         }
         if (invalidParameter != null) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_INCOMPATIBLE_ELLIPSOID_$2,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.INCOMPATIBLE_ELLIPSOID_$2,
                     invalidParameter, ellipsoid.getName().getCode()));
         }
         if (resetAxisLength) {
@@ -203,8 +203,8 @@ public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
         if (dimension>=0 && dimension<getDimension()) {
             return unit;
         }
-        throw new IndexOutOfBoundsException(Resources.format(
-                ResourceKeys.ERROR_INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
+        throw new IndexOutOfBoundsException(Errors.format(
+                ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
     }
     
     /**

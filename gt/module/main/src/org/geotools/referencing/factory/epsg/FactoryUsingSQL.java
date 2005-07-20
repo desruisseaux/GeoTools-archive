@@ -121,8 +121,10 @@ import org.geotools.referencing.operation.DefaultConversion;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.util.LocalName;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.ScopedName;
@@ -148,13 +150,12 @@ import org.geotools.util.ScopedName;
  * EPSG database is MS-Access. For translating this SQL dialect into an other one, subclasses
  * should override the {@link #adaptSQL} method.
  *
+ * @since 2.1
  * @version $Id$
  * @author Yann Cézard
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  * @author Matthias Basler
- *
- * @since 2.1
  */
 public class FactoryUsingSQL extends AbstractAuthorityFactory {
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -659,8 +660,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         if (result.wasNull()) {
             final String column = result.getMetaData().getColumnName(columnIndex);
             result.close();
-            throw new FactoryException(Resources.format(ResourceKeys.ERROR_NULL_VALUE_$2,
-                                                        code, column));
+            throw new FactoryException(Errors.format(ErrorKeys.NULL_VALUE_$2, code, column));
         }
         return str.trim();
     }
@@ -684,8 +684,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         if (result.wasNull()) {
             final String column = result.getMetaData().getColumnName(columnIndex);
             result.close();
-            throw new FactoryException(Resources.format(ResourceKeys.ERROR_NULL_VALUE_$2,
-                                                        code, column));
+            throw new FactoryException(Errors.format(ErrorKeys.NULL_VALUE_$2, code, column));
         }
         return value;
     }
@@ -709,8 +708,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         if (result.wasNull()) {
             final String column = result.getMetaData().getColumnName(columnIndex);
             result.close();
-            throw new FactoryException(Resources.format(ResourceKeys.ERROR_NULL_VALUE_$2,
-                                                        code, column));
+            throw new FactoryException(Errors.format(ErrorKeys.NULL_VALUE_$2, code, column));
         }
         return value;
     }
@@ -799,7 +797,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         if (oldValue.equals(newValue)) {
             return oldValue;
         }
-        throw new FactoryException(Resources.format(ResourceKeys.ERROR_DUPLICATED_VALUES_$1, code));
+        throw new FactoryException(Errors.format(ErrorKeys.DUPLICATED_VALUES_$1, code));
     }
 
     /**
@@ -967,8 +965,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 result.close();
                 if (present) {
                     if (index >= 0) {
-                        throw new FactoryException(Resources.format(
-                                ResourceKeys.ERROR_DUPLICATED_VALUES_$1, code));
+                        throw new FactoryException(Errors.format(ErrorKeys.DUPLICATED_VALUES_$1, code));
                     }
                     index = (i < 0) ? lastObjectType : i;
                     if (isPrimaryKey) {
@@ -1111,8 +1108,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                         // Both are null, which is not allowed.
                         final String column = result.getMetaData().getColumnName(3);
                         result.close();
-                        throw new FactoryException(Resources.format(
-                                                   ResourceKeys.ERROR_NULL_VALUE_$2, code, column));
+                        throw new FactoryException(Errors.format(ErrorKeys.NULL_VALUE_$2, code, column));
                     } else {
                         // We only have semiMinorAxis defined -> it's OK
                         ellipsoid = factories.getDatumFactory().createEllipsoid(
@@ -1122,7 +1118,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     if (semiMinorAxis != 0) {
                         // Both 'inverseFlattening' and 'semiMinorAxis' are defined.
                         // Log a warning and create the ellipsoid using the inverse flattening.
-                        LOGGER.warning(Resources.format(ResourceKeys.WARNING_AMBIGUOUS_ELLIPSOID));
+                        LOGGER.warning(Logging.format(LoggingKeys.AMBIGUOUS_ELLIPSOID));
                     }
                     ellipsoid = factories.getDatumFactory().createFlattenedSphere(
                                 properties, semiMajorAxis, inverseFlattening, unit);
@@ -1465,8 +1461,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     datum = factory.createEngineeringDatum(properties);
                 } else {
                     result.close();
-                    throw new FactoryException(Resources.format(
-                                               ResourceKeys.ERROR_UNKNOW_TYPE_$1, type));
+                    throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
                 }
                 returnValue = (Datum) ensureSingleton(datum, returnValue, code);
                 if (result == null) {
@@ -1559,8 +1554,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 } else if (orientation.equalsIgnoreCase("Geocentre > north pole")) {
                     direction = AxisDirection.NORTH;
                 } else {
-                    throw new FactoryException(Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1,
-                                                                orientation), exception);
+                    throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1,
+                                                             orientation), exception);
                 }
             }
             if (description == null) {
@@ -1574,7 +1569,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         }
         result.close();
         if (i != axis.length) {
-            throw new FactoryException(Resources.format(ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new FactoryException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
                                        new Integer(axis.length), new Integer(i)));
         }
         return axis;
@@ -1654,8 +1649,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     }
                 } else {
                     result.close();
-                    throw new FactoryException(Resources.format(
-                                               ResourceKeys.ERROR_UNKNOW_TYPE_$1, type));
+                    throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
                 }
                 if (cs == null) {
                     result.close();
@@ -1839,7 +1833,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                  * ---------------------------------------------------------------------- */
                 else {
                     result.close();
-                    throw new FactoryException(Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, type));
+                    throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
                 }
                 returnValue = (CoordinateReferenceSystem) ensureSingleton(crs, returnValue, code);
                 if (result == null) {
@@ -2441,7 +2435,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                         operation = new DefaultConversion(properties, sourceCRS, targetCRS, mt, method);
                     } else {
                         result.close();
-                        throw new FactoryException(Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, type));
+                        throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
                     }
                 }
                 returnValue = (CoordinateOperation) ensureSingleton(operation, returnValue, code);

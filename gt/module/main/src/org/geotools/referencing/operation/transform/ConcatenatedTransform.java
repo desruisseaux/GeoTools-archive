@@ -40,18 +40,17 @@ import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
  * Base class for concatenated transform. Concatenated transforms are
  * serializable if all their step transforms are serializables.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class ConcatenatedTransform extends AbstractMathTransform implements Serializable {
     /**
@@ -89,9 +88,8 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         this.transform1 = transform1;
         this.transform2 = transform2;
         if (!isValid()) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_CANT_CONCATENATE_CS_$2,
-                    getName(transform1), getName(transform2)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.CANT_CONCATENATE_CS_$2,
+                                               getName(transform1), getName(transform2)));
         }
     }
     

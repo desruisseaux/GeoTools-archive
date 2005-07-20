@@ -38,8 +38,8 @@ package org.geotools.ct;
 // Geotools dependences
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -94,7 +94,7 @@ public class CannotCreateTransformException extends TransformException {
     public CannotCreateTransformException(final CoordinateSystem sourceCS,
                                           final CoordinateSystem targetCS)
     {
-        super(Resources.format(ResourceKeys.ERROR_NO_TRANSFORMATION_PATH_$2,
+        super(Errors.format(ErrorKeys.NO_TRANSFORMATION_PATH_$2,
                                getName(sourceCS), getName(targetCS)));
     }
     
@@ -110,7 +110,7 @@ public class CannotCreateTransformException extends TransformException {
                                           final CoordinateSystem targetCS,
                                           final Throwable           cause)
     {
-        super(Resources.format(ResourceKeys.ERROR_NO_TRANSFORMATION_PATH_$2,
+        super(Errors.format(ErrorKeys.NO_TRANSFORMATION_PATH_$2,
                                getName(sourceCS), getName(targetCS)), cause);
     }
     

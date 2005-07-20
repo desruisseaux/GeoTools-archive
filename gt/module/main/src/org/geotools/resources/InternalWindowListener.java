@@ -33,10 +33,9 @@ import javax.swing.event.InternalFrameListener;
  * by {@link SwingUtilities} in order to have the same methods working seemless on both
  * {@link Frame} and {@link JInternalFrame}.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 final class InternalWindowListener implements InternalFrameListener {
     /**

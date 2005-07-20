@@ -31,8 +31,8 @@ import java.util.Locale;
 // Geotools dependencies
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.XArray;
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -152,7 +152,7 @@ public class LineFormat {
         this.format = new Format[] {format};
         if (format==null) {
             final Integer one=new Integer(1);
-            throw new NullPointerException(Resources.format(ResourceKeys.ERROR_NULL_FORMAT_$2, one, one));
+            throw new NullPointerException(Errors.format(ErrorKeys.NULL_FORMAT_$2, one, one));
         }
     }
 
@@ -174,7 +174,8 @@ public class LineFormat {
         System.arraycopy(formats, 0, format, 0, formats.length);
         for (int i=0; i<format.length; i++) {
             if (format[i]==null) {
-                throw new NullPointerException(Resources.format(ResourceKeys.ERROR_NULL_FORMAT_$2, new Integer(i+1), new Integer(format.length)));
+                throw new NullPointerException(Errors.format(ErrorKeys.NULL_FORMAT_$2,
+                                               new Integer(i+1), new Integer(format.length)));
             }
         }
     }
@@ -244,7 +245,9 @@ public class LineFormat {
                 final int error = position.getErrorIndex();
                 int end = error;
                 while (end<upper && !Character.isWhitespace(line.charAt(end))) end++;
-                throw new ParseException(Resources.format(ResourceKeys.ERROR_PARSE_EXCEPTION_$2, line.substring(lower, end).trim(), line.substring(error, Math.min(error+1, end))), error);
+                throw new ParseException(Errors.format(ErrorKeys.PARSE_EXCEPTION_$2,
+                          line.substring(lower, end).trim(),
+                          line.substring(error, Math.min(error+1, end))), error);
             }
             /*
              * Mémorise la nouvelle donnée, en agrandissant
@@ -331,9 +334,8 @@ public class LineFormat {
                 error = exception;
             }
         }
-        ParseException exception = new ParseException(Resources.format(
-                                       ResourceKeys.ERROR_UNPARSABLE_NUMBER_$1,
-                                       data[index]), limits[index]);
+        ParseException exception = new ParseException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1,
+                                                      data[index]), limits[index]);
         if (error!=null) {
             exception.initCause(error);
         }
@@ -524,9 +526,8 @@ public class LineFormat {
         if (count!=expected) {
             final int lower=limits[Math.min(count, expected  )];
             final int upper=limits[Math.min(count, expected+1)];
-            throw new ParseException(Resources.format(count<expected ?
-                                     ResourceKeys.ERROR_LINE_TOO_SHORT_$2 :
-                                     ResourceKeys.ERROR_LINE_TOO_LONG_$3,
+            throw new ParseException(Errors.format(count<expected ?
+                                     ErrorKeys.LINE_TOO_SHORT_$2 : ErrorKeys.LINE_TOO_LONG_$3,
                                      new Integer(count), new Integer(expected),
                                      line.substring(lower,upper).trim()), lower);
         }
@@ -539,9 +540,8 @@ public class LineFormat {
      * @return The exception.
      */
     private ParseException notAnInteger(final int i) {
-        return new ParseException(Resources.format(ResourceKeys.ERROR_NOT_AN_INTEGER_$1,
-                                                   line.substring(limits[i], limits[i+1])),
-                                                   limits[i]);
+        return new ParseException(Errors.format(ErrorKeys.NOT_AN_INTEGER_$1,
+                                  line.substring(limits[i], limits[i+1])), limits[i]);
     }
 
     /**

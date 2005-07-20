@@ -60,8 +60,10 @@ import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -129,10 +131,9 @@ import org.geotools.resources.cts.Resources;
  * @see <a href="http://www.ngs.noaa.gov/TOOLS/Nadcon/Nadcon.html"> NADCON -
  *      North American Datum Conversion Utility</a>
  *
+ * @since 2.1
  * @version $Id$
  * @author Rueben Schulz 
- *
- * @since 2.1
  *
  * @todo the transform code does not deal with the case where grids cross +- 180 degrees.
  */
@@ -259,8 +260,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
                     || (latGridName.endsWith(".LAA") && longGridName.endsWith(".LOA"))) {
                 loadTextGrid(latGridURL, longGridURL);
             } else {
-                throw new FactoryException(Resources.format(
-                        ResourceKeys.ERROR_UNSUPPORTED_FILE_TYPE_$2,
+                throw new FactoryException(Errors.format(ErrorKeys.UNSUPPORTED_FILE_TYPE_$2,
                         latGridName.substring(latGridName.lastIndexOf('.') + 1),
                         longGridName.substring(longGridName.lastIndexOf('.') + 1)));
                 // Note: the +1 above hide the dot, but also make sure that the code is
@@ -427,8 +427,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
                 || (ymin  != longBuffer.getFloat())
                 || (dy    != longBuffer.getFloat())
                 || (angle != longBuffer.getFloat())) {
-            throw new FactoryException(Resources.format(
-                    ResourceKeys.ERROR_GRID_LOCATIONS_UNEQUAL));
+            throw new FactoryException(Errors.format(ErrorKeys.GRID_LOCATIONS_UNEQUAL));
         }
 
         ////////////////////////
@@ -478,8 +477,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
         ByteBuffer buf = ByteBuffer.allocateDirect(numBytes);
 
         if (fill(buf, channel) == -1) {
-            throw new EOFException(Resources.format(
-                    ResourceKeys.ERROR_END_OF_DATA_FILE));
+            throw new EOFException(Errors.format(ErrorKeys.END_OF_DATA_FILE));
         }
 
         buf.flip();
@@ -532,8 +530,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
             File file = new File(url.getFile());
 
             if (!file.exists() || !file.canRead()) {
-                throw new IOException(Resources.format(
-                        ResourceKeys.ERROR_FILE_DOES_NOT_EXIST_$1, file));
+                throw new IOException(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, file));
             }
 
             FileInputStream in = new FileInputStream(file);
@@ -585,9 +582,8 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
         latSt = new StringTokenizer(latLine, " ");
 
         if (latSt.countTokens() != 8) {
-            throw new FactoryException(Resources.format(
-                    ResourceKeys.ERROR_HEADER_UNEXPECTED_LENGTH_$1,
-                    String.valueOf(latSt.countTokens())));
+            throw new FactoryException(Errors.format(ErrorKeys.HEADER_UNEXPECTED_LENGTH_$1,
+                                       String.valueOf(latSt.countTokens())));
         }
 
         int nc = Integer.parseInt(latSt.nextToken());
@@ -609,9 +605,8 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
         longSt = new StringTokenizer(longLine, " ");
 
         if (longSt.countTokens() != 8) {
-            throw new FactoryException(Resources.format(
-                    ResourceKeys.ERROR_HEADER_UNEXPECTED_LENGTH_$1,
-                    String.valueOf(longSt.countTokens())));
+            throw new FactoryException(Errors.format(ErrorKeys.HEADER_UNEXPECTED_LENGTH_$1,
+                                       String.valueOf(longSt.countTokens())));
         }
 
         //check that latitude grid header is the same as for latitude grid
@@ -623,8 +618,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
                 || (ymin  != Float.parseFloat(longSt.nextToken()))
                 || (dy    != Float.parseFloat(longSt.nextToken()))
                 || (angle != Float.parseFloat(longSt.nextToken()))) {
-            throw new FactoryException(Resources.format(
-                    ResourceKeys.ERROR_GRID_LOCATIONS_UNEQUAL));
+            throw new FactoryException(Errors.format(ErrorKeys.GRID_LOCATIONS_UNEQUAL));
         }
 
         ////////////////////////
@@ -697,8 +691,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
 //issue of bbox crossing +- 180 degrees (ie input point of -188 longitude);
 //abs(x - xmin) > 0 , rollLongitude() ???
             if (((x < xmin) || (x > xmax)) || ((y < ymin) || (y > ymax))) {
-                throw new TransformException(Resources.format(
-                        ResourceKeys.ERROR_POINT_OUTSIDE_GRID));
+                throw new TransformException(Errors.format(ErrorKeys.POINT_OUTSIDE_GRID));
             }
 
             //find the grid the point is in (index is 0 based)
@@ -772,8 +765,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
                     break;
                 }
                 if (--i < 0) {
-                    throw new TransformException(Resources.format(
-                            ResourceKeys.ERROR_NO_CONVERGENCE));
+                    throw new TransformException(Errors.format(ErrorKeys.NO_CONVERGENCE));
                 }
             }
 
@@ -979,8 +971,8 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
                 new NamedIdentifier(CitationImpl.OGC,      "NADCON"),
                 new NamedIdentifier(CitationImpl.EPSG,     "NADCON"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9613"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.NADCON_TRANSFORM))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.NADCON_TRANSFORM))
             }, new ParameterDescriptor[] {
                 LAT_DIFF_FILE,
                 LONG_DIFF_FILE

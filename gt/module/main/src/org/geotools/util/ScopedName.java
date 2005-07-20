@@ -43,10 +43,9 @@ import org.geotools.resources.Utilities;
  * which may be a {@link LocalName} or an other {@link org.opengis.util.ScopedName},
  * as {@linkplain #getScope tail}.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see NameFactory
  */

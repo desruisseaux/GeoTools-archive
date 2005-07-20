@@ -70,8 +70,8 @@ import org.geotools.axis.LogarithmicNumberGraduation;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.GCSUtilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -361,8 +361,8 @@ public class ColorRamp extends JComponent {
                     min = tr.transform(lower);
                     max = tr.transform(upper);
                 } catch (TransformException cause) {
-                    IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "band", band));
+                    IllegalArgumentException e = new IllegalArgumentException(Errors.format(
+                                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "band", band));
                     e.initCause(cause);
                     throw e;
                 }
@@ -374,8 +374,8 @@ public class ColorRamp extends JComponent {
                 }
                 if (!(min <= max)) {
                     // This case occurs if one or both values is NaN.
-                    throw new IllegalArgumentException(Resources.format(
-                                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "band", band));
+                    throw new IllegalArgumentException(Errors.format(
+                                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "band", band));
                 }
                 graduation = createGraduation(this.graduation, band, min, max);
             }

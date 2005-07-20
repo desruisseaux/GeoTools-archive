@@ -53,8 +53,8 @@ import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.parameter.Parameter;
 import org.geotools.resources.XArray;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -76,11 +76,10 @@ import org.geotools.resources.cts.ResourceKeys;
  * <A HREF="http://java.sun.com/products/java-media/jai/forDevelopers/jai1_0_1guide-unc/Geom-image-manip.doc.html">Geometric
  * Image Manipulation</A> in the <cite>Programming in Java Advanced Imaging</cite> guide.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Alessio Fabiani
- *
- * @since 2.1
  *
  * @see LocalizationGrid#getPolynomialTransform(int)
  * @see Warp
@@ -333,7 +332,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
             return ((WarpTransform2D) transform).getWarp();
         }
         if (name == null) {
-            name = Resources.formatInternational(ResourceKeys.UNKNOW);
+            name = Vocabulary.formatInternational(VocabularyKeys.UNKNOW);
         }
         return new WarpAdapter(name, transform);
     }

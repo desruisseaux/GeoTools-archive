@@ -39,8 +39,8 @@ import org.opengis.referencing.operation.PlanarProjection;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -230,8 +230,8 @@ public abstract class Stereographic extends MapProjection {
                 new NamedIdentifier(CitationImpl.EPSG,     "9809"),
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_ObliqueStereographic"),
                 new NamedIdentifier(CitationImpl.ESRI,     "Double_Stereographic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
@@ -312,8 +312,8 @@ public abstract class Stereographic extends MapProjection {
                 new NamedIdentifier(CitationImpl.EPSG,     "Polar Stereographic (variant A)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9810"),
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_PolarStereographic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
@@ -384,8 +384,8 @@ public abstract class Stereographic extends MapProjection {
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.EPSG,     "Polar Stereographic (variant B)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9829"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_TRUE_SCALE,
@@ -453,8 +453,8 @@ public abstract class Stereographic extends MapProjection {
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.ESRI,     "Stereographic_North_Pole"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_TRUE_SCALE,
@@ -520,8 +520,8 @@ public abstract class Stereographic extends MapProjection {
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.ESRI,     "Stereographic_South_Pole"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_TRUE_SCALE,
@@ -578,8 +578,8 @@ public abstract class Stereographic extends MapProjection {
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.ESRI,     "Stereographic"),
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Stereographic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,

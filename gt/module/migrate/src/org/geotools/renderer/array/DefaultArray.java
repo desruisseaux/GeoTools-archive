@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.array;
 
@@ -37,10 +24,11 @@ package org.geotools.renderer.array;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+// Geotools dependencies
 import org.geotools.renderer.geom.CompressionLevel;
 import org.geotools.resources.XArray;
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.renderer.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -76,7 +64,7 @@ public class DefaultArray extends PointArray implements RandomAccess {
     public DefaultArray(final float[] array) throws IllegalArgumentException {
         this.array = array;
         if ((array.length & 1) != 0) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_ODD_ARRAY_LENGTH_$1,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ODD_ARRAY_LENGTH_$1,
                                                new Integer(array.length)));
         }
     }

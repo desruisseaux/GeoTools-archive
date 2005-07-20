@@ -68,8 +68,8 @@ import org.geotools.pt.Envelope;
 import org.geotools.pt.Matrix;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.CannotEvaluateException;
@@ -647,8 +647,8 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
             final double boundsHeight = bounds.getHeight();
             if (!(width > 0)) { // Use '!' in order to catch NaN
                 if (!(height > 0)) {
-                    throw new IllegalArgumentException(Resources.format(
-                             ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
+                    throw new IllegalArgumentException(Errors.format(
+                             ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
                 }
                 width = (int)Math.round(height * (boundsWidth/boundsHeight));
             } else if (!(height > 0)) {

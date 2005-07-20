@@ -51,21 +51,24 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+
 
 /**
  * The USGS oblique/equatorial case of the {@linkplain Stereographic stereographic} 
  * projection. This is similar but <strong>NOT</strong> equal to EPSG code 9809.
  *
+ * @since 2.1
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
- *
- * @since 2.1
  */
 public class StereographicOblique extends Stereographic {    
     /**
@@ -169,7 +172,7 @@ public class StereographicOblique extends Stereographic {
             }
             phi0 = phi;
             if (--i < 0) {
-                throw new ProjectionException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE));
+                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
             }
         }
 
@@ -268,8 +271,8 @@ public class StereographicOblique extends Stereographic {
             final double coslon = Math.cos(x);
             double f = 1.0 + sinphi0*sinlat + cosphi0*coslat*coslon; // (21-4)
             if (f < EPS) {
-                throw new ProjectionException(Resources.format(
-                          ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                throw new ProjectionException(Errors.format(
+                          ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
             f = k0/f;
             x = f * coslat * Math.sin(x);                           // (21-2)
@@ -460,7 +463,7 @@ public class StereographicOblique extends Stereographic {
                 }
                 y = phi;
                 if (--i < 0) {
-                    throw new ProjectionException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE));
+                    throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
                 }
             }
             // End pj_inv_gauss(...) method inlined

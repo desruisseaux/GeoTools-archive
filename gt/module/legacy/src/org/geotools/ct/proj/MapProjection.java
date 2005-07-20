@@ -40,8 +40,8 @@ import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MissingParameterException;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -249,8 +249,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         {
             return Math.toRadians(y);
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+        throw new IllegalArgumentException(Errors.format(
+                ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
     }
     
     /**
@@ -270,8 +270,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         {
             return Math.toRadians(x);
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
+        throw new IllegalArgumentException(Errors.format(
+                ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
     }
 
     /**
@@ -513,12 +513,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         final double y = ptSrc.getY();
 
         if (x<Longitude.MIN_VALUE-EPS || x>Longitude.MAX_VALUE+EPS) { // Do not fail for NaN values.
-            throw new PointOutsideEnvelopeException(Resources.format(
-                    ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
+            throw new PointOutsideEnvelopeException(Errors.format(
+                    ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
         }
         if (y<Latitude.MIN_VALUE-EPS || y>Latitude.MAX_VALUE+EPS) { // Do not fail for NaN values.
-            throw new PointOutsideEnvelopeException(Resources.format(
-                    ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+            throw new PointOutsideEnvelopeException(Errors.format(
+                    ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
         }
 
         ptDst = transformNormalized(ensureInRange(Math.toRadians(x) - centralMeridian),
@@ -679,12 +679,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             ptDst.setLocation(x,y);
 
             if (x<Longitude.MIN_VALUE-EPS || x>Longitude.MAX_VALUE+EPS) { // Accept NaN values.
-                throw new PointOutsideEnvelopeException(Resources.format(
-                        ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
+                throw new PointOutsideEnvelopeException(Errors.format(
+                        ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
             }
             if (y<Latitude.MIN_VALUE-EPS || y>Latitude.MAX_VALUE+EPS) { // Accept NaN values.
-                throw new PointOutsideEnvelopeException(Resources.format(
-                        ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+                throw new PointOutsideEnvelopeException(Errors.format(
+                        ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
             }
             assert checkTransform(ptDst, (ptSrc!=ptDst) ? ptSrc : new Point2D.Double(x0, y0), false);
             return ptDst;
@@ -939,7 +939,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                 return phi;
             }
         }
-        throw new ProjectionException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE));
+        throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
     }
     
     /**

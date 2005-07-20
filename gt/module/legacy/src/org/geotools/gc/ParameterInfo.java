@@ -43,8 +43,8 @@ import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.util.Range;
 
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.gc.GC_ParameterInfo;
 
 
@@ -110,8 +110,8 @@ public class ParameterInfo implements Serializable {
                 }
             }
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_UNKNOW_PARAMETER_NAME_$1, name));
+        throw new IllegalArgumentException(Errors.format(
+                ErrorKeys.UNKNOW_PARAMETER_NAME_$1, name));
     }
     
     /**

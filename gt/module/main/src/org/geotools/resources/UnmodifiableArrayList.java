@@ -30,10 +30,9 @@ import java.util.AbstractList;
 /**
  * An unmodifiable view of an array.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class UnmodifiableArrayList extends AbstractList implements Serializable {
     /**

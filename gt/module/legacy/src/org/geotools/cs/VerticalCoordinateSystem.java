@@ -26,8 +26,8 @@ package org.geotools.cs;
 // OpenGIS dependencies
 import java.rmi.RemoteException;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.cs.CS_LinearUnit;
 import org.opengis.cs.CS_VerticalCoordinateSystem;
@@ -155,8 +155,8 @@ public class VerticalCoordinateSystem extends CoordinateSystem {
         if (dimension>=0 && dimension<maxDim) {
             return axis;
         }
-        throw new IndexOutOfBoundsException(Resources.format(
-                ResourceKeys.ERROR_INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
+        throw new IndexOutOfBoundsException(Errors.format(
+                ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
     }
     
     /**
@@ -176,8 +176,8 @@ public class VerticalCoordinateSystem extends CoordinateSystem {
         if (dimension>=0 && dimension<maxDim) {
             return unit;
         }
-        throw new IndexOutOfBoundsException(Resources.format(
-                ResourceKeys.ERROR_INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
+        throw new IndexOutOfBoundsException(Errors.format(
+                ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
     }
     
     /**

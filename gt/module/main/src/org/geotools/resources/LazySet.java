@@ -30,10 +30,9 @@ import java.util.Iterator;
  * unique; we assume that it was already verified by {@link javax.imageio.spi.ServiceRegistry}.
  * This set is constructed by {@link org.geotools.referencing.FactoryFinder}.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class LazySet extends AbstractSet {
     /**

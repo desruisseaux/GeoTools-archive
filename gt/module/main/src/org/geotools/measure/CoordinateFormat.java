@@ -53,8 +53,8 @@ import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -381,8 +381,8 @@ public class CoordinateFormat extends Format {
     {
         final int dimension = point.getDimension();
         if (dimension != formats.length) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, "point",
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$3, "point",
                         new Integer(dimension), new Integer(formats.length)));
         }
         for (int i=0; i<formats.length; i++) {

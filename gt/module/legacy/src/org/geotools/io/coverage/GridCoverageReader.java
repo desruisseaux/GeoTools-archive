@@ -52,8 +52,8 @@ import org.geotools.io.LineWriter;
 import org.geotools.io.TableWriter;
 //import org.geotools.image.io.RawBinaryImageReadParam;
 import org.geotools.pt.Envelope;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -225,7 +225,7 @@ public abstract class GridCoverageReader {
                     }
                 }
             }
-            throw new IllegalArgumentException(getString(ResourceKeys.ERROR_NO_IMAGE_READER));
+            throw new IllegalArgumentException(getString(ErrorKeys.NO_IMAGE_READER));
         }
     }
     
@@ -263,7 +263,7 @@ public abstract class GridCoverageReader {
      */
     public int getNumImages(final boolean allowSearch) throws IOException {
         if (reader==null) {
-            throw new IllegalStateException(getString(ResourceKeys.ERROR_NO_IMAGE_INPUT));
+            throw new IllegalStateException(getString(ErrorKeys.NO_IMAGE_INPUT));
         }
         return reader.getNumImages(allowSearch);
     }
@@ -279,7 +279,7 @@ public abstract class GridCoverageReader {
      */
     final void checkImageIndex(final int imageIndex) throws IOException, IndexOutOfBoundsException {
         if (reader==null) {
-            throw new IllegalStateException(getString(ResourceKeys.ERROR_NO_IMAGE_INPUT));
+            throw new IllegalStateException(getString(ErrorKeys.NO_IMAGE_INPUT));
         }
         final int numImages = getNumImages(false);
         if (imageIndex<reader.getMinIndex() || (imageIndex>=numImages && numImages>=0)) {
@@ -307,7 +307,7 @@ public abstract class GridCoverageReader {
         if (input instanceof URL) {
             return new File(((URL) input).getPath()).getName();
         }
-        return getString(ResourceKeys.UNTITLED);
+        return "Untitled";
     }
     
     /**
@@ -489,7 +489,7 @@ public abstract class GridCoverageReader {
      * Returns a localized string for the specified key.
      */
     final String getString(final int key) {
-        return Resources.getResources(locale).getString(key);
+        return Errors.getResources(locale).getString(key);
     }
     
     /**

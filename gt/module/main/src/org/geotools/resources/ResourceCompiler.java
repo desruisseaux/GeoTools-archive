@@ -30,6 +30,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -45,39 +46,22 @@ import java.util.StringTokenizer;
 
 
 /**
- * Resource compiler. This class is run from the command line at compile time
- * only. {@code ResourceCompiler} scans for {@code .properties} files
- * and copies their content to {@code .utf} files using UTF8 encoding. It
- * also checks for key validity (making sure that the same set of keys is
- * defined in every language) and checks values for {@link MessageFormat}
- * compatibility.
- * Finally, it creates a {@code ResourceKeys.java} source file declaring
- * resource keys as integer constants.
- * <br><br>
- * {@code ResourceCompiler} and all {@code ResourceKeys} classes
- * don't need to be included in the final JAR file. They are used at
- * compile time only and no other classes should keep reference to them.
- *
- * @version $Id$
- * @author Martin Desruisseaux
+ * Resource compiler. This class is run from the command line at compile time only.
+ * {@code ResourceCompiler} scans for {@code .properties} files in the current directory and copies
+ * their content to {@code .utf} files using UTF8 encoding. It also checks for key validity and
+ * checks values for {@link MessageFormat} compatibility. Finally, it creates a {@code FooKeys.java}
+ * source file declaring resource keys as integer constants.
+ * <p>
+ * This class <strong>must</strong> be run from the root of Java source files.
+ * <p>
+ * {@code ResourceCompiler} and all {@code FooKeys} classes don't need to be included in the final
+ * JAR file. They are used at compile time only and no other classes should keep reference to them.
  *
  * @since 2.0
+ * @version $Id$
+ * @author Martin Desruisseaux
  */
 final class ResourceCompiler implements Comparator {
-    /**
-     * Special order for resource keys starting
-     * with the specified prefix.
-     */
-    private static final String[] ORDER = {
-        "WARNING_",
-        "ERROR_"
-    };
-
-    /**
-     * The class name for the interfaces to be generated.
-     */
-    private static final String CLASS_NAME = "ResourceKeys";
-
     /**
      * Extension for properties files.
      */
@@ -89,50 +73,47 @@ final class ResourceCompiler implements Comparator {
     private static final String RESOURCES_EXT = ".utf";
 
     /**
-     * Prefix for argument count in resource key names.
-     * For example, a resource expecting one argument may
-     * have a key name like "HELLO_$1".
+     * Prefix for argument count in resource key names. For example, a resource
+     * expecting one argument may have a key name like "HELLO_$1".
      */
     private static final String ARGUMENT_COUNT_PREFIX = "_$";
 
     /**
-     * Integer IDs allocated to resource keys. This map
-     * uses <code>&lt;Integer,String&gt;</code> entries.
+     * Integer IDs allocated to resource keys. This map will be shared for all languages
+     * of a given resource bundle.
      */
-    private final Map allocatedIDs = new HashMap();
+    private final Map/*<Integer,String>*/ allocatedIDs = new HashMap();
 
     /**
-     * Resource keys and their localized values. This map
-     * uses <code>&lt;String,String&gt;</code> entries.
+     * Resource keys and their localized values. This map will be cleared for each language
+     * in a resource bundle.
      */
-    private final Map resources = new HashMap();
+    private final Map/*<String,String>*/ resources = new HashMap();
 
     /**
-     * Construct a new {@code ResourceCompiler}.  This method will
-     * immediately look for a {@code ResourceKeys.class} file. If
-     * one is found, integer keys are loaded in order to reuse the same values.
+     * The output stream for printing message.
+     */
+    private final PrintWriter out;
+
+    /**
+     * Constructs a new {@code ResourceCompiler}. This method will immediately look for
+     * a {@code FooKeys.class} file. If one is found, integer keys are loaded in order to
+     * reuse the same values.
      *
-     * @param directory The resource directory. This directory should or
-     *                  will contain the following input and output files:
-     *      <ul>
-     *        <li>{@code resources*.properties} (mandatory input)</li>
-     *        <li>{@code ResourceKeys.class}    (optional  input)</li>
-     *        <li>{@code resources*.utf}                 (output)</li>
-     *        <li>{@code ResourceKeys.class}             (output)</li>
-     *      </ul>
-     *
+     * @param  out The output stream for printing message.
+     * @param  bundleClass The resource bundle base class
+     *         (e.g. <code>{@linkplain org.geotools.resources.i18n.Vocabulary}.class}</code>).
      * @throws IOException if an input/output operation failed.
      */
-    private ResourceCompiler(final File directory) throws IOException {
+    private ResourceCompiler(final PrintWriter out, final Class bundleClass) throws IOException {
+        this.out = out;
         try {
-            String classname;
-            classname = toRelative(new File(directory, CLASS_NAME));
-            classname = classname.replace(File.separatorChar, '.');
+            final String classname = toKeyClass(bundleClass.getName());
             final Field[] fields = Class.forName(classname).getFields();
-            System.out.print("Loading ");
-            System.out.println(classname);
+            out.print("Loading ");
+            out.println(classname);
             /*
-             * Copy all fields into {@link #allocatedIDs} map.
+             * Copies all fields into {@link #allocatedIDs} map.
              */
             Field.setAccessible(fields, true);
             for (int i=fields.length; --i>=0;) {
@@ -144,62 +125,42 @@ final class ResourceCompiler implements Comparator {
                         allocatedIDs.put((Integer)ID, key);
                     }
                 } catch (IllegalAccessException exception) {
-                    warning(toSourceFile(classname), key, "Access denied", exception);
+                    final File source = new File(classname.replace('.','/') + ".class");
+                    warning(source, key, "Access denied", exception);
                 }
             }
         } catch (ClassNotFoundException exception) {
             /*
-             * 'ResourceKeys.class' doesn't exist. This is okay
-             * (probably normal). We will create 'ResourceKeys.java'
-             * later using automatic key values.
+             * 'VocabularyKeys.class' doesn't exist. This is okay (probably normal).
+             * We will create 'VocabularyKeys.java' later using automatic key values.
              */
         }
     }
 
     /**
-     * Scan the specified directory and all subdirectories for resources.
-     *
-     * @param  directory The root directory.
-     * @throws IOException if an input/output operation failed.
+     * Returns the class name for the keys. For example if {@code bundleClass} is
+     * {@code "org.geotools.resources.i18n.Vocabulary"}, then this method returns
+     * {@code "org.geotools.resources.i18n.VocabularyKeys"}.
      */
-    private static void scanForResources(final File directory) throws IOException {
-        ResourceCompiler compiler = null;
-        final File[] content = directory.listFiles();
-        for (int i=0; i<content.length; i++) {
-            final File file = content[i];
-            if (file.isDirectory()) {
-                scanForResources(file);
-                continue;
-            }
-            if (file.getName().endsWith(PROPERTIES_EXT)) {
-                if (compiler==null) {
-                    compiler = new ResourceCompiler(directory);
-                }
-                compiler.loadPropertyFile(file);
-                String path = file.getPath();
-                path = path.substring(0, path.length()-PROPERTIES_EXT.length())
-                       + RESOURCES_EXT;
-                compiler.writeUTFFile(new File(path));
-            }
+    private static String toKeyClass(String bundleClass) {
+        if (bundleClass.endsWith("s")) {
+            bundleClass = bundleClass.substring(0, bundleClass.length()-1);
         }
-        if (compiler!=null) {
-            compiler.writeJavaSource(new File(directory, CLASS_NAME+".java"));
-        }
+        return bundleClass + "Keys";
     }
 
     /**
-     * Load all properties from a {@code .properties} file. Resource
-     * keys are checked for naming conventions (i.e. resources expecting some
-     * arguments must have a key ending with "_$n" where "n" is the number of
-     * arguments). This method transforms resource values into legal
-     * {@link MessageFormat} patterns when necessary.
+     * Loads all properties from a {@code .properties} file. Resource keys are checked for naming
+     * conventions (i.e. resources expecting some arguments must have a key name ending with
+     * {@code "_$n"} where {@code "n"} is the number of arguments). This method transforms resource
+     * values into legal {@link MessageFormat} patterns when necessary.
      *
-     * @param  file Resource file to read.
+     * @param  file The properties file to read.
      * @throws IOException if an input/output operation failed.
      */
     private void loadPropertyFile(final File file) throws IOException {
-        final InputStream input=new FileInputStream(file);
-        final Properties properties=new Properties();
+        final InputStream input = new FileInputStream(file);
+        final Properties properties = new Properties();
         properties.load(input);
         input.close();
         resources.clear();
@@ -208,18 +169,18 @@ final class ResourceCompiler implements Comparator {
             final String key      = (String) entry.getKey();
             final String value    = (String) entry.getValue();
             /*
-             * Check key and value validity.
+             * Checks key and value validity.
              */
-            if (key.trim().length()==0) {
+            if (key.trim().length() == 0) {
                 warning(file, key, "Empty key.", null);
                 continue;
             }
-            if (value.trim().length()==0) {
+            if (value.trim().length() == 0) {
                 warning(file, key, "Empty value.", null);
                 continue;
             }
             /*
-             * Check if the resource value is a legal MessageFormat pattern.
+             * Checks if the resource value is a legal MessageFormat pattern.
              */
             final MessageFormat message;
             try {
@@ -229,55 +190,31 @@ final class ResourceCompiler implements Comparator {
                 continue;
             }
             /*
-             * Check if the expected arguments count (according to naming
-             * conventions) matches the arguments count found in the
-             * MessageFormat pattern.
+             * Checks if the expected arguments count (according to naming conventions)
+             * matches the arguments count found in the MessageFormat pattern.
              */
             final int argumentCount;
             final int index = key.lastIndexOf(ARGUMENT_COUNT_PREFIX);
-            if (index<0) {
+            if (index < 0) {
                 argumentCount = 0;
-                resources.put(key, value);
+                resources.put(key, value); // Text will not be formatted using MessageFormat.
             } else try {
-                String suffix = key.substring(index+ARGUMENT_COUNT_PREFIX.length());
+                String suffix = key.substring(index + ARGUMENT_COUNT_PREFIX.length());
                 argumentCount = Integer.parseInt(suffix);
                 resources.put(key, message.toPattern());
             } catch (NumberFormatException exception) {
                 warning(file, key, "Bad number in resource key", exception);
                 continue;
             }
-            final int expected=message.getFormats().length;
-            if (argumentCount!=expected) {
-                final String suffix = ARGUMENT_COUNT_PREFIX+expected;
+            final int expected = message.getFormats().length;
+            if (argumentCount != expected) {
+                final String suffix = ARGUMENT_COUNT_PREFIX + expected;
                 warning(file, key, "Key name should ends with \""+suffix+"\".", null);
                 continue;
             }
         }
         /*
-         * Finished loading properties. Now, check if some keys are missing.
-         */
-        if (!allocatedIDs.isEmpty()) {
-            final Set missing = new HashSet(allocatedIDs.values());
-            missing.removeAll(resources.keySet());
-            final String filename = file.getName();
-            if (filename.indexOf('_') == filename.lastIndexOf('_')) {
-                for (final Iterator it=missing.iterator(); it.hasNext();) {
-                    final String key = (String) it.next();
-                    warning(file, key, "Key defined in previous languages "+
-                                       "is missing in current one.", null);
-                }
-            }
-            // Second check
-            missing.clear();
-            missing.addAll(resources.keySet());
-            missing.removeAll(allocatedIDs.values());
-            for (final Iterator it=missing.iterator(); it.hasNext();) {
-                final String key = (String) it.next();
-                warning(file, key, "Key was not defined in previous languages.", null);
-            }
-        }
-        /*
-         * Allocate an ID for each new key.
+         * Allocates an ID for each new key.
          */
         final String[] keys = (String[]) resources.keySet().toArray(new String[resources.size()]);
         Arrays.sort(keys, this);
@@ -286,22 +223,24 @@ final class ResourceCompiler implements Comparator {
             final String key = keys[i];
             if (!allocatedIDs.containsValue(key)) {
                 Integer ID;
-                while (allocatedIDs.containsKey(ID=new Integer(freeID++)));
+                do {
+                    ID = new Integer(freeID++);
+                } while (allocatedIDs.containsKey(ID));
                 allocatedIDs.put(ID, key);
             }
         }
     }
 
     /**
-     * Write UTF file. Method {@link #loadPropertyFile} should
-     * be invoked beforehand to {@code writeUTFFile}.
+     * Write UTF file. Method {@link #loadPropertyFile} should be invoked beforehand to
+     * {@code writeUTFFile}.
      *
      * @param  file The destination file.
      * @throws IOException if an input/output operation failed.
      */
     private void writeUTFFile(final File file) throws IOException {
         final int count = allocatedIDs.isEmpty() ? 0 : ((Integer) Collections.max(allocatedIDs.keySet())).intValue()+1;
-        final DataOutputStream out=new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+        final DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
         out.writeInt(count);
         for (int i=0; i<count; i++) {
             final String value = (String) resources.get(allocatedIDs.get(new Integer(i)));
@@ -311,57 +250,8 @@ final class ResourceCompiler implements Comparator {
     }
 
     /**
-     * Returns the source file for the specified class.
-     */
-    private static File toSourceFile(final String classname) {
-        return new File(classname.replace('.','/')+".java");
-    }
-
-    /**
-     * Returns the class name for the specified source file.
-     * The returned class name is not to include the package name.
-     */
-    private static String toClassName(final File file) {
-        String name = file.getName();
-        final int index = name.lastIndexOf('.');
-        if (index>=0) name = name.substring(0, index);
-        return name;
-    }
-
-    /**
-     * Make a file path relative to the classpath.  The file path may be
-     * relative (to current {@code chdir}) or absolute. This method
-     * finds the canonical form of {@code path} and compares it with
-     * canonical forms of every path in the classpath.  If a classpath
-     * matches the beginning of {@code path}, then the corresponding
-     * part of {@code path} is removed.  If there is more than one
-     * match, the one resulting in the shortest relative path is chosen.
-     */
-    private static String toRelative(final File path) throws IOException {
-        String bestpath = null;
-        final String  absolutePath = path.getCanonicalPath();
-        final String fileSeparator = System.getProperty("file.separator", "/");
-        final StringTokenizer tokr = new StringTokenizer(System.getProperty("java.class.path", "."),
-                                                         System.getProperty("path.separator", ":"));
-        while (tokr.hasMoreTokens()) {
-            String classpath = new File(tokr.nextToken()).getCanonicalPath();
-            if (!classpath.endsWith(fileSeparator)) classpath+=fileSeparator;
-            if (absolutePath.startsWith(classpath)) {
-                final String candidate = absolutePath.substring(classpath.length());
-                if (bestpath==null || bestpath.length()>candidate.length()) {
-                    // Choose the shortest path.
-                    bestpath = candidate;
-                }
-            }
-        }
-        return (bestpath!=null) ? bestpath : path.getPath();
-    }
-
-    /**
-     * Change a "normal" text string into a pattern compatible with
-     * {@link MessageFormat}.
-     * The main operation consists of changing ' for '', except for '{' and '}'
-     * strings.
+     * Changes a "normal" text string into a pattern compatible with {@link MessageFormat}.
+     * The main operation consists of changing ' for '', except for '{' and '}' strings.
      */
     private static String toMessageFormatString(final String text) {
         int level =  0;
@@ -370,19 +260,17 @@ final class ResourceCompiler implements Comparator {
 search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
             switch (buffer.charAt(i)) {
                 /*
-                 * Left and right braces take us up or down a level.  Quotes
-                 * will only be doubled if we are at level 0.  If the brace
-                 * is between quotes it will not be taken into account as it
-                 * will have been skipped over during the previous pass through
-                 * the loop.
+                 * Left and right braces take us up or down a level.  Quotes will only be doubled
+                 * if we are at level 0.  If the brace is between quotes it will not be taken into
+                 * account as it will have been skipped over during the previous pass through the
+                 * loop.
                  */
                 case '{' : level++; last=i; break;
                 case '}' : level--; last=i; break;
                 case '\'': {
                     /*
-                     * If a brace ('{' or '}') is found between quotes,
-                     * the entire block is ignored and we continue with the
-                     * character following the closing quote.
+                     * If a brace ('{' or '}') is found between quotes, the entire block is
+                     * ignored and we continue with the character following the closing quote.
                      */
                     if (i+2<buffer.length() && buffer.charAt(i+2)=='\'') {
                         switch (buffer.charAt(i+1)) {
@@ -390,18 +278,16 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
                             case '}': i+=2; continue search;
                         }
                     }
-                    if (level<=0) {
+                    if (level <= 0) {
                         /*
-                         * If we weren't between braces, we must double the
-                         * quotes.
+                         * If we weren't between braces, we must double the quotes.
                          */
                         buffer.insert(i++, '\'');
                         continue search;
                     }
                     /*
-                     * If we find ourselves between braces, we don't normally
-                     * need to double our quotes.  However, the format
-                     * {0,choice,...} is an exception.
+                     * If we find ourselves between braces, we don't normally need to double
+                     * our quotes.  However, the format {0,choice,...} is an exception.
                      */
                     if (last>=0 && buffer.charAt(last)=='{') {
                         int scan=last;
@@ -421,59 +307,65 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
     }
 
     /**
-     * Print a message to the error output stream {@link System#err}.
+     * Prints a message to the output stream.
      *
      * @param file      File that produced the error, or {@code null} if none.
      * @param key       Resource key that produced the error, or {@code null} if none.
      * @param message   The message string.
      * @param exception An optional exception that is the cause of this warning.
      */
-    private static void warning(final File file,      final String key,
-                                final String message, final Exception exception) {
-        System.out.flush();
-        System.err.print("ERROR ");
-        if (file!=null) {
+    private void warning(final File file,      final String key,
+                         final String message, final Exception exception)
+    {
+        out.print("ERROR ");
+        if (file != null) {
             String filename = file.getPath();
             if (filename.endsWith(PROPERTIES_EXT)) {
                 filename = filename.substring(0, filename.length()-PROPERTIES_EXT.length());
             }
-            System.err.print('(');
-            System.err.print(filename);
-            System.err.print(')');
+            out.print('(');
+            out.print(filename);
+            out.print(')');
         }
-        System.err.print(": ");
-        if (key!=null) {
-            System.err.print('"');
-            System.err.print(key);
-            System.err.print('"');
+        out.print(": ");
+        if (key != null) {
+            out.print('"');
+            out.print(key);
+            out.print('"');
         }
-        System.err.println();
-        System.err.print(message);
-        if (exception!=null) {
-            System.err.print(": ");
-            System.err.print(exception.getLocalizedMessage());
+        out.println();
+        out.print(message);
+        if (exception != null) {
+            out.print(": ");
+            out.print(exception.getLocalizedMessage());
         }
-        System.err.println();
-        System.err.println();
-        System.err.flush();
+        out.println();
+        out.println();
+        out.flush();
     }
 
     /**
-     * Write {@code count} spaces to the {@code out} stream.
+     * Writes {@code count} spaces to the {@code out} stream.
      * @throws IOException if an input/output operation failed.
      */
     private static void writeWhiteSpaces(final Writer out, int count) throws IOException {
-        while (--count>=0) out.write(' ');
+        while (--count>=0) {
+            out.write(' ');
+        }
     }
 
     /**
-     * Create a source file for resource keys.
+     * Creates a source file for resource keys.
      *
-     * @param  file The destination file.
+     * @param  bundleClass The resource bundle base class
+     *         (e.g. <code>{@linkplain org.geotools.resources.i18n.Vocabulary}.class}</code>).
      * @throws IOException if an input/output operation failed.
      */
-    private void writeJavaSource(final File file) throws IOException {
-        final String packageName = toRelative(file.getParentFile()).replace(File.separatorChar, '.');
+    private void writeJavaSource(final Class bundleClass) throws IOException {
+        final String fullname    = toKeyClass(bundleClass.getName());
+        final String classname   = fullname.substring(fullname.lastIndexOf('.')+1);
+        final String packageName = fullname.substring(0, fullname.lastIndexOf('.'));
+        final File          file = new File(fullname.replace('.', '/') + ".java");
         final BufferedWriter out = new BufferedWriter(new FileWriter(file));
         out.write("/*\n"                                                             +
                   " * Geotools - OpenSource mapping toolkit\n"                       +
@@ -486,8 +378,8 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
         out.write(packageName);
         out.write(";\n\n\n");
         out.write("/**\n"                                                                  +
-                  " * Resource keys. This interface is used when compiling sources, but\n" +
-                  " * no dependencies to {@code ResourceKeys} should appear in any\n" +
+                  " * Resource keys. This class is used when compiling sources, but\n"     +
+                  " * no dependencies to {@code ResourceKeys} should appear in any\n"      +
                   " * resulting class files.  Since Java compiler inlines final integer\n" +
                   " * values, using long identifiers will not bloat constant pools of\n"   +
                   " * classes compiled against the interface, provided that no class\n"    +
@@ -496,22 +388,22 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
                   " * @see org.geotools.resources.ResourceBundle\n"                        +
                   " * @see org.geotools.resources.ResourceCompiler\n"                      +
                   " */\n");
-        out.write("public interface ");
-        out.write(toClassName(file));
-        out.write("\n{\n");
+        out.write("public final class "); out.write(classname); out.write(" {\n");
+        out.write("    private "); out.write(classname); out.write("() {\n");
+        out.write("    }\n");
+        out.write("\n");
         final Map.Entry[] entries = (Map.Entry[]) allocatedIDs.entrySet().toArray(new Map.Entry[allocatedIDs.size()]);
         Arrays.sort(entries, this);
-        int maxLength=0;
+        int maxLength = 0;
         for (int i=entries.length; --i>=0;) {
             final int length = ((String) entries[i].getValue()).length();
-            if (length>maxLength) maxLength=length;
+            if (length > maxLength) {
+                maxLength = length;
+            }
         }
         for (int i=0; i<entries.length; i++) {
             final String key = (String) entries[i].getValue();
             final String ID  = entries[i].getKey().toString();
-            if (i!=0 && compare(entries[i-1], key)<-1) {
-                out.write('\n');
-            }
             writeWhiteSpaces(out, 4);
             out.write("public static final int ");
             out.write(key);
@@ -526,34 +418,82 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
     }
 
     /**
-     * Compare two resource keys. Object {@code o1} and {@code o2}
-     * are usually {@link String} objects representing resource keys (for
-     * example, "{@code MISMATCHED_DIMENSION}").  This method compares
-     * strings in the same manner as {@link String#compareTo}, except that
-     * strings starting with one of the prefixes enumerated in {@link #ORDER}
-     * will appear last in the sorted array.
+     * Compares two resource keys. Object {@code o1} and {@code o2} are usually {@link String}
+     * objects representing resource keys (for example, "{@code MISMATCHED_DIMENSION}"), but
+     * may also be {@link Map.Entry}.
      */
     public int compare(Object o1, Object o2) {
         if (o1 instanceof Map.Entry) o1 = ((Map.Entry) o1).getValue();
         if (o2 instanceof Map.Entry) o2 = ((Map.Entry) o2).getValue();
         final String key1 = (String) o1;
         final String key2 = (String) o2;
-        int i1=ORDER.length; while (--i1>=0) if (key1.startsWith(ORDER[i1])) break;
-        int i2=ORDER.length; while (--i2>=0) if (key2.startsWith(ORDER[i2])) break;
-        if (i1 < i2) return -2;
-        if (i1 > i2) return +2;
-        return XMath.sgn(key1.compareTo(key2));
+        return key1.compareTo(key2);
+    }
+
+    /**
+     * Scans the package for resources.
+     *
+     * @param  out The output stream for printing message.
+     * @param  bundleClass The resource bundle base class
+     *         (e.g. <code>{@linkplain org.geotools.resources.i18n.Vocabulary}.class}</code>).
+     * @throws IOException if an input/output operation failed.
+     */
+    private static void scanForResources(final PrintWriter out, final Class bundleClass) throws IOException {
+        String classname = bundleClass.getName();
+        final File directory = new File(classname.replace('.', '/')).getParentFile();
+        if (!directory.isDirectory()) {
+            out.print('"');
+            out.print(directory.getPath());
+            out.println("\" is not a directory.");
+            return;
+        }
+        classname = classname.substring(classname.lastIndexOf('.')+1);
+        ResourceCompiler compiler = null;
+        final File[] content = directory.listFiles();
+        for (int i=0; i<content.length; i++) {
+            final File file = content[i];
+            final String filename = file.getName();
+            if (filename.startsWith(classname) && filename.endsWith(PROPERTIES_EXT)) {
+                if (compiler == null) {
+                    compiler = new ResourceCompiler(out, bundleClass);
+                }
+                compiler.loadPropertyFile(file);
+                String path = file.getPath();
+                path = path.substring(0, path.length()-PROPERTIES_EXT.length()) + RESOURCES_EXT;
+                compiler.writeUTFFile(new File(path));
+            }
+        }
+        if (compiler != null) {
+            compiler.writeJavaSource(bundleClass);
+        }
     }
 
     /**
      * Run the resource compiler.
      *
-     * @param  args Command-line arguments.
-     * @throws IOException if an input/output operation failed.
+     * @param  args List of fully-qualified class name. If none, then a default set is used.
      */
-    public static void main(final String[] args) throws IOException {
-        for (int i=0; i<args.length; i++) {
-            scanForResources(new File(args[i]));
+    public static void main(String[] args) {
+        final Arguments arguments = new Arguments(args);
+        final PrintWriter out = arguments.out;
+        args = arguments.getRemainingArguments(0);
+        if (args.length == 0) {
+            args = new String[] {
+                org.geotools.resources.i18n.Descriptions.class.getName(),
+                org.geotools.resources.i18n.Vocabulary  .class.getName(),
+                org.geotools.resources.i18n.Logging     .class.getName(),
+                org.geotools.resources.i18n.Errors      .class.getName()
+            };
         }
+        for (int i=0; i<args.length; i++) {
+            try {
+                scanForResources(out, Class.forName(args[i]));
+            } catch (ClassNotFoundException exception) {
+                out.println(exception.getLocalizedMessage());
+            } catch (IOException exception) {
+                out.println(exception.getLocalizedMessage());
+            }
+        }
+        out.flush();
     }
 }

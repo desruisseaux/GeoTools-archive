@@ -20,7 +20,7 @@
  */
 package org.geotools.renderer.geom;
 
-// Geometry and graphics
+// J2SE dependencies
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.FlatteningPathIterator;
@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 
+// Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CoordinateSystemFactory;
 import org.geotools.cs.Ellipsoid;
@@ -61,8 +62,8 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.XMath;
 import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.renderer.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.referencing.operation.TransformException;
 
@@ -209,8 +210,8 @@ public class Polyline extends Geometry {
             if ((cs=coordinateTransform.getSourceCS()).getDimension() != 2 ||
                 (cs=coordinateTransform.getTargetCS()).getDimension() != 2)
             {
-                throw new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
-                   org.geotools.resources.cts.ResourceKeys.ERROR_CANT_REDUCE_TO_TWO_DIMENSIONS_$1, cs));
+                throw new IllegalArgumentException(Errors.format(
+                           ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1, cs));
             }
         }
         refreshFlattenedShape();
@@ -626,7 +627,7 @@ public class Polyline extends Geometry {
             throw new UnmodifiableGeometryException((Locale)null);
         }
         if (isClosed) {
-            throw new IllegalStateException(Resources.format(ResourceKeys.ERROR_POLYGON_CLOSED));
+            throw new IllegalStateException(Errors.format(ErrorKeys.POLYGON_CLOSED));
         }
         MathTransform2D transform = getMathTransform2D(getTransformationFromInternalCS(cs));
         if (transform != null) {
@@ -693,7 +694,7 @@ public class Polyline extends Geometry {
             throw new UnmodifiableGeometryException((Locale)null);
         }
         if (isClosed || toAppend.isClosed) {
-            throw new IllegalStateException(Resources.format(ResourceKeys.ERROR_POLYGON_CLOSED));
+            throw new IllegalStateException(Errors.format(ErrorKeys.POLYGON_CLOSED));
         }
         if (toAppend == null) {
             return;

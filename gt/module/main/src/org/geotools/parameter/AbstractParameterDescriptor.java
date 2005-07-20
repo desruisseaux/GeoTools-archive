@@ -33,8 +33,8 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 // Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -80,7 +80,7 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
         super(properties);
         this.minimumOccurs = minimumOccurs;
         if (minimumOccurs < 0  ||  maximumOccurs < minimumOccurs) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_RANGE_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
                         new Integer(minimumOccurs), new Integer(maximumOccurs)));
         }
     }

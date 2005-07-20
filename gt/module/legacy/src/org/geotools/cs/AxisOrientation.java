@@ -30,8 +30,8 @@ import java.util.NoSuchElementException;
 
 import javax.media.jai.EnumeratedParameter;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.opengis.cs.CS_AxisOrientationEnum;
 import org.opengis.referencing.cs.AxisDirection;
 
@@ -83,7 +83,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#OTHER}.
      */
     public static final AxisOrientation OTHER = new AxisOrientation("OTHER",
-        CS_AxisOrientationEnum.CS_AO_Other, ResourceKeys.OTHER, AxisDirection.OTHER);
+        CS_AxisOrientationEnum.CS_AO_Other, VocabularyKeys.OTHER, AxisDirection.OTHER);
     
     /**
      * Increasing ordinates values go North.
@@ -94,7 +94,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#NORTH}.
      */
     public static final AxisOrientation NORTH = new AxisOrientation("NORTH",
-            CS_AxisOrientationEnum.CS_AO_North, ResourceKeys.NORTH, AxisDirection.NORTH);
+            CS_AxisOrientationEnum.CS_AO_North, VocabularyKeys.NORTH, AxisDirection.NORTH);
     
     /**
      * Increasing ordinates values go South.
@@ -104,7 +104,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#SOUTH}.
      */
     public static final AxisOrientation SOUTH = new AxisOrientation("SOUTH",
-            CS_AxisOrientationEnum.CS_AO_South, ResourceKeys.SOUTH, AxisDirection.SOUTH);
+            CS_AxisOrientationEnum.CS_AO_South, VocabularyKeys.SOUTH, AxisDirection.SOUTH);
     
     /**
      * Increasing ordinates values go East.
@@ -115,7 +115,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#EAST}.
      */
     public static final AxisOrientation EAST = new AxisOrientation("EAST",
-            CS_AxisOrientationEnum.CS_AO_East, ResourceKeys.EAST, AxisDirection.EAST);
+            CS_AxisOrientationEnum.CS_AO_East, VocabularyKeys.EAST, AxisDirection.EAST);
     
     /**
      * Increasing ordinates values go West.
@@ -125,7 +125,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#WEST}.
      */
     public static final AxisOrientation WEST = new AxisOrientation("WEST",
-            CS_AxisOrientationEnum.CS_AO_West, ResourceKeys.WEST, AxisDirection.WEST);
+            CS_AxisOrientationEnum.CS_AO_West, VocabularyKeys.WEST, AxisDirection.WEST);
     
     /**
      * Increasing ordinates values go up.
@@ -136,7 +136,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#UP}.
      */
     public static final AxisOrientation UP = new AxisOrientation("UP",
-            CS_AxisOrientationEnum.CS_AO_Up, ResourceKeys.UP, AxisDirection.UP);
+            CS_AxisOrientationEnum.CS_AO_Up, VocabularyKeys.UP, AxisDirection.UP);
     
     /**
      * Increasing ordinates values go down.
@@ -147,7 +147,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#DOWN}.
      */
     public static final AxisOrientation DOWN = new AxisOrientation("DOWN",
-            CS_AxisOrientationEnum.CS_AO_Down, ResourceKeys.DOWN, AxisDirection.DOWN);
+            CS_AxisOrientationEnum.CS_AO_Down, VocabularyKeys.DOWN, AxisDirection.DOWN);
     
     /**
      * Increasing time go toward future.
@@ -156,7 +156,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#FUTURE}.
      */
     public static final AxisOrientation FUTURE = new AxisOrientation("FUTURE",
-            7, ResourceKeys.FUTURE, AxisDirection.FUTURE);
+            7, VocabularyKeys.FUTURE, AxisDirection.FUTURE);
     
     /**
      * Increasing time go toward past.
@@ -165,7 +165,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#PAST}.
      */
     public static final AxisOrientation PAST = new AxisOrientation("PAST",
-            8, ResourceKeys.PAST, AxisDirection.PAST);
+            8, VocabularyKeys.PAST, AxisDirection.PAST);
     
     /**
      * The last paired value. Paired values are NORTH-SOUTH, EAST-WEST,
@@ -259,7 +259,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      */
     public static AxisOrientation getEnum(String name, final Locale locale) {
         name = name.trim();
-        final Resources resources = Resources.getResources(locale);
+        final Vocabulary resources = Vocabulary.getResources(locale);
         for (int i=0; i<ENUMS.length; i++) {
             final AxisOrientation candidate = ENUMS[i];
             if (name.equalsIgnoreCase(resources.getString(candidate.key))) {
@@ -278,7 +278,7 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * @return Enum's name in the specified locale.
      */
     public String getName(final Locale locale) {
-        return Resources.getResources(locale).getString(key);
+        return Vocabulary.getResources(locale).getString(key);
     }
     
     /**

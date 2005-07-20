@@ -44,8 +44,10 @@ import org.geotools.ct.MathTransform1D;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Matrix;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
 import org.opengis.referencing.operation.TransformException;
@@ -225,8 +227,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
                             }
                         }
                     }
-                    throw new IllegalArgumentException(Resources.format(
-                                ResourceKeys.ERROR_RANGE_OVERLAP_$4, args));
+                    throw new IllegalArgumentException(Errors.format(
+                                ErrorKeys.RANGE_OVERLAP_$4, args));
                 }
                 // Check if there is a gap between this category and the previous one.
                 if (!Double.isNaN(minimum) && minimum!=previous.getRange().getMaximum(false)) {
@@ -458,7 +460,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
             buffer.append(main.getName(locale));
         } else {
             buffer.append('(');
-            buffer.append(Resources.getResources(locale).getString(ResourceKeys.UNTITLED));
+            buffer.append(Vocabulary.getResources(locale).getString(VocabularyKeys.UNTITLED));
             buffer.append(')');
         }
         buffer.append(' ');
@@ -688,7 +690,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
             {
                 category = getCategory(value);
                 if (category == null) {
-                    return Resources.getResources(locale).getString(ResourceKeys.UNTITLED);
+                    return Vocabulary.getResources(locale).getString(VocabularyKeys.UNTITLED);
                 }
                 last = category;
             }
@@ -849,8 +851,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     private static void checkDimension(final CoordinatePoint point) {
         final int dim = point.getDimension();
         if (dim != 1) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(dim), new Integer(1)));
         }
     }
@@ -895,8 +897,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         {
             category = getCategory(value);
             if (category == null) {
-                throw new TransformException(Resources.format(
-                        ResourceKeys.ERROR_NO_CATEGORY_FOR_VALUE_$1, new Double(value)));
+                throw new TransformException(Errors.format(
+                        ErrorKeys.NO_CATEGORY_FOR_VALUE_$1, new Double(value)));
             }
             last = category;
         }
@@ -917,8 +919,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         {
             category = getCategory(value);
             if (category == null) {
-                throw new TransformException(Resources.format(
-                        ResourceKeys.ERROR_NO_CATEGORY_FOR_VALUE_$1, new Double(value)));
+                throw new TransformException(Errors.format(
+                        ErrorKeys.NO_CATEGORY_FOR_VALUE_$1, new Double(value)));
             }
             last = category;
         }
@@ -1059,8 +1061,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
             }
             category = getCategory(value);
             if (category == null) {
-                throw new TransformException(Resources.format(
-                        ResourceKeys.ERROR_NO_CATEGORY_FOR_VALUE_$1, new Double(value)));
+                throw new TransformException(Errors.format(
+                        ErrorKeys.NO_CATEGORY_FOR_VALUE_$1, new Double(value)));
             }
             maximum = category.maximum;
             minimum = category.minimum;
@@ -1174,8 +1176,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
             }
             while (!iterator.nextLineDone());
         } catch (TransformException cause) {
-            RasterFormatException exception = new RasterFormatException(Resources.format(
-                    ResourceKeys.ERROR_BAD_TRANSFORM_$1, Utilities.getShortClassName(tr)));
+            RasterFormatException exception = new RasterFormatException(Errors.format(
+                    ErrorKeys.BAD_TRANSFORM_$1, Utilities.getShortClassName(tr)));
             exception.initCause(cause);
             throw exception;
         }

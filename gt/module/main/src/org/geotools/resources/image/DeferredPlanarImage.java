@@ -55,8 +55,8 @@ import javax.media.jai.TileScheduler;
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.renderer.Resources;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.util.WeakValueHashMap;
 
 
@@ -66,18 +66,17 @@ import org.geotools.util.WeakValueHashMap;
  * retournée. Lorsque la tuile est enfin disponible, un évènement est déclenché
  * indiquant au composant qui désire afficher l'image que la tuile est maintenant
  * disponible.
- * <br><br>
+ * <p>
  * Le composant qui désire être informé des évènements sur les tuiles doit au préalable 
  * s'enregistrer auprès de la classe <CODE>DefferedPlanarImage</CODE> au travers de la
  * méthode {@link #addTileObserver}. Lorsque le composant est informé qu'une tuile est
  * prête, il lui suffit d'appeler une méthode <CODE>repaint(...)</CODE> pour mettre à
  * jour cette tuile.
  *
+ * @since 2.0
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class DeferredPlanarImage extends PlanarImage
                             implements WritableRenderedImage, TileObserver, TileComputationListener
@@ -283,8 +282,8 @@ public final class DeferredPlanarImage extends PlanarImage
          * Flag that this tile will need to be repainted later and returns an empty tile.
          */
         if (LOGGER.isLoggable(Level.FINER)) {
-            final LogRecord record = Resources.getResources(null).getLogRecord(Level.FINER,
-                  ResourceKeys.DEFERRED_TILE_PAINTING_$2, new Integer(tileX), new Integer(tileY));
+            final LogRecord record = Logging.getResources(null).getLogRecord(Level.FINER,
+                  LoggingKeys.DEFERRED_TILE_PAINTING_$2, new Integer(tileX), new Integer(tileY));
             record.setSourceClassName(Utilities.getShortClassName(this));
             record.setSourceMethodName("getTile");
             LOGGER.log(record);

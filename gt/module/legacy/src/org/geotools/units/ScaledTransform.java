@@ -30,8 +30,8 @@
 package org.geotools.units;
 
 // Divers
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -65,8 +65,8 @@ final class ScaledTransform extends UnitTransform {
         super(fromUnit, toUnit);
         this.amount = amount;
         if (Double.isNaN(amount) || Double.isInfinite(amount) || amount==0) {
-            throw new UnitException(Resources.format(
-                                    ResourceKeys.ERROR_NOT_DIFFERENT_THAN_ZERO_$1,
+            throw new UnitException(Errors.format(
+                                    ErrorKeys.NOT_DIFFERENT_THAN_ZERO_$1,
                                     new Double(amount)));
         }
     }

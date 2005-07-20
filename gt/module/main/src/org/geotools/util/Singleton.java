@@ -28,10 +28,9 @@ import java.util.NoSuchElementException;
 /**
  * A mutable set containing only one element. This set can't contains null element.
  *
- * @author Martin Desruisseaux
- * @version $Id$
- *
  * @since 2.1
+ * @version $Id$
+ * @author Martin Desruisseaux
  */
 public class Singleton extends AbstractSet {
     /**

@@ -19,7 +19,7 @@
  */
 package org.geotools.image.io;
 
-// Input/output
+// J2SE dependencies
 import java.awt.image.DataBuffer;
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,14 +34,16 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.Locale;
-
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
+// Geotools dependencies
 import org.geotools.io.LineFormat;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -188,10 +190,10 @@ public abstract class TextImageReader extends SimpleImageReader {
      * @throws IOException si le flot n'a pas pu être ouvert.
      */
     protected final BufferedReader getReader() throws IOException {
-        if (reader==null) {
-            final Object input=getInput();
-            if (input==null) {
-                throw new IllegalStateException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_INPUT));
+        if (reader == null) {
+            final Object input = getInput();
+            if (input == null) {
+                throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_INPUT));
             }
             if (input instanceof BufferedReader) {
                 return reader = (BufferedReader) input;
@@ -285,16 +287,16 @@ public abstract class TextImageReader extends SimpleImageReader {
         final Integer line = (reader instanceof LineNumberReader) ?
                 new Integer(((LineNumberReader) reader).getLineNumber()) : null;
         
-        final Resources resources = Resources.getResources(null);
+        final Vocabulary resources = Vocabulary.getResources(null);
         final String position;
         if (file!=null) {
             if (line!=null) {
-                position = resources.getString(ResourceKeys.FILE_POSITION_$2, file, line);
+                position = resources.getString(VocabularyKeys.FILE_POSITION_$2, file, line);
             } else {
-                position = resources.getString(ResourceKeys.FILE_$1, file);
+                position = resources.getString(VocabularyKeys.FILE_$1, file);
             }
         } else if (line!=null) {
-            position = resources.getString(ResourceKeys.LINE_$1, line);
+            position = resources.getString(VocabularyKeys.LINE_$1, line);
         } else {
             position=null;
         }

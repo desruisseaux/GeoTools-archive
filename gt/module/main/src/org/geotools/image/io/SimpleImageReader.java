@@ -43,8 +43,8 @@ import javax.media.jai.ComponentSampleModelJAI;
 import javax.media.jai.util.Range;
 
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ComponentColorModelJAI;
 
 
@@ -183,7 +183,7 @@ public abstract class SimpleImageReader extends ImageReader {
         if (input != null) {
             return 1;
         }
-        throw new IllegalStateException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_INPUT));
+        throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_INPUT));
     }
     
     /**

@@ -37,8 +37,8 @@ package org.geotools.ct;
 
 // OpenGIS dependencies
 import org.geotools.cs.Projection;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.referencing.FactoryException;
 
 
@@ -73,8 +73,8 @@ public class MissingParameterException extends FactoryException {
      * @param parameter The missing parameter name.
      */
     public MissingParameterException(final String msg, final String parameter) {
-        super((msg!=null || parameter==null) ? msg : Resources.format(
-                ResourceKeys.ERROR_MISSING_PARAMETER_$1, parameter));
+        super((msg!=null || parameter==null) ? msg : Errors.format(
+                ErrorKeys.MISSING_PARAMETER_$1, parameter));
         this.parameter = parameter;
     }
     

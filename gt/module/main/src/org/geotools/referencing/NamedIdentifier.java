@@ -43,8 +43,10 @@ import org.opengis.util.ScopedName;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.util.GrowableInternationalString;
 import org.geotools.util.WeakValueHashMap;
@@ -68,10 +70,9 @@ import org.geotools.util.WeakValueHashMap;
  * titles} often contains abreviation (for example "DCW" as an alternative title for
  * "<cite>Digital Chart of the World</cite>").
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class NamedIdentifier implements Identifier, GenericName, Serializable {
     /**
@@ -332,7 +333,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
                 remarks = growable;
             } else {
                 Logger.getLogger("org.geotools.referencing").warning(
-                                 Resources.format(ResourceKeys.WARNING_LOCALES_DISCARTED));
+                                 Logging.format(LoggingKeys.LOCALES_DISCARTED));
             }
         }
         /*
@@ -346,8 +347,8 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
             key= AUTHORITY_KEY; this.authority = (Citation)            (value=authority);
             key=   REMARKS_KEY; this.remarks   = (InternationalString) (value=remarks);
         } catch (ClassCastException exception) {
-            InvalidParameterValueException e = new InvalidParameterValueException(Resources.format(
-                                   ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, key, value), key, value);
+            InvalidParameterValueException e = new InvalidParameterValueException(Errors.format(
+                                   ErrorKeys.ILLEGAL_ARGUMENT_$2, key, value), key, value);
             e.initCause(exception);
             throw e;
         }
@@ -368,8 +369,8 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
         throws IllegalArgumentException
     {
         if (object == null) {
-            throw new InvalidParameterValueException(Resources.format(
-                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name), name, object);
+            throw new InvalidParameterValueException(Errors.format(
+                        ErrorKeys.NULL_ARGUMENT_$1, name), name, object);
         }
     }
 

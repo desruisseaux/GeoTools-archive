@@ -53,8 +53,10 @@ import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -421,8 +423,8 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                 try {
                     matrix.invert();
                 } catch (SingularMatrixException exception) {
-                    throw new NoninvertibleTransformException(Resources.format(
-                              ResourceKeys.ERROR_NONINVERTIBLE_TRANSFORM), exception);
+                    throw new NoninvertibleTransformException(Errors.format(
+                              ErrorKeys.NONINVERTIBLE_TRANSFORM), exception);
                 }
                 inverse = new ProjectiveTransform(matrix);
                 inverse.inverse = this;
@@ -507,7 +509,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                 new NamedIdentifier(CitationImpl.EPSG, "Affine general parametric transformation"),
                 new NamedIdentifier(CitationImpl.EPSG, "9624"),
                 new NamedIdentifier(CitationImpl.GEOTOOLS,
-                    Resources.formatInternational(ResourceKeys.AFFINE_TRANSFORM))
+                    Vocabulary.formatInternational(VocabularyKeys.AFFINE_TRANSFORM))
             });
             PARAMETERS = new MatrixParameterDescriptors(properties);
         }

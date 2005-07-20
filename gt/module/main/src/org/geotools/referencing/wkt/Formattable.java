@@ -34,8 +34,8 @@ import org.opengis.referencing.cs.CoordinateSystem;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -43,10 +43,9 @@ import org.geotools.resources.cts.Resources;
  * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
  * Known Text</cite> (WKT)</A>.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
@@ -158,8 +157,8 @@ public class Formattable {
              throws UnformattableObjectException
     {
         if (authority == null) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_NULL_ARGUMENT_$1, "authority"));
+            throw new IllegalArgumentException(Errors.format(
+                      ErrorKeys.NULL_ARGUMENT_$1, "authority"));
         }
         // No need to synchronize. This is not a big deal
         // if two formatters co-exist for a short time.

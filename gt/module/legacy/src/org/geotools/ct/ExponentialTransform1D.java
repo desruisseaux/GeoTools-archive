@@ -25,7 +25,7 @@ import java.io.Serializable;
 import javax.media.jai.ParameterList;
 import javax.media.jai.util.Range;
 
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -332,7 +332,7 @@ final class ExponentialTransform1D extends AbstractMathTransform implements Math
          */
         public Provider(final boolean logarithm) {
             super(logarithm ? "Logarithmic" : "Exponential",
-                  logarithm ? ResourceKeys.LOGARITHMIC : ResourceKeys.EXPONENTIAL,
+                  logarithm ? VocabularyKeys.LOGARITHMIC : VocabularyKeys.EXPONENTIAL,
                   null);
             this.logarithm = logarithm;
             put("base", 10, POSITIVE_RANGE);

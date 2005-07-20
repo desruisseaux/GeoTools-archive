@@ -55,10 +55,9 @@ import javax.media.jai.iterator.RectIter;
  *
  * @todo Remove this patch when JAI will recognize J2SE 1.4 classes.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class ComponentColorModelJAI extends ComponentColorModel {
     /**

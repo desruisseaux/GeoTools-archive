@@ -55,8 +55,8 @@ import org.geotools.measure.AngleFormat;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -230,20 +230,20 @@ public class ParameterWriter extends FilterWriter {
         /*
          * Format the table header (i.e. column names).
          */
-        final Resources resources = Resources.getResources(locale);
+        final Vocabulary resources = Vocabulary.getResources(locale);
         final TableWriter table = new TableWriter(out, " \u2502 ");
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();
-        table.write(resources.getString(ResourceKeys.NAME));
+        table.write(resources.getString(VocabularyKeys.NAME));
         table.nextColumn();
-        table.write(resources.getString(ResourceKeys.CLASS));
+        table.write(resources.getString(VocabularyKeys.CLASS));
         table.nextColumn();
         table.write("Minimum");  // TODO localize
         table.nextColumn();
         table.write("Maximum");  // TODO localize
         table.nextColumn();
-        table.write(resources.getString((values==null) ? ResourceKeys.DEFAULT_VALUE
-                                                       : ResourceKeys.VALUE));
+        table.write(resources.getString((values==null) ? VocabularyKeys.DEFAULT_VALUE
+                                                       : VocabularyKeys.VALUE));
         table.nextColumn();
         table.write("Units");  // TODO localize
         table.nextLine();

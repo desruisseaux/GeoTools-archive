@@ -32,8 +32,9 @@ import javax.media.jai.util.Range;
 import org.geotools.cs.Ellipsoid;
 import org.geotools.cs.HorizontalDatum;
 import org.geotools.cs.WGS84ConversionInfo;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -161,8 +162,8 @@ class MolodenskiTransform extends AbstractMathTransform implements Serializable 
         switch (dim) {
             case 2:  source3D=target3D=false; break;
             case 3:  source3D=target3D=true;  break;
-            default: throw new IllegalArgumentException(Resources.format(
-                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dim", new Integer(dim)));
+            default: throw new IllegalArgumentException(Errors.format(
+                                ErrorKeys.ILLEGAL_ARGUMENT_$2, "dim", new Integer(dim)));
         }
         final double ta, tb, f;
         dx = parameters.getDoubleParameter("dx");
@@ -362,7 +363,7 @@ class MolodenskiTransform extends AbstractMathTransform implements Serializable 
          * Create a provider.
          */
         public Provider() {
-            super("Molodenski", ResourceKeys.MOLODENSKI_TRANSFORM, null);
+            super("Molodenski", VocabularyKeys.MOLODENSKI_TRANSFORM, null);
             putInt("dim",         3, DIM_RANGE);
             put("dx",             Double.NaN, null);
             put("dy",             Double.NaN, null);

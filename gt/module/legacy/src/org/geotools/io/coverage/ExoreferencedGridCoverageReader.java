@@ -44,7 +44,7 @@ import org.geotools.cv.SampleDimension;
 import org.geotools.gc.GridCoverage;
 import org.geotools.gc.GridRange;
 import org.geotools.pt.Envelope;
-import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.cs.CoordinateSystem;
 
 
@@ -148,7 +148,7 @@ public class ExoreferencedGridCoverageReader extends GridCoverageReader {
             // TODO: invokes rename(String) here and rebuild the URL.
             throw new UnsupportedOperationException("URL support not yet implemented");
         } else {
-            throw new IllegalArgumentException(getString(ResourceKeys.ERROR_NO_IMAGE_READER));
+            throw new IllegalArgumentException(getString(ErrorKeys.NO_IMAGE_READER));
         }
         super.setInput(input, seekForwardOnly);
     }

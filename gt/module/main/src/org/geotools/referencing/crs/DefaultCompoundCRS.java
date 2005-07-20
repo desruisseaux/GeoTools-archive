@@ -42,8 +42,8 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.DefaultCompoundCS;
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -139,8 +139,8 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
             ensureNonNull("crs", crs, i);
         }
         if (crs.length < 2) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_MISSING_PARAMETER_$1, "crs["+crs.length+']'));
+            throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.MISSING_PARAMETER_$1, "crs["+crs.length+']'));
         }
         this.crs = Collections.unmodifiableList(Arrays.asList(crs));
     }

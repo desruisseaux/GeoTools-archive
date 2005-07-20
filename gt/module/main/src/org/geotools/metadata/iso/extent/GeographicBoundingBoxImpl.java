@@ -42,8 +42,8 @@ import org.geotools.measure.AngleFormat;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -118,8 +118,8 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
                 try {
                     operation = factory.createOperation(crs, DefaultGeographicCRS.WGS84);
                 } catch (FactoryException exception) {
-                    throw new TransformException(Resources.format(
-                              ResourceKeys.ERROR_CANT_TRANSFORM_ENVELOPE, exception));
+                    throw new TransformException(Errors.format(
+                              ErrorKeys.CANT_TRANSFORM_ENVELOPE, exception));
                 }
                 envelope = CRSUtilities.transform(operation.getMathTransform(), envelope);
             }

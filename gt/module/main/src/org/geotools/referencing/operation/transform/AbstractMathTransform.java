@@ -58,8 +58,8 @@ import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -72,10 +72,9 @@ import org.geotools.resources.cts.ResourceKeys;
  * Subclasses must declare <code>implements&nbsp;MathTransform2D</code>
  * themself if they know to maps two-dimensional coordinate systems.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public abstract class AbstractMathTransform extends Formattable implements MathTransform {
     /**
@@ -161,8 +160,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                                            final int   dimension,
                                            final int    expected)
     {
-        return Resources.format(ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
-                                argument, new Integer(dimension), new Integer(expected));
+        return Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
+                             argument, new Integer(dimension), new Integer(expected));
     }
     
     /**
@@ -473,7 +472,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         if (dimSource != 2) {
             throw new MismatchedDimensionException(constructMessage("point", 2, dimSource));
         }
-        throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
+        throw new TransformException(Errors.format(ErrorKeys.CANT_COMPUTE_DERIVATIVE));
     }
     
     /**
@@ -522,7 +521,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                            ((MathTransform1D) this).derivative(point.getOrdinate(0))});
             }
         }
-        throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
+        throw new TransformException(Errors.format(ErrorKeys.CANT_COMPUTE_DERIVATIVE));
     }
     
     /**
@@ -535,8 +534,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         if (isIdentity()) {
             return this;
         }
-        throw new NoninvertibleTransformException(
-                Resources.format(ResourceKeys.ERROR_NONINVERTIBLE_TRANSFORM));
+        throw new NoninvertibleTransformException(Errors.format(ErrorKeys.NONINVERTIBLE_TRANSFORM));
     }
 
     /**
@@ -631,8 +629,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
             throws IllegalArgumentException
     {
         if (object == null) {
-            throw new InvalidParameterValueException(Resources.format(
-                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name), name, object);
+            throw new InvalidParameterValueException(Errors.format(
+                        ErrorKeys.NULL_ARGUMENT_$1, name), name, object);
         }
     }
 
@@ -718,7 +716,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         } catch (RuntimeException exception) {
             // Catch both SingularMatrixException and ClassCastException
             NoninvertibleTransformException e = new NoninvertibleTransformException(
-                        Resources.format(ResourceKeys.ERROR_NONINVERTIBLE_TRANSFORM));
+                        Errors.format(ErrorKeys.NONINVERTIBLE_TRANSFORM));
             e.initCause(exception);
             throw e;
         }

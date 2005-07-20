@@ -40,8 +40,8 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.util.Singleton;
 
 
@@ -153,7 +153,7 @@ public class MathTransformParser extends AbstractParser {
             if ("PASSTHROUGH_MT".equals(keyword))  return parsePassThroughMT(element);
         }
         if (required) {
-            throw element.parseFailed(null, Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, key));
+            throw element.parseFailed(null, Errors.format(ErrorKeys.UNKNOW_TYPE_$1, key));
         }
         return null;
     }

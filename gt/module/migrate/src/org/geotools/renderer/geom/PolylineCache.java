@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.geom;
 
@@ -40,11 +27,12 @@ import java.awt.geom.PathIterator;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 
+// Geotools dependencies
 import org.geotools.renderer.array.ArrayData;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.renderer.Resources;
+import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.i18n.Logging;
 import org.geotools.util.WeakHashSet;
 
 
@@ -196,7 +184,7 @@ final class PolylineCache {
                 // Continue... On va simplement reconstruire le tableau à partir de la base.
             } else {
                 // Should be uncommon. Doesn't hurt, but may be a memory issue for big polyline.
-                Polyline.LOGGER.info(Resources.format(ResourceKeys.WARNING_EXCESSIVE_MEMORY_USAGE));
+                Polyline.LOGGER.info(Logging.format(LoggingKeys.EXCESSIVE_MEMORY_USAGE));
                 this.array = array = new float[32];
             }
         } else {

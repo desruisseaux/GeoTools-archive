@@ -38,8 +38,10 @@ import org.geotools.ct.MathTransformFactory;
 import org.geotools.pt.Matrix;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.util.NumberRange;
 import org.geotools.util.WeakHashSet;
 import org.opengis.cv.CV_SampleDimension;
@@ -110,14 +112,14 @@ public class Category implements Serializable {
      * with floating point images. The rendering color default to a fully transparent color and
      * the name is "no data" localized to the requested locale.
      */
-    public static final Category NODATA = new Localized(ResourceKeys.NODATA, new Color(0,0,0,0), 0);
+    public static final Category NODATA = new Localized(VocabularyKeys.NODATA, new Color(0,0,0,0), 0);
 
     /**
      * A default category for the boolean "{@link Boolean#FALSE false}" value. This default
      * identity category uses sample value 0, the color {@linkplain Color#BLACK black} and
      * the name "false" localized to the specified locale.
      */
-    public static final Category FALSE = new Localized(ResourceKeys.FALSE, Color.BLACK,
+    public static final Category FALSE = new Localized(VocabularyKeys.FALSE, Color.BLACK,
                                                        new Byte((byte)0));
 
     /**
@@ -125,7 +127,7 @@ public class Category implements Serializable {
      * identity category uses sample value 1, the color {@linkplain Color#WHITE white}
      * and the name "true" localized to the specified locale.
      */
-    public static final Category TRUE = new Localized(ResourceKeys.TRUE, Color.WHITE,
+    public static final Category TRUE = new Localized(VocabularyKeys.TRUE, Color.WHITE,
                                                       new Byte((byte)1));
     
     /**
@@ -341,12 +343,12 @@ public class Category implements Serializable {
             throw new AssertionError(exception);
         }
         if (Double.isNaN(scale) || Double.isInfinite(scale)) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_BAD_COEFFICIENT_$2, "scale", new Double(scale)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.BAD_COEFFICIENT_$2, "scale", new Double(scale)));
         }
         if (Double.isNaN(offset) || Double.isInfinite(offset)) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_BAD_COEFFICIENT_$2, "offset", new Double(offset)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.BAD_COEFFICIENT_$2, "offset", new Double(offset)));
         }
     }
     
@@ -452,8 +454,8 @@ public class Category implements Serializable {
          */
         if (!(minimum<=maximum) || Double.isInfinite(minimum) || Double.isInfinite(maximum))
         {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_BAD_RANGE_$2, range.getMinValue(), range.getMaxValue()));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.BAD_RANGE_$2, range.getMinValue(), range.getMaxValue()));
         }
         /*
          * Now initialize the geophysics category.
@@ -478,8 +480,8 @@ public class Category implements Serializable {
         } catch (TransformException exception) {
             cause = exception;
         }
-        IllegalArgumentException exception = new IllegalArgumentException(Resources.format(
-            ResourceKeys.ERROR_BAD_TRANSFORM_$1, Utilities.getShortClassName(sampleToGeophysics)));
+        IllegalArgumentException exception = new IllegalArgumentException(Errors.format(
+            ErrorKeys.BAD_TRANSFORM_$1, Utilities.getShortClassName(sampleToGeophysics)));
         exception.initCause(cause);
         throw exception;
     }
@@ -928,7 +930,7 @@ public class Category implements Serializable {
          * Used for the construction of the {@link #NODATA} category.
          */
         public Localized(final int key, final Color color, final int index) {
-            super(Resources.format(key), color, index);
+            super(Errors.format(key), color, index);
             this.key = key;
         }
 
@@ -937,7 +939,7 @@ public class Category implements Serializable {
          * Used for the construction of the {@link #FALSE} and {@link #TRUE} categories.
          */
         public Localized(final int key, final Color color, final Byte index) {
-            super(Resources.format(key), new Color[]{color},
+            super(Errors.format(key), new Color[]{color},
                   new NumberRange(Byte.class, index, index),
                   MathTransform1D.IDENTITY);
             this.key = key;
@@ -948,7 +950,7 @@ public class Category implements Serializable {
          */
         public String getName(final Locale locale) {
             if (locale != null) {
-                return Resources.getResources(locale).getString(key);
+                return Vocabulary.getResources(locale).getString(key);
             } else {
                 return super.getName(locale);
             }

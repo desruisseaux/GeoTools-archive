@@ -34,8 +34,8 @@ import java.util.Set;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -46,10 +46,9 @@ import org.geotools.resources.cts.Resources;
  * between making constructionss easier, and being suitable for use in
  * immutable objects.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class GrowableInternationalString extends AbstractInternationalString implements Serializable {
     /**
@@ -192,7 +191,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
             }
             parts[i] = key.substring(position, position=next);
         }
-        throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                                            "locale", key.substring(prefix.length())));
     }
 

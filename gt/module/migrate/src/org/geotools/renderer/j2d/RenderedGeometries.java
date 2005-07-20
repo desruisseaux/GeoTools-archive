@@ -63,8 +63,8 @@ import org.geotools.renderer.style.Style;
 import org.geotools.resources.XMath;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.resources.geometry.XAffineTransform;
@@ -490,8 +490,8 @@ public class RenderedGeometries extends RenderedLayer {
             }
             geometry.setStyle(null);
             final Locale locale = null; // Can't invokes 'getLocale()' in a static method.
-            final LogRecord record = Resources.getResources(locale).getLogRecord(Level.WARNING,
-                            ResourceKeys.WARNING_UNKNOW_STYLE_$2,
+            final LogRecord record = Logging.getResources(locale).getLogRecord(Level.WARNING,
+                            LoggingKeys.UNKNOW_STYLE_$2,
                             Utilities.getShortClassName(style), geometry.getName(locale));
             record.setSourceClassName("RenderedGeometries");
             record.setSourceMethodName("paint");

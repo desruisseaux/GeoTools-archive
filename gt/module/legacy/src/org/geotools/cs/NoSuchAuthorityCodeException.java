@@ -23,8 +23,8 @@
 package org.geotools.cs;
 
 // Resources
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -66,6 +66,6 @@ public class NoSuchAuthorityCodeException extends org.opengis.referencing.NoSuch
      * @param code The specified code.
      */
     NoSuchAuthorityCodeException(final String classname, final String code) {
-        super(Resources.format(ResourceKeys.ERROR_NO_SUCH_AUTHORITY_CODE_$2, classname, code), code);
+        super(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$2, classname, code), code);
     }
 }

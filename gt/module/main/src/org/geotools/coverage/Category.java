@@ -43,8 +43,10 @@ import org.opengis.util.InternationalString;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.NumberRange;
 import org.geotools.util.WeakHashSet;
 import org.geotools.util.SimpleInternationalString;
@@ -132,7 +134,7 @@ public class Category implements Serializable {
      * the name is "no data" localized to the requested locale.
      */
     public static final Category NODATA = new Category(
-            Resources.formatInternational(ResourceKeys.NODATA), new Color(0,0,0,0), 0);
+            Vocabulary.formatInternational(VocabularyKeys.NODATA), new Color(0,0,0,0), 0);
 
     /**
      * A default category for the boolean "{@link Boolean#FALSE false}" value. This default
@@ -140,7 +142,7 @@ public class Category implements Serializable {
      * the name "false" localized to the specified locale.
      */
     public static final Category FALSE = new Category(
-            Resources.formatInternational(ResourceKeys.FALSE), Color.BLACK, false);
+            Vocabulary.formatInternational(VocabularyKeys.FALSE), Color.BLACK, false);
 
     /**
      * A default category for the boolean "{@link Boolean#TRUE true}" value. This default
@@ -148,7 +150,7 @@ public class Category implements Serializable {
      * and the name "true" localized to the specified locale.
      */
     public static final Category TRUE = new Category(
-            Resources.formatInternational(ResourceKeys.TRUE), Color.WHITE, true);
+            Vocabulary.formatInternational(VocabularyKeys.TRUE), Color.WHITE, true);
     
     /**
      * The category name.
@@ -373,12 +375,12 @@ public class Category implements Serializable {
             throw new AssertionError(exception);
         }
         if (Double.isNaN(scale) || Double.isInfinite(scale)) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_BAD_COEFFICIENT_$2, "scale", new Double(scale)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_COEFFICIENT_$2,
+                                               "scale", new Double(scale)));
         }
         if (Double.isNaN(offset) || Double.isInfinite(offset)) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_BAD_COEFFICIENT_$2, "offset", new Double(offset)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_COEFFICIENT_$2,
+                                               "offset", new Double(offset)));
         }
     }
     
@@ -485,8 +487,8 @@ public class Category implements Serializable {
          */
         if (!(minimum<=maximum) || Double.isInfinite(minimum) || Double.isInfinite(maximum))
         {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_BAD_RANGE_$2, range.getMinValue(), range.getMaxValue()));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
+                                               range.getMinValue(), range.getMaxValue()));
         }
         /*
          * Now initialize the geophysics category.
@@ -511,8 +513,8 @@ public class Category implements Serializable {
         } catch (TransformException exception) {
             cause = exception;
         }
-        IllegalArgumentException exception = new IllegalArgumentException(Resources.format(
-            ResourceKeys.ERROR_BAD_TRANSFORM_$1, Utilities.getShortClassName(sampleToGeophysics)));
+        IllegalArgumentException exception = new IllegalArgumentException(Errors.format(
+            ErrorKeys.BAD_TRANSFORM_$1, Utilities.getShortClassName(sampleToGeophysics)));
         exception.initCause(cause);
         throw exception;
     }
@@ -928,9 +930,7 @@ public class Category implements Serializable {
         throws IllegalArgumentException
     {
         if (object == null) {
-            throw new IllegalArgumentException(
-                    org.geotools.resources.cts.Resources.format(
-                    org.geotools.resources.cts.ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
     }
 

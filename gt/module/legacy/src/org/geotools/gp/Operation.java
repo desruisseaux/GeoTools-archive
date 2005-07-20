@@ -47,8 +47,10 @@ import org.geotools.io.TableWriter;
 import org.geotools.resources.DescriptorNaming;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.image.ImageUtilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.gp.GP_Operation;
 
 
@@ -248,8 +250,8 @@ public abstract class Operation implements Serializable {
                 }
             }
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_UNKNOW_INTERPOLATION_$1, type));
+        throw new IllegalArgumentException(Errors.format(
+                ErrorKeys.UNKNOW_INTERPOLATION_$1, type));
     }
 
     /**
@@ -342,15 +344,15 @@ public abstract class Operation implements Serializable {
         out.write(getName());
         out.write(lineSeparator);
         
-        final Resources resources = Resources.getResources(null);
+        final Vocabulary resources = Vocabulary.getResources(null);
         final TableWriter table = new TableWriter(out, " \u2502 ");
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();
-        table.write(resources.getString(ResourceKeys.NAME));
+        table.write(resources.getString(VocabularyKeys.NAME));
         table.nextColumn();
-        table.write(resources.getString(ResourceKeys.CLASS));
+        table.write(resources.getString(VocabularyKeys.CLASS));
         table.nextColumn();
-        table.write(resources.getString(param!=null ? ResourceKeys.VALUE : ResourceKeys.DEFAULT_VALUE));
+        table.write(resources.getString(param!=null ? VocabularyKeys.VALUE : VocabularyKeys.DEFAULT_VALUE));
         table.nextLine();
         table.writeHorizontalSeparator();
 

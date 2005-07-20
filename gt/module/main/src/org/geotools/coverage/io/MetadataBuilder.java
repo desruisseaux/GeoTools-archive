@@ -100,8 +100,8 @@ import org.opengis.util.Cloneable;
 import org.geotools.io.TableWriter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.referencing.wkt.UnformattableObjectException;
 import org.geotools.referencing.factory.FactoryGroup;
@@ -1004,9 +1004,8 @@ public class MetadataBuilder {
         while (true) {
             if (oldValue!=null && !oldValue.equals(value)) {
                 final String alias = aliasAsKey.toString();
-                throw new AmbiguousMetadataException(Resources.getResources(userLocale).
-                          getString(ResourceKeys.ERROR_INCONSISTENT_PROPERTY_$1, alias),
-                          checkKey, alias);
+                throw new AmbiguousMetadataException(Errors.getResources(userLocale).
+                          getString(ErrorKeys.INCONSISTENT_PROPERTY_$1, alias), checkKey, alias);
             }
             if (iterator == null) {
                 if (naming == null) break;
@@ -1073,9 +1072,8 @@ public class MetadataBuilder {
         if (metadata != null) {
             final Object value = getOptional(key); // Checks also alias
             if (value!=null && !value.equals(metadata)) {
-                throw new AmbiguousMetadataException(Resources.getResources(userLocale).
-                          getString(ResourceKeys.ERROR_INCONSISTENT_PROPERTY_$1, alias),
-                          key, alias);
+                throw new AmbiguousMetadataException(Errors.getResources(userLocale).
+                          getString(ErrorKeys.INCONSISTENT_PROPERTY_$1, alias), key, alias);
             }
         }
         if (naming == null) {
@@ -1127,7 +1125,7 @@ public class MetadataBuilder {
      * @return The value as a string.
      * @throws MetadataException if the value can't be cast to a string.
      */
-    private static String toString(final Object value, final Key key, final String alias)
+    private String toString(final Object value, final Key key, final String alias)
             throws MetadataException
     {
         if (value == null) {
@@ -1139,8 +1137,8 @@ public class MetadataBuilder {
         if (value instanceof IdentifiedObject) {
             return ((IdentifiedObject) value).getName().getCode();
         }
-        throw new MetadataException(Resources.format(ResourceKeys.ERROR_CANT_CONVERT_FROM_TYPE_$1,
-                                    Utilities.getShortClassName(value)), key, alias);
+        throw new MetadataException(Errors.getResources(userLocale).getString(
+              ErrorKeys.CANT_CONVERT_FROM_TYPE_$1, Utilities.getShortClassName(value)), key, alias);
     }
 
     /**
@@ -1231,8 +1229,8 @@ public class MetadataBuilder {
         if (value!=null && value!=Image.UndefinedProperty) {
             return value;
         }
-        throw new MissingMetadataException(Resources.getResources(userLocale).
-                  getString(ResourceKeys.ERROR_UNDEFINED_PROPERTY_$1, key), key, lastAlias);
+        throw new MissingMetadataException(Errors.getResources(userLocale).
+                  getString(ErrorKeys.UNDEFINED_PROPERTY_$1, key), key, lastAlias);
     }
     
     /**
@@ -1304,8 +1302,8 @@ public class MetadataBuilder {
         final double value = getAsDouble(key);
         final int  integer = (int) value;
         if (value != integer) {
-            throw new MetadataException(Resources.getResources(userLocale).getString(
-                      ResourceKeys.ERROR_BAD_PARAMETER_$2, lastAlias, new Double(value)), key, lastAlias);
+            throw new MetadataException(Errors.getResources(userLocale).getString(
+                      ErrorKeys.BAD_PARAMETER_$2, lastAlias, new Double(value)), key, lastAlias);
         }
         return integer;
     }
@@ -1719,8 +1717,8 @@ public class MetadataBuilder {
             if ((semiMajorAxisDefined && parameters.parameter("semi_major").doubleValue(axisUnit)!=semiMajor) ||
                 (semiMinorAxisDefined && parameters.parameter("semi_minor").doubleValue(axisUnit)!=semiMinor))
             {
-                throw new AmbiguousMetadataException(Resources.getResources(userLocale).getString(
-                          ResourceKeys.ERROR_AMBIGIOUS_AXIS_LENGTH), PROJECTION, projectionAlias);
+                throw new AmbiguousMetadataException(Errors.getResources(userLocale).getString(
+                          ErrorKeys.AMBIGIOUS_AXIS_LENGTH), PROJECTION, projectionAlias);
             }
             parameters.parameter("semi_major").setValue(semiMajor, axisUnit);
             parameters.parameter("semi_minor").setValue(semiMinor, axisUnit);
@@ -1928,8 +1926,8 @@ public class MetadataBuilder {
         final double max = getAsDouble(maxKey, crs);
         envelope.setRange(dimension, min, max);
         if (Math.abs((min-max)/resolution - range) > EPS) {
-            throw new AmbiguousMetadataException(Resources.getResources(userLocale).getString(
-                      ResourceKeys.ERROR_INCONSISTENT_PROPERTY_$1, resKey), resKey, lastAlias);
+            throw new AmbiguousMetadataException(Errors.getResources(userLocale).getString(
+                      ErrorKeys.INCONSISTENT_PROPERTY_$1, resKey), resKey, lastAlias);
         }
     }
     
@@ -1999,7 +1997,7 @@ public class MetadataBuilder {
     final synchronized void setUserLocale(final Locale locale) {
         userLocale = locale;
     }
-    
+
     /**
      * List all metadata to the specified stream. The default implementation list the
      * metadata as <cite>key&nbsp;=&nbsp;value</cite> pairs. Each pair is formatted on

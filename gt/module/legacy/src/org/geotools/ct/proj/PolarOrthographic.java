@@ -59,8 +59,8 @@ import java.awt.geom.Point2D;
 
 import org.geotools.cs.Projection;
 import org.geotools.ct.MissingParameterException;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -103,8 +103,8 @@ public class PolarOrthographic extends Orthographic {
             throws ProjectionException
     {
         if (Math.abs(y - latitudeOfOrigin) - EPS > Math.PI/2.0) {
-            throw new ProjectionException(Resources.format(
-                ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
+            throw new ProjectionException(Errors.format(
+                ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
 
         }
         
@@ -135,8 +135,8 @@ public class PolarOrthographic extends Orthographic {
         double sinc = rho;
         if (sinc > 1.0) {
             if ((sinc - 1.0) > EPS) {
-                throw new ProjectionException(Resources.format(
-                    ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
+                throw new ProjectionException(Errors.format(
+                    ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
             }
             sinc = 1.0;
         }

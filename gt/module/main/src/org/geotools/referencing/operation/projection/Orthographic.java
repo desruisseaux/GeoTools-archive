@@ -36,8 +36,10 @@ import org.opengis.referencing.operation.PlanarProjection;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -131,8 +133,8 @@ public abstract class Orthographic extends MapProjection {
                 new NamedIdentifier(CitationImpl.OGC,      "Orthographic"),
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Orthographic"),
                 new NamedIdentifier(CitationImpl.ESRI,     "Orthographic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.ORTHOGRAPHIC_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.ORTHOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, LATITUDE_OF_ORIGIN,
@@ -184,8 +186,8 @@ public abstract class Orthographic extends MapProjection {
                     return new OrthographicOblique(parameters, descriptors);
                 }
             } else {
-                throw new UnsupportedOperationException(Resources.format(
-                    ResourceKeys.ERROR_ELLIPTICAL_NOT_SUPPORTED));
+                throw new UnsupportedOperationException(Errors.format(
+                    ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
             }
         }    
     }

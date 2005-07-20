@@ -49,22 +49,25 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+
 
 /**
  * The polar case of the {@linkplain Stereographic stereographic} projection.
  * This default implementation uses USGS equation (i.e. iteration) for computing
  * the {@linkplain #inverseTransformNormalized inverse transform}.
  *
+ * @since 2.1
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
- *
- * @since 2.1
  */
 public class StereographicPolar extends Stereographic {
     /**
@@ -184,7 +187,7 @@ public class StereographicPolar extends Stereographic {
             }
             phi0 = phi;
             if (--i < 0) {
-                throw new ProjectionException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE));
+                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
             }
         }
 
@@ -300,8 +303,8 @@ public class StereographicPolar extends Stereographic {
 
             if (southPole) {
                 if (Math.abs(1-sinlat) < EPS) {
-                    throw new ProjectionException(Resources.format(
-                        ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                    throw new ProjectionException(Errors.format(
+                        ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
                 }
                 // (21-12)
                 final double f = k0 * coslat / (1-sinlat); // == tan (pi/4 + phi/2)
@@ -309,8 +312,8 @@ public class StereographicPolar extends Stereographic {
                 y = f * coslon; // (21-10)
             } else {
                 if (Math.abs(1+sinlat) < EPS) {
-                    throw new ProjectionException(Resources.format(
-                        ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                    throw new ProjectionException(Errors.format(
+                        ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
                 }
                 // (21-8)
                 final double f = k0 * coslat / (1+sinlat); // == tan (pi/4 - phi/2)

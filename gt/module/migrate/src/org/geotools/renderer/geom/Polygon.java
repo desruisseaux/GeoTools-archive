@@ -36,8 +36,8 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.math.Statistics;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.renderer.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -189,8 +189,7 @@ public class Polygon extends Polyline {
             return;
         }
         if (!getBounds2D().contains(hole.getBounds2D())) {
-            throw new IllegalArgumentException(Resources.format(
-                                               ResourceKeys.ERROR_HOLE_NOT_INSIDE_POLYGON));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.HOLE_NOT_INSIDE_POLYGON));
         }
         if (holes == null) {
             holes = new Polyline[] {hole};

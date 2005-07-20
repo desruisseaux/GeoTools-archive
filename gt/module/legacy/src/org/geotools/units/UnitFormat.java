@@ -40,8 +40,8 @@ import java.util.Set;
 import org.geotools.resources.CharUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.util.WeakHashSet;
 
 
@@ -344,8 +344,8 @@ final class UnitFormat {
                 if (level==0) break;
             }
             if (level!=0) {
-                throw new IllegalArgumentException(Resources.format(
-                                ResourceKeys.ERROR_NON_EQUILIBRATED_PARENTHESIS_$2,
+                throw new IllegalArgumentException(Errors.format(
+                                ErrorKeys.NON_EQUILIBRATED_PARENTHESIS_$2,
                                 symbol, String.valueOf(level>=0 ? CLOSE_SYMBOL : OPEN_SYMBOL)));
             }
             if (index==length) {
@@ -403,8 +403,8 @@ final class UnitFormat {
                 return (set.size()==initialSize) ? unrecognized : null;
             }
             if (level!=0) {
-                throw new IllegalArgumentException(Resources.format(
-                                ResourceKeys.ERROR_NON_EQUILIBRATED_PARENTHESIS_$2,
+                throw new IllegalArgumentException(Errors.format(
+                                ErrorKeys.NON_EQUILIBRATED_PARENTHESIS_$2,
                                 symbol, String.valueOf(level>=0 ? CLOSE_SYMBOL : OPEN_SYMBOL)));
             }
         }

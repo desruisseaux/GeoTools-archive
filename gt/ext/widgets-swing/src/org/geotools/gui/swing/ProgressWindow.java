@@ -48,8 +48,8 @@ import java.lang.reflect.InvocationTargetException;
 import org.geotools.util.ProgressListener;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -150,10 +150,10 @@ public class ProgressWindow implements ProgressListener {
          * Création de la fenêtre qui contiendra
          * les composantes affichant le progrès.
          */
-        Dimension       parentSize;
-        final Resources  resources = Resources.getResources(parent!=null ? parent.getLocale() : null);
-        final String         title = resources.getString(ResourceKeys.PROGRESSION);
-        final JDesktopPane desktop = JOptionPane.getDesktopPaneForComponent(parent);
+        Dimension        parentSize;
+        final Vocabulary  resources = Vocabulary.getResources(parent!=null ? parent.getLocale() : null);
+        final String          title = resources.getString(VocabularyKeys.PROGRESSION);
+        final JDesktopPane  desktop = JOptionPane.getDesktopPaneForComponent(parent);
         if (desktop != null) {
             final JInternalFrame frame = new JInternalFrame(title);
             window                     = frame;
@@ -208,7 +208,7 @@ public class ProgressWindow implements ProgressListener {
      * Returns a localized string for the specified key.
      */
     private String getString(final int key) {
-        return Resources.getResources(window.getLocale()).getString(key);
+        return Vocabulary.getResources(window.getLocale()).getString(key);
     }
 
     /**
@@ -222,7 +222,7 @@ public class ProgressWindow implements ProgressListener {
      * Set the window title. A {@code null} value reset the default title.
      */
     public void setTitle(final String name) {
-        set(Caller.TITLE, (name!=null) ? name : getString(ResourceKeys.PROGRESSION));
+        set(Caller.TITLE, (name!=null) ? name : getString(VocabularyKeys.PROGRESSION));
     }
 
     /**
@@ -285,7 +285,7 @@ public class ProgressWindow implements ProgressListener {
             if (warningArea != null) {
                 buffer.append('\n');
             }
-            buffer.append(source!=null ? source : getString(ResourceKeys.UNTITLED));
+            buffer.append(source!=null ? source : getString(VocabularyKeys.UNTITLED));
             buffer.append('\n');
         }
         int wm = WARNING_MARGIN;
@@ -516,10 +516,10 @@ public class ProgressWindow implements ProgressListener {
                     warningArea.setFont(Font.getFont("Monospaced"));
                     warningArea.setEditable(false);
                     title.setBorder(BorderFactory.createEmptyBorder(0,HMARGIN,VMARGIN,HMARGIN));
-                    panel.add(content,                                     BorderLayout.NORTH);
-                    title.add(new JLabel(getString(ResourceKeys.WARNING)), BorderLayout.NORTH );
-                    title.add(scroll,                                      BorderLayout.CENTER);
-                    panel.add(title,                                       BorderLayout.CENTER);
+                    panel.add(content,                                       BorderLayout.NORTH);
+                    title.add(new JLabel(getString(VocabularyKeys.WARNING)), BorderLayout.NORTH);
+                    title.add(scroll,                                        BorderLayout.CENTER);
+                    panel.add(title,                                         BorderLayout.CENTER);
                     if (window instanceof JDialog) {
                         final JDialog window = (JDialog) ProgressWindow.this.window;
                         window.setContentPane(panel);

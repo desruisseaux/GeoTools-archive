@@ -38,8 +38,10 @@ import org.opengis.coverage.SampleDimensionType;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.AbstractInternationalString;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NumberRange;
@@ -139,7 +141,7 @@ public final class TypeMap {
      */
     private final InternationalString name = new AbstractInternationalString() {
         public String toString(final Locale locale) {
-            return Resources.getResources(locale).getString(ResourceKeys.DATA_TYPE_$2,
+            return Vocabulary.getResources(locale).getString(VocabularyKeys.DATA_TYPE_$2,
                     new Integer(real ? 2 : signed ? 1 : 0), new Integer(size));
         }
     };
@@ -270,8 +272,8 @@ public final class TypeMap {
             throws IllegalArgumentException
     {
         if (band<0 || band>=model.getNumBands()) {
-            throw new IllegalArgumentException(
-                    Resources.format(ResourceKeys.ERROR_BAD_BAND_NUMBER_$1, new Integer(band)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,
+                                               new Integer(band)));
         }
         boolean signed = true;
         switch (model.getDataType()) {
@@ -392,8 +394,7 @@ public final class TypeMap {
                 }
             }
         }
-        throw new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
-                  org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "type", type));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "type", type));
     }
 
     /**
@@ -477,14 +478,12 @@ public final class TypeMap {
                 return new Double(value);
             }
             default: {
-                throw new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
-                          org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                          "type", type));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                                   "type", type));
             }
         }
-        throw new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
-                  org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                  "value", new Double(value)));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                           "value", new Double(value)));
     }
     
     /**
@@ -499,8 +498,8 @@ public final class TypeMap {
             throws IllegalArgumentException
     {
         if (band<0 || band>=model.getNumComponents()) {
-            throw new IllegalArgumentException(
-                    Resources.format(ResourceKeys.ERROR_BAD_BAND_NUMBER_$1, new Integer(band)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,
+                                               new Integer(band)));
         }
         if (model instanceof IndexColorModel) {
             return ColorInterpretation.PALETTE_INDEX;

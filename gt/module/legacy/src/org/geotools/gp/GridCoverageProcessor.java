@@ -46,8 +46,8 @@ import org.geotools.image.jai.HysteresisDescriptor;
 import org.geotools.image.jai.NodataFilterDescriptor;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.util.WeakValueHashMap;
 
 
@@ -81,16 +81,6 @@ public class GridCoverageProcessor {
         final Logger logger = Logger.getLogger("org.geotools.gp");
         logger.config("Java Advanced Imaging: "+JAI.getBuildVersion()+
                     ", TileCache capacity="+(float)(cache.getMemoryCapacity()/(1024*1024))+" Mb");
-        /*
-         * Verify that the tile cache has some reasonable value.  A lot of users seems to
-         * misunderstand the memory setting in Java and set wrong values. If the user set
-         * a tile cache greater than the maximum heap size, tell him that he is looking
-         * for serious trouble.
-         */
-        if (cache.getMemoryCapacity() + (4*1024*1024) >= maxMemory) {
-            logger.severe(Resources.format(ResourceKeys.WARNING_EXCESSIVE_TILE_CACHE_$1,
-                                           new Double(maxMemory/(1024*1024.0))));
-        }
     }
     
     /**
@@ -273,7 +263,7 @@ public class GridCoverageProcessor {
             assert !operations.containsValue(operation);
             operations.put(name, operation);
         }
-        else throw new IllegalStateException(Resources.format(ResourceKeys.ERROR_OPERATION_ALREADY_BOUND_$1, operation.getName()));
+        else throw new IllegalStateException(Errors.format(ErrorKeys.OPERATION_ALREADY_BOUND_$1, operation.getName()));
     }
     
     /**
@@ -296,8 +286,8 @@ public class GridCoverageProcessor {
         if (operation!=null) {
             return operation;
         }
-        throw new OperationNotFoundException(Resources.format(
-                ResourceKeys.ERROR_OPERATION_NOT_FOUND_$1, name));
+        throw new OperationNotFoundException(Errors.format(
+                ErrorKeys.OPERATION_NOT_FOUND_$1, name));
     }
     
     /**
@@ -449,7 +439,6 @@ public class GridCoverageProcessor {
         final CacheKey cacheKey = new CacheKey(operation, parameters);
         GridCoverage coverage = (GridCoverage) cache.get(cacheKey);
         if (coverage != null) {
-            log(source, coverage, operationName, true);
             return coverage;
         }
         /*
@@ -484,40 +473,9 @@ public class GridCoverageProcessor {
             coverage = Interpolator.create(coverage, interpolations);
         }
         if (coverage != source) {
-            log(source, coverage, operationName, false);
             cache.put(cacheKey, coverage);
         }
         return coverage;
-    }
-
-    /**
-     * Log a message for an operation. The message will be logged only if the source grid
-     * coverage is different from the result (i.e. if the operation did some work).
-     *
-     * @param source The source grid coverage.
-     * @param result The resulting grid coverage.
-     * @param operationName the operation name.
-     * @param fromCache <code>true</code> if the result has been fetch from the cache.
-     */
-    private static void log(final GridCoverage  source,
-                            final GridCoverage  result,
-                            final String operationName,
-                            final boolean    fromCache)
-    {
-        if (source != result) {
-            String interp = "Nearest";
-            if (result instanceof Interpolator) {
-                interp = ((Interpolator)result).getInterpolationName();
-            }
-            final Locale locale = null; // Set locale here (if any).
-            final LogRecord record = Resources.getResources(locale).getLogRecord(
-                                     Level.FINE, ResourceKeys.APPLIED_OPERATION_$4,
-                                     ((source!=null) ? source : result).getName(locale),
-                                     operationName, interp, new Integer(fromCache ? 1:0));
-            record.setSourceClassName("GridCoverageProcessor");
-            record.setSourceMethodName("doOperation");
-            Logger.getLogger("org.geotools.gp").log(record);
-        }
     }
 
     /**

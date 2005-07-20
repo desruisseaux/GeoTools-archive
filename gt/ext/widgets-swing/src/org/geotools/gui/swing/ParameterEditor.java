@@ -68,8 +68,8 @@ import org.geotools.measure.Angle;
 import org.geotools.measure.AngleFormat;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -576,13 +576,13 @@ public class ParameterEditor extends JPanel {
                 field = new JTextField();
             }
             field.setEditable(editable);
-            final Resources resources = Resources.getResources(getLocale());
+            final Vocabulary resources = Vocabulary.getResources(getLocale());
             final GridBagConstraints c = new GridBagConstraints();
             c.gridx=0; c.gridwidth=1; c.insets.left=9; c.fill=c.HORIZONTAL;
-            c.gridy=0; add(new JLabel(resources.getLabel(ResourceKeys.TYPE   )), c);
-            c.gridy++; add(new JLabel(resources.getLabel(ResourceKeys.MINIMUM)), c);
-            c.gridy++; add(new JLabel(resources.getLabel(ResourceKeys.MAXIMUM)), c);
-            c.gridy++; add(new JLabel(resources.getLabel(ResourceKeys.VALUE  )), c);
+            c.gridy=0; add(new JLabel(resources.getLabel(VocabularyKeys.TYPE   )), c);
+            c.gridy++; add(new JLabel(resources.getLabel(VocabularyKeys.MINIMUM)), c);
+            c.gridy++; add(new JLabel(resources.getLabel(VocabularyKeys.MAXIMUM)), c);
+            c.gridy++; add(new JLabel(resources.getLabel(VocabularyKeys.VALUE  )), c);
             c.gridx=1; c.weightx=1; c.insets.right=9;
             c.gridy=0; add(type,    c);
             c.gridy++; add(minimum, c);
@@ -626,8 +626,8 @@ public class ParameterEditor extends JPanel {
                 classe = XMath.primitiveToWrapper(classe);
                 boolean isInteger = false;
                 if (XMath.isReal(classe) || (isInteger=XMath.isInteger(classe))==true) {
-                    type = Resources.format(isInteger ? ResourceKeys.SIGNED_INTEGER_$1
-                                                      : ResourceKeys.REAL_NUMBER_$1,
+                    type = Vocabulary.format(isInteger ? VocabularyKeys.SIGNED_INTEGER_$1
+                                                       : VocabularyKeys.REAL_NUMBER_$1,
                                             new Integer(XMath.getBitCount(classe)));
                 } else {
                     type = Utilities.getShortName(classe);
@@ -721,8 +721,8 @@ public class ParameterEditor extends JPanel {
          */
         public String getColumnName(final int index) {
             switch (index) {
-                case 0:  return Resources.format(ResourceKeys.INDEX);
-                default: return Resources.format(ResourceKeys.VALUE);
+                case 0:  return Vocabulary.format(VocabularyKeys.INDEX);
+                default: return Vocabulary.format(VocabularyKeys.VALUE);
             }
         }
 

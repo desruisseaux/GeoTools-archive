@@ -31,10 +31,9 @@ import org.geotools.resources.XMath;
  * A range of numbers. {@linkplain #union Union} and {@linkplain #intersect intersection}
  * are computed as usual, except that widening conversions will be applied as needed.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class NumberRange extends Range {
     /**

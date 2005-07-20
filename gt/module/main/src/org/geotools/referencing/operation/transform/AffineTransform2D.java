@@ -40,18 +40,17 @@ import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.wkt.Symbols;
 import org.geotools.resources.Formattable;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**
  * Transforms two-dimensional coordinate points using an {@link AffineTransform}.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 final class AffineTransform2D extends XAffineTransform
                            implements MathTransform2D, LinearTransform, Formattable {
@@ -79,7 +78,7 @@ final class AffineTransform2D extends XAffineTransform
      */
     protected void checkPermission() {
         throw new UnsupportedOperationException(
-                Resources.format(ResourceKeys.ERROR_UNMODIFIABLE_AFFINE_TRANSFORM));
+                  Errors.format(ErrorKeys.UNMODIFIABLE_AFFINE_TRANSFORM));
     }
 
     /**
@@ -136,8 +135,8 @@ final class AffineTransform2D extends XAffineTransform
         } else {
             final int dimension = ptDst.getDimension();
             if (dimension != 2) {
-                throw new MismatchedDimensionException(Resources.format(
-                          ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
+                throw new MismatchedDimensionException(Errors.format(
+                          ErrorKeys.MISMATCHED_DIMENSION_$3,
                           "ptDst", new Integer(dimension), new Integer(2)));
             }
         }

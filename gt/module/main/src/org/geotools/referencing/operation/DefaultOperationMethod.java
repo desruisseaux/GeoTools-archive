@@ -44,8 +44,10 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -53,10 +55,9 @@ import org.geotools.resources.cts.Resources;
  * methods use a number of operation parameters, although some coordinate conversions
  * use none. Each coordinate operation using the method assigns values to these parameters.
  *  
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see DefaultOperation
  */
@@ -118,7 +119,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
             final AbstractMathTransform mt = (AbstractMathTransform) transform;
             properties = getProperties(mt.getParameterDescriptors(), null);
         } else {
-            properties = Collections.singletonMap(NAME_KEY, Resources.format(ResourceKeys.UNKNOW));
+            properties = Collections.singletonMap(NAME_KEY, Vocabulary.format(VocabularyKeys.UNKNOW));
         }
         return properties;
     }
@@ -273,8 +274,8 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
             throws IllegalArgumentException
     {
         if (value < 0) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Integer(value)));
+            throw new IllegalArgumentException(Errors.format(
+                      ErrorKeys.ILLEGAL_ARGUMENT_$2, name, new Integer(value)));
         }
     }
 
@@ -398,8 +399,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
             } else {
                 return;
             }
-            throw new IllegalArgumentException(Resources.format(
-                                               ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
                                                name, new Integer(actual), new Integer(expected)));
         }
     }

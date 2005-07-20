@@ -29,8 +29,8 @@ import java.awt.geom.Point2D;
 
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Matrix;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
@@ -69,7 +69,7 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
      */
     protected void checkPermission() {
         throw new UnsupportedOperationException(
-                Resources.format(ResourceKeys.ERROR_UNMODIFIABLE_AFFINE_TRANSFORM));
+                Errors.format(ErrorKeys.UNMODIFIABLE_AFFINE_TRANSFORM));
     }
     
     /**

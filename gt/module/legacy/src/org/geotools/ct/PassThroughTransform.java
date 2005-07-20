@@ -25,6 +25,8 @@ import java.io.Serializable;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Matrix;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -181,8 +183,8 @@ final class PassThroughTransform extends AbstractMathTransform implements Serial
         final int transDim = transform.getDimSource();
         final int pointDim = point.getDimension();
         if (pointDim != transDim+nSkipped) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(pointDim), new Integer(transDim+nSkipped)));
         }
         final CoordinatePoint subPoint = new CoordinatePoint(transDim);

@@ -86,8 +86,8 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -97,11 +97,9 @@ import org.geotools.resources.cts.Resources;
  * most of its work to one or many of {@code createOperationStep} methods. Subclasses can
  * override those methods in order to extend the factory capability to some more CRS.
  *
- * @version $Id$
- * @author <A HREF="http://www.opengis.org">OpenGIS</A>
- * @author Martin Desruisseaux
- *
  * @since 2.1
+ * @version $Id$
+ * @author Martin Desruisseaux
  */
 public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperationFactory {
     /**
@@ -1075,8 +1073,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                     datumShift = new GeneralMatrix(4); // Identity transform.
                     identifier = ELLIPSOID_SHIFT;
                 } else {
-                    throw new OperationNotFoundException(Resources.format(
-                                ResourceKeys.BURSA_WOLF_PARAMETERS_REQUIRED));
+                    throw new OperationNotFoundException(Errors.format(
+                                ErrorKeys.BURSA_WOLF_PARAMETERS_REQUIRED));
                 }
             }
             final Matrix normalizeSource = swapAndScaleAxis(sourceCS, STANDARD);

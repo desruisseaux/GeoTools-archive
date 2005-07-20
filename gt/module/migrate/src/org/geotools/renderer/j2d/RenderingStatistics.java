@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.j2d;
 
@@ -42,8 +29,8 @@ import java.util.logging.LogRecord;
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.renderer.geom.Geometry; // For Javadoc
 
 
@@ -166,18 +153,18 @@ final class RenderingStatistics {
     final void finish(final Renderer renderer) {
         time = System.currentTimeMillis() - time;
         if (isLoggable() && time>=TIME_THRESHOLD) {
-            final Locale       locale = renderer.getLocale();
-            final Resources resources = Resources.getResources(locale);
-            final String         name = renderer.getName(locale);
-            final Double         time = new Double(this.time/1000.0);
+            final Locale     locale = renderer.getLocale();
+            final Logging resources = Logging.getResources(locale);
+            final String       name = renderer.getName(locale);
+            final Double       time = new Double(this.time/1000.0);
             final LogRecord    record;
             if (total==0 || rendered==0) {
-                record = resources.getLogRecord(LEVEL, ResourceKeys.PAINTING_$2, name, time);
+                record = resources.getLogRecord(LEVEL, LoggingKeys.PAINTING_LAYER_$2, name, time);
             } else {
                 record = new LogRecord(LEVEL,
-                         resources.getString(ResourceKeys.PAINTING_$2, name, time) +
+                         resources.getString(LoggingKeys.PAINTING_LAYER_$2, name, time) +
                          System.getProperty("line.separator", "\n") +
-                         resources.getString(ResourceKeys.POLYGON_CACHE_USE_$4,
+                         resources.getString(LoggingKeys.POLYGON_CACHE_USE_$4,
                               new Double((double)rendered/(double)total),
                               new Double((double)(rendered-recomputed)/(double)rendered),
                               new Double(resolution/rendered), units));

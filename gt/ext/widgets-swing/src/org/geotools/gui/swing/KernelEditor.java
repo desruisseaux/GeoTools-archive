@@ -65,8 +65,8 @@ import java.util.Locale;
 // Geotools dependencies
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.SwingUtilities;
 
 
@@ -129,9 +129,9 @@ public class KernelEditor extends JComponent {
     public KernelEditor() {
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
-        final Resources resources = Resources.getResources(getDefaultLocale());
+        final Vocabulary resources = Vocabulary.getResources(getDefaultLocale());
 
-        categorySelector.addItem(resources.getString(ResourceKeys.ALL)); // Must be first category
+        categorySelector.addItem(resources.getString(VocabularyKeys.ALL)); // Must be first category
         categorySelector.addItemListener(model);
         widthSelector.   addChangeListener(model);
         heightSelector.  addChangeListener(model);
@@ -150,8 +150,8 @@ public class KernelEditor extends JComponent {
         ////                                            ////
         ////////////////////////////////////////////////////
         c.gridx=0; c.fill=c.HORIZONTAL;
-        c.gridy=2; predefinedKernels.add(new JLabel(resources.getLabel(ResourceKeys.CATEGORY), JLabel.RIGHT ), c);
-        c.gridy=3; predefinedKernels.add(new JLabel(resources.getLabel(ResourceKeys.KERNEL),   JLabel.RIGHT ), c);
+        c.gridy=2; predefinedKernels.add(new JLabel(resources.getLabel(VocabularyKeys.CATEGORY), JLabel.RIGHT ), c);
+        c.gridy=3; predefinedKernels.add(new JLabel(resources.getLabel(VocabularyKeys.KERNEL),   JLabel.RIGHT ), c);
 
         c.gridx=1; c.weightx=1; c.insets.left=0;
         c.gridy=2; predefinedKernels.add(categorySelector, c);
@@ -160,7 +160,7 @@ public class KernelEditor extends JComponent {
         c.gridx=0; c.gridy=2; c.gridwidth=c.REMAINDER; add(predefinedKernels, c);
         predefinedKernels.setBorder(
             BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder(resources.getString(ResourceKeys.PREDEFINED_KERNELS)),
+            BorderFactory.createTitledBorder(resources.getString(VocabularyKeys.PREDEFINED_KERNELS)),
             BorderFactory.createEmptyBorder(/*top*/3,/*left*/9,/*bottom*/6,/*right*/6)));
 
 
@@ -170,9 +170,9 @@ public class KernelEditor extends JComponent {
         ////                                      ////
         //////////////////////////////////////////////
         c.weightx=0; c.gridwidth=1; c.insets.bottom=3;
-        c.gridy=0; add(new JLabel(    resources.getLabel(ResourceKeys.SIZE), JLabel.RIGHT), c);
-        c.gridx=2; add(new JLabel(' '+resources.getString(ResourceKeys.LINES).toLowerCase()+" \u00D7 ", JLabel.CENTER), c);
-        c.gridx=4; add(new JLabel(' '+resources.getString(ResourceKeys.COLUMNS).toLowerCase(), JLabel.LEFT),  c);
+        c.gridy=0; add(new JLabel(    resources.getLabel(VocabularyKeys.SIZE), JLabel.RIGHT), c);
+        c.gridx=2; add(new JLabel(' '+resources.getString(VocabularyKeys.LINES).toLowerCase()+" \u00D7 ", JLabel.CENTER), c);
+        c.gridx=4; add(new JLabel(' '+resources.getString(VocabularyKeys.COLUMNS).toLowerCase(), JLabel.LEFT),  c);
 
         c.weightx=1;
         c.gridx=1; add(heightSelector, c);
@@ -192,14 +192,14 @@ public class KernelEditor extends JComponent {
     /**
      * Returns the resources for the widget locale.
      */
-    final Resources getResources() {
+    final Vocabulary getResources() {
         Locale locale;
         try {
             locale = getLocale();
         } catch (IllegalComponentStateException exception) {
             locale = getDefaultLocale();
         }
-        return Resources.getResources(locale);
+        return Vocabulary.getResources(locale);
     }
 
     /**
@@ -210,9 +210,9 @@ public class KernelEditor extends JComponent {
      * {@linkplain KernelJAI#ERROR_FILTER_STUCKI Stucki (1981)}.
      */
     public void addDefaultKernels() {
-        final Resources resources   = getResources();
-        final String ERROR_FILTERS  = resources.getString(ResourceKeys.ERROR_FILTERS);
-        final String GRADIENT_MASKS = resources.getString(ResourceKeys.GRADIENT_MASKS);
+        final Vocabulary resources  = getResources();
+        final String ERROR_FILTERS  = resources.getString(VocabularyKeys.ERROR_FILTERS);
+        final String GRADIENT_MASKS = resources.getString(VocabularyKeys.GRADIENT_MASKS);
         addKernel(ERROR_FILTERS,  "Floyd & Steinberg (1975)",      KernelJAI.ERROR_FILTER_FLOYD_STEINBERG);
         addKernel(ERROR_FILTERS,  "Jarvis, Judice & Ninke (1976)", KernelJAI.ERROR_FILTER_JARVIS);
         addKernel(ERROR_FILTERS,  "Stucki (1981)",                 KernelJAI.ERROR_FILTER_STUCKI);
@@ -290,7 +290,7 @@ public class KernelEditor extends JComponent {
      */
     public void addKernel(String category, final String name, final KernelJAI kernel) {
         if (category == null) {
-            category = Resources.getResources(getLocale()).getString(ResourceKeys.OTHERS);
+            category = Vocabulary.getResources(getLocale()).getString(VocabularyKeys.OTHERS);
         }
         model.addKernel(category, name, kernel);
     }
@@ -544,7 +544,7 @@ public class KernelEditor extends JComponent {
          * Used by the combox box of kernel names.
          */
         public Object getSelectedItem() {
-            return (name!=null) ? name : getString(ResourceKeys.PERSONALIZED);
+            return (name!=null) ? name : getString(VocabularyKeys.PERSONALIZED);
         }
 
         /**
@@ -747,7 +747,7 @@ public class KernelEditor extends JComponent {
             names = null;
             fireListChanged(ListDataEvent.INTERVAL_REMOVED, 0, size-1);
             categorySelector.removeAllItems();
-            categorySelector.addItem(getResources().getString(ResourceKeys.ALL));
+            categorySelector.addItem(getResources().getString(VocabularyKeys.ALL));
         }
 
         /**
@@ -777,7 +777,7 @@ public class KernelEditor extends JComponent {
                         names[count++] = (String) entry.getKey();
                     }
                 }
-                names[count++] = getString(ResourceKeys.PERSONALIZED);
+                names[count++] = getString(VocabularyKeys.PERSONALIZED);
                 names = (String[]) XArray.resize(names, count);
             }
             return names;
@@ -807,7 +807,7 @@ public class KernelEditor extends JComponent {
                 }
             }
             if (newName == null) {
-                newName = getString(ResourceKeys.PERSONALIZED);
+                newName = getString(VocabularyKeys.PERSONALIZED);
             }
             if (!newName.equals(name)) {
                 // Set the name now in order to avoid that

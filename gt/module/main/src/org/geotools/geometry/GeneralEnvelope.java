@@ -33,8 +33,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.geometry.XRectangle2D;
 
 
@@ -144,8 +144,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         throws MismatchedDimensionException
     {
         if (minCP.length != maxCP.length) {
-            throw new MismatchedDimensionException(Resources.format(
-                                ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
                                 new Integer(minCP.length), new Integer(maxCP.length)));
         }
         ordinates = new double[minCP.length + maxCP.length];
@@ -192,8 +191,8 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         final int dimension = ordinates.length/2;
         for (int i=0; i<dimension; i++) {
             if (!(ordinates[i] <= ordinates[dimension+i])) { // Use '!' in order to catch 'NaN'.
-                throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_ILLEGAL_ENVELOPE_ORDINATE_$1, new Integer(i)));
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.ILLEGAL_ENVELOPE_ORDINATE_$1, new Integer(i)));
             }
         }
     }
@@ -431,12 +430,12 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         final int curDim = ordinates.length/2;
         final int newDim = upper-lower;
         if (lower<0 || lower>curDim) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
         }
         if (newDim<0 || upper>curDim) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
         }
         final GeneralEnvelope envelope = new GeneralEnvelope(newDim);
         System.arraycopy(ordinates, lower,        envelope.ordinates, 0,      newDim);
@@ -459,12 +458,12 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         final int curDim = ordinates.length/2;
         final int rmvDim = upper-lower;
         if (lower<0 || lower>curDim) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
         }
         if (rmvDim<0 || upper>curDim) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
         }
         final GeneralEnvelope envelope = new GeneralEnvelope(curDim - rmvDim);
         System.arraycopy(ordinates, 0,     envelope.ordinates, 0,            lower);
@@ -483,8 +482,8 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             return XRectangle2D.createFromExtremums(ordinates[0], ordinates[1],
                                                     ordinates[2], ordinates[3]);
         } else {
-            throw new IllegalStateException(Resources.format(
-                    ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(getDimension())));
+            throw new IllegalStateException(Errors.format(
+                    ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(getDimension())));
         }
     }
     

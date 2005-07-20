@@ -19,13 +19,14 @@
  */
 package org.geotools.math;
 
-// Miscellaneous
+// J2SE dependencies
 import java.io.Serializable;
 import java.util.Locale;
 
+// Geotools dependencies
 import org.geotools.io.TableWriter;
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.Descriptions;
+import org.geotools.resources.i18n.DescriptionKeys;
 import org.opengis.util.Cloneable;
 
 
@@ -341,8 +342,8 @@ public class Statistics implements Cloneable, Serializable {
      * by spaces.
      */
     public String toString(final Locale locale, final boolean tabulations) {
-        String text = Resources.getResources(locale).getString(ResourceKeys.STATISTICS_TO_STRING_$6,
-            new Number[] {
+        String text = Descriptions.getResources(locale).getString(
+                DescriptionKeys.STATISTICS_TO_STRING_$6, new Number[] {
                 new Integer(count()  ),
                 new Double (minimum()),
                 new Double (maximum()),

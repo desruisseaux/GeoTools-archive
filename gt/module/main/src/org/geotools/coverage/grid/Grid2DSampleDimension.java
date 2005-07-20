@@ -46,8 +46,8 @@ import org.geotools.coverage.TypeMap;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.ClassChanger;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.NumberRange;
 import org.geotools.util.SimpleInternationalString;
 
@@ -113,14 +113,12 @@ final class Grid2DSampleDimension extends GridSampleDimension {
     {
         final int numBands = image.getSampleModel().getNumBands();
         if (src!=null && src.length!=numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
-                    new Integer(numBands), new Integer(src.length), "SampleDimension"));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
+                      new Integer(numBands), new Integer(src.length), "SampleDimension"));
         }
         if (dst.length != numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
-                    new Integer(numBands), new Integer(dst.length), "SampleDimension"));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
+                      new Integer(numBands), new Integer(dst.length), "SampleDimension"));
         }
         /*
          * Now, we know that the number of bands and the array length are consistent.
@@ -157,7 +155,7 @@ final class Grid2DSampleDimension extends GridSampleDimension {
         if (nInt == numBands) {
             return false;
         }
-        throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_MIXED_CATEGORIES));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.MIXED_CATEGORIES));
     }
 
     /**
@@ -235,19 +233,16 @@ final class Grid2DSampleDimension extends GridSampleDimension {
     {
         final int numBands = dst.length;
         if (min!=null && min.length != numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
-                    new Integer(numBands), new Integer(min.length), "min[i]"));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
+                      new Integer(numBands), new Integer(min.length), "min[i]"));
         }
         if (max!=null && max.length != numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
-                    new Integer(numBands), new Integer(max.length), "max[i]"));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
+                      new Integer(numBands), new Integer(max.length), "max[i]"));
         }
         if (colors!=null && colors.length != numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
-                    new Integer(numBands), new Integer(colors.length), "colors[i]"));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
+                      new Integer(numBands), new Integer(colors.length), "colors[i]"));
         }
         /*
          * Arguments are know to be valids. We now need to compute two ranges:

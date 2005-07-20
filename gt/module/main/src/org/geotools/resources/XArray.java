@@ -32,10 +32,9 @@ import java.util.Locale;
  * This class may be removed if JavaSoft provide some language construct
  * functionally equivalent to C/C++'s {@code realloc}.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class XArray {
     /**

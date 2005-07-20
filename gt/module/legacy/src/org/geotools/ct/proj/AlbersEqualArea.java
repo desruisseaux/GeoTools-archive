@@ -61,8 +61,10 @@ import org.geotools.cs.Projection;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MissingParameterException;
 import org.geotools.measure.Latitude;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 
 
 /**
@@ -125,7 +127,7 @@ public class AlbersEqualArea extends ConicProjection {
          */
         public Provider() {
             super("Albers_Conic_Equal_Area",
-                  ResourceKeys.ALBERS_EQUAL_AREA_PROJECTION);
+                  VocabularyKeys.ALBERS_EQUAL_AREA_PROJECTION);
             remove("scale_factor");
             put("standard_parallel_1", 50.0, LATITUDE_RANGE);
             put("standard_parallel_2", 58.5, LATITUDE_RANGE);
@@ -153,8 +155,8 @@ public class AlbersEqualArea extends ConicProjection {
 
 	//Compute Constants
         if (Math.abs(phi1 + phi2) < EPS) 
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ANTIPODE_LATITUDES_$2,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ANTIPODE_LATITUDES_$2,
                     new Latitude(Math.toDegrees(phi1)),
                     new Latitude(Math.toDegrees(phi2))));
          
@@ -190,7 +192,7 @@ public class AlbersEqualArea extends ConicProjection {
      * Returns a human readable name localized for the specified locale.
      */
     public String getName(final Locale locale) {
-        return Resources.getResources(locale).getString(ResourceKeys.ALBERS_EQUAL_AREA_PROJECTION);
+        return Vocabulary.getResources(locale).getString(VocabularyKeys.ALBERS_EQUAL_AREA_PROJECTION);
     }
 
     /**
@@ -295,7 +297,7 @@ public class AlbersEqualArea extends ConicProjection {
                 return phi;
             }
         } 
-        throw new ProjectionException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE));
+        throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
     }
     
     /** 

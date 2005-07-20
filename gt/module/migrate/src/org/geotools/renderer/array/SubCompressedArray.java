@@ -17,25 +17,12 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.array;
 
-// Divers
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.renderer.Resources;
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -70,11 +57,11 @@ final class SubCompressedArray extends CompressedArray {
         this.lower  = lower;
         this.upper  = upper;
         if (upper-lower < 2) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_RANGE_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
                                                new Integer(lower), new Integer(upper)));
         }
         if (((upper-lower)&1) !=0) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_ODD_ARRAY_LENGTH_$1,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ODD_ARRAY_LENGTH_$1,
                                                new Integer(upper-lower)));
         }
         if (lower < 0) {

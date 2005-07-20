@@ -42,8 +42,8 @@ import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -409,8 +409,8 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
         AbstractParameter.ensureValidClass(valueClass, maximum);
         if (minimum!=null && maximum!=null) {
             if (minimum.compareTo(maximum) > 0) {
-                throw new IllegalArgumentException(Resources.format(
-                          ResourceKeys.ERROR_BAD_RANGE_$2, minimum, maximum));
+                throw new IllegalArgumentException(Errors.format(
+                          ErrorKeys.BAD_RANGE_$2, minimum, maximum));
             }
         }
         if (validValues != null) {

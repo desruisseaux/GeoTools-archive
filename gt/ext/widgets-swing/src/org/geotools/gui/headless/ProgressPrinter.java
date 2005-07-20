@@ -37,8 +37,8 @@ import java.text.BreakIterator;
 import org.geotools.util.ProgressListener;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -307,12 +307,12 @@ public class ProgressPrinter implements ProgressListener {
     {
         carriageReturn(0);
         if (!hasPrintedWarning) {
-            printInBox(Resources.format(ResourceKeys.WARNING));
+            printInBox(Vocabulary.format(VocabularyKeys.WARNING));
             hasPrintedWarning=true;
         }
         if (!Utilities.equals(source, lastSource)) {
             out.println();
-            out.println(source!=null ? source : Resources.format(ResourceKeys.UNTITLED));
+            out.println(source!=null ? source : Vocabulary.format(VocabularyKeys.UNTITLED));
             lastSource=source;
         }
         /*
@@ -367,7 +367,7 @@ public class ProgressPrinter implements ProgressListener {
      */
     public synchronized void exceptionOccurred(final Throwable exception) {
         carriageReturn(0);
-        printInBox(Resources.format(ResourceKeys.EXCEPTION));
+        printInBox(Vocabulary.format(VocabularyKeys.EXCEPTION));
         exception.printStackTrace(out);
         hasPrintedWarning = false;
         out.flush();

@@ -71,8 +71,12 @@ import org.geotools.gp.CannotReprojectException;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.LegacyGCSUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.resources.image.ImageUtilities;
@@ -709,8 +713,8 @@ public class RenderedGridCoverage extends RenderedLayer implements TileObserver 
             gridToCS.setTransform((AffineTransform) coverage.getGridGeometry()
                                                     .getGridToCoordinateSystem2D());
         } catch (ClassCastException exception) {
-            throw new TransformException(Resources.getResources(getLocale()).getString(
-                                         ResourceKeys.ERROR_NON_AFFINE_TRANSFORM), exception);
+            throw new TransformException(Errors.getResources(getLocale()).getString(
+                                         ErrorKeys.NON_AFFINE_TRANSFORM), exception);
         }
         final Graphics2D graphics = context.getGraphics();
         PlanarImage image; // The image to display (will be computed below).
@@ -816,8 +820,8 @@ public class RenderedGridCoverage extends RenderedLayer implements TileObserver 
         final Logger logger = Renderer.LOGGER;
         if (logger.isLoggable(Level.FINE)) {
             final Locale locale = getLocale();
-            final LogRecord record = Resources.getResources(locale).getLogRecord(
-                               Level.FINE, ResourceKeys.RESSAMPLING_RENDERED_IMAGE_$3,
+            final LogRecord record = Logging.getResources(locale).getLogRecord(
+                               Level.FINE, LoggingKeys.RESSAMPLING_RENDERED_IMAGE_$3,
                                coverage.getName(locale),
                                new Integer(level), new Integer(images.length));
             record.setSourceClassName(Utilities.getShortClassName(this));
@@ -862,7 +866,7 @@ public class RenderedGridCoverage extends RenderedLayer implements TileObserver 
                 return false;
             } catch (CannotEvaluateException exception) {
                 // The point can't be evaluated for some other reason. Append an error flag.
-                toAppendTo.append(Resources.getResources(locale).getString(ResourceKeys.ERROR));
+                toAppendTo.append(Vocabulary.getResources(locale).getString(VocabularyKeys.ERROR));
                 return true;
             }
             if (bands == null) {

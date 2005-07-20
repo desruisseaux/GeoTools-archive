@@ -45,8 +45,10 @@ import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransformProvider;
 import org.geotools.ct.MissingParameterException;
 import org.geotools.measure.Latitude;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -117,7 +119,7 @@ public class Mercator extends CylindricalProjection {
          */
         public Provider(boolean sp2) {
             super(sp2 ? "Mercator_2SP": "Mercator_1SP", 
-                  ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION);
+                  VocabularyKeys.CYLINDRICAL_MERCATOR_PROJECTION);
             remove("latitude_of_origin");
             if (sp2) {
                 remove("scale_factor");
@@ -184,7 +186,7 @@ public class Mercator extends CylindricalProjection {
      * Returns a human readable name localized for the specified locale.
      */
     public String getName(final Locale locale) {
-        return Resources.getResources(locale).getString(ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION);
+        return Vocabulary.getResources(locale).getString(VocabularyKeys.CYLINDRICAL_MERCATOR_PROJECTION);
     }
     
     /**
@@ -195,8 +197,8 @@ public class Mercator extends CylindricalProjection {
             throws ProjectionException
     {
         if (Math.abs(y) > (Math.PI/2 - EPS)) {
-            throw new ProjectionException(Resources.format(
-                    ResourceKeys.ERROR_POLE_PROJECTION_$1, new Latitude(Math.toDegrees(y))));
+            throw new ProjectionException(Errors.format(
+                    ErrorKeys.POLE_PROJECTION_$1, new Latitude(Math.toDegrees(y))));
         }
 
         y = - Math.log(tsfn(y, Math.sin(y)));
@@ -256,8 +258,8 @@ public class Mercator extends CylindricalProjection {
                 throws ProjectionException
         {
             if (Math.abs(y) > (Math.PI/2 - EPS)) {
-                throw new ProjectionException(Resources.format(
-                        ResourceKeys.ERROR_POLE_PROJECTION_$1, new Latitude(Math.toDegrees(y))));
+                throw new ProjectionException(Errors.format(
+                        ErrorKeys.POLE_PROJECTION_$1, new Latitude(Math.toDegrees(y))));
             }
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;

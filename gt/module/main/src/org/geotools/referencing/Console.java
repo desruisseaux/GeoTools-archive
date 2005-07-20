@@ -49,8 +49,8 @@ import org.geotools.referencing.wkt.AbstractConsole;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Preprocessor;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -603,8 +603,7 @@ public class Console extends AbstractConsole {
         final int sourceDim = transformedSource.getDimension();
         final int targetDim =    targetPosition.getDimension();
         if (sourceDim != targetDim) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(sourceDim), new Integer(targetDim)));
         }
         for (int i=0; i<sourceDim; i++) {

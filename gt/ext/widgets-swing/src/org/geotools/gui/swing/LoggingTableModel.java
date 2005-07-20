@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing;
 
@@ -60,8 +47,8 @@ import java.text.DateFormat;
 
 // Resources
 import org.geotools.resources.XArray;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -78,12 +65,12 @@ final class LoggingTableModel extends Handler implements TableModel {
      * If the order is changed, then the constants in {@link LoggingPanel} must be updated.
      */
     private static final int[] COLUMN_NAMES = new int[] {
-        ResourceKeys.LOGGER,
-        ResourceKeys.CLASS,
-        ResourceKeys.METHOD,
-        ResourceKeys.TIME_OF_DAY,
-        ResourceKeys.LEVEL,
-        ResourceKeys.MESSAGE
+        VocabularyKeys.LOGGER,
+        VocabularyKeys.CLASS,
+        VocabularyKeys.METHOD,
+        VocabularyKeys.TIME_OF_DAY,
+        VocabularyKeys.LEVEL,
+        VocabularyKeys.MESSAGE
     };
 
     /**
@@ -282,7 +269,7 @@ final class LoggingTableModel extends Handler implements TableModel {
      * Returns the name of the column at {@code columnIndex}.
      */
     public String getColumnName(final int columnIndex) {
-        return Resources.format(columnNames[columnIndex]);
+        return Vocabulary.format(columnNames[columnIndex]);
     }
 
     /**
@@ -296,12 +283,12 @@ final class LoggingTableModel extends Handler implements TableModel {
             for (int i=0; i<row.length; i++) {
                 final String value;
                 switch (columnNames[i]) {
-                    case ResourceKeys.LOGGER:      value=record.getLoggerName();                          break;
-                    case ResourceKeys.CLASS:       value=getShortClassName(record.getSourceClassName());  break;
-                    case ResourceKeys.METHOD:      value=record.getSourceMethodName();                    break;
-                    case ResourceKeys.TIME_OF_DAY: value=dateFormat.format(new Date(record.getMillis())); break;
-                    case ResourceKeys.LEVEL:       value=record.getLevel().getLocalizedName();            break;
-                    case ResourceKeys.MESSAGE:     value=getFormatter().formatMessage(record);            break;
+                    case VocabularyKeys.LOGGER:      value=record.getLoggerName();                          break;
+                    case VocabularyKeys.CLASS:       value=getShortClassName(record.getSourceClassName());  break;
+                    case VocabularyKeys.METHOD:      value=record.getSourceMethodName();                    break;
+                    case VocabularyKeys.TIME_OF_DAY: value=dateFormat.format(new Date(record.getMillis())); break;
+                    case VocabularyKeys.LEVEL:       value=record.getLevel().getLocalizedName();            break;
+                    case VocabularyKeys.MESSAGE:     value=getFormatter().formatMessage(record);            break;
                     default:                       throw new AssertionError(i);
                 }
                 row[i] = value;

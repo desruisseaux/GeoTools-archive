@@ -60,8 +60,10 @@ import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NumberRange;
 
@@ -810,7 +812,7 @@ public class CoverageStack extends AbstractCoverage {
      * @todo provides a better formatting of the point coordinate.
      */
     private static String cannotEvaluate(final DirectPosition point) {
-        return Resources.format(ResourceKeys.ERROR_CANT_EVALUATE_$1, point);
+        return Errors.format(ErrorKeys.CANT_EVALUATE_$1, point);
     }
     
     /**
@@ -852,7 +854,7 @@ public class CoverageStack extends AbstractCoverage {
     private void load(final int index) throws IOException {
         final Element    element = elements[index];
         final NumberRange zRange = element.getZRange();
-        logLoading(ResourceKeys.LOADING_IMAGE_$1, new String[]{element.getName()});
+        logLoading(VocabularyKeys.LOADING_IMAGE_$1, new String[] {element.getName()});
         lower      = upper      = load(element);
         lowerZ     = upperZ     = getZ(zRange);
         lowerRange = upperRange = zRange;
@@ -864,8 +866,8 @@ public class CoverageStack extends AbstractCoverage {
      * @throws IOException if an error occured while loading images.
      */
     private void load(final Element lowerElement, final Element upperElement) throws IOException {
-        logLoading(ResourceKeys.LOADING_IMAGES_$2, new String[]{lowerElement.getName(),
-                                                                upperElement.getName()});
+        logLoading(VocabularyKeys.LOADING_IMAGES_$2, new String[] {lowerElement.getName(),
+                                                                   upperElement.getName()});
         final NumberRange lowerRange = lowerElement.getZRange();
         final NumberRange upperRange = upperElement.getZRange();
         final Coverage lower = load(lowerElement);
@@ -978,8 +980,8 @@ public class CoverageStack extends AbstractCoverage {
         } catch (IOException exception) {
             throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
         }
-        throw new OrdinateOutsideCoverageException(Resources.format(
-                  ResourceKeys.ERROR_ZVALUE_OUTSIDE_COVERAGE_$1, Z), zDimension);
+        throw new OrdinateOutsideCoverageException(Errors.format(
+                  ErrorKeys.ZVALUE_OUTSIDE_COVERAGE_$1, Z), zDimension);
     }
     
     /**
@@ -1275,14 +1277,14 @@ public class CoverageStack extends AbstractCoverage {
     protected void logLoading(final LogRecord record) {
         Logger.getLogger("org.geotools.coverage").log(record);
     }
-    
+
     /**
      * Prepares a log record about an image to be loaded, and put the log record in a stack.
      * The record will be effectively logged only when image loading really beging.
      */
     private void logLoading(final int key, final Object[] parameters) {
         final Locale locale = null;
-        final LogRecord record = Resources.getResources(locale).getLogRecord(Level.INFO, key);
+        final LogRecord record = Vocabulary.getResources(locale).getLogRecord(Level.INFO, key);
         record.setSourceClassName("CoverageStack");
         record.setSourceMethodName("evaluate");
         record.setParameters(parameters);
@@ -1292,7 +1294,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         readListener.record = record;
     }
-    
+
     /**
      * A listener for monitoring image loading. The purpose for this listener is to
      * log a message when an image is about to be loaded.

@@ -72,8 +72,8 @@ import org.geotools.gui.swing.tree.TreeNode;
 import org.geotools.gui.swing.tree.NamedTreeNode;
 import org.geotools.gui.swing.tree.MutableTreeNode;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
-import org.geotools.resources.gui.ResourceKeys;
-import org.geotools.resources.gui.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 
 
 /**
@@ -226,7 +226,7 @@ public class RegisteredOperationBrowser extends JPanel {
             }
             try {
                 description = resources.getString(key);
-                version     = Resources.getResources(locale).getString(ResourceKeys.VERSION_$1,
+                version     = Vocabulary.getResources(locale).getString(VocabularyKeys.VERSION_$1,
                               resources.getString("Version")) + ", " +
                               resources.getString("Vendor");
             } catch (MissingResourceException exception) {
@@ -266,9 +266,9 @@ public class RegisteredOperationBrowser extends JPanel {
      * @see Locale#getDefault()
      */
     public static TreeModel getTree(final OperationRegistry registry, final Locale locale) {
-        final Resources resources = Resources.getResources(locale);
+        final Vocabulary resources = Vocabulary.getResources(locale);
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode(
-                                                resources.getString(ResourceKeys.OPERATIONS));
+                                                resources.getString(VocabularyKeys.OPERATIONS));
         /*
          * Add registry modes ("rendered", "renderable", etc.),
          * and gets the operation descriptors for each mode.
@@ -315,7 +315,7 @@ public class RegisteredOperationBrowser extends JPanel {
                 if (products != null) {
                     final DefaultMutableTreeNode productsNode;
                     productsNode = new DefaultMutableTreeNode(
-                                   resources.getString(ResourceKeys.IMPLEMENTATIONS));
+                                   resources.getString(VocabularyKeys.IMPLEMENTATIONS));
                     for (final Iterator itp=products.iterator(); itp.hasNext();) {
                         final String product = (String) itp.next();
                         final DefaultMutableTreeNode productNode;
@@ -437,7 +437,7 @@ public class RegisteredOperationBrowser extends JPanel {
         if (arguments.getFlag("-print")) {
             arguments.out.println(Trees.toString(getTree()));
         } else {
-            final JFrame frame = new JFrame(Resources.format(ResourceKeys.OPERATIONS));
+            final JFrame frame = new JFrame(Vocabulary.format(VocabularyKeys.OPERATIONS));
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             frame.getContentPane().add(new RegisteredOperationBrowser());
             frame.pack();

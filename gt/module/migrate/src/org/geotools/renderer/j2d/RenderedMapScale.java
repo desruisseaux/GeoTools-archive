@@ -54,8 +54,10 @@ import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.resources.XMath;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -214,7 +216,7 @@ public class RenderedMapScale extends RenderedLegend {
                     final double factor = XMath.pow10((int)Math.floor(XMath.log10(scale))-2);
                     scale = (float) (Math.rint(scale/factor) * factor);
                 }
-                return Resources.getResources(locale).getString(ResourceKeys.SCALE_$1,
+                return Vocabulary.getResources(locale).getString(VocabularyKeys.SCALE_$1,
                                                                      new Float(scale));
             }
         }
@@ -266,8 +268,8 @@ public class RenderedMapScale extends RenderedLegend {
      */
     public void setUnits(final Unit units) throws UnitException {
         if (units==null || !Unit.METRE.canConvert(units)) {
-            throw new UnitException(Resources.getResources(getLocale()).getString(
-                                    ResourceKeys.ERROR_BAD_ARGUMENT_$2, "units", units));
+            throw new UnitException(Errors.getResources(getLocale()).getString(
+                                    ErrorKeys.BAD_ARGUMENT_$2, "units", units));
         }
         final Unit old;
         synchronized (getTreeLock()) {
@@ -409,7 +411,7 @@ public class RenderedMapScale extends RenderedLegend {
      */
     private void paintError(final RenderingContext context) throws TransformException {
         context.getGraphics().setPaint(foreground);
-        paint(context, Resources.getResources(getLocale()).getString(ResourceKeys.ERROR));
+        paint(context, Vocabulary.getResources(getLocale()).getString(VocabularyKeys.ERROR));
     }
 
     /**

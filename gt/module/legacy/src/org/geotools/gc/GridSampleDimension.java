@@ -43,8 +43,8 @@ import org.geotools.cv.SampleDimension;
 import org.geotools.cv.SampleDimensionType;
 import org.geotools.gp.Hints;
 import org.geotools.resources.ClassChanger;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
 
@@ -146,13 +146,13 @@ final class GridSampleDimension extends SampleDimension {
     {
         final int numBands = image.getSampleModel().getNumBands();
         if (src!=null && src.length!=numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
                     new Integer(numBands), new Integer(src.length), "SampleDimension"));
         }
         if (dst.length != numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
                     new Integer(numBands), new Integer(dst.length), "SampleDimension"));
         }
         int nGeo = 0;
@@ -180,7 +180,7 @@ final class GridSampleDimension extends SampleDimension {
         if (nInt == numBands) {
             return false;
         }
-        throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_MIXED_CATEGORIES));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.MIXED_CATEGORIES));
     }
 
     /**
@@ -270,18 +270,18 @@ final class GridSampleDimension extends SampleDimension {
             Arrays.fill(max, Double.NEGATIVE_INFINITY);
         }
         if (min.length != numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
                     new Integer(numBands), new Integer(min.length), "min[i]"));
         }
         if (max.length != numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
                     new Integer(numBands), new Integer(max.length), "max[i]"));
         }
         if (colors!=null && colors.length != numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
                     new Integer(numBands), new Integer(colors.length), "colors[i]"));
         }
         /*

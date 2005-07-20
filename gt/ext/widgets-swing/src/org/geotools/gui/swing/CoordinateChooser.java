@@ -80,8 +80,10 @@ import org.geotools.measure.AngleFormat;
 
 // Resources
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.geometry.XDimension2D;
 
 
@@ -253,10 +255,10 @@ public class CoordinateChooser extends JPanel {
         super(new GridBagLayout());
         final Locale locale = getDefaultLocale();
         final int timeField = Calendar.DAY_OF_YEAR;
-        final Resources resources = Resources.getResources(locale);
+        final Vocabulary resources = Vocabulary.getResources(locale);
 
-        radioBestRes = new JRadioButton(resources.getString(ResourceKeys.USE_BEST_RESOLUTION), true);
-        radioPrefRes = new JRadioButton(resources.getString(ResourceKeys.SET_PREFERRED_RESOLUTION));
+        radioBestRes = new JRadioButton(resources.getString(VocabularyKeys.USE_BEST_RESOLUTION), true);
+        radioPrefRes = new JRadioButton(resources.getString(VocabularyKeys.SET_PREFERRED_RESOLUTION));
 
         tmin = new JSpinner(new SpinnerDateModel(minTime, minTime, maxTime, timeField));
         tmax = new JSpinner(new SpinnerDateModel(maxTime, minTime, maxTime, timeField));
@@ -289,7 +291,7 @@ public class CoordinateChooser extends JPanel {
         timezone = new JComboBox(timezones);
         timezone.setSelectedItem(dateFormat.getTimeZone().getID());
 
-        final JLabel labelSize1 = new JLabel(resources.getLabel(ResourceKeys.SIZE_IN_MINUTES));
+        final JLabel labelSize1 = new JLabel(resources.getLabel(VocabularyKeys.SIZE_IN_MINUTES));
         final JLabel labelSize2 = new JLabel("\u00D7"  /* Multiplication symbol */);
         final ButtonGroup group = new ButtonGroup();
         group.add(radioBestRes);
@@ -301,9 +303,9 @@ public class CoordinateChooser extends JPanel {
         timezone    .addActionListener(listeners);
         radioPrefRes.addChangeListener(listeners);
 
-        areaPanel = getPanel(resources.getString(ResourceKeys.GEOGRAPHIC_COORDINATES));
-        timePanel = getPanel(resources.getString(ResourceKeys.TIME_RANGE            ));
-        resoPanel = getPanel(resources.getString(ResourceKeys.PREFERRED_RESOLUTION  ));
+        areaPanel = getPanel(resources.getString(VocabularyKeys.GEOGRAPHIC_COORDINATES));
+        timePanel = getPanel(resources.getString(VocabularyKeys.TIME_RANGE            ));
+        resoPanel = getPanel(resources.getString(VocabularyKeys.PREFERRED_RESOLUTION  ));
         final GridBagConstraints c = new GridBagConstraints();
 
         c.weightx=1;
@@ -314,9 +316,9 @@ public class CoordinateChooser extends JPanel {
 
         JLabel label;
         c.gridx=0; c.anchor=c.WEST; c.insets.right=3; c.weightx=0;
-        c.gridy=0; timePanel.add(label=new JLabel(resources.getLabel(ResourceKeys.START_TIME)), c); label.setLabelFor(tmin);
-        c.gridy=1; timePanel.add(label=new JLabel(resources.getLabel(ResourceKeys.END_TIME  )), c); label.setLabelFor(tmax);
-        c.gridy=2; timePanel.add(label=new JLabel(resources.getLabel(ResourceKeys.TIME_ZONE )), c); label.setLabelFor(timezone); c.gridwidth=4;
+        c.gridy=0; timePanel.add(label=new JLabel(resources.getLabel(VocabularyKeys.START_TIME)), c); label.setLabelFor(tmin);
+        c.gridy=1; timePanel.add(label=new JLabel(resources.getLabel(VocabularyKeys.END_TIME  )), c); label.setLabelFor(tmax);
+        c.gridy=2; timePanel.add(label=new JLabel(resources.getLabel(VocabularyKeys.TIME_ZONE )), c); label.setLabelFor(timezone); c.gridwidth=4;
         c.gridy=0; resoPanel.add(radioBestRes,  c);
         c.gridy=1; resoPanel.add(radioPrefRes,  c);
         c.gridy=2; c.gridwidth=1; c.anchor=c.EAST; c.insets.right=c.insets.left=1; c.weightx=1;
@@ -602,20 +604,13 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Returns the resources.
-     */
-    private Resources getResources() {
-        return Resources.getResources(getLocale());
-    }
-
-    /**
      * Check if an angle is of expected type (latitude or longitude).
      */
     private void checkAngle(final JSpinner field, final boolean expectLatitude) throws ParseException {
         final Object angle=field.getValue();
         if (expectLatitude ? (angle instanceof Longitude) : (angle instanceof Latitude)) {
-            throw new ParseException(getResources().getString(
-                    ResourceKeys.ERROR_BAD_COORDINATE_$1, angle), 0);
+            throw new ParseException(Errors.getResources(getLocale()).getString(
+                                     ErrorKeys.BAD_COORDINATE_$1, angle), 0);
         }
     }
 
@@ -660,8 +655,8 @@ public class CoordinateChooser extends JPanel {
             commitEdit();
         } catch (ParseException exception) {
             SwingUtilities.showMessageDialog(owner, exception.getLocalizedMessage(),
-                                             getResources().getString(ResourceKeys.ERROR_BAD_ENTRY),
-                                             JOptionPane.ERROR_MESSAGE);
+                           Errors.getResources(getLocale()).getString(ErrorKeys.BAD_ENTRY),
+                           JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;
@@ -747,7 +742,8 @@ public class CoordinateChooser extends JPanel {
      *         (e.g. pressing "Cancel" or closing the dialog box from the title bar).
      */
     public boolean showDialog(final Component owner) {
-        return showDialog(owner, getResources().format(ResourceKeys.COORDINATES_SELECTION));
+        return showDialog(owner, Vocabulary.getResources(getLocale()).
+                                 getString(VocabularyKeys.COORDINATES_SELECTION));
     }
 
     /**

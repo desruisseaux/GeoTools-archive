@@ -61,8 +61,8 @@ import java.awt.geom.Point2D;
 
 import org.geotools.cs.Projection;
 import org.geotools.ct.MissingParameterException;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -205,7 +205,7 @@ public class PolarStereographic extends Stereographic {
             }
             phi0 = phi;
             if (--i < 0) {
-                throw new ProjectionException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE));
+                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
             }
         }
 
@@ -294,8 +294,8 @@ public class PolarStereographic extends Stereographic {
 
             if (southPole) {
                 if (Math.abs(1-sinlat) < EPS) {
-                    throw new ProjectionException(Resources.format(
-                        ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                    throw new ProjectionException(Errors.format(
+                        ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
                 }
                 // (21-12)
                 final double f = k0 * coslat / (1-sinlat); // == tan (pi/4 + phi/2)
@@ -303,8 +303,8 @@ public class PolarStereographic extends Stereographic {
                 y = f * coslon; // (21-10)
             } else {
                 if (Math.abs(1+sinlat) < EPS) {
-                    throw new ProjectionException(Resources.format(
-                        ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                    throw new ProjectionException(Errors.format(
+                        ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
                 }
                 // (21-8)
                 final double f = k0 * coslat / (1+sinlat); // == tan (pi/4 - phi/2)

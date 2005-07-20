@@ -35,8 +35,10 @@ import javax.vecmath.SingularMatrixException;
 
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Matrix;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 
@@ -299,7 +301,7 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
             matrix.invert();
         } catch (SingularMatrixException exception) {
             NoninvertibleTransformException e = new NoninvertibleTransformException(
-                    Resources.format(ResourceKeys.ERROR_NONINVERTIBLE_TRANSFORM));
+                    Errors.format(ErrorKeys.NONINVERTIBLE_TRANSFORM));
             e.initCause(exception);
             throw e;
         }
@@ -383,7 +385,7 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
          * The default matrix size is 4&times;4.
          */
         public Provider() {
-            super("Affine", ResourceKeys.AFFINE_TRANSFORM, null);
+            super("Affine", VocabularyKeys.AFFINE_TRANSFORM, null);
             final int defaultSize = MatrixParameters.DEFAULT_SIZE.intValue();
             putInt("num_row", defaultSize, MatrixParameters.POSITIVE_RANGE);
             putInt("num_col", defaultSize, MatrixParameters.POSITIVE_RANGE);

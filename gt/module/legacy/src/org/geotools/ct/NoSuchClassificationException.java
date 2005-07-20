@@ -39,8 +39,8 @@ package org.geotools.ct;
 import javax.media.jai.ParameterList;
 
 import org.geotools.cs.Projection;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.referencing.FactoryException;
 
 
@@ -78,8 +78,8 @@ public class NoSuchClassificationException extends FactoryException {
      * @param classification The classification name.
      */
     public NoSuchClassificationException(final String msg, final String classification) {
-        super((msg!=null || classification==null) ? msg : Resources.format(
-                ResourceKeys.ERROR_NO_TRANSFORM_FOR_CLASSIFICATION_$1, classification));
+        super((msg!=null || classification==null) ? msg : Errors.format(
+                ErrorKeys.NO_TRANSFORM_FOR_CLASSIFICATION_$1, classification));
         this.classification = classification;
     }
     

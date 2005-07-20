@@ -43,8 +43,10 @@ import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -73,11 +75,10 @@ import org.geotools.resources.cts.Resources;
  *        EPSG Guidence Note Number 7, Version 19.</li>
  * </ul>
  *
+ * @since 2.1
  * @version $Id$
  * @author Rueben Schulz
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class MolodenskiTransform extends AbstractMathTransform implements Serializable {
     /**
@@ -629,8 +630,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                 new NamedIdentifier(CitationImpl.OGC,      "Molodenski"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Molodenski"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9604"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.MOLODENSKI_TRANSFORM))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.MOLODENSKI_TRANSFORM))
             }, new ParameterDescriptor[] {
                 DIM, DX, DY, DZ,
                 SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
@@ -697,8 +698,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                     break;
                 }
                 default: {
-                    throw new IllegalArgumentException(Resources.format(
-                               ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dim", new Integer(dim)));
+                    throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                                       "dim", new Integer(dim)));
                 }
             }
             final double  a = doubleValue(SRC_SEMI_MAJOR, values);
@@ -761,8 +762,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                 new NamedIdentifier(CitationImpl.OGC,      "Abridged_Molodenski"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Abridged Molodenski"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9605"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.format(
-                                                           ResourceKeys.ABRIDGED_MOLODENSKI_TRANSFORM))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.format(
+                                    VocabularyKeys.ABRIDGED_MOLODENSKI_TRANSFORM))
             }, new ParameterDescriptor[] {
                 DIM, DX, DY, DZ,
                 SRC_SEMI_MAJOR, SRC_SEMI_MINOR,

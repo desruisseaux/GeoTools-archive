@@ -59,8 +59,8 @@ import org.geotools.renderer.geom.Arrow2D;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.geometry.XAffineTransform;
 
 
@@ -465,12 +465,12 @@ public class RenderedGridMarks extends RenderedMarks {
      */
     public void setDecimation(final int decimateX, final int decimateY) {
         if (decimateX <=0) {
-            throw new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_NOT_GREATER_THAN_ZERO_$1, new Integer(decimateX)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_GREATER_THAN_ZERO_$1,
+                                               new Integer(decimateX)));
         }
         if (decimateY <=0) {
-            throw new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_NOT_GREATER_THAN_ZERO_$1, new Integer(decimateY)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_GREATER_THAN_ZERO_$1,
+                                               new Integer(decimateY)));
         }
         if (decimateX!=this.decimateX || decimateY!=this.decimateY) {
             synchronized (getTreeLock()) {
@@ -495,12 +495,12 @@ public class RenderedGridMarks extends RenderedMarks {
      */
     public void setAutoDecimation(final int spaceX, final int spaceY) {
         if (spaceX < 0) {
-            throw new IllegalArgumentException(Resources.format(
-                                ResourceKeys.ERROR_BAD_ARGUMENT_$2, "spaceX", new Integer(spaceX)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_ARGUMENT_$2,
+                                               "spaceX", new Integer(spaceX)));
         }
         if (spaceY < 0) {
-            throw new IllegalArgumentException(Resources.format(
-                                ResourceKeys.ERROR_BAD_ARGUMENT_$2, "spaceY", new Integer(spaceY)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_ARGUMENT_$2,
+                                               "spaceY", new Integer(spaceY)));
         }
         if (spaceX!=this.spaceX || spaceY!=this.spaceY) {
             synchronized (getTreeLock()) {
@@ -566,8 +566,8 @@ public class RenderedGridMarks extends RenderedMarks {
      */
     public void setMarkPaint(final Paint paint) {
         if (paint == null) {
-            throw new IllegalArgumentException(
-                            Resources.format(ResourceKeys.ERROR_BAD_ARGUMENT_$2, "paint", paint));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_ARGUMENT_$2,
+                                               "paint", paint));
         }
         final Paint oldPaint;
         synchronized (getTreeLock()) {

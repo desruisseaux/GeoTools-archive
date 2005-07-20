@@ -47,8 +47,8 @@ import javax.mail.internet.AddressException;
 // Geotools dependencies
 import org.geotools.util.ProgressListener;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -169,7 +169,7 @@ public class ProgressMailer implements ProgressListener {
             final Message message = new MimeMessage(session);
             message.setFrom();
             message.setRecipients(Message.RecipientType.TO, address);
-            message.setSubject(Resources.format(subjectKey));
+            message.setSubject(Vocabulary.getResources(locale).getString(subjectKey));
             message.setSentDate(new Date());
             message.setText(messageText);
             Transport.send(message);
@@ -191,23 +191,23 @@ public class ProgressMailer implements ProgressListener {
      * @param percent Pourcentage effectué (entre 0 et 100).
      */
     private void send(final String method, final float percent) {
-        final Runtime      system = Runtime.getRuntime();
-        final float   MEMORY_UNIT = (1024f*1024f);
-        final float    freeMemory = system.freeMemory()  / MEMORY_UNIT;
-        final float   totalMemory = system.totalMemory() / MEMORY_UNIT;
-        final Resources resources = Resources.getResources(null);
-        final NumberFormat format = NumberFormat.getPercentInstance(locale);
-        final StringBuffer buffer = new StringBuffer(description!=null ?
-                description : resources.getString(ResourceKeys.PROGRESSION));
+        final Runtime       system = Runtime.getRuntime();
+        final float    MEMORY_UNIT = (1024f*1024f);
+        final float     freeMemory = system.freeMemory()  / MEMORY_UNIT;
+        final float    totalMemory = system.totalMemory() / MEMORY_UNIT;
+        final Vocabulary resources = Vocabulary.getResources(locale);
+        final NumberFormat  format = NumberFormat.getPercentInstance(locale);
+        final StringBuffer  buffer = new StringBuffer(description!=null ?
+                description : resources.getString(VocabularyKeys.PROGRESSION));
         buffer.append(": "); format.format(percent/100, buffer, new FieldPosition(0));
         buffer.append('\n');
-        buffer.append(resources.getString(ResourceKeys.MEMORY_HEAP_SIZE_$1,
+        buffer.append(resources.getString(VocabularyKeys.MEMORY_HEAP_SIZE_$1,
                                           new Float(totalMemory)));
         buffer.append('\n');
-        buffer.append(resources.getString(ResourceKeys.MEMORY_HEAP_USAGE_$1,
+        buffer.append(resources.getString(VocabularyKeys.MEMORY_HEAP_USAGE_$1,
                                           new Float(1-freeMemory/totalMemory)));
         buffer.append('\n');
-        send(method, ResourceKeys.PROGRESSION, buffer.toString());
+        send(method, VocabularyKeys.PROGRESSION, buffer.toString());
     }
 
     /**
@@ -265,7 +265,7 @@ public class ProgressMailer implements ProgressListener {
             buffer.append(": ");
         }
         buffer.append(warning);
-        send("warningOccurred", ResourceKeys.WARNING, buffer.toString());
+        send("warningOccurred", VocabularyKeys.WARNING, buffer.toString());
     }
 
     /**
@@ -274,6 +274,6 @@ public class ProgressMailer implements ProgressListener {
     public synchronized void exceptionOccurred(final Throwable exception) {
         final CharArrayWriter buffer = new CharArrayWriter();
         exception.printStackTrace(new PrintWriter(buffer));
-        send("exceptionOccurred", ResourceKeys.EXCEPTION, buffer.toString());
+        send("exceptionOccurred", VocabularyKeys.EXCEPTION, buffer.toString());
     }
 }

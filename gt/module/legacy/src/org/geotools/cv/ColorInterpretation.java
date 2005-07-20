@@ -33,8 +33,10 @@ import java.util.NoSuchElementException;
 
 import javax.media.jai.EnumeratedParameter;
 
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.opengis.cv.CV_ColorInterpretation;
 
 
@@ -62,21 +64,21 @@ public final class ColorInterpretation extends EnumeratedParameter {
      * @see CV_ColorInterpretation#CV_Undefined
      */
     public static final ColorInterpretation UNDEFINED = new ColorInterpretation("UNDEFINED",
-                        CV_ColorInterpretation.CV_Undefined, ResourceKeys.UNDEFINED);
+                        CV_ColorInterpretation.CV_Undefined, VocabularyKeys.UNDEFINED);
     
     /**
      * Band is an index into a lookup table.
      * @see CV_ColorInterpretation#CV_GrayIndex
      */
     public static final ColorInterpretation GRAY_INDEX = new ColorInterpretation("GRAY_INDEX",
-                        CV_ColorInterpretation.CV_GrayIndex, ResourceKeys.GRAY);
+                        CV_ColorInterpretation.CV_GrayIndex, VocabularyKeys.GRAY);
     
     /**
      * Band is a color index into a color table.
      * @see CV_ColorInterpretation#CV_PaletteIndex
      */
     public static final ColorInterpretation PALETTE_INDEX = new ColorInterpretation("PALETTE_INDEX",
-                        CV_ColorInterpretation.CV_PaletteIndex, ResourceKeys.PALETTE);
+                        CV_ColorInterpretation.CV_PaletteIndex, VocabularyKeys.PALETTE);
     
     /**
      * Bands correspond to RGB color model components.
@@ -84,7 +86,7 @@ public final class ColorInterpretation extends EnumeratedParameter {
      * @see CV_ColorInterpretation#CV_RedBand
      */
     public static final ColorInterpretation RED_BAND = new ColorInterpretation("RED_BAND",
-                        CV_ColorInterpretation.CV_RedBand, ResourceKeys.RED);
+                        CV_ColorInterpretation.CV_RedBand, VocabularyKeys.RED);
     
     /**
      * Bands correspond to RGB color model components.
@@ -92,7 +94,7 @@ public final class ColorInterpretation extends EnumeratedParameter {
      * @see CV_ColorInterpretation#CV_GreenBand
      */
     public static final ColorInterpretation GREEN_BAND = new ColorInterpretation("GREEN_BAND",
-                        CV_ColorInterpretation.CV_GreenBand, ResourceKeys.GREEN);
+                        CV_ColorInterpretation.CV_GreenBand, VocabularyKeys.GREEN);
     
     /**
      * Bands correspond to RGB color model components.
@@ -100,62 +102,62 @@ public final class ColorInterpretation extends EnumeratedParameter {
      * @see CV_ColorInterpretation#CV_BlueBand
      */
     public static final ColorInterpretation BLUE_BAND = new ColorInterpretation("BLUE_BAND",
-                        CV_ColorInterpretation.CV_BlueBand, ResourceKeys.BLUE);
+                        CV_ColorInterpretation.CV_BlueBand, VocabularyKeys.BLUE);
     
     /**
      * Bands correspond to RGB color model components.
      * @see CV_ColorInterpretation#CV_AlphaBand
      */
     public static final ColorInterpretation ALPHA_BAND = new ColorInterpretation("ALPHA_BAND",
-                        CV_ColorInterpretation.CV_AlphaBand, ResourceKeys.TRANSPARENCY);
+                        CV_ColorInterpretation.CV_AlphaBand, VocabularyKeys.TRANSPARENCY);
     
     /**
      * Bands correspond to HSL color model.
      * @see CV_ColorInterpretation#CV_HueBand
      */
     public static final ColorInterpretation HUE_BAND = new ColorInterpretation("HUE_BAND",
-                        CV_ColorInterpretation.CV_HueBand, ResourceKeys.HUE);
+                        CV_ColorInterpretation.CV_HueBand, VocabularyKeys.HUE);
     
     /**
      * Bands correspond to HSL color model.
      * @see CV_ColorInterpretation#CV_SaturationBand
      */
     public static final ColorInterpretation SATURATION_BAND = new ColorInterpretation("SATURATION_BAND",
-                        CV_ColorInterpretation.CV_SaturationBand, ResourceKeys.SATURATION);
+                        CV_ColorInterpretation.CV_SaturationBand, VocabularyKeys.SATURATION);
     
     /**
      * Bands correspond to HSL color model.
      * @see CV_ColorInterpretation#CV_LightnessBand
      */
     public static final ColorInterpretation LIGHTNESS_BAND = new ColorInterpretation("LIGHTNESS_BAND",
-                        CV_ColorInterpretation.CV_LightnessBand, ResourceKeys.LIGHTNESS);
+                        CV_ColorInterpretation.CV_LightnessBand, VocabularyKeys.LIGHTNESS);
     
     /**
      * Bands correspond to CMYK color model.
      * @see CV_ColorInterpretation#CV_CyanBand
      */
     public static final ColorInterpretation CYAN_BAND = new ColorInterpretation("CYAN_BAND",
-                        CV_ColorInterpretation.CV_CyanBand, ResourceKeys.CYAN);
+                        CV_ColorInterpretation.CV_CyanBand, VocabularyKeys.CYAN);
     /**
      * Bands correspond to CMYK color model.
      * @see CV_ColorInterpretation#CV_MagentaBand
      */
     public static final ColorInterpretation MAGENTA_BAND = new ColorInterpretation("MAGENTA_BAND",
-                        CV_ColorInterpretation.CV_MagentaBand, ResourceKeys.MAGENTA);
+                        CV_ColorInterpretation.CV_MagentaBand, VocabularyKeys.MAGENTA);
     
     /**
      * Bands correspond to CMYK color model.
      * @see CV_ColorInterpretation#CV_YellowBand
      */
     public static final ColorInterpretation YELLOW_BAND = new ColorInterpretation("YELLOW_BAND",
-                        CV_ColorInterpretation.CV_YellowBand, ResourceKeys.YELLOW);
+                        CV_ColorInterpretation.CV_YellowBand, VocabularyKeys.YELLOW);
     
     /**
      * Bands correspond to CMYK color model.
      * @see CV_ColorInterpretation#CV_BlackBand
      */
     public static final ColorInterpretation BLACK_BAND = new ColorInterpretation("BLACK_BAND",
-                        CV_ColorInterpretation.CV_BlackBand, ResourceKeys.BLACK);
+                        CV_ColorInterpretation.CV_BlackBand, VocabularyKeys.BLACK);
     
     /**
      * Color interpretation by value. Used to
@@ -245,7 +247,7 @@ public final class ColorInterpretation extends EnumeratedParameter {
     {
         if (band<0 || band>=model.getNumComponents()) {
             throw new IllegalArgumentException(
-                    Resources.format(ResourceKeys.ERROR_BAD_BAND_NUMBER_$1, new Integer(band)));
+                    Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
         }
         if (model instanceof IndexColorModel) {
             return PALETTE_INDEX;
@@ -297,7 +299,7 @@ public final class ColorInterpretation extends EnumeratedParameter {
      * @return Enum's name in the specified locale.
      */
     public String getName(final Locale locale) {
-        return Resources.getResources(locale).getString(key);
+        return Vocabulary.getResources(locale).getString(key);
     }
     
     /**

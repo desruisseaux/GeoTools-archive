@@ -44,8 +44,8 @@ import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.Utilities;
 
 
@@ -209,9 +209,8 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
             final int[] count = (int[]) occurences.get(descriptor);
             if (count == null) {
                 final String name = getName(descriptor);
-                throw new InvalidParameterTypeException(Resources.format(
-                          ResourceKeys.ERROR_ILLEGAL_DESCRIPTOR_FOR_PARAMETER_$1,
-                          name), name);
+                throw new InvalidParameterTypeException(Errors.format(
+                          ErrorKeys.ILLEGAL_DESCRIPTOR_FOR_PARAMETER_$1, name), name);
             }
             count[0]++;
         }
@@ -226,8 +225,8 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
             final int max   = descriptor.getMaximumOccurs();
             if (!(count>=min && count<=max)) {
                 final String name = getName(descriptor);
-                throw new InvalidParameterCardinalityException(Resources.format(
-                          ResourceKeys.ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4, name,
+                throw new InvalidParameterCardinalityException(Errors.format(
+                          ErrorKeys.ILLEGAL_OCCURS_FOR_PARAMETER_$4, name,
                           new Integer(count), new Integer(min), new Integer(max)), name);
             }
         }
@@ -319,8 +318,8 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
                 }
             }
         }
-        throw new ParameterNotFoundException(Resources.format(
-                  ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+        throw new ParameterNotFoundException(Errors.format(
+                  ErrorKeys.MISSING_PARAMETER_$1, name), name);
     }
 
     /**
@@ -358,8 +357,8 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
             final GeneralParameterDescriptor check = 
                     ((ParameterDescriptorGroup) descriptor).descriptor(name);
             if (!(check instanceof ParameterDescriptorGroup)) {
-                throw new ParameterNotFoundException(Resources.format(
-                          ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+                throw new ParameterNotFoundException(Errors.format(
+                          ErrorKeys.MISSING_PARAMETER_$1, name), name);
             }
         }
         return groups;
@@ -385,8 +384,8 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
         final GeneralParameterDescriptor check = 
                 ((ParameterDescriptorGroup) descriptor).descriptor(name);
         if (!(check instanceof ParameterDescriptorGroup)) {
-            throw new ParameterNotFoundException(Resources.format(
-                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+            throw new ParameterNotFoundException(Errors.format(
+                      ErrorKeys.MISSING_PARAMETER_$1, name), name);
         }
         int count = 0;
         for (final Iterator it=values.iterator(); it.hasNext();) {
@@ -396,8 +395,8 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
             }
         }
         if (count >= check.getMaximumOccurs()) {
-            throw new InvalidParameterCardinalityException(Resources.format(
-                ResourceKeys.ERROR_TOO_MANY_OCCURENCES_$2, name, new Integer(count)), name);
+            throw new InvalidParameterCardinalityException(Errors.format(
+                      ErrorKeys.TOO_MANY_OCCURENCES_$2, name, new Integer(count)), name);
         }
         final ParameterValueGroup value = (ParameterValueGroup) // Remove this cast for J2SE 1.5
               ((ParameterDescriptorGroup) check).createValue();

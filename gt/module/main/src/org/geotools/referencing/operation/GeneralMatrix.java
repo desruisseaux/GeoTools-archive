@@ -42,17 +42,16 @@ import org.geotools.io.LineFormat;
 import org.geotools.io.ContentFormatException;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
  * A two dimensional array of numbers. Row and column numbering begins with zero.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see javax.vecmath.GMatrix
  * @see java.awt.geom.AffineTransform
@@ -112,7 +111,7 @@ public class GeneralMatrix extends GMatrix implements Matrix {
         final int numCol = getNumCol();
         for (int j=0; j<numRow; j++) {
             if (matrix[j].length!=numCol) {
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_MATRIX_NOT_REGULAR));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.MATRIX_NOT_REGULAR));
             }
             setRow(j, matrix[j]);
         }
@@ -278,9 +277,8 @@ public class GeneralMatrix extends GMatrix implements Matrix {
                 if (search.equals(srcAxe.absolute())) {
                     if (hasFound) {
                         // TODO: Use the localized version of 'getName' in GeoAPI 1.1
-                        throw new IllegalArgumentException(
-                                    Resources.format(ResourceKeys.ERROR_COLINEAR_AXIS_$2,
-                                    srcAxe.name(), dstAxe.name()));
+                        throw new IllegalArgumentException(Errors.format(ErrorKeys.COLINEAR_AXIS_$2,
+                                                           srcAxe.name(), dstAxe.name()));
                     }
                     hasFound = true;
                     /*
@@ -304,8 +302,8 @@ public class GeneralMatrix extends GMatrix implements Matrix {
             }
             if (!hasFound) {
                 // TODO: Use the localized version of 'getName' in GeoAPI 1.1
-                throw new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_NO_SOURCE_AXIS_$1, dstAxis[dstIndex].name()));
+                throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.NO_SOURCE_AXIS_$1, dstAxis[dstIndex].name()));
             }
         }
         setElement(dstAxis.length, srcAxis.length, 1);
@@ -328,8 +326,8 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     {
         final int dim = envelope.getDimension();
         if (dimension != dim) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, name,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$3, name,
                         new Integer(dim), new Integer(dimension)));
         }
     }
@@ -422,16 +420,15 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     public final AffineTransform toAffineTransform2D() throws IllegalStateException {
         int check;
         if ((check=getNumRow())!=3 || (check=getNumCol())!=3) {
-            throw new IllegalStateException(Resources.format(
-                        ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(check-1)));
+            throw new IllegalStateException(Errors.format(
+                        ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(check-1)));
         }
         if (isAffine()) {
             return new AffineTransform(getElement(0,0), getElement(1,0),
             getElement(0,1), getElement(1,1),
             getElement(0,2), getElement(1,2));
         }
-        throw new IllegalStateException(Resources.format(
-                    ResourceKeys.ERROR_NOT_AN_AFFINE_TRANSFORM));
+        throw new IllegalStateException(Errors.format(ErrorKeys.NOT_AN_AFFINE_TRANSFORM));
     }
     
     /**

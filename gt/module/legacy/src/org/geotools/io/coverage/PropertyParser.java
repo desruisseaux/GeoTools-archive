@@ -77,8 +77,8 @@ import org.geotools.measure.Longitude;
 import org.geotools.pt.Envelope;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
@@ -994,8 +994,8 @@ public class PropertyParser {
         while (true) {
             if (oldValue!=null && !oldValue.equals(value)) {
                 final String alias = aliasAsKey.toString();
-                throw new AmbiguousPropertyException(Resources.getResources(userLocale).
-                          getString(ResourceKeys.ERROR_INCONSISTENT_PROPERTY_$1, alias),
+                throw new AmbiguousPropertyException(Errors.getResources(userLocale).
+                          getString(ErrorKeys.INCONSISTENT_PROPERTY_$1, alias),
                           checkKey, alias);
             }
             if (iterator == null) {
@@ -1066,8 +1066,8 @@ public class PropertyParser {
         if (property != null) {
             final Object value = getOptional(key); // Checks also alias
             if (value!=null && !value.equals(property)) {
-                throw new AmbiguousPropertyException(Resources.getResources(userLocale).
-                          getString(ResourceKeys.ERROR_INCONSISTENT_PROPERTY_$1, alias),
+                throw new AmbiguousPropertyException(Errors.getResources(userLocale).
+                          getString(ErrorKeys.INCONSISTENT_PROPERTY_$1, alias),
                           key, alias);
             }
         }
@@ -1200,8 +1200,8 @@ public class PropertyParser {
         if (value!=null && value!=Image.UndefinedProperty) {
             return value;
         }
-        throw new MissingPropertyException(Resources.getResources(userLocale).
-                  getString(ResourceKeys.ERROR_UNDEFINED_PROPERTY_$1, key), key, lastAlias);
+        throw new MissingPropertyException(Errors.getResources(userLocale).
+                  getString(ErrorKeys.UNDEFINED_PROPERTY_$1, key), key, lastAlias);
     }
     
     /**
@@ -1277,8 +1277,8 @@ public class PropertyParser {
         final double value = getAsDouble(key);
         final int  integer = (int) value;
         if (value != integer) {
-            throw new PropertyException(Resources.getResources(userLocale).getString(
-                      ResourceKeys.ERROR_BAD_PARAMETER_$2, lastAlias, new Double(value)), key, lastAlias);
+            throw new PropertyException(Errors.getResources(userLocale).getString(
+                      ErrorKeys.BAD_PARAMETER_$2, lastAlias, new Double(value)), key, lastAlias);
         }
         return integer;
     }
@@ -1638,8 +1638,8 @@ public class PropertyParser {
             if ((semiMajorAxisDefined && parameters.getDoubleParameter("semi_major")!=semiMajor) ||
                 (semiMinorAxisDefined && parameters.getDoubleParameter("semi_minor")!=semiMinor))
             {
-                throw new AmbiguousPropertyException(Resources.getResources(userLocale).
-                          getString(ResourceKeys.ERROR_AMBIGIOUS_AXIS_LENGTH), PROJECTION, lastAlias);
+                throw new AmbiguousPropertyException(Errors.getResources(userLocale).
+                          getString(ErrorKeys.AMBIGIOUS_AXIS_LENGTH), PROJECTION, lastAlias);
             }
             parameters = parameters.setParameter("semi_major", semiMajor)
                                    .setParameter("semi_minor", semiMinor);
@@ -1760,8 +1760,8 @@ public class PropertyParser {
             cache(CACHE_KEY, envelope);
             return (Envelope) envelope.clone();
         } catch (TransformException exception) {
-            throw new PropertyException(Resources.getResources(userLocale).
-                      getString(ResourceKeys.ERROR_CANT_TRANSFORM_ENVELOPE), exception);
+            throw new PropertyException(Errors.getResources(userLocale).
+                      getString(ErrorKeys.CANT_TRANSFORM_ENVELOPE), exception);
         }
     }
     
@@ -1856,8 +1856,8 @@ public class PropertyParser {
         final double max = getAsDouble(maxKey, cs);
         envelope.setRange(dimension, min, max);
         if (Math.abs((min-max)/resolution - range) > EPS) {
-            throw new AmbiguousPropertyException(Resources.getResources(userLocale).getString(
-                      ResourceKeys.ERROR_INCONSISTENT_PROPERTY_$1, resKey), resKey, lastAlias);
+            throw new AmbiguousPropertyException(Errors.getResources(userLocale).getString(
+                      ErrorKeys.INCONSISTENT_PROPERTY_$1, resKey), resKey, lastAlias);
         }
     }
     

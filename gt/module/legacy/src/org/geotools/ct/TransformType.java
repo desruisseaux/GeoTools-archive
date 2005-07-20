@@ -42,8 +42,8 @@ import java.util.NoSuchElementException;
 
 import javax.media.jai.EnumeratedParameter;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.opengis.ct.CT_TransformType;
 
 
@@ -69,7 +69,7 @@ public final class TransformType extends EnumeratedParameter {
      *
      * @see org.opengis.ct.CT_TransformType#CT_TT_Other
      */
-    public static final TransformType OTHER = new TransformType("OTHER", CT_TransformType.CT_TT_Other, ResourceKeys.OTHER);
+    public static final TransformType OTHER = new TransformType("OTHER", CT_TransformType.CT_TT_Other, VocabularyKeys.OTHER);
     
     /**
      * Transform depends only on defined parameters.
@@ -77,7 +77,7 @@ public final class TransformType extends EnumeratedParameter {
      *
      * @see org.opengis.ct.CT_TransformType#CT_TT_Conversion
      */
-    public static final TransformType CONVERSION = new TransformType("CONVERSION", CT_TransformType.CT_TT_Conversion, ResourceKeys.CONVERSION);
+    public static final TransformType CONVERSION = new TransformType("CONVERSION", CT_TransformType.CT_TT_Conversion, VocabularyKeys.CONVERSION);
     
     /**
      * Transform depends only on empirically derived parameters.
@@ -85,14 +85,14 @@ public final class TransformType extends EnumeratedParameter {
      *
      * @see org.opengis.ct.CT_TransformType#CT_TT_Transformation
      */
-    public static final TransformType TRANSFORMATION = new TransformType("TRANSFORMATION", CT_TransformType.CT_TT_Transformation, ResourceKeys.TRANSFORMATION);
+    public static final TransformType TRANSFORMATION = new TransformType("TRANSFORMATION", CT_TransformType.CT_TT_Transformation, VocabularyKeys.TRANSFORMATION);
     
     /**
      * Transform depends on both defined and empirical parameters.
      *
      * @see org.opengis.ct.CT_TransformType#CT_TT_ConversionAndTransformation
      */
-    public static final TransformType CONVERSION_AND_TRANSFORMATION = new TransformType("CONVERSION_AND_TRANSFORMATION", CT_TransformType.CT_TT_ConversionAndTransformation, ResourceKeys.CONVERSION_AND_TRANSFORMATION);
+    public static final TransformType CONVERSION_AND_TRANSFORMATION = new TransformType("CONVERSION_AND_TRANSFORMATION", CT_TransformType.CT_TT_ConversionAndTransformation, VocabularyKeys.CONVERSION_AND_TRANSFORMATION);
     
     /**
      * Transform types by value. Used to
@@ -152,7 +152,7 @@ public final class TransformType extends EnumeratedParameter {
      * @return Enum's name in the specified locale.
      */
     public String getName(final Locale locale) {
-        return Resources.getResources(locale).getString(key);
+        return Vocabulary.getResources(locale).getString(key);
     }
     
     /**

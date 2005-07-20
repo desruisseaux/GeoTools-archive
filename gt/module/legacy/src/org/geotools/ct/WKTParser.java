@@ -33,8 +33,8 @@ import javax.media.jai.util.CaselessStringKey;
 
 import org.geotools.resources.WKTElement;
 import org.geotools.resources.WKTFormat;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
@@ -211,7 +211,7 @@ final class WKTParser extends WKTFormat {
             if ("PASSTHROUGH_MT".equals(keyword))  return parsePassThroughMT(element);
         }
         if (required) {
-            throw element.parseFailed(null, Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, key));
+            throw element.parseFailed(null, Errors.format(ErrorKeys.UNKNOW_TYPE_$1, key));
         }
         return null;
     }

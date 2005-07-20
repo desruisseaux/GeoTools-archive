@@ -36,10 +36,9 @@ import org.geotools.resources.Utilities;
  * which remove their entry from the collection when {@link Reference#clear}
  * is invoked.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 final class WeakCollectionCleaner extends Thread {
     /**

@@ -34,8 +34,8 @@ import javax.units.ConversionException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -260,8 +260,8 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
      */
     static void ensureNonNull(final String name, final double n) throws IllegalArgumentException {
         if (Double.isNaN(n) || Double.isInfinite(n) || n==0) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Double(n)));
+            throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.ILLEGAL_ARGUMENT_$2, name, new Double(n)));
         }
     }
     
@@ -274,8 +274,8 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
      */
     static void ensureFinite(final String name, final double n) throws IllegalArgumentException {
         if (Double.isNaN(n) || Double.isInfinite(n)) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Double(n)));
+            throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.ILLEGAL_ARGUMENT_$2, name, new Double(n)));
         }
     }
 
@@ -288,8 +288,8 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
      */
     static void ensureFinite(final String name, final float n) throws IllegalArgumentException {
         if (Float.isNaN(n) || Float.isInfinite(n)) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Float(n)));
+            throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.ILLEGAL_ARGUMENT_$2, name, new Float(n)));
         }
     }
 

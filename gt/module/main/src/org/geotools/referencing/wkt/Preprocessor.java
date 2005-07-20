@@ -36,8 +36,8 @@ import java.util.TreeMap;
 import org.geotools.io.TableWriter;
 import org.geotools.referencing.Console;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchIdentifierException;
@@ -57,10 +57,9 @@ import org.opengis.referencing.operation.MathTransform;
  * {@linkplain #parseObject parseObject}("PROJCS[\"Mercator_1SP\", <strong>WGS84</strong>, PROJECTION[</code> ...<i>etc</i>... <code>]]")</code>
  * </blockquote>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class Preprocessor extends Format {
     /**
@@ -211,12 +210,10 @@ public class Preprocessor extends Format {
             if (type.isAssignableFrom(actualType)) {
                 return value;
             }
-            throw new FactoryException(
-                      Resources.format(ResourceKeys.ERROR_ILLEGAL_CLASS_$2,
+            throw new FactoryException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                       Utilities.getShortName(actualType), Utilities.getShortName(type)));
         }
-        throw new NoSuchIdentifierException(
-                  Resources.format(ResourceKeys.ERROR_NO_SUCH_AUTHORITY_CODE_$2,
+        throw new NoSuchIdentifierException(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$2,
                   Utilities.getShortName(type), text), text);
     }
 

@@ -64,8 +64,8 @@ import java.awt.geom.Point2D;
 
 import org.geotools.cs.Projection;
 import org.geotools.ct.MissingParameterException;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -187,7 +187,7 @@ public class ObliqueStereographic extends Stereographic {
             }
             phi0 = phi;
             if (--i < 0) {
-                throw new ProjectionException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE));
+                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
             }
         }
 
@@ -281,8 +281,8 @@ public class ObliqueStereographic extends Stereographic {
             final double coslon = Math.cos(x);
             double f = 1.0 + sinphi0*sinlat + cosphi0*coslat*coslon; // (21-4)
             if (f < EPS) {
-                throw new ProjectionException(Resources.format(
-                          ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                throw new ProjectionException(Errors.format(
+                          ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
             f = k0/f;
             x = f * coslat * Math.sin(x);                           // (21-2)
@@ -468,7 +468,7 @@ public class ObliqueStereographic extends Stereographic {
                 }
                 y = phi;
                 if (--i < 0) {
-                    throw new ProjectionException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE));
+                    throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
                 }
             }
             // End pj_inv_gauss(...) method inlined

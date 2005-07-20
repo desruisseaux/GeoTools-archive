@@ -89,8 +89,12 @@ import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Envelope;
 import org.geotools.resources.LegacyGCSUtilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
@@ -284,8 +288,8 @@ public class GridCoverage extends Coverage {
     {
         final MathTransform transform = gridGeometry.getGridToCoordinateSystem2D();
         if (!(transform instanceof AffineTransform)) {
-            throw new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
-                    org.geotools.resources.cts.ResourceKeys.ERROR_NOT_AN_AFFINE_TRANSFORM));
+            throw new IllegalArgumentException(Errors.format(
+                      ErrorKeys.NOT_AN_AFFINE_TRANSFORM));
         }
         final AffineTransform at = (AffineTransform) transform;
         if (at.getShearX()!=0 || at.getShearY()!=0) {
@@ -612,11 +616,11 @@ public class GridCoverage extends Coverage {
         }
         final int dimension = envelope.getDimension();
         if (envelope.isEmpty() || dimension<2) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_EMPTY_ENVELOPE));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ENVELOPE));
         }
         if (dimension != cs.getDimension()) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(cs.getDimension()), new Integer(envelope.getDimension())));
         }
         this.envelope = (Envelope)pool.canonicalize(envelope);
@@ -678,7 +682,7 @@ public class GridCoverage extends Coverage {
                 default: min=0;               length=1;                 label=new Integer(i); break;
             }
             if (range.getLower(i)!=min || range.getLength(i)!=length) {
-                return Resources.format(ResourceKeys.ERROR_BAD_GRID_RANGE_$3, label,
+                return Errors.format(ErrorKeys.BAD_GRID_RANGE_$3, label,
                                         new Integer(min), new Integer(min+length));
             }
         }
@@ -1018,8 +1022,8 @@ public class GridCoverage extends Coverage {
                 inverse.inverse = this;
             } else if (inverse.inverse != this) {
                 final Locale locale = null;
-                throw new RasterFormatException(Resources.getResources(locale).getString(
-                          ResourceKeys.ERROR_COVERAGE_ALREADY_BOUND_$2,
+                throw new RasterFormatException(Vocabulary.getResources(locale).getString(
+                          ErrorKeys.COVERAGE_ALREADY_BOUND_$2,
                           "createGeophysics", inverse.inverse.getName(locale)));
             }
             return inverse;
@@ -1289,8 +1293,8 @@ testLinear: for (int i=0; i<numBands; i++) {
             final int        index = operation.lastIndexOf('.');
             final String shortName = (index>=0) ? operation.substring(index+1) : operation;
             final Locale    locale = null;
-            final LogRecord record = Resources.getResources(locale).getLogRecord(Level.FINE,
-                                     ResourceKeys.SAMPLE_TRANSCODE_$3, new Object[] {
+            final LogRecord record = Logging.getResources(locale).getLogRecord(Level.FINE,
+                                     LoggingKeys.SAMPLE_TRANSCODE_$3, new Object[] {
                                      getName(locale), new Integer(geo ? 1 : 0), shortName});
             record.setSourceClassName("GridCoverage");
             record.setSourceMethodName("geophysics");

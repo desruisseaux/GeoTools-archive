@@ -31,8 +31,8 @@ package org.geotools.units;
 
 // Divers
 import org.geotools.resources.XMath;
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.units.Units;
 
 
@@ -104,11 +104,11 @@ final class ScaledUnit extends Unit {
         this.unit   = unit;
         
         if (unit==null) {
-            throw new NullPointerException(Resources.format(ResourceKeys.ERROR_NO_UNIT));
+            throw new NullPointerException(Errors.format(ErrorKeys.NO_UNIT));
         }
         if (Double.isNaN(amount) || Double.isInfinite(amount) || amount==0) {
-            throw new IllegalArgumentException(Resources.format(
-                                               ResourceKeys.ERROR_NOT_DIFFERENT_THAN_ZERO_$1,
+            throw new IllegalArgumentException(Errors.format(
+                                               ErrorKeys.NOT_DIFFERENT_THAN_ZERO_$1,
                                                new Double(amount)));
         }
     }
@@ -209,7 +209,7 @@ final class ScaledUnit extends Unit {
          */
         if (amount==1) {
             if (unit==null) {
-                throw new NullPointerException(Resources.format(ResourceKeys.ERROR_NO_UNIT));
+                throw new NullPointerException(Errors.format(ErrorKeys.NO_UNIT));
             }
             if (symbol!=null) {
                 // TODO: Que faire si le symbole spécifié

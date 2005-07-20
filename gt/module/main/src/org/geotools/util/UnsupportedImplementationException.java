@@ -29,10 +29,9 @@ import org.geotools.resources.Utilities;
  * thrown when an operation requires a Geotools implementation of a
  * <A HREF="http://geoapi.sourceforge.net">GeoAPI</A> interface.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class UnsupportedImplementationException extends UnsupportedOperationException {
     /**

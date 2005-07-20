@@ -33,8 +33,8 @@ import javax.media.jai.ParameterList;
 import org.geotools.resources.DescriptorNaming;
 import org.geotools.resources.WKTElement;
 import org.geotools.resources.WKTFormat;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.referencing.FactoryException;
 
@@ -153,7 +153,7 @@ final class WKTParser extends WKTFormat {
             return new AxisInfo(name, AxisOrientation.getEnum(orientation.keyword, locale));
         } catch (NoSuchElementException exception) {
             throw element.parseFailed(exception,
-                    Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, orientation));
+                    Errors.format(ErrorKeys.UNKNOW_TYPE_$1, orientation));
         }
     }
 
@@ -338,7 +338,7 @@ final class WKTParser extends WKTFormat {
         } catch (RuntimeException exception) {
             // Include 'NoSuchElementException' and 'ClassCastException'
             throw element.parseFailed(exception,
-                    Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, new Integer(datum)));
+                    Errors.format(ErrorKeys.UNKNOW_TYPE_$1, new Integer(datum)));
         }
         try {
             return factory.createVerticalDatum(name, type);
@@ -370,7 +370,7 @@ final class WKTParser extends WKTFormat {
         } catch (RuntimeException exception) {
             // Include 'NoSuchElementException' and 'ClassCastException'
             throw element.parseFailed(exception,
-                    Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, new Integer(datum)));
+                    Errors.format(ErrorKeys.UNKNOW_TYPE_$1, new Integer(datum)));
         }
         try {
             return factory.createLocalDatum(name, type);
@@ -600,7 +600,7 @@ final class WKTParser extends WKTFormat {
             if ("LOCAL_CS".equals(keyword)) return parseLocalCS(element);
             if ("COMPD_CS".equals(keyword)) return parseCompdCS(element);
         }
-        throw element.parseFailed(null, Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, key));
+        throw element.parseFailed(null, Errors.format(ErrorKeys.UNKNOW_TYPE_$1, key));
     }
 
     /**

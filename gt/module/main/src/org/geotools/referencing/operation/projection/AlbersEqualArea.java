@@ -62,8 +62,10 @@ import org.opengis.referencing.operation.MathTransform;
 import org.geotools.measure.Latitude;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -146,10 +148,9 @@ public class AlbersEqualArea extends MapProjection {
 
 	//Compute Constants
         if (Math.abs(phi1 + phi2) < EPS) 
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ANTIPODE_LATITUDES_$2,
-                    new Latitude(Math.toDegrees(phi1)),
-                    new Latitude(Math.toDegrees(phi2))));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ANTIPODE_LATITUDES_$2,
+                                               new Latitude(Math.toDegrees(phi1)),
+                                               new Latitude(Math.toDegrees(phi2))));
          
         double  sinphi = Math.sin(phi1);
         double  cosphi = Math.cos(phi1);
@@ -302,7 +303,7 @@ public class AlbersEqualArea extends MapProjection {
                 return phi;
             }
         } 
-        throw new ProjectionException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE));
+        throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
     }
     
     /** 
@@ -404,8 +405,8 @@ public class AlbersEqualArea extends MapProjection {
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_AlbersEqualArea"),
                 new NamedIdentifier(CitationImpl.ESRI,     "Albers"),
                 new NamedIdentifier(CitationImpl.ESRI,     "Albers Equal Area Conic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.ALBERS_EQUAL_AREA_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                    VocabularyKeys.ALBERS_EQUAL_AREA_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,

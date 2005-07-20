@@ -33,8 +33,8 @@ import javax.media.jai.Warp;
 
 import org.geotools.ct.MathTransform2D;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -99,8 +99,8 @@ final class WarpTransform extends Warp {
         } catch (TransformException exception) {
             // At least one transformation failed. In Geotools MapProjection
             // implementation, unprojected coordinates are set to (NaN,NaN).
-            RasterFormatException e = new RasterFormatException(Resources.format(
-                            ResourceKeys.ERROR_CANT_REPROJECT_$1, name));
+            RasterFormatException e = new RasterFormatException(Errors.format(
+                            ErrorKeys.CANT_REPROJECT_$1, name));
             e.initCause(exception);
             throw e;
         }
@@ -122,8 +122,8 @@ final class WarpTransform extends Warp {
             bounds = CTSUtilities.transform(inverse, bounds, bounds);
             return bounds.getBounds();
         } catch (TransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_BAD_PARAMETER_$2, "destRect", destRect));
+            IllegalArgumentException e = new IllegalArgumentException(Errors.format(
+                            ErrorKeys.BAD_PARAMETER_$2, "destRect", destRect));
             e.initCause(exception);
             throw e;
         }
@@ -144,8 +144,8 @@ final class WarpTransform extends Warp {
             bounds = CTSUtilities.transform((MathTransform2D)inverse.inverse(), bounds, bounds);
             return bounds.getBounds();
         } catch (TransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_BAD_PARAMETER_$2, "sourceRect", sourceRect));
+            IllegalArgumentException e = new IllegalArgumentException(Errors.format(
+                            ErrorKeys.BAD_PARAMETER_$2, "sourceRect", sourceRect));
             e.initCause(exception);
             throw e;
         }
@@ -161,8 +161,8 @@ final class WarpTransform extends Warp {
         try {
             return inverse.transform(destPt, null);
         } catch (TransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_BAD_PARAMETER_$2, "destPt", destPt));
+            IllegalArgumentException e = new IllegalArgumentException(Errors.format(
+                            ErrorKeys.BAD_PARAMETER_$2, "destPt", destPt));
             e.initCause(exception);
             throw e;
         }
@@ -178,8 +178,8 @@ final class WarpTransform extends Warp {
         try {
             return ((MathTransform2D)inverse.inverse()).transform(sourcePt, null);
         } catch (TransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_BAD_PARAMETER_$2, "sourcePt", sourcePt));
+            IllegalArgumentException e = new IllegalArgumentException(Errors.format(
+                            ErrorKeys.BAD_PARAMETER_$2, "sourcePt", sourcePt));
             e.initCause(exception);
             throw e;
         }

@@ -43,8 +43,8 @@ import java.util.NoSuchElementException;
 import javax.media.jai.EnumeratedParameter;
 
 import org.geotools.resources.XArray;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.opengis.ct.CT_DomainFlags;
 
 
@@ -152,18 +152,18 @@ public final class DomainFlags extends EnumeratedParameter {
     public String[] getNames(final Locale locale) {
         int            count = 0;
         int             bits = getValue();
-        Resources  resources = null;
+        Vocabulary resources = null;
         final int[] nameKeys =
         {
-            ResourceKeys.INSIDE,
-            ResourceKeys.OUTSIDE,
-            ResourceKeys.DISCONTINUOUS
+            VocabularyKeys.INSIDE,
+            VocabularyKeys.OUTSIDE,
+            VocabularyKeys.DISCONTINUOUS
         };
         final String[] names = new String[nameKeys.length];
         for (int i=0; i<nameKeys.length; i++) {
             if ((bits & 1)!=0) {
-                if (resources==null) {
-                    resources = Resources.getResources(locale);
+                if (resources == null) {
+                    resources = Vocabulary.getResources(locale);
                 }
                 names[count++] = resources.getString(nameKeys[i]);
             }

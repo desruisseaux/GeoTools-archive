@@ -39,10 +39,9 @@ import org.geotools.resources.XMath;
  *
  * It may change in incompatible way in any future version.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class ColorUtilities {
     /**

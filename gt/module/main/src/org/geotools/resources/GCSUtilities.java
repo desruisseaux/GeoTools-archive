@@ -45,10 +45,9 @@ import org.geotools.geometry.GeneralEnvelope;
  * A set of utilities methods for the Grid Coverage package. Those methods are not really
  * rigorous; must of them should be seen as temporary implementations.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class GCSUtilities {
     /**

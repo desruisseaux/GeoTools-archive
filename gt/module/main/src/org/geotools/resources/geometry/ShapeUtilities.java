@@ -39,10 +39,9 @@ import org.geotools.resources.XMath;
  * Static utilities methods. Those methods operate on geometric
  * shapes from the {@code java.awt.geom} package.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class ShapeUtilities {
     /**

@@ -48,8 +48,10 @@ import org.geotools.resources.RemoteProxy;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.XMath;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
@@ -222,7 +224,7 @@ public class SampleDimension implements Serializable {
     private static CategoryList list(final String[] names, final Color[] colors) {
         if (names.length != colors.length) {
             throw new IllegalArgumentException(
-                    Resources.format(ResourceKeys.ERROR_MISMATCHED_ARRAY_LENGTH));
+                    Errors.format(ErrorKeys.MISMATCHED_ARRAY_LENGTH));
         }
         final Category[] categories = new Category[names.length];
         for (int i=0; i<categories.length; i++) {
@@ -308,15 +310,15 @@ public class SampleDimension implements Serializable {
                                      final Unit     unit)
     {
         if (Double.isInfinite(minimum) || Double.isInfinite(maximum) || !(minimum < maximum)) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_RANGE_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
                                                new Double(minimum), new Double(maximum)));
         }
         if (Double.isNaN(scale) || Double.isInfinite(scale) || scale==0) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_PARAMETER_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_PARAMETER_$2,
                                                "scale", new Double(scale)));
         }
         if (Double.isNaN(offset) || Double.isInfinite(offset)) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_PARAMETER_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_PARAMETER_$2,
                                                "offset", new Double(offset)));
         }
         if (type == null) {
@@ -516,7 +518,7 @@ public class SampleDimension implements Serializable {
         list = (CategoryList) Category.pool.canonicalize(list);
         if (CategoryList.isScaled(categories, false)) return list;
         if (CategoryList.isScaled(categories, true )) return list.inverse;
-        throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_MIXED_CATEGORIES));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.MIXED_CATEGORIES));
     }
 
     /**
@@ -640,9 +642,9 @@ public class SampleDimension implements Serializable {
             if (lower!=category.minimum || lower<0 ||
                 upper!=category.maximum || upper<0)
             {
-                final Resources resources = Resources.getResources(locale);
+                final Vocabulary resources = Vocabulary.getResources(locale);
                 throw new IllegalStateException(resources.getString(
-                        ResourceKeys.ERROR_NON_INTEGER_CATEGORY));
+                        ErrorKeys.NON_INTEGER_CATEGORY));
             }
             if (names == null) {
                 names = new String[upper+1];
@@ -765,8 +767,8 @@ public class SampleDimension implements Serializable {
                         if (lower!=min || upper!=max ||
                             !XMath.isInteger(category.getRange().getElementClass()))
                         {
-                            throw new IllegalStateException(Resources.format(
-                                    ResourceKeys.ERROR_NON_INTEGER_CATEGORY));
+                            throw new IllegalStateException(Errors.format(
+                                    ErrorKeys.NON_INTEGER_CATEGORY));
                         }
                         final int requiredLength = count + (upper-lower);
                         if (requiredLength > padValues.length) {
@@ -997,8 +999,8 @@ public class SampleDimension implements Serializable {
         } catch (TransformException exception) {
             cause = exception;
         }
-        IllegalStateException exception = new IllegalStateException(Resources.format(
-                                              ResourceKeys.ERROR_NON_LINEAR_RELATION));
+        IllegalStateException exception = new IllegalStateException(Errors.format(
+                                              ErrorKeys.NON_LINEAR_RELATION));
         exception.initCause(cause);
         throw exception;
     }

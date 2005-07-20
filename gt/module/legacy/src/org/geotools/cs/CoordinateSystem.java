@@ -29,8 +29,8 @@ import java.rmi.RemoteException;
 import org.geotools.pt.Dimensioned;
 import org.geotools.pt.Envelope;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.geotools.util.UnsupportedImplementationException;
 import org.opengis.cs.CS_AxisInfo;
@@ -103,8 +103,8 @@ public abstract class CoordinateSystem extends Info
         for (int i=0; i<dimension; i++) {
             AxisOrientation check = getAxis(i).orientation;
             if (type!=null && !type.isCompatibleOrientation(check)) {
-                throw new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_ILLEGAL_AXIS_ORIENTATION_$2,
+                throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.ILLEGAL_AXIS_ORIENTATION_$2,
                             check.getName(null), Utilities.getShortClassName(this)));
             }
             check = check.absolute();
@@ -113,8 +113,8 @@ public abstract class CoordinateSystem extends Info
                     if (check.equals(getAxis(j).orientation.absolute())) {
                         final String nameI = getAxis(i).orientation.getName(null);
                         final String nameJ = getAxis(j).orientation.getName(null);
-                        throw new IllegalArgumentException(Resources.format(
-                                    ResourceKeys.ERROR_COLINEAR_AXIS_$2, nameI, nameJ));
+                        throw new IllegalArgumentException(Errors.format(
+                                    ErrorKeys.COLINEAR_AXIS_$2, nameI, nameJ));
                     }
                 }
             }

@@ -40,9 +40,8 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterNameException;
 
 // Geotools dependencies
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
-
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -274,7 +273,7 @@ public abstract class AbstractGridCoverageProcessor extends DefaultProcessor
     private static InvalidParameterNameException invalidParameterName(final ParameterNotFoundException cause) {
         final String name = cause.getParameterName();
         final InvalidParameterNameException exception = new InvalidParameterNameException(
-                Resources.format(ResourceKeys.ERROR_UNKNOW_PARAMETER_NAME_$1, name), name);
+                Errors.format(ErrorKeys.UNKNOW_PARAMETER_NAME_$1, name), name);
         exception.initCause(cause);
         return exception;
     }
@@ -309,7 +308,7 @@ public abstract class AbstractGridCoverageProcessor extends DefaultProcessor
      * @deprecated This class do not stores any properties.
      */
     public String getMetadataValue(final String name) throws MetadataNameNotFoundException {
-        throw new MetadataNameNotFoundException(Resources.format(
-                ResourceKeys.ERROR_UNDEFINED_PROPERTY_$1, name));
+        throw new MetadataNameNotFoundException(Errors.format(
+                  ErrorKeys.UNDEFINED_PROPERTY_$1, name));
     }    
 }

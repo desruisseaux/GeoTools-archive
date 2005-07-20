@@ -35,13 +35,13 @@ import org.opengis.referencing.ObjectFactory;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.FactoryFinder;  // For javadoc
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
  * Base class for all factories. Factories can be grouped in two categories:
- * <BR>
+ * <P>
  * <UL>
  *   <LI>{@linkplain AuthorityFactory Authority factories} creates objects from
  *       a compact string defined by an authority.</LI>
@@ -51,10 +51,9 @@ import org.geotools.resources.cts.Resources;
  *       easier to use.</LI>
  * </UL>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class AbstractFactory extends org.geotools.factory.AbstractFactory implements Factory {
     /**
@@ -103,8 +102,8 @@ public class AbstractFactory extends org.geotools.factory.AbstractFactory implem
         throws IllegalArgumentException
     {
         if (object == null) {
-            throw new InvalidParameterValueException(Resources.format(
-                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name), name, object);
+            throw new InvalidParameterValueException(Errors.format(
+                        ErrorKeys.NULL_ARGUMENT_$1, name), name, object);
         }
     }
 }

@@ -33,8 +33,8 @@ import javax.media.jai.PerspectiveTransform;
 
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Matrix;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.ct.CT_DomainFlags;
 import org.opengis.ct.CT_MathTransform;
 import org.opengis.pt.PT_CoordinatePoint;
@@ -379,8 +379,8 @@ final class MathTransformExport extends UnicastRemoteObject implements CT_MathTr
         final int dimSource = transform.getDimSource();
         final int dimTarget = transform.getDimTarget();
         if ((ord.length % dimSource)!=0) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARRAY_LENGTH_FOR_DIMENSION_$1,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARRAY_LENGTH_FOR_DIMENSION_$1,
                     new Integer(dimSource)));
         }
         final int     count = ord.length/dimSource;

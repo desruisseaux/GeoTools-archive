@@ -40,8 +40,8 @@ import javax.imageio.IIOException;
 // Geotools dependencies
 import org.geotools.io.DefaultFileFilter;
 import org.geotools.io.LineFormat;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ColorUtilities;
 
 
@@ -348,7 +348,7 @@ public class PaletteFactory {
      */
     private static int byteValue(final int value) throws ParseException {
         if (value>=0 && value<256) return value;
-        throw new ParseException(Resources.format(
-                ResourceKeys.ERROR_RGB_OUT_OF_RANGE_$1, new Integer(value)), 0);
+        throw new ParseException(Errors.format(ErrorKeys.RGB_OUT_OF_RANGE_$1,
+                                 new Integer(value)), 0);
     }
 }

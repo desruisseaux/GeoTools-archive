@@ -48,8 +48,8 @@ import org.opengis.referencing.operation.SingleOperation;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -60,10 +60,9 @@ import org.geotools.resources.cts.Resources;
  * coordinate reference system of the last step are the source and target coordinate reference
  * system associated with the concatenated operation.
  *  
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
                                        implements ConcatenatedOperation
@@ -209,8 +208,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
                 expand((CoordinateOperation[]) cops.toArray(new CoordinateOperation[cops.size()]),
                        list, factory, false);
             } else {
-                throw new IllegalArgumentException(Resources.format(
-                                                   ResourceKeys.ERROR_ILLEGAL_CLASS_$2,
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                                                    Utilities.getShortClassName(op),
                                                    Utilities.getShortName(SingleOperation.class)));
             }
@@ -224,8 +222,8 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
                     final int dim1 = previous.getCoordinateSystem().getDimension();
                     final int dim2 =     next.getCoordinateSystem().getDimension();
                     if (dim1 != dim2) {
-                        throw new IllegalArgumentException(Resources.format(
-                                  ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        throw new IllegalArgumentException(Errors.format(
+                                  ErrorKeys.MISMATCHED_DIMENSION_$2,
                                   new Integer(dim1), new Integer(dim2)));
                     }
                 }
@@ -247,8 +245,8 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
         if (wantTransform) {
             final int size = list.size();
             if (size <= 1) {
-                throw new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_MISSING_PARAMETER_$1, "operations["+size+']'));
+                throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.MISSING_PARAMETER_$1, "operations["+size+']'));
             }
         }
         return transform;

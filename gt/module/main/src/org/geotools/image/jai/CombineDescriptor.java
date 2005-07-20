@@ -29,8 +29,8 @@ import javax.media.jai.registry.RenderedRegistryMode;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -87,7 +87,7 @@ public class CombineDescriptor extends OperationDescriptorImpl {
             for (int i=param.getNumSources(); --i>=0;) {
                 final Object source = param.getSource(i);
                 if (!(source instanceof RenderedImage)) {
-                    message.append(Resources.format(ResourceKeys.ERROR_BAD_PARAMETER_TYPE_$2,
+                    message.append(Errors.format(ErrorKeys.BAD_PARAMETER_TYPE_$2,
                                    "source"+i, Utilities.getShortClassName(source)));
                     return false;
                 }
@@ -120,7 +120,7 @@ public class CombineDescriptor extends OperationDescriptorImpl {
         }
         for (int i=0; i<matrix.length; i++) {
             if (matrix[i].length != numSamples) {
-                message.append(Resources.format(ResourceKeys.ERROR_UNEXPECTED_ROW_LENGTH_$3,
+                message.append(Errors.format(ErrorKeys.UNEXPECTED_ROW_LENGTH_$3,
                         new Integer(i), new Integer(matrix[i].length), new Integer(numSamples)));
                 return false;
             }

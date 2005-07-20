@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -285,7 +285,7 @@ public final class WKTElement {
             }
         }
         return trim("unparsableString", new ParseException(complete(
-                    Resources.format(ResourceKeys.ERROR_UNPARSABLE_STRING_$2,
+                    Errors.format(ErrorKeys.UNPARSABLE_STRING_$2,
                     text.substring(position.getIndex()), text.substring(lower, upper))), lower));
     }
 
@@ -297,7 +297,7 @@ public final class WKTElement {
      */
     private ParseException missingCharacter(final char c, final int position) {
         return trim("missingCharacter", new ParseException(complete(
-                    Resources.format(ResourceKeys.ERROR_MISSING_CHARACTER_$1, new Character(c))),
+                    Errors.format(ErrorKeys.MISSING_CHARACTER_$1, new Character(c))),
                     position));
     }
 
@@ -308,7 +308,7 @@ public final class WKTElement {
      */
     private ParseException missingParameter(final String key) {
         return trim("missingParameter", new ParseException(complete(
-                    Resources.format(ResourceKeys.ERROR_MISSING_PARAMETER_$1, key)),
+                    Errors.format(ErrorKeys.MISSING_PARAMETER_$1, key)),
                     offset + keyword.length()));
     }
 
@@ -320,7 +320,7 @@ public final class WKTElement {
      */
     private String complete(String message) {
         if (keyword != null) {
-            message = Resources.format(ResourceKeys.ERROR_IN_$1, keyword) + ' ' + message;
+            message = Errors.format(ErrorKeys.IN_$1, keyword) + ' ' + message;
         }
         return message;
     }
@@ -391,8 +391,8 @@ public final class WKTElement {
                 iterator.remove();
                 final Number number = (Number) object;
                 if (number instanceof Float || number instanceof Double) {
-                    throw new ParseException(complete(Resources.format(
-                            ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, key, number)), offset);
+                    throw new ParseException(complete(Errors.format(
+                            ErrorKeys.ILLEGAL_ARGUMENT_$2, key, number)), offset);
                 }
                 return number.intValue();
             }
@@ -496,8 +496,8 @@ public final class WKTElement {
      */
     public void close() throws ParseException {
         if (list!=null && !list.isEmpty()) {
-            throw new ParseException(complete(Resources.format(
-                        ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, list.get(0))),
+            throw new ParseException(complete(Errors.format(
+                        ErrorKeys.UNEXPECTED_PARAMETER_$1, list.get(0))),
                         offset+keyword.length());
         }
     }

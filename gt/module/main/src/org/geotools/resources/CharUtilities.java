@@ -23,10 +23,9 @@ package org.geotools.resources;
 /**
  * A set of utilities for characters handling.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public final class CharUtilities {
     /**

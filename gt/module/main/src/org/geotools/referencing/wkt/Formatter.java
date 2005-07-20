@@ -52,8 +52,8 @@ import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -65,10 +65,9 @@ import org.geotools.resources.cts.Resources;
  * The {@linkplain Locale locale} associated with the symbols is used for querying
  * {@linkplain org.opengis.metadata.citation.Citation#getTitle authority titles}.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
@@ -173,12 +172,10 @@ public class Formatter {
         this.symbols     = symbols;
         this.indentation = indentation;
         if (symbols == null) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_NULL_ARGUMENT_$1, "symbols"));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "symbols"));
         }
         if (indentation < 0) {
-            throw new IllegalArgumentException(Resources.format(
-                                               ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                                                "indentation", new Integer(indentation)));
         }
         numberFormat = (NumberFormat) symbols.numberFormat.clone();
@@ -636,8 +633,7 @@ public class Formatter {
      */
     public void setLinearUnit(final Unit unit) {
         if (unit!=null && !SI.METER.isCompatible(unit)) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NON_LINEAR_UNIT_$1, unit));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NON_LINEAR_UNIT_$1, unit));
         }
         linearUnit = unit;
     }
@@ -660,8 +656,7 @@ public class Formatter {
      */
     public void setAngularUnit(final Unit unit) {
         if (unit!=null && (!SI.RADIAN.isCompatible(unit) || Unit.ONE.equals(unit))) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1, unit));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NON_ANGULAR_UNIT_$1, unit));
         }
         angularUnit = unit;
     }

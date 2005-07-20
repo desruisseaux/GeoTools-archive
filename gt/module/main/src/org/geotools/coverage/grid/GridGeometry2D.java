@@ -47,8 +47,8 @@ import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -261,8 +261,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
                 cause = exception;
             }
         }
-        IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                                         ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+        IllegalArgumentException e = new IllegalArgumentException(Errors.format(
+                                         ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
         e.initCause(cause); // TODO: Move in constructor's argument when we
         throw e;            //       will be allowed to compile for J2SE 1.5.
     }
@@ -282,9 +282,9 @@ public class GridGeometry2D extends GeneralGridGeometry {
         } else try {
             return (MathTransform2D) gridToCoordinateSystem2D.inverse();
         } catch (NoninvertibleTransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                                         ResourceKeys.ERROR_BAD_TRANSFORM_$1,
-                                         Utilities.getShortClassName(gridToCoordinateSystem2D)));
+            final IllegalArgumentException e;
+            e = new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
+                                             Utilities.getShortClassName(gridToCoordinateSystem2D)));
             e.initCause(exception);
             throw e;
         }
@@ -316,8 +316,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         if (gridToCoordinateSystem2D != null) {
             return gridToCoordinateSystem2D;
         }
-        throw new InvalidGridGeometryException(Resources.format(
-                  ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
     }
     
     /**
@@ -334,13 +333,11 @@ public class GridGeometry2D extends GeneralGridGeometry {
             try {
                 return gridFromCoordinateSystem2D.transform(point, null);
             } catch (TransformException exception) {
-                throw new CannotEvaluateException(
-                          Resources.format(ResourceKeys.ERROR_CANT_EVALUATE_$1,
+                throw new CannotEvaluateException(Errors.format(ErrorKeys.CANT_EVALUATE_$1,
                           AbstractGridCoverage.toString(point, Locale.getDefault()), exception));
             }
         }
-        throw new InvalidGridGeometryException(Resources.format(
-                  ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
     }
     
     /**

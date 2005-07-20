@@ -36,9 +36,8 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
-
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -189,8 +188,7 @@ public abstract class AbstractOperation implements Operation, Serializable {
             throws IllegalArgumentException
     {
         if (object == null) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
     }
 

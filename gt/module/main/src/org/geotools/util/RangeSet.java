@@ -33,8 +33,8 @@ import javax.media.jai.util.Range;
 
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.opengis.util.Cloneable;
 
 
@@ -45,15 +45,14 @@ import org.opengis.util.Cloneable;
  * When a range is added, {@code RangeSet} first looks for an existing range overlapping the
  * specified range. If an overlapping range is found, ranges are merged as of {@link Range#union}.
  * Consequently, ranges returned by {@link #iterator} may not be the same than added ranges.
- * <br><br>
+ * <p>
  * All entries in this set can be seen as {@link Range} objects.
  * This class is not thread-safe.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Andrea Aime
- *
- * @since 2.0
  */
 public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Serializable {
     /**
@@ -195,9 +194,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
             }
         }
         if (!Comparable.class.isAssignableFrom(type)) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_NOT_COMPARABLE_CLASS_$1,
-                      Utilities.getShortClassName(type)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_COMPARABLE_CLASS_$1,
+                                               Utilities.getShortClassName(type)));
         }
         Class elementType = ClassChanger.getTransformedClass(type); // e.g. change Date --> Long
         useClassChanger   = (elementType != type);
@@ -283,8 +281,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
             throw new IllegalArgumentException(String.valueOf(upper));
         }
         if (lower.compareTo(upper) > 0) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_BAD_RANGE_$2, lower, upper));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2, lower, upper));
         }
         if (useClassChanger) {
             try {
@@ -518,8 +515,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
             throw new IllegalArgumentException(String.valueOf(upper));
         }
         if (lower.compareTo(upper) >= 0) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_BAD_RANGE_$2, lower, upper));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2, lower, upper));
         }
         if (useClassChanger) {
             try {

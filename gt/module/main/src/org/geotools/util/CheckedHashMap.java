@@ -18,20 +18,22 @@ package org.geotools.util;
 // J2SE dependencies
 import java.util.LinkedHashMap;
 
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.util.Cloneable;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
  * Acts as a typed {@link java.util.Map} while we wait for Java 5.0.
  * 
+ * @since 2.1
  * @version $Id$
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @todo Provides synchronization facility on arbitrary lock, for use with the metadata package.
  *       The lock would be the metadata that owns this collection. Be carefull to update the lock
@@ -71,8 +73,7 @@ public class CheckedHashMap extends LinkedHashMap implements Cloneable {
      */
     private static void ensureNonNull(final Class type, final String name) {
         if (type == null) {
-            throw new NullPointerException(
-                      Resources.format(ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
+            throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
     }
 
@@ -87,7 +88,7 @@ public class CheckedHashMap extends LinkedHashMap implements Cloneable {
             throws IllegalArgumentException
     {
         if (element!=null && !type.isInstance(element)) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_ILLEGAL_CLASS_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                       Utilities.getShortClassName(element), Utilities.getShortName(type)));
         }
     }

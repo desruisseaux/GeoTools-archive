@@ -29,8 +29,8 @@ import java.text.FieldPosition;
 import java.text.NumberFormat;
 
 import org.geotools.pt.CoordinatePoint;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.coverage.CannotEvaluateException;
 
 
@@ -74,7 +74,7 @@ public class PointOutsideCoverageException extends CannotEvaluateException {
      * Construct an exception with a message for the specified point.
      */
     public PointOutsideCoverageException(final CoordinatePoint point) {
-        super(Resources.format(ResourceKeys.ERROR_POINT_OUTSIDE_COVERAGE_$1, toString(point)));
+        super(Errors.format(ErrorKeys.POINT_OUTSIDE_COVERAGE_$1, toString(point)));
     }
     
     /**

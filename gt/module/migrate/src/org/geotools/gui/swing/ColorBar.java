@@ -71,8 +71,8 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.LegacyGCSUtilities;
 
 // Resources (Note: CTS resources are okay for this class).
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -351,8 +351,8 @@ public class ColorBar extends JComponent {
             min = tr.transform(lower);
             max = tr.transform(upper);
         } catch (TransformException cause) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "category", category));
+            IllegalArgumentException e = new IllegalArgumentException(Errors.format(
+                            ErrorKeys.ILLEGAL_ARGUMENT_$2, "category", category));
             e.initCause(cause);
             throw e;
         }
@@ -363,7 +363,7 @@ public class ColorBar extends JComponent {
             max = -max;
         }
         if (!(min <= max)) {
-            throw new IllegalStateException(Resources.format(ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
+            throw new IllegalStateException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                                                              "category", category));
         }
         AbstractGraduation graduation = (this.graduation instanceof AbstractGraduation) ?

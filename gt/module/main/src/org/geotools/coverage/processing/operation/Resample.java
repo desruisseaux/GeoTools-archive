@@ -50,8 +50,10 @@ import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.GCSUtilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
 
 
@@ -208,11 +210,11 @@ public class Resample extends Operation2D {
             coverage = Resampler2D.reproject(source, crs, gridGeom, interp,
                 (hints instanceof Hints) ? (Hints) hints : new Hints(hints));
         } catch (FactoryException exception) {
-            throw new CannotReprojectException(Resources.format(
-                    ResourceKeys.ERROR_CANT_REPROJECT_$1, source.getName()), exception);
+            throw new CannotReprojectException(Errors.format(
+                    ErrorKeys.CANT_REPROJECT_$1, source.getName()), exception);
         } catch (TransformException exception) {
-            throw new CannotReprojectException(Resources.format(
-                    ResourceKeys.ERROR_CANT_REPROJECT_$1, source.getName()), exception);
+            throw new CannotReprojectException(Errors.format(
+                    ErrorKeys.CANT_REPROJECT_$1, source.getName()), exception);
         }
         /*
          * Check if we have been able to respect the user request. We may have failed to
@@ -234,9 +236,8 @@ public class Resample extends Operation2D {
             }
             if (mismatche) {
                 final Locale locale = source.getLocale();
-                Resampler2D.log(Resources.getResources(locale).getLogRecord(Level.WARNING,
-                    ResourceKeys.WARNING_ADJUSTED_GRID_GEOMETRY_$1,
-                        coverage.getName().toString(locale)));
+                Resampler2D.log(Logging.getResources(locale).getLogRecord(Level.WARNING,
+                    LoggingKeys.ADJUSTED_GRID_GEOMETRY_$1, coverage.getName().toString(locale)));
             }
         }
         return coverage;

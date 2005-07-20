@@ -32,8 +32,8 @@ import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListImpl;
 import javax.media.jai.util.CaselessStringKey;
 
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 
 
@@ -154,8 +154,8 @@ public final class DescriptorNaming {
         }
         final CaselessStringKey key = new CaselessStringKey(classification);
         if (descriptors.containsKey(key)) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_OPERATION_ALREADY_BOUNDS_$1, classification));
+            throw new IllegalArgumentException(Errors.format(
+                      ErrorKeys.OPERATION_ALREADY_BOUNDS_$1, classification));
         }
         descriptors.put(key, descriptor);
     }

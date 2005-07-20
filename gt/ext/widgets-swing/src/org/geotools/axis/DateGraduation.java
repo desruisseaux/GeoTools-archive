@@ -36,8 +36,8 @@ import javax.units.ConversionException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -118,8 +118,8 @@ public class DateGraduation extends AbstractGraduation {
      */
     private static void ensureTimeUnit(final Unit unit) throws ConversionException {
         if (unit==null || !MILLISECOND.isCompatible(unit)) {
-            throw new ConversionException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "unit", unit));
+            throw new ConversionException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "unit", unit));
         }
     }
 

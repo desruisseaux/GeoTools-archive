@@ -33,8 +33,8 @@
 package org.geotools.io.coverage;
 
 // Resources
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -69,7 +69,7 @@ public class AmbiguousPropertyException extends PropertyException {
                                       final PropertyParser.Key key,
                                       final String alias)
     {
-        super((message!=null) ? message :  Resources.format(
-              ResourceKeys.ERROR_INCONSISTENT_PROPERTY_$1, alias), key, alias);
+        super((message!=null) ? message :  Errors.format(
+              ErrorKeys.INCONSISTENT_PROPERTY_$1, alias), key, alias);
     }
 }

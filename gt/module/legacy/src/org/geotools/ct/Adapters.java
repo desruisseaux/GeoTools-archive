@@ -100,12 +100,7 @@ public class Adapters extends org.geotools.cs.Adapters {
             final AbstractMathTransform atr = (AbstractMathTransform) transform;
             return (CT_MathTransform) atr.cachedOpenGIS(this);
         }
-        // TODO: We don't have any cache mechanism for math transforms that are
-        //       not AbstractMathTransform subclass (e.g. AffineTransform2D). A
-        //       better solution would be to do the cache inside this Adapters,
-        //       but we need something like a WeakHashMap with WeakReference on
-        //       values rather than keys...
-        return new MathTransformExport(this, transform);
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -187,9 +182,6 @@ public class Adapters extends org.geotools.cs.Adapters {
     {
         if (transform==null) {
             return null;
-        }
-        if (transform instanceof MathTransformExport) {
-            return ((MathTransformExport)transform).transform;
         }
         if (transform.getDimSource()==2 && transform.getDimTarget()==2) {
             return new MathTransformAdapter2D(transform);

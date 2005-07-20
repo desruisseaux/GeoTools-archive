@@ -20,8 +20,8 @@
 package org.geotools.coverage.io;
 
 // Resources
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -54,8 +54,8 @@ public class MissingMetadataException extends MetadataException {
                                     final MetadataBuilder.Key key,
                                     final String alias)
     {
-        super((message!=null) ? message :  Resources.format(
-                (alias!=null) ? ResourceKeys.ERROR_UNDEFINED_PROPERTY_$1 :
-                                ResourceKeys.ERROR_UNDEFINED_PROPERTY, alias), key, alias);
+        super((message!=null) ? message :  Errors.format(
+                (alias!=null) ? ErrorKeys.UNDEFINED_PROPERTY_$1 :
+                                ErrorKeys.UNDEFINED_PROPERTY, alias), key, alias);
     }
 }

@@ -54,8 +54,8 @@ import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.operation.transform.MathTransformProxy;
 
@@ -249,7 +249,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
     private static Map toMap(final Identifier[] identifiers) {
         ensureNonNull("identifiers", identifiers);
         if (identifiers.length == 0) {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_EMPTY_ARRAY));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ARRAY));
         }
         int idCount    = 0;
         int aliasCount = 0;
@@ -349,8 +349,8 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
                     values.groups(name).add(groups);
                     continue;
                 } else {
-                    throw new InvalidParameterNameException(Resources.format(
-                              ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, name), name);
+                    throw new InvalidParameterNameException(Errors.format(
+                              ErrorKeys.UNEXPECTED_PARAMETER_$1, name), name);
                 }
             }
             /*
@@ -362,8 +362,8 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
                 target = copy.parameter(name);
             } catch (ParameterNotFoundException cause) {
                 final InvalidParameterNameException exception =
-                      new InvalidParameterNameException(Resources.format(
-                          ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, name), name);
+                      new InvalidParameterNameException(Errors.format(
+                          ErrorKeys.UNEXPECTED_PARAMETER_$1, name), name);
                 exception.initCause(cause);
                 throw exception;
             }
@@ -376,8 +376,8 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
             } else if (v instanceof double[]) {
                 target.setValue((double[]) v, unit);
             } else {
-                throw new InvalidParameterValueException(Resources.format(
-                          ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, v), name, v);
+                throw new InvalidParameterValueException(Errors.format(
+                          ErrorKeys.ILLEGAL_ARGUMENT_$2, name, v), name, v);
             }
         }
     }

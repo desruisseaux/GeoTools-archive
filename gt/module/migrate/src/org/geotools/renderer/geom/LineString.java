@@ -47,8 +47,8 @@ import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.geometry.ShapeUtilities;
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.renderer.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.referencing.operation.TransformException;
 
@@ -976,9 +976,9 @@ final class LineString implements Serializable {
             xUnit = targetCS.getUnits(0);
             yUnit = targetCS.getUnits(1);
             if (!Utilities.equals(xUnit, yUnit)) {
-                throw new IllegalArgumentException(Resources.format(
-                                            ResourceKeys.ERROR_NON_CARTESIAN_COORDINATE_SYSTEM_$1,
-                                            targetCS.getName().toString()));
+                throw new IllegalArgumentException(Errors.format(
+                          ErrorKeys.NON_CARTESIAN_COORDINATE_SYSTEM_$1,
+                          targetCS.getName().toString()));
             }
             ellipsoid = CTSUtilities.getHeadGeoEllipsoid(targetCS);
         } else {
@@ -1064,9 +1064,9 @@ final class LineString implements Serializable {
             if (CTSUtilities.getHeadGeoEllipsoid(targetCS)!=null ||
                 !Utilities.equals(targetCS.getUnits(0), targetCS.getUnits(1)))
             {
-                throw new IllegalArgumentException(Resources.format(
-                                            ResourceKeys.ERROR_NON_CARTESIAN_COORDINATE_SYSTEM_$1,
-                                            targetCS.getName().toString()));
+                throw new IllegalArgumentException(Errors.format(
+                          ErrorKeys.NON_CARTESIAN_COORDINATE_SYSTEM_$1,
+                          targetCS.getName().toString()));
             }
             final MathTransform tr = transformation.getMathTransform();
             if (!tr.isIdentity()) {

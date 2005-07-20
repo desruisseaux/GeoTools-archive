@@ -22,24 +22,24 @@ package org.geotools.resources;
 // J2SE dependencies
 import java.text.ChoiceFormat;
 
-import org.geotools.resources.rsc.ResourceKeys;
-import org.geotools.resources.rsc.Resources;
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Simple mathematical functions. Some of these functions will
- * be removed if JavaSoft provide a standard implementation
- * or fix some issues in Bug Parade:<br>
+ * Simple mathematical functions. Some of these functions will be removed if JavaSoft provide a
+ * standard implementation or fix some issues in Bug Parade:
+ * <p>
  * <ul>
  *   <li><a href="http://developer.java.sun.com/developer/bugParade/bugs/4074599.html">Implement log10 (base 10 logarithm)</a></li>
  *   <li><a href="http://developer.java.sun.com/developer/bugParade/bugs/4358794.html">implement pow10 (power of 10) with optimization for integer powers</a>/li>
  *   <li><a href="http://developer.java.sun.com/developer/bugParade/bugs/4461243.html">Math.acos is very slow</a></li>
  * </ul>
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class XMath {
     /**
@@ -449,9 +449,8 @@ public final class XMath {
         if (isInteger(type)) {
             return value + amount;
         }
-        throw new IllegalArgumentException(Resources.format(
-                  ResourceKeys.ERROR_UNSUPPORTED_DATA_TYPE_$1,
-                  Utilities.getShortName(type)));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.UNSUPPORTED_DATA_TYPE_$1,
+                                                         Utilities.getShortName(type)));
     }
 
     /**

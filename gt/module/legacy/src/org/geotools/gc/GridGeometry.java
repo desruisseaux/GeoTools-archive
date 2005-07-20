@@ -45,8 +45,8 @@ import org.geotools.pt.Envelope;
 import org.geotools.pt.Matrix;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.JAIUtilities;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.ct.CT_MathTransform;
@@ -141,13 +141,13 @@ public class GridGeometry implements Dimensioned, Serializable {
             final int dimSource = gridToCoordinateSystem.getDimSource();
             final int dimTarget = gridToCoordinateSystem.getDimTarget();
             if (dimRange != dimSource) {
-                throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                            org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                throw new MismatchedDimensionException(Errors.format(
+                            ErrorKeys.MISMATCHED_DIMENSION_$2,
                             new Integer(dimRange), new Integer(dimSource)));
             }
             if (dimRange != dimTarget) {
-                throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                            org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                throw new MismatchedDimensionException(Errors.format(
+                            ErrorKeys.MISMATCHED_DIMENSION_$2,
                             new Integer(dimRange), new Integer(dimTarget)));
             }
         }
@@ -179,13 +179,13 @@ public class GridGeometry implements Dimensioned, Serializable {
          */
         final int dimension = gridRange.getDimension();
         if (userRange.getDimension() != dimension) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(gridRange.getDimension()), new Integer(userRange.getDimension())));
         }
         if (inverse!=null && inverse.length!=dimension) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(dimension), new Integer(inverse.length)));
         }
         /*
@@ -276,8 +276,8 @@ public class GridGeometry implements Dimensioned, Serializable {
             try {
                 return (MathTransform2D) gridToCoordinateSystem2D.inverse();
             } catch (NoninvertibleTransformException exception) {
-                IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                                            ResourceKeys.ERROR_BAD_TRANSFORM_$1,
+                IllegalArgumentException e = new IllegalArgumentException(Errors.format(
+                                            ErrorKeys.BAD_TRANSFORM_$1,
                                             Utilities.getShortClassName(gridToCoordinateSystem2D)));
                 e.initCause(exception);
                 throw e;
@@ -320,8 +320,8 @@ public class GridGeometry implements Dimensioned, Serializable {
         try {
             return CTSUtilities.transform(gridToCoordinateSystem, envelope);
         } catch (TransformException exception) {
-            throw new InvalidGridGeometryException(Resources.format(
-                    ResourceKeys.ERROR_BAD_TRANSFORM_$1,
+            throw new InvalidGridGeometryException(Errors.format(
+                    ErrorKeys.BAD_TRANSFORM_$1,
                     Utilities.getShortClassName(gridToCoordinateSystem)), exception);
         }
     }
@@ -345,8 +345,8 @@ public class GridGeometry implements Dimensioned, Serializable {
         if (gridRange != null) {
             return gridRange;
         } else {
-            throw new InvalidGridGeometryException(Resources.format(
-                      ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
+            throw new InvalidGridGeometryException(Errors.format(
+                      ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
         }
     }
     
@@ -395,8 +395,8 @@ public class GridGeometry implements Dimensioned, Serializable {
         if (gridToCoordinateSystem2D != null) {
             return gridToCoordinateSystem2D;
         }
-        throw new InvalidGridGeometryException(Resources.format(
-                  ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+        throw new InvalidGridGeometryException(Errors.format(
+                  ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
     }
 
     /**
@@ -449,8 +449,8 @@ public class GridGeometry implements Dimensioned, Serializable {
                 throw new CannotEvaluateException(null, exception);
             }
         }
-        throw new InvalidGridGeometryException(Resources.format(
-                  ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
+        throw new InvalidGridGeometryException(Errors.format(
+                  ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
     }
     
     /**

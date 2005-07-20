@@ -66,8 +66,8 @@ import javax.imageio.event.IIOReadProgressListener;
 import org.geotools.renderer.j2d.GeoMouseEvent;
 import org.geotools.renderer.j2d.MouseCoordinateFormat;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -338,8 +338,8 @@ public class StatusBar extends JComponent implements MouseMotionListener {
             if (coordinateMenu == null) {
                 coordinateMenu = new JPopupMenu();
                 final MenuListener listener = new MenuListener();
-                final Resources resources = Resources.getResources(getLocale());
-                JMenuItem item = coordinateMenu.add(resources.getMenuLabel(ResourceKeys.FORMAT));
+                final Vocabulary resources = Vocabulary.getResources(getLocale());
+                JMenuItem item = coordinateMenu.add(resources.getMenuLabel(VocabularyKeys.FORMAT));
                 item.addActionListener(listener);
                 addPropertyChangeListener("coordinateFormat", listener);
             }
@@ -363,9 +363,9 @@ public class StatusBar extends JComponent implements MouseMotionListener {
             if (chooser == null) {
                 chooser = new FormatChooser(getCoordinateFormat());
             }
-            final Resources resources = Resources.getResources(getLocale());
+            final Vocabulary resources = Vocabulary.getResources(getLocale());
             if (chooser.showDialog(StatusBar.this,
-                                   resources.getString(ResourceKeys.COORDINATE_FORMAT)))
+                                   resources.getString(VocabularyKeys.COORDINATE_FORMAT)))
             {
                 setCoordinateFormat((MouseCoordinateFormat) chooser.getFormat());
             }
@@ -391,8 +391,8 @@ public class StatusBar extends JComponent implements MouseMotionListener {
      *             in the status bar when the loading will start.
      */
     public IIOReadProgressListener getIIOReadProgressListener(final String name) {
-        return new ProgressListener(Resources.getResources(getLocale()).
-                                    getString(ResourceKeys.LOADING_$1, name));
+        return new ProgressListener(Vocabulary.getResources(getLocale()).
+                                    getString(VocabularyKeys.LOADING_$1, name));
     }
 
 

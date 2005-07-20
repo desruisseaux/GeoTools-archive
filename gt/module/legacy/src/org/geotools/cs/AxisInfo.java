@@ -34,8 +34,8 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.units.Unit;
 
 
@@ -84,7 +84,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      *
      * @deprecated Replaced by {@link DefaultCoordinateSystemAxis#LONGITUDE}.
      */
-    public static final AxisInfo LONGITUDE = new AxisInfo.Localized("Longitude", ResourceKeys.LONGITUDE, AxisOrientation.EAST);
+    public static final AxisInfo LONGITUDE = new AxisInfo.Localized("Longitude", VocabularyKeys.LONGITUDE, AxisOrientation.EAST);
     
     /**
      * Default axis info for latitudes.
@@ -94,7 +94,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      *
      * @deprecated Replaced by {@link DefaultCoordinateSystemAxis#LATITUDE}.
      */
-    public static final AxisInfo LATITUDE = new AxisInfo.Localized("Latitude", ResourceKeys.LATITUDE, AxisOrientation.NORTH);
+    public static final AxisInfo LATITUDE = new AxisInfo.Localized("Latitude", VocabularyKeys.LATITUDE, AxisOrientation.NORTH);
     
     /**
      * The default axis for altitude values.
@@ -102,7 +102,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      *
      * @deprecated Replaced by {@link DefaultCoordinateSystemAxis#ALTITUDE}.
      */
-    public static final AxisInfo ALTITUDE = new AxisInfo.Localized("Altitude", ResourceKeys.ALTITUDE, AxisOrientation.UP);
+    public static final AxisInfo ALTITUDE = new AxisInfo.Localized("Altitude", VocabularyKeys.ALTITUDE, AxisOrientation.UP);
     
     /**
      * A default axis for time values.
@@ -110,7 +110,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      *
      * @deprecated Replaced by {@link DefaultCoordinateSystemAxis#TIME}.
      */
-    public static final AxisInfo TIME = new AxisInfo.Localized("Time", ResourceKeys.TIME, AxisOrientation.FUTURE);
+    public static final AxisInfo TIME = new AxisInfo.Localized("Time", VocabularyKeys.TIME, AxisOrientation.FUTURE);
     
     /**
      * Human readable name for axis.
@@ -280,7 +280,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
          * Returns a localized string.
          */
         public String getName(final Locale locale) {
-            return Resources.getResources(locale).getString(key);
+            return Vocabulary.getResources(locale).getString(key);
         }
     }
 }

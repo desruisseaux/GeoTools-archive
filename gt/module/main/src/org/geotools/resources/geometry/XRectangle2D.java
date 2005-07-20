@@ -43,10 +43,9 @@ import org.geotools.resources.Utilities;
  * class work correctly with {@linkplain Double#POSITIVE_INFINITY infinites} and
  * {@linkplain Double#NaN NaN} values.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class XRectangle2D extends Rectangle2D implements Serializable {
     /**

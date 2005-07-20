@@ -104,8 +104,10 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.NumberRange;
 import org.geotools.util.WeakHashSet;
@@ -375,10 +377,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         }
         final int dimension = envelope.getDimension();
         if (dimension != cs.getDimension()) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
-                        new Integer(cs.getDimension()),
-                        new Integer(envelope.getDimension())));
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
+                        new Integer(cs.getDimension()), new Integer(envelope.getDimension())));
         }
         envelope.setCoordinateReferenceSystem(crs);
         this.envelope = (GeneralEnvelope) pool.canonicalize(envelope);
@@ -432,7 +432,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             !(this.envelope.getLength(gridGeometry.axisDimensionX) > 0) ||
             !(this.envelope.getLength(gridGeometry.axisDimensionY) > 0))
         {
-            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_EMPTY_ENVELOPE));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ENVELOPE));
         }
         /*
          * Constructs the two-dimensional CRS.
@@ -441,10 +441,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             crs2D = new FactoryGroup().separate(crs, new int[] {gridGeometry.axisDimensionX,
                                                                 gridGeometry.axisDimensionY});
         } catch (FactoryException exception) {
-            final IllegalArgumentException e =
-                new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
-                    org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "crs",
-                    crs.getName().getClass()));
+            final IllegalArgumentException e = new IllegalArgumentException(
+                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs.getName().getClass()));
             e.initCause(exception); // TODO: inline in the constructor with J2SE 1.5.
             throw e;
         }
@@ -482,8 +480,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 label  = new Integer(i);
             }
             if (range.getLower(i)!=min || range.getLength(i)!=length) {
-                return Resources.format(ResourceKeys.ERROR_BAD_GRID_RANGE_$3, label,
-                                        new Integer(min), new Integer(min+length));
+                return Errors.format(ErrorKeys.BAD_GRID_RANGE_$3, label,
+                                     new Integer(min), new Integer(min+length));
             }
         }
         return null;
@@ -677,9 +675,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         final int actual   = point.getDimension();
         final int expected = crs.getCoordinateSystem().getDimension();
         if (actual != expected) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
-                        new Integer(actual), new Integer(expected)));
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
+                                                   new Integer(actual), new Integer(expected)));
         }
         if (point instanceof Point2D) {
             return (Point2D) point;
@@ -960,8 +957,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 inverse.inverse = this;
             } else if (inverse.inverse != this) {
                 final Locale locale = getLocale();
-                throw new RasterFormatException(Resources.getResources(locale).getString(
-                          ResourceKeys.ERROR_COVERAGE_ALREADY_BOUND_$2,
+                throw new RasterFormatException(Errors.getResources(locale).getString(
+                          ErrorKeys.COVERAGE_ALREADY_BOUND_$2,
                           "geophysics", inverse.inverse.getName().toString(locale)));
             }
             return inverse;
@@ -1215,9 +1212,9 @@ testLinear: for (int i=0; i<numBands; i++) {
             final int        index = operation.lastIndexOf('.');
             final String shortName = (index>=0) ? operation.substring(index+1) : operation;
             final Locale    locale = getLocale();
-            final LogRecord record = Resources.getResources(locale).getLogRecord(
+            final LogRecord record = Logging.getResources(locale).getLogRecord(
                                      AbstractProcessor.OPERATION,
-                                     ResourceKeys.SAMPLE_TRANSCODE_$3, new Object[] {
+                                     LoggingKeys.SAMPLE_TRANSCODE_$3, new Object[] {
                                      getName().toString(locale),
                                      new Integer(geo ? 1 : 0), shortName});
             record.setSourceClassName("GridCoverage");

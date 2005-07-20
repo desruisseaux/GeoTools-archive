@@ -40,8 +40,8 @@ import java.rmi.RemoteException;
 import javax.media.jai.PropertySource;
 
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.cv.CV_Coverage;
 
@@ -87,7 +87,7 @@ final class CoverageProperties implements PropertySource, Serializable {
         try {
             return coverage.getMetadataNames();
         } catch (RemoteException exception) {
-            throw new CannotEvaluateException(Resources.format(ResourceKeys.ERROR_RMI_FAILURE, exception));
+            throw new CannotEvaluateException(Errors.format(ErrorKeys.RMI_FAILURE, exception));
         }
     }
 
@@ -130,7 +130,7 @@ final class CoverageProperties implements PropertySource, Serializable {
             final String value = coverage.getMetadataValue(name);
             return (value!=null) ? value : Image.UndefinedProperty;
         } catch (RemoteException exception) {
-            throw new CannotEvaluateException(Resources.format(ResourceKeys.ERROR_RMI_FAILURE, exception));
+            throw new CannotEvaluateException(Errors.format(ErrorKeys.RMI_FAILURE, exception));
         }
     }
 }

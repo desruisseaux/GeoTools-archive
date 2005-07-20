@@ -19,7 +19,7 @@
  */
 package org.geotools.image.io;
 
-// Input/output
+// J2SE and JAI dependencies
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -32,7 +32,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Locale;
-
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
@@ -40,10 +39,13 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.media.jai.util.Range;
 
+// Geotools dependencies
 import org.geotools.io.LineFormat;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Descriptions;
+import org.geotools.resources.i18n.DescriptionKeys;
 
 
 /**
@@ -447,7 +449,7 @@ public class TextMatrixImageReader extends TextImageReader {
          * @return A String containing a description of this service provider.
          */
         public String getDescription(final Locale locale) {
-            return Resources.getResources(locale).getString(ResourceKeys.CODEC_MATRIX);
+            return Descriptions.getResources(locale).getString(DescriptionKeys.CODEC_MATRIX);
         }
         
         /**

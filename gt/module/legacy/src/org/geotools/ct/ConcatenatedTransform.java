@@ -30,8 +30,8 @@ import java.io.Serializable;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Matrix;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 
@@ -96,8 +96,8 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
         this.transform1 = transform1;
         this.transform2 = transform2;
         if (!isValid()) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_CANT_CONCATENATE_CS_$2,
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.CANT_CONCATENATE_CS_$2,
                     getName(transform1), getName(transform2)));
         }
     }

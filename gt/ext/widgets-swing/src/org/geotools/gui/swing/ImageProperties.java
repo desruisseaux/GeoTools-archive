@@ -52,8 +52,8 @@ import javax.media.jai.OperationDescriptor;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -140,7 +140,7 @@ public class ImageProperties extends JPanel {
      */
     public ImageProperties() {
         super(new BorderLayout());
-        final Resources  resources = Resources.getResources(getLocale());
+        final Vocabulary resources = Vocabulary.getResources(getLocale());
         final JTabbedPane     tabs = new JTabbedPane();
         final GridBagConstraints c = new GridBagConstraints();
         /*
@@ -156,12 +156,12 @@ public class ImageProperties extends JPanel {
 
             final int ytop = c.gridy;
             c.gridwidth=1; c.weightx=0; c.insets.bottom=0;
-            c.gridy++; panel.add(getLabel(ResourceKeys.IMAGE_SIZE,   resources), c);
-            c.gridy++; panel.add(getLabel(ResourceKeys.TILES_SIZE,   resources), c);
-            c.gridy++; panel.add(getLabel(ResourceKeys.DATA_TYPE,    resources), c);
-            c.gridy++; panel.add(getLabel(ResourceKeys.SAMPLE_MODEL, resources), c);
-            c.gridy++; panel.add(getLabel(ResourceKeys.COLOR_MODEL,  resources), c);
-            c.gridy++; panel.add(getLabel(ResourceKeys.COLORS,       resources), c);
+            c.gridy++; panel.add(getLabel(VocabularyKeys.IMAGE_SIZE,   resources), c);
+            c.gridy++; panel.add(getLabel(VocabularyKeys.TILES_SIZE,   resources), c);
+            c.gridy++; panel.add(getLabel(VocabularyKeys.DATA_TYPE,    resources), c);
+            c.gridy++; panel.add(getLabel(VocabularyKeys.SAMPLE_MODEL, resources), c);
+            c.gridy++; panel.add(getLabel(VocabularyKeys.COLOR_MODEL,  resources), c);
+            c.gridy++; panel.add(getLabel(VocabularyKeys.COLORS,       resources), c);
 
             c.gridx=1; c.gridy=ytop; c.weightx=1;
             c.gridy++; panel.add(imageSize,   c);
@@ -172,7 +172,7 @@ public class ImageProperties extends JPanel {
             c.gridy++; c.anchor=c.CENTER; c.insets.right=6;
 
             panel.add(colorRamp, c);
-            tabs.addTab(resources.getString(ResourceKeys.INFORMATIONS), panel);
+            tabs.addTab(resources.getString(VocabularyKeys.INFORMATIONS), panel);
         }
         /*
          * Build the image's properties tab.
@@ -180,14 +180,14 @@ public class ImageProperties extends JPanel {
         if (true) {
             properties = new Table(resources);
             final JTable table = new JTable(properties);
-            tabs.addTab(resources.getString(ResourceKeys.PROPERTIES), new JScrollPane(table));
+            tabs.addTab(resources.getString(VocabularyKeys.PROPERTIES), new JScrollPane(table));
         }
         /*
          * Build the image preview tab.
          */
         if (true) {
             viewer = new ImagePane();
-            tabs.addTab(resources.getString(ResourceKeys.PREVIEW), viewer);
+            tabs.addTab(resources.getString(VocabularyKeys.PREVIEW), viewer);
         }
         add(tabs, BorderLayout.CENTER);
         setPreferredSize(new Dimension(400,250));
@@ -196,7 +196,7 @@ public class ImageProperties extends JPanel {
     /**
      * Returns the localized label for the given key.
      */
-    private static JLabel getLabel(final int key, final Resources resources) {
+    private static JLabel getLabel(final int key, final Vocabulary resources) {
         return new JLabel(resources.getLabel(key));
     }
 
@@ -224,8 +224,8 @@ public class ImageProperties extends JPanel {
         String name        = " ";
         String description = " ";
         String version     = " ";
-        final Locale    locale    = getLocale();
-        final Resources resources = Resources.getResources(locale);
+        final Locale     locale    = getLocale();
+        final Vocabulary resources = Vocabulary.getResources(locale);
         if (image instanceof OperationNode) {
             final String mode;
             final RegistryElementDescriptor descriptor;
@@ -238,14 +238,14 @@ public class ImageProperties extends JPanel {
                 bundle      = ((OperationDescriptor) descriptor).getResourceBundle(locale);
                 name        = bundle   .getString("LocalName");
                 description = bundle   .getString("Description");
-                version     = resources.getString(ResourceKeys.VERSION_$1,
+                version     = resources.getString(VocabularyKeys.VERSION_$1,
                               bundle   .getString("Version")) + ", " +
                               bundle   .getString("Vendor");
-                name = resources.getString(ResourceKeys.OPERATION_$1, name);
+                name = resources.getString(VocabularyKeys.OPERATION_$1, name);
             }
         } else if (image != null) {
             name = Utilities.getShortClassName(image);
-            name = resources.getString(ResourceKeys.IMAGE_CLASS_$1, name);
+            name = resources.getString(VocabularyKeys.IMAGE_CLASS_$1, name);
         }
         operationName       .setText(name       );
         operationDescription.setText(description);
@@ -296,8 +296,8 @@ public class ImageProperties extends JPanel {
     public void setImage(final RenderableImage image) {
         clear();
         if (image != null) {
-            final Resources resources = Resources.getResources(getLocale());
-            imageSize.setText(resources.getString(ResourceKeys.SIZE_$2,
+            final Vocabulary resources = Vocabulary.getResources(getLocale());
+            imageSize.setText(resources.getString(VocabularyKeys.SIZE_$2,
                               new Float(image.getWidth()),
                               new Float(image.getHeight())));
         }
@@ -315,14 +315,14 @@ public class ImageProperties extends JPanel {
         if (image == null) {
             clear();
         } else {
-            final Resources resources = Resources.getResources(getLocale());
+            final Vocabulary resources = Vocabulary.getResources(getLocale());
             final  ColorModel cm = image.getColorModel();
             final SampleModel sm = image.getSampleModel();
-            imageSize.setText(resources.getString(ResourceKeys.IMAGE_SIZE_$3,
+            imageSize.setText(resources.getString(VocabularyKeys.IMAGE_SIZE_$3,
                               new Integer(image.getWidth()),
                               new Integer(image.getHeight()),
                               new Integer(sm.getNumBands())));
-            tileSize.setText(resources.getString(ResourceKeys.TILE_SIZE_$4,
+            tileSize.setText(resources.getString(VocabularyKeys.TILE_SIZE_$4,
                               new Integer(image.getNumXTiles()),
                               new Integer(image.getNumYTiles()),
                               new Integer(image.getTileWidth()),
@@ -351,18 +351,18 @@ public class ImageProperties extends JPanel {
      */
     private static String getDataType(final int        type,
                                       final ColorModel cm,
-                                      final Resources  resources)
+                                      final Vocabulary resources)
     {
         final int key;
         switch (type) {
             case DataBuffer.TYPE_BYTE:      // Fall through
-            case DataBuffer.TYPE_USHORT:    key=ResourceKeys.UNSIGNED_INTEGER_$2; break;
+            case DataBuffer.TYPE_USHORT:    key=VocabularyKeys.UNSIGNED_INTEGER_$2; break;
             case DataBuffer.TYPE_SHORT:     // Fall through
-            case DataBuffer.TYPE_INT:       key=ResourceKeys.SIGNED_INTEGER_$1; break;
+            case DataBuffer.TYPE_INT:       key=VocabularyKeys.SIGNED_INTEGER_$1; break;
             case DataBuffer.TYPE_FLOAT:     // Fall through
-            case DataBuffer.TYPE_DOUBLE:    key=ResourceKeys.REAL_NUMBER_$1; break;
+            case DataBuffer.TYPE_DOUBLE:    key=VocabularyKeys.REAL_NUMBER_$1; break;
             case DataBuffer.TYPE_UNDEFINED: // Fall through
-            default: return resources.getString(ResourceKeys.UNDEFINED);
+            default: return resources.getString(VocabularyKeys.UNDEFINED);
         }
         final Integer  typeSize = new Integer(DataBuffer.getDataTypeSize(type));
         final Integer pixelSize = (cm!=null) ? new Integer(cm.getPixelSize()) : typeSize;
@@ -377,9 +377,9 @@ public class ImageProperties extends JPanel {
      * @param  resources The resources to use for formatting localized text.
      * @return The object class name.
      */
-    private static String formatClassName(final Object object, final Resources resources) {
+    private static String formatClassName(final Object object, final Vocabulary resources) {
         if (object == null) {
-            return resources.getString(ResourceKeys.UNDEFINED);
+            return resources.getString(VocabularyKeys.UNDEFINED);
         }
         final String         name = Utilities.getShortClassName(object);
         final int          length = name.length();
@@ -402,7 +402,7 @@ public class ImageProperties extends JPanel {
         if (object instanceof IndexColorModel) {
             final IndexColorModel cm = (IndexColorModel) object;
             buffer.append(" (");
-            buffer.append(resources.getString(ResourceKeys.COLOR_COUNT_$1,
+            buffer.append(resources.getString(VocabularyKeys.COLOR_COUNT_$1,
                           new Integer(cm.getMapSize())));
             buffer.append(')');
         }
@@ -428,7 +428,7 @@ public class ImageProperties extends JPanel {
         /**
          * The resources for formatting localized strings.
          */
-        private final Resources resources;
+        private final Vocabulary resources;
 
         /**
          * The property sources. Usually (but not always) the same object than
@@ -453,7 +453,7 @@ public class ImageProperties extends JPanel {
          *
          * @param resources The resources for formatting localized strings.
          */
-        public Table(final Resources resources) {
+        public Table(final Vocabulary resources) {
             this.resources = resources;
         }
 
@@ -554,8 +554,8 @@ public class ImageProperties extends JPanel {
         public String getColumnName(final int column) {
             final int key;
             switch (column) {
-                case 0: key=ResourceKeys.NAME;  break;
-                case 1: key=ResourceKeys.VALUE; break;
+                case 0: key=VocabularyKeys.NAME;  break;
+                case 1: key=VocabularyKeys.VALUE; break;
                 default: throw new IndexOutOfBoundsException(String.valueOf(column));
             }
             return resources.getString(key);
@@ -589,7 +589,7 @@ public class ImageProperties extends JPanel {
                 case 1: {
                     Object value = source.getProperty(name);
                     if (value == Image.UndefinedProperty) {
-                        value = resources.getString(ResourceKeys.UNDEFINED);
+                        value = resources.getString(VocabularyKeys.UNDEFINED);
                     }
                     return value;
                 }

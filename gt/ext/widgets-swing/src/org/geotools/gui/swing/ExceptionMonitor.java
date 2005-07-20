@@ -56,8 +56,8 @@ import java.lang.reflect.InvocationTargetException;
 
 // Resources
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.GraphicsUtilities;
 
 
@@ -72,7 +72,7 @@ import org.geotools.resources.GraphicsUtilities;
  * <p>&nbsp;</p>
  *
  * @since 2.0
- * @version $Id: ExceptionMonitor.java,v 1.7 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class ExceptionMonitor {
@@ -207,7 +207,7 @@ public final class ExceptionMonitor {
         /**
          * Resources in the user's language.
          */
-        private final Resources resources;
+        private final Vocabulary resources;
 
         /**
          * Constructs a pane which will display the specified error message.
@@ -221,7 +221,7 @@ public final class ExceptionMonitor {
          */
         private Pane(final Component owner,   final Throwable exception,
                      final Container message, final AbstractButton[] buttons,
-                     final Resources resources)
+                     final Vocabulary resources)
         {
             super(message, ERROR_MESSAGE, OK_CANCEL_OPTION, null, buttons);
             this.exception   = exception;
@@ -235,7 +235,7 @@ public final class ExceptionMonitor {
              * we should be happy with JDialog. The exception trace will not be written immediately.
              */
             final String classname = Utilities.getShortClassName(exception);
-            final String title = resources.getString(ResourceKeys.ERROR_$1, classname);
+            final String title = resources.getString(VocabularyKeys.ERROR_$1, classname);
             final JDesktopPane desktop = getDesktopPaneForComponent(owner);
             if (desktop != null) {
                 final JInternalFrame dialog = createInternalFrame(desktop, title);
@@ -260,12 +260,12 @@ public final class ExceptionMonitor {
          * same thread as the Swing thread.
          */
         public static void show(final Component owner, final Throwable exception, String message) {
-            final Resources resources = Resources.getResources((owner != null) ? owner.getLocale() : null);
+            final Vocabulary resources = Vocabulary.getResources((owner != null) ? owner.getLocale() : null);
             if (message == null) {
                 message = exception.getLocalizedMessage();
                 if (message == null) {
                     final String classname = Utilities.getShortClassName(exception);
-                    message = resources.getString(ResourceKeys.NO_DETAILS_$1, classname);
+                    message = resources.getString(VocabularyKeys.NO_DETAILS_$1, classname);
                 }
             }
             final JTextArea textArea = new JTextArea(message, 1, WIDTH);
@@ -274,16 +274,15 @@ public final class ExceptionMonitor {
             textArea.setWrapStyleWord(true);
             textArea.setBackground(null);
             textArea.setBorder(null); // Certain L&Fs have a border.
-            
-            /**
+            /*
              * Constructs the rest of the dialog box.  The title bar will
              * contain the name of the exception class.
              */
             final JComponent messageBox = new JPanel(new BorderLayout());
             messageBox.add(textArea, BorderLayout.NORTH);
             final Pane pane = new Pane(owner, exception, messageBox, new AbstractButton[] {
-                new JButton(resources.getString(ResourceKeys.DEBUG)),
-                new JButton(resources.getString(ResourceKeys.CLOSE))
+                new JButton(resources.getString(VocabularyKeys.DEBUG)),
+                new JButton(resources.getString(VocabularyKeys.CLOSE))
             }, resources);
             pane.dialog.setVisible(true);
         }
@@ -341,9 +340,8 @@ public final class ExceptionMonitor {
              * hidden, it will not be destroyed if the user would like to
              * redisplay it.
              */
-            final Resources resources = Resources.getResources(getLocale());
-            traceButton.setText(resources.format(traceVisible ? ResourceKeys.DEBUG
-                                                              : ResourceKeys.HIDE));
+            traceButton.setText(resources.format(traceVisible ? VocabularyKeys.DEBUG
+                                                              : VocabularyKeys.HIDE));
             traceVisible = !traceVisible;
             if (dialog instanceof Dialog) {
                 ((Dialog) dialog).setResizable(traceVisible);

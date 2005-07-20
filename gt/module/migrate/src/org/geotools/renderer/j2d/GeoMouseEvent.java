@@ -37,6 +37,8 @@ import org.geotools.ct.MathTransform2D;
 import org.geotools.renderer.DeformableViewer;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -215,8 +217,8 @@ public final class GeoMouseEvent extends MouseEvent {
             assert cs.getDimension() == 2;
             if (dest != null) {
                 if (dest.ord.length != 2) {
-                    throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                                org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                    throw new MismatchedDimensionException(Errors.format(
+                                ErrorKeys.MISMATCHED_DIMENSION_$2,
                                 new Integer(cs.getDimension()), new Integer(dest.getDimension())));
                 }
                 dest.ord[0] = px;

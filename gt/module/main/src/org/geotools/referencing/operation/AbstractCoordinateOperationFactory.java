@@ -63,8 +63,10 @@ import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.Singleton;
 import org.geotools.util.WeakHashSet;
 
@@ -130,7 +132,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      */
     protected static final Identifier GEOCENTRIC_CONVERSION =
             new NamedIdentifier(CitationImpl.GEOTOOLS,
-                Resources.formatInternational(ResourceKeys.GEOCENTRIC_TRANSFORM));
+                Vocabulary.formatInternational(VocabularyKeys.GEOCENTRIC_TRANSFORM));
 
     /**
      * The identifier for an inverse operation.
@@ -645,8 +647,8 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     protected static String getErrorMessage(final IdentifiedObject source,
                                             final IdentifiedObject target)
     {
-        return Resources.format(ResourceKeys.ERROR_NO_TRANSFORMATION_PATH_$2,
-                                getClassName(source), getClassName(target));
+        return Errors.format(ErrorKeys.NO_TRANSFORMATION_PATH_$2,
+                             getClassName(source), getClassName(target));
     }
 
     /**
@@ -660,8 +662,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
             throws IllegalArgumentException
     {
         if (object == null) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
     }
 }

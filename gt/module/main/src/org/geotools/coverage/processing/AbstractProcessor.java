@@ -44,8 +44,12 @@ import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -167,8 +171,8 @@ public abstract class AbstractProcessor {
                             ((Interpolator2D) result).getInterpolation());
             }
             final Locale locale = getLocale();
-            final LogRecord record = Resources.getResources(locale).getLogRecord(
-                                     OPERATION, ResourceKeys.APPLIED_OPERATION_$4,
+            final LogRecord record = Logging.getResources(locale).getLogRecord(
+                                     OPERATION, LoggingKeys.APPLIED_OPERATION_$4,
                                      getName((source!=null) ? source : result, locale),
                                      operationName, interp, new Integer(fromCache ? 1:0));
             record.setSourceClassName("DefaultProcessor");
@@ -206,7 +210,7 @@ public abstract class AbstractProcessor {
         if (coverage instanceof AbstractCoverage) {
             return ((AbstractCoverage) coverage).getName().toString(locale);
         } else {
-            return Resources.getResources(locale).getString(ResourceKeys.UNTITLED);
+            return Vocabulary.getResources(locale).getString(VocabularyKeys.UNTITLED);
         }
     }
 
@@ -221,8 +225,7 @@ public abstract class AbstractProcessor {
             throws IllegalArgumentException
     {
         if (object == null) {
-            throw new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
     }
 

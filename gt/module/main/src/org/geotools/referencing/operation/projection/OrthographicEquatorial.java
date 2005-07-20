@@ -47,23 +47,26 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+
 
 /**
  * The equatorial case of the {@link Orthographic} projection. This is a 
  * simplification of the oblique case for {@link #latitudeOfOrigin} == 0.0. 
  * Only the spherical form is given here.
  *
- * @task REVISIT: this code is identical to the oblique except for 6 lines.
- *                It could be moved to the oblique with an isEquatorial flag.
- *
- * @version $Id$
- * @author Rueben Schulz
+ * @todo this code is identical to the oblique except for 6 lines.
+ *       It could be moved to the oblique with an isEquatorial flag.
  *
  * @since 2.1
+ * @version $Id$
+ * @author Rueben Schulz
  */
 public class OrthographicEquatorial extends OrthographicOblique {
     
@@ -97,8 +100,7 @@ public class OrthographicEquatorial extends OrthographicOblique {
 	double coslam = Math.cos(x);
         
         if (cosphi * coslam < -EPS) {
-            throw new ProjectionException(Resources.format(
-                ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
+            throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
         
 	y = Math.sin(y);
@@ -128,8 +130,7 @@ public class OrthographicEquatorial extends OrthographicOblique {
         double sinc = rho;
         if (sinc > 1.0) {
             if ((sinc - 1.0) > EPS) {
-                throw new ProjectionException(Resources.format(
-                    ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
+                throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
             }
             sinc = 1.0;
         }

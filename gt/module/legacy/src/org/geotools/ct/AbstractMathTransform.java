@@ -43,8 +43,8 @@ import javax.vecmath.SingularMatrixException;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Matrix;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.util.UnsupportedImplementationException;
 import org.opengis.ct.CT_MathTransform;
@@ -161,15 +161,15 @@ public abstract class AbstractMathTransform implements MathTransform {
         final int dimSource = getDimSource();
         final int dimTarget = getDimTarget();
         if (dimPoint != dimSource) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(dimPoint), new Integer(dimSource)));
         }
         if (ptDst==null) {
             ptDst = new CoordinatePoint(dimTarget);
         } else if (ptDst.getDimension() != dimTarget) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(ptDst.getDimension()), new Integer(dimTarget)));
         }
         transform(ptSrc.ord, 0, ptDst.ord, 0, 1);
@@ -389,11 +389,11 @@ public abstract class AbstractMathTransform implements MathTransform {
     public Matrix derivative(final Point2D point) throws TransformException {
         final int dimSource = getDimSource();
         if (dimSource != 2) {
-            throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                        org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(2), new Integer(dimSource)));
         }
-        throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
+        throw new TransformException(Errors.format(ErrorKeys.CANT_COMPUTE_DERIVATIVE));
     }
     
     /**
@@ -425,8 +425,8 @@ public abstract class AbstractMathTransform implements MathTransform {
         if (point != null) {
             final int dimPoint = point.getDimension();
             if (dimPoint != dimSource) {
-                throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
-                            org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                throw new MismatchedDimensionException(Errors.format(
+                            ErrorKeys.MISMATCHED_DIMENSION_$2,
                             new Integer(dimPoint), new Integer(dimSource)));
             }
             if (dimSource == 2) {
@@ -440,7 +440,7 @@ public abstract class AbstractMathTransform implements MathTransform {
                 ((MathTransform1D) this).derivative(point.ord[0])
             });
         }
-        throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
+        throw new TransformException(Errors.format(ErrorKeys.CANT_COMPUTE_DERIVATIVE));
     }
     
     /**
@@ -454,7 +454,7 @@ public abstract class AbstractMathTransform implements MathTransform {
             return this;
         }
         throw new NoninvertibleTransformException(
-                Resources.format(ResourceKeys.ERROR_NONINVERTIBLE_TRANSFORM));
+                Errors.format(ErrorKeys.NONINVERTIBLE_TRANSFORM));
     }
 
     /**
@@ -594,9 +594,7 @@ public abstract class AbstractMathTransform implements MathTransform {
                 return proxy;
             }
         }
-        final Object opengis = new MathTransformExport(adapters, this);
-        proxy = new WeakReference(opengis);
-        return opengis;
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -609,7 +607,7 @@ public abstract class AbstractMathTransform implements MathTransform {
             matrix.invert();
             return matrix;
         } catch (SingularMatrixException exception) {
-            NoninvertibleTransformException e = new NoninvertibleTransformException(Resources.format(ResourceKeys.ERROR_NONINVERTIBLE_TRANSFORM));
+            NoninvertibleTransformException e = new NoninvertibleTransformException(Errors.format(ErrorKeys.NONINVERTIBLE_TRANSFORM));
             e.initCause(exception);
             throw e;
         }

@@ -41,10 +41,9 @@ import org.geotools.resources.Utilities;
  * {@link GenericName}, or a pointer to another name space (with a new {@link GenericName})
  * one step closer to the target of the identifier.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see NameFactory
  */

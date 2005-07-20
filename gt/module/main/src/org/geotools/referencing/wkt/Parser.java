@@ -79,8 +79,8 @@ import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -275,7 +275,7 @@ public class Parser extends MathTransformParser {
             if ( "COMPD_CS".equals(keyword)) return parseCompdCS (element);
             if ("FITTED_CS".equals(keyword)) return parseFittedCS(element);
         }
-        throw element.parseFailed(null, Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, key));
+        throw element.parseFailed(null, Errors.format(ErrorKeys.UNKNOW_TYPE_$1, key));
     }
 
     /**
@@ -401,8 +401,7 @@ public class Parser extends MathTransformParser {
         final AxisDirection direction = (AxisDirection) directions.get(
                                         orientation.keyword.trim().toUpperCase());
         if (direction == null) {
-            throw element.parseFailed(null,
-                  Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, orientation));
+            throw element.parseFailed(null, Errors.format(ErrorKeys.UNKNOW_TYPE_$1, orientation));
         }
         try {
             return createAxis(name, direction, unit);
@@ -597,8 +596,8 @@ public class Parser extends MathTransformParser {
                 parameter.setValue(paramValue);
             }
         } catch (ParameterNotFoundException exception) {
-            throw param.parseFailed(exception, Resources.format(
-                  ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, exception.getParameterName()));
+            throw param.parseFailed(exception, Errors.format(ErrorKeys.UNEXPECTED_PARAMETER_$1,
+                                                             exception.getParameterName()));
         }
         return parameters;
     }
@@ -657,8 +656,7 @@ public class Parser extends MathTransformParser {
         element.close();
         final VerticalDatumType type = DefaultVerticalDatum.getVerticalDatumTypeFromLegacyCode(datum);
         if (type == null) {
-            throw element.parseFailed(null,
-                  Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, new Integer(datum)));
+            throw element.parseFailed(null, Errors.format(ErrorKeys.UNKNOW_TYPE_$1, new Integer(datum)));
         }
         try {
             return datumFactory.createVerticalDatum(properties, type);

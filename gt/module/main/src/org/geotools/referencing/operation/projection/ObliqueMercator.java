@@ -61,8 +61,10 @@ import org.opengis.referencing.operation.MathTransform;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -311,13 +313,13 @@ public class ObliqueMercator extends MapProjection {
             
             double con = Math.abs(latitudeOf1stPoint);
             if (Math.abs(latitudeOf1stPoint - latitudeOf2ndPoint) < TOL) {
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_LAT1_EQ_LAT2));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.LAT1_EQ_LAT2));
             }
             if (Math.abs(latitudeOf1stPoint) < TOL) {
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_LAT1_EQ_ZERO));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.LAT1_EQ_ZERO));
             }
             if (Math.abs(latitudeOf2ndPoint + Math.PI/2.0) < TOL) {
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_LAT2_EQ_NEG_90));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.LAT2_EQ_NEG_90));
             }
         } else {
 	    latitudeOf1stPoint  = Double.NaN;
@@ -332,8 +334,7 @@ public class ObliqueMercator extends MapProjection {
             //already checked for +-360 deg. above. 
             if ((alpha_c > -1.5*Math.PI && alpha_c < -0.5*Math.PI) ||
                 (alpha_c > 0.5*Math.PI && alpha_c < 1.5*Math.PI)) {
-                    throw new IllegalArgumentException(
-                        Resources.format(ResourceKeys.ERROR_VALUE_OUT_OF_BOUNDS_$3,
+                    throw new IllegalArgumentException(Errors.format(ErrorKeys.VALUE_OUT_OF_BOUNDS_$3,
                         new Double(Math.toDegrees(alpha_c)), new Double(-90), new Double(90)));
             }
             
@@ -468,7 +469,7 @@ public class ObliqueMercator extends MapProjection {
             double V = Math.sin(B * x);
             double U = (S * singamma0 - V * cosgamma0) / (0.5 * (Q + temp));
             if (Math.abs(Math.abs(U) - 1.0) < EPS) {
-                throw new ProjectionException(Resources.format(ResourceKeys.ERROR_V_INFINITE));
+                throw new ProjectionException(Errors.format(ErrorKeys.V_INFINITE));
             }
             v = 0.5 * ArB * Math.log((1.0 - U) / (1.0 + U));
             temp = Math.cos(B * x);
@@ -663,8 +664,8 @@ public class ObliqueMercator extends MapProjection {
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_ObliqueMercator"),
                 new NamedIdentifier(CitationImpl.ESRI,     "Hotine_Oblique_Mercator_Azimuth_Center"),
                 new NamedIdentifier(CitationImpl.ESRI,     "Rectified_Skew_Orthomorphic_Center"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.OBLIQUE_MERCATOR_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 LONG_OF_CENTRE,      LAT_OF_CENTRE,
@@ -729,8 +730,8 @@ public class ObliqueMercator extends MapProjection {
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_ObliqueMercator_Hotine"),
                 new NamedIdentifier(CitationImpl.ESRI,     "Hotine_Oblique_Mercator_Azimuth_Natural_Origin"),
                 new NamedIdentifier(CitationImpl.ESRI,     "Rectified_Skew_Orthomorphic_Natural_Origin"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.OBLIQUE_MERCATOR_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 LONG_OF_CENTRE,      LAT_OF_CENTRE,
@@ -837,8 +838,8 @@ public class ObliqueMercator extends MapProjection {
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.ESRI,     "Hotine_Oblique_Mercator_Two_Point_Center"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.OBLIQUE_MERCATOR_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 LAT_OF_1ST_POINT,    LONG_OF_1ST_POINT,
@@ -900,8 +901,8 @@ public class ObliqueMercator extends MapProjection {
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.ESRI,     "Hotine_Oblique_Mercator_Two_Point_Natural_Origin"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.OBLIQUE_MERCATOR_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 LAT_OF_1ST_POINT,    LONG_OF_1ST_POINT,

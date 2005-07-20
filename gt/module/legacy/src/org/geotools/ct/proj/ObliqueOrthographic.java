@@ -59,8 +59,8 @@ import java.awt.geom.Point2D;
 
 import org.geotools.cs.Projection;
 import org.geotools.ct.MissingParameterException;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 /**
  * The oblique case of the {@link Orthographic} projection. Only the spherical
@@ -107,8 +107,8 @@ public class ObliqueOrthographic extends Orthographic {
         double sinphi = Math.sin(y);
         
         if (sinphi0*sinphi + cosphi0*cosphi*coslam < - EPS) {
-            throw new ProjectionException(Resources.format(
-                ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
+            throw new ProjectionException(Errors.format(
+                ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
         
 	y = cosphi0 * sinphi - sinphi0 * cosphi * coslam;      
@@ -132,8 +132,8 @@ public class ObliqueOrthographic extends Orthographic {
         double sinc = rho;
         if (sinc > 1.0) {
             if ((sinc - 1.0) > EPS) {
-                throw new ProjectionException(Resources.format(
-                    ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
+                throw new ProjectionException(Errors.format(
+                    ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
             }
             sinc = 1.0;
         }

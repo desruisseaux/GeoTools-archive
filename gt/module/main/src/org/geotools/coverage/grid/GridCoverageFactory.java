@@ -50,6 +50,8 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -99,8 +101,7 @@ public class GridCoverageFactory {
     {
         final MathTransform transform = gridGeometry.getGridToCoordinateSystem2D();
         if (!(transform instanceof AffineTransform)) {
-            throw new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
-                    org.geotools.resources.cts.ResourceKeys.ERROR_NOT_AN_AFFINE_TRANSFORM));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_AN_AFFINE_TRANSFORM));
         }
         final AffineTransform at = (AffineTransform) transform;
         if (at.getShearX()!=0 || at.getShearY()!=0) {

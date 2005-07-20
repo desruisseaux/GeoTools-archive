@@ -33,11 +33,10 @@ import java.util.Arrays;
 /**
  * An {@link IndexColorModel} tolerant with image having more than one band.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Andrea Aime
- *
- * @since 2.0
  */
 final class MultiBandsIndexColorModel extends IndexColorModel {
     /**

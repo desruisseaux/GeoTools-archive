@@ -88,10 +88,9 @@ import org.geotools.resources.Utilities;
  * java.util.logging.ConsoleHandler.level = FINE
  * </pre></blockquote>
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class MonolineFormatter extends Formatter {
     /**

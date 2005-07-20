@@ -31,10 +31,9 @@ import org.geotools.referencing.wkt.Formatter;
  * interface is not public because the {@code formatWKT(Formatter)} method usually has a
  * protected access.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public interface Formattable {
     /**

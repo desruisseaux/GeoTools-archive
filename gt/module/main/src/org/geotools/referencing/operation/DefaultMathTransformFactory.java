@@ -60,8 +60,8 @@ import org.geotools.referencing.wkt.MathTransformParser;
 import org.geotools.referencing.wkt.Symbols;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.DerivedSet;
 import org.geotools.util.WeakHashSet;
 
@@ -100,10 +100,9 @@ import org.geotools.util.WeakHashSet;
  * and target coordinate systems mean, it is not necessary or desirable for a math
  * transform object to keep information on its source and target coordinate systems.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultMathTransformFactory implements MathTransformFactory {
     /**
@@ -247,8 +246,8 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
                 return last = provider;
             }
         }
-        throw new NoSuchIdentifierException(Resources.format(
-                  ResourceKeys.ERROR_NO_TRANSFORM_FOR_CLASSIFICATION_$1, method), method);
+        throw new NoSuchIdentifierException(Errors.format(
+                  ErrorKeys.NO_TRANSFORM_FOR_CLASSIFICATION_$1, method), method);
     }
     
     /**

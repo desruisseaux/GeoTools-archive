@@ -56,8 +56,8 @@ import org.geotools.pt.Dimensioned;
 import org.geotools.pt.Matrix;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.JAIUtilities;
 import org.geotools.units.Unit;
 import org.opengis.cs.CS_CoordinateSystem;
@@ -1268,8 +1268,8 @@ public class CoordinateTransformationFactory {
         final Matrix step3 = getWGS84Parameters(targetHD);
         final Matrix step4 = swapAndScaleAxis(GeocentricCoordinateSystem.DEFAULT, targetCS);
         if (step2==null || step3==null) {
-            throw new CannotCreateTransformException(Resources.format(
-                        ResourceKeys.BURSA_WOLF_PARAMETERS_REQUIRED));
+            throw new CannotCreateTransformException(Errors.format(
+                        ErrorKeys.BURSA_WOLF_PARAMETERS_REQUIRED));
         }
         /*
          * Since all steps are matrix, we can multiply them into a single matrix operation.

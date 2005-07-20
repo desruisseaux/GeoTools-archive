@@ -48,8 +48,8 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -147,8 +147,8 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
             ensureNonNull("direction", check);
             if (!isCompatibleDirection(check)) {
                 // TOOD: localize name()
-                throw new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_ILLEGAL_AXIS_ORIENTATION_$2,
+                throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.ILLEGAL_AXIS_ORIENTATION_$2,
                             check.name(), Utilities.getShortClassName(this)));
             }
             check = check.absolute();
@@ -158,8 +158,8 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
                         // TODO: localize name()
                         final String nameI = axis[i].getDirection().name();
                         final String nameJ = axis[j].getDirection().name();
-                        throw new IllegalArgumentException(Resources.format(
-                                    ResourceKeys.ERROR_COLINEAR_AXIS_$2, nameI, nameJ));
+                        throw new IllegalArgumentException(Errors.format(
+                                    ErrorKeys.COLINEAR_AXIS_$2, nameI, nameJ));
                     }
                 }
             }
@@ -401,8 +401,8 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
             throws MismatchedDimensionException
     {
         if (coordinates.length != axis.length) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, name,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$3, name,
                         new Integer(coordinates.length), new Integer(axis.length)));
         }
     }

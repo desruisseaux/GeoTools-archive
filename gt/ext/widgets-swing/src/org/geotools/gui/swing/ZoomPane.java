@@ -105,8 +105,10 @@ import java.util.logging.LogRecord;
 import java.util.Arrays;
 import java.io.Serializable;
 import org.geotools.renderer.DeformableViewer;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -343,16 +345,16 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * List of resource keys, to construct the menus in the user's language.
      */
     private static final int[] RESOURCE_ID = {
-        /*[0] Left        */ ResourceKeys.LEFT,
-        /*[1] Right       */ ResourceKeys.RIGHT,
-        /*[2] Up          */ ResourceKeys.UP,
-        /*[3] Down        */ ResourceKeys.DOWN,
-        /*[4] ZoomIn      */ ResourceKeys.ZOOM_IN,
-        /*[5] ZoomOut     */ ResourceKeys.ZOOM_OUT,
-        /*[6] ZoomMax     */ ResourceKeys.ZOOM_MAX,
-        /*[7] Reset       */ ResourceKeys.RESET,
-        /*[8] RotateLeft  */ ResourceKeys.ROTATE_LEFT,
-        /*[9] RotateRight */ ResourceKeys.ROTATE_RIGHT
+        /*[0] Left        */ VocabularyKeys.LEFT,
+        /*[1] Right       */ VocabularyKeys.RIGHT,
+        /*[2] Up          */ VocabularyKeys.UP,
+        /*[3] Down        */ VocabularyKeys.DOWN,
+        /*[4] ZoomIn      */ VocabularyKeys.ZOOM_IN,
+        /*[5] ZoomOut     */ VocabularyKeys.ZOOM_OUT,
+        /*[6] ZoomMax     */ VocabularyKeys.ZOOM_MAX,
+        /*[7] Reset       */ VocabularyKeys.RESET,
+        /*[8] RotateLeft  */ VocabularyKeys.ROTATE_LEFT,
+        /*[9] RotateRight */ VocabularyKeys.ROTATE_RIGHT
     };
 
     /**
@@ -669,7 +671,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
             throw new IllegalArgumentException();
         }
         this.type = type;
-        final Resources resources = Resources.getResources(null);
+        final Vocabulary resources = Vocabulary.getResources(null);
         final InputMap   inputMap = getInputMap();
         final ActionMap actionMap = getActionMap();
         for (int i = 0; i < ACTION_ID.length; i++) {
@@ -867,7 +869,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
                 firePropertyChange("preferredArea", oldArea, area);
                 log("setPreferredArea", area);
             } else {
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_RECTANGLE_$1, area));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RECTANGLE_$1, area));
             }
         }
         else preferredArea = null;
@@ -936,8 +938,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
          * the user.
          */
         if (!isValid(source)) {
-            throw new IllegalArgumentException(Resources.format(
-                                               ResourceKeys.ERROR_BAD_RECTANGLE_$1, source));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RECTANGLE_$1, source));
         }
         if (!isValid(dest)) {
             return new AffineTransform();
@@ -1650,8 +1651,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
             if (navigationPopupMenu == null) {
                 navigationPopupMenu = new PointPopupMenu(event.getPoint());
                 if (magnifierEnabled) {
-                    final Resources resources = Resources.getResources(getLocale());
-                    final JMenuItem item = new JMenuItem(resources.getString(ResourceKeys.SHOW_MAGNIFIER));
+                    final Vocabulary resources = Vocabulary.getResources(getLocale());
+                    final JMenuItem item = new JMenuItem(
+                            resources.getString(VocabularyKeys.SHOW_MAGNIFIER));
                     item.addActionListener(new ActionListener()
                     {
                         public void actionPerformed(final ActionEvent event)
@@ -1679,13 +1681,13 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * @return The contextual menu, or {@code null} to avoid displaying the menu.
      */
     protected JPopupMenu getMagnifierMenu(final MouseEvent event) {
-        final Resources resources = Resources.getResources(getLocale());
-        final JPopupMenu menu = new JPopupMenu(resources.getString(ResourceKeys.MAGNIFIER));
-        final JMenuItem  item = new JMenuItem (resources.getString(ResourceKeys.HIDE));
-        item.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(final ActionEvent event)
-            {setMagnifierVisible(false);}
+        final Vocabulary resources = Vocabulary.getResources(getLocale());
+        final JPopupMenu menu = new JPopupMenu(resources.getString(VocabularyKeys.MAGNIFIER));
+        final JMenuItem  item = new JMenuItem (resources.getString(VocabularyKeys.HIDE));
+        item.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                setMagnifierVisible(false);
+            }
         });
         menu.add(item);
         return menu;
@@ -2354,10 +2356,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
                 areaBounds = new Double[4];
                 Arrays.fill(areaBounds, new Double(Double.NaN));
             }
-            final Resources resources = Resources.getResources(null);
+            final Vocabulary resources = Vocabulary.getResources(null);
             final LogRecord record = resources.getLogRecord(Level.FINER,
-                                                            ResourceKeys.RECTANGLE_$4,
-                                                            areaBounds);
+                                     VocabularyKeys.RECTANGLE_$4, areaBounds);
             record.setSourceClassName (className);
             record.setSourceMethodName(methodName);
             LOGGER.log(record);

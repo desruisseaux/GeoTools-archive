@@ -34,8 +34,8 @@ import org.opengis.parameter.InvalidParameterValueException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -70,7 +70,7 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
      */
     private InvalidParameterTypeException invalidType(final ClassCastException cause) {
         final InvalidParameterTypeException exception = new InvalidParameterTypeException(
-                Resources.format(ResourceKeys.ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
+                Errors.format(ErrorKeys.ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
                 Utilities.getShortName(getType())), getName(descriptor));
         exception.initCause(cause);
         return exception;

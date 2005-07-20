@@ -33,8 +33,8 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.resources.XArray;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -55,10 +55,9 @@ import org.geotools.resources.cts.ResourceKeys;
  * (<var>longitude</var>, <var>latitude</var>) outputs. The later can be verified with
  * a call to {@link #getTargetDimensions}.</P>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @todo This class is specific to Geotools implementation; it is better to avoid it if
  *       you can. It could be generalized a bit if we perform the same operations on
@@ -291,8 +290,7 @@ public class DimensionFilter {
                      *
                      * TODO: provide a more accurate error message.
                      */
-                    throw new FactoryException(Resources.format(
-                                               ResourceKeys.ERROR_INSEPARABLE_TRANSFORM));
+                    throw new FactoryException(Errors.format(ErrorKeys.INSEPARABLE_TRANSFORM));
                 }
                 targetDimensions[i] = j;
             }
@@ -321,9 +319,8 @@ public class DimensionFilter {
         final int upper     = sourceDimensions[dimInput-1] + 1;
         assert XArray.isStrictlySorted(sourceDimensions);
         if (upper > dimSource) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                    "sourceDimensions", new Integer(upper-1)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                               "sourceDimensions", new Integer(upper-1)));
         }
         /*
          * Check for easiest cases: same transform, identity transform or concatenated transforms.
@@ -461,7 +458,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
             // to any input dimension. But in this particuler case, our matrix has such
             // dependencies. TODO: is there anything we could do about that?
         }
-        throw new FactoryException(Resources.format(ResourceKeys.ERROR_INSEPARABLE_TRANSFORM));
+        throw new FactoryException(Errors.format(ErrorKeys.INSEPARABLE_TRANSFORM));
     }
 
     /**
@@ -487,9 +484,8 @@ reduce:     for (int j=0; j<rows.length; j++) {
         final int upper     = targetDimensions[dimOutput-1];
         assert XArray.isStrictlySorted(targetDimensions);
         if (upper > dimTarget) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                      "targetDimensions", new Integer(upper)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                               "targetDimensions", new Integer(upper)));
         }
         if (dimOutput == dimTarget) {
             assert lower==0 && upper==dimTarget;
@@ -597,8 +593,8 @@ reduce:     for (int j=0; j<rows.length; j++) {
      */
     private static int[] add(int[] sequence, int dimension) throws IllegalArgumentException {
         if (dimension < 0) {
-            throw new IllegalArgumentException(Resources.format(
-                  ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dimension", new Integer(dimension)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                               "dimension", new Integer(dimension)));
         }
         if (sequence == null) {
             return new int[] {dimension};
@@ -649,8 +645,8 @@ reduce:     for (int j=0; j<rows.length; j++) {
             throws IllegalArgumentException
     {
         if (lower<0 || lower>=upper) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                               "lower", new Integer(lower)));
         }
         if (sequence == null) {
             sequence = series(lower, upper);
@@ -687,9 +683,8 @@ reduce:     for (int j=0; j<rows.length; j++) {
         for (int i=0; i<dimensions.length; i++) {
             final int value = dimensions[i];
             if (value <= last) {
-                throw new IllegalArgumentException(Resources.format(
-                          ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dimensions["+i+']',
-                          new Integer(value)));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                                   "dimensions["+i+']', new Integer(value)));
             }
             last = value;
         }

@@ -28,8 +28,8 @@ import java.rmi.RemoteException;
 
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Envelope;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.cs.CS_CompoundCoordinateSystem;
 import org.opengis.cs.CS_CoordinateSystem;
@@ -144,8 +144,8 @@ public class CompoundCoordinateSystem extends CoordinateSystem {
                 return tail.getAxis(dim);
             }
         }
-        throw new IndexOutOfBoundsException(Resources.format(
-                    ResourceKeys.ERROR_INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
+        throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
     }
     
     /**
@@ -165,8 +165,8 @@ public class CompoundCoordinateSystem extends CoordinateSystem {
                 return tail.getUnits(dim);
             }
         }
-        throw new IndexOutOfBoundsException(Resources.format(
-                    ResourceKeys.ERROR_INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
+        throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
     }
     
     /**

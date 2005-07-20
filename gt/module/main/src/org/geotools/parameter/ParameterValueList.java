@@ -37,8 +37,8 @@ import org.opengis.parameter.ParameterValue;
 
 // Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -139,8 +139,8 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
                      * Found a matching name. Consequently, the operation failed because
                      * the descriptor was illegal.
                      */
-                    throw new IllegalArgumentException(Resources.format(
-                              ResourceKeys.ERROR_ILLEGAL_DESCRIPTOR_FOR_PARAMETER_$1, name));
+                    throw new IllegalArgumentException(Errors.format(
+                              ErrorKeys.ILLEGAL_DESCRIPTOR_FOR_PARAMETER_$1, name));
                 }
             }
             /*
@@ -153,8 +153,8 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
             } else {
                 value = "(group)";
             }
-            throw new InvalidParameterNameException(Resources.format(
-                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, value), name);
+            throw new InvalidParameterNameException(Errors.format(
+                      ErrorKeys.ILLEGAL_ARGUMENT_$2, name, value), name);
         }
         final int max = type.getMaximumOccurs();
         if (max == 1) {
@@ -184,8 +184,8 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
                 }
             }
             if (count >= max) {
-                throw new InvalidParameterCardinalityException(Resources.format(
-                    ResourceKeys.ERROR_TOO_MANY_OCCURENCES_$2, name, new Integer(count)), name);
+                throw new InvalidParameterCardinalityException(Errors.format(
+                          ErrorKeys.TOO_MANY_OCCURENCES_$2, name, new Integer(count)), name);
             }
         }
         values.add(parameter);
@@ -222,8 +222,8 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
         final int min = type.getMinimumOccurs();
         if (count <= min) {
             final int max = type.getMaximumOccurs();
-            throw new InvalidParameterCardinalityException(Resources.format(
-                      ResourceKeys.ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4, name,
+            throw new InvalidParameterCardinalityException(Errors.format(
+                      ErrorKeys.ILLEGAL_OCCURS_FOR_PARAMETER_$4, name,
                       new Integer(count-1), new Integer(min), new Integer(max)), name);
         }
         // Note: remove cast with J2SE 1.5.

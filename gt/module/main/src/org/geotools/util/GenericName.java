@@ -28,8 +28,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -41,10 +44,9 @@ import org.opengis.util.InternationalString;
  *    The natural ordering may be case-insensitive and ignore the character
  *    separator between name elements.</P>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see NameFactory
  */

@@ -33,8 +33,10 @@ import java.util.Locale;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.Info;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.opengis.cs.CS_CoordinateSystem;
 import org.opengis.ct.CT_CoordinateTransformation;
 import org.opengis.ct.CT_MathTransform;
@@ -145,8 +147,8 @@ public class CoordinateTransformation extends Info {
      */
     private static void checkDimension(final String name, final int actual, final int expected) {
         if (actual != expected) {
-            throw new IllegalArgumentException(Resources.format(
-                                               ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
+            throw new IllegalArgumentException(Errors.format(
+                                               ErrorKeys.MISMATCHED_DIMENSION_$3,
                                                name, new Integer(actual), new Integer(expected)));
         }
     }
@@ -257,8 +259,8 @@ public class CoordinateTransformation extends Info {
          * Gets the name of this coordinate transformation.
          */
         public String getName(final Locale locale) {
-            return Resources.getResources(locale).getString(
-                    ResourceKeys.INVERSE_$1, this.inverse.getName(locale));
+            return Vocabulary.getResources(locale).getString(
+                    VocabularyKeys.INVERSE_$1, this.inverse.getName(locale));
         }
     }
     

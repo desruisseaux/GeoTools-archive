@@ -92,8 +92,10 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.GraphicsUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.resources.geometry.XAffineTransform;
@@ -616,8 +618,8 @@ public class Renderer implements Renderer2D {
              * scale, it is not crucial to the renderer working. Log a warning message and continue.
              * We keep the m value computed so far, which will be assumed to be a length in metres.
              */
-            final LogRecord record = Resources.getResources(getLocale()).getLogRecord(Level.WARNING,
-                                                     ResourceKeys.WARNING_UNEXPECTED_UNIT_$1, unit);
+            final LogRecord record = Logging.getResources(getLocale()).getLogRecord(Level.WARNING,
+                                                          LoggingKeys.UNEXPECTED_UNIT_$1, unit);
             record.setSourceClassName ("Renderer");
             record.setSourceMethodName("setCoordinateSystem");
             record.setThrown(exception);
@@ -952,8 +954,7 @@ public class Renderer implements Renderer2D {
                 return;
             }
             if (layer.renderer != null) {
-                throw new IllegalArgumentException(
-                            Resources.format(ResourceKeys.ERROR_RENDERER_NOT_OWNER_$1, layer));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.RENDERER_NOT_OWNER_$1, layer));
             }
             layer.renderer = this;
             /*
@@ -967,8 +968,8 @@ public class Renderer implements Renderer2D {
                 try {
                     getMathTransform(layerCS, getCoordinateSystem(), "Renderer", "addLayer");
                 } catch (TransformException exception) {
-                    final StringBuffer buffer = new StringBuffer(Resources.getResources(getLocale())
-                                                .getString(ResourceKeys.CHANGED_COORDINATE_SYSTEM));
+                    final StringBuffer buffer = new StringBuffer(Logging.getResources(getLocale())
+                                    .getString(LoggingKeys.CHANGED_COORDINATE_REFERENCE_SYSTEM));
                     buffer.append(System.getProperty("line.separator", "\n"));
                     buffer.append(exception.getLocalizedMessage());
                     LOGGER.info(buffer.toString());
@@ -1038,8 +1039,7 @@ public class Renderer implements Renderer2D {
             return;
         }
         if (layer.renderer != this) {
-            throw new IllegalArgumentException(
-                        Resources.format(ResourceKeys.ERROR_RENDERER_NOT_OWNER_$1, layer));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.RENDERER_NOT_OWNER_$1, layer));
         }
         repaint(); // Must be invoked first
         flushOffscreenBuffer(layer.getZOrder());
@@ -1536,9 +1536,9 @@ public class Renderer implements Renderer2D {
          */
         if (LOGGER.isLoggable(Level.FINER)) {
             // FINER is the default level for entering, returning, or throwing an exception.
-            final LogRecord record = Resources.getResources(null).getLogRecord(Level.FINER,
-                                               ResourceKeys.INITIALIZING_TRANSFORMATION_$2,
-                                               toString(sourceCS), toString(targetCS));
+            final LogRecord record = Logging.getResources(null).getLogRecord(Level.FINER,
+                                             LoggingKeys.INITIALIZING_TRANSFORMATION_$2,
+                                             toString(sourceCS), toString(targetCS));
             record.setSourceClassName (sourceClassName);
             record.setSourceMethodName(sourceMethodName);
             LOGGER.log(record);
@@ -2034,8 +2034,8 @@ renderOffscreen:while (true) {
      */
     private void handleOffscreenException(final RenderedLayer layer, final Exception exception) {
         final Locale locale = getLocale();
-        final LogRecord record = Resources.getResources(locale).getLogRecord(Level.FINE,
-                ResourceKeys.WARNING_OFFSCREEN_RENDERING_FAILED_$1, layer.getName(locale));
+        final LogRecord record = Logging.getResources(locale).getLogRecord(Level.FINE,
+                LoggingKeys.OFFSCREEN_RENDERING_FAILED_$1, layer.getName(locale));
         record.setSourceClassName("Renderer");
         record.setSourceMethodName("paint");
         record.setThrown(exception);

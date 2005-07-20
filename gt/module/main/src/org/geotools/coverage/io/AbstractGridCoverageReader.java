@@ -55,8 +55,10 @@ import org.geotools.coverage.grid.GeneralGridRange;
 // import org.geotools.image.io.RawBinaryImageReadParam; // TODO
 import org.geotools.io.LineWriter;
 import org.geotools.io.TableWriter;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -83,6 +85,7 @@ import org.geotools.resources.gcs.Resources;
  * However, other methods may be overriden too in order to get finner control
  * on the result.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -115,27 +118,23 @@ public abstract class AbstractGridCoverageReader {
     protected ImageReader reader;
     
     /**
-     * The input {@link File} or {@link URL}, or
-     * <code>null</code> if input is not set.
+     * The input {@link File} or {@link URL}, or {@code null} if input is not set.
      */
     private Object input;
     
     /**
-     * The input stream, or <code>null</code> if input
-     * is not set of if {@link #reader} accepted directly
-     * {@link #input}.
+     * The input stream, or <code>null</code> if input is not set of if {@link #reader}
+     * accepted directly {@link #input}.
      */
     private ImageInputStream stream;
     
     /**
-     * The locale to use for formatting messages,
-     * or <code>null</code> for a default locale.
+     * The locale to use for formatting messages, or {@code null} for a default locale.
      */
     private Locale locale;
     
     /**
-     * Construct a <code>AbstractGridCoverageReader</code>
-     * for the specified format name.
+     * Constructs a {@code AbstractGridCoverageReader} for the specified format name.
      */
     public AbstractGridCoverageReader(final String formatName) {
         this.formatName = formatName;
@@ -157,7 +156,7 @@ public abstract class AbstractGridCoverageReader {
     }
     
     /**
-     * Clear this <code>AbstractGridCoverageReader</code>. This method is
+     * Clears this {@code AbstractGridCoverageReader}. This method is
      * similar to {@link #reset},  except that it doesn't destroy
      * the current {@link ImageReader} and keeps the locale setting.
      *
@@ -179,7 +178,7 @@ public abstract class AbstractGridCoverageReader {
      * Sets the input source to the given object. The input is usually a
      * {@link File} or an {@link URL} object. But some other types (e.g.
      * {@link ImageInputStream}) may be accepted too.
-     * <br><br>
+     * <p>
      * If this method is invoked for the first time or after a call to
      * {@link #reset}, then it will queries {@link #getImageReaders} for
      * a list of {@link ImageReader}s and select the first one that accept
@@ -226,13 +225,12 @@ public abstract class AbstractGridCoverageReader {
                     }
                 }
             }
-            throw new IllegalArgumentException(getString(ResourceKeys.ERROR_NO_IMAGE_READER));
+            throw new IllegalArgumentException(getString(ErrorKeys.NO_IMAGE_READER));
         }
     }
     
     /**
-     * Check if the array <code>types</code> contains
-     * <code>type</code> or a super-class of <code>type</code>.
+     * Check if the array {@code types} contains {@code type} or a super-class of {@code type}.
      */
     private static boolean contains(final Class[] types, final Class type) {
         for (int i=0; i<types.length; i++) {
@@ -251,24 +249,22 @@ public abstract class AbstractGridCoverageReader {
      * The <code>allowSearch</code> parameter may be set to <code>false</code>
      * to indicate that an exhaustive search is not desired.
      *
-     * @param  allowSearch If <code>true</code>, the true number of images will
-     *         be returned even if a search is required. If <code>false</code>,
+     * @param  allowSearch If {@code true}, the true number of images will
+     *         be returned even if a search is required. If {@code false},
      *         the reader may return -1 without performing the search.
-     * @return The number of images, or -1 if <code>allowSearch</code> is
-     *         <code>false</code> and a search would be required.
+     * @return The number of images, or -1 if {@code allowSearch} is
+     *         {@code false} and a search would be required.
      * @throws IllegalStateException If the input source has not been set, or if
-     *         the input has been specified with <code>seekForwardOnly</code> set
-     *         to <code>true</code>.
-     * @throws IOException If an error occurs reading the information from the input
-     *         source.
+     *         the input has been specified with {@code seekForwardOnly} set to {@code true}.
+     * @throws IOException If an error occurs reading the information from the input source.
      */
     public int getNumImages(final boolean allowSearch) throws IOException {
         if (reader==null) {
-            throw new IllegalStateException(getString(ResourceKeys.ERROR_NO_IMAGE_INPUT));
+            throw new IllegalStateException(getString(ErrorKeys.NO_IMAGE_INPUT));
         }
         return reader.getNumImages(allowSearch);
     }
-    
+
     /**
      * Vérifie si l'index de l'image est dans la plage des valeurs
      * autorisées. L'index maximal autorisé est obtenu en appelant
@@ -280,7 +276,7 @@ public abstract class AbstractGridCoverageReader {
      */
     final void checkImageIndex(final int imageIndex) throws IOException, IndexOutOfBoundsException {
         if (reader==null) {
-            throw new IllegalStateException(getString(ResourceKeys.ERROR_NO_IMAGE_INPUT));
+            throw new IllegalStateException(getString(ErrorKeys.NO_IMAGE_INPUT));
         }
         final int numImages = getNumImages(false);
         if (imageIndex<reader.getMinIndex() || (imageIndex>=numImages && numImages>=0)) {
@@ -289,9 +285,8 @@ public abstract class AbstractGridCoverageReader {
     }
     
     /**
-     * Gets the {@link GridCoverage} name at the specified index.
-     * Default implementation returns the input path, or the
-     * "Untitled" string if input is not a {@link File} or an
+     * Gets the {@link GridCoverage} name at the specified index. The default implementation
+     * returns the input path, or the "Untitled" string if input is not a {@link File} or an
      * {@link URL} object.
      *
      * @param  index The index of the image to be queried.
@@ -308,9 +303,9 @@ public abstract class AbstractGridCoverageReader {
         if (input instanceof URL) {
             return new File(((URL) input).getPath()).getName();
         }
-        return getString(ResourceKeys.UNTITLED);
+        return Vocabulary.getResources(locale).getString(VocabularyKeys.UNTITLED);
     }
-    
+
     /**
      * Returns the coordinate reference system for the {@link GridCoverage} to be read.
      *
@@ -325,14 +320,13 @@ public abstract class AbstractGridCoverageReader {
     /**
      * Returns the envelope for the {@link GridCoverage} to be read.
      * The envelope must have the same number of dimensions than the
-     * coordinate system.
+     * coordinate reference system.
      *
      * @param  index The index of the image to be queried.
      * @return The envelope for the {@link GridCoverage} at the specified index.
      * @throws IllegalStateException if the input source has not been set.
      * @throws IndexOutOfBoundsException if the supplied index is out of bounds.
-     * @throws IOException if an error occurs reading the width information from
-     *         the input source.
+     * @throws IOException if an error occurs reading the width information from the input source.
      */
     public abstract Envelope getEnvelope(int index) throws IOException;
     
@@ -349,8 +343,7 @@ public abstract class AbstractGridCoverageReader {
      * @return The grid range for the {@link GridCoverage} at the specified index.
      * @throws IllegalStateException if the input source has not been set.
      * @throws IndexOutOfBoundsException if the supplied index is out of bounds.
-     * @throws IOException if an error occurs reading the width information from
-     *         the input source.
+     * @throws IOException if an error occurs reading the width information from the input source.
      */
     public synchronized GridRange getGridRange(final int index) throws IOException {
         checkImageIndex(index);
@@ -366,15 +359,14 @@ public abstract class AbstractGridCoverageReader {
     /**
      * Returns the sample dimensions for each band of the {@link GridCoverage}
      * to be read. If sample dimensions are not known, then this method returns
-     * <code>null</code>. The default implementation always returns <code>null</code>.
+     * {@code null}. The default implementation always returns {@code null}.
      *
      * @param  index The index of the image to be queried.
      * @return The category lists for the {@link GridCoverage} at the specified index.
      *         This array's length must be equals to the number of bands in {@link GridCoverage}.
      * @throws IllegalStateException if the input source has not been set.
      * @throws IndexOutOfBoundsException if the supplied index is out of bounds.
-     * @throws IOException if an error occurs reading the width information from
-     *         the input source.
+     * @throws IOException if an error occurs reading the width information from the input source.
      */
     public synchronized SampleDimension[] getSampleDimensions(final int index) throws IOException {
         checkImageIndex(index);
@@ -382,20 +374,17 @@ public abstract class AbstractGridCoverageReader {
     }
     
 	/**
-	 * Read the grid coverage. The default implementation gets the
-	 * default {@link ImageReadParam} and checks if it is an instance of
-	 * {@link RawBinaryImageReadParam}. If it is, this method then invokes
-	 * {@link RawBinaryImageReadParam#setStreamImageSize} with informations
-	 * provided by {@link #getGridRange}. Finally, a grid coverage is
-	 * constructed using informations provided by {@link #getName},
-	 * {@link #getCoordinateReferenceSystem} and {@link #getEnvelope}.
+	 * Read the grid coverage. The default implementation gets the default {@link ImageReadParam}
+     * and checks if it is an instance of {@link RawBinaryImageReadParam}. If it is, this method
+     * then invokes {@link RawBinaryImageReadParam#setStreamImageSize} with informations provided
+     * by {@link #getGridRange}. Finally, a grid coverage is constructed using informations provided
+     * by {@link #getName}, {@link #getCoordinateReferenceSystem} and {@link #getEnvelope}.
 	 *
 	 * @param  index The index of the image to be queried.
 	 * @return The {@link GridCoverage} at the specified index.
 	 * @throws IllegalStateException if the input source has not been set.
 	 * @throws IndexOutOfBoundsException if the supplied index is out of bounds.
-	 * @throws IOException if an error occurs reading the width information from
-	 *         the input source.
+	 * @throws IOException if an error occurs reading the width information from the input source.
 	 */
 	public synchronized GridCoverage getGridCoverage(final int index) throws IOException {
 		checkImageIndex(index);
@@ -487,12 +476,12 @@ public abstract class AbstractGridCoverageReader {
     protected Iterator getImageReaders(final Object input) {
         return ImageIO.getImageReadersByFormatName(formatName);
     }
-    
+
     /**
-     * Returns a localized string for the specified key.
+     * Returns a localized string for the specified error key.
      */
     final String getString(final int key) {
-        return Resources.getResources(locale).getString(key);
+        return Errors.getResources(locale).getString(key);
     }
     
     /**
@@ -531,8 +520,7 @@ public abstract class AbstractGridCoverageReader {
     }
     
     /**
-     * Returns the ISO language code for the specified
-     * locale, or <code>null</code> if not available.
+     * Returns the ISO language code for the specified locale, or {@code null} if not available.
      */
     private static String getISO3Language(final Locale locale) {
         try {
@@ -543,8 +531,7 @@ public abstract class AbstractGridCoverageReader {
     }
     
     /**
-     * Returns the currently set {@link Locale},
-     * or <code>null</code> if none has been set.
+     * Returns the currently set {@link Locale}, or {@code null} if none has been set.
      */
     public Locale getLocale() {
         return locale;

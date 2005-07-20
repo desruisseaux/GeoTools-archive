@@ -30,8 +30,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -162,9 +162,8 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
         if (crs != null) {
             final int dimension = crs.getCoordinateSystem().getDimension();
             if (dimension != expected) {
-                throw new IllegalArgumentException(Resources.format(
-                       ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, crs.getName().getCode(),
-                                    new Integer(dimension), new Integer(expected)));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
+                          crs.getName().getCode(), new Integer(dimension), new Integer(expected)));
             }
         }
     }
@@ -184,9 +183,8 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
             throws MismatchedDimensionException
     {
         if (dimension != expectedDimension) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3, name,
-                        new Integer(dimension), new Integer(expectedDimension)));
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
+                        name, new Integer(dimension), new Integer(expectedDimension)));
         }
     }
 
@@ -258,8 +256,8 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      */
     public void setLocation(final Point2D point) throws MismatchedDimensionException {
         if (ordinates.length != 2) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(ordinates.length)));
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
+                                                   new Integer(ordinates.length)));
         }
         ordinates[0] = point.getX();
         ordinates[1] = point.getY();
@@ -275,8 +273,8 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      */
     public Point2D toPoint2D() throws IllegalStateException {
         if (ordinates.length != 2) {
-            throw new IllegalStateException(Resources.format(
-                        ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(ordinates.length)));
+            throw new IllegalStateException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
+                                            new Integer(ordinates.length)));
         }
         return new Point2D.Double(ordinates[0], ordinates[1]);
     }

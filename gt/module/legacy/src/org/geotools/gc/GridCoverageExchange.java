@@ -44,8 +44,8 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.gc.GC_GridCoverageExchange;
 
 
@@ -90,8 +90,8 @@ public class GridCoverageExchange {
      * @see GC_GridCoverageExchange#createFromName
      */
     public GridCoverage createFromName(final String name, ImageReadParam param) throws IOException {
-        throw new IIOException(Resources.getResources(locale).
-                               getString(ResourceKeys.ERROR_NO_IMAGE_READER));
+        throw new IIOException(Errors.getResources(locale).
+                               getString(ErrorKeys.NO_IMAGE_READER));
     }
     
     /**

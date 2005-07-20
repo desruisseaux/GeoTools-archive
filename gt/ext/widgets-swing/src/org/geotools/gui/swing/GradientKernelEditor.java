@@ -36,8 +36,8 @@ import javax.media.jai.operator.GradientMagnitudeDescriptor; // For Javadoc
 // Seagis dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -151,15 +151,15 @@ public class GradientKernelEditor extends JComponent {
      */
     public GradientKernelEditor() {
         setLayout(new GridBagLayout());
-        final Resources resources = Resources.getResources(getDefaultLocale());
+        final Vocabulary resources = Vocabulary.getResources(getDefaultLocale());
         final Border border = BorderFactory.createCompoundBorder(
                               BorderFactory.createLoweredBevelBorder(),
                               BorderFactory.createEmptyBorder(3,3,3,3));
         kernelH.setBorder(border);
         kernelV.setBorder(border);
         final JLabel labelH, labelV;
-        labelH = new JLabel(resources.getString(ResourceKeys.HORIZONTAL_COMPONENT), JLabel.CENTER);
-        labelV = new JLabel(resources.getString(ResourceKeys.VERTICAL_COMPONENT),   JLabel.CENTER);
+        labelH = new JLabel(resources.getString(VocabularyKeys.HORIZONTAL_COMPONENT), JLabel.CENTER);
+        labelV = new JLabel(resources.getString(VocabularyKeys.VERTICAL_COMPONENT),   JLabel.CENTER);
         final GridBagConstraints c = new GridBagConstraints();
         
         c.insets.top = 6;
@@ -221,7 +221,7 @@ public class GradientKernelEditor extends JComponent {
          * Add a set of predefined kernels.
          */
         public void addDefaultKernels() {
-            final String GRADIENT_MASKS = getResources().getString(ResourceKeys.GRADIENT_MASKS);
+            final String GRADIENT_MASKS = getResources().getString(VocabularyKeys.GRADIENT_MASKS);
             final KernelJAI prewitt, isotropic, kirsch, sobel;
             if (horizontal) {
                 prewitt   = PREWITT_HORIZONTAL;

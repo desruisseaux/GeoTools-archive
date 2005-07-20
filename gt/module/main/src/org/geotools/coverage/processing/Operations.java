@@ -35,8 +35,8 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -418,7 +418,7 @@ public class Operations {
     private static InvalidParameterNameException invalidParameterName(final ParameterNotFoundException cause) {
         final String name = cause.getParameterName();
         final InvalidParameterNameException exception = new InvalidParameterNameException(
-                Resources.format(ResourceKeys.ERROR_UNKNOW_PARAMETER_NAME_$1, name), name);
+                Errors.format(ErrorKeys.UNKNOW_PARAMETER_NAME_$1, name), name);
         exception.initCause(cause);
         return exception;
     }

@@ -27,8 +27,8 @@ package org.geotools.cs;
 import java.rmi.RemoteException;
 import java.util.Locale;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.units.Unit;
 import org.opengis.cs.CS_LocalDatum;
 
@@ -64,7 +64,7 @@ public class LocalDatum extends Datum {
      */
     public static final LocalDatum UNKNOW = new LocalDatum("Unknow", DatumType.UNKNOW) {
         public String getName(final Locale locale) {
-            return Resources.getResources(locale).getString(ResourceKeys.UNKNOW);
+            return Vocabulary.getResources(locale).getString(VocabularyKeys.UNKNOW);
         }
     };
     

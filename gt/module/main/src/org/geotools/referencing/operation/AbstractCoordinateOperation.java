@@ -49,8 +49,8 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.AbstractDerivedCRS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -74,10 +74,9 @@ import org.geotools.resources.cts.Resources;
  * {@code Default} prefix instead. An exception to this rule may occurs when it is not possible to
  * identify the exact type.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                                       implements CoordinateOperation
@@ -257,8 +256,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     {
         final int actual = crs.getCoordinateSystem().getDimension();
         if (actual != expected) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
                       name, new Integer(actual), new Integer(expected)));
         }
     }

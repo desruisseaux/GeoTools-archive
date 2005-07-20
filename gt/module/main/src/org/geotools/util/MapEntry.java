@@ -34,10 +34,9 @@ import org.geotools.resources.Utilities;
  * A default implementation of {@link java.util.Map.Entry} which map an arbitrary
  * key-value pairs. This entry is immutable by default.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class MapEntry implements Map.Entry, Serializable {
     /**

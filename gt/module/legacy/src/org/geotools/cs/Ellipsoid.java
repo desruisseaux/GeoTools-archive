@@ -34,8 +34,8 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.measure.CoordinateFormat;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.cs.CS_Ellipsoid;
 import org.opengis.cs.CS_LinearUnit;
@@ -199,8 +199,8 @@ public class Ellipsoid extends Info {
         if (value>0) {
             return value;
         }
-        throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Double(value)));
+        throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, name, new Double(value)));
     }
     
     /**
@@ -387,7 +387,7 @@ public class Ellipsoid extends Info {
         }
         // Other cases: no solution for this algorithm.
         final CoordinateFormat format = new CoordinateFormat();
-        throw new ArithmeticException(Resources.format(ResourceKeys.ERROR_NO_CONVERGENCE_$2,
+        throw new ArithmeticException(Errors.format(ErrorKeys.NO_CONVERGENCE_$2,
                   format.format(new GeneralDirectPosition(Math.toDegrees(x1),Math.toDegrees(y1))),
                   format.format(new GeneralDirectPosition(Math.toDegrees(x2),Math.toDegrees(y2)))));
     }

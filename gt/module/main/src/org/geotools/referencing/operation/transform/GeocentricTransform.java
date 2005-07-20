@@ -49,8 +49,10 @@ import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.FloatParameter;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -172,7 +174,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     }
     
     /**
-     * Check an argument value. The argument must be greater
+     * Checks an argument value. The argument must be greater
      * than 0 and finite, otherwise an exception is thrown.
      *
      * @param name  The argument name.
@@ -185,8 +187,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     {
         if (!(value>=0 && value<=max)) {
             // Use '!' in order to trap NaN
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Double(value)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                               name, new Double(value)));
         }
     }
 
@@ -598,7 +600,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                         "Ellipsoid_To_Geocentric",              // OGC name
                         "Geographic/geocentric conversions",    // EPSG name
                         "9602",                                 // EPSG identifier
-                        ResourceKeys.GEOCENTRIC_TRANSFORM);     // Geotools name
+                        VocabularyKeys.GEOCENTRIC_TRANSFORM);   // Geotools name
 
         /**
          * Constructs the parameters group.
@@ -612,7 +614,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                     new NamedIdentifier(CitationImpl.OGC,      ogc),
                     new NamedIdentifier(CitationImpl.EPSG,     epsgName),
                     new NamedIdentifier(CitationImpl.EPSG,     epsgCode),
-                    new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(geotools))
+                    new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(geotools))
                 }, new ParameterDescriptor[] {
                     SEMI_MAJOR, SEMI_MINOR, DIM
                 });
@@ -700,7 +702,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                         "Geocentric_To_Ellipsoid",              // OGC name
                         "Geographic/geocentric conversions",    // EPSG name
                         "9602",                                 // EPSG identifier
-                        ResourceKeys.GEOCENTRIC_TRANSFORM);     // Geotools name
+                        VocabularyKeys.GEOCENTRIC_TRANSFORM);   // Geotools name
 
         /**
          * Creates a provider.

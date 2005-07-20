@@ -44,8 +44,8 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.util.CodeList;
 
 // Geotools dependencies
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.Utilities;
 
 
@@ -256,7 +256,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final String error;
         if (!descriptor.getValueClass().isAssignableFrom(value.getClass())) {
-            error = Resources.format(ResourceKeys.ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
+            error = Errors.format(ErrorKeys.ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
                     Utilities.getShortClassName(value));
         } else {
             final Comparable minimum = descriptor.getMinimumValue();
@@ -264,13 +264,11 @@ public class Parameter extends AbstractParameter implements ParameterValue {
             if ((minimum!=null && minimum.compareTo(value)>0) ||
                 (maximum!=null && maximum.compareTo(value)<0))
             {
-                error = Resources.format(ResourceKeys.ERROR_VALUE_OUT_OF_BOUNDS_$3,
-                                         value, minimum, maximum);
+                error = Errors.format(ErrorKeys.VALUE_OUT_OF_BOUNDS_$3, value, minimum, maximum);
             } else {
                 final Set validValues = descriptor.getValidValues();
                 if (validValues!=null && !validValues.contains(value)) {
-                    error = Resources.format(ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                                             getName(descriptor), value);
+                    error = Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, getName(descriptor), value);
                 } else {
                     return;
                 }
@@ -283,7 +281,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * Format an error message for illegal method call for the current value type.
      */
     private String getClassTypeError() {
-        return Resources.format(ResourceKeys.ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
+        return Errors.format(ErrorKeys.ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
                Utilities.getShortName(((ParameterDescriptor)descriptor).getValueClass()));
     }
 
@@ -311,11 +309,11 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      */
     static int getUnitMessageID(final Unit unit) {
         // Note: ONE must be tested before RADIAN.
-        if (Unit.ONE .equals      (unit)) return ResourceKeys.ERROR_INCOMPATIBLE_UNIT_$1;
-        if (SI.METER .isCompatible(unit)) return ResourceKeys.ERROR_NON_LINEAR_UNIT_$1;
-        if (SI.SECOND.isCompatible(unit)) return ResourceKeys.ERROR_NON_TEMPORAL_UNIT_$1;
-        if (SI.RADIAN.isCompatible(unit)) return ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1;
-        return ResourceKeys.ERROR_INCOMPATIBLE_UNIT_$1;
+        if (Unit.ONE .equals      (unit)) return ErrorKeys.INCOMPATIBLE_UNIT_$1;
+        if (SI.METER .isCompatible(unit)) return ErrorKeys.NON_LINEAR_UNIT_$1;
+        if (SI.SECOND.isCompatible(unit)) return ErrorKeys.NON_TEMPORAL_UNIT_$1;
+        if (SI.RADIAN.isCompatible(unit)) return ErrorKeys.NON_ANGULAR_UNIT_$1;
+        return ErrorKeys.INCOMPATIBLE_UNIT_$1;
     }
 
     /**
@@ -339,7 +337,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         ensureNonNull("unit", unit);
         final int expectedID = getUnitMessageID(this.unit);
         if (getUnitMessageID(unit) != expectedID) {
-            throw new IllegalArgumentException(Resources.format(expectedID, unit));
+            throw new IllegalArgumentException(Errors.format(expectedID, unit));
         }
         return this.unit.getConverterTo(unit).convert(doubleValue());
     }
@@ -361,8 +359,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final String name = getName(descriptor);
         if (value == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+            throw new IllegalStateException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, name));
         }
         throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
@@ -383,8 +380,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final String name = getName(descriptor);
         if (value == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+            throw new IllegalStateException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, name));
         }
         throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
@@ -404,8 +400,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final String name = getName(descriptor);
         if (value == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+            throw new IllegalStateException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, name));
         }
         throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
@@ -426,8 +421,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final String name = getName(descriptor);
         if (value == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+            throw new IllegalStateException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, name));
         }
         throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
@@ -453,7 +447,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         ensureNonNull("unit", unit);
         final int expectedID = getUnitMessageID(this.unit);
         if (getUnitMessageID(unit) != expectedID) {
-            throw new IllegalArgumentException(Resources.format(expectedID, unit));
+            throw new IllegalArgumentException(Errors.format(expectedID, unit));
         }
         final Converter converter = this.unit.getConverterTo(unit);
         final double[] values = (double[]) doubleValueList().clone();
@@ -480,8 +474,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final String name = getName(descriptor);
         if (value == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+            throw new IllegalStateException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, name));
         }
         throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
@@ -502,8 +495,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final String name = getName(descriptor);
         if (value == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+            throw new IllegalStateException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, name));
         }
         throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
@@ -545,8 +537,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
          */
         final String name = getName(descriptor);
         if (value == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+            throw new IllegalStateException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, name));
         }
         final InvalidParameterTypeException exception =
                 new InvalidParameterTypeException(getClassTypeError(), name);
@@ -589,7 +580,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final int expectedID = getUnitMessageID(targetUnit);
         if (getUnitMessageID(unit) != expectedID) {
-            throw new InvalidParameterValueException(Resources.format(expectedID, unit),
+            throw new InvalidParameterValueException(Errors.format(expectedID, unit),
                       descriptor.getName().getCode(), value);
         }
         final Double converted = wrap(unit.getConverterTo(targetUnit).convert(value));
@@ -685,7 +676,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final int expectedID = getUnitMessageID(targetUnit);
         if (getUnitMessageID(unit) != expectedID) {
-            throw new IllegalArgumentException(Resources.format(expectedID, unit));
+            throw new IllegalArgumentException(Errors.format(expectedID, unit));
         }
         final double[] converted = (double[]) values.clone();
         final Converter converter = unit.getConverterTo(targetUnit);

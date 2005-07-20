@@ -43,8 +43,8 @@ import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -164,9 +164,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * Format an error message for mismatched dimension.
      */
     private static String format(final int dim1, final int dim2) {
-        return org.geotools.resources.cts.Resources.format(
-               org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
-               new Integer(dim1), new Integer(dim2));
+        return Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2, new Integer(dim1), new Integer(dim2));
     }
 
     /**
@@ -203,8 +201,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         try {
             return CRSUtilities.transform(gridToCoordinateSystem, envelope);
         } catch (TransformException exception) {
-            throw new InvalidGridGeometryException(Resources.format(
-                    ResourceKeys.ERROR_BAD_TRANSFORM_$1,
+            throw new InvalidGridGeometryException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
                     Utilities.getShortClassName(gridToCoordinateSystem)), exception);
         }
     }
@@ -227,8 +224,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         if (gridRange != null) {
             return gridRange;
         }
-        throw new InvalidGridGeometryException(Resources.format(
-                  ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
+        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
     }
 
     /**

@@ -42,8 +42,8 @@ import java.util.Locale;
 import org.geotools.cs.Projection;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MissingParameterException;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 
 
 /**
@@ -188,7 +188,7 @@ public abstract class Stereographic extends PlanarProjection {
         public Provider(final boolean polar, final boolean EPSG) {
             super(EPSG ? (polar ? "Polar_Stereographic_Series" : "Oblique_Stereographic") :
                           (polar ? "Polar_Stereographic"        : "Stereographic"), 
-                          ResourceKeys.STEREOGRAPHIC_PROJECTION);
+                          VocabularyKeys.STEREOGRAPHIC_PROJECTION);
             if (polar && !EPSG) {
                 //no default, allows default to be decided in PolarStereographic
                 put("latitude_true_scale", Double.NaN, LATITUDE_RANGE);
@@ -254,6 +254,6 @@ public abstract class Stereographic extends PlanarProjection {
      * Returns a human readable name localized for the specified locale.
      */
     public String getName(final Locale locale) {
-        return Resources.getResources(locale).getString(ResourceKeys.STEREOGRAPHIC_PROJECTION);
+        return Vocabulary.getResources(locale).getString(VocabularyKeys.STEREOGRAPHIC_PROJECTION);
     }
 }

@@ -42,10 +42,9 @@ import org.geotools.resources.Utilities;
  * <p>
  * The {@code WeakValueHashMap} class is thread-safe.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see WeakHashMap
  * @see WeakHashSet

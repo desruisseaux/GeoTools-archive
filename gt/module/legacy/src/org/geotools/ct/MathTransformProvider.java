@@ -37,7 +37,7 @@ import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Vocabulary;
 import org.opengis.referencing.FactoryException;
 
 
@@ -358,7 +358,7 @@ public abstract class MathTransformProvider {
      * returns a name in an arbitrary locale.
      */
     public String getName(final Locale locale) {
-        return (nameKey>=0) ? Resources.getResources(locale).getString(nameKey) : getClassName();
+        return (nameKey>=0) ? Vocabulary.getResources(locale).getString(nameKey) : getClassName();
     }
     
     /**

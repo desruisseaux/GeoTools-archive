@@ -66,8 +66,10 @@ import org.geotools.ct.MathTransform;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.geometry.XAffineTransform;
 
@@ -252,8 +254,8 @@ public abstract class RenderedLayer {
      */
     public RenderedLayer(final CoordinateSystem cs) {
         if (cs == null) {
-            throw new IllegalArgumentException(Resources.getResources(getLocale())
-                      .getString(ResourceKeys.ERROR_BAD_ARGUMENT_$2, "cs", cs));
+            throw new IllegalArgumentException(Errors.getResources(getLocale())
+                      .getString(ErrorKeys.BAD_ARGUMENT_$2, "cs", cs));
         }
         coordinateSystem = cs;
         listeners = new PropertyChangeSupport(this);
@@ -346,8 +348,8 @@ public abstract class RenderedLayer {
      */
     protected void setCoordinateSystem(final CoordinateSystem cs) throws TransformException {
         if (cs == null) {
-            throw new IllegalArgumentException(Resources.getResources(getLocale())
-                      .getString(ResourceKeys.ERROR_BAD_ARGUMENT_$2, "cs", cs));
+            throw new IllegalArgumentException(Errors.getResources(getLocale())
+                      .getString(ErrorKeys.BAD_ARGUMENT_$2, "cs", cs));
         }
         final CoordinateSystem oldCS;
         synchronized (getTreeLock()) {
@@ -634,13 +636,13 @@ public abstract class RenderedLayer {
             final Locale locale = getLocale();
             final LogRecord record;
             if (bounds != null) {
-                record = Resources.getResources(locale).getLogRecord(Level.FINEST,
-                                   ResourceKeys.SEND_REPAINT_EVENT_$5, new Object[]{getName(locale),
-                                   new Integer(bounds.x), new Integer(bounds.x+bounds.width-1),
-                                   new Integer(bounds.y), new Integer(bounds.y+bounds.height-1)});
+                record = Logging.getResources(locale).getLogRecord(Level.FINEST,
+                                 LoggingKeys.SEND_REPAINT_EVENT_$5, new Object[]{getName(locale),
+                                 new Integer(bounds.x), new Integer(bounds.x+bounds.width-1),
+                                 new Integer(bounds.y), new Integer(bounds.y+bounds.height-1)});
             } else {
-                record = Resources.getResources(locale).getLogRecord(Level.FINEST,
-                                   ResourceKeys.SEND_REPAINT_EVENT_$1, getName(locale));
+                record = Logging.getResources(locale).getLogRecord(Level.FINEST,
+                                 LoggingKeys.SEND_REPAINT_EVENT_$1, getName(locale));
             }
             record.setSourceClassName("RenderedLayer");
             record.setSourceMethodName("repaint");
@@ -971,8 +973,8 @@ public abstract class RenderedLayer {
     final void logUpdateCache(final String classname) {
         if (Renderer.LOGGER.isLoggable(Level.FINER)) {
             final Locale locale = getLocale();
-            final LogRecord record = Resources.getResources(locale).getLogRecord(Level.FINER,
-                                              ResourceKeys.UPDATE_CACHE_$1, getName(locale));
+            final LogRecord record = Logging.getResources(locale).getLogRecord(Level.FINER,
+                                             LoggingKeys.UPDATE_RENDERER_CACHE_$1, getName(locale));
             record.setSourceClassName(classname);
             record.setSourceMethodName("paint");
             Renderer.LOGGER.log(record);

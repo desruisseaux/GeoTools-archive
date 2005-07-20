@@ -38,8 +38,8 @@ import javax.media.jai.FloatDoubleColorModel;
 import javax.media.jai.RasterFactory;
 
 // Geotools dependencies
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.WeakValueHashMap;
@@ -103,8 +103,8 @@ final class ColorModelFactory {
         this.numBands    = numBands;
         this.type        = type;
         if (visibleBand<0 || visibleBand>=numBands) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_BAD_BAND_NUMBER_$1, new Integer(visibleBand)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,
+                                               new Integer(visibleBand)));
         }
     }
     

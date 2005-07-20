@@ -35,10 +35,9 @@ import org.geotools.resources.Utilities;
  * For such a particular case, this implementation is the more effective than
  * other implementations provided in this package.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class SimpleInternationalString extends AbstractInternationalString implements Serializable {
     /**

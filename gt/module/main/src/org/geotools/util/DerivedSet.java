@@ -35,10 +35,9 @@ import java.util.Set;
  * This class is serializable if the underlying {@linkplain #base} set is serializable
  * too.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public abstract class DerivedSet extends AbstractSet implements Serializable {
     /**

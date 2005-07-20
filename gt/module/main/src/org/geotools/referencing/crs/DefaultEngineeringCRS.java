@@ -43,8 +43,8 @@ import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.NameFactory;
  
 
@@ -90,7 +90,7 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
         /** The alias to use for all Cartesian CS. */
         private static Collection/*<GenericName>*/ ALIAS = Collections.singleton(
                         NameFactory.create(new InternationalString[] {
-                        Resources.formatInternational(ResourceKeys.CARTESIAN)}));
+                        Vocabulary.formatInternational(VocabularyKeys.CARTESIAN)}));
 
         /** Constructs a coordinate system with the given name. */
         public Cartesian(final String name, final CoordinateSystem cs) {

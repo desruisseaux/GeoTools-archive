@@ -33,8 +33,8 @@ import java.util.Arrays;
 // Geotools dependencies
 import org.opengis.coverage.grid.GridRange;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -70,8 +70,8 @@ public class GeneralGridRange implements GridRange, Serializable {
             final int lower = index[i];
             final int upper = index[dimension+i];
             if (!(lower <= upper)) {
-                throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_BAD_GRID_RANGE_$3, new Integer(i),
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.BAD_GRID_RANGE_$3, new Integer(i),
                         new Integer(lower), new Integer(upper)));
             }
         }
@@ -111,8 +111,7 @@ public class GeneralGridRange implements GridRange, Serializable {
      */
     public GeneralGridRange(final int[] lower, final int[] upper) {
         if (lower.length != upper.length) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(lower.length), new Integer(upper.length)));
         }
         index = new int[lower.length + upper.length];
@@ -245,14 +244,12 @@ public class GeneralGridRange implements GridRange, Serializable {
         final int curDim = index.length/2;
         final int newDim = upper-lower;
         if (lower<0 || lower>curDim) {
-            throw new IndexOutOfBoundsException(org.geotools.resources.cts.Resources.format(
-                    org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                    "lower", new Integer(lower)));
+            throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                                "lower", new Integer(lower)));
         }
         if (newDim<0 || upper>curDim) {
-            throw new IndexOutOfBoundsException(org.geotools.resources.cts.Resources.format(
-                    org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                    "upper", new Integer(upper)));
+            throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                                "upper", new Integer(upper)));
         }
         final GeneralGridRange gridRange = new GeneralGridRange(newDim);
         System.arraycopy(index, lower,        gridRange.index, 0,      newDim);
@@ -270,9 +267,8 @@ public class GeneralGridRange implements GridRange, Serializable {
         if (index.length == 4) {
             return new Rectangle(index[0], index[1], index[2]-index[0], index[3]-index[1]);
         } else {
-            throw new IllegalStateException(org.geotools.resources.cts.Resources.format(
-                    org.geotools.resources.cts.ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1,
-                    new Integer(getDimension())));
+            throw new IllegalStateException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
+                                            new Integer(getDimension())));
         }
     }
     

@@ -46,8 +46,8 @@ import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
 import javax.media.jai.registry.RenderedRegistryMode;
 
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.DualRectIter;
 
 
@@ -193,13 +193,13 @@ final class SampleTranscoder extends PointOpImage {
             final SampleDimension[] bands = (SampleDimension[]) param.getObjectParameter(0);
             final int numBands = source.getSampleModel().getNumBands();
             if (numBands != bands.length) {
-                message.append(Resources.format(ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
+                message.append(Errors.format(ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
                          new Integer(numBands), new Integer(bands.length), "SampleDimension"));
                 return false;
             }
             for (int i=0; i<numBands; i++) {
                 if (bands[i].categories == null) {
-                    message.append(Resources.format(ResourceKeys.ERROR_BAD_PARAMETER_$2,
+                    message.append(Errors.format(ErrorKeys.BAD_PARAMETER_$2,
                                            "sampleDimensions["+i+"].categories", null));
                     return false;
                 }
@@ -265,12 +265,6 @@ final class SampleTranscoder extends PointOpImage {
             registry.registerFactory(RenderedRegistryMode.MODE_NAME, OPERATION_NAME,
                                      "geotools.org", new CRIF());
         } catch (IllegalArgumentException exception) {
-            final LogRecord record = Resources.getResources(null).getLogRecord(Level.SEVERE,
-                   ResourceKeys.ERROR_CANT_REGISTER_JAI_OPERATION_$1, OPERATION_NAME);
-            record.setSourceClassName("SampleDimension");
-            record.setSourceMethodName("<classinit>");
-            record.setThrown(exception);
-            Logger.getLogger("org.geotools.gc").log(record);
         }
     }
 }

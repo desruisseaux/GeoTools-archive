@@ -29,8 +29,8 @@ import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.util.Range;
 
 import org.geotools.pt.Matrix;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 /**
  * A matrix editable as a {@link ParameterList} object. Changes to the {@link Matrix} are
@@ -285,8 +285,8 @@ final class MatrixParameters extends Matrix implements ParameterList, ParameterL
                 return !Double.isNaN(((Number) value).doubleValue());
             }
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, value));
+        throw new IllegalArgumentException(Errors.format(
+                ErrorKeys.ILLEGAL_ARGUMENT_$2, name, value));
     }
 
     /**
@@ -294,8 +294,8 @@ final class MatrixParameters extends Matrix implements ParameterList, ParameterL
      */
     private static void ensurePositive(final String name, final int value) {
         if (value <=0) {
-            throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Integer(value)));
+            throw new IllegalArgumentException(Errors.format(
+                ErrorKeys.ILLEGAL_ARGUMENT_$2, name, new Integer(value)));
         }
     }
 
@@ -343,8 +343,8 @@ final class MatrixParameters extends Matrix implements ParameterList, ParameterL
             }
             return setParameter(name, ((Number) value).doubleValue());
         }
-        throw new IllegalArgumentException(Resources.format(
-                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, value));
+        throw new IllegalArgumentException(Errors.format(
+                ErrorKeys.ILLEGAL_ARGUMENT_$2, name, value));
     }
 
     public boolean getBooleanParameter(String n) {throw new IllegalArgumentException(n);}

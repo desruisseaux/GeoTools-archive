@@ -59,11 +59,11 @@ import java.net.URLDecoder;
  * By convention you should try and locate test-data near the junit test
  * cases that uses it.
  * </p>
+ *
+ * @since 2.0
  * @version $Id$
  * @author James McGill
  * @author Simone Giannecchiin (simboss)
- *
- * @since 2.0
  */
 public class TestData {
     /**

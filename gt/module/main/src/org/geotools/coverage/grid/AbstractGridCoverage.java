@@ -52,8 +52,8 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 // Geotools dependencies
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.geometry.DirectPosition2D;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -364,9 +364,8 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
      * Returns a localized error message for {@link IndexOutOfBoundsException}.
      */
     private String indexOutOfBounds(final int index) {
-        return org.geotools.resources.cts.Resources.getResources(getLocale()).getString(
-               org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-               "index", new Integer(index));
+        return Errors.getResources(getLocale()).
+                getString(ErrorKeys.ILLEGAL_ARGUMENT_$2, "index", new Integer(index));
     }
 
     /**
@@ -389,8 +388,8 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
      */
     protected String pointOutsideCoverage(final DirectPosition point) {
         final Locale locale = getLocale();
-        return Resources.getResources(locale).
-                getString(ResourceKeys.ERROR_POINT_OUTSIDE_COVERAGE_$1, toString(point, locale));
+        return Errors.getResources(locale).
+                getString(ErrorKeys.POINT_OUTSIDE_COVERAGE_$1, toString(point, locale));
     }
 
     /**

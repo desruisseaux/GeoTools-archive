@@ -33,8 +33,8 @@ import org.opengis.referencing.datum.EngineeringDatum;
 // Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.LocalName;
 
 
@@ -44,10 +44,9 @@ import org.geotools.util.LocalName;
  * defined point at a construction site), or be a defined point on a moving vehicle (such as on a
  * ship or satellite).
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultEngineeringDatum extends AbstractDatum implements EngineeringDatum {
     /**
@@ -67,7 +66,7 @@ public class DefaultEngineeringDatum extends AbstractDatum implements Engineerin
         final Map properties = new HashMap(4);
         properties.put( NAME_KEY, "Unknow");
         properties.put(ALIAS_KEY,
-                       new LocalName(Resources.formatInternational(ResourceKeys.UNKNOW)));
+                       new LocalName(Vocabulary.formatInternational(VocabularyKeys.UNKNOW)));
         UNKNOW = new DefaultEngineeringDatum(properties);
     }
 

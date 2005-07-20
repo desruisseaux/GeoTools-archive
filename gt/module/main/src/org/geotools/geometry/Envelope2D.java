@@ -30,8 +30,8 @@ import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -49,7 +49,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
     private static final long serialVersionUID = -3319231220761419350L;
     
     /**
-     * The coordinate reference system, or <code>null</code>.
+     * The coordinate reference system, or {@code null}.
      */
     private CoordinateReferenceSystem crs;
 
@@ -63,8 +63,8 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
         // TODO: check below should be first, if only Sun could fix RFE #4093999.
         final int dimension = envelope.getDimension();
         if (dimension != 2) {
-            throw new IllegalStateException(Resources.format(
-                    ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(dimension)));
+            throw new IllegalStateException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
+                                            new Integer(dimension)));
         }
         // TODO: Code below would be simplier if 'getCoordinateReferenceSystem()'
         //       method was defined right into the 'Envelope' interface.

@@ -41,8 +41,10 @@ import org.opengis.referencing.operation.MathTransform;
 import org.geotools.measure.Latitude;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -159,10 +161,9 @@ public class LambertConformal extends MapProjection{
         }
         // Compute constants
         if (Math.abs(phi1 + phi2) < EPS) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_ANTIPODE_LATITUDES_$2,
-                    new Latitude(Math.toDegrees(phi1)),
-                    new Latitude(Math.toDegrees(phi2))));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ANTIPODE_LATITUDES_$2,
+                                               new Latitude(Math.toDegrees(phi1)),
+                                               new Latitude(Math.toDegrees(phi2))));
         }
         final double  cosphi1 = Math.cos(phi1);
         final double  sinphi1 = Math.sin(phi1);
@@ -236,9 +237,8 @@ public class LambertConformal extends MapProjection{
         //Snyder p. 108
         if (Math.abs(Math.abs(y) - (Math.PI/2)) < EPS) {
             if (y*n <= 0) {
-                throw new ProjectionException(Resources.format(
-                        ResourceKeys.ERROR_POLE_PROJECTION_$1,
-                        new Latitude(Math.toDegrees(y))));
+                throw new ProjectionException(Errors.format(ErrorKeys.POLE_PROJECTION_$1,
+                                              new Latitude(Math.toDegrees(y))));
             } else {
                 rho = 0;
             }
@@ -362,8 +362,8 @@ public class LambertConformal extends MapProjection{
                 new NamedIdentifier(CitationImpl.EPSG,     "Lambert Conic Conformal (1SP)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9801"),
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_LambertConfConic_1SP"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.LAMBERT_CONFORMAL_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                    VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
@@ -445,8 +445,8 @@ public class LambertConformal extends MapProjection{
                 new NamedIdentifier(CitationImpl.EPSG,     "9802"),
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_LambertConfConic_2SP"),
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_LambertConfConic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.LAMBERT_CONFORMAL_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
@@ -508,8 +508,8 @@ public class LambertConformal extends MapProjection{
                 new NamedIdentifier(CitationImpl.OGC,      "Lambert_Conformal_Conic_2SP_Belgium"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Lambert Conic Conformal (2SP Belgium)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9803"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.LAMBERT_CONFORMAL_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
@@ -562,8 +562,8 @@ public class LambertConformal extends MapProjection{
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.ESRI,     "Lambert_Conformal_Conic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                           ResourceKeys.LAMBERT_CONFORMAL_PROJECTION))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                                                           VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,

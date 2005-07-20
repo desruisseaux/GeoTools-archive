@@ -35,10 +35,9 @@ import java.util.Date;
  * Number myObjectAsANumber = {@link ClassChanger#toNumber ClassChanger.toNumber}(someArbitraryObject);
  * </pre></blockquote>
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public abstract class ClassChanger {
     /**

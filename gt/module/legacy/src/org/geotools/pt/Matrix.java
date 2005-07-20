@@ -25,8 +25,8 @@ import java.awt.geom.AffineTransform;
 import javax.vecmath.GMatrix;
 
 import org.geotools.cs.AxisOrientation;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
@@ -125,8 +125,8 @@ public class Matrix extends org.geotools.referencing.operation.GeneralMatrix {
          */
         final int dimension = srcAxis.length;
         if (dstAxis.length != dimension) {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(
+                        ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(dimension), new Integer(dstAxis.length)));
         }
         if (validRegions) {
@@ -149,7 +149,7 @@ public class Matrix extends org.geotools.referencing.operation.GeneralMatrix {
                 final AxisOrientation dstAxe = dstAxis[dstIndex];
                 if (search.equals(dstAxe.absolute())) {
                     if (hasFound) {
-                        throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_COLINEAR_AXIS_$2,
+                        throw new IllegalArgumentException(Errors.format(ErrorKeys.COLINEAR_AXIS_$2,
                         srcAxe.getName(null), dstAxe.getName(null)));
                     }
                     hasFound = true;

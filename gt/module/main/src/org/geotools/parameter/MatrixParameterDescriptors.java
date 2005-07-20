@@ -41,8 +41,8 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -178,8 +178,8 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
             throws IndexOutOfBoundsException
     {
         if (index<0 || index>=upper) {
-            throw new IndexOutOfBoundsException(Resources.format(
-                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Integer(index)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                      ErrorKeys.ILLEGAL_ARGUMENT_$2, name, new Integer(index)));
         }
     }
 
@@ -391,8 +391,8 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
                     }
                 }
                 final InvalidParameterNameException exception;
-                exception = new InvalidParameterNameException(Resources.format(
-                                ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, name), name);
+                exception = new InvalidParameterNameException(Errors.format(
+                                ErrorKeys.UNEXPECTED_PARAMETER_$1, name), name);
                 if (cause != null) {
                     exception.initCause(cause);
                 }

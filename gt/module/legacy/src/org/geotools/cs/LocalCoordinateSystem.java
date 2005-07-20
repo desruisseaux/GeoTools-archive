@@ -30,8 +30,8 @@ import java.util.Locale;
 
 import javax.vecmath.MismatchedSizeException;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.units.Unit;
 import org.opengis.cs.CS_LocalCoordinateSystem;
 import org.opengis.cs.CS_LocalDatum;
@@ -77,7 +77,7 @@ public class LocalCoordinateSystem extends CoordinateSystem {
 
         /** Returns the localized name for "Cartesian". */
         public String getName(final Locale locale) {
-            return Resources.getResources(locale).getString(ResourceKeys.CARTESIAN);
+            return Vocabulary.getResources(locale).getString(VocabularyKeys.CARTESIAN);
         }
 
         // TODO: What about serialization?

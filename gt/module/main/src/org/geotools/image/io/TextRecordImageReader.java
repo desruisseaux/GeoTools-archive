@@ -19,7 +19,7 @@
  */
 package org.geotools.image.io;
 
-// Images
+// J2SE and JAI dependencies
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
@@ -35,7 +35,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
-
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
@@ -43,10 +42,13 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.media.jai.util.Range;
 
+// Geotools dependencies
 import org.geotools.io.LineFormat;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Descriptions;
+import org.geotools.resources.i18n.DescriptionKeys;
 
 
 /**
@@ -516,7 +518,8 @@ public class TextRecordImageReader extends TextImageReader {
                 if (records!=null) {
                     final int lineCount = records.getLineCount();
                     if (lineCount<2) {
-                        throw new IIOException(getPositionString(Resources.format(ResourceKeys.ERROR_FILE_HAS_TOO_FEW_DATA)));
+                        throw new IIOException(getPositionString(Errors.format(
+                                               ErrorKeys.FILE_HAS_TOO_FEW_DATA)));
                     }
                     if (data==null) {
                         data = new RecordList[imageIndex+1];
@@ -702,8 +705,8 @@ public class TextRecordImageReader extends TextImageReader {
      * correspond pas à des coordonnées pixels entières.
      */
     private void fireBadCoordinate(final float coordinate) {
-        processWarningOccurred(getPositionString(Resources.format(
-                ResourceKeys.ERROR_BAD_COORDINATE_$1, new Float(coordinate))));
+        processWarningOccurred(getPositionString(Errors.format(
+                ErrorKeys.BAD_COORDINATE_$1, new Float(coordinate))));
     }
     
     /**
@@ -834,12 +837,12 @@ public class TextRecordImageReader extends TextImageReader {
             this.xColumn = xColumn;
             this.yColumn = yColumn;
             if (xColumn < 0) {
-                throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NEGATIVE_COLUMN_$2, "x", new Integer(xColumn)));
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.NEGATIVE_COLUMN_$2, "x", new Integer(xColumn)));
             }
             if (yColumn < 0) {
-                throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NEGATIVE_COLUMN_$2, "y", new Integer(yColumn)));
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.NEGATIVE_COLUMN_$2, "y", new Integer(yColumn)));
             }
             pluginClassName = "org.geotools.image.io.TextRecordImageReader";
         }
@@ -853,7 +856,7 @@ public class TextRecordImageReader extends TextImageReader {
          * @return A String containing a description of this service provider.
          */
         public String getDescription(final Locale locale) {
-            return Resources.getResources(locale).getString(ResourceKeys.CODEC_GRID);
+            return Descriptions.getResources(locale).getString(DescriptionKeys.CODEC_GRID);
         }
         
         /**

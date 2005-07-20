@@ -40,8 +40,8 @@ import org.geotools.io.TableWriter;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -98,8 +98,7 @@ public abstract class AbstractParameter extends Formattable
             throws IllegalArgumentException
     {
         if (object == null) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
     }
     
@@ -116,8 +115,8 @@ public abstract class AbstractParameter extends Formattable
         throws IllegalArgumentException
     {
         if (array[index] == null) {
-            throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_NULL_ARGUMENT_$1, name+'['+index+']'));
+            throw new IllegalArgumentException(Errors.format(
+                      ErrorKeys.NULL_ARGUMENT_$1, name+'['+index+']'));
         }
     }
 
@@ -134,8 +133,7 @@ public abstract class AbstractParameter extends Formattable
     {
         if (value != null) {
             if (!valueClass.isAssignableFrom(value.getClass())) {
-                throw new IllegalArgumentException(Resources.format(
-                          ResourceKeys.ERROR_ILLEGAL_CLASS_$2,
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                           Utilities.getShortClassName(value), Utilities.getShortName(valueClass)));
             }
         }
@@ -146,8 +144,8 @@ public abstract class AbstractParameter extends Formattable
      * specified descriptor.
      */
     static IllegalStateException unitlessParameter(final GeneralParameterDescriptor descriptor) {
-        return new IllegalStateException(Resources.format(ResourceKeys.ERROR_UNITLESS_PARAMETER_$1,
-                                                          getName(descriptor)));
+        return new IllegalStateException(Errors.format(ErrorKeys.UNITLESS_PARAMETER_$1,
+                                                       getName(descriptor)));
     }
 
     /**

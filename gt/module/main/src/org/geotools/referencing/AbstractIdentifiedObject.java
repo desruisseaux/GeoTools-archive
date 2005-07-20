@@ -55,8 +55,10 @@ import org.opengis.util.ScopedName;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.util.GrowableInternationalString;
 import org.geotools.util.NameFactory;
 
@@ -78,10 +80,9 @@ import org.geotools.util.NameFactory;
  * Known Text</cite></A> is some cases (e.g. in a {@code LOCAL_CS} element). In such exceptional
  * situation, a plain {@link org.geotools.referencing.cs.AbstractCS} object may be instantiated.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class AbstractIdentifiedObject extends Formattable implements IdentifiedObject, Serializable {
     /**
@@ -421,7 +422,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 remarks = growable;
             } else {
                 Logger.getLogger("org.geotools.referencing").warning(
-                                 Resources.format(ResourceKeys.WARNING_LOCALES_DISCARTED));
+                                 Logging.format(LoggingKeys.LOCALES_DISCARTED));
             }
         }
         if (subProperties!=null && subGrowables!=null) {
@@ -432,7 +433,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                         subProperties.put(prefix, subGrowables[i]);
                     } else {
                         Logger.getLogger("org.geotools.referencing").warning(
-                                         Resources.format(ResourceKeys.WARNING_LOCALES_DISCARTED));
+                                         Logging.format(LoggingKeys.LOCALES_DISCARTED));
                     }
                 }
             }
@@ -449,8 +450,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             key= IDENTIFIERS_KEY; this.identifiers = asSet( (Identifier[]) (value=identifiers));
             key=     REMARKS_KEY; this.remarks     = (InternationalString) (value=remarks);
         } catch (ClassCastException exception) {
-            InvalidParameterValueException e = new InvalidParameterValueException(Resources.format(
-                                   ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, key, value), key, value);
+            InvalidParameterValueException e = new InvalidParameterValueException(Errors.format(
+                                   ErrorKeys.ILLEGAL_ARGUMENT_$2, key, value), key, value);
             e.initCause(exception);
             throw e;
         }
@@ -968,8 +969,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             throws IllegalArgumentException
     {
         if (object == null) {
-            throw new InvalidParameterValueException(Resources.format(
-                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name), name, object);
+            throw new InvalidParameterValueException(Errors.format(
+                        ErrorKeys.NULL_ARGUMENT_$1, name), name, object);
         }
     }
     
@@ -986,8 +987,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             throws IllegalArgumentException
     {
         if (array[index] == null) {
-            throw new InvalidParameterValueException(Resources.format(
-                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name+'['+index+']'), name, array);
+            throw new InvalidParameterValueException(Errors.format(
+                        ErrorKeys.NULL_ARGUMENT_$1, name+'['+index+']'), name, array);
         }
     }
     
@@ -1000,8 +1001,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      */
     protected static void ensureTimeUnit(final Unit unit) throws IllegalArgumentException {
         if (!SI.SECOND.isCompatible(unit)) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NON_TEMPORAL_UNIT_$1, unit));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NON_TEMPORAL_UNIT_$1, unit));
         }
     }
     
@@ -1014,8 +1014,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      */
     protected static void ensureLinearUnit(final Unit unit) throws IllegalArgumentException {
         if (!SI.METER.isCompatible(unit)) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NON_LINEAR_UNIT_$1, unit));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NON_LINEAR_UNIT_$1, unit));
         }
     }
     
@@ -1028,8 +1027,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      */
     protected static void ensureAngularUnit(final Unit unit) throws IllegalArgumentException {
         if (!SI.RADIAN.isCompatible(unit) && !Unit.ONE.equals(unit)) {
-            throw new IllegalArgumentException(Resources.format(
-                        ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1, unit));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NON_ANGULAR_UNIT_$1, unit));
         }
     }
 }

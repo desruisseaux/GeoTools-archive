@@ -49,22 +49,25 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+
 
 /**
  * The USGS equatorial case of the {@linkplain Stereographic stereographic} projection.
  * This is a special case of oblique stereographic projection for 
  * {@link #latitudeOfOrigin} == 0.0.
  *
+ * @since 2.1
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
- *
- * @since 2.1
  */
 public class StereographicEquatorial extends StereographicOblique {
     /**
@@ -159,8 +162,8 @@ public class StereographicEquatorial extends StereographicOblique {
             final double coslat = Math.cos(y);
             double f = 1.0 + coslat*Math.cos(x);
             if (f < EPS) {
-                throw new ProjectionException(Resources.format(
-                          ResourceKeys.ERROR_VALUE_TEND_TOWARD_INFINITY));
+                throw new ProjectionException(Errors.format(
+                          ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
             f = k0/f;                     // (21-14)
             x = f * coslat * Math.sin(x); // (21-2)

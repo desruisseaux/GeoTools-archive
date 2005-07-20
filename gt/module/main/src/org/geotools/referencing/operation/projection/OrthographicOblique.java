@@ -47,19 +47,22 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+
 
 /**
  * The oblique case of the {@link Orthographic} projection. Only the spherical
  * form is given here.
  *
+ * @since 2.1
  * @version $Id$
  * @author Rueben Schulz
- *
- * @since 2.1
  */
 public class OrthographicOblique extends Orthographic {
     /**
@@ -101,8 +104,7 @@ public class OrthographicOblique extends Orthographic {
         double sinphi = Math.sin(y);
         
         if (sinphi0*sinphi + cosphi0*cosphi*coslam < - EPS) {
-            throw new ProjectionException(Resources.format(
-                ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
+            throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
         
 	y = cosphi0 * sinphi - sinphi0 * cosphi * coslam;      
@@ -126,8 +128,7 @@ public class OrthographicOblique extends Orthographic {
         double sinc = rho;
         if (sinc > 1.0) {
             if ((sinc - 1.0) > EPS) {
-                throw new ProjectionException(Resources.format(
-                    ResourceKeys.ERROR_POINT_OUTSIDE_HEMISPHERE));
+                throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
             }
             sinc = 1.0;
         }

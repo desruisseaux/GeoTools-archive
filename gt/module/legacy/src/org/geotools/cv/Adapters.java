@@ -30,8 +30,8 @@ import javax.media.jai.PropertySource;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.pt.Envelope;
 import org.geotools.resources.RemoteProxy;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.cv.CV_ColorInterpretation;
@@ -386,7 +386,7 @@ public class Adapters {
                     dimensions[i] = wrap(coverage.getSampleDimension(i));
                 }
             } catch (RemoteException exception) {
-                throw new CannotEvaluateException(Resources.format(ResourceKeys.ERROR_RMI_FAILURE, exception));
+                throw new CannotEvaluateException(Errors.format(ErrorKeys.RMI_FAILURE, exception));
             }
             return (SampleDimension[]) dimensions.clone();
         }
@@ -409,7 +409,7 @@ public class Adapters {
                     return result;
                 }
             } catch (RemoteException exception) {
-                throw new CannotEvaluateException(Resources.format(ResourceKeys.ERROR_RMI_FAILURE, exception));
+                throw new CannotEvaluateException(Errors.format(ErrorKeys.RMI_FAILURE, exception));
             }
         }
 
@@ -431,7 +431,7 @@ public class Adapters {
                     return result;
                 }
             } catch (RemoteException exception) {
-                throw new CannotEvaluateException(Resources.format(ResourceKeys.ERROR_RMI_FAILURE, exception));
+                throw new CannotEvaluateException(Errors.format(ErrorKeys.RMI_FAILURE, exception));
             }
         }
 
@@ -453,7 +453,7 @@ public class Adapters {
                     return result;
                 }
             } catch (RemoteException exception) {
-                throw new CannotEvaluateException(Resources.format(ResourceKeys.ERROR_RMI_FAILURE, exception));
+                throw new CannotEvaluateException(Errors.format(ErrorKeys.RMI_FAILURE, exception));
             }
         }
 
@@ -475,7 +475,7 @@ public class Adapters {
                     return result;
                 }
             } catch (RemoteException exception) {
-                throw new CannotEvaluateException(Resources.format(ResourceKeys.ERROR_RMI_FAILURE, exception));
+                throw new CannotEvaluateException(Errors.format(ErrorKeys.RMI_FAILURE, exception));
             }
         }
     }

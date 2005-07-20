@@ -55,8 +55,8 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -141,11 +141,11 @@ public class FormatChooser extends JPanel {
         value = suggestSampleValue(format);
         setFormat(format);
 
-        final Resources resources = Resources.getResources(null);
+        final Vocabulary resources = Vocabulary.getResources(getDefaultLocale());
         final GridBagConstraints c = new GridBagConstraints();
         c.gridx=0; c.insets.right=6;
-        c.gridy=0;                 add(new JLabel(resources.getLabel(ResourceKeys.FORMAT )), c);
-        c.gridy++; c.insets.top=3; add(new JLabel(resources.getLabel(ResourceKeys.PREVIEW)), c);
+        c.gridy=0;                 add(new JLabel(resources.getLabel(VocabularyKeys.FORMAT )), c);
+        c.gridy++; c.insets.top=3; add(new JLabel(resources.getLabel(VocabularyKeys.PREVIEW)), c);
         c.insets.right=0; c.gridx++; c.weightx=1; c.fill=c.HORIZONTAL;
         c.gridy=0; c.insets.top=0; add(choices, c);
         c.gridy++; c.insets.top=3; add(preview, c);

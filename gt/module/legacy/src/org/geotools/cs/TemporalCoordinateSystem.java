@@ -26,8 +26,8 @@ package org.geotools.cs;
 // Time
 import java.util.Date;
 
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.units.Unit;
 
 /**
@@ -147,8 +147,8 @@ public class TemporalCoordinateSystem extends CoordinateSystem {
         if (dimension>=0 && dimension<maxDim) {
             return axis;
         }
-        throw new IndexOutOfBoundsException(Resources.format(
-                ResourceKeys.ERROR_INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
+        throw new IndexOutOfBoundsException(Errors.format(
+                ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
     }
     
     /**
@@ -163,8 +163,8 @@ public class TemporalCoordinateSystem extends CoordinateSystem {
         if (dimension>=0 && dimension<maxDim) {
             return unit;
         }
-        throw new IndexOutOfBoundsException(Resources.format(
-                ResourceKeys.ERROR_INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
+        throw new IndexOutOfBoundsException(Errors.format(
+                ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension)));
     }
 
     /**

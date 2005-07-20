@@ -26,8 +26,8 @@ import java.util.Date;
 import org.opengis.coverage.PointOutsideCoverageException;
 
 // Geotools dependencies
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -68,15 +68,14 @@ public class OrdinateOutsideCoverageException extends PointOutsideCoverageExcept
      * constructor assumes that the out-of-bounds value was the temporal ordinate (i.e. the date).
      * This condition should be verified before to invoke this constructor. A localized error
      * message including the specified date is then formatted.
-     * <br><br>
+     * <p>
      * This constructor is for internal use by {@code evaluate(Point2D, Date, ...)} methods in
      * {@link SpatioTemporalCoverage3D}, in order to replace dates as numerical values by a more
      * explicit string. Users can still get the numerical value if they looks at the cause of this
      * exception.
      */
-    OrdinateOutsideCoverageException(final OrdinateOutsideCoverageException cause, final Date date)
-    {
-        super(Resources.format(ResourceKeys.ERROR_DATE_OUTSIDE_COVERAGE_$1, date));
+    OrdinateOutsideCoverageException(final OrdinateOutsideCoverageException cause, final Date date) {
+        super(Errors.format(ErrorKeys.DATE_OUTSIDE_COVERAGE_$1, date));
         dimension = cause.dimension;
         initCause(cause);
     }
