@@ -21,7 +21,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
-import org.geotools.data.ows.BoundingBox;
+import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.Specification;
@@ -85,7 +85,7 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
             assertEquals(layer.getSrs().size(), 1);
             assertTrue(layer.getSrs().contains("EPSG:4326" ));
             
-            validateLatLonBoundingBox(layer.getLatLonBoundingBox(),
+            validateBoundingBox(layer.getLatLonBoundingBox(),
                     -168.67, 17.84, -65.15, 71.55);
             
             assertNull(layer.getParent());
@@ -102,17 +102,17 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
             assertTrue(layer.getSrs().contains("EPSG:26905"));
             assertTrue(layer.getSrs().contains("EPSG:26920"));
             assertEquals(layer.getBoundingBoxes().size(), 13);
-            BoundingBox bbox = (BoundingBox) layer.getBoundingBoxes().get("EPSG:26905");
+            CRSEnvelope bbox = (CRSEnvelope) layer.getBoundingBoxes().get("EPSG:26905");
             assertNotNull(bbox);
-            assertEquals(bbox.getCrs(), "EPSG:26905");
+            assertEquals(bbox.getEPSGCode(), "EPSG:26905");
             assertEquals(bbox.getMinX(), 552600.0, 0.0);
             assertEquals(bbox.getMinY(), 6540200.0, 0.0);
             assertEquals(bbox.getMaxX(), 670200.0, 0.0);
             assertEquals(bbox.getMaxY(), 6794800.0, 0.0);
             
-            bbox = (BoundingBox) layer.getBoundingBoxes().get("EPSG:26920");
+            bbox = (CRSEnvelope) layer.getBoundingBoxes().get("EPSG:26920");
             assertNotNull(bbox);
-            assertEquals(bbox.getCrs(), "EPSG:26920");
+            assertEquals(bbox.getEPSGCode(), "EPSG:26920");
             assertEquals(bbox.getMinX(), 181800.0, 0.0);
             assertEquals(bbox.getMinY(), 1985200.0, 0.0);
             assertEquals(bbox.getMaxX(), 269400.0, 0.0);
@@ -129,7 +129,7 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
             assertFalse(layer.isQueryable());
             
             // Added test to verify inheritance, should be same as previous llbbox
-            validateLatLonBoundingBox(layer.getLatLonBoundingBox(),
+            validateBoundingBox(layer.getLatLonBoundingBox(),
                     -168.67, 17.84, -65.15, 71.55);
             
             
@@ -138,7 +138,7 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
             assertEquals(layer.getName(), "DRG");
             assertEquals(layer.getTitle(), "USGS Raster Graphics (Topo Maps)");
             // Added test to verify inheritance, should be same as previous llbbox
-            validateLatLonBoundingBox(layer.getLatLonBoundingBox(),
+            validateBoundingBox(layer.getLatLonBoundingBox(),
                     -168.67, 17.84, -65.15, 71.55);
             
             layer = (Layer) capabilities.getLayerList().get(3);
@@ -146,7 +146,7 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
             assertEquals(layer.getName(), "UrbanArea");
             assertEquals(layer.getTitle(), "USGS Urban Areas Ortho-Imagery");
             // Added test to verify inheritance, should be same as previous llbbox
-            validateLatLonBoundingBox(layer.getLatLonBoundingBox(),
+            validateBoundingBox(layer.getLatLonBoundingBox(),
                     -168.67, 17.84, -65.15, 71.55);
             
             

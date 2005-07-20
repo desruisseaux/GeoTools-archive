@@ -8,8 +8,7 @@ import java.util.logging.Level;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.ows.BoundingBox;
-import org.geotools.data.ows.LatLonBoundingBox;
+import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.xml.WMSSchema;
@@ -79,7 +78,7 @@ public class WMSSchemaTest extends TestCase {
 		assertEquals(topLayer.getSrs().size(), 1);
 		assertTrue(topLayer.getSrs().contains("CRS:84"));
 		
-		LatLonBoundingBox llbbox = topLayer.getLatLonBoundingBox();
+		CRSEnvelope llbbox = topLayer.getLatLonBoundingBox();
 		assertNotNull(llbbox);
 		assertEquals(llbbox.getMinX(), -180, 0.0);
 		assertEquals(llbbox.getMaxX(), 180, 0.0);
@@ -88,9 +87,9 @@ public class WMSSchemaTest extends TestCase {
 		
 		assertEquals(topLayer.getBoundingBoxes().size(), 1);
 		
-		BoundingBox bbox = (BoundingBox) topLayer.getBoundingBoxes().get("CRS:84");
+		CRSEnvelope bbox = (CRSEnvelope) topLayer.getBoundingBoxes().get("CRS:84");
 		assertNotNull(bbox);
-		assertEquals(bbox.getCrs(), "CRS:84");
+		assertEquals(bbox.getEPSGCode(), "CRS:84");
 		assertEquals(bbox.getMinX(), -184, 0.0);
 		assertEquals(bbox.getMaxX(), 180, 0.0);
 		assertEquals(bbox.getMinY(), -90.0000000017335, 0.0);
@@ -110,9 +109,9 @@ public class WMSSchemaTest extends TestCase {
 		assertEquals(llbbox.getMinY(), -90, 0.0);
 		assertEquals(llbbox.getMaxY(), 90, 0.0);
 		
-		bbox = (BoundingBox) layer.getBoundingBoxes().get("CRS:84");
+		bbox = (CRSEnvelope) layer.getBoundingBoxes().get("CRS:84");
 		assertNotNull(bbox);
-		assertEquals(bbox.getCrs(), "CRS:84");
+		assertEquals(bbox.getEPSGCode(), "CRS:84");
 		assertEquals(bbox.getMinX(), -180, 0.0);
 		assertEquals(bbox.getMaxX(), 180, 0.0);
 		assertEquals(bbox.getMinY(), -90, 0.0);
@@ -134,9 +133,9 @@ public class WMSSchemaTest extends TestCase {
 		assertEquals(llbbox.getMinY(), -90, 0.0);
 		assertEquals(llbbox.getMaxY(), 90, 0.0);
 		
-		bbox = (BoundingBox) layer.getBoundingBoxes().get("CRS:84");
+		bbox = (CRSEnvelope) layer.getBoundingBoxes().get("CRS:84");
 		assertNotNull(bbox);
-		assertEquals(bbox.getCrs(), "CRS:84");
+		assertEquals(bbox.getEPSGCode(), "CRS:84");
 		assertEquals(bbox.getMinX(), -180, 0.0);
 		assertEquals(bbox.getMaxX(), 179.999420166016, 0.0);
 		assertEquals(bbox.getMinY(), -62.9231796264648, 0.0);

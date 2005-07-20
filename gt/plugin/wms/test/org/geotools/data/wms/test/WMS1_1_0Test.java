@@ -24,11 +24,10 @@ import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
-import org.geotools.data.ows.LatLonBoundingBox;
+import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.LayerDescription;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_1_0;
 import org.geotools.data.wms.WMSUtils;
@@ -204,8 +203,8 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
             assertTrue(layer.getSrs().contains("EPSG:4269"));
             assertTrue(layer.getSrs().contains("EPSG:4326"));
             
-            LatLonBoundingBox llbbox = layer.getLatLonBoundingBox();
-            validateLatLonBoundingBox(llbbox, -172.367, 35.6673, -11.5624, 83.8293);
+            CRSEnvelope llbbox = layer.getLatLonBoundingBox();
+            validateBoundingBox(llbbox, -172.367, 35.6673, -11.5624, 83.8293);
             
             
             assertEquals(layer.getBoundingBoxes().size(), 1);
@@ -223,7 +222,7 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
             assertEquals(layer2.getName(), "land_fn");
             assertEquals(layer2.getTitle(), "Foreign Lands");
             
-            validateLatLonBoundingBox(layer2.getLatLonBoundingBox(),
+            validateBoundingBox(layer2.getLatLonBoundingBox(),
                     -178.838, 31.8844, 179.94, 89.8254);
             
             assertTrue(layer2.getSrs().contains("EPSG:42304"));
@@ -235,7 +234,7 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
             assertEquals(layer2.getName(), "park");
             assertEquals(layer2.getTitle(), "Parks");
             
-            validateLatLonBoundingBox(layer2.getLatLonBoundingBox(),
+            validateBoundingBox(layer2.getLatLonBoundingBox(),
                     -173.433, 41.4271, -13.3643, 83.7466);
             
             assertTrue(layer2.getSrs().contains("EPSG:42304"));
@@ -248,7 +247,7 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
             assertEquals(layer2.getTitle(), "Grid");
             
             llbbox = layer2.getLatLonBoundingBox();
-            validateLatLonBoundingBox(llbbox, -178.838, 31.8844, 179.94, 89.8254);
+            validateBoundingBox(llbbox, -178.838, 31.8844, 179.94, 89.8254);
             
             assertTrue(layer2.getSrs().contains("EPSG:42304"));
             assertFalse(layer2.isQueryable());
@@ -284,7 +283,7 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
         return new CustomWMS(featureURL);
     }
     
-    protected void validateLatLonBoundingBox(LatLonBoundingBox llbbox,
+    protected void validateBoundingBox(CRSEnvelope llbbox,
             double minX, double minY, double maxX, double maxY) {
         assertNotNull(llbbox);
         assertEquals(llbbox.getMinX(), minX, 0.0);

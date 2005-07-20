@@ -16,8 +16,6 @@
  */
 package org.geotools.data.wms.request;
 
-import org.geotools.data.wms.SimpleLayer;
-
 /**
  * A request used to get the legend graphic for a given layer
  * 
@@ -38,9 +36,7 @@ public interface GetLegendGraphicRequest extends Request {
     public static final String EXCEPTIONS = "EXCEPTIONS";
     
     public void setLayer(String layer);
-    
-    public void setLayer(SimpleLayer layer);
-    
+        
     public void setStyle(String style);
     
     public void setFeatureType(String featureType);

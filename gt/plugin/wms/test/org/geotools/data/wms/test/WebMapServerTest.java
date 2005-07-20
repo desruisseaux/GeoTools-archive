@@ -17,9 +17,7 @@
 package org.geotools.data.wms.test;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,20 +34,16 @@ import junit.framework.TestCase;
 
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WMSLayerCatalogEntry;
 import org.geotools.data.wms.WMSLayerMetadataEntity;
 import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.Envelope;
 import org.xml.sax.SAXException;
 
 
@@ -101,36 +95,29 @@ public class WebMapServerTest extends TestCase {
 
         //request.setVersion("1.1.1");
 
-        List simpleLayers = new ArrayList();
         Layer[] layers = WMSUtils.getNamedLayers(capabilities);
         Iterator iter = Arrays.asList(layers).iterator();
         int count = -1;
         while (iter.hasNext()) {
 
             Layer layer = (Layer) iter.next();
-            SimpleLayer sLayer = new SimpleLayer(layer.getName(), "");
             count++;
             if (count >= 5) { 
                 break;
             }
-            
-            simpleLayers.add(sLayer);
-            
+                        
             List styles = layer.getStyles();
 
             if (styles.size() == 0) {
-                sLayer.setStyle("");
-
+                request.addLayer(layer);
                 continue;
             }
 
             Random random = new Random();
             int randomInt = random.nextInt(styles.size());
-            sLayer.setStyle((String) styles.get(randomInt));
-
+            
+            request.addLayer(layer, (String) styles.get(randomInt));
         }
-
-        request.setLayers(simpleLayers);
 
         Set srss = WMSUtils.getSRSs(capabilities);
         request.setSRS((String) srss.iterator().next());
@@ -149,6 +136,7 @@ public class WebMapServerTest extends TestCase {
         GetMapResponse response = (GetMapResponse) wms.issueRequest(request);
 
         assertEquals(response.getContentType(), format);
+        System.out.println("Content Type: " + response.getContentType());
 
         BufferedImage image = ImageIO.read(response.getInputStream());
         assertEquals(image.getHeight(), 400);
@@ -273,7 +261,7 @@ public class WebMapServerTest extends TestCase {
     public void testServiceExceptions  () throws Exception { 
     	WebMapServer wms = new WebMapServer(featureURL);
     	GetMapRequest request = wms.createGetMapRequest();
-    	request.setLayers(Collections.singletonList(new SimpleLayer("NoLayer", "NoStyle")));
+    	request.addLayer("NoLayer", "NoStyle");
     	try {
     		System.out.println(request.getFinalURL());
     		GetMapResponse response = wms.issueRequest(request);

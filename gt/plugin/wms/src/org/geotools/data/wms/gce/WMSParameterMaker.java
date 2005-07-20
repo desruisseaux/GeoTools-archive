@@ -25,7 +25,6 @@ import java.util.TreeSet;
 
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WMSUtils;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
@@ -140,19 +139,18 @@ public class WMSParameterMaker {
                 + "is the style for that layer. The valid values are all the "
                 + "styles that layer can be drawn with.");
 
-        List layers = Arrays.asList(WMSUtils.findDrawableLayers(
-                    capabilities.getLayerList()));
+        List layers = Arrays.asList(WMSUtils.getNamedLayers(capabilities));
 
         GeneralParameterDescriptor[] layerParams = new DefaultParameterDescriptor[layers
             .size()];
 
         for (int i = 0; i < layers.size(); i++) {
-            SimpleLayer layer = (SimpleLayer) layers.get(i);
+            Layer layer = (Layer) layers.get(i);
 
             Map layerProperties = fillProperties(layer.getName(), "");
 
             layerParams[i] = new DefaultParameterDescriptor(layerProperties,
-                    String.class, layer.getValidStyles().toArray(), null, null,
+                    String.class, layer.getStyles().toArray(), null, null,
                     null, null, false);
         }
 

@@ -8,7 +8,6 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.request.AbstractGetMapRequest;
 import org.geotools.data.wms.request.AbstractRequest;
 import org.geotools.data.wms.request.GetMapRequest;
@@ -21,13 +20,14 @@ public class AbstractGetMapRequestTest extends TestCase {
 		
 		GetMapRequest request = new RequestTest(badURL, null);
 		
-		SimpleLayer layer = new SimpleLayer("Provincial Boundary", "Two words");
-		request.setLayers(Collections.singletonList(layer));
+		request.addLayer("Provincial Boundary", "Two words");
+		request.addLayer("Layer2", null);
 		
 		URL finalURL = request.getFinalURL();
+        System.out.println(finalURL);
 		String processedURL = finalURL.toExternalForm();
-		assertTrue(processedURL.indexOf("LAYERS=Provincial+Boundary") != -1);
-		assertTrue(processedURL.indexOf("STYLES=Two+words") != -1);
+		assertTrue(processedURL.indexOf("LAYERS=Layer2,Provincial+Boundary") != -1);
+		assertTrue(processedURL.indexOf("STYLES=,Two+words") != -1);
         assertTrue(processedURL.indexOf("SERVICE=WMS") != -1);
 	}
 	

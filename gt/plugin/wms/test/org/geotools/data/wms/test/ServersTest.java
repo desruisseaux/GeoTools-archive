@@ -1,39 +1,27 @@
 package org.geotools.data.wms.test;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.ows.LatLonBoundingBox;
+import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.SimpleLayer;
-import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.ows.ServiceException;
-import org.geotools.resources.TestData;
 import org.xml.sax.SAXException;
 
 public class ServersTest extends TestCase {
@@ -222,11 +210,10 @@ public class ServersTest extends TestCase {
 
         out.print("Performing GetMap operation...");
         GetMapRequest request = wms.createGetMapRequest();
-        //TODO make this easier
-        request.setLayers(Collections.singletonList(new SimpleLayer(layer.getName(), "")));
-        //TODO make this easier
-        LatLonBoundingBox bbox = layer.getLatLonBoundingBox();
-        request.setBBox(bbox.getMinX()+","+bbox.getMinY()+","+bbox.getMaxX()+","+bbox.getMaxY());
+        
+        request.addLayer(layer);
+        CRSEnvelope bbox = layer.getLatLonBoundingBox();
+        request.setBBox(bbox);
         request.setFormat(format);
         request.setSRS("EPSG:4326");
         request.setDimensions("100","100");

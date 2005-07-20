@@ -30,8 +30,7 @@ import java.util.TreeSet;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.geotools.data.ows.BoundingBox;
-import org.geotools.data.ows.LatLonBoundingBox;
+import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WMSCapabilities;
@@ -2509,14 +2508,14 @@ public class WMSComplexTypes {
 
 				if (sameName(elems[5], value[i])
 						|| sameName(elems[20], value[i])) {
-					layer.setLatLonBoundingBox((LatLonBoundingBox) value[i]
+					layer.setLatLonBoundingBox((CRSEnvelope) value[i]
 							.getValue());
 				}
 
 				if (sameName(elems[6], value[i])) {
-					BoundingBox bbox = (BoundingBox) value[i].getValue();
+					CRSEnvelope bbox = (CRSEnvelope) value[i].getValue();
 
-					boundingBoxes.put(bbox.getCrs(), bbox);
+					boundingBoxes.put(bbox.getEPSGCode(), bbox);
 				}
 
 				// if (sameName(elems[7], value[i])) {
@@ -2676,7 +2675,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			LatLonBoundingBox bbox = new LatLonBoundingBox();
+			CRSEnvelope bbox = new CRSEnvelope();
 
 			for (int i = 0; i < value.length; i++) {
 				if (sameName(elems[0], value[i])) {
@@ -2711,7 +2710,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return LatLonBoundingBox.class;
+			return CRSEnvelope.class;
 		}
 
 		/*
@@ -2794,7 +2793,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			LatLonBoundingBox bbox = new LatLonBoundingBox();
+			CRSEnvelope bbox = new CRSEnvelope();
 
 			bbox.setMinX(Double.parseDouble(attrs.getValue("minx")));
 			bbox.setMaxX(Double.parseDouble(attrs.getValue("maxx")));
@@ -2819,7 +2818,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return LatLonBoundingBox.class;
+			return CRSEnvelope.class;
 		}
 
 		/*
@@ -2910,7 +2909,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			BoundingBox bbox = new BoundingBox();
+			CRSEnvelope bbox = new CRSEnvelope();
 
 			String crs = attrs.getValue("CRS");
 			if (crs == null || crs.length() == 0) {
@@ -2922,7 +2921,7 @@ public class WMSComplexTypes {
 				}
 			}
 
-			bbox.setCrs(crs.toUpperCase());
+			bbox.setEPSGCode(crs.toUpperCase());
 			bbox.setMinX(Double.parseDouble(attrs.getValue("minx")));
 			bbox.setMaxX(Double.parseDouble(attrs.getValue("maxx")));
 			bbox.setMinY(Double.parseDouble(attrs.getValue("miny")));
@@ -2946,7 +2945,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return BoundingBox.class;
+			return CRSEnvelope.class;
 		}
 
 		/*

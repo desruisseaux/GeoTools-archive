@@ -9,12 +9,13 @@ package org.geotools.data.wms.request;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.List;
+import java.util.ListIterator;
 import java.util.Properties;
-import org.apache.commons.lang.StringUtils;
-import org.geotools.data.ows.LatLonBoundingBox;
+import java.util.Stack;
 
-import org.geotools.data.wms.SimpleLayer;
+import org.apache.commons.lang.StringUtils;
+import org.geotools.data.ows.CRSEnvelope;
+import org.geotools.data.ows.Layer;
 
 /**
  * @author Richard Gould
@@ -23,7 +24,9 @@ import org.geotools.data.wms.SimpleLayer;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class AbstractGetMapRequest extends AbstractRequest implements GetMapRequest {
- 
+
+    Stack layers = new Stack();
+    Stack styles = new Stack();
 
     /**
      * Constructs a GetMapRequest. The data passed in represents valid values 
@@ -39,6 +42,42 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
         initVersion();
     }
 
+    public URL getFinalURL() {
+        if (!layers.isEmpty()) {
+            String layerString = ""; //$NON-NLS-1$
+            String styleString = ""; //$NON-NLS-1$
+    
+            ListIterator layerIter = layers.listIterator(layers.size());
+            ListIterator styleIter = styles.listIterator(styles.size());
+            while (layerIter.hasPrevious()) {
+    
+                String layerName = (String) layerIter.previous();
+                String styleName = (String) styleIter.previous();
+                
+                try {
+                    layerString = layerString + URLEncoder.encode(layerName, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    layerString = layerString + layerName;
+                }
+                try {
+                    styleString = styleString + URLEncoder.encode(StringUtils.defaultString(styleName), "UTF-8");
+                } catch (UnsupportedEncodingException e1) {
+                    styleString = styleString + StringUtils.defaultString(styleName);
+                }
+                
+                if (layerIter.hasPrevious()) {
+                    layerString = layerString + ","; //$NON-NLS-1$
+                    styleString = styleString + ","; //$NON-NLS-1$
+                }
+            }
+            
+            setProperty(LAYERS, layerString);
+            setProperty(STYLES, styleString);
+        }
+        
+        return super.getFinalURL();
+    }
+    
     protected abstract void initVersion();
     
     protected void initRequest() {
@@ -55,35 +94,24 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
         properties.setProperty(VERSION, version);
     }
 
-    /**
-     * @see org.geotools.data.wms.request.GetMapRequest#setLayers(java.util.List)
-     */
-    public void setLayers(List layers) {
-        String layerString = ""; //$NON-NLS-1$
-        String styleString = ""; //$NON-NLS-1$
-
-        for (int i = 0; i < layers.size(); i++) {
-            SimpleLayer simpleLayer = (SimpleLayer) layers.get(i);
-            try {
-				layerString = layerString + URLEncoder.encode(simpleLayer.getName(), "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				layerString = layerString + simpleLayer.getName();
-			}
-            try {
-				styleString = styleString + URLEncoder.encode(StringUtils.defaultString(simpleLayer.getStyle()), "UTF-8");
-			} catch (UnsupportedEncodingException e1) {
-				styleString = styleString + StringUtils.defaultString(simpleLayer.getStyle());
-			}
-
-            if (i != (layers.size() - 1)) {
-                layerString = layerString + ","; //$NON-NLS-1$
-                styleString = styleString + ","; //$NON-NLS-1$
-            }
-        }
-
-        setProperty(LAYERS, layerString);
-        setProperty(STYLES, styleString);
+    
+    
+    public void addLayer( Layer layer, String style ) {
+        addLayer(layer.getName(), style);
     }
+    
+    public void addLayer( Layer layer ) {
+        addLayer(layer, null);
+    }
+
+    public void addLayer( String layerName, String style ) {
+        layers.push(layerName);
+        if (style == null) {
+            style = ""; //$NON-NLS-1$
+        }
+        styles.push(style);
+    }
+
 
     /**
      * From the Web Map Service Implementation Specification: "The required SRS
@@ -121,7 +149,7 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
         properties.setProperty(BBOX, bbox);
     }
 
-    public void setBBox(LatLonBoundingBox box){
+    public void setBBox(CRSEnvelope box){
         StringBuffer sb = new StringBuffer();
         sb.append(box.getMinX());
         sb.append(",");

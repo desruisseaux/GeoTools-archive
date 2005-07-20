@@ -18,8 +18,6 @@ package org.geotools.data.wms.request;
 
 import java.net.URL;
 
-import org.geotools.data.wms.SimpleLayer;
-
 /**
  * Provides functionality for a basic GetLegendGraphic request
  * 
@@ -50,15 +48,6 @@ public abstract class AbstractGetLegendGraphicRequest extends AbstractRequest im
         setProperty(LAYER, layer);
     }
     
-    /**
-     * Sets this request's layer and style properties
-     * @param layer a SimpleLayer object containing a layer name and style
-     */
-    public void setLayer(SimpleLayer layer) {
-        setLayer(layer.getName());
-        setStyle(layer.getStyle());
-    }
-
     /* (non-Javadoc)
      * @see org.geotools.data.wms.request.GetLegendGraphic#setStyle(java.lang.String)
      */

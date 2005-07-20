@@ -20,8 +20,7 @@ import java.util.zip.GZIPInputStream;
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.Discovery;
 import org.geotools.catalog.QueryRequest;
-import org.geotools.data.ows.BoundingBox;
-import org.geotools.data.ows.LatLonBoundingBox;
+import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
@@ -561,12 +560,12 @@ public class WebMapServer implements Discovery {
         for (final Iterator i=crs.getIdentifiers().iterator(); i.hasNext();) {
             String epsgCode = i.next().toString();
 
-            BoundingBox tempBBox = null;
+            CRSEnvelope tempBBox = null;
             Layer parentLayer = layer;
 
             //Locate a BBOx if we can
             while( tempBBox == null && parentLayer != null ) {
-                tempBBox = (BoundingBox) parentLayer.getBoundingBoxes().get(epsgCode);
+                tempBBox = (CRSEnvelope) parentLayer.getBoundingBoxes().get(epsgCode);
                 
                 parentLayer = parentLayer.getParent();
             }
@@ -574,7 +573,7 @@ public class WebMapServer implements Discovery {
             //Otherwise, locate a LatLon BBOX
     
             if (tempBBox == null && ("EPSG:4326".equals(epsgCode.toUpperCase()))) { //$NON-NLS-1$
-                LatLonBoundingBox latLonBBox = null;
+                CRSEnvelope latLonBBox = null;
     
                 parentLayer = layer;
                 while (latLonBBox == null && parentLayer != null) {
@@ -595,10 +594,10 @@ public class WebMapServer implements Discovery {
                 
                 if (latLonBBox == null) {
                     //TODO could convert another bbox to latlon?
-                    tempBBox = new BoundingBox("EPSG:4326", -180, -90, 180, 90);
+                    tempBBox = new CRSEnvelope("EPSG:4326", -180, -90, 180, 90);
                 }
                 
-                tempBBox = new BoundingBox("EPSG:4326", latLonBBox.getMinX(), latLonBBox.getMinY(), latLonBBox.getMaxX(), latLonBBox.getMaxY());
+                tempBBox = new CRSEnvelope("EPSG:4326", latLonBBox.getMinX(), latLonBBox.getMinY(), latLonBBox.getMaxX(), latLonBBox.getMaxY());
             }
             
             if (tempBBox == null) {
@@ -606,14 +605,14 @@ public class WebMapServer implements Discovery {
                 
                 String epsg = null;
                 if (layer.getLatLonBoundingBox() != null) {
-                    LatLonBoundingBox latLonBBox = layer.getLatLonBoundingBox();
-                    tempBBox = new BoundingBox("EPSG:4326", latLonBBox.getMinX(), latLonBBox.getMinY(), latLonBBox.getMaxX(), latLonBBox.getMaxY());
+                    CRSEnvelope latLonBBox = layer.getLatLonBoundingBox();
+                    tempBBox = new CRSEnvelope("EPSG:4326", latLonBBox.getMinX(), latLonBBox.getMinY(), latLonBBox.getMaxX(), latLonBBox.getMaxY());
                     epsg = "EPSG:4326";
                 }
                 
                 if (tempBBox == null && layer.getBoundingBoxes() != null && layer.getBoundingBoxes().size() > 0) {
-                    tempBBox = (BoundingBox) layer.getBoundingBoxes().values().iterator().next();
-                    epsg = tempBBox.getCrs();
+                    tempBBox = (CRSEnvelope) layer.getBoundingBoxes().values().iterator().next();
+                    epsg = tempBBox.getEPSGCode();
                 }
                 
                 if (tempBBox == null) {

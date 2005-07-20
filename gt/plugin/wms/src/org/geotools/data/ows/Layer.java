@@ -55,7 +55,7 @@ public class Layer implements Comparable {
      * A boundingbox containing the minimum rectangle of the map data in
      * EPSG:4326
      */
-    private LatLonBoundingBox latLonBoundingBox = null;
+    private CRSEnvelope latLonBoundingBox = null;
 
     /** A list of type String */
     private List styles;
@@ -276,11 +276,11 @@ public class Layer implements Comparable {
      * 
      * @return the LatLonBoundingBox for this layer or null if no lat/lon bounding box is found
      */
-    public LatLonBoundingBox getLatLonBoundingBox() {
+    public CRSEnvelope getLatLonBoundingBox() {
        if (latLonBoundingBox == null) {
           Layer parent = this.getParent();
           while (parent != null) {
-             LatLonBoundingBox llbb = parent.getLatLonBoundingBox();
+             CRSEnvelope llbb = parent.getLatLonBoundingBox();
              if (llbb != null)
                 return llbb;
              else 
@@ -295,7 +295,7 @@ public class Layer implements Comparable {
        return latLonBoundingBox;
     }
 
-    public void setLatLonBoundingBox(LatLonBoundingBox latLonBoundingBox) {
+    public void setLatLonBoundingBox(CRSEnvelope latLonBoundingBox) {
         this.latLonBoundingBox = latLonBoundingBox;
     }
     public Layer[] getChildren() {

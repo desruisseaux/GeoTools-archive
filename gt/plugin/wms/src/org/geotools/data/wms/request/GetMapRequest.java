@@ -19,7 +19,8 @@ package org.geotools.data.wms.request;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import org.geotools.data.ows.LatLonBoundingBox;
+import org.geotools.data.ows.CRSEnvelope;
+import org.geotools.data.ows.Layer;
 
 
 /**
@@ -139,16 +140,27 @@ public interface GetMapRequest extends Request{
     public void setVersion(String version);
 
     /**
-     * A list of type <code>SimpleLayer</code> used to set the layers and
-     * styles for this request. The first element in the List is the first
-     * Layer in the request (and the layer drawn on the bottom).
-     * 
-     * Typically, each layer name and style name is passed through an
-     * encoder before being added to the final URL.
-     * 
-     * @param layers a List of type SimpleLayer
+     * Adds a Layer to the list of layers to be requested. This layer will be drawn
+     * below any previously added layers. 
+     * @param layerName the name of the layer to use
+     * @param style the style to use to draw the layer, can also be NULL, "" or "default"
      */
-    public void setLayers(List layers);
+    public void addLayer(String layerName, String style);
+    
+    /**
+     * Adds a Layer to the list of layers to be requested. This layer will be drawn
+     * below any previously added layers. 
+     * @param layer the Layer to use
+     * @param style the style to use to draw the layer, can also be NULL, "" or "default"
+     */
+    public void addLayer(Layer layer, String style);
+    
+    /**
+     * Adds a Layer to the list of layers to be requested. This layer will be drawn
+     * below any previously added layers. The style will be the default one. 
+     * @param layer the Layer to use
+     */
+    public void addLayer(Layer layer);
 
     /**
      * From the Web Map Service Implementation Specification: "The required SRS
@@ -190,7 +202,7 @@ public interface GetMapRequest extends Request{
      *        "minx,miny,maxx,maxy"
      */
     public void setBBox(String bbox);
-    public void setBBox(LatLonBoundingBox box);
+    public void setBBox(CRSEnvelope box);
     /**
      * From the Web Map Service Implementation Specification: "The required
      * FORMAT parameter states the desired format of the response to an

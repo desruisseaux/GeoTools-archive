@@ -32,53 +32,6 @@ import org.geotools.data.ows.WMSCapabilities;
  */
 public class WMSUtils {
     /**
-     * Returns a list containing multiple SimpleLayer instances, representing a
-     * layer to be drawn and all available styles that can be used to draw it
-     * with. The Style value can be empty.
-     *
-     * @param layers The list of layers to process
-     *
-     * @return a list of type SimpleLayer
-     */
-    public static SimpleLayer[] findDrawableLayers(List layers) {
-        List drawableLayers = new ArrayList();
-
-        for (int i = 0; i < layers.size(); i++) {
-            Layer layer = (Layer) layers.get(i);
-            if ((layer.getName() == null)
-                    || (layer.getName().length() == 0)) {
-                continue;
-            }
-
-            Layer parentLayer = layer.getParent();
-            Set styles = new TreeSet();
-
-            if (layer.getStyles() != null) {
-                styles.addAll(layer.getStyles());
-            }
-
-            while (parentLayer != null) {
-                if (layer.getStyles() != null) {
-                    styles.addAll(parentLayer.getStyles());
-                }
-
-                parentLayer = parentLayer.getParent();
-            }
-
-            SimpleLayer sLayer = new SimpleLayer(layer.getName(), styles);
-            drawableLayers.add(sLayer);
-        }
-
-        SimpleLayer[] simpleLayers = new SimpleLayer[drawableLayers.size()];
-
-        for (int i = 0; i < drawableLayers.size(); i++) {
-            simpleLayers[i] = (SimpleLayer) drawableLayers.get(i);
-        }
-
-        return simpleLayers;
-    }
-
-    /**
      * Utility method to return each layer that has a name. This method maintains no hierarchy at all.
      * 
      * @return An array of Layers, each value has a it's name property set or an empty array if there are none. It will return null if there is no capabilities document

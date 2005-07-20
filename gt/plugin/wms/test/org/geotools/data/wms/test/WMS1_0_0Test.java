@@ -36,10 +36,9 @@ import java.util.logging.Level;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.ows.BoundingBox;
+import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_0_0;
 import org.geotools.data.wms.WMSUtils;
@@ -151,7 +150,7 @@ public class WMS1_0_0Test extends TestCase {
             assertEquals(layers[20].getName(), "Ocean features");
             assertEquals(layers[0].getBoundingBoxes().size(), 1);
             
-            BoundingBox bbox = (BoundingBox) layers[1].getBoundingBoxes().get("EPSG:4326");
+            CRSEnvelope bbox = (CRSEnvelope) layers[1].getBoundingBoxes().get("EPSG:4326");
             assertNotNull(bbox);
         } catch(Exception e){
             if(e.getMessage().indexOf("timed out")>0){
