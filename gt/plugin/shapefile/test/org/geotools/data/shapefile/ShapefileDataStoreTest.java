@@ -8,11 +8,15 @@ package org.geotools.data.shapefile;
 
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
@@ -68,6 +72,16 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     public void testLoad() throws Exception {
         loadFeatures(STATE_POP,null);
     }
+    
+    public void testNamespace() throws Exception {
+		ShapefileDataStoreFactory factory=new ShapefileDataStoreFactory();
+		Map map=new HashMap();
+		URI namespace = new URI("http://jesse.com");
+		map.put(ShapefileDataStoreFactory.NAMESPACEP.key, namespace);
+		map.put(ShapefileDataStoreFactory.URLP.key, getTestResource(STATE_POP));
+		DataStore store = factory.createDataStore(map);
+		assertEquals(namespace, store.getSchema(STATE_POP.substring(0, STATE_POP.lastIndexOf('.'))).getNamespace());
+	}
     
     public void testSchema() throws Exception {
         URL url = getTestResource(STATE_POP);

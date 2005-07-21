@@ -22,12 +22,14 @@ package org.geotools.data.shapefile.indexed;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.data.shapefile.ShapefileDataStore;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -44,7 +46,9 @@ public class IndexedShapefileDataStoreFactory
     public  static final Byte TREE_NONE = new Byte(IndexedShapefileDataStore.TREE_NONE);
     public  static final Byte  TREE_GRX = new Byte(IndexedShapefileDataStore.TREE_GRX);
     public  static final Byte  TREE_QIX = new Byte(IndexedShapefileDataStore.TREE_QIX);
-    
+
+    public static final Param NAMESPACEP = new Param("namespace", URI.class,
+    											"uri to a the namespace",false); //not required
 	public static final Param URLP = new Param("url", URL.class,
                                                 "url to a .shp file");
     public static final Param MEMORY_MAPPED =
@@ -110,29 +114,8 @@ public class IndexedShapefileDataStoreFactory
     public DataStore createDataStore(Map params) throws IOException {
         DataStore ds = null;
     	if ( !liveStores.containsKey(params) ){
-	
-	        URL url = null;
-	        try {
-	            url = (URL) URLP.lookUp(params);
-	            Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
-	            if (mm == null)
-	                mm = Boolean.TRUE;
-	
-	            Boolean idx = (Boolean) CREATE_SPATIAL_INDEX.lookUp(params);
-	            if (idx == null)
-	                idx = Boolean.TRUE;
-	            
-	            Byte type=(Byte) SPATIAL_INDEX_TYPE.lookUp(params);
-	            if ( type==null )
-	            	type=new Byte(IndexedShapefileDataStore.TREE_GRX);
-	            ds = new IndexedShapefileDataStore(url, null, 
-	                                        mm.booleanValue(), 
-	                                        idx.booleanValue(), type.byteValue());
-	            liveStores.put(params,ds);
-	        } catch (MalformedURLException mue) {
-	            throw new DataSourceException("Unable to attatch datastore to "
-	                + url, mue);
-	        } 
+    		ds=createNewDataStore(params);
+	        
     	}else
     		ds=(DataStore) liveStores.get(params);
         return ds;
@@ -151,7 +134,7 @@ public class IndexedShapefileDataStoreFactory
     public DataStore createNewDataStore(Map params) throws IOException {
     	URL url = null;
         DataStore ds=null;
-		try {
+        try {
             url = (URL) URLP.lookUp(params);
             Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
             if (mm == null)
@@ -160,13 +143,14 @@ public class IndexedShapefileDataStoreFactory
             Boolean idx = (Boolean) CREATE_SPATIAL_INDEX.lookUp(params);
             if (idx == null)
                 idx = Boolean.TRUE;
-            
+            URI namespace=(URI) NAMESPACEP.lookUp(params);
             Byte type=(Byte) SPATIAL_INDEX_TYPE.lookUp(params);
             if ( type==null )
             	type=new Byte(IndexedShapefileDataStore.TREE_GRX);
-            ds = new IndexedShapefileDataStore(url, null, 
+            ds = new IndexedShapefileDataStore(url, namespace, 
                                         mm.booleanValue(), 
                                         idx.booleanValue(), type.byteValue());
+            liveStores.put(params,ds);
         } catch (MalformedURLException mue) {
             throw new DataSourceException("Unable to attatch datastore to "
                 + url, mue);
@@ -237,7 +221,7 @@ public class IndexedShapefileDataStoreFactory
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */
     public Param[] getParametersInfo() {
-        return new Param[] { URLP, MEMORY_MAPPED, CREATE_SPATIAL_INDEX, SPATIAL_INDEX_TYPE };
+        return new Param[] { URLP, NAMESPACEP, MEMORY_MAPPED, CREATE_SPATIAL_INDEX, SPATIAL_INDEX_TYPE };
     }
 
     /**

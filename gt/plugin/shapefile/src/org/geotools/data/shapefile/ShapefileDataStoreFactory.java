@@ -91,12 +91,7 @@ public class ShapefileDataStoreFactory
 	
 	        URL url = null;
 	        try {
-	            url = (URL) URLP.lookUp(params);
-	            Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
-	            if (mm == null)
-	                mm = Boolean.TRUE;
-	            ds = new ShapefileDataStore(url, null, 
-	                                        mm.booleanValue());
+	        	ds=createNewDataStore(params);
 	            liveStores.put(params,ds);
 	        } catch (MalformedURLException mue) {
 	            throw new DataSourceException("Unable to attatch datastore to "
@@ -125,8 +120,12 @@ public class ShapefileDataStoreFactory
         URL url = null;
         try {
             url = (URL) URLP.lookUp(params);
-            URI namespace = (URI) NAMESPACEP.lookUp(params);  //will be null if it doesnt exist
-            ds = new ShapefileDataStore(url,namespace);
+            Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
+            URI namespace = (URI) NAMESPACEP.lookUp(params);  
+            if (mm == null)
+                mm = Boolean.TRUE;
+            ds = new ShapefileDataStore(url, namespace, 
+                                        mm.booleanValue());
         } catch (MalformedURLException mue) {
             throw new DataSourceException("Unable to attatch datastore to "
                 + url, mue);

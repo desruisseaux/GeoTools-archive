@@ -1,12 +1,14 @@
 package org.geotools.data.shapefile.indexed;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 
 public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
 
@@ -67,6 +69,18 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
 	private IndexedShapefileDataStore testCreateDataStore(Byte treeType, boolean memorymapped, boolean createIndex) throws Exception {
 		return testCreateDataStore(false, treeType, memorymapped, createIndex);
 	}
+	
+    
+    public void testNamespace() throws Exception {
+		ShapefileDataStoreFactory factory=new ShapefileDataStoreFactory();
+		Map map=new HashMap();
+		URI namespace = new URI("http://jesse.com");
+		map.put(ShapefileDataStoreFactory.NAMESPACEP.key, namespace);
+		map.put(ShapefileDataStoreFactory.URLP.key, getTestResource(ShapefileDataStoreTest.STATE_POP));
+		DataStore store = factory.createDataStore(map);
+		assertEquals(namespace, store.getSchema(ShapefileDataStoreTest.STATE_POP.substring(0, ShapefileDataStoreTest.STATE_POP.lastIndexOf('.'))).getNamespace());
+	}
+    
 	
 	private IndexedShapefileDataStore testCreateDataStore(boolean newDS, Byte treeType, boolean memorymapped, boolean createIndex) throws Exception {
 		Map map=new HashMap();
