@@ -638,8 +638,10 @@ public class ShapefileRenderer {
 				}
 			}
 		} finally {
-			dbfreader.close();
-			shpreader.close();
+			if ( dbfreader!=null )
+				dbfreader.close();
+			if ( shpreader!=null )
+				shpreader.close();
 		}
 	}
 
