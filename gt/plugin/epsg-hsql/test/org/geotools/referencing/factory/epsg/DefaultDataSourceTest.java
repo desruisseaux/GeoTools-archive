@@ -18,10 +18,11 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Set;
-import java.util.Collections;
+import java.util.Locale;
 import java.util.Iterator;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.SQLException;
+import javax.units.Unit;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -201,6 +203,7 @@ public class DefaultDataSourceTest extends TestCase {
      */
     public void testAuthorityCodes() throws FactoryException {
         if (factory == null) return;
+
         final Set crs = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         assertFalse(crs.isEmpty());
         assertTrue (crs.size() > 0);
@@ -273,6 +276,20 @@ public class DefaultDataSourceTest extends TestCase {
         assertTrue (conversions.contains("101"));
         assertFalse(projections.contains("101"));
         assertTrue (projections.contains("16001"));
+
+        final Set units = factory.getAuthorityCodes(Unit.class);
+        assertFalse(units.isEmpty());
+        assertTrue (units.size() > 0);
+    }
+
+    /**
+     * Tests the {@link AuthorityFactory#getDescriptionText} method.
+     */
+    public void testDescriptionText() throws FactoryException {
+        assertEquals("World Geodetic System 1984", factory.getDescriptionText( "6326").toString(Locale.ENGLISH));
+        assertEquals("Mean Sea Level",             factory.getDescriptionText( "5100").toString(Locale.ENGLISH));
+        assertEquals("NTF (Paris) / Nord France",  factory.getDescriptionText("27591").toString(Locale.ENGLISH));
+        assertEquals("Ellipsoidal height",         factory.getDescriptionText(   "84").toString(Locale.ENGLISH));
     }
 
     /**
@@ -287,6 +304,14 @@ public class DefaultDataSourceTest extends TestCase {
      */
     public void testNameUsage() throws FactoryException {
         if (factory == null) return;
+        /*
+         * Tests unit
+         */
+        assertSame   (factory.createUnit("9002"), factory.createUnit("foot"));
+        assertNotSame(factory.createUnit("9001"), factory.createUnit("foot"));
+        /*
+         * Tests CRS
+         */
         final CoordinateReferenceSystem primary, byName;
         primary = factory.createCoordinateReferenceSystem("27581");
         assertEquals("27581", getIdentifier(primary));
@@ -308,6 +333,12 @@ public class DefaultDataSourceTest extends TestCase {
          * Tests descriptions.
          */
         assertEquals("NTF (Paris) / France I", factory.getDescriptionText("27581").toString());
+        /*
+         * Tests fetching an object with name containing semi-colon.
+         */
+        final IdentifiedObject cs = factory.createCoordinateSystem(
+                "Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east.  UoM: DMS");
+        assertEquals("6411", getIdentifier(cs));
     }
 
     /**
@@ -377,6 +408,13 @@ public class DefaultDataSourceTest extends TestCase {
         assertTrue(sourceCRS instanceof CompoundCRS);
         assertEquals(3, sourceCRS.getCoordinateSystem().getDimension());
 
+        // GeographicCRS without datum
+        sourceCRS = factory.createCoordinateReferenceSystem("63266405");
+        assertTrue(sourceCRS instanceof GeographicCRS);
+        assertEquals("WGS 84 (deg)", sourceCRS.getName().getCode());
+        assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
+
+        // Operations
         sourceCRS = factory.createCoordinateReferenceSystem("4273");
         targetCRS = factory.createCoordinateReferenceSystem("4979");
         operation = opf.createOperation(sourceCRS, targetCRS);

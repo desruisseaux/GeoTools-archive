@@ -24,10 +24,9 @@ package org.geotools.referencing.factory.epsg;
  * for the creation of SQL queries. The MS-Access dialect of SQL is assumed (it will
  * be translated into ANSI SQL later by {@link FactoryUsingSQL#adaptSQL} if needed).
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 final class TableInfo {
     /**
@@ -36,7 +35,7 @@ final class TableInfo {
     public final Class type;
 
     /**
-     * The table name for SQL queries.
+     * The table name for SQL queries. May contains a {@code "JOIN"} clause.
      */
     public final String table;
 
@@ -68,8 +67,8 @@ final class TableInfo {
     /**
      * Stores information about a specific table.
      */
-    TableInfo(final Class type,
-              final String table, final String codeColumn, final String nameColumn)
+    TableInfo(final Class type, final String table,
+              final String codeColumn, final String nameColumn)
     {
         this(type, table, codeColumn, nameColumn, null, null, null);
     }

@@ -61,6 +61,19 @@ public class GeodeticCalculatorTest extends TestCase {
     }
 
     /**
+     * Tests some trivial azimuth directions.
+     */
+    public void testAzimuth() {
+        final double EPS = 2E-1;
+        final GeodeticCalculator calculator = new GeodeticCalculator();
+        calculator.setAnchorPoint(12, 20);
+        calculator.setDestinationPoint(13, 20);  assertEquals("East",   90, calculator.getAzimuth(), EPS);
+        calculator.setDestinationPoint(12, 21);  assertEquals("North",   0, calculator.getAzimuth(), EPS);
+        calculator.setDestinationPoint(11, 20);  assertEquals("West",  -90, calculator.getAzimuth(), EPS);
+        calculator.setDestinationPoint(12, 19);  assertEquals("South", 180, calculator.getAzimuth(), EPS);
+    }
+
+    /**
      * Test path on the 45th parallel. Data for this test come from the
      * <A HREF="http://www.univ-lemans.fr/~hainry/articles/loxonavi.html">Orthodromie et
      * loxodromie</A> page.

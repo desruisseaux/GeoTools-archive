@@ -267,9 +267,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
          new String[] {"Cartesian",       "ellipsoidal",       "spherical",       "gravity-related"}),
 
         new TableInfo(CoordinateSystemAxis.class,
-                      "[Coordinate Axis]",
+                      "[Coordinate Axis] AS CA INNER JOIN [Coordinate Axis Name] AS CAN"+
+                                       " ON CA.COORD_AXIS_NAME_CODE=CAN.COORD_AXIS_NAME_CODE",
                       "COORD_AXIS_CODE",
-                      null),
+                      "COORD_AXIS_NAME"),
 
         new TableInfo(Datum.class,
                       "[Datum]",
@@ -306,7 +307,12 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         new TableInfo(ParameterDescriptor.class,
                       "[Coordinate_Operation Parameter]",
                       "PARAMETER_CODE",
-                      "PARAMETER_NAME")
+                      "PARAMETER_NAME"),
+
+        new TableInfo(Unit.class,
+                      "[Unit of Measure]",
+                      "UOM_CODE",
+                      "UNIT_OF_MEAS_NAME")
     };
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -656,9 +662,20 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     private static String getString(final ResultSet result, final int columnIndex, final String code)
             throws SQLException, FactoryException
     {
+        return getString(result, columnIndex, code, columnIndex);
+    }
+
+    /**
+     * Same as {@link #getString(ResultSet,int,String)}, but report the fault on an alternative
+     * column if the value is null.
+     */
+    private static String getString(final ResultSet result, final int columnIndex,
+                                    final String    code,   final int columnFault)
+            throws SQLException, FactoryException
+    {
         final String str = result.getString(columnIndex);
         if (result.wasNull()) {
-            final String column = result.getMetaData().getColumnName(columnIndex);
+            final String column = result.getMetaData().getColumnName(columnFault);
             result.close();
             throw new FactoryException(Errors.format(ErrorKeys.NULL_VALUE_$2, code, column));
         }
@@ -995,6 +1012,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 case 6:  return buffered.createCoordinateOperation      (code);
                 case 7:  return buffered.createOperationMethod          (code);
                 case 8:  return buffered.createParameterDescriptor      (code);
+                case 9:  break; // Can't cast Unit to IdentifiedObject
                 default: throw new AssertionError(index); // Should not happen
             }
         }
@@ -1534,6 +1552,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         while (result.next()) {
             if (i >= axis.length) {
                 // An exception will be thrown after the loop.
+                ++i;
                 continue;
             }
                          code         = getString(result, 1, code);
@@ -1608,7 +1627,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 final String    type = getString(result, 3, code).trim().toLowerCase();
                 final int  dimension = getInt   (result, 4, code);
                 final String remarks = result.getString( 5);
-                final CoordinateSystemAxis[] axis = createCoordinateSystemAxis(code, dimension);
+                final CoordinateSystemAxis[] axis = createCoordinateSystemAxis(primaryKey, dimension);
                 final Map properties = createProperties(name, epsg, remarks); // Must be after axis
                 final CSFactory factory = factories.getCSFactory();
                 CoordinateSystem cs = null;
@@ -1704,8 +1723,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                           +       " COORD_REF_SYS_KIND,"
                                           +       " COORD_SYS_CODE,"       // Null for CompoundCRS
                                           +       " DATUM_CODE,"           // Null for ProjectedCRS
-                                          +       " SOURCE_GEOGCRS_CODE,"  // For ProjectedCRS only
-                                          +       " PROJECTION_CONV_CODE," // For ProjectedCRS only
+                                          +       " SOURCE_GEOGCRS_CODE,"  // For ProjectedCRS
+                                          +       " PROJECTION_CONV_CODE," // For ProjectedCRS
                                           +       " CMPD_HORIZCRS_CODE,"   // For CompoundCRS only
                                           +       " CMPD_VERTCRS_CODE"     // For CompoundCRS only
                                           + " FROM [Coordinate Reference System]"
@@ -1733,10 +1752,19 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 if (type.equalsIgnoreCase("geographic 2D") ||
                     type.equalsIgnoreCase("geographic 3D"))
                 {
-                    final String csCode       = getString(result, 7, code);
-                    final String dmCode       = getString(result, 8, code);
-                    final EllipsoidalCS cs    = buffered.createEllipsoidalCS(csCode);
-                    final GeodeticDatum datum = buffered.createGeodeticDatum(dmCode);
+                    final String csCode    = getString(result, 7, code);
+                    final String dmCode    = result.getString( 8);
+                    final EllipsoidalCS cs = buffered.createEllipsoidalCS(csCode);
+                    final GeodeticDatum datum;
+                    if (dmCode != null) {
+                        datum = buffered.createGeodeticDatum(dmCode);
+                    } else {
+                        final String geoCode = getString(result, 9, code, 8);
+                        result.close(); // Must be close before createGeographicCRS
+                        result = null;
+                        final GeographicCRS baseCRS = buffered.createGeographicCRS(geoCode);
+                        datum = (GeodeticDatum) baseCRS.getDatum(); // TODO: remove cast with J2SE 1.5.
+                    }
                     final Map properties = createProperties(name, epsg, area, scope, remarks);
                     crs = factory.createGeographicCRS(properties, datum, cs);
                 }
@@ -2218,7 +2246,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                                          +       " REMARKS"
                                                          + " FROM [Coordinate_Operation]"
                                                          + " WHERE COORD_OP_CODE = ?");
-            stmt.setString(1, code);
+            stmt.setString(1, primaryKey);
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg = getString(result, 1, code);

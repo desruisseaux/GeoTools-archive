@@ -99,10 +99,9 @@ import org.geotools.util.NameFactory;
  * {@link #createObject}, which may be the only method that a subclass need to override.
  * However, other methods may be overriden as well for better performances.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public abstract class AbstractAuthorityFactory extends AbstractFactory
         implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory,
@@ -869,16 +868,12 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     /**
      * Trim the authority scope, if present. For example if this factory is an EPSG authority
      * factory and the specified code start with the "EPSG:" prefix, then the prefix is removed.
-     * Otherwise, if a prefix is present but unrecognized, then an exception is thrown.
+     * Otherwise, the string is returned unchanged (except for leading and trailing spaces).
      *
      * @param  code The code to trim.
      * @return The code without the authority scope.
-     * @throws NoSuchAuthorityCodeException if the specified code as a scope and the scope
-     *         is not the one expected by this factory.
-     *
-     * @todo Localize the error message.
      */
-    protected String trimAuthority(String code) throws NoSuchAuthorityCodeException {
+    protected String trimAuthority(String code) {
         code = code.trim();
         final GenericName name  = NameFactory.create(code);
         final GenericName scope = name.getScope();
@@ -888,9 +883,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
         if (CitationImpl.titleMatches(getAuthority(), scope.toString())) {
             return name.asLocalName().toString().trim();
         }
-        final InternationalString authority = getAuthority().getTitle();
-        throw new NoSuchAuthorityCodeException("\"" + scope.toInternationalString() + 
-                "\" is outside the scope of " + authority + "factory.", authority.toString(), code);
+        return code;
     }
 
     /**

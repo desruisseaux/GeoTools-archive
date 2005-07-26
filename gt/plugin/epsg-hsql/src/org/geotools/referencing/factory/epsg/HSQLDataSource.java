@@ -21,12 +21,17 @@ package org.geotools.referencing.factory.epsg;
 // J2SE dependencies
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 // Geotools dependencies
@@ -53,21 +58,25 @@ import org.hsqldb.jdbc.jdbcDataSource;
  * tables, if available. Otherwise, the scripts will be executed again in order to recreate
  * them.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Didier Richard
- *
- * @since 2.2
  */
 public class HSQLDataSource extends jdbcDataSource implements DataSource {
+    /**
+     * The directory where the database is stored.
+     */
+    private File directory;
+
     /**
      * Creates a new instance of this data source
      */
     public HSQLDataSource() {
         File directory = new File(System.getProperty("java.io.tmpdir", "."), "Geotools");
         if (directory.isDirectory() || directory.mkdir()) {
-            directory = new File(directory, "Cached databases");
-            if (directory.isDirectory() || directory.mkdir()) {
+            directory = new File(directory, "Databases/HSQL");
+            if (directory.isDirectory() || directory.mkdirs()) {
                 /*
                  * Constructs the full path to the HSQL database. Note: we do not use
                  * File.toURI() because HSQL doesn't seem to expect an encoded URL
@@ -84,6 +93,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
                 }
                 url.append("EPSG");
                 setDatabase(url.toString());
+                this.directory = directory;
             }
             /*
              * If the temporary directory do not exists or can't be created,
@@ -184,6 +194,20 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
                     }
                 }
                 in.close();
+                /*
+                 * The database has been fully created. Now, make it read-only.
+                 */
+                if (directory != null) {
+                    final File file = new File(directory, "EPSG.properties");
+                    final InputStream propertyIn = new FileInputStream(file);
+                    final Properties properties  = new Properties();
+                    properties.load(propertyIn);
+                    propertyIn.close();
+                    properties.put("readonly", "true");
+                    final OutputStream out = new FileOutputStream(file);
+                    properties.store(out, "EPSG database on HSQL");
+                    out.close();
+                }
             } catch (IOException exception) {
                 statement.close();
                 SQLException e = new SQLException("Can't read the SQL script."); // TODO: localize

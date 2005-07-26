@@ -212,8 +212,7 @@ public class GeodeticCalculator {
      *
      * @param  azimuth The azimuth value in <strong>degrees</strong>.
      * @return The azimuth value in <strong>radians</strong>.
-     * @throws IllegalArgumentException if {@code azimuth} is not
-     *                                  between -180 and +180 degrees.
+     * @throws IllegalArgumentException if {@code azimuth} is not between -180 and +180 degrees.
      */
     private static double checkAzimuth(final double azimuth) throws IllegalArgumentException {
         if (azimuth>=-180.0 && azimuth<=180.0) {

@@ -48,10 +48,9 @@ import org.geotools.resources.Utilities;
  * Serialization of this class store a copy of all authority codes. The serialization
  * do not preserve any connection to the database.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 final class AuthorityCodes extends AbstractSet implements Serializable {
     /**
