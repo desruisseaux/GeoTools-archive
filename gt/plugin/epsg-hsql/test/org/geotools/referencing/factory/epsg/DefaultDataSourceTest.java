@@ -286,6 +286,8 @@ public class DefaultDataSourceTest extends TestCase {
      * Tests the {@link AuthorityFactory#getDescriptionText} method.
      */
     public void testDescriptionText() throws FactoryException {
+        if (factory == null) return;
+
         assertEquals("World Geodetic System 1984", factory.getDescriptionText( "6326").toString(Locale.ENGLISH));
         assertEquals("Mean Sea Level",             factory.getDescriptionText( "5100").toString(Locale.ENGLISH));
         assertEquals("NTF (Paris) / Nord France",  factory.getDescriptionText("27591").toString(Locale.ENGLISH));
