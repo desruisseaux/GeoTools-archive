@@ -226,7 +226,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 				long featureId = ArcSDEAdapter.getNumericFid(feature.getID());
 				SeObjectId objectID = new SeObjectId(featureId);
 				seDelete.byId(this.layer.getQualifiedName(), objectID);
-				this.dataStore.fireRemoved(feature);
+				//this.dataStore.fireRemoved(feature);
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 				throw new IOException(e.getMessage());
@@ -278,7 +278,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 				// Now "commit" the changes.
 				insert.execute();
 				insert.close();
-				this.dataStore.fireAdded(feature);
+				//this.dataStore.fireAdded(feature);
 			} else {
 				// The record is already inserted, so we will be updating
 				// the values associated with the given record.

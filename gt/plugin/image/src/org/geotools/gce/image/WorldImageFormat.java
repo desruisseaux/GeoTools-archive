@@ -18,15 +18,23 @@ package org.geotools.gce.image;
 
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.parameter.*;
+
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
+import org.geotools.parameter.ParameterGroup;
+
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
+
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
@@ -48,14 +56,14 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
      * an output format in which we want to encode the image itself. PNG is
      * default output format.
      */
-    public static final DefaultParameterDescriptor FORMAT = new DefaultParameterDescriptor("Format",
+    public static final ParameterDescriptor FORMAT = new DefaultParameterDescriptor("Format",
             "Indicates the output format for this image", "png", true);
-    public static final DefaultParameterDescriptor CRS = new DefaultParameterDescriptor("crs",
+    public static final ParameterDescriptor CRS = new DefaultParameterDescriptor("crs",
             CoordinateReferenceSystem.class, //class of the object we will pass
             null, //list of valid values not provided
             getDefaultCRS() //default value
         );
-    public static final DefaultParameterDescriptor ENVELOPE = new DefaultParameterDescriptor("envelope",
+    public static final ParameterDescriptor ENVELOPE = new DefaultParameterDescriptor("envelope",
             Envelope.class, null,
             new GeneralEnvelope(new double[] { 0, 0 }, new double[] { 1, 1 })); //default envelope to avoid exceptions in GridCoverage2D
 

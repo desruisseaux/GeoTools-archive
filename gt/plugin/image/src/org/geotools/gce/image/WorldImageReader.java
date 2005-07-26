@@ -265,7 +265,7 @@ public class WorldImageReader implements GridCoverageReader {
                         .getValue());
                 } else if (((Parameter) parameters[i]).getDescriptor().getName()
                                 .getCode().equalsIgnoreCase("envelope")) {
-                    this.format.getReadParameters().parameter("crs").setValue(((Parameter) parameters[i])
+                    this.format.getReadParameters().parameter("envelope").setValue(((Parameter) parameters[i])
                         .getValue());
                 }
             }

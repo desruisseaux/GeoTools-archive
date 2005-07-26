@@ -37,6 +37,16 @@
   </developers>
   <dependencies>
     <dependency>
+      <id>beam</id>
+      <version>1.0</version>
+      <url>http://lists.refractions.net/geotools/</url>
+    </dependency>    
+    <dependency>
+      <id>jdom</id>
+      <version>1.0</version>
+      <url>http://lists.refractions.net/geotools/</url>
+		</dependency> 
+    <dependency>
       <id>vecmath</id>
       <version>1.3</version>
       <url>http://java.sun.com/products/java-media/3D/</url>
@@ -71,16 +81,17 @@
     <sourceDirectory>${basedir}/src</sourceDirectory>
     <unitTestSourceDirectory>${basedir}/test</unitTestSourceDirectory>
     <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
       <excludes>
-        <exclude>**/GeoTiffReaderTest.java</exclude>
-        <exclude>**/GeoTiffReaderWriterTest.java</exclude>
+        <exclude>**/org/geotools/gce/geotiff/GeoTiffReaderTest.java</exclude>
       </excludes>
       <resources>
         <resource>
           <directory>${basedir}/test</directory>
           <includes>
-            <include>**/*.tif</include>
-            <include>**/*.jpg</include>
+            <include>**/*.png</include>
           </includes>
         </resource>
       </resources>
