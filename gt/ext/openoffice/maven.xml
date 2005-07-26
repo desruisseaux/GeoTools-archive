@@ -1,0 +1,44 @@
+<project xmlns:j="jelly:core" xmlns:u="jelly:util" xmlns:ant="jelly:ant" xmlns:maven="jelly:maven" xmlns:deploy="deploy" default="info">
+  <!-- ==================================================================== -->
+  <!-- Pre goals for the OpenOffice extension: copy javamaker output.       -->
+  <!-- Must be run before compilation, which is why resources in            -->
+  <!-- project.xml doesn't seem to fit.                                     -->
+  <!-- ==================================================================== -->   
+  <preGoal name="java:compile">
+    <ant:copy overwrite="true" todir="${basedir}/target/classes">
+      <ant:fileset dir="${basedir}/src">
+        <ant:include name="**/*.class"/>
+      </ant:fileset>
+    </ant:copy>
+  </preGoal> 
+
+  <!-- ==================================================================== -->
+  <!-- Post goals for the OpenOffice extension: creates the OOo package.    -->
+  <!-- ==================================================================== -->   
+  <postGoal name="jar:install">
+    <ant:zip destfile="${basedir}/target/geotools.uno.pkg">
+      <ant:fileset dir="${basedir}/src">
+        <ant:include name="META-INF/manifest.xml"/>
+        <ant:include name="*.rdb"/>
+      </ant:fileset>
+    </ant:zip>
+    <ant:zip destfile="${basedir}/target/geotools.uno.pkg" update="true">
+      <ant:fileset dir="${basedir}/target">
+        <ant:include name="*.jar"/>
+      </ant:fileset>
+    </ant:zip>
+
+    <!-- Add the dependencies to various modules -->
+    <ant:zip destfile="${basedir}/target/geotools.uno.pkg" update="true">
+      <ant:fileset dir="${basedir}/../../module/main/target">
+        <ant:include name="*.jar"/>
+      </ant:fileset>
+    </ant:zip>
+    <ant:zip destfile="${basedir}/target/geotools.uno.pkg" update="true">
+      <ant:fileset dir="${basedir}/../../plugin/epsg-hsql/target">
+        <ant:include name="*.jar"/>
+      </ant:fileset>
+    </ant:zip>
+  </postGoal>
+
+</project>
