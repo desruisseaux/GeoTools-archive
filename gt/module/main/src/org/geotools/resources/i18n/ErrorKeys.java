@@ -43,7 +43,7 @@ public final class ErrorKeys {
     public static final int BAD_UNIT_POWER_$2                     =    17;
     public static final int BURSA_WOLF_PARAMETERS_REQUIRED        =    18;
     public static final int CANT_COMPUTE_DERIVATIVE               =    19;
-    public static final int CANT_CONCATENATE_CS_$2                =    20;
+    public static final int CANT_CONCATENATE_TRANSFORMS_$2        =    20;
     public static final int CANT_CONVERT_FROM_TYPE_$1             =    21;
     public static final int CANT_CREATE_FROM_TEXT_$1              =    22;
     public static final int CANT_EVALUATE_$1                      =    23;

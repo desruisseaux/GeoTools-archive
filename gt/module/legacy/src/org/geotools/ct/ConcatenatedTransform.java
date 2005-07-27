@@ -97,7 +97,7 @@ class ConcatenatedTransform extends AbstractMathTransform implements Serializabl
         this.transform2 = transform2;
         if (!isValid()) {
             throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.CANT_CONCATENATE_CS_$2,
+                    ErrorKeys.CANT_CONCATENATE_TRANSFORMS_$2,
                     getName(transform1), getName(transform2)));
         }
     }

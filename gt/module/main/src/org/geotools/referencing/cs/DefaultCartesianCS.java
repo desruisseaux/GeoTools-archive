@@ -52,10 +52,9 @@ import org.geotools.measure.Measure;
  *   {@link org.geotools.referencing.crs.DefaultImageCRS       Image}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see DefaultAffineCS
  */

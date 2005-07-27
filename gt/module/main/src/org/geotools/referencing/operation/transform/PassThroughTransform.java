@@ -47,10 +47,9 @@ import org.geotools.resources.i18n.Errors;
  * coordinates, then you may wish to convert the height values from feet to
  * meters without affecting the latitude and longitude values.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see DimensionFilter
  */
@@ -73,6 +72,8 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
     
     /**
      * The sub transform.
+     *
+     * @see #getSubTransform
      */
     protected final MathTransform subTransform;
     
@@ -171,6 +172,15 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
          * for the "Pass through case" is done right in the  constructor.
          */
         return new PassThroughTransform(firstAffectedOrdinate, subTransform, numTrailingOrdinates);
+    }
+
+    /**
+     * Returns the sub transform.
+     *
+     * @since 2.2
+     */
+    public MathTransform getSubTransform() {
+        return subTransform;
     }
 
     /**

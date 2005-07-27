@@ -88,7 +88,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         this.transform1 = transform1;
         this.transform2 = transform2;
         if (!isValid()) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.CANT_CONCATENATE_CS_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.CANT_CONCATENATE_TRANSFORMS_$2,
                                                getName(transform1), getName(transform2)));
         }
     }
@@ -148,6 +148,15 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      *       of the whole PassThroughTransform object.
      */
     public static MathTransform create(MathTransform tr1, MathTransform tr2) {
+        final int dim1 = tr1.getTargetDimensions();
+        final int dim2 = tr2.getSourceDimensions();
+        if (dim1 != dim2) {
+            throw new IllegalArgumentException(
+                      Errors.format(ErrorKeys.CANT_CONCATENATE_TRANSFORMS_$2,
+                                    getName(tr1), getName(tr2)) + ' ' +
+                      Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
+                                    new Integer(dim1), new Integer(dim2)));
+        }
         if (tr1.isIdentity()) return tr2;
         if (tr2.isIdentity()) return tr1;
 

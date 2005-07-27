@@ -48,10 +48,9 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  *   {@link org.geotools.referencing.crs.DefaultEngineeringCRS Engineering}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
     /**
@@ -186,6 +185,19 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
         return AxisDirection.NORTH.equals(direction) ||
                AxisDirection.EAST .equals(direction) ||
                AxisDirection.UP   .equals(direction);
+    }
+
+    /**
+     * Returns {@code true} if the specified unit is compatible with
+     * {@linkplain NonSI#DEGREE_ANGLE degrees} (or {@linkplain SI#METER meters} in the special case
+     * of height). This method is invoked at construction time for checking units compatibility.
+     *
+     * @since 2.2
+     */
+    protected boolean isCompatibleUnit(AxisDirection direction, final Unit unit) {
+        direction = direction.absolute();
+        final Unit expected = AxisDirection.UP.equals(direction) ? SI.METER : NonSI.DEGREE_ANGLE;
+        return expected.isCompatible(unit);
     }
 
     /**

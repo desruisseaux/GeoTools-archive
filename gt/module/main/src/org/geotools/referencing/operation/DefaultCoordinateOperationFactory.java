@@ -1099,8 +1099,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
     /**
      * Creates an operation from a geographic to a geocentric coordinate reference systems.
      * If the source CRS doesn't have a vertical axis, height above the ellipsoid will be
-     * assumed equals to zero everywhere. The default implementation use the
-     * <code>"Ellipsoid_To_Geocentric"</code> math transform.
+     * assumed equals to zero everywhere. The default implementation uses the
+     * {@code "Ellipsoid_To_Geocentric"} math transform.
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
@@ -1445,7 +1445,7 @@ search: for (int j=0; j<targets.length; j++) {
      * Returns {@code true} if a transformation path from {@code sourceCRS} to
      * {@code targetCRS} is likely to requires a tri-dimensional geodetic CRS as an
      * intermediate step. More specifically, this method returns {@code false} if at
-     * lest one of the following conditions is meet:
+     * least one of the following conditions is meet:
      *
      * <ul>
      *   <li>The target datum is not a vertical or geodetic one (the two datum that must work
@@ -1454,7 +1454,8 @@ search: for (int j=0; j<targets.length; j++) {
      *
      *   <li>The target datum is vertical or geodetic, but there is no datum change. It is
      *       better to not try to create 3D-geodetic CRS, since they are more difficult to
-     *       separate in the generic method above.</li>
+     *       separate in the generic method above. An exception to this rule occurs when
+     *       the target datum is used in a three-dimensional CRS.</li>
      *
      *   <li>A datum change is required, but source CRS doesn't have both a geodetic
      *       and a vertical CRS, so we can't apply a 3D datum shift anyway.</li>
@@ -1492,7 +1493,8 @@ search: for (int j=0; j<targets.length; j++) {
                                                 Datum.class);
             }
         }
-        return shift && horizontal && vertical;
+        return horizontal && vertical &&
+               (shift || targetCRS.getCoordinateSystem().getDimension()>=3);
     }
     
 

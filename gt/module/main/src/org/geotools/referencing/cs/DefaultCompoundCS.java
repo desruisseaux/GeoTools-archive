@@ -39,10 +39,9 @@ import org.geotools.referencing.AbstractIdentifiedObject;
  *   {@link org.geotools.referencing.crs.DefaultCompoundCRS Compound}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultCompoundCS extends AbstractCS {
     /**

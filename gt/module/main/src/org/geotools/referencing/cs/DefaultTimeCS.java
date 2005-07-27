@@ -22,8 +22,10 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
+import javax.units.SI;
+import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.TimeCS;
@@ -46,10 +48,9 @@ import org.geotools.measure.Measure;
  *   {@link org.geotools.referencing.crs.DefaultTemporalCRS Temporal}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultTimeCS extends AbstractCS implements TimeCS {
     /**
@@ -108,6 +109,16 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
      */
     protected boolean isCompatibleDirection(final AxisDirection direction) {
         return AxisDirection.FUTURE.equals(direction.absolute());
+    }
+
+    /**
+     * Returns {@code true} if the specified unit is compatible with {@linkplain SI#SECOND seconds}.
+     * This method is invoked at construction time for checking units compatibility.
+     *
+     * @since 2.2
+     */
+    protected boolean isCompatibleUnit(final AxisDirection direction, final Unit unit) {
+        return SI.SECOND.isCompatible(unit);
     }
 
     /**

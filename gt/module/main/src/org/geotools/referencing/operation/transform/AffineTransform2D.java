@@ -226,4 +226,11 @@ final class AffineTransform2D extends XAffineTransform
         formatter.append(this);
         return formatter.toString();
     }
+
+    /**
+     * Returns the WKT representation of this transform.
+     */
+    public String toString() {
+        return toWKT();
+    }
 }

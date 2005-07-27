@@ -42,10 +42,9 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *   {@link org.geotools.referencing.crs.DefaultEngineeringCRS Engineering}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see DefaultCylindricalCS
  */

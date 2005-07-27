@@ -22,8 +22,10 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
+import javax.units.SI;
+import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AffineCS;
@@ -42,10 +44,9 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *   {@link org.geotools.referencing.crs.DefaultImageCRS       Image}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see DefaultCartesianCS
  */
@@ -138,5 +139,16 @@ public class DefaultAffineCS extends AbstractCS implements AffineCS {
      */
     protected boolean isCompatibleDirection(final AxisDirection direction) {
         return !AxisDirection.FUTURE.equals(direction.absolute());
+    }
+
+    /**
+     * Returns {@code true} if the specified unit is compatible with {@linkplain SI#METER meters}.
+     * In addition, this method also accepts {@link Unit#ONE}, which is used for coordinates in a
+     * grid. This method is invoked at construction time for checking units compatibility.
+     *
+     * @since 2.2
+     */
+    protected boolean isCompatibleUnit(final AxisDirection direction, final Unit unit) {
+        return SI.METER.isCompatible(unit) || Unit.ONE.equals(unit);
     }
 }

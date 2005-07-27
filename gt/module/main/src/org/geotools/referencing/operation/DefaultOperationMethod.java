@@ -42,6 +42,7 @@ import org.geotools.parameter.Parameters;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -374,30 +375,41 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     }
 
     /**
-     * Check if an operation method and a math transform have a compatible number of source
-     * and target dimensions. This convenience method is provided for argument checking.
+     * Checks if an operation method and a math transform have a compatible number of source
+     * and target dimensions. In the special case of a {@linkplain PassThroughTransform pass
+     * through transform}, the method's dimensions may be checked against the
+     * {@linkplain PassThroughTransform#getSubTransform sub transform}'s dimensions.
+     * This convenience method is provided for argument checking.
      *
      * @param  method    The operation method to compare to the math transform, or {@code null}.
      * @param  transform The math transform to compare to the operation method, or {@code null}.
      * @throws MismatchedDimensionException if the number of dimensions are incompatibles.
+     *
+     * @todo The check for {@link PassThroughTransform} works only for Geotools implementation.
      */
-    public static void checkDimensions(final OperationMethod method,
-                                       final MathTransform transform)
+    public static void checkDimensions(final OperationMethod method, MathTransform transform)
             throws MismatchedDimensionException
     {
         if (method!=null && transform!=null) {
+            int actual, expected=method.getSourceDimensions();
+            while ((actual=transform.getSourceDimensions()) > expected) {
+                if (transform instanceof PassThroughTransform) {
+                    transform = ((PassThroughTransform) transform).getSubTransform();
+                } else {
+                    break;
+                }
+            }
             final String name;
-            int actual, expected;
-            if ((actual=transform.getSourceDimensions()) !=
-                 (expected=method.getSourceDimensions()))
-            {
+            if (actual != expected) {
                 name = "sourceDimensions";
-            } else if ((actual=transform.getTargetDimensions()) !=
-                        (expected=method.getTargetDimensions()))
-            {
-                name = "targetDimensions";
             } else {
-                return;
+                actual   = transform.getTargetDimensions();
+                expected =    method.getTargetDimensions();
+                if (actual != expected) {
+                    name = "targetDimensions";
+                } else {
+                    return;
+                }
             }
             throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
                                                name, new Integer(actual), new Integer(expected)));

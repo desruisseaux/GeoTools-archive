@@ -39,10 +39,9 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * curved. A {@code UserDefinedCS} shall have two or three
  * {@linkplain #getAxis axis}.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultUserDefinedCS extends AbstractCS implements UserDefinedCS {
     /**

@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Map;
 import javax.units.ConversionException;
 import javax.units.Converter;
+import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
@@ -67,10 +68,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Known Text</cite></A> is some cases (e.g. in a {@code LOCAL_CS} element). In such exceptional
  * situation, a plain {@code AbstractCS} object may be instantiated.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see DefaultCoordinateSystemAxis
  * @see javax.units.Unit
@@ -151,6 +151,11 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
                             ErrorKeys.ILLEGAL_AXIS_ORIENTATION_$2,
                             check.name(), Utilities.getShortClassName(this)));
             }
+            final Unit unit = axis[i].getUnit();
+            if (!isCompatibleUnit(check, unit)) {
+                throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.INCOMPATIBLE_UNIT_$1, unit));
+            }
             check = check.absolute();
             if (!check.equals(AxisDirection.OTHER)) {
                 for (int j=i; --j>=0;) {
@@ -168,11 +173,24 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
 
     /**
      * Returns {@code true} if the specified axis direction is allowed for this coordinate
-     * system. This method is invoked at construction time for checking argument validity. The
-     * default implementation returns {@code true} for all axis directions. Subclass will
-     * overrides this method in order to put more restrictions on allowed axis directions.
+     * system. This method is invoked at construction time for checking argument validity.
+     * The default implementation returns {@code true} for all axis directions. Subclasses
+     * will overrides this method in order to put more restrictions on allowed axis directions.
      */
     protected boolean isCompatibleDirection(final AxisDirection direction) {
+        return true;
+    }
+
+    /**
+     * Returns {@code true} is the specified unit is legal for the specified axis direction.
+     * This method is invoked at construction time for checking units compatibility. The default
+     * implementation returns {@code true} in all cases. Subclasses can override this method and
+     * check for compatibility with {@linkplain SI#METER meter} or
+     * {@linkplain NonSI#DEGREE_ANGLE degree} units.
+     *
+     * @since 2.2
+     */
+    protected boolean isCompatibleUnit(final AxisDirection direction, final Unit unit) {
         return true;
     }
 
