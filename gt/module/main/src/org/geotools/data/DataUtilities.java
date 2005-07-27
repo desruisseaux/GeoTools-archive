@@ -1522,8 +1522,13 @@ public class DataUtilities {
          */
         public void visit(LogicFilter logicFilter) {
             for (Iterator i = logicFilter.getFilterIterator(); i.hasNext();) {
-                traverse((Expression) i.next());
-                visit((Expression) i.next());
+		//GR: LogicFilters are the only ones whose members are Filters
+		//instead of Expressions, so it was causing ClassCastExceptions
+		//FIX GEOT-642
+		//traverse((Expression) i.next());
+		//visit((Expression) i.next());
+		traverse((Filter) i.next());
+		visit((Filter) i.next());
             }
         }
 
