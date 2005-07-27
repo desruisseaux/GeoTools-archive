@@ -35,10 +35,9 @@ import org.opengis.referencing.operation.Matrix;
  * and the {@linkplain Matrix#getNumRow number of rows} is equals to the number of
  * {@linkplain #getTargetDimensions target dimensions} plus 1.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public interface LinearTransform extends MathTransform {
     /**

@@ -68,7 +68,7 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Construct a test case.
+     * Constructs a test case.
      */
     public BasicTest(String testName) {
         super(testName);

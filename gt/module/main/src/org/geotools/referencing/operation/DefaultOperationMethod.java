@@ -31,6 +31,7 @@ import java.util.Map;
 // OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
@@ -41,7 +42,9 @@ import org.opengis.util.InternationalString;
 import org.geotools.parameter.Parameters;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
@@ -375,6 +378,33 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     }
 
     /**
+     * Returns {@code true} if the specified transform is likely to exists only for axis switch
+     * and/or unit conversions. The heuristic rule checks if the transform is backed by a square
+     * matrix with exactly one non-null value in each row and each column. This method is used
+     * for implementation of the {@link #checkDimensions} method only.
+     */
+    private static boolean isTrivial(final MathTransform transform) {
+        if (transform instanceof LinearTransform) {
+            final Matrix matrix = ((LinearTransform) transform).getMatrix();
+            final int size = matrix.getNumRow();
+            if (matrix.getNumCol() == size) {
+                for (int j=0; j<size; j++) {
+                    int n1=0, n2=0;
+                    for (int i=0; i<size; i++) {
+                        if (matrix.getElement(j,i) != 0) n1++;
+                        if (matrix.getElement(i,j) != 0) n2++;
+                    }
+                    if (n1!=1 || n2!=1) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Checks if an operation method and a math transform have a compatible number of source
      * and target dimensions. In the special case of a {@linkplain PassThroughTransform pass
      * through transform}, the method's dimensions may be checked against the
@@ -385,7 +415,8 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
      * @param  transform The math transform to compare to the operation method, or {@code null}.
      * @throws MismatchedDimensionException if the number of dimensions are incompatibles.
      *
-     * @todo The check for {@link PassThroughTransform} works only for Geotools implementation.
+     * @todo The check for {@link ConcatenatedTransform} and {@link PassThroughTransform} works
+     *       only for Geotools implementation.
      */
     public static void checkDimensions(final OperationMethod method, MathTransform transform)
             throws MismatchedDimensionException
@@ -393,7 +424,17 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
         if (method!=null && transform!=null) {
             int actual, expected=method.getSourceDimensions();
             while ((actual=transform.getSourceDimensions()) > expected) {
-                if (transform instanceof PassThroughTransform) {
+                if (transform instanceof ConcatenatedTransform) {
+                    // Ignore axis switch and unit conversions.
+                    final ConcatenatedTransform c = (ConcatenatedTransform) transform;
+                    if (isTrivial(c.transform1)) {
+                        transform = c.transform2;
+                    } else if (isTrivial(c.transform2)) {
+                        transform = c.transform1;
+                    } else {
+                        break;
+                    }
+                } else if (transform instanceof PassThroughTransform) {
                     transform = ((PassThroughTransform) transform).getSubTransform();
                 } else {
                     break;
