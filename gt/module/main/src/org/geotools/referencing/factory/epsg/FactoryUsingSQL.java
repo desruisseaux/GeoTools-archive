@@ -593,19 +593,20 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     /**
      * Gets a description of the object corresponding to a code.
      *
-     * @since 2.2
-     *
      * @param  code Value allocated by authority.
      * @return A description of the object, or {@code null} if the object
      *         corresponding to the specified {@code code} has no description.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the query failed for some other reason.
+     *
+     * @since 2.2
      */
     public InternationalString getDescriptionText(final String code) throws FactoryException {
+        final String primaryKey = trimAuthority(code);
         for (int i=0; i<TABLES_INFO.length; i++) {
             final Set codes = getAuthorityCodes0(TABLES_INFO[i].type);
             if (codes instanceof AuthorityCodes) {
-                final String text = (String) ((AuthorityCodes) codes).asMap().get(code);
+                final String text = (String) ((AuthorityCodes) codes).asMap().get(primaryKey);
                 if (text != null) {
                     return new SimpleInternationalString(text);
                 }
@@ -628,7 +629,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * and {@link #createObject}.
      *
      * @param  key A key uniquely identifying the caller
-     *         (e.g. <code>"Ellipsoid"</code> for {@link #createEllipsoid}).
+     *         (e.g. {@code "Ellipsoid"} for {@link #createEllipsoid}).
      * @param  sql The SQL statement to use if for creating the {@link PreparedStatement}
      *         object. Will be used only if no prepared statement was already created for
      *         the specified key.

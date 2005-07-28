@@ -69,7 +69,7 @@ public final class ErrorKeys {
     public static final int ILLEGAL_ARRAY_LENGTH_FOR_DIMENSION_$1 =    43;
     public static final int ILLEGAL_AXIS_ORIENTATION_$2           =    44;
     public static final int ILLEGAL_CLASS_$2                      =    45;
-    public static final int ILLEGAL_COORDINATE_SYSTEM             =    46;
+    public static final int ILLEGAL_COORDINATE_REFERENCE_SYSTEM   =    46;
     public static final int ILLEGAL_CS_DIMENSION_$1               =    47;
     public static final int ILLEGAL_DESCRIPTOR_FOR_PARAMETER_$1   =    48;
     public static final int ILLEGAL_ENVELOPE_ORDINATE_$1          =    49;

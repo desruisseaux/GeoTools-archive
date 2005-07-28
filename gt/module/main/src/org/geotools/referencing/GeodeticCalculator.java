@@ -26,10 +26,25 @@ import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import javax.units.NonSI;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.crs.CompoundCRS;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
@@ -38,8 +53,15 @@ import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.referencing.datum.DefaultEllipsoid;
+import org.geotools.referencing.datum.DefaultPrimeMeridian;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.cs.DefaultEllipsoidalCS;
+import org.geotools.referencing.operation.transform.IdentityTransform;
+import org.geotools.geometry.DirectPosition2D;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Coordinate;
@@ -53,15 +75,15 @@ import com.vividsolutions.jts.geom.MultiLineString;
 /**
  * Performs geodetic calculations on an ellipsoid. This class encapsulate a generic ellipsoid
  * and calculate the following properties:
+ * <p>
  * <ul>
  *   <li>Distance and azimuth between two points.</li>
  *   <li>Point located at a given distance and azimuth from an other point.</li>
  * </ul>
  *
- * <br>
+ * <p>
  * Note: This class is not thread-safe. If geodetic calculations are needed in a multi-threads
- * environment, create one instance of {@code GeodeticCalculator} for each thread even
- * if the computations are performed with the same ellipsoid.
+ * environment, create one distinct instance of {@code GeodeticCalculator} for each thread.
  *
  * @since 2.1
  * @version $Id$
@@ -78,6 +100,24 @@ public class GeodeticCalculator {
                                 TOLERANCE_2 = 5.0e-13,  // tt
                                 TOLERANCE_3 = 7.0e-3;   // tol2
     
+    /**
+     * The transform from user coordinates to geodetic coordinates used for computation.
+     * Note: consider this field as final. It is not final only because a constructor
+     * needs to modify them.
+     */
+    private MathTransform userToGeodetic;
+    
+    /**
+     * The transform from geodetic coordinates to user coordinates. This is the inverse of
+     * {@link #userToGeodetic}. Will be computed only when first needed.
+     */
+    private transient MathTransform geodeticToUser;
+
+    /**
+     * The coordinate reference system for all methods working on {@link Position} objects.
+     */
+    private CoordinateReferenceSystem coordinateReferenceSystem;
+
     /**
      * The encapsulated ellipsoid.
      */
@@ -157,6 +197,144 @@ public class GeodeticCalculator {
      * {@code false} if {@link #distance} and {@link #azimuth} need to be computed.
      */
     private boolean directionValid;
+
+    /**
+     * The position in geographic coordinates, for transformation purpose only.
+     * Reused in order to reduce object creation.
+     */
+    private transient DirectPosition geopos;
+
+    /**
+     * Constructs a new geodetic calculator associated with the WGS84 ellipsoid.
+     */
+    public GeodeticCalculator() {
+        this(DefaultEllipsoid.WGS84);
+    }
+
+    /**
+     * Constructs a new geodetic calculator associated with the specified ellipsoid.
+     * All calculations done by the new instance are referenced to this ellipsoid.
+     *
+     * @param ellipsoid The reference to the ellipsoid onto which calculates distances and azimuths.
+     */
+    public GeodeticCalculator(final Ellipsoid ellipsoid) {
+        if (ellipsoid == null) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "ellipsoid"));
+        }
+        this.ellipsoid     = ellipsoid;
+        this.semiMajorAxis = ellipsoid.getSemiMajorAxis();
+        this.semiMinorAxis = ellipsoid.getSemiMinorAxis();
+
+        /* calculation of GPNHRI parameters */
+        f  = (semiMajorAxis-semiMinorAxis) / semiMajorAxis;
+        fo = 1.0 - f;
+        f2 = f*f;
+        f3 = f*f2;
+        f4 = f*f3;
+        eccentricitySquared = f * (2.0-f);
+
+        /* Calculation of GNPARC parameters */
+        final double E2 = eccentricitySquared;
+        final double E4 = E2*E2;
+        final double E6 = E4*E2;
+        final double E8 = E6*E2;
+        final double EX = E8*E2;
+
+        A =  1.0+0.75*E2+0.703125*E4+0.68359375 *E6+0.67291259765625*E8+0.6661834716796875 *EX;
+        B =      0.75*E2+0.9375  *E4+1.025390625*E6+1.07666015625   *E8+1.1103057861328125 *EX;
+        C =              0.234375*E4+0.41015625 *E6+0.538330078125  *E8+0.63446044921875   *EX;
+        D =                          0.068359375*E6+0.15380859375   *E8+0.23792266845703125*EX;
+        E =                                         0.01922607421875*E8+0.0528717041015625 *EX;
+        F =                                                             0.00528717041015625*EX;
+
+        maxOrthodromicDistance = semiMajorAxis * (1.0-E2) * Math.PI * A - 1.0;
+
+        T1 = 1.0;
+        T2 = -0.25*f*(1.0 + f + f2);
+        T4 = 0.1875 * f2 * (1.0+2.25*f);
+        T6 = 0.1953125 * f3;
+
+        final double a = f3*(1.0+2.25*f);
+        a01 = -f2*(1.0+f+f2)/4.0;
+        a02 = 0.1875*a;
+        a03 = -0.1953125*f4;
+        a21 = -a01;
+        a22 = -0.25*a;
+        a23 = 0.29296875*f4;
+        a42 = 0.03125*a;
+        a43 = 0.05859375*f4;
+        a63 = 5.0*f4/768.0;
+
+        userToGeodetic = geodeticToUser = IdentityTransform.create(2);
+    }
+
+    /**
+     * Constructs a new geodetic calculator expecting coordinates in the supplied CRS.
+     * The ellipsoid will be inferred from the CRS.
+     *
+     * @param  crs The reference system for the {@link Position} objects.
+     * @throws FactoryException if no transform to a geodetic CRS can be created
+     *         for the specified CRS.
+     */
+    public GeodeticCalculator(final CoordinateReferenceSystem crs) throws FactoryException {
+        this(CRSUtilities.getEllipsoid(crs));
+        coordinateReferenceSystem = crs;
+        userToGeodetic = FactoryFinder.getCoordinateOperationFactory(null)
+                         .createOperation(crs, getGeographicCRS(crs)).getMathTransform();
+        geodeticToUser = null; // Will be computed when first needed.
+    }
+
+
+
+
+
+    ///////////////////////////////////////////////////////////
+    ////////                                           ////////
+    ////////        H E L P E R   M E T H O D S        ////////
+    ////////                                           ////////
+    ///////////////////////////////////////////////////////////
+
+    /**
+     * Returns the first two-dimensional geographic CRS using standard axis, creating one if needed.
+     *
+     * @throws FactoryException If the CRS is {@code null} or unrecognized.
+     */
+    private static GeographicCRS getGeographicCRS(final CoordinateReferenceSystem crs)
+            throws FactoryException
+    {
+        if (crs instanceof GeographicCRS) {
+            final CoordinateSystem cs = crs.getCoordinateSystem();
+            if (cs.getDimension() == 2 &&
+                isStandard(cs.getAxis(0), AxisDirection.EAST) &&
+                isStandard(cs.getAxis(1), AxisDirection.NORTH))
+            {
+                return (GeographicCRS) crs;
+            }
+        }
+        final Datum datum = CRSUtilities.getDatum(crs);
+        if (datum instanceof GeodeticDatum) {
+            return new DefaultGeographicCRS("Geodetic", (GeodeticDatum) datum,
+                                            DefaultEllipsoidalCS.GEODETIC_2D);
+        }
+        if (crs instanceof CompoundCRS) {
+            final List components = ((CompoundCRS) crs).getCoordinateReferenceSystems();
+            for (final Iterator it=components.iterator(); it.hasNext();) {
+                final GeographicCRS candidate = getGeographicCRS((CoordinateReferenceSystem) it.next());
+                if (candidate != null) {
+                    return candidate;
+                }
+            }
+        }
+        throw new FactoryException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
+    }
+
+    /**
+     * Returns {@code true} if the specified axis is oriented toward the specified direction and
+     * uses degrees units.
+     */
+    private static boolean isStandard(final CoordinateSystemAxis axis, final AxisDirection direction) {
+        return direction.equals(axis.getDirection()) && NonSI.DEGREE_ANGLE.equals(axis.getUnit());
+    }
 
     /**
      * Returns an angle between -{@linkplain Math#PI PI} and {@linkplain Math#PI PI}
@@ -267,67 +445,31 @@ public class GeodeticCalculator {
                format.format(new GeneralDirectPosition(Math.toDegrees(long2), Math.toDegrees(lat2))));
     }
 
+
+
+
+    ///////////////////////////////////////////////////////////////
+    ////////                                               ////////
+    ////////        G E O D E T I C   M E T H O D S        ////////
+    ////////                                               ////////
+    ///////////////////////////////////////////////////////////////
+
     /**
-     * Constructs a new geodetic calculator associated with the WGS84 ellipsoid.
+     * Returns the coordinate reference system for all methods working on {@link Position} objects.
+     * This is the CRS specified at {@linkplain #GeodeticCalculator(CoordinateReferenceSystem)
+     * construction time}.
      */
-    public GeodeticCalculator() {
-        this(DefaultEllipsoid.WGS84);
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        if (coordinateReferenceSystem == null) {
+            coordinateReferenceSystem = new DefaultGeographicCRS("Geodetic",
+                    new DefaultGeodeticDatum("Geodetic", ellipsoid, DefaultPrimeMeridian.GREENWICH),
+                        DefaultEllipsoidalCS.GEODETIC_2D);
+        }
+        return coordinateReferenceSystem;
     }
 
     /**
-     * Constructs a new geodetic calculator associated with the specified ellipsoid.
-     * All calculations done by the new instance are referenced to the ellipsoid specified.
-     *
-     * @param ellipsoid The reference to the ellipsoid onto which calculates distances and azimuths.
-     */
-    public GeodeticCalculator(final Ellipsoid ellipsoid) {
-        this.ellipsoid     = ellipsoid;
-        this.semiMajorAxis = ellipsoid.getSemiMajorAxis();
-        this.semiMinorAxis = ellipsoid.getSemiMinorAxis();
-
-        /* calculation of GPNHRI parameters*/
-        f  = (semiMajorAxis-semiMinorAxis) / semiMajorAxis;
-        fo = 1.0 - f;
-        f2 = f*f;
-        f3 = f*f2;
-        f4 = f*f3;
-        eccentricitySquared = f * (2.0-f);
-
-        /* Calculation of GNPARC parameters */
-        final double E2 = eccentricitySquared;
-        final double E4 = E2*E2;
-        final double E6 = E4*E2;
-        final double E8 = E6*E2;
-        final double EX = E8*E2;
-
-        A =  1.0+0.75*E2+0.703125*E4+0.68359375 *E6+0.67291259765625*E8+0.6661834716796875 *EX;
-        B =      0.75*E2+0.9375  *E4+1.025390625*E6+1.07666015625   *E8+1.1103057861328125 *EX;
-        C =              0.234375*E4+0.41015625 *E6+0.538330078125  *E8+0.63446044921875   *EX;
-        D =                          0.068359375*E6+0.15380859375   *E8+0.23792266845703125*EX;
-        E =                                         0.01922607421875*E8+0.0528717041015625 *EX;
-        F =                                                             0.00528717041015625*EX;
-
-        maxOrthodromicDistance = semiMajorAxis * (1.0-E2) * Math.PI * A - 1.0;
-
-        T1 = 1.0;
-        T2 = -0.25*f*(1.0 + f + f2);
-        T4 = 0.1875 * f2 * (1.0+2.25*f);
-        T6 = 0.1953125 * f3;
-
-        final double a = f3*(1.0+2.25*f);
-        a01 = -f2*(1.0+f+f2)/4.0;
-        a02 = 0.1875*a;
-        a03 = -0.1953125*f4;
-        a21 = -a01;
-        a22 = -0.25*a;
-        a23 = 0.29296875*f4;
-        a42 = 0.03125*a;
-        a43 = 0.05859375*f4;
-        a63 = 5.0*f4/768.0;
-    }
-
-    /**
-     * Return the referenced ellipsoid.
+     * Returns the referenced ellipsoid.
      *
      * @return The referenced ellipsoid.
      */
@@ -373,6 +515,19 @@ public class GeodeticCalculator {
     }
 
     /**
+     * Set the anchor position in user coordinates, which doesn't need to be geographic.
+     * The coordinate reference system is the one specified to the
+     * {@linkplain #GeodeticCalculator(CoordinateReferenceSystem) constructor}.
+     *
+     * @param  position The position in user coordinate reference system.
+     * @throws TransformException if the position can't be transformed.
+     */
+    public void setAnchorPosition(final Position position) throws TransformException {
+        geopos = userToGeodetic.transform(position.getPosition(), geopos);
+        setAnchorPoint(geopos.getOrdinate(0), geopos.getOrdinate(1));
+    }
+
+    /**
      * Returns the anchor point. The <var>x</var> and <var>y</var> coordinates
      * are the longitude and latitude in degrees, respectively. If the anchor
      * point has never been set, then the default value is (0,0).
@@ -381,6 +536,25 @@ public class GeodeticCalculator {
      */
     public Point2D getAnchorPoint() {
         return new Point2D.Double(Math.toDegrees(long1), Math.toDegrees(lat1));
+    }
+
+    /**
+     * Returns the anchor position in user coordinates, which doesn't need to be geographic.
+     * The coordinate reference system is the one specified to the
+     * {@linkplain #GeodeticCalculator(CoordinateReferenceSystem) constructor}.
+     *
+     * @throws TransformException if the position can't be transformed to user coordinates.
+     */
+    public DirectPosition getAnchorPosition() throws TransformException {
+        if (geopos == null) {
+            geopos = new DirectPosition2D();
+        }
+        geopos.setOrdinate(0, Math.toDegrees(long1));
+        geopos.setOrdinate(1, Math.toDegrees( lat1));
+        if (geodeticToUser == null) {
+            geodeticToUser = userToGeodetic.inverse();
+        }
+        return geodeticToUser.transform(geopos, null);
     }
 
     /**
@@ -419,6 +593,19 @@ public class GeodeticCalculator {
     }
 
     /**
+     * Set the destination position in user coordinates, which doesn't need to be geographic.
+     * The coordinate reference system is the one specified to the
+     * {@linkplain #GeodeticCalculator(CoordinateReferenceSystem) constructor}.
+     *
+     * @param  position The position in user coordinate reference system.
+     * @throws TransformException if the position can't be transformed.
+     */
+    public void setDestinationPosition(final Position position) throws TransformException {
+        geopos = userToGeodetic.transform(position.getPosition(), geopos);
+        setDestinationPoint(geopos.getOrdinate(0), geopos.getOrdinate(1));
+    }
+
+    /**
      * Returns the destination point. This method returns the point set by the last call to a
      * <code>{@linkplain #setDestinationPoint(double,double) setDestinationPoint}(...)</code>
      * method, <strong>except</strong> if
@@ -435,6 +622,28 @@ public class GeodeticCalculator {
             computeDestinationPoint();
         }
         return new Point2D.Double(Math.toDegrees(long2), Math.toDegrees(lat2));
+    }
+
+    /**
+     * Returns the destination position in user coordinates, which doesn't need to be geographic.
+     * The coordinate reference system is the one specified to the
+     * {@linkplain #GeodeticCalculator(CoordinateReferenceSystem) constructor}.
+     *
+     * @throws TransformException if the position can't be transformed to user coordinates.
+     */
+    public DirectPosition getDestinationPosition() throws TransformException {
+        if (!destinationValid) {
+            computeDestinationPoint();
+        }
+        if (geopos == null) {
+            geopos = new DirectPosition2D();
+        }
+        geopos.setOrdinate(0, Math.toDegrees(long2));
+        geopos.setOrdinate(1, Math.toDegrees( lat2));
+        if (geodeticToUser == null) {
+            geodeticToUser = userToGeodetic.inverse();
+        }
+        return geodeticToUser.transform(geopos, null);
     }
 
     /**
@@ -518,7 +727,7 @@ public class GeodeticCalculator {
     }
 
     /**
-     * Compute the destination point from the {@linkplain #getAnchorPoint anchor point},
+     * Computes the destination point from the {@linkplain #getAnchorPoint anchor point},
      * the {@linkplain #getAzimuth azimuth} and the {@linkplain #getOrthodromicDistance
      * orthodromic distance}.
      *
@@ -591,7 +800,7 @@ public class GeodeticCalculator {
     }
 
     /**
-     * Calculate the meridian arc length between two points in the same meridian 
+     * Calculates the meridian arc length between two points in the same meridian 
      * in the referenced ellipsoid.
      *
      * @param  latitude1 The latitude of the first  point (in degrees).
@@ -603,7 +812,7 @@ public class GeodeticCalculator {
     }
 
     /**
-     * Calculate the meridian arc length between two points in the same meridian 
+     * Calculates the meridian arc length between two points in the same meridian 
      * in the referenced ellipsoid.
      *
      * @param  P1 The latitude of the first  point (in radians).
@@ -642,7 +851,7 @@ public class GeodeticCalculator {
     }
 
     /**
-     * Compute the azimuth and orthodromic distance from the
+     * Computes the azimuth and orthodromic distance from the
      * {@linkplain #getAnchorPoint anchor point} and the
      * {@linkplain #getDestinationPoint destination point}.
      *
@@ -687,18 +896,18 @@ public class GeodeticCalculator {
             return;
         }
         /*
-         * Compute the limit in longitude (alimit), it is equal 
+         * Computes the limit in longitude (alimit), it is equal 
          * to twice  the distance from the equator to the pole,
          * as measured along the equator
          */
-        //test for antinodal difference
+        // tests for antinodal difference
         final double ESQP = eccentricitySquared / (1.0-eccentricitySquared);
         final double alimit = Math.PI*fo;
         if (ss>=alimit &&
             lat1<TOLERANCE_3 && lat1>-TOLERANCE_3 &&
             lat2<TOLERANCE_3 && lat2>-TOLERANCE_3)
         {
-            // Compute an approximate AZ
+            // Computes an approximate AZ
             final double CONS = (Math.PI-ss)/(Math.PI*f);
             double AZ = Math.asin(CONS);
             double AZ_TEMP, S, AO;

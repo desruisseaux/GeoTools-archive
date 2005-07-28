@@ -22,6 +22,7 @@ package org.geotools.referencing;
 import java.awt.Shape;
 import java.awt.geom.IllegalPathStateException;
 import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 import javax.units.SI;
 
 // JUnit dependencies
@@ -29,12 +30,23 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+
 // Geotools dependencies
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.cs.DefaultEllipsoidalCS;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.datum.DefaultEllipsoid;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 
 
 /**
- * Test the geodetic calculator.
+ * Tests the geodetic calculator.
  *
  * @version $Id$
  */
@@ -66,6 +78,7 @@ public class GeodeticCalculatorTest extends TestCase {
     public void testAzimuth() {
         final double EPS = 2E-1;
         final GeodeticCalculator calculator = new GeodeticCalculator();
+        assertTrue(calculator.getCoordinateReferenceSystem() instanceof GeographicCRS);
         calculator.setAnchorPoint(12, 20);
         calculator.setDestinationPoint(13, 20);  assertEquals("East",   90, calculator.getAzimuth(), EPS);
         calculator.setDestinationPoint(12, 21);  assertEquals("North",   0, calculator.getAzimuth(), EPS);
@@ -141,5 +154,30 @@ public class GeodeticCalculatorTest extends TestCase {
                                                         // valid when the path will contains curves.
             assertEquals("Orthodromic path length", orthodromic, length, 1E-4);
         }
+    }
+
+    /**
+     * Tests geodetic calculator involving a coordinate operation.
+     * Our test uses a simple geographic CRS with only the axis order interchanged.
+     */
+    public void testUsingTransform() throws FactoryException, TransformException {
+        final GeographicCRS crs = new DefaultGeographicCRS("Test", DefaultGeodeticDatum.WGS84,
+                new DefaultEllipsoidalCS("Test", DefaultCoordinateSystemAxis.LATITUDE,
+                                                 DefaultCoordinateSystemAxis.LONGITUDE));
+        final GeodeticCalculator calculator = new GeodeticCalculator(crs);
+        assertSame(crs, calculator.getCoordinateReferenceSystem());
+
+        final double x = 45;
+        final double y = 30;
+        calculator.setAnchorPosition(new DirectPosition2D(x,y));
+        Point2D point = calculator.getAnchorPoint();
+        assertEquals(y, point.getX(), 1E-5);
+        assertEquals(x, point.getY(), 1E-5);
+
+        calculator.setDirection(10, 100);
+        DirectPosition position = calculator.getDestinationPosition();
+        point = calculator.getDestinationPoint();
+        assertEquals(point.getX(), position.getOrdinate(1), 1E-5);
+        assertEquals(point.getY(), position.getOrdinate(0), 1E-5);
     }
 }

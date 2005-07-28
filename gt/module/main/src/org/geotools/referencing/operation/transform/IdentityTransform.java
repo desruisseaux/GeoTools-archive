@@ -41,10 +41,9 @@ import org.geotools.referencing.operation.LinearTransform;
  * {@link LinearTransform1D} and {@link java.awt.geom.AffineTransform} already provide their
  * own optimisations.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class IdentityTransform extends AbstractMathTransform
                             implements LinearTransform, Serializable

@@ -24,6 +24,7 @@ package org.geotools.parameter;
 
 // J2SE dependencies
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,11 +57,10 @@ import org.geotools.resources.Utilities;
  * values of one or more {@link ParameterValue}s which suitably distinquish among
  * those groups.
  *  
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett (Refractions Research)
- *
- * @since 2.1
  *
  * @see DefaultParameterDescriptorGroup
  * @see Parameter
@@ -70,6 +70,12 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -1985309386356545126L;
+
+    /**
+     * An empty parameter value group. This group contains no parameter value.
+     */
+    public static ParameterValueGroup EMPTY = new ParameterGroup(
+            Collections.singletonMap(ParameterDescriptorGroup.NAME_KEY, "Void"), new ParameterValue[0]);
 
     /**
      * The {@linkplain #values() parameter values} for this group.

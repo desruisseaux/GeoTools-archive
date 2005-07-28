@@ -12,6 +12,7 @@
     Provides some Geotools's fonctionalities as OpenOffice plugins. For example provides
     coordinate operation services as formulas inside the Calc spread sheet.
   </description>
+  
   <developers>
     <developer>
       <name>Martin Desruisseaux</name>
@@ -31,7 +32,17 @@
       </roles>
     </developer>
   </developers>
+  
   <dependencies>
+    <dependency>
+      <!-- Overrides GeoAPI dependency with "jar.manifest.classpath" property -->
+      <id>geoapi</id>
+      <version>2.0</version>
+      <url>http://geoapi.sourceforge.net</url>
+      <properties>
+        <jar.manifest.classpath>true</jar.manifest.classpath>
+      </properties>
+    </dependency>
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
@@ -57,6 +68,9 @@
       <id>units</id>
       <version>0.01</version>
       <url>http://jsr-108.sourceforge.net</url>
+      <properties>
+        <jar.manifest.classpath>true</jar.manifest.classpath>
+      </properties>
     </dependency>
     <dependency>
       <id>ridl</id>

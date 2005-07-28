@@ -35,12 +35,19 @@ import com.sun.star.beans.XPropertySet;
 
 // GeoAPI dependencies
 import org.opengis.util.InternationalString;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.ReferenceSystem;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.Datum;
+import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeneralDerivedCRS;
+import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -56,9 +63,14 @@ import org.geotools.measure.Angle;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.measure.AngleFormat;
+import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -81,6 +93,11 @@ public final class Referencing extends Formulas implements XReferencing {
      * The name of the provided service.
      */
     private static final String ADDIN_SERVICE = "com.sun.star.sheet.AddIn";
+
+    /**
+     * The authority used in this implementation.
+     */
+    private static final String AUTHORITY = "EPSG";
 
     /**
      * The pattern for the {@link #angleFormat}. Used in order to avoid creating
@@ -112,71 +129,101 @@ public final class Referencing extends Formulas implements XReferencing {
      * Constructs a default implementation of {@code XReferencing} interface.
      */
     public Referencing() {
-        methods.put("parseAngle", new MethodInfo("Text", "VALUE.ANGLE",
+        methods.put("getValueAngle", new MethodInfo("Text", "VALUE.ANGLE",
             "Converts text in degrees-minutes-seconds to an angle in decimal degrees.",
             new String[] {
-                "(internal)", "(internal)",
-                "text",      "The text to be converted to an angle."
+                "xOptions",   "Provided by OpenOffice.",
+                "text",       "The text to be converted to an angle."
         }));
-        methods.put("formatAngle", new MethodInfo("Text", "TEXT.ANGLE",
+        methods.put("getTextAngle", new MethodInfo("Text", "TEXT.ANGLE",
             "Converts an angle to text according to a given format.",
             new String[] {
-                "(internal)", "(internal)",
+                "xOptions",   "Provided by OpenOffice.",
                 "value",      "The angle value (in decimal degrees) to be converted.",
                 "pattern",    "The text that describes the format (example: \"D°MM.m'\")."
         }));
-        methods.put("formatLongitude", new MethodInfo("Text", "TEXT.LONGITUDE",
+        methods.put("getTextLongitude", new MethodInfo("Text", "TEXT.LONGITUDE",
             "Converts a longitude to text according to a given format.",
             new String[] {
-                "(internal)", "(internal)",
+                "xOptions",   "Provided by OpenOffice.",
                 "value",      "The longitude value (in decimal degrees) to be converted.",
                 "pattern",    "The text that describes the format (example: \"D°MM.m'\")."
         }));
-        methods.put("formatLatitude", new MethodInfo("Text", "TEXT.LATITUDE",
+        methods.put("getTextLatitude", new MethodInfo("Text", "TEXT.LATITUDE",
             "Converts a latitude to text according to a given format.",
             new String[] {
-                "(internal)", "(internal)",
+                "xOptions",   "Provided by OpenOffice.",
                 "value",      "The latitude value (in decimal degrees) to be converted.",
                 "pattern",    "The text that describes the format (example: \"D°MM.m'\")."
         }));
         methods.put("getDescription", new MethodInfo("Referencing", "CRS.DESCRIPTION",
             "Returns a description for an object identified by the given authority code.",
             new String[] {
-                "(internal)", "(internal)",
+                "xOptions",   "Provided by OpenOffice.",
                 "code",       "The code allocated by authority."
         }));
         methods.put("getScope", new MethodInfo("Referencing", "CRS.SCOPE",
             "Returns the scope for an identified object.",
             new String[] {
-                "(internal)", "(internal)",
+                "xOptions",   "Provided by OpenOffice.",
                 "code",       "The code allocated by authority."
         }));
         methods.put("getRemarks", new MethodInfo("Referencing", "CRS.REMARKS",
             "Returns the remarks for an identified object.",
             new String[] {
-                "(internal)", "(internal)",
+                "xOptions",   "Provided by OpenOffice.",
                 "code",       "The code allocated by authority."
+        }));
+        methods.put("getAxis", new MethodInfo("Referencing", "CRS.AXIS",
+            "Returns the axis name for the specified dimension in an identified object.",
+            new String[] {
+                "xOptions",   "Provided by OpenOffice.",
+                "code",       "The code allocated by authority.",
+                "dimension",  "The dimension (1, 2, ...)."
         }));
         methods.put("getWKT", new MethodInfo("Referencing", "CRS.WKT",
             "Returns the Well Know Text (WKT) for an identified object.",
             new String[] {
-                "(internal)", "(internal)",
+                "xOptions",   "Provided by OpenOffice.",
                 "code",       "The code allocated by authority."
+        }));
+        methods.put("getParameter", new MethodInfo("Referencing", "CRS.PARAMETER",
+            "Returns the value for a coordinate reference system parameter.",
+            new String[] {
+                "xOptions",   "Provided by OpenOffice.",
+                "code",       "The code allocated by authority.",
+                "parameter",  "The parameter name (e.g. \"False easting\")."
         }));
         methods.put("getAccuracy", new MethodInfo("Referencing", "CRS.ACCURACY",
             "Returns the accuracy of a transformation between two coordinate reference systems.",
             new String[] {
-                "(internal)",  "(internal)",
+                "xOptions",    "Provided by OpenOffice.",
                 "source CRS",  "The source coordinate reference system.",
                 "target CRS",  "The target coordinate reference system."
         }));
-        methods.put("transform", new MethodInfo("Referencing", "CRS.TRANSFORM",
+        methods.put("getTransformedCoordinates", new MethodInfo("Referencing", "CRS.TRANSFORM",
             "Transform coordinates from the given source CRS to the given target CRS.",
             new String[] {
-                "(internal)",  "(internal)",
+                "xOptions",    "Provided by OpenOffice.",
                 "coordinates", "The coordinate values to transform.",
                 "source CRS",  "The source coordinate reference system.",
                 "target CRS",  "The target coordinate reference system."
+        }));
+        methods.put("getOrthodromicDistance", new MethodInfo("Referencing", "ORTHODROMIC.DISTANCE",
+            "Computes the orthodromic distance and azimuth between two coordinates.",
+            new String[] {
+                "xOptions",    "Provided by OpenOffice.",
+                "CRS",         "Authority code of the coordinate reference system.",
+                "source",      "The source positions.",
+                "target",      "The target positions."
+        }));
+        methods.put("getOrthodromicForward", new MethodInfo("Referencing", "ORTHODROMIC.FORWARD",
+            "Computes the coordinates after a displacement of the specified distance.",
+            new String[] {
+                "xOptions",    "Provided by OpenOffice.",
+                "CRS",         "Authority code of the coordinate reference system.",
+                "source",      "The source positions.",
+                "displacement","The distance and azimuth."
         }));
     }
 
@@ -262,7 +309,7 @@ public final class Referencing extends Formulas implements XReferencing {
      */
     private CRSAuthorityFactory crsFactory() {
         if (crsFactory == null) {
-            crsFactory = FactoryFinder.getCRSAuthorityFactory("EPSG", null);
+            crsFactory = FactoryFinder.getCRSAuthorityFactory(AUTHORITY, null);
         }
         return crsFactory;
     }
@@ -277,6 +324,27 @@ public final class Referencing extends Formulas implements XReferencing {
         return opFactory;
     }
 
+    /**
+     * Returns the geodetic calculator for the specified CRS, datum or ellipsoid.
+     *
+     * @throws FactoryException if the geodetic calculator can't be created.
+     */
+    private GeodeticCalculator getGeodeticCalculator(final String authorityCode)
+            throws FactoryException
+    {
+        final IdentifiedObject object = crsFactory().createObject(authorityCode);
+        if (object instanceof Ellipsoid) {
+            return new GeodeticCalculator((Ellipsoid) object);
+        }
+        if (object instanceof GeodeticDatum) {
+            return new GeodeticCalculator(((GeodeticDatum) object).getEllipsoid());
+        }
+        if (object instanceof CoordinateReferenceSystem) {
+            return new GeodeticCalculator((CoordinateReferenceSystem) object);
+        }
+        throw new FactoryException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
+    }
+
 
 
 
@@ -287,8 +355,8 @@ public final class Referencing extends Formulas implements XReferencing {
     /**
      * {@inheritDoc}
      */
-    public double parseAngle(final XPropertySet xOptions,
-                             final String       text)
+    public double getValueAngle(final XPropertySet xOptions,
+                                final String       text)
     {
         if (angleParser == null) {
             angleParser = new AngleFormat("D°MM'SS.s\"", getJavaLocale());
@@ -306,8 +374,8 @@ public final class Referencing extends Formulas implements XReferencing {
      * @param value The angle value (in decimal degrees) to be converted.
      * @param pattern he text that describes the format (example: "D°MM.m'").
      */
-    private String formatAngle(final Object value,
-                               final String pattern)
+    private String getTextAngle(final Object value,
+                                final String pattern)
     {
         if (angleFormat == null) {
             angleFormat = new AngleFormat(pattern, getJavaLocale());
@@ -322,31 +390,31 @@ public final class Referencing extends Formulas implements XReferencing {
     /**
      * {@inheritDoc}
      */
-    public String formatAngle(final XPropertySet xOptions,
-                              final double       value,
-                              final String       pattern)
+    public String getTextAngle(final XPropertySet xOptions,
+                               final double       value,
+                               final String       pattern)
     {
-        return formatAngle(new Angle(value), pattern);
+        return getTextAngle(new Angle(value), pattern);
     }
 
     /**
      * {@inheritDoc}
      */
-    public String formatLongitude(final XPropertySet xOptions,
+    public String getTextLongitude(final XPropertySet xOptions,
+                                   final double       value,
+                                   final String       pattern)
+    {
+        return getTextAngle(new Longitude(value), pattern);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getTextLatitude(final XPropertySet xOptions,
                                   final double       value,
                                   final String       pattern)
     {
-        return formatAngle(new Longitude(value), pattern);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String formatLatitude(final XPropertySet xOptions,
-                                 final double       value,
-                                 final String       pattern)
-    {
-        return formatAngle(new Latitude(value), pattern);
+        return getTextAngle(new Latitude(value), pattern);
     }
 
     /**
@@ -408,6 +476,31 @@ public final class Referencing extends Formulas implements XReferencing {
     /**
      * {@inheritDoc}
      */
+    public String getAxis(final XPropertySet xOptions,
+                          final String  authorityCode,
+                          final int         dimension)
+    {
+        CoordinateSystem cs;
+        try {
+            cs = crsFactory().createCoordinateReferenceSystem(authorityCode).getCoordinateSystem();
+        } catch (Exception exception) {
+            try {
+                cs = FactoryFinder.getCSAuthorityFactory(AUTHORITY, null).createCoordinateSystem(authorityCode);
+            } catch (Exception ignore) {
+                // Ignore - we will report the previous exception instead.
+            }
+            return getLocalizedMessage(exception);
+        }
+        if (dimension>=1 && dimension<=cs.getDimension()) {
+            return cs.getAxis(dimension-1).getName().getCode();
+        } else {
+            return Errors.format(ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String getWKT(final XPropertySet xOptions,
                          final String authorityCode)
     {
@@ -420,6 +513,36 @@ public final class Referencing extends Formulas implements XReferencing {
         try {
             return object.toWKT();
         } catch (UnsupportedOperationException exception) {
+            return getLocalizedMessage(exception);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Object getParameter(final XPropertySet xOptions,
+                               final String  authorityCode,
+                               final String      parameter)
+    {
+        final IdentifiedObject object;
+        try {
+            object = crsFactory().createObject(authorityCode);
+        } catch (FactoryException exception) {
+            return getLocalizedMessage(exception);
+        }
+        final ParameterValueGroup parameters;
+        if (object instanceof Operation) {
+            parameters = ((Operation) object).getParameterValues();
+        } else if (object instanceof GeneralDerivedCRS) {
+            parameters = ((GeneralDerivedCRS) object).getConversionFromBase().getParameterValues();
+        } else {
+            parameters = ParameterGroup.EMPTY;
+        }
+        try {
+            return parameters.parameter(parameter).getValue();
+        } catch (ParameterNotFoundException exception) {
+            return Errors.format(ErrorKeys.UNKNOW_PARAMETER_$1, parameter);
+        } catch (RuntimeException exception) {
             return getLocalizedMessage(exception);
         }
     }
@@ -440,7 +563,7 @@ public final class Referencing extends Formulas implements XReferencing {
              targetCRS = crsFactory.createCoordinateReferenceSystem(targetCode);
              operation = opFactory().createOperation(sourceCRS, targetCRS);
         } catch (FactoryException exception) {
-            reportException("transform", exception);
+            reportException("getAccuracy", exception);
             return Double.NaN;
         }
         final Collection accuracies = operation.getPositionalAccuracy();
@@ -465,10 +588,10 @@ public final class Referencing extends Formulas implements XReferencing {
     /**
      * {@inheritDoc}
      */
-    public double[][] transform(final XPropertySet xOptions,
-                                final double[][]   coordinates,
-                                final String       sourceCode,
-                                final String       targetCode)
+    public double[][] getTransformedCoordinates(final XPropertySet xOptions,
+                                                final double[][]   coordinates,
+                                                final String       sourceCode,
+                                                final String       targetCode)
     {
         final CoordinateReferenceSystem sourceCRS;
         final CoordinateReferenceSystem targetCRS;
@@ -479,7 +602,7 @@ public final class Referencing extends Formulas implements XReferencing {
              targetCRS = crsFactory.createCoordinateReferenceSystem(targetCode);
              operation = opFactory().createOperation(sourceCRS, targetCRS);
         } catch (FactoryException exception) {
-            reportException("transform", exception);
+            reportException("getTransformedCoordinates", exception);
             return null;
         }
         /*
@@ -493,6 +616,9 @@ public final class Referencing extends Formulas implements XReferencing {
         final double[][] result = new double[coordinates.length][];
         for (int j=0; j<coordinates.length; j++) {
             double[] coords = coordinates[j];
+            if (coords == null) {
+                continue;
+            }
             for (int i=sourcePt.ordinates.length; --i>=0;) {
                 sourcePt.ordinates[i] = (i<coords.length) ? coords[i] : 0;
             }
@@ -507,11 +633,9 @@ public final class Referencing extends Formulas implements XReferencing {
                  * all subsequent failures are likely to be the same one.
                  */
                 if (!failureReported) {
-                    reportException("transform", exception);
+                    reportException("getTransformedCoordinates", exception);
                     failureReported = true;
                 }
-                coords = new double[targetPt.getDimension()];
-                Arrays.fill(coords, Double.NaN);
                 continue;
             }
             coords = new double[pt.getDimension()];
@@ -519,6 +643,106 @@ public final class Referencing extends Formulas implements XReferencing {
                 coords[i] = pt.getOrdinate(i);
             }
             result[j] = coords;
+        }    
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public double[][] getOrthodromicDistance(final XPropertySet xOptions,
+                                             final String       CRS,
+                                             final double[][]   source,
+                                             final double[][]   target)
+    {
+        final GeodeticCalculator calculator;
+        try {
+            calculator = getGeodeticCalculator(CRS);
+        } catch (FactoryException exception) {
+            reportException("getOrthodromicDistance", exception);
+            return null;
+        }
+        boolean failureReported = false;
+        final int dim = calculator.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
+        final GeneralDirectPosition sourcePt = new GeneralDirectPosition(dim);
+        final GeneralDirectPosition targetPt = new GeneralDirectPosition(dim);
+        final double[][] result = new double[Math.min(source.length, target.length)][];
+        for (int j=0; j<result.length; j++) {
+            final double[] src = source[j];
+            final double[] dst = target[j];
+            if (src==null || dst==null) {
+                continue;
+            }
+            for (int i=dim; --i>=0;) {
+                sourcePt.ordinates[i] = (i<src.length) ? src[i] : 0;
+                targetPt.ordinates[i] = (i<dst.length) ? dst[i] : 0;
+            }
+            try {
+                calculator.setAnchorPosition     (sourcePt);
+                calculator.setDestinationPosition(targetPt);
+            } catch (TransformException exception) {
+                if (!failureReported) {
+                    reportException("getOrthodromicDistance", exception);
+                    failureReported = true;
+                }
+                continue;
+            }
+            result[j] = new double[] {
+                calculator.getOrthodromicDistance(),
+                calculator.getAzimuth()
+            };
+        }    
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public double[][] getOrthodromicForward(final XPropertySet xOptions,
+                                            final String       CRS,
+                                            final double[][]   source,
+                                            final double[][]   displacement)
+    {
+        final GeodeticCalculator calculator;
+        try {
+            calculator = getGeodeticCalculator(CRS);
+        } catch (FactoryException exception) {
+            reportException("getOrthodromicForward", exception);
+            return null;
+        }
+        boolean failureReported = false;
+        final int dim = calculator.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
+        final GeneralDirectPosition sourcePt = new GeneralDirectPosition(dim);
+        final double[][] result = new double[Math.min(source.length, displacement.length)][];
+        for (int j=0; j<result.length; j++) {
+            final double[] src = source      [j];
+            final double[] mov = displacement[j];
+            if (src==null || mov==null) {
+                continue;
+            }
+            for (int i=dim; --i>=0;) {
+                sourcePt.ordinates[i] = (i<src.length) ? src[i] : 0;
+            }
+            double distance=0, azimuth=0;
+            switch (mov.length) {
+                default:                    // Fall through
+                case 2:  azimuth  = mov[1]; // Fall through
+                case 1:  distance = mov[0]; // Fall through
+                case 0:  break;
+            }
+            final DirectPosition targetPt;
+            try {
+                calculator.setAnchorPosition(sourcePt);
+                calculator.setDirection(azimuth, distance);
+                targetPt = calculator.getDestinationPosition();
+            } catch (TransformException exception) {
+                if (!failureReported) {
+                    reportException("getOrthodromicForward", exception);
+                    failureReported = true;
+                }
+                continue;
+            }
+            result[j] = targetPt.getCoordinates();
         }    
         return result;
     }
