@@ -19,9 +19,11 @@ import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.BBoxExpression;
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.IllegalFilterException;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -55,6 +57,7 @@ public class WFSDataStoreReadTest extends TestCase {
     }
         
     public static void doFeatureType(URL url,boolean get, boolean post, int i) throws IOException, SAXException{
+        if( url == null ) return; // test distabled (must be site specific)                
         try{
         WFSDataStore wfs = getDataStore(url);
         System.out.println("FeatureTypeTest + "+url);
@@ -79,6 +82,7 @@ public class WFSDataStoreReadTest extends TestCase {
     }
     
     public static void doFeatureReader(URL url, boolean get, boolean post, int i) throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
+        if( url == null ) return; // test distabled (must be site specific)                
         try{
         System.out.println("FeatureReaderTest + "+url);
         WFSDataStore wfs = getDataStore(url);
@@ -109,6 +113,7 @@ public class WFSDataStoreReadTest extends TestCase {
     }
     
     public static void doFeatureReaderWithFilter(URL url, boolean get, boolean post, int i) throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
+        if( url == null ) return; // test distabled (must be site specific)                
         try{
         System.out.println("FeatureReaderWithFilterTest + "+url);
         WFSDataStore wfs = getDataStore(url);
@@ -148,5 +153,50 @@ public class WFSDataStoreReadTest extends TestCase {
             se.printStackTrace();
         }
     }
-    
+       /** Request a subset of available properties 
+     * @throws IllegalFilterException */
+    public static void doFeatureReaderWithBBox(URL url, boolean get, boolean post, int i, Envelope bbox) throws NoSuchElementException, IllegalAttributeException, IOException, SAXException, IllegalFilterException{
+        if( url == null ) return; // test distabled (must be site specific)                
+        try{
+        System.out.println("FeatureReaderWithFilterTest + "+url);
+        WFSDataStore wfs = getDataStore(url);
+        assertNotNull("No featureTypes",wfs.getTypeNames());
+        assertNotNull("Null featureType in [0]",wfs.getTypeNames()[i]);
+        FeatureType ft = wfs.getSchema(wfs.getTypeNames()[i]);
+        // take atleast attributeType 3 to avoid the undeclared one .. inherited optional attrs
+        
+        
+        FilterFactory factory = FilterFactory.createFilterFactory();
+        
+        DefaultQuery query = new DefaultQuery(ft.getTypeName());
+        BBoxExpression theBBox = factory.createBBoxExpression( bbox );
+        AttributeExpression theGeom = factory.createAttributeExpression( ft, ft.getDefaultGeometry().getName() );
+        
+        GeometryFilter filter = factory.createGeometryFilter( GeometryFilter.GEOMETRY_BBOX );
+        filter.addLeftGeometry( theGeom );
+        filter.addRightGeometry( theBBox );
+        query.setFilter( filter );
+        //query.setMaxFeatures(3);
+        if(get){
+            //  get
+            FeatureReader fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
+            assertNotNull("FeatureType was null",ft);
+            assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
+            int j=0;while(fr.hasNext()){fr.next();j++;}
+            System.out.println("bbox selected "+j+" Features");
+            fr.close();
+        }if(post){
+            //  post
+
+            FeatureReader fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
+            assertNotNull("FeatureType was null",ft);
+            assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
+            int j=0;while(fr.hasNext()){fr.next();j++;}
+            System.out.println("bbox selected "+j+" Features");
+            fr.close();
+        }
+        }catch(java.net.SocketException se){
+            se.printStackTrace();
+        }
+    }
 }
