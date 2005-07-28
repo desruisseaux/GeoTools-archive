@@ -65,8 +65,9 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
         if( !diff.isEmpty() ){
             for( Iterator iter = diff.keySet().iterator(); iter.hasNext(); ) {
                 String string = (String) iter.next();
-                String number=string.substring(3);
+                
                 try{
+                    String number=string.substring(3);
                     int tmp=Integer.parseInt(number);
                     if( tmp>nextfidIndex){
                         nextfidIndex=tmp;

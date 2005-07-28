@@ -25,7 +25,7 @@ public class DiffWriterTest extends TestCase {
         geom = fac.createPoint(new Coordinate(10,10));
 		
 		HashMap diff=new HashMap();
-		diff.put("diff1", type.create(new Object[]{ "diff1", geom }, "diff1"));
+		diff.put("1", type.create(new Object[]{ "diff1", geom }, "1"));
 		FeatureReader reader=new TestReader(type,type.create(new Object[]{ "original", geom }, "original") );
 		writer=new DiffFeatureWriter(reader, diff){
 
@@ -58,11 +58,11 @@ public class DiffWriterTest extends TestCase {
 		while( writer.hasNext() ){
 			writer.next();
 		}
+		
 		Feature feature=writer.next();
 		feature.setAttribute("name", "new1");
 		
 		writer.write();
-		
 		assertEquals(2, writer.diff.size() );
 		feature=writer.next();
 		feature.setAttribute("name", "new2");
