@@ -793,7 +793,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         }
 
         FeatureType schema = getSchema();
-        JDBCDataStore jdbc = getJDBCDataStore();
+        JDBCDataStore jdbc = (JDBCDataStore)getJDBCDataStore();
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(schema.getTypeName());
 
         if (sqlBuilder.getPostQueryFilter(query.getFilter()) != null) {
