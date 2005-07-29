@@ -2,9 +2,6 @@
 package org.geotools.data.wfs;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,20 +9,12 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 import org.geotools.data.DataStore;
-import org.geotools.data.DefaultFeatureReader;
-import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
-import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.collection.CollectionDataStore;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.DefaultFeatureCollections;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.CompareFilter;
@@ -57,13 +46,6 @@ public class WFSDataStoreWriteTest extends TestCase {
     
     public WFSDataStoreWriteTest(){
         Logger.global.setLevel(Level.SEVERE);
-    }
-
-    public static WFSDataStore getDataStore(URL server) throws IOException{
-        Map m = new HashMap();
-        m.put(WFSDataStoreFactory.URL.key,server);
-        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
-        return (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
     }
     
     public static FidFilter doInsert(DataStore ds,FeatureType ft,FeatureReader insert) throws NoSuchElementException, IOException, IllegalAttributeException{

@@ -55,7 +55,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
 
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.xdo.ElementHandlerFactory;
 
 
 /**
@@ -1278,10 +1277,6 @@ public class WFSCapabilitiesComplexTypes {
                         if(j>0){
                             // we have a ns prefix
                             String prefix = fsd.getName().substring(0,j);
-                            if(hints != null && hints.containsKey(ElementHandlerFactory.KEY)){
-                                ElementHandlerFactory ehf = (ElementHandlerFactory)hints.get(ElementHandlerFactory.KEY);
-                                fsd.setNamespace(ehf.getNamespace(prefix));
-                            }
                         }
                     }
                 } else {

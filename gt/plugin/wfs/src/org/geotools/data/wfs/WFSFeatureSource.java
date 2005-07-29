@@ -19,7 +19,6 @@ package org.geotools.data.wfs;
 import java.io.IOException;
 
 import org.geotools.data.AbstractFeatureSource;
-import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.DefaultQuery;
@@ -29,9 +28,7 @@ import org.geotools.data.FeatureResults;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;

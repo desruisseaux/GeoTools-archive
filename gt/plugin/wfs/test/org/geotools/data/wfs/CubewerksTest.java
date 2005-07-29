@@ -21,10 +21,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.NoSuchElementException;
 
+import junit.framework.TestCase;
+
 import org.geotools.feature.IllegalAttributeException;
 import org.xml.sax.SAXException;
-
-import junit.framework.TestCase;
 
 /**
  *  summary sentence.
