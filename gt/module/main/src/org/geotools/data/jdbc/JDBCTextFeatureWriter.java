@@ -376,7 +376,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 		    int srid = ftInfo.getSRID(geomName);
 		    attrValue = getGeometryInsertText((Geometry) currAtt, srid);
 		} else {
-		    attrValue = addQuotes(attributes[i]);
+		    attrValue = addQuotes(currAtt);
 		}
 
 		String colName = encodeName(attributes[i].getName());
