@@ -67,7 +67,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
 /** Current Transaction this FeatureSource is opperating against */
     protected Transaction transaction = Transaction.AUTO_COMMIT;
 
-    public JDBCFeatureStore(JDBCDataStore jdbcDataStore, FeatureType featureType) {
+    public JDBCFeatureStore(JDBC1DataStore jdbcDataStore, FeatureType featureType) {
         super(jdbcDataStore, featureType);
     }
 

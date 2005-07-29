@@ -16,71 +16,18 @@
  */
 package org.geotools.data.jdbc;
 
-import org.geotools.catalog.CatalogEntry;
-import org.geotools.catalog.QueryRequest;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.DefaultTypeEntry;
-import org.geotools.data.EmptyFeatureReader;
-import org.geotools.data.FeatureListenerManager;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureWriter;
-import org.geotools.data.FilteringFeatureReader;
-import org.geotools.data.FilteringFeatureWriter;
-import org.geotools.data.InProcessLockingManager;
-import org.geotools.data.LockingManager;
-import org.geotools.data.Query;
-import org.geotools.data.ReTypeFeatureReader;
-import org.geotools.data.SchemaNotFoundException;
-import org.geotools.data.Transaction;
-import org.geotools.data.TypeEntry;
-import org.geotools.data.jdbc.attributeio.AttributeIO;
-import org.geotools.data.jdbc.attributeio.BasicAttributeIO;
-import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
-import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
-import org.geotools.data.view.DefaultView;
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
-import org.geotools.filter.SQLEncoder;
-import org.geotools.filter.SQLEncoderException;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
+import org.geotools.feature.AttributeType;
 
 /**
- * Abstract class for JDBC (level2) based DataStore implementations.
- * This a convenience class that just extends JDBC2DataStore to keep
- * current datastores that use it happy.
- * Eventually datastores should extend one of JDBC1DataStore, or 
- * JDBC2DataStore.
+ * This JDBCDataStore is able to take advantage of additonal functionality
+ * provided by JDBC2 level drivers - for example ConnectionPools.
+ * 
  * <p>
  * This class provides a default implementation of a JDBC data store. Support
  * for vendor specific JDBC data stores can be easily added to Geotools by
@@ -153,15 +100,33 @@ import java.util.logging.Logger;
  * </li>
  * </ul>
  * </p>
- *
+ * 
  * @author Amr Alam, Refractions Research
- * @author Sean  Geoghegan, Defence Science and Technology Organisation
- * @author Chris Holmes, TOPP
- * @author Andrea Aime $Id: JDBCDataStore.java,v 1.23.2.6 2004/05/09 15:15:42
- *         aaime Exp $
+ * @author Jody Garnett, Refractions Research
  */
-public abstract class JDBCDataStore extends JDBC2DataStore {
-	protected JDBCDataStore( ConnectionPool pool, JDBCDataStoreConfig config ) throws IOException {
-		super( pool, config );		
-	}
+public abstract class JDBC2DataStore extends JDBC1DataStore {
+
+	protected ConnectionPool connectionPool;
+	
+    /**
+     * Construct a JDBCDataStore with ConnectionPool and associated
+     * configuration.
+     *
+     * @param connectionPool
+     * @param config
+     *
+     * @throws IOException
+     */
+    public JDBC2DataStore(ConnectionPool connectionPool,
+        JDBCDataStoreConfig config) throws IOException {
+    	super( config );
+        this.connectionPool = connectionPool;        
+    }
+        
+    /**
+     * Create a connection for your JDBC1 database
+     */
+    protected Connection createConnection() throws SQLException {
+    	return connectionPool.getConnection();
+    }
 }

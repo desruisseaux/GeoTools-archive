@@ -82,7 +82,7 @@ public class JDBCFeatureSource implements FeatureSource {
     private FeatureType featureType;
     
     /** JDBCDataStore based dataStore used to aquire content */
-    private JDBCDataStore dataStore;
+    private JDBC1DataStore dataStore;
 
     /**
      * JDBCFeatureSource creation.
@@ -95,7 +95,7 @@ public class JDBCFeatureSource implements FeatureSource {
      * @param jdbcDataStore DataStore containing contents
      * @param featureType FeatureType being served
      */
-    public JDBCFeatureSource(JDBCDataStore jdbcDataStore,
+    public JDBCFeatureSource(JDBC1DataStore jdbcDataStore,
         FeatureType featureType) {
         this.featureType = featureType;
         this.dataStore = jdbcDataStore;
@@ -121,7 +121,7 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @return JDBDataStore managing this FeatureSource
      */
-    public JDBCDataStore getJDBCDataStore() {
+    public JDBC1DataStore getJDBCDataStore() {
         return dataStore;
     }
 
@@ -378,7 +378,7 @@ public class JDBCFeatureSource implements FeatureSource {
             return 0;
         }
 
-        JDBCDataStore jdbc = getJDBCDataStore();
+        JDBC1DataStore jdbc = getJDBCDataStore();
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(featureType.getTypeName());
 
         if (sqlBuilder.getPostQueryFilter(query.getFilter()) != null) {

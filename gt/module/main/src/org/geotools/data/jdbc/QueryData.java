@@ -82,7 +82,7 @@ public class QueryData implements AttributeReader, AttributeWriter {
      * @param resultSet 
      * @param transaction 
      */
-    public QueryData(FeatureTypeInfo featureTypeInfo, JDBCDataStore parentDataStore,
+    public QueryData(FeatureTypeInfo featureTypeInfo, JDBC1DataStore parentDataStore,
         Connection connection, Statement statement, ResultSet resultSet, Transaction transaction) throws IOException {
         this.featureTypeInfo = featureTypeInfo;
         this.mapper = featureTypeInfo.getFIDMapper();

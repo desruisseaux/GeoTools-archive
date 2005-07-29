@@ -33,6 +33,10 @@ import org.geotools.data.Transaction.State;
  */
 public class JDBCTransactionState implements State {
     private Connection connection;
+    
+    public JDBCTransactionState( Connection connection ) throws IOException{
+        this.connection = connection;            
+    }
     public JDBCTransactionState( ConnectionPool pool) throws IOException{
         try {
             connection = pool.getConnection();

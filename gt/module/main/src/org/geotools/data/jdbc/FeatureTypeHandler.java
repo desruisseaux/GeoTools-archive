@@ -49,7 +49,7 @@ public class FeatureTypeHandler {
     private FIDMapperFactory fmFactory;
     protected Map featureTypeMap = new HashMap();
     protected Map featureTypeTimeoutMap = new HashMap();
-    JDBCDataStore dataStore;
+    JDBC1DataStore dataStore;
     Map typeMappers = new HashMap();
     long cacheTimeOut;
     long lastTypeNameRequestTime;
@@ -61,7 +61,7 @@ public class FeatureTypeHandler {
      * @param fmFactory the FIDMapper factory
      * @param cacheTimeOut timeout used to purge possibly stale data from the caches
      */
-    public FeatureTypeHandler(JDBCDataStore store, FIDMapperFactory fmFactory, long cacheTimeOut) {
+    public FeatureTypeHandler(JDBC1DataStore store, FIDMapperFactory fmFactory, long cacheTimeOut) {
         this.dataStore = store;
         this.cacheTimeOut = cacheTimeOut;
         this.fmFactory = fmFactory;

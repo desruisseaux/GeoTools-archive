@@ -68,7 +68,7 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
     implements FeatureLocking {
     FeatureLock featureLock = FeatureLock.TRANSACTION;
 
-    public JDBCFeatureLocking(JDBCDataStore jdbcDataStore,
+    public JDBCFeatureLocking(JDBC1DataStore jdbcDataStore,
         FeatureType featureType) {
         super(jdbcDataStore, featureType);
     }
