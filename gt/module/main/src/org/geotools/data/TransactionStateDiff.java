@@ -171,8 +171,13 @@ public class TransactionStateDiff implements State {
         if (diff.isEmpty()) {
             return;
         }
-
-        FeatureWriter writer = store.getFeatureWriter(typeName);
+        FeatureWriter writer;
+		try{
+        	writer = store.createFeatureWriter(typeName, transaction);
+        }catch (UnsupportedOperationException e) {
+			// backwards compatibility
+        	writer = store.getFeatureWriter(typeName);
+		}
         SimpleFeature feature;
         Feature update;
         String fid;

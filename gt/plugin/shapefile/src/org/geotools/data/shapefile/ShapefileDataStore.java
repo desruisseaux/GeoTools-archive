@@ -55,6 +55,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
+import org.geotools.data.Transaction;
 import org.geotools.data.TypeEntry;
 import org.geotools.data.shapefile.dbf.DbaseFileException;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
@@ -566,7 +567,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @throws IOException If the typeName is not available or some other error
      *         occurs.
      */
-    protected FeatureWriter getFeatureWriter(String typeName)
+    protected FeatureWriter createFeatureWriter(String typeName, Transaction transaction)
     throws IOException {
         typeCheck(typeName);
         

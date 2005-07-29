@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.QueryRequest;
 import org.geotools.data.view.DefaultView;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
@@ -261,12 +260,12 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @param typeName
      *
      * @return FeatureReader over contents of typeName
+     * 
      */
     protected abstract FeatureReader getFeatureReader(String typeName)
         throws IOException;
-
     /**
-     * Subclass should implement this to provide writing support.
+     * Subclass can implement this to provide writing support.
      *
      * @param typeName
      *
@@ -275,11 +274,30 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      *
      * @throws IOException Subclass may throw IOException
      * @throws UnsupportedOperationException Subclass may implement
+     * @deprecated
      */
     protected FeatureWriter getFeatureWriter(String typeName) throws IOException{
-        throw new UnsupportedOperationException("Writing not supported");
+        throw new UnsupportedOperationException("Schema creation not supported");    	
     }
 
+    /**
+     * Subclass should implement this to provide writing support.
+     * <p>A feature writer writes to the resource so it should considered to always be committing.
+     * The transaction is passed in so that it can be known what FeatureListeners should be notified of the
+     * changes.  If the Transaction is AUTOCOMMIT then all listeners should be notified.  If not
+     * all listeners that are NOT registered with that transaction should be notified.<p>
+     * @param typeName
+     * @param transaction a feature writer
+     * @return FeatureWriter over contents of typeName
+     * @throws IOException 
+     *
+     * @throws IOException Subclass may throw IOException
+     * @throws UnsupportedOperationException Subclass may implement
+     */
+    protected FeatureWriter createFeatureWriter(String typeName, Transaction transaction)
+    throws IOException {
+        throw new UnsupportedOperationException("Schema creation not supported");    	
+    }
     /**
      * Subclass should implement to provide writing support.
      *
@@ -574,7 +592,12 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         FeatureWriter writer;
 
         if (transaction == Transaction.AUTO_COMMIT) {
-            writer = getFeatureWriter(typeName);
+        	try{
+        		writer = createFeatureWriter(typeName, transaction);
+        	}catch (UnsupportedOperationException e) {
+				// This is for backward compatibility.
+        		writer = getFeatureWriter(typeName);
+			}
         } else {
             writer = state(transaction).writer(typeName);
         }

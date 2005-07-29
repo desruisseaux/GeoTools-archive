@@ -369,7 +369,7 @@ public class MemoryDataStore extends AbstractDataStore {
      *
      * @see org.geotools.data.AbstractDataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureWriter getFeatureWriter(final String typeName)
+    public FeatureWriter createFeatureWriter(final String typeName, final Transaction transaction)
         throws IOException {
         return new FeatureWriter() {
                 FeatureType featureType = getSchema(typeName);
@@ -421,8 +421,8 @@ public class MemoryDataStore extends AbstractDataStore {
                     if (live != null) {
                         // remove existing content
                         iterator.remove();
-                        listenerManager.fireFeaturesRemoved(typeName, Transaction.AUTO_COMMIT,
-                            live.getBounds(), false);
+                        listenerManager.fireFeaturesRemoved(typeName, transaction,
+                            live.getBounds(), true);
                         live = null;
                         current = null;
                     } else {
@@ -459,8 +459,8 @@ public class MemoryDataStore extends AbstractDataStore {
                             Envelope bounds = new Envelope();
                             bounds.expandToInclude(live.getBounds());
                             bounds.expandToInclude(current.getBounds());
-                            listenerManager.fireFeaturesChanged(typeName, Transaction.AUTO_COMMIT,
-                                bounds, false);
+                            listenerManager.fireFeaturesChanged(typeName, transaction,
+                                bounds, true);
                             live = null;
                             current = null;
                         }
@@ -468,8 +468,8 @@ public class MemoryDataStore extends AbstractDataStore {
                         // add new content
                         //
                         contents.put(current.getID(), current);
-                        listenerManager.fireFeaturesAdded(typeName, Transaction.AUTO_COMMIT,
-                            current.getBounds(), false);
+                        listenerManager.fireFeaturesAdded(typeName, transaction,
+                            current.getBounds(), true);
                         current = null;
                     }
                 }

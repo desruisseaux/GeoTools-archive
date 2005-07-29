@@ -18,6 +18,8 @@ package org.geotools.data.memory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.DataStore;
@@ -28,6 +30,9 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.DiffFeatureReader;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.EmptyFeatureWriter;
+import org.geotools.data.FeatureEvent;
+import org.geotools.data.FeatureListener;
+import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLockFactory;
 import org.geotools.data.FeatureLocking;
@@ -50,6 +55,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -492,7 +498,7 @@ public class MemoryDataStoreTest extends DataTestCase {
      */
     public void testGetFeatureWriter()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureWriter writer = data.getFeatureWriter("road");
+        FeatureWriter writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         assertEquals(roadFeatures.length, count(writer));
 
         try {
@@ -510,7 +516,7 @@ public class MemoryDataStoreTest extends DataTestCase {
 
     public void testGetFeatureWriterRemove()
         throws IOException, IllegalAttributeException {
-        FeatureWriter writer = data.getFeatureWriter("road");
+        FeatureWriter writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         Feature feature;
 
         while (writer.hasNext()) {
@@ -527,7 +533,7 @@ public class MemoryDataStoreTest extends DataTestCase {
 
     public void testGetFeaturesWriterAdd()
         throws IOException, IllegalAttributeException {
-        FeatureWriter writer = data.getFeatureWriter("road");
+        FeatureWriter writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         SimpleFeature feature;
 
         while (writer.hasNext()) {
@@ -545,7 +551,7 @@ public class MemoryDataStoreTest extends DataTestCase {
 
     public void testGetFeaturesWriterModify()
         throws IOException, IllegalAttributeException {
-        FeatureWriter writer = data.getFeatureWriter("road");
+        FeatureWriter writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         Feature feature;
 
         while (writer.hasNext()) {
@@ -851,7 +857,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         
         road1.setTransaction( t1 );
         road2.setTransaction( t2 );
-        
+
         Feature feature;
         Feature[] ORIGIONAL = roadFeatures;
         Feature[] REMOVE = new Feature[ORIGIONAL.length - 1];
@@ -930,6 +936,134 @@ public class MemoryDataStoreTest extends DataTestCase {
         InProcessLockingManager lockingManager = (InProcessLockingManager) data.getLockingManager();
         return lockingManager.isLocked( typeName, fid );            
     }
+    
+    public void testFeatureEvents() throws Exception {
+		FeatureStore store1=(FeatureStore) data.getFeatureSource(roadFeatures[0].getFeatureType().getTypeName());
+		FeatureStore store2=(FeatureStore) data.getFeatureSource(roadFeatures[0].getFeatureType().getTypeName());
+		store1.setTransaction(new DefaultTransaction());
+		class Listener implements FeatureListener{
+
+			String name;
+			List events=new ArrayList();
+			public Listener(String name){
+				this.name=name;
+			}
+			
+			public void changed(FeatureEvent featureEvent) {
+				this.events.add(featureEvent);
+			}
+			FeatureEvent getEvent(int i) {
+				return (FeatureEvent) events.get(i);
+			}
+			
+		}
+		Listener listener1=new Listener("one");
+		Listener listener2=new Listener("two");
+		
+		store1.addFeatureListener(listener1);
+		store2.addFeatureListener(listener2);
+		FilterFactory factory=FilterFactory.createFilterFactory();
+		
+		//test that only the listener listening with the current transaction gets the event.
+		final Feature feature=roadFeatures[0];
+		store1.removeFeatures(factory.createFidFilter(feature.getID()));
+		assertEquals( 1, listener1.events.size() );
+		assertEquals( 0, listener2.events.size() );
+		FeatureEvent event = listener1.getEvent(0);
+		assertEquals(feature.getBounds(), event.getBounds() );
+		assertEquals(FeatureEvent.FEATURES_REMOVED, event.getEventType() );
+
+
+
+		//test that commit only sends events to listener2.
+		listener1.events.clear();
+		listener2.events.clear();
+		
+		store1.getTransaction().commit();
+
+		assertEquals( 0, listener1.events.size() );
+
+		assertEquals( 3, listener2.events.size() );
+		event = listener2.getEvent(0);
+		assertEquals(feature.getBounds(), event.getBounds() );
+		assertEquals(FeatureEvent.FEATURES_REMOVED, event.getEventType() );
+		
+		//test add same as modify
+		listener1.events.clear();
+		listener2.events.clear();
+		
+		store1.addFeatures(new FeatureReader( ){
+
+			public FeatureType getFeatureType() {
+				return feature.getFeatureType();
+			}
+			boolean hasNext=true;
+			public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+				hasNext=false;
+				return feature;
+			}
+
+			public boolean hasNext() throws IOException {
+				return hasNext;
+			}
+
+			public void close() throws IOException {
+				//do nothing.
+			}
+			
+		});
+
+		assertEquals( 1, listener1.events.size() );
+		event=listener1.getEvent(0);
+		assertEquals(feature.getBounds(),event.getBounds() );
+		assertEquals(FeatureEvent.FEATURES_ADDED, event.getEventType() );
+		assertEquals( 0, listener2.events.size() );
+		
+
+		//test that rollback only sends events to listener1.
+		listener1.events.clear();
+		listener2.events.clear();
+		
+		store1.getTransaction().rollback();
+
+		assertEquals( 1, listener1.events.size() );
+		event=listener1.getEvent(0);
+		assertNull(event.getBounds() );
+		assertEquals(FeatureEvent.FEATURES_CHANGED, event.getEventType() );
+
+		assertEquals( 0, listener2.events.size() );
+		
+//		 this is how Auto_commit is supposed to work
+		listener1.events.clear();
+		listener2.events.clear();
+		store2.addFeatures(new FeatureReader( ){
+
+			public FeatureType getFeatureType() {
+				return feature.getFeatureType();
+			}
+			boolean hasNext=true;
+			public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+				hasNext=false;
+				return feature;
+			}
+
+			public boolean hasNext() throws IOException {
+				return hasNext;
+			}
+
+			public void close() throws IOException {
+				//do nothing.
+			}
+			
+		});
+
+		assertEquals( 1, listener1.events.size() );
+		event=listener1.getEvent(0);
+		assertEquals(feature.getBounds(),event.getBounds() );
+		assertEquals(FeatureEvent.FEATURES_ADDED, event.getEventType() );
+		assertEquals( 0, listener2.events.size() );
+	}
+    
     
     //
     // FeatureLocking Testing    
