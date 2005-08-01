@@ -62,9 +62,6 @@
      ================================================================== -->
 	<goal name="build">
 		<tstamp/>
-		<available classname="javax.media.jai.JAI" property="jai.present"/>
-		<ant:available classname="javax.media.jai.JAI" property="jai.present"/>
-		<fail unless="jai.present" message="JAI extension not found.  Please download and install it from: http://java.sun.com/products/java-media/jai/downloads/"/>
 		
 		<available file="module" property="module.present"/>
 		<fail unless="module.present" message="'maven build' can not be used in this directory, for individual modules use 'maven java:compile', 'maven test' or 'maven jar:install' goals"/>
@@ -117,10 +114,8 @@
 		<j:set var="release.report" value="releaseReport-${release.version}.txt"/>
 		<echo message="release report is set to ${release.report}"/>
 		<echo file="${release.report}" message="release is ${release.version}"/>
-		
-		
-		
-                
+
+                <ant:delete dir="${basedir}/target/temp/alldeps"/>
                 <ant:mkdir dir="${basedir}/target/binRelease/module"/>
                 
 		
@@ -129,9 +124,14 @@
 		
 		<attainGoal name="moveBuildFiles"/>
 		<j:set var="ignoreFailures" value="false"/>
-                <j:set var="goal" value="clean,jar:install,moveBin,moveLib,moveSrc,updateList"/>
+                
+                <j:set var="goal" value="findSharedDeps"/>
                 <attainGoal name="multiproject:goal"/>
                 
+               <j:set var="goal" value="clean,jar:install,moveBin,moveLib,moveSrc,updateList"/>
+              
+                <attainGoal name="multiproject:goal"/>
+  
                 <loadfile property="pluginList" srcFile="${release.version}-plugin-list.txt"/>
                 <loadfile property="moduleList" srcFile="${release.version}-module-list.txt"/>
                 <loadfile property="demoList" srcFile="${release.version}-demo-list.txt"/>
@@ -172,6 +172,9 @@
 		<ant:zip longfile="gnu" destfile="${maven.dist.dir}/geotools-src-${release.version}.zip">
 			<zipfileset dir="${basedir}/target/srcRelease" prefix="geotools" filemode="755" includes="**/*"/>
 		</ant:zip>
+                
+                
+                
 	</goal>
 	<goal name="updateList">
              <property file="../release.properties"/>
@@ -179,6 +182,8 @@
              <echo file="../../${release.version}-${type}-list.txt" append="true"> ${pom.artifactId}</echo>
         </goal>
         <goal name="moveLib">
+         <property file="../release.properties"/>
+          <echo>Type for this release is : ${type}</echo>
 		<j:set var="release.report" value="releaseReport-${release.version}.txt"/>
 		<echo file="../../${release.report}" append="true">
             ${pom.id}</echo>
@@ -187,7 +192,39 @@
 			<j:set var="dep" value="${lib.dependency}"/>
 			<j:if test="${dep.groupId !='gt2'}">
 				<j:if test="${dep.type =='jar'}">
-					<ant:copy todir="../../target/binRelease/shared" file="${lib.path}"/>
+					<echo message="testing ${dep.artifactId}-${dep.version}.${dep.type} to see if shared"/>
+					<j:set var="shareddep" value=""/>
+					<u:available file="${basedir}/../../target/binRelease/shared/${dep.artifactId}-${dep.version}.${dep.type}">
+						<ant:copy todir="../../target/binRelease/shared" file="${lib.path}"/>
+                                                <j:set var="shareddep" value="found"/>
+					</u:available>
+					<j:if test="${shareddep != 'found'}">
+						<echo message="copy type = ${type} jar"/>
+						<ant:copy todir="../../target/binRelease/${type}/${pom.artifactId}/lib" file="${lib.path}"/>
+					</j:if>
+				</j:if>
+			</j:if>
+		</j:forEach>
+		<echo file="../../${release.report}" append="true">  OK</echo>
+	</goal>
+        
+         <goal name="findSharedDeps">
+		<j:set var="release.report" value="releaseReport-${release.version}.txt"/>
+		<echo file="../../${release.report}" append="true">
+            ${pom.id}</echo>
+		<echo message="working on ${pom.id} to find 3rd party jars to include"/>
+		<j:forEach var="lib" items="${pom.artifacts}">
+			<j:set var="dep" value="${lib.dependency}"/>
+			<j:if test="${dep.groupId !='gt2'}">
+                                
+				<j:if test="${dep.type =='jar'}">
+                                <echo message="testing ${dep.artifactId}-${dep.version}.${dep.type} to see if shared"/>
+					<j:set var="shareddep" value=""/>
+					<u:available file="${basedir}/../../target/temp/alldeps/${dep.artifactId}-${dep.version}.${dep.type}">
+						<j:set var="shareddep" value="found"/>
+                                                <ant:copy todir="../../target/binRelease/shared" file="${lib.path}"/>
+					</u:available>
+					<ant:copy todir="../../target/temp/alldeps" file="${lib.path}"/>
 				</j:if>
 			</j:if>
 		</j:forEach>
@@ -211,23 +248,7 @@
 		<j:set var="release.report" value="releaseReport-${release.version}.txt"/>
 		<echo file="../../${release.report}" append="true">
             ${pom.id}</echo>
-		<echo message="working on ${pom.id} to find 3rd party jars to include"/>
-		<j:forEach var="lib" items="${pom.artifacts}">
-			<j:set var="dep" value="${lib.dependency}"/>
-			<j:if test="${dep.groupId !='gt2'}">
-				<j:if test="${dep.type =='jar'}">
-					<echo message="testing ${dep.artifactId}-${dep.version}.${dep.type} to see if shared"/>
-					<j:set var="shareddep" value=""/>
-					<u:available file="${basedir}/../../target/binRelease/shared/${dep.artifactId}-${dep.version}.${dep.type}">
-						<j:set var="shareddep" value="found"/>
-					</u:available>
-					<j:if test="${shareddep != 'found'}">
-						<echo message="copy ${type} jar"/>
-						<ant:copy todir="../../target/binRelease/${type}/${pom.artifactId}/lib" file="${lib.path}"/>
-					</j:if>
-				</j:if>
-			</j:if>
-		</j:forEach>
+		
 		<echo file="../../target/binRelease/${type}/${pom.artifactId}/readme.txt">
 GeoTools Plugin/Extention : ${pom.description}
 
