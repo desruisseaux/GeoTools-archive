@@ -238,6 +238,20 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
     }
 
     /**
+     * Returns the minimal length of the specified arrays. In the special case where one array
+     * has a length of 1, we assume that this single element will be repeated for all elements
+     * in the other array.
+     */
+    static int getLength(final Object[] array1, final Object[] array2) {
+        if (array1==null || array2==null) {
+            return 0;
+        }
+        if (array1.length == 1) return array2.length;
+        if (array2.length == 1) return array1.length;
+        return Math.min(array1.length, array2.length);
+    }
+
+    /**
      * Returns the localized message from the specified exception. If no message is available,
      * returns a default string. This method never returns a null value.
      */

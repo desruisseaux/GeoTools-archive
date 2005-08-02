@@ -69,7 +69,7 @@ import org.geotools.util.SimpleInternationalString;
  * images of Sea Surface Temperature  (SST)  may have a quantitative category
  * for temperature with values ranging from –2 to 35°C,  and three qualitative
  * categories for cloud, land and ice.
- * <br><br>
+ * <p>
  * All categories must have a human readable name. In addition, quantitative
  * categories may define a transformation between sample values <var>s</var>
  * and geophysics values <var>x</var>.   This transformation is usually (but
@@ -85,13 +85,12 @@ import org.geotools.util.SimpleInternationalString;
  * is a linear one (as in the formula above), then a {@code Category} object
  * may be understood as the interval between two breakpoints in the JAI's
  * {@linkplain PiecewiseDescriptor piecewise} operation.
- * <br><br>
+ * <p>
  * All {@code Category} objects are immutable and thread-safe.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see GridSampleDimension
  * @see PiecewiseDescriptor
@@ -418,8 +417,8 @@ public class Category implements Serializable {
     {
         this(name, colors, sampleValueRange,
              createLinearTransform(sampleValueRange, geophysicsValueRange));
-        inverse.range = NumberRange.wrap(geophysicsValueRange);
-        assert range.equals(NumberRange.wrap(sampleValueRange));
+        inverse.range = geophysicsValueRange;
+        assert range.equals(sampleValueRange);
     }
 
     /**
@@ -482,7 +481,7 @@ public class Category implements Serializable {
             return;
         }
         /*
-         * Check the arguments. Use '!' in comparaison in order to reject NaN values,
+         * Checks the arguments. Use '!' in comparaison in order to reject NaN values,
          * except for the legal case catched by the "if" block just above.
          */
         if (!(minimum<=maximum) || Double.isInfinite(minimum) || Double.isInfinite(maximum))
@@ -596,10 +595,11 @@ public class Category implements Serializable {
         if (sMinInc == gMinInc) sMinInc = gMinInc = 0;
         if (sMaxInc == gMaxInc) sMaxInc = gMaxInc = 0;
         /*
-         * The minimum value of only zero of one range will be adjusted, and the same for
-         * maximum value (see code above). Now, choose the range to adjust:  If one range
-         * uses integer values while the other uses floating point values, then the integer
-         * range will be adjusted. Otherwise, the range of geophysics values will be adjusted.
+         * If the minimal geophysics value is exclusive while the minimal sample value is inclusive,
+         * prepares to substract 1 to the sample value in order to make it exclusive (so that sample
+         * and geophysics values have the same "exclusive" state).  Do similar processing on maximal
+         * values as well.  Note: the change is usually applied on sample values, but may be applied
+         * on geophysics values instead if sample are floats or geophysics values are integers.
          */
         final boolean adjustSamples = (XMath.isInteger(sType) && !XMath.isInteger(gType));
         if ((adjustSamples ? gMinInc : sMinInc) != 0) {
@@ -613,7 +613,7 @@ public class Category implements Serializable {
             gMaxInc = -swap;
         }
         /*
-         * Now, extract the minimal and maximal values and compute the linear coefficients.
+         * Now, extracts the minimal and maximal values and computes the linear coefficients.
          */
         final double minSample = doubleValue(sType,     sampleValueRange.getMinValue(), sMinInc);
         final double maxSample = doubleValue(sType,     sampleValueRange.getMaxValue(), sMaxInc);
@@ -626,7 +626,7 @@ public class Category implements Serializable {
         {
             scale = 1.0;
         }
-        final double offset    = minValue - scale*minSample;
+        final double offset = minValue - scale*minSample;
         return createLinearTransform(scale, offset);
     }
 
@@ -796,7 +796,7 @@ public class Category implements Serializable {
      * a "{@linkplain #getSampleToGeophysics sample to geophysics}" transformation set to the
      * specified one. Other properties like the {@linkplain #getRange sample value range}
      * and the {@linkplain #getColors colors} are unchanged.
-     * <br><br>
+     * <p>
      * <strong>Note about geophysics categories:</strong> The above rules are straightforward
      * when applied on non-geophysics category, but this method can be invoked on geophysics
      * category (as returned by <code>{@linkplain #geophysics geophysics}(true)</code>) as well.
@@ -826,14 +826,14 @@ public class Category implements Serializable {
      * transform is always the identity transform, or {@code null} if no such transform existed
      * in the first place. In other words, the range of sample values in a geophysics category maps
      * directly the "real world" values without the need for any transformation.
-     * <br><br>
+     * <p>
      * {@code Category} objects live by pair: a <cite>geophysics</cite> one (used for
      * computation) and a <cite>non-geophysics</cite> one (used for packing data, usually as
      * integers). The {@code geo} argument specifies which object from the pair is wanted,
      * regardless if this method is invoked on the geophysics or non-geophysics instance of the
      * pair. In other words, the result of {@code geophysics(b1).geophysics(b2).geophysics(b3)}
      * depends only on the value in the last call ({@code b3}).
-     * <br><br>
+     * <p>
      * Newly constructed categories are non-geophysics (i.e. a {@linkplain #getSampleToGeophysics
      * sample to geophysics} transform must be applied in order to gets geophysics values).
      *
@@ -939,7 +939,7 @@ public class Category implements Serializable {
      * However, if an identical object was previously deserialized, then this method replace
      * {@code this} by the previously deserialized object in order to reduce memory usage.
      * This is correct only for immutable objects.
-     * <br><br>
+     * <p>
      * NOTE: we keep this method private for two reasons:
      * <ul>
      *   <li>The user may have created a mutable subclass. Since the need to subclass this class
@@ -962,7 +962,7 @@ public class Category implements Serializable {
      * However, if identical objects are found in the same graph during serialization, then
      * they will be replaced by a single instance in order to reduce the amount of data sent
      * to the output stream. This is correct only for immutable objects.
-     * <br><br>
+     * <p>
      * NOTE: we keep this method private for two reasons:
      * <ul>
      *   <li>The user may have created a mutable subclass. Since the need to subclass this class

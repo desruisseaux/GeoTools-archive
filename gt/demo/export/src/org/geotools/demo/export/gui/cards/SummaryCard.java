@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.demos.export.gui.cards;
+package org.geotools.demo.export.gui.cards;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import org.geotools.demos.export.ExportParameters;
+import org.geotools.demo.export.ExportParameters;
 import org.geotools.feature.FeatureType;
 
 

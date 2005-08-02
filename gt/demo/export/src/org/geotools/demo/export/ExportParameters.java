@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.demos.export;
+package org.geotools.demo.export;
 
 import java.util.ArrayList;
 import java.util.List;

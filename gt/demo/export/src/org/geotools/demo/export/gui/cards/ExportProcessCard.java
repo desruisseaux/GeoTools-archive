@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.demos.export.gui.cards;
+package org.geotools.demo.export.gui.cards;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -34,7 +34,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
-import org.geotools.demos.export.ExportParameters;
+import org.geotools.demo.export.ExportParameters;
 import org.geotools.feature.FeatureType;
 
 

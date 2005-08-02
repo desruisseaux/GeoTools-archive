@@ -14,9 +14,9 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.demos.export.gui.cards;
+package org.geotools.demo.export.gui.cards;
 
-import org.geotools.demos.export.ExportParameters;
+import org.geotools.demo.export.ExportParameters;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.CompareFilter;

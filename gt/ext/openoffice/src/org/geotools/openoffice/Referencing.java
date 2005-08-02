@@ -126,6 +126,18 @@ public final class Referencing extends Formulas implements XReferencing {
     private transient CoordinateOperationFactory opFactory;
 
     /**
+     * The last geodetic calculator used, or {@code null} if none. Cached for better
+     * performance when many orthodromic distances are computed on the same ellipsoid.
+     */
+    private transient GeodeticCalculator calculator;
+
+    /**
+     * The CRS authority code used for {@link #calculator} setup,
+     * or {@code null} if not yet defined.
+     */
+    private transient String calculatorCRS;
+
+    /**
      * Constructs a default implementation of {@code XReferencing} interface.
      */
     public Referencing() {
@@ -326,23 +338,29 @@ public final class Referencing extends Formulas implements XReferencing {
 
     /**
      * Returns the geodetic calculator for the specified CRS, datum or ellipsoid.
+     * This method cache the last calculator used for better performance when many
+     * orthodromic distances are computed on the same ellipsoid.
      *
      * @throws FactoryException if the geodetic calculator can't be created.
      */
     private GeodeticCalculator getGeodeticCalculator(final String authorityCode)
             throws FactoryException
     {
-        final IdentifiedObject object = crsFactory().createObject(authorityCode);
-        if (object instanceof Ellipsoid) {
-            return new GeodeticCalculator((Ellipsoid) object);
+        if (calculatorCRS==null || !calculatorCRS.equals(authorityCode)) {
+            final IdentifiedObject object = crsFactory().createObject(authorityCode);
+            if (object instanceof Ellipsoid) {
+                calculator = new GeodeticCalculator((Ellipsoid) object);
+            } else if (object instanceof GeodeticDatum) {
+                calculator = new GeodeticCalculator(((GeodeticDatum) object).getEllipsoid());
+            } else if (object instanceof CoordinateReferenceSystem) {
+                calculator = new GeodeticCalculator((CoordinateReferenceSystem) object);
+            } else {
+                throw new FactoryException(Errors.format(
+                                           ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
+            }
+            calculatorCRS = authorityCode;
         }
-        if (object instanceof GeodeticDatum) {
-            return new GeodeticCalculator(((GeodeticDatum) object).getEllipsoid());
-        }
-        if (object instanceof CoordinateReferenceSystem) {
-            return new GeodeticCalculator((CoordinateReferenceSystem) object);
-        }
-        throw new FactoryException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
+        return calculator;
     }
 
 
@@ -666,10 +684,10 @@ public final class Referencing extends Formulas implements XReferencing {
         final int dim = calculator.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
         final GeneralDirectPosition sourcePt = new GeneralDirectPosition(dim);
         final GeneralDirectPosition targetPt = new GeneralDirectPosition(dim);
-        final double[][] result = new double[Math.min(source.length, target.length)][];
+        final double[][] result = new double[getLength(source, target)][];
         for (int j=0; j<result.length; j++) {
-            final double[] src = source[j];
-            final double[] dst = target[j];
+            final double[] src = source[j % source.length];
+            final double[] dst = target[j % target.length];
             if (src==null || dst==null) {
                 continue;
             }
@@ -713,10 +731,10 @@ public final class Referencing extends Formulas implements XReferencing {
         boolean failureReported = false;
         final int dim = calculator.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
         final GeneralDirectPosition sourcePt = new GeneralDirectPosition(dim);
-        final double[][] result = new double[Math.min(source.length, displacement.length)][];
+        final double[][] result = new double[getLength(source, displacement)][];
         for (int j=0; j<result.length; j++) {
-            final double[] src = source      [j];
-            final double[] mov = displacement[j];
+            final double[] src = source      [j % source.length];
+            final double[] mov = displacement[j % displacement.length];
             if (src==null || mov==null) {
                 continue;
             }

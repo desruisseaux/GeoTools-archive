@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.demos.export.gui.cards;
+package org.geotools.demo.export.gui.cards;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;

@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.demos.export.gui.cards;
+package org.geotools.demo.export.gui.cards;
 
 import java.awt.BorderLayout;
 import java.util.logging.Logger;

@@ -14,16 +14,16 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.demos.export.gui;
+package org.geotools.demo.export.gui;
 
-import org.geotools.demos.export.gui.cards.CardListener;
-import org.geotools.demos.export.gui.cards.DestDataStoreCard;
-import org.geotools.demos.export.gui.cards.EditPropertiesCard;
-import org.geotools.demos.export.gui.cards.ExportProcessCard;
-import org.geotools.demos.export.gui.cards.SelectSourceDataStoreCard;
-import org.geotools.demos.export.gui.cards.SourceFeatureTypeCard;
-import org.geotools.demos.export.gui.cards.SummaryCard;
-import org.geotools.demos.export.gui.cards.WizzardCard;
+import org.geotools.demo.export.gui.cards.CardListener;
+import org.geotools.demo.export.gui.cards.DestDataStoreCard;
+import org.geotools.demo.export.gui.cards.EditPropertiesCard;
+import org.geotools.demo.export.gui.cards.ExportProcessCard;
+import org.geotools.demo.export.gui.cards.SelectSourceDataStoreCard;
+import org.geotools.demo.export.gui.cards.SourceFeatureTypeCard;
+import org.geotools.demo.export.gui.cards.SummaryCard;
+import org.geotools.demo.export.gui.cards.WizzardCard;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;

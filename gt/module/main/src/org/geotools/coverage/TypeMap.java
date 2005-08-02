@@ -24,12 +24,14 @@
 package org.geotools.coverage;
 
 // J2SE dependencies and extensions
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Locale;
 import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.awt.image.SampleModel;
-import java.util.Locale;
 import javax.media.jai.util.Range;
 
 // OpenGIS dependencies
@@ -53,22 +55,11 @@ import org.geotools.util.NumberRange;
  * This class provides also some methods for mapping {@link SampleDimensionType}
  * to {@link DataBuffer} types.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public final class TypeMap {
-    /**
-     * The 0 pixel value. For range construction.
-     */
-    private static final Number ZERO = new Long(0);
-
-    /**
-     * The 1 pixel value. For range construction.
-     */
-    private static final Number ONE = new Long(1);
-    
     /**
      * The mapping of {@link SampleDimensionType} to {@link DataBuffer} types.
      *
@@ -77,22 +68,23 @@ public final class TypeMap {
      */
     private static final TypeMap[] MAP = new TypeMap[SampleDimensionType.values().length];
     static {
+        final Map  pool = new HashMap(32);
         final Float  M1 = new Float (-Float  .MAX_VALUE);
         final Float  P1 = new Float ( Float  .MAX_VALUE);
         final Double M2 = new Double(-Double .MAX_VALUE);
         final Double P2 = new Double( Double .MAX_VALUE);
         // The constructor will register automatically those objects in the above array.
-        new TypeMap(SampleDimensionType. UNSIGNED_1BIT,  DataBuffer.TYPE_BYTE,   (byte) 1, false, false);
-        new TypeMap(SampleDimensionType. UNSIGNED_2BITS, DataBuffer.TYPE_BYTE,   (byte) 2, false, false);
-        new TypeMap(SampleDimensionType. UNSIGNED_4BITS, DataBuffer.TYPE_BYTE,   (byte) 4, false, false);
-        new TypeMap(SampleDimensionType. UNSIGNED_8BITS, DataBuffer.TYPE_BYTE,   (byte) 8, false, false);
-        new TypeMap(SampleDimensionType.   SIGNED_8BITS, DataBuffer.TYPE_BYTE,   (byte) 8, true,  false);
-        new TypeMap(SampleDimensionType.UNSIGNED_16BITS, DataBuffer.TYPE_USHORT, (byte)16, false, false);
-        new TypeMap(SampleDimensionType.  SIGNED_16BITS, DataBuffer.TYPE_SHORT,  (byte)16, true,  false);
-        new TypeMap(SampleDimensionType.UNSIGNED_32BITS, DataBuffer.TYPE_INT,    (byte)32, false, false);
-        new TypeMap(SampleDimensionType.  SIGNED_32BITS, DataBuffer.TYPE_INT,    (byte)32, true,  false);
-        new TypeMap(SampleDimensionType.    REAL_32BITS, DataBuffer.TYPE_FLOAT,  (byte)32, true,  true, M1, P1);
-        new TypeMap(SampleDimensionType.    REAL_64BITS, DataBuffer.TYPE_DOUBLE, (byte)64, true,  true, M2, P2);
+        new TypeMap(SampleDimensionType. UNSIGNED_1BIT,  DataBuffer.TYPE_BYTE,   (byte) 1, false, false,        pool);
+        new TypeMap(SampleDimensionType. UNSIGNED_2BITS, DataBuffer.TYPE_BYTE,   (byte) 2, false, false,        pool);
+        new TypeMap(SampleDimensionType. UNSIGNED_4BITS, DataBuffer.TYPE_BYTE,   (byte) 4, false, false,        pool);
+        new TypeMap(SampleDimensionType. UNSIGNED_8BITS, DataBuffer.TYPE_BYTE,   (byte) 8, false, false,        pool);
+        new TypeMap(SampleDimensionType.   SIGNED_8BITS, DataBuffer.TYPE_BYTE,   (byte) 8, true,  false,        pool);
+        new TypeMap(SampleDimensionType.UNSIGNED_16BITS, DataBuffer.TYPE_USHORT, (byte)16, false, false,        pool);
+        new TypeMap(SampleDimensionType.  SIGNED_16BITS, DataBuffer.TYPE_SHORT,  (byte)16, true,  false,        pool);
+        new TypeMap(SampleDimensionType.UNSIGNED_32BITS, DataBuffer.TYPE_INT,    (byte)32, false, false,        pool);
+        new TypeMap(SampleDimensionType.  SIGNED_32BITS, DataBuffer.TYPE_INT,    (byte)32, true,  false,        pool);
+        new TypeMap(SampleDimensionType.    REAL_32BITS, DataBuffer.TYPE_FLOAT,  (byte)32, true,  true, M1, P1, pool);
+        new TypeMap(SampleDimensionType.    REAL_64BITS, DataBuffer.TYPE_DOUBLE, (byte)64, true,  true, M2, P2, pool);
     };
 
     /**
@@ -151,21 +143,10 @@ public final class TypeMap {
      */
     private TypeMap(final SampleDimensionType code,
                     final int     type,   final byte    size,
-                    final boolean signed, final boolean real)
-    {
-        this(code, type, size, signed, real, (1L << (signed ? size-1 : size)) - 1);
-    }
-
-    /**
-     * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
-     * call in constructors").
-     */
-    private TypeMap(final SampleDimensionType code,
-                    final int     type,   final byte    size,
                     final boolean signed, final boolean real,
-                    final long    max)
+                    final Map pool)
     {
-        this(code, type, size, signed, real, signed ? new Long(~max) : ZERO, new Long(max));
+        this(code, type, size, signed, real, null, null, pool);
     }
 
     /**
@@ -174,8 +155,35 @@ public final class TypeMap {
     private TypeMap(final SampleDimensionType code,
                     final int     type,   final byte    size,
                     final boolean signed, final boolean real,
-                    final Number  lower,  final Number  upper)
+                    Number lower, Number upper, final Map pool)
     {
+        Number one = null;
+        if (lower == null) {
+            final long max = (1L << (signed ? size-1 : size)) - 1;
+            final long min = signed ? ~max : 0; // Tild (~), not minus sign (-).
+            if (max <= Byte.MAX_VALUE) {
+                lower = new Byte((byte) min);
+                upper = new Byte((byte) max);
+                one   = new Byte((byte) 1);
+            } else if (max <= Short.MAX_VALUE) {
+                lower = new Short((short) min);
+                upper = new Short((short) max);
+                one   = new Short((short) 1);
+            } else if (max <= Integer.MAX_VALUE) {
+                lower = new Integer((int) min);
+                upper = new Integer((int) max);
+                one   = new Integer((int) 1);
+            } else {
+                lower = new Long(min);
+                upper = new Long(max);
+                one   = new Long(1L);
+            }
+            lower = canonicalize(pool, lower);
+            upper = canonicalize(pool, upper);
+            one   = canonicalize(pool, one);
+            assert lower.longValue() == min;
+            assert upper.longValue() == max;
+        }
         assert ((Comparable) lower).compareTo(upper) < 0 : upper;
         final Class c      = upper.getClass();
         this.code          = code;
@@ -184,11 +192,23 @@ public final class TypeMap {
         this.signed        = signed;
         this.real          = real;
         this.range         = new NumberRange(c, lower, upper);
-        this.positiveRange = signed ? null : new NumberRange(c, ONE, upper);
+        this.positiveRange = signed ? null : new NumberRange(c, one, upper);
         final int ordinal  = code.ordinal();
         assert MAP[ordinal] == null : code;
         MAP[ordinal] = this;
         assert code.equals(getSampleDimensionType(range)) : code;
+    }
+
+    /**
+     * Returns a single instance of the specified number.
+     */
+    private static Number canonicalize(final Map pool, final Number n) {
+        final Number candidate = (Number) pool.put(n, n);
+        if (candidate == null) {
+            return n;
+        }
+        pool.put(candidate, candidate);
+        return candidate;
     }
 
     /**
