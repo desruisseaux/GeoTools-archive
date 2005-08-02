@@ -35,6 +35,7 @@ import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
 import org.geotools.data.wms.gce.WMSReader;
+import org.geotools.data.wms.test.ServerTestCase;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
@@ -52,7 +53,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author rgould TODO To change the template for this generated type comment
  *         go to Window - Preferences - Java - Code Style - Code Templates
  */
-public class WMSReaderTest extends TestCase {
+public class WMSReaderTest extends ServerTestCase {
     WMSCapabilities capabilities;
     WMSReader reader;
     URL server;

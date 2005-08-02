@@ -32,7 +32,7 @@ public class WMSSchemaTest extends TestCase {
 		File getCaps = TestData.file(this, "1.3.0Capabilities.xml");
         URL getCapsURL = getCaps.toURL();
 
-		Object object = DocumentFactory.getInstance(getCapsURL.openStream(), null, Level.FINE);
+		Object object = DocumentFactory.getInstance(getCapsURL.openStream(), null, Level.WARNING);
 
         Schema schema = WMSSchema.getInstance();
 		SchemaFactory.getInstance(WMSSchema.NAMESPACE);

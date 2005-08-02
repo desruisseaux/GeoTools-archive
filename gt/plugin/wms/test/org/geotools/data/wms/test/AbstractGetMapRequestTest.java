@@ -24,7 +24,7 @@ public class AbstractGetMapRequestTest extends TestCase {
 		request.addLayer("Layer2", null);
 		
 		URL finalURL = request.getFinalURL();
-        System.out.println(finalURL);
+        //System.out.println(finalURL);
 		String processedURL = finalURL.toExternalForm();
 		assertTrue(processedURL.indexOf("LAYERS=Layer2,Provincial+Boundary") != -1);
 		assertTrue(processedURL.indexOf("STYLES=,Two+words") != -1);

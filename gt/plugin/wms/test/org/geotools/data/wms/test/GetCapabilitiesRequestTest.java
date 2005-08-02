@@ -17,13 +17,14 @@
 package org.geotools.data.wms.test;
 
 import junit.framework.TestCase;
+
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
 
-public class GetCapabilitiesRequestTest extends TestCase {
+public class GetCapabilitiesRequestTest extends ServerTestCase {
     public void testGetCapabilitiesRequest() throws Exception {
         URL testURL = new URL(
                 "http://office.refractions.net:4001/cgi-bin/mapserv?map=/opt/dra2/orthophotos/tiles.map&");

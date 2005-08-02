@@ -192,7 +192,7 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
         WMSCapabilities caps = wms.getCapabilities();
         GetMapRequest request = wms.createGetMapRequest();
         request.setFormat("image/jpeg");
-        System.out.println(request.getFinalURL().toExternalForm());
+        //System.out.println(request.getFinalURL().toExternalForm());
         
         assertTrue(request.getFinalURL().toExternalForm().indexOf("image%2Fjpeg") >= 0);
     }
@@ -236,18 +236,18 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
             request.setQueryPoint(200, 200);
             request.setInfoFormat("text/html");
             
-            System.out.println(request.getFinalURL());
+            //System.out.println(request.getFinalURL());
             
 //     TODO   Currently this server rtreturns code 400 !?
             GetFeatureInfoResponse response = (GetFeatureInfoResponse) wms.issueRequest(request);
-            System.out.println(response.getContentType());
+            //System.out.println(response.getContentType());
             assertTrue( response.getContentType().indexOf("text/html") != -1 );
             BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
             String line;
             
             boolean textFound = false;
             while ((line = in.readLine()) != null) {
-                System.out.println(line);
+                //System.out.println(line);
                 if (line.indexOf("25.5790") != -1) {
                     textFound = true;
                 }

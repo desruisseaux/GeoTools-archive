@@ -17,36 +17,24 @@
 
 package org.geotools.data.wms.test;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-
-import junit.framework.TestCase;
 
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_0_0;
-import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
-import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.resources.TestData;
 import org.geotools.xml.DocumentFactory;
@@ -56,7 +44,7 @@ import org.geotools.xml.schema.Schema;
 import org.xml.sax.SAXException;
 
 
-public class WMS1_0_0Test extends TestCase {
+public class WMS1_0_0Test extends ServerTestCase {
     protected URL server;
     protected Specification spec;
     
@@ -167,7 +155,7 @@ public class WMS1_0_0Test extends TestCase {
             WMSCapabilities caps = wms.getCapabilities();
             GetMapRequest request = wms.createGetMapRequest();
             request.setFormat("image/jpeg");
-            System.out.println(request.getFinalURL().toExternalForm());
+//            System.out.println(request.getFinalURL().toExternalForm());
             
             assertTrue(request.getFinalURL().toExternalForm().indexOf("JPEG") >= 0);
         } catch(java.net.ConnectException ce){
@@ -264,7 +252,7 @@ public class WMS1_0_0Test extends TestCase {
             URL getCapsURL = getCaps.toURL();
             Map hints = new HashMap();
             hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
-            Object object = DocumentFactory.getInstance(getCapsURL.openStream(), hints, Level.FINEST);
+            Object object = DocumentFactory.getInstance(getCapsURL.openStream(), hints, Level.WARNING);
             
             Schema schema = WMSSchema.getInstance();
             SchemaFactory.getInstance(WMSSchema.NAMESPACE);

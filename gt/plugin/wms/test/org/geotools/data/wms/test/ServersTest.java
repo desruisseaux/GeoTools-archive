@@ -93,11 +93,11 @@ public class ServersTest extends TestCase {
             out.close();
 
             if (passed) {
-                System.out.println(server.toExternalForm() + " passed.");
+                //System.out.println(server.toExternalForm() + " passed.");
                 passedCount++;
 //                file.delete();
             } else {
-            	System.out.println(server.toExternalForm() + " failed.");
+            	//System.out.println(server.toExternalForm() + " failed.");
             }
 //    		    WebMapServer wms = new WebMapServer(servers[i]);
 //    			assertNotNull("Missing Capabilities",wms.getCapabilities());
@@ -105,8 +105,8 @@ public class ServersTest extends TestCase {
 //    		    assertNotNull(capabilities.getRequest());
 		}
 
-        System.out.println("Total tested: "+total);
-        System.out.println("Total passed: "+passedCount);
+//        System.out.println("Total tested: "+total);
+//        System.out.println("Total passed: "+passedCount);
     }
 
     public boolean serverTest(PrintStream out, URL url) {

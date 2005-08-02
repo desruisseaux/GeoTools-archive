@@ -53,7 +53,7 @@ import org.xml.sax.SAXException;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class WebMapServerTest extends TestCase {
+public class WebMapServerTest extends ServerTestCase {
     URL serverURL;
     URL brokenURL;
     private URL featureURL;
@@ -132,11 +132,11 @@ public class WebMapServerTest extends TestCase {
 
         request.setBBox("366800,2170400,816000,2460400");
 
-        System.out.println(request.getFinalURL());
+        //System.out.println(request.getFinalURL());
         GetMapResponse response = (GetMapResponse) wms.issueRequest(request);
 
         assertEquals(response.getContentType(), format);
-        System.out.println("Content Type: " + response.getContentType());
+        //System.out.println("Content Type: " + response.getContentType());
 
         BufferedImage image = ImageIO.read(response.getInputStream());
         assertEquals(image.getHeight(), 400);
@@ -263,11 +263,11 @@ public class WebMapServerTest extends TestCase {
     	GetMapRequest request = wms.createGetMapRequest();
     	request.addLayer("NoLayer", "NoStyle");
     	try {
-    		System.out.println(request.getFinalURL());
+    		//System.out.println(request.getFinalURL());
     		GetMapResponse response = wms.issueRequest(request);
     		assertTrue(false);
     	} catch (ServiceException e) {
-    		e.printStackTrace();
+    		//e.printStackTrace();
     	}    	
     }
 }
