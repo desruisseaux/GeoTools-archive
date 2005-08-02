@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-hsql</name>
+  <id>hsql</id>
+  <currentVersion>2.2.x</currentVersion>
+  <package>org.geotools</package>
+  <shortDescription>hsql module</shortDescription>
+  <description>HSQL is a lightweight (~600k) JAVA database that
+  is usefull for saving data locally. This module also uses
+  the Spatial DB in a Box extensions written by David Blasby.
+  </description>
+  <developers>
+    <developer>
+      <name>Amr Alam</name>
+      <id>aalam</id>
+      <email>aalam@refractions.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
+      <id>hsqldb</id>
+      <version>1.8.0.1</version>
+      <url>http://hsqldb.org/</url>
+      <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <id>spatialdb</id>
+      <version>0.1</version>
+      <url>http://docs.codehaus.org/pages/viewpageattachments.action?pageId=19596</url>
+      <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.6</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+       <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+  </dependencies>
+  <build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+    </unitTest>
+  </build>
+</project>
