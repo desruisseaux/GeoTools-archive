@@ -18,6 +18,7 @@
 package org.geotools.data.wms.test;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
@@ -63,6 +64,8 @@ public class ServerTestCase extends TestCase {
             e.printStackTrace(System.err);
         } catch (FileNotFoundException e) {
             e.printStackTrace(System.err);
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
         }
     }
 
@@ -76,6 +79,8 @@ public class ServerTestCase extends TestCase {
         } catch (NoRouteToHostException e) {
             e.printStackTrace(System.err);
         } catch (FileNotFoundException e) {
+            e.printStackTrace(System.err);
+        } catch (IOException e) {
             e.printStackTrace(System.err);
         }
     }
