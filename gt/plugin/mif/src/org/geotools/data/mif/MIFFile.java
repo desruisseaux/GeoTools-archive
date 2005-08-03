@@ -22,6 +22,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -51,6 +52,7 @@ import java.util.Date; // TODO use java.sql.Date?
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 
@@ -77,7 +79,7 @@ import java.util.logging.Logger;
  *
  * @author Luca S. Percich, AMA-MI
  * @author Paolo Rizzi, AMA-MI
- * @version $Id: MIFFile.java,v 1.13 2005/07/12 10:19:51 lpercich Exp $
+ * @version $Id: MIFFile.java,v 1.16 2005/08/02 12:04:16 lpercich Exp $
  */
 public class MIFFile {
     // Geometry type identifier constants 
@@ -132,7 +134,6 @@ public class MIFFile {
     private File midFileOut = null;
     private Object[] featureDefaults = null;
     private char chDelimiter = '\t'; // TAB is the default delimiter if not specified in header
-    private Geometry nullGeometry = null;
 
     // Schema variables
     private FeatureType featureType = null;
@@ -153,6 +154,7 @@ public class MIFFile {
     private String fieldNameCase;
     private String geometryName;
     private String geometryClass;
+    private boolean toGeometryCollection = false;
 
     /**
      * <p>
@@ -187,8 +189,7 @@ public class MIFFile {
      * PARAM_GEOMTYPE = geometry type handling: "untyped" uses Geometry class |
      * "typed" force geometry to the type of the first valid geometry found in
      * file | "multi" like typed, but forces LineString to MultilineString and
-     * Polygon to MultiPolygon; <br>
-     * (This option is not supported yet)
+     * Polygon to MultiPolygon; | "Point" | "LineString" | "MultiLineString" | "Polygon" | "MultiPolygon"
      * </li>
      * </ul>
      * 
@@ -345,9 +346,6 @@ public class MIFFile {
             geomFactory = new GeometryFactory(new PrecisionModel(
                         PrecisionModel.FLOATING), SRID.intValue());
         }
-
-        // TODO use null instead???
-        nullGeometry = geomFactory.createPoint(new Coordinate(0, 0));
 
         geometryName = (String) getParam(MIFDataStore.PARAM_GEOMNAME,
                 "the_geom", false, params);
@@ -718,6 +716,7 @@ public class MIFFile {
         throws IOException, SchemaException {
         try {
             String tok;
+            AttributeType[] columns = null;
 
             while (mif.readLine()) {
                 tok = mif.getToken().toLowerCase();
@@ -800,7 +799,7 @@ public class MIFFile {
                     }
 
                     // Columns <n> does not take into account the geometry column, so we increment
-                    AttributeType[] columns = new AttributeType[++cols];
+                    columns = new AttributeType[++cols];
 
                     String name;
                     String type;
@@ -862,38 +861,90 @@ public class MIFFile {
                         columns[i] = AttributeTypeFactory.newAttributeType(name,
                                 typeClass, (defa == null), size, defa);
                     }
+                }
+            }
 
-                    // If Table_is_mappable()
-                    Class geomType = Geometry.class;
+            // Builds schema if not in skip mode...
+            if (!skipRead) {
+                Class geomType = null;
 
-                    if (!geometryClass.equalsIgnoreCase("untyped")) {
-                        // TODO look for the first valid geometry to determine exact Geometry subtype for FT
-                        if (geometryClass.equalsIgnoreCase("multi")) {
-                            // TODO Switch a flag to be used in readRegionOject and ReadPlineObject forcing conversion to MultiLineString and MultiPolygon
+                String geomClass = geometryClass.toLowerCase();
+
+                if (geomClass.equals("untyped")) {
+                    geomType = Geometry.class;
+                } else if (geomClass.equals("typed")) {
+                    toGeometryCollection = false;
+                } else if (geomClass.equals("multi")) {
+                    toGeometryCollection = true;
+                } else if (geomClass.equals("point")) {
+                    geomType = Point.class;
+                } else if (geomClass.equals("linestring")) {
+                    geomType = LineString.class;
+                } else if (geomClass.equals("multilinestring")) {
+                    geomType = MultiLineString.class;
+                    toGeometryCollection = true;
+                } else if (geomClass.equals("polygon")) {
+                    geomType = Polygon.class;
+                } else if (geomClass.equals("multipolygon")) {
+                    geomType = MultiPolygon.class;
+                    toGeometryCollection = true;
+                } else {
+                    throw new SchemaException("Bad geometry type option: "
+                        + geomClass);
+                }
+
+                // Determine geometry type from the first non-null geometry read from mif file
+                if (geomType == null) {
+                    Reader reader = new Reader(mif, null);
+                    Geometry geom = null;
+
+                    while (!reader.mifEOF) {
+                        geom = reader.readGeometry();
+
+                        if (geom != null) {
+                            geomType = geom.getClass();
+
+                            if (toGeometryCollection) {
+                                if (geomType.isAssignableFrom(Polygon.class)) {
+                                    geomType = MultiPolygon.class;
+                                } else if (geomType.isAssignableFrom(
+                                            LineString.class)) {
+                                    geomType = MultiLineString.class;
+                                }
+                            }
+
+                            break;
                         }
                     }
 
-                    columns[0] = AttributeTypeFactory.newAttributeType(geometryName,
-                            geomType, true);
+                    reader.close();
+                    reader = null;
+                }
 
-                    try {
-                        String typeName = mifFile.getName();
-                        typeName = typeName.substring(0, typeName.indexOf("."));
+                if (geomType == null) {
+                    throw new SchemaException(
+                        "Unable to determine geometry type from mif file");
+                }
 
-                        FeatureTypeBuilder builder = FeatureTypeBuilder
-                            .newInstance(typeName);
+                columns[0] = AttributeTypeFactory.newAttributeType(geometryName,
+                        geomType, true);
 
-                        builder.setNamespace(namespace);
+                try {
+                    String typeName = mifFile.getName();
+                    typeName = typeName.substring(0, typeName.indexOf("."));
 
-                        for (int i = 0; i < columns.length; i++)
-                            builder.addType(columns[i]);
+                    FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(typeName);
 
-                        setSchema(builder.getFeatureType());
-                    } catch (SchemaException schexp) {
-                        throw new SchemaException(
-                            "Exception creating feature type from MIF header: "
-                            + schexp.toString());
-                    }
+                    builder.setNamespace(namespace);
+
+                    for (int i = 0; i < columns.length; i++)
+                        builder.addType(columns[i]);
+
+                    setSchema(builder.getFeatureType());
+                } catch (SchemaException schexp) {
+                    throw new SchemaException(
+                        "Exception creating feature type from MIF header: "
+                        + schexp.toString());
                 }
             }
         } catch (Exception e) {
@@ -1119,15 +1170,19 @@ public class MIFFile {
             MIFFileTokenizer midTokenizer) throws IOException {
             inputBuffer = new Object[numAttribs];
 
-            try {
-                fieldValueSetters = getValueSetters();
-            } catch (SchemaException e) {
-                throw new IOException(e.getMessage());
-            }
-
             mif = mifTokenizer;
             mid = midTokenizer;
-            inputFeature = readFeature();
+
+            // numAttribs == 0 when Reader is called from within readMifHeader for determining geometry Type
+            if (numAttribs > 0) {
+                try {
+                    fieldValueSetters = getValueSetters();
+                } catch (SchemaException e) {
+                    throw new IOException(e.getMessage());
+                }
+
+                inputFeature = readFeature();
+            }
         }
 
         public boolean hasNext() {
@@ -1200,10 +1255,6 @@ public class MIFFile {
                 return null;
             }
 
-            if (geom == nullGeometry) {
-                geom = null;
-            }
-
             // Reads data from mid file
             // Assumes that geomFieldIndex == 0
             try {
@@ -1265,7 +1316,7 @@ public class MIFFile {
                 String objType = mif.getToken().toLowerCase();
 
                 if (objType.equals(TYPE_NONE)) {
-                    geom = nullGeometry;
+                    geom = null;
                 } else if (objType.equals(TYPE_POINT)) {
                     geom = readPointObject();
                 } else if (objType.equals(TYPE_LINE)) {
@@ -1335,13 +1386,9 @@ public class MIFFile {
                     lineStrings[i] = geomFactory.createLineString(coords);
                 }
 
-                if (numsections == 1) {
-                    LOGGER.finest("Read polyline()");
-
+                if ((numsections == 1) && !toGeometryCollection) {
                     return (Geometry) lineStrings[0];
                 }
-
-                LOGGER.finest("Read MultiPolyline(" + lineStrings.length + ")");
 
                 return (Geometry) geomFactory.createMultiLineString(lineStrings);
             } catch (Exception e) {
@@ -1361,17 +1408,18 @@ public class MIFFile {
         private Geometry readRegionObject() throws IOException {
             try {
                 int numpolygons = Integer.parseInt(mif.getToken(' ', true));
-                LinearRing[] rings = null;
-                LinearRing theRing = null;
 
-                if (numpolygons > 1) {
-                    rings = new LinearRing[numpolygons - 1];
-                }
+                Vector polygons = new Vector();
 
-                // Read each linearring; for now, assumes that all the other rings but the first one are interior holes
+                LinearRing tmpRing = null;
+                Polygon shell = null;
+                LinearRing shellRing = null;
+                Vector holes = null;
+                boolean savePolygon;
+
+                // Read all linearrings;
                 for (int i = 0; i < numpolygons; i++) {
-                    // TODO - Add support Multipolygons!!!!!!!
-                    // Read coordinates
+                    // Read coordinates & create ring
                     int numpoints = Integer.parseInt(mif.getToken(' ', true));
                     Coordinate[] coords = new Coordinate[numpoints + 1];
 
@@ -1380,28 +1428,62 @@ public class MIFFile {
                     }
 
                     coords[coords.length - 1] = coords[0];
+                    tmpRing = geomFactory.createLinearRing(coords);
 
-                    LinearRing tmpRing = geomFactory.createLinearRing(coords);
-
-                    if (theRing == null) {
-                        theRing = tmpRing;
+                    /*
+                     * In MIF format a polygon is described as a list of rings, with no info wether 
+                     * a ring is a hole or a shell, so we have to determine it by checking if 
+                     * a ring in contained in the previously defined shell
+                     */                    
+                    if ((shell != null) && shell.contains(tmpRing)) {
+                        holes.add(tmpRing);
+                        tmpRing = null; // mark as done
+                        savePolygon = (i == (numpolygons - 1));
                     } else {
-                        // if (theRing.contains(tmpRing)) {
-                        rings[i - 1] = tmpRing;
+                        // New polygon, must save previous if it's not the first ring
+                        savePolygon = (i > 0);
+                    }
 
-                        // } else {
-                        // Create Poly and add to multipolygon list
-                        // theRing = tmpRing; // new element for Multipolygon
+                    if (savePolygon) {
+                        LinearRing[] h = null;
+
+                        if (holes.size() > 0) {
+                            h = new LinearRing[holes.size()];
+
+                            for (int hole = 0; hole < holes.size(); hole++) {
+                                h[hole] = (LinearRing) holes.get(hole);
+                            }
+                        }
+
+                        polygons.add(geomFactory.createPolygon(shellRing, h));
+
+                        shellRing = null;
+                    }
+
+                    // Build the polygon needed for testing holes
+                    if (tmpRing != null) {
+                        shellRing = tmpRing;
+                        shell = geomFactory.createPolygon(shellRing, null);
+                        holes = new Vector();
                     }
                 }
 
+                if (shellRing != null) {
+                    polygons.add(geomFactory.createPolygon(shellRing, null));
+                }
+
                 try {
-                    Polygon pol = geomFactory.createPolygon(theRing, rings);
+                    if ((polygons.size() == 1) && !toGeometryCollection) {
+                        return (Polygon) polygons.get(0);
+                    }
 
-                    return pol;
+                    Polygon[] polys = new Polygon[polygons.size()];
 
-                    // MultiPolygon polyGeom = geomFactory.createMultiPolygon(polys);
-                    // return polyGeom;
+                    for (int i = 0; i < polygons.size(); i++) {
+                        polys[i] = (Polygon) polygons.get(i);
+                    }
+
+                    return geomFactory.createMultiPolygon(polys);
                 } catch (TopologyException topexp) {
                     throw new TopologyException(
                         "TopologyException reading Region polygon : "
@@ -1472,7 +1554,13 @@ public class MIFFile {
             cPoints[0] = readMIFCoordinate();
             cPoints[1] = readMIFCoordinate();
 
-            return geomFactory.createLineString(cPoints);
+            LineString[] result = { geomFactory.createLineString(cPoints) };
+
+            if (toGeometryCollection) {
+                return geomFactory.createMultiLineString(result);
+            }
+
+            return result[0];
         }
     }
 
@@ -1652,7 +1740,7 @@ public class MIFFile {
 
         private String exportGeometry(Geometry geom) {
             // Style information is optional, so we will not export the default styles
-            if ((geom == null) || (geom == nullGeometry) || (geom.isEmpty())) {
+            if ((geom == null) || (geom.isEmpty())) {
                 return TYPE_NONE.toUpperCase();
             }
 
@@ -1667,7 +1755,36 @@ public class MIFFile {
                 return TYPE_PLINE + " " + exportCoords(coords, false);
             }
 
-            // TODO Handle MultiPolygon
+            if (geom instanceof MultiPolygon) {
+                MultiPolygon mpoly = (MultiPolygon) geom;
+
+                int nPol = mpoly.getNumGeometries();
+                int nRings = nPol;
+
+                for (int i = 0; i < nPol; i++) {
+                    nRings += ((Polygon) mpoly.getGeometryN(i))
+                    .getNumInteriorRing();
+                }
+
+                String buf = TYPE_REGION + " " + (nRings);
+
+                for (int i = 0; i < nPol; i++) {
+                    Polygon poly = (Polygon) mpoly.getGeometryN(i);
+
+                    buf += ("\n"
+                    + exportCoords(poly.getExteriorRing().getCoordinates(), true));
+
+                    for (int inner = 0; inner < poly.getNumInteriorRing();
+                            inner++) {
+                        buf += ("\n"
+                        + exportCoords(poly.getInteriorRingN(inner)
+                                           .getCoordinates(), true));
+                    }
+                }
+
+                return buf;
+            }
+
             if (geom instanceof Polygon) {
                 Polygon poly = (Polygon) geom;
                 int nRings = poly.getNumInteriorRing();

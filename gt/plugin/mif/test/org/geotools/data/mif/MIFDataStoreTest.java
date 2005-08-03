@@ -356,7 +356,7 @@ public class MIFDataStoreTest extends TestCase {
 
         try {
             MIFTestUtils.copyMif("mixed", outmif);
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             fail(e.getMessage());
         }
 

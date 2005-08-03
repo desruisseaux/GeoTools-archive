@@ -16,13 +16,21 @@
  */
 package org.geotools.data.mif;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 
 /**
@@ -260,6 +268,182 @@ public class MIFFileTest extends TestCase {
             assertEquals(9, counter);
         } catch (Exception e) {
             fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Test opening of two FeatureReaders on the same MIF file.
+     */
+    public void testConcurrentReader() {
+        try {
+            MIFFile mif1 = new MIFFile(MIFTestUtils.fileName("grafo"), // .mif
+                    MIFTestUtils.getParams("", "", null));
+
+            MIFFile mif2 = new MIFFile(MIFTestUtils.fileName("grafo"), // .mif
+                    MIFTestUtils.getParams("", "", null));
+
+            FeatureReader fr1 = mif1.getFeatureReader();
+
+            fr1.next();
+
+            Feature f1 = fr1.next();
+
+            FeatureReader fr2 = mif2.getFeatureReader();
+
+            fr2.next();
+
+            Feature f2 = fr2.next();
+
+            for (int i = 0; i < f1.getNumberOfAttributes(); i++) {
+                assertEquals("Features are different",
+                    f1.getAttribute(i).toString(), f2.getAttribute(i).toString());
+            }
+
+            fr2.close();
+            fr1.close();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void testUntypedGeometryTypes() {
+        try {
+            mif = new MIFFile(MIFTestUtils.fileName("mixed"), // .mif
+                    MIFTestUtils.getParams("mif", "", null, "untyped"));
+
+            FeatureType ft = mif.getSchema();
+
+            assertEquals(ft.getDefaultGeometry().getType(), Geometry.class);
+
+            FeatureReader fr = mif.getFeatureReader();
+
+            while (fr.hasNext()) {
+                Feature f = fr.next();
+                String geomtype = (String) f.getAttribute("GEOMTYPE");
+
+                if (geomtype.equals("LINE")) {
+                    geomtype = "LINESTRING";
+                }
+
+                Geometry geom = (Geometry) f.getAttribute("the_geom");
+
+                if (geom == null) {
+                    assertEquals(geomtype, "NULL");
+                } else {
+                    String gtype = geom.getClass().getName();
+                    gtype = gtype.substring(28).toUpperCase();
+
+                    boolean compat = (geomtype.equals(gtype));
+
+                    // compat = compat || geomtype.equals("MULTI" + gtype);
+                    assertTrue("Uncompatible types: " + gtype + ", " + geomtype,
+                        compat);
+
+                    if (geomtype.equals("POLYGON")) {
+                        assertEquals("Bad number of holes",
+                            ((Integer) f.getAttribute("NUM_OF_HOLES")).intValue(),
+                            ((Polygon) geom).getNumInteriorRing());
+                    }
+                }
+            }
+
+            fr.close();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void testTypedGeometryUntyped() {
+        doTestTyping("grafo", "untyped", Geometry.class, LineString.class, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void testTypedGeometryTyped() {
+        doTestTyping("grafo", "typed", LineString.class, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void testTypedGeometryTypesMulti() {
+        doTestTyping("grafo", "multi", MultiLineString.class, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void testTypedGeometryTypesLineString() {
+        doTestTyping("grafo", "LineString", LineString.class, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void testTypedGeometryTypesMultiLineString() {
+        doTestTyping("grafo", "MultiLineString", MultiLineString.class, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void testTypedGeometryTypesPoint() {
+        // If I force to MultiLineString, the features read must already be MultiLineString
+        doTestTyping("nodi", "Point", Point.class, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void testTypedGeometryTypesMultiPoint() {
+        // If I force to MultiLineString, the features read must already be MultiLineString
+        doTestTyping("nodi", "multi", Point.class, false);
+    }
+
+    private void doTestTyping(String typeName, String geomType,
+        Class geomClass, boolean errorExpected) {
+        doTestTyping(typeName, geomType, geomClass, geomClass, errorExpected);
+    }
+
+    private void doTestTyping(String typeName, String geomType,
+        Class geomClass, Class instanceGeomClass, boolean errorExpected) {
+        try {
+            mif = new MIFFile(MIFTestUtils.fileName(typeName), // .mif
+                    MIFTestUtils.getParams("mif", "", null, geomType));
+
+            FeatureType ft = mif.getSchema();
+
+            assertEquals(geomClass, ft.getDefaultGeometry().getType());
+
+            FeatureReader fr = mif.getFeatureReader();
+
+            try {
+                Feature f = fr.next();
+                Geometry geom = (Geometry) f.getAttribute("the_geom");
+
+                if (errorExpected) {
+                    fail("Expected error reading geometric attribute");
+                } else {
+                    assertEquals(instanceGeomClass, geom.getClass());
+                }
+            } catch (Exception e) {
+                if (!errorExpected) {
+                    fail(e.getMessage());
+                }
+            }
+
+            fr.close();
+        } catch (Exception e) {
+            if (!errorExpected) {
+                fail(e.getMessage());
+            }
         }
     }
 }

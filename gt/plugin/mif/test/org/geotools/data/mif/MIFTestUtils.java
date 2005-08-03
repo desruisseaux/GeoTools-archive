@@ -69,10 +69,10 @@ public class MIFTestUtils {
      * @param inMif DOCUMENT ME!
      * @param outMif DOCUMENT ME!
      *
-     * @throws FileNotFoundException
+     * @throws IOException
      */
     public static void copyMif(String inMif, String outMif)
-        throws FileNotFoundException {
+        throws IOException {
         File path = getDataPath();
 
         copyFileUsingChannels(MIFFile.getFileHandler(path, inMif, ".mif", true),
@@ -87,23 +87,15 @@ public class MIFTestUtils {
      * @param in DOCUMENT ME!
      * @param out DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @throws IOException
      */
-    public static String copyFileUsingChannels(File in, File out) {
-        String res = "";
-
-        try {
-            FileChannel sourceChannel = new FileInputStream(in).getChannel();
-            FileChannel destinationChannel = new FileOutputStream(out)
-                .getChannel();
-            sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
-            sourceChannel.close();
-            destinationChannel.close();
-        } catch (Exception e) {
-            res = e.getMessage();
-        }
-
-        return res;
+    public static void copyFileUsingChannels(File in, File out)
+        throws IOException {
+        FileChannel sourceChannel = new FileInputStream(in).getChannel();
+        FileChannel destinationChannel = new FileOutputStream(out).getChannel();
+        sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
+        sourceChannel.close();
+        destinationChannel.close();
     }
 
     /**
@@ -186,10 +178,12 @@ public class MIFTestUtils {
      * @param dbtype DOCUMENT ME!
      * @param path DOCUMENT ME!
      * @param uri DOCUMENT ME!
+     * @param geomType DOCUMENT ME!
      *
      * @return DOCUMENT ME!
      */
-    protected static HashMap getParams(String dbtype, String path, URI uri) {
+    protected static HashMap getParams(String dbtype, String path, URI uri,
+        String geomType) {
         HashMap params = new HashMap();
 
         params.put("dbtype", dbtype);
@@ -201,6 +195,7 @@ public class MIFTestUtils {
 
         params.put(MIFDataStore.PARAM_FIELDCASE, "upper");
         params.put(MIFDataStore.PARAM_GEOMNAME, "the_geom");
+        params.put(MIFDataStore.PARAM_GEOMTYPE, geomType);
 
         // params.put(MIFDataStore.PARAM_GEOMFACTORY, MIFTestUtils.geomFactory);
         params.put(MIFDataStore.PARAM_SRID, new Integer(SRID));
@@ -208,6 +203,19 @@ public class MIFTestUtils {
         params.put(MIFDataStore.HCLAUSE_COORDSYS, MIFTestUtils.coordsysClause);
 
         return params;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param dbtype DOCUMENT ME!
+     * @param path DOCUMENT ME!
+     * @param uri DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    protected static HashMap getParams(String dbtype, String path, URI uri) {
+        return getParams(dbtype, path, uri, "untyped");
     }
 
     /**
