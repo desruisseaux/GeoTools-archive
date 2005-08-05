@@ -386,7 +386,7 @@ public final class ImageUtilities {
                 RIFRegistry.setPreference(registry, operation, product,
                                           allowed ? nativeFactory : javaFactory,
                                           allowed ? javaFactory : nativeFactory);
-                final LogRecord record = Logging.getResources(null).getLogRecord(Level.CONFIG,
+                final LogRecord record = Logging.format(Level.CONFIG,
                                                  LoggingKeys.NATIVE_ACCELERATION_STATE_$2,
                                                  operation, new Integer(allowed ? 1 : 0));
                 record.setSourceClassName("ImageUtilities");

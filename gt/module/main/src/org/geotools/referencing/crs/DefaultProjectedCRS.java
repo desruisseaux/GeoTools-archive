@@ -68,10 +68,9 @@ import org.geotools.resources.Utilities;
  *   {@link CartesianCS Cartesian}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultProjectedCRS extends AbstractDerivedCRS implements ProjectedCRS {
     /**

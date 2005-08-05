@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 
 // JAI dependencies
 import javax.media.jai.Interpolation;
@@ -96,8 +97,8 @@ public class DefaultProcessor extends AbstractProcessor {
          * for serious trouble.
          */
         if (cache.getMemoryCapacity() + (4*1024*1024) >= maxMemory) {
-            LOGGER.severe(Logging.format(LoggingKeys.EXCESSIVE_TILE_CACHE_$1,
-                                           new Double(maxMemory/(1024*1024.0))));
+            LOGGER.log(Logging.format(Level.SEVERE, LoggingKeys.EXCESSIVE_TILE_CACHE_$1,
+                                      new Double(maxMemory/(1024*1024.0))));
         }
     }
 

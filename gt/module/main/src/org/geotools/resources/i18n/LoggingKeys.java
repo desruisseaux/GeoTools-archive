@@ -27,8 +27,11 @@ public final class LoggingKeys {
     public static final int AMBIGUOUS_ELLIPSOID                 =     1;
     public static final int APPLIED_OPERATION_$4                =     2;
     public static final int APPLIED_RESAMPLE_$11                =     3;
+    public static final int CANT_BIND_DATASOURCE_$1             =    24;
     public static final int CANT_REGISTER_JAI_OPERATION_$1      =     4;
     public static final int CHANGED_COORDINATE_REFERENCE_SYSTEM =     5;
+    public static final int CLOSED_EPSG_DATABASE                =    26;
+    public static final int CREATED_DATASOURCE_ENTRY_$1         =    25;
     public static final int DEFERRED_TILE_PAINTING_$2           =     6;
     public static final int EXCESSIVE_MEMORY_USAGE              =     7;
     public static final int EXCESSIVE_TILE_CACHE_$1             =     8;
@@ -45,5 +48,7 @@ public final class LoggingKeys {
     public static final int UNEXPECTED_UNIT_$1                  =    19;
     public static final int UNKNOW_PARAMETER_$3                 =    20;
     public static final int UNKNOW_STYLE_$2                     =    21;
+    public static final int UNRECOGNIZED_SCALE_TYPE_$1          =    23;
     public static final int UPDATE_RENDERER_CACHE_$1            =    22;
+    public static final int USING_FILE_AS_FACTORY_$2            =    27;
 }

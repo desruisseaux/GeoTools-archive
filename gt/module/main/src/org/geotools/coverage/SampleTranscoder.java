@@ -270,7 +270,7 @@ final class SampleTranscoder extends PointOpImage {
             registry.registerFactory(RenderedRegistryMode.MODE_NAME, OPERATION_NAME,
                                      "geotools.org", new CRIF());
         } catch (IllegalArgumentException exception) {
-            final LogRecord record = Logging.getResources(null).getLogRecord(Level.SEVERE,
+            final LogRecord record = Logging.format(Level.SEVERE,
                    LoggingKeys.CANT_REGISTER_JAI_OPERATION_$1, OPERATION_NAME);
             record.setSourceClassName("GridSampleDimension");
             record.setSourceMethodName("<classinit>");

@@ -39,6 +39,7 @@ import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultSphericalCS;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -53,10 +54,9 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
  *   {@link SphericalCS Spherical}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultGeocentricCRS extends AbstractSingleCRS implements GeocentricCRS {
     /**
@@ -72,7 +72,8 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
      * The <var>Y</var> axis points East.
      * The <var>Z</var> axis points North.
      */
-    public static final DefaultGeocentricCRS CARTESIAN = new DefaultGeocentricCRS("Cartesian",
+    public static final DefaultGeocentricCRS CARTESIAN = new DefaultGeocentricCRS(
+                        name(VocabularyKeys.CARTESIAN),
                         DefaultGeodeticDatum.WGS84, DefaultCartesianCS.GEOCENTRIC);
     
     /**
@@ -80,7 +81,8 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
      * {@linkplain DefaultSphericalCS#GEOCENTRIC spherical coordinate system}.
      * Prime meridian is Greenwich, geodetic datum is WGS84 and linear units are metres.
      */
-    public static final DefaultGeocentricCRS SPHERICAL = new DefaultGeocentricCRS("Spherical",
+    public static final DefaultGeocentricCRS SPHERICAL = new DefaultGeocentricCRS(
+                        name(VocabularyKeys.SPHERICAL),
                         DefaultGeodeticDatum.WGS84, DefaultSphericalCS.GEOCENTRIC);
 
     /**

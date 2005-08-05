@@ -375,7 +375,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
 
     /**
      * Gets a string for the given key and appends "..." to it.
-     * This method is typically used for creating menu labels.
+     * This method is typically used for creating menu items.
      *
      * @param  key The key for the desired string.
      * @return The string for the given key.
@@ -387,7 +387,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
 
     /**
      * Gets a string for the given key and appends ": " to it.
-     * This method is typically used for creating menu labels.
+     * This method is typically used for creating labels.
      *
      * @param  key The key for the desired string.
      * @return The string for the given key.
@@ -571,7 +571,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
     {
         final LogRecord record = new LogRecord(level, String.valueOf(key));
         record.setResourceBundle(this);
-        if (arg0!=null) {
+        if (arg0 != null) {
             record.setParameters(toArray(arg0));
         }
         return record;

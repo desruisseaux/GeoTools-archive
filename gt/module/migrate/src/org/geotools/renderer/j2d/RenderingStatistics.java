@@ -145,7 +145,7 @@ final class RenderingStatistics {
     }
 
     /**
-     * Declare that a rendering is finished. This method update the statistics and logs
+     * Declares that a rendering is finished. This method update the statistics and logs
      * a message with the specified level. Invoked by {@link Renderer#paint} only.
      *
      * @param renderer The caller.
@@ -156,7 +156,7 @@ final class RenderingStatistics {
             final Locale     locale = renderer.getLocale();
             final Logging resources = Logging.getResources(locale);
             final String       name = renderer.getName(locale);
-            final Double       time = new Double(this.time/1000.0);
+            final Double       time = new Double(this.time / 1000.0);
             final LogRecord    record;
             if (total==0 || rendered==0) {
                 record = resources.getLogRecord(LEVEL, LoggingKeys.PAINTING_LAYER_$2, name, time);

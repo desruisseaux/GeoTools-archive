@@ -48,10 +48,9 @@ import org.geotools.referencing.AbstractReferenceSystem;
  *   {@link TimeCS Time}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS {
     /**

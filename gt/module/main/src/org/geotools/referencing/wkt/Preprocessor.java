@@ -29,20 +29,26 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.geotools.io.TableWriter;
-import org.geotools.referencing.Console;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
+// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
+import org.geotools.io.TableWriter;
+import org.geotools.referencing.Console;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -333,15 +339,13 @@ public class Preprocessor extends Format {
      * @param  value The Well Know Text (WKT) represented by the name.
      * @throws IllegalArgumentException if the name is invalid.
      * @throws ParseException if the WKT can't be parsed.
-     *
-     * @todo Localize error messages.
      */
     public void addDefinition(final String name, String value) throws ParseException {
         if (value==null || value.trim().length()==0) {
-            throw new IllegalArgumentException("Missing WKT definition.");
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.MISSING_WKT_DEFINITION));
         }
         if (!isIdentifier(name)) {
-            throw new IllegalArgumentException("\""+name+"\" is not a valid identifier.");
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_IDENTIFIER_$1));
         }
         value = substitute(value);
         final Definition newDef = new Definition(value, forwardParse(value));
@@ -377,17 +381,18 @@ public class Preprocessor extends Format {
      *
      * @param  out writer The output stream where to write the table.
      * @throws IOException if an error occured while writting to the output stream.
-     * @todo   Localize column headers.
      */
     public void printDefinitions(final Writer out) throws IOException {
+        final Locale locale = null;
+        final Vocabulary resources = Vocabulary.getResources(locale);
         final TableWriter table = new TableWriter(out, " \u2502 ");
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();
-        table.write("Name");
+        table.write(resources.getString(VocabularyKeys.NAME));
         table.nextColumn();
-        table.write("Type");
+        table.write(resources.getString(VocabularyKeys.TYPE));
         table.nextColumn();
-        table.write("Description");
+        table.write(resources.getString(VocabularyKeys.DESCRIPTION));
         table.nextLine();
         table.writeHorizontalSeparator();
         for (final Iterator it=definitions.entrySet().iterator(); it.hasNext();) {

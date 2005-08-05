@@ -35,6 +35,11 @@ import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.VocabularyKeys;
+
 
 /**
  * A two- or three-dimensional coordinate system in which position is specified by geodetic
@@ -63,10 +68,9 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
      * <var>{@linkplain DefaultCoordinateSystemAxis#GEODETIC_LONGITUDE longitude}</var>,
      * <var>{@linkplain DefaultCoordinateSystemAxis#GEODETIC_LATITUDE latitude}</var>
      * axis in degrees.
-     *
-     * @todo Localize name.
      */
-    public static DefaultEllipsoidalCS GEODETIC_2D = new DefaultEllipsoidalCS("Geodetic 2D",
+    public static DefaultEllipsoidalCS GEODETIC_2D = new DefaultEllipsoidalCS(
+                    name(VocabularyKeys.GEODETIC_2D),
                     DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,
                     DefaultCoordinateSystemAxis.GEODETIC_LATITUDE);
 
@@ -76,10 +80,9 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
      * <var>{@linkplain DefaultCoordinateSystemAxis#GEODETIC_LATITUDE latitude}</var>,
      * <var>{@linkplain DefaultCoordinateSystemAxis#ELLIPSOIDAL_HEIGHT height}</var>
      * axis.
-     *
-     * @todo Localize name.
      */
-    public static DefaultEllipsoidalCS GEODETIC_3D = new DefaultEllipsoidalCS("Geodetic 3D",
+    public static DefaultEllipsoidalCS GEODETIC_3D = new DefaultEllipsoidalCS(
+                    name(VocabularyKeys.GEODETIC_3D),
                     DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,
                     DefaultCoordinateSystemAxis.GEODETIC_LATITUDE,
                     DefaultCoordinateSystemAxis.ELLIPSOIDAL_HEIGHT);
@@ -283,8 +286,7 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
         if (heightConverter == null) {
             update();
             if (heightConverter == null) {
-                throw new IllegalStateException("Not a 3D coordinate system");
-                // TODO: localize the error message.
+                throw new IllegalStateException(Errors.format(ErrorKeys.NOT_THREE_DIMENSIONAL_CS));
             }
         }
         return heightConverter.convert(coordinates[heightAxis]);

@@ -631,8 +631,8 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
                 return candidate;
             }
         }
-        // TODO: localize
-        throw new NoSuchElementException("Unknow axis direction: \""+direction+"\".");
+        throw new NoSuchElementException(
+                Errors.format(ErrorKeys.UNKNOW_AXIS_DIRECTION_$1, direction));
     }
 
     /**

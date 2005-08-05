@@ -59,10 +59,9 @@ import org.geotools.referencing.wkt.Formatter;
  * {@code Default} prefix instead. An exception to this rule may occurs when it is not possible to
  * identify the exact type.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see org.geotools.referencing.cs.AbstractCS
  * @see org.geotools.referencing.datum.AbstractDatum

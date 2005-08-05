@@ -737,8 +737,7 @@ public class GeodeticCalculator {
      */
     private void computeDestinationPoint() throws IllegalStateException {
         if (!directionValid) {
-            // TODO: localize this message.
-            throw new IllegalStateException("Direction not set");
+            throw new IllegalStateException(Errors.format(ErrorKeys.DIRECTION_NOT_SET));
         }
         // Protect internal variables from changes
         final double lat1     = this.lat1;
@@ -862,8 +861,7 @@ public class GeodeticCalculator {
      */
     private void computeDirection() throws IllegalStateException {
         if (!destinationValid) {
-            // TODO: localize this message.
-            throw new IllegalStateException("Destination not set");
+            throw new IllegalStateException(Errors.format(ErrorKeys.DESTINATION_NOT_SET));
         }
         // Protect internal variables from change.
         final double long1 = this.long1;

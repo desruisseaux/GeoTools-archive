@@ -282,7 +282,7 @@ public final class DeferredPlanarImage extends PlanarImage
          * Flag that this tile will need to be repainted later and returns an empty tile.
          */
         if (LOGGER.isLoggable(Level.FINER)) {
-            final LogRecord record = Logging.getResources(null).getLogRecord(Level.FINER,
+            final LogRecord record = Logging.format(Level.FINER,
                   LoggingKeys.DEFERRED_TILE_PAINTING_$2, new Integer(tileX), new Integer(tileY));
             record.setSourceClassName(Utilities.getShortClassName(this));
             record.setSourceMethodName("getTile");

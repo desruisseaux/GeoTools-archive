@@ -81,6 +81,8 @@ import org.opengis.util.InternationalString;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.Utilities;
 import org.geotools.util.NameFactory;
 
@@ -895,17 +897,13 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * @param  code  The unknow authority code.
      * @return An exception initialized with an error message built
      *         from the specified informations.
-     *
-     * @todo Localize the error message.
      */
     protected final NoSuchAuthorityCodeException noSuchAuthorityCode(final Class  type,
                                                                      final String code)
     {
         final String authority = getAuthority().getTitle().toString();
-        return new NoSuchAuthorityCodeException(
-                "No code \""+code+"\" from the authority \""+authority+
-                "\" was found for object of type "+Utilities.getShortName(type)+".",
-                authority, code);
+        return new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$3,
+                   code, authority, Utilities.getShortName(type)), authority, code);
     }
 
     /**

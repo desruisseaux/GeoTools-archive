@@ -74,6 +74,8 @@ import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.cs.AbstractCS;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.XArray;
 import org.geotools.util.Singleton;
@@ -588,7 +590,8 @@ public class FactoryGroup {
         if (length==0 || dimensions[0]<0 || dimensions[length-1]>=crsDimension ||
             !XArray.isStrictlySorted(dimensions))
         {
-            throw new IllegalArgumentException("Illegal dimension array."); // TODO: localize.
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1,
+                                               "dimension"));
         }
         if (length == crsDimension) {
             return crs;
@@ -647,7 +650,8 @@ search:     for (final Iterator it=sources.iterator(); it.hasNext();) {
          *       It may requires the creation of new CoordinateSystem objects,
          *       which is why this method live in 'FactoryGroup'.
          */
-        throw new FactoryException("Can't separate the CRS."); // TODO: localize
+        throw new FactoryException(Errors.format(ErrorKeys.CANT_SEPARATE_CRS_$1,
+                                   crs.getName().getCode()));
     }
 
     /**

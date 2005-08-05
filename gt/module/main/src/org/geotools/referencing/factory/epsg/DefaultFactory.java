@@ -53,6 +53,12 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.Arguments;
 import org.geotools.util.MonolineFormatter;
 
@@ -151,7 +157,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             // (indirectly) createBackingStore, which will fetch the DataSource.
             if (!super.isReady()) {
                 // Connection failed, but the exception is not available.
-                throw new SQLException("No data source found."); // TODO: localize;
+                throw new SQLException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
             }
         }
         return datasource;
@@ -243,8 +249,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             register = (context != null);
             // Fall back on 'getDataSources()' below.
         } catch (NamingException exception) {
-            SQLException e = new SQLException("Failed to get the data source for name \"" +
-                                              DATASOURCE_NAME + "\"."); // TODO: localize
+            SQLException e = new SQLException(Errors.format(ErrorKeys.CANT_GET_DATASOURCE_$1,
+                                              DATASOURCE_NAME));
             e.initCause(exception);
             throw e;
         }
@@ -273,7 +279,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             }
             if (!sources.hasNext()) {
                 if (failure == null) {
-                    failure = new SQLException("No data source found."); // TODO: localize;
+                    failure = new SQLException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
                 }
                 throw failure;
             }
@@ -287,11 +293,11 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         if (register) {
             try {
                 context.bind(DATASOURCE_NAME, source);
-                record = new LogRecord(Level.INFO, "Created a \"" + DATASOURCE_NAME +
-                                       "\" entry in the naming system."); // TODO: localize
+                record = Logging.format(Level.INFO, LoggingKeys.CREATED_DATASOURCE_ENTRY_$1,
+                                        DATASOURCE_NAME);
             } catch (NamingException exception) {
-                record = new LogRecord(Level.WARNING, "Failed to bind \"" + DATASOURCE_NAME +
-                                       "\" entry"); // TODO: localize
+                record = Logging.format(Level.WARNING, LoggingKeys.CANT_BIND_DATASOURCE_$1,
+                                        DATASOURCE_NAME);
                 record.setThrown(exception);
             }
             record.setSourceMethodName(DefaultFactory.class.getName());
@@ -314,8 +320,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      */
     protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
         final AbstractAuthorityFactory factory;
-        String product = "<unknow>"; // TODO: localize
-        String url     = "<unknow>";
+        String product = '<' + Vocabulary.format(VocabularyKeys.UNKNOW) + '>';
+        String url     = product;
         try {
             factory = createFactory();
             if (factory instanceof FactoryUsingSQL) {
@@ -324,8 +330,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                 url     = info.getURL();
             }
         } catch (SQLException exception) {
-            // TODO: localize
-            throw new FactoryException("Failed to connect to the EPSG database", exception);
+            throw new FactoryException(Errors.format(ErrorKeys.CANT_CONNECT_DATABASE_$1, "EPSG"),
+                                       exception);
         }
         // TODO: Provide a localized message including the database version.
         LOGGER.config("Connected to EPSG database \"" + url + "\" on " + product + '.');

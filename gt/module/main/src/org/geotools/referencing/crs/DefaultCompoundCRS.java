@@ -53,10 +53,9 @@ import org.geotools.resources.i18n.Errors;
  * defining the compound CRS as an ordered set of two or more instances of
  * {@link CoordinateReferenceSystem}.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
     /**

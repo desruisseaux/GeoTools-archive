@@ -30,6 +30,9 @@ import org.opengis.referencing.cs.SphericalCS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
+// Geotools dependencies
+import org.geotools.resources.i18n.VocabularyKeys;
+
 
 /**
  * A three-dimensional coordinate system with one distance measured from the origin and two angular
@@ -62,10 +65,9 @@ public class DefaultSphericalCS extends AbstractCS implements SphericalCS {
      * axis.
      *
      * @see DefaultCartesianCS#GEOCENTRIC
-     *
-     * @todo Localize name.
      */
-    public static DefaultSphericalCS GEOCENTRIC = new DefaultSphericalCS("Geocentric",
+    public static DefaultSphericalCS GEOCENTRIC = new DefaultSphericalCS(
+                    name(VocabularyKeys.GEOCENTRIC),
                     DefaultCoordinateSystemAxis.SPHERICAL_LONGITUDE,
                     DefaultCoordinateSystemAxis.SPHERICAL_LATITUDE,
                     DefaultCoordinateSystemAxis.GEOCENTRIC_RADIUS);

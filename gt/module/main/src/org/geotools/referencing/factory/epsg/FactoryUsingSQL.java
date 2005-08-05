@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.logging.Level;
 import javax.units.NonSI;
 import javax.units.Unit;
 import javax.units.SI;
@@ -125,6 +126,8 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.LocalName;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.ScopedName;
@@ -224,8 +227,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             case 8609: parameters.ey  = value; break;
             case 8610: parameters.ez  = value; break;
             case 8611: parameters.ppm = value; break;
-            default:   throw new FactoryException("Unexpected parameter code: "+code);
-                       // TODO: localize.
+            default:   throw new FactoryException(Errors.format(ErrorKeys.UNEXPECTED_PARAMETER_$1,
+                                                  new Integer(code)));
         }
     }
     /// Datum shift operation methods
@@ -325,11 +328,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     ///////////////////////////////////////////////////////////////////////////////
     /**
      * The name for the transformation accuracy metadata.
-     *
-     * @todo localize.
      */
     private static final InternationalString TRANSFORMATION_ACCURACY =
-            new SimpleInternationalString("Transformation accuracy");
+            Vocabulary.formatInternational(VocabularyKeys.TRANSFORMATION_ACCURACY);
 
     /**
      * The name of the thread to execute at JVM shutdown. This thread will be created
@@ -445,8 +446,6 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * Returns the authority for this EPSG database.
      * This authority will contains the database version in the {@linkplain Citation#getEdition
      * edition} attribute, together with the {@linkplain Citation#getEditionDate edition date}.
-     *
-     * @todo Localize the alternate title.
      */
     public synchronized Citation getAuthority() {
         if (authority == null) try {
@@ -460,8 +459,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 final Date   date    = result.getDate  (2);
                 final String engine  = metadata.getDatabaseProductName();
                 final CitationImpl c = new CitationImpl(CitationImpl.EPSG);
-                c.getAlternateTitles().add(new SimpleInternationalString(
-                        "EPSG database version "+version+" on "+engine));
+                c.getAlternateTitles().add(Vocabulary.formatInternational(
+                        VocabularyKeys.DATA_BASE_$3, "EPSG", version, engine));
                 c.setEdition(new SimpleInternationalString(version));
                 c.setEditionDate(date);
                 authority = c;
@@ -1137,7 +1136,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     if (semiMinorAxis != 0) {
                         // Both 'inverseFlattening' and 'semiMinorAxis' are defined.
                         // Log a warning and create the ellipsoid using the inverse flattening.
-                        LOGGER.warning(Logging.format(LoggingKeys.AMBIGUOUS_ELLIPSOID));
+                        LOGGER.log(Logging.format(Level.WARNING, LoggingKeys.AMBIGUOUS_ELLIPSOID));
                     }
                     ellipsoid = factories.getDatumFactory().createFlattenedSphere(
                                 properties, semiMajorAxis, inverseFlattening, unit);
@@ -1673,7 +1672,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 }
                 if (cs == null) {
                     result.close();
-                    throw new FactoryException("Unexpected dimensions."); // TODO: localize.
+                    throw new FactoryException(Errors.format(
+                                               ErrorKeys.UNEXPECTED_DIMENSION_FOR_CS_$1, type));
                 }
                 returnValue = (CoordinateSystem) ensureSingleton(cs, returnValue, code);
             }
@@ -1842,8 +1842,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                         crs = factory.createGeocentricCRS(properties, datum, (SphericalCS) cs);
                     } else {
                         result.close();
-                        throw new FactoryException("Incompatible CS type.");
-                        // TODO: localize and provide more details.
+                        throw new FactoryException(Errors.format(
+                                ErrorKeys.ILLEGAL_COORDINATE_SYSTEM_FOR_CRS_$2,
+                                Utilities.getShortClassName(cs),
+                                Utilities.getShortName(GeocentricCRS.class)));
                     }
                 }
                 /* ----------------------------------------------------------------------
@@ -2444,10 +2446,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                             parameters.parameter("tgt_dim").setValue(targetCRS.getCoordinateSystem().getDimension());
                         }
                     } catch (ParameterNotFoundException exception) {
-                        // TODO: localize
                         result.close();
-                        throw new FactoryException("Geotools extensions required for \""+
-                                method.getName().getCode()+"\" method.", exception);
+                        throw new FactoryException(Errors.format(
+                                ErrorKeys.GEOTOOLS_EXTENSION_REQUIRED_$1,
+                                method.getName().getCode(), exception));
                     }
                     /*
                      * At this stage, the parameters are ready for use. Creates the math transform
@@ -2620,24 +2622,20 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
 
     /**
      * Constructs an exception for recursive calls.
-     *
-     * @todo localize
      */
     private static FactoryException recursiveCall(final Class type, final String code) {
-        return new FactoryException("Recursivity detected while constructing a " +
-                Utilities.getShortName(type) + " for code \""+code+"\".");
+        return new FactoryException(Errors.format(ErrorKeys.RECURSIVE_CALL_$2,
+                   Utilities.getShortName(type), code));
     }
 
     /**
      * Constructs an exception for a database failure.
-     *
-     * @todo localize
      */
     private static FactoryException databaseFailure(final Class type, final String code,
                                                     final SQLException cause)
     {
-        return new FactoryException("Database failure while constructing a " +
-                Utilities.getShortName(type) + " for code \""+code+"\".", cause);
+        return new FactoryException(Errors.format(ErrorKeys.DATABASE_FAILURE_$2,
+                   Utilities.getShortName(type), code), cause);
     }
 
     /**
@@ -2764,7 +2762,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         } catch (SQLException exception) {
             throw new FactoryException(exception);
         }
-        LOGGER.fine("EPSG connection closed."); // TODO: localize
+        LOGGER.log(Logging.format(Level.FINE, LoggingKeys.CLOSED_EPSG_DATABASE));
     }
 
     /**

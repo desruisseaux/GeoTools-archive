@@ -59,10 +59,9 @@ import org.geotools.util.UnsupportedImplementationException;
  *   {@link EllipsoidalCS Ellipsoidal}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultGeographicCRS extends AbstractSingleCRS implements GeographicCRS {
     /**

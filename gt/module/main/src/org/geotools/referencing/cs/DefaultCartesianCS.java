@@ -34,6 +34,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -69,10 +70,9 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
      * <var>{@linkplain DefaultCoordinateSystemAxis#EASTING Easting,}</var>,
      * <var>{@linkplain DefaultCoordinateSystemAxis#NORTHING Northing}</var>
      * axis in metres.
-     *
-     * @todo Localize name.
      */
-    public static DefaultCartesianCS PROJECTED = new DefaultCartesianCS("Projected",
+    public static DefaultCartesianCS PROJECTED = new DefaultCartesianCS(
+                    name(VocabularyKeys.PROJECTED),
                     DefaultCoordinateSystemAxis.EASTING,
                     DefaultCoordinateSystemAxis.NORTHING);
 
@@ -84,10 +84,9 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
      * axis in metres.
      *
      * @see DefaultSphericalCS#GEOCENTRIC
-     *
-     * @todo Localize name.
      */
-    public static DefaultCartesianCS GEOCENTRIC = new DefaultCartesianCS("Geocentric",
+    public static DefaultCartesianCS GEOCENTRIC = new DefaultCartesianCS(
+                    name(VocabularyKeys.GEOCENTRIC),
                     DefaultCoordinateSystemAxis.GEOCENTRIC_X,
                     DefaultCoordinateSystemAxis.GEOCENTRIC_Y,
                     DefaultCoordinateSystemAxis.GEOCENTRIC_Z);
@@ -97,10 +96,9 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
      * <var>{@linkplain DefaultCoordinateSystemAxis#X x}</var>,
      * <var>{@linkplain DefaultCoordinateSystemAxis#Y y}</var>
      * axis in metres.
-     *
-     * @todo Localize name.
      */
-    public static DefaultCartesianCS GENERIC_2D = new DefaultCartesianCS("Cartesian",
+    public static DefaultCartesianCS GENERIC_2D = new DefaultCartesianCS(
+                    name(VocabularyKeys.CARTESIAN_2D),
                     DefaultCoordinateSystemAxis.X,
                     DefaultCoordinateSystemAxis.Y);
 
@@ -110,10 +108,9 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
      * <var>{@linkplain DefaultCoordinateSystemAxis#Y y}</var>,
      * <var>{@linkplain DefaultCoordinateSystemAxis#Z z}</var>
      * axis in metres.
-     *
-     * @todo Localize name.
      */
-    public static DefaultCartesianCS GENERIC_3D = new DefaultCartesianCS("Cartesian",
+    public static DefaultCartesianCS GENERIC_3D = new DefaultCartesianCS(
+                    name(VocabularyKeys.CARTESIAN_3D),
                     DefaultCoordinateSystemAxis.X,
                     DefaultCoordinateSystemAxis.Y,
                     DefaultCoordinateSystemAxis.Z);
@@ -123,10 +120,9 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
      * <var>{@linkplain DefaultCoordinateSystemAxis#COLUMN column}</var>,
      * <var>{@linkplain DefaultCoordinateSystemAxis#ROW row}</var>
      * axis.
-     *
-     * @todo Localize name.
      */
-    public static DefaultCartesianCS GRID = new DefaultCartesianCS("Grid",
+    public static DefaultCartesianCS GRID = new DefaultCartesianCS(
+                    name(VocabularyKeys.GRID),
                     DefaultCoordinateSystemAxis.COLUMN,
                     DefaultCoordinateSystemAxis.ROW);
 

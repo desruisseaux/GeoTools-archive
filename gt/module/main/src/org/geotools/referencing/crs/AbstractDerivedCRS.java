@@ -64,10 +64,9 @@ import org.geotools.resources.i18n.Errors;
  * {@code Default} prefix instead. An exception to this rule may occurs when it is not possible to
  * identify the exact type.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDerivedCRS {
     /**

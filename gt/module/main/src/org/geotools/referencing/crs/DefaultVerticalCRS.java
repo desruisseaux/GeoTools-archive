@@ -37,6 +37,8 @@ import org.geotools.referencing.cs.DefaultVerticalCS;
 import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.datum.DefaultVerticalDatum;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
 
 
 /**
@@ -53,10 +55,9 @@ import org.geotools.referencing.datum.DefaultVerticalDatum;
  *   {@link VerticalCS Vertical}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultVerticalCRS extends AbstractSingleCRS implements VerticalCRS {
     /**
@@ -68,10 +69,9 @@ public class DefaultVerticalCRS extends AbstractSingleCRS implements VerticalCRS
      * Default vertical coordinate reference system using ellipsoidal datum.
      * Ellipsoidal heights are measured along the normal to the ellipsoid
      * used in the definition of horizontal datum.
-     *
-     * @todo Localize name.
      */
-    public static final DefaultVerticalCRS ELLIPSOIDAL_HEIGHT = new DefaultVerticalCRS("Ellipsoidal height",
+    public static final DefaultVerticalCRS ELLIPSOIDAL_HEIGHT = new DefaultVerticalCRS(
+                        name(VocabularyKeys.ELLIPSOIDAL_HEIGHT),
                         DefaultVerticalDatum.ELLIPSOIDAL, DefaultVerticalCS.ELLIPSOIDAL_HEIGHT);
 
     /**

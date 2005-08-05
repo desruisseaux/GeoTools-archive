@@ -71,6 +71,66 @@ public class Vocabulary extends ResourceBundle {
     }
 
     /**
+     * Gets an international string for the given key. This method does not check for the key
+     * validity. If the key is invalid, then a {@link MissingResourceException} may be thrown
+     * when a {@link InternationalString#toString} method is invoked.
+     *
+     * @param  key The key for the desired string.
+     * @param  arg0 Value to substitute to "{0}".
+     * @return An international string for the given key.
+     *
+     * @todo Current implementation just invokes {@link #format}. Need to format only when
+     *       {@code toString(Locale)} is invoked.
+     */
+    public static InternationalString formatInternational(final int    key,
+                                                          final String arg0)
+    {
+        return new org.geotools.util.SimpleInternationalString(format(key, arg0));
+    }
+
+    /**
+     * Gets an international string for the given key. This method does not check for the key
+     * validity. If the key is invalid, then a {@link MissingResourceException} may be thrown
+     * when a {@link InternationalString#toString} method is invoked.
+     *
+     * @param  key The key for the desired string.
+     * @param  arg0 Value to substitute to "{0}".
+     * @param  arg1 Value to substitute to "{1}".
+     * @return An international string for the given key.
+     *
+     * @todo Current implementation just invokes {@link #format}. Need to format only when
+     *       {@code toString(Locale)} is invoked.
+     */
+    public static InternationalString formatInternational(final int    key,
+                                                          final String arg0,
+                                                          final String arg1)
+    {
+        return new org.geotools.util.SimpleInternationalString(format(key, arg0, arg1));
+    }
+
+    /**
+     * Gets an international string for the given key. This method does not check for the key
+     * validity. If the key is invalid, then a {@link MissingResourceException} may be thrown
+     * when a {@link InternationalString#toString} method is invoked.
+     *
+     * @param  key The key for the desired string.
+     * @param  arg0 Value to substitute to "{0}".
+     * @param  arg1 Value to substitute to "{1}".
+     * @param  arg2 Value to substitute to "{2}".
+     * @return An international string for the given key.
+     *
+     * @todo Current implementation just invokes {@link #format}. Need to format only when
+     *       {@code toString(Locale)} is invoked.
+     */
+    public static InternationalString formatInternational(final int    key,
+                                                          final String arg0,
+                                                          final String arg1,
+                                                          final String arg2)
+    {
+        return new org.geotools.util.SimpleInternationalString(format(key, arg0, arg1, arg2));
+    }
+
+    /**
      * Gets a string for the given key from this resource bundle or one of its parents.
      *
      * @param  key The key for the desired string.

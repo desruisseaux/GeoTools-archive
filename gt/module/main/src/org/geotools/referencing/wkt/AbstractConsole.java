@@ -40,10 +40,9 @@ import org.opengis.referencing.operation.MathTransform;
  * results sent to the {@linkplain System#out standard output stream}, but those streams can
  * be redirected. The set of allowed instructions depends on the subclass used.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public abstract class AbstractConsole implements Runnable {
     /**
@@ -202,7 +201,6 @@ public abstract class AbstractConsole implements Runnable {
      * method print nothing if the {@linkplain #parser} is not an instance of {@link Preprocessor}.
      *
      * @throws IOException if an error occured while writting to the output stream.
-     * @todo Localize table header.
      */
     public void printDefinitions() throws IOException {
         if (parser instanceof Preprocessor) {

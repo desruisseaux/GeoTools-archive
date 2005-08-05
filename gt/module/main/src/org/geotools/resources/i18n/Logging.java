@@ -22,6 +22,8 @@ package org.geotools.resources.i18n;
 // J2SE dependencies
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.logging.LogRecord;
+import java.util.logging.Level;
 
 // Geotools dependencies
 import org.geotools.resources.ResourceBundle;
@@ -55,52 +57,60 @@ public class Logging extends ResourceBundle {
     }
 
     /**
-     * Gets a string for the given key from this resource bundle or one of its parents.
+     * Gets a log record for the given key from this resource bundle or one of its parents.
      *
+     * @param  level The log record level.
      * @param  key The key for the desired string.
      * @return The string for the given key.
      * @throws MissingResourceException If no object for the given key can be found.
      */
-    public static String format(final int key) throws MissingResourceException {
-        return getResources(null).getString(key);
+    public static LogRecord format(final Level level,
+                                   final int key) throws MissingResourceException
+    {
+        return getResources(null).getLogRecord(level, key);
     }
 
     /**
-     * Gets a string for the given key are replace all occurence of "{0}"
+     * Gets a log record for the given key. Replaces all occurence of "{0}"
      * with values of {@code arg0}.
      *
+     * @param  level The log record level.
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute to "{0}".
      * @return The formatted string for the given key.
      * @throws MissingResourceException If no object for the given key can be found.
      */
-    public static String format(final int     key,
-                                final Object arg0) throws MissingResourceException
+    public static LogRecord format(final Level level,
+                                   final int     key,
+                                   final Object arg0) throws MissingResourceException
     {
-        return getResources(null).getString(key, arg0);
+        return getResources(null).getLogRecord(level, key, arg0);
     }
 
     /**
-     * Gets a string for the given key are replace all occurence of "{0}",
+     * Gets a log record for the given key. Replaces all occurence of "{0}",
      * "{1}", with values of {@code arg0}, {@code arg1}.
      *
+     * @param  level The log record level.
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute to "{0}".
      * @param  arg1 Value to substitute to "{1}".
      * @return The formatted string for the given key.
      * @throws MissingResourceException If no object for the given key can be found.
      */
-    public static String format(final int     key,
-                                final Object arg0,
-                                final Object arg1) throws MissingResourceException
+    public static LogRecord format(final Level level,
+                                   final int     key,
+                                   final Object arg0,
+                                   final Object arg1) throws MissingResourceException
     {
-        return getResources(null).getString(key, arg0, arg1);
+        return getResources(null).getLogRecord(level, key, arg0, arg1);
     }
 
     /**
-     * Gets a string for the given key are replace all occurence of "{0}",
+     * Gets a log record for the given key. Replaces all occurence of "{0}",
      * "{1}", with values of {@code arg0}, {@code arg1}, etc.
      *
+     * @param  level The log record level.
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute to "{0}".
      * @param  arg1 Value to substitute to "{1}".
@@ -108,11 +118,35 @@ public class Logging extends ResourceBundle {
      * @return The formatted string for the given key.
      * @throws MissingResourceException If no object for the given key can be found.
      */
-    public static String format(final int     key,
-                                final Object arg0,
-                                final Object arg1,
-                                final Object arg2) throws MissingResourceException
+    public static LogRecord format(final Level level,
+                                   final int     key,
+                                   final Object arg0,
+                                   final Object arg1,
+                                   final Object arg2) throws MissingResourceException
     {
-        return getResources(null).getString(key, arg0, arg1, arg2);
+        return getResources(null).getLogRecord(level, key, arg0, arg1, arg2);
+    }
+
+    /**
+     * Gets a log record for the given key. Replaces all occurence of "{0}",
+     * "{1}", with values of {@code arg0}, {@code arg1}, etc.
+     *
+     * @param  level The log record level.
+     * @param  key The key for the desired string.
+     * @param  arg0 Value to substitute to "{0}".
+     * @param  arg1 Value to substitute to "{1}".
+     * @param  arg2 Value to substitute to "{2}".
+     * @param  arg3 Value to substitute to "{3}".
+     * @return The formatted string for the given key.
+     * @throws MissingResourceException If no object for the given key can be found.
+     */
+    public static LogRecord format(final Level level,
+                                   final int     key,
+                                   final Object arg0,
+                                   final Object arg1,
+                                   final Object arg2,
+                                   final Object arg3) throws MissingResourceException
+    {
+        return getResources(null).getLogRecord(level, key, arg0, arg1, arg2, arg3);
     }
 }

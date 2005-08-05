@@ -25,6 +25,7 @@ package org.geotools.referencing.cs;
 // J2SE dependencies and extensions
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import javax.units.ConversionException;
 import javax.units.Converter;
@@ -42,6 +43,7 @@ import org.opengis.referencing.cs.SphericalCS;
 import org.opengis.referencing.cs.VerticalCS;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;
@@ -51,6 +53,8 @@ import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -172,6 +176,23 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
     }
 
     /**
+     * Creates a name for the predefined constants in subclasses. The name is an unlocalized String
+     * object. However, since this method is used for creation of convenience objects only (not for
+     * objects created from an "official" database), the "unlocalized" name is actually choosen
+     * according the user's locale at class initialization time. The same name is also added in
+     * a localizable form as an alias. Since the {@link #nameMatches} convenience method checks
+     * the alias, it still possible to consider two objects are equivalent even if their names
+     * were formatted in different locales.
+     */
+    static Map name(final int key) {
+        final Map properties = new HashMap(4);
+        final InternationalString name = Vocabulary.formatInternational(key);
+        properties.put(NAME_KEY,  name.toString());
+        properties.put(ALIAS_KEY, name);
+        return properties;
+    }
+
+    /**
      * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. This method is invoked at construction time for checking argument validity.
      * The default implementation returns {@code true} for all axis directions. Subclasses
@@ -260,9 +281,11 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
         // Note: while this method signature declares Matrix as the return type,
         // DefaultCoordinateOperationFactory.createTransformationStep(GeocentricCRS,GeocentricCRS)
         // really expects a GeneralMatrix. Other transformation steps are generic enough.
-        if (!Utilities.sameInterfaces(sourceCS.getClass(), targetCS.getClass(), CoordinateSystem.class)) {
-            // TODO: localize
-            throw new IllegalArgumentException("Incompatible type of coordinate systems.");
+        if (!Utilities.sameInterfaces(sourceCS.getClass(), targetCS.getClass(),
+                                      CoordinateSystem.class))
+        {
+            throw new IllegalArgumentException(Errors.format(
+                      ErrorKeys.INCOMPATIBLE_COORDINATE_SYSTEM_TYPE));
         }
         final AxisDirection[] sourceAxis = getAxisDirections(sourceCS);
         final AxisDirection[] targetAxis = getAxisDirections(targetCS);
@@ -304,8 +327,8 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
                 }
                 final Converter converter = sourceUnit.getConverterTo(targetUnit);
                 if (!converter.isLinear()) {
-                    // TODO: localize
-                    throw new ConversionException("Unit conversion is non-linear");
+                    throw new ConversionException(Errors.format(
+                              ErrorKeys.NON_LINEAR_UNIT_CONVERSION_$2, sourceUnit, targetUnit));
                 }
                 final double offset = converter.convert(0);
                 final double scale  = converter.derivative(0);
@@ -366,8 +389,8 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
                 case 1: return DefaultVerticalCS.ELLIPSOIDAL_HEIGHT;
             }
         }
-        throw new IllegalArgumentException("Coordinate system \"" + cs.getName().getCode() +
-                                           "\" is not supported."); // TODO: localize
+        throw new IllegalArgumentException(
+                Errors.format(ErrorKeys.UNSUPPORTED_COORDINATE_SYSTEM_$1, cs.getName().getCode()));
     }
 
     /**

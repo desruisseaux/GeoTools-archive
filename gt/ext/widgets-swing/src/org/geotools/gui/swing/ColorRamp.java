@@ -46,6 +46,7 @@ import java.awt.geom.Rectangle2D;
 // Miscellaneous
 import java.util.List;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -72,6 +73,8 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
@@ -670,9 +673,8 @@ public class ColorRamp extends JComponent {
                 graduation = new LogarithmicNumberGraduation(units);
             }
         } else {
-            // TODO: localize
-            Logger.getLogger("org.geotools.gui.swing").warning("Unrecognized scale type: \""+
-                             Utilities.getShortClassName(tr)+"\". Default to linear.");
+            Logger.getLogger("org.geotools.gui.swing").log(Logging.format(Level.WARNING,
+                    LoggingKeys.UNRECOGNIZED_SCALE_TYPE_$1, Utilities.getShortClassName(tr)));
             graduation = new NumberGraduation(units);
         }
         if (graduation == reuse) {

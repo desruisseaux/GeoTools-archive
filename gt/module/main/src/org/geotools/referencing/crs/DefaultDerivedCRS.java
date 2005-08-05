@@ -46,10 +46,9 @@ import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
  * category includes coordinate reference systems derived from a projected coordinate
  * reference system.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS {
     /**

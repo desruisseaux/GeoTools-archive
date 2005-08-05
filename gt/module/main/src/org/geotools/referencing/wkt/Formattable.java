@@ -182,8 +182,7 @@ public class Formattable {
                     formatter.append(this);
                 }
                 if (strict && formatter.isInvalidWKT()) {
-                    // TODO localize.
-                    throw new UnformattableObjectException("Not a valid WKT format.");
+                    throw new UnformattableObjectException(Errors.format(ErrorKeys.INVALID_WKT_FORMAT));
                 }
                 return formatter.toString();
             } finally {

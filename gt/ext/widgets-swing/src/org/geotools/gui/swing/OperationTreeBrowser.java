@@ -37,23 +37,23 @@ import javax.swing.event.TreeSelectionListener;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderableImage;
 import java.awt.image.RenderedImage;
-import java.awt.image.SampleModel; // For javadoc
-import java.awt.image.ColorModel;  // For javadoc
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Component;
 import java.awt.Dimension;
-
-// JAI dependencies
-import javax.media.jai.KernelJAI;      // For javadoc
-import javax.media.jai.RenderedOp;     // For javadoc
-import javax.media.jai.RenderableOp;   // For javadoc
-import javax.media.jai.LookupTableJAI; // For javadoc
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.RenderableOp;
 import javax.media.jai.PropertySource;
 import javax.media.jai.OperationNode;
 import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.KernelJAI;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -64,6 +64,9 @@ import org.geotools.gui.swing.tree.TreeNode;
 import org.geotools.gui.swing.tree.NamedTreeNode;
 import org.geotools.gui.swing.tree.MutableTreeNode;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -193,6 +196,9 @@ public class OperationTreeBrowser extends JPanel {
     private static String getName(final Object image) {
         if (image instanceof OperationNode) {
             return ((OperationNode) image).getOperationName();
+        }
+        if (image instanceof CharSequence) {
+            return image.toString();
         }
         return Utilities.getShortClassName(image);
     }
@@ -444,5 +450,26 @@ public class OperationTreeBrowser extends JPanel {
         frame.getContentPane().add(this);
         frame.pack();
         frame.setVisible(true);
+    }
+    
+    /**
+     * Display the properties for the images specified on the command line.
+     *
+     * @throws IOException if an error occured while reading an image.
+     */
+    public static void main(String[] args) throws IOException {
+        final Arguments arguments = new Arguments(args);
+        args = arguments.getRemainingArguments(Integer.MAX_VALUE);
+        for (int i=0; i<args.length; i++) {
+            final File file = new File(args[i]);
+            final RenderedImage image;
+            try {
+                image = ImageIO.read(file);
+            } catch (FileNotFoundException e) {
+                arguments.out.println(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, file));
+                continue;
+            }
+            new OperationTreeBrowser(image).showFrame(file.getName());
+        }
     }
 }

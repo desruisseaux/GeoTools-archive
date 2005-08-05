@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.units.SI;
 import javax.units.Unit;
@@ -421,8 +422,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             if (remarks == null) {
                 remarks = growable;
             } else {
-                Logger.getLogger("org.geotools.referencing").warning(
-                                 Logging.format(LoggingKeys.LOCALES_DISCARTED));
+                Logger.getLogger("org.geotools.referencing").log(Logging.format(
+                        Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
             }
         }
         if (subProperties!=null && subGrowables!=null) {
@@ -432,8 +433,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                     if (subProperties.get(prefix) == null) {
                         subProperties.put(prefix, subGrowables[i]);
                     } else {
-                        Logger.getLogger("org.geotools.referencing").warning(
-                                         Logging.format(LoggingKeys.LOCALES_DISCARTED));
+                        Logger.getLogger("org.geotools.referencing").log(Logging.format(
+                                Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
                     }
                 }
             }

@@ -33,6 +33,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -63,30 +64,27 @@ public class DefaultVerticalCS extends AbstractCS implements VerticalCS {
      * A one-dimensional vertical CS with
      * <var>{@linkplain DefaultCoordinateSystemAxis#ELLIPSOIDAL_HEIGHT
      * ellipsoidal height}</var> axis in metres.
-     *
-     * @todo Localize name.
      */
-    public static DefaultVerticalCS ELLIPSOIDAL_HEIGHT = new DefaultVerticalCS("Ellipsoidal height",
+    public static DefaultVerticalCS ELLIPSOIDAL_HEIGHT = new DefaultVerticalCS(
+                    name(VocabularyKeys.ELLIPSOIDAL_HEIGHT),
                     DefaultCoordinateSystemAxis.ELLIPSOIDAL_HEIGHT);
 
     /**
      * A one-dimensional vertical CS with
      * <var>{@linkplain DefaultCoordinateSystemAxis#GRAVITY_RELATED_HEIGHT
      * gravity-related height}</var> axis in metres.
-     *
-     * @todo Localize name.
      */
-    public static DefaultVerticalCS GRAVITY_RELATED = new DefaultVerticalCS("Gravity-related",
+    public static DefaultVerticalCS GRAVITY_RELATED = new DefaultVerticalCS(
+                    name(VocabularyKeys.GRAVITY_RELATED_HEIGHT),
                     DefaultCoordinateSystemAxis.GRAVITY_RELATED_HEIGHT);
 
     /**
      * A one-dimensional vertical CS with
      * <var>{@linkplain DefaultCoordinateSystemAxis#DEPTH depth}</var>
      * axis in metres.
-     *
-     * @todo Localize name.
      */
-    public static DefaultVerticalCS DEPTH = new DefaultVerticalCS("Depth",
+    public static DefaultVerticalCS DEPTH = new DefaultVerticalCS(
+                    name(VocabularyKeys.DEPTH),
                     DefaultCoordinateSystemAxis.DEPTH);
 
     /**

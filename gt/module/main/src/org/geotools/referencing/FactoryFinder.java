@@ -54,6 +54,8 @@ import org.geotools.io.TableWriter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -544,19 +546,18 @@ public final class FactoryFinder {
      * @param  out The output stream where to format the list.
      * @param  locale The locale for the list, or {@code null}.
      * @throws IOException if an error occurs while writting to {@code out}.
-     *
-     * @todo Localize the title line.
      */
     public static synchronized void listProviders(final Writer out, final Locale locale)
             throws IOException
     {
+        final Vocabulary resources = Vocabulary.getResources(locale);
         getServiceRegistry().getServiceProviders(DatumFactory.class); // Force the initialization of ServiceRegistry
         final TableWriter table  = new TableWriter(out, " \u2502 ");
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();
-        table.write("Factory");
+        table.write(resources.getString(VocabularyKeys.FACTORY));
         table.nextColumn();
-        table.write("Implementation(s)");
+        table.write(resources.getString(VocabularyKeys.IMPLEMENTATIONS));
         table.writeHorizontalSeparator();
         for (final Iterator categories=getServiceRegistry().getCategories(); categories.hasNext();) {
             final Class category = (Class)categories.next();

@@ -21,6 +21,7 @@ package org.geotools.referencing.factory.epsg;
 // J2SE dependencies
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
 import java.net.URL;
 
 // OpenGIS dependencies
@@ -34,6 +35,10 @@ import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.referencing.factory.PropertyAuthorityFactory;
+import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -49,12 +54,11 @@ import org.geotools.referencing.factory.PropertyAuthorityFactory;
  *       or in a JAR file.</li>
  * </ul>
  *
+ * @since 2.1
  * @version $Id$
  * @author Jody Garnett
  * @author Rueben Schulz
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class FactoryUsingWKT extends DeferredAuthorityFactory {
     /**
@@ -104,11 +108,11 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory {
             if (url == null) {
                 throw new FileNotFoundException(FILENAME);
             }
-            LOGGER.config("Using \""+url.getPath()+"\" as EPSG factory."); // TODO: localize
+            LOGGER.log(Logging.format(Level.CONFIG, LoggingKeys.USING_FILE_AS_FACTORY_$2,
+                                      url.getPath(), "EPSG"));
             return new PropertyAuthorityFactory(factories, getAuthority(), url);
         } catch (IOException exception) {
-            // TODO: localize
-            throw new FactoryException("Failed to read \""+FILENAME+"\".", exception);
+            throw new FactoryException(Errors.format(ErrorKeys.CANT_READ_$1, FILENAME), exception);
         }
     }
 }

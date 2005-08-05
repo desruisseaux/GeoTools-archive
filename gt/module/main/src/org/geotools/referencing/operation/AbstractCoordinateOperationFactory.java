@@ -87,30 +87,27 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
 {
     /**
      * The identifier for an identity operation.
-     *
-     * @todo localize
      */
     protected static final Identifier IDENTITY =
-            new NamedIdentifier(CitationImpl.GEOTOOLS, "Identity");
+            new NamedIdentifier(CitationImpl.GEOTOOLS,
+                                Vocabulary.formatInternational(VocabularyKeys.IDENTITY));
 
     /**
      * The identifier for conversion using an affine transform for axis swapping and/or
      * unit conversions.
-     *
-     * @todo localize
      */
     protected static final Identifier AXIS_CHANGES =
-            new NamedIdentifier(CitationImpl.GEOTOOLS, "Axis changes");
+            new NamedIdentifier(CitationImpl.GEOTOOLS,
+                                Vocabulary.formatInternational(VocabularyKeys.AXIS_CHANGES));
 
     /**
      * The identifier for a transformation which is a datum shift.
      *
      * @see PositionalAccuracyImpl#DATUM_SHIFT_APPLIED
-     *
-     * @todo localize
      */
     protected static final Identifier DATUM_SHIFT =
-            new NamedIdentifier(CitationImpl.GEOTOOLS, "Datum shift");
+            new NamedIdentifier(CitationImpl.GEOTOOLS,
+                                Vocabulary.formatInternational(VocabularyKeys.DATUM_SHIFT));
 
     /**
      * The identifier for a transformation which is a datum shift without
@@ -121,11 +118,10 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * {@link Boolean#TRUE}.
      *
      * @see PositionalAccuracyImpl#DATUM_SHIFT_OMITTED
-     *
-     * @todo localize
      */
     protected static final Identifier ELLIPSOID_SHIFT =
-            new NamedIdentifier(CitationImpl.GEOTOOLS, "Ellipsoid shift");
+            new NamedIdentifier(CitationImpl.GEOTOOLS,
+                                Vocabulary.formatInternational(VocabularyKeys.ELLIPSOID_SHIFT));
 
     /**
      * The identifier for a geocentric conversion.
@@ -136,12 +132,10 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
 
     /**
      * The identifier for an inverse operation.
-     *
-     * @todo localize
      */
     protected static final Identifier INVERSE_OPERATION =
             new NamedIdentifier(CitationImpl.GEOTOOLS,
-                "Inverse operation");
+                Vocabulary.formatInternational(VocabularyKeys.INVERSE_OPERATION));
 
     /**
      * Shortcut to identified object constants.
@@ -595,14 +589,12 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * Returns a temporary name for object derived from the specified one.
      *
      * @param source The CRS to base name on, or {@code null} if none.
-     *
-     * @todo Find better names, and localize.
      */
     static Map getTemporaryName(final IdentifiedObject source) {
         final Map properties = new HashMap(4);
         properties.put(NAME_KEY, new TemporaryIdentifier(source.getName()));
-        properties.put(IdentifiedObject.REMARKS_KEY,
-                       "Derived from " + getClassName(source));
+        properties.put(IdentifiedObject.REMARKS_KEY, Vocabulary.formatInternational(
+                       VocabularyKeys.DERIVED_FROM_$1, getClassName(source)));
         return properties;
     }
 

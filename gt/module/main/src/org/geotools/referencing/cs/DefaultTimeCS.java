@@ -35,6 +35,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -63,7 +64,9 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
      * <var>{@linkplain DefaultCoordinateSystemAxis#TIME time}</var>,
      * axis in days.
      */
-    public static DefaultTimeCS DAYS = new DefaultTimeCS("Temporal", DefaultCoordinateSystemAxis.TIME);
+    public static DefaultTimeCS DAYS = new DefaultTimeCS(
+                  name(VocabularyKeys.TEMPORAL),
+                  DefaultCoordinateSystemAxis.TIME);
 
     /**
      * Constructs a new coordinate system with the same values than the specified one.

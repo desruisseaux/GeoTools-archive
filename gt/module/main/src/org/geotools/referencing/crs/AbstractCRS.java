@@ -24,12 +24,14 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies and extensions
 import java.util.Map;
+import java.util.HashMap;
 import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;
@@ -38,16 +40,16 @@ import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
  * Abstract coordinate reference system, usually defined by a coordinate system and a datum.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see AbstractCS
  * @see org.geotools.referencing.datum.AbstractDatum
@@ -89,6 +91,23 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
         super(properties);
         ensureNonNull("cs", cs);
         this.coordinateSystem = cs;
+    }
+
+    /**
+     * Creates a name for the predefined constants in subclasses. The name is an unlocalized String
+     * object. However, since this method is used for creation of convenience objects only (not for
+     * objects created from an "official" database), the "unlocalized" name is actually choosen
+     * according the user's locale at class initialization time. The same name is also added in
+     * a localizable form as an alias. Since the {@link #nameMatches} convenience method checks
+     * the alias, it still possible to consider two objects are equivalent even if their names
+     * were formatted in different locales.
+     */
+    static Map name(final int key) {
+        final Map properties = new HashMap(4);
+        final InternationalString name = Vocabulary.formatInternational(key);
+        properties.put(NAME_KEY,  name.toString());
+        properties.put(ALIAS_KEY, name);
+        return properties;
     }
 
     /**

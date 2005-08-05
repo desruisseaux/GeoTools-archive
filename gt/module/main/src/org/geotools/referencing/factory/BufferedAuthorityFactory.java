@@ -76,6 +76,8 @@ import org.opengis.util.InternationalString;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -184,7 +186,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      */
     AbstractAuthorityFactory getBackingStore() throws FactoryException {
         if (backingStore == null) {
-            throw new FactoryException("The factory has been disposed."); // TODO: localize.
+            throw new FactoryException(Errors.format(ErrorKeys.DISPOSED_FACTORY));
         }
         return backingStore;
     }

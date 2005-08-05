@@ -51,6 +51,8 @@ import org.geotools.referencing.wkt.Preprocessor;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -113,10 +115,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  *   <P align="justify">Quit the console.</P></td></tr>
  * </table>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class Console extends AbstractConsole {
     /**
@@ -406,23 +407,23 @@ public class Console extends AbstractConsole {
                 }
             }
         }
-        // TODO: localize
-        throw new ParseException("Illegal instruction \""+instruction+"\".", 0);
+        throw new ParseException(Errors.format(ErrorKeys.ILLEGAL_INSTRUCTION_$1, instruction), 0);
     }
 
     /**
      * Executes the "{@code print crs}" instruction.
-     * @todo Localize
      */
     private void printCRS() throws FactoryException, IOException {
+        final Locale locale = null;
+        final Vocabulary resources = Vocabulary.getResources(locale);
         final TableWriter table = new TableWriter(out, " \u2502 ");
         table.setMultiLinesCells(true);
         char separator = '\u2500';
         if (sourceCRS!=null || targetCRS!=null) {
             table.writeHorizontalSeparator();
-            table.write("Source CRS");
+            table.write(resources.getString(VocabularyKeys.SOURCE_CRS));
             table.nextColumn();
-            table.write("Target CRS");
+            table.write(resources.getString(VocabularyKeys.TARGET_CRS));
             table.nextLine();
             table.writeHorizontalSeparator();
             if (sourceCRS != null) {
@@ -441,9 +442,9 @@ public class Console extends AbstractConsole {
         update();
         if (transform != null) {
             table.nextLine(separator);
-            table.write("Math transform");
+            table.write(resources.getString(VocabularyKeys.MATH_TRANSFORM));
             table.nextColumn();
-            table.write("Inverse transform");
+            table.write(resources.getString(VocabularyKeys.INVERSE_TRANSFORM));
             table.nextLine();
             table.writeHorizontalSeparator();
             table.write(parser.format(transform));
@@ -465,7 +466,6 @@ public class Console extends AbstractConsole {
      * @throws FactoryException if the transform can't be computed.
      * @throws TransformException if a transform failed.
      * @throws IOException if an error occured while writing to the output stream.
-     * @todo Localize line headers.
      */
     private void printPts() throws FactoryException, TransformException, IOException {
         update();
@@ -487,24 +487,26 @@ public class Console extends AbstractConsole {
                 }
             }
         }
+        final Locale locale = null;
+        final Vocabulary resources = Vocabulary.getResources(locale);
         final TableWriter table = new TableWriter(out, 0);
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();
         table.setAlignment(TableWriter.ALIGN_RIGHT);
         if (sourcePosition != null) {
-            table.write("Source point:");
+            table.write(resources.getLabel(VocabularyKeys.SOURCE_POINT));
             print(sourcePosition,    table);
             print(transformedSource, table);
             table.nextLine();
         }
         if (targetPosition != null) {
-            table.write("Target point:");
+            table.write(resources.getLabel(VocabularyKeys.TARGET_POINT));
             print(transformedTarget, table);
             print(targetPosition,    table);
             table.nextLine();
         }
         if (sourceCRS!=null && targetCRS!=null) {
-            table.write("Distance:");
+            table.write(resources.getLabel(VocabularyKeys.DISTANCE));
             printDistance(sourceCRS, sourcePosition, transformedTarget, table);
             printDistance(targetCRS, targetPosition, transformedSource, table);
             table.nextLine();
@@ -612,8 +614,7 @@ public class Console extends AbstractConsole {
                               targetPosition.getOrdinate(i))
                   <= tolerance[Math.min(i, tolerance.length-1)]))
             {
-                // TODO: Localize
-                throw new TransformException("Transformation doesn't produce the expected value.");
+                throw new TransformException(Errors.format(ErrorKeys.UNEXPECTED_TRANSFORM_RESULT));
             }
         }
     }
@@ -673,11 +674,10 @@ public class Console extends AbstractConsole {
      *
      * @param  instruction The instruction name.
      * @return The exception to throws.
-     * @todo Localize.
      */
     private static ParseException unexpectedArgument(final String instruction) {
-        return new ParseException("Unexpected argument for instruction \"" +
-                                  instruction + "\".", 0);
+        return new ParseException(Errors.format(ErrorKeys.UNEXPECTED_ARGUMENT_FOR_INSTRUCTION_$1,
+                                  instruction), 0);
     }
 
     /**

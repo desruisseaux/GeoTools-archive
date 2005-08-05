@@ -129,6 +129,11 @@ public class ImageProperties extends JPanel {
     private final Table properties;
 
     /**
+     * The table for sample values.
+     */
+    private final ImageSampleValues samples;
+
+    /**
      * The viewer for an image quick look.
      */
     private final ImagePane viewer;
@@ -183,11 +188,19 @@ public class ImageProperties extends JPanel {
             tabs.addTab(resources.getString(VocabularyKeys.PROPERTIES), new JScrollPane(table));
         }
         /*
+         * Build the image sample value tab.
+         */
+        if (true) {
+            samples = new ImageSampleValues();
+            tabs.addTab(resources.getString(VocabularyKeys.PIXELS), samples);
+        }
+        /*
          * Build the image preview tab.
          */
         if (true) {
             viewer = new ImagePane();
-            tabs.addTab(resources.getString(VocabularyKeys.PREVIEW), viewer);
+            viewer.setPaintingWhileAdjusting(true);
+            tabs.addTab(resources.getString(VocabularyKeys.PREVIEW), viewer.createScrollPane());
         }
         add(tabs, BorderLayout.CENTER);
         setPreferredSize(new Dimension(400,250));
@@ -285,7 +298,8 @@ public class ImageProperties extends JPanel {
         clear();
         setDescription(image);
         properties.setSource(image);
-        viewer.setImage((RenderedImage)null);
+        viewer    .setImage((RenderedImage) null);
+        samples   .setImage((RenderedImage) null);
     }
 
     /**
@@ -303,7 +317,8 @@ public class ImageProperties extends JPanel {
         }
         setDescription(image);
         properties.setSource(image);
-        viewer.setImage(image);
+        viewer    .setImage (image);
+        samples   .setImage ((RenderedImage) null);
     }
 
     /**
@@ -338,7 +353,8 @@ public class ImageProperties extends JPanel {
         }
         setDescription(image);
         properties.setSource(image);
-        viewer.setImage(image);
+        viewer    .setImage (image);
+        samples   .setImage (image);
     }
 
     /**

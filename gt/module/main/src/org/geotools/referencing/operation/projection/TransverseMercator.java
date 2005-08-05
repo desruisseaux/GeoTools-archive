@@ -521,16 +521,16 @@ public class TransverseMercator extends MapProjection {
      *         case of the projection cannot be determined.
      */
     public int getZone() {
-        //UTM
+        // UTM
         if (scaleFactor == 0.9996 && falseEasting == 500000.0) {
             return getZone(-177, 6);
         }
-        //MTM
+        // MTM
         if (scaleFactor == 0.9999 && falseEasting == 304800.0){
             return getZone(-52.5, -3);
         }
-        //unknown (TODO: localize the error message)
-        throw new IllegalStateException("Unknow projection type.");
+        // unknown
+        throw new IllegalStateException(Errors.format(ErrorKeys.UNKNOW_PROJECTION_TYPE));
     }
 
     /**
@@ -544,16 +544,16 @@ public class TransverseMercator extends MapProjection {
      *         if the case of the projection cannot be determined.
      */
     public double getCentralMeridian() {
-        //UTM
+        // UTM
         if (scaleFactor == 0.9996 && falseEasting == 500000.0) {
             return getCentralMedirian(-177, 6);
         }
-        //MTM
+        // MTM
         if (scaleFactor == 0.9999 && falseEasting == 304800.0){
             return getCentralMedirian(-52.5, -3);
         }
-        //unknown (TODO: localize the error message)
-        throw new IllegalStateException("Unknow projection type.");
+        // unknown
+        throw new IllegalStateException(Errors.format(ErrorKeys.UNKNOW_PROJECTION_TYPE));
     }
 
     /**

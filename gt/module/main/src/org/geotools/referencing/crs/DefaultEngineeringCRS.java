@@ -69,10 +69,9 @@ import org.geotools.util.NameFactory;
  *   {@link org.opengis.referencing.cs.LinearCS       Linear}
  * </TD></TR></TABLE>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultEngineeringCRS extends AbstractSingleCRS implements EngineeringCRS {
     /**
@@ -87,19 +86,9 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
         /** Serial number for interoperability with different versions. */
         private static final long serialVersionUID = -1773381554353809683L;
 
-        /** The alias to use for all Cartesian CS. */
-        private static Collection/*<GenericName>*/ ALIAS = Collections.singleton(
-                        NameFactory.create(new InternationalString[] {
-                        Vocabulary.formatInternational(VocabularyKeys.CARTESIAN)}));
-
         /** Constructs a coordinate system with the given name. */
-        public Cartesian(final String name, final CoordinateSystem cs) {
-            super(name, DefaultEngineeringDatum.UNKNOW, cs);
-        }
-
-        /** Returns the localized name for "Cartesian". */
-        public Collection/*<GenericName>*/ getAlias() {
-            return ALIAS;
+        public Cartesian(final int key, final CoordinateSystem cs) {
+            super(name(key), DefaultEngineeringDatum.UNKNOW, cs);
         }
 
         /**
@@ -129,7 +118,7 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
      * {@linkplain DefaultGeographicCRS geographic coordinate reference system} for example).
      */
     public static final DefaultEngineeringCRS CARTESIAN_2D =
-            new Cartesian("Cartesian", DefaultCartesianCS.GENERIC_2D);
+            new Cartesian(VocabularyKeys.CARTESIAN_2D, DefaultCartesianCS.GENERIC_2D);
 
     /**
      * A three-dimensional cartesian coordinate reference system with
@@ -141,7 +130,7 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
      * {@linkplain DefaultGeographicCRS geographic coordinate reference system} for example).
      */
     public static final DefaultEngineeringCRS CARTESIAN_3D =
-            new Cartesian("Cartesian", DefaultCartesianCS.GENERIC_3D);
+            new Cartesian(VocabularyKeys.CARTESIAN_3D, DefaultCartesianCS.GENERIC_3D);
 
     /**
      * A two-dimensional wildcard coordinate system with
@@ -156,7 +145,7 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
      * transform. This CRS is usefull as a kind of wildcard when no CRS were explicitly specified.
      */
     public static final DefaultEngineeringCRS GENERIC_2D =
-            new Cartesian("Generic", DefaultCartesianCS.GENERIC_2D);
+            new Cartesian(VocabularyKeys.GENERIC_CARTESIAN_2D, DefaultCartesianCS.GENERIC_2D);
 
     /**
      * A three-dimensional wildcard coordinate system with
@@ -172,7 +161,7 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
      * transform. This CRS is usefull as a kind of wildcard when no CRS were explicitly specified.
      */
     public static final DefaultEngineeringCRS GENERIC_3D =
-            new Cartesian("Generic", DefaultCartesianCS.GENERIC_3D);
+            new Cartesian(VocabularyKeys.GENERIC_CARTESIAN_3D, DefaultCartesianCS.GENERIC_3D);
 
     /**
      * Constructs a new enginnering CRS with the same values than the specified one.

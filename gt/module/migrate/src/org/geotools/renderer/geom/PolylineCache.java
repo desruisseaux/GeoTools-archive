@@ -26,6 +26,7 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.PathIterator;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.util.logging.Level;
 
 // Geotools dependencies
 import org.geotools.renderer.array.ArrayData;
@@ -184,7 +185,7 @@ final class PolylineCache {
                 // Continue... On va simplement reconstruire le tableau à partir de la base.
             } else {
                 // Should be uncommon. Doesn't hurt, but may be a memory issue for big polyline.
-                Polyline.LOGGER.info(Logging.format(LoggingKeys.EXCESSIVE_MEMORY_USAGE));
+                Polyline.LOGGER.log(Logging.format(Level.INFO, LoggingKeys.EXCESSIVE_MEMORY_USAGE));
                 this.array = array = new float[32];
             }
         } else {

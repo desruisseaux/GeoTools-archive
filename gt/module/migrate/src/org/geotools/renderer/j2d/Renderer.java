@@ -1536,7 +1536,7 @@ public class Renderer implements Renderer2D {
          */
         if (LOGGER.isLoggable(Level.FINER)) {
             // FINER is the default level for entering, returning, or throwing an exception.
-            final LogRecord record = Logging.getResources(null).getLogRecord(Level.FINER,
+            final LogRecord record = Logging.getResources(getLocale()).getLogRecord(Level.FINER,
                                              LoggingKeys.INITIALIZING_TRANSFORMATION_$2,
                                              toString(sourceCS), toString(targetCS));
             record.setSourceClassName (sourceClassName);
