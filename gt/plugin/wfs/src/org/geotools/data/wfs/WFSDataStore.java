@@ -519,7 +519,7 @@ public class WFSDataStore extends AbstractDataStore {
                 if (request.getFilter().getFilterType() == FilterType.GEOMETRY_BBOX) {
                     String bb = printBBoxGet(((GeometryFilter) request.getFilter()),request.getTypeName());
                     if(bb!=null)
-                        url += ("&BBOX=" + bb);
+                        url += ("&BBOX=" + URLEncoder.encode(bb, "UTF-8"));
                 } else {
                     if (request.getFilter().getFilterType() == FilterType.FID) {
                         FidFilter ff = (FidFilter) request.getFilter();
