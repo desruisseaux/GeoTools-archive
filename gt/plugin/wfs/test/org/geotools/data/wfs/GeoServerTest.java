@@ -44,8 +44,6 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class GeoServerTest extends TestCase {
 
-//    private URL locale = null;
-    private URL remote = null;
     private URL url = null;
     public void setUp() throws MalformedURLException { 
 //         url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
@@ -72,10 +70,7 @@ public class GeoServerTest extends TestCase {
     public void testTypes() throws IOException, NoSuchElementException {
         WFSDataStore wfs; 
         try {
-            Map m = new HashMap();
-            m.put(WFSDataStoreFactory.URL.key,remote);
-            m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000)); // was 1000000 for debug
-            wfs = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
+            wfs = WFSDataStoreReadTest.getDataStore(url);
         } catch (ConnectException e) {
             e.printStackTrace(System.err);
             return;
@@ -134,92 +129,103 @@ public class GeoServerTest extends TestCase {
     }
     public void testFeatureReaderWithFilterPOST() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
         WFSDataStoreReadTest.doFeatureReaderWithFilter(url,false,true,0);
-    }    
+    } 
+
+    // RR change the data?
+    // NOPE, it's in Lat-Long for the Env, BCAlbers for the data
     public void testFeatureReaderWithFilterBBoxGET() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException, IllegalFilterException{
-        Envelope bbox = new Envelope(-75.791435,38.44949,-75.045998,39.840008);        
+        // minx,miny,maxx,maxy
+//        Envelope bbox = new Envelope(-75.791435,38.44949,-75.045998,39.840008); // lat long
+        Envelope bbox = new Envelope(556759.0,5233034,556934, 5233040.0);  // bc albers  
         WFSDataStoreReadTest.doFeatureReaderWithBBox(url,true,false,0,bbox);
     }
     public void testFeatureReaderWithFilterBBoxPOST() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException, IllegalFilterException{
-        Envelope bbox = new Envelope(-75.791435,38.44949,-75.045998,39.840008);        
+        // minx,miny,maxx,maxy
+//      Envelope bbox = new Envelope(-75.791435,38.44949,-75.045998,39.840008); // lat long
+      Envelope bbox = new Envelope(556759.0,5233034,556934, 5233040.0);  // bc albers  
         WFSDataStoreReadTest.doFeatureReaderWithBBox(url,true,false,0,bbox);
     }    
+    
     /**
      * Writing test that only engages against a remote geoserver.
      * <p>
      * Makes referece to the standard featureTypes that geoserver ships with.
      * </p>
      */
-    public void testWrite() throws NoSuchElementException, IllegalFilterException, IOException, IllegalAttributeException{
-
-
-
-        Map m = new HashMap();
-        m.put(WFSDataStoreFactory.URL.key,remote);
-        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
-        DataStore post = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
-        FeatureType ft = post.getSchema( "states" );
-        FeatureSource fs = post.getFeatureSource( "states" );        
-        class Watcher implements FeatureListener {
-            public int count=0;
-            public void changed( FeatureEvent featureEvent ) {
-                System.out.println("Event "+featureEvent );
-                count++;
-            }            
-        }
-        Watcher watcher = new Watcher();
-        fs.addFeatureListener( watcher );
-
-        GeometryFactory gf = new GeometryFactory();
-        MultiPolygon mp = gf.createMultiPolygon(new Polygon[]{gf.createPolygon(gf.createLinearRing(new Coordinate[]{new Coordinate(-88.071564,37.51099), new Coordinate(-88.467644,37.400757), new Coordinate(-90.638329,42.509361), new Coordinate(-89.834618,42.50346),new Coordinate(-88.071564,37.51099)}),new LinearRing[]{})});
-        mp.setUserData("http://www.opengis.net/gml/srs/epsg.xml#4326");
-        
-        Object[] attrs = {
-                mp,
-                "MyStateName",
-                "70",
-                "Refrac",
-                "RR",
-                new Double(180),
-                new Double(18),
-                new Double(220),
-                new Double(80),
-                new Double(20),
-                new Double(40),
-                new Double(180),
-                new Double(90),
-                new Double(100),
-                new Double(40),
-                new Double(80),
-                new Double(40),
-                new Double(180),
-                new Double(90),
-                new Double(70),
-                new Double(70),
-                new Double(60),
-                new Double(10)  
-        };
-        
-        System.out.println(attrs[0]);
-        Feature f = ft.create(attrs);
-                
-        FeatureReader inserts = DataUtilities.reader(new Feature[] {f});
-        FidFilter fp = WFSDataStoreWriteTest.doInsert(post,ft,inserts);
-        // geoserver does not return the correct fid here ... 
-        // get the 3rd feature ... and delete it?        
-        inserts.close();
-        
-        /// okay now count ...
-        FeatureReader count = post.getFeatureReader(new DefaultQuery(ft.getTypeName()),Transaction.AUTO_COMMIT);        
-        int i = 0;
-        while(count.hasNext() && i<3){
-            f = count.next();i++;
-        }
-        count.close();       
-        //
-        fp = FilterFactory.createFilterFactory().createFidFilter(f.getID());
-        
-        WFSDataStoreWriteTest.doDelete(post,ft,fp);
-        WFSDataStoreWriteTest.doUpdate(post,ft);
-        //assertFalse("events fired", watcher.count == 0);
-    }    
+    
+    // Feature Set no longer at RR.
+    
+//    public void testWrite() throws NoSuchElementException, IllegalFilterException, IOException, IllegalAttributeException{
+//
+//
+//
+//        Map m = new HashMap();
+//        m.put(WFSDataStoreFactory.URL.key,url);
+//        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
+//        DataStore post = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
+//        FeatureType ft = post.getSchema( "gd:states" );
+//        FeatureSource fs = post.getFeatureSource( "gd:states" );        
+//        class Watcher implements FeatureListener {
+//            public int count=0;
+//            public void changed( FeatureEvent featureEvent ) {
+//                System.out.println("Event "+featureEvent );
+//                count++;
+//            }            
+//        }
+//        Watcher watcher = new Watcher();
+//        fs.addFeatureListener( watcher );
+//
+//        GeometryFactory gf = new GeometryFactory();
+//        MultiPolygon mp = gf.createMultiPolygon(new Polygon[]{gf.createPolygon(gf.createLinearRing(new Coordinate[]{new Coordinate(-88.071564,37.51099), new Coordinate(-88.467644,37.400757), new Coordinate(-90.638329,42.509361), new Coordinate(-89.834618,42.50346),new Coordinate(-88.071564,37.51099)}),new LinearRing[]{})});
+//        mp.setUserData("http://www.opengis.net/gml/srs/epsg.xml#4326");
+//        
+//        Object[] attrs = {
+//                mp,
+//                "MyStateName",
+//                "70",
+//                "Refrac",
+//                "RR",
+//                new Double(180),
+//                new Double(18),
+//                new Double(220),
+//                new Double(80),
+//                new Double(20),
+//                new Double(40),
+//                new Double(180),
+//                new Double(90),
+//                new Double(100),
+//                new Double(40),
+//                new Double(80),
+//                new Double(40),
+//                new Double(180),
+//                new Double(90),
+//                new Double(70),
+//                new Double(70),
+//                new Double(60),
+//                new Double(10)  
+//        };
+//        
+//        System.out.println(attrs[0]);
+//        Feature f = ft.create(attrs);
+//                
+//        FeatureReader inserts = DataUtilities.reader(new Feature[] {f});
+//        FidFilter fp = WFSDataStoreWriteTest.doInsert(post,ft,inserts);
+//        // geoserver does not return the correct fid here ... 
+//        // get the 3rd feature ... and delete it?        
+//        inserts.close();
+//        
+//        /// okay now count ...
+//        FeatureReader count = post.getFeatureReader(new DefaultQuery(ft.getTypeName()),Transaction.AUTO_COMMIT);        
+//        int i = 0;
+//        while(count.hasNext() && i<3){
+//            f = count.next();i++;
+//        }
+//        count.close();       
+//        //
+//        fp = FilterFactory.createFilterFactory().createFidFilter(f.getID());
+//        
+//        WFSDataStoreWriteTest.doDelete(post,ft,fp);
+//        WFSDataStoreWriteTest.doUpdate(post,ft);
+//        //assertFalse("events fired", watcher.count == 0);
+//    }    
 }

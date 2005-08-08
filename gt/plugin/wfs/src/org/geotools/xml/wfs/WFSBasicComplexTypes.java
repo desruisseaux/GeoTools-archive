@@ -182,7 +182,7 @@ public class WFSBasicComplexTypes {
                 if ((query != null)
                         && (query.getMaxFeatures() != Query.DEFAULT_MAX)) {
                     attributes.addAttribute(WFSSchema.NAMESPACE.toString(),
-                        elems[3].getName(), null, "integer",
+                            attrs[3].getName(), null, "integer",
                         "" + query.getMaxFeatures());
                 }
 

@@ -144,7 +144,6 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          */
         public WFSFeatureResults(WFSFeatureSource fs, Query query) {
         	super(fs, query);
-//System.out.println("WFS QUERY = "+query.toString()+"\n\n\n");
             this.query = query;
             this.fs = fs;
         }
