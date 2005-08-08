@@ -59,6 +59,19 @@ public class ExtentImpl extends MetadataEntity implements Extent {
     private static final long serialVersionUID = 7812213837337326257L;
 
     /**
+     * A geographic extent ranging from 180°W to 180°E and 90°S to 90°N.
+     *
+     * @since 2.2
+     */
+    public static final Extent WORLD;
+    static {
+        final ExtentImpl world = new ExtentImpl();
+        world.getGeographicElements().add(GeographicBoundingBoxImpl.WORLD);
+        world.freeze();
+        WORLD = world;
+    }
+
+    /**
      * Returns the spatial and temporal extent for the referring object.
      */
     private InternationalString description;

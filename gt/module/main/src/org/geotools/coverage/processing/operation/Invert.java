@@ -23,6 +23,7 @@ package org.geotools.coverage.processing.operation;
 import javax.media.jai.operator.InvertDescriptor;
 
 // Geotools dependencies
+import org.geotools.util.NumberRange;
 import org.geotools.coverage.processing.OperationJAI;
 
 
@@ -72,5 +73,15 @@ public class Invert extends OperationJAI {
      */
     public Invert() {
         super("Invert");
+    }
+
+    /**
+     * Returns the expected range of values for the resulting image.
+     */
+    protected NumberRange deriveRange(final NumberRange[] ranges, final Parameters parameters) {
+        final NumberRange range = ranges[0];
+        final double min = -range.getMaximum();
+        final double max = -range.getMinimum();
+        return new NumberRange(min, max);
     }
 }

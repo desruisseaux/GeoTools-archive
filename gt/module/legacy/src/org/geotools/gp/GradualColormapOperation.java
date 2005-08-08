@@ -48,7 +48,7 @@ import org.geotools.cv.SampleDimension;
  * returns <code>true</code>). If it find  a range of sample values using the same color, then this
  * operation will interpolate the colors in the color palette. This interpolation give a smoother
  * appeareance to images that uses this color palette.
- * <br><br>
+ * <p>
  * <strong>Example:</strong> Consider the following color palette. Sample values 0-2 are red,
  * 3-5 are green and 6-8 are blue. In each block of identical color, this operation lets the
  * first occurence inchanged and interpolate all others. The last block of color (blue in our

@@ -215,7 +215,7 @@ public class CoverageStack extends AbstractCoverage {
          *
          * @param coverage The coverage to wrap. Can be {@code null} only if this constructor
          *                 is invoked from a sub-class constructor.
-         * @param range    The Minimum and maximum <var>z</var> values for this element, or
+         * @param range    The minimum and maximum <var>z</var> values for this element, or
          *                 {@code null} to infers it from the last dimension in the coverage's
          *                 envelope.
          */
@@ -586,8 +586,13 @@ public class CoverageStack extends AbstractCoverage {
         }
         this.numSampleDimensions = (sampleDimensions!=null) ? sampleDimensions.length : 0;
         this.sampleDimensions = sampleDimensionMismatch ? null : sampleDimensions;
-        this.envelope = (envelope!=null) ? envelope : new GeneralEnvelope(CRSUtilities.getEnvelope(crs));
-        this.envelope.setCoordinateReferenceSystem(crs);
+        if (envelope != null) {
+            this.envelope = envelope;
+            envelope.setCoordinateReferenceSystem(crs);
+        } else {
+            assert this.elements.length == 0;
+            this.envelope = new GeneralEnvelope(CRSUtilities.getEnvelope(crs));
+        }
     }
     
     /**

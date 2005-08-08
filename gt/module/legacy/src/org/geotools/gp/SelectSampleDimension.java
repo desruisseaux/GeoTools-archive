@@ -61,7 +61,7 @@ import org.geotools.resources.image.ColorUtilities;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.coverage.operation.BandSelect2D}.
+ * @deprecated Replaced by {@link org.geotools.coverage.operation.BandSelector2D}.
  */
 final class SelectSampleDimension extends GridCoverage {
     /**

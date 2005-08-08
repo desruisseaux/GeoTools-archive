@@ -24,6 +24,7 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies and extensions
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import javax.units.NonSI;
 import javax.units.Unit;
@@ -40,6 +41,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;
+import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
@@ -75,8 +77,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
      * increasing north and latitude values increasing east. Angular units are degrees and
      * prime meridian is Greenwich.
      */
-    public static final DefaultGeographicCRS WGS84 = new DefaultGeographicCRS("WGS84",
-                        DefaultGeodeticDatum.WGS84, DefaultEllipsoidalCS.GEODETIC_2D);
+    public static final DefaultGeographicCRS WGS84;
 
     /**
      * A three-dimensional geographic coordinate reference system using WGS84 datum.
@@ -85,8 +86,16 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
      * east and height above the ellipsoid in metre. Angular units are degrees and
      * prime meridian is Greenwich.
      */
-    public static final DefaultGeographicCRS WGS84_3D = new DefaultGeographicCRS("WGS84",
-                        DefaultGeodeticDatum.WGS84, DefaultEllipsoidalCS.GEODETIC_3D);
+    public static final DefaultGeographicCRS WGS84_3D;
+    static {
+        final Map properties = new HashMap(4);
+        properties.put(NAME_KEY, "WGS84");
+        properties.put(VALID_AREA_KEY, ExtentImpl.WORLD);
+        WGS84    = new DefaultGeographicCRS(properties, DefaultGeodeticDatum.WGS84,
+                                            DefaultEllipsoidalCS.GEODETIC_2D);
+        WGS84_3D = new DefaultGeographicCRS(properties, DefaultGeodeticDatum.WGS84,
+                                            DefaultEllipsoidalCS.GEODETIC_3D);
+    }
 
     /**
      * Constructs a new geographic CRS with the same values than the specified one.

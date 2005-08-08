@@ -42,7 +42,7 @@ public class NumberRange extends Range {
     private static final long serialVersionUID = -818167965963008231L;
 
     /**
-     * Construct an inclusive range of {@code byte} values.
+     * Constructs an inclusive range of {@code byte} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -52,7 +52,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of {@code byte} values.
+     * Constructs a range of {@code byte} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -67,7 +67,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of {@code short} values.
+     * Constructs an inclusive range of {@code short} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -77,7 +77,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of {@code short} values.
+     * Constructs a range of {@code short} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -92,7 +92,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of {@code int} values.
+     * Constructs an inclusive range of {@code int} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -102,7 +102,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of {@code int} values.
+     * Constructs a range of {@code int} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -117,7 +117,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of {@code long} values.
+     * Constructs an inclusive range of {@code long} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -127,7 +127,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of {@code long} values.
+     * Constructs a range of {@code long} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -142,7 +142,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of {@code float} values.
+     * Constructs an inclusive range of {@code float} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -152,7 +152,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of {@code float} values.
+     * Constructs a range of {@code float} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -167,7 +167,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of {@code double} values.
+     * Constructs an inclusive range of {@code double} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -177,7 +177,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of {@code double} values.
+     * Constructs a range of {@code double} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -192,7 +192,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of {@link Comparable} objects.
+     * Constructs an inclusive range of {@link Comparable} objects.
      * This constructor is used by {@link RangeSet#newRange} only.
      *
      * @param classe The element class, usually one of {@link Byte}, {@link Short},
@@ -205,7 +205,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of {@link Number} objects.
+     * Constructs an inclusive range of {@link Number} objects.
      *
      * @param classe The element class, usually one of {@link Byte}, {@link Short},
      *               {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
@@ -217,7 +217,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of {@link Number} objects.
+     * Constructs a range of {@link Number} objects.
      *
      * @param classe The element class, usually one of {@link Byte}, {@link Short},
      *               {@link Integer}, {@link Long}, {@link Float} or {@link Double}.

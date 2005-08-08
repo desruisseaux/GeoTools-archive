@@ -36,7 +36,7 @@ import javax.media.jai.iterator.RandomIterFactory;
 /**
  * Effectue un seuillage par hysteresis sur une image.
  * L'opération de seuillage s'effectue de la manière suivante:
- * <br><br>
+ * <p>
  * On dispose d'un seuil haut, <var>sh</var>, et d'un seuil bas, <var>sb</var>.
  * Si la valeur d'un pixel est supérieur à <var>sh</var>, on la conserve, elle
  * nous interesse. Si cette valeur est inférieure à <var>sb</var>, on la supprime.
@@ -46,11 +46,10 @@ import javax.media.jai.iterator.RandomIterFactory;
  * de valeur supérieure à <var>sh</var>. Cette recherche se fait de manière itérative,
  * jusqu'à ce que le point indéterminé n'est plus de voisins satisfaisants.
  * 
+ * @since 2.1
  * @version $Id$
  * @author Lionel Flahaut
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class Hysteresis extends UntiledOpImage {
     /**

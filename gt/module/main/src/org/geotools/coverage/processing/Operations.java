@@ -21,6 +21,7 @@ package org.geotools.coverage.processing;
 
 // J2SE and JAI dependencies
 import java.awt.RenderingHints;
+import javax.media.jai.KernelJAI;
 import javax.media.jai.Interpolation;
 
 // OpenGIS dependencies
@@ -284,6 +285,61 @@ public class Operations {
      */
     public Coverage selectSampleDimension(final Coverage source, final int[] sampleDimensions) {
         return doOperation("SelectSampleDimension", source, "SampleDimensions", sampleDimensions);
+    }
+
+    /**
+     * Replaces {@link Float#NaN NaN} values by the weighted average of neighbors values.
+     * This method uses the default padding and validity threshold.
+     *
+     * @param source The source coverage.
+     *
+     * @see org.geotools.coverage.processing.operation.NodataFilter
+     */
+    public GridCoverage nodataFilter(final GridCoverage source) {
+        return (GridCoverage) doOperation("NodataFilter", source);
+    }
+
+    /**
+     * Replaces {@link Float#NaN NaN} values by the weighted average of neighbors values.
+     *
+     * @param source The source coverage.
+     *
+     * @see org.geotools.coverage.processing.operation.NodataFilter
+     */
+    public GridCoverage nodataFilter(final GridCoverage source, final int padding,
+                                     final int validityThreshold)
+    {
+        return (GridCoverage) doOperation("NodataFilter",      source,
+                                          "padding",           new Integer(padding),
+                                          "validityThreshold", new Integer(validityThreshold));
+    }
+
+    /**
+     * Edge detector which computes the magnitude of the image gradient vector in two orthogonal
+     * directions. The default masks are the Sobel ones.
+     *
+     * @param source The source coverage.
+     *
+     * @see org.geotools.coverage.processing.operation.GradientMagnitude
+     */
+    public Coverage gradientMagnitude(final Coverage source) {
+        return doOperation("GradientMagnitude", source);
+    }
+
+    /**
+     * Edge detector which computes the magnitude of the image gradient vector in two orthogonal
+     * directions.
+     *
+     * @param source The source coverage.
+     * @param mask1  The first mask.
+     * @param mask2  The second mask, orthogonal to the first one.
+     *
+     * @see org.geotools.coverage.processing.operation.GradientMagnitude
+     */
+    public Coverage gradientMagnitude(final Coverage source,
+                                      final KernelJAI mask1, final KernelJAI mask2)
+    {
+        return doOperation("GradientMagnitude", source, "mask1", mask1, "mask2", mask2);
     }
 
     /**

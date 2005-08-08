@@ -28,10 +28,9 @@ import javax.media.jai.util.Range;
 /**
  * The descriptor for the {@link NodataFilter} operation.
  *
+ * @since 2.1
  * @version $Id$
  * @author Lionel Flahaut 
- *
- * @since 2.1
  */
 public class NodataFilterDescriptor extends OperationDescriptorImpl {
     /**

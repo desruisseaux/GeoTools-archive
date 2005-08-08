@@ -258,19 +258,11 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
             Citation authority = null;
             if (vendor != null) {
                 vendor = vendor.trim();
-                final int offset = vendor.length();
-                if (offset != 0) {
-                    if (name.startsWith(vendor)) {
-                        final int length = name.length();
-                        if (offset<length && name.charAt(offset)=='.') {
-                            name = name.substring(offset + 1);
-                        }
-                    }
-                    for (int i=0; i<AUTHORITIES.length; i+=2) {
-                        if (vendor.equalsIgnoreCase((String) AUTHORITIES[i])) {
-                            authority = (Citation) AUTHORITIES[i+1];
-                            break;
-                        }
+                name = ImagingParameterDescription.trimPrefix(name, vendor);
+                for (int i=0; i<AUTHORITIES.length; i+=2) {
+                    if (vendor.equalsIgnoreCase((String) AUTHORITIES[i])) {
+                        authority = (Citation) AUTHORITIES[i+1];
+                        break;
                     }
                 }
             }
@@ -283,7 +275,8 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
              * can be used to contact the individual or organisation - it is information about an
              * image operation, and I'm not sure that anyone wants to phone to an image operation).
              */
-            final InternationalString description = new ImagingParameterDescription(op, "Description");
+            final InternationalString description;
+            description = new ImagingParameterDescription(op, "Description", null);
             try {
                 final URI                uri      = new URI(bundle.getString("DocURL"));
                 final OnLineResourceImpl resource = new OnLineResourceImpl(uri);
@@ -319,8 +312,8 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
              * "com.sun.media.jai.Add".
              */
             final GenericName alias = NameFactory.create(new InternationalString[] {
-                new ImagingParameterDescription(op, "Vendor"),      // Scope name
-                new ImagingParameterDescription(op, "LocalName")    // Local name
+                new ImagingParameterDescription(op, "Vendor"   , null),     // Scope name
+                new ImagingParameterDescription(op, "LocalName", "Vendor")  // Local name
             }, '.');
             properties.put(ALIAS_KEY,   alias);
             properties.put(REMARKS_KEY, description);

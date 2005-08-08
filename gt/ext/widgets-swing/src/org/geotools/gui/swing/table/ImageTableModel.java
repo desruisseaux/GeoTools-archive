@@ -126,7 +126,9 @@ public class ImageTableModel extends AbstractTableModel {
         pixel       = null;
         rowNames    = null;
         columnNames = null;
-        format.setMinimumFractionDigits(update());
+        final int digits = update();
+        format.setMinimumFractionDigits(digits);
+        format.setMaximumFractionDigits(digits);
         fireTableStructureChanged();
     }
 
@@ -152,7 +154,7 @@ public class ImageTableModel extends AbstractTableModel {
                 case DataBuffer.TYPE_SHORT:   // Fall through
                 case DataBuffer.TYPE_USHORT:  // Fall through
                 case DataBuffer.TYPE_INT:     type=Integer.class;           break;
-                case DataBuffer.TYPE_FLOAT:   type=Float  .class; digits=3; break;
+                case DataBuffer.TYPE_FLOAT:   type=Float  .class; digits=2; break;
                 case DataBuffer.TYPE_DOUBLE:  type=Double .class; digits=3; break;
                 default:                      type=Number .class;           break;
             }

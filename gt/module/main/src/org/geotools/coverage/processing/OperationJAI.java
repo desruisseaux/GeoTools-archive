@@ -70,6 +70,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.AbstractInternationalString;
+import org.geotools.util.NumberRange;
 
 
 /**
@@ -96,6 +97,8 @@ import org.geotools.util.AbstractInternationalString;
  *       <td>gets the destination sample dimensions.</td></tr>
  *   <tr><td>{@link #deriveCategory deriveCategory}:&nbsp;</td>
  *       <td>gets the destination categories.</td></tr>
+ *   <tr><td>{@link #deriveRange deriveRange}:&nbsp;</td>
+ *       <td>gets the expected range of values.</td></tr>
  *   <tr><td>{@link #deriveUnit deriveUnit}:&nbsp;</td>
  *       <td>gets the destination units.</td></tr>
  *   <tr><td>{@link #createRenderedImage createRenderedImage}:&nbsp;</td>
@@ -149,7 +152,7 @@ public class OperationJAI extends Operation2D {
      * Constructs a grid coverage operation backed by a JAI operation. The operation descriptor
      * must supports the {@code "rendered"} mode (which is the case for most JAI operations).
      *
-     * @param operation The operation descriptor.
+     * @param operation The JAI operation descriptor.
      */
     public OperationJAI(final OperationDescriptor operation) {
         this(operation, new ImagingParameterDescriptors(operation));
@@ -159,8 +162,8 @@ public class OperationJAI extends Operation2D {
      * Constructs a grid coverage operation backed by a JAI operation. The operation descriptor
      * must supports the {@code "rendered"} mode (which is the case for most JAI operations).
      *
-     * @param operation The operation descriptor.
-     * @param descriptor The parameters descriptor.
+     * @param operation  The JAI operation descriptor.
+     * @param descriptor The OGC parameters descriptor.
      */
     protected OperationJAI(final OperationDescriptor      operation,
                            final ParameterDescriptorGroup descriptor)
@@ -270,18 +273,22 @@ public class OperationJAI extends Operation2D {
      */
     protected Coverage doOperation(final ParameterValueGroup parameters, final Hints hints) {
         /*
-         * Copies parameter values from the 'ParameterValues' object to the 'ParameterBlockJAI',
-         * except the sources. The sources GridCoverages are extracted now but will be set in the
-         * ParameterBlockJAI (as RenderedImages) later.
+         * Copies parameter values from the ParameterValues object to the ParameterBlockJAI,
+         * except the sources. Note: it would be possible to use the ParameterBlockJAI in the
+         * user-supplied parameters. However, we peform an unconditional copy instead because
+         * some operations (e.g. "GradientMagnitude") may change the values.
          */
         final ParameterBlockJAI block;
-        if (parameters instanceof ImagingParameters) {
-            block = (ParameterBlockJAI) ((ImagingParameters) parameters).parameters;
-        } else {
+        if (true) {
             final ImagingParameters copy = (ImagingParameters) descriptor.createValue();
             block = (ParameterBlockJAI) copy.parameters;
             org.geotools.parameter.Parameters.copy(parameters, copy);
         }
+        /*
+         * Extracts the source grid coverages now as an array. The sources will be set in the
+         * ParameterBlockJAI (as RenderedImages) later, after the reprojection performed in the
+         * next block.
+         */
         Boolean  requireGeophysicsType = null;
         final String[]     sourceNames = operation.getSourceNames();
         final GridCoverage2D[] sources = new GridCoverage2D[sourceNames.length];
@@ -319,10 +326,8 @@ public class OperationJAI extends Operation2D {
         }
         /*
          * Applies the operation. This delegates the work to the chain of 'deriveXXX' methods.
-         * TODO: get the range specifier.
          */
-        RangeSpecifier[] ranges = null;
-        coverage = deriveGridCoverage(sources, new Parameters(crs, gridToCRS, block, hints, ranges));
+        coverage = deriveGridCoverage(sources, new Parameters(crs, gridToCRS, block, hints));
         if (requireGeophysicsType != null) {
             coverage = coverage.geophysics(requireGeophysicsType.booleanValue());
         }
@@ -756,18 +761,8 @@ public class OperationJAI extends Operation2D {
      * Returns the quantitative category for a single {@linkplain GridSampleDimension sample dimension}
      * in the target {@linkplain GridCoverage2D grid coverage}. This method is invoked automatically
      * by the {@link #deriveSampleDimension deriveSampleDimension} method for each band in the
-     * target image. Subclasses should override this method in order to compute the target
-     * {@link Category} from the source categories. For example, the {@code "add"} operation
-     * may implements this method as below:
-     *
-     * <blockquote><pre>
-     * NumberRange r0 = categories[0].getRange();
-     * NumberRange r1 = categories[0].getRange();
-     * double min = r0.getMinimum() + r1.getMinimum();
-     * double min = r0.getMaximum() + r1.getMaximum();
-     * NumberRange newRange = new NumberRange(min, max);
-     * return new Category("My category", null, r0, newRange);
-     * </pre></blockquote>
+     * target image. The default implementation creates a default category from the target range
+     * of values returned by {@link #deriveRange deriveRange}.
      *
      * @param  categories The quantitative categories from every sources. For unary operations
      *         like {@code "GradientMagnitude"}, this array has a length of 1. For binary
@@ -776,6 +771,39 @@ public class OperationJAI extends Operation2D {
      * @return The quantative category to use in the destination image, or {@code null} if unknow.
      */
     protected Category deriveCategory(final Category[] categories, final Parameters parameters) {
+        final NumberRange[] ranges = new NumberRange[categories.length];
+        for (int i=0; i<ranges.length; i++) {
+            ranges[i] = categories[i].getRange();
+        }
+        final NumberRange range = deriveRange(ranges, parameters);
+        if (range != null) {
+            final Category category = categories[PRIMARY_SOURCE_INDEX];
+            return new Category(category.getName(), category.getColors(),
+                                category.geophysics(false).getRange(), range).geophysics(true);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the range of value for a single {@linkplain GridSampleDimension sample dimension}
+     * in the target {@linkplain GridCoverage2D grid coverage}. This method is invoked automatically
+     * by the {@link #deriveCategory deriveCategory} method for each band in the target image.
+     * Subclasses should override this method in order to compute the target range of values.
+     * For example, the {@code "add"} operation may implements this method as below:
+     *
+     * <blockquote><pre>
+     * double min = ranges[0].getMinimum() + ranges[1].getMinimum();
+     * double max = ranges[0}.getMaximum() + ranges[1}.getMaximum();
+     * return new NumberRange(min, max);
+     * </pre></blockquote>
+     *
+     * @param  ranges The range of values from every sources. For unary operations like
+     *         {@code "GradientMagnitude"}, this array has a length of 1. For binary operations
+     *         like {@code "add"} and {@code "multiply"}, this array has a length of 2.
+     * @param  parameters Parameters, rendering hints and coordinate reference system to use.
+     * @return The range of values to use in the destination image, or {@code null} if unknow.
+     */
+    protected NumberRange deriveRange(final NumberRange[] ranges, final Parameters parameters) {
         return null;
     }
 
@@ -831,7 +859,7 @@ public class OperationJAI extends Operation2D {
                 names[i] = sources[i].getName();
             }
         }
-        return new Name(getName(), null);
+        return new Name(getName(), names);
     }
 
     /**
@@ -945,8 +973,7 @@ public class OperationJAI extends Operation2D {
         public final CoordinateReferenceSystem crs;
 
         /**
-         * The "grid to coordinate reference system" transform common to all source grid
-         * coverages.
+         * The "grid to coordinate reference system" transform common to all source grid coverages.
          */
         public final MathTransform2D gridToCRS;
 
@@ -963,32 +990,17 @@ public class OperationJAI extends Operation2D {
         public final RenderingHints hints;
 
         /**
-         * The range, colors and units of the main quantitative {@link Category} to be created.
-         * If non-null, then this array length matches the number of sources.
-         */
-        final RangeSpecifier[] rangeSpecifiers;
-
-        /**
-         * Construct a new parameter block with the specified values.
+         * Constructs a new parameter block with the specified values.
          */
         Parameters(final CoordinateReferenceSystem crs,
                    final MathTransform2D   gridToCRS,
                    final ParameterBlockJAI parameters,
-                   final RenderingHints    hints,
-                   final RangeSpecifier[]  rangeSpecifiers)
+                   final RenderingHints    hints)
         {
             this.crs             = crs;
             this.gridToCRS       = gridToCRS;
             this.parameters      = parameters;
             this.hints           = hints;
-            this.rangeSpecifiers = rangeSpecifiers;
-        }
-
-        /**
-         * Returns the range specifier for the first source, or {@code null} if none.
-         */
-        final RangeSpecifier getRangeSpecifier() {
-            return (rangeSpecifiers!=null && rangeSpecifiers.length!=0) ? rangeSpecifiers[0] : null;
         }
 
         /**

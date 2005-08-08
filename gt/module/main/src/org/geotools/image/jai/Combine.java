@@ -47,13 +47,13 @@ import org.geotools.resources.image.ImageUtilities;
  * Computes a set of arbitrary linear combinations of the bands of many rendered source images,
  * using a specified matrix. The matrix size ({@code nRows}&times;{@code nColumns}) must be equals
  * to the following:
- * <br><br>
+ * <p>
  * <ul>
  *   <li>{@code nRows}: the number of desired destination bands.</li>
  *   <li>{@code nColumns}: the total number of source bands (i.e. the
  *       sum of the number of source bands in all source images) plus one.</li>
  * </ul>
- * <br>
+ * <p>
  * The number of source bands used to determine the matrix dimensions is given by the
  * following code regardless of the type of {@link ColorModel} the sources have:
  *
@@ -81,11 +81,10 @@ import org.geotools.resources.image.ImageUtilities;
  * In the special case where there is only one source, this method is equivalent to JAI's
  * "{@link BandCombineDescriptor BandCombine}" operation.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Remi Eve
- *
- * @since 2.1
  */
 public class Combine extends PointOpImage {
     /**

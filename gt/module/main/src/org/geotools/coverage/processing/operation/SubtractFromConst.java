@@ -23,6 +23,7 @@ package org.geotools.coverage.processing.operation;
 import javax.media.jai.operator.SubtractFromConstDescriptor;
 
 // Geotools dependencies
+import org.geotools.util.NumberRange;
 import org.geotools.coverage.processing.OperationJAI;
 
 
@@ -80,5 +81,20 @@ public class SubtractFromConst extends OperationJAI {
      */
     public SubtractFromConst() {
         super("SubtractFromConst");
+    }
+
+    /**
+     * Returns the expected range of values for the resulting image.
+     */
+    protected NumberRange deriveRange(final NumberRange[] ranges, final Parameters parameters) {
+        final double[] constants = (double[]) parameters.parameters.getObjectParameter("constants");
+        if (constants.length == 1) {
+            final double c = constants[0];
+            final NumberRange range = ranges[0];
+            final double min = c - range.getMaximum();
+            final double max = c - range.getMinimum();
+            return new NumberRange(min, max);
+        }
+        return super.deriveRange(ranges, parameters);
     }
 }

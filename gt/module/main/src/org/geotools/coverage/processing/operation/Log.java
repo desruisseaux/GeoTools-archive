@@ -23,6 +23,7 @@ package org.geotools.coverage.processing.operation;
 import javax.media.jai.operator.LogDescriptor;
 
 // Geotools dependencies
+import org.geotools.util.NumberRange;
 import org.geotools.coverage.processing.OperationJAI;
 
 
@@ -67,5 +68,15 @@ public class Log extends OperationJAI {
      */
     public Log() {
         super("Log");
+    }
+
+    /**
+     * Returns the expected range of values for the resulting image.
+     */
+    protected NumberRange deriveRange(final NumberRange[] ranges, final Parameters parameters) {
+        final NumberRange range = ranges[0];
+        final double min = Math.log(range.getMinimum());
+        final double max = Math.log(range.getMaximum());
+        return new NumberRange(min, max);
     }
 }

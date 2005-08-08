@@ -17,13 +17,13 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gp;
+package org.geotools.coverage.processing;
 
-// JAI dependencies
-import javax.media.jai.OperationDescriptor;
-import javax.media.jai.ParameterListDescriptor;
+// OpenGIS dependencies
+import org.opengis.coverage.processing.OperationNotFoundException;
 
-import org.geotools.cv.SampleDimension;
+// Geotools dependencies
+import org.geotools.coverage.GridSampleDimension;
 
 
 /**
@@ -52,16 +52,20 @@ import org.geotools.cv.SampleDimension;
  * duplicated to fill a complete kernel.
  * </blockquote>
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.processing.FilterOperation}.
  */
-class FilterOperation extends OperationJAI {
+public class FilterOperation extends OperationJAI {
     /**
-     * Construct a new filter operation.
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = 7984379314515755769L;
+
+    /**
+     * Constructs a new filter operation.
      *
-     * @param  name The operation name.
+     * @param  name The JAI operation name.
      * @throws OperationNotFoundException if no JAI descriptor was found for the given name.
      */
     public FilterOperation(final String name) throws OperationNotFoundException {
@@ -69,28 +73,11 @@ class FilterOperation extends OperationJAI {
     }
 
     /**
-     * Construct a new filter operation backed by a JAI operation.
-     * The arguments are passed unchanged to super-class constructor.
-     *
-     * @param name The operation name for {@link GridCoverageProcessor} registration.
-     * @param operationDescriptor The operation descriptor.
-     * @param paramDescriptor The parameters descriptor, or <code>null</code>.
-     *
-     * @throws NullPointerException if <code>operationDescriptor</code> is null.
-     */
-    protected FilterOperation(final String name,
-                              final OperationDescriptor operationDescriptor,
-                              final ParameterListDescriptor paramDescriptor)
-    {
-        super(name, operationDescriptor, paramDescriptor);
-    }
-
-    /**
      * Returns the target sample dimensions. Since filter operation do not change the range of
      * values, this method returns the same sample dimension than the first source.
      */
-    protected SampleDimension[] deriveSampleDimension(final SampleDimension[][] bandLists,
-                                                      final Parameters parameters)
+    protected GridSampleDimension[] deriveSampleDimension(final GridSampleDimension[][] bandLists,
+                                                          final Parameters parameters)
     {
         return bandLists[0];
     }

@@ -23,6 +23,7 @@ package org.geotools.coverage.processing.operation;
 import javax.media.jai.operator.RescaleDescriptor;
 
 // Geotools dependencies
+import org.geotools.util.NumberRange;
 import org.geotools.coverage.processing.OperationJAI;
 
 
@@ -91,5 +92,14 @@ public class Rescale extends OperationJAI {
      */
     public Rescale() {
         super("Rescale");
+    }
+
+    /**
+     * Returns the expected range of values for the resulting image.
+     *
+     * @todo Not yet implemented.
+     */
+    protected NumberRange deriveRange(final NumberRange[] ranges, final Parameters parameters) {
+        return super.deriveRange(ranges, parameters);
     }
 }

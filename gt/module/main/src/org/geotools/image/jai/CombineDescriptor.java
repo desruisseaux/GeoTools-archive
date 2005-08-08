@@ -38,11 +38,10 @@ import org.geotools.resources.i18n.ErrorKeys;
  * to support 0 {@link RenderedImage} sources, an arbitrary amount of sources can really be
  * specified. The "0" should be understood as the <em>minimal</em> number of sources required.
  *
+ * @since 2.1
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class CombineDescriptor extends OperationDescriptorImpl {
     /**

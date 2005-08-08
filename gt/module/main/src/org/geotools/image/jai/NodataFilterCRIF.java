@@ -33,10 +33,9 @@ import javax.media.jai.JAI;
 /**
  * The factory for the {@link NodataFilter} operation.
  *
+ * @since 2.1
  * @version $Id$
  * @author Lionel Flahaut
- *
- * @since 2.1
  */
 public class NodataFilterCRIF extends CRIFImpl {
     /**

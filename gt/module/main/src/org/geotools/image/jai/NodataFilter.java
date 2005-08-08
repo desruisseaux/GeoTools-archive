@@ -37,18 +37,17 @@ import org.geotools.resources.XMath;
 
 
 /**
- * Replace {@link Double#NaN} values by the weighted average of neighbors values.
+ * Replaces {@link Double#NaN} values by the weighted average of neighbors values.
  * This operation use a box of {@code size}&times{@code size} pixels centered on
  * each {@code NaN} value. The weighted average is then computed, ignoring all
  * {@code NaN} values. If the number of valid values is greater than
  * {@code validityThreshold}, then the center {@code NaN} is replaced
  * by the computed average. Otherwise, the {@code NaN} value is left unchanged.
  * 
+ * @since 2.1
  * @version $Id$
  * @author Lionel Flahaut
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class NodataFilter extends AreaOpImage {
     /**

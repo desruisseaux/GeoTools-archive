@@ -33,11 +33,10 @@ import javax.media.jai.CRIFImpl;
 /**
  * The image factory for the {@link Combine} operation.
  *
+ * @since 2.1
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class CombineCRIF extends CRIFImpl {
     /**

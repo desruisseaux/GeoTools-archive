@@ -23,6 +23,7 @@ package org.geotools.coverage.processing.operation;
 import javax.media.jai.operator.MultiplyConstDescriptor;
 
 // Geotools dependencies
+import org.geotools.util.NumberRange;
 import org.geotools.coverage.processing.OperationJAI;
 
 
@@ -80,5 +81,20 @@ public class MultiplyConst extends OperationJAI {
      */
     public MultiplyConst() {
         super("MultiplyConst");
+    }
+
+    /**
+     * Returns the expected range of values for the resulting image.
+     */
+    protected NumberRange deriveRange(final NumberRange[] ranges, final Parameters parameters) {
+        final double[] constants = (double[]) parameters.parameters.getObjectParameter("constants");
+        if (constants.length == 1) {
+            final double c = constants[0];
+            final NumberRange range = ranges[0];
+            final double min = range.getMinimum() * c;
+            final double max = range.getMaximum() * c;
+            return (max<min) ? new NumberRange(max, min) : new NumberRange(min, max);
+        }
+        return super.deriveRange(ranges, parameters);
     }
 }

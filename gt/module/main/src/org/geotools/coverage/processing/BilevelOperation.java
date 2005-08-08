@@ -17,66 +17,63 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gp;
+package org.geotools.coverage.processing;
 
-// J2SE dependencies
+// J2SE and JAI dependencies
 import java.util.Arrays;
-
 import javax.media.jai.operator.BinarizeDescriptor;
 
-import org.geotools.cv.Category;
-import org.geotools.cv.SampleDimension;
+// OpenGIS dependencies
+import org.opengis.coverage.processing.OperationNotFoundException;
+
+// Geotools dependencies
+import org.geotools.coverage.Category;
+import org.geotools.coverage.GridSampleDimension;
 
 
 /**
  * Wraps any JAI operation producing a bilevel image. An example of such operation is
  * {@link BinarizeDescriptor Binarize}.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.processing.BilevelOperation}.
  */
-final class BilevelOperation extends OperationJAI {
+public class BilevelOperation extends OperationJAI {
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = 8975871552152978976L;
+
     /**
      * The sample dimension for the resulting image.
      */
-    private static final SampleDimension SAMPLE_DIMENSION = new SampleDimension(new Category[] {
+    private static final GridSampleDimension SAMPLE_DIMENSION = new GridSampleDimension(new Category[] {
         Category.FALSE,
         Category.TRUE
     }, null);
 
     /**
-     * Construct a bilevel operation.
+     * Constructs a bilevel operation with an OGC's name identical to the JAI name.
      *
-     * @param name The OpenGIS and JAI name.
+     * @param name The JAI operation name.
+     * @throws OperationNotFoundException if no JAI descriptor was found for the given name.
      */
-    public BilevelOperation(final String name) {
-        this(name, name);
+    public BilevelOperation(final String name) throws OperationNotFoundException {
+        super(name);
     }
 
     /**
-     * Construct a bilevel operation.
-     *
-     * @param name The OpenGIS name.
-     * @param nameJAI The JAI name.
-     */
-    public BilevelOperation(final String name, final String nameJAI) {
-        super(name, getOperationDescriptor(nameJAI), null);
-    }
-
-    /**
-     * Derive the {@link SampleDimension}s for the destination image.
+     * Derives the {@link GridSampleDimension}s for the destination image.
      *
      * @param  bandLists Sample dimensions for each band in each source coverages.
-     * @param  cs The coordinate system of the destination grid coverage.
      * @param  parameters The user-supplied parameters.
-     * @return The category lists for each band in the destination image.
+     * @return The sample dimensions for each band in the destination image.
      */
-    protected SampleDimension[] deriveSampleDimension(final SampleDimension[][] bandLists,
-                                                      final Parameters parameters)
+    protected GridSampleDimension[] deriveSampleDimension(final GridSampleDimension[][] bandLists,
+                                                          final Parameters parameters)
     {
-        final SampleDimension[] bands = new SampleDimension[bandLists[0].length];
+        final GridSampleDimension[] bands = new GridSampleDimension[bandLists[0].length];
         Arrays.fill(bands, SAMPLE_DIMENSION);
         return bands;
     }

@@ -50,10 +50,12 @@ import org.geotools.resources.Utilities;
  * {@linkplain OperationJAI operation} to replace {@code null} values by a default
  * one.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @since 2.2
+ * @todo Move into the {@code org.geotools.coverage.grid} package as a {@code ImageLayout}
+ *       subclass. Rename as {@code GridCoverageLayout}.
  */
 public class RangeSpecifier implements Serializable, Cloneable {
     /**

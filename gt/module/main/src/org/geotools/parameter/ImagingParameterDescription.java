@@ -21,6 +21,7 @@ package org.geotools.parameter;
 
 // J2SE dependencies
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.MissingResourceException;
 import java.io.Serializable;
 
@@ -36,10 +37,9 @@ import org.geotools.util.AbstractInternationalString;
  * A localized string for a JAI's operation parameter.
  * This is used by {@link ImagingParameterDescriptor}.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 final class ImagingParameterDescription extends AbstractInternationalString implements Serializable {
     /**
@@ -63,6 +63,12 @@ final class ImagingParameterDescription extends AbstractInternationalString impl
     private final String key;
 
     /**
+     * Prefix to removes from the value associated to the {@code key}, or {@code null} if none.
+     * This is usually the vendor key.
+     */
+    private final String prefixKey;
+
+    /**
      * Creates a new international string from the specified operation and argument number.
      *
      * @param operation The operation to fetch localized resource from.
@@ -70,6 +76,7 @@ final class ImagingParameterDescription extends AbstractInternationalString impl
      */
     public ImagingParameterDescription(final OperationDescriptor operation, final int arg) {
         this.operation = operation;
+        this.prefixKey = null;
         if (arg < argumentKeys.length) {
             String candidate = argumentKeys[arg];
             if (candidate != null) {
@@ -89,9 +96,13 @@ final class ImagingParameterDescription extends AbstractInternationalString impl
      * @param operation The operation to fetch localized resource from.
      * @param key The key for the resource to fetch.
      */
-    public ImagingParameterDescription(final OperationDescriptor operation, final String key) {
+    public ImagingParameterDescription(final OperationDescriptor operation,
+                                       final String              key,
+                                       final String              prefixKey)
+    {
         this.operation = operation;
         this.key       = key;
+        this.prefixKey = prefixKey;
     }
 
     /**
@@ -117,7 +128,34 @@ final class ImagingParameterDescription extends AbstractInternationalString impl
         if (locale == null) {
             locale = Locale.getDefault();
         }
-        return operation.getResourceBundle(locale).getString(key);
+        final ResourceBundle resources = operation.getResourceBundle(locale);
+        String name = resources.getString(key);
+        if (prefixKey != null) {
+            name = trimPrefix(name, resources.getString(prefixKey));
+        }
+        return name;
+    }
+
+    /**
+     * If the specified name starts with the specified prefix, removes the prefix from
+     * the name. This is used for removing the "org.geotools" part in operation name
+     * like "org.geotools.NodataFilter" for example.
+     */
+    static String trimPrefix(String name, String prefix) {
+        name = name.trim();
+        if (prefix != null) {
+            prefix = prefix.trim();
+            final int offset = prefix.length();
+            if (offset != 0) {
+                if (name.startsWith(prefix)) {
+                    final int length = name.length();
+                    if (offset<length && name.charAt(offset)=='.') {
+                        name = name.substring(offset + 1);
+                    }
+                }
+            }
+        }
+        return name;
     }
 
     /**
@@ -126,7 +164,8 @@ final class ImagingParameterDescription extends AbstractInternationalString impl
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final ImagingParameterDescription that = (ImagingParameterDescription) object;
-            return Utilities.equals(this.key,       that.key) &&
+            return Utilities.equals(this.key,       that.key)       &&
+                   Utilities.equals(this.prefixKey, that.prefixKey) &&
                    Utilities.equals(this.operation, that.operation);
         }
         return false;

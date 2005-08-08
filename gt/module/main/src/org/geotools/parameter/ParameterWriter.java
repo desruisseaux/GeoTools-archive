@@ -536,13 +536,15 @@ trim:   for (int column=hide.length; --column>=1;) {
             int counter = 0;
             for (final Iterator it=names.iterator(); it.hasNext();) {
                 final String[] aliases = (String[]) it.next();
-                for (column=0; column<aliases.length; column++) {
+                for (column=0; column<hide.length; column++) {
                     if (hide[column]) {
                         continue;
                     }
-                    final String alias = aliases[column];
-                    if (alias != null) {
-                        table.write(alias);
+                    if (column < aliases.length) {
+                        final String alias = aliases[column];
+                        if (alias != null) {
+                            table.write(alias);
+                        }
                     }
                     table.nextColumn();
                 }

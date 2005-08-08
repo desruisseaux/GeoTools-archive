@@ -21,7 +21,7 @@ package org.geotools.image.jai;
 
 
 /**
- * Transform the sample values for one pixel during a "{@link Combine Combine}" operation.
+ * Transforms the sample values for one pixel during a "{@link Combine Combine}" operation.
  * The method {@link #transformSamples} is invoked by {@link Combine#computeRect
  * Combine.computeRect(...)} just before the sample values are combined as
  *
@@ -31,10 +31,9 @@ package org.geotools.image.jai;
  * linear one. For example, the {@code transformSamples} method could substitutes some
  * values by their logarithm.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public interface CombineTransform {
     /**

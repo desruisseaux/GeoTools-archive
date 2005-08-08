@@ -2,10 +2,12 @@ org.geotools.coverage.processing.operation.Absolute
 org.geotools.coverage.processing.operation.AddConst
 org.geotools.coverage.processing.operation.DivideByConst
 org.geotools.coverage.processing.operation.Exp
+org.geotools.coverage.processing.operation.GradientMagnitude
 org.geotools.coverage.processing.operation.Interpolate
 org.geotools.coverage.processing.operation.Invert
 org.geotools.coverage.processing.operation.Log
 org.geotools.coverage.processing.operation.MultiplyConst
+org.geotools.coverage.processing.operation.NodataFilter
 org.geotools.coverage.processing.operation.Resample
 org.geotools.coverage.processing.operation.Rescale
 org.geotools.coverage.processing.operation.SelectSampleDimension

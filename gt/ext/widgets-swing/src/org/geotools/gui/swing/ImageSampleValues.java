@@ -28,6 +28,7 @@ import java.awt.GridBagLayout;
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
+import java.text.NumberFormat;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -39,9 +40,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 // Geotools dependencies
 import org.geotools.gui.swing.table.ImageTableModel;
@@ -63,6 +65,11 @@ public class ImageSampleValues extends JPanel {
      * The table which contains sample values.
      */
     private final JTable table;
+
+    /**
+     * The cell renderer for sample values.
+     */
+    private final CellRenderer renderer;
     
     /**
      * The model for band selection.
@@ -102,7 +109,29 @@ public class ImageSampleValues extends JPanel {
             return table.getRowHeight(row);
         }
     }
-    
+
+    /**
+     * The cell renderer for pixel values.
+     */
+    private static final class CellRenderer extends DefaultTableCellRenderer {
+        /** The formatter for sample values, to be updated for each new image. */
+        NumberFormat formatter;
+
+        /** Constructs a cell renderer. */
+        public CellRenderer() {
+            setHorizontalAlignment(RIGHT);
+        }
+
+        /** Format a cell value. */
+        public void setValue(final Object value) {
+            final String text;
+            if      (value     == null) text = "";
+            else if (formatter == null) text = value.toString();
+            else                        text = formatter.format(value);
+            setText(text);
+        }
+    }
+
     /**
      * The component responsible for drawing the color for the selected cell.
      * Also a listener for various events of interest for the enclosing class.
@@ -161,7 +190,11 @@ public class ImageSampleValues extends JPanel {
 
         // Prepares the table of sample values.
         final ImageTableModel model = new ImageTableModel();
+        renderer = new CellRenderer();
         table = new JTable(model);
+        table.setDefaultRenderer(Float .class, null);     // Remove JTable default renderer.
+        table.setDefaultRenderer(Double.class, null);     // Remove JTable default renderer.
+        table.setDefaultRenderer(Number.class, renderer); // Use same renderer for all numbers.
         table.setCellSelectionEnabled(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.getSelectionModel().addListSelectionListener(current);
@@ -206,6 +239,7 @@ public class ImageSampleValues extends JPanel {
         final ImageTableModel samples = (ImageTableModel) table.getModel();
         final boolean isFirst = (samples.getRenderedImage() == null);
         samples.setRenderedImage(image);
+        renderer.formatter = samples.getNumberFormat();
         final SampleModel model = image.getSampleModel();
         final int      numBands = model.getNumBands();
         final Integer  maximum  = new Integer(numBands);

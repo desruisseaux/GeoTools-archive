@@ -461,13 +461,13 @@ public final class CRSUtilities {
                             //       a method is defined in a future version.
                             continue;
                         }
-                        candidate = new GeneralEnvelope(new double[] {bounds.getEastBoundLongitude(),
-                                                                      bounds.getWestBoundLongitude()},
-                                                        new double[] {bounds.getSouthBoundLatitude(),
+                        candidate = new GeneralEnvelope(new double[] {bounds.getWestBoundLongitude(),
+                                                                      bounds.getSouthBoundLatitude()},
+                                                        new double[] {bounds.getEastBoundLongitude(),
                                                                       bounds.getNorthBoundLatitude()});
+                        candidate.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
                     } else if (geo instanceof BoundingPolygon) {
-                        // TODO: iterates through all polygons and invoke
-                        //       Polygon.getEnvelope();
+                        // TODO: iterates through all polygons and invoke Polygon.getEnvelope();
                         continue;
                     } else {
                         continue;

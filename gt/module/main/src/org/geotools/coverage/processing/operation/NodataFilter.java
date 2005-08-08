@@ -19,19 +19,24 @@
  */
 package org.geotools.coverage.processing.operation;
 
-// JAI dependencies (for javadoc)
-import javax.media.jai.operator.AbsoluteDescriptor;
+// OpenGIS dependencies
+import org.opengis.coverage.grid.GridCoverage;
 
 // Geotools dependencies
-import org.geotools.util.NumberRange;
-import org.geotools.coverage.processing.OperationJAI;
+import org.geotools.coverage.processing.FilterOperation;
 
 
 /**
- * Computes the mathematical absolute value of each sample value.
+ * Replaces {@link Float#NaN NaN} values by the weighted average of neighbors values. This
+ * operation uses a box of {@code size}&times{@code size} pixels centered on each {@code NaN}
+ * value, where {@code size} = 2&times;{@code padding}+1 (the <cite>padding</cite> is the number
+ * of pixel above, below, to the left and to the right of central {@code NaN} pixel). The weighted
+ * average is then computed, ignoring all {@code NaN} values. If the number of valid values is
+ * greater than or equals to {@code validityThreshold}, then the center {@code NaN} is replaced by
+ * the computed average. Otherwise, the {@code NaN} value is left unchanged.
  *
- * <P><STRONG>Name:</STRONG>&nbsp;<CODE>"Absolute"</CODE><BR>
- *    <STRONG>JAI operator:</STRONG>&nbsp;<CODE>"{@linkplain AbsoluteDescriptor Absolute}"</CODE><BR>
+ * <P><STRONG>Name:</STRONG>&nbsp;<CODE>"NodataFilter"</CODE><BR>
+ *    <STRONG>JAI operator:</STRONG>&nbsp;none<BR>
  *    <STRONG>Parameters:</STRONG></P>
  * <table border='3' cellpadding='6' bgcolor='F4F8FF'>
  *   <tr bgcolor='#B9DCFF'>
@@ -48,35 +53,38 @@ import org.geotools.coverage.processing.OperationJAI;
  *     <td align="center">N/A</td>
  *     <td align="center">N/A</td>
  *   </tr>
+ *   <tr>
+ *     <td>{@code "padding"}</td>
+ *     <td>{@link java.lang.Integer}</td>
+ *     <td>1</td>
+ *     <td align="center">0</td>
+ *     <td align="center">N/A</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@code "validityThreshold"}</td>
+ *     <td>{@link java.lang.Integer}</td>
+ *     <td>4</td>
+ *     <td align="center">0</td>
+ *     <td align="center">N/A</td>
+ *   </tr>
  * </table>
  *
  * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.coverage.processing.Operations#absolute
- * @see AbsoluteDescriptor
+ * @see org.geotools.coverage.processing.Operations#nodataFilter(GridCoverage,int,int)
  */
-public class Absolute extends OperationJAI {
+public class NodataFilter extends FilterOperation {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 3723059532452772794L;
+    private static final long serialVersionUID = 6818008657792977519L;
 
     /**
-     * Constructs a default {@code "Absolute"} operation.
+     * Constructs a default {@code "NodataFilter"} operation.
      */
-    public Absolute() {
-        super("Absolute");
-    }
-
-    /**
-     * Returns the expected range of values for the resulting image.
-     */
-    protected NumberRange deriveRange(final NumberRange[] ranges, final Parameters parameters) {
-        final NumberRange range = ranges[0];
-        final double min = Math.abs(range.getMinimum());
-        final double max = Math.abs(range.getMaximum());
-        return (max<min) ? new NumberRange(max, min) : new NumberRange(min, max);
+    public NodataFilter() {
+        super("org.geotools.NodataFilter");
     }
 }

@@ -65,6 +65,18 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     private static final long serialVersionUID = -3278089380004172514L;
 
     /**
+     * A bounding box ranging from 180°W to 180°E and 90°S to 90°N.
+     *
+     * @since 2.2
+     */
+    public static final GeographicBoundingBox WORLD;
+    static {
+        final GeographicBoundingBoxImpl world = new GeographicBoundingBoxImpl(-180, 180, -90, 90);
+        world.freeze();
+        WORLD = world;
+    }
+
+    /**
      * The western-most coordinate of the limit of the
      * dataset extent. The value is expressed in longitude in
      * decimal degrees (positive east).
