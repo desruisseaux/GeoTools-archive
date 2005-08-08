@@ -508,8 +508,6 @@ public class WFSDataStore extends AbstractDataStore {
             url += "&REQUEST=GetFeature";
         }
 
-        url += ("&TYPENAME=" + request.getTypeName());
-
         if (request != null) {
             if (request.getMaxFeatures() != Query.DEFAULT_MAX) {
                 url += ("&MAXFEATURES=" + request.getMaxFeatures());
@@ -541,6 +539,8 @@ public class WFSDataStore extends AbstractDataStore {
                 }
             }
         }
+
+        url += ("&TYPENAME=" + URLEncoder.encode(request.getTypeName(), "UTF-8"));
 
         getUrl = new URL(url);
         HttpURLConnection hc = getConnection(getUrl,auth,false);
