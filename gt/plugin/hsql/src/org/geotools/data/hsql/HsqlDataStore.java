@@ -648,4 +648,8 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 		}
 	}
     
+	protected void setAutoCommit(boolean arg0, Connection arg1) throws SQLException {
+		// do nothing
+	}
+	
 }
