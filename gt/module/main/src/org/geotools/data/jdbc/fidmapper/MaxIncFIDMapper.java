@@ -84,7 +84,11 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getPKAttributes(java.lang.String)
      */
     public Object[] getPKAttributes(String FID) {
+    	try{
         return new Object[] { new Long(Long.parseLong(FID)) };
+    	}catch (NumberFormatException e) {
+			return new Object[]{new Long(-1)};
+		}
     }
 
     /**
