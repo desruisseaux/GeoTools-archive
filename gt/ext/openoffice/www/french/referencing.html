@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+  <head>
+    <title>Utilisation des formules de transformations de coordonnées</title>
+  </head>
+  <body>
+  <h1>Utilisation des formules de transformations de coordonnées</h1>
+  <p align="justify">L'extension Geotools pour OpenOffice fournit de nouvelles fonctions
+  réparties dans 2 catégories: <cite>Texte</cite> et <cite>Add-in</cite>. Cette page
+  suppose que l'<a href="install.html">installation de l'extension Geotools</a> a été complétée
+  avec succès.</p>
+  
+  <table border="1" cellpadding="6" bgcolor="floralwhite">
+  <tr bgcolor="lightsteelblue">
+    <th nowrap>Catégorie</th>
+    <th nowrap>Fonction (nom français)</th>
+    <th nowrap>Fonction (nom anglais)</th>
+  </tr>
+  <tr>
+    <td nowrap><b>Texte</b></td>
+    <td nowrap>(...à faire...)</td>
+    <td nowrap><code>
+      <a href="#TEXT.ANGLE">TEXT.ANGLE</a><br>
+      <a href="#TEXT.LATITUDE">TEXT.LATITUDE</a><br>
+      <a href="#TEXT.LONGITUDE">TEXT.LONGITUDE</a><br>
+      <a href="#VALUE.ANGLE">VALUE.ANGLE</a>
+    </code></td>
+  </tr>
+  <tr>
+    <td nowrap><b>Referencing</b></td>
+    <td nowrap>(...à faire...)</td>
+    <td nowrap><code>
+      CRS.ACCURACY<br>
+      CRS.AXIS<br>
+      CRS.DESCRIPTION<br>
+      CRS.REMARKS<br>
+      CRS.SCOPE<br>
+      CRS.TRANSFORM<br>
+      CRS.VALID.AREA<br>
+      CRS.WKT<br>
+      ORTHODROMIC.DISTANCE<br>
+      ORTHODROMIC.FORWARD
+    </code></td>
+  </tr>
+  </table>
+  <p align="justify"><strong>Note:</strong> au moment d’écrire ces lignes, OpenOffice ne permettait
+  pas encore de créer de nouvelles catégories. La catégorie <cite>Referencing</cite> apparaît donc
+  pour l’instant dans la catégorie <cite>Add-in</cite>.</p>
+
+  <p align="justify">Le principe de base de fonctions de la catégorie <cite>Referencing</cite> est le
+  suivant: chaque système de référence des coordonnées est identifié par un code numérique de la base
+  EPSG (<a href="http://www.epsg.org/">http://www.epsg.org/</a>). Cette base de données recense plus de
+  3000 systèmes en usage sur la planète, ainsi que des paramètres permettant d’effectuer des transformations
+  d’un système vers un autre. Certaines fonctions de la catégories <cite>Referencing</cite> permettent d’obtenir
+  des informations sur un système de référence en particulier (par exemple <code><a href="#CRS.DESCRIPTION">CRS.DESCRIPTION</a></code>);
+  ces fonctions n’attendent qu’un seul code EPSG en paramètre. D’autres fonctions agissent non pas à partir
+  d’un système de référence seul, mais plutôt à partir d’une transformation passant d’un système vers un autre
+  (par exemple <code><a href="#CRS.ACCURACY">CRS.ACCURACY</a></code>). Ces fonctions attendent deux codes EPSG en paramètres,
+  chacun correspondant à un système de référence différent. Le premier code définit le système source, et le second
+  code définit le système destination. La transformation est définit par l’algorithme permettant de passer des
+  coordonnées du système source vers celles du système destination.</p>
+
+  <p>&nbsp;</p>
+  <h2>Catégorie <cite>Texte</cite></h2>
+  <h3><a name="TEXT.ANGLE">TEXT.ANGLE</a></h3>
+  <p align="justify">Convertit une valeur numérique en chaîne de caractères représentant un angle.
+  La valeur numérique doit être un angle en degrés décimaux (par exemple 12,5 pour 12°30’). La chaîne
+  retournée peut être un angle sexagésimal, en fonction du modèle donné en argument. Ce modèle comprend
+  six caractères spéciaux : <var>D</var>, <var>M</var>, <var>S</var>, <var>d</var>, <var>m</var> et <var>s</var>.
+  Le caractère <var>D</var> représente la partie entière des degrés, et <var>d</var> la partie fractionnaire.
+  Le symbole <var>M</var> représente la partie entière des minutes, et <var>m</var> la partie fractionnaire.
+  Enfin le symbole <var>S</var> représente la partie entière des secondes, et <var>s</var> la partie fractionnaire.
+  La capture d’écran ci-dessous donne quelques exemples d’angles formatés en fonction de différents modèles.</p>
+  
+  <center><img src="TEXT.ANGLE.png" alt="TEXT.ANGLE"></center>
+
+  <p>&nbsp;</p>
+  <h3><a name="TEXT.LATITUDE">TEXT.LATITUDE</a></h3>
+  <p align="justify">Convertit une valeur numérique en chaîne de caractères représentant une latitude. Cette
+  fonction est identique à <code><a href="#TEXT.ANGLE">TEXT.ANGLE</a></code>, excepté qu’elle remplace le signe
+  (positif ou négatif) de l’angle par le symbole de l’hémisphère (<cite>N</cite> ou <cite>S</cite> pour Nord et
+  Sud respectivement) placé après l'angle.</p>
+
+  <p>&nbsp;</p>
+  <h3><a name="TEXT.LONGITUDE">TEXT.LONGITUDE</a></h3>
+  <p align="justify">Convertit une valeur numérique en chaîne de caractères représentant une longitude. Cette
+  fonction est identique à <code><a href="#TEXT.ANGLE">TEXT.ANGLE</a></code>, excepté qu’elle remplace le signe
+  (positif ou négatif) de l’angle par le symbole de l’hémisphère (<cite>E</cite> ou <cite>W</cite> pour Est et
+  Ouest respectivement) placé après l'angle.</p>
+
+  <p>&nbsp;</p>
+  <h3><a name="VALUE.ANGLE">VALUE.ANGLE</a></h3>
+  <p align="justify">Convertit en valeur numérique une chaîne de caractères représentant un angle. Cette
+  fonction est l’inverse de <code><a href="#TEXT.ANGLE">TEXT.ANGLE</a></code>. La chaîne de caractères peut
+  représenter un angle sexagésimal, à la condition que les symboles °, ' et " soient correctement utilisés
+  pour identifier les degrés, minutes et secondes respectivement. L’hémisphère (N, S, E ou W) est optionnel.
+  L’angle retourné est toujours exprimé en degrés décimaux.</p>
+
+  <p>&nbsp;</p>
+  <hr>
+  <p>&nbsp;</p>
+  <h2>Catégorie <cite>Referencing</cite></h2>
+  
+
+  </body>
+</html>
