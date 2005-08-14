@@ -11,13 +11,38 @@
     <A HREF="index.html">page d’introduction</A> donne un aperçu des fonctionnalités apportées.
     Le <A HREF="referencing.html">guide de l’utilisateur</A> décrit chacune de ces fonctions.<p>
 
-    <p>Contenu de cette page:</p>
+    <table border="1" cellpadding="6" bgcolor="floralwhite">
+    <tr bgcolor="lightsteelblue">
+      <th nowrap>Composante</th>
+      <th nowrap>Nom du fichier</th>
+      <th nowrap>Taille</th>
+      <th nowrap colspan="2">Téléchargement</th>
+    </tr>
+    <tr>
+      <td><b><cite>Add-in</cite> Geotools pour OpenOffice</b></td>
+      <td><code>geotools.uno.pkg</code></td>
+      <td align="right">1&nbsp;644 ko</td>
+      <td>par FTP</td>
+      <td><a href="../downloads/geotools.uno.pkg">par HTTP</a></td>
+    </tr>
+    <tr>
+      <td><b>Exemple de feuille de calcul</td>
+      <td><code>Referencing.ods</code></td>
+      <td align="right">26 ko</td>
+      <td>par FTP</td>
+      <td><a href="../downloads/Referencing.ods">par HTTP</a></td>
+    </tr>
+    </table>
+
+    <p>Le reste de cette page présente les sujets suivants:</p>
     <ul>
       <li><a href="#requirements">Pré requis</a></li>
       <li><a href="#install">Installation</a></li>
       <li><a href="#troubleshooting">Résolution de problèmes</a></li>
     </ul>
 
+    <p>&nbsp</p>
+    <hr>
     <p>&nbsp</p>
     <h2><a name="requirements">Pré requis</a></h2>
     <p align="justify">Les logiciels suivants doivent être installés au préalable. Tous sont gratuits
@@ -39,20 +64,16 @@
       <td><A HREF="http://java.sun.com/products/java-media/3D/downloads/">http://java.sun.com/products/java-media/3D/downloads/</A>
           <br>(Sélectionner <cite>API Download</cite>)</td>
     </tr>
-    <tr bgcolor="khaki">
-      <td><b><cite>Add-in</cite> Geotools pour OpenOffice</b></td>
-      <td>...(todo)...</td>
-    </tr>
     </table>
 
     <p>&nbsp</p>
-    <h3>Note: pourquoi Java3D et comment s’en passer</h3>
+    <h3>Pourquoi Java3D et comment s’en passer?</h3>
     <p align="justify">Geotools ne fait pas d’animation tridimensionnelle (3D), bien qu’il peut manipuler
     des coordonnées à trois dimensions ou plus. Toutefois, il a besoin d’effectuer des calculs matriciels,
     quel que soit le nombre de dimensions. L’extension standard Java3D de Sun Microsystems comprend des routines
     à cet effet, les animations 3D faisant un usage intensif de ces derniers. Java3D n’est pas la seule extension
     capable de manipuler des matrices, mais il a l’avantage d’être un peu plus standard que les autres dans un
-    environnement Java, et d’être particulièrement optimisé pour des manipulations de matrices de tailles 2&times;2,
+    environnement Java, et d’être particulièrement optimisé pour des manipulations de matrices de tailles
     3&times;3 et 4&times;4 (il se trouve que les transformations de coordonnées géographiques utilisent aussi des
     matrices de ces tailles).</p>
 
@@ -63,6 +84,8 @@
     de la machine cliente, ou <code>jre</code> est le répertoire d’installation du Java.</p>
 
 
+    <p>&nbsp</p>
+    <hr>
     <p>&nbsp;</p>
     <h2><a name="install">Installation de l’extension</a></h2>
     <p align="justify">Avant d’installer l’extension Geotools, il peut être utile de configurer
@@ -71,14 +94,14 @@
     sélectionner <cite>Java</cite>. Si aucun environnement Java n’apparaît dans la liste, appuyer sur
     le bouton <cite>Ajouter</cite> et sélectionner le répertoire où un environnement Java est installé.</p>
 
-    <center><img src="install_java.png" alt="Répertoire d'installation du Java"></center>
+    <center><img src="../images/install_java.png" alt="Répertoire d'installation du Java"></center>
 
     <p align="justify">Après avoir téléchargé le fichier <code>geotools.uno.pkg</code>, lancer le tableur
     d’Open Office (<cite>Calc</cite>). Aller dans <cite>Outils</cite>, <cite>Gestionnaire de packages</cite>.
     Sélectionner <cite>Mes packages</cite> dans la colonne <cite>Package</cite> et appuyer sur le bouton
     <cite>Ajouter</cite>.</p>
 
-    <center><img src="install_geotools.png" alt="Répertoire d'installation du Java"></center> 
+    <center><img src="../images/install_geotools.png" alt="Gestionnaire de packages"></center> 
 
     <p align="justify">Aller dans le répertoire où se trouve le fichier <code>geotools.uno.pkg</code>
     téléchargé et sélectionnez le, puis appuyer sur le bouton <cite>Ouvrir</cite>. Après que l’extension ait
@@ -101,6 +124,8 @@
     </p></td></tr></table>
 
     
+    <p>&nbsp</p>
+    <hr>
     <p>&nbsp</p>
     <h2><a name="troubleshooting">Résolution de problèmes</a></h2>
     <p align="justify">Si l’exécution des formules fournit par l’extension Geotools ne produit que le
