@@ -132,7 +132,7 @@ public class GMLFilterDocument extends org.xml.sax.helpers.XMLFilterImpl {
         /* if at a GML element, do some checks to determine
          * how to handle the element
          */
-        if (namespaceURI.equals(GML_NAMESPACE)) {
+        if (namespaceURI != null && namespaceURI.equals(GML_NAMESPACE)) {
             // if geometry, pass it on down the filter chain
             if (BASE_GEOMETRY_TYPES.contains(localName)) {
                 parent.geometryStart(localName, atts);
