@@ -33,6 +33,11 @@
    <version>2.2.x</version>
   </dependency>
   <dependency>
+   <artifactId>jai_imageio</artifactId>
+   <groupId>jai</groupId>
+   <version>1.0</version>
+  </dependency>
+  <dependency>
    <groupId>JTS</groupId>
    <artifactId>JTS</artifactId>
    <version>1.6</version>
