@@ -64,26 +64,26 @@ import java.awt.geom.Point2D;
  *       1, ie width/heigh=1.  Currently, this is assumed to be 1.
  */
 public class MapPaneImpl extends JPanel implements MapBoundsListener,
-    MapLayerListListener, ComponentListener, SelectedToolListener {
+        MapLayerListListener, ComponentListener, SelectedToolListener {
     /** The class used for identifying for logging. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.gui.swing.MapPaneImpl");
-
+    
     /** The class to use to render this MapPane. */
     Renderer2D renderer;
-
+    
     /** The model which stores a list of layers and BoundingBox. */
     private MapContext context;
-
+    
     /** List of tools which can be used by this class. */
     private ToolList toolList;
-
+    
     /* Used to convert between types. */
     private Adapters adapters = Adapters.getDefault();
-
+    
     /** A transform from screen coordinates to real world coordinates. */
     private AffineTransform dotToCoordinateTransform = new AffineTransform();
-
+    
     private Envelope selectionBox = null;
     private Envelope selectionCircle = null;
     
@@ -97,7 +97,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
      * @throws IllegalArgumentException when parameters are null.
      */
     public MapPaneImpl(MapContext context, ToolList toolList)
-        throws IllegalArgumentException, IOException {
+    throws IllegalArgumentException, IOException {
         if ((context == null) || (toolList == null)) {
             throw new IllegalArgumentException();
         } else {
@@ -117,7 +117,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
                 }
                 context.setAreaOfInterest(bounds);
             }
-
+            
             // Request to be notified when map parameters change
             context.addMapBoundsListener(this);
             context.addMapLayerListListener(this);
@@ -125,19 +125,19 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
             toolList.getSelectedTool().addMouseListener(this, context);
             toolList.getSelectedTool().addMouseMotionListener(this, context);
             addComponentListener(this);
-
+            
             // A zero sized mapPane cannot be resized later and doesn't behave
             // very nicely
             this.setMinimumSize(new Dimension(2, 2));
-
+            
             // use absolute positioning
             this.setLayout(null);
-
+            
             // set up the varialbes associated with this tool.
             initialiseTool();
         }
     }
-
+    
     /**
      * Create a MapPane. A MapPane marshals the drawing of maps.
      *
@@ -149,7 +149,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
     public MapPaneImpl(MapContext context) throws IllegalArgumentException, IOException {
         this(context, ToolFactory.createFactory().createDefaultToolList());
     }
-
+    
     /**
      * Loop through all the layers in this mapPane's layerList and render each
      * Layer which is set to Visable.  If the AreaOfInterest is null, then the
@@ -166,38 +166,38 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
      */
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
-
+        
         try {
             if (context.getAreaOfInterest() == null) {
                 Envelope bounds = context.getLayerBounds();
-
+                
                 if (bounds != null) {
                     LOGGER.info("AreaOfInterest calculated during rendering");
                     context.setAreaOfInterest(bounds, null);
                 }
             }
-
+            
             int w = getWidth() - getInsets().left - getInsets().right;
             int h = getHeight() - getInsets().top - getInsets().bottom;
-
+            
             // prevent divide by zero errors
             if (h == 0) {
                 h = 2;
             }
-
+            
             // paint only what's needed
-            renderer.paint((Graphics2D) graphics,  
-                graphics.getClipBounds(),
-                dotToCoordinateTransform.createInverse());
+            renderer.paint((Graphics2D) graphics,
+                    graphics.getClipBounds(),
+                    dotToCoordinateTransform.createInverse());
         } catch (java.awt.geom.NoninvertibleTransformException e) {
             LOGGER.warning("Transform error while rendering. Cause is: " +
-                e.getCause());
+                    e.getCause());
         } catch (IOException ioe) {
-        	LOGGER.log(Level.SEVERE, "IOException while rendering data", ioe);
+            LOGGER.log(Level.SEVERE, "IOException while rendering data", ioe);
         }
     }
-
-
+    
+    
     /**
      * Processes mouse events occurring on this component. This method
      * overrides the default AWT's implementation in order to wrap the
@@ -211,7 +211,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
         super.processMouseEvent(new GeoMouseEvent(event,
                 MathTransformFactory.getDefault().createAffineTransform(dotToCoordinateTransform)));
     }
-
+    
     /**
      * Processes mouse motion events occurring on this component. This method
      * overrides the default AWT's implementation in order to wrap the
@@ -225,7 +225,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
         super.processMouseMotionEvent(new GeoMouseEvent(event,
                 MathTransformFactory.getDefault().createAffineTransform(dotToCoordinateTransform)));
     }
-
+    
     /**
      * Invoked when the component has been made invisible.
      *
@@ -233,7 +233,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
      */
     public void componentHidden(ComponentEvent e) {
     }
-
+    
     /**
      * Invoked when the component's position changes.
      *
@@ -241,7 +241,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
      */
     public void componentMoved(ComponentEvent e) {
     }
-
+    
     /**
      * Invoked when the component's size changes, change the AreaOfInterest so
      * that the aspect ratio remains the same.  One axis will remain the same
@@ -254,36 +254,53 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
      * @throws java.lang.reflect.UndeclaredThrowableException DOCUMENT ME!
      */
     public void componentResized(ComponentEvent e) {
+        updateAspectRatio();
+        
+    }
+
+    public void updateAspectRatio() {
         int w = getWidth() - getInsets().left - getInsets().right;
         int h = getHeight() - getInsets().top - getInsets().bottom;
         double newAspectRatio = (double) w / (double) h;
-
-        AffineTransform at = new AffineTransform();
-        Envelope aoi = context.getAreaOfInterest();
-
-        double contextAspectRatio = (double) (aoi.getMaxX() - aoi.getMinX()) / (double) (aoi.getMaxY() -
-            aoi.getMinY());
-
-        // No need to resize if the aspect ratio is correct.
-        if (contextAspectRatio == newAspectRatio) {
-            return;
-        }
-
-        if (newAspectRatio > contextAspectRatio) {
-            // Increase the width to fit new aspect ratio
-            at.translate((aoi.getMinX() + aoi.getMaxX()) / 2, 0);
-            at.scale(newAspectRatio / contextAspectRatio, 1);
-            at.translate(-(aoi.getMinX() + aoi.getMaxX()) / 2, 0);
-        } else {
-            // Increase the height to fit new aspect ratio
-            at.translate(0, (aoi.getMinY() + aoi.getMaxY()) / 2);
-            at.scale(1, contextAspectRatio / newAspectRatio);
-            at.translate(0, -(aoi.getMinY() + aoi.getMaxY()) / 2);
-        }
-
-        context.transform(at);
+        
+        applyAspectRatio(newAspectRatio);
     }
 
+    /**
+     * @param newAspectRatio
+     */
+    private void applyAspectRatio(final double newAspectRatio) {
+        AffineTransform at = new AffineTransform();
+        Envelope aoi = context.getAreaOfInterest();
+        
+        double contextAspectRatio = calcuateContextAspectRatio(aoi);
+        // No need to resize if the aspect ratio is correct.
+        if (contextAspectRatio != newAspectRatio) {
+            if (newAspectRatio > contextAspectRatio) {
+                // Increase the width to fit new aspect ratio
+                at.translate((aoi.getMinX() + aoi.getMaxX()) / 2, 0);
+                at.scale(newAspectRatio / contextAspectRatio, 1);
+                at.translate(-(aoi.getMinX() + aoi.getMaxX()) / 2, 0);
+            } else {
+                // Increase the height to fit new aspect ratio
+                at.translate(0, (aoi.getMinY() + aoi.getMaxY()) / 2);
+                at.scale(1, contextAspectRatio / newAspectRatio);
+                at.translate(0, -(aoi.getMinY() + aoi.getMaxY()) / 2);
+            }
+            context.transform(at);
+        }
+    }
+    
+    /**
+     * @param aoi
+     * @return
+     */
+    private double calcuateContextAspectRatio(final Envelope aoi) {
+        double contextAspectRatio = (double) (aoi.getMaxX() - aoi.getMinX()) / (double) (aoi.getMaxY() -  aoi.getMinY());
+        
+        return contextAspectRatio;
+    }
+    
     /**
      * Invoked when the component has been made visible.
      *
@@ -291,7 +308,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
      */
     public void componentShown(ComponentEvent e) {
     }
-
+    
     /**
      * Called when the selectedTool on a MapPane changes. Register for
      * mouseEvents on behalf of the tool, and set the Cursor.
@@ -301,7 +318,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
     public void selectedToolChanged(EventObject event) {
         initialiseTool();
     }
-
+    
     /**
      * Initialise variables associated with the tool.
      */
@@ -314,7 +331,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
-
+    
     /**
      * Re-evaluate the screen to CoordinateSystem transform, this method should
      * be called whenever the MapPane resizes, boundingBox resizes, or
@@ -323,13 +340,13 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
     public void updateTransform() {
         //Real World Coordinates
         Envelope aoi = context.getAreaOfInterest();
-
+        
         // Scaling
         double scaleX = (aoi.getMaxX() - aoi.getMinX()) / (getWidth() -
-            getInsets().left - getInsets().right);
+                getInsets().left - getInsets().right);
         double scaleY = (aoi.getMaxY() - aoi.getMinY()) / (getHeight() -
-            getInsets().top - getInsets().bottom);
-
+                getInsets().top - getInsets().bottom);
+        
         // x'=(x-leftBorder)*scaleX+csMinX
         //   = x*scaleX -leftBorder*scaleX+csMinX
         // y'=(maxY-bottomBorder-y)*scaleY+csMinY
@@ -345,19 +362,19 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
         // [y']=[0       -scaleY (maxY-bottomBorder)*scaleY+csMinY][y]
         // [1 ] [0       0       1                                ][1]
         dotToCoordinateTransform = new AffineTransform(
-            // m00: ScaleX
-            scaleX, 
-            // m10
-            0.0, 
-            // m01:
-            0.0, -scaleY, 
-            // m02: TransformX
-            aoi.getMinX() - (scaleX * getInsets().left),
+                // m00: ScaleX
+                scaleX,
+                // m10
+                0.0,
+                // m01:
+                0.0, -scaleY,
+                // m02: TransformX
+                aoi.getMinX() - (scaleX * getInsets().left),
                 (
-            // m12: TransformY
-            (getHeight() - getInsets().bottom) * scaleY) + aoi.getMinY());
+                // m12: TransformY
+                (getHeight() - getInsets().bottom) * scaleY) + aoi.getMinY());
     }
-
+    
     /**
      * Added by Jamison Conley Aug 12, 2004
      * Takes a point in screen coordinates and returns the same point in real world coordinates.
@@ -384,7 +401,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
         try{
             Point2D retPoint = new Point2D.Double();
             dotToCoordinateTransform.createInverse().transform(worldPoint, retPoint);
-            return retPoint;                   
+            return retPoint;
         } catch (java.awt.geom.NoninvertibleTransformException nte){
             throw new RuntimeException("The transform from screen to real world coordinates could not be inverted: " + nte.getMessage());
         }
@@ -413,11 +430,11 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
      */
     public Shape toScreenShape(Shape worldShape){
         try{
-            return dotToCoordinateTransform.createInverse().createTransformedShape(worldShape);          
+            return dotToCoordinateTransform.createInverse().createTransformedShape(worldShape);
         } catch (java.awt.geom.NoninvertibleTransformException nte){
             throw new RuntimeException("The transform from screen to real world coordinates could not be inverted: " + nte.getMessage());
         }
-    }    
+    }
     
     /**
      * Set the ToolList for this class.
@@ -427,7 +444,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
     public void setToolList(ToolList toolList) {
         this.toolList = toolList;
     }
-
+    
     /**
      * Get the ToolList for this class.
      *
@@ -436,41 +453,47 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
     public ToolList getToolList() {
         return this.toolList;
     }
-
-	/* (non-Javadoc)
-	 * @see org.geotools.map.event.MapBoundsListener#mapBoundsChanged(org.geotools.map.event.MapBoundsEvent)
-	 */
-	public void mapBoundsChanged(MapBoundsEvent event) {
-		updateTransform();
-		repaint(getVisibleRect());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.map.event.MapLayerListListener#layerAdded(org.geotools.map.event.MapLayerListEvent)
-	 */
-	public void layerAdded(MapLayerListEvent event) {
-		repaint(getVisibleRect());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.map.event.MapLayerListListener#layerRemoved(org.geotools.map.event.MapLayerListEvent)
-	 */
-	public void layerRemoved(MapLayerListEvent event) {
-		repaint(getVisibleRect());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.map.event.MapLayerListListener#layerChanged(org.geotools.map.event.MapLayerListEvent)
-	 */
-	public void layerChanged(MapLayerListEvent event) {
-		repaint(getVisibleRect());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.map.event.MapLayerListListener#layerMoved(org.geotools.map.event.MapLayerListEvent)
-	 */
-	public void layerMoved(MapLayerListEvent event) {
-		repaint(getVisibleRect());
-	}
-
+    
+        /* (non-Javadoc)
+         * @see org.geotools.map.event.MapBoundsListener#mapBoundsChanged(org.geotools.map.event.MapBoundsEvent)
+         */
+    public void mapBoundsChanged(MapBoundsEvent event) {
+        updateTransform();
+        repaint(getVisibleRect());
+    }
+    
+        /* (non-Javadoc)
+         * @see org.geotools.map.event.MapLayerListListener#layerAdded(org.geotools.map.event.MapLayerListEvent)
+         */
+    public void layerAdded(MapLayerListEvent event) {
+        repaint(getVisibleRect());
+    }
+    
+        /* (non-Javadoc)
+         * @see org.geotools.map.event.MapLayerListListener#layerRemoved(org.geotools.map.event.MapLayerListEvent)
+         */
+    public void layerRemoved(MapLayerListEvent event) {
+        repaint(getVisibleRect());
+    }
+    
+        /* (non-Javadoc)
+         * @see org.geotools.map.event.MapLayerListListener#layerChanged(org.geotools.map.event.MapLayerListEvent)
+         */
+    public void layerChanged(MapLayerListEvent event) {
+        repaint(getVisibleRect());
+    }
+    
+        /* (non-Javadoc)
+         * @see org.geotools.map.event.MapLayerListListener#layerMoved(org.geotools.map.event.MapLayerListEvent)
+         */
+    public void layerMoved(MapLayerListEvent event) {
+        repaint(getVisibleRect());
+    }
+    
+    public void useMemoryCache(boolean flag){
+        ((LiteRenderer)renderer).setMemoryPreloadingEnabled(flag);
+        ((LiteRenderer)renderer).setOptimizedDataLoadingEnabled(flag);
+        
+    }
+    
 }
