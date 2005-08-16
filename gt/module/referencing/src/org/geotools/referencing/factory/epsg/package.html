@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>package org.geotools.referencing.factory.epsg</TITLE>
+  </HEAD>
+  <BODY>
+  {@linkplain org.opengis.referencing.AuthorityFactory Authority factories} for
+  the <A HREF="http://www.epsg.org">EPSG</A> database.
+
+  <P ALIGN="justify">EPSG codes are numerical identifiers. For example "4326" is the EPSG
+  identifier for the "WGS 84" geographic CRS. However, the default implementation accepts
+  names as well as numeric identifiers. For example "<cite>NTF (Paris) / France I</cite>"
+  and {@code "27581"} both fetchs the same object. Note that names may be ambiguous since
+  the same name may be used for more than one object. This is the case of "WGS 84" for example.
+  If such an ambiguity is found, an exception will be thrown.</P>
+
+  <P ALIGN="justify">An EPSG authority factory is created using the following code:</P>
+  <BLOCKQUOTE><CODE>{@linkplain org.opengis.referencing.crs.CRSAuthorityFactory} factory =
+  {@linkplain org.geotools.referencing.FactoryFinder}.getCRSAuthorityFactory("EPSG", null);</CODE></BLOCKQUOTE>
+
+  <P ALIGN="justify">This package provides the general framework for accessing an EPSG database,
+  but the actual connection to a database requires the existence of an EPSG plugin in the classpath.
+  Otherwise, a {@link org.geotools.factory.FactoryNotFoundException} will be thrown. Available plugins are:</P>
+
+  <TABLE ALIGN="center" BORDER="1" CELLPADDING="3">
+    <TR>
+      <TH>Required software</TH>
+      <TH>Data source</TH>
+      <TH>Plugin / JAR file</TH>
+      <TH>Additional notes</TH>
+    </TR>
+    <TR>
+      <TD>MS-Access ODBC driver</TD>
+      <TD>{@link org.geotools.referencing.factory.epsg.AccessDataSource}</TD>
+      <TD>{@code epsg-access}</TD>
+      <TD>See <A HREF="doc-files/Access.html">installation instructions</A></TD>
+    </TR>
+    <TR>
+      <TD>HSQL embedded database</TD>
+      <TD>{@link org.geotools.referencing.factory.epsg.HSQLDataSource}</TD>
+      <TD>{@code epsg-hsql}</TD>
+      <TD><A HREF="doc-files/HSQL.html">Note for module mainteners</A></TD>
+    </TR>
+    <TR>
+      <TD>PostgreSQL database</TD>
+      <TD>{@link org.geotools.referencing.factory.epsg.PostgreDataSource}</TD>
+      <TD>{@code epsg-postgresql}</TD>
+      <TD><A HREF="doc-files/PostgreSQL.html">Note for module mainteners</A></TD>
+    </TR>
+  </TABLE>
+
+  <P>&nbsp;</P>
+  <H2>How to create a custom data source</H2>
+  <P ALIGN="justify">For getting the EPSG factory to uses a custom connection, create some subclass
+  that implements Geotools's {@link org.geotools.referencing.factory.epsg.DataSource} interface. For
+  example:</P>
+  <BLOCKQUOTE><TABLE border="2" width="100%"><TR><TD><PRE><B>import</B> org.postgresql.ds.PGSimpleDataSource;
+<B>import</B> org.geotools.factory.Hints;
+<B>import</B> org.geotools.referencing.factory.AbstractAuthorityFactory;
+<B>import</B> org.geotools.referencing.factory.epsg.DataSource;
+
+<B>public</B> MyDataSource <B>extends</B> PGSimpleDataSource <B>implements</B> {@linkplain org.geotools.referencing.factory.epsg.DataSource} {
+    <B>public</B> MyDataSource() {
+        setServerName("myserver.com");
+        setDatabaseName("mydatabase");
+    }
+
+    <B>public</B> <B>int</B> getPriority() {
+        <B>return</B> MAXIMUM_PRIORITY - 200;
+
+    <B>public</B> AbstractAuthorityFactory createFactory(Hints hints) <B>throws</B> SQLException {
+        <B>return</B> <B>new</B> FactoryUsingAnsiSQL(hints, getConnection());
+    }
+}</PRE></TD></TR></TABLE></BLOCKQUOTE>
+  <P ALIGN="justify">Then, declare this custom implementation in the following file
+  (for uses by {@link org.geotools.factory.FactoryRegistry}):</P>
+
+  <BLOCKQUOTE><PRE>META-INF/services/org.geotools.referencing.factory.epsg.DataSource</PRE></BLOCKQUOTE>
+
+  <P ALIGN="justify">Just providing a JAR file with the above-cited {@link org.geotools.referencing.factory.epsg.DataSource}
+  implementation and {@code META-INF/services/} registration is suffisient for an application to connects automatically to
+  the specified server (providing that the relevant JDBC driver is present, of course).</P></LI>
+
+
+  <h3>Registration with JNDI (usually J2EE)</h3>
+  <P ALIGN="justify">Installation on Unix systems typically has a database software running on some
+  server rather than the local machine. The administrator will probably have to download the SQL
+  scripts from <A HREF="http://www.epsg.org">http://www.epsg.org</A> and executes it in whatever database
+  software they use (PostgreSQL, MySQL, Oracle, <cite>etc.</cite>). The connection parameters (server URL,
+  user name, <cite>etc.</cite>) can be specified as a {@link org.geotools.referencing.factory.epsg.DataSource}
+  registered with a naming service based on Java Naming and Directory (JNDI) interfaces. Like databases, the
+  naming service is typically located on some server. The data source name for the connection to the EPSG database
+  is <code>{@value org.geotools.referencing.factory.epsg.DefaultFactory#DATASOURCE_NAME}</code>.</P>
+
+  <UL>
+    <LI><P ALIGN="justify">For setting up a naming service (LDAP, NIS, <cite>etc.</cite>), see the
+        <A HREF="http://java.sun.com/products/jndi/tutorial/trailmap.html">JNDI tutorial</A>.</P></LI>
+        
+    <LI><P ALIGN="justify">For an example of {@link javax.sql.DataSource} creation with different connection parameters
+        than the default ones, see <A HREF="http://java.sun.com/j2se/1.5/docs/guide/jdbc/bridge.html">New data source
+        implementations in the JDBC-ODBC bridge</A>.</P></LI>
+
+    <LI><P ALIGN="justify">For {@link javax.sql.DataSource} implementations targeting other database softwares, see
+        their JDBC documentation. For example the <A HREF="http://jdbc.postgresql.org">PostgreSQL JDBC</A> provides
+        an {@code org.postgresql.ds.PGSimpleDataSource} basic implementation.</P></LI>
+  </UL>
+  </BODY>
+</HTML>

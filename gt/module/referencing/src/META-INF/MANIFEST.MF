@@ -1,0 +1,27 @@
+Class-Path: units.jar geoapi.jar
+Implementation-Version: 2.2
+Implementation-Vendor: Geotools OpenSource project
+
+Name: org/geotools/parameter/
+Specification-Title: GeoAPI for ISO 19111
+Specification-Version: 1.0.0
+Specification-Vendor: OpenGIS Consortium, Inc.
+Implementation-Title: Referencing by coordinates Services
+Implementation-Version: 2.2
+Implementation-Vendor: Geotools OpenSource project
+
+Name: org/geotools/referencing/
+Specification-Title: GeoAPI for ISO 19111
+Specification-Version: 1.0.0
+Specification-Vendor: OpenGIS Consortium, Inc.
+Implementation-Title: Referencing by coordinates Services
+Implementation-Version: 2.2
+Implementation-Vendor: Geotools OpenSource project
+
+Name: org/geotools/geometry/
+Specification-Title: GeoAPI for ISO 19107
+Specification-Version: 1.0.0
+Specification-Vendor: OpenGIS Consortium, Inc.
+Implementation-Title: Spatial schema
+Implementation-Version: 2.2
+Implementation-Vendor: Geotools OpenSource project
