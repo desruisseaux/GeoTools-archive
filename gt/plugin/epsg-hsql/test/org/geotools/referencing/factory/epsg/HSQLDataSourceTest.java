@@ -24,7 +24,6 @@ import java.sql.SQLException;
 
 // JUnit dependencies
 import junit.framework.Test;
-import junit.framework.TestSuite;
 
 // Geotools dependencies
 import org.geotools.util.MonolineFormatter;
@@ -59,7 +58,7 @@ public class HSQLDataSourceTest extends DefaultDataSourceTest {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(HSQLDataSourceTest.class);
+        return new Suite(HSQLDataSourceTest.class);
     }
 
     /**

@@ -49,12 +49,12 @@ import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.resources.image.CoverageUtilities;
 
 
 /**
@@ -226,11 +226,11 @@ public class Resample extends Operation2D {
         if (gridGeom != null) {
             boolean mismatche = false;
             final GridGeometry2D actualGeom = (GridGeometry2D) coverage.getGridGeometry();
-            if (GCSUtilities.hasGridRange(gridGeom)) {
+            if (CoverageUtilities.hasGridRange(gridGeom)) {
                 mismatche |= !gridGeom.getGridRange().equals(
                             actualGeom.getGridRange());
             }
-            if (GCSUtilities.hasTransform(gridGeom)) {
+            if (CoverageUtilities.hasTransform(gridGeom)) {
                 mismatche |= !gridGeom.getGridToCoordinateSystem().equals(
                             actualGeom.getGridToCoordinateSystem());
             }

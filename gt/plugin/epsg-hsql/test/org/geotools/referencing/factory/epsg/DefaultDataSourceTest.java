@@ -38,9 +38,11 @@ import javax.units.Unit;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import junit.framework.TestResult;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
+import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
@@ -66,6 +68,7 @@ import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.factory.epsg.DefaultFactory;
+import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.util.MonolineFormatter;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Arguments;
@@ -89,9 +92,12 @@ public class DefaultDataSourceTest extends TestCase {
     private static final double EPS = 1E-6;
 
     /**
-     * The EPSG factory to test.
+     * The EPSG factory to test. Will be setup only when first needed.
+     * This is a static field because we ant to setup only once, keep
+     * the cached CRS (for faster test execution) and avoid closing it
+     * before all tests are run (which lead to trouble).
      */
-    DefaultFactory factory;
+    static DefaultFactory factory;
 
     /**
      * {@code true} if {@link #setUp} has been invoked at least once and failed to make a
@@ -117,7 +123,24 @@ public class DefaultDataSourceTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(DefaultDataSourceTest.class);
+        return new Suite(DefaultDataSourceTest.class);
+    }
+
+    /**
+     * A custom suite for EPSG data source test, which closes the connection only after all
+     * tests have been run.
+     */
+    protected static class Suite extends TestSuite {
+        /** Creates a suite from the specified TestCase class. */
+        public Suite(final Class type) {
+            super(type);
+        }
+
+        /** Run the suite and dispose only when fully finished. */
+        public void run(final TestResult result) {
+            super.run(result);
+            dispose();
+        }
     }
 
     /**
@@ -133,9 +156,17 @@ public class DefaultDataSourceTest extends TestCase {
      * not throws an exception for peoples who don't have an EPSG database on their machine.
      */
     protected void setUp() throws SQLException {
+        if (factory != null) {
+            /*
+             * The factory is already up and running.
+             */
+            return;
+        }
         if (noConnection) {
-            // This method was already invoked before and failed.
-            // Do not try again.
+            /*
+             * This method was already invoked before and failed.
+             * Do not try again.
+             */
             return;
         }
         boolean isReady = false;
@@ -176,11 +207,16 @@ public class DefaultDataSourceTest extends TestCase {
     }
 
     /**
-     * Release any resources holds by the EPSG factory.
+     * Releases any resources holds by the EPSG factory.
      * Note: the shutdown is performed in a separated thread because the thread
      * name is used by HSQL as a flag meaning to stop the database process.
+     *
+     * Note 2: We don't overrides {@link #tearDown} because we don't want to close the
+     *         connection after every method tested. Some classes like AuthorityBackedFactory
+     *         keep a connexion to the factory, which lead to a lot of trouble if we close it
+     *         here.
      */
-    protected void tearDown() throws InterruptedException {
+    private static void dispose() {
         if (factory != null) {
             final DefaultFactory f = factory;
             final Thread shutdown = new Thread(FactoryUsingSQL.SHUTDOWN_THREAD) {
@@ -194,7 +230,11 @@ public class DefaultDataSourceTest extends TestCase {
             };
             shutdown.start();
             factory = null;
-            shutdown.join();
+            try {
+                shutdown.join();
+            } catch (InterruptedException ignore) {
+                // Exit anyway.
+            }
         }
     }
 
@@ -569,6 +609,7 @@ public class DefaultDataSourceTest extends TestCase {
         assertTrue   (operation1 instanceof Transformation);
         assertNotSame(sourceCRS, targetCRS);
         assertFalse  (operation1.getMathTransform().isIdentity());
+        assertEquals (999, AbstractCoordinateOperation.getAccuracy(operation1), 1E-6);
         /*
          * ED50 (4230)  -->  WGS 84 (4326)  using
          * Position Vector 7-param. transformation (9606).
@@ -581,6 +622,7 @@ public class DefaultDataSourceTest extends TestCase {
         assertSame (targetCRS, operation2.getTargetCRS());
         assertFalse(operation2.getMathTransform().isIdentity());
         assertFalse(transform.equals(operation2.getMathTransform()));
+        assertEquals(1.5, AbstractCoordinateOperation.getAccuracy(operation2), 1E-6);
         /*
          * ED50 (4230)  -->  WGS 84 (4326)  using
          * Coordinate Frame rotation (9607).
@@ -593,12 +635,20 @@ public class DefaultDataSourceTest extends TestCase {
         assertSame (targetCRS, operation3.getTargetCRS());
         assertFalse(operation3.getMathTransform().isIdentity());
         assertFalse(transform.equals(operation3.getMathTransform()));
+        assertEquals(1.0, AbstractCoordinateOperation.getAccuracy(operation3), 1E-6);
         if (false) {
             System.out.println(operation3);
             System.out.println(operation3.getSourceCRS());
             System.out.println(operation3.getTargetCRS());
             System.out.println(operation3.getMathTransform());
         }
+        /*
+         * Tests "BD72 to WGS 84 (1)" (EPSG:1609) creation. This one has an unusual unit for the
+         * "Scale difference" parameter (EPSG:8611). The value is 0.999999 and the unit is "unity"
+         * (EPSG:9201) instead of the usual "parts per million" (EPSG:9202). It was used to thrown
+         * an exception in older EPSG factory implementations.
+         */
+        assertEquals(1.0, AbstractCoordinateOperation.getAccuracy(factory.createCoordinateOperation("1609")), 1E-6);
         /*
          * Creates from CRS codes. There is 40 such operations in EPSG version 6.7.
          * The preferred one (according the "supersession" table) is EPSG:1612.
@@ -620,6 +670,52 @@ public class DefaultDataSourceTest extends TestCase {
             final CoordinateOperation check = (CoordinateOperation) it.next();
             assertSame(sourceCRS, check.getSourceCRS());
             assertSame(targetCRS, check.getTargetCRS());
+        }
+    }
+
+    /**
+     * Fetchs the accuracy declared in all coordinate operations found in the database.
+     */
+    public void testAccuracy() throws FactoryException {
+        if (factory == null) return;
+        final Set identifiers = factory.getAuthorityCodes(CoordinateOperation.class);
+        double min   = Double.POSITIVE_INFINITY;
+        double max   = Double.NEGATIVE_INFINITY;
+        double sum   = 0;
+        int    count = 0; // Number of coordinate operations recognized by the factory.
+        int    valid = 0; // Number of non-NaN accuracies.
+        for (final Iterator it=identifiers.iterator(); it.hasNext();) {
+            final CoordinateOperation operation;
+            final String code = (String) it.next();
+            final int n = Integer.parseInt(code);
+            if (n>=10087 && n<=10088) {
+                // Valid, but log a warning. Will avoid just in order to keep the output clean.
+                continue;
+            }
+            try {
+                operation = factory.createCoordinateOperation(code);
+            } catch (FactoryException exception) {
+                // Skip unsupported coordinate operations.
+                continue;
+            }
+            count++;
+            assertNotNull(operation);
+            final double accuracy = AbstractCoordinateOperation.getAccuracy(operation);
+            assertFalse(accuracy < 0);
+            if (!Double.isNaN(accuracy)) {
+                if (accuracy < min) min=accuracy;
+                if (accuracy > max) max=accuracy;
+                sum += accuracy;
+                valid++;
+            }
+        }
+        if (false) {
+            System.out.print("Number of coordinate operations:    "); System.out.println(identifiers.size());
+            System.out.print("Number of recognized operations:    "); System.out.println(count);
+            System.out.print("Number of operations with accuracy: "); System.out.println(valid);
+            System.out.print("Minimal accuracy value (meters):    "); System.out.println(min);
+            System.out.print("Maximal accuracy value (meters):    "); System.out.println(max);
+            System.out.print("Average accuracy value (meters):    "); System.out.println(sum / valid);
         }
     }
 }

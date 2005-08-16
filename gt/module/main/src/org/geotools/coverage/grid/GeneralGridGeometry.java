@@ -39,7 +39,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
@@ -51,10 +51,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Describes the valid range of grid coordinates and the math
  * transform to transform grid coordinates to real world coordinates.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class GeneralGridGeometry implements GridGeometry, Serializable {
     /**
@@ -143,7 +142,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
          * According OpenGIS specification, transforms must map pixel center.
          * This is done by adding 0.5 to grid coordinates.
          */
-        final GeneralMatrix matrix = new GeneralMatrix(dimension+1);
+        final Matrix matrix = MatrixFactory.create(dimension+1);
         for (int i=0; i<dimension; i++) {
             double scale = userRange.getLength(i) / gridRange.getLength(i);
             double trans;

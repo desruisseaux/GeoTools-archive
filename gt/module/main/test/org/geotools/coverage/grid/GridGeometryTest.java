@@ -36,7 +36,7 @@ import org.opengis.spatialschema.geometry.Envelope;
 // Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.matrix.MatrixFactory;
 
 
 /**
@@ -74,7 +74,7 @@ public class GridGeometryTest extends TestCase {
         final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(null);
         final int[] lower = new int[] {0,     0, 2};
         final int[] upper = new int[] {100, 200, 4};
-        final MathTransform identity = factory.createAffineTransform(new GeneralMatrix(4));
+        final MathTransform identity = factory.createAffineTransform(MatrixFactory.create(4));
         GridGeometry2D gg;
         try {
             gg = new GridGeometry2D(new GeneralGridRange(lower,upper), identity);

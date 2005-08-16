@@ -1,1 +1,1 @@
-RegistrationClassName: org.geotools.openoffice.Referencing
+RegistrationClassName: org.geotools.openoffice.Registration

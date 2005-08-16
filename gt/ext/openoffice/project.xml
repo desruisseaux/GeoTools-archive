@@ -44,7 +44,7 @@
       </properties>
     </dependency>
     <dependency>
-      <artifactId>main</artifactId>
+      <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
       <version>2.2.x</version>
       <properties>

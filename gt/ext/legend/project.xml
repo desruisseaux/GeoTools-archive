@@ -52,6 +52,11 @@
       <url>http://www.geotools.org</url>
     </dependency>
     <dependency>
+      <artifactId>referencing</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
       <id>widgets-swing</id>
       <groupId>gt2</groupId>
       <version>2.2.x</version>

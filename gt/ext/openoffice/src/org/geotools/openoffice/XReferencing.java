@@ -24,7 +24,9 @@ import com.sun.star.beans.XPropertySet;
 
 
 /**
- * The services to be exported to <A HREF="http://www.openoffice.org">OpenOffice</A>.
+ * Services from the {@link org.geotools.referencing} package to be exported to
+ * <A HREF="http://www.openoffice.org">OpenOffice</A>.
+ *
  * This interface is derived from the {@code XReferencing.idl} file using the {@code javamaker}
  * tool provided in OpenOffice SDK, and disassembling the output using the {@code javap} tool
  * provided in Java SDK. This source file exists mostly for javadoc purpose and in order to keep
@@ -41,8 +43,9 @@ public interface XReferencing extends XInterface {
      *
      * @param xOptions Provided by OpenOffice.
      * @param text The text to be converted to an angle.
+     * @param pattern The text that describes the format (example: "D°MM.m'").
      */
-    double getValueAngle(XPropertySet xOptions, String text);
+    double getValueAngle(XPropertySet xOptions, String text, String pattern);
 
     /**
      * Converts an angle to text according to a given format.
@@ -88,6 +91,25 @@ public interface XReferencing extends XInterface {
     String getScope(XPropertySet xOptions, String authorityCode);
 
     /**
+     * Returns the valid area as a textual description for an identified object.
+     *
+     * @param xOptions Provided by OpenOffice.
+     * @param authorityCode The code allocated by the authority.
+     */
+    String getValidArea(XPropertySet xOptions, String authorityCode);
+
+    /**
+     * Returns the valid area as a geographic bounding box for an identified object. This method
+     * returns a 2&times;2 matrix. The first row contains the latitude and longitude of upper left
+     * corder, and the second row contains the latitude and longitude or bottom right corner. Units
+     * are degrees.
+     *
+     * @param xOptions Provided by OpenOffice.
+     * @param authorityCode The code allocated by the authority.
+     */
+    double[][] getBoundingBox(XPropertySet xOptions, String authorityCode);
+
+    /**
      * Returns the remarks for an identified object.
      *
      * @param xOptions Provided by OpenOffice.
@@ -105,6 +127,15 @@ public interface XReferencing extends XInterface {
     String getAxis(XPropertySet xOptions, String authorityCode, int dimension);
 
     /**
+     * Returns the value for a coordinate reference system parameter.
+     *
+     * @param xOptions Provided by OpenOffice.
+     * @param authorityCode The code allocated by the authority.
+     * @param parameter The parameter name (e.g. "False easting").
+     */
+    Object getParameter(XPropertySet xOptions, String authorityCode, String parameter);
+
+    /**
      * Returns the Well Know Text (WKT) for an identified object.
      *
      * @param xOptions Provided by OpenOffice.
@@ -113,13 +144,14 @@ public interface XReferencing extends XInterface {
     String getWKT(XPropertySet xOptions, String authorityCode);
 
     /**
-     * Returns the value for a coordinate reference system parameter.
+     * Returns the Well Know Text (WKT) of a transformation between two coordinate reference
+     * systems.
      *
      * @param xOptions Provided by OpenOffice.
-     * @param authorityCode The code allocated by the authority.
-     * @param parameter The parameter name (e.g. "False easting").
+     * @param sourceCRS The authority code for the source coordinate reference system.
+     * @param sourceCRS The authority code for the target coordinate reference system.
      */
-    Object getParameter(XPropertySet xOptions, String authorityCode, String parameter);
+    String getTransformWKT(XPropertySet xOptions, String sourceCRS, String targetCRS);
 
     /**
      * Returns the accuracy of a transformation between two coordinate reference systems.

@@ -93,7 +93,7 @@ import org.geotools.resources.SwingUtilities;
  *
  * @see GradientKernelEditor
  * @see ConvolveDescriptor
- * @see org.geotools.coverage.processor.operation.GradientMagnitude
+ * @see org.geotools.coverage.processing.operation.GradientMagnitude
  */
 public class KernelEditor extends JComponent {
     /**

@@ -70,7 +70,7 @@ import org.geotools.axis.LogarithmicNumberGraduation;
 // Geotools dependencies
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.GCSUtilities;
+import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
@@ -403,7 +403,7 @@ public class ColorRamp extends JComponent {
     public boolean setColors(final Coverage coverage) {
         SampleDimension band = null;
         if (coverage != null) {
-            band = coverage.getSampleDimension(GCSUtilities.getVisibleBand(band));
+            band = coverage.getSampleDimension(CoverageUtilities.getVisibleBand(band));
         }
         return setColors(band);
     }

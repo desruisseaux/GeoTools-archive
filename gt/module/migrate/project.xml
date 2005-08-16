@@ -23,13 +23,18 @@
     </developer>
   </developers>
   <dependencies>
-     <dependency>
+    <dependency>
       <id>main</id>
       <groupId>gt2</groupId>
       <version>2.2.x</version>
     </dependency>
     <dependency>
-      <id>legacy</id>
+      <artifactId>referencing</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
+      <artifactId>legacy</artifactId>
       <groupId>gt2</groupId>
       <version>2.2.x</version>
     </dependency>

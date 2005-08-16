@@ -65,10 +65,10 @@ import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.util.AbstractInternationalString;
 import org.geotools.util.NumberRange;
 
@@ -598,7 +598,7 @@ public class OperationJAI extends Operation2D {
                 if (layout == null) {
                     layout = new ImageLayout();
                 }
-                int visibleBand = GCSUtilities.getVisibleBand(primarySource.getRenderedImage());
+                int visibleBand = CoverageUtilities.getVisibleBand(primarySource.getRenderedImage());
                 if (visibleBand >= sampleDims.length) {
                     visibleBand = 0;
                 }

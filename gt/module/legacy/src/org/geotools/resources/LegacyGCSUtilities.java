@@ -39,7 +39,7 @@ import org.geotools.pt.Envelope;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link GCSUtilities}.
+ * @deprecated Replaced by {@link org.geotools.resources.image.CoverageUtilities}.
  */
 public final class LegacyGCSUtilities {
     /**

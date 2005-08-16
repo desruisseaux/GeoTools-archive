@@ -50,7 +50,7 @@ public class AllTests extends TestCase {
      */
     public static Test suite() {
         final TestSuite suite = new TestSuite("org.geotools.coverage");
-        suite.addTest(org.geotools.referencing.  AllTests            .suite());
+//      suite.addTest(org.geotools.referencing.  AllTests            .suite());
         suite.addTest(org.geotools.coverage.     CategoryTest        .suite());
         suite.addTest(org.geotools.coverage.     CategoryListTest    .suite());
         suite.addTest(org.geotools.coverage.     SampleDimensionTest .suite());

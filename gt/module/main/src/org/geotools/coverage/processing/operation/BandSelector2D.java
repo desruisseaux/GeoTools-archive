@@ -38,7 +38,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.OperationJAI;
-import org.geotools.resources.GCSUtilities;
+import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.resources.image.ColorUtilities;
 
 
@@ -141,7 +141,7 @@ final class BandSelector2D extends GridCoverage2D {
                 }
             }
             image             = source.getRenderedImage();
-            visibleSourceBand = GCSUtilities.getVisibleBand(image);
+            visibleSourceBand = CoverageUtilities.getVisibleBand(image);
             visibleTargetBand = (visibleBand!=null) ? visibleBand.intValue() :
                                 (bandIndices!=null) ? bandIndices[visibleSourceBand] :
                                                                   visibleSourceBand;

@@ -30,7 +30,7 @@
 
     <!-- Add the dependencies to various modules -->
     <ant:zip destfile="${basedir}/target/geotools.uno.pkg" update="true">
-      <ant:fileset dir="${basedir}/../../module/main/target">
+      <ant:fileset dir="${basedir}/../../module/referencing/target">
         <ant:include name="*.jar"/>
       </ant:fileset>
     </ant:zip>

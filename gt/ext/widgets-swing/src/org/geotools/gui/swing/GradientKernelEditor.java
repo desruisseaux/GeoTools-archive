@@ -56,7 +56,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  *
  * @see KernelEditor
  * @see GradientMagnitudeDescriptor
- * @see org.geotools.coverage.processor.operation.GradientMagnitude
+ * @see org.geotools.coverage.processing.operation.GradientMagnitude
  */
 public class GradientKernelEditor extends JComponent {
     /**

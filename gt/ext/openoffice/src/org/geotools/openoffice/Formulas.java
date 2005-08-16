@@ -23,15 +23,21 @@ package org.geotools.openoffice;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TimeZone;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
 // OpenOffice dependencies
 import com.sun.star.sheet.XAddIn;
+import com.sun.star.util.Date;
 import com.sun.star.lang.Locale;
 import com.sun.star.lang.XServiceInfo;
 import com.sun.star.lang.XServiceName;
+import com.sun.star.beans.XPropertySet;
+import com.sun.star.uno.AnyConverter;
 import com.sun.star.lib.uno.helper.WeakBase;
 
 // Geotools dependencies
@@ -48,6 +54,11 @@ import org.geotools.resources.Utilities;
  */
 public abstract class Formulas extends WeakBase implements XAddIn, XServiceName, XServiceInfo {
     /**
+     * The logger to use for all message to log in this package.
+     */
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.openoffice");
+
+    /**
      * Informations about exported methods.
      */
     final Map/*<String,MethodInfo>*/ methods = new HashMap/*<String,MethodInfo>*/();
@@ -62,6 +73,11 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
      * Will be fetched only when first needed.
      */
     private transient java.util.Locale javaLocale;
+
+    /**
+     * The calendar to uses for date conversions. Will be created only when first needed.
+     */
+    private transient Calendar calendar;
 
     /**
      * Default constructor. Subclass constructors need to add entries in the {@link #methods} map.
@@ -238,6 +254,53 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
     }
 
     /**
+     * Sets the timezone for time values to be provided to {@link #toDate}.
+     */
+    protected void setTimeZone(final String timezone) {
+        final TimeZone tz = TimeZone.getTimeZone(timezone);
+        if (calendar == null) {
+            calendar = new GregorianCalendar(tz);
+        } else {
+            calendar.setTimeZone(tz);
+        }
+    }
+
+    /**
+     * Converts a date from a spreadsheet values to a Java {@link java.util.Date} object.
+     *
+     * @param  xOptions Provided by OpenOffice.
+     * @param  time The spreadsheet numerical value for a date, by default in the local timezone.
+     * @return The date (in GMT) as a Java object.
+     */
+    protected java.util.Date toDate(final XPropertySet xOptions, final double time) {
+        final Date date;
+        try {
+            date = (Date) AnyConverter.toObject(Date.class, xOptions.getPropertyValue("NullDate"));
+        } catch (Exception e) {
+            // Les exception lancées par la ligne ci-dessus sont nombreuses...
+            reportException("toDate", e);
+            return null;
+        }
+        if (calendar == null) {
+            calendar = new GregorianCalendar();
+        }
+        calendar.clear();
+        calendar.set(date.Year, date.Month-1, date.Day);
+        final java.util.Date epoch = calendar.getTime();
+        epoch.setTime(epoch.getTime() + Math.round(time * (24*60*60*1000L)));
+        return epoch;
+    }
+
+    /**
+     * The string to returns when a formula don't have any value to return.
+     *
+     * @todo localize.
+     */
+    static String emptyString() {
+        return "(none)";
+    }
+
+    /**
      * Returns the minimal length of the specified arrays. In the special case where one array
      * has a length of 1, we assume that this single element will be repeated for all elements
      * in the other array.
@@ -274,6 +337,6 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
         record.setSourceClassName (Utilities.getShortClassName(this));
         record.setSourceMethodName(method);
         record.setThrown          (exception);
-        Logger.getLogger("org.geotools.openoffice").log(record);
+        LOGGER.log(record);
     }
 }

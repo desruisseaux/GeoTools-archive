@@ -122,38 +122,12 @@
     </developer>    
   </developers>
 
-  <contributors>
-    <contributor>
-      <name>Rémi Eve</name>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-    </contributor>
-    <contributor>
-      <name>Yann Cézard</name>
-      <organization>Université de Montpellier II</organization>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-    </contributor>
-    <contributor>
-      <name>Daniele Franzoni</name>
-      <organization>SATA srl, Italy</organization>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-    </contributor>
-    <contributor>
-      <name>Touraïvane</name>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-    </contributor>
-  </contributors>
-
   <dependencies>
+    <dependency>
+      <artifactId>referencing</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>
     <dependency>
       <id>commons-jxpath</id>
       <version>1.2</version>

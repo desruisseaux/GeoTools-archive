@@ -29,6 +29,11 @@ http://www.software.ibm.com/data/spatial.
       <version>2.2.x</version>
     </dependency>
     <dependency>
+      <artifactId>referencing</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
       <artifactId>units</artifactId>
       <groupId>units</groupId>
       <version>0.01</version>

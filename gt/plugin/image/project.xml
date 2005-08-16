@@ -33,9 +33,9 @@
    <version>2.2.x</version>
   </dependency>
   <dependency>
-   <artifactId>jai_imageio</artifactId>
-   <groupId>jai</groupId>
-   <version>1.0</version>
+    <artifactId>referencing</artifactId>
+    <groupId>gt2</groupId>
+    <version>2.2.x</version>
   </dependency>
   <dependency>
    <groupId>JTS</groupId>

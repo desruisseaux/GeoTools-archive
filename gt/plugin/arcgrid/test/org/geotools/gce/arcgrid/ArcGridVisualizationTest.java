@@ -24,7 +24,6 @@ import org.geotools.gce.image.WorldImageWriter;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.TestData;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.GridCoverage;

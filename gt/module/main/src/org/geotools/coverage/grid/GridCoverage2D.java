@@ -102,13 +102,13 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.factory.FactoryGroup;
-import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.util.NumberRange;
 import org.geotools.util.WeakHashSet;
 
@@ -358,11 +358,11 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
          */
         final CoordinateSystem cs = crs.getCoordinateSystem();
         final GridRange gridRange;
-        if (GCSUtilities.hasGridRange(gridGeometry)) {
+        if (CoverageUtilities.hasGridRange(gridGeometry)) {
             gridRange = gridGeometry.getGridRange();
         } else {
             gridRange = new GeneralGridRange(image, cs.getDimension());
-            if (GCSUtilities.hasTransform(gridGeometry)) {
+            if (CoverageUtilities.hasTransform(gridGeometry)) {
                 gridGeometry = new GridGeometry2D(gridRange, gridGeometry.getGridToCoordinateSystem());
             }
         }
@@ -948,7 +948,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         if (inverse != null) {
             return inverse;
         }
-        if (!GCSUtilities.hasTransform(sampleDimensions)) {
+        if (!CoverageUtilities.hasTransform(sampleDimensions)) {
             return inverse=this;
         }
         synchronized (this) {
@@ -1010,7 +1010,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             image = op.getSourceImage(0);
         }
         final int                      numBands = image.getNumBands();
-        final int                   visibleBand = GCSUtilities.getVisibleBand(image);
+        final int                   visibleBand = CoverageUtilities.getVisibleBand(image);
         final GridSampleDimension[] targetBands = (GridSampleDimension[]) sampleDimensions.clone();
         assert targetBands.length == numBands : targetBands.length;
         for (int i=0; i<targetBands.length; i++) {

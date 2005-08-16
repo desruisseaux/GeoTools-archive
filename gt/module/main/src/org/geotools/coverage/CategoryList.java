@@ -52,7 +52,7 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.matrix.Matrix1;
 import org.geotools.referencing.wkt.UnformattableObjectException;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -936,9 +936,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      */
     public final Matrix derivative(final DirectPosition point) throws TransformException {
         checkDimension(point);
-        return new GeneralMatrix(1, 1, new double[] {
-            derivative(point.getOrdinate(0))
-        });
+        return new Matrix1(derivative(point.getOrdinate(0)));
     }
     
     /**

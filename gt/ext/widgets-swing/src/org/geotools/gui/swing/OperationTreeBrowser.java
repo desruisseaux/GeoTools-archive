@@ -85,10 +85,10 @@ import org.geotools.resources.i18n.Errors;
  * {@linkplain OperationNode#getParameterBlock image parameters} are like files.
  *
  * When a tree node is selected in the left pane, the content of the right pane is adjusted
- * accordingly. If the node is an image, a "preview" tab is show together with an
- * "information" tab. Informations include the {@linkplain ColorModel color model},
- * {@linkplain SampleModel sample model}, data type, etc. If the selected tree node is a
- * parameter, then the right pane show the parameter value in {@linkplain ParameterEditor
+ * accordingly. If the node is an image, a "preview" tab is show together with an "information"
+ * tab. Informations include the {@linkplain java.awt.image.ColorModel color model},
+ * {@linkplain java.awt.image.SampleModel sample model}, data type, etc. If the selected tree node
+ * is a parameter, then the right pane show the parameter value in {@linkplain ParameterEditor
  * some widget} appropriate for the parameter type.
  *
  * <p>&nbsp;</p>

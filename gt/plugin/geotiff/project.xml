@@ -57,9 +57,9 @@
       <version>2.2.x</version>
     </dependency>
     <dependency>
-      <artifactId>geoapi</artifactId>
-      <groupId>geoapi</groupId>
-      <version>2.0</version>
+      <artifactId>referencing</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
     </dependency>
     <dependency>
       <id>opengis+legacy</id>

@@ -20,6 +20,7 @@
 package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies
+import java.util.Iterator;
 import java.util.logging.Level;
 
 // JUnit dependencies
@@ -33,10 +34,14 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.ConcatenatedOperation;
 
 // Geotools dependencies
+import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.referencing.operation.AuthorityBackedFactory;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.util.MonolineFormatter;
@@ -94,9 +99,9 @@ public class OperationFactoryTest extends TestCase {
     public void testCreate() throws FactoryException {
         final CRSAuthorityFactory       crsFactory;
         final CoordinateOperationFactory opFactory;
-        final CoordinateReferenceSystem  sourceCRS;
-        final CoordinateReferenceSystem  targetCRS;
-        final CoordinateOperation        operation;
+              CoordinateReferenceSystem  sourceCRS;
+              CoordinateReferenceSystem  targetCRS;
+              CoordinateOperation        operation;
 
         crsFactory = FactoryFinder.getCRSAuthorityFactory("EPSG", null);
         opFactory  = FactoryFinder.getCoordinateOperationFactory(null);
@@ -108,5 +113,28 @@ public class OperationFactoryTest extends TestCase {
         assertSame(targetCRS, operation.getTargetCRS());
         assertTrue("EPSG authority factory not found.", opFactory instanceof AuthorityBackedFactory);
         assertEquals("1612", getIdentifier(operation)); // See comment in DefaultDataSourceTest.
+        assertEquals(1.0, AbstractCoordinateOperation.getAccuracy(operation), 1E-6);
+        assertTrue(operation instanceof Transformation);
+        /*
+         * Tests a transformation not backed by an authority factory.
+         */
+        sourceCRS  = crsFactory.createCoordinateReferenceSystem("4326");
+        targetCRS  = crsFactory.createCoordinateReferenceSystem("2995");
+        operation  = opFactory.createOperation(sourceCRS, targetCRS);
+        assertTrue("This test needs an operation not backed by the EPSG factory.",
+                   operation.getIdentifiers().isEmpty());
+        // Should contains exactly one transformations and an arbitrary number of conversions.
+        assertTrue(operation instanceof ConcatenatedOperation);
+        int count = 0;
+        for (final Iterator it=((ConcatenatedOperation) operation).getOperations().iterator(); it.hasNext();) {
+            final CoordinateOperation op = (CoordinateOperation) it.next();
+            if (op instanceof Transformation) {
+                count++;
+            } else {
+                assertTrue(op instanceof Conversion);
+            }
+        }
+        assertEquals("The coordinate operation should contains exactly 1 transformation", 1, count);
+        assertEquals(25, AbstractCoordinateOperation.getAccuracy(operation), 1E-6);
     }
 }

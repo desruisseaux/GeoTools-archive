@@ -19,11 +19,11 @@
 package org.geotools.openoffice;
 
 // J2SE dependencies
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Collection;
 import java.text.Format;
 import java.text.ParseException;
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 // OpenOffice dependencies
 import com.sun.star.lang.Locale;
@@ -48,17 +48,17 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeneralDerivedCRS;
 import org.opengis.referencing.operation.Operation;
-import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.metadata.quality.PositionalAccuracy;
-import org.opengis.metadata.quality.QuantitativeResult;
-import org.opengis.metadata.quality.Result;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.Identifier;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.measure.Angle;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
@@ -67,8 +67,11 @@ import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.resources.CRSUtilities;
+import org.geotools.metadata.iso.extent.ExtentImpl;
+import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -79,8 +82,8 @@ import org.geotools.resources.i18n.Errors;
  *
  * @since 2.2
  * @version $Id$
- * @author Richard Deplanque
  * @author Martin Desruisseaux
+ * @author Richard Deplanque
  */
 public final class Referencing extends Formulas implements XReferencing {
     /**
@@ -106,14 +109,10 @@ public final class Referencing extends Formulas implements XReferencing {
     private transient String anglePattern;
 
     /**
-     * The format to use for formatting angles. Will be created only when first needed.
+     * The format to use for parsing and formatting angles.
+     * Will be created only when first needed.
      */
     private transient Format angleFormat;
-
-    /**
-     * The format to use for parsing angles. Will be created only when first needed.
-     */
-    private transient Format angleParser;
 
     /**
      * The CRS authority factory. Will be created only when first needed.
@@ -124,6 +123,16 @@ public final class Referencing extends Formulas implements XReferencing {
      * The coordinate operation factory. Will be created only when first needed.
      */
     private transient CoordinateOperationFactory opFactory;
+
+    /**
+     * The last coordinate operation used. Cached for performance reasons.
+     */
+    private transient CoordinateOperation lastOperation;
+
+    /**
+     * The last source and target CRS used for fetching {@link #lastOperation}.
+     */
+    private transient String lastSourceCRS, lastTargetCRS;
 
     /**
      * The last geodetic calculator used, or {@code null} if none. Cached for better
@@ -145,7 +154,8 @@ public final class Referencing extends Formulas implements XReferencing {
             "Converts text in degrees-minutes-seconds to an angle in decimal degrees.",
             new String[] {
                 "xOptions",   "Provided by OpenOffice.",
-                "text",       "The text to be converted to an angle."
+                "text",       "The text to be converted to an angle.",
+                "pattern",    "The text that describes the format (example: \"D°MM.m'\")."
         }));
         methods.put("getTextAngle", new MethodInfo("Text", "TEXT.ANGLE",
             "Converts an angle to text according to a given format.",
@@ -180,6 +190,18 @@ public final class Referencing extends Formulas implements XReferencing {
                 "xOptions",   "Provided by OpenOffice.",
                 "code",       "The code allocated by authority."
         }));
+        methods.put("getValidArea", new MethodInfo("Referencing", "CRS.VALID.AREA",
+            "Returns the valid area as a textual description for an identified object.",
+            new String[] {
+                "xOptions",   "Provided by OpenOffice.",
+                "code",       "The code allocated by authority."
+        }));
+        methods.put("getBoundingBox", new MethodInfo("Referencing", "CRS.BOUNDING.BOX",
+            "Returns the valid area as a geographic bounding box for an identified object.",
+            new String[] {
+                "xOptions",   "Provided by OpenOffice.",
+                "code",       "The code allocated by authority."
+        }));
         methods.put("getRemarks", new MethodInfo("Referencing", "CRS.REMARKS",
             "Returns the remarks for an identified object.",
             new String[] {
@@ -193,12 +215,6 @@ public final class Referencing extends Formulas implements XReferencing {
                 "code",       "The code allocated by authority.",
                 "dimension",  "The dimension (1, 2, ...)."
         }));
-        methods.put("getWKT", new MethodInfo("Referencing", "CRS.WKT",
-            "Returns the Well Know Text (WKT) for an identified object.",
-            new String[] {
-                "xOptions",   "Provided by OpenOffice.",
-                "code",       "The code allocated by authority."
-        }));
         methods.put("getParameter", new MethodInfo("Referencing", "CRS.PARAMETER",
             "Returns the value for a coordinate reference system parameter.",
             new String[] {
@@ -206,14 +222,26 @@ public final class Referencing extends Formulas implements XReferencing {
                 "code",       "The code allocated by authority.",
                 "parameter",  "The parameter name (e.g. \"False easting\")."
         }));
-        methods.put("getAccuracy", new MethodInfo("Referencing", "CRS.ACCURACY",
+        methods.put("getWKT", new MethodInfo("Referencing", "CRS.WKT",
+            "Returns the Well Know Text (WKT) for an identified object.",
+            new String[] {
+                "xOptions",   "Provided by OpenOffice.",
+                "code",       "The code allocated by authority."
+        }));
+        methods.put("getTransformWKT", new MethodInfo("Referencing", "TRANSFORM.WKT",
+            "Returns the Well Know Text (WKT) of a transformation between two coordinate reference systems.",
+            new String[] {
+                "xOptions",   "Provided by OpenOffice.",
+                "code",       "The code allocated by authority."
+        }));
+        methods.put("getAccuracy", new MethodInfo("Referencing", "TRANSFORM.ACCURACY",
             "Returns the accuracy of a transformation between two coordinate reference systems.",
             new String[] {
                 "xOptions",    "Provided by OpenOffice.",
                 "source CRS",  "The source coordinate reference system.",
                 "target CRS",  "The target coordinate reference system."
         }));
-        methods.put("getTransformedCoordinates", new MethodInfo("Referencing", "CRS.TRANSFORM",
+        methods.put("getTransformedCoordinates", new MethodInfo("Referencing", "TRANSFORM.COORD",
             "Transform coordinates from the given source CRS to the given target CRS.",
             new String[] {
                 "xOptions",    "Provided by OpenOffice.",
@@ -305,7 +333,6 @@ public final class Referencing extends Formulas implements XReferencing {
     public void setLocale(final Locale locale) {
         anglePattern = null;
         angleFormat  = null;
-        angleParser  = null;
         super.setLocale(locale);
     }
 
@@ -327,13 +354,57 @@ public final class Referencing extends Formulas implements XReferencing {
     }
 
     /**
-     * Returns the coordinate operation factory.
+     * Returns the coordinate operation for the two specified CRS.
+     *
+     * @param  method The method invoking this {@code #getCoordinateOperation} method.
+     *                For logging purpose only.
+     * @param  source The source CRS authority code.
+     * @param  target The target CRS authority code.
+     * @return The coordinate operation.
+     * @throws FactoryException if the coordinate operation can't be created.
      */
-    private CoordinateOperationFactory opFactory() {
-        if (opFactory == null) {
-            opFactory = FactoryFinder.getCoordinateOperationFactory(null);
+    private CoordinateOperation getCoordinateOperation(final String method,
+                                                       final String source,
+                                                       final String target)
+            throws FactoryException
+    {
+        if (lastOperation!=null && lastSourceCRS.equals(source) && lastTargetCRS.equals(target)) {
+            return lastOperation;
         }
-        return opFactory;
+        final CoordinateReferenceSystem sourceCRS;
+        final CoordinateReferenceSystem targetCRS;
+        final CoordinateOperation       operation;
+        final CRSAuthorityFactory       crsFactory = crsFactory();
+        sourceCRS = crsFactory.createCoordinateReferenceSystem(source);
+        targetCRS = crsFactory.createCoordinateReferenceSystem(target);
+        if (opFactory == null) {
+            opFactory = FactoryFinder.getCoordinateOperationFactory(
+                    new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
+        }
+        operation = opFactory.createOperation(sourceCRS, targetCRS);
+        if (LOGGER.isLoggable(Level.FINER)) {
+            final LogRecord record = Logging.format(Level.FINER,
+                    LoggingKeys.CREATED_COORDINATE_OPERATION_$3,
+                    getIdentifier(operation), getIdentifier(sourceCRS), getIdentifier(targetCRS));
+            record.setSourceClassName("Referencing");
+            record.setSourceMethodName(method);
+            LOGGER.log(record);
+        }
+        lastSourceCRS = source;
+        lastTargetCRS = target;
+        lastOperation = operation;
+        return operation;
+    }
+
+    /**
+     * Returns the identifier for the specified object. Used for logging.
+     */
+    private static String getIdentifier(final IdentifiedObject object) {
+        final Collection identifiers = object.getIdentifiers();
+        if (identifiers!=null && !identifiers.isEmpty()) {
+            return ((Identifier) identifiers.iterator().next()).getCode();
+        }
+        return object.getName().getCode();
     }
 
     /**
@@ -363,6 +434,24 @@ public final class Referencing extends Formulas implements XReferencing {
         return calculator;
     }
 
+    /**
+     * Returns the angle format to use for the specified pattern.
+     *
+     * @param  pattern he text that describes the format (example: "D°MM.m'").
+     * @return The angle format, as a {@link Format} object (instead of {@link AngleFormat}
+     *         in order to avoid too early class loading.
+     */
+    private Format getAngleFormat(final String pattern) {
+        if (angleFormat == null) {
+            angleFormat = new AngleFormat(pattern, getJavaLocale());
+            anglePattern = pattern;
+        } else if (!pattern.equals(anglePattern)) {
+            ((AngleFormat) angleFormat).applyPattern(pattern);
+            anglePattern = pattern;
+        }
+        return angleFormat;
+    }
+
 
 
 
@@ -374,35 +463,14 @@ public final class Referencing extends Formulas implements XReferencing {
      * {@inheritDoc}
      */
     public double getValueAngle(final XPropertySet xOptions,
-                                final String       text)
+                                final String       text,
+                                final String       pattern)
     {
-        if (angleParser == null) {
-            angleParser = new AngleFormat("D°MM'SS.s\"", getJavaLocale());
-        }
         try {
-            return ((Angle) angleParser.parseObject(text)).degrees();
+            return ((Angle) getAngleFormat(pattern).parseObject(text)).degrees();
         } catch (ParseException exception) {
             throw new IllegalArgumentException(getLocalizedMessage(exception));
         }
-    }
-
-    /**
-     * Converts an angle to text according to a given format.
-     *
-     * @param value The angle value (in decimal degrees) to be converted.
-     * @param pattern he text that describes the format (example: "D°MM.m'").
-     */
-    private String getTextAngle(final Object value,
-                                final String pattern)
-    {
-        if (angleFormat == null) {
-            angleFormat = new AngleFormat(pattern, getJavaLocale());
-            anglePattern = pattern;
-        } else if (!pattern.equals(anglePattern)) {
-            ((AngleFormat) angleFormat).applyPattern(pattern);
-            anglePattern = pattern;
-        }
-        return angleFormat.format(value);
     }
 
     /**
@@ -412,7 +480,7 @@ public final class Referencing extends Formulas implements XReferencing {
                                final double       value,
                                final String       pattern)
     {
-        return getTextAngle(new Angle(value), pattern);
+        return getAngleFormat(pattern).format(new Angle(value));
     }
 
     /**
@@ -422,7 +490,7 @@ public final class Referencing extends Formulas implements XReferencing {
                                    final double       value,
                                    final String       pattern)
     {
-        return getTextAngle(new Longitude(value), pattern);
+        return getAngleFormat(pattern).format(new Longitude(value));
     }
 
     /**
@@ -432,7 +500,7 @@ public final class Referencing extends Formulas implements XReferencing {
                                   final double       value,
                                   final String       pattern)
     {
-        return getTextAngle(new Latitude(value), pattern);
+        return getAngleFormat(pattern).format(new Latitude(value));
     }
 
     /**
@@ -447,7 +515,7 @@ public final class Referencing extends Formulas implements XReferencing {
         } catch (Exception exception) {
             return getLocalizedMessage(exception);
         }
-        return (description!=null) ? description.toString(getJavaLocale()) : "(none)";
+        return (description!=null) ? description.toString(getJavaLocale()) : emptyString();
     }
 
     /**
@@ -472,7 +540,66 @@ public final class Referencing extends Formulas implements XReferencing {
         } else {
             description = null;
         }
-        return (description!=null) ? description.toString(getJavaLocale()) : "(none)";
+        return (description!=null) ? description.toString(getJavaLocale()) : emptyString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getValidArea(final XPropertySet xOptions,
+                               final String authorityCode)
+    {
+        Extent validArea;
+        try {
+            validArea = crsFactory().createCoordinateReferenceSystem(authorityCode).getValidArea();
+        } catch (Exception exception) {
+            try {
+                validArea = FactoryFinder.getCoordinateOperationAuthorityFactory(AUTHORITY, null)
+                                         .createCoordinateOperation(authorityCode).getValidArea();
+            } catch (Exception ignore) {
+                return getLocalizedMessage(exception);
+            }
+        }
+        if (validArea != null) {
+            final InternationalString description = validArea.getDescription();
+            if (description != null) {
+                return description.toString(getJavaLocale());
+            }
+            final GeographicBoundingBox box = ExtentImpl.getGeographicBoundingBox(validArea);
+            if (box != null) {
+                return box.toString();
+            }
+        }
+        return emptyString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public double[][] getBoundingBox(final XPropertySet xOptions,
+                                     final String authorityCode)
+    {
+        Extent validArea;
+        try {
+            validArea = crsFactory().createCoordinateReferenceSystem(authorityCode).getValidArea();
+        } catch (Exception exception) {
+            try {
+                validArea = FactoryFinder.getCoordinateOperationAuthorityFactory(AUTHORITY, null)
+                                         .createCoordinateOperation(authorityCode).getValidArea();
+            } catch (Exception ignore) {
+                reportException("getBoundingBox", exception);
+                return null;
+            }
+        }
+        final GeographicBoundingBox box = ExtentImpl.getGeographicBoundingBox(validArea);
+        if (box == null) {
+            return null;
+        }
+        return new double[][] {
+            new double[] {box.getNorthBoundLatitude(),
+                          box.getWestBoundLongitude()},
+            new double[] {box.getSouthBoundLatitude(),
+                          box.getEastBoundLongitude()}};
     }
 
     /**
@@ -488,7 +615,7 @@ public final class Referencing extends Formulas implements XReferencing {
             return getLocalizedMessage(exception);
         }
         final InternationalString remarks = object.getRemarks();
-        return (remarks!=null) ? remarks.toString(getJavaLocale()) : "(none)";
+        return (remarks!=null) ? remarks.toString(getJavaLocale()) : emptyString();
     }
 
     /**
@@ -503,7 +630,8 @@ public final class Referencing extends Formulas implements XReferencing {
             cs = crsFactory().createCoordinateReferenceSystem(authorityCode).getCoordinateSystem();
         } catch (Exception exception) {
             try {
-                cs = FactoryFinder.getCSAuthorityFactory(AUTHORITY, null).createCoordinateSystem(authorityCode);
+                cs = FactoryFinder.getCSAuthorityFactory(AUTHORITY, null)
+                                  .createCoordinateSystem(authorityCode);
             } catch (Exception ignore) {
                 // Ignore - we will report the previous exception instead.
             }
@@ -513,25 +641,6 @@ public final class Referencing extends Formulas implements XReferencing {
             return cs.getAxis(dimension-1).getName().getCode();
         } else {
             return Errors.format(ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, new Integer(dimension));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getWKT(final XPropertySet xOptions,
-                         final String authorityCode)
-    {
-        final IdentifiedObject object;
-        try {
-            object = crsFactory().createObject(authorityCode);
-        } catch (Exception exception) {
-            return getLocalizedMessage(exception);
-        }
-        try {
-            return object.toWKT();
-        } catch (UnsupportedOperationException exception) {
-            return getLocalizedMessage(exception);
         }
     }
 
@@ -568,39 +677,47 @@ public final class Referencing extends Formulas implements XReferencing {
     /**
      * {@inheritDoc}
      */
-    public double getAccuracy(final XPropertySet xOptions,
-                              final String       sourceCode,
-                              final String       targetCode)
+    public String getWKT(final XPropertySet xOptions,
+                         final String authorityCode)
     {
-        final CoordinateReferenceSystem sourceCRS;
-        final CoordinateReferenceSystem targetCRS;
-        final CoordinateOperation       operation;
-        final CRSAuthorityFactory       crsFactory = crsFactory();
+        final IdentifiedObject object;
         try {
-             sourceCRS = crsFactory.createCoordinateReferenceSystem(sourceCode);
-             targetCRS = crsFactory.createCoordinateReferenceSystem(targetCode);
-             operation = opFactory().createOperation(sourceCRS, targetCRS);
+            return crsFactory().createObject(authorityCode).toWKT();
+        } catch (Exception exception) {
+            return getLocalizedMessage(exception);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getTransformWKT(final XPropertySet xOptions,
+                                  final String       sourceCRS,
+                                  final String       targetCRS)
+    {
+        final CoordinateOperation operation;
+        try {
+            return getCoordinateOperation("getTransformWKT", sourceCRS, targetCRS).getMathTransform().toWKT();
+        } catch (Exception exception) {
+            return getLocalizedMessage(exception);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public double getAccuracy(final XPropertySet xOptions,
+                              final String       sourceCRS,
+                              final String       targetCRS)
+    {
+        final CoordinateOperation operation;
+        try {
+             operation = getCoordinateOperation("getAccuracy", sourceCRS, targetCRS);
         } catch (FactoryException exception) {
             reportException("getAccuracy", exception);
             return Double.NaN;
         }
-        final Collection accuracies = operation.getPositionalAccuracy();
-        for (final Iterator it=accuracies.iterator(); it.hasNext();) {
-            final Result accuracy = ((PositionalAccuracy) it.next()).getResult();
-            if (accuracy instanceof QuantitativeResult) {
-                final double[] r = ((QuantitativeResult) accuracy).getValues();
-                if (r!=null && r.length!=0) {
-                    return r[0];
-                }
-            }
-        }
-        if (operation instanceof Conversion) {
-            /*
-             * For conversions, the accuracy is up to rounding error by definition.
-             */
-            return 0;
-        }
-        return Double.NaN;
+        return AbstractCoordinateOperation.getAccuracy(operation);
     }
 
     /**
@@ -608,17 +725,12 @@ public final class Referencing extends Formulas implements XReferencing {
      */
     public double[][] getTransformedCoordinates(final XPropertySet xOptions,
                                                 final double[][]   coordinates,
-                                                final String       sourceCode,
-                                                final String       targetCode)
+                                                final String       sourceCRS,
+                                                final String       targetCRS)
     {
-        final CoordinateReferenceSystem sourceCRS;
-        final CoordinateReferenceSystem targetCRS;
-        final CoordinateOperation       operation;
-        final CRSAuthorityFactory       crsFactory = crsFactory();
+        final CoordinateOperation operation;
         try {
-             sourceCRS = crsFactory.createCoordinateReferenceSystem(sourceCode);
-             targetCRS = crsFactory.createCoordinateReferenceSystem(targetCode);
-             operation = opFactory().createOperation(sourceCRS, targetCRS);
+             operation = getCoordinateOperation("getTransformedCoordinates", sourceCRS, targetCRS);
         } catch (FactoryException exception) {
             reportException("getTransformedCoordinates", exception);
             return null;

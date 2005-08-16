@@ -46,6 +46,11 @@
       <version>2.2.x</version>
     </dependency>
     <dependency>
+      <artifactId>referencing</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
       <id>JTS</id>
       <version>1.6</version>
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
