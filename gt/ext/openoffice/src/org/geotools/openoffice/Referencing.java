@@ -21,6 +21,7 @@ package org.geotools.openoffice;
 // J2SE dependencies
 import java.text.Format;
 import java.text.ParseException;
+import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -101,6 +102,11 @@ public final class Referencing extends Formulas implements XReferencing {
      * The authority used in this implementation.
      */
     private static final String AUTHORITY = "EPSG";
+
+    /**
+     * The decimal separator. Will be computed when a no locale is set.
+     */
+    private char decimalSeparator = '.';
 
     /**
      * The pattern for the {@link #angleFormat}. Used in order to avoid creating
@@ -443,8 +449,10 @@ public final class Referencing extends Formulas implements XReferencing {
      */
     private Format getAngleFormat(final String pattern) {
         if (angleFormat == null) {
-            angleFormat = new AngleFormat(pattern, getJavaLocale());
-            anglePattern = pattern;
+            final java.util.Locale locale = getJavaLocale();
+            angleFormat      = new AngleFormat(pattern, locale);
+            anglePattern     = pattern;
+            decimalSeparator = new DecimalFormatSymbols(locale).getDecimalSeparator();
         } else if (!pattern.equals(anglePattern)) {
             ((AngleFormat) angleFormat).applyPattern(pattern);
             anglePattern = pattern;
@@ -466,9 +474,19 @@ public final class Referencing extends Formulas implements XReferencing {
                                 final String       text,
                                 final String       pattern)
     {
+        final AngleFormat angleFormat = (AngleFormat) getAngleFormat(pattern);
         try {
-            return ((Angle) getAngleFormat(pattern).parseObject(text)).degrees();
+            return angleFormat.parse(text).degrees();
         } catch (ParseException exception) {
+            /*
+             * Parse failed. Tries to replace the dot by the decimal separator in current locale.
+             */
+            final String localized = text.replace('.', decimalSeparator);
+            if (localized != text) try {
+                return angleFormat.parse(localized).degrees();
+            } catch (ParseException ignore) {
+                // Ignore; will throw the first exception.
+            }
             throw new IllegalArgumentException(getLocalizedMessage(exception));
         }
     }

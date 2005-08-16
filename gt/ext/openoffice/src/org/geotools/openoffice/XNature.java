@@ -104,9 +104,9 @@ public interface XNature extends XInterface {
      * @param  salinity    Salinity PSS-78.
      * @param  pressure    Pressure in decibars, not including atmospheric pressure.
      */
-    double getSeaWaterFusionTemperature(XPropertySet xOptions,
-                                        double       salinity,
-                                        double       pressure);
+    double getSeaWaterMeltingPoint(XPropertySet xOptions,
+                                   double       salinity,
+                                   double       pressure);
 
     /**
      * Computes the sound velocity in sea water as a function of salinity, temperature and pressure.

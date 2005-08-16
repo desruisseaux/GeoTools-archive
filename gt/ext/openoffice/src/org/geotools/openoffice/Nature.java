@@ -111,7 +111,7 @@ public final class Nature extends Formulas implements XNature {
                 "temperature", "Temperature ITS-68.",
                 "pressure",    "Pressure in decibars, not including atmospheric pressure."
         }));
-        methods.put("getSeaWaterFusionTemperature", new MethodInfo("Nature", "SEAWATER.MELTING.POINT",
+        methods.put("getSeaWaterMeltingPoint", new MethodInfo("Nature", "SEAWATER.MELTING.POINT",
             "Computes the sea water fusion temperature (melting point) as a function of salinity and pressure.",
             new String[] {
                 "xOptions",    "Provided by OpenOffice.",
@@ -277,9 +277,9 @@ public final class Nature extends Formulas implements XNature {
     /**
      * {@inheritDoc}
      */
-    public double getSeaWaterFusionTemperature(final XPropertySet xOptions,
-                                               final double       salinity,
-                                               final double       pressure)
+    public double getSeaWaterMeltingPoint(final XPropertySet xOptions,
+                                          final double       salinity,
+                                          final double       pressure)
     {
         return SeaWater.fusionTemperature(salinity, pressure);
     }

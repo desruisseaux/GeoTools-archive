@@ -91,7 +91,7 @@ module org {
         );
 
         /// Computes the fusion temperature (melting point) as a function of salinity and pressure.
-        double getSeaWaterFusionTemperature(
+        double getSeaWaterMeltingPoint(
           [in] com::sun::star::beans::XPropertySet xOptions,
           /// Salinity PSS-78.
           [in] double salinity,
