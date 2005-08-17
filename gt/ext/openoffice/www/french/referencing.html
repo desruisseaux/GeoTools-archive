@@ -378,9 +378,15 @@
   entre deux systèmes de référence des coordonnées. Cette information permet de vérifier quel chemin a suivit
   Geotools pour transformer les coordonnées avec <code><a href="#TRANSFORM.COORD">TRANSFORM.COORD</a></code>
   par exemple. Cette fonction attend en argument les codes des systèmes de référence source et destination.
-  La sortie ci-dessous donne un exemple pour la transformation de <code>EPSG:4326</code> vers <code>EPSG:32759</code>:</p>
+  Voyez <code><a href="#CRS.WKT">CRS.WKT</a></code> pour quelques détails sur ce format.</p>
 
-  <blockquote><pre>CONCAT_MT[PARAM_MT["Affine",
+  <blockquote><table cellpadding="0" cellspacing="0">
+    <tr>
+      <td nowrap valign="top"><strong>Exemple:&nbsp;&nbsp;&nbsp;</strong></td>
+      <td nowrap><pre>TRANSFORM.WKT("EPSG:4326", "EPSG:32759", "OGC")</pre></td>
+    </tr><tr>
+      <td nowrap valign="top"><strong>retourne&nbsp;&nbsp;&nbsp;</strong></td>
+      <td nowrap><pre>CONCAT_MT[PARAM_MT["Affine",
     PARAMETER["num_row", 3],
     PARAMETER["num_col", 3],
     PARAMETER["elt_0_0", 0.0],
@@ -395,7 +401,9 @@
     PARAMETER["scale_factor", 0.9996],
     PARAMETER["false_easting", 500000.0],
     PARAMETER["false_northing", 10000000.0]]],
-AUTHORITY["EPSG","16159"]]</pre></blockquote>
+AUTHORITY["EPSG","16159"]]</pre></td>
+    </tr>
+  </table></blockquote>
 
   <hr>
   <h3><a name="CRS.WKT">CRS.WKT</a></h3>
@@ -410,9 +418,17 @@ AUTHORITY["EPSG","16159"]]</pre></blockquote>
   dans un petit fichier texte portant l’extension <code>.prj</code>) d’une série de données.</p>
 
   <p align="justify">La syntaxe du format WKT est <a href="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">définie
-  en utilisant la notation de Backus Naur étendue</a>. La sortie ci-dessous donne un exemple pour le système de
-  référence <code>EPSG:27572</code>:</p>
-  <blockquote><pre>PROJCS["NTF (Paris) / Lambert zone II",
+  en utilisant la notation de Backus Naur étendue</a>. Le dernier argument indique quelle autorité utiliser pour
+  le choix des noms des paramètres apparaissant dans la sortie. Sa valeur est habituellement <code>"OGC"</code>
+  (pour <cite>Open Geospatial Consortium</cite>). Une autre valeur courante est <code>"GeoTIFF"</code>.</p>
+
+  <blockquote><table cellpadding="0" cellspacing="0">
+    <tr>
+      <td nowrap valign="top"><strong>Exemple:&nbsp;&nbsp;&nbsp;</strong></td>
+      <td nowrap><pre>CRS.WKT("EPSG:27572", "OGC")</pre></td>
+    </tr><tr>
+      <td nowrap valign="top"><strong>retourne&nbsp;&nbsp;&nbsp;</strong></td>
+      <td nowrap><pre>PROJCS["NTF (Paris) / Lambert zone II",
   GEOGCS["NTF (Paris)",
     DATUM["Nouvelle Triangulation Francaise (Paris)",
       SPHEROID["Clarke 1880 (IGN)", 6378249.2, 293.4660212936269, AUTHORITY["EPSG","7011"]],
@@ -431,7 +447,9 @@ AUTHORITY["EPSG","16159"]]</pre></blockquote>
   UNIT["m", 1.0],
   AXIS["Easting", EAST],
   AXIS["Northing", NORTH],
-  AUTHORITY["EPSG","27572"]]</pre></blockquote>
+  AUTHORITY["EPSG","27572"]]</pre></td>
+    </tr>
+  </table></blockquote>
 
   <hr>
   <h3><a name="ORTHODROMIC.DISTANCE">ORTHODROMIC.DISTANCE</a></h3>

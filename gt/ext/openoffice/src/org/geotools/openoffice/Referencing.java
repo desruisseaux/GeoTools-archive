@@ -66,10 +66,12 @@ import org.geotools.measure.Longitude;
 import org.geotools.measure.AngleFormat;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.wkt.Formattable;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Logging;
@@ -414,6 +416,27 @@ public final class Referencing extends Formulas implements XReferencing {
     }
 
     /**
+     * Returns the Well Know Text (WKT) for the specified object using the parameter names
+     * from the specified authority.
+     *
+     * @param  object The object to format.
+     * @param  authority The authority name for choice of parameter names. Usually "OGC".
+     * @return The Well Know Text (WKT) for the specified object.
+     * @throws UnsupportedOperationException if the object can't be formatted.
+     */
+    private static String toWKT(final Object object, final String authority)
+            throws UnsupportedOperationException
+    {
+        if (object instanceof Formattable) {
+            return ((Formattable) object).toWKT(CitationImpl.createCitation(authority), 2);
+        }
+        if (object instanceof MathTransform) {
+            return ((MathTransform) object).toWKT();
+        }
+        return ((IdentifiedObject) object).toWKT();
+    }
+
+    /**
      * Returns the geodetic calculator for the specified CRS, datum or ellipsoid.
      * This method cache the last calculator used for better performance when many
      * orthodromic distances are computed on the same ellipsoid.
@@ -696,11 +719,11 @@ public final class Referencing extends Formulas implements XReferencing {
      * {@inheritDoc}
      */
     public String getWKT(final XPropertySet xOptions,
-                         final String authorityCode)
+                         final String  authorityCode,
+                         final String  authority)
     {
-        final IdentifiedObject object;
         try {
-            return crsFactory().createObject(authorityCode).toWKT();
+            return toWKT(crsFactory().createObject(authorityCode), authority);
         } catch (Exception exception) {
             return getLocalizedMessage(exception);
         }
@@ -711,11 +734,12 @@ public final class Referencing extends Formulas implements XReferencing {
      */
     public String getTransformWKT(final XPropertySet xOptions,
                                   final String       sourceCRS,
-                                  final String       targetCRS)
+                                  final String       targetCRS,
+                                  final String       authority)
     {
-        final CoordinateOperation operation;
         try {
-            return getCoordinateOperation("getTransformWKT", sourceCRS, targetCRS).getMathTransform().toWKT();
+            return toWKT(getCoordinateOperation("getTransformWKT", sourceCRS, targetCRS)
+                        .getMathTransform(), authority);
         } catch (Exception exception) {
             return getLocalizedMessage(exception);
         }

@@ -125,7 +125,9 @@ module org {
         string getWKT(
           [in] com::sun::star::beans::XPropertySet xOptions,
           /// The authority code (e.g. "EPSG:4326").
-          [in] string authorityCode
+          [in] string authorityCode,
+          /// The authority name for choice of parameter names. Usually "OGC".
+          [in] string authority
         );
 
         /// Returns the Well Know Text (WKT) of a transformation between two coordinate reference systems.
@@ -134,7 +136,9 @@ module org {
           /// Authority code of the source coordinate reference system.
           [in] string sourceCRS,
           /// Authority code of the target coordinate reference system.
-          [in] string targetCRS
+          [in] string targetCRS,
+          /// The authority name for choice of parameter names. Usually "OGC".
+          [in] string authority
         );
 
         /// Returns the accuracy of a transformation between two coordinate reference systems.

@@ -138,10 +138,11 @@ public interface XReferencing extends XInterface {
     /**
      * Returns the Well Know Text (WKT) for an identified object.
      *
-     * @param xOptions Provided by OpenOffice.
+     * @param xOptions      Provided by OpenOffice.
      * @param authorityCode The code allocated by the authority.
+     * @param authority     The authority name for choice of parameter names. Usually "OGC".
      */
-    String getWKT(XPropertySet xOptions, String authorityCode);
+    String getWKT(XPropertySet xOptions, String authorityCode, String authority);
 
     /**
      * Returns the Well Know Text (WKT) of a transformation between two coordinate reference
@@ -150,8 +151,9 @@ public interface XReferencing extends XInterface {
      * @param xOptions Provided by OpenOffice.
      * @param sourceCRS The authority code for the source coordinate reference system.
      * @param sourceCRS The authority code for the target coordinate reference system.
+     * @param authority The authority name for choice of parameter names. Usually "OGC".
      */
-    String getTransformWKT(XPropertySet xOptions, String sourceCRS, String targetCRS);
+    String getTransformWKT(XPropertySet xOptions, String sourceCRS, String targetCRS, String authority);
 
     /**
      * Returns the accuracy of a transformation between two coordinate reference systems.
