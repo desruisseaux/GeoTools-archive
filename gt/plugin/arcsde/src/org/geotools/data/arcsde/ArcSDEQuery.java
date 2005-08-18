@@ -261,7 +261,7 @@ class ArcSDEQuery {
             SeConnection conn = getConnection();
             try {
 				String[] propsToQuery = getPropertiesToFetch();
-				this.query = createSeQuery(conn, propsToQuery, true);
+				this.query = createSeQueryForFetch(conn, propsToQuery, true);
 			} catch (DataSourceException e) {
 				throw e;
 			} catch (IOException e) {
@@ -278,12 +278,10 @@ class ArcSDEQuery {
 
     /**
      * creates an SeQuery with the filters provided to the constructor and
-     * returns it.
+     * returns it.  Queries created with this method can be used to execute and
+     * fetch results.  They cannot be used for other operations, such as
+     * calculating layer extents, or result count.
      * 
-     * <p>
-     * This method just creates a query, does not assigns it as the inuse
-     * query.
-     * </p>
      *
      * @param connection DOCUMENT ME!
      * @param propertyNames names of attributes to build the query for,
@@ -299,7 +297,7 @@ class ArcSDEQuery {
      *         SeQuery or setting it the spatial constraints.
      * @throws DataSourceException DOCUMENT ME!
      */
-    private SeQuery createSeQuery(SeConnection connection,
+    private SeQuery createSeQueryForFetch(SeConnection connection,
         String[] propertyNames, boolean setReturnGeometryMasks)
         throws SeException, DataSourceException {
         if (LOGGER.isLoggable(Level.FINE)) {
@@ -313,6 +311,51 @@ class ArcSDEQuery {
                 this.filters.getSeSqlConstruct());
         SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
 
+        query.prepareQuery();
+        
+        if (spatialConstraints.length > 0) {
+            query.setSpatialConstraints(SeQuery.SE_OPTIMIZE,
+                setReturnGeometryMasks, spatialConstraints);
+        }
+
+        return query;
+    }
+    
+    /**
+     * creates an SeQuery with the filters provided to the constructor and
+     * returns it.  Queries created with this method are to be used for
+     * calculating layer extents and result counts.  These queries cannot
+     * be executed or used to fetch results.
+     * 
+     *
+     * @param connection DOCUMENT ME!
+     * @param propertyNames names of attributes to build the query for,
+     *        respecting order
+     * @param setReturnGeometryMasks tells
+     *        <code>SeQuery.setSpatialConstraints</code> wether to return
+     *        geometry based bitmasks, which are needed for calculating the
+     *        query extent and result count, but not for fetching SeRows
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws SeException if the ArcSDE Java API throws it while creating the
+     *         SeQuery or setting it the spatial constraints.
+     * @throws DataSourceException DOCUMENT ME!
+     */
+    private SeQuery createSeQueryForQueryInfo(SeConnection connection,
+        String[] propertyNames, boolean setReturnGeometryMasks)
+        throws SeException, DataSourceException {
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("constructing new sql query with connection: "
+                + connection + ", propnames: "
+                + java.util.Arrays.asList(propertyNames) + " sqlConstruct: "
+                + this.filters.getSeSqlConstruct());
+        }
+
+        SeQuery query = new SeQuery(connection, propertyNames,
+                this.filters.getSeSqlConstruct());
+        SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
+        
         if (spatialConstraints.length > 0) {
             query.setSpatialConstraints(SeQuery.SE_OPTIMIZE,
                 setReturnGeometryMasks, spatialConstraints);
@@ -431,7 +474,7 @@ class ArcSDEQuery {
             SeQuery countQuery = null;
 
             try {
-                countQuery = createSeQuery(getConnection(), columns, true);
+                countQuery = createSeQueryForQueryInfo(getConnection(), columns, true);
 
                 SeQueryInfo qInfo = new SeQueryInfo();
                 qInfo.setConstruct(this.filters.getSeSqlConstruct());
@@ -474,7 +517,7 @@ class ArcSDEQuery {
                     .getTypeName());
             String[] spatialCol = { layer.getSpatialColumn() };
 
-            extentQuery = createSeQuery(getConnection(), spatialCol, true);
+            extentQuery = createSeQueryForQueryInfo(getConnection(), spatialCol, true);
 
             SeQueryInfo sdeQueryInfo = new SeQueryInfo();
             sdeQueryInfo.setColumns(spatialCol);

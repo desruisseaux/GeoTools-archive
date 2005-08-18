@@ -539,7 +539,7 @@ class ArcSDEDataStore extends AbstractDataStore {
         try {
             FeatureType schema = getSchema(typeName);
             sdeQuery = ArcSDEQuery.createQuery(this, schema, query);
-            sdeQuery.prepareQuery();
+            
             sdeQuery.execute();
 
             AttributeReader attReader = new ArcSDEAttributeReader(sdeQuery);
