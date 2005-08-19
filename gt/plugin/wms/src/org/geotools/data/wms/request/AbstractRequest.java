@@ -95,9 +95,10 @@ public abstract class AbstractRequest implements Request{
 
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken();
-                String[] param = token.split("="); //$NON-NLS-1$
-                
-                setProperty(param[0].toUpperCase(), param[1]);
+                String[] param = token.split("="); //$NON-NLS-1$'
+                if (param != null && param[0] != null) {                
+                    setProperty(param[0].toUpperCase(), param[1]);
+                }
             }
         }
 
