@@ -38,8 +38,8 @@ module org {
           /// The text to be converted to an angle.
           [in] string text,
           /// The text that describes the format (example: "D°MM.m'").
-          [in] string pattern
-        );
+          [in] any pattern
+        ) raises (com::sun::star::lang::IllegalArgumentException);
 
         /// Converts an angle to text according to a given format.
         string getTextAngle(
@@ -47,8 +47,8 @@ module org {
           /// The angle value (in decimal degrees) to be converted.
           [in] double value,
           /// The text that describes the format (example: "D°MM.m'").
-          [in] string pattern
-        );
+          [in] any pattern
+        ) raises (com::sun::star::lang::IllegalArgumentException);
 
         /// Converts a longitude to text according to a given format.
         string getTextLongitude(
@@ -56,8 +56,8 @@ module org {
           /// The longitude value (in decimal degrees) to be converted.
           [in] double value,
           /// The text that describes the format (example: "D°MM.m'").
-          [in] string pattern
-        );
+          [in] any pattern
+        ) raises (com::sun::star::lang::IllegalArgumentException);
 
         /// Converts a latitude to text according to a given format.
         string getTextLatitude(
@@ -65,8 +65,8 @@ module org {
           /// The latitude value (in decimal degrees) to be converted.
           [in] double value,
           /// The text that describes the format (example: "D°MM.m'").
-          [in] string pattern
-        );
+          [in] any pattern
+        ) raises (com::sun::star::lang::IllegalArgumentException);
 
         /// Returns an identified object description from an authority code.
         string getDescription(
@@ -127,7 +127,7 @@ module org {
           /// The authority code (e.g. "EPSG:4326").
           [in] string authorityCode,
           /// The authority name for choice of parameter names. Usually "OGC".
-          [in] string authority
+          [in] any authority
         );
 
         /// Returns the Well Know Text (WKT) of a transformation between two coordinate reference systems.
@@ -138,7 +138,7 @@ module org {
           /// Authority code of the target coordinate reference system.
           [in] string targetCRS,
           /// The authority name for choice of parameter names. Usually "OGC".
-          [in] string authority
+          [in] any authority
         );
 
         /// Returns the accuracy of a transformation between two coordinate reference systems.
@@ -164,23 +164,23 @@ module org {
         /// Computes the orthodromic distance and azimuth between two coordinates.
         sequence< sequence< double > > getOrthodromicDistance(
           [in] com::sun::star::beans::XPropertySet xOptions,
-          /// Authority code of the coordinate reference system.
-          [in] string CRS,
           /// The source positions.
           [in] sequence< sequence< double > > source,
           /// The target positions.
-          [in] sequence< sequence< double > > target
+          [in] sequence< sequence< double > > target,
+          /// Authority code of the coordinate reference system.
+          [in] any CRS
         );
 
         /// Computes the coordinates after a displacement of the specified distance.
         sequence< sequence< double > > getOrthodromicForward(
           [in] com::sun::star::beans::XPropertySet xOptions,
-          /// Authority code of the coordinate reference system.
-          [in] string CRS,
           /// The source positions.
           [in] sequence< sequence< double > > source,
           /// The distance and azimuth.
-          [in] sequence< sequence< double > > displacement
+          [in] sequence< sequence< double > > displacement,
+          /// Authority code of the coordinate reference system.
+          [in] any CRS
         );
       };
 

@@ -21,6 +21,7 @@ package org.geotools.openoffice;
 // OpenOffice dependencies
 import com.sun.star.uno.XInterface;
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.lang.IllegalArgumentException;
 
 
 /**
@@ -44,8 +45,10 @@ public interface XReferencing extends XInterface {
      * @param xOptions Provided by OpenOffice.
      * @param text The text to be converted to an angle.
      * @param pattern The text that describes the format (example: "D°MM.m'").
+     * @throws IllegalArgumentException if {@code pattern} is illegal.
      */
-    double getValueAngle(XPropertySet xOptions, String text, String pattern);
+    double getValueAngle(XPropertySet xOptions, String text, Object pattern)
+            throws IllegalArgumentException;
 
     /**
      * Converts an angle to text according to a given format.
@@ -53,8 +56,10 @@ public interface XReferencing extends XInterface {
      * @param xOptions Provided by OpenOffice.
      * @param value The angle value (in decimal degrees) to be converted.
      * @param pattern The text that describes the format (example: "D°MM.m'").
+     * @throws IllegalArgumentException if {@code pattern} is illegal.
      */
-    String getTextAngle(XPropertySet xOptions, double value, String pattern);
+    String getTextAngle(XPropertySet xOptions, double value, Object pattern)
+            throws IllegalArgumentException;
 
     /**
      * Converts a longitude to text according to a given format.
@@ -62,8 +67,10 @@ public interface XReferencing extends XInterface {
      * @param xOptions Provided by OpenOffice.
      * @param value The longitude value (in decimal degrees) to be converted.
      * @param pattern The text that describes the format (example: "D°MM.m'").
+     * @throws IllegalArgumentException if {@code pattern} is illegal.
      */
-    String getTextLongitude(XPropertySet xOptions, double value, String pattern);
+    String getTextLongitude(XPropertySet xOptions, double value, Object pattern)
+            throws IllegalArgumentException;
 
     /**
      * Converts a latitude to text according to a given format.
@@ -71,8 +78,10 @@ public interface XReferencing extends XInterface {
      * @param xOptions Provided by OpenOffice.
      * @param value The latitude value (in decimal degrees) to be converted.
      * @param pattern The text that describes the format (example: "D°MM.m'").
+     * @throws IllegalArgumentException if {@code pattern} is illegal.
      */
-    String getTextLatitude(XPropertySet xOptions, double value, String pattern);
+    String getTextLatitude(XPropertySet xOptions, double value, Object pattern)
+            throws IllegalArgumentException;
 
     /**
      * Returns the identified object description from an authority code.
@@ -142,7 +151,7 @@ public interface XReferencing extends XInterface {
      * @param authorityCode The code allocated by the authority.
      * @param authority     The authority name for choice of parameter names. Usually "OGC".
      */
-    String getWKT(XPropertySet xOptions, String authorityCode, String authority);
+    String getWKT(XPropertySet xOptions, String authorityCode, Object authority);
 
     /**
      * Returns the Well Know Text (WKT) of a transformation between two coordinate reference
@@ -153,7 +162,7 @@ public interface XReferencing extends XInterface {
      * @param sourceCRS The authority code for the target coordinate reference system.
      * @param authority The authority name for choice of parameter names. Usually "OGC".
      */
-    String getTransformWKT(XPropertySet xOptions, String sourceCRS, String targetCRS, String authority);
+    String getTransformWKT(XPropertySet xOptions, String sourceCRS, String targetCRS, Object authority);
 
     /**
      * Returns the accuracy of a transformation between two coordinate reference systems.
@@ -179,19 +188,19 @@ public interface XReferencing extends XInterface {
      * Computes the orthodromic distance and azimuth between two coordinates.
      *
      * @param xOptions Provided by OpenOffice.
-     * @param CRS Authority code of the coordinate reference system.
      * @param source The source positions.
      * @param target The target positions.
+     * @param CRS Authority code of the coordinate reference system.
      */
-    double[][] getOrthodromicDistance(XPropertySet xOptions, String CRS, double[][] source, double[][] target);
+    double[][] getOrthodromicDistance(XPropertySet xOptions, double[][] source, double[][] target, Object CRS);
 
     /**
      * Computes the coordinates after a displacement of the specified distance.
      *
      * @param xOptions Provided by OpenOffice.
-     * @param CRS Authority code of the coordinate reference system.
      * @param source The source positions.
      * @param displacement The distance and azimuth.
+     * @param CRS Authority code of the coordinate reference system.
      */
-    double[][] getOrthodromicForward(XPropertySet xOptions, String CRS, double[][] source, double[][] displacement);
+    double[][] getOrthodromicForward(XPropertySet xOptions, double[][] source, double[][] displacement, Object CRS);
 }

@@ -30,9 +30,11 @@ import java.util.logging.LogRecord;
 import com.sun.star.lang.Locale;
 import com.sun.star.lang.XSingleServiceFactory;
 import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.comp.loader.FactoryHelper;
 import com.sun.star.registry.XRegistryKey;
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.uno.AnyConverter;
 
 // GeoAPI dependencies
 import org.opengis.util.InternationalString;
@@ -234,13 +236,15 @@ public final class Referencing extends Formulas implements XReferencing {
             "Returns the Well Know Text (WKT) for an identified object.",
             new String[] {
                 "xOptions",   "Provided by OpenOffice.",
-                "code",       "The code allocated by authority."
+                "code",       "The code allocated by authority.",
+                "authority",  "The authority name for choice of parameter names."
         }));
         methods.put("getTransformWKT", new MethodInfo("Referencing", "TRANSFORM.WKT",
             "Returns the Well Know Text (WKT) of a transformation between two coordinate reference systems.",
             new String[] {
                 "xOptions",   "Provided by OpenOffice.",
-                "code",       "The code allocated by authority."
+                "code",       "The code allocated by authority.",
+                "authority",  "The authority name for choice of parameter names."
         }));
         methods.put("getAccuracy", new MethodInfo("Referencing", "TRANSFORM.ACCURACY",
             "Returns the accuracy of a transformation between two coordinate reference systems.",
@@ -261,17 +265,17 @@ public final class Referencing extends Formulas implements XReferencing {
             "Computes the orthodromic distance and azimuth between two coordinates.",
             new String[] {
                 "xOptions",    "Provided by OpenOffice.",
-                "CRS",         "Authority code of the coordinate reference system.",
                 "source",      "The source positions.",
-                "target",      "The target positions."
+                "target",      "The target positions.",
+                "CRS",         "Authority code of the coordinate reference system."
         }));
         methods.put("getOrthodromicForward", new MethodInfo("Referencing", "ORTHODROMIC.FORWARD",
             "Computes the coordinates after a displacement of the specified distance.",
             new String[] {
                 "xOptions",    "Provided by OpenOffice.",
-                "CRS",         "Authority code of the coordinate reference system.",
                 "source",      "The source positions.",
-                "displacement","The distance and azimuth."
+                "displacement","The distance and azimuth.",
+                "CRS",         "Authority code of the coordinate reference system."
         }));
     }
 
@@ -422,13 +426,20 @@ public final class Referencing extends Formulas implements XReferencing {
      * @param  object The object to format.
      * @param  authority The authority name for choice of parameter names. Usually "OGC".
      * @return The Well Know Text (WKT) for the specified object.
+     * @throws IllegalArgumentException if {@code authority} is not a string value or void.
      * @throws UnsupportedOperationException if the object can't be formatted.
      */
-    private static String toWKT(final Object object, final String authority)
-            throws UnsupportedOperationException
+    private static String toWKT(final Object object, final Object authority)
+            throws IllegalArgumentException, UnsupportedOperationException
     {
+        final String authorityString;
+        if (AnyConverter.isVoid(authority)) {
+            authorityString = "OGC";
+        } else {
+            authorityString = AnyConverter.toString(authority);
+        }
         if (object instanceof Formattable) {
-            return ((Formattable) object).toWKT(CitationImpl.createCitation(authority), 2);
+            return ((Formattable) object).toWKT(CitationImpl.createCitation(authorityString), 2);
         }
         if (object instanceof MathTransform) {
             return ((MathTransform) object).toWKT();
@@ -441,13 +452,20 @@ public final class Referencing extends Formulas implements XReferencing {
      * This method cache the last calculator used for better performance when many
      * orthodromic distances are computed on the same ellipsoid.
      *
+     * @throws IllegalArgumentException if {@code authorityCode} is not a string value or void.
      * @throws FactoryException if the geodetic calculator can't be created.
      */
-    private GeodeticCalculator getGeodeticCalculator(final String authorityCode)
-            throws FactoryException
+    private GeodeticCalculator getGeodeticCalculator(final Object authorityCode)
+            throws IllegalArgumentException, FactoryException
     {
-        if (calculatorCRS==null || !calculatorCRS.equals(authorityCode)) {
-            final IdentifiedObject object = crsFactory().createObject(authorityCode);
+        final String authorityString;
+        if (AnyConverter.isVoid(authorityCode)) {
+            authorityString = "EPSG:4326";
+        } else {
+            authorityString = AnyConverter.toString(authorityCode);
+        }
+        if (calculatorCRS==null || !calculatorCRS.equals(authorityString)) {
+            final IdentifiedObject object = crsFactory().createObject(authorityString);
             if (object instanceof Ellipsoid) {
                 calculator = new GeodeticCalculator((Ellipsoid) object);
             } else if (object instanceof GeodeticDatum) {
@@ -458,7 +476,7 @@ public final class Referencing extends Formulas implements XReferencing {
                 throw new FactoryException(Errors.format(
                                            ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
             }
-            calculatorCRS = authorityCode;
+            calculatorCRS = authorityString;
         }
         return calculator;
     }
@@ -469,16 +487,23 @@ public final class Referencing extends Formulas implements XReferencing {
      * @param  pattern he text that describes the format (example: "D°MM.m'").
      * @return The angle format, as a {@link Format} object (instead of {@link AngleFormat}
      *         in order to avoid too early class loading.
+     * @throws IllegalArgumentException if {@code pattern} is not a string value or void.
      */
-    private Format getAngleFormat(final String pattern) {
+    private Format getAngleFormat(final Object pattern) throws IllegalArgumentException {
+        final String patternString;
+        if (AnyConverter.isVoid(pattern)) {
+            patternString = "D°MM'SS.s\"";
+        } else {
+            patternString = AnyConverter.toString(pattern);
+        }
         if (angleFormat == null) {
             final java.util.Locale locale = getJavaLocale();
-            angleFormat      = new AngleFormat(pattern, locale);
-            anglePattern     = pattern;
+            angleFormat      = new AngleFormat(patternString, locale);
+            anglePattern     = patternString;
             decimalSeparator = new DecimalFormatSymbols(locale).getDecimalSeparator();
-        } else if (!pattern.equals(anglePattern)) {
-            ((AngleFormat) angleFormat).applyPattern(pattern);
-            anglePattern = pattern;
+        } else if (!patternString.equals(anglePattern)) {
+            ((AngleFormat) angleFormat).applyPattern(patternString);
+            anglePattern = patternString;
         }
         return angleFormat;
     }
@@ -495,7 +520,8 @@ public final class Referencing extends Formulas implements XReferencing {
      */
     public double getValueAngle(final XPropertySet xOptions,
                                 final String       text,
-                                final String       pattern)
+                                final Object       pattern)
+            throws IllegalArgumentException
     {
         final AngleFormat angleFormat = (AngleFormat) getAngleFormat(pattern);
         try {
@@ -519,7 +545,8 @@ public final class Referencing extends Formulas implements XReferencing {
      */
     public String getTextAngle(final XPropertySet xOptions,
                                final double       value,
-                               final String       pattern)
+                               final Object       pattern)
+            throws IllegalArgumentException
     {
         return getAngleFormat(pattern).format(new Angle(value));
     }
@@ -529,7 +556,8 @@ public final class Referencing extends Formulas implements XReferencing {
      */
     public String getTextLongitude(final XPropertySet xOptions,
                                    final double       value,
-                                   final String       pattern)
+                                   final Object       pattern)
+            throws IllegalArgumentException
     {
         return getAngleFormat(pattern).format(new Longitude(value));
     }
@@ -539,7 +567,8 @@ public final class Referencing extends Formulas implements XReferencing {
      */
     public String getTextLatitude(final XPropertySet xOptions,
                                   final double       value,
-                                  final String       pattern)
+                                  final Object       pattern)
+            throws IllegalArgumentException
     {
         return getAngleFormat(pattern).format(new Latitude(value));
     }
@@ -720,7 +749,7 @@ public final class Referencing extends Formulas implements XReferencing {
      */
     public String getWKT(final XPropertySet xOptions,
                          final String  authorityCode,
-                         final String  authority)
+                         final Object  authority)
     {
         try {
             return toWKT(crsFactory().createObject(authorityCode), authority);
@@ -735,7 +764,7 @@ public final class Referencing extends Formulas implements XReferencing {
     public String getTransformWKT(final XPropertySet xOptions,
                                   final String       sourceCRS,
                                   final String       targetCRS,
-                                  final String       authority)
+                                  final Object       authority)
     {
         try {
             return toWKT(getCoordinateOperation("getTransformWKT", sourceCRS, targetCRS)
@@ -823,14 +852,14 @@ public final class Referencing extends Formulas implements XReferencing {
      * {@inheritDoc}
      */
     public double[][] getOrthodromicDistance(final XPropertySet xOptions,
-                                             final String       CRS,
                                              final double[][]   source,
-                                             final double[][]   target)
+                                             final double[][]   target,
+                                             final Object       CRS)
     {
         final GeodeticCalculator calculator;
         try {
             calculator = getGeodeticCalculator(CRS);
-        } catch (FactoryException exception) {
+        } catch (Exception exception) {
             reportException("getOrthodromicDistance", exception);
             return null;
         }
@@ -871,14 +900,14 @@ public final class Referencing extends Formulas implements XReferencing {
      * {@inheritDoc}
      */
     public double[][] getOrthodromicForward(final XPropertySet xOptions,
-                                            final String       CRS,
                                             final double[][]   source,
-                                            final double[][]   displacement)
+                                            final double[][]   displacement,
+                                            final Object       CRS)
     {
         final GeodeticCalculator calculator;
         try {
             calculator = getGeodeticCalculator(CRS);
-        } catch (FactoryException exception) {
+        } catch (Exception exception) {
             reportException("getOrthodromicForward", exception);
             return null;
         }
