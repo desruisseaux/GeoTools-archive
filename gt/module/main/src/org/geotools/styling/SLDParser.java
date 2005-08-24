@@ -715,6 +715,13 @@ public class SLDParser {
 			if (childName == null) {
 				childName = child.getNodeName();
 			}
+			
+			if (childName.indexOf(':') != -1)
+	        {
+	        	//the DOM parser wasnt properly set to handle namespaces...
+	        	childName = childName.substring(childName.indexOf(':')+1);
+	        }
+			 
 			if (LOGGER.isLoggable(Level.FINEST)) {
 				LOGGER.finest("processing " + child.getLocalName());
 			}
@@ -939,6 +946,16 @@ public class SLDParser {
 			if (childName.equalsIgnoreCase("Halo")) {
 				symbol.setHalo(parseHalo(child));
 			}
+			
+			if (childName.equalsIgnoreCase("priority")) 
+			{
+				symbol.setPriority(parseCssParameter(child));
+			}
+			if (childName.equalsIgnoreCase("vendoroption")) 
+			{
+				parseVendorOption(symbol,child);
+			}
+			
 		}
 
 		symbol.setFonts((Font[]) fonts.toArray(new Font[0]));
@@ -946,7 +963,42 @@ public class SLDParser {
 		return symbol;
 	}
 
-	
+	/**
+	 *   adds the key/value pair from the node ("<VendorOption name="...">...</VendorOption>").
+	 *   This can be generalized for other symbolizers in the future
+	 * @param symbol
+	 * @param child
+	 */
+	private void parseVendorOption(TextSymbolizer symbol, Node child) 
+	{
+		String key =child.getAttributes().getNamedItem("name").getNodeValue();
+		String value  =child.getFirstChild().getNodeValue();
+		
+		symbol.addToOptions(key,value);		
+	}
+
+	private Expression parseLiteral(Node root) {
+		NodeList children = root.getChildNodes();
+		for(int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+			if((child == null) || child.getNodeType() != Node.ELEMENT_NODE) {
+				continue;
+			}
+			String childName = child.getLocalName();
+			if(childName == null) {
+				childName = child.getNodeName();
+			}
+			if(childName.equalsIgnoreCase("Literal")) {
+				try {
+					return (Expression) ExpressionBuilder
+							.parse(child.getFirstChild().getNodeValue());
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
+		}
+		return null;
+	}
 	/**
 	 * parses the SLD for a text symbolizer
 	 * 

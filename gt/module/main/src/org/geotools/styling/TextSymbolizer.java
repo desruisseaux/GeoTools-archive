@@ -22,6 +22,8 @@
  */
 
 package org.geotools.styling;
+import java.util.Map;
+
 import org.geotools.filter.Expression;
 /**
  * $Id: TextSymbolizer.java,v 1.7 2003/08/06 18:11:24 desruisseaux Exp $
@@ -112,6 +114,43 @@ public interface TextSymbolizer extends Symbolizer {
      *  that should be used.  If null then the default geometry should be used.
      */
     void setGeometryPropertyName(String name);    
+    
+    /**
+     * Priority -- null       = use the default labeling priority
+     *             Expression = an expression that evaluates to a number (ie. Integer, Long, Double...)
+     *                          Larger = more likely to be rendered
+     * @param e
+     */
+    void setPriority(Expression e);
+    /**
+     * Priority -- null       = use the default labeling priority
+     *             Expression = an expression that evaluates to a number (ie. Integer, Long, Double...)
+     *                          Larger = more likely to be rendered
+     * @param e
+     */
+    Expression getPriority();
+    
+    /**
+     *   adds a parameter value to the options map
+     * @param key
+     * @param value
+     */
+    void addToOptions(String key, String value);
+    /**
+     * Find the value of a key in the map (may return null)
+     * @param key
+     * @return
+     */
+    String getOption(String key);
+    /**
+     * return the map of option
+     *  
+     * @return null - no options set 
+     */
+    Map getOptions();
+    
+    
+    
     
     void accept(StyleVisitor visitor);
 }

@@ -20,6 +20,10 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import java.util.HashMap;
+import java.util.Map;
+
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
@@ -41,6 +45,10 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
     private LabelPlacement labelPlacement;
     private String geometryPropertyName = null;
     private org.geotools.filter.Expression label = null;
+    
+    private Expression priority = null;
+    private HashMap  optionsMap = null;  //null=nothing in it
+    
 
     /** Creates a new instance of DefaultTextSymbolizer */
     protected TextSymbolizerImpl() {
@@ -254,5 +262,49 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
 
         return false;
     }
+
+	/* (non-Javadoc)
+	 * @see org.geotools.styling.TextSymbolizer#setPriority(org.geotools.filter.Expression)
+	 */
+	public void setPriority(Expression e) {
+		priority = e;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.styling.TextSymbolizer#getPriority()
+	 *  null = "default"
+	 *  should evaluate to a Number.
+	 */
+	public Expression getPriority() {
+		return priority;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.styling.TextSymbolizer#addToOptions(java.lang.String, java.lang.String)
+	 */
+	public void addToOptions(String key, String value) 
+	{
+		if (optionsMap == null)
+			optionsMap = new HashMap();
+	    optionsMap.put(key,value.trim());			
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.styling.TextSymbolizer#getOption(java.lang.String)
+	 */
+	public String getOption(String key) 
+	{
+		if (optionsMap == null)
+			return null;
+		return (String) optionsMap.get(key);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.styling.TextSymbolizer#getOptions()
+	 */
+	public Map getOptions() 
+	{
+		return optionsMap;
+	}
 
 }
