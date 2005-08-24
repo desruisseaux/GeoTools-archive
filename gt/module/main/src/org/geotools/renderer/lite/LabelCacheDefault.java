@@ -1,7 +1,9 @@
 /*
  *    uDig - User Friendly Desktop Internet GIS client
  *    http://udig.refractions.net
- *    (C) 2004, Refractions Research Inc.
+ *    (C) 2004, Refractions Research Inc. 
+ *    (C) 2005, Geotools PMC
+ *    (c) others
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -13,6 +15,8 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  *
+ *     @author dblasby
+ *     @author jessie
  */
 package org.geotools.renderer.lite;
 
@@ -26,6 +30,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,6 +43,7 @@ import java.util.Map;
 import javax.media.jai.util.Range;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.Expression;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.TextStyle2D;
 import org.geotools.styling.TextSymbolizer;
@@ -92,15 +98,40 @@ import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
  *         tiny label, dont bother).  Metrics are descibed in #3.
  *6. TODO: add ability for SLD to tweak parameters (ie. "always label").  
  *
+ *
+ * ------------------------------------------------------------------------------------------
+ * I've added extra functionality;
+ *   a) priority -- if you set the <Priority> in a TextSymbolizer, then you can control the order of labelling
+ *        ** see mailing list for more details 
+ *   b) <VendorOption name="group">no</VendorOption> --- turns off grouping for this symbolizer
+ *   c) <VendorOption name="spaceAround">5</VendorOption> -- do not put labels within 5 pixels of this label.
+ * 
  *  @author jeichar,dblasby
  * @since 0.9.0
  */
 public class LabelCacheDefault implements LabelCache {
 
+	/**
+	 *  labels that arent this good will not be shown
+	 */
+	public double MIN_GOODNESS_FIT = 0.7;
+	
+	public double DEFAULT_PRIORITY = 1000.0;
+	
     /** Map<label, LabelCacheItem> the label cache */
 	protected Map labelCache=new HashMap();
+	
+	/** non-grouped labels get thrown in here**/
+	protected ArrayList labelCacheNonGrouped = new ArrayList();
+	
+	public boolean DEFAULT_GROUP=true; //what to do if there's no grouping option
+	public int DEFAULT_SPACEAROUND = 0;
+	
+	
 	protected SLDStyleFactory styleFactory=new SLDStyleFactory();
 	boolean stop=false;
+	
+	LineLengthComparator lineLengthComparator = new LineLengthComparator ();
 	
 	public void stop() {
 		stop=true;
@@ -119,27 +150,131 @@ public class LabelCacheDefault implements LabelCache {
 	}
 
 	/**
+	 *  get the priority from the symbolizer
+	 *   its an expression, so it will try to evaluate it:
+	 *     1. if its missing --> DEFAULT_PRIORITY
+	 *     2. if its a number, return that number
+	 *     3. if its not a number, convert to string and try to parse the number; return the number
+	 *     4. otherwise, return DEFAULT_PRIORITY
+	 * @param symbolizer
+	 * @param feature
+	 * @return
+	 */
+    public double getPriority(TextSymbolizer symbolizer,Feature feature)
+    {
+    	if (symbolizer.getPriority() == null)
+    		return DEFAULT_PRIORITY;
+    	
+    	//evaluate
+    	Object o = symbolizer.getPriority().getValue(feature);
+    	if (o==null)
+    		return DEFAULT_PRIORITY;
+    	
+    	if (o instanceof Number)
+    		return ((Number)o).doubleValue();
+    	
+    	String oStr = o.toString();
+    	
+    	try{
+    		double d= Double.parseDouble(oStr);
+    		return d;
+    	}
+    	catch (Exception e)
+		{
+    		return DEFAULT_PRIORITY;
+		}    	
+    }
+
+	/**
 	 * @see org.geotools.renderer.lite.LabelCache#put(org.geotools.renderer.style.TextStyle2D, org.geotools.renderer.lite.LiteShape)
 	 */
 	public void put(TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange) 
 	{
 		try{
-			TextStyle2D textStyle=(TextStyle2D) styleFactory.createStyle(feature, symbolizer, scaleRange);
-	    	//equals and hashcode of LabelCacheItem is the hashcode of label and the
-	    	// equals of the 2 labels so label can be used to find the entry.  
-	    	if( !labelCache.containsKey(textStyle.getLabel())){
-	    		labelCache.put(textStyle.getLabel(), new LabelCacheItem(textStyle, shape));
-	    	}else{
-	    		LabelCacheItem item=(LabelCacheItem) labelCache.get(textStyle.getLabel());
-	    		item.getGeoms().add(shape.getGeometry());
-	    	}
+			//get label and geometry				
+		    Object labelObj = symbolizer.getLabel().getValue(feature);
+		    
+			if (labelObj == null)
+				return;
+		    String label = labelObj.toString().trim(); //DJB: remove white space from label
+		    if (label.length() ==0)
+		    	return; // dont label something with nothing!
+		    
+		    double priorityValue = getPriority(symbolizer,feature);
+		    
+		    
+		    boolean group = isGrouping(symbolizer);
+		    
+		    if (!(group))
+		    {
+		    	TextStyle2D textStyle=(TextStyle2D) styleFactory.createStyle(feature, symbolizer, scaleRange);
+				LabelCacheItem item = new LabelCacheItem(textStyle, shape);
+				item.setPriority(priorityValue);
+				item.setSpaceAround( getSpaceAround(symbolizer) );
+				labelCacheNonGrouped.add(item);
+		    }
+		    else
+		    {    /// --------- grouping case ----------------
+			    
+		    	//equals and hashcode of LabelCacheItem is the hashcode of label and the
+		    	// equals of the 2 labels so label can be used to find the entry.
+				
+				//DJB: this is where the "grouping" of 'same label' features occurs
+				LabelCacheItem lci = (LabelCacheItem)  labelCache.get(  label );
+				if (lci == null) //nothing in there yet!
+				{
+					TextStyle2D textStyle=(TextStyle2D) styleFactory.createStyle(feature, symbolizer, scaleRange);
+					LabelCacheItem item = new LabelCacheItem(textStyle, shape);
+					item.setPriority(priorityValue);
+					item.setSpaceAround( getSpaceAround(symbolizer) );
+					labelCache.put(label, item );
+				}
+				else
+				{
+					//add				
+					lci.setPriority (  lci.getPriority() + priorityValue );
+					lci.getGeoms().add(shape.getGeometry());
+				}					
+		    }
 		}
 		catch(Exception e)  //DJB: protection if there's a problem with the decimation (getGeometry() can be null)
 		{
 			//do nothing
 		}
 	}
+	
+	/**
+	 * pull space around from the sybolizer options - defaults to DEFAULT_SPACEAROUND.
+	 * @param symbolizer
+	 * @return
+	 */
+	private int getSpaceAround(TextSymbolizer symbolizer) 
+	{
+		String value = symbolizer.getOption("spaceAround");
+		if (value == null)
+			return DEFAULT_SPACEAROUND;
+		try {
+			return Integer.parseInt(value);
+		}
+		catch (Exception e)
+		{
+			return DEFAULT_SPACEAROUND;
+		}
+	}
 
+	/**
+	 *   look at the options in the symbolizer for "group".  return its value
+	 *   if not present, return "DEFAULT_GROUP"
+	 * @param symbolizer
+	 * @return
+	 */
+	private boolean isGrouping(TextSymbolizer symbolizer) 
+	{
+		String value = symbolizer.getOption("group");
+		if (value == null)
+			return DEFAULT_GROUP;
+		return value.equalsIgnoreCase("yes")||value.equalsIgnoreCase("true")||value.equalsIgnoreCase("1");
+	}
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#endLayer(java.awt.Graphics2D, java.awt.Rectangle)
 	 */
@@ -147,50 +282,76 @@ public class LabelCacheDefault implements LabelCache {
 	}
 
 	/**
+	 *   return a list with all the values in priority order.  Both grouped and non-grouped
+	 * @param labelCache
+	 * @return
+	 */
+	public List orderedLabels()
+	{
+		Collection c = labelCache.values();
+		ArrayList al = new ArrayList(c); // modifiable (ie. sortable)
+		
+		al.addAll(labelCacheNonGrouped);
+		
+		Collections.sort(al);
+		Collections.reverse(al);
+		return al;		
+	}
+	/**
 	 * @see org.geotools.renderer.lite.LabelCache#end(java.awt.Graphics2D, java.awt.Rectangle)
 	 */
 	public void end(Graphics2D graphics, Rectangle displayArea) {
 		List glyphs=new ArrayList();
-    	for (Iterator labelIter = labelCache.keySet().iterator(); labelIter.hasNext();) 
+		
+		GeometryFactory factory=new GeometryFactory();
+		Geometry displayGeom=factory.toGeometry(new Envelope(displayArea.getMinX(), displayArea.getMaxX(),
+				displayArea.getMinY(), displayArea.getMaxY()));
+        
+		List items = orderedLabels();  // both grouped and non-grouped
+    	for (Iterator labelIter = items.iterator(); labelIter.hasNext();) 
     	{
     		if(stop)
     			return;
     		try{
-				LabelCacheItem labelItem = (LabelCacheItem) labelCache.get(labelIter.next());
-	
-				
-				GeometryFactory factory=new GeometryFactory();
-				Geometry displayGeom=factory.toGeometry(new Envelope(displayArea.getMinX(), displayArea.getMaxX(),
-						displayArea.getMinY(), displayArea.getMaxY()));
-	
-				AffineTransform oldTransform = graphics.getTransform();
-				AffineTransform tempTransform = new AffineTransform(oldTransform);			
-	
+				//LabelCacheItem labelItem = (LabelCacheItem) labelCache.get(labelIter.next());
+    			LabelCacheItem labelItem = (LabelCacheItem) labelIter.next();
 				GlyphVector glyphVector = labelItem.getTextStyle().getTextGlyphVector(graphics);
 				
 				//DJB: simplified this.  Just send off to the point,line,or polygon routine
 				//    NOTE: labelItem.getGeometry() returns the FIRST geometry, so we're assuming that lines & points arent mixed
 				//          If they are, then the FIRST geometry determines how its rendered (which is probably bad since it should be in area,line,point order
 				//TOD: as in NOTE above
+				Geometry geom = labelItem.getGeometry();
 				
-				if ( ( labelItem.getGeometry() instanceof Point ) || ( labelItem.getGeometry() instanceof MultiPoint ) )
-					paintPointLabel(glyphVector, labelItem, tempTransform, displayGeom);
+				AffineTransform oldTransform = graphics.getTransform();
+				AffineTransform tempTransform = new AffineTransform(oldTransform);
 				
+				Geometry representativeGeom = null;
 				
+				if ( ( geom instanceof Point ) || ( geom instanceof MultiPoint ) )
+					representativeGeom=paintPointLabel(glyphVector, labelItem, tempTransform, displayGeom);
+				else if( ( (geom instanceof LineString )
+						&& !(geom instanceof LinearRing))
+						 ||( geom instanceof MultiLineString ))
+					representativeGeom = paintLineLabel(glyphVector, labelItem, tempTransform, displayGeom);
+				else if( geom instanceof Polygon ||
+						geom instanceof MultiPolygon ||
+						geom instanceof LinearRing )
+					representativeGeom=paintPolygonLabel(glyphVector, labelItem, tempTransform, displayGeom);
 				
-				if( ( (labelItem.getGeometry() instanceof LineString )
-						&& !(labelItem.getGeometry() instanceof LinearRing))
-						 ||( labelItem.getGeometry() instanceof MultiLineString ))
-					paintLineLabel(glyphVector, labelItem, tempTransform, displayGeom);
+				//DJB: this is where overlapping labels are forbidden (first out of the map has priority)
+
+
 				
-				
-				if( labelItem.getGeometry() instanceof Polygon ||
-						labelItem.getGeometry() instanceof MultiPolygon ||
-						labelItem.getGeometry() instanceof LinearRing )
-					paintPolygonLabel(glyphVector, labelItem, tempTransform, displayGeom);
-				
-				if( overlappingItems(glyphVector, tempTransform, glyphs)  )
+				if (offscreen(glyphVector, tempTransform,displayArea ))  // is this offscreen?
 					continue;
+				
+				if( overlappingItems(glyphVector, tempTransform, glyphs, labelItem.getSpaceAround())  )
+					continue;
+				
+				if (goodnessOfFit(glyphVector, tempTransform, representativeGeom ) < MIN_GOODNESS_FIT)
+					continue;
+
 				try {
 				    graphics.setTransform(tempTransform);
 				    
@@ -222,7 +383,12 @@ public class LabelCacheDefault implements LabelCache {
 				        graphics.setPaint(fill);
 				        graphics.setComposite(comp);
 				        graphics.drawGlyphVector(glyphVector, 0, 0);
-				        glyphs.add(glyphVector.getPixelBounds(new FontRenderContext(tempTransform, true, false), 0,0));
+				        Rectangle bounds = glyphVector.getPixelBounds(new FontRenderContext(tempTransform, true, false), 0,0);
+				        int extraSpace = labelItem.getSpaceAround();
+				        bounds = new Rectangle(bounds.x-extraSpace,bounds.y-extraSpace,
+				        		bounds.width+extraSpace, bounds.height+extraSpace );
+
+				        glyphs.add(bounds);
 				    }
 				} finally {
 				    graphics.setTransform(oldTransform);
@@ -237,6 +403,102 @@ public class LabelCacheDefault implements LabelCache {
     }
 
 	/**
+	 *   how well does the label "fit" with the geometry.
+	 *     1. points
+	 *               ALWAYS RETURNS 1.0
+	 *     2. lines
+	 *              ALWAYS RETURNS 1.0 (modify polygon method to handle rotated labels)
+	 *     3. polygon
+	 *                + assume: polylabels are unrotated
+	 *                + assume: polygon could be invalid
+	 *                +         dont worry about holes
+	 *             
+	 *           like to RETURN area of intersection between polygon and label bounds, but thats expensive
+	 *            and likely to give us problems due to invalid polygons
+	 *          SO, use a sample method - make a few points inside the label and see if they're "close to" the polygon
+	 *          The method sucks, but works well...
+	 *           
+	 * @param glyphVector
+	 * @param tempTransform
+	 * @param representativeGeom
+	 * @return
+	 */
+	private double goodnessOfFit(GlyphVector glyphVector, AffineTransform tempTransform, Geometry representativeGeom) 
+	{
+		if (representativeGeom instanceof Point)
+		{
+			return 1.0;
+		}
+		if (representativeGeom instanceof LineString)
+		{
+			return 1.0;
+		}
+		if (representativeGeom instanceof Polygon)
+		{
+			Rectangle glyphBounds = glyphVector.getPixelBounds(new FontRenderContext(tempTransform,true,false), 0,0);
+			try {
+				Polygon p = simplifyPoly( (Polygon)representativeGeom );
+				int count =0;
+				int n=10;
+				double mindistance = (glyphBounds.height);
+				for (int t=1;t<(n+1);t++ )
+				{
+					Coordinate c = new Coordinate(glyphBounds.x + ((double)glyphBounds.width) *  ( ((double)t)/(n+1) ),
+							    glyphBounds.getCenterY() );
+					Point pp = new Point(c,representativeGeom.getPrecisionModel(),representativeGeom.getSRID());
+					if (
+							 p.distance(pp) < mindistance  )
+						
+					{
+						count ++;
+					}
+				}
+				return ((double) count)/n;
+			}
+			catch(Exception e)
+			{				
+				representativeGeom.geometryChanged(); //djb -- jessie should do this during generalization
+				Envelope ePoly = representativeGeom.getEnvelopeInternal();
+				Envelope eglyph= new Envelope(glyphBounds.x,glyphBounds.x+glyphBounds.width,glyphBounds.y,glyphBounds.y+ glyphBounds.height);
+				Envelope inter = intersection(ePoly,eglyph);
+				if (inter!=null)
+					return (inter.getWidth()*inter.getHeight())/ (eglyph.getWidth()*eglyph.getHeight() );
+				return 0.0;
+			}
+		}
+		return 0.0;
+	}
+	
+	/**
+	 * Remove holes from a polygon
+	 * @param polygon
+	 * @return
+	 */
+	private Polygon simplifyPoly(Polygon polygon) 
+	{
+		LineString outer = polygon.getExteriorRing();
+		if (outer.getStartPoint().distance( outer.getEndPoint()) != 0)
+		{
+			List clist =  new ArrayList (Arrays.asList(outer.getCoordinates() ));
+			clist.add(outer.getStartPoint().getCoordinate());
+			outer =  outer.getFactory().createLinearRing( (Coordinate[]) clist.toArray(new Coordinate[clist.size()] ) );				
+		}
+		LinearRing r = (LinearRing) outer;
+		
+		return outer.getFactory().createPolygon(r,null);
+	}
+	/**
+	 *  Returns true if any part of the label is offscreen (even by a tinny bit)
+	 * @param glyphVector
+	 * @param tempTransform
+	 * @return
+	 */
+	private boolean offscreen(GlyphVector glyphVector, AffineTransform tempTransform,Rectangle screen) 
+	{
+		Rectangle glyphBounds = glyphVector.getPixelBounds(new FontRenderContext(tempTransform,true,false), 0,0);
+	    return !(screen.contains(glyphBounds));
+	}
+	/**
 	 * Determines whether labelItems overlaps a previously rendered label.
 	 * 
 	 * @param glyphVector new label
@@ -244,10 +506,15 @@ public class LabelCacheDefault implements LabelCache {
 	 * @param glyphs list of bounds of previously rendered glyphs.
 	 * @return true if labelItem overlaps a previously rendered glyph.
 	 */
-	private boolean overlappingItems(GlyphVector glyphVector, AffineTransform tempTransform, List glyphs) {
-		for (Iterator iter = glyphs.iterator(); iter.hasNext();) {
+	private boolean overlappingItems(GlyphVector glyphVector, AffineTransform tempTransform, List glyphs,int extraSpace) 
+	{
+		Rectangle glyphBounds = glyphVector.getPixelBounds(new FontRenderContext(tempTransform,true,false), 0,0);
+		glyphBounds = new Rectangle(glyphBounds.x-extraSpace,glyphBounds.y-extraSpace,
+				                    glyphBounds.width+extraSpace, glyphBounds.height+extraSpace );
+		for (Iterator iter = glyphs.iterator(); iter.hasNext();) 
+		{
 			Rectangle oldBounds = (Rectangle) iter.next();
-			if( oldBounds.intersects(glyphVector.getPixelBounds(new FontRenderContext(tempTransform,true,false), 0,0)))
+			if( oldBounds.intersects(glyphBounds) )
 				return true;
 		}
 		return false;
@@ -255,16 +522,17 @@ public class LabelCacheDefault implements LabelCache {
 
 	
 
-	private void paintLineLabel(GlyphVector glyphVector, LabelCacheItem labelItem, AffineTransform tempTransform, Geometry displayGeom) 
+	private Geometry paintLineLabel(GlyphVector glyphVector, LabelCacheItem labelItem, AffineTransform tempTransform, Geometry displayGeom) 
 	{
 		LineString line = (LineString) getLineSetRepresentativeLocation(labelItem.getGeoms(), displayGeom);
 		
 		if (line == null)
-			return;
+			return null;
 
 		TextStyle2D textStyle = labelItem.getTextStyle();
 
         paintLineStringLabel(glyphVector, line, textStyle, tempTransform);
+        return line;
 	}
 
 	private void paintLineStringLabel(GlyphVector glyphVector, LineString line, TextStyle2D textStyle, AffineTransform tempTransform) 
@@ -312,12 +580,12 @@ public class LabelCacheDefault implements LabelCache {
      *  Just choose the first one and paint it!
      * 
      */
-	private void paintPointLabel(GlyphVector glyphVector, LabelCacheItem labelItem, AffineTransform tempTransform, Geometry displayGeom) 
+	private Geometry paintPointLabel(GlyphVector glyphVector, LabelCacheItem labelItem, AffineTransform tempTransform, Geometry displayGeom) 
 	{
 		//    	 get the point onto the shape has to be painted
 		Point point=getPointSetRepresentativeLocation(labelItem.getGeoms(), displayGeom);
 		if (point == null)
-			return;
+			return null;
 		
 		TextStyle2D textStyle = labelItem.getTextStyle();
 		Rectangle2D textBounds = glyphVector.getVisualBounds();
@@ -344,14 +612,17 @@ public class LabelCacheDefault implements LabelCache {
 		}
 		tempTransform.rotate(textStyle.getRotation());
 		tempTransform.translate(displacementX, displacementY);
-
+		return point;
 	}
 	
-	private void paintPolygonLabel(GlyphVector glyphVector, LabelCacheItem labelItem, AffineTransform tempTransform, Geometry displayGeom) 
+	/**
+	 *  returns the representative geometry (for further processing)
+	 */
+	private Geometry paintPolygonLabel(GlyphVector glyphVector, LabelCacheItem labelItem, AffineTransform tempTransform, Geometry displayGeom) 
 	{
 		Polygon geom =  getPolySetRepresentativeLocation(labelItem.getGeoms(),  displayGeom);
 		if (geom == null)
-			return;
+			return null;
 		
 	
 		Point centroid;
@@ -371,7 +642,7 @@ public class LabelCacheDefault implements LabelCache {
 				}
 				catch(Exception eee)
 				{
-					return; //we're hooped
+					return null; //we're hooped
 				}
 			}
 		}
@@ -406,7 +677,7 @@ public class LabelCacheDefault implements LabelCache {
 		}
 		tempTransform.rotate(textStyle.getRotation());
 		tempTransform.translate(displacementX, displacementY);
-
+        return geom;        
 	}
     
 	/**
@@ -504,8 +775,7 @@ public class LabelCacheDefault implements LabelCache {
 				if (!(  (g instanceof LineString) || (g instanceof MultiLineString) ))
 					continue; //protection
 			}
-			
-			if (g instanceof LineString) 
+			else if (g instanceof LineString) 
 			{
 				lines.add(g);
 			}
@@ -531,10 +801,11 @@ public class LabelCacheDefault implements LabelCache {
 		//clip to bounding box
 		ArrayList clippedLines = new ArrayList();
 		it = merged.iterator();
+		Envelope displayGeomEnv = displayGeometry.getEnvelopeInternal();
 		while (it.hasNext())
 		{
 			LineString l = (LineString) it.next();
-			MultiLineString ll = clipLineString(l,(Polygon) displayGeometry);
+			MultiLineString ll = clipLineString(l,(Polygon) displayGeometry,displayGeomEnv);
 			if ((ll != null) && (!(ll.isEmpty())) )
 			{
 				for (int t=0;t<ll.getNumGeometries();t++)
@@ -570,9 +841,17 @@ public class LabelCacheDefault implements LabelCache {
 	 * @param bbox MUST BE A BOUNDING BOX
 	 * @return 
 	 */
-	public MultiLineString clipLineString(LineString line, Polygon bbox)
-	{
+	public MultiLineString clipLineString(LineString line, Polygon bbox,Envelope displayGeomEnv)
+	{		
 		Geometry clip = line;
+		line.geometryChanged();//djb -- jessie should do this during generalization
+		if (displayGeomEnv.contains(line.getEnvelopeInternal()))
+		{
+			//shortcut -- entirely inside the display rectangle -- no clipping required!
+			LineString[] lns = new LineString[1];
+			lns[0] =  (LineString) clip;
+			return line.getFactory().createMultiLineString(lns); 
+		}
 		try{
 			clip = EnhancedPrecisionOp.intersection(line,bbox);
 		}
@@ -660,10 +939,11 @@ public class LabelCacheDefault implements LabelCache {
 //		clip
 		ArrayList clippedPolys = new ArrayList();
 		it = polys.iterator();
+		Envelope displayGeomEnv = displayGeometry.getEnvelopeInternal();
 		while (it.hasNext())
 		{
 			Polygon p = (Polygon) it.next();
-			MultiPolygon pp = clipPolygon(p,(Polygon) displayGeometry);
+			MultiPolygon pp = clipPolygon(p,(Polygon) displayGeometry,displayGeomEnv);
 			if ((pp != null) && (!(pp.isEmpty())) )
 			{
 				for (int t=0;t<pp.getNumGeometries();t++)
@@ -696,9 +976,20 @@ public class LabelCacheDefault implements LabelCache {
 	 * @param bbox
 	 * @return
 	 */
-	public MultiPolygon clipPolygon(Polygon poly, Polygon bbox)
+	public MultiPolygon clipPolygon(Polygon poly, Polygon bbox,Envelope displayGeomEnv)
 	{
+		
 		Geometry clip = poly;
+		poly.geometryChanged();//djb -- jessie should do this during generalization
+		if (displayGeomEnv.contains(poly.getEnvelopeInternal()))
+		{
+			//shortcut -- entirely inside the display rectangle -- no clipping required!
+			Polygon[] polys = new Polygon[1];
+			polys[0] = (Polygon) clip;
+			return poly.getFactory().createMultiPolygon(polys);  
+		}
+		
+
 		try{
 			clip = EnhancedPrecisionOp.intersection(poly,bbox);
 		}
@@ -810,8 +1101,9 @@ public class LabelCacheDefault implements LabelCache {
 	Collection mergeLines(Collection lines)
 	{
 		LineMerger lm = new LineMerger();
-		lm.add(lines);
+	lm.add(lines);
 		Collection merged = lm.getMergedLineStrings(); //merged lines
+	//	Collection merged = lines;
 		
 		if (merged.size() == 0)
 		{
@@ -839,7 +1131,7 @@ public class LabelCacheDefault implements LabelCache {
 		while (keep_going)
 		{
 			keep_going = false; //no news is bad news
-			Collections.sort(mylines, new LineLengthComparator () ); //sorted long->short
+			Collections.sort(mylines, lineLengthComparator ); //sorted long->short
 			for (int t=0;t<mylines.size();t++)  //for each line
 			{
 				LineString major = (LineString) mylines.get(t); // this is the search geometry (step #1)
@@ -962,7 +1254,29 @@ public class LabelCacheDefault implements LabelCache {
 		public int compare(Object o1, Object o2) //note order - this sort big->small
 		{
 			return Double.compare( ((LineString)o2 ).getLength() , ((LineString)o1 ).getLength() );
-		}
-		
+		}		
 	}
+	
+	private Envelope intersection(Envelope e1,Envelope e2)
+	{
+			double tx1 = e1.getMinX();
+			double ty1 = e1.getMinY();
+			double rx1 = e2.getMinX();
+			double ry1 = e2.getMinY();
+			double tx2 = tx1; tx2 += e1.getWidth();
+			double ty2 = ty1; ty2 += e1.getHeight();
+			double rx2 = rx1; rx2 += e2.getWidth();
+			double ry2 = ry1; ry2 += e2.getHeight();
+			if (tx1 < rx1) tx1 = rx1;
+			if (ty1 < ry1) ty1 = ry1;
+			if (tx2 > rx2) tx2 = rx2;
+			if (ty2 > ry2) ty2 = ry2;
+			tx2 -= tx1;
+			ty2 -= ty1;
+			if ((tx2<0) || (ty2<0))
+				return null;
+			return new Envelope(tx1,tx1+ tx2, ty1,  ty1+ ty2);
+		    
+	}
+	
 }

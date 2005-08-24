@@ -20,11 +20,40 @@ import com.vividsolutions.jts.geom.Point;
  * The Labelling information that is put in the label cache.
  * 
  * @author jeichar
+ * @author dblasby
  */
-public class LabelCacheItem {
+public class LabelCacheItem implements Comparable
+{
 	TextStyle2D textStyle;
 	List geoms=new ArrayList();
+	double priority = 0.0;
+	int spaceAround = 0;
 	
+	/**
+	 * space around - "dont put any label near me by this # of pixels"
+	 */
+	public int getSpaceAround()
+	{
+		return spaceAround;
+	}
+	
+	/**
+	 * space around - "dont put any label near me by this # of pixels"
+	 */
+	public void setSpaceAround(int space)
+	{
+		spaceAround = space;
+	}
+	
+	public double getPriority()
+	{
+		return priority;
+	}
+	
+	public void setPriority(double d)
+	{
+		priority = d;
+	}
 	/**
 	 * Construct <code>LabelCacheItem</code>.
 	 */
@@ -78,5 +107,14 @@ public class LabelCacheItem {
 	 */
 	public Geometry getGeometry() {
 		return (Geometry) geoms.get(0);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(Object o) 
+	{
+		LabelCacheItem other = (LabelCacheItem) o;
+		return Double.compare(this.getPriority(),other.getPriority() );		
 	}
 }
