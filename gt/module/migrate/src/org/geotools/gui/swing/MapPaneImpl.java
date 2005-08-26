@@ -20,6 +20,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -98,12 +99,17 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
      */
     public MapPaneImpl(MapContext context, ToolList toolList)
     throws IllegalArgumentException, IOException {
+        this(context, toolList, true);
+    }
+    
+    public MapPaneImpl(MapContext context, ToolList toolList, boolean concatTransform)
+    throws IllegalArgumentException, IOException {
         if ((context == null) || (toolList == null)) {
             throw new IllegalArgumentException();
         } else {
             this.toolList = toolList;
             this.renderer = new LiteRenderer(context);
-            ((LiteRenderer) renderer).setConcatTransforms(true);
+            ((LiteRenderer) renderer).setConcatTransforms(concatTransform);
             // this.renderer = new org.geotools.renderer.Java2DRenderer(context);
             this.context = context;
             
@@ -184,7 +190,9 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
             if (h == 0) {
                 h = 2;
             }
-            
+            Point p = this.getLocation();
+    //         Graphics moved = graphics.create((int) p.getX(), (int) -p.getY(), (int) graphics.getClipBounds().getWidth(), (int) graphics.getClipBounds().getHeight());
+
             // paint only what's needed
             renderer.paint((Graphics2D) graphics,
                     graphics.getClipBounds(),
