@@ -1,5 +1,7 @@
 package org.opengis.feature;
 
+import org.opengis.feature.type.Type;
+
 
 public interface Attribute {
 
@@ -20,10 +22,8 @@ public interface Attribute {
 	 */
 	void set(Object newValue);
 
-	/*
-	 * @return         Returns the type1.
-	 * @uml.property   name="type" default="new org.opengis.feature.type.Type()"
-	 * @uml.associationEnd   multiplicity="(1 1)" inverse="attribute:org.opengis.feature.type.Type"
+	/**
+	 * @return Type information descirbing allowable content
 	 */
-	//public Type getType();
+	public Type getType();
 }
