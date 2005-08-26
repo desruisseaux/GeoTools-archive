@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import org.opengis.feature.type.FeatureCollectionType;
 
-public interface FeatureCollection {
+public interface FeatureCollection extends Feature {
     FeatureCollectionType getType();
 
     /**

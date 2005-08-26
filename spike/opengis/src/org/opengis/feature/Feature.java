@@ -2,7 +2,7 @@ package org.opengis.feature;
 
 import org.opengis.feature.type.FeatureType;
 
-interface Feature<GeometryAttribute> {
+interface Feature extends Complex  {
    /**
     * Feature ID, should be unique, inmutable identification for physical Feature being modeled.
     * <p>
