@@ -12,8 +12,13 @@ import org.opengis.spatialschema.geometry.Geometry;
  * <li>srs
  * <li>bounds
  * </ul>
+ * </p>
+ * <p>
+ * This class is cotten candy and does not add any new ability
+ * to our modeling.
+ * </p>
  */
-interface GeometryAttribute {
+public interface GeometryAttribute {
    CoordinateReferenceSystem getCRS();
    Object getBounds();
    /**

@@ -6,7 +6,7 @@ import org.opengis.feature.schema.Schema;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Type;
 
-interface Complex extends Attribute {
+public interface Complex extends Attribute {
    /**
     * Access the type of this construct.
     */
