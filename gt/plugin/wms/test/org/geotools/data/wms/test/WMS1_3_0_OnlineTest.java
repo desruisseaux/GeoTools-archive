@@ -50,10 +50,10 @@ import org.xml.sax.SAXException;
  * @author rgould
  *
  */
-public class WMS1_3_0Test extends WMS1_1_1Test{
+public class WMS1_3_0_OnlineTest extends WMS1_1_1_OnlineTest{
     
     private URL server2;
-    public WMS1_3_0Test() throws Exception {
+    public WMS1_3_0_OnlineTest() throws Exception {
         this.spec = new WMS1_3_0();
         this.server = new URL("http://www2.demis.nl/mapserver/Request.asp?Service=WMS&Version=1.3.0&Request=GetCapabilities");
         

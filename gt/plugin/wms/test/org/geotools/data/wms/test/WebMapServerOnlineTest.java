@@ -53,7 +53,7 @@ import org.xml.sax.SAXException;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class WebMapServerTest extends ServerTestCase {
+public class WebMapServerOnlineTest extends ServerTestCase {
     URL serverURL;
     URL brokenURL;
     private URL featureURL;

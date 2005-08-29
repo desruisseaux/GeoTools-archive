@@ -35,9 +35,9 @@ import org.xml.sax.SAXException;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class WMS1_1_1Test extends WMS1_1_0Test {
+public class WMS1_1_1_OnlineTest extends WMS1_1_0_OnlineTest {
     
-    public WMS1_1_1Test() throws Exception {
+    public WMS1_1_1_OnlineTest() throws Exception {
         this.spec = new WMS1_1_1();
         
         this.server = new URL(

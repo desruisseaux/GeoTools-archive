@@ -44,11 +44,11 @@ import org.geotools.xml.schema.Schema;
 import org.xml.sax.SAXException;
 
 
-public class WMS1_0_0Test extends ServerTestCase {
+public class WMS1_0_0_OnlineTest extends ServerTestCase {
     protected URL server;
     protected Specification spec;
     
-    public WMS1_0_0Test() throws Exception {
+    public WMS1_0_0_OnlineTest() throws Exception {
         this.spec = new WMS1_0_0();
         this.server = new URL(
                 "http://www2.demis.nl/mapserver/Request.asp?wmtver=1.0.0&request=getcapabilities");

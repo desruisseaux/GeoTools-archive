@@ -45,10 +45,10 @@ import org.xml.sax.SAXException;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class WMS1_1_0Test extends WMS1_0_0Test {
+public class WMS1_1_0_OnlineTest extends WMS1_0_0_OnlineTest {
     protected URL getStylesURL;
     
-    public WMS1_1_0Test() throws Exception {
+    public WMS1_1_0_OnlineTest() throws Exception {
         server = new URL("http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
         spec = new WMS1_1_0();
     }
