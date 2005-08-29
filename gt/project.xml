@@ -334,6 +334,11 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
+      <excludes>
+        <exclude>**/*StressTest.java</exclude>  <!-- remove this exclude before making major releases -->
+        <exclude>**/*OnlineTest.java</exclude>  <!-- remove this exclude before making major releases -->
+        <exclude>**/Geot553Test.java</exclude>
+      </excludes>
     </unitTest>
   </build>
   <reports>
