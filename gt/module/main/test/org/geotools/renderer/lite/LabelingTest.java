@@ -216,14 +216,15 @@ public class LabelingTest extends TestCase {
         		new Coordinate(startx, starty),
         };
         LinearRing line= geomFac.createLinearRing(c);
+        Polygon poly = geomFac.createPolygon(line,null);
 		if (crs != null)
-            types[0] = AttributeTypeFactory.newAttributeType("polygon", line.getClass(), false, 0,
+            types[0] = AttributeTypeFactory.newAttributeType("polygon", poly.getClass(), false, 0,
                     null, crs);
         else
             types[0] = AttributeTypeFactory.newAttributeType("centre", line.getClass());
 		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
 		FeatureType pointType = FeatureTypeFactory.newFeatureType(types, Rendering2DTest.POLYGON);
-		Feature pointFeature = pointType.create(new Object[]{line, name});
+		Feature pointFeature = pointType.create(new Object[]{poly, name});
 		
 		return pointFeature;
 	}
