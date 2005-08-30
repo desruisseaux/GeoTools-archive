@@ -31,8 +31,8 @@ import java.io.Serializable;
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridRange;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -107,27 +107,55 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
-     * Constructs a new grid geometry. An affine transform will be computed automatically
-     * from the specified envelope.  The {@code reverse} argument tells whatever or
-     * not an axis should be reversed. Callers will typically set {@code reverse[1]}
-     * to {@code true} in order to reverse the <var>y</var> axis.
+     * Constructs a new grid geometry from an envelope.
      *
-     * @param gridRange The valid coordinate range of a grid coverage.
-     * @param userRange The corresponding coordinate range in user coordinate.
-     *                  This rectangle must contains entirely all pixels, i.e.
-     *                  the rectangle's upper left corner must coincide with
-     *                  the upper left corner of the first pixel and the rectangle's
-     *                  lower right corner must coincide with the lower right corner
-     *                  of the last pixel.
-     * @param reverse   Tells whatever or not reverse axis. A {@code null} value reverse no axis.
+     * @deprecated Replaced by {@code GeneralGridGeometry(gridRange, userRange, reverse, false)}.
+     *             Users just need to append the {@code false} argument value, so this constructor
+     *             will be removed in a future version in order to keep the API lighter.
      */
     public GeneralGridGeometry(final GridRange gridRange,
                                final Envelope  userRange,
                                final boolean[] reverse)
     {
+        this(gridRange, userRange, reverse, false);
+    }
+
+    /**
+     * Constructs a new grid geometry from an envelope. An affine transform will be computed
+     * automatically from the specified envelope. The two last arguments are hints about the
+     * affine transform to be created: the {@code reverse} argument tells which (if any) axis
+     * should be reversed, and the {@code swapXY} tells if the two first axis should be
+     * interchanged.
+     * <p>
+     * If this convenience constructor do not provides suffisient control on axis order or reversal,
+     * then an affine transform shall be created outside and the grid geometry shall be created
+     * using the {@linkplain #GeneralGridGeometry(GridRange,MathTransform) constructor expecting
+     * a math transform} argument.
+     *
+     * @param gridRange The valid coordinate range of a grid coverage.
+     * @param userRange The corresponding coordinate range in user coordinate. This rectangle must
+     *                  contains entirely all pixels, i.e. the rectangle's upper left corner must
+     *                  coincide with the upper left corner of the first pixel and the rectangle's
+     *                  lower right corner must coincide with the lower right corner of the last
+     *                  pixel.
+     * @param reverse   Tells for each axis whatever or not it should be reversed. A {@code null}
+     *                  value reverse no axis. Callers will typically set {@code reverse[1]} to 
+     *                  {@code true} in order to reverse the <var>y</var> axis direction.
+     * @param swapXY    If {@code true}, then the two first axis will be interchanged. Callers will
+     *                  typically set this argument to {@code true} when the geographic coordinate
+     *                  system has axis in the (<var>y</var>,<var>x</var>) order. The {@code reverse}
+     *                  parameter then apply to axis after the swap.
+     */
+    public GeneralGridGeometry(final GridRange gridRange,
+                               final Envelope  userRange,
+                               final boolean[] reverse,
+                               final boolean   swapXY)
+    {
         this.gridRange = gridRange;
         /*
-         * Check arguments validity. Dimensions must match.
+         * Checks arguments validity. Grid range and envelope dimensions must match.
+         * We are more tolerant for the coordinate system dimension (if any), since
+         * it is only an optional hint for interchanging axis in a more common order.
          */
         final int dimension = gridRange.getDimension();
         final int userDim   = userRange.getDimension();
@@ -144,23 +172,27 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
          */
         final Matrix matrix = MatrixFactory.create(dimension+1);
         for (int i=0; i<dimension; i++) {
-            double scale = userRange.getLength(i) / gridRange.getLength(i);
-            double trans;
-            if (reverse==null || !reverse[i]) {
-                trans = userRange.getMinimum(i);
-            } else {
-                scale = -scale;
-                trans = userRange.getMaximum(i);
+            int j = i;
+            if (swapXY && i<=1) {
+                j = 1-j;
             }
-            trans -= scale * (gridRange.getLower(i)-0.5);
-            matrix.setElement(i, i,         scale);
-            matrix.setElement(i, dimension, trans);
+            double scale = userRange.getLength(i) / gridRange.getLength(i);
+            double offset;
+            if (reverse==null || !reverse[j]) {
+                offset = userRange.getMinimum(i);
+            } else {
+                scale  = -scale;
+                offset = userRange.getMaximum(i);
+            }
+            offset -= scale * (gridRange.getLower(i)-0.5);
+            matrix.setElement(j, i,         scale );
+            matrix.setElement(j, dimension, offset);
         }
         gridToCoordinateSystem = ProjectiveTransform.create(matrix);
     }
 
     /**
-     * Format an error message for mismatched dimension.
+     * Formats an error message for mismatched dimension.
      */
     private static String format(final int dim1, final int dim2) {
         return Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2, new Integer(dim1), new Integer(dim2));
@@ -244,46 +276,6 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             return gridToCoordinateSystem;
         }
         throw new InvalidGridGeometryException(); // TODO: provide a localized message.
-    }
-
-    /**
-     * Try to guess which axis are inverted in this grid geometry. If
-     * this method can't make the guess, it returns {@code null}.
-     *
-     * @return An array with length equals  to the number of dimensions in the "real world"
-     *         coordinate reference system, or {@code null} if this array can't be deduced.
-     */
-    final boolean[] areAxisInverted() {
-        final Matrix matrix;
-        try {
-            // Try to get the affine transform, assuming it is
-            // insensitive to location (thus the 'null' argument).
-            matrix = gridToCoordinateSystem.derivative(null);
-        } catch (NullPointerException exception) {
-            // The approximate affine transform is location-dependent.
-            // We can't guess axis orientation from this.
-            return null;
-        } catch (Exception exception) {
-            // Some other error occured. We didn't expected it,
-            // but it will not prevent 'GridCoverage' to work.
-            Utilities.unexpectedException("org.geotools.referencing", "MathTransform",
-                                          "derivative", exception);
-            return null;
-        }
-        final int numCol = matrix.getNumCol();
-        final boolean[] inverse = new boolean[matrix.getNumRow()];
-        for (int j=0; j<inverse.length; j++) {
-            for (int i=0; i<numCol; i++) {
-                final double value = matrix.getElement(j,i);
-                if (i == j) {
-                    inverse[j] = (value < 0);
-                } else if (value!=0) {
-                    // Matrix is not diagonal. Can't guess axis direction.
-                    return null;
-                }
-            }
-        }
-        return inverse;
     }
 
     /**

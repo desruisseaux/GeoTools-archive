@@ -55,12 +55,16 @@ import org.geotools.util.SimpleInternationalString;
 /**
  * Describes the band values for a grid coverage.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 final class Grid2DSampleDimension extends GridSampleDimension {
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = 946331925096804779L;
+
     /**
      * Band number for this sample dimension.
      */
@@ -126,8 +130,8 @@ final class Grid2DSampleDimension extends GridSampleDimension {
          * by a default SampleDimension. In all cases, count the number of geophysics
          * and non-geophysics sample dimensions.
          */
-        int nGeo = 0;
-        int nInt = 0;
+        int countGeophysics = 0;
+        int countIndexed    = 0;
         GridSampleDimension[] defaultSD = null;
         for (int i=0; i<numBands; i++) {
             GridSampleDimension sd = (src!=null) ? src[i] : null;
@@ -146,13 +150,13 @@ final class Grid2DSampleDimension extends GridSampleDimension {
             }
             sd = new Grid2DSampleDimension(sd, image, i);
             dst[i] = sd;
-            if (sd.geophysics(true ) == sd) nGeo++;
-            if (sd.geophysics(false) == sd) nInt++;
+            if (sd.geophysics(true ) == sd) countGeophysics++;
+            if (sd.geophysics(false) == sd) countIndexed++;
         }
-        if (nGeo == numBands) {
+        if (countGeophysics == numBands) {
             return true;
         }
-        if (nInt == numBands) {
+        if (countIndexed == numBands) {
             return false;
         }
         throw new IllegalArgumentException(Errors.format(ErrorKeys.MIXED_CATEGORIES));
@@ -163,19 +167,15 @@ final class Grid2DSampleDimension extends GridSampleDimension {
      *
      * @param  name The name for data (e.g. "Elevation").
      * @param  raster The raster.
-     * @param  min The minimal value for each bands, or {@code null} for computing it
-     *         automatically.
-     * @param  max The maximal value for each bands, or {@code null} for computing it
-     *         automatically.
+     * @param  min The minimal value for each bands, or {@code null} for computing it automatically.
+     * @param  max The maximal value for each bands, or {@code null} for computing it automatically.
      * @param  units The units of sample values, or {@code null} if unknow.
-     * @param  colors The colors to use for values from {@code min} to {@code max}
-     *         for each bands, or {@code null} for a default color palette. If non-null,
-     *         each arrays {@code colors[b]} may have any length; colors will be interpolated
-     *         as needed.
-     * @param  hints An optional set of rendering hints, or {@code null} if none.
-     *         Those hints will not affect the sample dimensions to be created. However,
-     *         they may affect the sample dimensions to be returned by
-     *         <code>{@link #geophysics geophysics}(false)</code>, i.e.
+     * @param  colors The colors to use for values from {@code min} to {@code max} for each
+     *         bands, or {@code null} for a default color palette. If non-null, each arrays
+     *         {@code colors[b]} may have any length; colors will be interpolated as needed.
+     * @param  hints An optional set of rendering hints, or {@code null} if none. Those hints will
+     *         not affect the sample dimensions to be created. However, they may affect the sample
+     *         dimensions to be returned by <code>{@link #geophysics geophysics}(false)</code>, i.e.
      *         the view to be used at rendering time. The optional hint
      *         {@link Hints#SAMPLE_DIMENSION_TYPE} specifies the {@link SampleDimensionType}
      *         to be used at rendering time, which can be one of

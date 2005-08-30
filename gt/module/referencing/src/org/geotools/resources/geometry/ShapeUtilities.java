@@ -366,24 +366,31 @@ public final class ShapeUtilities {
     }
 
     /**
-     * Retourne le point de contrôle d'une courbe quadratique passant par les trois points spécifiés. Il peut exister une infinité
-     * de courbes quadratiques passant par trois points. On peut voir les choses en disant qu'une courbe quadratique correspond à
-     * une parabole produite par une équation de la forme <code>y=ax²+bx+c</code>,  mais que l'axe des <var>x</var> de
-     * cette équation n'est pas nécessairement horizontal. La direction de cet axe des <var>x</var> dépend du paramètre
-     * {@code orientation} spécifié à cette méthode. La valeur {@link #HORIZONTAL} signifie que l'axe des <var>x</var>
-     * de la parabole sera toujours horizontal. La courbe quadratique produite ressemblera alors à une parabole classique
-     * telle qu'on en voit dans les ouvrages de mathématiques élémentaires. La valeur {@link #PARALLEL} indique plutôt que
-     * l'axe des <var>x</var> de la parabole doit être parallèle à la droite joignant les points {@code (x0,y0)} et
-     * {@code (x2,y2)}. Ce dernier type produira le même résultat que {@link #HORIZONTAL} si {@code y0==y2}.
+     * Retourne le point de contrôle d'une courbe quadratique passant par les trois points spécifiés.
+     * Il peut exister une infinité de courbes quadratiques passant par trois points. On peut voir
+     * les choses en disant qu'une courbe quadratique correspond à une parabole produite par une
+     * équation de la forme <code>y=ax²+bx+c</code>, mais que l'axe des <var>x</var> de cette
+     * équation n'est pas nécessairement horizontal. La direction de cet axe des <var>x</var> dépend
+     * du paramètre {@code orientation} spécifié à cette méthode. La valeur {@link #HORIZONTAL}
+     * signifie que l'axe des <var>x</var> de la parabole sera toujours horizontal. La courbe
+     * quadratique produite ressemblera alors à une parabole classique telle qu'on en voit dans les
+     * ouvrages de mathématiques élémentaires. La valeur {@link #PARALLEL} indique plutôt que l'axe
+     * des <var>x</var> de la parabole doit être parallèle à la droite joignant les points
+     * {@code (x0,y0)} et {@code (x2,y2)}. Ce dernier type produira le même résultat que
+     * {@link #HORIZONTAL} si {@code y0==y2}.
      *
-     * @param  orientation Orientation de l'axe des <var>x</var> de la parabole: {@link #PARALLEL} ou {@link #HORIZONTAL}.
-     * @return Le point de contrôle d'une courbe quadratique passant par les trois points spécifiés. La courbe commencera au
-     *         point {@code (x0,y0)} et se terminera au point {@code (x2,y2)}. Si deux points ont des coordonnées
-     *         presque identiques, ou si les trois points sont colinéaires, alors cette méthode retourne {@code null}.
-     * @throws IllegalArgumentException si l'argument {@code orientation} n'est pas une des constantes valides.
+     * @param  orientation Orientation de l'axe des <var>x</var> de la parabole: {@link #PARALLEL}
+     *         ou {@link #HORIZONTAL}.
+     * @return Le point de contrôle d'une courbe quadratique passant par les trois points spécifiés.
+     *         La courbe commencera au point {@code (x0,y0)} et se terminera au point {@code (x2,y2)}.
+     *         Si deux points ont des coordonnées presque identiques, ou si les trois points sont
+     *         colinéaires, alors cette méthode retourne {@code null}.
+     * @throws IllegalArgumentException si l'argument {@code orientation} n'est pas une des
+     *         constantes valides.
      */
     public static Point2D parabolicControlPoint(final double x0, final double y0,
-                                                double x1, double y1, double x2, double y2,
+                                                      double x1,       double y1,
+                                                      double x2,       double y2,
                                                 final int orientation, final Point2D dest)
         throws IllegalArgumentException
     {

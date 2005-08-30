@@ -315,7 +315,7 @@ public class PaletteFactory {
     /**
      * Load an index color model from a definition file.
      * The returned model will use index from {@code lower} inclusive to
-     * {@code upper} exclusive. Other index will have transparent color.
+     * {@code upper} exclusive. Other index will have a transparent color.
      *
      * @param  The palette's name to load. This name doesn't need to contains a path
      *         or an extension. Path and extension are set according value specified
@@ -329,7 +329,7 @@ public class PaletteFactory {
     private IndexColorModel getIndexColorModel(final String name,
                                                final int    lower,
                                                final int    upper)
-        throws IOException
+            throws IOException
     {
         final Color[] colors = getColors(name);
         if (colors == null) {

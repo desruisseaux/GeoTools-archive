@@ -187,20 +187,21 @@ public final class ColorUtilities {
     }
 
     /**
-     * Returns a suggered bit count for an {@link IndexColorModel} of
-     * {@code mapSize} colors. This method returns 1, 2, 4, 8 or
-     * 16 according the value of {@code mapSize}. It is guaranteed
-     * that the following relation is hold:
+     * Returns a bit count for an {@link IndexColorModel} mapping {@code mapSize} colors.
+     * It is guaranteed that the following relation is hold:
      *
      * <center><pre>(1 << getBitCount(mapSize)) >= mapSize</pre></center>
      */
-    public static int getBitCount(final int mapSize) {
-        if (mapSize <= 0x00002) return  1;
-        if (mapSize <= 0x00004) return  2;
-        if (mapSize <= 0x00010) return  4;
-        if (mapSize <= 0x00100) return  8;
-        if (mapSize <= 0x10000) return 16;
-        throw new IllegalArgumentException(Integer.toString(mapSize));
+    public static int getBitCount(int mapSize) {
+        if (--mapSize <= 1) {
+            return 1;
+        }
+        int count = 0;
+        while (mapSize != 0) {
+            count++;
+            mapSize >>= 1;
+        }
+        return count;
     }
 
     /**

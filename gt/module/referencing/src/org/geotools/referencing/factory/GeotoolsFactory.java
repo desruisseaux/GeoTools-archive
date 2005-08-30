@@ -122,10 +122,9 @@ import org.geotools.util.WeakHashSet;
  * expect properties given through a {@link Map} argument. The content of this map is described
  * in the {@link ObjectFactory} interface.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class GeotoolsFactory extends AbstractFactory
                           implements CSFactory, DatumFactory, CRSFactory

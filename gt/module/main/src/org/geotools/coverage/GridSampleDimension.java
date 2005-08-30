@@ -87,10 +87,9 @@ import org.geotools.util.NumberRange;
  * grid coverage} storing their sample values as integers. This explain the "{@code Grid}" prefix
  * in the class name.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class GridSampleDimension implements SampleDimension, Serializable {
     /**

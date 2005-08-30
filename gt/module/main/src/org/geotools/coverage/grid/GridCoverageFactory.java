@@ -40,6 +40,7 @@ import org.opengis.coverage.SampleDimensionType;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.Envelope;
@@ -153,6 +154,10 @@ public class GridCoverageFactory {
     /**
      * Constructs a grid coverage from a {@linkplain Raster raster} with the specified
      * {@linkplain Envelope envelope}.
+     * 
+     * See the {@linkplain #create(CharSequence, RenderedImage, CoordinateReferenceSystem,
+     * Envelope, GridSampleDimension[], GridCoverage[], Map) rendered image variant} for
+     * a note on heuristic rules applied by this method.
      *
      * @param name        The grid coverage name.
      * @param raster      The data (may be floating point numbers). {@linkplain Float#NaN NaN}
@@ -293,7 +298,24 @@ public class GridCoverageFactory {
     }
 
     /**
-     * Constructs a grid coverage with the specified envelope and sample dimensions.
+     * Constructs a grid coverage with the specified envelope and sample dimensions. This
+     * convenience constructor assumes that axis order in the supplied image matches exactly
+     * axis order in the supplied CRS. In other words, if axis order in the supplied image is
+     * (<var>column</var>,<var>row</var>) (which is the case for a majority of images), then
+     * the CRS given to this constructor should probably have a
+     * (<var>longitude</var>,<var>latitude</var>) or (<var>easting</var>,<var>northing</var>)
+     * axis order.
+     * <p>
+     * An exception to the above rule applies for CRS using exactly the following axis order:
+     * ({@link AxisDirection#NORTH NORTH}|{@link AxisDirection#SOUTH SOUTH},
+     * {@link AxisDirection#EAST EAST}|{@link AxisDirection#WEST WEST}).
+     * Example of such CRS is {@code EPSG:4326}. This convenience constructor swaps automatically
+     * the axis order for such CRS.
+     * <p>
+     * The rules applied by this convenience constructor are heuristic. While we try to keep them
+     * stable, some adjustments may be applied in future versions. For strict, determinist behavior,
+     * use the constructor variant expecting a {@link MathTransform} argument instead of an
+     * {@link Envelope}. The math transform allows full control on axis swapping and inversion.
      *
      * @param name         The grid coverage name.
      * @param image        The image.

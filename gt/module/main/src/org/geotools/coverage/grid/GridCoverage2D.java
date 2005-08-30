@@ -110,14 +110,13 @@ import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.util.NumberRange;
-import org.geotools.util.WeakHashSet;
 
 
 /**
  * Basic access to grid data values backed by a two-dimensional
  * {@linkplain RenderedImage rendered image}. Each band in an image is represented as a
  * {@linkplain GridSampleDimension sample dimension}.
- * <br><br>
+ * <p>
  * Grid coverages are usually two-dimensional. However, {@linkplain #getEnvelope their envelope}
  * may have more than two dimensions. For example, a remote sensing image may be valid only over
  * some time range (the time of satellite pass over the observed area). Envelopes for such grid
@@ -128,7 +127,7 @@ import org.geotools.util.WeakHashSet;
  * {@code GridCoverage2D} can be a slice in a 3 dimensional grid coverage. Each slice can have an
  * arbitrary width and height (like any two-dimensional images), but only 1 voxel depth (a "voxel"
  * is a three-dimensional pixel).
- * <br><br>
+ * <p>
  * <strong>Serialization note:</strong><br>
  * Because it is serializable, {@code GridCoverage2D} can be included as method argument or as
  * return type in <cite>Remote Method Invocation</cite> (RMI). However, the pixel data are not
@@ -153,26 +152,6 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * the user wants.
      */
     private static final boolean CONSERVATIVE_PIECEWISE = true;
-
-    /**
-     * Axis orientation of image's coordinate systems. In most images, <var>x</var> values are
-     * increasing toward the right ({@code EAST}) and <var>y</var> values are increasing
-     * toward the bottom ({@code SOUTH}). This is different to many geographic coordinate
-     * reference systems, which have <var>y</var> values increasing {@code NORTH}. The grid
-     * coverage constructor will compare the geographic axis orientations to this
-     * {@code IMAGE_ORIENTATION} and inverse the <var>y</var> axis if necessary. The axis
-     * inversions are handle by {@link GridGeometry#getGridToCoordinateSystem()}.
-     */
-    private static final AxisDirection[] IMAGE_ORIENTATION = {
-        AxisDirection.EAST,
-        AxisDirection.SOUTH
-    };
-
-    /**
-     * Pool of created object. Objects in this pool must be immutable.
-     * Those objects will be shared among many grid coverages.
-     */
-    private static final WeakHashSet pool = new WeakHashSet();
 
     /**
      * A grid coverage using the sample dimensions {@code GridSampleDimension.inverse}.
@@ -246,7 +225,24 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
-     * Constructs a grid coverage with the specified envelope and sample dimensions.
+     * Constructs a grid coverage with the specified envelope and sample dimensions. This
+     * convenience constructor assumes that axis order in the supplied image matches exactly
+     * axis order in the supplied CRS. In other words, if axis order in the supplied image is
+     * (<var>column</var>,<var>row</var>) (which is the case for a majority of images), then
+     * the CRS given to this constructor should probably have a
+     * (<var>longitude</var>,<var>latitude</var>) or (<var>easting</var>,<var>northing</var>)
+     * axis order.
+     * <p>
+     * An exception to the above rule applies for CRS using exactly the following axis order:
+     * ({@link AxisDirection#NORTH NORTH}|{@link AxisDirection#SOUTH SOUTH},
+     * {@link AxisDirection#EAST EAST}|{@link AxisDirection#WEST WEST}).
+     * Example of such CRS is {@code EPSG:4326}. This convenience constructor swaps automatically
+     * the axis order for such CRS.
+     * <p>
+     * The rules applied by this convenience constructor are heuristic. While we try to keep them
+     * stable, some adjustments may be applied in future versions. For strict, determinist behavior,
+     * use the constructor variant expecting a {@link MathTransform} argument instead of an
+     * {@link Envelope}. The math transform allows full control on axis swapping and inversion.
      *
      * @param name         The grid coverage name.
      * @param image        The image.
@@ -320,10 +316,9 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
-     * Constructs a grid coverage. This private constructor expects an envelope
-     * ({@code envelope}) or a grid geometry ({@code gridGeometry}).
-     * <strong>One and only one of those argument</strong> should be non-null.
-     * The null arguments will be computed from the non-null argument.
+     * Constructs a grid coverage. This private constructor expects either an {@code envelope} or a
+     * {@code gridGeometry}. <strong>One and only one of those arguments</strong> should be non-null.
+     * The null argument will be computed from the non-null arguments.
      */
     GridCoverage2D(final CharSequence             name,
                    final PlanarImage             image,
@@ -342,19 +337,20 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         }
         this.image = image;
         /*
-         * Checks sample dimensions. The number of SampleDimensions must matches the
-         * number of image's bands (this is checked by Grid2DSampleDimension.create).
+         * Wraps the user-suplied sample dimensions into instances of Grid2DSampleDimension. This
+         * process will creates default sample dimensions if the user supplied null values. Those
+         * default will be inferred from image type (integers, floats...) and range of values. If
+         * an inconsistency is found in user-supplied sample dimensions, an IllegalArgumentException
+         * is thrown.
          */
         sampleDimensions = new GridSampleDimension[image.getNumBands()];
         isGeophysics = Grid2DSampleDimension.create(name, image, sdBands, sampleDimensions);
         /*
-         * Constructs the grid range and the envelope if they were not explicitly provided.
-         * The envelope computation (if needed) requires a valid 'gridToCoordinateSystem'
-         * transform in the GridGeometry. Otherwise, no transform are required. The range
-         * will be inferred from the image size, if needed. In any cases, the envelope must
-         * be non-empty and its dimension must matches the coordinate reference system's
-         * dimension. A pool of shared envelopes will be used in order to recycle existing
-         * envelopes.
+         * Constructs the grid range and the envelope if they were not explicitly provided. The
+         * envelope computation (if needed) requires a valid 'gridToCoordinateSystem' transform
+         * in the GridGeometry object. Otherwise, no transform are required at this stage.  The
+         * range will be inferred from the image size, if needed. In any cases, the envelope must
+         * be non-empty and its dimension must matches the coordinate reference system's dimension.
          */
         final CoordinateSystem cs = crs.getCoordinateSystem();
         final GridRange gridRange;
@@ -374,68 +370,59 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             if (envelope == null) {
                 envelope = new GeneralEnvelope(gridGeometry.getEnvelope());
             }
+        } else {
+            // As of this constructor contract, envelope can't be null if the grid geometry
+            // is null. This condition has been checked at the begining of this constructor.
         }
         final int dimension = envelope.getDimension();
         if (dimension != cs.getDimension()) {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
                         new Integer(cs.getDimension()), new Integer(envelope.getDimension())));
         }
+        // Our envelope is always a copy of the user-specified envelope (if any),
+        // so it is safe to modify it directly.
         envelope.setCoordinateReferenceSystem(crs);
-        this.envelope = (GeneralEnvelope) pool.canonicalize(envelope);
+        this.envelope = envelope;
         /*
-         * Computes the grid geometry. The math transform will be computed from the envelope.
-         * A pool of shared grid geometries will be used in order to recycle existing objects.
-         *
-         * Note: Should we invert some axis? For example, the 'y' axis is often inversed
-         *       (since image use a downward 'y' axis). If all source grid coverages use
-         *       the same axis orientations, we will reuse those orientations. Otherwise,
-         *       we will use default orientations where only the 'y' axis is inversed.
+         * Computes the grid geometry. If the math transform was not explicitly specified by the
+         * user, then it will be computed from the envelope.  In this case, some heuristic rules
+         * are used in order to decide if we should reverse some axis directions or swap axis. 
          */
         if (gridGeometry == null) {
-            boolean[] inverse = null;
-            if (sources != null) {
-                for (int i=0; i<sources.length; i++) {
-                    final GridCoverage source = sources[i];
-                    if (source instanceof GridCoverage2D) {
-                        boolean check[] = ((GridCoverage2D) source).gridGeometry.areAxisInverted();
-                        check = XArray.resize(check, dimension);
-                        if (inverse != null) {
-                            if (!Arrays.equals(check, inverse)) {
-                                inverse = null;
-                                break;
-                            }
-                        } else {
-                            inverse = check;
-                        }
-                    }
-                }
+            final boolean[] reverse = new boolean[dimension];
+            for (int i=0; i<dimension; i++) {
+                final AxisDirection direction = cs.getAxis(i).getDirection();
+                reverse[i] = direction.equals(direction.absolute().opposite());
             }
-            if (inverse == null) {
-                inverse = new boolean[dimension];
-                for (int i=Math.min(IMAGE_ORIENTATION.length, dimension); --i>=0;) {
-                    final AxisDirection toInverse = IMAGE_ORIENTATION[i].opposite();
-                    inverse[i] = toInverse.equals(cs.getAxis(1).getDirection());
-                }
+            boolean swapXY = false;
+            if (dimension >= 2) {
+                reverse[1] = !reverse[1]; // Reverses the 'y' axis.
+                swapXY = AxisDirection.NORTH.equals(cs.getAxis(0).getDirection().absolute()) &&
+                         AxisDirection.EAST .equals(cs.getAxis(1).getDirection().absolute());
             }
-            gridGeometry = new GridGeometry2D(gridRange, envelope, inverse);
+            gridGeometry = new GridGeometry2D(gridRange, envelope, reverse, swapXY);
         }
-        this.gridGeometry = (GridGeometry2D) pool.canonicalize(gridGeometry);
+        this.gridGeometry = gridGeometry;
         /*
-         * Last argument checks. We do (or redo) some checks here because the grid geometry
-         * may not has been available before.
+         * Last argument checks. We do (or redo) some checks here because the grid geometry may
+         * not have been available before. The image size must be consistent with the grid range
+         * and the envelope must be non-empty.
          */
-        final String error = checkConsistency(this.image, this.gridGeometry);
+        final String error = checkConsistency(image, gridGeometry);
         if (error != null) {
             throw new IllegalArgumentException(error);
         }
         if (dimension <= Math.max(gridGeometry.axisDimensionX, gridGeometry.axisDimensionY) ||
-            !(this.envelope.getLength(gridGeometry.axisDimensionX) > 0) ||
-            !(this.envelope.getLength(gridGeometry.axisDimensionY) > 0))
+            !(envelope.getLength(gridGeometry.axisDimensionX) > 0) ||
+            !(envelope.getLength(gridGeometry.axisDimensionY) > 0))
         {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ENVELOPE));
         }
         /*
-         * Constructs the two-dimensional CRS.
+         * Constructs the two-dimensional CRS. This is usually identical to the user-supplied CRS.
+         * However, the user is allowed to specify a wider CRS (for example a 3D one which includes
+         * a time axis), in which case we infer which axis apply to the 2D image, and constructs a
+         * 2D CRS with only those axis.
          */
         try {
             crs2D = new FactoryGroup().separate(crs, new int[] {gridGeometry.axisDimensionX,
@@ -453,7 +440,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * Checks if the bounding box of the specified image is consistents with the specified
      * grid geometry. If an inconsistency has been found, then an error string is returned.
      * This string will be typically used as a message in an exception to be thrown.
-     * <br><br>
+     * <p>
      * Note that a succesful check at construction time may fails later if the image is part
      * of a JAI chain (i.e. is a {@link RenderedOp}) and its bounds has been edited (i.e the
      * image node as been re-rendered). Since {@code GridCoverage} are immutable by design,
@@ -914,7 +901,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * coverage, the {@linkplain SampleDimension#getSampleToGeophysics sample to geophysics}
      * transform is the identity transform for all sample dimensions. "No data" values are
      * expressed by {@linkplain Float#NaN NaN} numbers.
-     * <br><br>
+     * <p>
      * This method may be understood as applying the JAI's {@linkplain PiecewiseDescriptor
      * piecewise} operation with breakpoints specified by the {@link Category} objects in
      * each sample dimension. However, it is more general in that the transformation specified
@@ -923,7 +910,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * <cite>identity</cite>, {@linkplain LookupDescriptor lookup}, {@linkplain RescaleDescriptor
      * rescale}, {@linkplain PiecewiseDescriptor piecewise} and in last ressort a more general
      * (but slower) <cite>sample transcoding</cite> algorithm.
-     * <br><br>
+     * <p>
      * {@code GridCoverage} objects live by pair: a <cite>geophysics</cite> one (used for
      * computation) and a <cite>non-geophysics</cite> one (used for packing data, usually as
      * integers). The {@code geo} argument specifies which object from the pair is wanted,

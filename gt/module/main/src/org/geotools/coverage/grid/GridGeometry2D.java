@@ -61,10 +61,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  * because a three-dimensional coordinate is mandatory for referencing a pixel without
  * ambiguity.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class GridGeometry2D extends GeneralGridGeometry {
     /**
@@ -132,23 +131,41 @@ public class GridGeometry2D extends GeneralGridGeometry {
     }
 
     /**
-     * Constructs a new grid geometry. The argument are passed unchanged to the
-     * {@linkplain GeneralGridGeometry#GeneralGridGeometry(GridRange,Envelope,boolean[])
-     * super-class constructor}. However, they must obey to one additional constraint:
-     * only two dimensions in the grid range can have a width larger than 1.
+     * Constructs a new grid geometry from an envelope.
      *
-     * @param gridRange The valid coordinate range of a grid coverage.
-     * @param userRange The corresponding coordinate range in user coordinate.
-     * @param reverse   Tells whatever or not reverse axis. A {@code null} value reverse no axis.
-     * @throws IllegalArgumentException if {@code gridRange} has more than 2 dimensions with
-     *         a width larger than 1.
+     * @deprecated Replaced by {@code GridGeometry(gridRange, userRange, reverse, false)}.
+     *             Users just need to append the {@code false} argument value, so this constructor
+     *             will be removed in a future version in order to keep the API lighter.
      */
     public GridGeometry2D(final GridRange gridRange,
                           final Envelope  userRange,
                           final boolean[] reverse)
             throws IllegalArgumentException
     {
-        super(gridRange, userRange, reverse);
+        this(gridRange, userRange, reverse, false);
+    }
+
+    /**
+     * Constructs a new grid geometry from an envelope. The argument are passed unchanged to the
+     * {@linkplain GeneralGridGeometry#GeneralGridGeometry(GridRange,Envelope,boolean[],boolean)
+     * super-class constructor}. However, they must obey to one additional constraint:
+     * only two dimensions in the grid range can have a width larger than 1.
+     *
+     * @param gridRange The valid coordinate range of a grid coverage.
+     * @param userRange The corresponding coordinate range in user coordinate.
+     * @param reverse   Tells for each axis whatever or not it should be reversed. A {@code null}
+     *                  value reverse no axis.
+     * @param swapXY    If {@code true}, then the two first axis will be interchanged.
+     * @throws IllegalArgumentException if {@code gridRange} has more than 2 dimensions with
+     *         a width larger than 1.
+     */
+    public GridGeometry2D(final GridRange gridRange,
+                          final Envelope  userRange,
+                          final boolean[] reverse,
+                          final boolean   swapXY)
+            throws IllegalArgumentException
+    {
+        super(gridRange, userRange, reverse, swapXY);
         final int[] dimensions     = new int[4];
         gridToCoordinateSystem2D   = getMathTransform2D(gridToCoordinateSystem, gridRange, dimensions);
         gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
