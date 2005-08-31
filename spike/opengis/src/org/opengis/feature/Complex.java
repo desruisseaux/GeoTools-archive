@@ -1,16 +1,15 @@
 package org.opengis.feature;
 
 import java.util.List;
-
 import org.opengis.feature.schema.Schema;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Type;
 
 public interface Complex extends Attribute {
-   /**
-    * Access the type of this construct.
-    */
-   ComplexType getType();
+   /** 
+ * Access the type of this construct.
+ */
+   public abstract ComplexType getType();
 
    /** Access to contents of this Feature */
    List<Attribute> attributes();

@@ -1,5 +1,6 @@
 package org.opengis.feature;
 
+import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Type;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Geometry;
@@ -18,16 +19,16 @@ import org.opengis.spatialschema.geometry.Geometry;
  * to our modeling.
  * </p>
  */
-public interface GeometryAttribute {
+public interface GeometryAttribute extends Complex {
    CoordinateReferenceSystem getCRS();
    Object getBounds();
+   
    /**
     * Type should be configued with a Geometry for getJavaType.
     * <p>
     * If needed a set of well-known GeometryType can be constructed.
     */
-   Type getType();
+   ComplexType getType();
    Geometry get();
    void set( Geometry geom );
 }
-
