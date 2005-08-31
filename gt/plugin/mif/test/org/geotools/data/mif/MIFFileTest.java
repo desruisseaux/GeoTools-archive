@@ -399,6 +399,14 @@ public class MIFFileTest extends TestCase {
         doTestTyping("nodi", "Point", Point.class, false);
     }
 
+    public void testTypedGeometryText() {
+        doTestTyping("text", "Text", Point.class, false);
+    }
+
+    public void testTypedGeometryTextAuto() {
+        doTestTyping("text", "Typed", Point.class, false);
+    }
+
     /**
      * DOCUMENT ME!
      */

@@ -27,6 +27,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.geom.TopologyException;
+import com.vividsolutions.jts.io.ParseException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.feature.AttributeType;
@@ -88,10 +89,10 @@ public class MIFFile {
     private static final String TYPE_LINE = "line";
     private static final String TYPE_PLINE = "pline";
     private static final String TYPE_REGION = "region";
+    private static final String TYPE_TEXT = "text";
 
     // The following object types are still not supported
     private static final String TYPE_ARC = "arc";
-    private static final String TYPE_TEXT = "text";
     private static final String TYPE_RECT = "rect"; // could be converted to polygon
     private static final String TYPE_ROUNDRECT = "roundrect";
     private static final String TYPE_ELLIPSE = "ellipse";
@@ -100,12 +101,18 @@ public class MIFFile {
     private static final String TYPE_MULTIPOINT = "multipoint";
     private static final String TYPE_COLLECTION = "collection";
 
-    // String Style Constants 
+    // String Style Constants  
     private static final String CLAUSE_SYMBOL = "symbol";
     private static final String CLAUSE_PEN = "pen";
     private static final String CLAUSE_SMOOTH = "smooth";
     private static final String CLAUSE_CENTER = "center";
     private static final String CLAUSE_BRUSH = "brush";
+    private static final String CLAUSE_FONT = "font";
+    private static final String CLAUSE_ANGLE = "angle";
+    private static final String CLAUSE_JUSTIFY = "justify";
+    private static final String CLAUSE_SPACING = "spacing";
+    private static final String CLAUSE_RIGHT = "right";
+    private static final String CLAUSE_LABEL = "label";
 
     // Header parse Constants (& parameter names) 
     private static final String CLAUSE_COLUMNS = "columns";
@@ -189,7 +196,9 @@ public class MIFFile {
      * PARAM_GEOMTYPE = geometry type handling: "untyped" uses Geometry class |
      * "typed" force geometry to the type of the first valid geometry found in
      * file | "multi" like typed, but forces LineString to MultilineString and
-     * Polygon to MultiPolygon; | "Point" | "LineString" | "MultiLineString" | "Polygon" | "MultiPolygon"
+     * Polygon to MultiPolygon; | "Point" | "LineString" | "MultiLineString" |
+     * "Polygon" | "MultiPolygon" | "Text" forces Geometry to Point and
+     * creates a MIF_TEXT String field in the schema
      * </li>
      * </ul>
      * 
@@ -716,6 +725,7 @@ public class MIFFile {
         throws IOException, SchemaException {
         try {
             String tok;
+            boolean hasMifText = false;
             AttributeType[] columns = null;
 
             while (mif.readLine()) {
@@ -878,6 +888,9 @@ public class MIFFile {
                     toGeometryCollection = true;
                 } else if (geomClass.equals("point")) {
                     geomType = Point.class;
+                } else if (geomClass.equals("text")) {
+                    geomType = Point.class;
+                    hasMifText = true;
                 } else if (geomClass.equals("linestring")) {
                     geomType = LineString.class;
                 } else if (geomClass.equals("multilinestring")) {
@@ -900,6 +913,7 @@ public class MIFFile {
 
                     while (!reader.mifEOF) {
                         geom = reader.readGeometry();
+                        hasMifText = (!reader.mifText.equals(""));
 
                         if (geom != null) {
                             geomType = geom.getClass();
@@ -939,6 +953,11 @@ public class MIFFile {
 
                     for (int i = 0; i < columns.length; i++)
                         builder.addType(columns[i]);
+
+                    if (hasMifText) {
+                        builder.addType(AttributeTypeFactory.newAttributeType(
+                                "MIF_TEXT", String.class, true));
+                    }
 
                     setSchema(builder.getFeatureType());
                 } catch (SchemaException schexp) {
@@ -1162,6 +1181,7 @@ public class MIFFile {
         private MIFFileTokenizer mif = null;
         private MIFFileTokenizer mid = null;
         private boolean mifEOF = false;
+        private String mifText = ""; // caption for text objects 
         private Feature inputFeature = null;
         private Object[] inputBuffer = null;
         private MIFValueSetter[] fieldValueSetters;
@@ -1272,6 +1292,14 @@ public class MIFFile {
                     inputBuffer[col] = fieldValueSetters[col].getValue();
                 }
 
+                if (!mifText.equals("")) {
+                    // MIF_TEXT MUST BE the LAST Field for now
+                    inputBuffer[++col] = mifText;
+
+                    // a better approach could be using a separate array of value setters for MIF_ fields
+                    // (TEXT, ANGLE...)
+                }
+
                 if (col != (numAttribs - 1)) {
                     throw new Exception(
                         "Bad number of attributes read on MID row "
@@ -1303,6 +1331,8 @@ public class MIFFile {
          * @throws IOException Error retrieving geometry from input MIF stream
          */
         private Geometry readGeometry() throws IOException {
+            mifText = "";
+
             if (!mif.readLine()) {
                 mifEOF = true;
 
@@ -1325,11 +1355,18 @@ public class MIFFile {
                     geom = readPLineObject();
                 } else if (objType.equals(TYPE_REGION)) {
                     geom = readRegionObject();
+                } else if (objType.equals(TYPE_TEXT)) {
+                    geom = readTextObject();
                 } else if (objType.equals(CLAUSE_PEN)
                         || objType.equals(CLAUSE_SYMBOL)
                         || objType.equals(CLAUSE_SMOOTH)
                         || objType.equals(CLAUSE_CENTER)
-                        || objType.equals(CLAUSE_BRUSH)) {
+                        || objType.equals(CLAUSE_BRUSH)
+                        || objType.equals(CLAUSE_FONT)
+                        || objType.equals(CLAUSE_ANGLE)
+                        || objType.equals(CLAUSE_JUSTIFY)
+                        || objType.equals(CLAUSE_SPACING)
+                        || objType.equals(CLAUSE_LABEL)) {
                     // Symply ignores styling clauses, so let's read the next lines
                     geom = readGeometry();
                 } else {
@@ -1431,10 +1468,10 @@ public class MIFFile {
                     tmpRing = geomFactory.createLinearRing(coords);
 
                     /*
-                     * In MIF format a polygon is described as a list of rings, with no info wether 
-                     * a ring is a hole or a shell, so we have to determine it by checking if 
+                     * In MIF format a polygon is described as a list of rings, with no info wether
+                     * a ring is a hole or a shell, so we have to determine it by checking if
                      * a ring in contained in the previously defined shell
-                     */                    
+                     */
                     if ((shell != null) && shell.contains(tmpRing)) {
                         holes.add(tmpRing);
                         tmpRing = null; // mark as done
@@ -1561,6 +1598,20 @@ public class MIFFile {
             }
 
             return result[0];
+        }
+
+        private Geometry readTextObject() throws IOException {
+            try {
+                mifText = mif.getToken(' ', true, true);
+            } catch (ParseException e) {
+                throw new IOException(e.getMessage());
+            }
+
+            Coordinate c1 = readMIFCoordinate();
+            Coordinate c2 = readMIFCoordinate();
+            Coordinate p = new Coordinate((c1.x + c2.x) / 2, (c1.y + c2.y) / 2);
+
+            return geomFactory.createPoint(p);
         }
     }
 
