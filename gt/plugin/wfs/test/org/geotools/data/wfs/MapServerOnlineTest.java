@@ -45,11 +45,11 @@ import org.xml.sax.SAXException;
  * @author dzwiers
  * @since 0.6.0
  */
-public class MapServerTest extends TestCase {
+public class MapServerOnlineTest extends TestCase {
 
     private URL url = null;
     
-    public MapServerTest() throws MalformedURLException{
+    public MapServerOnlineTest() throws MalformedURLException{
         url = new URL("http://map.ns.ec.gc.ca/MapServer/mapserv.exe?map=/mapserver/services/envdat/config.map&service=WFS&version=1.0.0&request=GetCapabilities");
     }
     

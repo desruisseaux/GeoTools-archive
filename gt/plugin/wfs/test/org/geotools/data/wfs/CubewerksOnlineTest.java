@@ -45,11 +45,11 @@ import org.xml.sax.SAXException;
  * @author dzwiers
  * @since 0.6.0
  */
-public class CubewerksTest extends TestCase {
+public class CubewerksOnlineTest extends TestCase {
 
     private URL url = null;
     
-    public CubewerksTest() throws MalformedURLException{
+    public CubewerksOnlineTest() throws MalformedURLException{
 
         //old server -- do not test version 0.0.16
 //        url = new URL("http://ceoware2.ccrs.nrcan.gc.ca/cubewerx/cwwfs/cubeserv.cgi?datastore=CEOWARE2&version=1.0.0&service=WFS&request=GetCapabilities");

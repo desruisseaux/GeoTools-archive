@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 
-public class GeoServerTest extends TestCase {
+public class GeoServerOnlineTest extends TestCase {
 
     private URL url = null;
     public void setUp() throws MalformedURLException { 

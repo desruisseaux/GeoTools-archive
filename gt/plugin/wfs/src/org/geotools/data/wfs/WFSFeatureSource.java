@@ -118,7 +118,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
     public FeatureCollection getFeatures(Query query) {
-        return new WFSFeatureResults(this, query);
+        return new DefaultFeatureResults(this, query);
     }
 
     /**

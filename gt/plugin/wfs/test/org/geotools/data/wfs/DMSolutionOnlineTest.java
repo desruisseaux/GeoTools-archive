@@ -45,11 +45,11 @@ import org.xml.sax.SAXException;
  * @author dzwiers
  * @since 0.6.0
  */
-public class DMSolutionTest extends TestCase {
+public class DMSolutionOnlineTest extends TestCase {
 
     private URL url = null;
     
-    public DMSolutionTest() throws MalformedURLException{
+    public DMSolutionOnlineTest() throws MalformedURLException{
         url = new URL("http://www2.dmsolutions.ca/cgi-bin/mswfs_gmap?version=1.0.0&request=getcapabilities&service=wfs");
     }
     

@@ -31,7 +31,7 @@ import org.geotools.filter.IllegalFilterException;
  * @author dzwiers
  *
  */
-public class WFSDataStoreWriteTest extends TestCase {
+public class WFSDataStoreWriteOnlineTest extends TestCase {
     public void testEmpty() throws NoSuchElementException, IOException, IllegalAttributeException, FactoryConfigurationError{
 //        URL u = new URL("http://localhost:8080/geoserver/wfs");
 //        WFSDataStore ds = getDataStore(u);
@@ -44,7 +44,7 @@ public class WFSDataStoreWriteTest extends TestCase {
     }
 
     
-    public WFSDataStoreWriteTest(){
+    public WFSDataStoreWriteOnlineTest(){
         Logger.global.setLevel(Level.SEVERE);
     }
     
