@@ -1,6 +1,7 @@
 package org.opengis.feature;
 
 import org.opengis.feature.type.FeatureType;
+import org.opengis.spatialschema.geometry.Geometry;
 
 public interface Feature extends Complex  {
    /**
@@ -18,7 +19,7 @@ public interface Feature extends Complex  {
     * creating one GML document based on two application schemas for Airport, both of which succeeded in
     * using the actual physical identification strings for their ID.
     * </p>
-    * @return Feature ID generated in an opaque fashion
+    * @return Feature ID generated in an opaque fashion, may not be null
     */
    String getID();
 
@@ -55,5 +56,5 @@ public interface Feature extends Complex  {
    /**
     * @return Default geomtry Attribute or null if unknown or not applicable.
     */
-   GeometryAttribute getDefault();
+   Geometry getDefault();
 }

@@ -1,12 +1,11 @@
 package org.opengis.feature.type;
 
+import java.util.Collection;
 
-public interface FeatureCollectionType extends FeatureType {
+
+public interface FeatureCollectionType extends FeatureType {	
 	/**
-	 * Allowable "child" FeatureType.
-	 * 
-	 * Once again this information may be considered derrived from
-	 * getMemberSchema().
+	 * FeatureTypes allowable as members of this collection.
 	 */
-	FeatureType getMemberType();
+	Collection<FeatureType> getMemberType();
 }

@@ -13,16 +13,23 @@ public interface Attribute {
 	 */
 	String name();
 
-	/** @return Value of the type indicated by type() */
+	/**
+	 * Access to the content of this attribtue.
+	 * 
+	 * @return Value of the type indicated by type()
+	 */
 	Object get();
 
 	/**
+	 * Set content to newZValue
 	 * @param newValue
 	 *            Must be of type indicated by type()
 	 */
 	void set(Object newValue);
 
 	/**
+	 * Indicate the Type of this content.
+	 * 
 	 * @return Type information descirbing allowable content
 	 */
 	public Type getType();

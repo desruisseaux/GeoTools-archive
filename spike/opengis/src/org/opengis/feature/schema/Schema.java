@@ -16,17 +16,17 @@ import java.util.List;
  *
  */
 public interface Schema {
-	int getMinOccurs();
-	int getMaxOccurs();
+	public int getMinOccurs();
+	public int getMaxOccurs();
 	// restrictions on content have moved over to type for reuse
 
 	public interface Ordered extends Schema {
-		List<Schema> sequence(); 
+		public List<Schema> sequence(); 
 	}
 	public interface Choice extends Schema {
-		List<Schema> options();
+		public List<Schema> options();
 	}
-	public interface All {
-		List<Schema> all();
+	public interface All extends Schema {
+		public List<Schema> all();
 	}
 }
