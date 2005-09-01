@@ -3,7 +3,6 @@ package org.geotools.feature.type;
 import java.util.Collections;
 import java.util.Set;
 
-import org.opengis.feature.schema.Schema;
 import org.opengis.feature.type.Restriction;
 import org.opengis.feature.type.Type;
 import org.opengis.util.GenericName;

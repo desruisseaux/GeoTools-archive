@@ -1,8 +1,6 @@
 package org.opengis.feature;
 
-import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Geometry;
 
 /**
