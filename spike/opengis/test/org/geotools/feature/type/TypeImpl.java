@@ -3,6 +3,7 @@ package org.geotools.feature.type;
 import java.util.Collections;
 import java.util.Set;
 
+import org.opengis.feature.schema.Schema;
 import org.opengis.feature.type.Restriction;
 import org.opengis.feature.type.Type;
 import org.opengis.util.GenericName;
@@ -10,6 +11,7 @@ import org.opengis.util.GenericName;
 public class TypeImpl implements Type {
 	// binding
 	final protected GenericName NAME;
+	protected final boolean IDENTIFIED;	
 	final protected Class BINDING;
 	// validation 
 	final protected boolean NILLABLE;
@@ -22,14 +24,15 @@ public class TypeImpl implements Type {
 		this( new GenericName( null, name ), binding );
 	}
 	public TypeImpl( GenericName name, Class binding ){
-		this( name, binding, false, null, null, false );
+		this( name, binding, false, false, null, null, false );
 	}
-	public TypeImpl( GenericName name, Class binding, boolean nillable, Set<Restriction> restrictions ){
-		this( name, binding, nillable, restrictions, null, false );
+	public TypeImpl( GenericName name, Class binding, boolean identified, boolean nillable, Set<Restriction> restrictions ){
+		this( name, binding, identified, nillable, restrictions, null, false );
 	}
-	public TypeImpl( GenericName name, Class binding, boolean nillable, Set<Restriction> restrictions, Type superType, boolean isAbstract ){
+	public TypeImpl( GenericName name, Class binding, boolean identified, boolean nillable, Set<Restriction> restrictions, Type superType, boolean isAbstract ){
 		NAME = name;
 		BINDING = binding;
+		IDENTIFIED = identified;
 		SUPER = superType;
 		ABSTRACT = isAbstract;
 		NILLABLE = nillable;
@@ -40,7 +43,9 @@ public class TypeImpl implements Type {
 			RESTRICTIONS = Collections.unmodifiableSet( restrictions );
 		}
 	}
-	
+	public boolean isIdentified() {
+		return IDENTIFIED;
+	}
 	public GenericName getName() {
 		return NAME;
 	}

@@ -13,6 +13,14 @@ public interface Attribute {
 	 */
 	String name();
 
+
+   /**
+    * Unique, inmutable identification for domain object being modeled.
+    * 
+    * @return Unique ID, may not be null if getType().isIdentifiable() is true
+    */
+   String getID();
+   
 	/**
 	 * Access to the content of this attribtue.
 	 * 

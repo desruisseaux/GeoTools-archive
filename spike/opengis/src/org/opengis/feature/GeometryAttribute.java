@@ -1,6 +1,7 @@
 package org.opengis.feature;
 
 import org.opengis.feature.type.ComplexType;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Geometry;
 
@@ -18,7 +19,7 @@ import org.opengis.spatialschema.geometry.Geometry;
  * to our modeling.
  * </p>
  */
-public interface GeometryAttribute extends Complex {
+public interface GeometryAttribute extends Attribute  {
    // May not be needed if Geometry has this information?
    // CoordinateReferenceSystem getCRS();
    // May not be needed if Geometry has this information?
@@ -27,10 +28,11 @@ public interface GeometryAttribute extends Complex {
    /**
     * Type should be configued with a Geometry for getJavaType.
     * <p>
-    * If needed a set of well-known GeometryType can be constructed,
+    * Q: If needed a set of well-known GeometryType can be constructed,
     * may be needed to report CRS and Bounds constraints on data?
+    * A: It was needed when we switched over to Attribute
     */
-   ComplexType getType();
+   GeometryType getType();
    Geometry get();
    void set( Geometry geom );
 }

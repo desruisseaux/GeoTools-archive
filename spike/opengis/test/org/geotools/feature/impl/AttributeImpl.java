@@ -12,11 +12,19 @@ import org.opengis.feature.type.Type;
 public class AttributeImpl implements Attribute {
 	Object content;
 	final Type TYPE;
+	protected final String ID;	
 	public AttributeImpl( Type type ){
+		this( null, type );
+	}
+	public AttributeImpl( String id, Type type ){
+		ID = id;
 		TYPE = type;
 	}
 	public String name() {
 		return getType().getName().toString();
+	}
+	public String getID() {
+		return ID;
 	}
 	public Object get() {
 		return content;

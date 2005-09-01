@@ -24,6 +24,13 @@ public interface Type {
 	public GenericName getName();
 	
 	/**
+	 * True if this type is usable as a target of a reference.
+	 * 
+	 * @return true if this complex type must have non null getID()
+	 */
+	boolean isIdentified();
+	
+	/**
 	 * Access to the name of this type.
 	 * <p>
 	 * </p>
