@@ -12,13 +12,13 @@ import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Type;
 
 public class ComplexImpl implements Complex {
-	protected final String ID;
 	protected final ComplexType TYPE;
-	
+	protected final String ID;	
 	protected List<Attribute> attribtues;
 	
 	private List<Type> types = null;	
 	private List<Object> values = null;
+
 	
 	public ComplexImpl( ComplexType type ){
 		this( null, type );
