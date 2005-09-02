@@ -7,11 +7,21 @@
 	<target name="_GeoWidgets.createRelease" description="Pack jars and create release zip."
 		depends="_GeoWidgets.createjar.bin,_GeoWidgets.createjar.src,
 		_GeoWidgets.createzip,_GeoWidgets.ziplibs">
+		<antcall target="clean"/>
 		<antcall target="_GeoWidgets.createjar.bin"/>
 		<antcall target="_GeoWidgets.createjar.src"/>
 		<antcall target="_GeoWidgets.createzip"/>
 		<antcall target="_GeoWidgets.ziplibs"/>
 	</target>
+	
+	<target name="clean" depends="init" description="Clean the plug-in of all the zips, jars and logs created.">
+		<property name="plugin.destination" value="${basedir}/jars"/>
+		<delete file="${plugin.destination}/GeoWidgets_${version}.jar"/>
+		<delete file="${plugin.destination}/GeoWidgets_${version}.zip"/>
+		<!--
+		<delete dir="${temp.folder}"/>
+		-->
+	</target>	
 	
 	<target name="_GeoWidgets.createjar.bin" description="Pack GeoWidgets binary files.">
 		<!-- basedir: directory from where to take files
@@ -59,7 +69,8 @@
 			basedir="${basedir}" includes = "lib/**" />
 	</target>		
 	
-	<target name="init" depends="properties">
+	<target name="init">
+		<!--
 		<condition property="pluginTemp" value="${buildTempFolder}/plugins">
 			<isset property="buildTempFolder"/>
 		</condition>
@@ -70,22 +81,8 @@
 		<property name="build.result.folder" value="${basedir}/jars"/>
 		<property name="temp.folder" value="${basedir}/temp.folder"/>
 		<property name="plugin.destination" value="${basedir}/jars"/>
+		-->
 	</target>
-
-	<target name="properties" if="eclipse.running">
-		<property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
-	</target> 
-<!--
-	<target name="build.update.jar" depends="init" description="Build the plug-in: net.refractions.udig.libs for an update site.">
-		<delete dir="${temp.folder}"/>
-		<mkdir dir="${temp.folder}"/>
-		<antcall target="build.jars"/>
-		<antcall target="gather.bin.parts">
-			<param name="destination.temp.folder" value="${temp.folder}/"/>
-		</antcall>
-		<zip zipfile="${plugin.destination}/net.refractions.udig.libs_${version}.jar" basedir="${temp.folder}/net.refractions.udig.libs_${version}" filesonly="false" whenempty="skip" update="false"/>
-		<delete dir="${temp.folder}"/>
-	</target> -->
 
 	<target name="refresh.all" depends="init" description="Load/update all the jars for the project.">
 		<description>
@@ -106,6 +103,8 @@
 		<antcall target="refresh.gt"/> <!-- GeoTools dependencies-->
 		<antcall target="refresh.libs"/> <!-- Other dependencies stored on GeoTools site-->
 		<antcall target="refresh.gw"/> <!-- Dependencies stored on GeoWidgets site-->
+		<eclipse.convertPath fileSystemPath="lib" property="resourcePath"/>
+		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite"/>
 	</target>
 	
 	<target name="load" description="Loads a library specified by -name-." if="name" >
@@ -114,7 +113,7 @@
 	</target>
 		
 	<target name="refresh.gw">
-		<property name="gwUpdateURL" value="http://geowidgets.sourceforge.net/dependencies/"/>
+		<property name="gwUpdateURL" value="http://geowidgets.sourceforge.net/dependencies"/>
 		<property name="gwRepo" value="file:///${user.home}/.maven/repository/gw"/>
 		<!--
 		<antcall target="load"><param name="name" value="l2fprod-common-all.jar"/></antcall>
@@ -212,55 +211,4 @@
 		-->
 	</target>
 	
-	<target name="build.sources" depends="init">
-	</target>
-
-	<target name="gather.bin.parts" depends="init" if="destination.temp.folder">
-		<mkdir dir="${destination.temp.folder}/GeoWidgets_${version}"/>
-		<copy todir="${destination.temp.folder}/GeoWidgets__${version}" failonerror="true">
-			<fileset dir="${basedir}" includes="plugin.xml,lib/"			/>
-		</copy>
-	</target>
-
-	<target name="build.zips" depends="init">
-	</target>
-
-	<target name="gather.sources" depends="init" if="destination.temp.folder">
-		<copy todir="${destination.temp.folder}/net.refractions.udig.libs_${version}" failonerror="false">
-			<fileset dir="${basedir}" includes="plugin.xml,lib/"			/>
-		</copy>
-	</target>
-
-	<target name="gather.logs" depends="init" if="destination.temp.folder">
-	</target>
-
-	<target name="clean" depends="init" description="Clean the plug-in of all the zips, jars and logs created.">
-		<delete file="${plugin.destination}/GeoWidgets_${version}.jar"/>
-		<delete file="${plugin.destination}/GeoWidgets_${version}.zip"/>
-		<delete dir="${temp.folder}"/>
-	</target>
-
-<!--	<target name="refresh" depends="init" if="eclipse.running" description="Refresh this folder.">
-		<eclipse.convertPath fileSystemPath="net.refractions.udig.libs" property="resourcePath"/>
-		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite"/>
-	</target>
--->
-	<target name="zip.plugin" depends="init" description="Create a zip containing all the elements for the project.">
-		<delete dir="${temp.folder}"/>
-		<mkdir dir="${temp.folder}"/>
-		<antcall target="build.jars"/>
-		<antcall target="build.sources"/>
-		<antcall target="gather.bin.parts">
-			<param name="destination.temp.folder" value="${temp.folder}/"/>
-		</antcall>
-		<antcall target="gather.sources">
-			<param name="destination.temp.folder" value="${temp.folder}/"/>
-		</antcall>
-		<delete>
-			<fileset dir="${temp.folder}" includes="**/*.bin.log"			/>
-		</delete>
-		<zip zipfile="${plugin.destination}/GeoWidgets_${version}.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false"/>
-		<delete dir="${temp.folder}"/>
-	</target>
-
 </project>
