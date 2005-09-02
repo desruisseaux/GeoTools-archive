@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Title: GeoWidgets
+Implementation-Vendor: GeoWidgets
+Implementation-Version: 1.0.M0
+

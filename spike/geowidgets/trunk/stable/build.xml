@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="GeoWidgets_Stable_SVN" default="refresh.all" basedir=".">
+
+	<property name="version" value="1.0.M1"/>
+	<property name="filename" value="GeoWidgets-${version}"/>
+	
+	<target name="_GeoWidgets.createRelease" description="Pack jars and create release zip."
+		depends="_GeoWidgets.createjar.bin,_GeoWidgets.createjar.src,
+		_GeoWidgets.createzip,_GeoWidgets.ziplibs">
+		<antcall target="_GeoWidgets.createjar.bin"/>
+		<antcall target="_GeoWidgets.createjar.src"/>
+		<antcall target="_GeoWidgets.createzip"/>
+		<antcall target="_GeoWidgets.ziplibs"/>
+	</target>
+	
+	<target name="_GeoWidgets.createjar.bin" description="Pack GeoWidgets binary files.">
+		<!-- basedir: directory from where to take files
+		-->
+		<!--
+		<antcall target="refresh.all"/>
+		-->
+		<jar destfile="${basedir}/jars/${filename}-bin.jar"
+			manifest="${basedir}/doc/manifest/manifest.mf">
+			<!-- <fileset dir="${basedir}" includes="*.*" /> -->
+			<fileset dir="${basedir}/bin"/>
+		</jar>
+	</target>
+	
+	<target name="_GeoWidgets.createjar.src" description="Pack GeoWidgets source files.">
+		<jar destfile="${basedir}/jars/${filename}-src.jar"
+			manifest="${basedir}/doc/manifest/manifest.mf">
+			<fileset dir="${basedir}/src-main"/>
+			<fileset dir="${basedir}/src-crs"/>
+		</jar>
+		
+	</target>
+	
+	<target name="_GeoWidgets.createzip" description="Pack GeoWidgets project incl. binary and source jar.">
+		<zip destfile="${basedir}/jars/GeoWidgets-${version}.zip"
+			basedir="${basedir}"
+			includes="
+			src-main/**,
+			src-crs/**,
+			doc/**,
+			jars/${filename}-bin.jar,
+			jars/${filename}-src.jar"
+			excludes="
+			doc/working/**,
+			doc/license_readme/**"
+		>
+			<fileset dir="${basedir}/doc/license_readme"/>
+			<zipfileset file="${basedir}/*.*" />
+			<zipfileset file="${basedir}/lib/*.txt" prefix="lib" />
+		</zip>
+	</target>
+
+	<target name="_GeoWidgets.ziplibs" description="Pack all libraries into extra zip file.">
+		<zip destfile="${basedir}/jars/GeoWidgets-libs-${version}.zip"
+			basedir="${basedir}" includes = "lib/**" />
+	</target>		
+	
+	<target name="init" depends="properties">
+		<condition property="pluginTemp" value="${buildTempFolder}/plugins">
+			<isset property="buildTempFolder"/>
+		</condition>
+		<property name="pluginTemp" value="${basedir}"/>
+		<condition property="build.result.folder" value="${pluginTemp}/GeoWidgets_Stable_SVN">
+			<isset property="buildTempFolder"/>
+		</condition>
+		<property name="build.result.folder" value="${basedir}/jars"/>
+		<property name="temp.folder" value="${basedir}/temp.folder"/>
+		<property name="plugin.destination" value="${basedir}/jars"/>
+	</target>
+
+	<target name="properties" if="eclipse.running">
+		<property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+	</target> 
+<!--
+	<target name="build.update.jar" depends="init" description="Build the plug-in: net.refractions.udig.libs for an update site.">
+		<delete dir="${temp.folder}"/>
+		<mkdir dir="${temp.folder}"/>
+		<antcall target="build.jars"/>
+		<antcall target="gather.bin.parts">
+			<param name="destination.temp.folder" value="${temp.folder}/"/>
+		</antcall>
+		<zip zipfile="${plugin.destination}/net.refractions.udig.libs_${version}.jar" basedir="${temp.folder}/net.refractions.udig.libs_${version}" filesonly="false" whenempty="skip" update="false"/>
+		<delete dir="${temp.folder}"/>
+	</target> -->
+
+	<target name="refresh.all" depends="init" description="Load/update all the jars for the project.">
+		<description>
+			Download the required jars from list.refractions.net or from
+			the local maven repository. Timestamps are compared and
+			the jars will only be downloaded if needed.
+	    </description>	
+		<!-- update spot dz-->
+		<antcall target="clean"/>
+		<property name="lib" value="../GeoWidgets_Stable_SVN/lib"/>
+		<!--<echo message="LIB=${lib}"/>-->
+		<mkdir dir="${lib}"/>
+		<!--<property name="updateURL" value="http://www.ibiblio.org/geotools"/>-->
+		<property name="updateURL" value="http://lists.refractions.net/geotools"/>
+		<property name="repo" value="file:///${user.home}/.maven/repository"/>
+		<property environment="env"/>
+		
+		<antcall target="refresh.gt"/> <!-- GeoTools dependencies-->
+		<antcall target="refresh.libs"/> <!-- Other dependencies stored on GeoTools site-->
+		<antcall target="refresh.gw"/> <!-- Dependencies stored on GeoWidgets site-->
+	</target>
+	
+	<target name="load" description="Loads a library specified by -name-." if="name" >
+		<get src="${gwRepo}/${name}" dest="${lib}/${name}" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${gwUpdateURL}/${name}" dest="${lib}/${name}" usetimestamp="true" ignoreerrors="true" verbose="true"/>		
+	</target>
+		
+	<target name="refresh.gw">
+		<property name="gwUpdateURL" value="http://geowidgets.sourceforge.net/dependencies/"/>
+		<property name="gwRepo" value="file:///${user.home}/.maven/repository/gw"/>
+		<!--
+		<antcall target="load"><param name="name" value="l2fprod-common-all.jar"/></antcall>
+		-->
+		<antcall target="load"><param name="name" value="epsg-access-2.2.M0.jar"/></antcall>
+		<antcall target="load"><param name="name" value="epsg-hsql-2.2.M0.jar"/></antcall>
+		<antcall target="load"><param name="name" value="main-2.2.M0.jar"/></antcall>
+		
+		<antcall target="load"><param name="name" value="org.eclipse.core.commands_3.1.0.jar"/></antcall>
+		<antcall target="load"><param name="name" value="org.eclipse.core.runtime.compatibility_3.1.0.jar"/></antcall>
+		<antcall target="load"><param name="name" value="org.eclipse.core.runtime_3.1.0.jar"/></antcall>
+		<antcall target="load"><param name="name" value="org.eclipse.jface.text_3.1.0.jar"/></antcall>
+		<antcall target="load"><param name="name" value="org.eclipse.jface_3.1.0.jar"/></antcall>
+		<antcall target="load"><param name="name" value="org.eclipse.osgi_3.1.0.jar"/></antcall>
+		<antcall target="load"><param name="name" value="org.eclipse.swt.win32.win32.x86_3.1.0.jar"/></antcall>
+		<antcall target="load"><param name="name" value="org.eclipse.ui.views_3.1.0.jar"/></antcall>
+	</target>
+	
+	<target name="refresh.gt">
+		<property name="gtUpdateURL" value="http://lists.refractions.net/geotools/gt2/SNAPSHOT"/>
+		<property name="gtRepo" value="file:///${user.home}/.maven/repository/gt2"/>
+		<property name="geotools.version" value="2.1.RC1"/>
+		<property name="geotools.version2" value="2.2.x"/>
+		<!-- 2.2 -->
+		<!-- Currently no 2.2 on the list library is up-to-date enough for what we need.
+		<get src="${gtRepo}/${moduleName}/jars/main-${geotools.version2}.jar" dest="${lib}/main-${geotools.version2}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		-->
+		<!-- 2.1 -->
+		<!--
+		<get src="${gtRepo}/${moduleName}/jars/migrate-${geotools.version}.jar" dest="${lib}/migrate-${geotools.version}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		-->
+		<!-- 2.2 -->
+		<!--
+		<get src="${gtUpdateURL}/main-${geotools.version2}.jar" dest="${lib}/main-${geotools.version2}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		-->
+		<!-- 2.1 -->
+		<!--
+		<get src="${gtUpdateURL}/migrate-${geotools.version}.jar" dest="${lib}/migrate-${geotools.version}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		-->
+
+	</target>
+				
+	<target name="refresh.libs">
+		<property name="geoapi.version" value="2.0-tiger"/>
+		<property name="geotools.version" value="2.1.RC1"/>
+		
+		<get src="${repo}/geoapi/jars/geoapi-${geoapi.version}.jar" dest="${lib}/geoapi-${geoapi.version}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/JTS/jars/JTS-1.6.jar" dest="${lib}/JTS-1.6.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/units/jars/units-0.01.jar" dest="${lib}/units-0.01.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/hsql/jars/hsqldb-1.8.0.1.jar" dest="${lib}/hsqldb-1.8.0.1.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/junit/jars/junit-3.8.1.jar" dest="${lib}/junit-3.8.1.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		
+		<!--
+		<get src="${repo}/commons-lang/jars/commons-lang-2.0.jar" dest="${lib}/commons-lang-2.0.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/jdom/jars/jdom-1.0b10.jar" dest="${lib}/jdom-1.0b10.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/log4j/jars/log4j-1.2.8.jar" dest="${lib}/log4j-1.2.8.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/opengis/jars/opengis-legacy-0.1.jar" dest="${lib}/opengis-legacy-0.1.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/postgis-driver/jars/postgis-driver-1.0.jar" dest="${lib}/postgis-driver-1.0.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/mysql/jars/mysql-connector-java-3.0.9.jar" dest="${lib}/mysql-connector-java-3.0.9.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/postgresql/jars/postgresql-74.213.jar" dest="${lib}/postgresql-74.213.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/vecmath/jars/vecmath-1.3.jar" dest="${lib}/vecmath-1.3.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/wkb4j/jars/wkb4j-1.0-RC1.jar" dest="${lib}/wkb4j-1.0-RC1.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/oracle/jars/dummy_spatial-8.1.8.jar" dest="${lib}/dummy_spatial-8.1.8.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/picocontainer/jars/picocontainer-1.2-SNAPSHOT.jar" dest="${lib}/picocontainer-1.2.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/arcsde/jars/jsde_concurrent-9.0.jar" dest="${lib}/jsde_concurrent-9.0.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/arcsde/jars/jsde_jpe_sdk-9.0.jar" dest="${lib}/jsde_jpe_sdk-9.0.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/arcsde/jars/jsde_sdk-9.0.jar" dest="${lib}/jsde_sdk-9.0.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/gt2/SNAPSHOT/image-${geotools.version}.jar" dest="${lib}/image-${geotools.version}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/gt2/SNAPSHOT/geotiff-${geotools.version}.jar" dest="${lib}/geotiff-${geotools.version}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${repo}/gt2/SNAPSHOT/arcgrid-${geotools.version}.jar" dest="${lib}/arcgrid-${geotools.version}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		-->
+		<get src="${updateURL}/geoapi/jars/geoapi-${geoapi.version}.jar" dest="${lib}/geoapi-${geoapi.version}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>					
+		<get src="${updateURL}/JTS/jars/JTS-1.6.jar" dest="${lib}/JTS-1.6.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/units/jars/units-0.01.jar" dest="${lib}/units-0.01.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/hsql/jars/hsqldb-1.8.0.1.jar" dest="${lib}/hsqldb-1.8.0.1.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/junit/jars/junit-3.8.1.jar" dest="${lib}/junit-3.8.1.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<!--
+		<get src="${updateURL}/commons-lang/jars/commons-lang-2.0.jar" dest="${lib}/commons-lang-2.0.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/jdom/jars/jdom-1.0b10.jar" dest="${lib}/jdom-1.0b10.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/log4j/jars/log4j-1.2.8.jar" dest="${lib}/log4j-1.2.8.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/opengis/jars/opengis-legacy-0.1.jar" dest="${lib}/opengis-legacy-0.1.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/postgis-driver/jars/postgis-driver-1.0.jar" dest="${lib}/postgis-driver-1.0.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/mysql/jars/mysql-connector-java-3.0.9.jar" dest="${lib}/mysql-connector-java-3.0.9.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/postgresql/jars/postgresql-74.213.jar" dest="${lib}/postgresql-74.213.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/vecmath/jars/vecmath-1.3.jar" dest="${lib}/vecmath-1.3.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/wkb4j/jars/wkb4j-1.0-RC1.jar" dest="${lib}/wkb4j-1.0-RC1.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/oracle/jars/dummy_spatial-8.1.8.jar" dest="${lib}/dummy_spatial-8.1.8.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/picocontainer/jars/picocontainer-1.2-SNAPSHOT.jar" dest="${lib}/picocontainer-1.2.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/arcsde/jars/jsde_concurrent-9.0.jar" dest="${lib}/jsde_concurrent-9.0.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/arcsde/jars/jsde_jpe_sdk-9.0.jar" dest="${lib}/jsde_jpe_sdk-9.0.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/arcsde/jars/jsde_sdk-9.0.jar" dest="${lib}/jsde_sdk-9.0.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/gt2/SNAPSHOT/image-${geotools.version}.jar" dest="${lib}/image-${geotools.version}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/gt2/SNAPSHOT/geotiff-${geotools.version}.jar" dest="${lib}/geotiff-${geotools.version}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		<get src="${updateURL}/gt2/SNAPSHOT/arcgrid-${geotools.version}.jar" dest="${lib}/arcgrid-${geotools.version}.jar" usetimestamp="true" ignoreerrors="true" verbose="true"/>
+		-->
+	</target>
+	
+	<target name="build.sources" depends="init">
+	</target>
+
+	<target name="gather.bin.parts" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/GeoWidgets_${version}"/>
+		<copy todir="${destination.temp.folder}/GeoWidgets__${version}" failonerror="true">
+			<fileset dir="${basedir}" includes="plugin.xml,lib/"			/>
+		</copy>
+	</target>
+
+	<target name="build.zips" depends="init">
+	</target>
+
+	<target name="gather.sources" depends="init" if="destination.temp.folder">
+		<copy todir="${destination.temp.folder}/net.refractions.udig.libs_${version}" failonerror="false">
+			<fileset dir="${basedir}" includes="plugin.xml,lib/"			/>
+		</copy>
+	</target>
+
+	<target name="gather.logs" depends="init" if="destination.temp.folder">
+	</target>
+
+	<target name="clean" depends="init" description="Clean the plug-in of all the zips, jars and logs created.">
+		<delete file="${plugin.destination}/GeoWidgets_${version}.jar"/>
+		<delete file="${plugin.destination}/GeoWidgets_${version}.zip"/>
+		<delete dir="${temp.folder}"/>
+	</target>
+
+<!--	<target name="refresh" depends="init" if="eclipse.running" description="Refresh this folder.">
+		<eclipse.convertPath fileSystemPath="net.refractions.udig.libs" property="resourcePath"/>
+		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite"/>
+	</target>
+-->
+	<target name="zip.plugin" depends="init" description="Create a zip containing all the elements for the project.">
+		<delete dir="${temp.folder}"/>
+		<mkdir dir="${temp.folder}"/>
+		<antcall target="build.jars"/>
+		<antcall target="build.sources"/>
+		<antcall target="gather.bin.parts">
+			<param name="destination.temp.folder" value="${temp.folder}/"/>
+		</antcall>
+		<antcall target="gather.sources">
+			<param name="destination.temp.folder" value="${temp.folder}/"/>
+		</antcall>
+		<delete>
+			<fileset dir="${temp.folder}" includes="**/*.bin.log"			/>
+		</delete>
+		<zip zipfile="${plugin.destination}/GeoWidgets_${version}.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false"/>
+		<delete dir="${temp.folder}"/>
+	</target>
+
+</project>
