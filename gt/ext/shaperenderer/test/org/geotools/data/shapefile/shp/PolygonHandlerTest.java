@@ -61,7 +61,7 @@ public class PolygonHandlerTest extends TestCase {
 		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, DefaultGeographicCRS.WGS84);
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new PolygonHandler(reader.getHeader().getShapeType(), env, mt));
+		reader.setHandler(new PolygonHandler(reader.getHeader().getShapeType(), env, mt, false));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
 		assertTrue( shape instanceof SimpleGeometry);
@@ -91,7 +91,7 @@ public class PolygonHandlerTest extends TestCase {
 				.createAffineTransform(new GeneralMatrix(at)));
 
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new PolygonHandler(reader.getHeader().getShapeType(), env, mt));
+		reader.setHandler(new PolygonHandler(reader.getHeader().getShapeType(), env, mt, false));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
 		assertTrue( shape instanceof SimpleGeometry);

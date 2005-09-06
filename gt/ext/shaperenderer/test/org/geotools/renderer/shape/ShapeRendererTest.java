@@ -58,7 +58,7 @@ public class ShapeRendererTest extends TestCase {
 		assertEquals("NAME", type.getAttributeType(0).getName());
 		assertEquals(2, type.getAttributeCount());
 		Feature feature = renderer.createFeature(type, ShapefileRendererUtil
-				.getShpReader(ds, ds.getFeatureSource().getBounds(), null)
+				.getShpReader(ds, ds.getFeatureSource().getBounds(), null, false)
 				.nextRecord(), ShapefileRendererUtil.getDBFReader(ds), "id");
 		assertEquals("id", feature.getID());
 		assertEquals("dave street", feature.getAttribute(0));

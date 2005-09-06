@@ -42,21 +42,15 @@ public class PointHandler implements ShapeHandler {
 	 * @param type the type of shape.
 	 * @param env the area that is visible.  If shape is not in area then skip.
 	 * @param mt the transform to go from data to the envelope (and that should be used to transform the shape coords)
+	 * @param hasOpacity 
 	 */
-	public PointHandler(ShapeType type, Envelope env, MathTransform mt) 
+	public PointHandler(ShapeType type, Envelope env, MathTransform mt, boolean hasOpacity) 
 	throws TransformException {
 		this.type=type;
 		this.bbox=env;
 		this.mt=mt;
 		if( mt!=null ){
-			double[] worldSize=new double[]{
-					env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY()
-			};
-			double[] screenSize=new double[4];
-			mt.transform(worldSize, 0, screenSize, 0, 2);
-			int width=(int) (screenSize[1]-screenSize[0]);
-			int height=-1*(int) (screenSize[3]-screenSize[2]);
-			screenMap=new ScreenMap(width+1,height+1);
+			screenMap=GeometryHandlerUtilities.calculateScreenSize(env,mt, hasOpacity);
 		}
 	}
 	
@@ -94,8 +88,6 @@ public class PointHandler implements ShapeHandler {
         if( !bbox.intersects(geomBBox) )
             return null;
 
-        if( transformed[0][0]<0 || transformed[0][1]<0 )
-        	return null;
         if( screenMap.get((int)(transformed[0][0]), (int)transformed[0][1]) ){
         	return null;
         }

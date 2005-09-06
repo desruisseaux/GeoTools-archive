@@ -9,9 +9,8 @@ public class ScreenMap {
 	public ScreenMap( int x, int y){
 		width=x;
 		height=y;
-		
-		
-		pixels=new int[x*y/32+1];
+		int arraySize=x*y/32+1;
+		pixels=new int[arraySize];
 	}
 	
 	public void set(int x, int y, boolean value){

@@ -16,10 +16,7 @@
  */
 package org.geotools.renderer.shape;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.awt.image.SampleModel;
-import java.awt.image.SinglePixelPackedSampleModel;
+import java.awt.geom.Point2D;
 import java.nio.ByteBuffer;
 
 import org.geotools.data.shapefile.shp.ShapeHandler;
@@ -48,31 +45,22 @@ public class MultiPointHandler implements ShapeHandler {
 	 * @param type the type of shape.
 	 * @param env the area that is visible.  If shape is not in area then skip.
 	 * @param mt the transform to go from data to the envelope (and that should be used to transform the shape coords)
+	 * @param hasOpacity 
 	 */
-	public MultiPointHandler(ShapeType type, Envelope env, MathTransform mt) 
+	public MultiPointHandler(ShapeType type, Envelope env, MathTransform mt, boolean hasOpacity) 
 	throws TransformException {
 		this.type=type;
 		this.bbox=env;
 		this.mt=mt;
 		if( mt!=null ){
-			double[] worldSize=new double[]{
-					env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY()
-			};
-			double[] screenSize=new double[4];
-			mt.transform(worldSize, 0, screenSize, 0, 2);
-			int width=(int) (screenSize[1]-screenSize[0]);
-			int height=-1*(int) (screenSize[3]-screenSize[2]);
-			screenMap=new ScreenMap(width+1,height+1);
+			screenMap=GeometryHandlerUtilities.calculateScreenSize(env, mt, hasOpacity);
 			
-			MathTransform screenToWorld = mt.inverse();
-			double[] original = new double[] { 0, 0, 1, 1 };
-			double[] coords = new double[4];
-			screenToWorld.transform(original, 0, coords, 0, 2);
-			this.spanx = Math.abs(coords[0] - coords[2]);
-			this.spany = Math.abs(coords[1] - coords[3]);
+			Point2D span = GeometryHandlerUtilities.calculateSpan(mt);
+			this.spanx =span.getX();
+			this.spany = span.getY();
 		}
 	}
-	
+
 	/**
 	 * @see org.geotools.data.shapefile.shp.ShapeHandler#getShapeType()
 	 */

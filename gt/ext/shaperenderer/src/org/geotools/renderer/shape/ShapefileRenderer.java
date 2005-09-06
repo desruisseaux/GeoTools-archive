@@ -76,6 +76,8 @@ import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
@@ -514,10 +516,16 @@ public class ShapefileRenderer {
 		} catch (Exception e) {
 			fireErrorEvent(e);
 		}
+		OpacityFinder opacityFinder=new OpacityFinder(getAcceptableSymbolizers(type.getDefaultGeometry()));
+		for (Iterator iter = ruleList.iterator(); iter.hasNext();) {
+			Rule rule = (Rule) iter.next();
+			rule.accept(opacityFinder);
+		}
 		IndexInfo.Reader shpreader = null;
 		try {
 			shpreader = new IndexInfo.Reader(info, ShapefileRendererUtil
-					.getShpReader(datastore, bbox, mt), bbox);
+					.getShpReader(datastore, bbox, mt, opacityFinder.hasOpacity),
+					bbox);
 		} catch (Exception e) {
 			fireErrorEvent(e);
 		}
@@ -643,6 +651,15 @@ public class ShapefileRenderer {
 			if ( shpreader!=null )
 				shpreader.close();
 		}
+	}
+
+	private Class[] getAcceptableSymbolizers(GeometryAttributeType defaultGeometry) {
+		if (Polygon.class.isAssignableFrom(defaultGeometry.getType())  
+				|| MultiPolygon.class.isAssignableFrom(defaultGeometry.getType()) ) {
+			return new Class[]{PointSymbolizer.class, LineSymbolizer.class, 
+					PolygonSymbolizer.class };
+			}
+		return new Class[]{PointSymbolizer.class, LineSymbolizer.class};
 	}
 
 	private void processStylersCaching(Graphics2D graphics,

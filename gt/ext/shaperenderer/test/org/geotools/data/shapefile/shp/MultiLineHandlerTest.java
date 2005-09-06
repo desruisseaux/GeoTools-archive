@@ -27,12 +27,14 @@ import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
+import org.geotools.geometry.JTS;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.renderer.lite.LiteRenderer;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.MultiLineHandler;
 import org.geotools.renderer.shape.ShapefileRenderer;
@@ -64,10 +66,19 @@ public class MultiLineHandlerTest extends TestCase {
 //		Envelope env=new Envelope(-180,180,-90,90);
 		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
 //		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
-		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, DefaultGeographicCRS.WGS84);
-		
+		MathTransform mt=null;
+		AffineTransform transform = ShapefileRenderer.worldToScreenTransform(env, new Rectangle(512,512));
+		MathTransform at = FactoryFinder.getMathTransformFactory(null)
+				.createAffineTransform(new GeneralMatrix(transform));
+		if (mt == null) {
+			mt = at;
+		} else {
+			mt = FactoryFinder.getMathTransformFactory(null)
+					.createConcatenatedTransform(mt, at);
+		}
+
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt));
+		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt, false));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
 		assertTrue( shape instanceof SimpleGeometry);
@@ -98,7 +109,7 @@ public class MultiLineHandlerTest extends TestCase {
 		mt = FactoryFinder.getMathTransformFactory(null)
 		.createConcatenatedTransform(mt,worldToScreen);
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt));
+		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt, false));
 		SimpleGeometry shape=(SimpleGeometry) reader.nextRecord().shape();
 		assertEquals( 6, shape.coords[0].length );
 		
@@ -125,7 +136,7 @@ public class MultiLineHandlerTest extends TestCase {
 	}
 
 	public void testBBoxIntersectSegment() throws Exception{
-		MultiLineHandler handler=new MultiLineHandler(ShapeType.ARC, new Envelope(0,10,0,10), null);
+		MultiLineHandler handler=new MultiLineHandler(ShapeType.ARC, new Envelope(0,10,0,10), null, false);
 		assertTrue("point contained in bbox", handler.bboxIntersectSegment(false, new double[]{1,1}, 2));
 		assertFalse("point outside of bbox",handler.bboxIntersectSegment(false, new double[]{-1,1}, 2));
 		assertTrue("Line enters bbox", handler.bboxIntersectSegment(false, new double[]{-1,1, 1,1}, 4));

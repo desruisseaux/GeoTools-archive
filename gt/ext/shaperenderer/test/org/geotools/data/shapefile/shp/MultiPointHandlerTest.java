@@ -53,7 +53,7 @@ public class MultiPointHandlerTest extends TestCase {
 		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, DefaultGeographicCRS.WGS84);
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new MultiPointHandler(reader.getHeader().getShapeType(), env, mt));
+		reader.setHandler(new MultiPointHandler(reader.getHeader().getShapeType(), env, mt, false));
 		ds.getSchema();
 //		Object shape=reader.nextRecord().shape();
 //		assertNotNull( shape );

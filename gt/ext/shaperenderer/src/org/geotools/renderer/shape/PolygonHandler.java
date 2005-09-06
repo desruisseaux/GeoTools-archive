@@ -16,6 +16,7 @@
  */
 package org.geotools.renderer.shape;
 
+import java.awt.geom.Point2D;
 import java.nio.ByteBuffer;
 
 import org.geotools.data.shapefile.shp.ShapeHandler;
@@ -51,19 +52,17 @@ public class PolygonHandler implements ShapeHandler {
 	 * @param mt
 	 *            the transform to go from data to the envelope (and that should
 	 *            be used to transform the shape coords)
+	 * @param hasOpacity 
 	 */
-	public PolygonHandler(ShapeType type, Envelope env, MathTransform mt)
+	public PolygonHandler(ShapeType type, Envelope env, MathTransform mt, boolean hasOpacity)
 			throws TransformException {
 		this.type = type;
 		this.bbox = env;
 		this.mt = mt;
 		if (mt != null) {
-			MathTransform screenToWorld = mt.inverse();
-			double[] original = new double[] { 0, 0, 1, 1 };
-			double[] coords = new double[4];
-			screenToWorld.transform(original, 0, coords, 0, 2);
-			this.spanx = Math.abs(coords[0] - coords[2]);
-			this.spany = Math.abs(coords[1] - coords[3]);
+			Point2D span = GeometryHandlerUtilities.calculateSpan(mt);
+			this.spanx = span.getX() ;
+			this.spany = span.getY() ;
 		}
 	}
 

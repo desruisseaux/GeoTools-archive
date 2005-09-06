@@ -50,18 +50,18 @@ public class ShapefileRendererUtil {
 	 * @throws IOException
 	 * @throws TransformException
 	 */
-	public static ShapefileReader getShpReader(ShapefileDataStore ds, Envelope bbox, MathTransform mt) throws IOException, TransformException{
+	public static ShapefileReader getShpReader(ShapefileDataStore ds, Envelope bbox, MathTransform mt,boolean hasOpacity) throws IOException, TransformException{
 		ShapefileReader reader=ds.openShapeReader();
 		ShapeType type=reader.getHeader().getShapeType();
 		
 		if( type==ShapeType.ARC || type==ShapeType.ARCM || type==ShapeType.ARCZ )
-			reader.setHandler(new MultiLineHandler(type, bbox, mt));
+			reader.setHandler(new MultiLineHandler(type, bbox, mt, hasOpacity));
 		if( type==ShapeType.POLYGON||type==ShapeType.POLYGONM ||type==ShapeType.POLYGONZ)
-			reader.setHandler(new PolygonHandler(type, bbox, mt));
+			reader.setHandler(new PolygonHandler(type, bbox, mt, hasOpacity));
 		if( type==ShapeType.POINT||type==ShapeType.POINTM ||type==ShapeType.POINTZ)
-			reader.setHandler(new PointHandler(type, bbox, mt));
+			reader.setHandler(new PointHandler(type, bbox, mt, hasOpacity));
 		if( type==ShapeType.MULTIPOINT||type==ShapeType.MULTIPOINTM ||type==ShapeType.MULTIPOINTZ)
-			reader.setHandler(new MultiPointHandler(type, bbox, mt));
+			reader.setHandler(new MultiPointHandler(type, bbox, mt, hasOpacity));
 		return reader;
 	}
 	public static DbaseFileReader getDBFReader(ShapefileDataStore ds) throws IOException{

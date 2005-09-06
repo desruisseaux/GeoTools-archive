@@ -16,6 +16,7 @@
  */
 package org.geotools.renderer.shape;
 
+import java.awt.geom.Point2D;
 import java.nio.ByteBuffer;
 
 import org.geotools.data.shapefile.shp.ShapeHandler;
@@ -24,7 +25,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * Creates Geometry line objects for use by the ShapeRenderer.
@@ -38,9 +38,12 @@ public class MultiLineHandler implements ShapeHandler {
 
 	private Envelope bbox;
 
-	double spanx, spany;
-
 	private MathTransform mt;
+	
+	ScreenMap screenMap;
+
+	private Point2D span;
+
 	
 	/**
 	 * Create new instance
@@ -52,20 +55,17 @@ public class MultiLineHandler implements ShapeHandler {
 	 * @param mt
 	 *            the transform to go from data to the envelope (and that should
 	 *            be used to transform the shape coords)
+	 * @param hasOpacity 
 	 * @throws TransformException
 	 */
-	public MultiLineHandler(ShapeType type, Envelope env, MathTransform mt)
+	public MultiLineHandler(ShapeType type, Envelope env, MathTransform mt, boolean hasOpacity)
 			throws TransformException {
 		this.type = type;
 		this.bbox = env;
 		this.mt = mt;
 		if (mt != null) {
-			MathTransform screenToWorld = mt.inverse();
-			double[] original = new double[] { 0, 0, 1, 1 };
-			double[] coords = new double[4];
-			screenToWorld.transform(original, 0, coords, 0, 2);
-			this.spanx = Math.abs(coords[0] - coords[2]);
-			this.spany = Math.abs(coords[1] - coords[3]);
+			span=GeometryHandlerUtilities.calculateSpan(mt);
+			screenMap=GeometryHandlerUtilities.calculateScreenSize(env,mt, hasOpacity);
 		}
 
 	}
@@ -93,8 +93,8 @@ public class MultiLineHandler implements ShapeHandler {
 			return null;
 		}
 
-		boolean bboxdecimate = geomBBox.getWidth() <= spanx
-				&& geomBBox.getHeight() <= spany;
+		boolean bboxdecimate = geomBBox.getWidth() <= span.getX()
+				&& geomBBox.getHeight() <= span.getY();
 		int numParts = buffer.getInt();
 		int numPoints = buffer.getInt(); // total number of points
 
@@ -124,7 +124,19 @@ public class MultiLineHandler implements ShapeHandler {
             if( !bbox.contains(coords[0][0],coords[0][1]) && !bbox.contains(coords[0][2], coords[0][3]) )
                 return null;
 			try {
-				mt.transform(coords[0], 0, transformed[0], 0, 2);
+				mt.transform(coords[0], 0, transformed[0], 0, 1);
+				if ( screenMap.get((int)transformed[0][0], (int)transformed[0][1]) )
+					return null;
+				screenMap.set((int)transformed[0][0], (int)transformed[0][1], true);
+				mt.transform(coords[0], 2, transformed[0], 2, 1);
+				double minx=(int)transformed[0][0];
+				double miny=(int)transformed[0][1];
+				double maxx=minx+1;
+				double maxy=transformed[0][3];
+				transformed[0][0]=minx;
+				transformed[0][1]=miny;
+				transformed[0][2]=maxx;
+				transformed[0][3]=maxy;
 			} catch (Exception e) {
 				ShapefileRenderer.LOGGER
 						.severe("could not transform coordinates "
@@ -161,9 +173,9 @@ public class MultiLineHandler implements ShapeHandler {
 
 					if (currentDoubles > 3 && currentDoubles < totalDoubles - 1) {
 						if (Math.abs(coords[part][readDoubles - 4]
-								- coords[part][readDoubles - 2]) <= spanx
+								- coords[part][readDoubles - 2]) <= span.getX()
 								&& Math.abs(coords[part][readDoubles - 3]
-										- coords[part][readDoubles - 1]) <= spany) {
+										- coords[part][readDoubles - 1]) <= span.getY()) {
 							readDoubles -= 2;
 						}else{
 							if( !mt.isIdentity() ){
@@ -280,46 +292,28 @@ public class MultiLineHandler implements ShapeHandler {
         return outcode;
     }
 
-	/**
-	 * @return
-	 */
-	private SimpleGeometry decimateBasedOnEnvelope(Envelope geomBBox) {
-		if (geomBBox.getWidth() <= spanx && geomBBox.getHeight() <= spany) {
-			double[][] coords = new double[1][];
-			coords[0] = new double[] { geomBBox.getMinX(), geomBBox.getMinY() };
-			double[][] transformed = new double[1][];
-			transformed[0] = new double[4];
-			try {
-				mt.transform(coords[0], 0, transformed[0], 0, 1);
-			} catch (Exception e) {
-				ShapefileRenderer.LOGGER.severe("could not transform coordinates "
-						+ e.getLocalizedMessage());
-				transformed = coords;
-			}
-			transformed[0][2]=transformed[0][0];
-			transformed[0][3]=transformed[0][1];
-			return new SimpleGeometry(type, transformed, geomBBox);
-		}
-		return null;
-	}
-
-	private void skipMultiLineGeom(ByteBuffer buffer, int dimensions) {
-		int numParts = buffer.getInt();
-		int numPoints = buffer.getInt(); // total number of points
-
-		// skip partOffsets
-		buffer.position(buffer.position() + numParts * 4);
-
-		// skip x y points;
-		buffer.position(buffer.position() + numPoints * 4);
-
-		// if we have another coordinate, read and add to the coordinate
-		// sequences
-		if (dimensions == 3) {
-			// skip z min, max and z points
-			buffer.position(buffer.position() + 2 * 8 + 8 * numPoints);
-		}
-	}
+//	/**
+//	 * @return
+//	 */
+//	private SimpleGeometry decimateBasedOnEnvelope(Envelope geomBBox) {
+//		if (geomBBox.getWidth() <= span.getX() && geomBBox.getHeight() <= span.getY()) {
+//			double[][] coords = new double[1][];
+//			coords[0] = new double[] { geomBBox.getMinX(), geomBBox.getMinY() };
+//			double[][] transformed = new double[1][];
+//			transformed[0] = new double[4];
+//			try {
+//				mt.transform(coords[0], 0, transformed[0], 0, 1);
+//			} catch (Exception e) {
+//				ShapefileRenderer.LOGGER.severe("could not transform coordinates "
+//						+ e.getLocalizedMessage());
+//				transformed = coords;
+//			}
+//			transformed[0][2]=transformed[0][0];
+//			transformed[0][3]=transformed[0][1];
+//			return new SimpleGeometry(type, transformed, geomBBox);
+//		}
+//		return null;
+//	}
 
 	/**
 	 * @see org.geotools.data.shapefile.shp.ShapeHandler#write(java.nio.ByteBuffer,

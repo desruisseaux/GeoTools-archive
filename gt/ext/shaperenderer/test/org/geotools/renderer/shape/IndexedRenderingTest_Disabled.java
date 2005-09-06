@@ -107,7 +107,7 @@ public class IndexedRenderingTest_Disabled extends TestCase {
 	        env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env
 	                .getMaxY());
         }        
-        IndexInfo.Reader reader=new IndexInfo.Reader(renderer.layerIndexInfo[0],ShapefileRendererUtil.getShpReader((ShapefileDataStore) ds.getDataStore(), null, null), 
+        IndexInfo.Reader reader=new IndexInfo.Reader(renderer.layerIndexInfo[0],ShapefileRendererUtil.getShpReader((ShapefileDataStore) ds.getDataStore(), null, null, false), 
         new Envelope( env.getMinX()+10, env.getMaxX()-10, env.getMinY()+10, env.getMaxY()-10));        
         assertNotNull("Should find records", reader.goodRecs);
         TestUtilites.INTERACTIVE=INTERACTIVE;

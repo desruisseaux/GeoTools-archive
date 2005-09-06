@@ -66,7 +66,7 @@ public class PointHandlerTest extends TestCase {
 		mt=FactoryFinder.getMathTransformFactory(null).createConcatenatedTransform(mt,at);
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new PointHandler(reader.getHeader().getShapeType(), env, mt));
+		reader.setHandler(new PointHandler(reader.getHeader().getShapeType(), env, mt, false));
 
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
