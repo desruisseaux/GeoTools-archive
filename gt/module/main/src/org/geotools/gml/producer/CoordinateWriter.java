@@ -36,15 +36,15 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author Ian Schneider
  */
 class CoordinateWriter {
-
+    
     /**
      * Internal representation of coordinate delimeter (',' for GML is default)
      */
     private final String coordinateDelimiter;
-
+    
     /** Internal representation of tuple delimeter (' ' for GML is  default) */
     private final String tupleDelimiter;
-
+    
     /** To be used for formatting numbers, uses US locale. */
     private final NumberFormat coordFormatter = NumberFormat.getInstance(Locale.US);
     
@@ -55,20 +55,45 @@ class CoordinateWriter {
     private final FieldPosition zero = new FieldPosition(0);
     
     private char[] buff = new char[200];
-
+    
+    private final boolean useDummyZ;
+    
+    private final double dummyZ;
+    
     public CoordinateWriter() {
         this(4);
     }
-
-    public CoordinateWriter(int numDecimals) {
-        this(numDecimals," ",",");
+    
+    public CoordinateWriter(int numDecimals, boolean isDummyZEnabled) {
+        this(numDecimals," ",",", isDummyZEnabled);
     }
-
+    
+    public CoordinateWriter(int numDecimals) {
+        this(numDecimals,false);
+    }
+    
     //TODO: check gml spec - can it be strings?  Or just chars?
-    public CoordinateWriter(int numDecimals, String tupleDelim, String coordDelim) {
+    public CoordinateWriter(int numDecimals, String tupleDelim, String coordDelim){
+        this(numDecimals, tupleDelim, coordDelim, false);
+    }
+    
+    public CoordinateWriter(int numDecimals, String tupleDelim, String coordDelim, boolean isDummyZEnabled){
+        this(numDecimals, tupleDelim, coordDelim, isDummyZEnabled, 0);
+    }
+    
+    public int getNumDecimals(){
+        return coordFormatter.getMaximumFractionDigits();
+    }
+    
+    public boolean isDummyZEnabled(){
+        return useDummyZ;
+    }
+    
+    public CoordinateWriter(int numDecimals, String tupleDelim, String coordDelim, boolean useDummyZ, double zValue) {
+        
         if (tupleDelim == null || tupleDelim.length() == 0)
             throw new IllegalArgumentException("Tuple delimeter cannot be null or zero length");
-
+        
         if ((coordDelim != null) && coordDelim.length() == 0) {
             throw new IllegalArgumentException("Coordinate delimeter cannot be null or zero length");
         }
@@ -81,24 +106,34 @@ class CoordinateWriter {
         
         atts.addAttribute(GMLUtils.GML_URL, "decimal", "decimal", "decimal", ".");
         atts.addAttribute(GMLUtils.GML_URL, "cs", "cs", "cs",
-            coordinateDelimiter);
+                coordinateDelimiter);
         atts.addAttribute(GMLUtils.GML_URL, "ts", "ts", "ts", tupleDelimiter);
+        
+        this.useDummyZ = useDummyZ;
+        this.dummyZ = zValue;
     }
-
+    
     public void writeCoordinates(Coordinate[] c, ContentHandler output)
-        throws SAXException {
-
+    throws SAXException {
+        
         output.startElement(GMLUtils.GML_URL, "coordinates", "gml:coordinates",
-            atts);
-
+                atts);
+        
         for (int i = 0, n = c.length; i < n; i++) {
             // clear the buffer
             coordBuff.delete(0, coordBuff.length());
             // format x into buffer and append delimiter
             coordFormatter.format(c[i].x,coordBuff,zero).append(coordinateDelimiter);
             // format y into buffer
-            coordFormatter.format(c[i].y,coordBuff,zero);
-
+            if(useDummyZ){
+                coordFormatter.format(c[i].y,coordBuff,zero).append(coordinateDelimiter);
+            } else{
+                coordFormatter.format(c[i].y,coordBuff,zero);
+            }
+            // format dummy z into buffer if required
+            if(useDummyZ){
+                coordFormatter.format(dummyZ, coordBuff, zero);
+            }
             // if theres another coordinate, tack on a tuple delimeter
             if (i + 1 < c.length)
                 coordBuff.append(tupleDelimiter);
@@ -111,7 +146,7 @@ class CoordinateWriter {
             // finally, output
             output.characters(buff, 0, coordBuff.length());
         }
-
+        
         output.endElement(GMLUtils.GML_URL,"coordinates", "gml:coordinates");
     }
 }
