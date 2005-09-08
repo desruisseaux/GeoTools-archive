@@ -1,7 +1,3 @@
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
- */
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
@@ -159,9 +155,10 @@ public class MySQLDataStoreFactory
                 if (!(((value = params.get(arrayParameters[i].key)) != null)
                         && (arrayParameters[i].type.isInstance(value)))) {
                     if (arrayParameters[i].required) {
-                        if (LOGGER.isLoggable(Level.FINE)) {
-                            LOGGER.warning("Failed on : " + arrayParameters[i].key);
-                            LOGGER.fine(params.toString());
+                        if (LOGGER.isLoggable(Level.FINER)) {
+                            LOGGER.finer("Failed on : " 
+                                         + arrayParameters[i].key + ", full " +
+                                         "params= " + params.toString()); 
                         }
                         return (false);
                     }
