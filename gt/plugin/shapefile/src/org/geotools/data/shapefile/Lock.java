@@ -20,12 +20,14 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 /**
- * A read-write lock for shapefiles so that OS file locking exceptions will not ruin an attempt to update a shapefile.
- * 
- * On windows there are often operating system locking conflicts when writing to a shapefile.  In order to 
- * not have exceptions thrown everytime a write is made, geotools has implemented file locking for shapefiles.
- * 
+ * A read-write lock for shapefiles so that OS file locking exceptions will not
+ * ruin an attempt to update a shapefile.  On windows there are often
+ * operating system locking conflicts when writing to a shapefile.  In order
+ * to  not have exceptions thrown everytime a write is made, geotools has
+ * implemented file locking for shapefiles.
+ *
  * @author jeichar
  */
 public class Lock {
@@ -38,8 +40,9 @@ public class Lock {
     }
 
     /**
-     * Called by shapefileReader before a read is started and before an IOStream is openned.
-     * 
+     * Called by shapefileReader before a read is started and before an
+     * IOStream is openned.
+     *
      * @throws IOException
      */
     public synchronized void startRead() throws IOException {
@@ -63,7 +66,8 @@ public class Lock {
     }
 
     /**
-     * Called by ShapefileReader after a read is complete and after the IOStream is closed.
+     * Called by ShapefileReader after a read is complete and after the
+     * IOStream is closed.
      */
     public synchronized void endRead() {
         assertTrue(level > 0);
@@ -71,9 +75,11 @@ public class Lock {
         logger.fine("End Read Lock:" + level);
         notifyAll();
     }
+
     /**
-     * Called by ShapefileDataStore before a write is started and before an IOStream is openned.
-     * 
+     * Called by ShapefileDataStore before a write is started and before an
+     * IOStream is openned.
+     *
      * @throws IOException
      */
     public synchronized void startWrite() throws IOException {
@@ -91,7 +97,8 @@ public class Lock {
     }
 
     /**
-     * Called by ShapefileDataStore after a write is complete and after the IOStream is closed.
+     * Called by ShapefileDataStore after a write is complete and after the
+     * IOStream is closed.
      */
     public synchronized void endWrite() {
         assertTrue(level == -1);
