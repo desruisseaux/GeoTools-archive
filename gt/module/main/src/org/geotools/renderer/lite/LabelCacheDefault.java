@@ -570,6 +570,10 @@ public class LabelCacheDefault implements LabelCache {
 		    displacementY = (textStyle.getAnchorY() + (textBounds.getHeight()/2.0))
 		        + textStyle.getDisplacementY();
 		}
+		if (rotation != rotation) // IEEE def'n x=x for all x except when x is NaN
+			rotation = 0.0;
+		if (Double.isInfinite(rotation))
+			rotation = 0; //weird number
 		tempTransform.rotate(rotation);
 		tempTransform.translate(displacementX, displacementY);
 	}
