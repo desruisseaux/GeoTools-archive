@@ -20,97 +20,108 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 
+
 /**
  * A shape for drawing on a graphics2d
- * 
+ *
  * @author jeichar
+ *
  * @since 2.1.x
  */
 public class MultiLineShape extends AbstractShape implements Shape {
+    public MultiLineShape(SimpleGeometry geom) {
+        super(geom);
+    }
 
-	public MultiLineShape(SimpleGeometry geom) {
-		super(geom);
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.Shape#getPathIterator(java.awt.geom.AffineTransform)
+     */
+    public PathIterator getPathIterator(final AffineTransform at) {
+        return new PathIterator() {
+                int currentPart = 0;
+                int currentIndex = 0;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#getPathIterator(java.awt.geom.AffineTransform)
-	 */
-	public PathIterator getPathIterator(final AffineTransform at) {
+                public int getWindingRule() {
+                    return WIND_NON_ZERO;
+                }
 
-		return new PathIterator() {
-			int currentPart = 0;
+                public boolean isDone() {
+                    // TODO Auto-generated method stub
+                    return currentPart == geom.coords.length;
+                }
 
-			int currentIndex = 0;
+                public void next() {
+                    if (isDone()) {
+                        return;
+                    }
 
-			public int getWindingRule() {
-				return WIND_NON_ZERO;
-			}
+                    if ((currentIndex + 1) >= geom.coords[currentPart].length) {
+                        currentIndex = 0;
+                        currentPart++;
+                    } else {
+                        currentIndex++;
+                    }
+                }
 
-			public boolean isDone() {
-				// TODO Auto-generated method stub
-				return currentPart == geom.coords.length;
-			}
+                public int currentSegment(float[] coords) {
+                    if (currentIndex == 0) {
+                        coords[0] = (float) geom.coords[currentPart][currentIndex];
+                        currentIndex++;
+                        coords[1] = (float) geom.coords[currentPart][currentIndex];
 
-			public void next() {
-				if (isDone())
-					return;
-				if (currentIndex + 1 >= geom.coords[currentPart].length) {
-					currentIndex = 0;
-					currentPart++;
-				} else
-					currentIndex++;
+                        if (at != null) {
+                            at.transform(coords, 0, coords, 0, 1);
+                        }
 
-			}
+                        return SEG_MOVETO;
+                    } else {
+                        coords[0] = (float) geom.coords[currentPart][currentIndex];
+                        currentIndex++;
+                        coords[1] = (float) geom.coords[currentPart][currentIndex];
 
-			public int currentSegment(float[] coords) {
-				if (currentIndex == 0) {
-					coords[0] = (float) geom.coords[currentPart][currentIndex];
-					currentIndex++;
-					coords[1] = (float) geom.coords[currentPart][currentIndex];
-					if (at != null)
-						at.transform(coords, 0, coords, 0, 1);
-					return SEG_MOVETO;
-				}else {
-					coords[0] = (float) geom.coords[currentPart][currentIndex];
-					currentIndex++;
-					coords[1] = (float) geom.coords[currentPart][currentIndex];
-					if (at != null)
-						at.transform(coords, 0, coords, 0, 1);
-					return SEG_LINETO;
-				}
-			}
+                        if (at != null) {
+                            at.transform(coords, 0, coords, 0, 1);
+                        }
 
-			public int currentSegment(double[] coords) {
-				if (currentIndex == 0) {
-					coords[0] = (float) geom.coords[currentPart][currentIndex];
-					currentIndex++;
-					coords[1] = (float) geom.coords[currentPart][currentIndex];
-					if (at != null)
-						at.transform(coords, 0, coords, 0, 1);
-					return SEG_MOVETO;
-				}else {
-					coords[0] = (float) geom.coords[currentPart][currentIndex];
-					currentIndex++;
-					coords[1] = (float) geom.coords[currentPart][currentIndex];
-					if (at != null)
-						at.transform(coords, 0, coords, 0, 1);
-					return SEG_LINETO;
-				}
-			}
+                        return SEG_LINETO;
+                    }
+                }
 
-		};
-	}
+                public int currentSegment(double[] coords) {
+                    if (currentIndex == 0) {
+                        coords[0] = (float) geom.coords[currentPart][currentIndex];
+                        currentIndex++;
+                        coords[1] = (float) geom.coords[currentPart][currentIndex];
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#getPathIterator(java.awt.geom.AffineTransform,
-	 *      double)
-	 */
-	public PathIterator getPathIterator(AffineTransform at, double flatness) {
-		return getPathIterator(at);
-	}
+                        if (at != null) {
+                            at.transform(coords, 0, coords, 0, 1);
+                        }
 
+                        return SEG_MOVETO;
+                    } else {
+                        coords[0] = (float) geom.coords[currentPart][currentIndex];
+                        currentIndex++;
+                        coords[1] = (float) geom.coords[currentPart][currentIndex];
+
+                        if (at != null) {
+                            at.transform(coords, 0, coords, 0, 1);
+                        }
+
+                        return SEG_LINETO;
+                    }
+                }
+            };
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.Shape#getPathIterator(java.awt.geom.AffineTransform,
+     *      double)
+     */
+    public PathIterator getPathIterator(AffineTransform at, double flatness) {
+        return getPathIterator(at);
+    }
 }

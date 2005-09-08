@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  *    Geotools - OpenSource mapping toolkit
  *    (C) 2002, Centre for Computational Geography
  *
@@ -19,9 +35,8 @@
  */
 package org.geotools.index.rtree;
 
-import java.util.Iterator;
-import java.util.logging.Logger;
-
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BetweenFilter;
@@ -38,17 +53,17 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
+import java.util.Iterator;
+import java.util.logging.Logger;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
+ * DOCUMENT ME!
+ *
  * @author Tommaso Nolli
  */
 public class FilterConsumer implements FilterVisitor {
-
     private static Logger LOGGER = Logger.getLogger("org.geotools.index.rtree");
-    
     private Envelope bounds = null;
 
     public Envelope getBounds() {
@@ -59,11 +74,10 @@ public class FilterConsumer implements FilterVisitor {
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
      */
     public void visit(Filter filter) {
-        if (filter.getFilterType() == Filter.NONE.getFilterType()){
+        if (filter.getFilterType() == Filter.NONE.getFilterType()) {
             this.bounds = new Envelope(Double.NEGATIVE_INFINITY,
-                                       Double.POSITIVE_INFINITY,
-                                       Double.NEGATIVE_INFINITY,
-                                       Double.POSITIVE_INFINITY);
+                    Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY,
+                    Double.POSITIVE_INFINITY);
         } else if (filter.getFilterType() == Filter.ALL.getFilterType()) {
             this.bounds = null;
         } else {
@@ -90,17 +104,17 @@ public class FilterConsumer implements FilterVisitor {
      */
     public void visit(GeometryFilter filter) {
         if (filter.getFilterType() == Filter.GEOMETRY_BBOX) {
-            DefaultExpression left = (DefaultExpression)filter.getLeftGeometry();
-            DefaultExpression right = (DefaultExpression)filter.getRightGeometry();
+            DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
+            DefaultExpression right = (DefaultExpression) filter
+                .getRightGeometry();
 
             if (left != null) {
                 left.accept(this);
             }
-            
+
             if (right != null) {
                 right.accept(this);
             }
-
         }
     }
 
@@ -116,22 +130,29 @@ public class FilterConsumer implements FilterVisitor {
      */
     public void visit(LogicFilter filter) {
         switch (filter.getFilterType()) {
-            case AbstractFilter.LOGIC_NOT:
-                LOGGER.finest("[NOT] LogicFilter ignored!");
-                break;
-            case AbstractFilter.LOGIC_OR:
-                LOGGER.finest("[OR] LogicFilter ignored!");
-                break;
-            case AbstractFilter.LOGIC_AND:
-                Iterator list = filter.getFilterIterator();
-                while (list.hasNext()) {
-                    ((AbstractFilter) list.next()).accept(this);
-                }
-                break;
-            default:
-                LOGGER.finest("LogicFilter ignored!");
+        case AbstractFilter.LOGIC_NOT:
+            LOGGER.finest("[NOT] LogicFilter ignored!");
+
+            break;
+
+        case AbstractFilter.LOGIC_OR:
+            LOGGER.finest("[OR] LogicFilter ignored!");
+
+            break;
+
+        case AbstractFilter.LOGIC_AND:
+
+            Iterator list = filter.getFilterIterator();
+
+            while (list.hasNext()) {
+                ((AbstractFilter) list.next()).accept(this);
+            }
+
+            break;
+
+        default:
+            LOGGER.finest("LogicFilter ignored!");
         }
-        
     }
 
     /**
@@ -166,14 +187,14 @@ public class FilterConsumer implements FilterVisitor {
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LiteralExpression)
      */
     public void visit(LiteralExpression expression) {
-        if(expression.getType() == DefaultExpression.LITERAL_GEOMETRY) {
-            Geometry bbox = (Geometry)expression.getLiteral();
+        if (expression.getType() == DefaultExpression.LITERAL_GEOMETRY) {
+            Geometry bbox = (Geometry) expression.getLiteral();
+
             if (this.bounds == null) {
                 this.bounds = bbox.getEnvelopeInternal();
             } else {
                 this.bounds.expandToInclude(bbox.getEnvelopeInternal());
             }
-            
         } else {
             LOGGER.warning("LiteralExpression ignored!");
         }
@@ -192,5 +213,4 @@ public class FilterConsumer implements FilterVisitor {
     public void visit(FunctionExpression expression) {
         LOGGER.finest("FunctionExpression ignored!");
     }
-
 }

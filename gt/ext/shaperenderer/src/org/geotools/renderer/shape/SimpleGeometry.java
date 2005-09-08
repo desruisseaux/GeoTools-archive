@@ -16,25 +16,22 @@
  */
 package org.geotools.renderer.shape;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.shapefile.shp.ShapeType;
 
-import com.vividsolutions.jts.geom.Envelope;
 
 public class SimpleGeometry {
-    
-    
-	public final ShapeType type;
-	public final double[][] coords;
+    public final ShapeType type;
+    public final double[][] coords;
     public final Envelope bbox;
-    
-    public SimpleGeometry( ShapeType shapeType, double[][] coords, Envelope bbox ) {
-        this.type=shapeType;
-        this.coords=coords;
-        this.bbox=bbox;
+
+    public SimpleGeometry(ShapeType shapeType, double[][] coords, Envelope bbox) {
+        this.type = shapeType;
+        this.coords = coords;
+        this.bbox = bbox;
     }
-    
+
     public String toString() {
-    	return coords[0].toString();
+        return coords[0].toString();
     }
-    
 }

@@ -16,6 +16,12 @@
  */
 package org.geotools.renderer.shape;
 
+import org.geotools.renderer.lite.LabelCache;
+import org.geotools.renderer.style.GraphicStyle2D;
+import org.geotools.renderer.style.LineStyle2D;
+import org.geotools.renderer.style.MarkStyle2D;
+import org.geotools.renderer.style.PolygonStyle2D;
+import org.geotools.renderer.style.Style2D;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Canvas;
@@ -34,13 +40,6 @@ import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.renderer.lite.LabelCache;
-import org.geotools.renderer.style.GraphicStyle2D;
-import org.geotools.renderer.style.LineStyle2D;
-import org.geotools.renderer.style.MarkStyle2D;
-import org.geotools.renderer.style.PolygonStyle2D;
-import org.geotools.renderer.style.Style2D;
-
 
 /**
  * A simple class that knows how to paint a Shape object onto a Graphic given a
@@ -58,15 +57,16 @@ public class StyledShapePainter {
     /** The logger for the rendering module. */
     private static final Logger LOGGER = Logger.getLogger(StyledShapePainter.class
             .getName());
-
     LabelCache labelCache;
+
     /**
-	 * Construct <code>StyledShapePainter</code>.
-	 */
-	public StyledShapePainter(LabelCache labelCache) {
-		this.labelCache=labelCache;
-	}
-    
+     * Construct <code>StyledShapePainter</code>.
+     *
+     * @param labelCache DOCUMENT ME!
+     */
+    public StyledShapePainter(LabelCache labelCache) {
+        this.labelCache = labelCache;
+    }
 
     /**
      * Invoked automatically when a polyline is about to be draw. This
@@ -89,25 +89,27 @@ public class StyledShapePainter {
         // Is the current scale within the style scale range? 
         if (!style.isScaleInRange(scale)) {
             LOGGER.fine("Out of scale");
+
             return;
         }
-        
-//        if(LOGGER.isLoggable(Level.FINE)) {
-//            LOGGER.fine("Graphics transform: " + graphics.getTransform());
-//        }
 
-        if (style instanceof MarkStyle2D) 
-        {
-        	PathIterator citer=shape.getPathIterator(IDENTITY_TRANSFORM);    	
+        //        if(LOGGER.isLoggable(Level.FINE)) {
+        //            LOGGER.fine("Graphics transform: " + graphics.getTransform());
+        //        }
+        if (style instanceof MarkStyle2D) {
+            PathIterator citer = shape.getPathIterator(IDENTITY_TRANSFORM);
+
             // get the point onto the shape has to be painted
             float[] coords = new float[2];
             MarkStyle2D ms2d = (MarkStyle2D) style;
-            
-            while (!(citer.isDone()))
-            {
-            	 citer.currentSegment(coords);
-            	 Shape transformedShape = ms2d.getTransformedShape(coords[0],coords[1]);
-            	 if (transformedShape != null) {
+
+            while (!(citer.isDone())) {
+                citer.currentSegment(coords);
+
+                Shape transformedShape = ms2d.getTransformedShape(coords[0],
+                        coords[1]);
+
+                if (transformedShape != null) {
                     if (ms2d.getFill() != null) {
                         graphics.setPaint(ms2d.getFill());
                         graphics.setComposite(ms2d.getFillComposite());
@@ -120,11 +122,12 @@ public class StyledShapePainter {
                         graphics.setComposite(ms2d.getContourComposite());
                         graphics.draw(transformedShape);
                     }
+
                     citer.next();
                 }
             }
-         } else if (style instanceof GraphicStyle2D) {
-         	// DJB:  TODO: almost certainly you want to do the same here as with the MarkStyle2D (above)
+        } else if (style instanceof GraphicStyle2D) {
+            // DJB:  TODO: almost certainly you want to do the same here as with the MarkStyle2D (above)
             // get the point onto the shape has to be painted
             float[] coords = new float[2];
             PathIterator iter = shape.getPathIterator(IDENTITY_TRANSFORM);
@@ -154,7 +157,7 @@ public class StyledShapePainter {
                                 width, height);
                         paint = new TexturePaint(image, scaledRect);
                     }
-                    
+
                     graphics.setPaint(paint);
                     graphics.setComposite(ps2d.getFillComposite());
                     graphics.fill(shape);
@@ -185,15 +188,20 @@ public class StyledShapePainter {
                             paint = new TexturePaint(image, scaledRect);
                         }
 
-//                        debugShape(shape);
-                        Stroke stroke=ls2d.getStroke();
-                        if( graphics.getRenderingHint(RenderingHints.KEY_ANTIALIASING)==RenderingHints.VALUE_ANTIALIAS_ON){
-                        	if( stroke instanceof BasicStroke ) {
-                        		BasicStroke bs=(BasicStroke) stroke;
-                        		stroke = new BasicStroke(bs.getLineWidth()+0.5f, bs.getEndCap(), bs.getLineJoin(), bs.getMiterLimit(), bs.getDashArray(), bs.getDashPhase());
-                        	}
+                        //                        debugShape(shape);
+                        Stroke stroke = ls2d.getStroke();
+
+                        if (graphics.getRenderingHint(
+                                    RenderingHints.KEY_ANTIALIASING) == RenderingHints.VALUE_ANTIALIAS_ON) {
+                            if (stroke instanceof BasicStroke) {
+                                BasicStroke bs = (BasicStroke) stroke;
+                                stroke = new BasicStroke(bs.getLineWidth()
+                                        + 0.5f, bs.getEndCap(),
+                                        bs.getLineJoin(), bs.getMiterLimit(),
+                                        bs.getDashArray(), bs.getDashPhase());
+                            }
                         }
-                        
+
                         graphics.setPaint(paint);
                         graphics.setStroke(stroke);
                         graphics.setComposite(ls2d.getContourComposite());
@@ -372,5 +380,4 @@ public class StyledShapePainter {
 
         return;
     }
-
 }

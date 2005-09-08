@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  *    Geotools - OpenSource mapping toolkit
  *    (C) 2002, Centre for Computational Geography
  *
@@ -25,13 +41,16 @@ import org.geotools.index.rtree.Node;
 
 
 /**
+ * DOCUMENT ME!
+ *
  * @author Tommaso Nolli
  */
 public class MemoryNode extends Node {
-
     private Node parent;
-    
+
     /**
+     * DOCUMENT ME!
+     *
      * @param maxNodeEntries
      */
     public MemoryNode(int maxNodeEntries) {
@@ -58,13 +77,17 @@ public class MemoryNode extends Node {
     protected Entry getEntry(Node node) {
         Entry ret = null;
         Node n = null;
+
         for (int i = 0; i < this.entries.length; i++) {
-            n = (Node)this.entries[i].getData();
+            n = (Node) this.entries[i].getData();
+
             if (n == node) {
                 ret = this.entries[i];
+
                 break;
             }
         }
+
         return ret;
     }
 

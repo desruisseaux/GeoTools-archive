@@ -41,7 +41,7 @@ import org.geotools.styling.Style;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * @TODO class description
+ * Tests ShapeRenderer class
  * 
  * @author jeichar
  * @since 2.1.x

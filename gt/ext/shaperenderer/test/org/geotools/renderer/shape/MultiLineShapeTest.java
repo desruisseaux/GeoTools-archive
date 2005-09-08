@@ -26,7 +26,7 @@ import org.geotools.data.shapefile.shp.ShapeType;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * @TODO class description
+ * Tests MultiLineShape class
  * 
  * @author jeichar
  * @since 2.1.x

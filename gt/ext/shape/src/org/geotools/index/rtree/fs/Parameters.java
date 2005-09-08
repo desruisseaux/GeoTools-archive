@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  *    Geotools - OpenSource mapping toolkit
  *    (C) 2002, Centre for Computational Geography
  *
@@ -19,16 +35,17 @@
  */
 package org.geotools.index.rtree.fs;
 
+import org.geotools.index.DataDefinition;
 import java.nio.channels.FileChannel;
 import java.util.Stack;
 
-import org.geotools.index.DataDefinition;
 
 /**
+ * DOCUMENT ME!
+ *
  * @author Tommaso Nolli
  */
 public class Parameters {
-
     private int maxNodeEntries;
     private int minNodeEntries;
     private short splitAlg;
@@ -41,102 +58,129 @@ public class Parameters {
         this.freePages = new Stack();
     }
 
-	/**
-	 * @return
-	 */
-	public FileChannel getChannel() {
-		return channel;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @return
+     */
+    public FileChannel getChannel() {
+        return channel;
+    }
 
-	/**
-	 * @return
-	 */
-	public DataDefinition getDataDef() {
-		return dataDef;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @return
+     */
+    public DataDefinition getDataDef() {
+        return dataDef;
+    }
 
-	/**
-	 * @return
-	 */
-	public int getMaxNodeEntries() {
-		return maxNodeEntries;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @return
+     */
+    public int getMaxNodeEntries() {
+        return maxNodeEntries;
+    }
 
-	/**
-	 * @return
-	 */
-	public int getMinNodeEntries() {
-		return minNodeEntries;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @return
+     */
+    public int getMinNodeEntries() {
+        return minNodeEntries;
+    }
 
-	/**
-	 * @return
-	 */
-	public short getSplitAlg() {
-		return splitAlg;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @return
+     */
+    public short getSplitAlg() {
+        return splitAlg;
+    }
 
-	/**
-	 * @param channel
-	 */
-	public void setChannel(FileChannel channel) {
-		this.channel = channel;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @param channel
+     */
+    public void setChannel(FileChannel channel) {
+        this.channel = channel;
+    }
 
-	/**
-	 * @param definition
-	 */
-	public void setDataDef(DataDefinition definition) {
-		dataDef = definition;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @param definition
+     */
+    public void setDataDef(DataDefinition definition) {
+        dataDef = definition;
+    }
 
-	/**
-	 * @param i
-	 */
-	public void setMaxNodeEntries(int i) {
-		maxNodeEntries = i;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @param i
+     */
+    public void setMaxNodeEntries(int i) {
+        maxNodeEntries = i;
+    }
 
-	/**
-	 * @param i
-	 */
-	public void setMinNodeEntries(int i) {
-		minNodeEntries = i;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @param i
+     */
+    public void setMinNodeEntries(int i) {
+        minNodeEntries = i;
+    }
 
-	/**
-	 * @param s
-	 */
-	public void setSplitAlg(short s) {
-		splitAlg = s;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @param s
+     */
+    public void setSplitAlg(short s) {
+        splitAlg = s;
+    }
 
-	/**
-	 * @return
-	 */
-	public boolean getForceChannel() {
-		return forceChannel;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @return
+     */
+    public boolean getForceChannel() {
+        return forceChannel;
+    }
 
-	/**
-	 * @param b
-	 */
-	public void setForceChannel(boolean b) {
-		forceChannel = b;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @param b
+     */
+    public void setForceChannel(boolean b) {
+        forceChannel = b;
+    }
 
-	/**
-	 * @return
-	 */
-	public Stack getFreePages() {
-		return freePages;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @return
+     */
+    public Stack getFreePages() {
+        return freePages;
+    }
 
-	/**
-	 * @param stack
-	 */
-	public void setFreePages(Stack stack) {
-		freePages = stack;
-	}
-
+    /**
+     * DOCUMENT ME!
+     *
+     * @param stack
+     */
+    public void setFreePages(Stack stack) {
+        freePages = stack;
+    }
 }

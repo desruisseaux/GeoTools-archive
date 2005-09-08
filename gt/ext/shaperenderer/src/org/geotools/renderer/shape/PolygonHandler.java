@@ -27,7 +27,8 @@ import org.opengis.referencing.operation.TransformException;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * @TODO class description
+ * A ShapeHandler that reads PointHandler objects from a file.  It returns a SimpleGeometry and decimates all points that
+ * map to the same screen location.
  * 
  * @author jeichar
  * @since 2.1.x

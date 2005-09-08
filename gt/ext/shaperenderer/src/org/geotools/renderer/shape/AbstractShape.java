@@ -24,7 +24,7 @@ import java.awt.geom.Rectangle2D;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * @TODO class description
+ * An abstract java awt shape that will allow a SimpleGeometry to be drawn using Graphics2D 
  * 
  * @author jeichar
  * @since 2.1.x

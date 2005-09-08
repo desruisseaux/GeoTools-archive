@@ -16,10 +16,7 @@
  */
 package org.geotools.renderer.shape;
 
-import java.awt.geom.AffineTransform;
-
 import junit.framework.TestCase;
-
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.GeneralMatrix;
@@ -29,238 +26,253 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import java.awt.geom.AffineTransform;
+
 
 public class GeometryHandlerUtilitiesTest extends TestCase {
+    private static final double ACCURACY = 0.00000001;
+    public static final AffineTransform at = AffineTransform.getScaleInstance(2,
+            .5);
+    public static final String ALBERS = "PROJCS[\"BC_Albers\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS_1980\",6378137,298.257222101],TOWGS84[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Albers\"],PARAMETER[\"False_Easting\",1000000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-126],PARAMETER[\"Standard_Parallel_1\",50],PARAMETER[\"Standard_Parallel_2\",58.5],PARAMETER[\"Latitude_Of_Origin\",45],UNIT[\"Meter\",1]]";
+    public static final MathTransform CANT_TRANSFORM_3RD_ELEMENT = new MathTransform() {
+            public int getDimSource() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-	private static final double ACCURACY = 0.00000001;
-	public static final AffineTransform at=AffineTransform.getScaleInstance(2,.5);
-	public void testTransform() throws Exception {
-		double[] src=new double[]{ 1,1,2,2,3,3,4,4,5,5 };
-		double [] dest=new double[8];
-		
-		MathTransform mt=FactoryFinder.getMathTransformFactory(null).createAffineTransform(new GeneralMatrix(at));
-		GeometryHandlerUtilities.transform(ShapeType.ARC, mt, src, dest);
-		
-		assertEquals(2d,dest[0],ACCURACY);
-		assertEquals(.5d,dest[1],ACCURACY);
-		assertEquals(4d,dest[2],ACCURACY);
-		assertEquals(1d,dest[3],ACCURACY);
-		assertEquals(6d,dest[4],ACCURACY);
-		assertEquals(1.5d,dest[5],ACCURACY);
-		assertEquals(8d,dest[6],ACCURACY);
-		assertEquals(2d,dest[7],ACCURACY);
-		
+            public int getSourceDimensions() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-		src=new double[]{ 1,1,2,2,3,3,4,4,5,5 };
-		dest=new double[8];
-		mt=NEVER_TRANSFORM;
-		try{
-			GeometryHandlerUtilities.transform(ShapeType.ARC, mt, src, dest);
-			assertFalse("Shouldn't get here", true);
-		}catch( Exception e){
-			//correct
-		}
-		
-		dest=new double[]{ 1,1,2,2,3,3,4,4 };
-		mt=CANT_TRANSFORM_FIRST_ELEMENT;
-		GeometryHandlerUtilities.transform(ShapeType.POLYGON, mt, src, dest);
-		
-		assertEquals(3d,dest[0],ACCURACY);
-		assertEquals(3d,dest[1],ACCURACY);
-		assertEquals(3d,dest[2],ACCURACY);
-		assertEquals(3d,dest[3],ACCURACY);
-		assertEquals(3d,dest[4],ACCURACY);
-		assertEquals(3d,dest[5],ACCURACY);
-		assertEquals(3d,dest[6],ACCURACY);
-		assertEquals(3d,dest[7],ACCURACY);
+            public int getDimTarget() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-		dest=new double[]{ 1,1,2,2,3,3,4,4 };
-		mt=CANT_TRANSFORM_3RD_ELEMENT;
-		GeometryHandlerUtilities.transform(ShapeType.POLYGON, mt, src, dest);
-		assertEquals(1d,dest[0],ACCURACY);
-		assertEquals(1d,dest[1],ACCURACY);
-		assertEquals(1d,dest[2],ACCURACY);
-		assertEquals(1d,dest[3],ACCURACY);
-		assertEquals(3d,dest[4],ACCURACY);
-		assertEquals(3d,dest[5],ACCURACY);
-		assertEquals(4d,dest[6],ACCURACY);
-		assertEquals(4d,dest[7],ACCURACY);
-		
-	}
+            public int getTargetDimensions() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-	public static final String ALBERS="PROJCS[\"BC_Albers\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS_1980\",6378137,298.257222101],TOWGS84[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Albers\"],PARAMETER[\"False_Easting\",1000000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-126],PARAMETER[\"Standard_Parallel_1\",50],PARAMETER[\"Standard_Parallel_2\",58.5],PARAMETER[\"Latitude_Of_Origin\",45],UNIT[\"Meter\",1]]";
-	
-	public static final MathTransform CANT_TRANSFORM_3RD_ELEMENT=new MathTransform(){
+            public DirectPosition transform(DirectPosition arg0,
+                DirectPosition arg1)
+                throws MismatchedDimensionException, TransformException {
+                // TODO Auto-generated method stub
+                return null;
+            }
 
-		public int getDimSource() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public void transform(double[] arg0, int arg1, double[] arg2,
+                int arg3, int arg4) throws TransformException {
+                if (arg1 == 2) {
+                    throw new TransformException("boom");
+                }
+            }
 
-		public int getSourceDimensions() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public void transform(float[] arg0, int arg1, float[] arg2,
+                int arg3, int arg4) throws TransformException {
+                // TODO Auto-generated method stub
+            }
 
-		public int getDimTarget() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public Matrix derivative(DirectPosition arg0)
+                throws MismatchedDimensionException, TransformException {
+                // TODO Auto-generated method stub
+                return null;
+            }
 
-		public int getTargetDimensions() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public MathTransform inverse()
+                throws NoninvertibleTransformException {
+                // TODO Auto-generated method stub
+                return null;
+            }
 
-		public DirectPosition transform(DirectPosition arg0, DirectPosition arg1) throws MismatchedDimensionException, TransformException {
-			// TODO Auto-generated method stub
-			return null;
-		}
+            public boolean isIdentity() {
+                // TODO Auto-generated method stub
+                return false;
+            }
 
-		public void transform(double[] arg0, int arg1, double[] arg2, int arg3, int arg4) throws TransformException {
-			if( arg1==2 )
-				throw new TransformException("boom");
-		}
+            public String toWKT() throws UnsupportedOperationException {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        };
 
-		public void transform(float[] arg0, int arg1, float[] arg2, int arg3, int arg4) throws TransformException {
-			// TODO Auto-generated method stub
-			
-		}
+    public static final MathTransform CANT_TRANSFORM_FIRST_ELEMENT = new MathTransform() {
+            public int getDimSource() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-		public Matrix derivative(DirectPosition arg0) throws MismatchedDimensionException, TransformException {
-			// TODO Auto-generated method stub
-			return null;
-		}
+            public int getSourceDimensions() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-		public MathTransform inverse() throws NoninvertibleTransformException {
-			// TODO Auto-generated method stub
-			return null;
-		}
+            public int getDimTarget() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-		public boolean isIdentity() {
-			// TODO Auto-generated method stub
-			return false;
-		}
+            public int getTargetDimensions() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-		public String toWKT() throws UnsupportedOperationException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-	};
-	public static final MathTransform CANT_TRANSFORM_FIRST_ELEMENT=new MathTransform(){
+            public DirectPosition transform(DirectPosition arg0,
+                DirectPosition arg1)
+                throws MismatchedDimensionException, TransformException {
+                // TODO Auto-generated method stub
+                return null;
+            }
 
-		public int getDimSource() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public void transform(double[] arg0, int arg1, double[] arg2,
+                int arg3, int arg4) throws TransformException {
+                if ((arg1 < 3) || (arg1 == (arg2.length - 2))) {
+                    throw new TransformException("boom");
+                }
+            }
 
-		public int getSourceDimensions() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public void transform(float[] arg0, int arg1, float[] arg2,
+                int arg3, int arg4) throws TransformException {
+                // TODO Auto-generated method stub
+            }
 
-		public int getDimTarget() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public Matrix derivative(DirectPosition arg0)
+                throws MismatchedDimensionException, TransformException {
+                // TODO Auto-generated method stub
+                return null;
+            }
 
-		public int getTargetDimensions() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public MathTransform inverse()
+                throws NoninvertibleTransformException {
+                // TODO Auto-generated method stub
+                return null;
+            }
 
-		public DirectPosition transform(DirectPosition arg0, DirectPosition arg1) throws MismatchedDimensionException, TransformException {
-			// TODO Auto-generated method stub
-			return null;
-		}
+            public boolean isIdentity() {
+                // TODO Auto-generated method stub
+                return false;
+            }
 
-		public void transform(double[] arg0, int arg1, double[] arg2, int arg3, int arg4) throws TransformException {
-			if( arg1<3 || arg1==arg2.length-2)
-				throw new TransformException("boom");
-		}
+            public String toWKT() throws UnsupportedOperationException {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        };
 
-		public void transform(float[] arg0, int arg1, float[] arg2, int arg3, int arg4) throws TransformException {
-			// TODO Auto-generated method stub
-			
-		}
+    public static final MathTransform NEVER_TRANSFORM = new MathTransform() {
+            public int getDimSource() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-		public Matrix derivative(DirectPosition arg0) throws MismatchedDimensionException, TransformException {
-			// TODO Auto-generated method stub
-			return null;
-		}
+            public int getSourceDimensions() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-		public MathTransform inverse() throws NoninvertibleTransformException {
-			// TODO Auto-generated method stub
-			return null;
-		}
+            public int getDimTarget() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-		public boolean isIdentity() {
-			// TODO Auto-generated method stub
-			return false;
-		}
+            public int getTargetDimensions() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
 
-		public String toWKT() throws UnsupportedOperationException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-	};
-	public static final MathTransform NEVER_TRANSFORM=new MathTransform(){
+            public DirectPosition transform(DirectPosition arg0,
+                DirectPosition arg1)
+                throws MismatchedDimensionException, TransformException {
+                // TODO Auto-generated method stub
+                return null;
+            }
 
-		public int getDimSource() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public void transform(double[] arg0, int arg1, double[] arg2,
+                int arg3, int arg4) throws TransformException {
+                throw new TransformException("exception");
+            }
 
-		public int getSourceDimensions() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public void transform(float[] arg0, int arg1, float[] arg2,
+                int arg3, int arg4) throws TransformException {
+                // TODO Auto-generated method stub
+            }
 
-		public int getDimTarget() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public Matrix derivative(DirectPosition arg0)
+                throws MismatchedDimensionException, TransformException {
+                // TODO Auto-generated method stub
+                return null;
+            }
 
-		public int getTargetDimensions() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+            public MathTransform inverse()
+                throws NoninvertibleTransformException {
+                // TODO Auto-generated method stub
+                return null;
+            }
 
-		public DirectPosition transform(DirectPosition arg0, DirectPosition arg1) throws MismatchedDimensionException, TransformException {
-			// TODO Auto-generated method stub
-			return null;
-		}
+            public boolean isIdentity() {
+                // TODO Auto-generated method stub
+                return false;
+            }
 
-		public void transform(double[] arg0, int arg1, double[] arg2, int arg3, int arg4) throws TransformException {
-			throw new TransformException("exception");
-		}
+            public String toWKT() throws UnsupportedOperationException {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        };
 
-		public void transform(float[] arg0, int arg1, float[] arg2, int arg3, int arg4) throws TransformException {
-			// TODO Auto-generated method stub
-			
-		}
+    public void testTransform() throws Exception {
+        double[] src = new double[] { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5 };
+        double[] dest = new double[8];
 
-		public Matrix derivative(DirectPosition arg0) throws MismatchedDimensionException, TransformException {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        MathTransform mt = FactoryFinder.getMathTransformFactory(null)
+                                        .createAffineTransform(new GeneralMatrix(
+                    at));
+        GeometryHandlerUtilities.transform(ShapeType.ARC, mt, src, dest);
 
-		public MathTransform inverse() throws NoninvertibleTransformException {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        assertEquals(2d, dest[0], ACCURACY);
+        assertEquals(.5d, dest[1], ACCURACY);
+        assertEquals(4d, dest[2], ACCURACY);
+        assertEquals(1d, dest[3], ACCURACY);
+        assertEquals(6d, dest[4], ACCURACY);
+        assertEquals(1.5d, dest[5], ACCURACY);
+        assertEquals(8d, dest[6], ACCURACY);
+        assertEquals(2d, dest[7], ACCURACY);
 
-		public boolean isIdentity() {
-			// TODO Auto-generated method stub
-			return false;
-		}
+        src = new double[] { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5 };
+        dest = new double[8];
+        mt = NEVER_TRANSFORM;
 
-		public String toWKT() throws UnsupportedOperationException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-	};
+        try {
+            GeometryHandlerUtilities.transform(ShapeType.ARC, mt, src, dest);
+            assertFalse("Shouldn't get here", true);
+        } catch (Exception e) {
+            //correct
+        }
+
+        dest = new double[] { 1, 1, 2, 2, 3, 3, 4, 4 };
+        mt = CANT_TRANSFORM_FIRST_ELEMENT;
+        GeometryHandlerUtilities.transform(ShapeType.POLYGON, mt, src, dest);
+
+        assertEquals(3d, dest[0], ACCURACY);
+        assertEquals(3d, dest[1], ACCURACY);
+        assertEquals(3d, dest[2], ACCURACY);
+        assertEquals(3d, dest[3], ACCURACY);
+        assertEquals(3d, dest[4], ACCURACY);
+        assertEquals(3d, dest[5], ACCURACY);
+        assertEquals(3d, dest[6], ACCURACY);
+        assertEquals(3d, dest[7], ACCURACY);
+
+        dest = new double[] { 1, 1, 2, 2, 3, 3, 4, 4 };
+        mt = CANT_TRANSFORM_3RD_ELEMENT;
+        GeometryHandlerUtilities.transform(ShapeType.POLYGON, mt, src, dest);
+        assertEquals(1d, dest[0], ACCURACY);
+        assertEquals(1d, dest[1], ACCURACY);
+        assertEquals(1d, dest[2], ACCURACY);
+        assertEquals(1d, dest[3], ACCURACY);
+        assertEquals(3d, dest[4], ACCURACY);
+        assertEquals(3d, dest[5], ACCURACY);
+        assertEquals(4d, dest[6], ACCURACY);
+        assertEquals(4d, dest[7], ACCURACY);
+    }
 }

@@ -16,26 +16,26 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import java.io.IOException;
-
 import org.geotools.data.FIDReader;
 import org.geotools.feature.FeatureType;
+import java.io.IOException;
+
 
 /**
+ * DOCUMENT ME!
+ *
  * @author Tommaso Nolli
  */
 public class ShapeFIDReader implements FIDReader {
     protected static final String CLOSE_MESG = "Close has already been called"
         + " on this FIDReader";
-
     private boolean opened;
     private IndexedShapefileDataStore.Reader reader;
     private int len;
     protected StringBuffer buffer;
 
-    
-
-    public ShapeFIDReader(String typeName, IndexedShapefileDataStore.Reader reader) {
+    public ShapeFIDReader(String typeName,
+        IndexedShapefileDataStore.Reader reader) {
         buffer = new StringBuffer(typeName);
         buffer.append('.');
         len = typeName.length() + 1;
@@ -43,8 +43,8 @@ public class ShapeFIDReader implements FIDReader {
         this.reader = reader;
     }
 
-    public ShapeFIDReader(FeatureType featureType, 
-                          IndexedShapefileDataStore.Reader reader) {
+    public ShapeFIDReader(FeatureType featureType,
+        IndexedShapefileDataStore.Reader reader) {
         this(featureType.getTypeName(), reader);
     }
 
@@ -56,9 +56,9 @@ public class ShapeFIDReader implements FIDReader {
     }
 
     /**
-     * This method always returns true, since it is
-     * built with a <code>ShapefileDataStore.Reader</code>
-     * you have to call <code>ShapefileDataStore.Reader.hasNext()</code>
+     * This method always returns true, since it is built with a
+     * <code>ShapefileDataStore.Reader</code> you have to call
+     * <code>ShapefileDataStore.Reader.hasNext()</code>
      *
      * @return always return <code>true</code>
      *
@@ -88,7 +88,7 @@ public class ShapeFIDReader implements FIDReader {
             throw new IOException(CLOSE_MESG);
         }
 
-        buffer.delete(len,buffer.length());
+        buffer.delete(len, buffer.length());
         buffer.append(reader.getRecordNumber());
 
         return buffer.toString();

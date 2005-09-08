@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  *    Geotools - OpenSource mapping toolkit
  *    (C) 2002, Centre for Computational Geography
  *
@@ -28,32 +44,29 @@ import org.geotools.index.rtree.PageStore;
 
 
 /**
+ * DOCUMENT ME!
+ *
  * @author Tommaso Nolli
  */
 public class MemoryPageStore extends PageStore {
-
     private static final int DEF_MAX = 50;
     private static final int DEF_MIN = 25;
     private static final short DEF_SPLIT = SPLIT_QUADRATIC;
-
     private LockManager lockManager = new LockManager();
-    
     private Node root = null;
-    
+
     public MemoryPageStore(DataDefinition def) throws TreeException {
         this(def, DEF_MAX, DEF_MIN, DEF_SPLIT);
     }
-    
+
     public MemoryPageStore(DataDefinition def, int max, int min, short split)
-    throws TreeException 
-    {
+        throws TreeException {
         super(def, max, min, split);
-        
+
         this.root = new MemoryNode(max);
         this.root.setLeaf(true);
     }
 
-    
     /**
      * @see org.geotools.index.rtree.PageStore#getRoot()
      */
@@ -75,15 +88,19 @@ public class MemoryPageStore extends PageStore {
     public Node getEmptyNode(boolean isLeaf) {
         MemoryNode ret = new MemoryNode(this.maxNodeEntries);
         ret.setLeaf(isLeaf);
+
         return ret;
     }
 
     /**
-     * @see org.geotools.index.rtree.PageStore#getNode(org.geotools.index.rtree.Entry, org.geotools.index.rtree.Node)
+     * @see org.geotools.index.rtree.PageStore#getNode(org.geotools.index.rtree.Entry,
+     *      org.geotools.index.rtree.Node)
      */
-    public Node getNode(Entry parentEntry, Node parent) throws TreeException {
-        Node ret = (Node)parentEntry.getData();
+    public Node getNode(Entry parentEntry, Node parent)
+        throws TreeException {
+        Node ret = (Node) parentEntry.getData();
         ret.setParent(parent);
+
         return ret;
     }
 
@@ -107,5 +124,4 @@ public class MemoryPageStore extends PageStore {
     public void close() throws TreeException {
         this.root = null;
     }
-
 }

@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  *    Geotools - OpenSource mapping toolkit
  *    (C) 2002, Centre for Computational Geography
  *
@@ -23,12 +39,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 
-
 /**
+ * DOCUMENT ME!
+ *
  * @author Tommaso Nolli
  */
 public class DataDefinition {
-
     private Charset charset;
     private ArrayList fields;
 
@@ -36,32 +52,48 @@ public class DataDefinition {
         fields = new ArrayList();
         this.charset = Charset.forName(charset);
     }
-    
+
     public final boolean isValid() {
-        return this.charset != null &&
-               !this.charset.equals("") &&
-               this.fields.size() > 0; 
+        return (this.charset != null) && !this.charset.equals("")
+        && (this.fields.size() > 0);
     }
-    
+
     public int getFieldsCount() {
         return this.fields.size();
     }
-    
+
     public Field getField(int i) {
-        return (Field)this.fields.get(i);
+        return (Field) this.fields.get(i);
     }
-    
+
     /**
      * Well known classes
+     * 
      * <ul>
-     * <li>Short
-     * <li>Integer
-     * <li>Long
-     * <li>Float
-     * <li>Double
-     * <li>Date
+     * <li>
+     * Short
+     * </li>
+     * <li>
+     * Integer
+     * </li>
+     * <li>
+     * Long
+     * </li>
+     * <li>
+     * Float
+     * </li>
+     * <li>
+     * Double
+     * </li>
+     * <li>
+     * Date
+     * </li>
      * </ul>
+     * 
+     *
      * @param clazz
+     *
+     * @throws TreeException DOCUMENT ME!
      */
     public void addField(Class clazz) throws TreeException {
         if (clazz.isAssignableFrom(Short.class)) {
@@ -76,14 +108,15 @@ public class DataDefinition {
         } else if (clazz.isAssignableFrom(Double.class)) {
             this.fields.add(new Field(clazz, 8));
         } else {
-            throw new TreeException("Unknow len of class " + clazz +
-                                     "use addField(int)");
+            throw new TreeException("Unknow len of class " + clazz
+                + "use addField(int)");
         }
     }
-    
+
     /**
      * For classes with unknown length; this values will be threated as
      * <code>String</code>s and truncated at the specified len
+     *
      * @param len
      */
     public void addField(int len) {
@@ -91,87 +124,96 @@ public class DataDefinition {
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @return
      */
     public Charset getCharset() {
         return charset;
     }
-    
+
     /**
      * Gets the max len of the data
+     *
      * @return
      */
     public int getLen() {
         int len = 0;
-        
+
         Field field = null;
+
         for (int i = 0; i < this.fields.size(); i++) {
-            field = (Field)this.fields.get(i);
+            field = (Field) this.fields.get(i);
             len += field.getLen();
         }
-     
-        return len;   
+
+        return len;
     }
-    
+
     /**
-     * Gets the len of this field after the encoding, this
-     * method may be different from getLen() only if exists strings
-     * in the definition
+     * Gets the len of this field after the encoding, this method may be
+     * different from getLen() only if exists strings in the definition
+     *
      * @return
      */
     public int getEncodedLen() {
         int len = 0;
-        
+
         Field field = null;
+
         for (int i = 0; i < this.fields.size(); i++) {
-            field = (Field)this.fields.get(i);
+            field = (Field) this.fields.get(i);
             len += field.getEncodedLen();
         }
-     
-        return len; 
+
+        return len;
     }
 
-    
     /**
      * Inner class for Data fields
+     *
      * @author Tommaso Nolli
      */
     public class Field {
         private Class clazz;
         private int len;
-        
+
         public Field(Class clazz, int len) {
             this.clazz = clazz;
             this.len = len;
         }
-        
-		/**
-		 * @return
-		 */
-		public Class getFieldClass() {
-			return clazz;
-		}
 
-		/**
-		 * @return
-		 */
-		public int getLen() {
-			return len;
-		}
-        
         /**
+         * DOCUMENT ME!
+         *
+         * @return
+         */
+        public Class getFieldClass() {
+            return clazz;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return
+         */
+        public int getLen() {
+            return len;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
          * @return
          */
         public int getEncodedLen() {
             int ret = this.len;
-            
+
             if (this.clazz.equals(String.class)) {
-                ret = (int)charset.newEncoder().maxBytesPerChar() * this.len;
+                ret = (int) charset.newEncoder().maxBytesPerChar() * this.len;
             }
-            
+
             return ret;
         }
-
     }
-
 }
