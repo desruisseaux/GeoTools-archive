@@ -51,6 +51,112 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 
     /** The matcher to match patterns with. */
     private Matcher match = null;
+    
+    
+    /**
+	 * Given OGC PropertyIsLike Filter information, construct
+	 * an SQL-compatible 'like' pattern.
+	 * 
+	 *   SQL   % --> match any number of characters
+	 *         _ --> match a single character
+	 * 
+	 *    NOTE; the SQL command is 'string LIKE pattern [ESCAPE escape-character]'
+	 *    We could re-define the escape character, but I'm not doing to do that in this code
+	 *    since some databases will not handle this case.
+	 * 
+	 *   Method:
+	 *     1. 
+	 * 
+	 *  Examples: ( escape ='!',  multi='*',    single='.'  )
+	 *    broadway*  -> 'broadway%'
+	 *    broad_ay   -> 'broad_ay'
+	 *    broadway   -> 'broadway'
+	 *    
+	 *    broadway!* -> 'broadway*'  (* has no significance and is escaped)
+	 *    can't      -> 'can''t'     ( ' escaped for SQL compliance)
+	 * 
+	 * 
+	 *  NOTE: we also handle "'" characters as special because they are
+	 *        end-of-string characters.  SQL will convert ' to '' (double single quote).
+	 * 
+	 *  NOTE: we dont handle "'" as a 'special' character because it would be 
+	 *        too confusing to have a special char as another special char.
+	 *        Using this will throw an error  (IllegalArgumentException).
+	 * 
+	 * @param escape
+	 * @param multi
+	 * @param single
+	 * @param pattern
+	 * 
+	 * @return
+	 */
+	public static String convertToSQL92(char escape, char multi,char single, String pattern)
+	   throws IllegalArgumentException
+	{
+		if ( (escape == '\'') || (multi  == '\'') || (single  == '\'')  )
+			throw new IllegalArgumentException("do not use single quote (') as special char!");
+		
+		 StringBuffer result = new StringBuffer(pattern.length()+5);
+		 for (int i = 0; i < pattern.length(); i++) 
+		 {
+            char chr = pattern.charAt(i);
+            if (chr == escape)
+            {
+            	// emit the next char and skip it
+            	if (i!= (pattern.length()-1) )
+            	     result.append( pattern.charAt(i+1) );// 
+            	i++; // skip next char
+            }
+            else if (chr == single)
+            {
+            	result.append('_');
+            }
+            else if (chr == multi)
+            {
+            	result.append('%');
+            }
+            else if (chr == '\'')
+            {
+            	result.append('\'');
+            	result.append('\'');
+            }
+            else 
+            {
+            	result.append(chr);
+            }
+		 }
+            
+		return result.toString();
+	}
+    
+	/**
+	 * see convertToSQL92
+	 * 
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+    public String getSQL92LikePattern() throws IllegalArgumentException
+    {
+    	if (escape.length() !=1)
+    	{
+    		throw new IllegalArgumentException("Like Pattern --> escape char should be of length exactly 1");
+    	}
+    	if (wildcardSingle.length() !=1)
+    	{
+    		throw new IllegalArgumentException("Like Pattern --> wildcardSingle char should be of length exactly 1");
+    	}
+    	if (wildcardMulti.length() !=1)
+    	{
+    		throw new IllegalArgumentException("Like Pattern --> wildcardMulti char should be of length exactly 1");
+    	}
+    	return LikeFilterImpl.convertToSQL92(
+    				escape.charAt(0),
+					wildcardMulti.charAt(0), 
+					wildcardSingle.charAt(0),
+					pattern);
+    }
+	
+	
     private Matcher getMatcher(){
         if(match == null){
             // protect the vars as this is moved code

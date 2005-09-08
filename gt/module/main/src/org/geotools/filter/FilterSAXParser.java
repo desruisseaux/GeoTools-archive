@@ -194,17 +194,30 @@ public class FilterSAXParser {
                 }
 
                 String wildcard = (String) attributes.get("wildCard");
+                
+                if ( (wildcard == null) || (wildcard.length() != 1) )
+                {
+                	throw new IllegalFilterException("like filter -- required attribute 'wildCard' missing or not exactly 1 char long.  Capitalization?");                	
+                }
                 String singleChar = (String) attributes.get("singleChar");
+                
+                if ( (singleChar == null)|| (singleChar.length() != 1) )
+                {
+                   	throw new IllegalFilterException("like filter -- required attribute 'singleChar' missing  or not exactly 1 char long.  Capitalization?");                	
+                }
+                
                 String escapeChar = (String) attributes.get("escape");
+                if (escapeChar == null) //totally against spec, but...
+                	 escapeChar = (String) attributes.get("escapeChar");
+                
+                if ( (escapeChar == null)|| (escapeChar.length() != 1) )
+                {
+                   	throw new IllegalFilterException("like filter -- required attribute 'escape' missing  or not exactly 1 char long.  Capitalization?");                	
+                }
+                
                 LOGGER.fine("escape char is " + escapeChar);
 
-                //old way, this should deprecate, but keep it for backwords
-                //compatability.  Spec says escape.
-                if (escapeChar == null) {
-                    escapeChar = (String) attributes.get("escapeChar");
-                }
-
-                LOGGER.fine("if null get new : " + escapeChar);
+              
                 ((LikeFilter) curFilter).setPattern(expression, wildcard,
                     singleChar, escapeChar);
                 curState = "complete";

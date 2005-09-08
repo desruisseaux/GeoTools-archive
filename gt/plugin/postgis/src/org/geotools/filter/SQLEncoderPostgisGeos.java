@@ -84,6 +84,9 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
         capabils.addType(AbstractFilter.GEOMETRY_CONTAINS);
         capabils.addType(AbstractFilter.GEOMETRY_OVERLAPS);
         capabils.addType(AbstractFilter.GEOMETRY_TOUCHES);
+        
+        capabils.addType(AbstractFilter.LIKE);
+        
     }
 
     /**

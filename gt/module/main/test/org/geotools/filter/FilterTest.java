@@ -200,6 +200,23 @@ public class FilterTest extends TestCase {
 	testFeature = testSchema.create(attributes);
         //LOGGER.finer("...flat feature created");
     }
+    
+    public void testLikeToSQL()
+    {
+    	assertTrue("BroadWay%".equals( LikeFilterImpl.convertToSQL92('!','*','.',"BroadWay*")));
+		assertTrue("broad#ay".equals(  LikeFilterImpl.convertToSQL92('!','*','.',"broad#ay")));
+		assertTrue("broadway".equals(  LikeFilterImpl.convertToSQL92('!','*','.',"broadway")));
+		 
+		assertTrue("broad_ay".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broad.ay")));
+		assertTrue("broad.ay".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broad!.ay")));
+				 
+		assertTrue("broa''dway".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broa'dway")));
+		assertTrue("broa''''dway".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broa''dway")));
+				 
+		assertTrue("broadway_".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broadway.")));
+		assertTrue("broadway".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broadway!")));
+		assertTrue("broadway!".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broadway!!")));
+    }
 
     /**
      * Sets up a schema and a test feature.

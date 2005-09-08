@@ -329,28 +329,23 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
      * @task REVISIT: Need to think through the escape char, so it works  right
      *       when Java uses one, and escapes correctly with an '_'.
      */
-    public void visit(LikeFilter filter) throws UnsupportedOperationException {
-        String message = "Like Filter support not yet added.";
-        throw new UnsupportedOperationException(message);
-
-        /*        log.finer("exporting like filter");
-           try{
-           String pattern = filter.getPattern();
-           pattern = pattern.replaceAll(escapedWildcardMulti, SQL_WILD_MULTI);
-           pattern = pattern.replaceAll(escapedWildcardSingle, SQL_WILD_SINGLE);
-            //pattern = pattern.replace('\\', ''); //get rid of java escapes.
-            //TODO escape the '_' char, as it could be in our string and will
-                     //mess up the SQL wildcard matching
-                 ((ExpressionDefault)filter.getValue()).accept(this);
-                 out.write(" LIKE ");
-                 out.write("'"+pattern+"'");
-              //if (pattern.indexOf(esc) != -1) { //if it uses the escape char
-              //out.write(" ESCAPE " + "'" + esc + "'");  //this needs testing
-              //} TODO figure out when to add ESCAPE clause,
-              //probably just for the '_' char.
-             } catch (java.io.IOException ioe){
-                 throw new RuntimeException(IO_ERROR, ioe);
-                 }*/
+    public void visit(LikeFilter filter) throws UnsupportedOperationException 
+	{
+    	char esc = filter.getEscape().charAt(0);
+    	char multi = filter.getWildcardMulti().charAt(0);
+    	char single = filter.getWildcardSingle().charAt(0);
+    	String pattern = LikeFilterImpl.convertToSQL92(esc,multi,single,filter.getPattern());
+    	
+    	DefaultExpression att = (DefaultExpression) filter.getValue();
+    	 
+    	try {
+	    	att.accept(this);
+	    	out.write(" LIKE '");
+	    	out.write(pattern);
+	    	out.write("' ");
+    	} catch (java.io.IOException ioe) {
+            throw new RuntimeException(IO_ERROR, ioe);
+        }    	
     }
 
     /**
