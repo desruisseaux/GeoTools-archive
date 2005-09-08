@@ -17,7 +17,6 @@
 package org.geotools.data.shapefile;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -32,12 +31,8 @@ import java.util.logging.Logger;
  */
 public class Lock {
     public final static int DELAY = 200;
-    Logger logger = Logger.getLogger("ShapefileLogger.Lock");
+    Logger logger = Logger.getLogger("org.geotools.datashapefile");
     int level = 0;
-
-    {
-        logger.setLevel(Level.FINE);
-    }
 
     /**
      * Called by shapefileReader before a read is started and before an
@@ -56,7 +51,7 @@ public class Lock {
 
         assertTrue(level > -1);
         level++;
-        logger.fine("Start Read Lock:" + level);
+        logger.finer("Start Read Lock:" + level);
     }
 
     private void assertTrue(boolean b) {
@@ -72,7 +67,7 @@ public class Lock {
     public synchronized void endRead() {
         assertTrue(level > 0);
         level--;
-        logger.fine("End Read Lock:" + level);
+        logger.finer("End Read Lock:" + level);
         notifyAll();
     }
 
@@ -93,7 +88,7 @@ public class Lock {
 
         assertTrue(level == 0);
         level = -1;
-        logger.fine("Start Write Lock:" + level);
+        logger.finer("Start Write Lock:" + level);
     }
 
     /**
@@ -103,7 +98,8 @@ public class Lock {
     public synchronized void endWrite() {
         assertTrue(level == -1);
         level = 0;
-        logger.fine("End Write Lock:" + level);
+        logger.finer("End Write Lock:" + level);
         notifyAll();
     }
 }
+
