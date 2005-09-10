@@ -93,7 +93,6 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     protected static final Logger logger = logger();
     private static Logger logger(){
     	Logger r = Logger.getLogger("org.geotools.data.wfs");
-    	r.setLevel(Level.OFF);
     	return r;
     }
 
