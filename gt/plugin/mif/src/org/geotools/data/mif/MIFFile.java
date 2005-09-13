@@ -80,7 +80,7 @@ import java.util.logging.Logger;
  *
  * @author Luca S. Percich, AMA-MI
  * @author Paolo Rizzi, AMA-MI
- * @version $Id: MIFFile.java,v 1.16 2005/08/02 12:04:16 lpercich Exp $
+ * @version $Id: MIFFile.java,v 1.17 2005/09/01 08:23:47 lpercich Exp $
  */
 public class MIFFile {
     // Geometry type identifier constants 

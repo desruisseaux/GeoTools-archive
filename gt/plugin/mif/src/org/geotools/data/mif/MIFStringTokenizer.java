@@ -23,11 +23,11 @@ import com.vividsolutions.jts.io.ParseException;
  * Simple tokenizer class
  *
  * @author Luca S. Percich, AMA-MI
- * @version $Id: MIFStringTokenizer.java,v 1.5 2005/06/16 14:06:42 lpercich Exp $
+ * @version $Id: MIFStringTokenizer.java,v 1.6 2005/09/01 08:51:36 lpercich Exp $
  */
 public class MIFStringTokenizer {
     private String line = ""; // Current line buffer
-    private String token = ""; // Current extracted token
+    private String lastToken = null; // Current extracted token
 
     /**
      * Builds a tokenizer
@@ -44,7 +44,6 @@ public class MIFStringTokenizer {
      * @return true if could read a non empty line (i.e. line != "")
      */
     public boolean readLine(String line) {
-        token = "";
 
         if (line == null) {
             this.line = "";
@@ -83,7 +82,15 @@ public class MIFStringTokenizer {
      */
     public String getToken(char separator, boolean nextLineIfEmpty,
         boolean quotedStrings) throws ParseException {
-        token = "";
+        
+        String token = "";
+
+        if (lastToken != null) {
+            token = lastToken;
+            lastToken = null;
+            return token;
+        }
+        
         line = ltrim(line);
 
         if (line.equals("") && nextLineIfEmpty) {
@@ -181,6 +188,15 @@ public class MIFStringTokenizer {
         return getToken(' ', false, false);
     }
 
+    /**
+     * Puts a token back to the input buffer so that the next call to getToken will
+     * return this token
+     * @param tok The token which has to be put back in the input buffer
+     */
+    public void putToken(String tok) {
+        lastToken = tok;
+    }
+    
     /**
      * DOCUMENT ME!
      *
