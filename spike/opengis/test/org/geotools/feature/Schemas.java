@@ -1,16 +1,20 @@
 package org.geotools.feature;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.opengis.feature.schema.Node;
+import org.opengis.feature.schema.AllSchema;
+import org.opengis.feature.schema.AttributeDescriptor;
+import org.opengis.feature.schema.ChoiceSchema;
+import org.opengis.feature.schema.OrderedSchema;
 import org.opengis.feature.schema.Schema;
 import org.opengis.feature.schema.SchemaFactory;
-import org.opengis.feature.type.Type;
+import org.opengis.feature.type.AttributeType;
 
 /**
  * Helper methods for dealing with Schema.
@@ -56,14 +60,14 @@ public class Schemas {
 	 * Since we will be creating a new Schema we need the factory.
 	 */
 	public Schema extention( Schema schema, Schema extend ){
-		if( schema instanceof Schema.All && extend instanceof Schema.All ){
-			return extension( (Schema.All) schema, (Schema.All) extend);
+		if( schema instanceof AllSchema && extend instanceof AllSchema ){
+			return extension( (AllSchema) schema, (AllSchema) extend);
 		}
-		else if( schema instanceof Schema.Choice && extend instanceof Schema.Choice ){
-			return extension( (Schema.Choice) schema, (Schema.Choice) extend);
+		else if( schema instanceof ChoiceSchema && extend instanceof ChoiceSchema ){
+			return extension( (ChoiceSchema) schema, (ChoiceSchema) extend);
 		}
-		else if( schema instanceof Schema.Ordered && extend instanceof Schema.Ordered ){
-			return extension( (Schema.Ordered) schema, (Schema.Ordered) extend);
+		else if( schema instanceof OrderedSchema && extend instanceof OrderedSchema ){
+			return extension( (OrderedSchema) schema, (OrderedSchema) extend);
 		}
 		else {
 			List<Schema> all = new ArrayList<Schema>();
@@ -72,19 +76,19 @@ public class Schemas {
 			return factory.ordered( all, 1, 1 );
 		}
 	}
-	private Schema.All extension( Schema.All schema, Schema.All extend ){
+	private AllSchema extension( AllSchema schema, AllSchema extend ){
 		List<Schema> all = new ArrayList<Schema>();
 		all.addAll( schema.all() );
 		all.addAll( extend.all() );		
 		return factory.all( all, extend.getMinOccurs(), extend.getMaxOccurs() );
 	}
-	private Schema.Ordered extension( Schema.Ordered schema, Schema.Ordered extend ){
+	private OrderedSchema extension( OrderedSchema schema, OrderedSchema extend ){
 		List<Schema> ordered = new ArrayList<Schema>();
 		ordered.addAll( schema.sequence() );
 		ordered.addAll( extend.sequence() );
 		return factory.ordered( ordered, extend.getMinOccurs(), extend.getMaxOccurs() );
 	}
-	private Schema.Choice extension( Schema.Choice schema, Schema.Choice extend ){
+	private ChoiceSchema extension( ChoiceSchema schema, ChoiceSchema extend ){
 		List<Schema> choice = new ArrayList<Schema>();
 		choice.addAll( schema.options() );
 		choice.addAll( extend.options() );
@@ -100,17 +104,17 @@ public class Schemas {
 	 * @return
 	 */	
 	public Schema restriction( Schema schema, Schema restrict ){
-		if( schema instanceof Schema.All && restrict instanceof Schema.All ){
-			return restriction( (Schema.All) schema, (Schema.All) restrict);
+		if( schema instanceof AllSchema && restrict instanceof AllSchema ){
+			return restriction( (AllSchema) schema, (AllSchema) restrict);
 		}
-		else if( schema instanceof Schema.Choice && restrict instanceof Schema.Choice ){
-			return restriction( (Schema.Choice) schema, (Schema.Choice) restrict);
+		else if( schema instanceof ChoiceSchema && restrict instanceof ChoiceSchema ){
+			return restriction( (ChoiceSchema) schema, (ChoiceSchema) restrict);
 		}
-		else if( schema instanceof Schema.Ordered && restrict instanceof Schema.Ordered ){
-			return restriction( (Schema.Ordered) schema, (Schema.Ordered) restrict);
+		else if( schema instanceof OrderedSchema && restrict instanceof OrderedSchema ){
+			return restriction( (OrderedSchema) schema, (OrderedSchema) restrict);
 		}
-		else if( schema instanceof Node && restrict instanceof Node ){
-			return restriction( (Node) schema, (Node) restrict);
+		else if( schema instanceof AttributeDescriptor && restrict instanceof AttributeDescriptor ){
+			return restriction( (AttributeDescriptor) schema, (AttributeDescriptor) restrict);
 		}
 		throw new IllegalStateException( "Cannot restrict provided schema" );
 	}
@@ -122,28 +126,38 @@ public class Schemas {
 	 * @param restrict
 	 * @return restrict, iff restrict.getType() ISA node.getType()
 	 */
-	Node restriction( Node node, Node restrict ){
+	AttributeDescriptor restriction( AttributeDescriptor node, AttributeDescriptor restrict ){
 		if( node.getType() == restrict.getType() ){
 			return restrict;
 		}
-		for( Type type = restrict.getType(); type != null; type = type.getSuper() ){
+		for( AttributeType type = restrict.getType(); type != null; type = type.getSuper() ){
 			if( node.getType() == type ){
 				return restrict; 
 			}
 		}
 		throw new IllegalStateException( "Cannot restrict provided schema" );
 	}
-	Schema.All restriction( Schema.All schema, Schema.All restrict ){
-		List<Schema> all = restriction( schema.all(), restrict.all() );		
+	AllSchema restriction( AllSchema schema, AllSchema restrict ){
+		Collection<Schema> all = restriction( schema.all(), restrict.all() );		
 		return factory.all( all, restrict.getMinOccurs(), restrict.getMaxOccurs() );
 	}
-	Schema.Ordered restriction( Schema.Ordered schema, Schema.Ordered restrict ){
+	OrderedSchema restriction( OrderedSchema schema, OrderedSchema restrict ){
 		List<Schema> sequence = restriction( schema.sequence(), restrict.sequence() );
 		return factory.ordered( sequence, restrict.getMinOccurs(), restrict.getMaxOccurs() );
 	}
-	Schema.Choice restriction( Schema.Choice schema, Schema.Choice restrict ){
-		List<Schema> sequence = restriction( schema.options(), restrict.options() );
+	ChoiceSchema restriction( ChoiceSchema schema, ChoiceSchema restrict ){
+		Collection<Schema> sequence = restriction( schema.options(), restrict.options() );
 		return factory.choice( sequence, restrict.getMinOccurs(), restrict.getMaxOccurs() );
+	}
+	Collection<Schema> restriction( Collection<Schema> schema, Collection<Schema> restrict ){
+		List<Schema> restriction = new ArrayList<Schema>();
+		
+		Iterator<Schema> i = schema.iterator();
+		Iterator<Schema> j = restrict.iterator();
+		while( i.hasNext() && j.hasNext() ){
+			restriction.add( restriction( i.next(), j.next() ) );
+		}
+		return restriction;
 	}
 	List<Schema> restriction( List<Schema> schema, List<Schema> restrict ){
 		List<Schema> restriction = new ArrayList<Schema>();
@@ -154,8 +168,7 @@ public class Schemas {
 			restriction.add( restriction( i.next(), j.next() ) );
 		}
 		return restriction;
-	}
-	
+	}	
 	/**
 	 * Locate type associated with provided name, or null if not found.
 	 * 
@@ -163,8 +176,8 @@ public class Schemas {
 	 * @param name
 	 * @return
 	 */
-	static public Type type( Schema schema, String name ){
-		Node node = node( schema, name );
+	static public AttributeType type( Schema schema, String name ){
+		AttributeDescriptor node = node( schema, name );
 		if( node != null ) return node.getType();
 		return null;
 	}
@@ -173,12 +186,12 @@ public class Schemas {
 	 * 
 	 * @param schema
 	 * @param name
-	 * @return Node assoicated with provided name, or null if not found.
+	 * @return AttributeDescriptor assoicated with provided name, or null if not found.
 	 */
-	static public Node node( Schema schema, String name ){
+	static public AttributeDescriptor node( Schema schema, String name ){
 		for( Schema child : list( schema ) ){
-			if( child instanceof Node ){
-				Node node = (Node) child;
+			if( child instanceof AttributeDescriptor ){
+				AttributeDescriptor node = (AttributeDescriptor) child;
 				if( node.getType().name().equals( name )){
 					return node;
 				}
@@ -194,12 +207,12 @@ public class Schemas {
 	 * </p>
 	 * @param schema
 	 * @param type
-	 * @return Node assoicated with provided name, or null if not found.
+	 * @return AttributeDescriptor assoicated with provided name, or null if not found.
 	 */
-	static public Node node( Schema schema, Type type){
+	static public AttributeDescriptor node( Schema schema, AttributeType type){
 		for( Schema child : list( schema ) ){
-			if( child instanceof Node ){
-				Node node = (Node) child;
+			if( child instanceof AttributeDescriptor ){
+				AttributeDescriptor node = (AttributeDescriptor) child;
 				if( node.getType() == type ){
 					return node;
 				}
@@ -208,17 +221,17 @@ public class Schemas {
 		return null;
 	}
 	/**
-	 * List of nodes matching Type.
+	 * List of nodes matching AttributeType.
 	 * 
 	 * @param schema
 	 * @param type
 	 * @return List of nodes for the provided type, or empty.
 	 */
-	static public List<Node> nodes( Schema schema, Type type ){
-		List<Node> nodes = new ArrayList<Node>();
+	static public List<AttributeDescriptor> nodes( Schema schema, AttributeType type ){
+		List<AttributeDescriptor> nodes = new ArrayList<AttributeDescriptor>();
 		for( Schema child : list( schema ) ){
-			if( child instanceof Node ){
-				Node node = (Node) child;
+			if( child instanceof AttributeDescriptor ){
+				AttributeDescriptor node = (AttributeDescriptor) child;
 				if( node.getType() == type ){
 					nodes.add( node );
 				}
@@ -233,22 +246,22 @@ public class Schemas {
 	 * @param type
 	 * @return List of nodes for the provided type, or empty.
 	 */
-	static public Set<Type> types( Schema schema ){
-		Set<Type> types = new HashSet<Type>();
+	static public Set<AttributeType> types( Schema schema ){
+		Set<AttributeType> types = new HashSet<AttributeType>();
 		for( Schema child : list( schema ) ){
-			if( child instanceof Node ){
-				Node node = (Node) child;
+			if( child instanceof AttributeDescriptor ){
+				AttributeDescriptor node = (AttributeDescriptor) child;
 				types.add( node.getType() );
 			}
 		}
 		return types;
 	}
 	/**
-	 * True if there may be more then one Type in the schema.
+	 * True if there may be more then one AttributeType in the schema.
 	 * <p>
 	 * This may happen if:
 	 * <ul>
-	 * <li>The Type is referenced by more then one node.
+	 * <li>The AttributeType is referenced by more then one node.
 	 * <li>The node referencing the type has multiplicy greater then 1
 	 * </ul>
 	 * 
@@ -256,15 +269,15 @@ public class Schemas {
 	 * @param type
 	 * @return
 	 */
-	public static boolean multiple( Schema schema, Type type ){
+	public static boolean multiple( Schema schema, AttributeType type ){
 		return maxOccurs( schema, type ) != 1;
 	}
-	public static int maxOccurs( Schema schema, Type type ){
-		List<Node> nodes = nodes( schema, type );
+	public static int maxOccurs( Schema schema, AttributeType type ){
+		List<AttributeDescriptor> nodes = nodes( schema, type );
 		if( nodes.isEmpty() ) return 0;
 		
 		int max = 0;
-		for( Node node : nodes ){
+		for( AttributeDescriptor node : nodes ){
 			if( max == Integer.MAX_VALUE ){
 				return Integer.MAX_VALUE;
 			}
@@ -273,15 +286,15 @@ public class Schemas {
 		return max;
 	}
 	@SuppressWarnings("unchecked")
-	static public List<Schema> list( Schema schema ){
-		if( schema instanceof Schema.Ordered ){
-			return ((Schema.Ordered)schema).sequence();
+	static public Collection<Schema> list( Schema schema ){
+		if( schema instanceof OrderedSchema ){
+			return ((OrderedSchema)schema).sequence();
 		}
-		else if( schema instanceof Schema.All ){
-			return ((Schema.All)schema).all();
+		else if( schema instanceof AllSchema ){
+			return ((AllSchema)schema).all();
 		}
-		else if( schema instanceof Schema.Choice ){
-			return ((Schema.Choice)schema).options();
+		else if( schema instanceof ChoiceSchema ){
+			return ((ChoiceSchema)schema).options();
 		}
 		return Collections.EMPTY_LIST;
 	}	

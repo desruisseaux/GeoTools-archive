@@ -1,12 +1,12 @@
 package org.opengis.feature;
 
-import org.opengis.feature.type.Type;
+import org.opengis.feature.type.AttributeType;
 
 
 public interface Attribute {
 
 	/**
-	 * Access name from Type, derrived property does not use Java Bean
+	 * Access name from AttributeType, derrived property does not use Java Bean
 	 * conventions
 	 * 
 	 * @return getType().getName().toString()
@@ -36,9 +36,9 @@ public interface Attribute {
 	void set(Object newValue);
 
 	/**
-	 * Indicate the Type of this content.
+	 * Indicate the AttributeType of this content.
 	 * 
-	 * @return Type information descirbing allowable content
+	 * @return AttributeType information descirbing allowable content
 	 */
-	public Type getType();
+	public AttributeType getType();
 }

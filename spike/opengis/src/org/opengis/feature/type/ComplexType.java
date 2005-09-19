@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.opengis.feature.schema.Schema;
 
-public interface ComplexType extends Type {
+public interface ComplexType extends AttributeType {
 	/**
 	 * Java class bound to this complex type.
 	 * <p>
@@ -14,13 +14,6 @@ public interface ComplexType extends Type {
 	 * @return Java binding, or null if not applicable
 	 */
 	Class getBinding();
-	
-	/**
-	 * True if this type is usable as a target of a reference.
-	 * 
-	 * @return true if this complex type must have non null getID()
-	 */
-	boolean isIdentified();
 
 	/** Super is restricted to other ComplexType */
 	ComplexType getSuper();
@@ -46,8 +39,8 @@ public interface ComplexType extends Type {
 	 * can return an List, where as usually a Set is returned.
 	 * </p>
 	 * <p>
-	 * Note: a Type may be returned by more then one Node in a Schema,
-	 * if it is allowed in more then one Choice or Sequence. While this
+	 * Note: a AttributeType may be returned by more then one AttributeDescriptor in a Schema,
+	 * if it is allowed in more then one ChoiceSchema or Sequence. While this
 	 * represents a form of multiplicity it does not indicate any difference
 	 * in containment.
 	 * </p>
@@ -57,7 +50,7 @@ public interface ComplexType extends Type {
 	 * </p>
 	 * @see getSchema
 	 */
-	Collection<Type> types();
+	Collection<AttributeType> types();
 	
 	/**
 	 * Works as a search through available types().
@@ -66,8 +59,8 @@ public interface ComplexType extends Type {
 	 * as with simple content.
 	 * </p>
 	 * @param name
-	 * @return The "first" type that with Type.getName
+	 * @return The "first" type that with AttributeType.getName
 	 */
-	Type type( String name );
+	AttributeType type( String name );
 
 }

@@ -19,11 +19,11 @@ public interface FeatureType extends ComplexType {
 	public boolean isIdentified();
 	
 	/**
-	 * Indicates which Type is to be considered the default
+	 * Indicates which AttributeType is to be considered the default
 	 * geometry.
-	 * @return Type used to locate the default Geometry
+	 * @return AttributeType used to locate the default Geometry
 	 */
-	public Type getDefaultGeometry();
+	public AttributeType getDefaultGeometry();
 	
 	/** Super may be a normal ComplexType */
 	public ComplexType getSuper();

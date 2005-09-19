@@ -4,19 +4,19 @@
 package org.geotools.feature.impl;
 
 import org.opengis.feature.Attribute;
-import org.opengis.feature.type.Type;
+import org.opengis.feature.type.AttributeType;
 
 /**
  * @author Jody Garnett
  */
 public class AttributeImpl implements Attribute {
 	Object content;
-	final Type TYPE;
+	final AttributeType TYPE;
 	protected final String ID;	
-	public AttributeImpl( Type type ){
+	public AttributeImpl( AttributeType type ){
 		this( null, type );
 	}
-	public AttributeImpl( String id, Type type ){
+	public AttributeImpl( String id, AttributeType type ){
 		ID = id;
 		TYPE = type;
 	}
@@ -32,7 +32,7 @@ public class AttributeImpl implements Attribute {
 	public void set(Object newValue) {
 		content = newValue;
 	}
-	public Type getType() {
+	public AttributeType getType() {
 		return null;
 	}
 }

@@ -7,16 +7,16 @@ import java.util.List;
 
 import org.geotools.feature.Schemas;
 import org.opengis.feature.Attribute;
-import org.opengis.feature.Complex;
+import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.type.ComplexType;
-import org.opengis.feature.type.Type;
+import org.opengis.feature.type.AttributeType;
 
-public class ComplexImpl implements Complex {
+public class ComplexImpl implements ComplexAttribute {
 	protected final ComplexType TYPE;
 	protected final String ID;	
 	protected List<Attribute> attribtues;
 	
-	private List<Type> types = null;	
+	private List<AttributeType> types = null;	
 	private List<Object> values = null;
 
 	
@@ -40,17 +40,17 @@ public class ComplexImpl implements Complex {
 	/**
 	 * Represents just enough info to convey the idea of this being a "view" into getAttribtues.
 	 */
-	public synchronized List<Type> types() {
+	public synchronized List<AttributeType> types() {
 		if( types == null ){
 			types = createTypesView( attribtues );
 		}
 		return types;
 	}
 	/** Factory method so subclasses can optimize */
-	protected List<Type> createTypesView( final List<Attribute> source ){
-		return new AbstractList<Type>(){
+	protected List<AttributeType> createTypesView( final List<Attribute> source ){
+		return new AbstractList<AttributeType>(){
 			@Override
-			public Type get(int index) {
+			public AttributeType get(int index) {
 				return attribtues.get(index).getType();
 			}
 			@Override
@@ -58,7 +58,7 @@ public class ComplexImpl implements Complex {
 				return attribtues.size();
 			}
 			@Override
-			public Type remove(int index) {
+			public AttributeType remove(int index) {
 				Attribute removed = attribtues.remove(index);
 				if( removed != null ){
 					return removed.getType();
@@ -74,7 +74,7 @@ public class ComplexImpl implements Complex {
 			 * @param type
 			 */
 			@Override
-			public void add(int arg0, Type type) {
+			public void add(int arg0, AttributeType type) {
 				throw new UnsupportedOperationException("Cannot add directly to types");
 			}
 		};
@@ -105,7 +105,7 @@ public class ComplexImpl implements Complex {
 				return attribtues.size();
 			}
 			@Override
-			public Type remove(int index) {
+			public AttributeType remove(int index) {
 				Attribute removed = attribtues.remove(index);
 				if( removed != null ){
 					return removed.getType();
@@ -186,7 +186,7 @@ public class ComplexImpl implements Complex {
 	public Object get(String name) {
 		return get( TYPE.type( name ));
 	}
-	public Object get(Type type) {
+	public Object get(AttributeType type) {
 		if( Schemas.multiple( TYPE.getSchema(),type ) ){
 			for( Attribute attribute : attribtues ){
 				if( attribute.getType() == type ){

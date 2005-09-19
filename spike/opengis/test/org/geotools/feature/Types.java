@@ -35,8 +35,8 @@ public class Types {
 	}
 	/**
 	 * This method is about as bad as it gets, we need to wander through Schema
-	 * detecting overrides by Type. Almost makes me thing Schema should have the
-	 * attrribute name, and the GenericName stuff should be left on Type.
+	 * detecting overrides by AttributeType. Almost makes me thing Schema should have the
+	 * attrribute name, and the GenericName stuff should be left on AttributeType.
 	 * 
 	 * @param complex
 	 * @return Schema that actually describes what is valid for the ComplexType.

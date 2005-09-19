@@ -6,7 +6,7 @@ import org.opengis.spatialschema.geometry.Geometry;
 /**
  * Represent a Geometry as complex content.
  * <p>
- * List of information to make available through Complex api:
+ * List of information to make available through ComplexAttribute api:
  * <ul>
  * <li>srs
  * <li>bounds
@@ -24,7 +24,7 @@ public interface GeometryAttribute extends Attribute  {
    // Object getBounds();
    
    /**
-    * Type should be configued with a Geometry for getJavaType.
+    * AttributeType should be configued with a Geometry for getJavaType.
     * <p>
     * Q: If needed a set of well-known GeometryType can be constructed,
     * may be needed to report CRS and Bounds constraints on data?

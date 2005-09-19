@@ -16,7 +16,9 @@ public interface FeatureCollection extends Feature {
 	 */
     Iterator<Feature> features();
 
-    /** You are required to close iterators after use */
+    /**
+     * You are required to close iterators after use.
+     */
     void close( Iterator<Feature> iterator );
 }
 
