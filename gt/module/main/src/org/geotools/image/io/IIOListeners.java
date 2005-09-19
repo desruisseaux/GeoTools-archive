@@ -38,10 +38,9 @@ import org.geotools.resources.XArray;
  * convenient when {@code ImageReader.addFooListener(...)} can't be invoked directly because the
  * {@link ImageReader} instance is not yet know or available.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @todo Add other listener types.
  */

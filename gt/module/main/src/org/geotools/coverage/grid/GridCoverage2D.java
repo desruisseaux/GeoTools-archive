@@ -429,7 +429,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                                                                 gridGeometry.axisDimensionY});
         } catch (FactoryException exception) {
             final IllegalArgumentException e = new IllegalArgumentException(
-                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs.getName().getClass()));
+                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs.getName()));
             e.initCause(exception); // TODO: inline in the constructor with J2SE 1.5.
             throw e;
         }

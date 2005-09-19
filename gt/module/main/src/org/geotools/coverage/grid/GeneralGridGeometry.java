@@ -107,6 +107,24 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
+     * Constructs a new grid geometry from an envelope. An affine transform will be computed
+     * automatically from the specified envelope. This constructor does not reverse or swap any
+     * axis.
+     *
+     * @param gridRange The valid coordinate range of a grid coverage.
+     * @param userRange The corresponding coordinate range in user coordinate. This rectangle must
+     *                  contains entirely all pixels, i.e. the rectangle's upper left corner must
+     *                  coincide with the upper left corner of the first pixel and the rectangle's
+     *                  lower right corner must coincide with the lower right corner of the last
+     *                  pixel.
+     *
+     * @since 2.2
+     */
+    public GeneralGridGeometry(final GridRange gridRange, final Envelope userRange) {
+        this(gridRange, userRange, null, false);
+    }
+
+    /**
      * Constructs a new grid geometry from an envelope.
      *
      * @deprecated Replaced by {@code GeneralGridGeometry(gridRange, userRange, reverse, false)}.
@@ -145,6 +163,8 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *                  typically set this argument to {@code true} when the geographic coordinate
      *                  system has axis in the (<var>y</var>,<var>x</var>) order. The {@code reverse}
      *                  parameter then apply to axis after the swap.
+     *
+     * @since 2.2
      */
     public GeneralGridGeometry(final GridRange gridRange,
                                final Envelope  userRange,

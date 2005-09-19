@@ -45,10 +45,9 @@ import org.geotools.util.NumberRange;
  * values.   By definition, the {@link #getSampleToGeophysics} method for this class returns
  * the identity transform, or {@code null} if this category is a qualitative one.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 final class GeophysicsCategory extends Category {
     /**
@@ -206,7 +205,7 @@ final class GeophysicsCategory extends Category {
         private final double maximum2;
 
         /**
-         * Construct a range of {@code double} values.
+         * Constructs a range of {@code double} values.
          */
         public Range(final double minimum,  final boolean isMinIncluded,
                      final double maximum,  final boolean isMaxIncluded,

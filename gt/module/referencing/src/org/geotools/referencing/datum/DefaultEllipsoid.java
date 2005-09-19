@@ -254,12 +254,13 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     }
 
     /**
-     * Wraps an arbitrary ellipsoid into a Geotools implementation. This method is
-     * usefull if {@link #orthodromicDistance orthodromic distance computation}
-     * (for example) are desired.
+     * Wraps an arbitrary ellipsoid into a Geotools implementation. This method is usefull if
+     * {@link #orthodromicDistance orthodromic distance computation} (for example) are desired.
+     * If the supplied ellipsoid is already an instance of {@code DefaultEllipsoid} or is
+     * {@code null}, then it is returned unchanged.
      */
     public static DefaultEllipsoid wrap(final Ellipsoid ellipsoid) {
-        if (ellipsoid instanceof DefaultEllipsoid) {
+        if (ellipsoid==null || ellipsoid instanceof DefaultEllipsoid) {
             return (DefaultEllipsoid) ellipsoid;
         }
         if (ellipsoid.isIvfDefinitive()) {

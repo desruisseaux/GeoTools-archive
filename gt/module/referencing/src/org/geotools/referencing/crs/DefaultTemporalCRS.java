@@ -123,9 +123,11 @@ public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS
     /**
      * Wraps an arbitrary temporal CRS into a Geotools implementation. This method is usefull
      * if the user wants to take advantage of {@link #toDate} and {@link #toValue} methods.
+     * If the supplied CRS is already an instance of {@code DefaultTemporalCRS} or is {@code null},
+     * then it is returned unchanged.
      */
     public static DefaultTemporalCRS wrap(final TemporalCRS crs) {
-        if (crs instanceof DefaultTemporalCRS) {
+        if (crs==null || crs instanceof DefaultTemporalCRS) {
             return (DefaultTemporalCRS) crs;
         }
         return new DefaultTemporalCRS(crs);

@@ -131,6 +131,20 @@ public class GridGeometry2D extends GeneralGridGeometry {
     }
 
     /**
+     * Constructs a new grid geometry from an envelope. An affine transform will be computed
+     * automatically from the specified envelope. This constructor does not reverse or swap any
+     * axis.
+     *
+     * @param gridRange The valid coordinate range of a grid coverage.
+     * @param userRange The corresponding coordinate range in user coordinate.
+     *
+     * @since 2.2
+     */
+    public GridGeometry2D(final GridRange gridRange, final Envelope userRange) {
+        this(gridRange, userRange, null, false);
+    }
+
+    /**
      * Constructs a new grid geometry from an envelope.
      *
      * @deprecated Replaced by {@code GridGeometry(gridRange, userRange, reverse, false)}.
@@ -158,6 +172,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * @param swapXY    If {@code true}, then the two first axis will be interchanged.
      * @throws IllegalArgumentException if {@code gridRange} has more than 2 dimensions with
      *         a width larger than 1.
+     *
+     * @since 2.2
      */
     public GridGeometry2D(final GridRange gridRange,
                           final Envelope  userRange,

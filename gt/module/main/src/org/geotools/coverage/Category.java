@@ -906,14 +906,20 @@ public class Category implements Serializable {
         buffer.append("\":[");
         if (Double.isNaN(minimum) && Double.isNaN(maximum)) {
             buffer.append("NaN(");
-            buffer.append((int)inverse.minimum);
-            buffer.append("..");
-            buffer.append((int)inverse.maximum);
+            buffer.append(Math.round(inverse.minimum));
+            buffer.append("...");
+            buffer.append(Math.round(inverse.maximum));
             buffer.append(')');
         } else {
-            buffer.append(minimum);
-            buffer.append(" .. ");
-            buffer.append(maximum); // Inclusive
+            if (XMath.isInteger(getRange().getElementClass())) {
+                buffer.append(Math.round(minimum));
+                buffer.append("...");
+                buffer.append(Math.round(maximum)); // Inclusive
+            } else {
+                buffer.append(minimum);
+                buffer.append(" ... ");
+                buffer.append(maximum); // Inclusive
+            }
         }
         buffer.append("])");
         return buffer.toString();

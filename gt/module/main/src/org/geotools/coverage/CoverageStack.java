@@ -104,10 +104,9 @@ import org.geotools.util.NumberRange;
  * <p>
  * <strong>Note:</strong> This implementation is thread-safe.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class CoverageStack extends AbstractCoverage {
     /**
@@ -124,6 +123,7 @@ public class CoverageStack extends AbstractCoverage {
      * image I/O operations, or {@link java.rmi.RemoteOperation} for remote method invocation
      * (which may be useful for large images database backed by a distant server).
      *
+     * @since 2.1
      * @version $Id$
      * @author Martin Desruisseaux
      */
@@ -194,6 +194,7 @@ public class CoverageStack extends AbstractCoverage {
      * encouraged to provides alternative implementation loading only the minimum amount of data
      * required for each method.
      *
+     * @since 2.1
      * @version $Id$
      * @author Martin Desruisseaux
      */

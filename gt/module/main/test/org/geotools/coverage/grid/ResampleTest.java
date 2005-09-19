@@ -215,7 +215,7 @@ public final class ResampleTest extends GridCoverageTest {
      */
     public void testCrop() {
         assertEquals("Crop", projectTo(null, new GridGeometry2D(
-                             new GeneralGridRange(new Rectangle(50,50,200,200)), null)));
+                             new GeneralGridRange(new Rectangle(50,50,200,200)), (MathTransform)null)));
     }
 
     /**

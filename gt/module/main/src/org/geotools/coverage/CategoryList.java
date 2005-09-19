@@ -71,10 +71,9 @@ import org.geotools.util.NumberRange;
  *
  * Instances of {@link CategoryList} are immutable and thread-safe.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 class CategoryList extends AbstractList implements MathTransform1D, Comparator, Serializable {
     /**
@@ -550,9 +549,9 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         final NumberRange range = getRange();
         buffer.append('[');
         if (range != null) {
-            buffer=format(range.getMinimum(), false, locale, buffer);
-            buffer.append("..");
-            buffer=format(range.getMaximum(), true,  locale, buffer);
+            buffer = format(range.getMinimum(), false, locale, buffer);
+            buffer.append(" ... ");
+            buffer = format(range.getMaximum(), true,  locale, buffer);
         } else {
             final Unit unit = getUnits();
             if (unit != null) {
@@ -564,11 +563,10 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
     
     /**
-     * Format the specified value using the specified locale convention.
-     * This method is to be overriden by {@link GeophysicsCategoryList}.
-     * The default implementation do not format the value very properly,
-     * since most invocation will be done on {@code geophysics(true).format(...)}
-     * anyway.
+     * Format the specified value using the specified locale convention. This method is to be
+     * overriden by {@link GeophysicsCategoryList}. The default implementation do not format
+     * the value very properly, since most invocation will be done on
+     * {@code geophysics(true).format(...)} anyway.
      *
      * @param  value The value to format.
      * @param  writeUnit {@code true} if unit symbol should be formatted after the number.
@@ -765,9 +763,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
     
     /**
-     * Returns a string representation of this category list.
-     * The {@code owner} argument allow for a different
-     * class name to be formatted.
+     * Returns a string representation of this category list. The {@code owner}
+     * argument allow for a different class name to be formatted.
      */
     final String toString(final Object owner) {
         final String lineSeparator = System.getProperty("line.separator", "\n");

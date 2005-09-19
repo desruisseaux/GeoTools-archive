@@ -255,6 +255,73 @@ public class GridCoverageFactory {
     }
 
     /**
+     * Constructs a grid coverage with the specified envelope and sample dimensions.
+     * This convenience constructor performs the same assumption on axis order than
+     * {@linkplain #create(CharSequence, RenderedImage, CoordinateReferenceSystem,
+     * Envelope, GridSampleDimension[], GridCoverage[], Map) the rendered image version}.
+     *
+     * @param name         The grid coverage name.
+     * @param raster       The raster.
+     * @param crs          The coordinate reference system. This specifies the CRS used when
+     *                     accessing a grid coverage with the {@code evaluate} methods. The
+     *                     number of dimensions must matches the number of dimensions
+     *                     of {@code envelope}.
+     * @param envelope     The grid coverage cordinates. This envelope must have at least two
+     *                     dimensions.   The two first dimensions describe the image location
+     *                     along <var>x</var> and <var>y</var> axis. The other dimensions are
+     *                     optional and may be used to locate the image on a vertical axis or
+     *                     on the time axis.
+     * @param bands        Sample dimensions for each image band, or {@code null} for default
+     *                     sample dimensions. If non-null, then this array's length must matches
+     *                     the number of bands in {@code image}.
+     *
+     * @throws MismatchedDimensionException If the envelope's dimension
+     *         is not the same than the coordinate system's dimension.
+     * @throws IllegalArgumentException if the number of bands differs
+     *         from the number of sample dimensions.
+     *
+     * @since 2.2
+     */
+    public GridCoverage create
+            (final CharSequence             name, final WritableRaster raster,
+             final CoordinateReferenceSystem crs, final Envelope     envelope,
+             final GridSampleDimension[]   bands)
+            throws MismatchedDimensionException, IllegalArgumentException
+    {
+        return create(name, raster, crs, null, new GeneralEnvelope(envelope), bands);
+    }
+
+    /**
+     * Constructs a grid coverage with the specified transform and sample dimension.
+     *
+     * @param name         The grid coverage name.
+     * @param raster       The raster.
+     * @param crs          The coordinate reference system. This specifies the CRS used when
+     *                     accessing a grid coverage with the {@code evaluate} methods. The
+     *                     number of dimensions must matches the number of target dimensions
+     *                     of {@code gridToCRS}.
+     * @param gridToCRS    The math transform from grid to coordinate reference system.
+     * @param bands        Sample dimensions for each image band, or {@code null} for
+     *                     default sample dimensions. If non-null, then this array's length
+     *                     must matches the number of bands in {@code image}.
+     *
+     * @throws MismatchedDimensionException If the transform's dimension
+     *         is not the same than the coordinate system's dimension.
+     * @throws IllegalArgumentException if the number of bands differs
+     *         from the number of sample dimensions.
+     *
+     * @since 2.2
+     */
+    public GridCoverage create
+            (final CharSequence             name, final WritableRaster   raster,
+             final CoordinateReferenceSystem crs, final MathTransform gridToCRS,
+             final GridSampleDimension[]   bands)
+            throws MismatchedDimensionException, IllegalArgumentException
+    {
+        return create(name, raster, crs, new GridGeometry2D(null, gridToCRS), null, bands);
+    }
+
+    /**
      * Helper method for public methods expecting a {@link Raster} argument.
      */
     private GridCoverage create(final CharSequence             name,

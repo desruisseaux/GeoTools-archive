@@ -248,20 +248,19 @@ public final class CRSUtilities {
         }
         return crs;
     }
-    
+
     /**
      * Returns a two-dimensional coordinate reference system representing the two first dimensions
-     * of the specified coordinate reference system. If {@code crs} is already a
-     * two-dimensional CRS, then it is returned unchanged. Otherwise, if it is a
-     * {@link CompoundCRS}, then the head coordinate system is examined.
+     * of the specified coordinate reference system. If {@code crs} is already a two-dimensional
+     * CRS, then it is returned unchanged. Otherwise, if it is a {@link CompoundCRS}, then the
+     * head coordinate reference system is examined.
      *
      * @param  crs The coordinate system, or {@code null}.
      * @return A two-dimensional coordinate reference system that represents the two first
-     *         dimensions of {@code crs}, or {@code null} if {@code crs} was
-     *         {@code null}.
+     *         dimensions of {@code crs}, or {@code null} if {@code crs} was {@code null}.
      * @throws TransformException if {@code crs} can't be reduced to a two-coordinate system.
-     *         We use this exception class since this method is usually invoked in the context of
-     *         a transformation process.
+     *         We use this exception class since this method is usually invoked in the context
+     *         of a transformation process.
      */
     public static CoordinateReferenceSystem getCRS2D(CoordinateReferenceSystem crs)
             throws TransformException

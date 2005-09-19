@@ -36,23 +36,22 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 /**
  * Holds the coordinates for a position within some coordinate reference system. Since
- * <code>DirectPosition</code>s, as data types, will often be included in larger objects
+ * {@code DirectPosition}s, as data types, will often be included in larger objects
  * (such as {@linkplain org.geotools.geometry.Geometry geometries}) that have references
  * to {@link CoordinateReferenceSystem}, the {@link #getCoordinateReferenceSystem} method
- * may returns <code>null</code> if this particular <code>DirectPosition</code> is included
+ * may returns {@code null} if this particular {@code DirectPosition} is included
  * in a larger object with such a reference to a {@linkplain CoordinateReferenceSystem
  * coordinate reference system}. In this case, the cordinate reference system is implicitly
  * assumed to take on the value of the containing object's {@link CoordinateReferenceSystem}.
- * <br><br>
- * This particular implementation of <code>DirectPosition</code> is said "General" because it
+ * <p>
+ * This particular implementation of {@code DirectPosition} is said "General" because it
  * uses an {@linkplain #ordinates array of ordinates} of an arbitrary length. If the direct
  * position is know to be always two-dimensional, then {@link DirectPosition2D} may provides
  * a more efficient implementation.
  * 
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see java.awt.geom.Point2D
  */
@@ -68,51 +67,62 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
     public final double[] ordinates;
 
     /**
-     * The coordinate reference system for this position, or <code>null</code>.
+     * The coordinate reference system for this position, or {@code null}.
      */
     private CoordinateReferenceSystem crs;
-    
+
     /**
-     * Construct a position with the specified number of dimensions.
+     * Constructs a position using the specified coordinate reference system.
+     * The number of dimensions is inferred from the coordinate reference system.
+     *
+     * @since 2.2
+     */
+    public GeneralDirectPosition(final CoordinateReferenceSystem crs) {
+        this(crs.getCoordinateSystem().getDimension());
+        this.crs = crs;
+    }
+
+    /**
+     * Constructs a position with the specified number of dimensions.
      *
      * @param  numDim Number of dimensions.
-     * @throws NegativeArraySizeException if <code>numDim</code> is negative.
+     * @throws NegativeArraySizeException if {@code numDim} is negative.
      */
     public GeneralDirectPosition(final int numDim) throws NegativeArraySizeException {
         ordinates = new double[numDim];
     }
     
     /**
-     * Construct a position with the specified ordinates.
-     * The <code>ordinates</code> array will be copied.
+     * Constructs a position with the specified ordinates.
+     * The {@code ordinates} array will be copied.
      */
     public GeneralDirectPosition(final double[] ordinates) {
         this.ordinates = (double[]) ordinates.clone();
     }
     
     /**
-     * Construct a 2D position from the specified ordinates.
+     * Constructs a 2D position from the specified ordinates.
      */
     public GeneralDirectPosition(final double x, final double y) {
         ordinates = new double[] {x,y};
     }
     
     /**
-     * Construct a 3D position from the specified ordinates.
+     * Constructs a 3D position from the specified ordinates.
      */
     public GeneralDirectPosition(final double x, final double y, final double z) {
         ordinates = new double[] {x,y,z};
     }
     
     /**
-     * Construct a position from the specified {@link Point2D}.
+     * Constructs a position from the specified {@link Point2D}.
      */
     public GeneralDirectPosition(final Point2D point) {
         this(point.getX(), point.getY());
     }
     
     /**
-     * Construct a position initialized to the same values than the specified point.
+     * Constructs a position initialized to the same values than the specified point.
      */
     public GeneralDirectPosition(final GeneralDirectPosition point) {
         ordinates = (double[]) point.ordinates.clone();
@@ -120,7 +130,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
     }
 
     /**
-     * Returns always <code>this</code>, the direct position for this
+     * Returns always {@code this}, the direct position for this
      * {@linkplain org.opengis.spatialschema.geometry.geometry.Position position}.
      */
     public DirectPosition getPosition() {
@@ -129,11 +139,11 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
 
     /**
      * Returns the coordinate reference system in which the coordinate is given.
-     * May be <code>null</code> if this particular <code>DirectPosition</code> is included
+     * May be {@code null} if this particular {@code DirectPosition} is included
      * in a larger object with such a reference to a {@linkplain CoordinateReferenceSystem
      * coordinate reference system}.
      *
-     * @return The coordinate reference system, or <code>null</code>.
+     * @return The coordinate reference system, or {@code null}.
      */
     public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
@@ -142,7 +152,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
     /**
      * Set the coordinate reference system in which the coordinate is given.
      *
-     * @param crs The new coordinate reference system, or <code>null</code>.
+     * @param crs The new coordinate reference system, or {@code null}.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
         checkCoordinateReferenceSystemDimension(crs, getDimension());

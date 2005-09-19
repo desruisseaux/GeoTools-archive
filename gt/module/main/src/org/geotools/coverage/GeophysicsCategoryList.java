@@ -44,10 +44,9 @@ import org.geotools.resources.XMath;
  * the list of {@link Category}. This transform is thread safe if each
  * {@link Category#getSampleToGeophysics} transform is thread-safe too.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 final class GeophysicsCategoryList extends CategoryList {
     /**

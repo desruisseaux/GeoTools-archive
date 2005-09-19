@@ -252,7 +252,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * @return {@code true} if this set changed as a result of the call.
      * @throws ClassCastException if the argument is not a {@link Range} object.
      *
-     * @task TODO: support open intervals.
+     * @todo support open intervals.
      */
     public boolean add(final Object r) throws ClassCastException {
         final Range range = (Range) r;
