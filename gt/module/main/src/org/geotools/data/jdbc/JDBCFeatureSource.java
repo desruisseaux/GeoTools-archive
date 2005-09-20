@@ -61,7 +61,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * </ul>
  * 
  * It is recomended that clients implement optimizations for:
- * 
  * <ul>
  * <li>
  * getBounds( Query )
@@ -269,7 +268,6 @@ public class JDBCFeatureSource implements FeatureSource {
 
     /**
      * Retrieve Bounds of all Features.
-     * 
      * <p>
      * Currently returns null, consider getFeatures().getBounds() instead.
      * </p>
@@ -311,43 +309,20 @@ public class JDBCFeatureSource implements FeatureSource {
             if(featureType!=null)
                 return new ReferencedEnvelope(new Envelope(),featureType.getDefaultGeometry().getCoordinateSystem());
             return new Envelope();
-        }
-
+        }               
         return null; // to expensive right now :-)
     }
-
     /**
      * Retrieve total number of Query results.
-     * 
      * <p>
-     * Currently returns -1, consider getFeatures( query ).getCount() instead.
+     * SQL: SELECT COUNT(*) as cnt FROM table WHERE filter
      * </p>
      * 
-     * <p>
-     * Subclasses may override this method to perform the appropriate
-     * optimization for this result.
-     * </p>
-     *
      * @param query Query we are requesting the count of
-     *
-     * @return -1 representing the lack of an optimization
+     * @return Count of indicated query
      */
-    public int getCount(Query query) {
-        if (getTransaction() != Transaction.AUTO_COMMIT) {
-            // it is too dangerous to issue this optimization
-            // against the transaction's connection
-            // (If we error out, we would be forced to rollback
-            //  the transaction and this method does not let
-            //  us report the problem to the user)            
-            return -1; // too dangerous
-        }
-
-        try {
-            return count(query, Transaction.AUTO_COMMIT);
-        } catch (IOException e) {
-            // could not acomplish optimization
-            return -1;
-        }
+    public int getCount(Query query) throws IOException {
+        return count(query, getTransaction() );        
     }
 
     /**
@@ -357,18 +332,15 @@ public class JDBCFeatureSource implements FeatureSource {
      * Note this is a low level SQL statment and if it fails the provided
      * Transaction will be rolled back.
      * </p>
-     * 
      * <p>
-     * Will return -1 if optimization can not be used
+     * SQL: SELECT COUNT(*) as cnt FROM table WHERE filter
      * </p>
-     *
      * @param query
      * @param transaction
      *
      * @return Number of rows in query, or -1 if not optimizable.
      *
-     * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
+     * @throws IOException Usual on the basis of a filter error
      */
     public int count(Query query, Transaction transaction)
         throws IOException {

@@ -16,8 +16,26 @@
  */
 package org.geotools.data.jdbc;
 
-import org.geotools.catalog.CatalogEntry;
-import org.geotools.catalog.QueryRequest;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -43,36 +61,17 @@ import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.data.view.DefaultView;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Abstract class for JDBC based DataStore implementations.
@@ -139,6 +138,7 @@ import java.util.logging.Logger;
  *         aaime Exp $
  */
 public abstract class JDBC1DataStore implements DataStore {
+	
 	/** The logger for the filter module. */
 	protected static final Logger LOGGER = Logger
 			.getLogger("org.geotools.data.jdbc");
@@ -206,15 +206,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @see FIDMapper#isVolatile()
 	 */
 	protected boolean allowWriteOnVolatileFIDs;
-
-	/**
-	 * List of TypeEntry subclass control provided by createContents.
-	 * 
-	 * <p>
-	 * Access via entries(), creation by createContents.
-	 * </p>
-	 */
-	private List contents = null;
 
 	/**
 	 * DOCUMENT ME!
@@ -322,50 +313,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *             throws IOException { this(connectionPool, null, new
 	 *             HashMap(), ""); }
 	 */
-	/**
-	 * List of TypeEntry entries - one for each featureType provided by this
-	 * Datastore
-	 * 
-	 * @return DOCUMENT ME!
-	 */
-	public List entries() {
-		if (contents == null) {
-			contents = createContents();
-		}
-
-		return Collections.unmodifiableList(contents);
-	}
-
-	/**
-	 * Create TypeEntries based on typeName.
-	 * 
-	 * <p>
-	 * This method is lazyly called to create a List of TypeEntry for each
-	 * FeatureCollection in this DataStore.
-	 * </p>
-	 * 
-	 * @return List of TypeEntry.
-	 */
-	protected List createContents() {
-		String[] typeNames;
-
-		try {
-			typeNames = getTypeNames();
-
-			List list = new ArrayList(typeNames.length);
-
-			for (int i = 0; i < typeNames.length; i++) {
-				list.add(createTypeEntry(typeNames[i]));
-			}
-
-			return Collections.unmodifiableList(list);
-		} catch (IOException help) {
-			// Contents are not available at this time!
-			LOGGER.warning("Could not aquire getTypeName() to build contents");
-
-			return null;
-		}
-	}
 
 	/**
 	 * Create a TypeEntry for the requested typeName.
@@ -393,36 +340,6 @@ public abstract class JDBC1DataStore implements DataStore {
 		// can optimize with a custom JDBCTypeEntry to allow
 		// access to database metadata.
 		return new DefaultTypeEntry(this, namespace, typeName);
-	}
-
-	/**
-	 * Metadata search through entries.
-	 * 
-	 * @param queryRequest
-	 * 
-	 * @return List of matching TypeEntry
-	 * 
-	 * @see org.geotools.catalog.Discovery#search(org.geotools.catalog.QueryRequest)
-	 */
-	public List search(QueryRequest queryRequest) {
-		if (queryRequest == QueryRequest.ALL) {
-			return entries();
-		}
-
-		List queryResults = new ArrayList();
-		CATALOG: for (Iterator i = entries().iterator(); i.hasNext();) {
-			CatalogEntry entry = (CatalogEntry) i.next();
-			METADATA: for (Iterator m = entry.metadata().values().iterator(); m
-					.hasNext();) {
-				if (queryRequest.match(m.next())) {
-					queryResults.add(entry);
-
-					break METADATA;
-				}
-			}
-		}
-
-		return queryResults;
 	}
 
 	/**
@@ -711,7 +628,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		FeatureTypeInfo typeInfo = typeHandler.getFeatureTypeInfo(typeName);
 
 		SQLBuilder sqlBuilder = getSqlBuilder(typeName);
-		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
+		//Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
 		Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
 
 		String[] requestedNames = propertyNames(query);
@@ -771,9 +688,9 @@ public abstract class JDBC1DataStore implements DataStore {
 		FeatureType schema;
 
 		try {
-			schema = FeatureTypeFactory.newFeatureType(attrTypes, typeName,
+			schema = FeatureTypeBuilder.newFeatureType(attrTypes, typeName,
 					getNameSpace());
-		} catch (FactoryConfigurationError e) {
+		} catch (FactoryRegistryException e) {
 			throw new DataSourceException(
 					"Schema Factory Error when creating schema for FeatureReader",
 					e);
@@ -818,13 +735,13 @@ public abstract class JDBC1DataStore implements DataStore {
 		String typeName = query.getTypeName();
 		SQLBuilder sqlBuilder = getSqlBuilder(query.getTypeName());
 		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
-		Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
+		//Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
 
 		FIDMapper mapper = getFIDMapper(typeName);
 
 		String sqlQuery;
-		FeatureTypeInfo info = typeHandler.getFeatureTypeInfo(typeName);
-		boolean useMax = (postFilter == null); // not used yet
+		//FeatureTypeInfo info = typeHandler.getFeatureTypeInfo(typeName);
+		//boolean useMax = (postFilter == null); // not used yet
 
 		try {
 			LOGGER.fine("calling sql builder with filter " + preFilter);
@@ -1252,14 +1169,14 @@ public abstract class JDBC1DataStore implements DataStore {
 			AttributeType[] types = (AttributeType[]) attributeTypes
 					.toArray(new AttributeType[0]);
 
-			return FeatureTypeFactory.newFeatureType(types, typeName,
+			return FeatureTypeBuilder.newFeatureType(types, typeName,
 					getNameSpace());
 		} catch (SQLException sqlException) {
 			JDBCUtils.close(conn, Transaction.AUTO_COMMIT, sqlException);
 			conn = null; // prevent finally block from reclosing
 			throw new DataSourceException("SQL Error building FeatureType for "
 					+ typeName + " " + sqlException.getMessage(), sqlException);
-		} catch (FactoryConfigurationError e) {
+		} catch (FactoryRegistryException e) {
 			throw new DataSourceException("Error creating FeatureType "
 					+ typeName, e);
 		} catch (SchemaException e) {
@@ -1563,7 +1480,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		LOGGER.fine("getting feature writer for " + typeName + ": " + info);
 
 		SQLBuilder sqlBuilder = getSqlBuilder(typeName);
-		Filter preFilter = sqlBuilder.getPreQueryFilter(filter);
+		//Filter preFilter = sqlBuilder.getPreQueryFilter(filter);
 		Filter postFilter = sqlBuilder.getPostQueryFilter(filter);
 		Query query = new DefaultQuery(typeName, filter);
 		String sqlQuery;
@@ -1611,7 +1528,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * Get propertyNames in a safe manner.
 	 * 
 	 * <p>
-	 * Method wil figure out names from the schema for query.getTypeName(), if
+	 * Method will figure out names from the schema for query.getTypeName(), if
 	 * query getPropertyNames() is <code>null</code>, or
 	 * query.retrieveAllProperties is <code>true</code>.
 	 * </p>
@@ -1743,4 +1660,16 @@ public abstract class JDBC1DataStore implements DataStore {
 		}
 		return true;
 	}
+	
+    /**
+     * Retrieve approx bounds of all Features.
+     * <p>
+     * This result is suitable for a quick map display, illustrating the data.
+     * This value is often stored as metadata in databases such as oraclespatial.
+     * </p>
+     * @return null as a generic implementation is not provided.
+     */
+    public Envelope getEnvelope( String typeName ){
+    	return null;
+    }
 }

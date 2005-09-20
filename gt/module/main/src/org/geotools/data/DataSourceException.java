@@ -41,7 +41,8 @@ public class DataSourceException extends java.io.IOException {
      * @param msg A message explaining the exception
      */
     public DataSourceException(Throwable cause) {
-        super( cause.getMessage() );                        
+    	super( cause.getMessage() );
+        initCause( cause );
     }
     /**
      * Constructs a new instance of DataSourceException
