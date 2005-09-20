@@ -19,6 +19,7 @@ package org.geotools.data.postgis;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -61,10 +62,13 @@ import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.WKTWriter;
 
 /**
- * Implementation of a Postgis specific FeatureStore.  This mostly just rips
- * off code from PostgisDataSource.  It could definitely use some nice code
- * reuse with PostgisDataStore, as they have a number of similar if not
- * identical methods right now.  Approaching deadlines, however, mean that
+ * Implementation of a Postgis specific FeatureStore.
+ * <p>
+ * This mostly just rips off code from PostgisDataSource
+ * It could definitely use some nice code reuse with PostgisDataStore, as they
+ * have a number of similar if not identical methods right now.
+ * <p>
+ * Approaching deadlines, however, mean that
  * we're sticking with the code that works, instead of getting all kinds of
  * nice reuse.  This'll hopefully change.  This bypasses the writers used in
  * JDBCFeatureStore, as I'm just not yet confident in them.  We  also should
@@ -785,6 +789,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
     // TODO: change this so that it queries for just the bbox instead of the entire sub-query schema columns!
     //        (this is harder than you might think because of filter requirements!)
+    //
     protected Envelope bounds(Query query) throws IOException {
         Filter filter = query.getFilter();
 
@@ -908,5 +913,5 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         statement.close();
 
         return retEnv;
-    }
+    }	
 }

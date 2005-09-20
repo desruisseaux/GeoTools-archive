@@ -16,14 +16,25 @@
  */
 package org.geotools.data.postgis;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -61,29 +72,25 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLEncoderPostgisGeos;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTReader;
 
 
 /**
@@ -109,10 +116,17 @@ import java.util.logging.Logger;
  *       -ch
  */
 public class PostgisDataStore extends JDBCDataStore implements DataStore {
+	
     /** The logger for the postgis module. */
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.postgis");
 
+    /** Factory for producing geometries (from JTS). */
+    protected static GeometryFactory geometryFactory = new GeometryFactory();
+    
+    /** Well Known Text reader (from JTS). */
+    protected static WKTReader geometryReader = new WKTReader(geometryFactory);
+    
     /** Map of postgis geometries to jts geometries */
     private static Map GEOM_TYPE_MAP = new HashMap();
 
@@ -167,7 +181,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     private static PostgisAuthorityFactory paf = null;
 
     /** The lock manager */
-    private LockingManager lockingManager = createLockingManager();
+    //private LockingManager lockingManager = createLockingManager();
 
     /** Enables the use of geos operators */
     protected boolean useGeos;
@@ -260,7 +274,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
             Statement statement = dbConnection.createStatement();
             ResultSet result = statement.executeQuery(sqlStatement);
-            boolean retValue = false;
+            //boolean retValue = false;
 
             if (result.next()) {
                 String version = result.getString(1);
@@ -310,6 +324,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getTypeNames()
      */
     public String[] getTypeNames() throws IOException {
+    	/*
         final int TABLE_NAME_COL = 3;
         Connection conn = null;
         List list = new ArrayList();
@@ -341,7 +356,179 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         } finally {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
         }
+        */
+    	Connection conn = null;    	
+		String namespace = config.getNamespace();
+		try {
+			conn = getConnection(Transaction.AUTO_COMMIT);
+			
+			PreparedStatement st = null;
+			
+			if (namespace != null && !namespace.trim().equals("")) { //$NON-NLS-1$
+				st = conn.prepareStatement(
+					"SELECT distinct a.relname "  //$NON-NLS-1$
+					+ "FROM pg_class a, pg_attribute b, pg_namespace c, pg_type d " //$NON-NLS-1$
+				   + "WHERE a.oid = b.attrelid " //$NON-NLS-1$
+				   	 + "AND b.atttypid = d.oid "  //$NON-NLS-1$
+				   	 + "AND a.relnamespace = c.oid "  //$NON-NLS-1$
+				   	 + "AND c.nspname = ? " //$NON-NLS-1$
+				   	 + "AND d.typname = ? " //$NON-NLS-1$
+				   	 + "AND a.relname in (SELECT f_table_name FROM geometry_columns)" //$NON-NLS-1$
+				);
+				st.setString(1, namespace);
+				st.setString(2, "geometry"); //$NON-NLS-1$
+			}
+			else {
+				st = conn.prepareStatement(
+					"SELECT distinct a.relname "  //$NON-NLS-1$
+					+ "FROM pg_class a, pg_attribute b, pg_type d " //$NON-NLS-1$
+				   + "WHERE a.oid = b.attrelid " //$NON-NLS-1$
+				   	 + "AND b.atttypid = d.oid "  //$NON-NLS-1$
+				   	 + "AND d.typname = ? " //$NON-NLS-1$
+				   	 + "AND a.relname in (SELECT f_table_name FROM geometry_columns)" //$NON-NLS-1$
+				);
+				st.setString(1, "geometry"); //$NON-NLS-1$
+			}
+			
+			ResultSet rs = st.executeQuery(); 
+			ArrayList names = new ArrayList();
+			while(rs.next()) {
+				String table = rs.getString(1);
+				if (allowTable(table)){
+					names.add(table);
+				}
+					
+			}
+			
+			return (String[])names.toArray(new String[names.size()]);
+		}
+		catch (SQLException sqlException) {
+	        JDBCUtils.close(conn, Transaction.AUTO_COMMIT, sqlException);
+	        conn = null;
+	        throw new DataSourceException( sqlException );
+	    } 
+	    finally {
+	        JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
+	    }    	    	
     }
+    
+    /**
+     * Retrieve approx bounds of all Features.
+     * <p>
+     * This result is suitable for a quick map display, illustrating the data.
+     * This value is often stored as metadata in databases such as oraclespatial.
+     * </p>
+     * @return null as a generic implementation is not provided.
+     */
+    public Envelope getEnvelope( String typeName ){
+    	Connection conn = null;
+    	    	
+    	try {
+    		conn = createConnection();    		
+    		    	
+        	FeatureType schema = getSchema(typeName);
+        	String geomName = schema.getDefaultGeometry().getName();
+        	
+	    	//optimization, version >= 1.0 contains estimate_extent function 
+			// to query the stats of the table to determine the bbox, however, 
+			// it may return null
+		    StringBuffer sql = new StringBuffer();
+		    sql.append("SELECT postgis_version()"); //$NON-NLS-1$
+		    Statement st = conn.createStatement();
+		    ResultSet rs = st.executeQuery(sql.toString());
+		    
+		    //should always return a result
+		    rs.next();
+		    String version = rs.getString(1);
+		    rs.close();
+		    st.close();
+		    
+		    Envelope envelope = null;
+		    if (version.trim().startsWith("1.0")) { //$NON-NLS-1$
+		    	//try the estimated_extent function
+		    	sql = new StringBuffer();
+		    	
+		    	PreparedStatement pst = conn.prepareStatement(
+	    			"SELECT  AsText(force_2d(envelope(estimated_extent(?,?))))" //$NON-NLS-1$
+				);
+		    	pst.setString(1, typeName );
+		    	pst.setString(2, geomName);
+		    	
+		    	rs = pst.executeQuery();
+		    	
+		    	if (rs.next()) {
+		    		//parse return value
+		    		String wkt = rs.getString(1);
+		    		if (wkt != null &&  !wkt.trim().equals("")) { //$NON-NLS-1$
+		    			envelope = geometryReader.read(wkt).getEnvelopeInternal();
+		    			
+		    			// expand the bounds by 20% (10% in each direction)
+		    			// Works whether or not the bounds are at the origin
+		    			double minX = envelope.getMinX();
+		    			double minY = envelope.getMinY();
+		    			double maxX = envelope.getMaxX();
+		    			double maxY = envelope.getMaxY();
+		    			double deltaX = (maxX - minX)*0.1;
+		    			double deltaY = (maxY - minY)*0.1;
+		    			envelope.expandToInclude(minX - deltaX, minY - deltaY);
+		    			envelope.expandToInclude(maxX + deltaX, maxY + deltaY);
+		    		}
+		    	}
+		    	
+		    	rs.close();
+		    	pst.close();
+		    }
+		    
+		    if (envelope == null) {
+		    	
+		    	//try to generate an approximation
+		    	envelope = new Envelope();
+		    	st = conn.createStatement();
+		    	int offset = 0;
+		    	for (int i = 0; i < 5; i++,offset+=10000) {
+		    		String q = "SELECT AsText(force_2d(envelope(" + geomName +  //$NON-NLS-1$
+		    			"))) FROM " + typeName + " LIMIT 1 OFFSET " + offset; //$NON-NLS-1$ //$NON-NLS-2$
+		    		rs = st.executeQuery(q);
+		    		if (rs.next()) {
+		    			String wkt = rs.getString(1);
+		    			if (wkt != null && !wkt.trim().equals("")) { //$NON-NLS-1$
+		    				Envelope e = geometryReader.read(wkt)
+		    					.getEnvelopeInternal();
+		    				
+		    				if (envelope.isNull()) 
+		    					envelope.init(e);
+		    				else 
+		    					envelope.expandToInclude(e);
+		    			}
+		    			
+		    		}
+		    	}
+		    	
+		    	// expand generously since this is an approximation
+		    	// Works whether or not the bounds are at the origin
+		    	double minX = envelope.getMinX();
+		    	double minY = envelope.getMinY();
+		    	double maxX = envelope.getMaxX();
+		    	double maxY = envelope.getMaxY();
+		    	double deltaX = (maxX - minX)*3;
+		    	double deltaY = (maxY - minY)*3;
+		    	envelope.expandToInclude(minX - deltaX, minY - deltaY);
+		    	envelope.expandToInclude(maxX + deltaX, maxY + deltaY);
+		    }		    
+		    return envelope;
+    	} catch (Exception ignore) {
+			return null;
+		} finally {
+    		if( conn != null ){
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// I give up
+				}
+    		}
+    	}
+    }
+    
 
     protected boolean allowTable(String tablename) {
         if (tablename.equals("geometry_columns")) {
@@ -585,6 +772,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     //        	
     //        return fidColumn;
     //    }
+    /*
     private static boolean isPresent(String[] array, String value) {
         if (array != null) {
             for (int i = 0; i < array.length; i++) {
@@ -596,7 +784,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         return (false);
     }
-
+    */
     /**
      * Constructs an AttributeType from a row in a ResultSet. The ResultSet
      * contains the information retrieved by a call to getColumns() on the
@@ -780,7 +968,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                         continue;
                     }
 
-                    int val = fidMapper.getColumnType(i);
+                    // int val = fidMapper.getColumnType(i);
                     String typeName = getSQLTypeName(fidMapper.getColumnType(i));
 
                     if (typeName.equals("VARCHAR")) {
@@ -850,10 +1038,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             //to get it back in exactly the order they wanted.  So for now 
             //let's leave things as is, and maybe talk about it in an irc. -ch 
             for (int i = 0; i < attributeType.length; i++) {
-                if (!attributeType[i].isGeometry()) {
+                if (!(attributeType[i] instanceof GeometryAttributeType)) {
                     continue;
                 }
-
                 GeometryAttributeType geomAttribute = (GeometryAttributeType) attributeType[i];
 
                 //This needs to be improved - I believe we now have
@@ -878,7 +1065,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 ResultSet rs = metaData.getCatalogs();
                 rs.next();
 
-                String dbName = rs.getString(1);
+                //String dbName = rs.getString(1);
                 rs.close();
 
                 String typeName = null;
@@ -887,7 +1074,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 //pass over if this wasn't a geometry...
                 Class type = geomAttribute.getType();
 
-                if (geomAttribute.isGeometry()) {
+                if (geomAttribute instanceof GeometryAttributeType) {
                     typeName = getGeometrySQLTypeName(type);
                 } else {
                     typeName = (String) CLASS_MAPPINGS.get(type);
@@ -1012,12 +1199,12 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
             if ((typeName = (String) CLASS_MAPPINGS.get(
                             attributeType[i].getType())) != null) {
-                if (attributeType[i].isGeometry()) {
+                if (attributeType[i] instanceof GeometryAttributeType) {
                     typeName = "GEOMETRY";
                 } else if (typeName.equals("VARCHAR")) {
                 	int length = -1;
                 	Filter f = attributeType[i].getRestriction();
-                	if(f !=null && f!=Filter.ALL && f != Filter.NONE && (f.getFilterType() == f.COMPARE_LESS_THAN || f.getFilterType() == f.COMPARE_LESS_THAN_EQUAL)){
+                	if(f !=null && f!=Filter.ALL && f != Filter.NONE && (f.getFilterType() == FilterType.COMPARE_LESS_THAN || f.getFilterType() == FilterType.COMPARE_LESS_THAN_EQUAL)){
                 		try{
                 		CompareFilter cf = (CompareFilter)f;
                 		if(cf.getLeftValue() instanceof LengthFunction){
@@ -1083,7 +1270,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         throws IOException {
         final int TABLE_NAME_COL = 3;
         Connection conn = null;
-        List list = new ArrayList();
+        //List list = new ArrayList();
 
         try {
             conn = getConnection(Transaction.AUTO_COMMIT);
@@ -1139,6 +1326,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @throws IOException
      */
+    /*
     private String[] propertyNames(Query query) throws IOException {
         String[] names = query.getPropertyNames();
 
@@ -1155,7 +1343,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         return names;
     }
-
+    */
     /**
      * @see org.geotools.data.DataStore#updateSchema(java.lang.String,
      *      org.geotools.feature.FeatureType)

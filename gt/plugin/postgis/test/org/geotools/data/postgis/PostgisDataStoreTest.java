@@ -161,6 +161,14 @@ public class PostgisDataStoreTest extends TestCase {
         // make sure the CRS is specified
         assertNotNull(schema1.getDefaultGeometry().getCoordinateSystem());
     }
+    public void testEnvelope() throws Exception {
+    	String[] types = dstore.getTypeNames();
+    	String typeName = types[0];
+    	Envelope e = dstore.getEnvelope( typeName );
+    	assertNotNull( e );
+    	assertFalse( e.isNull() );
+    	
+    }
 
     //tests todo: bad retyping. post filters. 
     public void testGetReader() throws Exception {
