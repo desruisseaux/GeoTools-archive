@@ -346,7 +346,7 @@ public class GeoTiffReader implements GridCoverageReader {
             // compute an "offset and scale" matrix
             gm.setElement(0, 0, scaleX);
             gm.setElement(0, 2, x - (scaleX * i));
-            gm.setElement(1, 1, scaleY);
+            gm.setElement(1, 1, - scaleY);
             gm.setElement(1, 2, y - (scaleY * j));
 
             // make it a LinearTransform

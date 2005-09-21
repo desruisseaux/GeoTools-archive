@@ -16,6 +16,9 @@
  */
 package org.geotools.gce.geotiff;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.File;
@@ -39,9 +42,9 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.referencing.crs.EPSGCRSAuthorityFactory;
-import org.geotools.referencing.operation.CoordinateOperationFactory;
+import org.geotools.resources.TestData;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.ParameterValueGroup;
@@ -60,39 +63,28 @@ import org.opengis.referencing.operation.TransformException;
  *         comment go to Window - Preferences - Java - Code Style - Code
  *         Templates
  */
-public class GeoTiffReaderWriterTest { // extends TestCase {
+public class GeoTiffReaderWriterTest extends TestCase {
 
     /**
      * Constructor for GeoTiffReaderTest.
      *
      * @param arg0
      */
-    public GeoTiffReaderWriterTest(String arg0) {
-        //super(arg0);
+    public GeoTiffReaderWriterTest() {
+        super("Reader-Writer Test!");
     }
 
-    public static void main(String[] args)
-        throws IllegalArgumentException, IOException, 
-            UnsupportedOperationException, ParseException, FactoryException, TransformException {
-        //junit.textui.TestRunner.run(GeoTiffReaderTest.class);
-        GeoTiffReaderWriterTest.testReader();
-        
+		public GeoTiffReaderWriterTest(String arg0) {
+        super(arg0);
     }
 
     /*
      * @see TestCase#setUp()
      */
     protected void setUp() throws Exception {
-        //super.setUp();
+        super.setUp();
     }
-
-    /*
-     * @see TestCase#tearDown()
-     */
-    protected void tearDown() throws Exception {
-        //super.tearDown();
-    }
-
+    
     /**
      * testReader
      *
@@ -102,10 +94,10 @@ public class GeoTiffReaderWriterTest { // extends TestCase {
      * @throws OperationNotFoundException 
      * @throws TransformException 
      */
-    public static void testReader()
+    public void testReader()
         throws IllegalArgumentException, IOException, OperationNotFoundException, FactoryException, TransformException {
-    	
-        File file = new File("C:\\temp\\po_168213_grn_0000000.tiff");
+
+				File file = TestData.file(GeoTiffReaderWriterTest.class, "002025_0100_010722_l7_01_utm21.tif");
 
         //getting a reader
         AbstractGridFormat format = new GeoTiffFormat();

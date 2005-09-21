@@ -25,6 +25,14 @@
         <role>Java Developer</role>
       </roles>
     </developer>
+  <developer>
+   <name>Alessio Fabiani</name>
+   <id>alfa</id>
+   <email>alessio.fabiani@gmail.com</email>
+   <roles>
+    <role>Java Developer</role>
+   </roles>
+  </developer>
     <developer>
       <name>Mike Gelbin</name>
       <id>mgelbin</id>
@@ -77,24 +85,20 @@
       <version>2.2.x</version>
     </dependency>
   </dependencies>
-  <build>
-    <sourceDirectory>${basedir}/src</sourceDirectory>
-    <unitTestSourceDirectory>${basedir}/test</unitTestSourceDirectory>
-    <unitTest>
-      <includes>
-        <include>**/*Test.java</include>
-      </includes>
-      <excludes>
-        <exclude>**/org/geotools/gce/geotiff/GeoTiffReaderTest.java</exclude>
-      </excludes>
-      <resources>
-        <resource>
-          <directory>${basedir}/test</directory>
-          <includes>
-            <include>**/*.png</include>
-          </includes>
-        </resource>
-      </resources>
-    </unitTest>
-  </build>
+ <build>
+  <unitTest>
+   <includes>
+    <include>**/*Test.java</include>
+   </includes>
+   <resources>
+    <resource>
+     <directory>${basedir}/test</directory>
+     <includes>
+      <include>**/*.*</include>
+      <include>**/*.*</include>
+     </includes>
+    </resource>
+   </resources>
+  </unitTest>
+ </build>
 </project>

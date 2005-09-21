@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.util.Collection;
 import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
@@ -157,7 +158,7 @@ public class GeoTiffWriter implements GridCoverageWriter {
             GeoTIFFMetadata metadata = new GeoTIFFMetadata();
 
             //check if we have authority and code
-            TreeSet identifiers = (TreeSet) crs.getIdentifiers();
+            TreeSet identifiers = new TreeSet(crs.getIdentifiers());
 
             //model type			
             int modelType = (crs instanceof ProjectedCRS) ? 1 : 2;

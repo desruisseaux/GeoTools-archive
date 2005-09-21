@@ -32,6 +32,8 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import java.io.File;
+import java.net.URL;
+import java.net.URLDecoder;
 
 // J2SE dependencies
 import java.util.HashMap;
@@ -90,6 +92,16 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
 
         if (goodfile) {
             goodfile = GeoTiffReader.isGeoTiffFile((File) o);
+        } else if (o instanceof URL) {
+            URL url = (URL) o;
+
+						try {
+            	final String pathname = URLDecoder.decode(url.getFile(),"UTF-8");
+            
+            	goodfile = GeoTiffReader.isGeoTiffFile(new File(pathname));
+            } catch (Exception e) {
+            	goodfile = false;
+            }
         }
 
         return goodfile;
@@ -111,7 +123,19 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
         GridCoverageReader reader = null;
 
         if (accepts(source)) {
-            reader = new GeoTiffReader(this, source, null);
+        		if (source instanceof URL) {
+            	URL url = (URL) source;
+
+							try {
+            		final String pathname = URLDecoder.decode(url.getFile(),"UTF-8");
+            
+            		reader = new GeoTiffReader(this, new File(pathname), null);
+            	} catch (Exception e) {
+            		reader = null;
+            	}
+            } else {
+            	reader = new GeoTiffReader(this, source, null);
+            }
         }
 
         return reader;
