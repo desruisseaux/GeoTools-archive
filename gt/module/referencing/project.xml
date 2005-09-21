@@ -83,6 +83,11 @@
 
   <dependencies>
     <dependency>
+      <id>beam</id>
+      <version>1.0</version>
+      <url>http://lists.refractions.net/geotools/</url>
+    </dependency>    
+    <dependency>
       <id>JTS</id>
       <version>1.6</version>
       <properties>
