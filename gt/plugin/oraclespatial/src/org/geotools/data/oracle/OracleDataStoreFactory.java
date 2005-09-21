@@ -36,8 +36,7 @@ import org.geotools.data.jdbc.ConnectionPool;
  * @author Jody Garnett, Refractions Research
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  */
-public class OracleDataStoreFactory
-    implements DataStoreFactorySpi {
+public class OracleDataStoreFactory implements DataStoreFactorySpi {
      
     private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
 
@@ -153,7 +152,7 @@ public class OracleDataStoreFactory
         String user = (String) USER.lookUp( params );
         String passwd = (String) PASSWD.lookUp( params );
         String schema = (String) SCHEMA.lookUp( params ); // checks uppercase
-        String namespace = (String) NAMESPACE.lookUp( params );
+        //String namespace = (String) NAMESPACE.lookUp( params );
         String dbtype = (String) DBTYPE.lookUp( params );
         
         if( !"oracle".equals( dbtype )){

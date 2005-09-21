@@ -56,6 +56,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * With a little fuss and bother LRS information can also be handled.
  * Although it is very rare that JTS makes use of such things. 
  * </p>
+ * @see <a href="http://otn.oracle.com/pls/db10g/db10g.to_toc?pathname=appdev.101%2Fb10826%2Ftoc.htm&remark=portal+%28Unstructured+data%29">Spatial User's Guide (10.1)</a>
  * @author Jody Garnett, Refractions Reasearch Inc.
  * @version CVS Version
  *
@@ -1039,13 +1040,11 @@ public final class SDO {
      */
     private static void addCoordinates(List list, Polygon polygon) {
         switch (elemInfoInterpretation(polygon)) {
-        case 4:
+        case 4:  // circle not supported
             break;
-
-        // circle not supported
+       
         case 3:
             addCoordinatesInterpretation3(list, polygon);
-
             break;
 
         case 2: // curve not suppported
@@ -2525,7 +2524,7 @@ public final class SDO {
 			        "ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
 		}        
 		if (!(INTERPRETATION == 1) && !(INTERPRETATION == 3)){
-		    LOGGER.warning( "Could not create JTS Polygon with INTERPRETATION "+INTERPRETATION+" - we can only support 1 for straight edges, and 2 for rectangle");
+		    LOGGER.warning( "Could not create JTS Polygon with INTERPRETATION "+INTERPRETATION+" - we can only support 1 for straight edges, and 3 for rectangle");
 			return null;
 		}
 
@@ -2749,7 +2748,7 @@ HOLES:
 		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.LINE))
 		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected LINE");
-		if (!(INTERPRETATION > 1)){
+		if (!(INTERPRETATION == 1)){
             // we cannot represent INTERPRETATION > 1 
 		    LOGGER.warning( "Could not create MultiLineString with INTERPRETATION "+INTERPRETATION+" - we can only represent 1 for straight edges");
 			return null;
@@ -2793,7 +2792,7 @@ LINES: 		// bad bad gotos jody
      * ETYPE: 2003 or 3 for Polygon
      * </li>
      * <li>
-     * INTERPRETATION: 1 for straight edges, 2 for rectangle
+     * INTERPRETATION: 1 for straight edges, 3 for rectangle
      * </li>
      * </ul>
      * 
@@ -2821,12 +2820,10 @@ LINES: 		// bad bad gotos jody
 		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR))
 		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
-		if (!(INTERPRETATION > 1)){
-            // we cannot represent INTERPRETATION > 1 
-		    LOGGER.warning( "Could not create MultiPolygon with INTERPRETATION "+INTERPRETATION +" - we can only represent 1 for straight edges");
+		if (INTERPRETATION != 1 && INTERPRETATION != 3){
+		    LOGGER.warning( "Could not create MultiPolygon with INTERPRETATION "+INTERPRETATION +" - we can only represent 1 for straight edges, or 3 for rectangle");
 			return null;
 		}
-
         final int LEN = D(GTYPE) + L(GTYPE);
         final int endTriplet = (N != -1) ? (triplet + N)
                                          : ((elemInfo.length / 3) + 1);
@@ -2900,15 +2897,7 @@ POLYGONS:
         
 		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= LENGTH))
 		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
-		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR))
-		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
-		if (!(INTERPRETATION > 1)) {
-            // we cannot represent INTERPRETATION > 1 
-		    LOGGER.warning( "Could not create GeometryCollection with INTERPRETATION "+INTERPRETATION);
-			return null;
-		}
-
-
+		
         final int LEN = D(GTYPE) + L(GTYPE);
         final int endTriplet = (N != -1) ? (triplet + N)
                                          : ((elemInfo.length / 3) + 1);

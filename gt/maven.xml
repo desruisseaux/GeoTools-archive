@@ -368,5 +368,10 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
 
     </ant:javadoc>
   </goal>
- 
+ 	<!-- multiproject goal for running eclipse in all module directories -->
+	<goal name="eclipseAll">
+		<j:set var="ignoreFailures" value="true"/>
+		<j:set var="goal" value="eclipse"/>
+		<attainGoal name="multiproject:goal"/>
+	</goal>
 </project>

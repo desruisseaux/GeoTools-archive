@@ -70,16 +70,24 @@ public class OracleTestFixture {
 	                properties.getProperty("port"), properties.getProperty("instance"));
 	       fact.setLogin(properties.getProperty("user"), properties.getProperty("passwd"));
 	       
-	       cPool = fact.getConnectionPool();	       
-	       System.out.println( "Connect to"+ properties );
-	       //connection = (OracleConnection) cPool.getConnection();
+	       try {
+		       cPool = fact.getConnectionPool();	       
+		       System.out.println( "Connect to"+ properties );
+	    	   
+	    	   connection = (OracleConnection) cPool.getConnection();
 	       
 	        	       
-	       // connection = (OracleConnection) DriverManager.getConnection  ("jdbc:oracle:thin:@hydra:1521:rrdev","dblasby","dave2000");
-	       connection = (OracleConnection) DriverManager.getConnection  ("jdbc:oracle:thin:@hydra:1521:dev","egouge","emily2004");
+	    	   // connection = (OracleConnection) DriverManager.getConnection  ("jdbc:oracle:thin:@hydra:1521:rrdev","dblasby","dave2000");
+	    	   // connection = (OracleConnection) DriverManager.getConnection  ("jdbc:oracle:thin:@hydra:1521:dev","egouge","emily2004");
+	       }
+	       catch( Throwable t ){
+	    	   System.out.println("Warning: could not connect, configure "+getClass().getResource("test.properties"));
+	    	   return;
+	       }
 	       System.out.println( connection.getTypeMap());
 	    }	    
 	    public void close() throws SQLException{
-	        connection.close();
+	        if( connection != null ) connection.close();
+	        connection = null;
 	    }    
 	}

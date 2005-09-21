@@ -58,10 +58,10 @@ public class SQLEncoderOracleTest extends TestCase {
         filter.addRightGeometry(filterFactory.createBBoxExpression(
                 new Envelope(-180.0, 180.0, -90.0, 90.0)));
         String value = encoder.encode(filter);
-        assertEquals("WHERE SDO_GEOM.RELATE(\"GEOM\",'disjoint'," +
-            "MDSYS.SDO_GEOMETRY(2003,NULL,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,1)," +
-            "MDSYS.SDO_ORDINATE_ARRAY(-180.0,-90.0,-180.0,90.0,180.0,90.0,180.0,-90.0,-180.0,-90.0)),0.001)" +
-            " = 'FALSE' ", value);
+        assertEquals("WHERE SDO_RELATE(\"GEOM\","+
+        		"MDSYS.SDO_GEOMETRY(2003,NULL,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,1),"+
+        		"MDSYS.SDO_ORDINATE_ARRAY(-180.0,-90.0,180.0,-90.0,180.0,90.0,-180.0,90.0,-180.0,-90.0)),"+
+        		"'mask=anyinteract querytype=WINDOW') = 'TRUE' ", value);
 
         filter = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_CONTAINS);
         filter.addLeftGeometry(filterFactory.createAttributeExpression(null, "SHAPE"));
@@ -69,8 +69,7 @@ public class SQLEncoderOracleTest extends TestCase {
                     new Coordinate(10.0, -10.0))));
         value = encoder.encode(filter);
         LOGGER.fine(value);
-        assertEquals("WHERE SDO_RELATE(\"SHAPE\",MDSYS.SDO_GEOMETRY(0001,NULL," +
-            "MDSYS.SDO_POINT_TYPE(10.0,-10.0,NULL),NULL,NULL),'mask=contains querytype=WINDOW') = 'TRUE' ",
+        assertEquals("WHERE SDO_RELATE(\"SHAPE\",MDSYS.SDO_GEOMETRY(2001,NULL,MDSYS.SDO_POINT_TYPE(10.0,-10.0,NULL),NULL,NULL),'mask=contains querytype=WINDOW') = 'TRUE' ",
             value);
 
         filter = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_CROSSES);
@@ -79,9 +78,7 @@ public class SQLEncoderOracleTest extends TestCase {
                 geometryFactory.createLineString(
                     new Coordinate[] { new Coordinate(-10.0d, -10.0d), new Coordinate(10d, 10d) })));
         value = encoder.encode(filter);
-        assertEquals("WHERE SDO_RELATE(\"GEOM\",MDSYS.SDO_GEOMETRY(1002,NULL," +
-            "NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,2,1),MDSYS.SDO_ORDINATE_ARRAY(" +
-            "-10.0,-10.0,10.0,10.0)),'mask=overlapbydisjoint querytype=WINDOW') = 'TRUE' ", value);
+        assertEquals("WHERE SDO_RELATE(\"GEOM\",MDSYS.SDO_GEOMETRY(2002,NULL,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,2,1),MDSYS.SDO_ORDINATE_ARRAY(-10.0,-10.0,10.0,10.0)),'mask=overlapbydisjoint querytype=WINDOW') = 'TRUE' ", value);
     }
     
     public void testFIDEncoding() throws Exception {

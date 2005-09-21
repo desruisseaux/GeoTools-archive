@@ -26,6 +26,8 @@ import java.util.logging.Logger;
 import org.geotools.data.oracle.sdo.SDO;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -82,21 +84,23 @@ public class SQLEncoderOracle extends SQLEncoder {
             "inside");
         SDO_RELATE_MASK_MAP.put(new Short(AbstractFilter.GEOMETRY_DISJOINT),
             "disjoint");
+        
         //Ok, back to using these, as the not disjoint turned out to be a big
         //performance hit.  I would really like to see some solid testing on 
         //these though, as with a trivial case it really did not seem to work
         //right, not disjoint was giving different answers than anyinteract.
         SDO_RELATE_MASK_MAP.put(new Short(AbstractFilter.GEOMETRY_BBOX),
             "anyinteract");
+        
         SDO_RELATE_MASK_MAP.put(new Short(AbstractFilter.GEOMETRY_INTERSECTS),
             "anyinteract");
     }
 
     /** The escaped version of the multiple wildcard for the REGEXP pattern. */
-    private String escapedWildcardMulti = "\\.\\*";
+    //private String escapedWildcardMulti = "\W.\\*"; // "\\*"
 
     /** The escaped version of the single wildcard for the REGEXP pattern. */
-    private String escapedWildcardSingle = "\\.\\?";
+    //private String escapedWildcardSingle = "\\.\\?";
 
     /**
      * The Spatial Reference System IDs  Keyed by ColumnName, value is Integer
@@ -534,9 +538,12 @@ public class SQLEncoderOracle extends SQLEncoder {
     public void visit(LikeFilter filter) {
         try {
             String pattern = filter.getPattern();
-
-            pattern = pattern.replaceAll(escapedWildcardMulti, SQL_WILD_MULTI);
-            pattern = pattern.replaceAll(escapedWildcardSingle, SQL_WILD_SINGLE);
+            
+            String multi = "\\Q"+filter.getWildcardMulti()+"\\E"; 
+            pattern = pattern.replaceAll( multi, SQL_WILD_MULTI);
+            
+            String single = "\\Q"+filter.getWildcardSingle()+"\\E";
+            pattern = pattern.replaceAll( single, SQL_WILD_SINGLE);
 
             //pattern = pattern.replace('\\', ''); //get rid of java escapes.
             out.write("UPPER(");

@@ -58,13 +58,13 @@ public class SDOTest extends TestCase {
     /*
      * @see TestCase#tearDown()
      */
-    protected void tearDown() throws Exception {
-        fixture = null;
+    protected void tearDown() throws Exception {    	        
+        oracle.close();        
         super.tearDown();
     }
     
     final public void testGType() throws SQLException {
-        assertEquals( 2003, SDO.gType( fixture.rectangle ) );               
+    	assertEquals( 2003, SDO.gType( fixture.rectangle ) );               
     }
     final public void testGTypeD() {
         assertEquals( 2, SDO.D( fixture.rectangle ) );        
@@ -103,6 +103,7 @@ public class SDOTest extends TestCase {
     }
     final public void testDecodePoint() throws SQLException
     {
+    	if( oracle.connection == null ) return;    	
     	STRUCT datum = converter.toSDO( fixture.point );
         Geometry geom = (Geometry) converter.asGeometry( datum );
         
@@ -110,6 +111,7 @@ public class SDOTest extends TestCase {
     }
     final public void testDecodeLine() throws SQLException
     {
+    	if( oracle.connection == null ) return;    	
     	STRUCT datum = converter.toSDO( fixture.lineString );
         Geometry geom = (Geometry) converter.asGeometry( datum );
 
@@ -117,6 +119,7 @@ public class SDOTest extends TestCase {
     }
     final public void testDecodeRectangle() throws SQLException
     {
+    	if( oracle.connection == null ) return;    	
     	STRUCT datum = converter.toSDO( fixture.rectangle );
         Geometry geom = (Geometry) converter.asGeometry( datum );
         
@@ -124,6 +127,7 @@ public class SDOTest extends TestCase {
     }
     final public void testDecodePolygon() throws SQLException
     {
+    	if( oracle.connection == null ) return;    	
     	STRUCT datum = converter.toSDO( fixture.polygon );
         Geometry geom = (Geometry) converter.asGeometry( datum );
         
@@ -184,6 +188,8 @@ public class SDOTest extends TestCase {
      */
     final public void testPolygonEncoding() throws SQLException
     {
+    	if( oracle.connection == null ) return;
+    	
     	Geometry g = fixture.polygonWithHole;
     	STRUCT datum = converter.toSDO( g );
     	
@@ -209,6 +215,8 @@ public class SDOTest extends TestCase {
     
     final public void testDecodePolygonWithHole() throws SQLException
     {
+    	if( oracle.connection == null ) return;
+    	
     	STRUCT datum = converter.toSDO( fixture.polygonWithHole );
         Geometry geom = (Geometry) converter.asGeometry( datum );
         
@@ -216,6 +224,8 @@ public class SDOTest extends TestCase {
     }    
     final public void testDecodeMultiPoint() throws SQLException
     {
+    	if( oracle.connection == null ) return;
+    	
     	STRUCT datum = converter.toSDO( fixture.multiPoint );
         Geometry geom = (Geometry) converter.asGeometry( datum );
         
@@ -223,6 +233,8 @@ public class SDOTest extends TestCase {
     }
     final public void testDecodeMultiLine() throws SQLException
     {
+    	if( oracle.connection == null ) return;
+    	
     	STRUCT datum = converter.toSDO( fixture.multiLineString );
         Geometry geom = (Geometry) converter.asGeometry( datum );
     
@@ -232,6 +244,8 @@ public class SDOTest extends TestCase {
     
     final public void testDecodeMultiPolygon() throws SQLException
     {
+    	if( oracle.connection == null ) return;
+    	
     	STRUCT datum = converter.toSDO( fixture.multiPolygon );
         
         System.out.println( fixture.multiPolygon );        
@@ -246,6 +260,8 @@ public class SDOTest extends TestCase {
     }
     final public void testDecodeMultiPolygonWithHole() throws SQLException
     {
+    	if( oracle.connection == null ) return;
+    	
         STRUCT datum = converter.toSDO( fixture.multiPolygonWithHole );
         
         Geometry geom = (Geometry) converter.asGeometry( datum );
@@ -258,6 +274,8 @@ public class SDOTest extends TestCase {
     }
     final public void testGeometryCollection() throws SQLException
     {
+    	if( oracle.connection == null ) return;
+    	
     	STRUCT datum = converter.toSDO( fixture.geometryCollection );
         
         Geometry geom = (Geometry) converter.asGeometry( datum );

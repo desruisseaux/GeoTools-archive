@@ -14,6 +14,10 @@ import java.sql.Statement;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import oracle.sql.ARRAY;
+import oracle.sql.Datum;
+import oracle.sql.STRUCT;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
@@ -32,7 +36,12 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderOracle;
+import org.geotools.geometry.JTS;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -86,7 +95,9 @@ public class OracleDataStore extends JDBCDataStore {
      */
     protected boolean allowTable(String tablename) {
 	LOGGER.finer("checking table name: " + tablename);
-        if (tablename.endsWith("$"))  {
+		if (tablename.endsWith("$"))  {
+            return false;
+		} else if (tablename.startsWith("BIN$"))  { // Added to ignore some Oracle 10g tables
             return false;
         } else if (tablename.startsWith("XDB$"))  {
             return false;
@@ -121,20 +132,23 @@ public class OracleDataStore extends JDBCDataStore {
         return true;
     }
 
-    /** Overrides the buildAttributeType method to check for SDO_GEOMETRY columns.
+    /**
+     * Overrides the buildAttributeType method to check for SDO_GEOMETRY columns.
+     * @see http://download-west.oracle.com/docs/cd/B14117_01/appdev.101/b10826.pdf
      * 
      *  TODO: Determine the specific type of the geometry.
-     * @see org.geotools.data.jdbc.JDBCDataStore#buildAttributeType(java.sql.ResultSet)
      */
     protected AttributeType buildAttributeType(ResultSet rs) throws IOException {
+    	final int TABLE_NAME = 3;
         final int COLUMN_NAME = 4;
-        final int DATA_TYPE = 5;
         final int TYPE_NAME = 6;
-        
+        final int IS_NULLABLE = 18; // "NO", "YES" or ""
         try {
 			if (rs.getString(TYPE_NAME).equals("SDO_GEOMETRY")) {
-			    String columnName = rs.getString(COLUMN_NAME);
-			    return AttributeTypeFactory.newAttributeType(columnName, Geometry.class);
+			    String tableName = rs.getString(TABLE_NAME);
+                String columnName = rs.getString(COLUMN_NAME);
+                String isNullable = rs.getString( IS_NULLABLE );
+                return getSDOGeometryAttribute(tableName, columnName, "YES".equals(isNullable) );
 			} else  {
 			    return super.buildAttributeType(rs);
 			}
@@ -143,8 +157,52 @@ public class OracleDataStore extends JDBCDataStore {
 		}
     }
    
-    
     /**
+     * Construct and SDO_GEOMETRY attribute.
+     * 
+     * @see org.geotools.data.jdbc.JDBCDataStore#buildAttributeType(java.sql.ResultSet) 
+     * @param tableName
+     * @param columnName
+     * @param isNillable 
+     * @return
+     */
+    private AttributeType getSDOGeometryAttribute(String tableName, String columnName, boolean isNullable ) {
+	    // HACK! Assume SRID matches EPSG number? No but it will do something for now ...
+	    // research required (p89) b10826.pdf above
+    	
+    	int srid = 0; // aka NULL
+		try {
+			srid = determineSRID( tableName, columnName );
+			CoordinateReferenceSystem crs = determineCRS( srid );
+			if( crs != null ){
+				return AttributeTypeFactory.newAttributeType(columnName, Geometry.class,isNullable, 0, null, crs );
+			}
+		} catch (IOException e) {
+			LOGGER.warning( "Could not map SRID "+srid+" to CRS:"+e );
+		}
+    	return AttributeTypeFactory.newAttributeType(columnName, Geometry.class,isNullable);		
+	}
+    protected CoordinateReferenceSystem determineCRS(int srid ) throws IOException {
+    	Connection conn = getConnection(Transaction.AUTO_COMMIT);;
+    	String wkt=null;
+    	try {
+    		Statement st = conn.createStatement();
+    		st.execute("select wktext from cs_srs where srid = "+srid );
+    		
+    		ResultSet set = st.getResultSet();
+    		if( !set.next() ) return null;
+    		wkt = set.getString(1);    	
+    		return CRS.parseWKT( wkt );
+    	}
+    	catch( FactoryException parse){
+    		throw (IOException) new IOException( "Unabled to parse WKTEXT into a CRS:"+wkt ).initCause( parse );
+    	}    	
+    	catch( SQLException sql ){
+    		throw (IOException) new IOException( "No CRS for srid "+srid ).initCause( sql );
+    	}
+    }
+        
+	/**
      * @see org.geotools.data.jdbc.JDBCDataStore#determineSRID(java.lang.String, java.lang.String)
      */
     protected int determineSRID(String tableName, String geometryColumnName) throws IOException {
@@ -215,5 +273,66 @@ public class OracleDataStore extends JDBCDataStore {
         QueryData queryData) throws IOException {
         return new OracleFeatureWriter(fReader, queryData);
     }
-
+    
+    /**
+     * Retrieve approx bounds of all Features.
+     * <p>
+     * This result is suitable for a quick map display, illustrating the data.
+     * This value is often stored as metadata in databases such as oraclespatial.
+     * </p>
+     * @return null as a generic implementation is not provided.
+     */
+    public Envelope getEnvelope( String typeName ){
+    	Connection conn = null;
+    	try {
+    		conn= getConnection( Transaction.AUTO_COMMIT );
+	    	Statement st = conn.createStatement();
+	    	st.execute("SELECT srid,diminfo FROM USER_SDO_GEOM_METADATA where TABLE_NAME = 'ORA_TEST_LINES'");    	
+	    	ResultSet set = st.getResultSet();    	
+	    	set.next();
+	    	
+	    	int srid = set.getInt( 1 );
+	    	CoordinateReferenceSystem crs = determineCRS( srid );
+	    	ARRAY array= (ARRAY) set.getObject(2);    	
+	    	Datum data[] = array.getOracleArray();
+	    	
+	    	double minx = Double.NaN;
+	    	double miny = Double.NaN;
+	    	double maxx = Double.NaN;
+	    	double maxy = Double.NaN;
+	    	
+	    	for( int i =0; i<data.length; i++){
+	    		Datum datum = data[i]; 
+	    		System.out.println( datum.getClass() );
+	    		STRUCT diminfo = (STRUCT) datum;
+	    		Datum info[] = diminfo.getOracleAttributes();
+	    		String ord = info[0].stringValue();
+	    		double min = info[1].doubleValue();
+	    		double max = info[2].doubleValue();
+  	    	    // TODO use this for accurate JTS PercisionModel!	    		
+	    		// double precision = info[3].doubleValue();
+	    		if( "X".equalsIgnoreCase( ord )){
+	    			minx = min; maxx= max;
+	    		}
+	    		if( "Y".equalsIgnoreCase( ord )){
+	    			miny = min; maxy= max;
+	    		}    		
+	    	}
+	    	Envelope extent = new Envelope(minx,maxx, miny,maxy );
+	    	JTS.ReferencedEnvelope ref = new JTS.ReferencedEnvelope( extent, crs );
+	    	return ref;
+	    }
+    	catch( Exception erp ){
+    		LOGGER.warning( erp.toString() );
+    		return null;
+    	}
+	    finally{
+	    	if( conn != null ){	    		
+	    		try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+	    	}
+	    }
+    }
 }
