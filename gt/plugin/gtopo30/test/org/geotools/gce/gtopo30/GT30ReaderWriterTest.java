@@ -119,7 +119,7 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
         defaultInstance.setMemoryCapacity(1024*1024*64);
         defaultInstance.setMemoryThreshold(1.0f);
         
-        TCTool tctool = new TCTool( );
+     //   TCTool tctool = new TCTool( );
         if (format.accepts(statURL)) {
             //get a reader
             GridCoverageReader reader = format.getReader(statURL);
