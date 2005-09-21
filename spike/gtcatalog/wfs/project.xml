@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+	<extend>${basedir}/../project.xml</extend>
+  <name>WFS Catalog Extension</name>
+  <id>catalog-wfs</id>
+
+	<dependencies>
+		<dependency>
+			<groupId>gt2</groupId>
+			<artifactId>catalog-core</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>gt2</groupId>
+			<artifactId>wms</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>gt2</groupId>
+			<artifactId>wfs</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+	</dependencies>
+</project>
