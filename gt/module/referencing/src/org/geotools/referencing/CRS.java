@@ -28,6 +28,7 @@ import java.util.TreeSet;
 // OpenGIS dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.factory.FactoryGroup;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.FactoryException;
@@ -181,6 +182,12 @@ public class CRS {
     	 return result;
     }
 
+    /** Parse WKT into a CRS object */
+    public static CoordinateReferenceSystem parseWKT( String wkt ) throws FactoryException {
+    	FactoryGroup factories = new FactoryGroup();
+    	return factories.getCRSFactory().createFromWKT( wkt );
+    }
+    
     /**
      * Locate for CoordinateReferenceSystem for specific code.
      * <p>
