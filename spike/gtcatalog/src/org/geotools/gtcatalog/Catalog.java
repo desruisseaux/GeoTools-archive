@@ -14,10 +14,10 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.catalog;
+package org.geotools.gtcatalog;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 
 import org.geotools.util.ProgressListener;
@@ -78,7 +78,7 @@ public abstract class Catalog implements Resolve {
      * @param service
      * @throws UnsupportedOperationException
      */
-    public abstract void replace( URL id, Service service ) throws UnsupportedOperationException;
+    public abstract void replace( URI id, Service service ) throws UnsupportedOperationException;
 
     /**
      * Will attempt to morph into the adaptee, and return that object. Required adaptions:
@@ -118,7 +118,7 @@ public abstract class Catalog implements Resolve {
      * @return List (possibly empty) of resolves (objects implementing the 
      * Resolve interface)
      */
-    public abstract List find( URL id, ProgressListener monitor );
+    public abstract List find( URI id, ProgressListener monitor );
 
     /**
      * Find Service matching this id directly from this Catalog.  This method is guaranteed to be non-blocking.
@@ -129,7 +129,7 @@ public abstract class Catalog implements Resolve {
      * @return List (possibly empty) of matching services (objects of type 
      * Service).
      */
-    public abstract List findService( URL query, ProgressListener monitor );
+    public abstract List findService( URI query, ProgressListener monitor );
     
     /**
      * Performs a search on this catalog based on the specified inputs.
@@ -171,14 +171,28 @@ public abstract class Catalog implements Resolve {
         buf.append(")"); //$NON-NLS-1$
         return buf.toString();
     }
-
+    
     /**
-     * @param listener
+     * This method does nothing. Sublcasses should override if events are 
+     * supported.
      */
-    public abstract void addCatalogListener( ResolveChangeListener listener );
-
+    public void addListener(ResolveChangeListener listener) {
+    	// do nothing
+    }
+    
     /**
-     * @param listener
+     * This method does nothing. Sublcasses should override if events are 
+     * supported.
      */
-    public abstract void removeCatalogListener( ResolveChangeListener listener );
+    public void removeListener(ResolveChangeListener listener) {
+    	// do nothing
+    }
+    
+    /**
+     * This method does nothing. Sublcasses should override if events are 
+     * supported.
+     */
+    public void fire(ResolveChangeEvent event) {
+    	// do nothing
+    }
 }

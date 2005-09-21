@@ -14,10 +14,10 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.catalog;
+package org.geotools.gtcatalog;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 
 import org.geotools.util.ProgressListener;
@@ -44,7 +44,7 @@ public interface Resolve {
      * @return Instance of type adaptee, or null if adaptee is unsuported.
      * @throws IOException if result was unavailable due to a technical problem
      */
-    public Object resolve( Class adaptee, ProgressListener monitor ) throws IOException;
+    Object resolve( Class adaptee, ProgressListener monitor ) throws IOException;
 
     /**
      * Required adaptions will be listed in Abstract Classes under the resolve() method.
@@ -55,7 +55,7 @@ public interface Resolve {
      * @see IResolve#resolve(Class,ProgressListener)
      * @return true if a resolution for adaptee is avaialble
      */
-    public boolean canResolve( Class adaptee );
+    boolean canResolve( Class adaptee );
 
     /**
      * The parent of this handle, may be null if parent unknown.
@@ -64,7 +64,7 @@ public interface Resolve {
      * @return Parent IResolve, null if unknown
      * @throws IOException in the event of a technical problem
      */
-    public Resolve parent( ProgressListener monitor ) throws IOException;
+    Resolve parent( ProgressListener monitor ) throws IOException;
 
     /**
      * Contents of this handle, null iff this is a leaf.
@@ -73,9 +73,9 @@ public interface Resolve {
      * @return List, possibly empty, of members. Will be null if this is a leaf.
      * @throws IOException in the event of a technical problem
      */
-    public List members( ProgressListener monitor ) throws IOException;
+    List members( ProgressListener monitor ) throws IOException;
 
-    public class Status {
+    class Status {
     	/** Status constant indicates a live connection in use */
         public static final Status CONNECTED = new Status();
 
@@ -97,7 +97,7 @@ public interface Resolve {
      * 
      * @return Status of CONNECTED, NOTCONNECTED or BROKEN
      */
-    public Status getStatus();
+    Status getStatus();
 
     /**
      * Text description for this serice status.
@@ -111,7 +111,7 @@ public interface Resolve {
      * 
      * @return Text describing service status
      */
-    public Throwable getMessage();
+    Throwable getMessage();
 
     /**
      * A unique resource identifier ... this should be unique for each service.
@@ -122,6 +122,23 @@ public interface Resolve {
      * 
      * @return ID for this IResolve, should not be null.
      */
-    public abstract URL getIdentifier();
+    URI getIdentifier();
+    
+    /**
+     * @param listener
+     */
+    void addListener( ResolveChangeListener listener );
+
+    /**
+     * @param listener
+     */
+    void removeListener( ResolveChangeListener listener );
+    
+    /**
+     * Fires a change event against the resolve.
+     * 
+     * @param event The event describing the change.
+     */
+    void fire(ResolveChangeEvent event);
 
 }

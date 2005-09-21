@@ -14,9 +14,9 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.catalog;
+package org.geotools.gtcatalog;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +48,7 @@ public interface ServiceFactory {
      * @return List<IService>
      * @see aquire(params)
      */
-    List aquire( URL target ); // creates a map, may look up authentication
+    List aquire( URI target ); // creates a map, may look up authentication
 
     /**
      * This methos is intended to be used when replacing an IService entry in a catalog, or for
@@ -60,6 +60,6 @@ public interface ServiceFactory {
      * @param params
      * @return List<IService>
      */
-    List aquire( URL id, Map params ); // may not look up
+    List aquire( URI id, Map params ); // may not look up
                                                                         // authentication
 }

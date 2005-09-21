@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.catalog;
+package org.geotools.gtcatalog;
 
 import java.net.URI;
 

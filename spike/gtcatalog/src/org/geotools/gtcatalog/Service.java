@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.catalog;
+package org.geotools.gtcatalog;
 
 import java.io.IOException;
 import java.util.List;
@@ -126,6 +126,31 @@ public abstract class Service implements Resolve {
         }
         return false;
     }
+    
+    /**
+     * This method does nothing. Sublcasses should override if events are 
+     * supported.
+     */
+    public void addListener(ResolveChangeListener listener) {
+    	// do nothing
+    }
+    
+    /**
+     * This method does nothing. Sublcasses should override if events are 
+     * supported.
+     */
+    public void removeListener(ResolveChangeListener listener) {
+    	// do nothing
+    }
+    
+    /**
+     * This method does nothing. Sublcasses should override if events are 
+     * supported.
+     */
+    public void fire(ResolveChangeEvent event) {
+    	// do nothing
+    }
+    
     /**
      * This should represent the identified
      * 

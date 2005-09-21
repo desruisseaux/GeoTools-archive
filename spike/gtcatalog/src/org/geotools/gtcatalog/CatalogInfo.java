@@ -14,9 +14,9 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.catalog;
+package org.geotools.gtcatalog;
 
-import java.net.URL;
+import java.net.URI;
 
 /**
  * Represents a bean style metadata accessor for metadata about a catalog. This may be the result of
@@ -28,14 +28,14 @@ import java.net.URL;
  */
 public class CatalogInfo {
     protected String title, description;
-    protected URL source;
+    protected URI source;
     protected String[] keywords;
 
     protected CatalogInfo() {
         // for sub-classes
     }
 
-    public CatalogInfo( String title, String description, URL source, String[] keywords ) {
+    public CatalogInfo( String title, String description, URI source, String[] keywords ) {
         this.title = title;
         this.description = description;
         this.source = source;
@@ -75,7 +75,7 @@ public class CatalogInfo {
      * 
      * @return
      */
-    public URL getSource() { // aka server
+    public URI getSource() { // aka server
         return source;
     }
 }

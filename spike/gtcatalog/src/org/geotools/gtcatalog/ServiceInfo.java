@@ -14,10 +14,9 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.catalog;
+package org.geotools.gtcatalog;
 
 import java.net.URI;
-import java.net.URL;
 
 import javax.swing.Icon;
 
@@ -36,7 +35,7 @@ public class ServiceInfo {
 
     protected String title, description, _abstract;
     protected URI schema;
-    protected URL source, publisher;
+    protected URI source, publisher;
     protected String[] keywords;
     protected Icon icon;
 
@@ -44,8 +43,8 @@ public class ServiceInfo {
         // to be used in an over-ride
     }
 
-    public ServiceInfo( String title, String description, String _abstract, URL source,
-            URL publisher, URI schema, String[] keywords, Icon icon ) {
+    public ServiceInfo( String title, String description, String _abstract, URI source,
+            URI publisher, URI schema, String[] keywords, Icon icon ) {
         this.title = title;
         this.description = description;
         this._abstract = _abstract;
@@ -100,7 +99,7 @@ public class ServiceInfo {
      * 
      * @return
      */
-    public URL getPublisher() {
+    public URI getPublisher() {
         return publisher;
     }
 
@@ -119,7 +118,7 @@ public class ServiceInfo {
      * 
      * @return
      */
-    public URL getSource() { // aka server
+    public URI getSource() { // aka server
         return source;
     }
 
