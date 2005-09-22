@@ -31,6 +31,7 @@ import java.io.Serializable;
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.referencing.cs.AxisDirection;    // For javadoc
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -54,6 +55,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Alessio Fabiani
  */
 public class GeneralGridGeometry implements GridGeometry, Serializable {
     /**
@@ -142,11 +144,38 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * Constructs a new grid geometry from an envelope. An affine transform will be computed
      * automatically from the specified envelope. The two last arguments are hints about the
      * affine transform to be created: the {@code reverse} argument tells which (if any) axis
-     * should be reversed, and the {@code swapXY} tells if the two first axis should be
-     * interchanged.
+     * from <cite>user</cite> space (not grid space) should be reversed, and the {@code swapXY}
+     * tells if the two first axis should be interchanged.
+     * <p>
+     * This constructor is convenient when the following conditions are meet:
+     * <p>
+     * <ul>
+     *   <li>Pixels coordinates (inside the {@code gridRange} range) are expressed in a fixed
+     *       coordinate reference system. For example {@link java.awt.image.BufferedImage} uses
+     *       ({@linkplain AxisDirection#COLUMN_POSITIVE column},
+     *        {@linkplain AxisDirection#ROW_POSITIVE row}) axis directions with the minimal
+     *        coordinate - typically (0,0) - in the upper left corner, and row numbers increasing
+     *        down.</li>
+     *
+     *   <li>"Real world" coordinates (inside the {@code userRange} range) are expressed in
+     *       arbitrary <em>horizontal</em> coordinate reference system. Axis directions may be
+     *       ({@linkplain AxisDirection#NORTH North}, {@linkplain AxisDirection#WEST West}), or
+     *       ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North}),
+     *       <cite>etc.</cite>.</li>
+     * <p>
+     * In such case, {@code swapXY} shall be set to {@code true} if the "real world" axis are
+     * colinear with ({@linkplain AxisDirection#NORTH North}, {@linkplain AxisDirection#EAST East})
+     * instead of ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North})
+     * (in order to maps the ({@linkplain AxisDirection#COLUMN_POSITIVE column},
+     * {@linkplain AxisDirection#ROW_POSITIVE row}) order in image axis). In addition, "real world"
+     * axis shall be reversed (i.e. {@code reverse[dimension]} set to {@code true}) if their
+     * direction is {@link AxisDirection#WEST WEST} or {@link AxisDirection#NORTH NORTH}, in order
+     * to get them oriented toward the {@link AxisDirection#EAST EAST} or
+     * {@link AxisDirection#SOUTH SOUTH} direction respectively. The later may seems unatural,
+     * but it reflects the fact that row values are increasing down in an image coordinate system.
      * <p>
      * If this convenience constructor do not provides suffisient control on axis order or reversal,
-     * then an affine transform shall be created outside and the grid geometry shall be created
+     * then an affine transform shall be created explicitly and the grid geometry shall be created
      * using the {@linkplain #GeneralGridGeometry(GridRange,MathTransform) constructor expecting
      * a math transform} argument.
      *
@@ -156,9 +185,10 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *                  coincide with the upper left corner of the first pixel and the rectangle's
      *                  lower right corner must coincide with the lower right corner of the last
      *                  pixel.
-     * @param reverse   Tells for each axis whatever or not it should be reversed. A {@code null}
-     *                  value reverse no axis. Callers will typically set {@code reverse[1]} to 
-     *                  {@code true} in order to reverse the <var>y</var> axis direction.
+     * @param reverse   Tells for each axis in <cite>user</cite> space whatever or not it should be
+     *                  reversed. A {@code null} value reverse no axis. Callers will typically set
+     *                  {@code reverse[1]} to {@code true} in order to reverse the <var>y</var> axis
+     *                  direction.
      * @param swapXY    If {@code true}, then the two first axis will be interchanged. Callers will
      *                  typically set this argument to {@code true} when the geographic coordinate
      *                  system has axis in the (<var>y</var>,<var>x</var>) order. The {@code reverse}
@@ -192,19 +222,22 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
          */
         final Matrix matrix = MatrixFactory.create(dimension+1);
         for (int i=0; i<dimension; i++) {
+            // NOTE: i is a dimension in the 'gridRange' space (source coordinates).
+            //       j is a dimension in the 'userRange' space (target coordinates).
             int j = i;
-            if (swapXY && i<=1) {
+            if (swapXY && j<=1) {
                 j = 1-j;
             }
-            double scale = userRange.getLength(i) / gridRange.getLength(i);
+            double scale = userRange.getLength(j) / gridRange.getLength(i);
             double offset;
             if (reverse==null || !reverse[j]) {
-                offset = userRange.getMinimum(i);
+                offset = userRange.getMinimum(j);
             } else {
                 scale  = -scale;
-                offset = userRange.getMaximum(i);
+                offset = userRange.getMaximum(j);
             }
             offset -= scale * (gridRange.getLower(i)-0.5);
+            matrix.setElement(j, j,         0.0   );
             matrix.setElement(j, i,         scale );
             matrix.setElement(j, dimension, offset);
         }

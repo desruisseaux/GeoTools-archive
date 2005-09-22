@@ -28,20 +28,27 @@ package org.geotools.openoffice;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class MethodInfo {
+public final class MethodInfo {
     /** The category name. */
-    public final String category;
+    final String category;
 
     /** The display name. */
-    public final String display;
+    final String display;
 
     /** A description of the exported method. */
-    public final String description;
+    final String description;
 
     /** Arguments names (even index) and descriptions (odd index). */
-    public final String[] arguments;
+    final String[] arguments;
 
-    /** Constructs method informations. */
+    /**
+     * Constructs method informations.
+     *
+     * @param category    The category name.
+     * @param display     The display name.
+     * @param description A description of the exported method.
+     * @param arguments   Arguments names (even index) and descriptions (odd index).
+     */
     public MethodInfo(final String   category,
                       final String   display,
                       final String   description,

@@ -25,9 +25,8 @@ package org.geotools.coverage;
 
 // J2SE dependencies
 import java.awt.Color;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.util.Arrays;
+import java.io.Serializable;
 
 // JAI dependencies
 import javax.media.jai.operator.PiecewiseDescriptor;
@@ -47,9 +46,8 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.util.NumberRange;
-import org.geotools.util.WeakHashSet;
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.NumberRange;
 
 
 /**
@@ -100,13 +98,6 @@ public class Category implements Serializable {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 6215962897884256696L;
-
-    /**
-     * A set of {@link Category} or {@link CategoryList} objects. Used in order to
-     * canonicalize object during deserialization, or as a memory optimisation in
-     * {@link CategoryList} constructor.
-     */
-    static final WeakHashSet pool = new WeakHashSet();
 
     /**
      * The 0 value as a byte. Used for {@link #FALSE} categories.
@@ -938,51 +929,5 @@ public class Category implements Serializable {
         if (object == null) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
-    }
-
-    /**
-     * Returns the object to use after deserialization. This is usually {@code this}.
-     * However, if an identical object was previously deserialized, then this method replace
-     * {@code this} by the previously deserialized object in order to reduce memory usage.
-     * This is correct only for immutable objects.
-     * <p>
-     * NOTE: we keep this method private for two reasons:
-     * <ul>
-     *   <li>The user may have created a mutable subclass. Since the need to subclass this class
-     *       should be exceptional, it is better to play safe.</li>
-     *   <li>{@code GeophysicsCategory} should not inherit it. {@code GeophysicsCategory} is never
-     *       serialized alone; it is always encapsulated in a {@code Category}. Consequently,
-     *       if {@code Category} has been canonicalized, then {@code GeophysicsCategory} has
-     *       been canonicalized too.</li>
-     * </ul>
-     *
-     * @return A canonical instance of this object.
-     * @throws ObjectStreamException if this object can't be replaced.
-     */
-    private Object readResolve() throws ObjectStreamException {
-        return pool.canonicalize(this);
-    }
-
-    /**
-     * Returns the object to write during serialization. This is usually {@code this}.
-     * However, if identical objects are found in the same graph during serialization, then
-     * they will be replaced by a single instance in order to reduce the amount of data sent
-     * to the output stream. This is correct only for immutable objects.
-     * <p>
-     * NOTE: we keep this method private for two reasons:
-     * <ul>
-     *   <li>The user may have created a mutable subclass. Since the need to subclass this class
-     *       should be exceptional, it is better to play safe.</li>
-     *   <li>{@code GeophysicsCategory} should not inherit it. {@code GeophysicsCategory} is never
-     *       serialized alone; it is always encapsulated in a {@code Category}. Consequently,
-     *       if {@code Category} has been canonicalized, then {@code GeophysicsCategory} has
-     *       been canonicalized too.</li>
-     * </ul>
-     *
-     * @return The object to serialize (usually {@code this}).
-     * @throws ObjectStreamException if this object can't be replaced.
-     */
-    private Object writeReplace() throws ObjectStreamException {
-        return pool.canonicalize(this);
     }
 }

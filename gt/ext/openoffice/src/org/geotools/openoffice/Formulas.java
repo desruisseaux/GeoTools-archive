@@ -56,12 +56,12 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
     /**
      * The logger to use for all message to log in this package.
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.openoffice");
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.openoffice");
 
     /**
      * Informations about exported methods.
      */
-    final Map/*<String,MethodInfo>*/ methods = new HashMap/*<String,MethodInfo>*/();
+    protected final Map/*<String,MethodInfo>*/ methods = new HashMap/*<String,MethodInfo>*/();
 
     /**
      * Locale attribute required by {@code com.sun.star.lang.XLocalizable} interface.
@@ -82,7 +82,7 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
     /**
      * Default constructor. Subclass constructors need to add entries in the {@link #methods} map.
      */
-    Formulas() {
+    protected Formulas() {
     }
 
     /**
@@ -318,7 +318,7 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
      * Returns the localized message from the specified exception. If no message is available,
      * returns a default string. This method never returns a null value.
      */
-    static String getLocalizedMessage(final Throwable exception) {
+    protected static String getLocalizedMessage(final Throwable exception) {
         final String message = exception.getLocalizedMessage();
         if (message != null) {
             return message;
@@ -332,11 +332,20 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
      * the WARNING level since this is not a program disfunction; the failure is probably caused
      * by wrong user-specified parameters.
      */
-    final void reportException(final String method, final Throwable exception) {
+    protected void reportException(final String method, final Throwable exception) {
         final LogRecord record = new LogRecord(Level.FINE, getLocalizedMessage(exception));
         record.setSourceClassName (Utilities.getShortClassName(this));
         record.setSourceMethodName(method);
         record.setThrown          (exception);
-        LOGGER.log(record);
+        getLogger().log(record);
+    }
+
+    /**
+     * Returns the logger to use for logging warnings. The default implementation returns the
+     * {@link org.geotools.openoffice} logger. Subclasses should override this method if they
+     * want to use a different logger.
+     */
+    protected Logger getLogger() {
+        return LOGGER;
     }
 }

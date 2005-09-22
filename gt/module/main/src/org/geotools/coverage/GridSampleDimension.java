@@ -522,8 +522,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         if (categories == null) {
             return null;
         }
-        CategoryList list = new CategoryList(categories, units);
-        list = (CategoryList) Category.pool.canonicalize(list);
+        final CategoryList list = new CategoryList(categories, units);
         if (CategoryList.isScaled(categories, false)) return list;
         if (CategoryList.isScaled(categories, true )) return list.inverse;
         throw new IllegalArgumentException(Errors.format(ErrorKeys.MIXED_CATEGORIES));

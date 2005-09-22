@@ -167,8 +167,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
      *
      * @param gridRange The valid coordinate range of a grid coverage.
      * @param userRange The corresponding coordinate range in user coordinate.
-     * @param reverse   Tells for each axis whatever or not it should be reversed. A {@code null}
-     *                  value reverse no axis.
+     * @param reverse   Tells for each axis in <cite>user</cite> space whatever or not it should
+     *                  be reversed. A {@code null} value reverse no axis.
      * @param swapXY    If {@code true}, then the two first axis will be interchanged.
      * @throws IllegalArgumentException if {@code gridRange} has more than 2 dimensions with
      *         a width larger than 1.

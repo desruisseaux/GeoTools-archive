@@ -30,7 +30,6 @@ import java.awt.image.RasterFormatException;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Arrays;
@@ -809,42 +808,6 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         last = main;
-    }
-
-    /**
-     * Returns the object to use after deserialization. This is usually {@code this}.
-     * However, if an identical object was previously deserialized, then this method replace
-     * {@code this} by the previously deserialized object in order to reduce memory usage.
-     * This is correct only for immutable objects.
-     * <br><br>
-     * NOTE: this method is private because {@link GeophysicsCategoryList} should not inherit it.
-     *       {@link GeophysicsCategoryList} is never serialized alone; it is always encapsulated
-     *       in a {@code CategoryList}. Consequently, if {@code CategoryList} has been
-     *       canonicalized, then {@link GeophysicsCategoryList} has been canonicalized too.
-     *
-     * @return A canonical instance of this object.
-     * @throws ObjectStreamException if this object can't be replaced.
-     */
-    private Object readResolve() throws ObjectStreamException {
-        return Category.pool.canonicalize(this);
-    }
-
-    /**
-     * Returns the object to write during serialization. This is usually {@code this}.
-     * However, if identical objects are found in the same graph during serialization, then
-     * they will be replaced by a single instance in order to reduce the amount of data sent
-     * to the output stream. This is correct only for immutable objects.
-     * <br><br>
-     * NOTE: this method is private because {@link GeophysicsCategoryList} should not inherit it.
-     *       {@link GeophysicsCategoryList} is never serialized alone; it is always encapsulated
-     *       in a {@code CategoryList}. Consequently, if {@code CategoryList} has been
-     *       canonicalized, then {@link GeophysicsCategoryList} has been canonicalized too.
-     *
-     * @return The object to serialize (usually {@code this}).
-     * @throws ObjectStreamException if this object can't be replaced.
-     */
-    private Object writeReplace() throws ObjectStreamException {
-        return Category.pool.canonicalize(this);
     }
 
 

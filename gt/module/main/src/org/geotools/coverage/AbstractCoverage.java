@@ -138,10 +138,9 @@ import org.geotools.resources.geometry.XAffineTransform;
  * of grid coverage <strong>is not the same</strong> than the number of sample dimensions.
  * The later may be better understood as the number of bands for 2D grid coverage.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public abstract class AbstractCoverage extends PropertySourceImpl implements Coverage {
     /**

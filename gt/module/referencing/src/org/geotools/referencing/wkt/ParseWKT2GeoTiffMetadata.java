@@ -73,6 +73,15 @@ import javax.units.Unit;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
+ *
+ * @since 2.2
+ *
+ * @todo This class is basically a copy of {@link Parser} with calls to {@link GeoTIFFMetadata} in
+ *       method body. It would be nice if, instead of setting up {@link GeoTIFFMetadata} during WKT
+ *       parsing, we could parse a WKT in the usual way, and then use a different class which
+ *       analyse the {@link CoordinateReferenceSystem} object produced. It would be more general
+ *       (it would work for any source, not just WKT) and avoid duplication (e.g. bug fixes in WKT
+ *       parser not ported in this class). See GEOT-690.
  */
 public class ParseWKT2GeoTiffMetadata extends AbstractParser {
     /**

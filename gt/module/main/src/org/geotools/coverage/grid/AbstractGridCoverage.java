@@ -59,10 +59,9 @@ import org.geotools.resources.i18n.ErrorKeys;
 /**
  * Base class for Geotools implementation of grid coverage.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public abstract class AbstractGridCoverage extends AbstractCoverage implements GridCoverage {
     /**

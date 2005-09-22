@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
 // OpenOffice dependencies
@@ -394,13 +395,14 @@ public final class Referencing extends Formulas implements XReferencing {
                     new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
         }
         operation = opFactory.createOperation(sourceCRS, targetCRS);
-        if (LOGGER.isLoggable(Level.FINER)) {
+        final Logger logger = getLogger();
+        if (logger.isLoggable(Level.FINER)) {
             final LogRecord record = Logging.format(Level.FINER,
                     LoggingKeys.CREATED_COORDINATE_OPERATION_$3,
                     getIdentifier(operation), getIdentifier(sourceCRS), getIdentifier(targetCRS));
             record.setSourceClassName("Referencing");
             record.setSourceMethodName(method);
-            LOGGER.log(record);
+            logger.log(record);
         }
         lastSourceCRS = source;
         lastTargetCRS = target;

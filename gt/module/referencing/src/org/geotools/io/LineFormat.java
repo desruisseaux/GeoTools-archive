@@ -75,10 +75,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  *
  * @todo This class is intented to be a subclass of {@link Format}.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class LineFormat {
     /**
@@ -358,10 +357,10 @@ public class LineFormat {
      *         n'est pas convertible en nombre.
      */
     public synchronized double[] getValues(double[] array) throws ParseException {
-        if (array!=null) {
+        if (array != null) {
             checkLength(array.length);
         } else {
-            array=new double[count];
+            array = new double[count];
         }
         for (int i=0; i<count; i++) {
             array[i] = getNumber(i).doubleValue();
@@ -385,13 +384,13 @@ public class LineFormat {
      *         n'est pas convertible en nombre.
      */
     public synchronized float[] getValues(float[] array) throws ParseException {
-        if (array!=null) {
+        if (array != null) {
             checkLength(array.length);
         } else {
-            array=new float[count];
+            array = new float[count];
         }
         for (int i=0; i<count; i++) {
-            array[i]=getNumber(i).floatValue();
+            array[i] = getNumber(i).floatValue();
         }
         return array;
     }
@@ -412,10 +411,10 @@ public class LineFormat {
      *         n'est pas convertible en nombre entier de type {@code long}.
      */
     public synchronized long[] getValues(long[] array) throws ParseException {
-        if (array!=null) {
+        if (array != null) {
             checkLength(array.length);
         } else {
-            array=new long[count];
+            array = new long[count];
         }
         for (int i=0; i<count; i++) {
             final Number n = getNumber(i);
@@ -442,10 +441,10 @@ public class LineFormat {
      *         n'est pas convertible en nombre entier de type {@code int}.
      */
     public synchronized int[] getValues(int[] array) throws ParseException {
-        if (array!=null) {
+        if (array != null) {
             checkLength(array.length);
         } else {
-            array=new int[count];
+            array = new int[count];
         }
         for (int i=0; i<count; i++) {
             final Number n = getNumber(i);
@@ -472,10 +471,10 @@ public class LineFormat {
      *         n'est pas convertible en nombre entier de type {@code short}.
      */
     public synchronized short[] getValues(short[] array) throws ParseException {
-        if (array!=null) {
+        if (array != null) {
             checkLength(array.length);
         } else {
-            array=new short[count];
+            array = new short[count];
         }
         for (int i=0; i<count; i++) {
             final Number n = getNumber(i);
@@ -502,10 +501,10 @@ public class LineFormat {
      *         n'est pas convertible en nombre entier de type {@code byte}.
      */
     public synchronized byte[] getValues(byte[] array) throws ParseException {
-        if (array!=null) {
+        if (array != null) {
             checkLength(array.length);
         } else {
-            array=new byte[count];
+            array = new byte[count];
         }
         for (int i=0; i<count; i++) {
             final Number n = getNumber(i);

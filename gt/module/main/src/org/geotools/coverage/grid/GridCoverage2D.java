@@ -392,11 +392,14 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             final boolean[] reverse = new boolean[dimension];
             for (int i=0; i<dimension; i++) {
                 final AxisDirection direction = cs.getAxis(i).getDirection();
-                reverse[i] = direction.equals(direction.absolute().opposite());
+                final AxisDirection absolute  = direction.absolute();
+                reverse[i] = direction.equals(absolute.opposite());
+                if (AxisDirection.NORTH.equals(absolute)) {
+                    reverse[i] = !reverse[i]; // Reverses the 'row' axis.
+                }
             }
             boolean swapXY = false;
             if (dimension >= 2) {
-                reverse[1] = !reverse[1]; // Reverses the 'y' axis.
                 swapXY = AxisDirection.NORTH.equals(cs.getAxis(0).getDirection().absolute()) &&
                          AxisDirection.EAST .equals(cs.getAxis(1).getDirection().absolute());
             }

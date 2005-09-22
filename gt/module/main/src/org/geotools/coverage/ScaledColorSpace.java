@@ -34,10 +34,9 @@ import org.geotools.resources.Utilities;
  *       Future implementation will be differents (interpolate in a color table instead of
  *       computing grayscales).
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @todo Consider extending {@link javax.media.jai.ColorSpaceJAI}.
  */
