@@ -21,7 +21,6 @@ public class AddServiceHandler extends HttpServlet {
 	Catalog catalog;
 	ServiceFactory factory;
 
-	
 	public AddServiceHandler(Catalog catalog, ServiceFactory factory) {
 		this.catalog = catalog;
 		this.factory = factory;
@@ -43,22 +42,27 @@ public class AddServiceHandler extends HttpServlet {
 		try {
 			services = factory.aquire(new URI(query));
 		} 
-		catch (URISyntaxException e) {
-			
-		}
+		catch (URISyntaxException e) {}
 		
 		ServletOutputStream out = response.getOutputStream();
 		
 		if (services != null && !services.isEmpty()) {
 			for (Iterator itr = services.iterator(); itr.hasNext();) {
 				Service service = (Service) itr.next();
-				catalog.add(service);
 				
-				out.println("Added " + service.getIdentifier());
+				//force conection to service to make sure its a valid handle
+				try {
+					service.members(null);
+			
+					catalog.add(service);
+					out.println("Added " + service.getIdentifier());
+				}
+				catch(Throwable t) {
+					//ok, continue
+				}
 			}
 		}
 		else {
-			
 			out.print("Service could not be added");
 		}
 		
