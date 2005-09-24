@@ -218,11 +218,12 @@ public class SimpleDataSource implements DataSource {
             classname = "org.geotools.referencing.factory.epsg.FactoryUsingSQL";
             final String driver = properties.getProperty("driver");
             if (driver != null) {
-                if (driver.contains(".postgresql.") || driver.contains(".mysql.")) {
+                // TODO: 'contains' instead of 'indexOf' when we will be allowed to target J2SE 1.5.
+                if (driver.indexOf(".postgresql.")>=0 || driver.indexOf(".mysql.")>=0) {
                     classname = "org.geotools.referencing.factory.epsg.FactoryUsingAnsiSQL";
                 } else if (driver.startsWith("oracle.")) {
                     classname = "org.geotools.referencing.factory.epsg.FactoryUsingOracleSQL";
-                } else if (driver.contains(".hsqldb.")) {
+                } else if (driver.indexOf(".hsqldb.") >= 0) {
                     classname = "org.geotools.referencing.factory.epsg.FactoryUsingHSQL";
                 }
             }
