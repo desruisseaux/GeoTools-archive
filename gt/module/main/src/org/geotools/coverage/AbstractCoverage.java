@@ -144,6 +144,11 @@ import org.geotools.resources.geometry.XAffineTransform;
  */
 public abstract class AbstractCoverage extends PropertySourceImpl implements Coverage {
     /**
+     * For compatibility during cross-version serialization.
+     */
+    private static final long serialVersionUID = -2989320942499746295L;
+
+    /**
      * The set of default axis name.
      */
     private static final String[] DIMENSION_NAMES = {"x", "y", "z", "t"};

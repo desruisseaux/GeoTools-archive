@@ -59,7 +59,7 @@ public class AbstractFactory extends org.geotools.factory.AbstractFactory implem
     /**
      * The logger for event related to Geotools's factories.
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory");
+    public static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory");
 
     /**
      * Constructs a factory with the default priority.

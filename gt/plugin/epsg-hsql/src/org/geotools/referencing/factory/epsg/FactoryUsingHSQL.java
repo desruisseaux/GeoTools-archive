@@ -35,10 +35,9 @@ import org.geotools.factory.Hints;
  * query. Unfortunatly, those parenthesis are required by MS-Access. We need to
  * removes them programmatically here.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 final class FactoryUsingHSQL extends FactoryUsingAnsiSQL {
     /**

@@ -52,10 +52,9 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * {@code DataSource} using the same plugins mechanism than for factories. In other words,
  * {@code DataSource} is a second level of plugins used internally by {@link DefaultFactory}.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public interface DataSource extends javax.sql.DataSource {
     /**
@@ -82,9 +81,8 @@ public interface DataSource extends javax.sql.DataSource {
     int getPriority();
 
     /**
-     * Open a connection and creates an EPSG factory for it. This method may returns a
-     * sub-class of {@link FactoryUsingSQL} if they wants to uses slightly different SQL
-     * queries.
+     * Opens a connection and creates an EPSG factory for it. This method may returns a
+     * sub-class of {@link FactoryUsingSQL} if it wants to use slightly different SQL queries.
      *
      * @param  hints A map of hints, including the low-level factories to use for CRS creation.
      *         This argument should be given unchanged to {@code FactoryUsingSQL} constructor.

@@ -37,6 +37,7 @@ public final class LoggingKeys {
     public static final int EXCESSIVE_MEMORY_USAGE              =     7;
     public static final int EXCESSIVE_TILE_CACHE_$1             =     8;
     public static final int INITIALIZING_TRANSFORMATION_$2      =     9;
+    public static final int LOADED_JDBC_DRIVER_$3               =    29;
     public static final int LOCALES_DISCARTED                   =    10;
     public static final int NATIVE_ACCELERATION_STATE_$2        =    11;
     public static final int OFFSCREEN_RENDERING_FAILED_$1       =    12;

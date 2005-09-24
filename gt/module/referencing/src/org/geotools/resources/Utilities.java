@@ -200,16 +200,23 @@ compare:for (int i=0; i<c1.length; i++) {
                                            final String   method,
                                            final Throwable error)
     {
-        final StringBuffer buffer = new StringBuffer(getShortClassName(error));
-        final String message = error.getLocalizedMessage();
-        if (message!=null) {
-            buffer.append(": ");
-            buffer.append(message);
-        }
-        final LogRecord record = new LogRecord(Level.WARNING, buffer.toString());
+        final LogRecord record = getLogRecord(error);
         record.setSourceClassName (classe);
         record.setSourceMethodName(method);
         record.setThrown          (error);
         Logger.getLogger(paquet).log(record);
+    }
+
+    /**
+     * Returns a log record for the specified exception.
+     */
+    static LogRecord getLogRecord(final Throwable error) {
+        final StringBuffer buffer = new StringBuffer(getShortClassName(error));
+        final String message = error.getLocalizedMessage();
+        if (message != null) {
+            buffer.append(": ");
+            buffer.append(message);
+        }
+        return new LogRecord(Level.WARNING, buffer.toString());
     }
 }

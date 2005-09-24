@@ -32,7 +32,7 @@ import org.geotools.factory.Hints;
 import org.geotools.resources.Utilities;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
-// postgreSQL dependencies
+// PostgreSQL dependencies
 import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
 
 
@@ -45,7 +45,7 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  * <h3>Connection parameters</h3>
  * The preferred way to specify connection parameters is through the JNDI interface.
  * However, this datasource provides the following alternative as a convenience: if an
- * {@code EPSG-DataSource.properties} file is found in current directory or in the user's home
+ * {@value #CONFIGURATION_FILE} file is found in current directory or in the user's home
  * directory, then the following properties are fetch. Note that the default value may change
  * in a future version if a public server become available.
  * <P>
@@ -57,34 +57,40 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  *   <TH>Geotools Default</TH>
  * </TR>
  * <TR>
- *   <TD>serverName</TD>
+ *   <TD>{@code serverName}</TD>
  *   <TD>String</TD>
  *   <TD>PostgreSQL database server host name</TD>
- *   <TD>localhost</TD>
+ *   <TD>{@code localhost}</TD>
  * </TR>
  * <TR>
- *   <TD>databaseName</TD>
+ *   <TD>{@code databaseName}</TD>
  *   <TD>String</TD>
  *   <TD>PostgreSQL database name</TD>
- *   <TD>EPSG</TD>
+ *   <TD>{@code EPSG}</TD>
  * </TR>
  * <TR>
- *   <TD>portNumber</TD>
+ *   <TD>{@code schema}</TD>
+ *   <TD>String</TD>
+ *   <TD>The schema for the EPSG tables</TD>
+ *   <TD></TD>
+ * </TR>
+ * <TR>
+ *   <TD>{@code portNumber}</TD>
  *   <TD>int</TD>
  *   <TD>TCP port which the PostgreSQL database server is listening on</TD>
- *   <TD>5432</TD>
+ *   <TD>{@code 5432}</TD>
  * </TR>
  * <TR>
- *   <TD>user</TD>
+ *   <TD>{@code user}</TD>
  *   <TD>String</TD>
  *   <TD>User used to make database connections</TD>
- *   <TD>GeoTools</TD>
+ *   <TD>{@code GeoTools}</TD>
  * </TR>
  * <TR>
- *   <TD>password</TD>
+ *   <TD>{@code password}</TD>
  *   <TD>String</TD>
  *   <TD>Password used to make database connections</TD>
- *   <TD>GeoTools</TD></TR>
+ *   <TD>{@code GeoTools}</TD></TR>
  * </TABLE>
  * <P>
  * The database version is given in the
@@ -98,13 +104,22 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  * bundle it with their own distribution if they want to connect their users to an other
  * database.
  *
+ * @since 2.2
  * @version $Id$
  * @author Didier Richard
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSource {
+    /**
+     * The user configuration file. This class search first for the first file found in the
+     * following directories:
+     * <ul>
+     *   <li>The current directory</li>
+     *   <li>The user's home direstory</li>
+     * </ul>
+     */
+    public static final String CONFIGURATION_FILE = "EPSG-DataSource.properties";
+
     /**
      * The schema name, or {@code null} if none.
      */
@@ -114,20 +129,31 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
      * Creates a new instance of this data source.
      */
     public PostgreDataSource() {
-        File file = new File("EPSG-DataSource.properties");
-        if (!file.isFile()) {
-            file = new File(System.getProperty("user.home", "."), "EPSG-DataSource.properties");
-            if (!file.isFile()) {
-                schema = null;
-                return;
-            }
-        }
-        final Properties p = new Properties();
+        this("localhost", "EPSG", null, "Geotools", "Geotools");
+    }
+
+    /**
+     * Creates a new instance of this data source with the specified default parameters.
+     * If a {@linkplain #CONFIGURATION_FILE configuration file} has been found, then the
+     * user setting will override the arguments supplied to this constructor.
+     *
+     * @param server   The server name.
+     * @param database The database name.
+     * @param schema   The schema name, or {@code null} if none.
+     * @param user     The user name.
+     * @param password The password.
+     */
+    public PostgreDataSource(final String server,
+                             final String database,
+                             final String schema,
+                             final String user,
+                             final String password)
+    {
+        Properties p;
         try {
-            final InputStream in = new FileInputStream(file);
-            p.load(in);
-            in.close();
+            p = load();
         } catch (IOException exception) {
+            p = new Properties();
             Utilities.unexpectedException("org.geotools.referencing.factory", "DataSource",
                                           "<init>", exception);
         }
@@ -139,12 +165,35 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
             Utilities.unexpectedException("org.geotools.referencing.factory", "DataSource",
                                           "<init>", exception);
         }
-        setServerName  (p.getProperty("serverName",   "localhost"));
-        setDatabaseName(p.getProperty("databaseName", "EPSG"     ));
-        setUser        (p.getProperty("user",         "Geotools" ));
-        setPassword    (p.getProperty("password",     "Geotools" ));
         setPortNumber  (port);
-        schema = p.getProperty("schema");
+        setServerName  (p.getProperty("serverName",   server  ));
+        setDatabaseName(p.getProperty("databaseName", database));
+        setUser        (p.getProperty("user",         user    ));
+        setPassword    (p.getProperty("password",     password));
+        this.schema =  (p.getProperty("schema",       schema  ));
+    }
+
+    /**
+     * Loads the {@linkplain #CONFIGURATION_FILE configuration file}.
+     *
+     * @return The properties from the configuration file, or {@code null} if the file has not
+     *         been found.
+     * @throws IOException if the configuration file was found, but an error occured while
+     *         reading it.
+     */
+    private static Properties load() throws IOException {
+        File file = new File(CONFIGURATION_FILE);
+        if (!file.isFile()) {
+            file = new File(System.getProperty("user.home", "."), CONFIGURATION_FILE);
+            if (!file.isFile()) {
+                return null;
+            }
+        }
+        final Properties properties = new Properties();
+        final InputStream in = new FileInputStream(file);
+        properties.load(in);
+        in.close();
+        return properties;
     }
 
     /**

@@ -43,10 +43,9 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * bundle it with their own distribution if they want to connect their users to an other
  * database (for example a PostgreSQL database reachable on internet).
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements DataSource {
     /**
@@ -57,8 +56,8 @@ public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements Dat
     }
 
     /**
-     * Returns the priority for this data source, which is
-     * {@link #NORMAL_PRIORITY NORMAL_PRIORITY}.
+     * Returns the priority for this data source. The default implementation returns
+     * <code>{@linkplain #NORMAL_PRIORITY NORMAL_PRIORITY} - 10</code>.
      */
     public int getPriority() {
         return NORMAL_PRIORITY;

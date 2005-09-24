@@ -33,10 +33,9 @@ import java.util.regex.Pattern;
  * in the Geotools JAR. It is run only once when a new SQL script is created. See
  * <A HREF="doc-files/HSQL.html">Creating EPSG database for HSQL</A>.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  *
  * @todo Find some way to exclude this file from JAR during Maven build.
  */
