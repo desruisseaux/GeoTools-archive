@@ -1,4 +1,4 @@
-package org.geotools.renderer.lite;
+package org.geotools.renderer;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
