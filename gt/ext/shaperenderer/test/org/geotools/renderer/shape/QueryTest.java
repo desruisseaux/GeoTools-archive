@@ -27,7 +27,7 @@ import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.map.DefaultMapContext;
-import org.geotools.renderer.lite.RenderListener;
+import org.geotools.renderer.RenderListener;
 import org.geotools.styling.Style;
 
 

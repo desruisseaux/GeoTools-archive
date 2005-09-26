@@ -23,7 +23,7 @@ import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.feature.Feature;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.renderer.lite.RenderListener;
+import org.geotools.renderer.RenderListener;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;

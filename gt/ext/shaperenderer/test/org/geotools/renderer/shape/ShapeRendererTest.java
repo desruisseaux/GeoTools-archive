@@ -35,7 +35,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.renderer.lite.RenderListener;
+import org.geotools.renderer.RenderListener;
 import org.geotools.styling.Style;
 
 import com.vividsolutions.jts.geom.Envelope;
