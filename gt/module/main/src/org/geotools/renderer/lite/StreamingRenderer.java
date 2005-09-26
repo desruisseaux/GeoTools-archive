@@ -104,7 +104,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  * 
  * @version $Id$
  */
-public class StreamingRenderer implements Renderer
+public class StreamingRenderer implements GTRenderer
 {
 	
 	public HashMap symbolizerAssociationHT = new HashMap(); //associate a symbolizer with some data

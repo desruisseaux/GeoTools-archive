@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  */
 
-public interface Renderer
+public interface GTRenderer
 {
 	 public void stopRendering();
 	 
