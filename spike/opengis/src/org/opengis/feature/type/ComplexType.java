@@ -2,7 +2,7 @@ package org.opengis.feature.type;
 
 import java.util.Collection;
 
-import org.opengis.feature.schema.Schema;
+import org.opengis.feature.schema.Descriptor;
 
 public interface ComplexType extends AttributeType {
 	/**
@@ -26,7 +26,7 @@ public interface ComplexType extends AttributeType {
 	 * </p>
 	 * @see types
 	 */
-	Schema getSchema();
+	Descriptor getDescriptor();
 
 	/**
 	 * Describes allowable content, indicates containment not validation .
@@ -39,8 +39,8 @@ public interface ComplexType extends AttributeType {
 	 * can return an List, where as usually a Set is returned.
 	 * </p>
 	 * <p>
-	 * Note: a AttributeType may be returned by more then one AttributeDescriptor in a Schema,
-	 * if it is allowed in more then one ChoiceSchema or Sequence. While this
+	 * Note: a AttributeType may be returned by more then one AttributeDescriptor in a Descriptor,
+	 * if it is allowed in more then one ChoiceDescriptor or Sequence. While this
 	 * represents a form of multiplicity it does not indicate any difference
 	 * in containment.
 	 * </p>
@@ -48,7 +48,7 @@ public interface ComplexType extends AttributeType {
 	 * Follows Collections naming conventions indicating this is a derrived
 	 * quality and not part of our data model.
 	 * </p>
-	 * @see getSchema
+	 * @see getDescriptor
 	 */
 	Collection<AttributeType> types();
 	

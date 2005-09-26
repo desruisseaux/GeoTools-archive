@@ -8,16 +8,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.opengis.feature.schema.AllSchema;
+import org.opengis.feature.schema.AllDescriptor;
 import org.opengis.feature.schema.AttributeDescriptor;
-import org.opengis.feature.schema.ChoiceSchema;
-import org.opengis.feature.schema.OrderedSchema;
-import org.opengis.feature.schema.Schema;
-import org.opengis.feature.schema.SchemaFactory;
+import org.opengis.feature.schema.ChoiceDescriptor;
+import org.opengis.feature.schema.OrderedDescriptor;
+import org.opengis.feature.schema.Descriptor;
+import org.opengis.feature.schema.DescriptorFactory;
 import org.opengis.feature.type.AttributeType;
 
 /**
- * Helper methods for dealing with Schema.
+ * Helper methods for dealing with Descriptor.
  * <p>
  * This methods opperate directly on the interfaces provided by geoapi,
  * no actual classes were harmed in the making of these utility methods.
@@ -25,15 +25,15 @@ import org.opengis.feature.type.AttributeType;
  * @author Jody Garnett
  */
 public class Schemas {
-	SchemaFactory factory;	
+	DescriptorFactory factory;	
 	/**
-	 * Assume plugin system will hook us up with an appropriate SchemaFactory
+	 * Assume plugin system will hook us up with an appropriate DescriptorFactory
 	 * <p>
 	 * Note: we are forcing applications to explicitly specify a default such as
 	 * SchemaFactoryImpl.
 	 * @param factory
 	 */
-	public Schemas( SchemaFactory factory ){
+	public Schemas( DescriptorFactory factory ){
 		this.factory = factory;
 	}
 	/**
@@ -46,7 +46,7 @@ public class Schemas {
 	 * @param subtype
 	 * @return
 	 */
-	public Schema subtype( Schema schema, Schema subtype ){
+	public Descriptor subtype( Descriptor schema, Descriptor subtype ){
 		try {
 			return restriction( schema, subtype );
 		}
@@ -57,39 +57,39 @@ public class Schemas {
 	/**
 	 * Extending a schema.
 	 * <p>
-	 * Since we will be creating a new Schema we need the factory.
+	 * Since we will be creating a new Descriptor we need the factory.
 	 */
-	public Schema extention( Schema schema, Schema extend ){
-		if( schema instanceof AllSchema && extend instanceof AllSchema ){
-			return extension( (AllSchema) schema, (AllSchema) extend);
+	public Descriptor extention( Descriptor schema, Descriptor extend ){
+		if( schema instanceof AllDescriptor && extend instanceof AllDescriptor ){
+			return extension( (AllDescriptor) schema, (AllDescriptor) extend);
 		}
-		else if( schema instanceof ChoiceSchema && extend instanceof ChoiceSchema ){
-			return extension( (ChoiceSchema) schema, (ChoiceSchema) extend);
+		else if( schema instanceof ChoiceDescriptor && extend instanceof ChoiceDescriptor ){
+			return extension( (ChoiceDescriptor) schema, (ChoiceDescriptor) extend);
 		}
-		else if( schema instanceof OrderedSchema && extend instanceof OrderedSchema ){
-			return extension( (OrderedSchema) schema, (OrderedSchema) extend);
+		else if( schema instanceof OrderedDescriptor && extend instanceof OrderedDescriptor ){
+			return extension( (OrderedDescriptor) schema, (OrderedDescriptor) extend);
 		}
 		else {
-			List<Schema> all = new ArrayList<Schema>();
+			List<Descriptor> all = new ArrayList<Descriptor>();
 			all.add( schema );
 			all.add( extend );
 			return factory.ordered( all, 1, 1 );
 		}
 	}
-	private AllSchema extension( AllSchema schema, AllSchema extend ){
-		List<Schema> all = new ArrayList<Schema>();
+	private AllDescriptor extension( AllDescriptor schema, AllDescriptor extend ){
+		List<Descriptor> all = new ArrayList<Descriptor>();
 		all.addAll( schema.all() );
 		all.addAll( extend.all() );		
 		return factory.all( all, extend.getMinOccurs(), extend.getMaxOccurs() );
 	}
-	private OrderedSchema extension( OrderedSchema schema, OrderedSchema extend ){
-		List<Schema> ordered = new ArrayList<Schema>();
+	private OrderedDescriptor extension( OrderedDescriptor schema, OrderedDescriptor extend ){
+		List<Descriptor> ordered = new ArrayList<Descriptor>();
 		ordered.addAll( schema.sequence() );
 		ordered.addAll( extend.sequence() );
 		return factory.ordered( ordered, extend.getMinOccurs(), extend.getMaxOccurs() );
 	}
-	private ChoiceSchema extension( ChoiceSchema schema, ChoiceSchema extend ){
-		List<Schema> choice = new ArrayList<Schema>();
+	private ChoiceDescriptor extension( ChoiceDescriptor schema, ChoiceDescriptor extend ){
+		List<Descriptor> choice = new ArrayList<Descriptor>();
 		choice.addAll( schema.options() );
 		choice.addAll( extend.options() );
 		return factory.choice( choice, extend.getMinOccurs(), extend.getMaxOccurs() );
@@ -103,15 +103,15 @@ public class Schemas {
 	 * @param sub
 	 * @return
 	 */	
-	public Schema restriction( Schema schema, Schema restrict ){
-		if( schema instanceof AllSchema && restrict instanceof AllSchema ){
-			return restriction( (AllSchema) schema, (AllSchema) restrict);
+	public Descriptor restriction( Descriptor schema, Descriptor restrict ){
+		if( schema instanceof AllDescriptor && restrict instanceof AllDescriptor ){
+			return restriction( (AllDescriptor) schema, (AllDescriptor) restrict);
 		}
-		else if( schema instanceof ChoiceSchema && restrict instanceof ChoiceSchema ){
-			return restriction( (ChoiceSchema) schema, (ChoiceSchema) restrict);
+		else if( schema instanceof ChoiceDescriptor && restrict instanceof ChoiceDescriptor ){
+			return restriction( (ChoiceDescriptor) schema, (ChoiceDescriptor) restrict);
 		}
-		else if( schema instanceof OrderedSchema && restrict instanceof OrderedSchema ){
-			return restriction( (OrderedSchema) schema, (OrderedSchema) restrict);
+		else if( schema instanceof OrderedDescriptor && restrict instanceof OrderedDescriptor ){
+			return restriction( (OrderedDescriptor) schema, (OrderedDescriptor) restrict);
 		}
 		else if( schema instanceof AttributeDescriptor && restrict instanceof AttributeDescriptor ){
 			return restriction( (AttributeDescriptor) schema, (AttributeDescriptor) restrict);
@@ -137,33 +137,33 @@ public class Schemas {
 		}
 		throw new IllegalStateException( "Cannot restrict provided schema" );
 	}
-	AllSchema restriction( AllSchema schema, AllSchema restrict ){
-		Collection<Schema> all = restriction( schema.all(), restrict.all() );		
+	AllDescriptor restriction( AllDescriptor schema, AllDescriptor restrict ){
+		Collection<Descriptor> all = restriction( schema.all(), restrict.all() );		
 		return factory.all( all, restrict.getMinOccurs(), restrict.getMaxOccurs() );
 	}
-	OrderedSchema restriction( OrderedSchema schema, OrderedSchema restrict ){
-		List<Schema> sequence = restriction( schema.sequence(), restrict.sequence() );
+	OrderedDescriptor restriction( OrderedDescriptor schema, OrderedDescriptor restrict ){
+		List<Descriptor> sequence = restriction( schema.sequence(), restrict.sequence() );
 		return factory.ordered( sequence, restrict.getMinOccurs(), restrict.getMaxOccurs() );
 	}
-	ChoiceSchema restriction( ChoiceSchema schema, ChoiceSchema restrict ){
-		Collection<Schema> sequence = restriction( schema.options(), restrict.options() );
+	ChoiceDescriptor restriction( ChoiceDescriptor schema, ChoiceDescriptor restrict ){
+		Collection<Descriptor> sequence = restriction( schema.options(), restrict.options() );
 		return factory.choice( sequence, restrict.getMinOccurs(), restrict.getMaxOccurs() );
 	}
-	Collection<Schema> restriction( Collection<Schema> schema, Collection<Schema> restrict ){
-		List<Schema> restriction = new ArrayList<Schema>();
+	Collection<Descriptor> restriction( Collection<Descriptor> schema, Collection<Descriptor> restrict ){
+		List<Descriptor> restriction = new ArrayList<Descriptor>();
 		
-		Iterator<Schema> i = schema.iterator();
-		Iterator<Schema> j = restrict.iterator();
+		Iterator<Descriptor> i = schema.iterator();
+		Iterator<Descriptor> j = restrict.iterator();
 		while( i.hasNext() && j.hasNext() ){
 			restriction.add( restriction( i.next(), j.next() ) );
 		}
 		return restriction;
 	}
-	List<Schema> restriction( List<Schema> schema, List<Schema> restrict ){
-		List<Schema> restriction = new ArrayList<Schema>();
+	List<Descriptor> restriction( List<Descriptor> schema, List<Descriptor> restrict ){
+		List<Descriptor> restriction = new ArrayList<Descriptor>();
 		
-		Iterator<Schema> i = schema.iterator();
-		Iterator<Schema> j = restrict.iterator();
+		Iterator<Descriptor> i = schema.iterator();
+		Iterator<Descriptor> j = restrict.iterator();
 		while( i.hasNext() && j.hasNext() ){
 			restriction.add( restriction( i.next(), j.next() ) );
 		}
@@ -176,7 +176,7 @@ public class Schemas {
 	 * @param name
 	 * @return
 	 */
-	static public AttributeType type( Schema schema, String name ){
+	static public AttributeType type( Descriptor schema, String name ){
 		AttributeDescriptor node = node( schema, name );
 		if( node != null ) return node.getType();
 		return null;
@@ -188,8 +188,8 @@ public class Schemas {
 	 * @param name
 	 * @return AttributeDescriptor assoicated with provided name, or null if not found.
 	 */
-	static public AttributeDescriptor node( Schema schema, String name ){
-		for( Schema child : list( schema ) ){
+	static public AttributeDescriptor node( Descriptor schema, String name ){
+		for( Descriptor child : list( schema ) ){
 			if( child instanceof AttributeDescriptor ){
 				AttributeDescriptor node = (AttributeDescriptor) child;
 				if( node.getType().name().equals( name )){
@@ -209,8 +209,8 @@ public class Schemas {
 	 * @param type
 	 * @return AttributeDescriptor assoicated with provided name, or null if not found.
 	 */
-	static public AttributeDescriptor node( Schema schema, AttributeType type){
-		for( Schema child : list( schema ) ){
+	static public AttributeDescriptor node( Descriptor schema, AttributeType type){
+		for( Descriptor child : list( schema ) ){
 			if( child instanceof AttributeDescriptor ){
 				AttributeDescriptor node = (AttributeDescriptor) child;
 				if( node.getType() == type ){
@@ -227,9 +227,9 @@ public class Schemas {
 	 * @param type
 	 * @return List of nodes for the provided type, or empty.
 	 */
-	static public List<AttributeDescriptor> nodes( Schema schema, AttributeType type ){
+	static public List<AttributeDescriptor> nodes( Descriptor schema, AttributeType type ){
 		List<AttributeDescriptor> nodes = new ArrayList<AttributeDescriptor>();
-		for( Schema child : list( schema ) ){
+		for( Descriptor child : list( schema ) ){
 			if( child instanceof AttributeDescriptor ){
 				AttributeDescriptor node = (AttributeDescriptor) child;
 				if( node.getType() == type ){
@@ -246,9 +246,9 @@ public class Schemas {
 	 * @param type
 	 * @return List of nodes for the provided type, or empty.
 	 */
-	static public Set<AttributeType> types( Schema schema ){
+	static public Set<AttributeType> types( Descriptor schema ){
 		Set<AttributeType> types = new HashSet<AttributeType>();
-		for( Schema child : list( schema ) ){
+		for( Descriptor child : list( schema ) ){
 			if( child instanceof AttributeDescriptor ){
 				AttributeDescriptor node = (AttributeDescriptor) child;
 				types.add( node.getType() );
@@ -269,10 +269,10 @@ public class Schemas {
 	 * @param type
 	 * @return
 	 */
-	public static boolean multiple( Schema schema, AttributeType type ){
+	public static boolean multiple( Descriptor schema, AttributeType type ){
 		return maxOccurs( schema, type ) != 1;
 	}
-	public static int maxOccurs( Schema schema, AttributeType type ){
+	public static int maxOccurs( Descriptor schema, AttributeType type ){
 		List<AttributeDescriptor> nodes = nodes( schema, type );
 		if( nodes.isEmpty() ) return 0;
 		
@@ -286,15 +286,15 @@ public class Schemas {
 		return max;
 	}
 	@SuppressWarnings("unchecked")
-	static public Collection<Schema> list( Schema schema ){
-		if( schema instanceof OrderedSchema ){
-			return ((OrderedSchema)schema).sequence();
+	static public Collection<Descriptor> list( Descriptor schema ){
+		if( schema instanceof OrderedDescriptor ){
+			return ((OrderedDescriptor)schema).sequence();
 		}
-		else if( schema instanceof AllSchema ){
-			return ((AllSchema)schema).all();
+		else if( schema instanceof AllDescriptor ){
+			return ((AllDescriptor)schema).all();
 		}
-		else if( schema instanceof ChoiceSchema ){
-			return ((ChoiceSchema)schema).options();
+		else if( schema instanceof ChoiceDescriptor ){
+			return ((ChoiceDescriptor)schema).options();
 		}
 		return Collections.EMPTY_LIST;
 	}	

@@ -187,7 +187,7 @@ public class ComplexImpl implements ComplexAttribute {
 		return get( TYPE.type( name ));
 	}
 	public Object get(AttributeType type) {
-		if( Schemas.multiple( TYPE.getSchema(),type ) ){
+		if( Schemas.multiple( TYPE.getDescriptor(),type ) ){
 			for( Attribute attribute : attribtues ){
 				if( attribute.getType() == type ){
 					return attribute.get();

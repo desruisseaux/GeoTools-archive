@@ -10,16 +10,16 @@ public interface Attribute {
 	 * conventions
 	 * 
 	 * @return getType().getName().toString()
-	 */
+	 *
 	String name();
+     */
 
-
-   /**
-    * Unique, inmutable identification for domain object being modeled.
-    * 
-    * @return Unique ID, may not be null if getType().isIdentifiable() is true
-    */
-   String getID();
+    /**
+     * Unique, inmutable identification for domain object being modeled.
+     *  
+     * @return Unique ID, may not be null if getType().isIdentifiable() is true
+     */
+    String getID();
    
 	/**
 	 * Access to the content of this attribtue.
@@ -40,5 +40,5 @@ public interface Attribute {
 	 * 
 	 * @return AttributeType information descirbing allowable content
 	 */
-	public AttributeType getType();
+	AttributeType getType();
 }

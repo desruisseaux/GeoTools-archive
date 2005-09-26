@@ -3,7 +3,7 @@ package org.geotools.feature;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.opengis.feature.schema.Schema;
+import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.feature.type.FeatureType;
@@ -22,7 +22,7 @@ public class Types {
 	public static Set<FeatureType> memberTypes( FeatureCollectionType collectionType ){
 		Set<FeatureType> memberTypes = new HashSet<FeatureType>();
 		while( collectionType != null ){
-			memberTypes.addAll( collectionType.getMemberType() );
+			memberTypes.addAll( collectionType.getMemberDescriptor() );
 			ComplexType superType = collectionType.getSuper();
 			if( superType instanceof FeatureCollectionType ){
 				collectionType = (FeatureCollectionType) superType;
@@ -34,16 +34,16 @@ public class Types {
 		return memberTypes;
 	}
 	/**
-	 * This method is about as bad as it gets, we need to wander through Schema
-	 * detecting overrides by AttributeType. Almost makes me thing Schema should have the
+	 * This method is about as bad as it gets, we need to wander through Descriptor
+	 * detecting overrides by AttributeType. Almost makes me thing Descriptor should have the
 	 * attrribute name, and the GenericName stuff should be left on AttributeType.
 	 * 
 	 * @param complex
-	 * @return Schema that actually describes what is valid for the ComplexType.
+	 * @return Descriptor that actually describes what is valid for the ComplexType.
 	 */
-	public static Schema schema( ComplexType complex ){
+	public static Descriptor schema( ComplexType complex ){
 		// We need to do this with tail recursion:
 		// - and sequence, any, choice gets hacked differently ...
-		return complex.getSchema();
+		return complex.getDescriptor();
 	}
 }

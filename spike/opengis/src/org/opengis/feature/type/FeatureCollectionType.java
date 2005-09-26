@@ -7,5 +7,5 @@ public interface FeatureCollectionType extends FeatureType {
 	/**
 	 * FeatureTypes allowable as members of this collection.
 	 */
-	Collection<FeatureType> getMemberType();
+	Collection<FeatureType> getMemberDescriptor();
 }

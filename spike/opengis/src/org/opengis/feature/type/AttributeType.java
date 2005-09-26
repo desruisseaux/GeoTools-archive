@@ -8,9 +8,6 @@ import org.opengis.filter.Filter;
 
 /**
  * AttributeType information, immutable.
- * <p>
- * This is not called AttributeType to prevent confusion by those familiar with
- * GeoTools
  */
 public interface AttributeType {
 	/**
@@ -74,7 +71,7 @@ public interface AttributeType {
 	 * <p>
 	 * Although this is a validation concern we are representing it here to
 	 * allow for the simplified view of the world as described by FlatFeature.
-	 * If this method gets in our way we can move it over to Schema.
+	 * If this method gets in our way we can move it over to Descriptor.
 	 * </p>
 	 * 
 	 * @return true if value may be null, false if value my be present, or null

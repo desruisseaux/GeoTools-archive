@@ -9,7 +9,7 @@ public interface ComplexAttribute extends Attribute {
    /** 
     * Access the type of this construct.
     */
-   public abstract ComplexType getType();
+   ComplexType getType();
    
    /**
     * Access to contents of this Feature.
@@ -57,16 +57,16 @@ public interface ComplexAttribute extends Attribute {
     * This method acts as a precanned search of getAttribtues() based on AttributeType,
     * where type is determined by getType().type( name )
     * <ul>
-    * <li>AttributeType by Schema 1:1 - it will return an Object of the bound java class indicated by AttributeType
-    * <li>AttributeType by Schema 0:* - it will return a possibly empty List of the bound java class indicated by AttributeType
+    * <li>AttributeType by Descriptor 1:1 - it will return an Object of the bound java class indicated by AttributeType
+    * <li>AttributeType by Descriptor 0:* - it will return a possibly empty List of the bound java class indicated by AttributeType
     * </p>
     * <p>
     * This method is not considered useful for accessing content with multiplicity
     * @param name
     * @return Object, or List based on type
-    */
+    *
    Object get( String name );
-
+    */
    /**
     * Access to value associated with type.
     * @param type

@@ -11,7 +11,7 @@ import org.opengis.feature.type.AttributeType;
  * </p>
  * @author Jody Garnett
  */
-public interface AttributeDescriptor extends Schema {
+public interface AttributeDescriptor extends Descriptor {
 
 	AttributeType getType();
 	

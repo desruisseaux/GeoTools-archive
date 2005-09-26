@@ -1,8 +1,8 @@
 package org.geotools.feature.schema;
 
-import org.opengis.feature.schema.Schema;
+import org.opengis.feature.schema.Descriptor;
 
-public class AbstractSchema implements Schema {
+public class AbstractSchema implements Descriptor {
 	protected int minOccurs;
 	protected int maxOccurs;
 	public AbstractSchema(){

@@ -6,34 +6,34 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.geotools.feature.Schemas;
-import org.opengis.feature.schema.Schema;
+import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.filter.Filter;
 
 public class ComplexTypeImpl extends TypeImpl implements ComplexType {
 	
-	protected final Schema SCHEMA;
+	protected final Descriptor SCHEMA;
 	
-	public ComplexTypeImpl( String name, Schema schema){
+	public ComplexTypeImpl( String name, Descriptor schema){
 		this( new QName( name), null );
 	}
-	public ComplexTypeImpl( QName name, Schema schema){
+	public ComplexTypeImpl( QName name, Descriptor schema){
 		super( name, null );
 		SCHEMA = schema;
 	}
-	public ComplexTypeImpl(QName name, Schema schema, boolean identified, Class binding, boolean nillable, Set<Filter> restrictions){
+	public ComplexTypeImpl(QName name, Descriptor schema, boolean identified, Class binding, boolean nillable, Set<Filter> restrictions){
 		super(name, binding, identified, nillable, restrictions );
 		SCHEMA = schema;
 	}	
-	public ComplexTypeImpl(QName name, Schema schema, boolean identified, Class binding, boolean nillable, Set<Filter> restrictions, ComplexType superType, boolean isAbstract){
+	public ComplexTypeImpl(QName name, Descriptor schema, boolean identified, Class binding, boolean nillable, Set<Filter> restrictions, ComplexType superType, boolean isAbstract){
 		super(name, binding, identified, nillable, restrictions, superType, isAbstract );
 		SCHEMA = schema;
 	}
 	public ComplexType getSuper() {
 		return (ComplexType) SUPER;
 	}
-	public Schema getSchema() {
+	public Descriptor getDescriptor() {
 		return SCHEMA;
 	}
 
