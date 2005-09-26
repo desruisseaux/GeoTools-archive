@@ -512,33 +512,37 @@ public class FilterComplexTypes {
                     "Parameter missing for Filter_Capabilities Type");
             }
 
-            if (value.length != 2) {
-                throw new SAXException(
-                    "Either there is an extra child, or too few child elements");
-            }
+//            if (value.length != 2) {
+//                throw new SAXException(
+//                    "Either there is an extra child, or too few child elements");
+//            }
 
             FilterCapabilitiesMask fc = new FilterCapabilitiesMask();
 
             if (elements[0].getName().equals(value[0].getElement().getName())) {
                 fc.addType((short) ((Integer) value[0].getValue()).intValue());
 
-                if (elements[1].getName().equals(value[1].getElement().getName())) {
-                    fc.addType((short) ((Integer) value[1].getValue()).intValue());
-                } else {
-                    throw new SAXException("Unknown element"
-                        + value[1].getElement().getName());
+                if (value.length > 1) {
+	                if (elements[1].getName().equals(value[1].getElement().getName())) {
+	                    fc.addType((short) ((Integer) value[1].getValue()).intValue());
+	                } else {
+	                    throw new SAXException("Unknown element"
+	                        + value[1].getElement().getName());
+	                }
                 }
             } else {
                 if (elements[1].getName().equals(value[0].getElement().getName())) {
                     fc.addType((short) ((Integer) value[0].getValue()).intValue());
 
-                    if (elements[0].getName().equals(value[1].getElement()
-                                                                 .getName())) {
-                        fc.addType((short) ((Integer) value[1].getValue())
-                            .intValue());
-                    } else {
-                        throw new SAXException("Unknown element"
-                            + value[1].getElement().getName());
+                    if (value.length > 1) {
+	                    if (elements[0].getName().equals(value[1].getElement()
+	                                                                 .getName())) {
+	                        fc.addType((short) ((Integer) value[1].getValue())
+	                            .intValue());
+	                    } else {
+	                        throw new SAXException("Unknown element"
+	                            + value[1].getElement().getName());
+	                    }
                     }
                 } else {
                     // error
