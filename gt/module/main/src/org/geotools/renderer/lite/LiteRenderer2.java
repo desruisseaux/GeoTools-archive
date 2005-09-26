@@ -56,6 +56,7 @@ import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.Renderer;
 import org.geotools.renderer.Renderer2D;
 import org.geotools.renderer.style.SLDStyleFactory;
