@@ -1,5 +1,7 @@
 package org.opengis.feature.type;
 
+import java.util.Collection;
+
 import javax.xml.namespace.QName;
 
 import org.opengis.feature.schema.SimpleDescriptor;
@@ -17,6 +19,7 @@ public interface SimpleFeatureType extends FeatureType {
 	
 	/**
 	 * Must be null for truely simple content.
+	 * @return null, as no super types are allowed
 	 */
 	public SimpleFeatureType getSuper();
 	
@@ -25,6 +28,12 @@ public interface SimpleFeatureType extends FeatureType {
 	 */
 	public SimpleDescriptor getDescriptor();
 
+	/**
+	 * Types are returned in the perscribed index order.
+	 * @return Types in prescribed order
+	 */
+	public Collection<AttributeType> types();
+	
 	/**
 	 * Retrive attributeType by qualified name
 	 */
@@ -38,5 +47,12 @@ public interface SimpleFeatureType extends FeatureType {
 	 * </p>
 	 */
 	AttributeType get( String name );
+	
+	/** AttribtueType indicated by index */
+	AttributeType get( int index );
+	
+	/** Number of available attributes */
+	int getNumberOfAttribtues();
+	
 	
 }

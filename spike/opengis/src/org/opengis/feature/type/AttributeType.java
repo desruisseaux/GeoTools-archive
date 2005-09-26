@@ -78,5 +78,20 @@ public interface AttributeType {
 	 *         indicating super should be used.
 	 */
 	public Boolean isNilable();
+	
+	/**
+	 * AttributeType identity should be based on QName.
+	 * <p>
+	 * </p>
+	 * @param obj
+	 * @return true iff this equals other
+	 */
+	public boolean equals(Object other);
 
+	/**
+	 * Hashcode should be based on QName.
+	 * 
+	 * @return getName().hashCode()
+	 */
+	public int hashCode();
 }

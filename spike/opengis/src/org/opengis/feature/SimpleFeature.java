@@ -16,19 +16,50 @@ import org.opengis.feature.type.SimpleFeatureType;
  */
 public interface SimpleFeature extends Feature {
 
-public SimpleFeatureType getType();
+	/**
+	 * Restrictued to SimpleFeatureType
+	 * <p>
+	 * This restriction enabled client code to confidently
+	 * assume that each attribute occurs in the perscribed order
+	 * and that no super types are used.
+	 * </p>
+	 */
+	SimpleFeatureType getType();
 
-/**
- * Retrive value by attribute name.
- * @param name
- * @return Attribute Value associated with name
- */
-public Object get(String name);
-
-/**
- * Retrive value by attribute name.
- * @param name
- * @return Attribute Value associated with name
- */
-public Object get(QName qname);
+	/**
+	 * Retrive value by attribute name.
+	 * @param name
+	 * @return Attribute Value associated with name
+	 */
+	Object get(String name);
+	
+	/**
+	 * Retrive value by attribute name.
+	 * @param name
+	 * @return Attribute Value associated with name
+	 */
+	Object get(QName qname);
+	
+	/**
+	 * Access attribute by "index" indicated by SimpleFeatureType.
+	 * 
+	 * @param index
+	 * @return
+	 */
+	Object get( int index );
+	
+	/**
+	 * Modify attribute at the "index" indicated by SimpleFeatureType.
+	 * 
+	 * @param index
+	 * @param value
+	 */
+	void set( int index, Object value);
+	
+	/**
+	 * Number of attributes in SimpleFeatureType.
+	 * 
+	 * @return number of available attribtues
+	 */
+	int getNumberOfAttributes();
 }

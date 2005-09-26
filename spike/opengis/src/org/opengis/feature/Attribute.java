@@ -14,6 +14,13 @@ public interface Attribute {
 	String name();
      */
 
+	/**
+	 * Indicate the AttributeType of this content.
+	 * 
+	 * @return AttributeType information descirbing allowable content
+	 */
+	AttributeType getType();
+	
     /**
      * Unique, inmutable identification for domain object being modeled.
      *  
@@ -34,11 +41,4 @@ public interface Attribute {
 	 *            Must be of type indicated by type()
 	 */
 	void set(Object newValue);
-
-	/**
-	 * Indicate the AttributeType of this content.
-	 * 
-	 * @return AttributeType information descirbing allowable content
-	 */
-	AttributeType getType();
 }

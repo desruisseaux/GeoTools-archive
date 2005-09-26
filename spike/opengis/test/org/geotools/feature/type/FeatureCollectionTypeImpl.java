@@ -13,17 +13,17 @@ import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 
 public class FeatureCollectionTypeImpl extends FeatureTypeImpl implements FeatureCollectionType {
-	protected final Collection<FeatureType> MEMBERTYPES;
+	protected final Descriptor MEMBERDESCRIPTOR;
 
-	public FeatureCollectionTypeImpl( QName name, Collection<FeatureType> memberTypes, Descriptor schema, AttributeType defaultGeom) {
+	public FeatureCollectionTypeImpl( QName name, Descriptor members, Descriptor schema, AttributeType defaultGeom) {
 		super(name, schema, defaultGeom);
-		MEMBERTYPES = memberTypes;
+		MEMBERDESCRIPTOR = members;
 	}
-	public FeatureCollectionTypeImpl( QName name, Collection<FeatureType> memberTypes, Descriptor schema, AttributeType defaultGeom, Set<Filter> restrictions, ComplexType superType, boolean isAbstract){
+	public FeatureCollectionTypeImpl( QName name, Descriptor members, Descriptor schema, AttributeType defaultGeom, Set<Filter> restrictions, ComplexType superType, boolean isAbstract){
 		super( name, schema, defaultGeom, restrictions, superType, isAbstract );
-		MEMBERTYPES = memberTypes;
-	}
-	public Collection<FeatureType> getMemberType() {
-		return MEMBERTYPES;
+		MEMBERDESCRIPTOR = members;
+	}	
+	public Descriptor getMemberDescriptor() {
+		return MEMBERDESCRIPTOR;
 	}
 }
