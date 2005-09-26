@@ -13,7 +13,7 @@ public interface Feature extends ComplexAttribute  {
     * code such as <b>YVR</b> for the Victoria International Airport.
     * </p>
     * <p>
-    * As a consequence of this different Application Schemas representing the same physical content should
+    * As a consequence of this different Application Descriptors representing the same physical content should
     * end up with the same idenification. This is a "dream", on the off chance is obtained you may
     * wish to prepend the typeName to this ID when producing GML. This would only be a problem when
     * creating one GML document based on two application schemas for Airport, both of which succeeded in

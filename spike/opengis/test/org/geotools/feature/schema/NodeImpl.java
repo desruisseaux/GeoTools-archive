@@ -3,7 +3,7 @@ package org.geotools.feature.schema;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 
-public class NodeImpl extends AbstractSchema implements AttributeDescriptor {
+public class NodeImpl extends AbstractDescriptor implements AttributeDescriptor {
 	final AttributeType TYPE;
 	public NodeImpl( AttributeType type ){
 		TYPE = type;

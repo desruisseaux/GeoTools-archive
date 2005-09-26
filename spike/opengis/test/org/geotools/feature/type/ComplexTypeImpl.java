@@ -5,13 +5,13 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.geotools.feature.Schemas;
+import org.geotools.feature.Descriptors;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.filter.Filter;
 
-public class ComplexTypeImpl extends TypeImpl implements ComplexType {
+public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 	
 	protected final Descriptor SCHEMA;
 	
@@ -38,11 +38,11 @@ public class ComplexTypeImpl extends TypeImpl implements ComplexType {
 	}
 
 	public Collection<AttributeType> types() {
-		return Schemas.types( SCHEMA );
+		return Descriptors.types( SCHEMA );
 	}
 
 	public AttributeType type(String name) {
-		return Schemas.type( SCHEMA, name );
+		return Descriptors.type( SCHEMA, name );
 	}
 
 }

@@ -8,7 +8,7 @@ import javax.xml.namespace.QName;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.filter.Filter;
 
-public class TypeImpl implements AttributeType {
+public class AttributeTypeImpl implements AttributeType {
 	// binding
 	final protected QName NAME;
 	protected final boolean IDENTIFIED;	
@@ -20,16 +20,16 @@ public class TypeImpl implements AttributeType {
 	final protected AttributeType SUPER;
 	final protected boolean ABSTRACT;
 	
-	public TypeImpl( String name, Class binding ){
+	public AttributeTypeImpl( String name, Class binding ){
 		this( new QName( name ), binding );
 	}
-	public TypeImpl( QName name, Class binding ){
+	public AttributeTypeImpl( QName name, Class binding ){
 		this( name, binding, false, false, null, null, false );
 	}
-	public TypeImpl( QName name, Class binding, boolean identified, boolean nillable, Set<Filter> restrictions ){
+	public AttributeTypeImpl( QName name, Class binding, boolean identified, boolean nillable, Set<Filter> restrictions ){
 		this( name, binding, identified, nillable, restrictions, null, false );
 	}
-	public TypeImpl( QName name, Class binding, boolean identified, boolean nillable, Set<Filter> restrictions, AttributeType superType, boolean isAbstract ){
+	public AttributeTypeImpl( QName name, Class binding, boolean identified, boolean nillable, Set<Filter> restrictions, AttributeType superType, boolean isAbstract ){
 		NAME = name;
 		BINDING = binding;
 		IDENTIFIED = identified;

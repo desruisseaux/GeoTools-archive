@@ -13,7 +13,7 @@ import org.opengis.feature.type.AttributeType;
  * @author Jody Garnett
  *
  */
-public class SchemaFactoryImpl implements DescriptorFactory {
+public class DescriptorFactoryImpl implements DescriptorFactory {
 	public NodeImpl node( AttributeType type, int min, int max ){
 		return new NodeImpl( type, min, max );
 	}

@@ -2,16 +2,16 @@ package org.geotools.feature.schema;
 
 import org.opengis.feature.schema.Descriptor;
 
-public class AbstractSchema implements Descriptor {
+public class AbstractDescriptor implements Descriptor {
 	protected int minOccurs;
 	protected int maxOccurs;
-	public AbstractSchema(){
+	public AbstractDescriptor(){
 		this( 1, 1 );
 	}
-	public AbstractSchema( int max ){
+	public AbstractDescriptor( int max ){
 		this( 0, max );
 	}
-	public AbstractSchema( int min, int max ){
+	public AbstractDescriptor( int min, int max ){
 		minOccurs = min;
 		maxOccurs = max;
 	}

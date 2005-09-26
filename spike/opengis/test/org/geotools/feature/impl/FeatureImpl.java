@@ -6,7 +6,7 @@ import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.spatialschema.geometry.Geometry;
 
-public class FeatureImpl extends ComplexImpl implements Feature {
+public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 	final FeatureType TYPE;
 	
 	public FeatureImpl( String id, FeatureType type ){

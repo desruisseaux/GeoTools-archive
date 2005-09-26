@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.opengis.feature.schema.AllDescriptor;
 import org.opengis.feature.schema.Descriptor;
 
-public class AllImpl extends AbstractSchema implements AllDescriptor {
+public class AllImpl extends AbstractDescriptor implements AllDescriptor {
 	Collection<Descriptor> all;
 	public AllImpl( Collection<Descriptor> all ){
 		this.all = all;

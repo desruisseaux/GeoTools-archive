@@ -24,7 +24,7 @@ import org.opengis.feature.type.AttributeType;
  * </p>
  * @author Jody Garnett
  */
-public class Schemas {
+public class Descriptors {
 	DescriptorFactory factory;	
 	/**
 	 * Assume plugin system will hook us up with an appropriate DescriptorFactory
@@ -33,7 +33,7 @@ public class Schemas {
 	 * SchemaFactoryImpl.
 	 * @param factory
 	 */
-	public Schemas( DescriptorFactory factory ){
+	public Descriptors( DescriptorFactory factory ){
 		this.factory = factory;
 	}
 	/**

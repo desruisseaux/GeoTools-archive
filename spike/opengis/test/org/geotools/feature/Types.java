@@ -23,18 +23,9 @@ public class Types {
 	
 	/** Wander up getSuper gathering all memberTypes */
 	public static Set<FeatureType> memberTypes( FeatureCollectionType collectionType ){
-		Set<FeatureType> memberTypes = new HashSet<FeatureType>();
-		while( collectionType != null ){
-			memberTypes.addAll( collectionType.getMemberDescriptor() );
-			ComplexType superType = collectionType.getSuper();
-			if( superType instanceof FeatureCollectionType ){
-				collectionType = (FeatureCollectionType) superType;
-			}
-			else {
-				collectionType = null;
-			}
-		}
-		return memberTypes;
+		Set<FeatureType> all = new HashSet<FeatureType>();
+		memberTypes( collectionType, all );
+		return all;		
 	}
 	/**
 	 * Collection memberType contributions.
@@ -46,7 +37,13 @@ public class Types {
 	 * @param all
 	 */
 	static void memberTypes( FeatureCollectionType collection, Set<FeatureType> all ){
+		if( collection == null ) return;
 		
+		ComplexType superType = collection.getSuper();
+		if( superType instanceof FeatureCollectionType){
+			memberTypes( (FeatureCollectionType) superType, all );	
+		}
+		featureTypes( collection.getMemberDescriptor(), all ); // tail recursion		
 	}
 	/**
 	 * Process a descriptor for indicated FeatureTypes.
@@ -90,9 +87,11 @@ public class Types {
 	}
 	/**
 	 * This method is about as bad as it gets, we need to wander through Descriptor
-	 * detecting overrides by AttributeType. Almost makes me thing Descriptor should have the
-	 * attrribute name, and the GenericName stuff should be left on AttributeType.
-	 * 
+	 * detecting overrides by AttributeType.
+	 * <p>
+	 * Almost makes me thing Descriptor should have the attrribute name, and the QName
+	 * stuff should be left on AttributeType.
+	 * </p>
 	 * @param complex
 	 * @return Descriptor that actually describes what is valid for the ComplexType.
 	 */

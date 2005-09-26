@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.geotools.feature.Schemas;
+import org.geotools.feature.Descriptors;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.AttributeType;
 
-public class ComplexImpl implements ComplexAttribute {
+public class ComplexAttributeImpl implements ComplexAttribute {
 	protected final ComplexType TYPE;
 	protected final String ID;	
 	protected List<Attribute> attribtues;
@@ -20,10 +20,10 @@ public class ComplexImpl implements ComplexAttribute {
 	private List<Object> values = null;
 
 	
-	public ComplexImpl( ComplexType type ){
+	public ComplexAttributeImpl( ComplexType type ){
 		this( null, type );
 	}
-	public ComplexImpl( String id, ComplexType type ){
+	public ComplexAttributeImpl( String id, ComplexType type ){
 		ID = id;
 		TYPE = type;
 		attribtues = new ArrayList<Attribute>();
@@ -157,7 +157,7 @@ public class ComplexImpl implements ComplexAttribute {
 	}
 	/**
 	 * No default binding perscribed by interface.
-	 * @see ComplexImpl.get()
+	 * @see ComplexAttributeImpl.get()
 	 */
 	@SuppressWarnings("unchecked")
 	public void set(Object newValue) {
@@ -187,7 +187,7 @@ public class ComplexImpl implements ComplexAttribute {
 		return get( TYPE.type( name ));
 	}
 	public Object get(AttributeType type) {
-		if( Schemas.multiple( TYPE.getDescriptor(),type ) ){
+		if( Descriptors.multiple( TYPE.getDescriptor(),type ) ){
 			for( Attribute attribute : attribtues ){
 				if( attribute.getType() == type ){
 					return attribute.get();

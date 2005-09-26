@@ -5,7 +5,7 @@ import java.util.List;
 import org.opengis.feature.schema.OrderedDescriptor;
 import org.opengis.feature.schema.Descriptor;
 
-public class OrderedImpl extends AbstractSchema implements OrderedDescriptor {
+public class OrderedImpl extends AbstractDescriptor implements OrderedDescriptor {
 	List<Descriptor> sequence;
 	public OrderedImpl( List<Descriptor> sequence ){
 		this.sequence = sequence;
