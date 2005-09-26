@@ -22,7 +22,7 @@ import org.geotools.xml.gml.FCBuffer;
  *
  * @author dzwiers www.refractions.net
  */
-public class GMLStreamingParserTest extends TestCase {
+public class GMLStreamingParserStressTest extends TestCase {
 
 //    public void testOSDNFFeatures() throws SAXException, IOException {
 //        FeatureReader fr = null;
