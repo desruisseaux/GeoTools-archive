@@ -56,7 +56,6 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.GTRenderer;
-import org.geotools.renderer.RenderListener;
 
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
@@ -85,6 +84,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import org.geotools.renderer.RenderListener;
 
 /**
  * A lite implementation of the Renderer interface. Lite means that:
@@ -342,65 +342,99 @@ public class StreamingRenderer implements GTRenderer
 		labelCache.stop();
     }
 
-    /**
-     * Render features based on the LayerList, BoundBox and Style specified in this.context. Don't
-     * mix calls to paint and setOutput, when calling this method the graphics set in the setOutput
-     * method is discarded.
+    /** Renders features based on the map layers and their styles as specified
+     * in the map context using <code>setContext</code>. 
+     * <p/>
+     * This version of the method assumes that the size of the output area
+     * and the transformation from coordinates to pixels are known.
+     * The latter determines the map scale. The viewport (the visible
+     * part of the map) will be calculated internally.
      * 
      * @param graphics The graphics object to draw to.
      * @param paintArea The size of the output area in output units (eg: pixels).
-     * @param transform A transform which converts World coordinates to Screen coordinates.
+     * @param worldToScreen A transform which converts World coordinates to Screen coordinates.
      * @task Need to check if the Layer CoordinateSystem is different to the BoundingBox rendering
      *       CoordinateSystem and if so, then transform the coordinates.
      */
-    public void paint( Graphics2D graphics, Rectangle paintArea, AffineTransform transform ) {
-        // Consider the geometries, they should lay inside or
-        // overlap with the bbox indicated by the painting area.
+    public void paint( Graphics2D graphics, Rectangle paintArea, AffineTransform worldToScreen ) {
+        if (worldToScreen == null || paintArea == null) {
+            LOGGER.info("renderer passed null arguments");
+            return;
+        } //Other arguments get checked later
         // First, create the bbox in real world coordinates
-        AffineTransform pixelToWorld = null;
-
+        Envelope mapArea;
         try {
-            pixelToWorld = transform.createInverse();
+            mapArea = RendererUtilities.createMapEnvelope(paintArea, worldToScreen);
+            this.outputGraphics = graphics;
+            paint(graphics, paintArea, mapArea, worldToScreen);
         } catch (NoninvertibleTransformException e) {
             fireErrorEvent(new Exception("Can't create pixel to world transform", e));
         }
-
-        Point2D p1 = new Point2D.Double();
-        Point2D p2 = new Point2D.Double();
-        pixelToWorld.transform(new Point2D.Double(paintArea.getMinX(), paintArea.getMinY()), p1);
-        pixelToWorld.transform(new Point2D.Double(paintArea.getMaxX(), paintArea.getMaxY()), p2);
-
-        double x1 = p1.getX();
-        double y1 = p1.getY();
-        double x2 = p2.getX();
-        double y2 = p2.getY();
-        Envelope envelope = new Envelope(Math.min(x1, x2), Math.max(x1, x2), Math.min(y1, y2), Math
-                .max(y1, y2));
-
-        this.outputGraphics = graphics;
-        paint(graphics, paintArea, envelope);
     }
 
-    /**
+    /** Renders features based on the map layers and their styles as specified
+     * in the map context using <code>setContext</code>. 
+     * <p/>
+     * This version of the method assumes that the area of the visible part
+     * of the map and the size of the output area are known. The transform
+     * between the two is calculated internally.
      * 
-     * @param graphics
-     * @param paintArea
-     * @param transform
-     * @param envelope
+     * @param graphics The graphics object to draw to.
+     * @param paintArea The size of the output area in output units (eg: pixels).
+     * @param envelope the map's visible area (viewport) in map coordinates.
      */
-    public void paint( Graphics2D graphics, Rectangle paintArea, Envelope envelope ) {
-        AffineTransform transform=worldToScreenTransform(envelope, paintArea);
+    public void paint( Graphics2D graphics, Rectangle paintArea, Envelope mapArea ) {
+        if (mapArea == null || paintArea == null) {
+            LOGGER.info("renderer passed null arguments");
+            return;
+        } //Other arguments get checked later
+        paint(graphics, paintArea, mapArea, worldToScreenTransform(mapArea, paintArea));
+    }
+        
+        /**
+         * Renders features based on the map layers and their styles as specified
+         * in the map context using <code>setContext</code>. 
+         * <p/>
+         * This version of the method assumes that paint area, enelope and
+         * worldToScreen transform are already computed. Use this method to
+         * avoid recomputation. <b>Note however that no check is performed that
+         * they are really in sync!<b/>
+         * 
+         * @param graphics The graphics object to draw to.
+         * @param paintArea The size of the output area in output units (eg: pixels).
+         * @param envelope the map's visible area (viewport) in map coordinates.
+         * @param worldToScreen A transform which converts World coordinates to Screen coordinates.
+         */
+        public void paint( Graphics2D graphics, Rectangle paintArea,
+                Envelope mapArea, AffineTransform worldToScreen) {
+            //Check for null arguments, recompute missing ones if possible
+            if (graphics == null || paintArea == null) {
+                LOGGER.info("renderer passed null arguments");
+                return;
+            } else if (mapArea == null && paintArea == null) {
+                LOGGER.info("renderer passed null arguments");
+                return;
+            } else if (mapArea == null){
+                try{
+                    mapArea = RendererUtilities.createMapEnvelope(
+                            paintArea, worldToScreen);
+                } catch (NoninvertibleTransformException e) {
+                    //TODO: Throw error here as in the other paint method?
+                    LOGGER.info("renderer passed null arguments");
+                    return;
+                }
+            } else if (worldToScreen == null){
+                worldToScreen = RendererUtilities.worldToScreenTransform(
+                        mapArea, paintArea);
+            }
+
         error = 0;
         if ( java2dHints != null )
             graphics.setRenderingHints(java2dHints);
-        if ((graphics == null) || (paintArea == null)) {
-            LOGGER.info("renderer passed null arguments");
-
-            return;
-        }
+        
         // reset the abort flag
         renderingStopRequested = false;
-        AffineTransform at = transform;
+        AffineTransform at = worldToScreen;
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("Affine Transform is " + at);
         }
@@ -419,7 +453,7 @@ public class StreamingRenderer implements GTRenderer
         //setScaleDenominator(1 / at.getScaleX()); //DJB old method
         
         try{
-        	setScaleDenominator(  calculateScale(envelope,context.getCoordinateReferenceSystem(),paintArea.width,paintArea.height,90));// 90 = OGC standard DPI (see SLD spec page 37)
+        	setScaleDenominator(  calculateScale(mapArea,context.getCoordinateReferenceSystem(),paintArea.width,paintArea.height,90));// 90 = OGC standard DPI (see SLD spec page 37)
         }
         catch (Exception e) // probably either (1) no CRS (2) error xforming
 		{
@@ -446,7 +480,7 @@ public class StreamingRenderer implements GTRenderer
             labelCache.startLayer();
             try {
                 // DJB: get a featureresults (so you can get a feature reader) for the data
-                FeatureResults results = queryLayer(currLayer, envelope, destinationCrs);                                
+                FeatureResults results = queryLayer(currLayer, mapArea, destinationCrs);                                
 
                 // extract the feature type stylers from the style object
                 // and process them

@@ -20,48 +20,87 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 
 /**
- * Typical usage:
- * 
+ * Typical usage: <pre>
+ *
  *          Rectangle paintArea = new Rectangle(width, height);
- *  
+ *          Envelope mapArea = map.getAreaOfInterest();
+ *
  *          renderer = new StreamingRenderer();
  *          renderer.setContext(map);
- *         
+ *
  *          RenderingHints hints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
  *          renderer.setJava2DHints(hints);
- *         
+ *
  *          Map rendererParams = new HashMap();
  *          rendererParams.put("optimizedDataLoadingEnabled",new Boolean(true) );
- *       
- *  
- *          Envelope dataArea = map.getAreaOfInterest();
- *          AffineTransform at = RendererUtilities.worldToScreenTransform(dataArea,   paintArea);
- *         
- * 
- *          renderer.paint(graphic, paintArea, at);      
  *
- *    
+ *          renderer.paint(graphic, paintArea, mapArea);
+ *</pre>
+ *
  * @author dblasby
  *
  */
 
-public interface GTRenderer
-{
-	 public void stopRendering();
-	 
-	 public void addRenderListener(RenderListener listener);
-	 public void removeRenderListener(RenderListener listener);
-	 
-     public void paint( Graphics2D graphics, Rectangle paintArea, Envelope envelope );
-     public void paint( Graphics2D graphics, Rectangle paintArea, AffineTransform transform ) ;
-
-     public void setJava2DHints(RenderingHints hints);
-     public RenderingHints getJava2DHints();
-
-     public void setRendererHints(Map hints);
-     public Map getRendererHints();
-
-     public void setContext( MapContext context );
-     public  MapContext getContext(  );
+public interface GTRenderer {
+    public void stopRendering();
+    
+    public void addRenderListener(RenderListener listener);
+    public void removeRenderListener(RenderListener listener);
+    
+    public void setJava2DHints(RenderingHints hints);
+    public RenderingHints getJava2DHints();
+    
+    public void setRendererHints(Map hints);
+    public Map getRendererHints();
+    
+    public void setContext( MapContext context );
+    public  MapContext getContext(  );
+    
+    /** Renders features based on the map layers and their styles as specified
+     * in the map context using <code>setContext</code>.
+     * <p/>
+     * This version of the method assumes that the size of the output area
+     * and the transformation from coordinates to pixels are known.
+     * The latter determines the map scale. The viewport (the visible
+     * part of the map) will be calculated internally.
+     *
+     * @param graphics The graphics object to draw to.
+     * @param paintArea The size of the output area in output units (eg: pixels).
+     * @param worldToScreen A transform which converts World coordinates to Screen coordinates.
+     * @task Need to check if the Layer CoordinateSystem is different to the BoundingBox rendering
+     *       CoordinateSystem and if so, then transform the coordinates.
+     */
+    public void paint( Graphics2D graphics, Rectangle paintArea, AffineTransform worldToScreen );
+    
+    /** Renders features based on the map layers and their styles as specified
+     * in the map context using <code>setContext</code>.
+     * <p/>
+     * This version of the method assumes that the area of the visible part
+     * of the map and the size of the output area are known. The transform
+     * between the two is calculated internally.
+     *
+     * @param graphics The graphics object to draw to.
+     * @param paintArea The size of the output area in output units (eg: pixels).
+     * @param envelope the map's visible area (viewport) in map coordinates.
+     */
+    public void paint( Graphics2D graphics, Rectangle paintArea, Envelope mapArea );
+    
+    
+    /**
+     * Renders features based on the map layers and their styles as specified
+     * in the map context using <code>setContext</code>.
+     * <p/>
+     * This version of the method assumes that paint area, enelope and
+     * worldToScreen transform are already computed and in sync. Use this method
+     * to avoid recomputation. <b>Note however that no check is performed that
+     * they are really synchronized!<b/>
+     *
+     * @param graphics The graphics object to draw to.
+     * @param paintArea The size of the output area in output units (eg: pixels).
+     * @param envelope the map's visible area (viewport) in map coordinates.
+     * @param worldToScreen A transform which converts World coordinates to Screen coordinates.
+     */
+    public void paint( Graphics2D graphics, Rectangle paintArea,
+            Envelope mapArea, AffineTransform worldToScreen);
 }
 
