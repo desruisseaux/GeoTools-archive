@@ -16,6 +16,7 @@
  */
 package org.geotools.data.hsql;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.resources.TestData;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -81,6 +83,8 @@ public class HsqlDataStoreTest extends DataTestCase {
         super(arg0);
     }
 
+    
+    
     /*
      * @see TestCase#setUp()
      */
@@ -255,7 +259,22 @@ public class HsqlDataStoreTest extends DataTestCase {
      */
     protected void tearDown() throws Exception {
         data = null;
-        super.tearDown();
+        File file=new File("tempDB.log");
+        if( file.exists())
+        	file.delete();
+        file=new File("tempDB.properties");
+        if( file.exists())
+        	file.delete();
+        file=new File("tempDB.data");
+        if( file.exists())
+        	file.delete();
+        file=new File("tempDB.script");
+        if( file.exists())
+        	file.delete();
+        file=new File("tempDB.backup");
+        if( file.exists())
+        	file.delete();
+        
     }
 
     public void testFeatureEvents() throws Exception {
