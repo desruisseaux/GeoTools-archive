@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.geotools.gtcatalog.Catalog;
 import org.geotools.gtcatalog.Service;
-import org.geotools.gtcatalog.ServiceExtension;
+import org.geotools.gtcatalog.ServiceFactory;
 
 
 /**
@@ -38,7 +38,7 @@ import org.geotools.gtcatalog.ServiceExtension;
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.6
  */
-public class WMSServiceExtension implements ServiceExtension {
+public class WMSServiceFactory implements ServiceFactory {
 
     /**
      * TODO summary sentence for createService ...

@@ -27,7 +27,7 @@ import java.util.Map;
 import org.geotools.data.wfs.WFSDataStoreFactory;
 import org.geotools.gtcatalog.Catalog;
 import org.geotools.gtcatalog.Service;
-import org.geotools.gtcatalog.ServiceExtension;
+import org.geotools.gtcatalog.ServiceFactory;
 import org.geotools.gtcatalog.wfs.WFSService.MyWFSDataStore;
 
 /**
@@ -38,7 +38,7 @@ import org.geotools.gtcatalog.wfs.WFSService.MyWFSDataStore;
  * @author David Zwiers, Refractions Research
  * @since 0.6
  */
-public class WFSServiceExtension implements ServiceExtension {
+public class WFSServiceFactory implements ServiceFactory {
 
     private static WFSDataStoreFactory wfsDSFactory;
     /**

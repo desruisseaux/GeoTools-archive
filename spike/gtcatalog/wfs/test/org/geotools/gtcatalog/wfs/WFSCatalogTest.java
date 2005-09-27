@@ -4,20 +4,20 @@ import java.net.URI;
 import java.util.Map;
 
 import org.geotools.gtcatalog.Service;
-import org.geotools.gtcatalog.wfs.WFSServiceExtension;
+import org.geotools.gtcatalog.wfs.WFSServiceFactory;
 
 import junit.framework.TestCase;
 
 public class WFSCatalogTest extends TestCase {
 	
 	URI uri;
-	WFSServiceExtension ext;
+	WFSServiceFactory ext;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
 		
 		uri = new URI("http://www.refractions.net:8080/geoserver/wfs/GetCapabilities");
-		ext = new WFSServiceExtension();
+		ext = new WFSServiceFactory();
 	}
 	
 	public void testCanProcess() {
