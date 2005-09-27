@@ -55,7 +55,8 @@ import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-import org.geotools.resources.TestData;
+import org.hsqldb.HsqlServerFactory;
+import org.hsqldb.HsqlSocketFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -258,6 +259,7 @@ public class HsqlDataStoreTest extends DataTestCase {
      * @see TestCase#tearDown()
      */
     protected void tearDown() throws Exception {
+        data.getConnection(Transaction.AUTO_COMMIT).close();
         data = null;
         File file=new File("tempDB.log");
         if( file.exists())
@@ -273,7 +275,10 @@ public class HsqlDataStoreTest extends DataTestCase {
         	file.delete();
         file=new File("tempDB.backup");
         if( file.exists())
-        	file.delete();
+            file.delete();
+        file=new File("tempDB.lck");
+        if( file.exists())
+            file.delete();
         
     }
 
@@ -1444,5 +1449,20 @@ public class HsqlDataStoreTest extends DataTestCase {
         assertTrue( isLocked("ROAD","0") );
         Thread.sleep(50);
         assertFalse( isLocked("ROAD","0") );        
-    }    
+    }
+    
+
+    public void testCreateSchema() throws Exception {
+        String typename = "NewType";
+        FeatureType t=DataUtilities.createType(typename, "*geom:Geometry");
+        data.createSchema(t);
+        String[] names = data.getTypeNames();
+        boolean foundNewType=false;
+        for( int i = 0; i < names.length; i++ ) {
+            if( names[i].equalsIgnoreCase(typename) )
+                foundNewType=true;
+        }
+        assertTrue(foundNewType);
+    }
+    
 }

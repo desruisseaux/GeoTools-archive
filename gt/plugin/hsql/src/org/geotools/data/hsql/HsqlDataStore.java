@@ -399,7 +399,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 		}
 		return connection;
 	}
-	
+	    
 	/**
      * Gets a connection for the provided transaction.
      *
@@ -431,7 +431,10 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
         }
 
         try {
-            return createConnection();
+            if( connection==null || connection.isClosed() )
+                return createConnection();
+            else
+                return connection;
         } catch (SQLException sqle) {
             throw new DataSourceException("Connection failed:" + sqle, sqle);
         }
@@ -461,8 +464,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 		
 		AttributeType[] atts = featureType.getAttributeTypes();
 		try {
-			if( connection == null )
-				createConnection();
+			createConnection();
 			Statement st = connection.createStatement();
 		    String sql = "CREATE CACHED TABLE " + typeName + "( ";
 			
@@ -493,13 +495,17 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 			}
 		    sql += " )";
 		    st.execute(sql);
-		    
+            typeHandler.forceRefresh();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("Attempted to re-create typeTable table...OK");
 		}
 	}
+    
+    protected boolean allowTable( String tablename ) {
+        return !tablename.equalsIgnoreCase("TYPETABLE");
+    }
 	
 	/**
      * Removes support for the featureType schema to HsqlDataStore. (Drops the table)
