@@ -17,49 +17,51 @@
 package org.geotools.gtcatalog;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
 /**
- * Builds service proxies or clones (with an id).
- * <p>
- * Where not specified, sensible defaults will be added to the create options. aka Magic will occur
- * here :-)
- * </p>
+ * This is the required addition on the part of a data provider. We also use this interface
+ * internally, so look in this plugin for examples.
  * 
  * @author David Zwiers, Refractions Research
- * @author Justin Deoliveira, The Open Planning Project
+ * @since 0.6
  */
 public interface ServiceFactory {
 
     /**
-     * This will create a new IService magically. In some cases sensible default parameters may be
-     * added, in addition to parameters removed. An ID will be generated.
+     * Creates an IService based on the params provided. This may or may not return a singleton,
+     * caching is optional. Error messages can be retrieved using the getStatus and getMessage
+     * methods. It is important to note that this method must inspect the url to determine if it can
+     * be used to create the service. If it cannot, null must be returned.
      * 
-     * @param params
-     * @return List<Service>
+     * @param parent The catalog containing the service, may be null
+     * @param id The sugested service id, should be generated when null.
+     * @param params The set of connection params. These param values may either be parsed, or
+     *        unparsed (String).
+     * @return the IService created, or null when a service cannot be created from these params.
+     * @see IService#getStatus()
+     * @see IService#getMessage()
      */
-    List aquire( Map params ); // may look up authentication
+    Service createService( Catalog parent, URI id, Map params );
 
     /**
-     * This method generates a default set of params, and calls aquire(params).
+     * Determines if the ServiceExtension can process the specified uri and use 
+     * it to create a set of connection paramters.
      * 
-     * @param target
-     * @return List<IService>
-     * @see aquire(params)
+     * @param uri The uri representing the service.
+     * 
+     * @return true if the uri can be processed, otherwise false.
      */
-    List aquire( URI target ); // creates a map, may look up authentication
-
+    boolean canProcess( URI uri );
+    
     /**
-     * This methos is intended to be used when replacing an IService entry in a catalog, or for
-     * cloning. This allows you to retain the URI id, while providing new parameters. This is also
-     * intended for persistence frameworks to use. WARNING: This may have undesired
-     * results/conflicts when added to a ICatalog if care is not taken when using this method.
+     * The primary intention is for drag 'n' drop. This generates a set of params for the given URL
+     * ... in most cases this will be passed to the createService method. It is important to note
+     * that this method must inspect the url to determine if it can be used to create the service.
+     * If it cannot, null must be returned.
      * 
-     * @param id
-     * @param params
-     * @return List<IService>
+     * @param url The potential source of params.
+     * @return Map of params to be used for creation, null if the URL cannot be used.
      */
-    List aquire( URI id, Map params ); // may not look up
-                                                                        // authentication
+    Map createParams( URI uri );
 }

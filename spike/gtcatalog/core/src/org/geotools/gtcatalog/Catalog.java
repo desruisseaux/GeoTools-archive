@@ -16,27 +16,28 @@
  */
 package org.geotools.gtcatalog;
 
+import com.vividsolutions.jts.geom.Envelope;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
-
 import org.geotools.util.ProgressListener;
 
-import com.vividsolutions.jts.geom.Envelope;
-
 /**
- * Interface to capture both the Local Catalog resources and Web Registry Service.
+ * Implementation of Resolve which represents a local catalog or web registry 
+ * service.
  * <p>
- * Conceptually provides a searchable Catalog of "Spatial Data Sources". Metadata search is
- * abitrary.
+ * Conceptually provides a searchable Catalog of "Spatial Data Sources". 
+ * Metadata search is abitrary.
  * </p>
  * 
  * @author David Zwiers, Refractions Research
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.7.0
- * @see IService
+ * 
  */
 public abstract class Catalog implements Resolve {
+	
     /**
      * Catalogs do not have a parent so null is returned.
      * <p>

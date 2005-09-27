@@ -19,7 +19,6 @@ package org.geotools.gtcatalog;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 import org.geotools.util.ProgressListener;
 
 /**
@@ -41,7 +40,7 @@ import org.geotools.util.ProgressListener;
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.6
  * @see ServiceInfo
- * @see ServiceFactory
+ * @see ServiceFinder
  */
 public abstract class Service implements Resolve {
 	
@@ -105,7 +104,7 @@ public abstract class Service implements Resolve {
      * within the factory during creation. This method is intended to be used for cloning (@see
      * IServiceFactory) or for persistence between sessions.
      * 
-     * @see ServiceFactory
+     * @see ServiceFinder
      * 
      * @return A map with key of type String, and value of type Serializable.
      */

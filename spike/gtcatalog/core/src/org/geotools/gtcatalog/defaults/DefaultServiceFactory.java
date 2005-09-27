@@ -28,8 +28,8 @@ import java.util.Map;
 
 import org.geotools.gtcatalog.Catalog;
 import org.geotools.gtcatalog.Service;
-import org.geotools.gtcatalog.ServiceExtension;
 import org.geotools.gtcatalog.ServiceFactory;
+import org.geotools.gtcatalog.ServiceFinder;
 
 /**
  * A default service factory which uses the SPI classpath plugin lookup 
@@ -39,7 +39,7 @@ import org.geotools.gtcatalog.ServiceFactory;
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.6
  */
-public class DefaultServiceFactory implements ServiceFactory {
+public class DefaultServiceFactory implements ServiceFinder {
 
 	private Catalog catalog;
 	
@@ -52,7 +52,7 @@ public class DefaultServiceFactory implements ServiceFactory {
         List extensions = getServiceExtensions();
         
         for (Iterator itr = extensions.iterator(); itr.hasNext();) {
-        	ServiceExtension se = (ServiceExtension) itr.next();
+        	ServiceFactory se = (ServiceFactory) itr.next();
         	try {
         		//protect ourselves from plugins
         		Service service = se.createService(catalog, id, params);
@@ -89,7 +89,7 @@ public class DefaultServiceFactory implements ServiceFactory {
         List extensions = getServiceExtensions();
         
         for (Iterator itr = extensions.iterator(); itr.hasNext();) {
-        	 ServiceExtension se = (ServiceExtension) itr.next();
+        	 ServiceFactory se = (ServiceFactory) itr.next();
              
         	 try {
 				Map m = se.createParams(target);
