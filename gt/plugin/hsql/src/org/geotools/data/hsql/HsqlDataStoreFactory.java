@@ -16,17 +16,14 @@
  */
 package org.geotools.data.hsql;
 
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi.Param;
-
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi;
 
 
 /**
@@ -39,7 +36,7 @@ import java.util.logging.Logger;
  *
  * @author Amr Alam, Refractions Research
  */
-public class HsqlDataStoreFactory {
+public class HsqlDataStoreFactory  implements DataStoreFactorySpi{
     private static final Logger LOGGER = Logger.getLogger(HsqlDataStoreFactory.class
             .getName());
 
@@ -160,7 +157,7 @@ public class HsqlDataStoreFactory {
      *
      * @throws IOException See DataSourceException
      */
-    public HsqlDataStore createDataStore(Map params) throws IOException {
+    public DataStore createDataStore(Map params) throws IOException {
         // lookup will throw nice exceptions back to the client code
         //        String host = (String) HOST.lookUp(params);
         String filename = (String) DBFILENAME.lookUp(params);
