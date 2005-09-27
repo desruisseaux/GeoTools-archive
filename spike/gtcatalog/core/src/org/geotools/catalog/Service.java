@@ -57,7 +57,8 @@ public abstract class Service implements Resolve {
 	}
 	
     /**
-     * Will attempt to morph into the adaptee, and return that object. Required adaptions:
+     * Will attempt to morph into the adaptee, and return that object. 
+     * Required adaptions:
      * <ul>
      * <li>IServiceInfo.class
      * <li>List.class <IGeoResource>
@@ -82,7 +83,14 @@ public abstract class Service implements Resolve {
     }
     
     /**
-     * Return list of IGeoResources managed by this service.
+     * Return list of IGeoResources managed by this service. This method must 
+     * return the same result as the following:
+     * 
+     * <pre>
+     *   <code>
+     *   (List)resolve(List.class,monitor);
+     *   </code>
+     * </pre>
      * <p>
      * Many file based serivces will just contain a single IGeoResource.
      * </p>
@@ -95,9 +103,11 @@ public abstract class Service implements Resolve {
      * @return IServiceInfo resolve(IServiceInfo.class,ProgressListener monitor);
      * @see IService#resolve(Class, ProgressListener)
      */
-    public ServiceInfo getInfo( ProgressListener monitor ) throws IOException {
-        return (ServiceInfo) resolve(ServiceInfo.class, monitor);
-    }
+    public abstract ServiceInfo getInfo( ProgressListener monitor ) throws IOException;
+//    {
+//        return (ServiceInfo) resolve(ServiceInfo.class, monitor);
+//    }
+    
     /**
      * Accessor to the set of params used to create this entry. There is no guarantee that these
      * params created a usable service (@see getStatus() ). These params may have been modified

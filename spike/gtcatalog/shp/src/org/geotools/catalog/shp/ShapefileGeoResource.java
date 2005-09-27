@@ -55,7 +55,7 @@ public class ShapefileGeoResource extends GeoResource {
 			return parent;
 		
 		if (adaptee.isAssignableFrom(GeoResource.class))
-			return getInfoInternal(monitor);
+			return getInfo(monitor);
 		
 		if (adaptee.isAssignableFrom(FeatureStore.class)) {
 			FeatureSource featureSource = getFeatureSource(monitor);
@@ -70,7 +70,7 @@ public class ShapefileGeoResource extends GeoResource {
 	}
 
 
-	protected GeoResourceInfo getInfoInternal(ProgressListener monitor) 
+	public GeoResourceInfo getInfo(ProgressListener monitor) 
 		throws IOException {
 		
 		if (info == null) {

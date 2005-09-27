@@ -79,9 +79,7 @@ public abstract class GeoResource implements Resolve {
      * @return IGeoResourceInfo resolve(IGeoResourceInfo.class,ProgressListener monitor);
      * @see GeoResource#resolve(Class, ProgressListener)
      */
-    public GeoResourceInfo getInfo( ProgressListener monitor ) throws IOException {
-        return (GeoResourceInfo) resolve(GeoResourceInfo.class, monitor);
-    }
+    public abstract GeoResourceInfo getInfo( ProgressListener monitor ) throws IOException;
 
     /**
      * This method is shorthand for 

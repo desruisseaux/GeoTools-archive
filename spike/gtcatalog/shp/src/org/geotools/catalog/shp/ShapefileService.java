@@ -51,9 +51,8 @@ public class ShapefileService extends Service {
 			return null;
 		
 		if (adaptee.isAssignableFrom(ServiceInfo.class))
-			return getInfoInternal(monitor);
+			return getInfo(monitor);
 			
-		
 		if (adaptee.isAssignableFrom(List.class))
 			return members(monitor);
 		
@@ -63,7 +62,7 @@ public class ShapefileService extends Service {
 		return null;
 	}
 	
-	protected ServiceInfo getInfoInternal(ProgressListener monitor)
+	public ServiceInfo getInfo(ProgressListener monitor)
 		throws IOException {
 		if (info == null) {
 			synchronized (getDataStore(monitor)) {

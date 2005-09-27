@@ -79,7 +79,7 @@ public class WFSService extends Service {
             return this.getInfo(monitor);
         
         if(adaptee.isAssignableFrom(List.class))
-            return members(monitor);
+            return this.members(monitor);
         
         if(adaptee.isAssignableFrom(WFSDataStore.class))
             return getDS();

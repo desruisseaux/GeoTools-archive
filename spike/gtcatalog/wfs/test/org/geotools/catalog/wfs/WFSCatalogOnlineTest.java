@@ -8,7 +8,7 @@ import org.geotools.catalog.wfs.WFSServiceFactory;
 
 import junit.framework.TestCase;
 
-public class WFSCatalogTest extends TestCase {
+public class WFSCatalogOnlineTest extends TestCase {
 	
 	URI uri;
 	WFSServiceFactory ext;
