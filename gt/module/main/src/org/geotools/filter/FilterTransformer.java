@@ -139,7 +139,7 @@ public class FilterTransformer extends TransformerBase {
             
             for (int i = 0; i < fids.length; i++) {
                 AttributesImpl atts = new AttributesImpl();
-                atts.addAttribute("", "fid", "", "", fids[i]);
+                atts.addAttribute("", "fid", "fid", "", fids[i]);
                 element("FeatureId",null,atts);
             }
         }
@@ -160,9 +160,9 @@ public class FilterTransformer extends TransformerBase {
             String wcs = filter.getWildcardSingle();
             String esc = filter.getEscape();
             AttributesImpl atts = new AttributesImpl();
-            atts.addAttribute("", "wildCard", "", "", wcm);
-            atts.addAttribute("", "singleChar", "", "", wcs);
-            atts.addAttribute("", "escape", "", "", esc);
+            atts.addAttribute("", "wildCard", "wildCard", "", wcm);
+            atts.addAttribute("", "singleChar", "singleChar", "", wcs);
+            atts.addAttribute("", "escape", "escape", "", esc);
             start("PropertyIsLike",atts);
             encode( filter.getValue() );
             element("Literal",filter.getPattern());
