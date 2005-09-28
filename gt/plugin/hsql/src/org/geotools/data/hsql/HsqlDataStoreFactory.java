@@ -81,7 +81,7 @@ public class HsqlDataStoreFactory  implements DataStoreFactorySpi{
             DBTYPE, DBFILENAME, USER, PASSWD, NAMESPACE
         };
 
-    private Map datastores=new HashMap();
+    private static Map datastores=Collections.synchronizedMap(new HashMap());
 
     /**
      * Creates a new instance of HsqlDataStoreFactory
