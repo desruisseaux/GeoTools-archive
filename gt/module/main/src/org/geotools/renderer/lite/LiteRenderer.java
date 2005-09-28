@@ -1142,7 +1142,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
             if (symbolizers[m] instanceof RasterSymbolizer) {
                 AffineTransform tempTransform = graphics.getTransform();
                 graphics.setTransform(at);
-                renderRaster(graphics, feature, (RasterSymbolizer) symbolizers[m]);
+                renderRaster(graphics, feature, (RasterSymbolizer) symbolizers[m], destinationCrs);
                 graphics.setTransform(tempTransform);
             } else{
                 Geometry g = findGeometry(feature, symbolizers[m]);
@@ -1264,13 +1264,13 @@ public class LiteRenderer implements Renderer, Renderer2D {
      * @param symbolizer The raster symbolizer
      * @task make it follow the symbolizer
      */
-    private void renderRaster( Graphics2D graphics, Feature feature, RasterSymbolizer symbolizer ) {
+    private void renderRaster( Graphics2D graphics, Feature feature, RasterSymbolizer symbolizer, CoordinateReferenceSystem destinationCRS ) {
         LOGGER.fine("rendering Raster for feature " + feature.toString() + " - " + feature.getAttribute("grid") );
         float alpha = getOpacity(symbolizer);
         graphics.setComposite(AlphaComposite.getInstance(
         			AlphaComposite.SRC_OVER, alpha));
         GridCoverage grid = (GridCoverage) feature.getAttribute("grid");
-        GridCoverageRenderer gcr = new GridCoverageRenderer(grid);
+        GridCoverageRenderer gcr = new GridCoverageRenderer(grid, destinationCRS);
         gcr.paint(graphics);
         LOGGER.fine("Raster rendered");
     }

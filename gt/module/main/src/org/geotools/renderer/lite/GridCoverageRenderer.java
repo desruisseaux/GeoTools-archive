@@ -24,9 +24,14 @@ import java.awt.image.RenderedImage;
 import javax.media.jai.ImageMIPMap;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.RenderedCoverage;
+import org.geotools.coverage.processing.Operations;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform2D;
 
 
@@ -69,7 +74,8 @@ public final class GridCoverageRenderer {
     /** The grid coverage to be rendered. */
     private final GridCoverage gridCoverage;
 
-    //private final GridCoverage coverage;
+    /** The Display (User defined) CRS **/
+	private final CoordinateReferenceSystem destinationCRS;
 
     /**
      * A list of multi-resolution images. Image at level 0 is identical to
@@ -86,14 +92,18 @@ public final class GridCoverageRenderer {
      * current style setting
      */
     private RenderedImage image;
-
+    
+    protected  final static CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(null);
+    
     /**
      * Creates a new GridCoverageRenderer object.
      *
      * @param gridCoverage DOCUMENT ME!
      */
-    public GridCoverageRenderer(GridCoverage gridCoverage) {
+    public GridCoverageRenderer(final GridCoverage gridCoverage, final CoordinateReferenceSystem destinationCRS) {
         this.gridCoverage = gridCoverage;
+        this.destinationCRS = (destinationCRS != null ? destinationCRS : gridCoverage.getCoordinateReferenceSystem());
+
         if (gridCoverage instanceof GridCoverage2D) {
         	image = ((GridCoverage2D) gridCoverage).geophysics(false).getRenderedImage();
         }else if (gridCoverage instanceof RenderedCoverage) {
@@ -125,8 +135,22 @@ public final class GridCoverageRenderer {
      *         coordinate system in the GridCoverage is not an AffineTransform
      */
     public void paint(final Graphics2D graphics) {
+    	final CoordinateReferenceSystem displayCRS = this.destinationCRS;
+    	GridGeometry2D newGridGeometry = new GridGeometry2D(
+    			this.gridCoverage.getGridGeometry().getGridRange(),
+				this.gridCoverage.getEnvelope(),
+				new boolean[] {false, true},
+				false
+    	);
+    	GridCoverage2D prjGridCoverage = (GridCoverage2D) Operations.DEFAULT.resample(
+    			this.gridCoverage,
+    			displayCRS,
+				newGridGeometry, 
+				null
+    	);
+
         final MathTransform2D mathTransform;
-        mathTransform = (MathTransform2D) gridCoverage.getGridGeometry()
+        mathTransform = (MathTransform2D) prjGridCoverage.getGridGeometry()
                                     .getGridToCoordinateSystem();
 
         if (!(mathTransform instanceof AffineTransform)) {
@@ -134,11 +158,11 @@ public final class GridCoverageRenderer {
                 "Non-affine transformations not yet implemented"); // TODO
         }
 
-        AffineTransform gridToCoordinate = (AffineTransform) mathTransform;
-
+        final AffineTransform gridToDevice = (AffineTransform) mathTransform;
+        
         if (images == null) {
             final AffineTransform transform;
-            transform = new AffineTransform(gridToCoordinate);
+            transform = new AffineTransform(gridToDevice);
             transform.translate(-0.5, -0.5); // Map to upper-left corner.
 
             try {
@@ -154,7 +178,7 @@ public final class GridCoverageRenderer {
              * resolution
              */
             AffineTransform transform = graphics.getTransform();
-            transform.concatenate(gridToCoordinate);
+            transform.concatenate(gridToDevice);
 
             double maxScale = Math.max(
                     XAffineTransform.getScaleX0(transform),
@@ -170,7 +194,7 @@ public final class GridCoverageRenderer {
              * If using an inferior resolution to speed up painting adjust
              * georeferencing
              */
-            transform.setTransform(gridToCoordinate);
+            transform.setTransform(gridToDevice);
 
             if (level != 0) {
                 final double scale = Math.pow(DOWN_SAMPLER, -level);
@@ -182,7 +206,7 @@ public final class GridCoverageRenderer {
         }
     }
 
-    /**
+	/**
      * Work around a bug in older JDKs
      *
      * @param img The JAI rendered image
