@@ -83,7 +83,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
     private Adapters adapters = Adapters.getDefault();
     
     /** A transform from screen coordinates to real world coordinates. */
-    private AffineTransform dotToCoordinateTransform = new AffineTransform();
+    protected AffineTransform dotToCoordinateTransform = new AffineTransform();
     
     private Envelope selectionBox = null;
     private Envelope selectionCircle = null;
@@ -110,6 +110,7 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
             this.toolList = toolList;
             this.renderer = new LiteRenderer(context);
             ((LiteRenderer) renderer).setConcatTransforms(concatTransform);
+            
             // this.renderer = new org.geotools.renderer.Java2DRenderer(context);
             this.context = context;
             
