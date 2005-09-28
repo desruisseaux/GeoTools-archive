@@ -1,8 +1,6 @@
-package org.opengis.feature;
+package org.opengis.feature.simple;
 
-import javax.xml.namespace.QName;
-
-import org.opengis.feature.type.SimpleFeatureType;
+import org.opengis.feature.Feature;
 
 /**
  * Feature interface customized for Simple content.
@@ -96,9 +94,11 @@ public interface SimpleFeature extends Feature {
 	/**
 	 * Number of attributes in SimpleFeatureType.
 	 * <p>
-	 * Of all the convience methods here, this is the most useless
+	 * Repressed, for simple content SimpleFeatureType.getNumberOfAttributes() will
+	 * be sufficient.
 	 * </p>
 	 * @return number of available attribtues
-	 */
+	 *
 	int getNumberOfAttributes();
+	 */
 }

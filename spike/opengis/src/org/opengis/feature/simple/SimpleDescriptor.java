@@ -1,6 +1,9 @@
-package org.opengis.feature.schema;
+package org.opengis.feature.simple;
 
 import java.util.List;
+
+import org.opengis.feature.schema.Descriptor;
+import org.opengis.feature.schema.OrderedDescriptor;
 
 public interface SimpleDescriptor extends OrderedDescriptor {
 	
