@@ -18,6 +18,7 @@ package org.geotools.data.hsql;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,6 +80,8 @@ public class HsqlDataStoreFactory  implements DataStoreFactorySpi{
     public static final Param[] arrayParameters = {
             DBTYPE, DBFILENAME, USER, PASSWD, NAMESPACE
         };
+
+    private Map datastores=new HashMap();
 
     /**
      * Creates a new instance of HsqlDataStoreFactory
@@ -158,7 +161,23 @@ public class HsqlDataStoreFactory  implements DataStoreFactorySpi{
      * @throws IOException See DataSourceException
      */
     public DataStore createDataStore(Map params) throws IOException {
-        // lookup will throw nice exceptions back to the client code
+        if (datastores.containsKey(params))
+            return (DataStore) datastores.get(params);
+        
+        return createNewDataStore(params);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param params
+     *
+     * @return
+     *
+     * @throws IOException See UnsupportedOperationException
+     */
+    public DataStore createNewDataStore(Map params) throws IOException {
+//      lookup will throw nice exceptions back to the client code
         //        String host = (String) HOST.lookUp(params);
         String filename = (String) DBFILENAME.lookUp(params);
         String user = (String) USER.lookUp(params);
@@ -177,24 +196,14 @@ public class HsqlDataStoreFactory  implements DataStoreFactorySpi{
         HsqlConnectionFactory connFact = new HsqlConnectionFactory(filename,
                 user, passwd);
 
+        HsqlDataStore ds;
         if (namespace != null) {
-            return new HsqlDataStore(connFact, namespace);
+            ds=new HsqlDataStore(connFact, namespace);
         } else {
-            return new HsqlDataStore(connFact);
+            ds=new HsqlDataStore(connFact);
         }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param params
-     *
-     * @return
-     *
-     * @throws IOException See UnsupportedOperationException
-     */
-    public DataStore createNewDataStore(Map params) throws IOException {
-        return createDataStore(params);
+        datastores.put(params,ds);
+        return ds;
     }
 
     /**
