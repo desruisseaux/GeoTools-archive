@@ -61,7 +61,7 @@ public class HsqlDataStoreFactory  implements DataStoreFactorySpi{
             "hsql database");
 
     /** Param, package visibiity for JUnit tests */
-    public static final Param DBFILENAME = new Param("filename", String.class,
+    public static final Param DBFILENAME = new Param("hsqlfilename", String.class,
             "hsql database filename");
 
     /** Param, package visibiity for JUnit tests */
