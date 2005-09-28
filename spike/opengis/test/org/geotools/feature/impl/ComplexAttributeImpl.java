@@ -8,8 +8,8 @@ import java.util.List;
 import org.geotools.feature.Descriptors;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
-import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.ComplexType;
 
 public class ComplexAttributeImpl implements ComplexAttribute {
 	protected final ComplexType TYPE;

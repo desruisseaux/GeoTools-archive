@@ -11,9 +11,9 @@ import java.util.Set;
 import org.opengis.feature.schema.AllDescriptor;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.ChoiceDescriptor;
-import org.opengis.feature.schema.OrderedDescriptor;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.schema.DescriptorFactory;
+import org.opengis.feature.schema.OrderedDescriptor;
 import org.opengis.feature.type.AttributeType;
 
 /**

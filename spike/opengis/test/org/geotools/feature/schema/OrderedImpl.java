@@ -2,8 +2,8 @@ package org.geotools.feature.schema;
 
 import java.util.List;
 
-import org.opengis.feature.schema.OrderedDescriptor;
 import org.opengis.feature.schema.Descriptor;
+import org.opengis.feature.schema.OrderedDescriptor;
 
 public class OrderedImpl extends AbstractDescriptor implements OrderedDescriptor {
 	List<Descriptor> sequence;
