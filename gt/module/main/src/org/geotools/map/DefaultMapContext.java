@@ -487,6 +487,7 @@ public class DefaultMapContext implements MapContext {
             if (env == null) {
                 continue;
             } else {
+                MathTransform transform = null;
                 try {
                     CoordinateReferenceSystem sourceCs = fs.getSchema()
                                                            .getDefaultGeometry()
@@ -495,7 +496,7 @@ public class DefaultMapContext implements MapContext {
                     if ((sourceCs != null) && (crs != null)
                             && !sourceCs.equals(crs)) {
                         
-                    	MathTransform transform = CRS.transform(sourceCs,crs);
+                    	transform = CRS.transform(sourceCs,crs);
 
                         if (transform != null) {
                             env = JTS.transform(env, transform);
