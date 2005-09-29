@@ -22,7 +22,6 @@ import java.util.NoSuchElementException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
-import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
@@ -30,7 +29,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.geometry.JTS;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -39,6 +37,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.data.store.DataFeatureCollection;
 
 
 /**
@@ -70,7 +69,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author $Author: jive $ (last modification)
  * @version $Id$ TODO: handle the case where there is more than one geometry and the other geometries have a different CS than the default geometry
  */
-public class ReprojectFeatureResults extends DefaultFeatureCollection implements FeatureResults {
+public class ReprojectFeatureResults extends DataFeatureCollection implements FeatureResults {
     FeatureResults results;
     FeatureType schema;
     MathTransform transform;
