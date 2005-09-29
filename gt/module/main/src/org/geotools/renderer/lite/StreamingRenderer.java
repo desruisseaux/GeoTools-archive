@@ -87,43 +87,42 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 import org.geotools.renderer.RenderListener;
 
 /**
- * A lite implementation of the Renderer interface. Lite means that:
+ * A streaming implementation of the GTRenderer interface. 
  * <ul>
  * <li>The code is relatively simple to understand, so it can be used as a simple example of an SLD
  * compliant rendering code</li>
- * <li>Uses as few memory as possible</li>
+ * <li>Uses as little memory as possible</li>
  * </ul>
  * Use this class if you need a stateless renderer that provides low memory footprint and decent
  * rendering performance on the first call but don't need good optimal performance on subsequent
  * calls on the same data. Notice: for the time being, this class doesn't support GridCoverage
  * stylers, that will be rendered using the non geophisics version of the GridCoverage, if
  * available, with the geophisics one, otherwise.
- * 
+ *
  * @author James Macgill
  * @author dblasby
  * @author jessie eichar
  * @author Andrea Aime
- * 
+ *
  * @version $Id$
  */
-public class StreamingRenderer implements GTRenderer
-{
-	
-	public HashMap symbolizerAssociationHT = new HashMap(); //associate a symbolizer with some data
-	
+public class StreamingRenderer implements GTRenderer {
+    
+    public HashMap symbolizerAssociationHT = new HashMap(); //associate a symbolizer with some data
+    
     /** Tolerance used to compare doubles for equality */
     private static final double TOLERANCE = 1e-6;
-
+    
     /** The logger for the rendering module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
     int error = 0;
     
-    /** 
+    /**
      * This listener is added to the list of listeners automatically.  It should be removed
      * if the default logging is not needed.
      */
     public static final DefaultRenderListener DEFAULT_LISTENER=new DefaultRenderListener();
-
+    
     /** Filter factory for creating bounding box filters */
     private FilterFactory filterFactory = FilterFactory.createFilterFactory();
     private final static CoordinateOperationFactory operationFactory;
@@ -136,74 +135,74 @@ public class StreamingRenderer implements GTRenderer
         Hints hints=new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
         mathTransformFactory=FactoryFinder.getMathTransformFactory(hints);
     }
-
+    
     /**
      *  This is used to control what type of image the system will draw into.
      */
     public int defaultImageType = BufferedImage.TYPE_4BYTE_ABGR;
-	
+    
     /**
      * Context which contains the layers and the bouning box which needs to be rendered.
      */
     private MapContext context;
-
+    
     /**
      * Flag which determines if the renderer is interactive or not. An interactive renderer will
      * return rather than waiting for time consuming operations to complete (e.g. Image Loading). A
      * non-interactive renderer (e.g. a SVG or PDF renderer) will block for these operations.
      */
     private boolean interactive = true;
-
+    
     /**
      * Flag which controls behaviour for applying affine transformation to the graphics object. If
      * true then the transform will be concatenated to the existing transform. If false it will be
      * replaced.
      */
     private boolean concatTransforms = false;
-
+    
     /** Geographic map extent */
     private Envelope mapExtent = null;
-
+    
     /** Graphics object to be rendered to. Controlled by set output. */
     private Graphics2D outputGraphics;
-
+    
     /** The size of the output area in output units. */
     private Rectangle screenSize;
-
+    
     /**
      * This flag is set to false when starting rendering, and will be checked during the rendering
      * loop in order to make it stop forcefully
      */
     private boolean renderingStopRequested;
-
+    
     /**
      * The ratio required to scale the features to be rendered so that they fit into the output
      * space.
      */
     private double scaleDenominator;
-
+    
     /** Maximun displacement for generalization during rendering */
     private double generalizationDistance = 1.0;
-
+    
     /** Factory that will resolve symbolizers into rendered styles */
     private SLDStyleFactory styleFactory = new SLDStyleFactory();
-
+    
     LabelCache labelCache=new LabelCacheDefault();
     
     /** The painter class we use to depict shapes onto the screen */
     private StyledShapePainter painter = new StyledShapePainter(labelCache);
-
+    
     /** The math transform cache */
     private HashMap transformMap = new HashMap();
-
+    
     /** Set to false if the reprojection fails */
     private boolean canTransform = true;
-
-
+    
+    
     private IndexedFeatureResults indexedFeatureResults;
     
     private ListenerList renderListeners= new ListenerList();
-
+    
     private RenderingHints java2dHints;
     
     private boolean optimizedDataLoadingEnabledDEFAULT = false;
@@ -221,62 +220,61 @@ public class StreamingRenderer implements GTRenderer
      */
     private Map rendererHints = null;
     
-
+    
     /**
      * Creates a new instance of LiteRenderer without a context. Use it only to gain access to
      * utility methods of this class or if you want to render random feature collections instead of
      * using the map context interface
      */
-    public StreamingRenderer() 
-    {
+    public StreamingRenderer() {
         addRenderListener(DEFAULT_LISTENER);
     }
-
-
+    
+    
     /**
      * Sets the flag which controls behaviour for applying affine transformation to the graphics
      * object.
-     * 
+     *
      * @param flag If true then the transform will be concatenated to the existing transform. If
      *        false it will be replaced.
      */
     private void setConcatTransforms( boolean flag ) {
         concatTransforms = flag;
     }
-
+    
     /**
      * Returns the amount of time the renderer waits for loading an external image before giving up
      * and examining the other images in the Graphic object
-     * 
+     *
      * @return the timeout in milliseconds
      */
     private static long getImageLoadingTimeout() {
         return ImageLoader.getTimeout();
     }
-
+    
     /**
      * Sets the maximum time to wait for getting an external image. Set it to -1 to wait
      * undefinitely. The default value is 10 seconds
-     * 
+     *
      * @param newTimeout the new timeout value in milliseconds
      */
     private static void setImageLoadingTimeout( long newTimeout ) {
         ImageLoader.setTimeout(newTimeout);
     }
-
+    
     /**
      * Flag which controls behaviour for applying affine transformation to the graphics object.
-     * 
+     *
      * @return a boolean flag. If true then the transform will be concatenated to the existing
      *         transform. If false it will be replaced.
      */
     private boolean getConcatTransforms() {
         return concatTransforms;
     }
-
+    
     /**
      * Called before {@link render}, this sets where any output will be sent.
-     * 
+     *
      * @param g A graphics object for future rendering to be sent to. Note: must be an instance of
      *        lite renderer.
      * @param bounds The size of the output area, required so that scale can be calculated.
@@ -288,9 +286,9 @@ public class StreamingRenderer implements GTRenderer
     }
     /**
      * adds a listener that responds to error events of feature rendered events.
-     * 
+     *
      * @see RenderListener
-     * 
+     *
      * @param listener the listener to add.
      */
     public void addRenderListener(RenderListener listener){
@@ -298,9 +296,9 @@ public class StreamingRenderer implements GTRenderer
     }
     /**
      * Removes a render listener.
-     * 
+     *
      * @see RenderListener
-     * 
+     *
      * @param listener the listener to remove.
      */
     public void removeRenderListener(RenderListener listener){
@@ -314,7 +312,7 @@ public class StreamingRenderer implements GTRenderer
             listener.featureRenderer(feature);
         }
     }
-
+    
     private void fireErrorEvent(Exception e) {
         Object[] objects=renderListeners.getListeners();
         for( int i = 0; i < objects.length; i++ ) {
@@ -322,34 +320,34 @@ public class StreamingRenderer implements GTRenderer
             listener.errorOccurred(e);
         }
     }
-
+    
     
     /**
      * Setter for property scaleDenominator.
-     * 
+     *
      * @param scaleDenominator New value of property scaleDenominator.
      */
     private void setScaleDenominator( double scaleDenominator ) {
         this.scaleDenominator = scaleDenominator;
     }
-
+    
     /**
      * If you call this method from another thread than the one that called <code>paint</code> or
      * <code>render</code> the rendering will be forcefully stopped before termination
      */
     public void stopRendering() {
         renderingStopRequested = true;
-		labelCache.stop();
+        labelCache.stop();
     }
-
+    
     /** Renders features based on the map layers and their styles as specified
-     * in the map context using <code>setContext</code>. 
+     * in the map context using <code>setContext</code>.
      * <p/>
      * This version of the method assumes that the size of the output area
      * and the transformation from coordinates to pixels are known.
      * The latter determines the map scale. The viewport (the visible
      * part of the map) will be calculated internally.
-     * 
+     *
      * @param graphics The graphics object to draw to.
      * @param paintArea The size of the output area in output units (eg: pixels).
      * @param worldToScreen A transform which converts World coordinates to Screen coordinates.
@@ -371,14 +369,14 @@ public class StreamingRenderer implements GTRenderer
             fireErrorEvent(new Exception("Can't create pixel to world transform", e));
         }
     }
-
+    
     /** Renders features based on the map layers and their styles as specified
-     * in the map context using <code>setContext</code>. 
+     * in the map context using <code>setContext</code>.
      * <p/>
      * This version of the method assumes that the area of the visible part
      * of the map and the size of the output area are known. The transform
      * between the two is calculated internally.
-     * 
+     *
      * @param graphics The graphics object to draw to.
      * @param paintArea The size of the output area in output units (eg: pixels).
      * @param envelope the map's visible area (viewport) in map coordinates.
@@ -390,44 +388,44 @@ public class StreamingRenderer implements GTRenderer
         } //Other arguments get checked later
         paint(graphics, paintArea, mapArea, worldToScreenTransform(mapArea, paintArea));
     }
-        
-        /**
-         * Renders features based on the map layers and their styles as specified
-         * in the map context using <code>setContext</code>. 
-         * <p/>
-         * This version of the method assumes that paint area, enelope and
-         * worldToScreen transform are already computed. Use this method to
-         * avoid recomputation. <b>Note however that no check is performed that
-         * they are really in sync!<b/>
-         * 
-         * @param graphics The graphics object to draw to.
-         * @param paintArea The size of the output area in output units (eg: pixels).
-         * @param envelope the map's visible area (viewport) in map coordinates.
-         * @param worldToScreen A transform which converts World coordinates to Screen coordinates.
-         */
-        public void paint( Graphics2D graphics, Rectangle paintArea,
-                Envelope mapArea, AffineTransform worldToScreen) {
-            //Check for null arguments, recompute missing ones if possible
-            if (graphics == null || paintArea == null) {
+    
+    /**
+     * Renders features based on the map layers and their styles as specified
+     * in the map context using <code>setContext</code>.
+     * <p/>
+     * This version of the method assumes that paint area, enelope and
+     * worldToScreen transform are already computed. Use this method to
+     * avoid recomputation. <b>Note however that no check is performed that
+     * they are really in sync!<b/>
+     *
+     * @param graphics The graphics object to draw to.
+     * @param paintArea The size of the output area in output units (eg: pixels).
+     * @param envelope the map's visible area (viewport) in map coordinates.
+     * @param worldToScreen A transform which converts World coordinates to Screen coordinates.
+     */
+    public void paint( Graphics2D graphics, Rectangle paintArea,
+            Envelope mapArea, AffineTransform worldToScreen) {
+        //Check for null arguments, recompute missing ones if possible
+        if (graphics == null || paintArea == null) {
+            LOGGER.info("renderer passed null arguments");
+            return;
+        } else if (mapArea == null && paintArea == null) {
+            LOGGER.info("renderer passed null arguments");
+            return;
+        } else if (mapArea == null){
+            try{
+                mapArea = RendererUtilities.createMapEnvelope(
+                        paintArea, worldToScreen);
+            } catch (NoninvertibleTransformException e) {
+                //TODO: Throw error here as in the other paint method?
                 LOGGER.info("renderer passed null arguments");
                 return;
-            } else if (mapArea == null && paintArea == null) {
-                LOGGER.info("renderer passed null arguments");
-                return;
-            } else if (mapArea == null){
-                try{
-                    mapArea = RendererUtilities.createMapEnvelope(
-                            paintArea, worldToScreen);
-                } catch (NoninvertibleTransformException e) {
-                    //TODO: Throw error here as in the other paint method?
-                    LOGGER.info("renderer passed null arguments");
-                    return;
-                }
-            } else if (worldToScreen == null){
-                worldToScreen = RendererUtilities.worldToScreenTransform(
-                        mapArea, paintArea);
             }
-
+        } else if (worldToScreen == null){
+            worldToScreen = RendererUtilities.worldToScreenTransform(
+                    mapArea, paintArea);
+        }
+        
         error = 0;
         if ( java2dHints != null )
             graphics.setRenderingHints(java2dHints);
@@ -453,45 +451,44 @@ public class StreamingRenderer implements GTRenderer
         //setScaleDenominator(1 / at.getScaleX()); //DJB old method
         
         try{
-        	setScaleDenominator(  calculateScale(mapArea,context.getCoordinateReferenceSystem(),paintArea.width,paintArea.height,90));// 90 = OGC standard DPI (see SLD spec page 37)
+            setScaleDenominator(  calculateScale(mapArea,context.getCoordinateReferenceSystem(),paintArea.width,paintArea.height,90));// 90 = OGC standard DPI (see SLD spec page 37)
+        } catch (Exception e) // probably either (1) no CRS (2) error xforming
+        {
+            setScaleDenominator(1 / at.getScaleX()); //DJB old method - the best we can do
         }
-        catch (Exception e) // probably either (1) no CRS (2) error xforming
-		{
-        	setScaleDenominator(1 / at.getScaleX()); //DJB old method - the best we can do
-		}
         
         MapLayer[] layers = context.getLayers();
         // get detstination CRS
         CoordinateReferenceSystem destinationCrs = context.getCoordinateReferenceSystem();
- 
+        
         labelCache.start();
         for( int i = 0; i < layers.length; i++ ) //DJB: for each layer (ie. one SLD or one LAYER= STYLE= for WMS request)
         {
             MapLayer currLayer = layers[i];
-
+            
             if (!currLayer.isVisible()) {
                 // Only render layer when layer is visible
                 continue;
             }
-
+            
             if (renderingStopRequested) {
                 return;
             }
             labelCache.startLayer();
             try {
                 // DJB: get a featureresults (so you can get a feature reader) for the data
-                FeatureResults results = queryLayer(currLayer, mapArea, destinationCrs);                                
-
+                FeatureResults results = queryLayer(currLayer, mapArea, destinationCrs);
+                
                 // extract the feature type stylers from the style object
                 // and process them
-                this.screenSize = paintArea; 
-				processStylers(graphics, results, currLayer.getStyle().getFeatureTypeStyles(), at,
+                this.screenSize = paintArea;
+                processStylers(graphics, results, currLayer.getStyle().getFeatureTypeStyles(), at,
                         context.getCoordinateReferenceSystem(),
                         currLayer.getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem()); //src CRS
             } catch (Exception exception) {
                 fireErrorEvent(new Exception("Exception rendering layer " + currLayer,exception));
             }
-
+            
             labelCache.endLayer(graphics, screenSize);
         }
         
@@ -504,52 +501,51 @@ public class StreamingRenderer implements GTRenderer
             LOGGER.warning("Number of Errors during paint(Graphics2D, AffineTransform) = " + error);
         }
     }
-
-	 /**
-	  * Find the scale denominator of the map.
-	  *   Method:
-	  *    1. find the diagonal distance (meters)
-	  *    2. find the diagonal distance (pixels)
-	  *    3. find the diagonal distance (meters) -- use DPI
-	  *    4. calculate scale (#1/#2)
-	  * 
-	  *   NOTE: return the scale denominator not the actual scale (1/scale = denominator)
-	  * 
-	  * TODO:  (SLD spec page 28):
-	  * Since it is common to integrate the output of multiple servers into a single displayed result in the 
-	  * web-mapping environment, it is important that different map servers have consistent behaviour with respect to 
-	  * processing scales, so that all of the independent servers will select or deselect rules at the same scales.
-	  * To insure consistent behaviour, scales relative to coordinate spaces must be handled consistently between map 
-	  * servers. For geographic coordinate systems, which use angular units, the angular coverage of a map should be 
-	  * converted to linear units for computation of scale by using the circumference of the Earth at the equator and 
-	  * by assuming perfectly square linear units. For linear coordinate systems, the size of the coordinate space 
-	  * should be used directly without compensating for distortions in it with respect to the shape of the real Earth.
-	  * 
-	  * NOTE: we are actually doing a a much more exact calculation, and accounting for non-square pixels (which are allowed in WMS)
-	  * 
-	  * @param envelope
-	  * @param coordinateReferenceSystem
-	  * @param imageWidth
-	  * @param imageHeight
-	  * @param DPI screen dots per inch (OGC standard is 90)
-	  * @return
-	  */
-	private static double calculateScale(Envelope envelope, CoordinateReferenceSystem coordinateReferenceSystem,int imageWidth,int imageHeight,double DPI) throws Exception 
-	{
-		double diagonalGroundDistance = CRS.distance(
-				            new Coordinate(envelope.getMinX(),envelope.getMinY()),
-				            new Coordinate(envelope.getMaxX(),envelope.getMaxY()),
-							coordinateReferenceSystem
-						);
-		     // pythagorus theorm
-		double diagonalPixelDistancePixels = Math.sqrt( imageWidth*imageWidth+imageHeight*imageHeight);
-		double diagonalPixelDistanceMeters = diagonalPixelDistancePixels / DPI * 2.54 / 100; // 2.54 = cm/inch, 100= cm/m
-		
-
-		return diagonalGroundDistance/diagonalPixelDistanceMeters; // remember, this is the denominator, not the actual scale;
-	}
-
-	/**
+    
+    /**
+     * Find the scale denominator of the map.
+     *   Method:
+     *    1. find the diagonal distance (meters)
+     *    2. find the diagonal distance (pixels)
+     *    3. find the diagonal distance (meters) -- use DPI
+     *    4. calculate scale (#1/#2)
+     *
+     *   NOTE: return the scale denominator not the actual scale (1/scale = denominator)
+     *
+     * TODO:  (SLD spec page 28):
+     * Since it is common to integrate the output of multiple servers into a single displayed result in the
+     * web-mapping environment, it is important that different map servers have consistent behaviour with respect to
+     * processing scales, so that all of the independent servers will select or deselect rules at the same scales.
+     * To insure consistent behaviour, scales relative to coordinate spaces must be handled consistently between map
+     * servers. For geographic coordinate systems, which use angular units, the angular coverage of a map should be
+     * converted to linear units for computation of scale by using the circumference of the Earth at the equator and
+     * by assuming perfectly square linear units. For linear coordinate systems, the size of the coordinate space
+     * should be used directly without compensating for distortions in it with respect to the shape of the real Earth.
+     *
+     * NOTE: we are actually doing a a much more exact calculation, and accounting for non-square pixels (which are allowed in WMS)
+     *
+     * @param envelope
+     * @param coordinateReferenceSystem
+     * @param imageWidth
+     * @param imageHeight
+     * @param DPI screen dots per inch (OGC standard is 90)
+     * @return
+     */
+    private static double calculateScale(Envelope envelope, CoordinateReferenceSystem coordinateReferenceSystem,int imageWidth,int imageHeight,double DPI) throws Exception {
+        double diagonalGroundDistance = CRS.distance(
+                new Coordinate(envelope.getMinX(),envelope.getMinY()),
+                new Coordinate(envelope.getMaxX(),envelope.getMaxY()),
+                coordinateReferenceSystem
+                );
+        // pythagorus theorm
+        double diagonalPixelDistancePixels = Math.sqrt( imageWidth*imageWidth+imageHeight*imageHeight);
+        double diagonalPixelDistanceMeters = diagonalPixelDistancePixels / DPI * 2.54 / 100; // 2.54 = cm/inch, 100= cm/m
+        
+        
+        return diagonalGroundDistance/diagonalPixelDistanceMeters; // remember, this is the denominator, not the actual scale;
+    }
+    
+    /**
      * Queries a given layer's features to be rendered based on the target rendering bounding box.
      * <p>
      * If <code>optimizedDataLoadingEnabled</code> attribute has been set to <code>true</code>,
@@ -576,7 +572,7 @@ public class StreamingRenderer implements GTRenderer
      * <code>paint(Graphics2D, Rectangle, AffineTransform)</code>. It is package protected just
      * to allow unit testing it.
      * </p>
-     * 
+     *
      * @param currLayer the actually processing layer for renderition
      * @param envelope the spatial extent wich is the target area fo the rendering process
      * @param destinationCrs DOCUMENT ME!
@@ -595,11 +591,11 @@ public class StreamingRenderer implements GTRenderer
         FeatureType schema = featureSource.getSchema();
         Query query = Query.ALL;
         MathTransform transform =null;
-
+        
         if (isOptimizedDataLoadingEnabled()) {
             // see what attributes we really need by exploring the styles
             String[] attributes = findStyleAttributes(currLayer, schema);
-
+            
             try {
                 // Then create the geometry filters. We have to create one for each
                 // geometric
@@ -607,22 +603,20 @@ public class StreamingRenderer implements GTRenderer
                 // than one
                 // and the styles could use non default geometric ones
                 CoordinateReferenceSystem sourceCrs = currLayer.getFeatureSource().getSchema()
-                        .getDefaultGeometry().getCoordinateSystem();
-
+                .getDefaultGeometry().getCoordinateSystem();
+                
                 if (sourceCrs != null && !sourceCrs.equals(destinationCrs)) {
                     // get an unprojected envelope since the feature source is operating on
                     // unprojected geometries
                     transform = operationFactory.createOperation(destinationCrs,sourceCrs).getMathTransform();
-                    if (transform != null && !transform.isIdentity())
-                    {
-                       // Envelope eee=  JTS.transform(envelope, transform);// this is the old way
-                    	    //10 = make 10 points on each side of the bbox & transform the polygon
+                    if (transform != null && !transform.isIdentity()) {
+                        // Envelope eee=  JTS.transform(envelope, transform);// this is the old way
+                        //10 = make 10 points on each side of the bbox & transform the polygon
                         envelope = JTS.transform(envelope, transform,10); // this will usually be a "bigger" bbox
-                    }
-                    else
-                    	transform = null; //reset transform
+                    } else
+                        transform = null; //reset transform
                 }
-
+                
                 Filter filter = null;
                 if (!isMemoryPreloadingEnabled()) {
                     BBoxExpression rightBBox = filterFactory.createBBoxExpression(envelope);
@@ -630,7 +624,7 @@ public class StreamingRenderer implements GTRenderer
                 } else {
                     filter = Filter.NONE;
                 }
-
+                
                 // now build the query using only the attributes and the bounding
                 // box needed
                 DefaultQuery q = new DefaultQuery(schema.getTypeName());
@@ -657,11 +651,11 @@ public class StreamingRenderer implements GTRenderer
                 query = q;
             }
         }
-
+        
         // now, if a definition query has been established for this layer, be
         // sure to respect it by combining it with the bounding box one.
         Query definitionQuery = currLayer.getQuery();
-
+        
         if (definitionQuery != Query.ALL) {
             if (query == Query.ALL) {
                 query = definitionQuery;
@@ -671,49 +665,44 @@ public class StreamingRenderer implements GTRenderer
         }
         
         if (!(query instanceof DefaultQuery))
-        	query = new DefaultQuery(query);
-       
+            query = new DefaultQuery(query);
+        
         ((DefaultQuery)query).setCoordinateSystem(
-        		currLayer.getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
-        	
-
-        if (isMemoryPreloadingEnabled()) 
-        {
+                currLayer.getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
+        
+        
+        if (isMemoryPreloadingEnabled()) {
             // TODO: attache a feature listener, we must erase the memory cache if
             // anything changes in the data store
-            if (indexedFeatureResults == null) 
-            {
+            if (indexedFeatureResults == null) {
                 indexedFeatureResults = new IndexedFeatureResults(featureSource.getFeatures(query));
             }
             indexedFeatureResults.setQueryBounds(envelope);
             results = indexedFeatureResults;
-        } 
-        else 
-        {   // insert a debug point here to check your query
+        } else {   // insert a debug point here to check your query
             results = featureSource.getFeatures(query);
         }
-
+        
         return results;
     }
-
+    
     /**
-	 * @return
-	 */
-	private boolean isMemoryPreloadingEnabled() 
-	{
-		if (rendererHints == null)
-    		return memoryPreloadingEnabledDEFAULT;
-    	Boolean result = (Boolean) rendererHints.get("memoryPreloadingEnabled");
-    	if (result == null)
-    		return memoryPreloadingEnabledDEFAULT;
+     * @return
+     */
+    private boolean isMemoryPreloadingEnabled() {
+        if (rendererHints == null)
+            return memoryPreloadingEnabledDEFAULT;
+        Boolean result = (Boolean) rendererHints.get("memoryPreloadingEnabled");
+        if (result == null)
+            return memoryPreloadingEnabledDEFAULT;
         return result.booleanValue();
-	}
-
-
-	/**
+    }
+    
+    
+    /**
      * Inspects the <code>MapLayer</code>'s style and retrieves it's needed attribute names,
      * returning at least the default geometry attribute name.
-     * 
+     *
      * @param layer the <code>MapLayer</code> to determine the needed attributes from
      * @param schema the <code>layer</code>'s featuresource schema
      * @return the minimun set of attribute names needed to render <code>layer</code>
@@ -721,9 +710,9 @@ public class StreamingRenderer implements GTRenderer
     private String[] findStyleAttributes( MapLayer layer, FeatureType schema ) {
         StyleAttributeExtractor sae = new StyleAttributeExtractor();
         sae.visit(layer.getStyle());
-
+        
         String[] ftsAttributes = sae.getAttributeNames();
-
+        
         /*
          * GR: if as result of sae.getAttributeNames() ftsAttributes already contains geometry
          * attribue names, they gets duplicated, wich produces an error in AbstracDatastore when
@@ -734,30 +723,30 @@ public class StreamingRenderer implements GTRenderer
         List atts = new LinkedList(Arrays.asList(ftsAttributes));
         AttributeType[] attTypes = schema.getAttributeTypes();
         String attName;
-
+        
         for( int i = 0; i < attTypes.length; i++ ) {
             attName = attTypes[i].getName();
-
+            
             //DJB: This geometry check was commented out.  I think it should actually be back in or
             //     you get ALL the attributes back, which isnt what you want.
-	    //ALX: For rasters I need even the "grid" attribute.
+            //ALX: For rasters I need even the "grid" attribute.
             if ((attTypes[i].isGeometry() || attTypes[i].getName().equalsIgnoreCase("grid")) && !atts.contains(attName)) {
                 atts.add(attName);
                 LOGGER.fine("added attribute " + attName);
             }
         }
-
+        
         ftsAttributes = new String[atts.size()];
         atts.toArray(ftsAttributes);
-
+        
         return ftsAttributes;
     }
-
+    
     /**
      * Creates the bounding box filters (one for each geometric attribute) needed to query a
      * <code>MapLayer</code>'s feature source to return just the features for the target
      * rendering extent
-     * 
+     *
      * @param schema the layer's feature source schema
      * @param attributes set of needed attributes
      * @param bbox the expression holding the target rendering bounding box
@@ -767,26 +756,26 @@ public class StreamingRenderer implements GTRenderer
      * @throws IllegalFilterException if something goes wrong creating the filter
      */
     private Filter createBBoxFilters( FeatureType schema, String[] attributes, BBoxExpression bbox )
-            throws IllegalFilterException {
+    throws IllegalFilterException {
         Filter filter = null;
-
+        
         for( int j = 0; j < attributes.length; j++ ) {
             AttributeType attType = schema.getAttributeType(attributes[j]);
             
             //DJB: added this for better error messages!
             if (attType == null)
-            	throw new IllegalFilterException("Could not find '"+attributes[j]+"' in the FeatureType ("+schema.getTypeName()+")");
-
+                throw new IllegalFilterException("Could not find '"+attributes[j]+"' in the FeatureType ("+schema.getTypeName()+")");
+            
             if (attType.isGeometry()) {
                 GeometryFilter gfilter = filterFactory.createGeometryFilter(Filter.GEOMETRY_BBOX);
-
+                
                 // TODO: how do I get the full xpath of an attribute should
                 // feature composition be used?
                 Expression left = filterFactory
                         .createAttributeExpression(schema, attType.getName());
                 gfilter.addLeftGeometry(left);
                 gfilter.addRightGeometry(bbox);
-
+                
                 if (filter == null) {
                     filter = gfilter;
                 } else {
@@ -794,17 +783,17 @@ public class StreamingRenderer implements GTRenderer
                 }
             }
         }
-
+        
         return filter;
     }
-
+    
     /**
      * Performs the actual rendering process to the graphics context set in setOutput.
      * <p>
      * The style parameter controls the appearance features. Rules within the style object may cause
      * some features to be rendered multiple times or not at all.
      * </p>
-     * 
+     *
      * @param features the feature collection to be rendered
      * @param map Controls the full extent of the input space. Used in the calculation of scale.
      * @param s A style object. Contains a set of FeatureTypeStylers that are to be applied in order
@@ -813,19 +802,19 @@ public class StreamingRenderer implements GTRenderer
     private void render( FeatureCollection features, Envelope map, Style s ) {
         if (outputGraphics == null) {
             LOGGER.info("renderer passed null graphics");
-
+            
             return;
         }
-
+        
         // reset the abort flag
         renderingStopRequested = false;
-
-      
+        
+        
         mapExtent = map;
-
+        
         // set up the affine transform and calculate scale values
         AffineTransform at = worldToScreenTransform(mapExtent, screenSize);
-
+        
         /*
          * If we are rendering to a component which has already set up some form of transformation
          * then we can concatenate our transformation to it. An example of this is the ZoomPane
@@ -837,10 +826,10 @@ public class StreamingRenderer implements GTRenderer
         // outputGraphics.setTransform(at);
         // }
         scaleDenominator = 1 / outputGraphics.getTransform().getScaleX();
-
+        
         // extract the feature type stylers from the style object and process them
         FeatureTypeStyle[] featureStylers = s.getFeatureTypeStyles();
-
+        
         try {
             processStylers(outputGraphics, DataUtilities.results(features), featureStylers, at,
                     null,null);
@@ -850,10 +839,10 @@ public class StreamingRenderer implements GTRenderer
             fireErrorEvent(new Exception("Illegal attribute exception while rendering the layer" ,iae));
         }
     }
-
+    
     /**
      * Sets up the affine transform
-     * 
+     *
      * @param mapExtent the map extent
      * @param screenSize the screen size
      * @return a transform that maps from real world coordinates to the screen
@@ -861,20 +850,20 @@ public class StreamingRenderer implements GTRenderer
     public AffineTransform worldToScreenTransform( Envelope mapExtent, Rectangle screenSize ) {
         double scaleX = screenSize.getWidth() / mapExtent.getWidth();
         double scaleY = screenSize.getHeight() / mapExtent.getHeight();
-
+        
         double tx = -mapExtent.getMinX() * scaleX ;
         double ty = (mapExtent.getMinY() * scaleY) + screenSize.getHeight();
         
         AffineTransform at = new AffineTransform(scaleX, 0.0d, 0.0d, -scaleY, tx, ty);
         AffineTransform originTranslation=AffineTransform.getTranslateInstance(screenSize.x, screenSize.y);
         originTranslation.concatenate(at);
-
+        
         return originTranslation!=null?originTranslation:at;
     }
-
+    
     /**
      * Converts a coordinate expressed on the device space back to real world coordinates
-     * 
+     *
      * @param x horizontal coordinate on device space
      * @param y vertical coordinate on device space
      * @param map The map extent
@@ -883,13 +872,13 @@ public class StreamingRenderer implements GTRenderer
     private Coordinate pixelToWorld( int x, int y, Envelope map ) {
         if (outputGraphics == null) {
             LOGGER.info("no graphics yet deffined");
-
+            
             return null;
         }
-
+        
         // set up the affine transform and calculate scale values
         AffineTransform at = worldToScreenTransform(map, screenSize);
-
+        
         /*
          * If we are rendering to a component which has already set up some form of transformation
          * then we can concatenate our transformation to it. An example of this is the ZoomPane
@@ -900,69 +889,66 @@ public class StreamingRenderer implements GTRenderer
         } else {
             outputGraphics.setTransform(at);
         }
-
+        
         try {
             Point2D result = at.inverseTransform(new java.awt.geom.Point2D.Double(x, y),
                     new java.awt.geom.Point2D.Double());
             Coordinate c = new Coordinate(result.getX(), result.getY());
-
+            
             return c;
         } catch (Exception e) {
             fireErrorEvent(e);
         }
-
+        
         return null;
     }
-
+    
     /**
      * Checks if a rule can be triggered at the current scale level
-     * 
+     *
      * @param r The rule
      * @return true if the scale is compatible with the rule settings
      */
     private boolean isWithInScale( Rule r ) {
         return ((r.getMinScaleDenominator() - TOLERANCE) <= scaleDenominator)
-                && ((r.getMaxScaleDenominator() + TOLERANCE) > scaleDenominator);
+        && ((r.getMaxScaleDenominator() + TOLERANCE) > scaleDenominator);
     }
     
     /**
      * creates a list of LiteFeatureTypeStyles
      *   a) out-of-scale rules removed
      *   b) incompatible FeatureTypeStyles removed
-     *   
-     * 
+     *
+     *
      * @param featureStylers
      * @param features
      * @return
      * @throws Exception
      */
-    private ArrayList createLiteFeatureTypeStyles( FeatureTypeStyle[] featureStylers,FeatureResults features, Graphics2D graphics) throws IOException
-    {
-    	ArrayList result  = new ArrayList();
-    	
-    	int itemNumber =0;
-    	
+    private ArrayList createLiteFeatureTypeStyles( FeatureTypeStyle[] featureStylers,FeatureResults features, Graphics2D graphics) throws IOException {
+        ArrayList result  = new ArrayList();
+        
+        int itemNumber =0;
+        
         for( int i = 0; i < featureStylers.length; i++ ) //DJB: for each FeatureTypeStyle in the SLD (each on is drawn indpendently)
         {
             FeatureTypeStyle fts = featureStylers[i];
             String typeName = features.getSchema().getTypeName();
-
+            
             if ((typeName != null)
-                    && (features.getSchema().isDescendedFrom(null,
-                            fts.getFeatureTypeName()) || typeName.equalsIgnoreCase(fts
-                            .getFeatureTypeName()))) 
-            {
-            	//DJB: this FTS is compatible with this FT.
-            	
+            && (features.getSchema().isDescendedFrom(null,
+                    fts.getFeatureTypeName()) || typeName.equalsIgnoreCase(fts
+                    .getFeatureTypeName()))) {
+                //DJB: this FTS is compatible with this FT.
+                
                 // get applicable rules at the current scale
                 Rule[] rules = fts.getRules();
                 ArrayList ruleList = new ArrayList();
                 ArrayList elseRuleList = new ArrayList();
-
-                for( int j = 0; j < rules.length; j++ ) 
-                {
+                
+                for( int j = 0; j < rules.length; j++ ) {
                     Rule r = rules[j];
-
+                    
                     if (isWithInScale(r)) {
                         if (r.hasElseFilter()) {
                             elseRuleList.add(r);
@@ -972,17 +958,15 @@ public class StreamingRenderer implements GTRenderer
                     }
                 }
                 if ( (ruleList.size() == 0) && (elseRuleList.size()==0) )
-                	continue;  //DJB: optimization - nothing to render, dont do anything!!
+                    continue;  //DJB: optimization - nothing to render, dont do anything!!
                 
                 LiteFeatureTypeStyle lfts =null;
                 if (itemNumber == 0) //we can optimize this one!
                 {
-                	lfts = new LiteFeatureTypeStyle(graphics,ruleList,elseRuleList);
-                }
-                else
-                {
-                	BufferedImage image = new BufferedImage(screenSize.width, screenSize.height,defaultImageType);               
-                    lfts = new LiteFeatureTypeStyle(image,graphics.getTransform(),ruleList,elseRuleList,java2dHints);           	
+                    lfts = new LiteFeatureTypeStyle(graphics,ruleList,elseRuleList);
+                } else {
+                    BufferedImage image = new BufferedImage(screenSize.width, screenSize.height,defaultImageType);
+                    lfts = new LiteFeatureTypeStyle(image,graphics.getTransform(),ruleList,elseRuleList,java2dHints);
                 }
                 result.add(lfts);
                 itemNumber++;
@@ -992,44 +976,40 @@ public class StreamingRenderer implements GTRenderer
         
         return result;
     }
-
-    private FeatureReader getReader(FeatureResults features,CoordinateReferenceSystem sourceCrs) throws IOException
-    {
-    	 FeatureReader reader = features.reader();
-         
-         //DJB: dont do reprojection here - do it after decimation
-         //     but we ensure that the reader is producing geometries with the correct CRS
-         //NOTE: it, by default, produces ones that are are tagged with the CRS of the datastore, which
-         //      maybe incorrect.
-         //      The correct value is in sourceCrs.
-         
-           // this is the reader's CRS
-         CoordinateReferenceSystem rCS = reader.getFeatureType().getDefaultGeometry().getCoordinateSystem();
-         
-         // sourceCrs == source's real SRS
-         
-         //if we need to recode the incoming geometries
-         
-         if (rCS != sourceCrs)  //not both null or both EXACTLY the same CRS object
-         {
-         	if (sourceCrs != null) //dont re-tag to null, keep the DataStore's CRS (this shouldnt really happen)
-         	{
-         		     // if the datastore is producing null CRS, we recode.
-         		     // if the datastore's CRS != real CRS, then we recode
-         		if ( ( rCS ==null) || (!rCS .equals ( sourceCrs) ))
-	            	{
-	            		//need to retag the features
-         			try{
-                 		reader = new ForceCoordinateSystemFeatureReader(reader,sourceCrs );
-                 	}
-                 	catch(Exception ee)
-     				{
-                 		ee.printStackTrace(); // do nothing but warn user
-     				}
-	            	}
-         	}
-         }
-         return reader;
+    
+    private FeatureReader getReader(FeatureResults features,CoordinateReferenceSystem sourceCrs) throws IOException {
+        FeatureReader reader = features.reader();
+        
+        //DJB: dont do reprojection here - do it after decimation
+        //     but we ensure that the reader is producing geometries with the correct CRS
+        //NOTE: it, by default, produces ones that are are tagged with the CRS of the datastore, which
+        //      maybe incorrect.
+        //      The correct value is in sourceCrs.
+        
+        // this is the reader's CRS
+        CoordinateReferenceSystem rCS = reader.getFeatureType().getDefaultGeometry().getCoordinateSystem();
+        
+        // sourceCrs == source's real SRS
+        
+        //if we need to recode the incoming geometries
+        
+        if (rCS != sourceCrs)  //not both null or both EXACTLY the same CRS object
+        {
+            if (sourceCrs != null) //dont re-tag to null, keep the DataStore's CRS (this shouldnt really happen)
+            {
+                // if the datastore is producing null CRS, we recode.
+                // if the datastore's CRS != real CRS, then we recode
+                if ( ( rCS ==null) || (!rCS .equals( sourceCrs) )) {
+                    //need to retag the features
+                    try{
+                        reader = new ForceCoordinateSystemFeatureReader(reader,sourceCrs );
+                    } catch(Exception ee) {
+                        ee.printStackTrace(); // do nothing but warn user
+                    }
+                }
+            }
+        }
+        return reader;
     }
     
     
@@ -1048,7 +1028,7 @@ public class StreamingRenderer implements GTRenderer
      * </p>
      * <p>
      * </p>
-     * 
+     *
      * @param graphics DOCUMENT ME!
      * @param features An array of features to be rendered
      * @param featureStylers An array of feature stylers to be applied
@@ -1057,15 +1037,14 @@ public class StreamingRenderer implements GTRenderer
      * @throws IOException DOCUMENT ME!
      * @throws IllegalAttributeException DOCUMENT ME!
      */
-    private void processStylers(final Graphics2D graphics, 
-    							final FeatureResults features,
-								final FeatureTypeStyle[] featureStylers, 
-								AffineTransform at,
-								CoordinateReferenceSystem destinationCrs,
-								CoordinateReferenceSystem sourceCrs
-								) 
-    								throws IOException,  IllegalAttributeException 
-	{
+    private void processStylers(final Graphics2D graphics,
+            final FeatureResults features,
+            final FeatureTypeStyle[] featureStylers,
+            AffineTransform at,
+            CoordinateReferenceSystem destinationCrs,
+            CoordinateReferenceSystem sourceCrs
+            )
+            throws IOException,  IllegalAttributeException {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("processing " + featureStylers.length + " stylers for "+features.getSchema().getTypeName());
         }
@@ -1073,104 +1052,93 @@ public class StreamingRenderer implements GTRenderer
         transformMap = new HashMap();
         NumberRange scaleRange = new NumberRange(scaleDenominator, scaleDenominator);
         
-
+        
         symbolizerAssociationHT = new HashMap();
         ArrayList lfts= createLiteFeatureTypeStyles(featureStylers,features,graphics);
         if (lfts.size() ==0)
-        	return; // nothing to do
+            return; // nothing to do
         FeatureReader reader = getReader(features,sourceCrs);
         int n_lfts = lfts.size();
         LiteFeatureTypeStyle[]  fts_array = (LiteFeatureTypeStyle[]) lfts.toArray( new LiteFeatureTypeStyle[n_lfts] );
- 
+        
         
         try{
-    
-        	 while( true ) 
-             {
-                 try {
-                     if (renderingStopRequested) {
-                         break;
-                     }                 
-                     if (!reader.hasNext()) {
-                         break;
-                     }
-                     Feature feature = reader.next(); // read the feature
-                     for (int t=0;t<n_lfts;t++)
-                     {
-                     	process(feature,fts_array[t],scaleRange,at,destinationCrs);  //draw the feature on the image(s)
-                     }
-                 }
-                 catch (Exception e) {
+            
+            while( true ) {
+                try {
+                    if (renderingStopRequested) {
+                        break;
+                    }
+                    if (!reader.hasNext()) {
+                        break;
+                    }
+                    Feature feature = reader.next(); // read the feature
+                    for (int t=0;t<n_lfts;t++) {
+                        process(feature,fts_array[t],scaleRange,at,destinationCrs);  //draw the feature on the image(s)
+                    }
+                } catch (Exception e) {
                     fireErrorEvent(e);
                 }
-             }
-
+            }
+            
+        } finally {
+            reader.close();
         }
-        finally
-		{
-           reader.close();
-		}
         //have to re-form the image now.
-       // graphics.setTransform( new AffineTransform() );
-        for (int t=0;t<n_lfts;t++)
-        {
-        	if (fts_array[t].myImage != null) // this is the case for the first one (ie. fts_array[t].graphics == graphics)       	
+        // graphics.setTransform( new AffineTransform() );
+        for (int t=0;t<n_lfts;t++) {
+            if (fts_array[t].myImage != null) // this is the case for the first one (ie. fts_array[t].graphics == graphics)
             {
-        		graphics.drawImage(fts_array[t].myImage,0,0,null);
-        	    fts_array[t].graphics.dispose();
-        	}
-        }
-      
-
-    }
-
-    /**
-	 * @param feature
-	 * @param style
-	 */
-	final private void process(Feature feature, LiteFeatureTypeStyle style,Range scaleRange,AffineTransform at, CoordinateReferenceSystem destinationCrs) throws TransformException,FactoryException 
-	{
-		boolean doElse = true;
-		Rule[] elseRuleList = style.elseRules;
-		Rule[] ruleList = style.ruleList;
-		
-		Graphics2D graphics = style.graphics;
-		
-		 // applicable rules
-        for( int t=0;t<ruleList.length;t++ ) 
-        {
-                Rule r = ruleList[t];
-                Filter filter = r.getFilter();
-
-                if ((filter == null) || filter.contains(feature)) 
-                {
-                    doElse = false;												        
-                    Symbolizer[] symbolizers = r.getSymbolizers();
-                    processSymbolizers(graphics, feature, symbolizers, scaleRange,
-                            at, destinationCrs);												      
-                }
-        }
-
-        if (doElse) 
-        {
-             for( int tt=0;tt<elseRuleList.length;tt++ ) 
-             {
-                Rule r = elseRuleList[tt];
-                Symbolizer[] symbolizers = r.getSymbolizers();
-
-                processSymbolizers(graphics, feature, symbolizers, scaleRange,
-                        at, destinationCrs);
-								      
+                graphics.drawImage(fts_array[t].myImage,0,0,null);
+                fts_array[t].graphics.dispose();
             }
         }
-	}
-
-	/**
+        
+        
+    }
+    
+    /**
+     * @param feature
+     * @param style
+     */
+    final private void process(Feature feature, LiteFeatureTypeStyle style,Range scaleRange,AffineTransform at, CoordinateReferenceSystem destinationCrs) throws TransformException,FactoryException {
+        boolean doElse = true;
+        Rule[] elseRuleList = style.elseRules;
+        Rule[] ruleList = style.ruleList;
+        
+        Graphics2D graphics = style.graphics;
+        
+        // applicable rules
+        for( int t=0;t<ruleList.length;t++ ) {
+            Rule r = ruleList[t];
+            Filter filter = r.getFilter();
+            
+            if ((filter == null) || filter.contains(feature)) {
+                doElse = false;
+                Symbolizer[] symbolizers = r.getSymbolizers();
+                processSymbolizers(graphics, feature, symbolizers, scaleRange,
+                        at, destinationCrs);
+            }
+        }
+        
+        if (doElse) {
+            for( int tt=0;tt<elseRuleList.length;tt++ ) {
+                Rule r = elseRuleList[tt];
+                Symbolizer[] symbolizers = r.getSymbolizers();
+                
+                processSymbolizers(graphics, feature, symbolizers, scaleRange,
+                        at, destinationCrs);
+                
+            }
+        }
+    }
+    
+    /**
      * Applies each of a set of symbolizers in turn to a given feature.
      * <p>
      * This is an internal method and should only be called by processStylers.
      * </p>
-     * 
+     *
      * @param graphics
      * @param feature The feature to be rendered
      * @param symbolizers An array of symbolizers which actually perform the rendering.
@@ -1179,45 +1147,39 @@ public class StreamingRenderer implements GTRenderer
      * @param shape
      * @param destinationCrs
      * @throws TransformException
-     * @throws FactoryException 
+     * @throws FactoryException
      */
     private void processSymbolizers( final Graphics2D graphics, final Feature feature,
             final Symbolizer[] symbolizers, Range scaleRange, AffineTransform at,
-            CoordinateReferenceSystem destinationCrs ) throws TransformException, FactoryException 
-	{
-    	LiteShape2 shape;
-    	
-        for( int m = 0; m < symbolizers.length; m++ ) 
-        {
-           
-
-            if (symbolizers[m] instanceof RasterSymbolizer) 
-            {
+            CoordinateReferenceSystem destinationCrs ) throws TransformException, FactoryException {
+        LiteShape2 shape;
+        
+        for( int m = 0; m < symbolizers.length; m++ ) {
+            
+            
+            if (symbolizers[m] instanceof RasterSymbolizer) {
                 AffineTransform tempTransform = graphics.getTransform();
                 graphics.setTransform(at);
                 renderRaster(graphics, feature, (RasterSymbolizer) symbolizers[m], destinationCrs);
-                graphics.setTransform(tempTransform);             
-            } 
-            else
-            {
-                Geometry g = findGeometry(feature, symbolizers[m]); //pulls the geometry 
+                graphics.setTransform(tempTransform);
+            } else {
+                Geometry g = findGeometry(feature, symbolizers[m]); //pulls the geometry
                 
                 SymbolizerAssociation sa = (SymbolizerAssociation) symbolizerAssociationHT.get(symbolizers[m]);
-                if (sa==null)
-                {
-                	sa= new SymbolizerAssociation();
-                	sa.setCRS(findGeometryCS(feature, symbolizers[m]));
-                	MathTransform2D transform = null;
-                	try {
-                    	// DJB: this should never be necessary since we've already taken care to make sure the reader is
-                    	// producing the correct coordinate system
+                if (sa==null) {
+                    sa= new SymbolizerAssociation();
+                    sa.setCRS(findGeometryCS(feature, symbolizers[m]));
+                    MathTransform2D transform = null;
+                    try {
+                        // DJB: this should never be necessary since we've already taken care to make sure the reader is
+                        // producing the correct coordinate system
                         transform = getMathTransform(sa.crs, destinationCrs);
                         if (transform != null) {
                             transform = (MathTransform2D) mathTransformFactory
                                     .createConcatenatedTransform(
-                                            transform,
-                                            mathTransformFactory.createAffineTransform(
-                                                    new GeneralMatrix(at)));
+                                    transform,
+                                    mathTransformFactory.createAffineTransform(
+                                    new GeneralMatrix(at)));
                         } else {
                             transform = (MathTransform2D) mathTransformFactory
                                     .createAffineTransform(new GeneralMatrix(at));
@@ -1229,65 +1191,64 @@ public class StreamingRenderer implements GTRenderer
                     symbolizerAssociationHT.put(symbolizers[m],sa);
                 }
                 
-          
-                MathTransform2D transform = sa.getXform();
-
                 
-
-            	shape = getTransformedShape(g, transform);
-            	
+                MathTransform2D transform = sa.getXform();
+                
+                
+                
+                shape = getTransformedShape(g, transform);
+                
                 if( symbolizers[m] instanceof TextSymbolizer ){
-                	labelCache.put((TextSymbolizer) symbolizers[m], feature, shape, scaleRange);
-                }
-                else{
+                    labelCache.put((TextSymbolizer) symbolizers[m], feature, shape, scaleRange);
+                } else{
                     Style2D style = styleFactory.createStyle(feature, symbolizers[m], scaleRange);
                     painter.paint(graphics, shape, style, scaleDenominator);
                 }
-
+                
             }
         }
-
-                    fireFeatureRenderedEvent(feature);
+        
+        fireFeatureRenderedEvent(feature);
     }
-
+    
     /**
      * DOCUMENT ME!
-     * 
+     *
      * @param g
      * @param transform
      * @return
      * @throws TransformException
-     * @throws FactoryException 
+     * @throws FactoryException
      */
     private LiteShape2 getTransformedShape( Geometry g, MathTransform2D transform )
-            throws TransformException, FactoryException {
-    	
+    throws TransformException, FactoryException {
+        
         LiteShape2 shape = new LiteShape2(g, transform, getDecimator(transform), false);
         return shape;
     }
-
+    
     HashMap decimators=new HashMap();
     /**
-	 * @return
+     * @return
      * @throws org.opengis.referencing.operation.NoninvertibleTransformException
-	 */
-	private Decimator getDecimator(MathTransform2D mathTransform) throws org.opengis.referencing.operation.NoninvertibleTransformException {
-		Decimator decimator=(Decimator) decimators.get(mathTransform);
-		if( decimator==null ){
-			if (mathTransform != null && !mathTransform.isIdentity())
-				decimator=new Decimator(mathTransform.inverse());
-			else
-				decimator=new Decimator(null);
-			
-			decimators.put(mathTransform, decimator);
-		}
-		return decimator;
-	}
-
-	/**
+     */
+    private Decimator getDecimator(MathTransform2D mathTransform) throws org.opengis.referencing.operation.NoninvertibleTransformException {
+        Decimator decimator=(Decimator) decimators.get(mathTransform);
+        if( decimator==null ){
+            if (mathTransform != null && !mathTransform.isIdentity())
+                decimator=new Decimator(mathTransform.inverse());
+            else
+                decimator=new Decimator(null);
+            
+            decimators.put(mathTransform, decimator);
+        }
+        return decimator;
+    }
+    
+    /**
      * Computes the math transform from the source CRS to the destination CRS. Since this is
      * expensive, we keep a cache of coordinate transformations during the rendering process
-     * 
+     *
      * @param sourceCrs
      * @param destinationCrs
      * @param at DOCUMENT ME!
@@ -1300,29 +1261,29 @@ public class StreamingRenderer implements GTRenderer
             CoordinateReferenceSystem destinationCrs)
             throws OperationNotFoundException, FactoryException {
         MathTransform2D transform = (MathTransform2D) transformMap.get(sourceCrs);
-
+        
         if (transform != null) {
             return transform;
         }
-
+        
         if (((sourceCrs == null) || (destinationCrs == null)) ) { // no transformation possible
-
+            
             return null;
         }
-
+        
         transform = (MathTransform2D) operationFactory.createOperation(sourceCrs, destinationCrs)
-                .getMathTransform();
-
+        .getMathTransform();
+        
         transformMap.put(sourceCrs, transform);
-
+        
         return transform;
     }
-
+    
     /**
      * Renders a grid coverage on the device. At the time being, the symbolizer is ignored and the
      * renderer tries to depict the non geophysics version of the grid coverage on the device, and
      * falls back on the geophysics one if the former fails
-     * 
+     *
      * @param graphics DOCUMENT ME!
      * @param feature the feature that contains the GridCoverage. The grid coverage must be
      *        contained in the "grid" attribute
@@ -1333,7 +1294,7 @@ public class StreamingRenderer implements GTRenderer
         LOGGER.fine("rendering Raster for feature " + feature.toString() + " - " + feature.getAttribute("grid") );
         float alpha = getOpacity(symbolizer);
         graphics.setComposite(AlphaComposite.getInstance(
-        			AlphaComposite.SRC_OVER, alpha));
+                AlphaComposite.SRC_OVER, alpha));
         GridCoverage grid = (GridCoverage) feature.getAttribute("grid");
         GridCoverageRenderer gcr = new GridCoverageRenderer(grid, destinationCRS);
         gcr.paint(graphics);
@@ -1341,20 +1302,20 @@ public class StreamingRenderer implements GTRenderer
     }
     
     private float getOpacity(RasterSymbolizer sym) {
-    	float alpha = 1.0f;
-    	Expression exp = sym.getOpacity();
-    	if(exp == null) return alpha;
-    	Object obj = exp.getValue(null);
-    	if(obj == null) return alpha;
-    	Number num = null;
-    	if(obj instanceof Number) num = (Number)obj;
-    	if(num == null) return alpha;
-    	return num.floatValue();
+        float alpha = 1.0f;
+        Expression exp = sym.getOpacity();
+        if(exp == null) return alpha;
+        Object obj = exp.getValue(null);
+        if(obj == null) return alpha;
+        Number num = null;
+        if(obj instanceof Number) num = (Number)obj;
+        if(num == null) return alpha;
+        return num.floatValue();
     }
-
+    
     /**
      * Finds the geometric attribute requested by the symbolizer
-     * 
+     *
      * @param f The feature
      * @param s The symbolizer
      * @return The geometry requested in the symbolizer, or the default geometry if none is
@@ -1362,21 +1323,21 @@ public class StreamingRenderer implements GTRenderer
      */
     private com.vividsolutions.jts.geom.Geometry findGeometry( Feature f, Symbolizer s ) {
         String geomName = getGeometryPropertyName(s);
-
+        
         // get the geometry
         Geometry geom;
-
+        
         if (geomName == null) {
             geom = f.getDefaultGeometry();
         } else {
             geom = (com.vividsolutions.jts.geom.Geometry) f.getAttribute(geomName);
         }
-
+        
         // if the symbolizer is a point symbolizer generate a suitable location to place the
         // point in order to avoid recomputing that location at each rendering step
         if (s instanceof PointSymbolizer)
-        	geom = getCentroid(geom); // djb: major simpificatioN
-
+            geom = getCentroid(geom); // djb: major simpificatioN
+        
         return geom;
     }
     
@@ -1384,30 +1345,25 @@ public class StreamingRenderer implements GTRenderer
      *  Finds the centroid of the input geometry
      *    if input = point, line, polygon  --> return a point that represents the centroid of that geom
      *    if input = geometry collection --> return a multipoint that represents the centoid of each sub-geom
-     * @param g 
+     * @param g
      * @return
      */
-    private Geometry getCentroid(Geometry g)
-    {
-    	if (g instanceof GeometryCollection)
-    	{
-    		GeometryCollection gc = (GeometryCollection) g;
-    		Coordinate[] pts = new Coordinate[gc.getNumGeometries()];
-    		for (int t=0;t<gc.getNumGeometries();t++)
-    		{
-    			pts[t] = gc.getGeometryN(t).getCentroid().getCoordinate();
-    		}
-    		return g.getFactory().createMultiPoint(pts);    		
-    	}
-    	else
-    	{
-    		return g.getCentroid();
-    	}
+    private Geometry getCentroid(Geometry g) {
+        if (g instanceof GeometryCollection) {
+            GeometryCollection gc = (GeometryCollection) g;
+            Coordinate[] pts = new Coordinate[gc.getNumGeometries()];
+            for (int t=0;t<gc.getNumGeometries();t++) {
+                pts[t] = gc.getGeometryN(t).getCentroid().getCoordinate();
+            }
+            return g.getFactory().createMultiPoint(pts);
+        } else {
+            return g.getCentroid();
+        }
     }
-
+    
     /**
      * Finds the geometric attribute coordinate reference system
-     * 
+     *
      * @param f The feature
      * @param s The symbolizer
      * @return The geometry requested in the symbolizer, or the default geometry if none is
@@ -1416,19 +1372,19 @@ public class StreamingRenderer implements GTRenderer
     private org.opengis.referencing.crs.CoordinateReferenceSystem findGeometryCS( Feature f,
             Symbolizer s ) {
         String geomName = getGeometryPropertyName(s);
-
+        
         if (geomName != null) {
             return ((GeometryAttributeType) f.getFeatureType().getAttributeType(geomName))
-                    .getCoordinateSystem();
+            .getCoordinateSystem();
         } else {
             return ((GeometryAttributeType) f.getFeatureType().getDefaultGeometry())
-                    .getCoordinateSystem();
+            .getCoordinateSystem();
         }
     }
-
+    
     private String getGeometryPropertyName( Symbolizer s ) {
         String geomName = null;
-
+        
         // TODO: fix the styles, the getGeometryPropertyName should probably be moved into an
         // interface...
         if (s instanceof PolygonSymbolizer) {
@@ -1440,29 +1396,29 @@ public class StreamingRenderer implements GTRenderer
         } else if (s instanceof TextSymbolizer) {
             geomName = ((TextSymbolizer) s).getGeometryPropertyName();
         }
-
+        
         return geomName;
     }
-
+    
     /**
      * Getter for property interactive.
-     * 
+     *
      * @return Value of property interactive.
      */
     private boolean isInteractive() {
         return interactive;
     }
-
+    
     /**
      * Sets the interactive status of the renderer. An interactive renderer won't wait for long
      * image loading, preferring an alternative mark instead
-     * 
+     *
      * @param interactive new value for the interactive property
      */
     private void setInteractive( boolean interactive ) {
         this.interactive = interactive;
     }
-
+    
     /**
      * <p>
      * Returns true if the optimized data loading is enabled, false otherwise.
@@ -1472,30 +1428,29 @@ public class StreamingRenderer implements GTRenderer
      * feature attributes (according to styles) and to load only the features that are in (or
      * overlaps with)the bounding box requested for painting
      * </p>
-     * 
+     *
      * @return
      */
-    private boolean isOptimizedDataLoadingEnabled() 
-    {
-    	if (rendererHints == null)
-    		return optimizedDataLoadingEnabledDEFAULT;
-    	Boolean result = (Boolean) rendererHints.get("optimizedDataLoadingEnabled");
-    	if (result == null)
-    		return optimizedDataLoadingEnabledDEFAULT;
+    private boolean isOptimizedDataLoadingEnabled() {
+        if (rendererHints == null)
+            return optimizedDataLoadingEnabledDEFAULT;
+        Boolean result = (Boolean) rendererHints.get("optimizedDataLoadingEnabled");
+        if (result == null)
+            return optimizedDataLoadingEnabledDEFAULT;
         return result.booleanValue();
     }
-
     
-
+    
+    
     /**
      * Returns the generalization distance in the screen space.
-     * 
+     *
      * @return
      */
     public double getGeneralizationDistance() {
         return generalizationDistance;
     }
-
+    
     /**
      * <p>
      * Sets the generalizazion distance in the screen space.
@@ -1507,13 +1462,13 @@ public class StreamingRenderer implements GTRenderer
      * <p>
      * Set the distance to 0 if you don't want any kind of generalization
      * </p>
-     * 
+     *
      * @param d
      */
     private void setGeneralizationDistance( double d ) {
         generalizationDistance = d;
     }
-
+    
     /**
      * By default ignores all feature renderered events and logs all exceptions as severe.
      */
@@ -1524,7 +1479,7 @@ public class StreamingRenderer implements GTRenderer
         public void featureRenderer( Feature feature ) {
             //do nothing.
         }
-
+        
         /**
          * @see org.geotools.renderer.lite.RenderListener#errorOccurred(java.lang.Exception)
          */
@@ -1533,52 +1488,46 @@ public class StreamingRenderer implements GTRenderer
         }
         
     }
-
-	/* (non-Javadoc)
-	 * @see org.geotools.renderer.lite.Renderer#setJava2DHints(java.awt.RenderingHints)
-	 */
-	public void setJava2DHints(RenderingHints hints) 
-	{
-		this.java2dHints = hints;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.renderer.lite.Renderer#getJava2DHints()
-	 */
-	public RenderingHints getJava2DHints() 
-	{
-		return java2dHints;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.renderer.lite.Renderer#setRendererHints(java.util.Map)
-	 */
-	public void setRendererHints(Map hints) 
-	{
-		rendererHints = hints;		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.renderer.lite.Renderer#getRendererHints()
-	 */
-	public Map getRendererHints() 
-	{
-		return rendererHints;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.renderer.lite.Renderer#setContext(org.geotools.map.MapContext)
-	 */
-	public void setContext(MapContext context) 
-	{
-		this.context = context;		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.renderer.lite.Renderer#getContext()
-	 */
-	public MapContext getContext() 
-	{
-		return context;
-	}
+    
+        /* (non-Javadoc)
+         * @see org.geotools.renderer.GTRenderer#setJava2DHints(java.awt.RenderingHints)
+         */
+    public void setJava2DHints(RenderingHints hints) {
+        this.java2dHints = hints;
+    }
+    
+        /* (non-Javadoc)
+         * @see org.geotools.renderer.GTRenderer#getJava2DHints()
+         */
+    public RenderingHints getJava2DHints() {
+        return java2dHints;
+    }
+    
+        /* (non-Javadoc)
+         * @see org.geotools.renderer.GTRenderer#setRendererHints(java.util.Map)
+         */
+    public void setRendererHints(Map hints) {
+        rendererHints = hints;
+    }
+    
+        /* (non-Javadoc)
+         * @see org.geotools.renderer.GTRenderer#getRendererHints()
+         */
+    public Map getRendererHints() {
+        return rendererHints;
+    }
+    
+        /* (non-Javadoc)
+         * @see org.geotools.renderer.GTRenderer#setContext(org.geotools.map.MapContext)
+         */
+    public void setContext(MapContext context) {
+        this.context = context;
+    }
+    
+        /* (non-Javadoc)
+         * @see org.geotools.renderer.GTRenderer#getContext()
+         */
+    public MapContext getContext() {
+        return context;
+    }
 }
