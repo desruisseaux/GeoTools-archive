@@ -103,7 +103,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  * @author James Macgill
  * @author Andrea Aime
  * @version $Id$
- * @deprecated
+ * @deprecated LiteRenderer has been replaced by StreamingRenderer.
  */
 public class LiteRenderer2 implements Renderer, Renderer2D {
     /** Tolerance used to compare doubles for equality */

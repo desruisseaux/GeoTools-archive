@@ -122,6 +122,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author James Macgill
  * @author Andrea Aime
+ * @deprecated LiteRenderer has been replaced by StreamingRenderer.
  */
 public class LiteRenderer implements Renderer, Renderer2D {
     /** Tolerance used to compare doubles for equality */
