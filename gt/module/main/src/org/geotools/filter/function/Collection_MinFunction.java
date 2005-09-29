@@ -50,12 +50,17 @@ public class Collection_MinFunction extends FunctionExpressionImpl implements Fu
         }
     }
     
+  
+    
     public void setArgs(Expression[] args){
         expr = args[0];
     }
     
     public Object getValue(Feature feature){
         FeatureCollection coll = feature.getParent();
+        if(coll == null){
+            return ((Number) expr.getValue(feature));
+        }
         if (!(coll.equals(fc))){
             fc = coll;
             calculateMin();
