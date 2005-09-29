@@ -370,19 +370,17 @@ public class SLDStyleFactory {
 
         // extract base properties
         Graphic sldGraphic = symbolizer.getGraphic();
-        float opacity = Float.parseFloat(sldGraphic.getOpacity().getValue(feature).toString());
+        float opacity = evalOpacity(sldGraphic.getOpacity(), feature);
 
-        //float opacity = ((Number) sldGraphic.getOpacity().getValue(feature)).floatValue();
-        //int size = ((Number) sldGraphic.getSize().getValue(feature)).intValue();
         int size;
 
         try {
-            size = (int) Double.parseDouble(sldGraphic.getSize().getValue(feature).toString());
+            size = (int) evalToDouble(sldGraphic.getSize(),feature,10);
         } catch (NumberFormatException nfe) {
-            size = 1;
+            size = 10;
         }
 
-        float rotation = (float) ((((Number) sldGraphic.getRotation().getValue(feature)).floatValue() * Math.PI) / 180);
+        float rotation = (float)((evalToFloat(sldGraphic.getRotation(),feature, 0) * Math.PI) / 180);
 
         // Extract the sequence of external graphics and symbols and process them in order
         // to recognize which one will be used for rendering
@@ -478,7 +476,8 @@ public class SLDStyleFactory {
 
         return retval;
     }
-
+    
+   
 
     Style2D createTextStyle(Feature feature, TextSymbolizer symbolizer, Range scaleRange) {
         TextStyle2D ts2d = new TextStyle2D();
@@ -887,8 +886,8 @@ public class SLDStyleFactory {
 
         // get the other properties needed for the stroke
         float[] dashes = stroke.getDashArray();
-        float width = ((Number) stroke.getWidth().getValue(feature)).floatValue();
-        float dashOffset = ((Number) stroke.getDashOffset().getValue(feature)).floatValue();
+        float width = evalToFloat(stroke.getWidth(), feature, 1);
+        float dashOffset = evalToFloat(stroke.getDashOffset(), feature, 0);
 
         // Simple optimization: let java2d use the fast drawing path if the line width
         // is small enough...
@@ -914,7 +913,7 @@ public class SLDStyleFactory {
         }
 
         // the foreground color
-        Paint contourPaint = Color.decode((String) stroke.getColor().getValue(feature));
+        Paint contourPaint = evalToColor(stroke.getColor(),feature,Color.BLACK);
 
         // if a graphic fill is to be used, prepare the paint accordingly....
         org.geotools.styling.Graphic gr = stroke.getGraphicFill();
@@ -932,7 +931,7 @@ public class SLDStyleFactory {
         }
 
         // get the opacity and prepare the composite
-        float opacity = ((Number) stroke.getOpacity().getValue(feature)).floatValue();
+        float opacity = evalOpacity(stroke.getOpacity(),feature);
         Composite composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
 
         return composite;
@@ -978,7 +977,7 @@ public class SLDStyleFactory {
         }
 
         // get the opacity and prepare the composite
-        float opacity = ((Number) fill.getOpacity().getValue(feature)).floatValue();
+        float opacity = evalOpacity(fill.getOpacity(),feature);
         Composite composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
 
         return composite;
@@ -1339,4 +1338,45 @@ public class SLDStyleFactory {
             return (int) (bits ^ (bits >>> 32));
         }
     }
+    
+     private float evalToFloat(Expression exp, Feature f, float fallback){
+        if(exp == null){
+            return fallback;
+        }
+        try{
+            return Float.parseFloat(exp.getValue(f).toString());
+        }
+        catch(NumberFormatException nfe){
+            return fallback;
+        }
+    }
+    
+    private double evalToDouble(Expression exp, Feature f, double fallback){
+        if(exp == null){
+            return fallback;
+        }
+        try{
+            return Double.parseDouble(exp.getValue(f).toString());
+        }
+        catch(NumberFormatException nfe){
+            return fallback;
+        }
+    }
+    
+    private Color evalToColor(Expression exp, Feature f, Color fallback){
+        if(exp == null){
+            return fallback;
+        }
+        try{
+            return Color.decode((String) exp.getValue(f));
+        }
+        catch(NumberFormatException nfe){
+            return fallback;
+        }
+    }
+    
+    private float evalOpacity(Expression e, Feature f){
+        return evalToFloat(e,f,1);
+    }
+    
 }
