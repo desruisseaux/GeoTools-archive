@@ -68,7 +68,6 @@ import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileException;
 import org.geotools.data.shapefile.shp.ShapefileHeader;
 import org.geotools.data.shapefile.shp.ShapefileReader;
-import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.data.shapefile.shp.xml.Metadata;
 import org.geotools.data.shapefile.shp.xml.ShpXmlFileReader;
@@ -76,7 +75,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -605,18 +604,18 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     parent = BasicFeatureTypes.LINE;
                 }
                 if(parent != null){
-                    schema = FeatureTypeFactory.newFeatureType(readAttributes(),
+                    schema = FeatureTypes.newFeatureType(readAttributes(),
                     createFeatureTypeName(), namespace, false, new FeatureType[] {parent});
                 }
                 else {
                 	if (namespace != null)
                 	{
-                		schema = FeatureTypeFactory.newFeatureType(readAttributes(),
+                		schema = FeatureTypes.newFeatureType(readAttributes(),
                 				createFeatureTypeName(),namespace,false);
                 	}
                 	else
                 	{
-                		schema = FeatureTypeFactory.newFeatureType(readAttributes(), createFeatureTypeName(), GMLSchema.NAMESPACE, false);
+                		schema = FeatureTypes.newFeatureType(readAttributes(), createFeatureTypeName(), GMLSchema.NAMESPACE, false);
                 	}
                 }
             } catch (SchemaException se) {
@@ -1215,7 +1214,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             FileChannel out = null;
             try {
 
-                readWriteLock.startWrite();
+                readWriteLock.lockWrite();
             	in = new FileInputStream(storage).getChannel();
                 out = new FileOutputStream(dest).getChannel();
 
@@ -1229,7 +1228,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 
                 storage.delete();
             } finally {
-                readWriteLock.endWrite();
+                readWriteLock.unlock();
                 if( in != null ) in.close();
                 if( out != null ) out.close();
             }

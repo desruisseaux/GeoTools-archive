@@ -16,90 +16,127 @@
  */
 package org.geotools.data.shapefile;
 
-import java.io.IOException;
-import java.util.logging.Logger;
+import java.util.*;
 
 
-/**
- * A read-write lock for shapefiles so that OS file locking exceptions will not
- * ruin an attempt to update a shapefile.  On windows there are often
- * operating system locking conflicts when writing to a shapefile.  In order
- * to  not have exceptions thrown everytime a write is made, geotools has
- * implemented file locking for shapefiles.
- *
- * @author jeichar
- */
-public class Lock {
-    public final static int DELAY = 200;
-    Logger logger = Logger.getLogger("org.geotools.datashapefile");
-    int level = 0;
+class RWNode {
+    static final int READER = 0;
+    static final int WRITER = 1;
+    Thread t;
+    int state;
+    int nAcquires;
 
-    /**
-     * Called by shapefileReader before a read is started and before an
-     * IOStream is openned.
-     *
-     * @throws IOException
-     */
-    public synchronized void startRead() throws IOException {
-        while (level < 0) {
-            try {
-                wait(DELAY);
-            } catch (InterruptedException e) {
-                throw (IOException) new IOException().initCause(e);
-            }
-        }
-
-        assertTrue(level > -1);
-        level++;
-        logger.finer("Start Read Lock:" + level);
-    }
-
-    private void assertTrue(boolean b) {
-        if (!b) {
-            throw new AssertionError();
-        }
-    }
-
-    /**
-     * Called by ShapefileReader after a read is complete and after the
-     * IOStream is closed.
-     */
-    public synchronized void endRead() {
-        assertTrue(level > 0);
-        level--;
-        logger.finer("End Read Lock:" + level);
-        notifyAll();
-    }
-
-    /**
-     * Called by ShapefileDataStore before a write is started and before an
-     * IOStream is openned.
-     *
-     * @throws IOException
-     */
-    public synchronized void startWrite() throws IOException {
-        while (level != 0) {
-            try {
-                wait(DELAY);
-            } catch (InterruptedException e) {
-                throw (IOException) new IOException().initCause(e);
-            }
-        }
-
-        assertTrue(level == 0);
-        level = -1;
-        logger.finer("Start Write Lock:" + level);
-    }
-
-    /**
-     * Called by ShapefileDataStore after a write is complete and after the
-     * IOStream is closed.
-     */
-    public synchronized void endWrite() {
-        assertTrue(level == -1);
-        level = 0;
-        logger.finer("End Write Lock:" + level);
-        notifyAll();
+    RWNode(Thread t, int state) {
+        this.t = t;
+        this.state = state;
+        nAcquires = 0;
     }
 }
 
+
+public class Lock {
+    private Vector waiters;
+
+    public Lock() {
+        waiters = new Vector();
+    }
+
+    private int firstWriter() {
+        Enumeration e;
+        int index;
+
+        for (index = 0, e = waiters.elements(); e.hasMoreElements(); index++) {
+            RWNode node = (RWNode) e.nextElement();
+
+            if (node.state == RWNode.WRITER) {
+                return index;
+            }
+        }
+
+        return Integer.MAX_VALUE;
+    }
+
+    private int getIndex(Thread t) {
+        Enumeration e;
+        int index;
+
+        for (index = 0, e = waiters.elements(); e.hasMoreElements(); index++) {
+            RWNode node = (RWNode) e.nextElement();
+
+            if (node.t == t) {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
+    public synchronized void lockRead() {
+        RWNode node;
+        Thread me = Thread.currentThread();
+        int index = getIndex(me);
+
+        if (index == -1) {
+            node = new RWNode(me, RWNode.READER);
+            waiters.addElement(node);
+        } else {
+            node = (RWNode) waiters.elementAt(index);
+        }
+
+        while (getIndex(me) > firstWriter()) {
+            try {
+                wait();
+            } catch (Exception e) {
+            }
+        }
+
+        node.nAcquires++;
+    }
+
+    public synchronized void lockWrite() {
+        RWNode node;
+        Thread me = Thread.currentThread();
+        int index = getIndex(me);
+
+        if (index == -1) {
+            node = new RWNode(me, RWNode.WRITER);
+            waiters.addElement(node);
+        } else {
+            node = (RWNode) waiters.elementAt(index);
+
+            if (node.state == RWNode.READER) {
+                throw new IllegalArgumentException("Upgrade lock");
+            }
+
+            node.state = RWNode.WRITER;
+        }
+
+        while (getIndex(me) != 0) {
+            try {
+                wait();
+            } catch (Exception e) {
+            }
+        }
+
+        node.nAcquires++;
+    }
+
+    public synchronized void unlock() {
+        RWNode node;
+        Thread me = Thread.currentThread();
+        int index;
+        index = getIndex(me);
+
+        if (index > firstWriter()) {
+            throw new IllegalArgumentException("Lock not held");
+        }
+
+        node = (RWNode) waiters.elementAt(index);
+        node.nAcquires--;
+
+        if (node.nAcquires == 0) {
+            waiters.removeElementAt(index);
+            notifyAll();
+        }
+    }
+}

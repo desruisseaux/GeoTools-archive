@@ -143,7 +143,7 @@ public class ShapefileReader {
 		this.useMemoryMappedBuffer=useMemoryMapped;
 		randomAccessEnabled = channel instanceof FileChannel;
 		this.lock = lock;
-		lock.startRead();
+		lock.lockRead();
 		init(strict);
 	}
 
@@ -278,7 +278,7 @@ public class ShapefileReader {
 	 *             If errors occur while closing the channel.
 	 */
 	public void close() throws IOException {
-		lock.endRead();
+		lock.unlock();
 		if (channel.isOpen()) {
 			channel.close();
 		}

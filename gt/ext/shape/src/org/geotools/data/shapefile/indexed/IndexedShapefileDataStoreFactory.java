@@ -39,7 +39,6 @@ package org.geotools.data.shapefile.indexed;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import java.io.IOException;
 import java.net.MalformedURLException;

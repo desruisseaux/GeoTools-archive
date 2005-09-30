@@ -77,7 +77,6 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
@@ -208,9 +207,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      * Creates a new instance of ShapefileDataStore.
      *
      * @param url The URL of the shp file to use for this DataSource.
-     * @param createIndex enable/disable index usage (mainly for testing)
-     * @param useMemoryMappedBuffer enable/disable memory mapping of files
      * @param createIndex enable/disable automatic index creation if needed
+     * @param useMemoryMappedBuffer enable/disable memory mapping of files
      * @param treeType DOCUMENT ME!
      *
      * @throws java.net.MalformedURLException
@@ -875,15 +873,15 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                 }
 
                 if (parent != null) {
-                    schema = FeatureTypeFactory.newFeatureType(readAttributes(),
+                    schema = FeatureTypes.newFeatureType(readAttributes(),
                             createFeatureTypeName(), namespace, false,
                             new FeatureType[] { parent });
                 } else {
                     if (namespace != null) {
-                        schema = FeatureTypeFactory.newFeatureType(readAttributes(),
+                        schema = FeatureTypes.newFeatureType(readAttributes(),
                                 createFeatureTypeName(), namespace, false);
                     } else {
-                        schema = FeatureTypeFactory.newFeatureType(readAttributes(),
+                        schema = FeatureTypes.newFeatureType(readAttributes(),
                                 createFeatureTypeName(), GMLSchema.NAMESPACE,
                                 false);
                     }
@@ -1391,9 +1389,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         // required header
         private int shapefileLength = 100;
 
-        // hold the defaultGeometry index in the FeatureType
-        private int defaultGeometryIdx;
-
         // keep track of the number of records written
         private int records = 0;
 
@@ -1608,7 +1603,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             FileChannel out = null;
 
             try {
-                readWriteLock.startWrite();
+                readWriteLock.lockWrite();
                 in = new FileInputStream(storage).getChannel();
                 out = new FileOutputStream(dest).getChannel();
 
@@ -1621,7 +1616,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
                 storage.delete();
             } finally {
-                readWriteLock.endWrite();
+                readWriteLock.unlock();
 
                 if (in != null) {
                     in.close();
