@@ -113,4 +113,24 @@ public class DbaseFileTest extends TestCaseSupport {
     f.delete();
   }
   
+  public void testFieldFormatter() throws Exception {
+      DbaseFileWriter.FieldFormatter formatter=new DbaseFileWriter.FieldFormatter();
+      
+      String stringWithInternationChars="hello "+'\u20ac';
+      
+      System.out.println(stringWithInternationChars);
+      
+      String formattedString=formatter.getFieldString(10, stringWithInternationChars);
+      
+      assertEquals("          ".getBytes().length, formattedString.getBytes().length);
+    
+      //test when the string is too big.
+      stringWithInternationChars='\u20ac'+"1234567890";
+      formattedString=formatter.getFieldString(10, stringWithInternationChars);
+      
+      assertEquals("          ".getBytes().length, formattedString.getBytes().length);
+    
+    
+  }
+  
 }

@@ -106,12 +106,14 @@ public class DbaseFileWriter  {
     
     for (int i = 0; i < header.getNumFields(); i++) {
       String fieldString = fieldString(record[i], i);
-//      if ( header.getFieldLength(i) != fieldString.getBytes().length) {
-//          System.out.println(i + " : " + header.getFieldName(i));
-//      }
+      if ( header.getFieldLength(i) != fieldString.getBytes().length) {
+          System.out.println(i + " : " + header.getFieldName(i)+" value = "+fieldString+"");
+          buffer.put(new byte[header.getFieldLength(i)]);
+      }else{
+          buffer.put(fieldString.getBytes());
+      }
       
       
-      buffer.put(fieldString.getBytes());
     
     }
     
@@ -202,7 +204,7 @@ public class DbaseFileWriter  {
     private StringBuffer buffer = new StringBuffer(255);
     private NumberFormat numFormat = NumberFormat.getNumberInstance(Locale.US);
     private Calendar calendar = Calendar.getInstance(Locale.US);
-    private String emtpyString;
+    private String emptyString;
     private static final int MAXCHARS = 255;
     
     public FieldFormatter() {
@@ -216,23 +218,40 @@ public class DbaseFileWriter  {
         sb.setCharAt(i, ' ');
       }
       
-      emtpyString = sb.toString();
+      emptyString = sb.toString();
     }
     
     public String getFieldString(int size, String s) {
-      buffer.replace(0, size, emtpyString);
+      buffer.replace(0, size, emptyString);
       buffer.setLength(size);
-      
+      int unit=" ".getBytes().length;
+      //international characters must be accounted for so size != length.
+      int maxSize=size;
       if(s != null) {
         buffer.replace(0, size, s);
-        if(s.length() <= size) {
-          for(int i = s.length(); i < size; i++) {
-            buffer.append(' ');
-          }
+        int currentBytes=s.substring(0, Math.min(size, s.length())).getBytes().length;
+        if( currentBytes>size ){
+            char[] c=new char[1];
+            for( int index=size-1; currentBytes>size; index--){
+                c[0] = buffer.charAt(index);
+                String string=new String(c);
+                buffer.deleteCharAt(index);
+                currentBytes-=string.getBytes().length;
+                maxSize--;
+            }
+        }else{
+            if(s.length() < size) {
+                maxSize=size-(currentBytes-s.length());
+              for(int i = s.length(); i < size; i++) {
+                buffer.append(' ');
+              }
+            }
         }
       }
       
-      buffer.setLength(size);
+      buffer.setLength(maxSize);
+
+      System.out.println(buffer.toString().getBytes().length);
       return buffer.toString();
     }
     
@@ -268,7 +287,7 @@ public class DbaseFileWriter  {
         buffer.append(day);
       } else {
         buffer.setLength(8);
-        buffer.replace(0, 8, emtpyString);
+        buffer.replace(0, 8, emptyString);
       }
       
       buffer.setLength(8);
