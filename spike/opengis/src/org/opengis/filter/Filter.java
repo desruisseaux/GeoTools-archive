@@ -29,6 +29,27 @@ import org.opengis.feature.Feature;
  * @since GeoAPI 2.0
  */
 public interface Filter {
+	
+	Filter ALL = new Filter(){
+		public Boolean evaluate(Object instance){
+			return Boolean.FALSE;
+		}
+		
+	    public boolean accepts( Feature feature ){
+	    	return false;
+	    }
+	};
+	
+	Filter NONE = new Filter(){
+		public Boolean evaluate(Object instance){
+			return Boolean.TRUE;
+		}
+		
+	    public boolean accepts( Feature feature ){
+	    	return true;
+	    }
+	};
+
 	/**
      * Given an instance, this method determines whether test(s)represented by this filter object are passed.
      * 
