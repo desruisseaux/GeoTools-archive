@@ -16,7 +16,7 @@ public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 	protected final Descriptor SCHEMA;
 	
 	public ComplexTypeImpl( String name, Descriptor schema){
-		this( new QName( name), null );
+		this( new QName( name), schema );
 	}
 	public ComplexTypeImpl( QName name, Descriptor schema){
 		super( name, null );

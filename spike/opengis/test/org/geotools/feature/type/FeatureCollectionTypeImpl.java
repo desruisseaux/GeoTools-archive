@@ -17,7 +17,7 @@ public class FeatureCollectionTypeImpl extends FeatureTypeImpl implements Featur
 		super(name, schema, defaultGeom);
 		MEMBERDESCRIPTOR = members;
 	}
-	public FeatureCollectionTypeImpl( QName name, Descriptor members, Descriptor schema, AttributeType defaultGeom, Set<Filter> restrictions, ComplexType superType, boolean isAbstract){
+	public FeatureCollectionTypeImpl( QName name, Descriptor members, Descriptor schema, AttributeType defaultGeom, Set<Filter> restrictions, FeatureCollectionType superType, boolean isAbstract){
 		super( name, schema, defaultGeom, restrictions, superType, isAbstract );
 		MEMBERDESCRIPTOR = members;
 	}	

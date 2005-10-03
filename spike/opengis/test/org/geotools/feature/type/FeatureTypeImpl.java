@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.opengis.feature.Feature;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -17,11 +18,11 @@ public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 		this( new QName( name ), schema, defaultGeom );
 	}	
 	public FeatureTypeImpl(QName name, Descriptor schema, AttributeType defaultGeom ) {
-		super(name, schema, true, null, false, null);
+		super(name, schema, true, Feature.class, false, null);
 		DEFAULT = defaultGeom;
 	}
-	public FeatureTypeImpl(QName name, Descriptor schema, AttributeType defaultGeom, Set<Filter> restrictions, ComplexType superType, boolean isAbstract){
-		super(name, schema, true, null, false, restrictions, superType, isAbstract );
+	public FeatureTypeImpl(QName name, Descriptor schema, AttributeType defaultGeom, Set<Filter> restrictions, FeatureType superType, boolean isAbstract){
+		super(name, schema, true, Feature.class, false, restrictions, superType, isAbstract );
 	}
 	public AttributeType getDefaultGeometry() {
 		return DEFAULT;
