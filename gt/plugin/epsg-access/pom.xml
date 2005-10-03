@@ -1,0 +1,67 @@
+<!-- ====================================================
+         Maven 2 project configuration file
+         http://maven.apache.org/maven2/
+
+         Configuration file for the Geotools 2 project
+         http://www.geotools.org
+
+         Version: $Id$
+     ==================================================== -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt2</artifactId>
+    <version>2.2.x</version>
+  </parent>
+
+
+  <!-- ==================================================== -->
+  <!--     Module description                               -->
+  <!-- ==================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>epsg-access</artifactId>
+  <packaging>jar</packaging>
+  <name>EPSG Authoriy Service using MS-Access database</name>
+  <url>http://modules.geotools.org/epsg-access</url>
+  <description>
+    Connection to EPSG database using MS-Access engine. This is the primary format
+    released by EPSG, so it should be understood as the most "official" one.
+    This plugin is very short and contains nothing else than connection parameters.
+    The user must install himself the EPSG database on his machine.
+  </description>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Developers and contributors                      -->
+  <!-- ==================================================== -->
+  <developers>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+
+  <!-- ==================================================== -->
+  <!--     External dependencies                            -->
+  <!-- ==================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>referencing</artifactId>
+      <version>2.2.x</version>
+    </dependency>
+  </dependencies>
+
+</project>

@@ -26,6 +26,10 @@
   <packaging>jar</packaging>
   <name>Main module</name>
   <url>http://modules.geotools.org/main</url>
+  <description>
+    The main module contains the key interfaces and default
+    implementations that are used by other GeoTools modules.
+  </description>
 
 
 

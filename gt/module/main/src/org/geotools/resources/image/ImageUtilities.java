@@ -26,13 +26,9 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderedImageFactory;
 import java.util.List;
 import java.util.Iterator;
-import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
 // Image I/O and JAI dependencies
 import javax.imageio.spi.IIORegistry;
@@ -332,69 +328,6 @@ public final class ImageUtilities {
             }
         }
         return Utilities.getShortClassName(interp);
-    }
-
-    /**
-     * Loads the {@code registryFile.jai} file. This method is invoked if JAI core failed to load
-     * the {@code registryFile.jai} file by itself, usually because the file is accessible from a
-     * {@linkplain ClassLoader class loader} which is not the JAI class loader. The caller is
-     * responsible to ensure that the {@code registryFile.jai} file really need to be loaded
-     * (usually by checking if some expected operation is absent from the
-     * {@linkplain OperationRegistry operation registry}).
-     * <p>
-     * In order to avoid parsing {@code registryFile.jai} files from other JAR files than the
-     * targeted one, an identifier is expected. This method will parse a {@code registryFile.jai}
-     * file only if the first line starts with "{@code #!}" followed by this identifier. For
-     * example if {@code identifier} is "{@code org.geotools}", then the first line must be
-     * "{@code #!org.geotools}", otherwise it will be ignored.
-     * <p>
-     * All exceptions encountered while parsing the registry file are caught and their error
-     * messages are redirected to {@link System#err} or logged.
-     *
-     * @param loader     The class loader to use for loading the {@code registryFile.jai} resource.
-     * @param identifier The identifier expected on the first line of {@code registryFile.jai}.
-     *
-     * @deprecated Doesn't seem to work because we have no way to specify the class loader to
-     *             {@code updateFromStream}. Commited anyway in order to keep this code in the
-     *             SVN history, but will be removed soon.
-     */
-    public static boolean loadRegistryFileJAI(final ClassLoader loader,
-                                              final String  identifier)
-    {
-        final String filename = "META-INF/registryFile.jai";
-        final String encoding = "UTF-8";
-        final String expected = "#!" + identifier + '\n';
-        OperationRegistry registry = null;
-        try {
-            final byte[] header = new byte[expected.getBytes(encoding).length];
-            final Enumeration urls = loader.getResources(filename);
-            while (urls.hasMoreElements()) {
-                final URL url = (URL) urls.nextElement();
-                final InputStream in = url.openStream();
-                if (in.read(header) == header.length) {
-                    if (header[header.length-1] == '\r') {
-                        header[header.length-1] = '\n';
-                    }
-                    if (expected.equals(new String(header, encoding))) {
-                        if (registry == null) {
-                            registry = JAI.getDefaultInstance().getOperationRegistry();
-                        }
-                        registry.updateFromStream(in);
-                    }
-                }
-                in.close();
-            }
-        } catch (IOException exception) {
-            final LogRecord record = Errors.getResources(null).getLogRecord(Level.WARNING,
-                                     ErrorKeys.CANT_READ_$1, filename);
-            record.setSourceClassName(Utilities.getShortClassName(ImageUtilities.class));
-            record.setSourceMethodName("loadRegistryFileJAI");
-            record.setThrown(exception);
-            Logger.getLogger("org.geotools.coverage").log(record);
-            // We used the "org.geotools.coverage" logger since this method is usually
-            // invoked from the grid coverage processor or one of its operations.
-        }
-        return false;
     }
 
     /**

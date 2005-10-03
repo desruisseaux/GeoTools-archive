@@ -1,0 +1,70 @@
+<!-- ====================================================
+         Maven 2 project configuration file
+         http://maven.apache.org/maven2/
+
+         Configuration file for the Geotools 2 project
+         http://www.geotools.org
+
+         Version: $Id$
+     ==================================================== -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt2</artifactId>
+    <version>2.2.x</version>
+  </parent>
+
+
+  <!-- ==================================================== -->
+  <!--     Module description                               -->
+  <!-- ==================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>epsg-hsql</artifactId>
+  <packaging>jar</packaging>
+  <name>EPSG Authoriy Service using WKT file</name>
+  <url>http://modules.geotools.org/epsg-wkt</url>
+  <description>
+    EPSG and AUTO authority factories are defined for data.crs.CRSService.
+    These codes are used to provide CoordinateRegerenceSystem for GCE and
+    DataStore implementations that do not define their own native definition.
+  
+    Contains a Property file based CoordinateSystemAuthority (the property file is too
+    large to be included in the main geotools release). This class will need to be
+    ported to the new GeoAPI CoordinateReferenceSystem interfaces.
+  </description>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Developers and contributors                      -->
+  <!-- ==================================================== -->
+  <developers>
+    <developer>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+
+  <!-- ==================================================== -->
+  <!--     External dependencies                            -->
+  <!-- ==================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>referencing</artifactId>
+      <version>2.2.x</version>
+    </dependency>
+  </dependencies>
+
+</project>

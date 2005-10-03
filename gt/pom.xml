@@ -23,16 +23,17 @@
   <version>2.2.x</version>
   <name>Geotools 2</name>
   <url>http://modules.geotools.org</url>
+  <description>
+    Welcome to the homepage of the GeoTool2 build process
+    In the left side bar you should see a list of active modules,
+    visit each for more details on the status of each module.
+  </description>
 
   <organization>
     <name>Geotools</name>
     <url>http://www.geotools.org</url>
   </organization>
   <inceptionYear>1996</inceptionYear>
-
-  <modules>
-    <module>module/referencing</module>
-  </modules>
 
   <licenses>
     <license>
@@ -472,5 +473,18 @@
       </plugin>
     </plugins>
   </build>
+
+
+
+
+  <!-- ==================================================== -->
+  <!--     All Geotools 2 modules included in the build     -->
+  <!-- ==================================================== -->
+  <modules>
+    <module>module/referencing</module>
+    <module>plugin/epsg-access</module>
+    <module>plugin/epsg-postgresql</module>
+    <module>plugin/epsg-wkt</module>
+  </modules>
 
 </project>
