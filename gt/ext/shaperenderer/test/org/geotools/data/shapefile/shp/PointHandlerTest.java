@@ -30,15 +30,14 @@ import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.PointHandler;
-import org.geotools.renderer.shape.ShapefileRenderer;
 import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.resources.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -60,7 +59,7 @@ public class PointHandlerTest extends TestCase {
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform mt=CRS.transform(crs, DefaultGeographicCRS.WGS84);
 		
-		AffineTransform transform=ShapefileRenderer.worldToScreenTransform(env, new Rectangle(300,300));
+		AffineTransform transform=RendererUtilities.worldToScreenTransform(env, new Rectangle(300,300));
 		GeneralMatrix matrix=new GeneralMatrix(transform);
 		MathTransform at=FactoryFinder.getMathTransformFactory(null).createAffineTransform(matrix);
 		mt=FactoryFinder.getMathTransformFactory(null).createConcatenatedTransform(mt,at);

@@ -1228,7 +1228,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 
                 storage.delete();
             } finally {
-                readWriteLock.unlock();
+                readWriteLock.unlockWrite();
                 if( in != null ) in.close();
                 if( out != null ) out.close();
             }

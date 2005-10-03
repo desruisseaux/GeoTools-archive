@@ -87,10 +87,14 @@ public class DataTestCase extends TestCase {
         super(arg0);        
     }
 
+    protected void setUp() throws Exception {
+        dataSetUp();
+    }
+    
     /*
      * @see TestCase#setUp()
      */
-    protected void setUp() throws Exception {
+    protected void dataSetUp() throws Exception {
         String namespace = getName();
         roadType = DataUtilities.createType(namespace+".road",
                 "id:0,geom:LineString,name:String");

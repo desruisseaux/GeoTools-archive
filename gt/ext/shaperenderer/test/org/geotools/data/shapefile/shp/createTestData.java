@@ -16,26 +16,26 @@
  */
 package org.geotools.data.shapefile.shp;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import org.geotools.data.DataStore;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.shapefile.ShapefileDataStoreFactory;
-import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.IllegalAttributeException;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.NoSuchElementException;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.IllegalAttributeException;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 
 public class createTestData {

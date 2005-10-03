@@ -26,7 +26,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * Tests the LiteRenderer labelling algorithms
+ * Tests the StreamingRenderer labelling algorithms
  * 
  * @author jeichar
  * @since 0.9.0
@@ -78,7 +78,9 @@ public class LabelingTest extends TestCase {
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(collection, style);
-        LiteRenderer renderer = new LiteRenderer(map);
+
+        StreamingRenderer renderer=new StreamingRenderer();
+        renderer.setContext(map);
         Envelope env = map.getLayerBounds();
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
@@ -124,7 +126,7 @@ public class LabelingTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("centre", point.getClass());
 		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType pointType = FeatureTypeFactory.newFeatureType(types, Rendering2DTest.POINT);
+		FeatureType pointType = FeatureTypes.newFeatureType(types, Rendering2DTest.POINT);
 		Feature pointFeature = pointType.create(new Object[]{point, name});
 		return pointFeature;
 	}
@@ -136,7 +138,9 @@ public class LabelingTest extends TestCase {
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(collection, style);
-        LiteRenderer renderer = new LiteRenderer(map);
+
+        StreamingRenderer renderer=new StreamingRenderer();
+        renderer.setContext(map);
         Envelope env = map.getLayerBounds();
         int boundary=10;
         Rendering2DTest.INTERACTIVE=INTERACTIVE;
@@ -174,7 +178,7 @@ public class LabelingTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("centre", line.getClass());
 		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType pointType = FeatureTypeFactory.newFeatureType(types, Rendering2DTest.LINE);
+		FeatureType pointType = FeatureTypes.newFeatureType(types, Rendering2DTest.LINE);
 		Feature pointFeature = pointType.create(new Object[]{line, name});
 		
 		return pointFeature;
@@ -185,7 +189,8 @@ public class LabelingTest extends TestCase {
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(collection, style);
-        LiteRenderer renderer = new LiteRenderer(map);
+        StreamingRenderer renderer=new StreamingRenderer();
+        renderer.setContext(map);
         Envelope env = map.getLayerBounds();
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
@@ -223,7 +228,7 @@ public class LabelingTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("centre", line.getClass());
 		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType pointType = FeatureTypeFactory.newFeatureType(types, Rendering2DTest.POLYGON);
+		FeatureType pointType = FeatureTypes.newFeatureType(types, Rendering2DTest.POLYGON);
 		Feature pointFeature = pointType.create(new Object[]{poly, name});
 		
 		return pointFeature;

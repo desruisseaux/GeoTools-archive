@@ -14,11 +14,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -32,12 +31,11 @@ import org.geotools.data.Query;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
@@ -49,11 +47,11 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.wkt.Parser;
+import org.geotools.renderer.GTRenderer;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -95,12 +93,15 @@ public class Rendering2DTest extends TestCase {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
     public static boolean INTERACTIVE=false;
     private static final FilterFactory filterFactory = FilterFactory.createFilterFactory();
-    private Object transform;
     static final String LINE = "linefeature";
     static final String POLYGON = "polygonfeature";
     static final String POINT = "pointfeature";
     static final String RING = "ringfeature";
     static final String COLLECTION = "collfeature";
+    static final Map rendererHints=new HashMap();
+    {
+        rendererHints.put("optimizedDataLoadingEnabled", new Boolean(true));
+    }
 
     public Rendering2DTest( java.lang.String testName ) {
         super(testName);
@@ -203,7 +204,7 @@ public class Rendering2DTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("centerline", line.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-        FeatureType lineType = FeatureTypeFactory.newFeatureType(types, LINE);
+        FeatureType lineType = FeatureTypes.newFeatureType(types, LINE);
         Feature lineFeature = lineType.create(new Object[]{line, "centerline"});
 
         Polygon polygon = makeSamplePolygon(geomFac);
@@ -214,7 +215,7 @@ public class Rendering2DTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("edge", polygon.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-        FeatureType polygonType = FeatureTypeFactory.newFeatureType(types, POLYGON);
+        FeatureType polygonType = FeatureTypes.newFeatureType(types, POLYGON);
 
         Feature polygonFeature = polygonType.create(new Object[]{polygon, "edge"});
 
@@ -225,7 +226,7 @@ public class Rendering2DTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("centre", point.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-        FeatureType pointType = FeatureTypeFactory.newFeatureType(types, POINT);
+        FeatureType pointType = FeatureTypes.newFeatureType(types, POINT);
 
         Feature pointFeature = pointType.create(new Object[]{point, "centre"});
 
@@ -236,7 +237,7 @@ public class Rendering2DTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("centerline", line.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-        FeatureType lrType = FeatureTypeFactory.newFeatureType(types, RING);
+        FeatureType lrType = FeatureTypes.newFeatureType(types, RING);
         Feature ringFeature = lrType.create(new Object[]{ring, "centerline"});
 
         GeometryCollection coll = makeSampleGeometryCollection(geomFac);
@@ -246,7 +247,7 @@ public class Rendering2DTest extends TestCase {
         else
             types[0] = AttributeTypeFactory.newAttributeType("collection", coll.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-        FeatureType collType = FeatureTypeFactory.newFeatureType(types, COLLECTION);
+        FeatureType collType = FeatureTypes.newFeatureType(types, COLLECTION);
         Feature collFeature = collType.create(new Object[]{coll, "collection"});
 
         MemoryDataStore data = new MemoryDataStore();
@@ -269,7 +270,9 @@ public class Rendering2DTest extends TestCase {
 
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
-        LiteRenderer renderer = new LiteRenderer(map);
+        StreamingRenderer renderer=new StreamingRenderer();
+        renderer.setContext(map);
+        renderer.setRendererHints(rendererHints);
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
                 .getMaxY() + 20);
@@ -305,7 +308,10 @@ public class Rendering2DTest extends TestCase {
 
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
-        LiteRenderer renderer = new LiteRenderer(map);
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(map);
+        renderer.setRendererHints(rendererHints);
+
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
                 .getMaxY() + 20);
@@ -323,7 +329,10 @@ public class Rendering2DTest extends TestCase {
 
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
-        LiteRenderer renderer = new LiteRenderer(map);
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(map);
+        renderer.setRendererHints(rendererHints);
+
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
                 .getMaxY() + 20);
@@ -353,7 +362,10 @@ public class Rendering2DTest extends TestCase {
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        LiteRenderer renderer = new LiteRenderer(map);
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(map);
+        renderer.setRendererHints(rendererHints);
+
         CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
@@ -366,7 +378,7 @@ public class Rendering2DTest extends TestCase {
         map.setAreaOfInterest(bounds, crs);
 
         Rectangle rect = new Rectangle(400, 400);
-        renderer.setOptimizedDataLoadingEnabled(true);
+//        renderer.setOptimizedDataLoadingEnabled(true);
 
         env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
                 bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
@@ -397,7 +409,11 @@ public class Rendering2DTest extends TestCase {
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        LiteRenderer renderer = new LiteRenderer(map);
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(map);
+        renderer.setRendererHints(rendererHints);
+
+
         CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
@@ -410,7 +426,7 @@ public class Rendering2DTest extends TestCase {
         map.setAreaOfInterest(bounds, crs);
 
         Rectangle rect = new Rectangle(400, 400);
-        renderer.setOptimizedDataLoadingEnabled(true);
+//        renderer.setOptimizedDataLoadingEnabled(true);
 
         env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
                 bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
@@ -442,7 +458,10 @@ public class Rendering2DTest extends TestCase {
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        LiteRenderer renderer = new LiteRenderer(map);
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(map);
+        renderer.setRendererHints(rendererHints);
+
         
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
@@ -461,7 +480,7 @@ public class Rendering2DTest extends TestCase {
         map.setAreaOfInterest(bounds, crs);
 
         Rectangle rect = new Rectangle(400, 400);
-        renderer.setOptimizedDataLoadingEnabled(true);
+//        renderer.setOptimizedDataLoadingEnabled(true);
 
         env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
                 bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
@@ -492,7 +511,10 @@ public class Rendering2DTest extends TestCase {
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        LiteRenderer renderer = new LiteRenderer(map);
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(map);
+        renderer.setRendererHints(rendererHints);
+
         CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
@@ -505,7 +527,7 @@ public class Rendering2DTest extends TestCase {
         map.setAreaOfInterest(bounds, crs);
 
         Rectangle rect = new Rectangle(400, 400);
-        renderer.setOptimizedDataLoadingEnabled(true);
+//        renderer.setOptimizedDataLoadingEnabled(true);
 
         env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
                 bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
@@ -517,7 +539,7 @@ public class Rendering2DTest extends TestCase {
 
     
     /**
-     * Tests the layer definition query behavior as implemented by LiteRenderer.
+     * Tests the layer definition query behavior as implemented by StreamingRenderer.
      * <p>
      * This method relies on the features created on createTestFeatureCollection()
      * </p>
@@ -538,10 +560,12 @@ public class Rendering2DTest extends TestCase {
         MapLayer layer = new DefaultMapLayer(ft, style);
         MapContext map = new DefaultMapContext(new MapLayer[]{layer});
         map.setAreaOfInterest(envelope);
-        LiteRenderer renderer = new LiteRenderer(map);
-        renderer.setOptimizedDataLoadingEnabled(true);
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(map);
+        renderer.setRendererHints(rendererHints);
 
-        // this is the reader that LiteRenderer obtains after applying
+
+        // this is the reader that StreamingRenderer obtains after applying
         // the mixed filter to a given layer.
         FeatureReader reader;
         Filter filter = Filter.NONE;
@@ -676,19 +700,12 @@ public class Rendering2DTest extends TestCase {
      * @param bounds
      */
     private static void render( Object obj, Graphics g, Rectangle rect, Envelope bounds ) {
-        if (obj instanceof LiteRenderer) {
-            LiteRenderer renderer = (LiteRenderer) obj;
+        if (obj instanceof GTRenderer) {
+            GTRenderer renderer = (GTRenderer) obj;
             if (bounds == null)
                 renderer.paint((Graphics2D) g, rect, new AffineTransform());
             else
-                renderer.paint((Graphics2D) g, rect, renderer.worldToScreenTransform(bounds, rect));
-        }
-        if (obj instanceof LiteRenderer) {
-            LiteRenderer renderer = (LiteRenderer) obj;
-            if (bounds == null)
-                renderer.paint((Graphics2D) g, rect, new AffineTransform());
-            else
-                renderer.paint((Graphics2D) g, rect, renderer.worldToScreenTransform(bounds, rect));
+                renderer.paint((Graphics2D) g, rect, RendererUtilities.worldToScreenTransform(bounds, rect));
         }
     }
 
@@ -701,7 +718,7 @@ public class Rendering2DTest extends TestCase {
         types[2] = AttributeTypeFactory.newAttributeType("line", LineString.class);
         types[3] = AttributeTypeFactory.newAttributeType("polygon", Polygon.class);
 
-        FeatureType type = FeatureTypeFactory.newFeatureType(types, "querytest");
+        FeatureType type = FeatureTypes.newFeatureType(types, "querytest");
 
         GeometryFactory gf = new GeometryFactory();
         Feature f;
@@ -879,7 +896,7 @@ public class Rendering2DTest extends TestCase {
     	DefaultProjectedCRS crs  = (DefaultProjectedCRS) parser.parseObject(wkt);
 
     	
-    	double s = LiteRenderer.calculateScale( envelope, crs,
+    	double s = RendererUtilities.calculateScale( envelope, crs,
     			       655, 368, 90.0) ;
     	
     	assertTrue( Math.abs(102355-s) < 10 ); //102355.1639202933

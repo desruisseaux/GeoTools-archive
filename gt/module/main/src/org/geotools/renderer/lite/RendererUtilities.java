@@ -2,8 +2,11 @@ package org.geotools.renderer.lite;
 
 import java.awt.Rectangle;
 import java.awt.geom.*;
-import java.awt.geom.AffineTransform;
 
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 /*
@@ -16,7 +19,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 
 /**
- *   Class for holding utility functions that are common tasks for people using the  "StreamingRenderer/Renderer".
+ * Class for holding utility functions that are common tasks for people using the  "StreamingRenderer/Renderer".
  * 
  * 
  * @author dblasby
@@ -71,5 +74,48 @@ public class RendererUtilities
         return new Envelope(
                 Math.min(x1, x2), Math.max(x1, x2),
                 Math.min(y1, y2), Math.max(y1, y2));        
+    }
+
+    /**
+     * Find the scale denominator of the map.
+     *   Method:
+     *    1. find the diagonal distance (meters)
+     *    2. find the diagonal distance (pixels)
+     *    3. find the diagonal distance (meters) -- use DPI
+     *    4. calculate scale (#1/#2)
+     *
+     *   NOTE: return the scale denominator not the actual scale (1/scale = denominator)
+     *
+     * TODO:  (SLD spec page 28):
+     * Since it is common to integrate the output of multiple servers into a single displayed result in the
+     * web-mapping environment, it is important that different map servers have consistent behaviour with respect to
+     * processing scales, so that all of the independent servers will select or deselect rules at the same scales.
+     * To insure consistent behaviour, scales relative to coordinate spaces must be handled consistently between map
+     * servers. For geographic coordinate systems, which use angular units, the angular coverage of a map should be
+     * converted to linear units for computation of scale by using the circumference of the Earth at the equator and
+     * by assuming perfectly square linear units. For linear coordinate systems, the size of the coordinate space
+     * should be used directly without compensating for distortions in it with respect to the shape of the real Earth.
+     *
+     * NOTE: we are actually doing a a much more exact calculation, and accounting for non-square pixels (which are allowed in WMS)
+     *
+     * @param envelope
+     * @param coordinateReferenceSystem
+     * @param imageWidth
+     * @param imageHeight
+     * @param DPI screen dots per inch (OGC standard is 90)
+     * @return
+     */
+    public static double calculateScale(Envelope envelope, CoordinateReferenceSystem coordinateReferenceSystem,int imageWidth,int imageHeight,double DPI) throws Exception {
+        double diagonalGroundDistance = CRS.distance(
+                new Coordinate(envelope.getMinX(),envelope.getMinY()),
+                new Coordinate(envelope.getMaxX(),envelope.getMaxY()),
+                coordinateReferenceSystem
+                );
+        // pythagorus theorm
+        double diagonalPixelDistancePixels = Math.sqrt( imageWidth*imageWidth+imageHeight*imageHeight);
+        double diagonalPixelDistanceMeters = diagonalPixelDistancePixels / DPI * 2.54 / 100; // 2.54 = cm/inch, 100= cm/m
+        
+        
+        return diagonalGroundDistance/diagonalPixelDistanceMeters; // remember, this is the denominator, not the actual scale;
     }
 }

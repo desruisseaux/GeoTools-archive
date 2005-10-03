@@ -30,10 +30,10 @@ import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.PolygonHandler;
-import org.geotools.renderer.shape.ShapefileRenderer;
 import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.resources.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -85,7 +85,7 @@ public class PolygonHandlerTest extends TestCase {
 //		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform mt= CRS.transform(crs, DefaultGeographicCRS.WGS84);
-		AffineTransform at=ShapefileRenderer.worldToScreenTransform(env,new Rectangle(300,300));
+		AffineTransform at=RendererUtilities.worldToScreenTransform(env,new Rectangle(300,300));
 		mt = FactoryFinder.getMathTransformFactory(null)
 		.createConcatenatedTransform(mt, FactoryFinder.getMathTransformFactory(null)
 				.createAffineTransform(new GeneralMatrix(at)));

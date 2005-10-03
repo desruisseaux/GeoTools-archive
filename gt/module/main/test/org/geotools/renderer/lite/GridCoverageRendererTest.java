@@ -18,9 +18,6 @@ package org.geotools.renderer.lite;
 
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -67,7 +64,8 @@ public class GridCoverageRendererTest extends TestCase {
         
         MapContext context=new DefaultMapContext();
         context.addLayer(coverage, getStyle());
-        LiteRenderer renderer=new LiteRenderer(context);
+        StreamingRenderer renderer=new StreamingRenderer();
+        renderer.setContext(context);
         Envelope env = context.getLayerBounds();
         int boundary=1;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
@@ -102,7 +100,9 @@ public class GridCoverageRendererTest extends TestCase {
          
          context.setAreaOfInterest(context.getLayerBounds(), crs);
          
-         LiteRenderer renderer=new LiteRenderer(context);
+         StreamingRenderer renderer=new StreamingRenderer();
+         renderer.setContext(context);
+
 
          Envelope env = context.getLayerBounds();
          int boundary=1;

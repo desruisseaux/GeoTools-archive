@@ -520,8 +520,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 		String typeName = featureType.getTypeName();
 		
 		try {
-			if( connection == null )
-				createConnection();
+			createConnection();
 			Statement st = connection.createStatement();
 		    String sql = "DROP TABLE " + typeName;
 		    st.execute(sql);

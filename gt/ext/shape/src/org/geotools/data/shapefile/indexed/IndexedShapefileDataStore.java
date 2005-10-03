@@ -1616,7 +1616,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
                 storage.delete();
             } finally {
-                readWriteLock.unlock();
+                readWriteLock.unlockWrite();
 
                 if (in != null) {
                     in.close();

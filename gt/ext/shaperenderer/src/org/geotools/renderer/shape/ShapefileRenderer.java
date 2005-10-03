@@ -16,83 +16,12 @@
  */
 package org.geotools.renderer.shape;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.data.DataStore;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.Query;
-import org.geotools.data.Transaction;
-import org.geotools.data.TransactionStateDiff;
-import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.data.shapefile.ShapefileRendererUtil;
-import org.geotools.data.shapefile.dbf.DbaseFileHeader;
-import org.geotools.data.shapefile.dbf.DbaseFileReader;
-import org.geotools.data.shapefile.shp.ShapeType;
-import org.geotools.data.shapefile.shp.ShapefileReader;
-import org.geotools.data.shapefile.shp.ShapefileReader.Record;
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultFeature;
-import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.IllegalFilterException;
-import org.geotools.geometry.JTS;
-import org.geotools.index.quadtree.StoreException;
-import org.geotools.map.DefaultMapContext;
-import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.renderer.RenderListener;
-import org.geotools.renderer.lite.Decimator;
-import org.geotools.renderer.lite.LabelCache;
-import org.geotools.renderer.lite.LabelCacheDefault;
-import org.geotools.renderer.lite.ListenerList;
-import org.geotools.renderer.lite.LiteCoordinateSequence;
-import org.geotools.renderer.lite.LiteCoordinateSequenceFactory;
-import org.geotools.renderer.lite.LiteRenderer;
-import org.geotools.renderer.lite.LiteShape2;
-import org.geotools.renderer.style.SLDStyleFactory;
-import org.geotools.renderer.style.Style2D;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.PointSymbolizer;
-import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.Rule;
-import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
-import org.geotools.styling.StyleAttributeExtractor;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.Symbolizer;
-import org.geotools.styling.TextSymbolizer;
-import org.geotools.util.NumberRange;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -107,7 +36,79 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.media.jai.util.Range;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.Query;
+import org.geotools.data.Transaction;
+import org.geotools.data.TransactionStateDiff;
+import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.shapefile.ShapefileRendererUtil;
+import org.geotools.data.shapefile.dbf.DbaseFileHeader;
+import org.geotools.data.shapefile.dbf.DbaseFileReader;
+import org.geotools.data.shapefile.shp.ShapeType;
+import org.geotools.data.shapefile.shp.ShapefileReader;
+import org.geotools.data.shapefile.shp.ShapefileReader.Record;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.DefaultFeature;
+import org.geotools.feature.DefaultFeatureType;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+import org.geotools.filter.Filter;
+import org.geotools.geometry.JTS;
+import org.geotools.index.quadtree.StoreException;
+import org.geotools.map.DefaultMapContext;
+import org.geotools.map.MapContext;
+import org.geotools.map.MapLayer;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.renderer.GTRenderer;
+import org.geotools.renderer.RenderListener;
+import org.geotools.renderer.RenderListener;
+import org.geotools.renderer.lite.Decimator;
+import org.geotools.renderer.lite.LabelCache;
+import org.geotools.renderer.lite.LabelCacheDefault;
+import org.geotools.renderer.lite.ListenerList;
+import org.geotools.renderer.lite.LiteCoordinateSequence;
+import org.geotools.renderer.lite.LiteCoordinateSequenceFactory;
+import org.geotools.renderer.lite.LiteShape2;
+import org.geotools.renderer.lite.RendererUtilities;
+import org.geotools.renderer.style.SLDStyleFactory;
+import org.geotools.renderer.style.Style2D;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.Rule;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleAttributeExtractor;
+import org.geotools.styling.Symbolizer;
+import org.geotools.styling.TextSymbolizer;
+import org.geotools.util.NumberRange;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -117,7 +118,7 @@ import javax.media.jai.util.Range;
  *
  * @since 2.1.x
  */
-public class ShapefileRenderer {
+public class ShapefileRenderer implements GTRenderer{
     public static final Logger LOGGER = Logger.getLogger(
             "org.geotools.renderer.shape");
 
@@ -184,158 +185,21 @@ public class ShapefileRenderer {
     private StyledShapePainter painter = new StyledShapePainter(labelCache);
     private Map decimators = new HashMap();
 
+    private Map rendererHints;
+
+    private Graphics2D outputGraphics;
+
     public ShapefileRenderer(MapContext context) {
-        if (context == null) {
-            context = new DefaultMapContext();
-        }
-
-        this.context = context;
-
-        MapLayer[] layers = context.getLayers();
-        layerIndexInfo = new IndexInfo[layers.length];
-
-        for (int i = 0; i < layers.length; i++) {
-            DataStore ds = layers[i].getFeatureSource().getDataStore();
-            assert (ds instanceof ShapefileDataStore);
-
-            ShapefileDataStore sds = (ShapefileDataStore) ds;
-
-            try {
-                layerIndexInfo[i] = useIndex(sds);
-            } catch (Exception e) {
-                layerIndexInfo[i] = new IndexInfo(IndexInfo.TREE_NONE, null,
-                        null);
-                LOGGER.fine("Exception while trying to use index"
-                    + e.getLocalizedMessage());
-            }
-        }
+        setContext(context);
     }
 
     public void paint(Graphics2D graphics, Rectangle paintArea,
-        Envelope envelope) {
-        AffineTransform transform = worldToScreenTransform(envelope, paintArea);
-
-        if (hints != null) {
-            graphics.setRenderingHints(hints);
-        }
-
-        if ((graphics == null) || (paintArea == null)) {
+        Envelope mapArea) {
+        if (mapArea == null || paintArea == null) {
             LOGGER.info("renderer passed null arguments");
-
             return;
-        }
-
-        // reset the abort flag
-        renderingStopRequested = false;
-
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Affine Transform is " + transform);
-        }
-
-        /*
-         * If we are rendering to a component which has already set up some form
-         * of transformation then we can concatenate our transformation to it.
-         * An example of this is the ZoomPane component of the swinggui module.
-         */
-        if (concatTransforms) {
-            AffineTransform atg = graphics.getTransform();
-
-            //			graphics.setTransform(new AffineTransform());
-            atg.concatenate(transform);
-            transform = atg;
-        }
-
-        try {
-            setScaleDenominator(LiteRenderer.calculateScale(envelope,
-                    context.getCoordinateReferenceSystem(), paintArea.width,
-                    paintArea.height, 90)); // 90 = OGC standard DPI (see SLD spec page 37)
-        } catch (Exception e) // probably either (1) no CRS (2) error xforming
-         {
-            setScaleDenominator(1 / transform.getScaleX()); //DJB old method - the best we can do
-        }
-
-        MapLayer[] layers = context.getLayers();
-
-        // get detstination CRS
-        CoordinateReferenceSystem destinationCrs = context
-            .getCoordinateReferenceSystem();
-        labelCache.start();
-
-        for (int i = 0; i < layers.length; i++) {
-            MapLayer currLayer = layers[i];
-
-            if (!currLayer.isVisible()) {
-                // Only render layer when layer is visible
-                continue;
-            }
-
-            if (renderingStopRequested) {
-                return;
-            }
-
-            labelCache.startLayer();
-
-            Envelope bbox = envelope;
-
-            try {
-                ShapefileDataStore ds = (ShapefileDataStore) currLayer.getFeatureSource()
-                                                                      .getDataStore();
-                CoordinateReferenceSystem dataCRS = ds.getSchema()
-                                                      .getDefaultGeometry()
-                                                      .getCoordinateSystem();
-                MathTransform mt;
-
-                try {
-                    mt = CRS.transform(dataCRS, destinationCrs, true);
-                    bbox = JTS.transform(bbox, mt.inverse(), 10);
-                } catch (Exception e) {
-                    mt = null;
-                }
-
-                MathTransform at = FactoryFinder.getMathTransformFactory(null)
-                                                .createAffineTransform(new GeneralMatrix(
-                            transform));
-
-                if (mt == null) {
-                    mt = at;
-                } else {
-                    mt = FactoryFinder.getMathTransformFactory(null)
-                                      .createConcatenatedTransform(mt, at);
-                }
-
-                //dbfheader must be set so that the attributes required for theming can be read in.
-                dbfheader = getDBFHeader(ds);
-
-                // graphics.setTransform(transform);
-                // extract the feature type stylers from the style object
-                // and process them
-                if (isCaching() && (geometryCache.size() > 0)) {
-                    processStylersCaching(graphics, ds, currLayer.getQuery(),
-                        bbox, mt, currLayer.getStyle());
-                } else {
-                    Transaction transaction = null;
-
-                    if (currLayer.getFeatureSource() instanceof FeatureStore) {
-                        transaction = ((FeatureStore) currLayer
-                            .getFeatureSource()).getTransaction();
-                    }
-
-                    processStylersNoCaching(graphics, ds, currLayer.getQuery(),
-                        bbox, mt, currLayer.getStyle(), layerIndexInfo[i],
-                        transaction);
-                }
-            } catch (Exception exception) {
-                fireErrorEvent(new Exception("Exception rendering layer "
-                        + currLayer, exception));
-            }
-
-            labelCache.endLayer(graphics, paintArea);
-        }
-
-        labelCache.end(graphics, paintArea);
-        LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio()
-            + " , hits " + styleFactory.getHits() + ", requests "
-            + styleFactory.getRequests());
+        } //Other arguments get checked later
+        paint(graphics, paintArea, mapArea, RendererUtilities.worldToScreenTransform(mapArea, paintArea));
     }
 
     private DbaseFileHeader getDBFHeader(ShapefileDataStore ds) {
@@ -951,7 +815,7 @@ public class ShapefileRenderer {
      * @throws SchemaException
      */
     FeatureType createFeatureType(Query query, Style style, FeatureType schema)
-        throws FactoryConfigurationError, SchemaException {
+        throws SchemaException {
         String[] attributes = findStyleAttributes((query == null) ? Query.ALL
                                                                   : query,
                 style, schema);
@@ -1131,19 +995,6 @@ public class ShapefileRenderer {
         return decimator;
     }
 
-    private Symbolizer getTestStyle() throws IllegalFilterException {
-        StyleFactory sFac = StyleFactory.createStyleFactory();
-
-        // The following is complex, and should be built from
-        FilterFactory filterFactory = FilterFactory.createFilterFactory();
-        LineSymbolizer linesym = sFac.createLineSymbolizer();
-        Stroke myStroke = sFac.getDefaultStroke();
-        myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
-        myStroke.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
-        linesym.setStroke(myStroke);
-
-        return linesym;
-    }
 
     /**
      * Creates a JTS shape that is an approximation of the SImpleGeometry. This
@@ -1161,8 +1012,6 @@ public class ShapefileRenderer {
     LiteShape2 getLiteShape2(SimpleGeometry geom)
         throws TransformException, FactoryException {
         Geometry jtsGeom;
-        LiteCoordinateSequenceFactory seqFactory = new LiteCoordinateSequenceFactory();
-
         if ((geom.type == ShapeType.POLYGON)
                 || (geom.type == ShapeType.POLYGONM)
                 || (geom.type == ShapeType.POLYGONZ)) {
@@ -1307,31 +1156,6 @@ public class ShapefileRenderer {
     }
 
     /**
-     * Sets up the affine transform
-     *
-     * @param mapExtent the map extent
-     * @param screenSize the screen size
-     *
-     * @return a transform that maps from real world coordinates to the screen
-     */
-    public static AffineTransform worldToScreenTransform(Envelope mapExtent,
-        Rectangle screenSize) {
-        double scaleX = screenSize.getWidth() / mapExtent.getWidth();
-        double scaleY = screenSize.getHeight() / mapExtent.getHeight();
-
-        double tx = -mapExtent.getMinX() * scaleX;
-        double ty = (mapExtent.getMinY() * scaleY) + screenSize.getHeight();
-
-        AffineTransform at = new AffineTransform(scaleX, 0.0d, 0.0d, -scaleY,
-                tx, ty);
-        AffineTransform originTranslation = AffineTransform
-            .getTranslateInstance(screenSize.x, screenSize.y);
-        originTranslation.concatenate(at);
-
-        return originTranslation;
-    }
-
-    /**
      * Setter for property scaleDenominator.
      *
      * @param scaleDenominator New value of property scaleDenominator.
@@ -1368,25 +1192,10 @@ public class ShapefileRenderer {
         this.caching = caching;
     }
 
-    MapContext getContext() {
+    public MapContext getContext() {
         return context;
     }
 
-    public RenderingHints getRenderHints() {
-        return hints;
-    }
-
-    public void setRenderHints(RenderingHints hints) {
-        this.hints = hints;
-    }
-
-    public void setRenderingHint(RenderingHints.Key key, Object value) {
-        if (hints == null) {
-            hints = new RenderingHints(key, value);
-        } else {
-            hints.put(key, value);
-        }
-    }
 
     public boolean isConcatTransforms() {
         return concatTransforms;
@@ -1464,34 +1273,188 @@ public class ShapefileRenderer {
         }
     }
 
-    private class NonValidatingFeature extends DefaultFeature {
-        /**
-         * DOCUMENT ME!
-         *
-         * @param schema
-         * @param attributes
-         *
-         * @throws IllegalAttributeException
-         */
-        protected NonValidatingFeature(DefaultFeatureType schema,
-            Object[] attributes) throws IllegalAttributeException {
-            super(schema, attributes);
+    public void setJava2DHints(RenderingHints hints) {
+        this.hints = hints;
+    }
 
-            // TODO Auto-generated constructor stub
+    public RenderingHints getJava2DHints() {
+        return hints;
+    }
+
+    public void setRendererHints(Map hints) {
+        rendererHints=hints;
+    }
+
+    public Map getRendererHints() {
+        return rendererHints;
+    }
+
+    public void setContext(MapContext context) {
+        if (context == null) {
+            context = new DefaultMapContext();
         }
 
-        /**
-         * @see org.geotools.feature.DefaultFeature#setAttributes(java.lang.Object[])
-         */
-        public void setAttributes(Object[] attributes)
-            throws IllegalAttributeException {
-            for (int i = 0; i < attributes.length; i++) {
-                setAttribute(i, attributes[i]);
+        this.context = context;
+
+        MapLayer[] layers = context.getLayers();
+        layerIndexInfo = new IndexInfo[layers.length];
+
+        for (int i = 0; i < layers.length; i++) {
+            DataStore ds = layers[i].getFeatureSource().getDataStore();
+            assert (ds instanceof ShapefileDataStore);
+
+            ShapefileDataStore sds = (ShapefileDataStore) ds;
+
+            try {
+                layerIndexInfo[i] = useIndex(sds);
+            } catch (Exception e) {
+                layerIndexInfo[i] = new IndexInfo(IndexInfo.TREE_NONE, null,
+                        null);
+                LOGGER.fine("Exception while trying to use index"
+                    + e.getLocalizedMessage());
             }
         }
+    }
 
-        public void setAttribute(int position, Object val) {
-            setAttributeValue(position, val);
+    public void paint(Graphics2D graphics, Rectangle paintArea, AffineTransform worldToScreen) {
+        if (worldToScreen == null || paintArea == null) {
+            LOGGER.info("renderer passed null arguments");
+            return;
+        } //Other arguments get checked later
+        // First, create the bbox in real world coordinates
+        Envelope mapArea;
+        try {
+            mapArea = RendererUtilities.createMapEnvelope(paintArea, worldToScreen);
+            paint(graphics, paintArea, mapArea, worldToScreen);
+        } catch (NoninvertibleTransformException e) {
+            fireErrorEvent(new Exception("Can't create pixel to world transform", e));
         }
     }
+
+    public void paint(Graphics2D graphics, Rectangle paintArea, Envelope envelope, AffineTransform transform) {
+        this.outputGraphics = graphics;
+
+        if (hints != null) {
+            graphics.setRenderingHints(hints);
+        }
+
+        if ((graphics == null) || (paintArea == null)) {
+            LOGGER.info("renderer passed null arguments");
+
+            return;
+        }
+
+        // reset the abort flag
+        renderingStopRequested = false;
+
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("Affine Transform is " + transform);
+        }
+
+        /*
+         * If we are rendering to a component which has already set up some form
+         * of transformation then we can concatenate our transformation to it.
+         * An example of this is the ZoomPane component of the swinggui module.
+         */
+        if (concatTransforms) {
+            AffineTransform atg = graphics.getTransform();
+
+            //          graphics.setTransform(new AffineTransform());
+            atg.concatenate(transform);
+            transform = atg;
+        }
+
+        try {
+            setScaleDenominator(RendererUtilities.calculateScale(envelope,
+                    context.getCoordinateReferenceSystem(), paintArea.width,
+                    paintArea.height, 90)); // 90 = OGC standard DPI (see SLD spec page 37)
+        } catch (Exception e) // probably either (1) no CRS (2) error xforming
+         {
+            setScaleDenominator(1 / transform.getScaleX()); //DJB old method - the best we can do
+        }
+
+        MapLayer[] layers = context.getLayers();
+
+        // get detstination CRS
+        CoordinateReferenceSystem destinationCrs = context
+            .getCoordinateReferenceSystem();
+        labelCache.start();
+
+        for (int i = 0; i < layers.length; i++) {
+            MapLayer currLayer = layers[i];
+
+            if (!currLayer.isVisible()) {
+                // Only render layer when layer is visible
+                continue;
+            }
+
+            if (renderingStopRequested) {
+                return;
+            }
+
+            labelCache.startLayer();
+
+            Envelope bbox = envelope;
+
+            try {
+                ShapefileDataStore ds = (ShapefileDataStore) currLayer.getFeatureSource()
+                                                                      .getDataStore();
+                CoordinateReferenceSystem dataCRS = ds.getSchema()
+                                                      .getDefaultGeometry()
+                                                      .getCoordinateSystem();
+                MathTransform mt;
+
+                try {
+                    mt = CRS.transform(dataCRS, destinationCrs, true);
+                    bbox = JTS.transform(bbox, mt.inverse(), 10);
+                } catch (Exception e) {
+                    mt = null;
+                }
+
+                MathTransform at = FactoryFinder.getMathTransformFactory(null)
+                                                .createAffineTransform(new GeneralMatrix(
+                            transform));
+
+                if (mt == null) {
+                    mt = at;
+                } else {
+                    mt = FactoryFinder.getMathTransformFactory(null)
+                                      .createConcatenatedTransform(mt, at);
+                }
+
+                //dbfheader must be set so that the attributes required for theming can be read in.
+                dbfheader = getDBFHeader(ds);
+
+                // graphics.setTransform(transform);
+                // extract the feature type stylers from the style object
+                // and process them
+                if (isCaching() && (geometryCache.size() > 0)) {
+                    processStylersCaching(graphics, ds, currLayer.getQuery(),
+                        bbox, mt, currLayer.getStyle());
+                } else {
+                    Transaction transaction = null;
+
+                    if (currLayer.getFeatureSource() instanceof FeatureStore) {
+                        transaction = ((FeatureStore) currLayer
+                            .getFeatureSource()).getTransaction();
+                    }
+
+                    processStylersNoCaching(graphics, ds, currLayer.getQuery(),
+                        bbox, mt, currLayer.getStyle(), layerIndexInfo[i],
+                        transaction);
+                }
+            } catch (Exception exception) {
+                fireErrorEvent(new Exception("Exception rendering layer "
+                        + currLayer, exception));
+            }
+
+            labelCache.endLayer(graphics, paintArea);
+        }
+
+        labelCache.end(graphics, paintArea);
+        LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio()
+            + " , hits " + styleFactory.getHits() + ", requests "
+            + styleFactory.getRequests());
+    }
+
 }

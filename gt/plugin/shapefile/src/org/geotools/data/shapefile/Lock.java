@@ -16,127 +16,215 @@
  */
 package org.geotools.data.shapefile;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
-
-class RWNode {
-    static final int READER = 0;
-    static final int WRITER = 1;
-    Thread t;
-    int state;
-    int nAcquires;
-
-    RWNode(Thread t, int state) {
-        this.t = t;
-        this.state = state;
-        nAcquires = 0;
-    }
-}
-
-
+/**
+ * A read-write lock for shapefiles so that OS file locking exceptions will not
+ * ruin an attempt to update a shapefile. On windows there are often operating
+ * system locking conflicts when writing to a shapefile. In order to not have
+ * exceptions thrown everytime a write is made, geotools has implemented file
+ * locking for shapefiles.
+ * 
+ * @author jeichar
+ */
 public class Lock {
-    private Vector waiters;
 
-    public Lock() {
-        waiters = new Vector();
+    Logger logger = Logger.getLogger("org.geotools.data.shapefile");
+
+    /**
+     * indicates a write is occurring
+     */
+    int writeLocks = 0;
+
+    /**
+     * if not null a writer is waiting for the lock or is writing.
+     */
+    Thread writer;
+
+    /**
+     * Thread->Owner map. If empty no read locks exist.
+     */
+    Map owners = new HashMap();
+
+    /**
+     * If the lock can be read locked the lock will be read and default
+     * visibility for tests
+     * 
+     * @return
+     * @throws IOException
+     */
+    synchronized boolean canRead() throws IOException {
+        if ( writer!=null && writer!=Thread.currentThread() )
+            return false;
+        if ( writer==null )
+            return true;
+        
+        
+        if ( owners.size()>1 )
+            return false;
+
+        return true;
     }
 
-    private int firstWriter() {
-        Enumeration e;
-        int index;
+    /**
+     * If the lock can be read locked the lock will be read and default
+     * visibility for tests
+     * 
+     * @return
+     * @throws IOException
+     */
+    synchronized boolean canWrite() throws IOException {
+        if( owners.size()>1 )
+            return false;
+        if ((canRead()) 
+                && (writer == Thread.currentThread() || writer==null)) {
+            if( owners.isEmpty() )
+                return true;
+            if( owners.containsKey(Thread.currentThread()))
+                return true;
+        }
+        return false;
+    }
 
-        for (index = 0, e = waiters.elements(); e.hasMoreElements(); index++) {
-            RWNode node = (RWNode) e.nextElement();
-
-            if (node.state == RWNode.WRITER) {
-                return index;
+    /**
+     * Called by shapefileReader before a read is started and before an IOStream
+     * is openned.
+     * 
+     * @throws IOException
+     */
+    public synchronized void lockRead() throws IOException {
+        if (!canRead()) {
+            while (writeLocks > 0 || writer != null) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    throw (IOException) new IOException().initCause(e);
+                }
             }
         }
 
-        return Integer.MAX_VALUE;
-    }
-
-    private int getIndex(Thread t) {
-        Enumeration e;
-        int index;
-
-        for (index = 0, e = waiters.elements(); e.hasMoreElements(); index++) {
-            RWNode node = (RWNode) e.nextElement();
-
-            if (node.t == t) {
-                return index;
-            }
-        }
-
-        return -1;
-    }
-
-    public synchronized void lockRead() {
-        RWNode node;
-        Thread me = Thread.currentThread();
-        int index = getIndex(me);
-
-        if (index == -1) {
-            node = new RWNode(me, RWNode.READER);
-            waiters.addElement(node);
+        assertTrue("A write lock exists that is owned by another thread", canRead());
+        Thread current = Thread.currentThread();
+        Owner owner = (Owner) owners.get(current);
+        if (owner != null) {
+            owner.timesLocked++;
         } else {
-            node = (RWNode) waiters.elementAt(index);
+            owner = new Owner(current);
+            owners.put(current, owner);
         }
 
-        while (getIndex(me) > firstWriter()) {
+        logger.finer("Start Read Lock:" + owner);
+    }
+
+    private void assertTrue(String message, boolean b) {
+        if (!b) {
+            throw new AssertionError(message);
+        }
+    }
+
+    /**
+     * Called by ShapefileReader after a read is complete and after the IOStream
+     * is closed.
+     */
+    public synchronized void unlockRead() {
+
+        assertTrue("Current thread does not have a readLock", owners
+                .containsKey(Thread.currentThread()));
+
+        Owner owner = (Owner) owners.get(Thread.currentThread());
+        assertTrue("Current thread has " + owner.timesLocked
+                + "negative number of locks", owner.timesLocked > 0);
+
+        owner.timesLocked--;
+        if (owner.timesLocked == 0)
+            owners.remove(Thread.currentThread());
+
+        notifyAll();
+
+        logger.finer("unlock Read:" + owner);
+    }
+
+    /**
+     * Called by ShapefileDataStore before a write is started and before an
+     * IOStream is openned.
+     * 
+     * @throws IOException
+     */
+    public synchronized void lockWrite() throws IOException {
+        Thread currentThread = Thread.currentThread();
+        if (writer == null)
+            writer = currentThread;
+        while (!canWrite()) {
             try {
                 wait();
-            } catch (Exception e) {
-            }
-        }
-
-        node.nAcquires++;
-    }
-
-    public synchronized void lockWrite() {
-        RWNode node;
-        Thread me = Thread.currentThread();
-        int index = getIndex(me);
-
-        if (index == -1) {
-            node = new RWNode(me, RWNode.WRITER);
-            waiters.addElement(node);
-        } else {
-            node = (RWNode) waiters.elementAt(index);
-
-            if (node.state == RWNode.READER) {
-                throw new IllegalArgumentException("Upgrade lock");
+            } catch (InterruptedException e) {
+                throw (IOException) new IOException().initCause(e);
             }
 
-            node.state = RWNode.WRITER;
+            if (writer == null)
+                writer = currentThread;
         }
 
-        while (getIndex(me) != 0) {
-            try {
-                wait();
-            } catch (Exception e) {
-            }
-        }
+        if (writer == null)
+            writer = currentThread;
+        
+        assertTrue("The current thread is not the writer",
+                writer == currentThread);
+        assertTrue("There are read locks not belonging to the current thread.",
+                canRead());
 
-        node.nAcquires++;
+        writeLocks++;
+        logger.finer(currentThread.getName() + " is getting write lock:"
+                + writeLocks);
     }
 
-    public synchronized void unlock() {
-        RWNode node;
-        Thread me = Thread.currentThread();
-        int index;
-        index = getIndex(me);
+    private class Owner {
+        final Thread owner;
 
-        if (index > firstWriter()) {
-            throw new IllegalArgumentException("Lock not held");
+        int timesLocked;
+
+        Owner(Thread owner) {
+            this.owner = owner;
+            timesLocked = 1;
         }
 
-        node = (RWNode) waiters.elementAt(index);
-        node.nAcquires--;
-
-        if (node.nAcquires == 0) {
-            waiters.removeElementAt(index);
-            notifyAll();
+        public String toString() {
+            return owner.getName() + " has " + timesLocked + " locks";
         }
     }
+
+    /**
+     * default visibility for tests
+     * 
+     */
+    synchronized int getReadLocks(Thread thread) {
+        Owner owner = (Owner) owners.get(thread);
+        if (owner == null)
+            return -1;
+        return owner.timesLocked;
+    }
+
+    public synchronized void unlockWrite() {
+        if (writeLocks > 0) {
+            assertTrue("current thread does not own the write lock",
+                    writer == Thread.currentThread());
+            assertTrue("writeLock has already been unlocked", writeLocks > 0);
+            writeLocks--;
+            if (writeLocks == 0)
+                writer = null;
+        }
+        logger.finer("unlock write:" + Thread.currentThread().getName());
+        notifyAll();
+    }
+    /**
+     * default visibility for tests
+     * 
+     */
+    synchronized boolean ownWriteLock(Thread thread) {
+        return writer==thread && writeLocks>0;
+    }
+
 }

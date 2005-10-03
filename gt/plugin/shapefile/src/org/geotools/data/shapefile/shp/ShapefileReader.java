@@ -278,7 +278,7 @@ public class ShapefileReader {
 	 *             If errors occur while closing the channel.
 	 */
 	public void close() throws IOException {
-		lock.unlock();
+		lock.unlockRead();
 		if (channel.isOpen()) {
 			channel.close();
 		}

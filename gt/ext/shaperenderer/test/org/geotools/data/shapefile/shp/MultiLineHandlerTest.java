@@ -27,14 +27,13 @@ import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
-import org.geotools.geometry.JTS;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.renderer.lite.LiteRenderer;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.MultiLineHandler;
 import org.geotools.renderer.shape.ShapefileRenderer;
@@ -44,7 +43,6 @@ import org.geotools.resources.TestData;
 import org.geotools.styling.Style;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -63,11 +61,8 @@ public class MultiLineHandlerTest extends TestCase {
 		ShapefileDataStore ds=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(url);
 		
 		Envelope env=ds.getFeatureSource().getBounds();
-//		Envelope env=new Envelope(-180,180,-90,90);
-		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
-//		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform mt=null;
-		AffineTransform transform = ShapefileRenderer.worldToScreenTransform(env, new Rectangle(512,512));
+		AffineTransform transform = RendererUtilities.worldToScreenTransform(env, new Rectangle(512,512));
 		MathTransform at = FactoryFinder.getMathTransformFactory(null)
 				.createAffineTransform(new GeneralMatrix(transform));
 		if (mt == null) {
@@ -102,8 +97,7 @@ public class MultiLineHandlerTest extends TestCase {
 		Envelope env=new Envelope(-7.105552354197932,8.20555235419793,-3.239388966356115,4.191388966388683);
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform mt=CRS.transform(crs, DefaultGeographicCRS.WGS84);
-		ShapefileRenderer renderer=new ShapefileRenderer(null);
-		AffineTransform at=renderer.worldToScreenTransform(env,new Rectangle(300,300));
+		AffineTransform at=RendererUtilities.worldToScreenTransform(env,new Rectangle(300,300));
 		MathTransform worldToScreen=FactoryFinder.getMathTransformFactory(null)
 		.createAffineTransform(new GeneralMatrix(at));
 		mt = FactoryFinder.getMathTransformFactory(null)
