@@ -76,6 +76,11 @@ public class OracleConnectionFactory {
      * @param instance The instance name on the host
      */
     public OracleConnectionFactory(String host, String port, String instance) {
+    	if( instance.startsWith("(") )
+        dbUrl = JDBC_PATH + instance;
+    	else if( instance.startsWith("/") )
+        dbUrl = JDBC_PATH + "//" + host + ":" + port + instance;
+    	else
         dbUrl = JDBC_PATH + host + ":" + port + ":" + instance;
     }
 
