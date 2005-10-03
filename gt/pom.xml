@@ -1,0 +1,476 @@
+<!-- ====================================================
+         Maven 2 project configuration file
+         http://maven.apache.org/maven2/
+
+         Configuration file for the Geotools 2 project
+         http://www.geotools.org
+
+         Version: $Id$
+     ==================================================== -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Project description (including license)          -->
+  <!-- ==================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>gt2</artifactId>
+  <packaging>pom</packaging>
+  <version>2.2.x</version>
+  <name>Geotools 2</name>
+  <url>http://modules.geotools.org</url>
+
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  <inceptionYear>1996</inceptionYear>
+
+  <modules>
+    <module>module/referencing</module>
+  </modules>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.html</url>
+      <distribution>manual</distribution>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <system>JIRA</system>
+    <url>http://jira.codehaus.org/browse/GEOT</url>
+  </issueManagement>
+
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/</url>
+  </scm>
+
+  <mailingLists>
+    <mailingList>
+      <name>geotools-gt2-users</name>
+      <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-gt2-users</subscribe>
+      <post>geotools-geotools-gt2-users@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-geotools-gt2-users</archive>
+    </mailingList>
+    <mailingList>
+      <name>geotools-devel</name>
+      <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-devel</subscribe>
+      <post>geotools-devel@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-devel</archive>
+    </mailingList>
+    <mailingList>
+      <name>geotools-gt2-i18n</name>
+      <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-gt2-i18n</subscribe>
+      <post>geotools-geotools-gt2-i18n@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-geotools-gt2-i18n</archive>
+    </mailingList>
+    <mailingList>
+      <name>geotools-gt2-commits</name>
+      <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-gt2-commits</subscribe>
+      <post>geotools-geotools-gt2-commits@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-geotools-gt2-commits</archive>
+    </mailingList>
+  </mailingLists>
+
+
+
+
+  <!-- ==================================================== -->
+  <!--     Developers and contributors                      -->
+  <!-- ==================================================== -->
+  <developers>
+    <developer>
+      <name>Ian Turton</name>
+      <id>ianturton</id>
+      <email>ianturton@users.sourceforge.net</email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>James Macgill</name>
+      <id>jmacgill</id>
+      <email>jmacgill@users.sourceforge.net</email>
+      <organization>PennState</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Rob Hranac</name>
+      <id>robhranac</id>
+      <email>robhranac@users.sourceforge.net</email>
+      <organization>VFNY</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Cameron Shorter</name>
+      <id>camerons</id>
+      <email>cameronsl@users.sourceforge.net</email>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Chris Holmes</name>
+      <id>cholmesny</id>
+      <email>cholmesny@users.sourceforge.net</email>
+      <organization>TOPP</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Ian Schneider</name>
+      <id>ianschne</id>
+      <email>ianschne@users.sourceforge.net</email>
+      <organization>USDA ARS</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Andrea Aime</name>
+      <id>aaime</id>
+      <email>aaime@users.sourceforge.net</email>
+      <organization>University of Modena and Reggio Emilia</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Artur Hefczyc</name>
+      <id>kobit</id>
+      <email>kobit@users.sourceforge.net</email>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+          <role>Project Management Committee (PMC) Member</role>
+        </roles>
+    </developer>
+    <developer>
+      <name>Justin Deoliveira</name>
+      <id>jdeolive</id>
+      <email>jdeolive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>				
+      </roles>
+    </developer>
+    <developer>
+      <name>Richard Gould</name>
+      <id>rgould</id>
+      <email>rgould@refractions.net</email>
+      <organization>Refractions Research, Inc.</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>				
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Christiaan ten Klooster</name>
+      <id>ckl</id>
+      <email>ckl@dacelo.nl</email>
+      <organization>Dacelo</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Gabriel Roldan</name>
+      <id>groldan</id>
+      <email>groldan@axios.es</email>
+      <organization>Axios Engineering</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+      <developer>
+      <name>Sean Geoghegan</name>
+      <id>seangeo</id>
+      <email>sean.geoghegan@dsto.defence.gov.au</email>
+      <organization>Defence Science and Technology Organisation</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Julian Ray</name>
+      <id>jjray</id>
+      <email>jjray@users.sourceforge.net</email>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Darren Edmonds</name>
+      <id>dledmonds</id>
+      <email>dledmonds@users.sourceforge.net</email>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Ray Gallagher</name>
+      <id>omyar</id>
+      <email>omyar@users.sourceforge.net</email>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jianhui Jin</name>
+      <id></id>
+      <email></email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Gary Sheppard</name>
+      <id>shepshep</id>
+      <email>garysheppard@psu.edu</email>
+      <organization>Penn State GeoVISTA Center</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Simon Rass</name>
+      <roles>
+        <role>Bug Fixer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>David Zwiers</name>
+      <id>dmzwiers</id>
+      <email>dzwiers@refractions.net</email>
+      <organization>Refractions Research Inc.</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Brent Owens</name>
+      <id>sploreg</id>
+      <email>sploreg@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer> 		
+    <developer>
+      <name>Rueben Schulz</name>
+      <id>rschulz</id>
+      <organization>University of British Columbia</organization>
+      <roles>
+        <role>Tester</role>
+        <role>Documentation</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Simone Giannecchini</name>
+      <id>simboss</id>
+      <email>jsimboss_ml@tiscali.it</email>
+      <organization></organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Documentation</role>
+      </roles>
+    </developer>    
+    <developer>
+      <name>Luca Sigfrido Percich</name>
+      <id>lpercich</id>
+      <email>luca.percich@ama-mi.it</email>
+      <organization>AMA-MI</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Mantainer</role>
+      </roles>
+    </developer>    
+  </developers>
+
+  <contributors>
+  </contributors>
+
+
+
+  <!-- ==================================================== -->
+  <!--     External dependencies                            -->
+  <!-- ==================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.opengis</groupId>
+      <artifactId>geoapi</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.units</groupId>
+      <artifactId>jsr108</artifactId>
+      <version>0.01</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>ibiblio</id>
+      <name>Ibiblio - the public's library and digital archive</name>
+      <url>http://www.ibiblio.org/maven2</url>
+    </repository>
+    <repository>
+      <id>sicade</id>
+      <name>Temporary repository (to be replaced by a more official one later)</name>
+      <url>http://www.espace.ird.nc/maven-repository</url>
+    </repository>
+  </repositories>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Compilation (including resources)                -->
+  <!-- ==================================================== -->
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <includes>
+          <include>**/*.txt</include>
+          <include>**/*.utf</include>
+          <include>**/*.properties</include>
+          <include>**/*.serialized</include>
+          <include>META-INF/*.jai</include>
+          <include>META-INF/services/**</include>
+        </includes>
+        <excludes>
+          <exclude>**/doc-files/**</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>test</directory>
+        <includes>
+          <include>META-INF/services/**</include>
+          <include>**/test-data/**</include>
+          <include>**/*.xml</include>
+          <include>**/*.xsd</include>
+          <include>**/*.csv</include>
+          <include>**/*.sld</include>
+          <include>**/*.gml</include>
+          <include>**/*.wkt</include>
+          <include>**/*.txt</include>
+          <include>**/*.properties</include>
+          <include>**/*.serialized</include>
+          <include>**/*.png</include>
+        </includes>
+        <excludes>
+          <exclude>**/doc-files/**</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.4</source>              <!-- The -source argument for the Java compiler.                            -->
+          <target>1.4</target>              <!-- The -target argument for the Java compiler.                            -->
+          <debug>true</debug>               <!-- Whether to include debugging information in the compiled class files.  -->
+          <encoding>ISO-8859-1</encoding>   <!-- The -encoding argument for the Java compiler.                          -->
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <version>false</version>                  <!-- Specifies whether or not the version text is included.                 -->
+          <encoding>ISO-8859-1</encoding>           <!-- Specifies the encoding name of the source files.                       -->
+          <noqualifier>all</noqualifier>            <!-- Omits qualifying package name from ahead of class names in output.     -->
+          <quiet>true</quiet>                       <!-- Shuts off non-error and non-warning messages.                          -->
+          <maxmemory>384M</maxmemory>               <!-- The maximum Java heap size to be used when launching the javadoc.      -->
+          <docfilessubdirs>true</docfilessubdirs>   <!-- Enables deep copying of "doc-files" directories.                       -->
+          <tag>     <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in doc comments. -->
+            todo:tfmc:TODO,
+            revisit:tfmc:TODO
+          </tag>
+          <link>                 <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
+            http://java.sun.com/j2se/1.5/docs/api,
+            http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs,
+            http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi,
+            http://jsr-108.sourceforge.net/javadoc,
+            http://geoapi.sourceforge.net/snapshot/javadoc
+          </link>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

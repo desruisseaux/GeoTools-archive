@@ -24,11 +24,15 @@ import java.awt.Dimension;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderedImageFactory;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Iterator;
+import java.util.Enumeration;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.LogRecord;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 // Image I/O and JAI dependencies
 import javax.imageio.spi.IIORegistry;
@@ -164,8 +168,7 @@ public final class ImageUtilities {
      *   <li>{@link JAI#KEY_IMAGE_LAYOUT} with a proposed tile size.</li>
      * </ul>
      *
-     * This method may returns {@code null}
-     * if no rendering hints is proposed.
+     * This method may returns {@code null} if no rendering hints is proposed.
      */
     public static RenderingHints getRenderingHints(final RenderedImage image) {
         final ImageLayout layout = getImageLayout(image, false);
@@ -173,9 +176,8 @@ public final class ImageUtilities {
     }
 
     /**
-     * Suggest a tile size for the specified image size. On input,
-     * {@code size} is the image's size. On output, it is the
-     * tile size. This method returns {@code size} for convenience.
+     * Suggests a tile size for the specified image size. On input, {@code size} is the image's
+     * size. On output, it is the tile size. This method returns {@code size} for convenience.
      */
     public static Dimension toTileSize(final Dimension size) {
         Dimension defaultSize = JAI.getDefaultTileSize();
@@ -233,8 +235,7 @@ public final class ImageUtilities {
      *
      * @param  layout The original layout. This object will not be modified.
      * @param  sources The list of sources {@link RenderedImage}.
-     * @return A new {@code ImageLayout}, or the original {@code layout} if no
-     *         change was needed.
+     * @return A new {@code ImageLayout}, or the original {@code layout} if no change was needed.
      */
     public static ImageLayout createIntersection(final ImageLayout layout, final List sources) {
         ImageLayout result = layout;
@@ -296,8 +297,8 @@ public final class ImageUtilities {
     /**
      * Cast the specified object to an {@link Interpolation object}.
      *
-     * @param  type The interpolation type as an {@link Interpolation}
-     *         or a {@link CharSequence} object.
+     * @param  type The interpolation type as an {@link Interpolation} or a {@link CharSequence}
+     *         object.
      * @return The interpolation object for the specified type.
      * @throws IllegalArgumentException if the specified interpolation type is not a know one.
      */
@@ -331,6 +332,69 @@ public final class ImageUtilities {
             }
         }
         return Utilities.getShortClassName(interp);
+    }
+
+    /**
+     * Loads the {@code registryFile.jai} file. This method is invoked if JAI core failed to load
+     * the {@code registryFile.jai} file by itself, usually because the file is accessible from a
+     * {@linkplain ClassLoader class loader} which is not the JAI class loader. The caller is
+     * responsible to ensure that the {@code registryFile.jai} file really need to be loaded
+     * (usually by checking if some expected operation is absent from the
+     * {@linkplain OperationRegistry operation registry}).
+     * <p>
+     * In order to avoid parsing {@code registryFile.jai} files from other JAR files than the
+     * targeted one, an identifier is expected. This method will parse a {@code registryFile.jai}
+     * file only if the first line starts with "{@code #!}" followed by this identifier. For
+     * example if {@code identifier} is "{@code org.geotools}", then the first line must be
+     * "{@code #!org.geotools}", otherwise it will be ignored.
+     * <p>
+     * All exceptions encountered while parsing the registry file are caught and their error
+     * messages are redirected to {@link System#err} or logged.
+     *
+     * @param loader     The class loader to use for loading the {@code registryFile.jai} resource.
+     * @param identifier The identifier expected on the first line of {@code registryFile.jai}.
+     *
+     * @deprecated Doesn't seem to work because we have no way to specify the class loader to
+     *             {@code updateFromStream}. Commited anyway in order to keep this code in the
+     *             SVN history, but will be removed soon.
+     */
+    public static boolean loadRegistryFileJAI(final ClassLoader loader,
+                                              final String  identifier)
+    {
+        final String filename = "META-INF/registryFile.jai";
+        final String encoding = "UTF-8";
+        final String expected = "#!" + identifier + '\n';
+        OperationRegistry registry = null;
+        try {
+            final byte[] header = new byte[expected.getBytes(encoding).length];
+            final Enumeration urls = loader.getResources(filename);
+            while (urls.hasMoreElements()) {
+                final URL url = (URL) urls.nextElement();
+                final InputStream in = url.openStream();
+                if (in.read(header) == header.length) {
+                    if (header[header.length-1] == '\r') {
+                        header[header.length-1] = '\n';
+                    }
+                    if (expected.equals(new String(header, encoding))) {
+                        if (registry == null) {
+                            registry = JAI.getDefaultInstance().getOperationRegistry();
+                        }
+                        registry.updateFromStream(in);
+                    }
+                }
+                in.close();
+            }
+        } catch (IOException exception) {
+            final LogRecord record = Errors.getResources(null).getLogRecord(Level.WARNING,
+                                     ErrorKeys.CANT_READ_$1, filename);
+            record.setSourceClassName(Utilities.getShortClassName(ImageUtilities.class));
+            record.setSourceMethodName("loadRegistryFileJAI");
+            record.setThrown(exception);
+            Logger.getLogger("org.geotools.coverage").log(record);
+            // We used the "org.geotools.coverage" logger since this method is usually
+            // invoked from the grid coverage processor or one of its operations.
+        }
+        return false;
     }
 
     /**
@@ -412,7 +476,7 @@ public final class ImageUtilities {
      * @param writer {@code false} to set the reader, or {@code true} to set the writer.
      * @param allowed {@code false} to disallow native acceleration.
      */
-    public synchronized static void allowNativeCodec(final String format,
+    public synchronized static void allowNativeCodec(final String  format,
                                                      final boolean writer,
                                                      final boolean allowed)
     {

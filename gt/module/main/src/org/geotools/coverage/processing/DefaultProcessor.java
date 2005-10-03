@@ -83,7 +83,7 @@ public class DefaultProcessor extends AbstractProcessor {
         final long targetCapacity = 0x4000000; // 64 Mo.
         final long maxMemory = Runtime.getRuntime().maxMemory();
         final TileCache cache = JAI.getDefaultInstance().getTileCache();
-        if (maxMemory > 2*targetCapacity) {
+        if (maxMemory >= 2*targetCapacity) {
             if (cache.getMemoryCapacity() < targetCapacity) {
                 cache.setMemoryCapacity(targetCapacity);
             }

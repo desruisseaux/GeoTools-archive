@@ -1,0 +1,254 @@
+<!-- ====================================================
+         Maven 2 project configuration file
+         http://maven.apache.org/maven2/
+
+         Configuration file for the Geotools 2 project
+         http://www.geotools.org
+
+         Version: $Id$
+     ==================================================== -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt2</artifactId>
+    <version>2.2.x</version>
+  </parent>
+
+
+  <!-- ==================================================== -->
+  <!--     Module description                               -->
+  <!-- ==================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>main</artifactId>
+  <packaging>jar</packaging>
+  <name>Main module</name>
+  <url>http://modules.geotools.org/main</url>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Developers and contributors                      -->
+  <!-- ==================================================== -->
+  <developers>
+    <developer>
+      <name>James Macgill</name>
+      <id>jmacgill</id>
+      <email>jmacgill@users.sourceforge.net</email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Ian Turton</name>
+      <id>ianturton</id>
+      <email>ianturton@users.sourceforge.net</email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Linda Oxnard</name>
+      <id>loxnard</id>
+      <email>loxnard@users.sourceforge.net</email>
+      <organization>None</organization>
+      <roles>
+        <role>Doc Editor</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Cameron Shorter</name>
+      <id>camerons</id>
+      <email>camerons@users.sourceforge.net</email>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Chris Holmes</name>
+      <id>cholmesny</id>
+      <email>cholmesny@users.sourceforge.net</email>
+      <organization>TOPP</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Ian Schneider</name>
+      <id>ianschneider</id>
+      <email>ianschneider@users.sourceforge.net</email>
+      <organization>USDA ARS</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Sean Geoghegan</name>
+      <id>seangeo</id>
+      <email>sean.geoghegan@dsto.defence.gov.au</email>
+      <organization>Defence Science and Technology Organisation</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>David Zwiers</name>
+      <id>dzwiers</id>
+      <email>dzwiers@refractions.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jesse Eichar</name>
+      <id>jeichar</id>
+      <email>jeichar@refractions.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Rueben Schulz</name>
+      <organization>University of British Columbia</organization>
+      <roles>
+        <role>Java developper / Tester</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Simone Giannecchini</name>
+      <id>simboss</id>
+      <email>simboss_nl@tiscali.it</email>
+      <organization></organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Documentation</role>
+      </roles>
+    </developer>    
+  </developers>
+
+  <contributors>
+  </contributors>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Dependencies                                     -->
+  <!-- ==================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>referencing</artifactId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
+      <version>1.6</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-jxpath</groupId>
+      <artifactId>commons-jxpath</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.5.1</version>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-gvt</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-svg-dom</artifactId>
+      <version>1.5</version>
+    </dependency>
+     <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-rasterizer</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-dom</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-bridge</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-css</artifactId>
+      <version>1.5</version>
+    </dependency>
+     <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-xml</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-transcoder</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opengis</groupId>
+      <artifactId>legacy</artifactId>
+      <version>0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>provided</scope>   <!-- Needed for compilation, not for running -->
+    </dependency>
+  </dependencies>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Compilation (including non-standard plugins)     -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.geotools</groupId>
+        <artifactId>jjtree-javacc</artifactId>
+        <version>2.2.x</version>
+        <configuration>
+          <sourceDirectory>src</sourceDirectory>       <!-- Where to search for .jjt files -->
+          <nodeDirectory>modified-src</nodeDirectory>  <!-- Where to search for Node.java  -->
+          <nodePackage>org.geotools.filter.parser</nodePackage>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

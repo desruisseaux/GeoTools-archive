@@ -290,7 +290,7 @@ public class GradientMagnitude extends OperationJAI {
     
     /**
      * Applies the operation on grid coverage. The default implementation looks for kernels
-     * specified in the {@link org.geotools.processing.OperationJAI.Parameters#parameters
+     * specified in the {@link org.geotools.coverage.processing.OperationJAI.Parameters#parameters
      * parameter block} and divide them by the distance between pixels, in the grid coverage's
      * coordinate reference system.
      */

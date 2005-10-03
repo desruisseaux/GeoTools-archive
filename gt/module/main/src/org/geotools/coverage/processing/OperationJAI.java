@@ -24,15 +24,20 @@ import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Locale;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Map;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import javax.units.Unit;
 
 // JAI dependencies
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
+import javax.media.jai.OperationRegistry;
 import javax.media.jai.OperationDescriptor;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.registry.RenderedRegistryMode;
@@ -132,6 +137,11 @@ public class OperationJAI extends Operation2D {
     private static final int PRIMARY_SOURCE_INDEX = 0;
 
     /**
+     * {@code true} if {@link #loadRegistryFileJAI} has been invoked at least once.
+     */
+    private static boolean registryFileLoaded;
+
+    /**
      * The JAI's operation descriptor.
      */
     protected final OperationDescriptor operation;
@@ -199,13 +209,36 @@ public class OperationJAI extends Operation2D {
     private static OperationDescriptor getOperationDescriptor(final String name)
             throws OperationNotFoundException
     {
-        final OperationDescriptor operation = (OperationDescriptor) JAI.getDefaultInstance().
-                                    getOperationRegistry().getDescriptor(RENDERED_MODE, name);
-        if (operation == null) {
-            throw new OperationNotFoundException(Errors.format(
-                      ErrorKeys.OPERATION_NOT_FOUND_$1, name));
+        final OperationRegistry registry = JAI.getDefaultInstance().getOperationRegistry();
+        OperationDescriptor operation;
+        do {
+            operation = (OperationDescriptor) registry.getDescriptor(RENDERED_MODE, name);
+            if (operation != null) {
+                return operation;
+            }
+        } while (name.startsWith("org.geotools.") && loadRegistryFileJAI(registry));
+        throw new OperationNotFoundException(Errors.format(ErrorKeys.OPERATION_NOT_FOUND_$1, name));
+    }
+
+    /**
+     * If Geotools operations doesn't seems to be available, load the {@code registryFile.jai} file
+     * programmatically. JAI may not find the registry file by itself if the Geotools JAR file is
+     * loaded from a different class loader, so we may need to do it here.
+     */
+    private static synchronized boolean loadRegistryFileJAI(final OperationRegistry registry) {
+        if (!registryFileLoaded) try {
+            registry.registerServices(OperationJAI.class.getClassLoader());
+            registryFileLoaded = true;
+            return true;
+        } catch (IOException exception) {
+            final LogRecord record = Errors.getResources(null).getLogRecord(Level.WARNING,
+                                     ErrorKeys.CANT_READ_$1, "META-INF/registryFile.jai");
+            record.setSourceClassName(Utilities.getShortClassName(ImageUtilities.class));
+            record.setSourceMethodName("loadRegistryFileJAI");
+            record.setThrown(exception);
+            AbstractProcessor.LOGGER.log(record);
         }
-        return operation;
+        return false;
     }
 
     /**
@@ -997,10 +1030,10 @@ public class OperationJAI extends Operation2D {
                    final ParameterBlockJAI parameters,
                    final RenderingHints    hints)
         {
-            this.crs             = crs;
-            this.gridToCRS       = gridToCRS;
-            this.parameters      = parameters;
-            this.hints           = hints;
+            this.crs        = crs;
+            this.gridToCRS  = gridToCRS;
+            this.parameters = parameters;
+            this.hints      = hints;
         }
 
         /**

@@ -1,15 +1,16 @@
 #
-# The registry file for Geotools Grid Coverage implementation
-# This file is automatically parsed by JAI under initialization
+# The registry file for Geotools Grid Coverage implementation. This file should be automatically
+# parsed by JAI under initialization. If it is not, then OperationRegistry.registerServices(...)
+# can parse it. This may happen if this file is not visible from JAI core because it live in a
+# claspath known only to a different class loader.
 #
-# Version: $Id: registryFile.jai,v 1.3 2003/07/18 13:49:56 desruisseaux Exp $
+# Version: $Id$
 #
-############################################################################
+##################################################################################################
 #
-# Each line can be in one of the formats described below. Space or tab
-# characters separate keywords in each line. The comment character is
-# '#'; on each line all characters following the first comment character
-# are ignored. The file must be encoded in UTF-8.
+# Each line can be in one of the formats described below. Space or tab characters separate
+# keywords in each line. The comment character is '#'; on each line all characters following
+# the first comment character are ignored. The file must be encoded in UTF-8.
 #
 # 1. To register descriptors :
 #
@@ -22,7 +23,7 @@
 #    The <local-name> is (only) used later on in this file to set preferences
 #    between factory objects, if wanted.
 #
-############################################################################
+##################################################################################################
 #
 # Image operation descriptors :
 #

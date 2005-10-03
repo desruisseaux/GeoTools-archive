@@ -333,7 +333,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      *       checks if the datum shift were applied with the help of Bursa-Wolf parameters.
      *       This procedure looks for Geotools-specific
      *       {@link PositionalAccuracyImpl#DATUM_SHIFT_APPLIED DATUM_SHIFT_APPLIED} and
-     *       {@link PositionalAccuracyImpl.DATUM_SHIFT_OMITTED DATUM_SHIFT_OMITTED} metadata.
+     *       {@link PositionalAccuracyImpl#DATUM_SHIFT_OMITTED DATUM_SHIFT_OMITTED} metadata.
      *       If a datum shift has been applied, returns 25 meters. If a datum shift should have
      *       been applied but has been omitted, returns 1000 meters. The 1000 meters value is
      *       higher than the highest value (999 meters) found in the EPSG database version 6.7.
