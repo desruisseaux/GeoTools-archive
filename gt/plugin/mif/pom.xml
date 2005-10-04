@@ -19,18 +19,12 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-wkt</artifactId>
+  <artifactId>mif</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using WKT file</name>
-  <url>http://modules.geotools.org/epsg-wkt</url>
+  <name>MapInfo MIF format module</name>
+  <url>http://modules.geotools.org/mif</url>
   <description>
-    EPSG and AUTO authority factories are defined for data.crs.CRSService.
-    These codes are used to provide CoordinateRegerenceSystem for GCE and
-    DataStore implementations that do not define their own native definition.
-  
-    Contains a Property file based CoordinateSystemAuthority (the property file is too
-    large to be included in the main geotools release). This class will need to be
-    ported to the new GeoAPI CoordinateReferenceSystem interfaces.
+    (todo)
   </description>
 
 
@@ -40,13 +34,32 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Jody Garnett</name>
-      <id>jive</id>
-      <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
+      <name>Luca Sigfrido Percich</name>
+      <id>lpercich</id>
+      <email>luca.percich@ama-mi.it</email>
+      <organization>AMA-MI</organization>
+      <roles>
+        <role>Module Mantainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>    
+    <developer>
+      <name>Ray Gallagher</name>
+      <id>omyar</id>
+      <email>omyar@users.sourceforge.net</email>
+      <organization>none</organization>
+      <roles>
+        <role>Former Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jianhui Jin</name>
+      <id></id>
+      <email></email>
+      <organization>CCG</organization>
       <roles>
         <role>Java Developer</role>
-        <role>Module Maintainer</role>
       </roles>
     </developer>
   </developers>
@@ -59,7 +72,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>main</artifactId>
       <version>2.2.x</version>
     </dependency>
   </dependencies>

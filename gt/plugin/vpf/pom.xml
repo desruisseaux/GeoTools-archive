@@ -19,18 +19,12 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-wkt</artifactId>
+  <artifactId>vpf</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using WKT file</name>
-  <url>http://modules.geotools.org/epsg-wkt</url>
+  <name>VPF Plugin</name>
+  <url>http://modules.geotools.org/vpf</url>
   <description>
-    EPSG and AUTO authority factories are defined for data.crs.CRSService.
-    These codes are used to provide CoordinateRegerenceSystem for GCE and
-    DataStore implementations that do not define their own native definition.
-  
-    Contains a Property file based CoordinateSystemAuthority (the property file is too
-    large to be included in the main geotools release). This class will need to be
-    ported to the new GeoAPI CoordinateReferenceSystem interfaces.
+    (todo)
   </description>
 
 
@@ -40,13 +34,40 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Jody Garnett</name>
-      <id>jive</id>
-      <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
+      <name>Jeff Yutzler</name>
+      <id>jyutzler</id>
+      <email>jeff@ionicenterprise.com</email>
+      <organization>IONIC Enterprise Inc.</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Knut-Erik Johnsen</name>
+      <id>knutejoh</id>
+      <email>knuterik@onemap.org</email>
+      <organization>Project OneMap</organization>
       <roles>
         <role>Java Developer</role>
-        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Artur Hefczyc</name>
+      <id>kobit</id>
+      <email>kobit@users.sourceforge.net</email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>John Meagher</name>
+      <id></id>
+      <email>john.meagher@solipsys.com</email>
+      <organization>Solipsys</organization>
+      <roles>
+        <role>Java Developer</role>
       </roles>
     </developer>
   </developers>
@@ -59,7 +80,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>main</artifactId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>epsg-wkt</artifactId>
       <version>2.2.x</version>
     </dependency>
   </dependencies>

@@ -19,18 +19,14 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-wkt</artifactId>
+  <artifactId>hsql</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using WKT file</name>
-  <url>http://modules.geotools.org/epsg-wkt</url>
+  <name>HSQL datasource module</name>
+  <url>http://modules.geotools.org/hsql</url>
   <description>
-    EPSG and AUTO authority factories are defined for data.crs.CRSService.
-    These codes are used to provide CoordinateRegerenceSystem for GCE and
-    DataStore implementations that do not define their own native definition.
-  
-    Contains a Property file based CoordinateSystemAuthority (the property file is too
-    large to be included in the main geotools release). This class will need to be
-    ported to the new GeoAPI CoordinateReferenceSystem interfaces.
+    HSQL is a lightweight (~600k) JAVA database that
+    is usefull for saving data locally. This module also uses
+    the Spatial DB in a Box extensions written by David Blasby.
   </description>
 
 
@@ -40,13 +36,13 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Jody Garnett</name>
-      <id>jive</id>
-      <email>jive@users.sourceforge.net</email>
+      <name>Amr Alam</name>
+      <id>aalam</id>
+      <email>aalam@refractions.net</email>
       <organization>Refractions Research</organization>
       <roles>
-        <role>Java Developer</role>
         <role>Module Maintainer</role>
+        <role>Java Developer</role>
       </roles>
     </developer>
   </developers>
@@ -59,9 +55,37 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>main</artifactId>
       <version>2.2.x</version>
     </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.8.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>spatialdb</groupId>
+      <artifactId>spatialdb</artifactId>
+      <version>0.1</version>
+      <url>http://docs.codehaus.org/pages/viewpageattachments.action?pageId=19596</url>
+    </dependency>
   </dependencies>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Plugins configuration                            -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

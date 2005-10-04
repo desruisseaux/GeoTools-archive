@@ -19,18 +19,14 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-wkt</artifactId>
+  <artifactId>gml</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using WKT file</name>
-  <url>http://modules.geotools.org/epsg-wkt</url>
+  <name>GML module</name>
+  <url>http://modules.geotools.org/gml</url>
   <description>
-    EPSG and AUTO authority factories are defined for data.crs.CRSService.
-    These codes are used to provide CoordinateRegerenceSystem for GCE and
-    DataStore implementations that do not define their own native definition.
-  
-    Contains a Property file based CoordinateSystemAuthority (the property file is too
-    large to be included in the main geotools release). This class will need to be
-    ported to the new GeoAPI CoordinateReferenceSystem interfaces.
+    Used to extract features from a GML file. The GML parser was 
+    developed by Refractions Research and conforms to GML 2.x.
+    The specification is availiable at the OGC website.
   </description>
 
 
@@ -40,13 +36,23 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Jody Garnett</name>
-      <id>jive</id>
-      <email>jive@users.sourceforge.net</email>
+      <name>David Zwiers</name>
+      <id>dzwiers</id>
+      <email>dzwiers@refractions.net</email>
       <organization>Refractions Research</organization>
       <roles>
-        <role>Java Developer</role>
         <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Chris Holmes</name>
+      <id>cholmesny</id>
+      <email>cholmesny@users.sourceforge.net</email>
+      <organization>TOPP</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
       </roles>
     </developer>
   </developers>
@@ -60,6 +66,11 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>referencing</artifactId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>main</artifactId>
       <version>2.2.x</version>
     </dependency>
   </dependencies>

@@ -19,18 +19,15 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-wkt</artifactId>
+  <artifactId>wms</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using WKT file</name>
-  <url>http://modules.geotools.org/epsg-wkt</url>
+  <name>Web Map Server client</name>
+  <url>http://modules.geotools.org/wms</url>
   <description>
-    EPSG and AUTO authority factories are defined for data.crs.CRSService.
-    These codes are used to provide CoordinateRegerenceSystem for GCE and
-    DataStore implementations that do not define their own native definition.
-  
-    Contains a Property file based CoordinateSystemAuthority (the property file is too
-    large to be included in the main geotools release). This class will need to be
-    ported to the new GeoAPI CoordinateReferenceSystem interfaces.
+    An OGC Web Map Server client implementation that can be used directly or as 
+    through the GridCoverageExchange API. Direct usage is recommended, as the
+    GridCoverageExchange access for WMS is not well tested and is complicated to
+    use. It supports WMS versions 1.0.0, 1.1.0, 1.1.1, and 1.3.0.
   </description>
 
 
@@ -40,13 +37,14 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Jody Garnett</name>
-      <id>jive</id>
-      <email>jive@users.sourceforge.net</email>
+      <name>Richard Gould</name>
+      <id>rgould</id>
+      <email>rgould@refractions.net</email>
       <organization>Refractions Research</organization>
       <roles>
         <role>Java Developer</role>
         <role>Module Maintainer</role>
+        <role>Project Management Committee (PMC) Member</role>
       </roles>
     </developer>
   </developers>
@@ -59,9 +57,37 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>main</artifactId>
       <version>2.2.x</version>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>epsg-wkt</artifactId>
+      <version>2.2.x</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.0</version>
+    </dependency>
   </dependencies>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Plugins configuration                            -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

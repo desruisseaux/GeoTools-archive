@@ -44,7 +44,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
-import tilecachetool.*;
+//import tilecachetool.*;
 /**
  * DOCUMENT ME!
  *

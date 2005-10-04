@@ -231,7 +231,12 @@ public class OperationJAI extends Operation2D {
             registryFileLoaded = true;
             return true;
         } catch (IOException exception) {
-            final LogRecord record = Errors.getResources(null).getLogRecord(Level.WARNING,
+            /*
+             * Logs a message with the SEVERE level, because DefaultProcessing class initialization
+             * is likely to fails (since it tries to load operations declared in META-INF/services,
+             * and some of them depend on JAI operations).
+             */
+            final LogRecord record = Errors.getResources(null).getLogRecord(Level.SEVERE,
                                      ErrorKeys.CANT_READ_$1, "META-INF/registryFile.jai");
             record.setSourceClassName(Utilities.getShortClassName(ImageUtilities.class));
             record.setSourceMethodName("loadRegistryFileJAI");

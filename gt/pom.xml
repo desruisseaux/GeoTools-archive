@@ -1,12 +1,13 @@
-<!-- ====================================================
-         Maven 2 project configuration file
-         http://maven.apache.org/maven2/
+<!-- ===========================================================================
+         Project configuration file for the Geotools 2 project
+         http://www.geotools.org/
 
-         Configuration file for the Geotools 2 project
-         http://www.geotools.org
+         NOTE: Some tests require a lot of memory. For a successfull build,
+               make sure that the MAVEN_OPTS environmental variable is set
+               to -Xmx384M or some higher value.
 
          Version: $Id$
-     ==================================================== -->
+     =========================================================================== -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -39,7 +40,7 @@
     <license>
       <name>Lesser General Public License (LGPL)</name>
       <url>http://www.gnu.org/copyleft/lesser.html</url>
-      <distribution>manual</distribution>
+      <distribution>repo</distribution>
     </license>
   </licenses>
 
@@ -375,6 +376,12 @@
       <name>Temporary repository (to be replaced by a more official one later)</name>
       <url>http://www.espace.ird.nc/maven-repository</url>
     </repository>
+    <repository>
+      <id>Refractions</id>
+      <name>Legacy repository on Refractions (do not includes transitive dependencies)</name>
+      <url>http://lists.refractions.net/geotools</url>
+      <layout>legacy</layout>
+    </repository>
   </repositories>
 
 
@@ -411,6 +418,7 @@
           <include>**/*.xsd</include>
           <include>**/*.csv</include>
           <include>**/*.sld</include>
+          <include>**/*.svg</include>
           <include>**/*.gml</include>
           <include>**/*.wkt</include>
           <include>**/*.txt</include>
@@ -481,10 +489,37 @@
   <!--     All Geotools 2 modules included in the build     -->
   <!-- ==================================================== -->
   <modules>
+    <module>module/legacy</module>
+    <module>module/main</module>
+    <module>module/migrate</module>
     <module>module/referencing</module>
+    <module>module/sample-data</module>
+    <module>module/svgsupport</module>
+    <module>plugin/arcgrid</module>
+    <module>plugin/arcsde</module>
+    <module>plugin/db2</module>
+    <module>plugin/directory</module>
     <module>plugin/epsg-access</module>
+    <module>plugin/epsg-hsql</module>
     <module>plugin/epsg-postgresql</module>
     <module>plugin/epsg-wkt</module>
+    <module>plugin/geomedia</module>
+    <module>plugin/geometryless</module>
+    <module>plugin/geotiff</module>
+    <module>plugin/gml</module>
+    <module>plugin/gtopo30</module>
+    <module>plugin/hsql</module>
+    <module>plugin/image</module>
+    <module>plugin/mif</module>
+    <module>plugin/mysql</module>
+    <module>plugin/oraclespatial</module>
+    <module>plugin/postgis</module>
+    <module>plugin/shapefile</module>
+    <module>plugin/tiger</module>
+    <module>plugin/vpf</module>
+    <module>plugin/wfs</module>
+    <module>plugin/wms</module>
+    <module>ext/widgets-swing</module>
   </modules>
 
 </project>

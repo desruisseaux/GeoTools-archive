@@ -19,13 +19,15 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-hsql</artifactId>
+  <artifactId>postgis</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using HSQL database</name>
-  <url>http://modules.geotools.org/epsg-hsql</url>
+  <name>PostGIS module</name>
+  <url>http://modules.geotools.org/postgis</url>
   <description>
-    Connection to an embedded EPSG database in HSQL format.
-    This database is built from the SQL scripts delivered by EPSG.
+    Used to extract and edit features from a PostGIS database.  PostGIS was
+    developed by Refractions Research. It is an extension to the excellent
+    Postgresql database, adding support for Geographic objects.  It is open
+    source and freely available.
   </description>
 
 
@@ -35,18 +37,20 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Didier Richard</name>
-      <email>dgr@libertysurf.fr</email>
-      <organization>Institut Géographique National - France</organization>
+      <name>Rob Hranac</name>
+      <id>robhranac</id>
+      <email>robhranac@users.sourceforge.net</email>
+      <organization>VFNY</organization>
       <roles>
+        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
-      <name>Martin Desruisseaux</name>
-      <id>desruisseaux</id>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <name>Chris Holmes</name>
+      <id>cholmesny</id>
+      <email>cholmesny@users.sourceforge.net</email>
+      <organization>TOPP</organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
@@ -62,13 +66,32 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>main</artifactId>
       <version>2.2.x</version>
     </dependency>
     <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>1.8.0.1</version>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>8.0-312.jdbc3</version>
+    </dependency>
+    <dependency>
+      <groupId>postgis-driver</groupId>
+      <artifactId>postgis-driver</artifactId>
+      <version>1.0</version>
+      <url>http://postgis.refractions.net/</url>
+    </dependency>
+    <dependency>
+      <groupId>wkb4j</groupId>
+      <artifactId>wkb4j</artifactId>
+      <version>1.0-RC1</version>
+    </dependency>
+    <dependency>
+      <!-- TODO: this dependency should appears in wkb4j -->
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.12</version>
+      <url>http://logging.apache.org/log4j/docs/</url>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 
@@ -79,13 +102,19 @@
   <!-- ==================================================== -->
   <build>
     <plugins>
-      <!-- TEMPORARY HACK: Disables JUnit tests for now, until the following get fixed:
-           http://jira.codehaus.org/browse/MNG-441   (targeted to Maven 2.0-beta 4) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <!-- This section excludes the tests -->
+          <excludes>
+            <exclude implementation="java.lang.String">**/PostgisLockingTest.java</exclude>
+            <exclude implementation="java.lang.String">**/PostgisTestSuite.java</exclude>
+            <exclude implementation="java.lang.String">**/PostgisDataStoreAPITest.java</exclude>
+            <exclude implementation="java.lang.String">**/PostgisDataStoreTest.java</exclude>
+          </excludes>
+          <!-- End exclude tests -->
+          <skip>false</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
         </configuration>
       </plugin>
     </plugins>

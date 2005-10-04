@@ -1,12 +1,9 @@
-<!-- ====================================================
-         Maven 2 project configuration file
-         http://maven.apache.org/maven2/
-
-         Configuration file for the Geotools 2 project
-         http://www.geotools.org
+<!-- ===========================================================================
+         Project configuration file for the Geotools 2 project
+         http://www.geotools.org/
 
          Version: $Id$
-     ==================================================== -->
+     =========================================================================== -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -166,51 +163,6 @@
       <version>1.6</version>
     </dependency>
     <dependency>
-      <groupId>commons-jxpath</groupId>
-      <artifactId>commons-jxpath</artifactId>
-      <version>1.2</version>
-    </dependency>
-    <dependency>
-      <groupId>xalan</groupId>
-      <artifactId>xalan</artifactId>
-      <version>2.5.1</version>
-    </dependency>
-    <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-gvt</artifactId>
-      <version>1.5</version>
-    </dependency>
-    <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-svg-dom</artifactId>
-      <version>1.5</version>
-    </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-rasterizer</artifactId>
-      <version>1.5</version>
-    </dependency>
-    <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-dom</artifactId>
-      <version>1.5</version>
-    </dependency>
-    <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-bridge</artifactId>
-      <version>1.5</version>
-    </dependency>
-    <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-css</artifactId>
-      <version>1.5</version>
-    </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-xml</artifactId>
-      <version>1.5</version>
-    </dependency>
-    <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-transcoder</artifactId>
       <version>1.5</version>
@@ -219,6 +171,12 @@
       <groupId>org.opengis</groupId>
       <artifactId>legacy</artifactId>
       <version>0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>mockrunner</groupId>
+      <artifactId>mockrunner</artifactId>
+      <version>0.3.6</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -240,8 +198,8 @@
         <artifactId>jjtree-javacc</artifactId>
         <version>2.2.x</version>
         <configuration>
-          <sourceDirectory>src</sourceDirectory>       <!-- Where to search for .jjt files -->
-          <nodeDirectory>modified-src</nodeDirectory>  <!-- Where to search for Node.java  -->
+          <sourceDirectory>${basedir}/src</sourceDirectory>       <!-- Where to search for .jjt files -->
+          <nodeDirectory>${basedir}/modified-src</nodeDirectory>  <!-- Where to search for Node.java  -->
           <nodePackage>org.geotools.filter.parser</nodePackage>
         </configuration>
         <executions>
@@ -251,6 +209,16 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- TEMPORARY HACK: Disables JUnit tests for now, until the following get fixed:
+           http://jira.codehaus.org/browse/MNG-441   (targeted to Maven 2.0-beta 4) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+        </configuration>
       </plugin>
     </plugins>
   </build>

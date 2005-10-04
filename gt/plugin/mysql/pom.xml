@@ -19,13 +19,14 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-postgresql</artifactId>
+  <artifactId>mysql</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using PostgreSQL database</name>
-  <url>http://modules.geotools.org/epsg-postgresql</url>
+  <name>MySQL DataStore Implementation</name>
+  <url>http://modules.geotools.org/mysql</url>
   <description>
-    Connection to an EPSG postgreSQL database.
-    This database is built from the SQL scripts delivered by EPSG.
+    The MySQL module contains an implementation of the DataStore interface
+    (found in data), as well as the older DataSource interface (found in core),
+    for use with MySQL.
   </description>
 
 
@@ -35,18 +36,29 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Didier Richard</name>
-      <email>dgr@libertysurf.fr</email>
-      <organization>Institut Géographique National - France</organization>
+      <name>Chris Holmes</name>
+      <id>cholmesny</id>
+      <email>cholmesny@users.sourceforge.net</email>
+      <organization>TOPP</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>James Macgill</name>
+      <id>jmacgill</id>
+      <email>jmacgill@users.sourceforge.net</email>
+      <organization>CCG</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
-      <name>Martin Desruisseaux</name>
-      <id>desruisseaux</id>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <name>Gary Sheppard</name>
+      <id>shepshep</id>
+      <email>garysheppard@psu.edu</email>
+      <organization>Penn State GeoVISTA Center</organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
@@ -62,14 +74,31 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>main</artifactId>
       <version>2.2.x</version>
     </dependency>
     <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.0-312.jdbc3</version>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>3.0.9</version>
     </dependency>
   </dependencies>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Plugins configuration                            -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

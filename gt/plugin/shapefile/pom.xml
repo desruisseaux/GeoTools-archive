@@ -19,13 +19,12 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-hsql</artifactId>
+  <artifactId>shapefile</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using HSQL database</name>
-  <url>http://modules.geotools.org/epsg-hsql</url>
+  <name>Shapefile module</name>
+  <url>http://modules.geotools.org/shapefile</url>
   <description>
-    Connection to an embedded EPSG database in HSQL format.
-    This database is built from the SQL scripts delivered by EPSG.
+    (todo)
   </description>
 
 
@@ -35,24 +34,75 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Didier Richard</name>
-      <email>dgr@libertysurf.fr</email>
-      <organization>Institut Géographique National - France</organization>
+      <name>James Macgill</name>
+      <id>jmacgill</id>
+      <email>jmacgill@users.sourceforge.net</email>
+      <organization>CCG</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
-      <name>Martin Desruisseaux</name>
-      <id>desruisseaux</id>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <name>Ian Turton</name>
+      <id>ianturton</id>
+      <email>ianturton@users.sourceforge.net</email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Darren Edmonds</name>
+      <id>dledmonds</id>
+      <email>dledmonds@btopenworld.com</email>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Andrea Aime</name>
+      <id>aaime</id>
+      <email>aaime@users.sourceforge.net</email>
+      <organization>University of Modena and Reggio Emilia</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Ian Schneider</name>
+      <id>en</id>
+      <email>ian.schneider@ars.usda.gov</email>
+      <organization>USDA/ARS</organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
   </developers>
+
+  <contributors>
+    <contributor>
+      <name>Dave Blasby</name>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Bug Fixer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>William Stockhausen</name>
+      <organization>Virginia Institute of Marine Science</organization>
+      <roles>
+        <role>Bug Fixer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Ithaqua</name>
+      <organization>Virginia Institute of Marine Science</organization>
+      <roles>
+        <role>External Project Developer</role>
+      </roles>
+    </contributor>
+  </contributors>
 
 
 
@@ -62,25 +112,27 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>main</artifactId>
       <version>2.2.x</version>
-    </dependency>
-    <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>1.8.0.1</version>
     </dependency>
   </dependencies>
 
 
 
   <!-- ==================================================== -->
-  <!--     Plugins configuration                            -->
+  <!--     Configuration (including resources)              -->
   <!-- ==================================================== -->
   <build>
+    <testResources>
+      <testResource>
+        <directory>test</directory>
+        <includes>
+          <include>testData/*</include> <!-- todo: should live in test-data directory -->
+        </includes>
+      </testResource>
+    </testResources>
+
     <plugins>
-      <!-- TEMPORARY HACK: Disables JUnit tests for now, until the following get fixed:
-           http://jira.codehaus.org/browse/MNG-441   (targeted to Maven 2.0-beta 4) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

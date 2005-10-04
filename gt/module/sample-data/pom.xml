@@ -19,18 +19,12 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-wkt</artifactId>
+  <artifactId>sample-data</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using WKT file</name>
-  <url>http://modules.geotools.org/epsg-wkt</url>
+  <name>Sample data module</name>
+  <url>http://modules.geotools.org/sample-data</url>
   <description>
-    EPSG and AUTO authority factories are defined for data.crs.CRSService.
-    These codes are used to provide CoordinateRegerenceSystem for GCE and
-    DataStore implementations that do not define their own native definition.
-  
-    Contains a Property file based CoordinateSystemAuthority (the property file is too
-    large to be included in the main geotools release). This class will need to be
-    ported to the new GeoAPI CoordinateReferenceSystem interfaces.
+    Contains sample data for testing purpose.
   </description>
 
 
@@ -40,13 +34,13 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Jody Garnett</name>
-      <id>jive</id>
-      <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
+      <name>James Macgill</name>
+      <id>jmacgill</id>
+      <email>jmacgill@users.sourceforge.net</email>
+      <organization>PennState</organization>
       <roles>
         <role>Java Developer</role>
-        <role>Module Maintainer</role>
+        <role>Project Management Committee (PMC) Member</role>
       </roles>
     </developer>
   </developers>
@@ -54,14 +48,20 @@
 
 
   <!-- ==================================================== -->
-  <!--     Dependencies                                     -->
+  <!--     Compilation (including resources)                -->
   <!-- ==================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
-      <version>2.2.x</version>
-    </dependency>
-  </dependencies>
+  <build>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <includes>
+          <include>**/*.shp</include>
+          <include>**/*.shx</include>
+          <include>**/*.dbf</include>
+          <include>**/spearfish_dem.asc.gz</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 
 </project>

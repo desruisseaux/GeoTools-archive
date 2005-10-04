@@ -19,13 +19,12 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-hsql</artifactId>
+  <artifactId>arcsde</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using HSQL database</name>
-  <url>http://modules.geotools.org/epsg-hsql</url>
+  <name>ArcSDE datasource module</name>
+  <url>http://modules.geotools.org/arcsde</url>
   <description>
-    Connection to an embedded EPSG database in HSQL format.
-    This database is built from the SQL scripts delivered by EPSG.
+    ArcSDE datasource module.
   </description>
 
 
@@ -35,20 +34,30 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Didier Richard</name>
-      <email>dgr@libertysurf.fr</email>
-      <organization>Institut Géographique National - France</organization>
+      <name>Gabriel Roldan</name>
+      <id>groldan</id>
+      <email>groldan@axios.es</email>
+      <organization>Axios Engineering</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Chris Dillard</name>
+      <id>csdillard</id>
+      <email>cdillard@polexis.com</email>
+      <organization>Polexis</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
-      <name>Martin Desruisseaux</name>
-      <id>desruisseaux</id>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <name>Jake Fear</name>
+      <id>jfear</id>
+      <email>jfear@polexis.com</email>
+      <organization>Polexis</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
@@ -62,13 +71,23 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>main</artifactId>
       <version>2.2.x</version>
     </dependency>
     <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>1.8.0.1</version>
+      <groupId>arcsde</groupId>
+      <artifactId>jsde_sdk</artifactId>
+      <version>9.0</version>
+    </dependency>
+    <dependency>
+      <groupId>arcsde</groupId>
+      <artifactId>jsde_concurrent</artifactId>
+      <version>9.0</version>
+    </dependency>
+    <dependency>
+      <groupId>arcsde</groupId>
+      <artifactId>jsde_jpe_sdk</artifactId>
+      <version>9.0</version>
     </dependency>
   </dependencies>
 
@@ -79,13 +98,21 @@
   <!-- ==================================================== -->
   <build>
     <plugins>
-      <!-- TEMPORARY HACK: Disables JUnit tests for now, until the following get fixed:
-           http://jira.codehaus.org/browse/MNG-441   (targeted to Maven 2.0-beta 4) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <!-- This section excludes the tests, comment out if your
+               testData/testparams.properties are set correctly -->
+          <excludes>
+            <exclude implementation="java.lang.String">**/ArcSDEJavaApiTest.java</exclude>
+            <exclude implementation="java.lang.String">**/ArcSDEDataStoreTest.java</exclude>
+            <exclude implementation="java.lang.String">**/ArcSDEConnectionPoolTest.java</exclude>
+            <exclude implementation="java.lang.String">**/ArcSDEFeatureStoreTest.java</exclude>
+            <exclude implementation="java.lang.String">**/ArcSDEQueryTest.java</exclude>
+            <exclude implementation="java.lang.String">**/FilterTest.java</exclude>
+          </excludes>
+          <!-- End exclude tests -->
         </configuration>
       </plugin>
     </plugins>

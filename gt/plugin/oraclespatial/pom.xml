@@ -19,18 +19,12 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-wkt</artifactId>
+  <artifactId>oracle-spatial</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using WKT file</name>
-  <url>http://modules.geotools.org/epsg-wkt</url>
+  <name>Oracle Spatial Module</name>
+  <url>http://modules.geotools.org/oracle-spatial</url>
   <description>
-    EPSG and AUTO authority factories are defined for data.crs.CRSService.
-    These codes are used to provide CoordinateRegerenceSystem for GCE and
-    DataStore implementations that do not define their own native definition.
-  
-    Contains a Property file based CoordinateSystemAuthority (the property file is too
-    large to be included in the main geotools release). This class will need to be
-    ported to the new GeoAPI CoordinateReferenceSystem interfaces.
+    (todo)
   </description>
 
 
@@ -40,13 +34,19 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Jody Garnett</name>
-      <id>jive</id>
-      <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
+      <name>Sean Geoghegan</name>
+      <id>seangeo</id>
+      <email>sean.geoghegan@dsto.defence.gov.au</email>
+      <organization>Defence Science and Technology Organisation</organization>
       <roles>
-        <role>Java Developer</role>
         <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Simon Rass</name>
+      <roles>
+        <role>Bug Fixer</role>
       </roles>
     </developer>
   </developers>
@@ -59,8 +59,29 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>main</artifactId>
       <version>2.2.x</version>
+    </dependency>
+    <!-- To use for real - download the ojdbc14.jar from oracle:
+         copy ojdbc14.jar to ~/.m2/repository/oracle/jars/ojdbc/14/ojdbc-14.jar
+
+         The test cases will try and connect to an oracle server on localhost;
+         or on the server indicated by a XXXX.properties file.
+      -->
+	<!--dependency>
+          <artifactId>ojdbc</artifactId>
+          <groupId>oracle</groupId>
+          <version>14</version>
+        </dependency-->
+    <!-- To use for fake:
+         Uncomment the following section, it downloads a jar full of
+         "Mock Objects" so you can compile without downloading the real
+         thing from oracle.
+     -->
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>dummy_spatial</artifactId>
+      <version>8.1.8</version>
     </dependency>
   </dependencies>
 

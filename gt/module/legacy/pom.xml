@@ -19,13 +19,14 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-postgresql</artifactId>
+  <artifactId>legacy</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using PostgreSQL database</name>
-  <url>http://modules.geotools.org/epsg-postgresql</url>
+  <name>Legacy module</name>
+  <url>http://modules.geotools.org/legacy</url>
   <description>
-    Connection to an EPSG postgreSQL database.
-    This database is built from the SQL scripts delivered by EPSG.
+    This module contains code which has been deprecated.  It exists to help users whilst
+    updating their code and to support the 'migrate' module which contains core geotools
+    code which needs to be updated before it can move back into main.
   </description>
 
 
@@ -35,10 +36,12 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Didier Richard</name>
-      <email>dgr@libertysurf.fr</email>
-      <organization>Institut Géographique National - France</organization>
+      <name>James Macgill</name>
+      <id>jmacgill</id>
+      <email>jmacgill@users.sourceforge.net</email>
+      <organization>CCG</organization>
       <roles>
+        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
@@ -48,7 +51,6 @@
       <email>desruisseaux@users.sourceforge.net</email>
       <organization>Institut de Recherche pour le Développement (IRD)</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
@@ -61,15 +63,39 @@
   <!-- ==================================================== -->
   <dependencies>
     <dependency>
+      <groupId>org.opengis</groupId>
+      <artifactId>legacy</artifactId>
+      <version>0.2</version>
+    </dependency>
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>referencing</artifactId>
       <version>2.2.x</version>
     </dependency>
     <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.0-312.jdbc3</version>
+      <groupId>org.geotools</groupId>
+      <artifactId>main</artifactId>
+      <version>2.2.x</version>
     </dependency>
   </dependencies>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Plugins configuration                            -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <!-- TEMPORARY HACK: Disables JUnit tests for now, until the following get fixed:
+           http://jira.codehaus.org/browse/MNG-441   (targeted to Maven 2.0-beta 4) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

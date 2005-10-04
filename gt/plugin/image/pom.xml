@@ -19,18 +19,12 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-wkt</artifactId>
+  <artifactId>image</artifactId>
   <packaging>jar</packaging>
-  <name>EPSG Authority Service using WKT file</name>
-  <url>http://modules.geotools.org/epsg-wkt</url>
+  <name>WorldImage datasource module</name>
+  <url>http://modules.geotools.org/image</url>
   <description>
-    EPSG and AUTO authority factories are defined for data.crs.CRSService.
-    These codes are used to provide CoordinateRegerenceSystem for GCE and
-    DataStore implementations that do not define their own native definition.
-  
-    Contains a Property file based CoordinateSystemAuthority (the property file is too
-    large to be included in the main geotools release). This class will need to be
-    ported to the new GeoAPI CoordinateReferenceSystem interfaces.
+    Datasource created to read images georeferenced by a world file.
   </description>
 
 
@@ -40,14 +34,20 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Jody Garnett</name>
-      <id>jive</id>
-      <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
-      <roles>
-        <role>Java Developer</role>
-        <role>Module Maintainer</role>
-      </roles>
+     <name>Simone Giannecchini</name>
+     <id>simboss</id>
+     <email>simboss_ml@tiscali.it</email>
+     <roles>
+       <role>Java Developer</role>
+     </roles>
+   </developer>
+   <developer>
+     <name>Alessio Fabiani</name>
+     <id>alfa</id>
+     <email>alessio.fabiani@gmail.com</email>
+     <roles>
+       <role>Java Developer</role>
+     </roles>
     </developer>
   </developers>
 
@@ -59,9 +59,28 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>main</artifactId>
       <version>2.2.x</version>
     </dependency>
   </dependencies>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Plugins configuration                            -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <!-- TEMPORARY HACK: Disables JUnit tests for now, until the following get fixed:
+           http://jira.codehaus.org/browse/MNG-441   (targeted to Maven 2.0-beta 4) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
