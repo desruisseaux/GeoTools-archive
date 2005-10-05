@@ -1,6 +1,6 @@
 package org.opengis.feature.simple;
 
-import java.util.Collection;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -33,7 +33,7 @@ public interface SimpleFeatureType extends FeatureType {
 	 * Types are returned in the perscribed index order.
 	 * @return Types in prescribed order
 	 */
-	public Collection<AttributeType> types();
+	public List<AttributeType> types();
 	
 	/**
 	 * Retrive attributeType by qualified name
