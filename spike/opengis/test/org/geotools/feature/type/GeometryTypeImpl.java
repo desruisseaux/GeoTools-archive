@@ -4,11 +4,12 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.filter.Filter;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.Geometry;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryTypeImpl extends AttributeTypeImpl implements GeometryType {
 
@@ -24,5 +25,9 @@ public class GeometryTypeImpl extends AttributeTypeImpl implements GeometryType 
 			CoordinateReferenceSystem crs){
 		super(name, binding, identified, nillable, restrictions, superType, isAbstract);
 		CRS = crs;
+	}
+	
+	public CoordinateReferenceSystem getCRS(){
+		return CRS;
 	}
 }

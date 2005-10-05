@@ -8,17 +8,14 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.TestCase;
-
-import org.geotools.feature.schema.ChoiceImpl;
 import org.geotools.feature.schema.NodeImpl;
 import org.geotools.feature.schema.OrderedImpl;
+import org.geotools.filter.Filter;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.schema.OrderedDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.TypeFactory;
-import org.opengis.filter.Filter;
 
 public class TypeFactoryImplTest extends ComplexTestData {
 

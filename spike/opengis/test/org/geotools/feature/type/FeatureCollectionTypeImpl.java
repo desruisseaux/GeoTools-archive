@@ -4,10 +4,10 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.filter.Filter;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.filter.Filter;
 
 public class FeatureCollectionTypeImpl extends FeatureTypeImpl implements FeatureCollectionType {
 	protected final Descriptor MEMBERDESCRIPTOR;

@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.geotools.feature.schema.DescriptorFactoryImpl;
+import org.geotools.filter.Filter;
 import org.opengis.feature.Feature;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.Descriptor;
@@ -15,7 +16,8 @@ import org.opengis.feature.schema.OrderedDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.TypeFactory;
-import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * Sanity tests that ensures the complex type business driver examples can be
@@ -117,5 +119,6 @@ public class BusinessDriverExamplesTest extends ComplexTestData {
 
 		assertNotNull(wqPlusType.getDefaultGeometry());
 		assertEquals("location", wqPlusType.getDefaultGeometry().name());
+		assertEquals(Point.class, wqPlusType.getDefaultGeometry().getBinding());
 	}
 }

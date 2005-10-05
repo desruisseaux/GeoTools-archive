@@ -4,11 +4,11 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.filter.Filter;
 import org.opengis.feature.Feature;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.filter.Filter;
 
 public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 	protected GeometryType DEFAULT;

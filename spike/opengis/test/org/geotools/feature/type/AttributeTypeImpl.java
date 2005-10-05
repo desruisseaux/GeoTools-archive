@@ -5,8 +5,8 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.filter.Filter;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.filter.Filter;
 
 public class AttributeTypeImpl implements AttributeType {
 	// binding

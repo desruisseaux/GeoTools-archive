@@ -7,22 +7,13 @@
 
 package org.geotools.feature.type;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.opengis.feature.Feature;
-import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.TypeFactory;
 

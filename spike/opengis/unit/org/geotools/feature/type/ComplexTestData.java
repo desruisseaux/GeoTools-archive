@@ -8,6 +8,7 @@ import javax.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
+import org.geotools.filter.Filter;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.schema.DescriptorFactory;
 import org.opengis.feature.schema.OrderedDescriptor;
@@ -15,7 +16,6 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.TypeFactory;
-import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Point;
 

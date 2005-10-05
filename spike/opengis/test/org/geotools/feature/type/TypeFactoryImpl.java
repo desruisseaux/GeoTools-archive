@@ -9,6 +9,7 @@ import javax.xml.namespace.QName;
 import org.geotools.feature.schema.NodeImpl;
 import org.geotools.feature.simple.SimpleDescriptorImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
+import org.geotools.filter.Filter;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.schema.AttributeDescriptor;
@@ -19,7 +20,6 @@ import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.TypeFactory;
-import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;

@@ -6,10 +6,10 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.geotools.feature.Descriptors;
+import org.geotools.filter.Filter;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
-import org.opengis.filter.Filter;
 
 public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 	
