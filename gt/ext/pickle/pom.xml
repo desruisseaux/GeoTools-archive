@@ -19,10 +19,10 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>geomedia</artifactId>
+  <artifactId>pickle</artifactId>
   <packaging>jar</packaging>
-  <name>GeoMedia datastore implementation</name>
-  <url>http://modules.geotools.org/geomedia</url>
+  <name>Pickle module</name>
+  <url>http://modules.geotools.org/pickle</url>
   <description>
     (todo)
   </description>
@@ -34,12 +34,11 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Julian Ray</name>
-      <id>jjray</id>
-      <email>jjray@users.sourceforge.net</email>
-      <organization></organization>
+      <name>Ian Schneider</name>
+      <id>ianschneider</id>
+      <email>ianschneider@users.sourceforge.net</email>
+      <organization>USDA/ARS</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
@@ -57,5 +56,22 @@
       <version>2.2-SNAPSHOT</version>
     </dependency>
   </dependencies>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Plugins configuration                            -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

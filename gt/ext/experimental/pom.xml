@@ -19,12 +19,12 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>geomedia</artifactId>
+  <artifactId>experimental</artifactId>
   <packaging>jar</packaging>
-  <name>GeoMedia datastore implementation</name>
-  <url>http://modules.geotools.org/geomedia</url>
+  <name>Geotools experiments</name>
+  <url>http://modules.geotools.org/experimental</url>
   <description>
-    (todo)
+    Multiple interface experiments with inovative implementations.
   </description>
 
 
@@ -34,15 +34,34 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Julian Ray</name>
-      <id>jjray</id>
-      <email>jjray@users.sourceforge.net</email>
-      <organization></organization>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
       <roles>
+        <role>Java Developer</role>
         <role>Module Maintainer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>David Zwiers</name>
+      <id>dmzwiers</id>
+      <email>dzwiers@refractions.net</email>
+      <organization>Refractions Research Inc.</organization>
+      <roles>
         <role>Java Developer</role>
       </roles>
     </developer>
+    <developer>
+      <name>Brent Owens</name>
+      <id>sploreg</id>
+      <email>sploreg@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>    
   </developers>
 
 

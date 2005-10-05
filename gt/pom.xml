@@ -21,7 +21,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>gt2</artifactId>
   <packaging>pom</packaging>
-  <version>2.2.x</version>
+  <version>2.2-SNAPSHOT</version>
   <name>Geotools 2</name>
   <url>http://modules.geotools.org</url>
   <description>
@@ -141,7 +141,7 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <organization>Institut de Recherche pour le D�veloppement (IRD)</organization>
       <roles>
         <role>Java Developer</role>
         <role>Project Management Committee (PMC) Member</role>
@@ -370,16 +370,19 @@
       <id>ibiblio</id>
       <name>Ibiblio - the public's library and digital archive</name>
       <url>http://www.ibiblio.org/maven2</url>
+      <snapshotPolicy>never</snapshotPolicy>
     </repository>
     <repository>
       <id>sicade</id>
       <name>Temporary repository (to be replaced by a more official one later)</name>
       <url>http://www.espace.ird.nc/maven-repository</url>
+      <snapshotPolicy>never</snapshotPolicy>
     </repository>
     <repository>
       <id>Refractions</id>
       <name>Legacy repository on Refractions (do not includes transitive dependencies)</name>
       <url>http://lists.refractions.net/geotools</url>
+      <snapshotPolicy>never</snapshotPolicy>
       <layout>legacy</layout>
     </repository>
   </repositories>
@@ -489,6 +492,7 @@
   <!--     All Geotools 2 modules included in the build     -->
   <!-- ==================================================== -->
   <modules>
+    <module>maven-plugin</module>
     <module>module/legacy</module>
     <module>module/main</module>
     <module>module/migrate</module>
@@ -519,6 +523,14 @@
     <module>plugin/vpf</module>
     <module>plugin/wfs</module>
     <module>plugin/wms</module>
+    <module>ext/experimental</module>
+    <module>ext/graph</module>
+    <module>ext/legend</module>
+    <module>ext/pickle</module>
+    <module>ext/shape</module>
+    <module>ext/shaperenderer</module>
+    <module>ext/validation</module>
+    <module>ext/view</module>
     <module>ext/widgets-swing</module>
   </modules>
 

@@ -19,14 +19,14 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>mysql</artifactId>
+  <artifactId>validation</artifactId>
   <packaging>jar</packaging>
-  <name>MySQL DataStore Implementation</name>
-  <url>http://modules.geotools.org/mysql</url>
+  <name>Validation Processor and Framework</name>
+  <url>http://modules.geotools.org/validation</url>
   <description>
-    The MySQL module contains an implementation of the DataStore interface
-    (found in data), as well as the older DataSource interface (found in core),
-    for use with MySQL.
+    Validation module (and validator batch tool) for use with geotools2.
+    This library has been ported to geotools2 as part of the VWFS project
+    sponcered by Geo Innovations.
   </description>
 
 
@@ -36,34 +36,34 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Chris Holmes</name>
-      <id>cholmesny</id>
-      <email>cholmesny@users.sourceforge.net</email>
-      <organization>TOPP</organization>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
       <roles>
+        <role>Java Developer</role>
         <role>Module Maintainer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>David Zwiers</name>
+      <id>dmzwiers</id>
+      <email>dzwiers@refractions.net</email>
+      <organization>Refractions Research Inc.</organization>
+      <roles>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
+      <name>Brent Owens</name>
+      <id>sploreg</id>
+      <email>sploreg@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
       <roles>
         <role>Java Developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Gary Sheppard</name>
-      <id>shepshep</id>
-      <email>garysheppard@psu.edu</email>
-      <organization>Penn State GeoVISTA Center</organization>
-      <roles>
         <role>Module Maintainer</role>
-        <role>Java Developer</role>
       </roles>
-    </developer>
+    </developer>    
   </developers>
 
 
@@ -74,13 +74,29 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>directory</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>3.0.9</version>
+      <groupId>org.geotools</groupId>
+      <artifactId>graph</artifactId>
+      <version>2.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>postgis</artifactId>
+      <version>2.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>shapefile</artifactId>
+      <version>2.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>provided</scope>   <!-- Needed for compilation, not for running -->
     </dependency>
   </dependencies>
 
@@ -95,7 +111,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <excludes>
+            <exclude implementation="java.lang.String">**/GazetteerNameValidationTest.java</exclude>
+            <exclude implementation="java.lang.String">**/MemoryLeakTest.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

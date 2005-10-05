@@ -19,12 +19,18 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>geomedia</artifactId>
+  <artifactId>graph</artifactId>
   <packaging>jar</packaging>
-  <name>GeoMedia datastore implementation</name>
-  <url>http://modules.geotools.org/geomedia</url>
+  <name>Feature Based Graphs and Networks</name>
+  <url>http://modules.geotools.org/graph</url>
   <description>
-    (todo)
+    Graph classes that builds and walk networks based on Feature relationships.
+    The original graph package has been developed using the JUMP Feature API.
+    Its intension is to be able to aid automated skeletonization of water bodies
+    by computing directionality of generated skeletons. The work for the original
+    JUMP based library has been funded by the BC Proventional Government department
+    of BMGS. This library has been ported to geotools2 as part of the VWFS project
+    sponcered by Geo Innovations.
   </description>
 
 
@@ -34,13 +40,23 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Julian Ray</name>
-      <id>jjray</id>
-      <email>jjray@users.sourceforge.net</email>
-      <organization></organization>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Justin Deoliveira</name>
+      <id>jdeolive</id>
+      <email>jdeolive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
   </developers>

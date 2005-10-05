@@ -19,14 +19,12 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>mysql</artifactId>
+  <artifactId>indexed-shapefile</artifactId>
   <packaging>jar</packaging>
-  <name>MySQL DataStore Implementation</name>
-  <url>http://modules.geotools.org/mysql</url>
+  <name>Indexed shapefile module</name>
+  <url>http://modules.geotools.org/indexed-shapefile</url>
   <description>
-    The MySQL module contains an implementation of the DataStore interface
-    (found in data), as well as the older DataSource interface (found in core),
-    for use with MySQL.
+    (todo)
   </description>
 
 
@@ -36,35 +34,49 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Chris Holmes</name>
-      <id>cholmesny</id>
-      <email>cholmesny@users.sourceforge.net</email>
-      <organization>TOPP</organization>
-      <roles>
-        <role>Module Maintainer</role>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
+      <name>Tommaso Nolli</name>
+      <id>tnolli</id>
+      <email>tommaso.nolli@asimantova.it</email>
+      <organization>Azienda Servizi Informativi S.p.a</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
-      <name>Gary Sheppard</name>
-      <id>shepshep</id>
-      <email>garysheppard@psu.edu</email>
-      <organization>Penn State GeoVISTA Center</organization>
+      <name>Jesse Eichar</name>
+      <id>jeichar</id>
+      <email>jeichar@refractions.net</email>
+      <organization>Refraction Research Inc.</organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
   </developers>
+
+  <contributors>
+    <contributor>
+      <name>Dave Blasby</name>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Bug Fixer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>William Stockhausen</name>
+      <organization>Virginia Institute of Marine Science</organization>
+      <roles>
+        <role>Bug Fixer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Ithaqua</name>
+      <organization>Virginia Institute of Marine Science</organization>
+      <roles>
+        <role>External Project Developer</role>
+      </roles>
+    </contributor>
+  </contributors>
 
 
 
@@ -74,13 +86,13 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>shapefile</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>3.0.9</version>
+      <groupId>velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.4</version>
     </dependency>
   </dependencies>
 
