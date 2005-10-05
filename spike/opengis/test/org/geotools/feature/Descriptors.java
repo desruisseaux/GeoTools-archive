@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import org.opengis.feature.schema.AllDescriptor;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.ChoiceDescriptor;
@@ -177,10 +179,26 @@ public class Descriptors {
 	 * @return
 	 */
 	static public AttributeType type( Descriptor schema, String name ){
+		return type(schema, new QName(name));
+	}
+
+	/**
+	 * Locate type associated with provided name, or null if not found.
+	 * 
+	 * @param schema
+	 * @param name
+	 * @return
+	 */
+	static public AttributeType type( Descriptor schema, QName name ){
 		AttributeDescriptor node = node( schema, name );
 		if( node != null ) return node.getType();
 		return null;
 	}
+
+	static public AttributeDescriptor node( Descriptor schema, String name ){
+		return node(schema, new QName(name));
+	}
+		
 	/**
 	 * Finds the node associated with the provided name.
 	 * 
@@ -188,11 +206,11 @@ public class Descriptors {
 	 * @param name
 	 * @return AttributeDescriptor assoicated with provided name, or null if not found.
 	 */
-	static public AttributeDescriptor node( Descriptor schema, String name ){
+	static public AttributeDescriptor node( Descriptor schema, QName name ){
 		for( Descriptor child : list( schema ) ){
 			if( child instanceof AttributeDescriptor ){
 				AttributeDescriptor node = (AttributeDescriptor) child;
-				if( node.getType().name().equals( name )){
+				if( node.getType().getName().equals( name )){
 					return node;
 				}
 			}
