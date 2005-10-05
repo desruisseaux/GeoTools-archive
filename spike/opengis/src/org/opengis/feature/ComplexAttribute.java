@@ -2,8 +2,8 @@ package org.opengis.feature;
 
 import java.util.List;
 
-import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.ComplexType;
 
 public interface ComplexAttribute extends Attribute {
    /** 

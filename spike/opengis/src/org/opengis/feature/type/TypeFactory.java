@@ -5,10 +5,10 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.filter.Filter;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.simple.SimpleDescriptor;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.Filter;
 
 /**
  * Factory interface for the typing system.

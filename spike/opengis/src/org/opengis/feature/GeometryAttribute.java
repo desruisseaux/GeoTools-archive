@@ -2,7 +2,9 @@ package org.opengis.feature;
 
 import org.opengis.feature.type.GeometryType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.Geometry;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Represent a Geometry as complex content.
@@ -42,7 +44,7 @@ public interface GeometryAttribute extends Attribute {
 	 * GeoAPI Geometry implementations are made avaialble.
 	 * </p>
 	 */
-	Object getBounds();
+	Envelope getBounds();
 
 	/**
 	 * GeometryType should be configued with a Geometry for getJavaType.

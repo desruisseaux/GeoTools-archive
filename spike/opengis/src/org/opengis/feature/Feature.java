@@ -1,7 +1,11 @@
 package org.opengis.feature;
 
 import org.opengis.feature.type.FeatureType;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 public interface Feature extends ComplexAttribute  {
    /**
@@ -31,7 +35,7 @@ public interface Feature extends ComplexAttribute  {
     * </p>
     * @return CoordinateReferenceSystem if known or null.
     */
-   Object getCRS();
+   CoordinateReferenceSystem getCRS();
 
    /**
     * The bounds of this Feature, if available.
@@ -46,7 +50,7 @@ public interface Feature extends ComplexAttribute  {
     * </p>
     * @return Bounds if available or null
     */
-   Object getBounds();
+   Envelope getBounds();
 
    /**
     * Access the type of this Feature.
@@ -56,5 +60,5 @@ public interface Feature extends ComplexAttribute  {
    /**
     * @return Default geomtry Attribute or null if unknown or not applicable.
     */
-   Geometry getDefault();
+   GeometryType getDefault();
 }
