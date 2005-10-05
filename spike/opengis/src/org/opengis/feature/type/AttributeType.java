@@ -77,7 +77,7 @@ public interface AttributeType {
 	 * @return true if value may be null, false if value my be present, or null
 	 *         indicating super should be used.
 	 */
-	public Boolean isNilable();
+	public Boolean isNillable();
 	
 	/**
 	 * AttributeType identity should be based on QName.
