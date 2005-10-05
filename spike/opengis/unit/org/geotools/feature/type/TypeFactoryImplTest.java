@@ -17,26 +17,13 @@ import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.schema.OrderedDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
+import org.opengis.feature.type.TypeFactory;
 import org.opengis.filter.Filter;
 
-public class TypeFactoryImplTest extends TestCase {
+public class TypeFactoryImplTest extends ComplexTestData {
 
 	TypeFactory factory;
 	
-	private static void checkType(AttributeType type, QName name, Class binding, Set<Filter> restrictions,
-			boolean identified, boolean _abstract, AttributeType superType, boolean nillable){
-		assertNotNull(type);
-		assertEquals(name.getLocalPart(), type.name());
-		assertEquals(name, type.getName());
-		assertEquals(binding, type.getBinding());
-		assertNotNull(type.getRestrictions());
-		assertEquals(restrictions, type.getRestrictions());
-		assertEquals(identified, type.isIdentified());
-		assertEquals(_abstract, type.isAbstract());
-		assertEquals(superType, type.getSuper());
-		assertEquals(Boolean.valueOf(nillable), type.isNilable());		
-	}
-
 	protected void setUp() throws Exception {
 		super.setUp();
 		factory = new TypeFactoryImpl();
@@ -102,7 +89,7 @@ public class TypeFactoryImplTest extends TestCase {
 		
 		Set<Filter> filters = Collections.emptySet();
 		type = factory.createType("TestString", String.class);
-		checkType(type, new QName("TestString"), String.class, filters, false, false, null, false);
+		checkType(type, new QName("TestString"), String.class, filters, false, false, null, true);
 	}
 
 	
@@ -122,7 +109,7 @@ public class TypeFactoryImplTest extends TestCase {
 		assertEquals(qname, type.getName());
 
 		Set<Filter> filters = Collections.emptySet();
-		checkType(type, qname, String.class, filters, false, false, null, false);
+		checkType(type, qname, String.class, filters, false, false, null, true);
 	}
 
 	/**

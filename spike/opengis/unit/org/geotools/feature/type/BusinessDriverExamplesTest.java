@@ -1,31 +1,34 @@
 package org.geotools.feature.type;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 import org.geotools.feature.schema.DescriptorFactoryImpl;
 import org.opengis.feature.Feature;
+import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.schema.DescriptorFactory;
+import org.opengis.feature.schema.OrderedDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
-
-import junit.framework.TestCase;
+import org.opengis.feature.type.TypeFactory;
+import org.opengis.filter.Filter;
 
 /**
- * Sanity tests that ensures the complex type business
- * driver examples can be created using the new typing system.
- *  
+ * Sanity tests that ensures the complex type business driver examples can be
+ * created using the new typing system.
+ * 
  * @author Gabriel Roldan, Axios Engineering
  */
-public class BusinessDriverExamplesTest extends TestCase {
+public class BusinessDriverExamplesTest extends ComplexTestData {
 
 	private TypeFactory typeFactory;
-	
+
 	private DescriptorFactory descFactory;
-	
+
 	protected void setUp() throws Exception {
 		super.setUp();
 		typeFactory = new TypeFactoryImpl();
@@ -40,120 +43,79 @@ public class BusinessDriverExamplesTest extends TestCase {
 
 	/**
 	 * Test the appliance of a GeoTools complex FeatureType to mirror the
-	 * sample GML schema at 
-FeatureType[
-	name = wq_plus
-	identified = true
-	super = Feature
-	abstract = false
-	binding = Feature.class
-	restrictions = EMPTY_SET
-	nillable = false
-	defaultGeometry = #location
-	descriptor = OrderedDescriptor(1, 1)[
-		sequence = List[
-			AttributeDescriptor(1, 1)[
-				type = AttributeType[
-					name = sitename
-					identified = false
-					super = null (?????????)
-					abstract = false
-					binding = String.class
-					restrictions = EMPTY_SET
-					nillable = false
-				]
-			],
-			AttributeDescriptor(0, 1)[
-				type = AttributeType[
-					name = anzlic_no
-					identified = false
-					super = null (?????????)
-					abstract = false
-					binding = String.class
-					restrictions = EMPTY_SET
-					nillable = true
-				]
-			],
-			AttributeDescriptor(0, 1)[
-				type = GeometryAttribute[
-					name = location
-					identified = false
-					super = HERE WE NEED TO REFER TO  gml:LocationPropertyType
-					abstract = false
-					binding = Point.class
-					restrictions = EMPTY_SET
-					nillable = true
-				]
-			],
-			AttributeDescriptor (0, Integer.MAX_VALUE)[
-				type = ComplexType[
-					name = measurement
-					identified = true
-					super = null (?????????????????)
-					abstract = false
-					binding = null
-					restrictions = EMPTY_SET
-					nillable = true
-					descriptor = OrderedDescriptor(0, Integer.MAX_VALUE)[
-						AttributeDescriptor(1, 1)[
-							type = AttributeType[
-								name = determinand_description
-								identified = false
-								super = null (?????????)
-								abstract = false
-								binding = String.class
-								restrictions = EMPTY_SET
-								nillable = false
-							]
-						],
-						AttributeDescriptor(1, 1)[
-							type = AttributeType[
-								name = result
-								identified = false
-								super = null (?????????)
-								abstract = false
-								binding = String.class
-								restrictions = EMPTY_SET
-								nillable = false
-							]
-						]
-					]
-				]
-			], //measurement
-			AttributeDescriptor(0, 1)[
-				type = AttributeType[
-					name = project_no
-					identified = false
-					super = null (?????????)
-					abstract = false
-					binding = String.class
-					restrictions = EMPTY_SET
-					nillable = false
-				]
-			]
-    	]
-	]
-]	 
+	 * following sample GML schema:
+	 * 
+	 * <pre>
+	 * <code>
+	 *   &lt;xs:complexType xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; name=&quot;wq_plus_Type&quot;&gt;
+	 * 	  &lt;xs:complexContent&gt;
+	 * 	   &lt;xs:extension base=&quot;gml:AbstractFeatureType&quot;&gt;
+	 * 	    &lt;xs:sequence&gt;
+	 * 	     &lt;xs:element name=&quot;sitename&quot; minOccurs=&quot;1&quot; nillable=&quot;false&quot; type=&quot;xs:string&quot; /&gt;
+	 * 	     &lt;xs:element name=&quot;anzlic_no&quot; minOccurs=&quot;0&quot; nillable=&quot;true&quot; type=&quot;xs:string&quot; /&gt;
+	 * 	     &lt;xs:element name=&quot;location&quot; minOccurs=&quot;0&quot; nillable=&quot;true&quot; type=&quot;gml:LocationPropertyType&quot; /&gt;
+	 * 	     &lt;xs:element name=&quot;measurement&quot; minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot; nillable=&quot;true&quot;&gt;
+	 * 	      &lt;xs:complexType&gt;
+	 * 	       &lt;xs:sequence&gt;
+	 * 	        &lt;xs:element name=&quot;determinand_description&quot; type=&quot;xs:string&quot; minOccurs=&quot;1&quot;/&gt;
+	 * 	        &lt;xs:element name=&quot;result&quot; type=&quot;xs:string&quot; minOccurs=&quot;1&quot;/&gt;
+	 * 	       &lt;/xs:sequence&gt;
+	 * 	       &lt;xs:attribute ref=&quot;gml:id&quot; use=&quot;optional&quot;/&gt;
+	 * 	      &lt;/xs:complexType&gt; 
+	 * 	     &lt;/xs:element&gt;
+	 * 	     &lt;xs:element name=&quot;project_no&quot; minOccurs=&quot;0&quot; nillable=&quot;true&quot; type=&quot;xs:string&quot; /&gt;
+	 * 	    &lt;/xs:sequence&gt;
+	 * 	   &lt;/xs:extension&gt;
+	 * 	  &lt;/xs:complexContent&gt;
+	 * 	 &lt;/xs:complexType&gt;
+	 * 	 
+	 * 	 &lt;xs:element name='wq_plus' type='sco:wq_plus_Type' substitutionGroup=&quot;gml:_Feature&quot; /&gt;
+	 * 
+	 * </code>
+	 * </pre>
 	 */
-	public void test01SingleRepeatedProperty(){
-		FeatureType wqPlusType;
-		final QName name = new QName("http://online.socialchange.net.au", "wq_plus");
-		final Descriptor schema;
-		final AttributeType defaultGeom = null;
-		
-		List<Descriptor> content = new ArrayList<Descriptor>();
-		
-		AttributeType sitename = typeFactory.createType("sitename", String.class);
-		content.add(descFactory.node(sitename, 0, Integer.MAX_VALUE));
+	public void test01SingleRepeatedProperty() {
+		final QName name = new QName(NSURI, "wq_plus");
+		final Class binding = Feature.class;
+		final Set<Filter> restrictions = Collections.emptySet();
+		final boolean identified = true;
+		final boolean isAbstract = false;
+		final AttributeType superType = null;
+		final boolean nillable = false;
 
-		schema = descFactory.ordered(content, 1, 1);
-		wqPlusType = typeFactory.createFeatureType(name, schema, defaultGeom);
-		
-		assertEquals(Feature.class, wqPlusType.getBinding());
-		assertEquals(defaultGeom, wqPlusType.getDefaultGeometry());
-		assertEquals(name, wqPlusType.getName());
-		assertNotNull(wqPlusType.getRestrictions());
-		assertEquals(0, wqPlusType.getRestrictions().size());
-		assertNotNull(wqPlusType.getSuper());
+		FeatureType wqPlusType = ComplexTestData.createExample01Type(
+				typeFactory, descFactory);
+
+		checkType(wqPlusType, name, binding, restrictions, identified,
+				isAbstract, superType, nillable);
+
+		assertNotNull(wqPlusType.getDescriptor());
+		assertTrue(wqPlusType.getDescriptor() instanceof OrderedDescriptor);
+		OrderedDescriptor schema = (OrderedDescriptor) wqPlusType
+				.getDescriptor();
+		assertEquals(1, schema.getMinOccurs());
+		assertEquals(1, schema.getMaxOccurs());
+
+		List<Descriptor> contents = schema.sequence();
+		assertNotNull(contents);
+		assertEquals(5, contents.size());
+		final String[] names = { "sitename", "anzlic_no", "location",
+				"measurement", "project_no" };
+		final int[][] multiplicities = { { 1, 1 }, { 0, 1 }, { 0, 1 },
+				{ 0, Integer.MAX_VALUE }, { 0, 1 } };
+		int i = 0;
+		for (Descriptor attDesc : contents) {
+			assertTrue(attDesc instanceof AttributeDescriptor);
+			AttributeDescriptor att = (AttributeDescriptor) attDesc;
+			assertNotNull(att.getType());
+			assertEquals(NSURI, att.getType().getName().getNamespaceURI());
+			assertEquals(names[i], att.getType().name());
+			assertEquals(multiplicities[i][0], att.getMinOccurs());
+			assertEquals(multiplicities[i][1], att.getMaxOccurs());
+			i++;
+		}
+
+		assertNotNull(wqPlusType.getDefaultGeometry());
+		assertEquals("location", wqPlusType.getDefaultGeometry().name());
 	}
 }
