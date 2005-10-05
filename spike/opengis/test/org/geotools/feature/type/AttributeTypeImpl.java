@@ -55,7 +55,7 @@ public class AttributeTypeImpl implements AttributeType {
 	public Class getBinding() {
 		return BINDING;
 	}
-	public Boolean isNilable() {
+	public Boolean isNillable() {
 		return NILLABLE;
 	}	
 	public Set<Filter> getRestrictions() {
@@ -67,4 +67,68 @@ public class AttributeTypeImpl implements AttributeType {
 	public boolean isAbstract() {
 		return ABSTRACT;
 	}
+	
+    /**
+     * Override of hashCode.
+     *
+     * @return hashCode for this object.
+     */
+    public int hashCode() {
+        return getName().hashCode() ^ (getBinding() == null? 17 : getBinding().hashCode());
+    }
+
+    /**
+     * Override of equals.
+     *
+     * @param other the object to be tested for equality.
+     *
+     * @return whether other is equal to this attribute Type.
+     */
+    public boolean equals(Object other) {
+        if (!(other instanceof AttributeTypeImpl)) {
+            return false;
+        }
+
+        AttributeType att = (AttributeType) other;
+
+        /*
+         * I guess we don't allow null names?
+        if (name == null) {
+            if (att.getName() != null) {
+                return false;
+            }
+        }
+        */
+
+        if (!NAME.equals(att.getName())) {
+            return false;
+        }
+
+        if ( (BINDING == null && att.getBinding() != null) || (BINDING != null && !BINDING.equals(att.getBinding()))) {
+            return false;
+        }
+
+    	if(IDENTIFIED != att.isIdentified()){
+    		return false;
+    	}
+
+    	if(NILLABLE != att.isNillable()){
+    		return false;
+    	}
+    	
+    	if(ABSTRACT != att.isAbstract()){
+    		return false;
+    	}
+
+    	if(!RESTRICTIONS.equals(att.getRestrictions())){
+    		return false;
+    	}
+    	
+    	if( (SUPER == null && att.getSuper() != null) || (SUPER != null && !SUPER.equals(att.getSuper()))){
+    		return false;
+    	}
+    	
+    	return true;
+    }
+	
 }
