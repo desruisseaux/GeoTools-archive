@@ -3,8 +3,8 @@
  */
 package org.opengis.feature.schema;
 
-import java.util.Collection;
+import java.util.Set;
 
 public interface ChoiceDescriptor extends Descriptor {
-	public Collection<Descriptor> options();
+	public Set<Descriptor> options();
 }

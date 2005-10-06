@@ -2,7 +2,7 @@ package org.opengis.feature.simple;
 
 import java.util.List;
 
-import org.opengis.feature.schema.Descriptor;
+import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.OrderedDescriptor;
 
 public interface SimpleDescriptor extends OrderedDescriptor {
@@ -13,6 +13,6 @@ public interface SimpleDescriptor extends OrderedDescriptor {
 	 * <p>
 	 * This is used to programatically indicate simple content.
 	 */
-	public List<Descriptor> sequence();
+	public List<AttributeDescriptor> sequence();
 
 }

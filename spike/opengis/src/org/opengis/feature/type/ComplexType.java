@@ -13,7 +13,7 @@ public interface ComplexType extends AttributeType {
 	 * </p>
 	 * @return Java binding, or null if not applicable
 	 */
-	Class getBinding();
+	Class/*<? extends List<? extends Attribute>>*/ getBinding();
 
 	/** Super is restricted to other ComplexType */
 	ComplexType getSuper();
