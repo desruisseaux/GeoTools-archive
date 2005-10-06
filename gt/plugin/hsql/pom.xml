@@ -67,7 +67,6 @@
       <groupId>spatialdb</groupId>
       <artifactId>spatialdb</artifactId>
       <version>0.1</version>
-      <url>http://docs.codehaus.org/pages/viewpageattachments.action?pageId=19596</url>
     </dependency>
   </dependencies>
 

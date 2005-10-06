@@ -60,7 +60,6 @@
       <groupId>db2</groupId>
       <artifactId>db2jcc_dummy</artifactId>
       <version>8.2.1</version>
-      <url>http://www.software.ibm.com/data/db2</url>
     </dependency>
   </dependencies>
 

@@ -141,7 +141,7 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le D�veloppement (IRD)</organization>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
       <roles>
         <role>Java Developer</role>
         <role>Project Management Committee (PMC) Member</role>
@@ -370,19 +370,16 @@
       <id>ibiblio</id>
       <name>Ibiblio - the public's library and digital archive</name>
       <url>http://www.ibiblio.org/maven2</url>
-      <snapshotPolicy>never</snapshotPolicy>
     </repository>
     <repository>
       <id>sicade</id>
       <name>Temporary repository (to be replaced by a more official one later)</name>
       <url>http://www.espace.ird.nc/maven-repository</url>
-      <snapshotPolicy>never</snapshotPolicy>
     </repository>
     <repository>
       <id>Refractions</id>
       <name>Legacy repository on Refractions (do not includes transitive dependencies)</name>
       <url>http://lists.refractions.net/geotools</url>
-      <snapshotPolicy>never</snapshotPolicy>
       <layout>legacy</layout>
     </repository>
   </repositories>
@@ -452,6 +449,7 @@
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
+            <compress>false</compress>  <!-- Do not compress, since Geotools's JARs are usually packaged in ZIP file.   -->
             <manifest>
               <addClasspath>true</addClasspath>
             </manifest>
@@ -484,7 +482,6 @@
       </plugin>
     </plugins>
   </build>
-
 
 
 
@@ -526,6 +523,7 @@
     <module>ext/experimental</module>
     <module>ext/graph</module>
     <module>ext/legend</module>
+    <module>ext/openoffice</module>
     <module>ext/pickle</module>
     <module>ext/shape</module>
     <module>ext/shaperenderer</module>

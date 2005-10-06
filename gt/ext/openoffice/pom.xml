@@ -19,15 +19,13 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>postgis</artifactId>
+  <artifactId>openoffice</artifactId>
   <packaging>jar</packaging>
-  <name>PostGIS module</name>
-  <url>http://modules.geotools.org/postgis</url>
+  <name>Bridges to OpenOffice suite</name>
+  <url>http://modules.geotools.org/openoffice</url>
   <description>
-    Used to extract and edit features from a PostGIS database.  PostGIS was
-    developed by Refractions Research. It is an extension to the excellent
-    Postgresql database, adding support for Geographic objects.  It is open
-    source and freely available.
+    Provides some Geotools's fonctionalities as OpenOffice plugins. For example provides
+    coordinate operation services as formulas inside the Calc spread sheet.
   </description>
 
 
@@ -37,22 +35,19 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>Rob Hranac</name>
-      <id>robhranac</id>
-      <email>robhranac@users.sourceforge.net</email>
-      <organization>VFNY</organization>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Institut de Recherche pour le développement</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
     <developer>
-      <name>Chris Holmes</name>
-      <id>cholmesny</id>
-      <email>cholmesny@users.sourceforge.net</email>
-      <organization>TOPP</organization>
+      <name>Richard Deplanque</name>
+      <organization>Université de Nouvelle-Calédonie</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
@@ -66,30 +61,38 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>referencing</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.0-312.jdbc3</version>
-    </dependency>
-    <dependency>
-      <groupId>postgis-driver</groupId>
-      <artifactId>postgis-driver</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>wkb4j</groupId>
-      <artifactId>wkb4j</artifactId>
-      <version>1.0-RC1</version>
-    </dependency>
-    <dependency>
-      <!-- TODO: this dependency should appears in wkb4j -->
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.12</version>
+      <groupId>org.geotools</groupId>
+      <artifactId>epsg-hsql</artifactId>
+      <version>2.2-SNAPSHOT</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.openoffice</groupId>
+      <artifactId>juh</artifactId>
+      <version>1.9</version>
+      <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
+    </dependency>
+    <dependency>
+      <groupId>org.openoffice</groupId>
+      <artifactId>jurt</artifactId>
+      <version>1.9</version>
+      <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
+    </dependency>
+    <dependency>
+      <groupId>org.openoffice</groupId>
+      <artifactId>ridl</artifactId>
+      <version>1.9</version>
+      <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
+    </dependency>
+    <dependency>
+      <groupId>org.openoffice</groupId>
+      <artifactId>unoil</artifactId>
+      <version>1.9</version>
+      <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
     </dependency>
   </dependencies>
 
@@ -100,21 +103,27 @@
   <!-- ==================================================== -->
   <build>
     <plugins>
+      <!-- Copies the OpenOffice-generated .class files -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!-- This section excludes the tests -->
-          <excludes>
-            <exclude>**/PostgisLockingTest.java</exclude>
-            <exclude>**/PostgisTestSuite.java</exclude>
-            <exclude>**/PostgisDataStoreAPITest.java</exclude>
-            <exclude>**/PostgisDataStoreTest.java</exclude>
-          </excludes>
-          <!-- End exclude tests -->
-          <skip>false</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
-        </configuration>
+        <groupId>org.geotools</groupId>
+        <artifactId>javamaker</artifactId>
+        <version>2.2-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
+<!--
+      <plugin>
+        <configuration>
+          <archive>
+            <manifestFile>...</manifestFile>
+          </archive>
+        </configuration>
+      </plugin> -->
     </plugins>
   </build>
 

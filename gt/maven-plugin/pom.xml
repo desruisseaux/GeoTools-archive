@@ -56,11 +56,6 @@
     </mailingList>
   </mailingLists>
 
-  <modules>
-    <module>jjtree-javacc</module>
-  </modules>
-
-
 
 
   <!-- ==================================================== -->
@@ -122,4 +117,14 @@
       </plugin>
     </plugins>
   </build>
+
+
+
+  <!-- ==================================================== -->
+  <!--     All Geotools 2 plugins included in the build     -->
+  <!-- ==================================================== -->
+  <modules>
+    <module>jjtree-javacc</module>
+    <module>javamaker</module>
+  </modules>
 </project>

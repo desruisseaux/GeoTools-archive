@@ -105,12 +105,12 @@
           <!-- This section excludes the tests, comment out if your
                testData/testparams.properties are set correctly -->
           <excludes>
-            <exclude implementation="java.lang.String">**/ArcSDEJavaApiTest.java</exclude>
-            <exclude implementation="java.lang.String">**/ArcSDEDataStoreTest.java</exclude>
-            <exclude implementation="java.lang.String">**/ArcSDEConnectionPoolTest.java</exclude>
-            <exclude implementation="java.lang.String">**/ArcSDEFeatureStoreTest.java</exclude>
-            <exclude implementation="java.lang.String">**/ArcSDEQueryTest.java</exclude>
-            <exclude implementation="java.lang.String">**/FilterTest.java</exclude>
+            <exclude>**/ArcSDEJavaApiTest.java</exclude>
+            <exclude>**/ArcSDEDataStoreTest.java</exclude>
+            <exclude>**/ArcSDEConnectionPoolTest.java</exclude>
+            <exclude>**/ArcSDEFeatureStoreTest.java</exclude>
+            <exclude>**/ArcSDEQueryTest.java</exclude>
+            <exclude>**/FilterTest.java</exclude>
           </excludes>
           <!-- End exclude tests -->
         </configuration>

@@ -112,8 +112,8 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludes>
-            <exclude implementation="java.lang.String">**/GazetteerNameValidationTest.java</exclude>
-            <exclude implementation="java.lang.String">**/MemoryLeakTest.java</exclude>
+            <exclude>**/GazetteerNameValidationTest.java</exclude>
+            <exclude>**/MemoryLeakTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
