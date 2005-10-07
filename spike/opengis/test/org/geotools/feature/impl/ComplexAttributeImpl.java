@@ -24,6 +24,9 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 		this( null, type );
 	}
 	public ComplexAttributeImpl( String id, ComplexType type ){
+		if(type == null){
+			throw new NullPointerException("type");
+		}
 		ID = id;
 		TYPE = type;
 		attribtues = new ArrayList<Attribute>();
@@ -138,7 +141,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 	 * <p>
 	 * Tempting to support a couple things according to assoiated type:
 	 * <ul>
-	 * <li>List.class - return ununmodifiable vaqlues()
+	 * <li>List.class - return ununmodifiable values()
 	 * <li>Array - return array of values()
 	 * </ul>
 	 * But really we should just return null and force client code to document

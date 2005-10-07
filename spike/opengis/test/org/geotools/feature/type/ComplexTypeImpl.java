@@ -1,12 +1,14 @@
 package org.geotools.feature.type;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 import org.geotools.feature.Descriptors;
 import org.geotools.filter.Filter;
+import org.opengis.feature.Attribute;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -22,7 +24,12 @@ public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 		super( name, null );
 		SCHEMA = schema;
 	}
-	public ComplexTypeImpl(QName name, Descriptor schema, boolean identified, Class binding, boolean nillable, Set<Filter> restrictions){
+	public ComplexTypeImpl(QName name, 
+						Descriptor schema, 
+						boolean identified, 
+						Class/*<? extends List<? extends Attribute>>*/ binding, 
+						boolean nillable, 
+						Set<Filter> restrictions){
 		super(name, binding, identified, nillable, restrictions );
 		SCHEMA = schema;
 	}	

@@ -33,6 +33,6 @@ public class AttributeImpl implements Attribute {
 		content = newValue;
 	}
 	public AttributeType getType() {
-		return null;
+		return TYPE;
 	}
 }

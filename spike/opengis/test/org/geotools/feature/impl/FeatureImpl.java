@@ -21,7 +21,8 @@ public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 		return TYPE;
 	}
 	public CoordinateReferenceSystem getCRS() {
-		return getDefault().getCRS();
+		GeometryAttribute att = getDefaultGeometry();
+		return att == null? null : att.getCRS();
 	}
 	public Envelope getBounds() {
 		Envelope bounds = new Envelope();
@@ -33,7 +34,16 @@ public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 		}
 		return bounds;
 	}
-	public GeometryType getDefault() {
-		return (GeometryType) get( TYPE.getDefaultGeometry() );
+	public GeometryAttribute getDefaultGeometry() {
+		return (GeometryAttribute) get( TYPE.getDefaultGeometry() );
 	}
+	public Geometry defaultGeometry() {
+		GeometryAttribute att = getDefaultGeometry();
+		return att == null? null : att.get();
+	}
+	 
+	public void setDefault(Geometry g){
+		throw new UnsupportedOperationException("implement!");
+	}
+
 }

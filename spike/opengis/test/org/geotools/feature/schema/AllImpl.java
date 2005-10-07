@@ -1,25 +1,29 @@
 package org.geotools.feature.schema;
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.opengis.feature.schema.AllDescriptor;
-import org.opengis.feature.schema.Descriptor;
+import org.opengis.feature.schema.AttributeDescriptor;
 
 public class AllImpl extends AbstractDescriptor implements AllDescriptor {
-	Collection<Descriptor> all;
-	public AllImpl( Collection<Descriptor> all ){
-		this.all = all;
-	}
-	public AllImpl( Collection<Descriptor> all, int max ){
-		super( max );
-		this.all = all;
-	}	
-	public AllImpl( Collection<Descriptor> all, int min, int max ){
-		super( min, max );
-		this.all = all;
-	}
-	public Collection<Descriptor> all() {
-		return all;
+	Set<AttributeDescriptor> all;
+
+	public AllImpl(Set<AttributeDescriptor> all) {
+		this.all = new HashSet<AttributeDescriptor>(all);
 	}
 
+	public AllImpl(Set<AttributeDescriptor> all, int max) {
+		super(max);
+		this.all = new HashSet<AttributeDescriptor>(all);
+	}
+
+	public AllImpl(Set<AttributeDescriptor> all, int min, int max) {
+		super(min, max);
+		this.all = new HashSet<AttributeDescriptor>(all);
+	}
+
+	public Set<AttributeDescriptor> all() {
+		return all;
+	}
 }

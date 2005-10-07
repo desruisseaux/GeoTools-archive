@@ -16,6 +16,7 @@ import org.opengis.feature.schema.ChoiceDescriptor;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.schema.DescriptorFactory;
 import org.opengis.feature.schema.OrderedDescriptor;
+import org.opengis.feature.simple.SimpleDescriptor;
 import org.opengis.feature.type.AttributeType;
 
 /**
@@ -79,7 +80,7 @@ public class Descriptors {
 		}
 	}
 	private AllDescriptor extension( AllDescriptor schema, AllDescriptor extend ){
-		List<Descriptor> all = new ArrayList<Descriptor>();
+		Set<AttributeDescriptor> all = new HashSet<AttributeDescriptor>();
 		all.addAll( schema.all() );
 		all.addAll( extend.all() );		
 		return factory.all( all, extend.getMinOccurs(), extend.getMaxOccurs() );
@@ -91,11 +92,13 @@ public class Descriptors {
 		return factory.ordered( ordered, extend.getMinOccurs(), extend.getMaxOccurs() );
 	}
 	private ChoiceDescriptor extension( ChoiceDescriptor schema, ChoiceDescriptor extend ){
-		List<Descriptor> choice = new ArrayList<Descriptor>();
+		Set<Descriptor> choice = new HashSet<Descriptor>();
 		choice.addAll( schema.options() );
 		choice.addAll( extend.options() );
 		return factory.choice( choice, extend.getMinOccurs(), extend.getMaxOccurs() );
-	}	
+	}
+	
+	
 	/**
 	 * Restriction only works on exact structure match.
 	 * <p>
@@ -105,20 +108,30 @@ public class Descriptors {
 	 * @param sub
 	 * @return
 	 */	
-	public Descriptor restriction( Descriptor schema, Descriptor restrict ){
+	@SuppressWarnings("unchecked")
+	public <T extends Descriptor> T restriction( T schema, T restrict ){
+		T descriptor;
 		if( schema instanceof AllDescriptor && restrict instanceof AllDescriptor ){
-			return restriction( (AllDescriptor) schema, (AllDescriptor) restrict);
+			Set<AttributeDescriptor> all = restriction( ((AllDescriptor)schema).all(), ((AllDescriptor)restrict).all() );		
+			descriptor = (T)factory.all(all, restrict.getMinOccurs(), restrict.getMaxOccurs());
+			//return null;//restriction( (AllDescriptor) schema, (AllDescriptor) restict);
 		}
 		else if( schema instanceof ChoiceDescriptor && restrict instanceof ChoiceDescriptor ){
-			return restriction( (ChoiceDescriptor) schema, (ChoiceDescriptor) restrict);
+			Set<Descriptor> options = restriction( ((ChoiceDescriptor)schema).options(), ((ChoiceDescriptor)restrict).options() );		
+			descriptor = (T)factory.choice(options, restrict.getMinOccurs(), restrict.getMaxOccurs());
+			//return restriction( (ChoiceDescriptor) schema, (ChoiceDescriptor) restrict);
 		}
 		else if( schema instanceof OrderedDescriptor && restrict instanceof OrderedDescriptor ){
-			return restriction( (OrderedDescriptor) schema, (OrderedDescriptor) restrict);
+			List<Descriptor> sequence = restriction( ((OrderedDescriptor)schema).sequence(), ((OrderedDescriptor)restrict).sequence() );		
+			descriptor = (T)factory.ordered(sequence, restrict.getMinOccurs(), restrict.getMaxOccurs());
+			//return restriction( (OrderedDescriptor) schema, (OrderedDescriptor) restrict);
 		}
 		else if( schema instanceof AttributeDescriptor && restrict instanceof AttributeDescriptor ){
-			return restriction( (AttributeDescriptor) schema, (AttributeDescriptor) restrict);
+			descriptor = (T) restriction( (AttributeDescriptor) schema, (AttributeDescriptor) restrict);
+		}else{
+			throw new IllegalStateException( "Cannot restrict provided schema" );
 		}
-		throw new IllegalStateException( "Cannot restrict provided schema" );
+		return descriptor;
 	}
 	
 	/**
@@ -139,28 +152,37 @@ public class Descriptors {
 		}
 		throw new IllegalStateException( "Cannot restrict provided schema" );
 	}
+
+
+	/*
 	AllDescriptor restriction( AllDescriptor schema, AllDescriptor restrict ){
-		Collection<Descriptor> all = restriction( schema.all(), restrict.all() );		
+		Set<AttributeDescriptor> all = restriction( schema.all(), restrict.all() );		
 		return factory.all( all, restrict.getMinOccurs(), restrict.getMaxOccurs() );
 	}
+	
 	OrderedDescriptor restriction( OrderedDescriptor schema, OrderedDescriptor restrict ){
 		List<Descriptor> sequence = restriction( schema.sequence(), restrict.sequence() );
 		return factory.ordered( sequence, restrict.getMinOccurs(), restrict.getMaxOccurs() );
 	}
+	
 	ChoiceDescriptor restriction( ChoiceDescriptor schema, ChoiceDescriptor restrict ){
-		Collection<Descriptor> sequence = restriction( schema.options(), restrict.options() );
+		Set<Descriptor> sequence = restriction( schema.options(), restrict.options() );
 		return factory.choice( sequence, restrict.getMinOccurs(), restrict.getMaxOccurs() );
 	}
-	Collection<Descriptor> restriction( Collection<Descriptor> schema, Collection<Descriptor> restrict ){
-		List<Descriptor> restriction = new ArrayList<Descriptor>();
+	*/
+	
+    
+	<T extends Descriptor> Set<T> restriction( Set<T> schema, Set<T> restrict ){
+		Set<T> restriction = new HashSet<T>();
 		
-		Iterator<Descriptor> i = schema.iterator();
-		Iterator<Descriptor> j = restrict.iterator();
+		Iterator<T> i = schema.iterator();
+		Iterator<T> j = restrict.iterator();
 		while( i.hasNext() && j.hasNext() ){
 			restriction.add( restriction( i.next(), j.next() ) );
 		}
 		return restriction;
-	}
+	}	
+	
 	List<Descriptor> restriction( List<Descriptor> schema, List<Descriptor> restrict ){
 		List<Descriptor> restriction = new ArrayList<Descriptor>();
 		
@@ -258,14 +280,18 @@ public class Descriptors {
 		return nodes;
 	}
 	/**
-	 * Set of types described by this schema.
+	 * List of types described by this schema.
+	 * <p>
+	 * On the cases where order matters, the returned list
+	 * preverves the order of descriptors declared in <code>schema</code>
+	 * </p>
 	 * 
 	 * @param schema
 	 * @param type
 	 * @return List of nodes for the provided type, or empty.
 	 */
-	static public Set<AttributeType> types( Descriptor schema ){
-		Set<AttributeType> types = new HashSet<AttributeType>();
+	static public List<AttributeType> types( Descriptor schema ){
+		List<AttributeType> types = new ArrayList<AttributeType>();
 		for( Descriptor child : list( schema ) ){
 			if( child instanceof AttributeDescriptor ){
 				AttributeDescriptor node = (AttributeDescriptor) child;
@@ -303,16 +329,32 @@ public class Descriptors {
 		}
 		return max;
 	}
+	
+	/**
+	 * Returns the list of descriptors defined in the provided schema, preserving
+	 * declaration order when relevant.
+	 * 
+	 * @param schema
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
-	static public Collection<Descriptor> list( Descriptor schema ){
-		if( schema instanceof OrderedDescriptor ){
+	static public List<? extends Descriptor> list( Descriptor schema ){
+		//ok, if SimpleDescriptor actually extends OrderedDescriptor
+		//this first comparison would bot be needed, though I couldn't
+		//get SimpleDescriptor extending OrderedDescriptor and still
+		//returning List<AttributeDescriptor> with my current/almost void,
+		//knowledge of Java5
+		if( schema instanceof SimpleDescriptor ){
+			return ((SimpleDescriptor)schema).sequence();
+		}
+		else  if( schema instanceof OrderedDescriptor ){
 			return ((OrderedDescriptor)schema).sequence();
 		}
 		else if( schema instanceof AllDescriptor ){
-			return ((AllDescriptor)schema).all();
+			return new ArrayList<AttributeDescriptor>(((AllDescriptor)schema).all());
 		}
 		else if( schema instanceof ChoiceDescriptor ){
-			return ((ChoiceDescriptor)schema).options();
+			return  new ArrayList<Descriptor>( ((ChoiceDescriptor)schema).options());
 		}
 		return Collections.EMPTY_LIST;
 	}	

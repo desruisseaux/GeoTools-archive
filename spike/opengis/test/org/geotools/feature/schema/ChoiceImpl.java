@@ -1,24 +1,25 @@
 package org.geotools.feature.schema;
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.opengis.feature.schema.ChoiceDescriptor;
 import org.opengis.feature.schema.Descriptor;
 
 public class ChoiceImpl extends AbstractDescriptor implements ChoiceDescriptor {
-	Collection<Descriptor> options;
-	public ChoiceImpl( Collection<Descriptor> options ){
-		this.options = options;
+	Set<Descriptor> options;
+	public ChoiceImpl( Set<Descriptor> options ){
+		this.options = new HashSet<Descriptor>( options );
 	}
-	public ChoiceImpl( Collection<Descriptor> options, int max ){
+	public ChoiceImpl( Set<Descriptor> options, int max ){
 		super( max );
-		this.options = options;
+		this.options = new HashSet<Descriptor>( options );
 	}	
-	public ChoiceImpl( Collection<Descriptor> options, int min, int max ){
+	public ChoiceImpl( Set<Descriptor> options, int min, int max ){
 		super( min, max );
-		this.options = options;
+		this.options = new HashSet<Descriptor>( options );
 	}
-	public Collection<Descriptor> options() {
+	public Set<Descriptor> options() {
 		return options;
 	}
 

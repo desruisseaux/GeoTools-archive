@@ -71,6 +71,6 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
 	 */
 	@Override
 	public List<AttributeType> types(){
-		return new ArrayList<AttributeType>(Descriptors.types(getDescriptor()));
+		return Descriptors.types(getDescriptor());
 	}
 }

@@ -1,10 +1,12 @@
 package org.geotools.feature.type;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 import org.geotools.filter.Filter;
+import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.FeatureType;
@@ -17,11 +19,11 @@ public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 		this( new QName( name ), schema, defaultGeom );
 	}	
 	public FeatureTypeImpl(QName name, Descriptor schema, GeometryType defaultGeom ) {
-		super(name, schema, true, Feature.class, false, null);
+		super(name, schema, true, List.class, false, null);
 		DEFAULT = defaultGeom;
 	}
 	public FeatureTypeImpl(QName name, Descriptor schema, GeometryType defaultGeom, Set<Filter> restrictions, FeatureType superType, boolean isAbstract){
-		super(name, schema, true, Feature.class, false, restrictions, superType, isAbstract );
+		super(name, schema, true, List.class, false, restrictions, superType, isAbstract );
 		DEFAULT = defaultGeom;
 	}
 	public GeometryType getDefaultGeometry() {

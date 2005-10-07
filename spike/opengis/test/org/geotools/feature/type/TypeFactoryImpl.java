@@ -212,6 +212,13 @@ public class TypeFactoryImpl implements TypeFactory {
 	}
 
 	public SimpleFeatureTypeImpl createFeatureType(
+			String name,
+			List<AttributeType> types, 
+			GeometryType defaultGeometry) {
+		return createFeatureType(new QName(name), types, defaultGeometry);
+	}
+	
+	public SimpleFeatureTypeImpl createFeatureType(
 								QName name,
 								List<AttributeType> types, 
 								GeometryType defaultGeometry) {
