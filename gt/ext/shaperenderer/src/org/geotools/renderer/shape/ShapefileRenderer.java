@@ -193,6 +193,9 @@ public class ShapefileRenderer implements GTRenderer{
         setContext(context);
     }
 
+    public ShapefileRenderer() {
+    }
+
     public void paint(Graphics2D graphics, Rectangle paintArea,
         Envelope mapArea) {
         if (mapArea == null || paintArea == null) {

@@ -210,6 +210,7 @@ public class OpacityFinder implements StyleVisitor {
      */
     public void visit(LineSymbolizer line) {
         if (isAcceptable(line)) {
+            if( line.getStroke()!=null )
             line.getStroke().accept(this);
         }
     }
@@ -221,8 +222,10 @@ public class OpacityFinder implements StyleVisitor {
      */
     public void visit(PolygonSymbolizer poly) {
         if (isAcceptable(poly)) {
-            poly.getStroke().accept(this);
-            poly.getFill().accept(this);
+            if( poly.getStroke()!=null )
+                poly.getStroke().accept(this);
+            if( poly.getFill()!=null)
+                poly.getFill().accept(this);
         }
     }
 

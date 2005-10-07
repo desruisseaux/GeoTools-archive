@@ -51,6 +51,8 @@ public class ScreenMap {
     }
 
     public boolean get(int x, int y) {
+        if( x<0 || x>width-1 || y<0 || y>height-1 )
+            return false;
         int bit = bit(x, y);
         int index = bit / 32;
         int offset = bit % 32;
@@ -59,7 +61,7 @@ public class ScreenMap {
         try {
             return ((pixels[index] & mask) != 0) ? true : false;
         } catch (Exception e) {
-            System.out.println("" + x + "," + y);
+            System.out.println("" + x + "," + y); //$NON-NLS-1$ //$NON-NLS-2$
 
             return false;
         }
