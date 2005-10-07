@@ -233,12 +233,12 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
         try {
             reader = reader();
             try {
-                return reader.hasNext();
+                return !reader.hasNext();
             } catch (IOException e) {
-                return false; // error seems like no features are available 
+                return true; // error seems like no features are available 
             }
         } catch (IOException e) {
-            return false;
+            return true;
         }
         finally {
             if( reader != null ){
