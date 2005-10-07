@@ -174,6 +174,11 @@ public interface TypeFactory {
 			FeatureType superType, 
 			boolean isAbstract);
 
+	
+	SimpleFeatureType createFeatureType(
+			String name,
+			List<AttributeType> types, 
+			GeometryType defaultGeometry);
 	/**
 	 * 
 	 * @param name

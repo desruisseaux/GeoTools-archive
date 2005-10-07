@@ -18,7 +18,7 @@ package org.opengis.feature.schema;
  * @author Jody Garnett
  *
  */
-public interface Descriptor {
+public interface Descriptor{
 	public int getMinOccurs();
 	public int getMaxOccurs();
 }

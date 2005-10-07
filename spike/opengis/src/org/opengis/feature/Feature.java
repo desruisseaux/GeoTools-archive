@@ -1,7 +1,6 @@
 package org.opengis.feature;
 
 import org.opengis.feature.type.FeatureType;
-import org.opengis.feature.type.GeometryType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -60,5 +59,14 @@ public interface Feature extends ComplexAttribute  {
    /**
     * @return Default geomtry Attribute or null if unknown or not applicable.
     */
-   GeometryType getDefault();
+   GeometryAttribute getDefaultGeometry();
+   
+   /**
+    * Convenience method for <code>getDefaultGeometry().get()</code> that
+    * safely returns null if <code>getDefaultGeometry() == null</code>
+    * @return
+    */
+   Geometry defaultGeometry();
+   
+   void setDefault(Geometry g);
 }
