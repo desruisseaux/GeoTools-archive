@@ -108,11 +108,6 @@
   <!-- ==================================================== -->
   <dependencies>
     <dependency>
-      <groupId>geotiff</groupId>
-      <artifactId>beam</artifactId>
-      <version>1.0</version>
-    </dependency>    
-    <dependency>
       <groupId>com.vividsolutions</groupId>
       <artifactId>jts</artifactId>
       <version>1.6</version>

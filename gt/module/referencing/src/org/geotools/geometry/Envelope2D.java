@@ -24,9 +24,9 @@ import java.awt.geom.Rectangle2D;
 
 // OpenGIS dependencies
 import org.opengis.util.Cloneable;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -35,19 +35,22 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * A two-dimensional envelope.
+ * A two-dimensional envelope on top of {@link Rectangle2D}. This implementation is provided for
+ * interoperability between Java2D and GeoAPI.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @since 2.1
+ * @see GeneralEnvelope
+ * @see org.geotools.geometry.jts.ReferencedEnvelope
  */
 public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneable {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -3319231220761419350L;
-    
+
     /**
      * The coordinate reference system, or {@code null}.
      */
@@ -124,7 +127,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
 
     /**
      * A coordinate position consisting of all the minimal ordinates for each
-     * dimension for all points within the <code>Envelope</code>.
+     * dimension for all points within the {@code Envelope}.
      *
      * @return The lower corner.
      */
@@ -134,14 +137,14 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
 
     /**
      * A coordinate position consisting of all the maximal ordinates for each
-     * dimension for all points within the <code>Envelope</code>.
+     * dimension for all points within the {@code Envelope}.
      *
      * @return The upper corner.
      */
     public DirectPosition getUpperCorner() {
         return new DirectPosition2D(crs, getMaxX(), getMaxY());
     }
-    
+
     /**
      * Returns the minimal ordinate along the specified dimension.
      */
@@ -152,7 +155,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
             default: throw new ArrayIndexOutOfBoundsException(dimension);
         }
     }
-    
+
     /**
      * Returns the maximal ordinate along the specified dimension.
      */
@@ -163,7 +166,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
             default: throw new ArrayIndexOutOfBoundsException(dimension);
         }
     }
-    
+
     /**
      * Returns the center ordinate along the specified dimension.
      */
@@ -174,7 +177,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
             default: throw new ArrayIndexOutOfBoundsException(dimension);
         }
     }
-    
+
     /**
      * Returns the envelope length along the specified dimension.
      * This length is equals to the maximum ordinate minus the
@@ -187,10 +190,9 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
             default: throw new ArrayIndexOutOfBoundsException(dimension);
         }
     }
-    
+
     /**
-     * Returns a hash value for this envelope.
-     * This value need not remain consistent between
+     * Returns a hash value for this envelope. This value need not remain consistent between
      * different implementations of the same class.
      */
     public int hashCode() {
@@ -200,14 +202,15 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
         }
         return code;
     }
-    
+
     /**
      * Compares the specified object with this envelope for equality.
      */
     public boolean equals(final Object object) {
         if (super.equals(object)) {
-            final Envelope2D that = (Envelope2D) object;
-            return Utilities.equals(this.crs, that.crs);
+            final CoordinateReferenceSystem otherCRS =
+                    (object instanceof Envelope2D) ? ((Envelope2D) object).crs : null;
+            return Utilities.equals(crs, otherCRS);
         }
         return false;
     }

@@ -1200,9 +1200,9 @@ public class GeodeticCalculator {
      * @param  factory  The JTS factory to use for creating geometry.
      * @return The JTS geometry.
      *
-     * @deprecated Use {@link org.geotools.geometry.JTS#shapeToGeometry} instead. This method
-     *             will be removed in a future version in order to avoid JTS dependency from
-     *             the referencing module.
+     * @deprecated Use {@link org.geotools.geometry.jts.JTS#shapeToGeometry} instead. This method
+     *             will be removed in a future version in order to avoid JTS dependency from the
+     *             referencing module.
      */
     public static com.vividsolutions.jts.geom.Geometry shapeToGeometry(
             final Shape shape, final com.vividsolutions.jts.geom.GeometryFactory factory)

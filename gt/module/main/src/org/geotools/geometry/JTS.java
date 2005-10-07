@@ -18,38 +18,20 @@
  */
 package org.geotools.geometry;
 
-// J2SE dependencies
-import java.awt.Shape;
-import java.awt.geom.PathIterator;
-import java.awt.geom.IllegalPathStateException;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
-
-// OpenGIS dependencies
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.geometry.jts.PreciseCoordinateSequenceTransformer;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// JTS dependencies
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-
-// Geotools dependencies
-import org.geotools.resources.geometry.ShapeUtilities;
 
 
 /**
@@ -68,8 +50,13 @@ import org.geotools.resources.geometry.ShapeUtilities;
  * @since 0.6.0
  * @version $Id$
  * @author Jody Garnett
+ *
+ * @deprecated This class moved to the {@link org.geotools.geometry.jts} package.  We hope to keep
+ *             JTS dependencies in their own package, in order to use other packages for a partial
+ *             (if accepted by the communauty) ISO 19107 implementation in a future Geotools
+ *             release.
  */
-public final class JTS {
+public final class JTS extends org.geotools.geometry.jts.JTS {
     /**
      * Do not allows instantiation of this class.
      */
@@ -78,6 +65,9 @@ public final class JTS {
 
     /**
      * Returns a new, empty envelope.
+     *
+     * @deprecated JTS 1.5 source code inspection show that {@code Envelope()} already invokes
+     *             {@link Envelope#setToNull}, so this method actually seems to add overhead.
      */
     public static Envelope empty(){
         Envelope envelope = new Envelope();
@@ -89,8 +79,7 @@ public final class JTS {
      * A JTS envelope associated with a {@linkplain CoordinateReferenceSystem coordinate reference
      * system}.
      *
-     * @todo Consider making this inner class an ordinary class, and implements GeoAPI's
-     *       Envelope interface in addition of JTS Envelope class.
+     * @deprecated Moved to {@link org.geotools.geometry.jts.ReferencedEnvelope}.
      */
     public static class ReferencedEnvelope extends Envelope {
         /**
@@ -116,6 +105,9 @@ public final class JTS {
 
     /**
      * Creates a new envelope with the specified coordinate reference system.
+     *
+     * @deprecated {@link org.geotools.geometry.jts.ReferencedEnvelope} provides more constructors,
+     *             and not all of them are listed in this {@code JTS} factory.
      */
     public static ReferencedEnvelope create(Envelope env, CoordinateReferenceSystem crs){
         return new ReferencedEnvelope(env,crs);
@@ -131,6 +123,9 @@ public final class JTS {
      * @param  npoints   densification of each side of the rectange.
      * @return the transformed envelope.
      * @throws TransformException if a coordinate can't be transformed.
+     *
+     * @deprecated {@link org.geotools.geometry.jts.JTS} should provides a slightly more efficient
+     *             implementation.
      */
     public static Envelope transform(final Envelope envelope, final MathTransform transform, int npoints) 
             throws TransformException 
@@ -201,8 +196,8 @@ public final class JTS {
      * Like a transform but eXtreme!
      * 
      * Transforms an array of coordinate using the provided math transform.  
-     * Each Coordinate is transformed seperately. In case of a transform exception then the new value
-     * of the coordinate is the last coordinate correctly transformed.
+     * Each Coordinate is transformed seperately. In case of a transform exception
+     * then the new value of the coordinate is the last coordinate correctly transformed.
      *
      * @param mt    The math transform to apply.
      * @param src   The source coordinates.
@@ -210,14 +205,15 @@ public final class JTS {
      * @param failureThreshold Ignored for now.
      * @throws TransformException if this method failed to transform any of the points.
      *
-     * @todo The {@code failureThreshold} argument seems ignored in current implementation.
+     * @deprecated This implementation do not copies last coordinate correctly transformed as the
+     *             javadoc said. Consider using {@link org.geotools.geometry.jts.JTS} instead.
      */
     public static void xform(MathTransform mt, double[] src, double[] dest, int dimensions, 
             float failureThreshold ) throws TransformException
     {
         int numCoords = dest.length/2;
         int failures  = 0;
-        int threshold = (int) ((float)numCoords*failureThreshold); // TODO: seems to be ignored.
+        int threshold = (int) ((float)numCoords*failureThreshold);
         boolean startPointTransformed = true;
         for( int i=0; i<dest.length; i+=dimensions){
             try{
@@ -245,7 +241,6 @@ public final class JTS {
         }
     }
 
-
     /**
      * Transforms the Envelope using the specified MathTransform.
      *
@@ -253,6 +248,12 @@ public final class JTS {
      * @param transform the transform to use.
      * @return the transformed Envelope
      * @throws TransformException if at least one coordinate can't be transformed.
+     *
+     * @deprecated This implementation gives unaccurate results for transformations more complicated
+     *             than scales and translations. It should transform at least the four corners (it
+     *             currently transforms only 2 corners), preferably more. Consider using
+     *             {@link org.geotools.geometry.jts.JTS#transform(Envelope,MathTransform)} instead,
+     *             which transform a densified envelope.
      */
     public static Envelope transform(Envelope envelope, MathTransform transform) throws TransformException {
         double[] coords=new double[]{envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()};
@@ -270,6 +271,9 @@ public final class JTS {
      *        information. Otherwise (if {@code false}), an exception is thrown in such case.
      * @return the transformed Envelope
      * @throws TransformException if at least one coordinate can't be transformed.
+     *
+     * @deprecated Moved to {@link org.geotools.geometry.jts.ReferencedEnvelope#transform},
+     *             as a class member.
      */
     public static ReferencedEnvelope transform(ReferencedEnvelope envelope, CoordinateReferenceSystem crs, boolean lenient) throws TransformException, OperationNotFoundException, NoSuchElementException, FactoryException {
         double[] coords=new double[]{envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()};
@@ -284,10 +288,8 @@ public final class JTS {
      * Creates a GeometryCoordinateSequenceTransformer.  This basic transformer
      * transforms the vertices and assumes that the underlying data structure is
      * an array of Coordinate objects.
-     * 
-     * @return a GeometryCoordinateSequenceTransformer
      */
-    public static GeometryCoordinateSequenceTransformer createGeometryTransformer(){
+    public static GeometryCoordinateSequenceTransformer createGeometryTransformer() {
         return new GeometryCoordinateSequenceTransformer();
     }
 
@@ -299,28 +301,11 @@ public final class JTS {
      * @param flatness The error in the transform is linked to the "flattening", the higher the
      *        flattening, the bigger the error, but also, the lesser the number of points that will
      *        be used to represent the resulting coordinate sequence.
-     * @return a GeometryCoordinateSequenceTransformer
      */
     public static GeometryCoordinateSequenceTransformer createPreciseGeometryTransformer(double flatness){
-        PreciseCoordinateSequenceTransformer t=new PreciseCoordinateSequenceTransformer();
+        PreciseCoordinateSequenceTransformer t = new PreciseCoordinateSequenceTransformer();
         t.setFlatness(flatness);
         return new GeometryCoordinateSequenceTransformer(t);
-    }
-
-    /**
-     * Transforms the geometry using the default transformer.
-     * 
-     * @param  geom The geom to transform
-     * @param  transform the transform to use during the transformation.
-     * @return the transformed geometry.  It will be a new geometry.
-     * @throws MismatchedDimensionException if the geometry doesn't have the expected dimension
-     *         for the specified transform.
-     * @throws TransformException if a point can't be transformed.
-     */
-    public static Geometry transform( Geometry geom, MathTransform transform ) throws MismatchedDimensionException, TransformException{
-        GeometryCoordinateSequenceTransformer transformer=createGeometryTransformer();
-        transformer.setMathTransform(transform);
-        return transformer.transform(geom);
     }
 
     /**
@@ -334,39 +319,12 @@ public final class JTS {
      *         for the specified transform.
      * @throws TransformException if a point can't be transformed.
      */
-    public static Geometry preciseTransform( Geometry geom, double flatness, MathTransform transform ) throws MismatchedDimensionException, TransformException{
+    public static Geometry preciseTransform(Geometry geom, double flatness, MathTransform transform)
+            throws MismatchedDimensionException, TransformException
+    {
         GeometryCoordinateSequenceTransformer transformer=createPreciseGeometryTransformer(flatness);
         transformer.setMathTransform(transform);
         return transformer.transform(geom);	    
-    }
-
-    /**
-     * Transforms the coordinate using the provided math transform.
-     *
-     * @param source the source coordinate that will be transformed
-     * @param dest the coordinate that will be set.  May be null or the source coordinate
-     *        (or new coordinate of course). 
-     * @return the destination coordinate if not null or a new Coordinate.
-     * @throws TransformException if the coordinate can't be transformed.
-     */     
-    public static Coordinate transform( Coordinate source, Coordinate dest, MathTransform transform ) throws TransformException{
-        if( dest==null)
-            dest=new Coordinate();
-
-        double[] array=null;
-        if ( transform.getSourceDimensions()==2 )
-            array=new double[]{ source.x, source.y };
-        else if( transform.getSourceDimensions()==3 )
-            array=new double[]{ source.x, source.y, source.z };
-
-        transform.transform(array,0,array,0,1);
-
-        dest.x=array[0];
-        dest.y=array[1];
-        if ( transform.getTargetDimensions()==3)
-            dest.z=array[2];
-
-        return dest;
     }
 
     /**
@@ -380,8 +338,9 @@ public final class JTS {
      * @throws FactoryException
      * @throws TransformException
      *
-     * @todo We may catch some exceptions and rethrown them in a simplier one.
-     *       After all, this is a convenience method (not an "official" one).
+     * @deprecated This method suffers from the same precision problem than
+     *             {@link #transform(Envelope,MathTransform)}. Consider using
+     *             {@link org.geotools.geometry.jts.JTS#toGeographic} instead.
      */
     public static Envelope toGeographic(Envelope env, CoordinateReferenceSystem crs)
             throws OperationNotFoundException, NoSuchElementException, FactoryException, TransformException
@@ -391,75 +350,6 @@ public final class JTS {
         }
         MathTransform transform = FactoryFinder.getCoordinateOperationFactory(null)
                 .createOperation(crs, DefaultGeographicCRS.WGS84).getMathTransform();
-        return JTS.transform(env, transform);
-    }
-
-    /**
-     * Converts an arbitrary Java2D shape into a JTS geometry. The created JTS geometry
-     * may be any of {@link LineString}, {@link LinearRing} or {@link MultiLineString}.
-     *
-     * @param  shape    The Java2D shape to create.
-     * @param  factory  The JTS factory to use for creating geometry.
-     * @return The JTS geometry.
-     *
-     * @since 2.2
-     * @author Martin Desruisseaux
-     */
-    public static Geometry shapeToGeometry(final Shape shape, final GeometryFactory factory) {
-        final PathIterator iterator = shape.getPathIterator(null, ShapeUtilities.getFlatness(shape));
-        final double[] buffer = new double[6];
-        final List     coords = new ArrayList();
-        final List     lines  = new ArrayList();
-        while (!iterator.isDone()) {
-            switch (iterator.currentSegment(buffer)) {
-                /*
-                 * Close the polygon: the last point is equal to
-                 * the first point, and a LinearRing is created.
-                 */
-                case PathIterator.SEG_CLOSE: {
-                    if (!coords.isEmpty()) {
-                        coords.add((Coordinate[]) coords.get(0));
-                        lines.add(factory.createLinearRing((Coordinate[]) coords.toArray(
-                                                        new Coordinate[coords.size()])));
-                        coords.clear();
-                    }
-                    break;
-                }
-                /*
-                 * General case: A LineString is created from previous
-                 * points, and a new LineString begin for next points.
-                 */
-                case PathIterator.SEG_MOVETO: {
-                    if (!coords.isEmpty()) {
-                        lines.add(factory.createLineString((Coordinate[]) coords.toArray(
-                                                        new Coordinate[coords.size()])));
-                        coords.clear();
-                    }
-                    // Fall through
-                }
-                case PathIterator.SEG_LINETO: {
-                    coords.add(new Coordinate(buffer[0], buffer[1]));
-                    break;
-                }
-                default: {
-                    throw new IllegalPathStateException();
-                }
-            }
-            iterator.next();
-        }
-        /*
-         * End of loops: create the last LineString if any, then create the MultiLineString.
-         */
-        if (!coords.isEmpty()) {
-            lines.add(factory.createLineString((Coordinate[]) coords.toArray(
-                                            new Coordinate[coords.size()])));
-        }
-        switch (lines.size()) {
-            case 0: return null;
-            case 1: return (LineString) lines.get(0);
-            default: {
-                return factory.createMultiLineString(GeometryFactory.toLineStringArray(lines));
-            }
-        }
+        return transform(env, transform);
     }
 }

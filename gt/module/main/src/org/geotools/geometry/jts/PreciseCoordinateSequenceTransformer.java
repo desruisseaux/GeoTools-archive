@@ -13,7 +13,9 @@ import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
  * of curved lines that will be "flattened" in order to get back a set of straight segments.
  * The error in the transform is linked to the "flattening", the higher the flattening,
  * the bigger the error, but also, the lesser the number of points that will be used
- * to represent the resulting coordinate sequence. 
+ * to represent the resulting coordinate sequence.
+ *
+ * @todo Not yet implemented.
  *
  */
 public class PreciseCoordinateSequenceTransformer implements CoordinateSequenceTransformer {

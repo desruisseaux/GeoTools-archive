@@ -116,14 +116,19 @@
           </execution>
         </executions>
       </plugin>
-<!--
+
+      <!-- Add a manifest entry for the class which register our add-in to OpenOffice -->
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
-            <manifestFile>...</manifestFile>
+            <manifestEntries>
+              <RegistrationClassName>org.geotools.openoffice.Registration</RegistrationClassName>
+            </manifestEntries>
           </archive>
         </configuration>
-      </plugin> -->
+      </plugin>
     </plugins>
   </build>
 

@@ -12,23 +12,34 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.geometry.jts;
 
+// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
+// JTS dependencies
 import com.vividsolutions.jts.geom.CoordinateSequence;
 
 
 /**
- * Interface that should be implemented by classes able to apply the provided 
- * transformation to a coordinate sequence.
+ * Interface that should be implemented by classes able to apply the provided
+ * {@linkplain MathTransform transformation} to a
+ * {@linkplain CoordinateSequence coordinate sequence}.
  *
+ * @since 2.1
+ * @version $Id$
  * @author Andrea Aime
  */
 public interface CoordinateSequenceTransformer {
-    public CoordinateSequence transform(CoordinateSequence cs,
-        MathTransform transform) throws TransformException;
+    /**
+     * Returns a transformed coordinate sequence.
+     *
+     * @param  sequence The sequence to transform.
+     * @param  transform The transformation to apply.
+     * @throws TransformException if at least one coordinate can't be transformed.
+     */
+    public CoordinateSequence transform(CoordinateSequence sequence, MathTransform transform)
+            throws TransformException;
 }

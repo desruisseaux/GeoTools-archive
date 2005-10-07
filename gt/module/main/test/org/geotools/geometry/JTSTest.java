@@ -48,6 +48,8 @@ import junit.framework.TestCase;
  * </p>
  * @author jeichar
  * @since 0.6.0
+ *
+ * @deprecated This class moved to {@link org.geotools.geometry.jts} package.
  */
 public class JTSTest extends TestCase {
 
