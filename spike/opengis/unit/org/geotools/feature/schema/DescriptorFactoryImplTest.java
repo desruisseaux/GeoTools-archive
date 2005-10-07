@@ -1,8 +1,13 @@
 package org.geotools.feature.schema;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.xml.namespace.QName;
 
 import org.geotools.feature.type.AttributeTypeImpl;
+import org.opengis.feature.schema.AllDescriptor;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.DescriptorFactory;
 import org.opengis.feature.type.AttributeType;
@@ -51,14 +56,26 @@ public class DescriptorFactoryImplTest extends TestCase {
 	 * Test method for 'org.geotools.feature.schema.DescriptorFactoryImpl.all(Collection<Descriptor>, int, int)'
 	 */
 	public void testAll() {
+		try{
+			factory.all(null, 0, 1);
+			fail("NullPointerException expected");
+		}catch(NullPointerException e){
+			//OK
+		}
+		Set<AttributeDescriptor> attributes = new HashSet<AttributeDescriptor>();
+		
 
+		AttributeDescriptor int1 = new NodeImpl(new AttributeTypeImpl("int2", Integer.class));
+		AttributeDescriptor int2 = new NodeImpl(new AttributeTypeImpl("int1", Integer.class));
+		AttributeDescriptor s2 = new NodeImpl(new AttributeTypeImpl("s1", String.class));
+		AllDescriptor all = factory.all(attributes, 1, 1);
 	}
 
 	/*
 	 * Test method for 'org.geotools.feature.schema.DescriptorFactoryImpl.ordered(List<Descriptor>, int, int)'
 	 */
 	public void testOrdered() {
-
+		
 	}
 
 	/*
@@ -66,6 +83,13 @@ public class DescriptorFactoryImplTest extends TestCase {
 	 */
 	public void testChoice() {
 
+	}
+	
+	public void testExtends(){
+		
+	}
+	
+	public void testRestricts(){
 	}
 
 }

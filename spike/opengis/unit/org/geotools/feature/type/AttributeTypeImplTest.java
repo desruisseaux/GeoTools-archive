@@ -76,6 +76,13 @@ public class AttributeTypeImplTest extends TestCase {
         AttributeType typeE = typeFactory.createType("secondDifferentName", Integer.class);
         AttributeType typeF = typeFactory.createType("secondDifferentName", Integer.class);
         
+        assertTrue(typeA instanceof AttributeTypeImpl);
+        assertTrue(typeB instanceof AttributeTypeImpl);
+        assertTrue(typeC instanceof AttributeTypeImpl);
+        assertTrue(typeD instanceof AttributeTypeImpl);
+        assertTrue(typeE instanceof AttributeTypeImpl);
+        assertTrue(typeF instanceof AttributeTypeImpl);
+
         assertTrue(typeA.equals(typeA));
         assertTrue(typeA.equals(typeB));
         assertTrue(typeE.equals(typeF));

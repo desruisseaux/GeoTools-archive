@@ -165,7 +165,7 @@ public class TypeFactoryImplTest extends ComplexTestData {
 		//assertEquals(schema, type.getDescriptor());
 		
 		assertTrue(type.getDescriptor() instanceof OrderedDescriptor);
-		List<Descriptor> sequence = ((OrderedDescriptor)type.getDescriptor()).sequence();
+		List<? extends Descriptor> sequence = ((OrderedDescriptor)type.getDescriptor()).sequence();
 		assertEquals(node1, sequence.get(0));
 		assertEquals(node2, sequence.get(1));
 	}
