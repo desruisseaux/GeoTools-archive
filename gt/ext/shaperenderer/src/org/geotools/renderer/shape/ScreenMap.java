@@ -32,7 +32,12 @@ public class ScreenMap {
         pixels = new int[arraySize];
     }
 
+    /**
+     * Sets location at position x,y to the value.
+     */
     public void set(int x, int y, boolean value) {
+        if( x<0 || x>width-1 || y<0 || y>height-1 )
+            return;
         int bit = bit(x, y);
         int index = bit / 32;
         int offset = bit % 32;
@@ -50,9 +55,12 @@ public class ScreenMap {
         }
     }
 
+    /**
+     * Returns true if the pixel at location x,y is set or out of bounds.
+     */
     public boolean get(int x, int y) {
         if( x<0 || x>width-1 || y<0 || y>height-1 )
-            return false;
+            return true;
         int bit = bit(x, y);
         int index = bit / 32;
         int offset = bit % 32;
@@ -63,7 +71,7 @@ public class ScreenMap {
         } catch (Exception e) {
             System.out.println("" + x + "," + y); //$NON-NLS-1$ //$NON-NLS-2$
 
-            return false;
+            return true;
         }
     }
 

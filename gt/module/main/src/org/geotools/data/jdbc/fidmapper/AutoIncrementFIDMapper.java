@@ -76,13 +76,25 @@ public class AutoIncrementFIDMapper extends AbstractFIDMapper {
 
         switch (dataType) {
         case Types.INTEGER:
-            pk = new Integer(Integer.parseInt(FID));
-
+        	try {
+        		pk = new Integer(Integer.parseInt(FID));
+	        } catch(NumberFormatException nfe) {
+	    		//if we get a really bad featureid we want to return something
+	    	    //that will not mess up the database and throw an exception,
+	    	    //we just want to not match against it, so we return -1
+	    	    pk = new Integer(-1);
+	    	}
             break;
 
         case Types.NUMERIC:
-            pk = new Long(Long.parseLong(FID));
-
+        	try {
+        		pk = new Long(Long.parseLong(FID));
+        	} catch(NumberFormatException nfe) {
+        		//if we get a really bad featureid we want to return something
+        	    //that will not mess up the database and throw an exception,
+        	    //we just want to not match against it, so we return -1
+        	    pk = new Integer(-1);
+        	}
             break;
         }
 
