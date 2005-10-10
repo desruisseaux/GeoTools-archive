@@ -191,17 +191,11 @@ public interface TypeFactory {
 			List<AttributeType> types, 
 			GeometryType defaultGeometry);
 	
-	/**
-	 * 
-	 * @param name
-	 * @param schema
-	 * @param defeaultGeometry
-	 * @param isAbstract
-	 * @return
-	 */
 	SimpleFeatureType createFeatureType(
 			QName name,
-			SimpleDescriptor schema, 
-			GeometryType defeaultGeometry,
+			List<AttributeType> types, 
+			GeometryType defaultGeometry,
+			Set<Filter> restrictions, 
+			SimpleFeatureType superType, 
 			boolean isAbstract);
 }

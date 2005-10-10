@@ -29,7 +29,7 @@ public interface AttributeFactory {
 	 * @param type
 	 * @return
 	 */
-	public Attribute create(AttributeType type);
+	public Attribute create(AttributeType type, String id);
 
 	/**
 	 * 
@@ -37,14 +37,14 @@ public interface AttributeFactory {
 	 * @param value
 	 * @return
 	 */
-	public Attribute create(AttributeType type, Object value);
+	public Attribute create(AttributeType type, String id, Object value);
 	
 	/**
 	 * 
 	 * @param type
 	 * @return
 	 */
-	public GeometryAttribute create(GeometryType type);
+	public GeometryAttribute create(GeometryType type, String id);
 	
 	/**
 	 * 
@@ -52,7 +52,7 @@ public interface AttributeFactory {
 	 * @param crs
 	 * @return
 	 */
-	public GeometryAttribute create(GeometryType type, CoordinateReferenceSystem crs);
+	public GeometryAttribute create(GeometryType type, String id, CoordinateReferenceSystem crs);
 	
 	/**
 	 * 
@@ -60,7 +60,7 @@ public interface AttributeFactory {
 	 * @param value
 	 * @return
 	 */
-	public GeometryAttribute create(GeometryType type, Geometry value);
+	public GeometryAttribute create(GeometryType type, String id, Geometry value);
 	
 	/**
 	 * 
@@ -69,14 +69,14 @@ public interface AttributeFactory {
 	 * @param value
 	 * @return
 	 */
-	public GeometryAttribute create(GeometryType type, CoordinateReferenceSystem crs, Geometry value);
+	public GeometryAttribute create(GeometryType type, String id, CoordinateReferenceSystem crs, Geometry value);
 	
 	/**
 	 * 
 	 * @param type
 	 * @return
 	 */
-	public SimpleFeature create(SimpleFeatureType type);
+	public SimpleFeature create(SimpleFeatureType type, String id);
 	
 	/**
 	 * 
@@ -84,7 +84,7 @@ public interface AttributeFactory {
 	 * @param values
 	 * @return
 	 */
-	public SimpleFeature create(SimpleFeatureType type, List<? extends Object>values);
+	public SimpleFeature create(SimpleFeatureType type, String id, List<? extends Object>values);
 
 	/**
 	 * 
@@ -92,26 +92,26 @@ public interface AttributeFactory {
 	 * @param values
 	 * @return
 	 */
-	public SimpleFeature create(SimpleFeatureType type, Object []values);
+	public SimpleFeature create(SimpleFeatureType type, String id, Object []values);
 
 	/**
 	 * 
 	 * @param type
 	 * @return
 	 */
-	public ComplexAttribute create(ComplexType type);
+	public ComplexAttribute create(ComplexType type, String id);
 
 	/**
 	 * 
 	 * @param type
 	 * @return
 	 */
-	public Feature create(FeatureType type);
+	public Feature create(FeatureType type, String id);
 	
 	/**
 	 * 
 	 * @param type
 	 * @return
 	 */
-	public FeatureCollection create(FeatureCollectionType type);
+	public FeatureCollection create(FeatureCollectionType type, String id);
 }
