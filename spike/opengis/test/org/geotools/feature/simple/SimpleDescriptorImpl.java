@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.feature.schema.AbstractDescriptor;
+import org.geotools.feature.schema.OrderedImpl;
+import org.opengis.feature.Attribute;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.simple.SimpleDescriptor;
 import org.opengis.feature.type.ComplexType;
@@ -41,6 +43,20 @@ public class SimpleDescriptorImpl extends AbstractDescriptor implements
 		}
 	}
 
+	public int hashCode() {
+		return super.hashCode() ^ (37 * sequence.hashCode());
+	}
+
+	public boolean equals(Object o) {
+		if (!(o instanceof SimpleDescriptorImpl))
+			return false;
+		if (!super.equals(o))
+			return false;
+
+		SimpleDescriptorImpl d = (SimpleDescriptorImpl) o;
+		return this.sequence.equals(d.sequence);
+	}
+
 	/**
 	 * Provides a List<AttributeDescriptor> where each attribute Descriptor has
 	 * multiplicity 1:1.
@@ -49,5 +65,11 @@ public class SimpleDescriptorImpl extends AbstractDescriptor implements
 	 */
 	public List<AttributeDescriptor> sequence() {
 		return sequence;
+	}
+
+	public void validate(List<Attribute> content) throws NullPointerException,
+			IllegalArgumentException {
+		// TODO: implement (same as ordered, or get this actually extend
+		// ordered)
 	}
 }

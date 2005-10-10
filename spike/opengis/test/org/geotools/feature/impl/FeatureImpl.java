@@ -25,11 +25,19 @@ public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 		return att == null? null : att.getCRS();
 	}
 	public Envelope getBounds() {
-		Envelope bounds = new Envelope();
+		if(TYPE.getDefaultGeometry() == null)
+			return null;
+		
+		Envelope bounds = null;
 		for( Attribute attribute : attribtues ){
 			if( attribute instanceof GeometryAttribute ){
-				GeometryAttribute geom = (GeometryAttribute) attribute;
-				bounds.expandToInclude( geom.get().getEnvelopeInternal() );
+				Geometry geom = ((GeometryAttribute) attribute).get();
+				if(geom != null){
+					if(bounds == null)
+						bounds = geom.getEnvelopeInternal();
+					else
+						bounds.expandToInclude( geom.getEnvelopeInternal() );
+				}
 			}
 		}
 		return bounds;

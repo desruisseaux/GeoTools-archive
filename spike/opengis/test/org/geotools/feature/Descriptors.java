@@ -109,25 +109,25 @@ public class Descriptors {
 	 * @return
 	 */	
 	@SuppressWarnings("unchecked")
-	public <T extends Descriptor> T restriction( T schema, T restrict ){
-		T descriptor;
+	public Descriptor restriction( Descriptor schema, Descriptor restrict ){
+		Descriptor descriptor;
 		if( schema instanceof AllDescriptor && restrict instanceof AllDescriptor ){
 			Set<AttributeDescriptor> all = restriction( ((AllDescriptor)schema).all(), ((AllDescriptor)restrict).all() );		
-			descriptor = (T)factory.all(all, restrict.getMinOccurs(), restrict.getMaxOccurs());
+			descriptor = factory.all(all, restrict.getMinOccurs(), restrict.getMaxOccurs());
 			//return null;//restriction( (AllDescriptor) schema, (AllDescriptor) restict);
 		}
 		else if( schema instanceof ChoiceDescriptor && restrict instanceof ChoiceDescriptor ){
 			Set<Descriptor> options = restriction( ((ChoiceDescriptor)schema).options(), ((ChoiceDescriptor)restrict).options() );		
-			descriptor = (T)factory.choice(options, restrict.getMinOccurs(), restrict.getMaxOccurs());
+			descriptor = factory.choice(options, restrict.getMinOccurs(), restrict.getMaxOccurs());
 			//return restriction( (ChoiceDescriptor) schema, (ChoiceDescriptor) restrict);
 		}
 		else if( schema instanceof OrderedDescriptor && restrict instanceof OrderedDescriptor ){
 			List<Descriptor> sequence = restriction( ((OrderedDescriptor)schema).sequence(), ((OrderedDescriptor)restrict).sequence() );		
-			descriptor = (T)factory.ordered(sequence, restrict.getMinOccurs(), restrict.getMaxOccurs());
+			descriptor = factory.ordered(sequence, restrict.getMinOccurs(), restrict.getMaxOccurs());
 			//return restriction( (OrderedDescriptor) schema, (OrderedDescriptor) restrict);
 		}
 		else if( schema instanceof AttributeDescriptor && restrict instanceof AttributeDescriptor ){
-			descriptor = (T) restriction( (AttributeDescriptor) schema, (AttributeDescriptor) restrict);
+			descriptor = restriction( (AttributeDescriptor) schema, (AttributeDescriptor) restrict);
 		}else{
 			throw new IllegalStateException( "Cannot restrict provided schema" );
 		}
@@ -178,16 +178,16 @@ public class Descriptors {
 		Iterator<T> i = schema.iterator();
 		Iterator<T> j = restrict.iterator();
 		while( i.hasNext() && j.hasNext() ){
-			restriction.add( restriction( i.next(), j.next() ) );
+			restriction.add( (T)restriction( i.next(), j.next() ) );
 		}
 		return restriction;
 	}	
 	
-	List<Descriptor> restriction( List<Descriptor> schema, List<Descriptor> restrict ){
+	List<Descriptor> restriction( List<? extends Descriptor> schema, List<? extends Descriptor> restrict ){
 		List<Descriptor> restriction = new ArrayList<Descriptor>();
 		
-		Iterator<Descriptor> i = schema.iterator();
-		Iterator<Descriptor> j = restrict.iterator();
+		Iterator<? extends Descriptor> i = schema.iterator();
+		Iterator<? extends Descriptor> j = restrict.iterator();
 		while( i.hasNext() && j.hasNext() ){
 			restriction.add( restriction( i.next(), j.next() ) );
 		}
@@ -283,7 +283,7 @@ public class Descriptors {
 	 * List of types described by this schema.
 	 * <p>
 	 * On the cases where order matters, the returned list
-	 * preverves the order of descriptors declared in <code>schema</code>
+	 * preserves the order of descriptors declared in <code>schema</code>
 	 * </p>
 	 * 
 	 * @param schema
@@ -344,10 +344,12 @@ public class Descriptors {
 		//get SimpleDescriptor extending OrderedDescriptor and still
 		//returning List<AttributeDescriptor> with my current/almost void,
 		//knowledge of Java5
+		/*
 		if( schema instanceof SimpleDescriptor ){
 			return ((SimpleDescriptor)schema).sequence();
 		}
-		else  if( schema instanceof OrderedDescriptor ){
+		else*/
+		if( schema instanceof OrderedDescriptor ){
 			return ((OrderedDescriptor)schema).sequence();
 		}
 		else if( schema instanceof AllDescriptor ){

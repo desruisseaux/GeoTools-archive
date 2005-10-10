@@ -2,8 +2,6 @@ package org.geotools.feature.simple;
 
 import java.util.List;
 
-import org.geotools.feature.Descriptors;
-import org.geotools.feature.Types;
 import org.geotools.feature.impl.AttributeFactoryImpl;
 import org.geotools.feature.impl.FeatureImpl;
 import org.opengis.feature.Attribute;
@@ -29,7 +27,7 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
 		AttributeFactory attFactory = new AttributeFactoryImpl();
 		int idx = 0;
 		for (AttributeDescriptor desc : contents) {
-			Attribute att = attFactory.create(desc.getType());
+			Attribute att = attFactory.create(desc.getType(), null);
 			Object value = null;
 			if (values != null) {
 				value = values.get(idx);
@@ -59,28 +57,29 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
 	 * @return Attribute Value associated with name
 	 */
 	public Object get(String name) {
-		for(Attribute att : super.attribtues){
+		for (Attribute att : super.attribtues) {
 			AttributeType type = att.getType();
 			String attName = type.name();
-			if(attName.equals(name)){
+			if (attName.equals(name)) {
 				return att.get();
 			}
 		}
 		return null;
 	}
 
-	public Object get(AttributeType type){
-		if(!super.types().contains(type)){
-			throw new IllegalArgumentException("this feature content model has no type " + type);
+	public Object get(AttributeType type) {
+		if (!super.types().contains(type)) {
+			throw new IllegalArgumentException(
+					"this feature content model has no type " + type);
 		}
-		for(Attribute att : super.attribtues){
-			if(att.getType().equals(type)){
+		for (Attribute att : super.attribtues) {
+			if (att.getType().equals(type)) {
 				return att.get();
 			}
 		}
 		throw new Error();
 	}
-	
+
 	/**
 	 * Access attribute by "index" indicated by SimpleFeatureType.
 	 * 
@@ -88,7 +87,9 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
 	 * @return
 	 */
 	public Object get(int index) {
-		return values().get(index);
+		Attribute att = super.attribtues.get(index);
+		return att == null ? null : att.get();
+		// return values().get(index);
 	}
 
 	/**
@@ -111,7 +112,7 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
 	 * @param value
 	 */
 	public void set(int index, Object value) {
-		List<Attribute> contents = super.getAttributes();
+		List<Attribute> contents = super.get();
 		Attribute attribute = contents.get(index);
 		attribute.set(value);
 	}

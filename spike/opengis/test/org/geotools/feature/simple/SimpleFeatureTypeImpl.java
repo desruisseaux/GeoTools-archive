@@ -1,12 +1,13 @@
 package org.geotools.feature.simple;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 import org.geotools.feature.Descriptors;
 import org.geotools.feature.type.FeatureTypeImpl;
+import org.geotools.filter.Filter;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.simple.SimpleDescriptor;
@@ -19,8 +20,8 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
 	
 	
 	public SimpleFeatureTypeImpl(QName name, SimpleDescriptor schema, GeometryType defaultGeometry,
-			boolean isAbstract){
-		super(name, schema, defaultGeometry, null, null, isAbstract);
+			Set<Filter> restrictions, SimpleFeatureType superType, boolean isAbstract){
+		super(name, schema, defaultGeometry, restrictions, superType, isAbstract);
 	}
 
 	public AttributeType get(QName qname) {
@@ -48,13 +49,15 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
 	}
 	
 	/**
-	 * Must be null for truely simple content.
+	 * JG: Must be null for truely simple content.
 	 * @return null, as no super types are allowed
+	 * GR:  GR: I guess not, at least super must be simple too
 	 */
 	@Override
 	public SimpleFeatureType getSuper(){
-		return null;
+		return (SimpleFeatureType)super.getSuper();
 	}
+	
 
 	/**
 	 * Indicates a director ordering of AttributeDescriptors.
