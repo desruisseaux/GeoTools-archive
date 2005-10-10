@@ -9,6 +9,7 @@ package test;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import test.crs.*;
+import test.main.JUnit_LoggerFactory;
 
 /** Performs the complete set of tests for completed widgets or widget groups.
  * (Widgets that are worked on are not included.)
@@ -18,6 +19,7 @@ public class JUnit_GeoWidgets {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for crs");
         //$JUnit-BEGIN$
+        suite.addTestSuite(JUnit_LoggerFactory.class);
         suite.addTestSuite(JUnit_CorrectEPSGFunction.class);
         
         suite.addTestSuite(JUnit_UnitModels.class);

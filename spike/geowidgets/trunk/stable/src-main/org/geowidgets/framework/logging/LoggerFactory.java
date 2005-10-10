@@ -35,7 +35,7 @@ public class LoggerFactory {
     //------------------------------------------------------------------------------
     //Get logger
     /** The path to the resource bundle to be used for translating log messages.*/
-    protected String bundle = "org.geowidgets.framework.widgets"; //$NON-NLS-1$
+    protected String bundle = "org.geowidgets.framework.Widgets"; //$NON-NLS-1$
     /** The default logging level. Messages below this level are not shown. */
     Level level = Level.FINE;
 
@@ -56,7 +56,10 @@ public class LoggerFactory {
         ConsoleHandler cHandler = new ConsoleHandler();
         cHandler.setLevel(Level.ALL);
         cHandler.setFormatter(new MonolineFormatter());
+        
+        logger.setUseParentHandlers(false);
         logger.addHandler(cHandler);
+        
     }
 
 }

@@ -21,6 +21,8 @@ public class Test_Logging {
         System.out.println("Test 2: Configure the logger to print FINE messages. ");
         System.out.println("You should see a message saying \"You just logged to FINE level.\"");
         logger.fine("  You just logged to FINE level.");
+        System.out.println("You should see \"Cause\" or a translation of this word.");
+        logger.log(Level.INFO, "err.Cause");
     }
 
 }
