@@ -14,5 +14,6 @@ public interface OrderedDescriptor extends Descriptor{
 	 * </p>
 	 * @return
 	 */
-	public <T extends Descriptor>List<T> sequence(); 
+	//public <T extends Descriptor>List<T> sequence();
+	public List<? extends Descriptor>sequence();
 }

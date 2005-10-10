@@ -3,9 +3,9 @@ package org.opengis.feature.simple;
 import java.util.List;
 
 import org.opengis.feature.schema.AttributeDescriptor;
-import org.opengis.feature.schema.Descriptor;
+import org.opengis.feature.schema.OrderedDescriptor;
 
-public interface SimpleDescriptor extends Descriptor {
+public interface SimpleDescriptor extends OrderedDescriptor {
 	
 	/**
 	 * Provides a List<AttributeDescriptor> where each attribute Descriptor
@@ -14,5 +14,4 @@ public interface SimpleDescriptor extends Descriptor {
 	 * This is used to programatically indicate simple content.
 	 */
 	public List<AttributeDescriptor> sequence();
-
 }
