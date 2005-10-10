@@ -10,63 +10,66 @@ import org.geotools.feature.impl.FeatureImpl;
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.feature.xpath.AttributePropertyHandler;
 import org.opengis.feature.Attribute;
-import org.opengis.feature.ComplexAttribute;
-import org.opengis.feature.schema.Descriptor;
-import org.opengis.feature.type.AttributeType;
 
+/**
+ * Utility class to evaluate XPath expressions against an Attribute instance,
+ * which may be any Attribute, wether it is simple, complex, a feature, etc.
+ * <p>
+ * At the difference of the Filter subsistem, which works against Attribute
+ * contents (for example to evaluate a coparison filter), the XPath subsistem,
+ * for which this class is the single entry point, works against Attribute
+ * instances. That is, the result of an XPath expression, if a single value, is
+ * an Attribtue, not the attribute content, or a List of Attributes, for
+ * instance.
+ * </p>
+ * 
+ * @author Gabriel Roldan
+ * 
+ * TODO: register namespaces in JXPathContext
+ */
 public class XPath {
-	private static final Logger LOGGER = Logger.getLogger(
-			XPath.class.getPackage().getName());
-	
-	static{
-		JXPathIntrospector.registerDynamicClass(AttributeImpl.class, AttributePropertyHandler.class);
-		JXPathIntrospector.registerDynamicClass(ComplexAttributeImpl.class, AttributePropertyHandler.class);
-		JXPathIntrospector.registerDynamicClass(FeatureImpl.class, AttributePropertyHandler.class);
-		JXPathIntrospector.registerDynamicClass(SimpleFeatureImpl.class, AttributePropertyHandler.class);
-		LOGGER.info("Registered " + AttributePropertyHandler.class.getName() + 
-				" to handle geotools Attribute xpath expressions");
+	private static final Logger LOGGER = Logger.getLogger(XPath.class
+			.getPackage().getName());
+
+	static {
+		JXPathIntrospector.registerDynamicClass(AttributeImpl.class,
+				AttributePropertyHandler.class);
+		JXPathIntrospector.registerDynamicClass(ComplexAttributeImpl.class,
+				AttributePropertyHandler.class);
+		JXPathIntrospector.registerDynamicClass(FeatureImpl.class,
+				AttributePropertyHandler.class);
+		JXPathIntrospector.registerDynamicClass(SimpleFeatureImpl.class,
+				AttributePropertyHandler.class);
+		LOGGER.finer("Registered " + AttributePropertyHandler.class.getName()
+				+ " to handle geotools Attribute xpath expressions");
 	}
 
 	/**
-	 * Applies the xpath expression given by <code>xpath</code> to the attributes
-	 * of <code>feature</code> and returns the result.
+	 * Applies the xpath expression given by <code>xpath</code> to the
+	 * contents of <code>att</code> and returns the result.
+	 * <p>
+	 * Note that due to an imposition in JXPath, the Attribute passed as
+	 * argument is treated as the root element.
+	 * </p>
 	 * 
-	 * @param feature
-	 * @param xpath
-	 * @return
+	 * @param att
+	 *            the Attribute to which apply the XPath expression
+	 * @param xpathExpression
+	 *            an XPath expression as supported by <a
+	 *            href="http://jakarta.apache.org/commons/jxpath/">JXPath</a>
+	 * @return an Attribute or List<Attribute>, depending on the
+	 *         <code>xpathExpression</code> resolving to a single or multiple
+	 *         values, or <code>null</code> if the expression matched nothing.
 	 */
-	public static Object get(final Attribute att, final String xpath){
-	 	JXPathContext ctx = JXPathContext.newContext(att);
+	public static Object get(final Attribute att, final String xpathExpression) {
+		JXPathContext ctx = JXPathContext.newContext(att);
 
-	 	Object retVal = ctx.getValue(xpath);
-	 	
-	 	return retVal;
+		Object retVal = ctx.getValue(xpathExpression);
+
+		return retVal;
 	}
-	
-	public static void set(final Attribute att, final String xpath, Object value){
+
+	public static void set(final Attribute att, final String xpath, Object value) {
 		JXPathContext.newContext(att).setValue(xpath, value);
 	}
-
-	/*
-	public static Object get(Attribute attribute, String xpath){
-		if(!(attribute instanceof ComplexAttribute)){
-			throw new IllegalArgumentException(
-					"attribute must be complex in order to evaluate: " + attribute);
-		}
-		return get((ComplexAttribute)attribute, xpath);
-	}
-
-	public static Object get(ComplexAttribute attribute, String xpath){
-		Descriptor schema = attribute.getType().getDescriptor();
-		if(xpath.indexOf("/") != -1){
-			throw new UnsupportedOperationException(
-					"XPath not properly implemented yet, just getting single nested attributes");
-		}
-		
-		String name = xpath;
-		AttributeType type = Descriptors.type(schema, name);
-		Object value = attribute.get(type);
-		return value;
-	}
-	*/
 }
