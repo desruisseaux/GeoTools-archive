@@ -19,4 +19,5 @@ public interface ChoiceDescriptor extends Descriptor {
 	 * @return
 	 */
 	public Set<Descriptor> options();
+
 }
