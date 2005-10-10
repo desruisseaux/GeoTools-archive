@@ -21,6 +21,7 @@ package org.geotools.geometry;
 import java.util.NoSuchElementException;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Coordinate;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.geometry.jts.PreciseCoordinateSequenceTransformer;
 import org.opengis.referencing.FactoryException;
@@ -56,7 +57,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  *             (if accepted by the communauty) ISO 19107 implementation in a future Geotools
  *             release.
  */
-public final class JTS extends org.geotools.geometry.jts.JTS {
+public final class JTS {
     /**
      * Do not allows instantiation of this class.
      */
@@ -309,6 +310,22 @@ public final class JTS extends org.geotools.geometry.jts.JTS {
     }
 
     /**
+     * Transforms the geometry using the default transformer.
+     * 
+     * @param  geom The geom to transform
+     * @param  transform the transform to use during the transformation.
+     * @return the transformed geometry.  It will be a new geometry.
+     * @throws MismatchedDimensionException if the geometry doesn't have the expected dimension
+     *         for the specified transform.
+     * @throws TransformException if a point can't be transformed.
+     */
+    public static Geometry transform(Geometry geom, MathTransform transform)
+            throws MismatchedDimensionException, TransformException
+    {
+        return org.geotools.geometry.jts.JTS.transform(geom, transform);
+    }
+
+    /**
      * Transforms the geometry using the Precise transformer.
      * 
      * @param  geom The geom to transform
@@ -325,6 +342,21 @@ public final class JTS extends org.geotools.geometry.jts.JTS {
         GeometryCoordinateSequenceTransformer transformer=createPreciseGeometryTransformer(flatness);
         transformer.setMathTransform(transform);
         return transformer.transform(geom);	    
+    }
+
+    /**
+     * Transforms the coordinate using the provided math transform.
+     *
+     * @param source the source coordinate that will be transformed
+     * @param dest the coordinate that will be set.  May be null or the source coordinate
+     *        (or new coordinate of course). 
+     * @return the destination coordinate if not null or a new Coordinate.
+     * @throws TransformException if the coordinate can't be transformed.
+     */     
+    public static Coordinate transform(Coordinate source, Coordinate dest, MathTransform transform)
+            throws TransformException
+    {
+        return org.geotools.geometry.jts.JTS.transform(source, dest, transform);
     }
 
     /**

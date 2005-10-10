@@ -31,16 +31,16 @@ import org.opengis.util.Cloneable;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.TransformPathNotFoundException;
 
 
 /**
  * Root class of the Geotools default implementation of geometric object. <code>Geometry</code>
  * instances are sets of direct positions in a particular coordinate reference system.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public abstract class Geometry implements org.opengis.spatialschema.geometry.Geometry, Serializable {
     /**
@@ -124,7 +124,7 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
                    coordinateOperationFactory.createOperation(crs, newCRS).getMathTransform());
         } catch (FactoryException exception) {
             // TODO: localize the message
-            throw new TransformException("Can't transform the geometry", exception);
+            throw new TransformPathNotFoundException("Can't transform the geometry", exception);
         }
     }
 

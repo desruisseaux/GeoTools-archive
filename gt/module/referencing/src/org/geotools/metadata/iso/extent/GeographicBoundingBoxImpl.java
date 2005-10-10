@@ -41,6 +41,7 @@ import org.geotools.measure.Longitude;
 import org.geotools.measure.AngleFormat;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.operation.TransformPathNotFoundException;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -139,7 +140,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
                 try {
                     operation = factory.createOperation(crs, DefaultGeographicCRS.WGS84);
                 } catch (FactoryException exception) {
-                    throw new TransformException(Errors.format(
+                    throw new TransformPathNotFoundException(Errors.format(
                               ErrorKeys.CANT_TRANSFORM_ENVELOPE, exception));
                 }
                 envelope = CRSUtilities.transform(operation.getMathTransform(), envelope);

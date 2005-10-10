@@ -27,6 +27,7 @@ import org.opengis.util.Cloneable;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.AxisDirection;  // For javadoc
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -37,6 +38,14 @@ import org.geotools.resources.i18n.ErrorKeys;
 /**
  * A two-dimensional envelope on top of {@link Rectangle2D}. This implementation is provided for
  * interoperability between Java2D and GeoAPI.
+ * <p>
+ * <strong>Note:</strong> This class inherits {@linkplain #x x} and {@linkplain #y y} fields. But
+ * despite their names, they don't need to be oriented toward {@linkplain AxisDirection#EAST East}
+ * and {@linkplain AxisDirection#NORTH North} respectively. The (<var>x</var>,<var>y</var>) axis
+ * can have any orientation and should be understood as "ordinate 0" and "ordinate 1" values
+ * instead. This is not specific to this implementation; in Java2D too, the visual axis orientation
+ * depend on the {@linkplain java.awt.Graphics2D#getTransform affine transform in the graphics
+ * context}.
  *
  * @since 2.1
  * @version $Id$
@@ -90,7 +99,12 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
     }
 
     /**
-     * Constructs two-dimensional envelope defined by the specified coordinates.
+     * Constructs two-dimensional envelope defined by the specified coordinates. Despite
+     * their name, the (<var>x</var>,<var>y</var>) coordinates don't need to be oriented
+     * toward ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North}).
+     * Those parameter names simply match the {@linkplain #x x} and {@linkplain #y y} fields.
+     * The actual axis orientations are determined by the specified CRS.
+     * See the {@linkplain Envelope2D class javadoc} for details.
      */
     public Envelope2D(final CoordinateReferenceSystem crs,
                       final double x, final double y, final double width, final double height)
@@ -102,7 +116,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
     /**
      * Returns the coordinate reference system in which the coordinates are given.
      *
-     * @return The coordinate reference system, or <code>null</code>.
+     * @return The coordinate reference system, or {@code null}.
      */
     public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
@@ -111,7 +125,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
     /**
      * Set the coordinate reference system in which the coordinate are given.
      *
-     * @param crs The new coordinate reference system, or <code>null</code>.
+     * @param crs The new coordinate reference system, or {@code null}.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
         GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());

@@ -27,25 +27,30 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 // OpenGIS dependencies
+import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
  * Holds the coordinates for a two-dimensional position within some coordinate reference system.
- * This class put no restriction on the axis order, i.e. it doesn't ensure that the value stored
- * in the {@linkplain #x x} field increases toward {@linkplain AxisDirection#EAST East} and the
- * value in the {@linkplain #y y} field toward {@linkplain AxisDirection#NORTH North}. The rational
- * is that other {@link DirectPosition} implementation do not have restriction on axis order, and
- * anyway such a restriction is hard to generalize (what to do with
- * {@linkplain AxisDirection#NORTH_EAST North-East} direction?).
+ * <p>
+ * <strong>Note:</strong> This class inherits {@linkplain #x x} and {@linkplain #y y} fields. But
+ * despite their names, they don't need to be oriented toward {@linkplain AxisDirection#EAST East}
+ * and {@linkplain AxisDirection#NORTH North} respectively. The (<var>x</var>,<var>y</var>) axis
+ * can have any orientation and should be understood as "ordinate 0" and "ordinate 1" values
+ * instead. This is not specific to this implementation; in Java2D too, the visual axis orientation
+ * depend on the {@linkplain java.awt.Graphics2D#getTransform affine transform in the graphics
+ * context}.
+ * <p>
+ * The rational for avoiding axis orientation restriction is that other {@link DirectPosition}
+ * implementation do not have such restriction, and anyway it would be hard to generalize (what
+ * to do with {@linkplain AxisDirection#NORTH_EAST North-East} direction?).
  * 
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class DirectPosition2D extends Point2D.Double implements DirectPosition, Serializable {
     /**
@@ -57,30 +62,39 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
      * The coordinate reference system for this position;
      */
     private CoordinateReferenceSystem crs;
-    
+
     /**
-     * Construct a position initialized to (0,0) with a <code>null</code>
+     * Constructs a position initialized to (0,0) with a {@code null}
      * coordinate reference system.
      */
     public DirectPosition2D() {
     }
-    
+
     /**
-     * Construct a position with the specified coordinate reference system.
+     * Constructs a position with the specified coordinate reference system.
      */
     public DirectPosition2D(final CoordinateReferenceSystem crs) {
         setCoordinateReferenceSystem(crs);
     }
-    
+
     /**
-     * Construct a 2D position from the specified ordinates.
+     * Constructs a 2D position from the specified ordinates. Despite their name,
+     * the (<var>x</var>,<var>y</var>) coordinates don't need to be oriented toward
+     * ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North}).
+     * Those parameter names simply match the {@linkplain #x x} and {@linkplain #y y}
+     * fields. See the {@linkplain DirectPosition2D class javadoc} for details.
      */
     public DirectPosition2D(final double x, final double y) {
         super(x,y);
     }
-    
+
     /**
-     * Construct a 2D position from the specified ordinates in the specified CRS.
+     * Constructs a 2D position from the specified ordinates in the specified CRS. Despite
+     * their name, the (<var>x</var>,<var>y</var>) coordinates don't need to be oriented toward
+     * ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North}).
+     * Those parameter names simply match the {@linkplain #x x} and {@linkplain #y y}
+     * fields. The actual axis orientations are determined by the specified CRS.
+     * See the {@linkplain DirectPosition2D class javadoc} for details.
      */
     public DirectPosition2D(final CoordinateReferenceSystem crs,
                             final double x, final double y)
@@ -88,9 +102,9 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
         super(x,y);
         setCoordinateReferenceSystem(crs);
     }
-    
+
     /**
-     * Construct a position from the specified {@link Point2D}.
+     * Constructs a position from the specified {@link Point2D}.
      */
     public DirectPosition2D(final Point2D point) {
         super(point.getX(), point.getY());
@@ -98,9 +112,9 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
             setCoordinateReferenceSystem(((DirectPosition) point).getCoordinateReferenceSystem());
         }
     }
-    
+
     /**
-     * Construct a position initialized to the same values than the specified point.
+     * Constructs a position initialized to the same values than the specified point.
      */
     public DirectPosition2D(final DirectPosition point) {
         setLocation(point);
@@ -116,11 +130,11 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
 
     /**
      * Returns the coordinate reference system in which the coordinate is given.
-     * May be <code>null</code> if this particular <code>DirectPosition</code> is included
+     * May be {@code null} if this particular {@code DirectPosition} is included
      * in a larger object with such a reference to a {@linkplain CoordinateReferenceSystem
      * coordinate reference system}.
      *
-     * @return The coordinate reference system, or <code>null</code>.
+     * @return The coordinate reference system, or {@code null}.
      */
     public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
@@ -129,7 +143,7 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
     /**
      * Set the coordinate reference system in which the coordinate is given.
      *
-     * @param crs The new coordinate reference system, or <code>null</code>.
+     * @param crs The new coordinate reference system, or {@code null}.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
         GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, 2);

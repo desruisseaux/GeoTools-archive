@@ -48,10 +48,9 @@ import org.geotools.resources.geometry.XRectangle2D;
  * This particular implementation of <code>Envelope</code> is said "General" because it
  * uses coordinates of an arbitrary dimension.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     /**
@@ -67,7 +66,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     private double[] ordinates;
 
     /**
-     * The coordinate reference system, or <code>null</code>.
+     * The coordinate reference system, or {@code null}.
      */
     private CoordinateReferenceSystem crs;
     
@@ -200,7 +199,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     /**
      * Returns the coordinate reference system in which the coordinates are given.
      *
-     * @return The coordinate reference system, or <code>null</code>.
+     * @return The coordinate reference system, or {@code null}.
      */
     public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
@@ -210,7 +209,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * Set the coordinate reference system in which the coordinate are given.
      * Note: this method <strong>do not</strong> reproject the envelope.
      *
-     * @param crs The new coordinate reference system, or <code>null</code>.
+     * @param crs The new coordinate reference system, or {@code null}.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
         GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());

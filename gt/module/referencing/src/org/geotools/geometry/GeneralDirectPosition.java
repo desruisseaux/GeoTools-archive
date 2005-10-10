@@ -60,7 +60,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 9071833698385715524L;
-    
+
     /**
      * The ordinates of the direct position.
      */
@@ -91,7 +91,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
     public GeneralDirectPosition(final int numDim) throws NegativeArraySizeException {
         ordinates = new double[numDim];
     }
-    
+
     /**
      * Constructs a position with the specified ordinates.
      * The {@code ordinates} array will be copied.
@@ -99,28 +99,34 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
     public GeneralDirectPosition(final double[] ordinates) {
         this.ordinates = (double[]) ordinates.clone();
     }
-    
+
     /**
-     * Constructs a 2D position from the specified ordinates.
+     * Constructs a 2D position from the specified ordinates. Despite their name, the
+     * (<var>x</var>,<var>y</var>) coordinates don't need to be oriented toward
+     * ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North}).
+     * See the {@link DirectPosition2D} javadoc for details.
      */
     public GeneralDirectPosition(final double x, final double y) {
         ordinates = new double[] {x,y};
     }
-    
+
     /**
-     * Constructs a 3D position from the specified ordinates.
+     * Constructs a 3D position from the specified ordinates. Despite their name, the
+     * (<var>x</var>,<var>y</var>,<var>z</var>) coordinates don't need to be oriented toward
+     * ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North},
+     * {@linkplain AxisDirection#UP Up}).
      */
     public GeneralDirectPosition(final double x, final double y, final double z) {
         ordinates = new double[] {x,y,z};
     }
-    
+
     /**
      * Constructs a position from the specified {@link Point2D}.
      */
     public GeneralDirectPosition(final Point2D point) {
         this(point.getX(), point.getY());
     }
-    
+
     /**
      * Constructs a position initialized to the same values than the specified point.
      */

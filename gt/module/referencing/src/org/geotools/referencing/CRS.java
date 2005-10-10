@@ -252,11 +252,10 @@ public class CRS {
      * @param crs  reference system the two points are in
      * @return approximate distance between the two points, in meters
      *
-     * @todo Would like to move this method in {@link org.geotools.geometry.JTS} instead in order
-     *       to avoid JTS dependency from the referencing module. Furthermore, we should also
-     *       declare more specific exceptions and we may take advantage of the recent API
-     *       enhancement in {@link GeodeticCalculator}. This method should also work with the
-     *       CRS ellipsoid instead of the WGS84's one.
+     * @deprecated Moved to {@link org.geotools.geometry.jts.JTS#orthodromicDistance} (in the
+     *             main module) in order to avoid JTS dependency from the referencing module.
+     *             In addition, the new method should be slightly more efficient and accurate,
+     *             and the method signature (including the exception clause) is more specific.
      */
     public static double distance(Coordinate p1, Coordinate p2, CoordinateReferenceSystem crs) throws Exception
 	{
@@ -283,6 +282,4 @@ public class CRS {
         Hints hints=new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
         distanceOperationFactory=FactoryFinder.getCoordinateOperationFactory(hints);
     }
-    
-    
 }

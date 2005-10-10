@@ -264,10 +264,19 @@ public class GeodeticCalculator {
      * @param  crs The reference system for the {@link Position} objects.
      * @throws FactoryException if no transform to a geodetic CRS can be created
      *         for the specified CRS.
+     *
+     * @since 2.2
      */
     public GeodeticCalculator(final CoordinateReferenceSystem crs) throws FactoryException {
         this(CRSUtilities.getEllipsoid(crs));
         coordinateReferenceSystem = crs;
+        /*
+         * Note: there is no need to set Hints.LENIENT_DATUM_SHIFT to Boolean.TRUE here since
+         *       the target CRS computed by our internal getGeographicCRS(crs) method should
+         *       returns a CRS using the same datum than the specified CRS. If the factory 
+         *       fails with a "Bursa-Wolf parameters required" error message, then we probably
+         *       have a bug somewhere.
+         */
         userToGeodetic = FactoryFinder.getCoordinateOperationFactory(null)
                          .createOperation(crs, getGeographicCRS(crs)).getMathTransform();
         geodeticToUser = null; // Will be computed when first needed.
@@ -447,6 +456,8 @@ public class GeodeticCalculator {
      * Returns the coordinate reference system for all methods working on {@link Position} objects.
      * This is the CRS specified at {@linkplain #GeodeticCalculator(CoordinateReferenceSystem)
      * construction time}.
+     *
+     * @since 2.2
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         if (coordinateReferenceSystem == null) {
@@ -510,6 +521,8 @@ public class GeodeticCalculator {
      *
      * @param  position The position in user coordinate reference system.
      * @throws TransformException if the position can't be transformed.
+     *
+     * @since 2.2
      */
     public void setAnchorPosition(final Position position) throws TransformException {
         geopos = userToGeodetic.transform(position.getPosition(), geopos);
@@ -533,6 +546,8 @@ public class GeodeticCalculator {
      * {@linkplain #GeodeticCalculator(CoordinateReferenceSystem) constructor}.
      *
      * @throws TransformException if the position can't be transformed to user coordinates.
+     *
+     * @since 2.2
      */
     public DirectPosition getAnchorPosition() throws TransformException {
         if (geopos == null) {
@@ -588,6 +603,8 @@ public class GeodeticCalculator {
      *
      * @param  position The position in user coordinate reference system.
      * @throws TransformException if the position can't be transformed.
+     *
+     * @since 2.2
      */
     public void setDestinationPosition(final Position position) throws TransformException {
         geopos = userToGeodetic.transform(position.getPosition(), geopos);
@@ -619,6 +636,8 @@ public class GeodeticCalculator {
      * {@linkplain #GeodeticCalculator(CoordinateReferenceSystem) constructor}.
      *
      * @throws TransformException if the position can't be transformed to user coordinates.
+     *
+     * @since 2.2
      */
     public DirectPosition getDestinationPosition() throws TransformException {
         if (!destinationValid) {

@@ -57,6 +57,7 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.operation.TransformPathNotFoundException;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
@@ -255,7 +256,7 @@ control:    for (int p=0; p<=1; p++) {
                 try {
                     transform = factory.createOperation(sourceCRS, targetCRS);
                 } catch (FactoryException exception) {
-                    throw new TransformException(exception.getLocalizedMessage(), exception);
+                    throw new TransformPathNotFoundException(exception);
                 }
                 geographicArea = CRSUtilities.transform((MathTransform2D)transform.getMathTransform(),
                                                          geographicArea, geographicArea);

@@ -31,10 +31,9 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 /**
  * Holds the coordinates for a one-dimensional position within some coordinate reference system.
  * 
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class DirectPosition1D implements DirectPosition, Serializable, Cloneable {
     /**
@@ -53,28 +52,28 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
     public double ordinate;
     
     /**
-     * Construct a position initialized to (0) with a <code>null</code>
+     * Constructs a position initialized to (0) with a {@code null}
      * coordinate reference system.
      */
     public DirectPosition1D() {
     }
     
     /**
-     * Construct a position with the specified coordinate reference system.
+     * Constructs a position with the specified coordinate reference system.
      */
     public DirectPosition1D(final CoordinateReferenceSystem crs) {
         setCoordinateReferenceSystem(crs);
     }
     
     /**
-     * Construct a 1D position from the specified ordinate.
+     * Constructs a 1D position from the specified ordinate.
      */
     public DirectPosition1D(final double ordinate) {
         this.ordinate = ordinate;
     }
     
     /**
-     * Construct a position initialized to the same values than the specified point.
+     * Constructs a position initialized to the same values than the specified point.
      */
     public DirectPosition1D(final DirectPosition point) {
         setLocation(point);
@@ -90,11 +89,11 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
 
     /**
      * Returns the coordinate reference system in which the coordinate is given.
-     * May be <code>null</code> if this particular <code>DirectPosition</code> is included
+     * May be {@code null} if this particular {@code DirectPosition} is included
      * in a larger object with such a reference to a {@linkplain CoordinateReferenceSystem
      * coordinate reference system}.
      *
-     * @return The coordinate reference system, or <code>null</code>.
+     * @return The coordinate reference system, or {@code null}.
      */
     public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
@@ -103,7 +102,7 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
     /**
      * Set the coordinate reference system in which the coordinate is given.
      *
-     * @param crs The new coordinate reference system, or <code>null</code>.
+     * @param crs The new coordinate reference system, or {@code null}.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
         GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, 1);

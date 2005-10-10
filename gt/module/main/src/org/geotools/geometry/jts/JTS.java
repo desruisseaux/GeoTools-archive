@@ -20,7 +20,10 @@ package org.geotools.geometry.jts;
 
 // J2SE dependencies
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.awt.Shape;
 import java.awt.geom.PathIterator;
 import java.awt.geom.IllegalPathStateException;
@@ -48,7 +51,10 @@ import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.operation.TransformPathNotFoundException;
+import org.geotools.geometry.GeneralDirectPosition;
 
 
 /**
@@ -68,12 +74,31 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
-public class JTS {
+public final class JTS {
     /**
-     * @deprecated Do not create subclasses of this class.
-     *             This constructor will be private in a future release.
+     * A pool of direct positions for use in {@link #orthodromicDistance}.
      */
-    protected JTS() {
+    private static final GeneralDirectPosition[] POSITIONS = new GeneralDirectPosition[4];
+    static {
+        for (int i=0; i<POSITIONS.length; i++) {
+            POSITIONS[i] = new GeneralDirectPosition(i);
+        }
+    }
+
+    /**
+     * Geodetic calculators already created for a given coordinate reference system.
+     * For use in {@link #orthodromicDistance}.
+     *
+     * Note: We would like to use {@link java.util.WeakHashSet}, but we can't because
+     *       {@link GeodeticCalculator} keep a reference to the CRS which is used as the key.
+     */
+    private static final Map/*<CoordinateReferenceSystem,GeodeticCalculator>*/ CALCULATORS =
+            new HashMap();
+
+    /**
+     * Do not allow instantiation of this class.
+     */
+    private JTS() {
     }
 
     /**
@@ -185,12 +210,7 @@ public class JTS {
             dest = new Coordinate();
         }
         final double[] array = new double[transform.getSourceDimensions()];
-        switch (array.length) {
-            case 3: array[2] = source.z;  // Fall through
-            case 2: array[1] = source.y;  // Fall through
-            case 1: array[0] = source.x;  // Fall through
-            case 0: break;
-        }
+        copy(source, array);
         transform.transform(array, 0, array, 0, 1);
         switch (transform.getTargetDimensions()) {
             case 3: dest.z = array[2];  // Fall through
@@ -208,16 +228,21 @@ public class JTS {
      * @param envelope The envelope to transform.
      * @param crs The CRS the envelope is currently in.
      * @return The envelope transformed to be in WGS84 CRS.
-     * @throws FactoryException If no transform is available from {@code crs} to WGS84.
      * @throws TransformException If at least one coordinate can't be transformed.
      */
     public static Envelope toGeographic(final Envelope envelope, final CoordinateReferenceSystem crs)
-            throws FactoryException, TransformException
+            throws TransformException
     {
         if (CRSUtilities.equalsIgnoreMetadata(crs, DefaultGeographicCRS.WGS84)) {
             return envelope;
         }
-        final MathTransform transform = CRS.transform(crs, DefaultGeographicCRS.WGS84, true);
+        final MathTransform transform;
+        try {
+            transform = CRS.transform(crs, DefaultGeographicCRS.WGS84, true);
+        } catch (FactoryException exception) {
+            throw new TransformPathNotFoundException(Errors.format(
+                      ErrorKeys.CANT_TRANSFORM_ENVELOPE, exception));
+        }
         return transform(envelope, transform);
     }
 
@@ -241,7 +266,8 @@ public class JTS {
         if (targetDim != sourceDim) {
             throw new MismatchedDimensionException();
         }
-        boolean startPointTransformed = true;
+        TransformException firstError = null;
+        boolean startPointTransformed = false;
         for (int i=0; i<src.length; i+=sourceDim) {
             try {
                 mt.transform(src, i, dest, i, 1);
@@ -252,16 +278,85 @@ public class JTS {
                     }
                 }
             } catch (TransformException e) {
-                if (i==0) {
-                    startPointTransformed = false;
-                } else if (startPointTransformed) {
+                if (firstError == null) {
+                    firstError = e;
+                }
+                if (startPointTransformed) {
                     System.arraycopy(dest, i-targetDim, dest, i, targetDim);
                 }
             }
         }
-        if (!startPointTransformed) {
-            // TODO: localize
-            throw new TransformException("Unable to transform any of the points in the shape");
+        if (!startPointTransformed && firstError!=null) {
+            throw firstError;
+        }
+    }
+
+    /**
+     * Computes the orthodromic distance between two points. This method:
+     * <p>
+     * <ol>
+     *   <li>Transforms both points to geographic coordinates
+     *       (<var>latitude</var>,<var>longitude</var>).</li>
+     *   <li>Computes the orthodromic distance between the two points using ellipsoidal
+     *       calculations.</li>
+     * </ol>
+     * <p>
+     * The real work is performed by {@link GeodeticCalculator}. This convenience method simply
+     * manages a pool of pre-defined geodetic calculators for the given coordinate reference system
+     * in order to avoid repetitive object creation. If a large amount of orthodromic distances
+     * need to be computed, direct use of {@link GeodeticCalculator} provides better performance
+     * than this convenience method.
+     * 
+     * @param p1  First point
+     * @param p2  Second point
+     * @param crs Reference system the two points are in.
+     * @return    Orthodromic distance between the two points, in meters.
+     * @throws    TransformException if the coordinates can't be transformed from the specified
+     *            CRS to a {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
+     */
+    public static synchronized double orthodromicDistance(final Coordinate p1, final Coordinate p2,
+                                                          CoordinateReferenceSystem crs)
+            throws TransformException
+    {
+        /*
+         * Needs to synchronize because we use shared instances of GeodeticCalculator and
+         * GeneralDirectPosition, and none of them are thread-safe.
+         */
+        GeodeticCalculator gc = (GeodeticCalculator) CALCULATORS.get(crs);
+        if (gc == null) {
+            try {
+                gc = new GeodeticCalculator(crs);
+            } catch (FactoryException exception) {
+                throw new TransformPathNotFoundException(exception);
+            }
+            CALCULATORS.put(crs, gc);
+        }
+        assert crs.equals(gc.getCoordinateReferenceSystem()) : crs;
+        final GeneralDirectPosition pos = POSITIONS[Math.min(POSITIONS.length-1,
+                                          crs.getCoordinateSystem().getDimension())];
+        copy(p1, pos.ordinates);
+        gc.setAnchorPosition(pos);
+        copy(p2, pos.ordinates);
+        gc.setDestinationPosition(pos);
+        return gc.getOrthodromicDistance();
+    }
+
+    /**
+     * Copies the ordinates values from the specified JTS coordinates to the specified array. The
+     * destination array can have any length. Only the relevant field of the source coordinate will
+     * be copied. If the array length is greater than 3, then all extra dimensions will be set to
+     * {@link Double#NaN NaN}.
+     *
+     * @param point The source coordinate.
+     * @param ordinates The destination array.
+     */
+    public static void copy(final Coordinate point, final double[] ordinates) {
+        switch (ordinates.length) {
+            default: Arrays.fill(ordinates, 3, ordinates.length, Double.NaN); // Fall through
+            case  3: ordinates[2] = point.z; // Fall through
+            case  2: ordinates[1] = point.y; // Fall through
+            case  1: ordinates[0] = point.x; // Fall through
+            case  0: break;
         }
     }
 
