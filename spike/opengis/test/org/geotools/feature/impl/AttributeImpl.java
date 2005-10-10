@@ -24,11 +24,32 @@ public class AttributeImpl implements Attribute {
 
 	protected final String ID;
 
+	/**
+	 * Creates an attribute instance of <code>type</code> with null id.
+	 * 
+	 * @param type
+	 *            attribute's type
+	 * @throws NullPointerException
+	 *             if <code>type.isIdentified()</code>
+	 */
 	public AttributeImpl(AttributeType type) {
 		this(null, type);
 	}
 
+	/**
+	 * 
+	 * @param id
+	 *            attribute identified, optional if !type.isIdentified(),
+	 *            mandatory otherwise
+	 * 
+	 * @param type
+	 *            non null type of this attribute
+	 */
 	public AttributeImpl(String id, AttributeType type) {
+		this(id, type, null);
+	}
+
+	public AttributeImpl(String id, AttributeType type, Object content) {
 		if (type == null) {
 			throw new NullPointerException("type");
 		}
@@ -36,17 +57,10 @@ public class AttributeImpl implements Attribute {
 			throw new UnsupportedOperationException(type.getName()
 					+ " is abstract");
 		}
+
 		ID = id;
 		TYPE = type;
-	}
-
-	public AttributeImpl(String id, AttributeType type, Object content) {
-		ID = id;
-		TYPE = type;
-	}
-
-	public String name() {
-		return getType().getName().toString();
+		set(content);
 	}
 
 	public String getID() {
@@ -65,7 +79,7 @@ public class AttributeImpl implements Attribute {
 	 * 
 	 * @throws IllegalArgumentException
 	 * @throws IllegalStateException
-	 *             if the value has been parsed and validater, yet this
+	 *             if the value has been parsed and validated, yet this
 	 *             Attribute does not passes the restrictions imposed by its
 	 *             AttributeType
 	 */
@@ -147,17 +161,34 @@ public class AttributeImpl implements Attribute {
 
 	/**
 	 * Whether the tested object passes the validity constraints of this
-	 * Attribute's AttributeType. At a minimum it should be of the correct class
-	 * specified by {@link #getType()}, non-null if isNillable is
-	 * <tt>false</tt>. If The object does not validate then an
-	 * IllegalArgumentException reporting the error in validation should be
-	 * thrown.
+	 * Attribute's AttributeType.
+	 * <p>
+	 * At a minimum it should be of the correct class specified by
+	 * {@link #getType()}, non-null if isNillable is <tt>false</tt>, and an
+	 * attribute with the passed content must pass all the restrictions imposed
+	 * by <code>getType().getRestrictions()</code>. If The object does not
+	 * validate then an IllegalArgumentException reporting the error in
+	 * validation should be thrown.
+	 * </p>
+	 * <p>
+	 * Note that since Filter operates against Attribute, a fake Attribute
+	 * instance is used to check the filters, so this method does not imposes
+	 * setting the content value prior to pass the restrictions, maintaining the
+	 * Attribute instance thread safe.
+	 * </p>
 	 * 
 	 * @param attribute
 	 *            The object to be tested for validity.
 	 * 
+	 * @throws NullPointerException
+	 *             if <code>attributeContent</code> is null and attribute's
+	 *             type is not nillable.
+	 * 
 	 * @throws IllegalArgumentException
-	 *             if the object does not validate.
+	 *             if <code>attributeContent</code> is not valid for the
+	 *             attribute's type binding class, or the attribute does not
+	 *             passes the restrictions imposed by
+	 *             <code>getType().getRestrictions()</code>
 	 */
 	protected void validate(final Object attributeContent)
 			throws IllegalArgumentException {
@@ -200,7 +231,7 @@ public class AttributeImpl implements Attribute {
 	 * Checks this Attribute instance passes the restrictions imposed by the
 	 * AttributeType
 	 * 
-	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
 	 *             if at least one Filter of the AttributeType restrictions does
 	 *             not contains this Attribute instance.
 	 */
@@ -209,9 +240,9 @@ public class AttributeImpl implements Attribute {
 		if (!att.getType().getRestrictions().isEmpty()) {
 			for (Filter f : att.getType().getRestrictions()) {
 				if (!f.contains(att)) {
-					throw new IllegalStateException(
+					throw new IllegalArgumentException(
 							"Attribute instance does not complies with type restriction "
-									+ f);
+									+ f + ": " + att.getID());
 				}
 			}
 		}

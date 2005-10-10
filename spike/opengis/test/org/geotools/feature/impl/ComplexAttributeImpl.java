@@ -159,7 +159,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 			 * </p>
 			 * 
 			 * @param index
-			 * @param type
+			 * @param testType
 			 */
 			@Override
 			public void add(int index, Object value) {

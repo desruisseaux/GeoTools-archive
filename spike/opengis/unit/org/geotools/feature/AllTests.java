@@ -11,6 +11,7 @@ public class AllTests {
 		suite.addTestSuite(TypesTest.class);
 		suite.addTestSuite(DescriptorsTest.class);
 		suite.addTestSuite(RestrictionsTest.class);
+		suite.addTestSuite(XPathTest.class);
 		suite.addTest(org.geotools.feature.schema.AllTests.suite());
 		suite.addTest(org.geotools.feature.type.AllTests.suite());
 		suite.addTest(org.geotools.feature.simple.AllTests.suite());

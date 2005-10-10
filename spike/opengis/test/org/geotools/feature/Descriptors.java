@@ -287,7 +287,7 @@ public class Descriptors {
 	 * </p>
 	 * 
 	 * @param schema
-	 * @param type
+	 * @param testType
 	 * @return List of nodes for the provided type, or empty.
 	 */
 	static public List<AttributeType> types( Descriptor schema ){

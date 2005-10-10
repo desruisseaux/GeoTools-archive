@@ -118,7 +118,14 @@ public class AttributeExpressionImpl extends DefaultExpression
      * @return DOCUMENT ME!
      */
     public Object getValue(Attribute att) {
-        return XPath.get(att, attPath);
+    	//The XPath subsistem works directly against Attribute, not
+    	//Attribute content
+    	Object xpathResult = XPath.get(att, attPath);
+    	Object result = null;
+    	if(xpathResult instanceof Attribute){
+    		result = ((Attribute)xpathResult).get();
+    	}
+    	return result;
     }
 
      /**
