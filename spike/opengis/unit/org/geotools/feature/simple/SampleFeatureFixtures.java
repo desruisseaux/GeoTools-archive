@@ -21,26 +21,18 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.SchemaException;
 import org.geotools.feature.impl.AttributeFactoryImpl;
-import org.geotools.feature.type.ChoiceAttributeType;
 import org.geotools.feature.type.TypeFactoryImpl;
 import org.opengis.feature.AttributeFactory;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.TypeFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 
 
@@ -68,7 +60,7 @@ public class SampleFeatureFixtures {
             SimpleFeatureType testType = createTestType();
             Object[] attributes = createAttributes();
             AttributeFactory factory = new AttributeFactoryImpl();
-            return factory.create(testType, attributes);
+            return factory.create(testType, null, attributes);
         } catch (Exception e) {
             Error ae = new AssertionError(
                     "Sample Feature for tests has been misscoded");
@@ -191,7 +183,7 @@ public class SampleFeatureFixtures {
      *
      * @throws SchemaException
      */
-    public static SimpleFeatureType createTestType() throws SchemaException {
+    public static SimpleFeatureType createTestType() throws Exception {
         QName name = new QName("test");
         List<AttributeType>atts = new ArrayList<AttributeType>();
         atts.add(typeFactory.createType("testGeometry", Point.class));

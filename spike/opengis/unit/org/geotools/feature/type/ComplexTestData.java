@@ -13,6 +13,7 @@ import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.schema.DescriptorFactory;
 import org.opengis.feature.schema.OrderedDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.TypeFactory;
@@ -260,7 +261,7 @@ public abstract class ComplexTestData extends TestCase {
 		return wqPlusType;
 	}
 
-	public static AttributeType createMeasurementType(TypeFactory typeFactory,
+	public static ComplexType createMeasurementType(TypeFactory typeFactory,
 			DescriptorFactory descFactory) {
 		// build complex attribute
 		List<Descriptor> masurementContents = new ArrayList<Descriptor>();
@@ -281,7 +282,7 @@ public abstract class ComplexTestData extends TestCase {
 		boolean NILLABLE = true;
 		Set<Filter> RESTRICTIONS = null;
 
-		AttributeType measurement = typeFactory.createType(new QName(NSURI,
+		ComplexType measurement = typeFactory.createType(new QName(NSURI,
 				"measurement"), measurementContentsDescriptor, IDENTIFIED,
 				BINDING, NILLABLE, RESTRICTIONS);
 

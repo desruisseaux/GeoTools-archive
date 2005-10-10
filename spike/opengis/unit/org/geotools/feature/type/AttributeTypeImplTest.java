@@ -66,6 +66,7 @@ public class AttributeTypeImplTest extends TestCase {
     public void testGetBinding(){
         AttributeType type = typeFactory.createType("testAttribute", Double.class);
         assertEquals(Double.class, type.getBinding());
+        
     }
     
     public void testEquals(){

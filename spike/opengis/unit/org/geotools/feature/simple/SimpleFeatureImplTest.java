@@ -11,21 +11,13 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeature;
-import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.impl.AttributeFactoryImpl;
 import org.geotools.feature.type.TypeFactoryImpl;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.AttributeFactory;
-import org.opengis.feature.Feature;
-import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.TypeFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -34,7 +26,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
-public class FeatureFlatTest extends TestCase {
+public class SimpleFeatureImplTest extends TestCase {
 
 	private static TypeFactory typeFactory = new TypeFactoryImpl();
 
@@ -44,14 +36,14 @@ public class FeatureFlatTest extends TestCase {
 	 * The logger for the default core module.
 	 */
 	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.defaultcore");
+			.getLogger(SimpleFeatureImplTest.class.getPackage().getName());
 
 	/** Feature on which to preform tests */
 	private SimpleFeature testFeature = null;
 
 	TestSuite suite = null;
 
-	public FeatureFlatTest(String testName) {
+	public SimpleFeatureImplTest(String testName) {
 		super(testName);
 	}
 
@@ -61,7 +53,7 @@ public class FeatureFlatTest extends TestCase {
 	}
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite(FeatureFlatTest.class);
+		TestSuite suite = new TestSuite(SimpleFeatureImplTest.class);
 		return suite;
 	}
 
@@ -187,7 +179,7 @@ public class FeatureFlatTest extends TestCase {
 		atts.add(newAtt("p3", Point.class));
 		atts.add(newAtt("p4", Point.class));
 		SimpleFeatureType t = typeFactory.createFeatureType("test", atts, null);
-		SimpleFeature f = attFactory.create(t);
+		SimpleFeature f = attFactory.create(t, null, g);
 		assertTrue(gc.getEnvelopeInternal().equals(f.getBounds()));
 
 		g[1].getCoordinate().y = 20;
@@ -239,7 +231,7 @@ public class FeatureFlatTest extends TestCase {
 				.createType(new QName(name), c, false, nillable, null);
 	}
 
-	public void testModify() throws IllegalAttributeException {
+	public void testModify() throws Exception {
 		String newData = "new test string data";
 		testFeature.set("testString", newData);
 		assertEquals("match modified (string) attribute", newData, testFeature
@@ -268,17 +260,18 @@ public class FeatureFlatTest extends TestCase {
 	public void testAttributeAccess() throws Exception {
 		// this ones kinda silly
 		SimpleFeature f = (SimpleFeature) SampleFeatureFixtures.createFeature();
-		List<Attribute> atts = f.getAttributes();
+		List<Attribute> atts = f.get();
 
 		for (int i = 0, ii = atts.size(); i < ii; i++) {
-			assertEquals(atts.get(i), f.get(i));
+			Object expected = atts.get(i).get();
+			assertEquals(expected, f.get(i));
 		}
 
-		List<Attribute> attsAgain = f.getAttributes();
+		List<Attribute> attsAgain = f.get();
 		assertTrue(atts != attsAgain);
 
 		f.set(atts);
-		attsAgain = f.getAttributes();
+		attsAgain = f.get();
 		assertTrue(atts != attsAgain);
 
 		for (int i = 0, ii = atts.size(); i < ii; i++) {
@@ -347,8 +340,8 @@ public class FeatureFlatTest extends TestCase {
 				});
 		SimpleFeatureType another = typeFactory.createFeatureType("different",
 				atts, null);
-		SimpleFeature anotherFeature = attFactory.create(another);
-		assertFalse(!f1.equals(anotherFeature));
+		SimpleFeature anotherFeature = attFactory.create(another, null);
+		assertFalse(f1.equals(anotherFeature));
 	}
 
 	/*
@@ -380,7 +373,7 @@ public class FeatureFlatTest extends TestCase {
 				});
 		SimpleFeatureType another = typeFactory.createFeatureType("different",
 				atts, null);
-		SimpleFeature f1 = attFactory.create(another);
+		SimpleFeature f1 = attFactory.create(another, null);
 		assertNull(f1.getDefaultGeometry());
 
 		try {

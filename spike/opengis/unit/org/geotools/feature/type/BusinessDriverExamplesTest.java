@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class BusinessDriverExamplesTest extends ComplexTestData {
 
-	private TypeFactory typeFactory;
+	private TypeFactoryImpl typeFactory;
 
 	private DescriptorFactory descFactory;
 
@@ -86,7 +86,7 @@ public class BusinessDriverExamplesTest extends ComplexTestData {
 		final Set<Filter> restrictions = Collections.emptySet();
 		final boolean identified = true;
 		final boolean isAbstract = false;
-		final AttributeType superType = null;
+		final AttributeType superType = typeFactory.getGmlAbstractFeatureType();
 		final boolean nillable = false;
 
 		FeatureType wqPlusType = ComplexTestData.createExample01Type(
@@ -102,7 +102,7 @@ public class BusinessDriverExamplesTest extends ComplexTestData {
 		assertEquals(1, schema.getMinOccurs());
 		assertEquals(1, schema.getMaxOccurs());
 
-		List<Descriptor> contents = schema.sequence();
+		List<? extends Descriptor> contents = schema.sequence();
 		assertNotNull(contents);
 		assertEquals(5, contents.size());
 		final String[] names = { "sitename", "anzlic_no", "location",
@@ -165,7 +165,7 @@ public class BusinessDriverExamplesTest extends ComplexTestData {
 		final Set<Filter> restrictions = Collections.emptySet();
 		final boolean identified = true;
 		final boolean isAbstract = false;
-		final AttributeType superType = null;
+		final AttributeType superType = typeFactory.getGmlAbstractFeatureType();
 		final boolean nillable = false;
 
 		checkType(wqPlusType, name, binding, restrictions, identified,
@@ -178,7 +178,7 @@ public class BusinessDriverExamplesTest extends ComplexTestData {
 		assertEquals(1, schema.getMinOccurs());
 		assertEquals(1, schema.getMaxOccurs());
 
-		List<Descriptor> contents = schema.sequence();
+		List<? extends Descriptor> contents = schema.sequence();
 		assertNotNull(contents);
 		assertEquals(3, contents.size());
 		final String[] names = { "measurement", "the_geom", "sitename" };
@@ -214,7 +214,7 @@ public class BusinessDriverExamplesTest extends ComplexTestData {
 		final Set<Filter> restrictions = Collections.emptySet();
 		final boolean identified = true;
 		final boolean isAbstract = false;
-		final AttributeType superType = null;
+		final AttributeType superType = typeFactory.getGmlAbstractFeatureType();
 		final boolean nillable = false;
 
 		checkType(wqPlusType, name, binding, restrictions, identified,
@@ -227,7 +227,7 @@ public class BusinessDriverExamplesTest extends ComplexTestData {
 		assertEquals(1, schema.getMinOccurs());
 		assertEquals(1, schema.getMaxOccurs());
 
-		List<Descriptor> contents = schema.sequence();
+		List<? extends Descriptor> contents = schema.sequence();
 		assertNotNull(contents);
 		assertEquals(4, contents.size());
 		final String[] names = { "measurement", "location", "nearestSlimePit", "sitename" };
