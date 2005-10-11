@@ -2,6 +2,7 @@ package org.opengis.feature;
 
 import org.opengis.feature.type.FeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -68,5 +69,17 @@ public interface Feature extends ComplexAttribute  {
     */
    Geometry defaultGeometry();
    
+   /**
+    * XXX Not sure we can do this as a convience method,
+    * can we come up something better? 
+    * <p>
+    * It is very hard to have convience mthod for this and still follow
+    * any kind of conventions (beans or collections). Simply because this
+    * a derived quantity.
+    * <p>
+    * Implemented as: getDefaultGeometry().set( Geometry )
+    * </p>
+    * Note: we could shorten this to getDefault().set( Geometry )
+    */
    void setDefault(Geometry g);
 }

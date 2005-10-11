@@ -9,7 +9,7 @@ import org.geotools.filter.Filter;
 /**
  * AttributeType information, immutable.
  */
-public interface AttributeType {
+public interface AttributeType<T> {
 	/**
 	 * Indicates the actual name of this AttributeType.
 	 * <p>
@@ -46,13 +46,15 @@ public interface AttributeType {
 	 * 
 	 * @return AttributeType of supertype
 	 */
-	public AttributeType getSuper();
+	public AttributeType<? super T> getSuper();
 
 	/** Indicate that this AttributeType may not be used directly */
 	public boolean isAbstract();
 
-	/** Java class bound to this content type */
-	public Class getBinding();
+	/**
+	 * Java class bound to this content type.
+	 */
+	public Class<T> getBinding();
 
 	/**
 	 * List of restrictions used to limit the allowable values for objects of

@@ -10,7 +10,7 @@ package org.opengis.feature.type;
  * @author Jody Garnett
  *
  */
-public interface FeatureType extends ComplexType {
+public interface FeatureType<T> extends ComplexType<T> {
 	
 	/** I am under the impression this should return Boolean.FALSE? */
 	public Boolean isNillable();
@@ -25,6 +25,8 @@ public interface FeatureType extends ComplexType {
 	 */
 	public GeometryType getDefaultGeometry();
 	
-	/** Super may be a normal ComplexType */
-	public ComplexType getSuper();
+	/**
+	 * Super may be a normal ComplexType.
+	 */
+	public ComplexType<? super T> getSuper();
 }

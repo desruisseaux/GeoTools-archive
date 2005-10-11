@@ -42,14 +42,40 @@ public class Descriptors {
 	/**
 	 * Handle subtyping in a "sensible" manner.
 	 * <p>
-	 * If the subtype is an exact match (excepting multiplicity) it can serve
-	 * as a restriction. If not it is used as an extention.
+	 * We explored using the XMLSchema of extention and restriction, and have instead
+	 * opted for the traditional Java lanaguage notion of an override.
+	 * <p>
+	 * The concept of an overrided allows both:
+	 * <ul>
+	 * <li>extention - completly new attribtues are tacked on the "end" of the list
+	 * <li>restriction - attribute with the same qname are used to specify additional
+	 * (or replace) information provided by the parent.
+	 * </ol>
+	 * Note - even <b>removal</b> ( a complicated (and silly) use of restriction in XMLSchema)
+	 * is supported. To remove simply override an attribute mentioned by the parent with
+	 * multiplicity 0:0.
 	 * </p>
 	 * @param schema
 	 * @param subtype
-	 * @return
+	 * @return Descriptor resulting by extending the provided schema (collisions on qname are treated as overrides)
 	 */
-	public Descriptor subtype( Descriptor schema, Descriptor subtype ){
+	public Descriptor subtype( Descriptor schema, Descriptor extend ){
+		/*
+		if( schema instanceof AllDescriptor && subtype instanceof AllDescriptor ){
+			return subtype( (AllDescriptor) schema, (AllDescriptor) extend);
+		}
+		else if( schema instanceof ChoiceDescriptor && extend instanceof ChoiceDescriptor ){
+			return subtype( (ChoiceDescriptor) schema, (ChoiceDescriptor) extend);
+		}
+		else if( schema instanceof OrderedDescriptor && extend instanceof OrderedDescriptor ){
+			return subtype( (OrderedDescriptor) schema, (OrderedDescriptor) extend);
+		}
+		else {
+			List<Descriptor> all = new ArrayList<Descriptor>();
+			all.add( schema );
+			all.add( extend );
+			return factory.ordered( all, 1, 1 );
+		}*/
 		try {
 			return restriction( schema, subtype );
 		}

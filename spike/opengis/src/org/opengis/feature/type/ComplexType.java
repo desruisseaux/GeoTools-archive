@@ -4,7 +4,13 @@ import java.util.Collection;
 
 import org.opengis.feature.schema.Descriptor;
 
-public interface ComplexType extends AttributeType {
+/**
+ * The type
+ * @author Jody Garnett
+ *
+ * @param <T>
+ */
+public interface ComplexType<T> extends AttributeType<T> {
 	/**
 	 * Java class bound to this complex type.
 	 * <p>
@@ -13,10 +19,41 @@ public interface ComplexType extends AttributeType {
 	 * </p>
 	 * @return Java binding, or null if not applicable
 	 */
-	Class/*<? extends List<? extends Attribute>>*/ getBinding();
+	Class<T> getBinding();
 
-	/** Super is restricted to other ComplexType */
-	ComplexType getSuper();
+	/**
+	 * Super is restricted to other ComplexType.
+	 * <p>
+	 * Note: If generics get in the way of reuse in this manner
+	 * we will have to get rid of them. I cannot thing of a real
+	 * world example where this is the case at the moment.
+	 * </p>
+	 * <p>
+	 * Note: Although you may be tempted to make this
+	 * ComplexType<List<Attribtue>> this would be inaccurate, a
+	 * list of Attribtues is the data model, representing
+	 * the representation of content to the feature modeling
+	 * system. The real content may be expressed in terms a of
+	 * Plain-old Java Object (POJO) as per the domain model
+	 * being represented.
+	 * </p>
+	 * <p>
+	 * A good sanity check is this: only use complex types
+	 * when you need to make content accessable as attributes
+	 * (perhaps you want to access the content via XPath for visialization?).
+	 * </p>
+	 * <p>
+	 * Other ideas for making things easy:
+	 * <ul>
+	 * <li>An implementation of ComplexAttribute based on Java Bean
+	 *     reflection.
+	 * <li>Direct use of Java Beans in xPath expressions (see JXPath)
+	 * </ul>
+	 * In short the less work you as the end-user of this API have
+	 * to put into use the better.
+	 * </p>
+	 */
+	ComplexType<? super T> getSuper();
 	
 	/**
 	 * Access to multiplicity and order of allowed content.
@@ -62,5 +99,5 @@ public interface ComplexType extends AttributeType {
 	 * @return The "first" type that with AttributeType.getName
 	 */
 	AttributeType type( String name );
-
+	
 }

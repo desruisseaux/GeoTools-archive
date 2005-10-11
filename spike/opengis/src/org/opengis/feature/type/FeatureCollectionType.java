@@ -3,7 +3,7 @@ package org.opengis.feature.type;
 import org.opengis.feature.schema.Descriptor;
 
 
-public interface FeatureCollectionType extends FeatureType {	
+public interface FeatureCollectionType<T> extends FeatureType<T> {	
 	/**
 	 * FeatureTypes allowable as members of this collection.
 	 * <p>
