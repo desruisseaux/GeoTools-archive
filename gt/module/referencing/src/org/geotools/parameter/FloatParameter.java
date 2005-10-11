@@ -48,10 +48,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  * When those conditions are meet, {@code ParameterRealValue} is slightly more efficient
  * than {@code ParameterValue} since it avoid the creation of {@link Double} objects.
  *  
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see DefaultParameterDescriptor
  * @see ParameterGroup

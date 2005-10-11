@@ -237,7 +237,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * constructor.
      *
      * @param properties The properties to parse, as described in the public constructor.
-     * @param {@code standalone} {@code true} for parsing "remarks" as well.
+     * @param standalone {@code true} for parsing "remarks" as well.
      *
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.

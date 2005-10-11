@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ===========================================================================
+         Project configuration file for the Geotools 2 project
+         http://www.geotools.org/
+
+         Version: $Id$
+     =========================================================================== -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt2</artifactId>
+    <version>2.2-SNAPSHOT</version>
+  </parent>
+
+
+  <!-- ==================================================== -->
+  <!--     Module description                               -->
+  <!-- ==================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>plugin</artifactId>
+  <packaging>pom</packaging>
+  <version>2.2-SNAPSHOT</version>
+  <name>Geotools plugins</name>
+  <url>http://modules.geotools.org/plugin</url>
+  <description>
+    Geotools plugins.
+  </description>
+
+  <modules>
+    <module>arcgrid</module>
+    <module>arcsde</module>
+    <module>db2</module>
+    <module>directory</module>
+    <module>epsg-access</module>
+    <module>epsg-hsql</module>
+    <module>epsg-postgresql</module>
+    <module>epsg-wkt</module>
+    <module>geomedia</module>
+    <module>geometryless</module>
+    <module>geotiff</module>
+    <module>gml</module>
+    <module>gtopo30</module>
+    <module>hsql</module>
+    <module>image</module>
+    <module>mif</module>
+    <module>mysql</module>
+    <module>oraclespatial</module>
+    <module>postgis</module>
+    <module>shapefile</module>
+    <module>tiger</module>
+    <module>vpf</module>
+    <module>wfs</module>
+    <module>wms</module>
+  </modules>
+
+</project>

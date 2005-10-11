@@ -48,10 +48,9 @@ import org.geotools.resources.Utilities;
  * This class is serializable if the {@linkplain #transform underlying transform} is serializable
  * too.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 public class MathTransformProxy implements MathTransform, Serializable {
     /**

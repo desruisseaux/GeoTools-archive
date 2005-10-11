@@ -194,7 +194,7 @@ public class Formatter {
 
     /**
      * Constructor for private use by {@link AbstractParser#format} only.
-     * This constructor help to share some objects with {@link AbstractFormat}.
+     * This constructor help to share some objects with {@link AbstractParser}.
      */
     Formatter(final Symbols symbols, final NumberFormat numberFormat) {
         this.symbols = symbols;

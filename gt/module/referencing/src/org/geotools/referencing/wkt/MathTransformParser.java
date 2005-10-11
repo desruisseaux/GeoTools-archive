@@ -50,12 +50,11 @@ import org.geotools.util.Singleton;
  * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
  * Known Text</cite> (WKT)</A> of math transform.
  * 
+ * @since 2.0
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  * @author Rueben Schulz
- *
- * @since 2.0
  */
 public class MathTransformParser extends AbstractParser {
     /**

@@ -70,12 +70,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  * or RMI use, but will probably not be compatible with future version. For long term storage,
  * WKT (Well Know Text) or XML (not yet implemented) are more appropriate.
  *
+ * @since 2.0
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
- *
- * @since 2.0
  *
  * @see <A HREF="http://mathworld.wolfram.com/MapProjection.html">Map projections on MathWorld</A>
  */

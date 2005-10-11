@@ -28,6 +28,7 @@ import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.operation.CoordinateOperation; // For javadoc
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 
 // Geotools dependencies
@@ -39,10 +40,9 @@ import org.geotools.referencing.factory.IdentifiedObjectSet;
  * {@link FactoryUsingSQL#createFromCoordinateReferenceSystemCodes
  * createFromCoordinateReferenceSystemCodes} method. 
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 final class CoordinateOperationSet extends IdentifiedObjectSet {
     /**

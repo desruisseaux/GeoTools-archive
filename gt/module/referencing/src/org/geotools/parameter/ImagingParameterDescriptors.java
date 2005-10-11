@@ -71,10 +71,9 @@ import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
  * This adaptor make it easier to access parameters for a JAI operation through the general GeoAPI
  * parameters framework.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup {
     /**

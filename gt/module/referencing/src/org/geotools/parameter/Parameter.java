@@ -58,11 +58,10 @@ import org.geotools.measure.Units;
  * The {@link #getValue()} and {@link #setValue(Object)} methods can be invoked at any time.
  * Others getters and setters are parameter-type dependents.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett (Refractions Research)
- *
- * @since 2.1
  *
  * @see DefaultParameterDescriptor
  * @see ParameterGroup

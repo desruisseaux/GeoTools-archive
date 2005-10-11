@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ===========================================================================
          Project configuration file for the Geotools 2 project
          http://www.geotools.org/
@@ -10,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2</artifactId>
+    <artifactId>module</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -38,7 +39,7 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le DÃ©veloppement (IRD)</organization>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
@@ -65,15 +66,15 @@
 
   <contributors>
     <contributor>
-      <name>RÃ©mi Eve</name>
-      <organization>Institut de Recherche pour le DÃ©veloppement (IRD)</organization>
+      <name>Rémi Eve</name>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
       <roles>
         <role>Java developper</role>
       </roles>
     </contributor>
     <contributor>
-      <name>Yann CÃ©zard</name>
-      <organization>UniversitÃ© de Montpellier II</organization>
+      <name>Yann Cézard</name>
+      <organization>Université de Montpellier II</organization>
       <roles>
         <role>Java developper</role>
       </roles>
@@ -86,8 +87,8 @@
       </roles>
     </contributor>
     <contributor>
-      <name>TouraÃ¯vane</name>
-      <organization>Institut de Recherche pour le DÃ©veloppement (IRD)</organization>
+      <name>Touraïvane</name>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
       <roles>
         <role>Java developper</role>
       </roles>

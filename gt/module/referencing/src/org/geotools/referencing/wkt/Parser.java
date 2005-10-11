@@ -89,11 +89,10 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Known Text</cite> (WKT)</A>. This parser can parse {@linkplain MathTransform math transform}
  * objects as well, which is part of the WKT's {@code FITTED_CS} element.
  *
+ * @since 2.0
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>

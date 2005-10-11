@@ -54,10 +54,9 @@ import org.geotools.resources.i18n.Errors;
 /**
  * The definition of a group of related parameters used by an operation method.
  *  
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see ParameterGroup
  * @see DefaultParameterDescriptor

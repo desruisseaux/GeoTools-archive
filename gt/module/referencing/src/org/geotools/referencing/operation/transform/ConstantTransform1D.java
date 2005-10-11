@@ -29,10 +29,9 @@ import java.util.Arrays;
  * <code>{@link #scale} = 0</code> and <code>{@link #offset} = constant</code>. However, this
  * specialized {@code ConstantTransform1D} class is faster.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 final class ConstantTransform1D extends LinearTransform1D {
     /**

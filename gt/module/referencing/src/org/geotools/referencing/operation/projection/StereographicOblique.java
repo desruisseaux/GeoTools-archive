@@ -245,7 +245,6 @@ public class StereographicOblique extends Stereographic {
          * @param  expected The expected parameter descriptors.
          * @param stereoType The type of stereographic projection (used for 
          *        creating wkt).
-         * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
         protected Spherical(final ParameterValueGroup parameters, final Collection expected,
@@ -378,7 +377,6 @@ public class StereographicOblique extends Stereographic {
          * @param  expected The expected parameter descriptors.
          * @param stereoType The type of stereographic projection (used for 
          *        creating wkt).
-         * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
         protected EPSG(final ParameterValueGroup parameters, final Collection expected,

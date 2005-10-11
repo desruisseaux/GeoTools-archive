@@ -76,11 +76,10 @@ import org.geotools.util.WeakHashSet;
  * construction of building blocks. It doesn't figure out any operation path by itself. This
  * more "intelligent" job is left to subclasses.
  *
+ * @since 2.1
  * @version $Id$
  * @author <A HREF="http://www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
                                                       implements CoordinateOperationFactory

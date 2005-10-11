@@ -75,12 +75,11 @@ import org.geotools.resources.i18n.Errors;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on Remote Sensing</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on Remote Sensing</A>
  * 
+ * @since 2.1
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
- *
- * @since 2.1
  */
 public class Mercator extends MapProjection {
     /**

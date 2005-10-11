@@ -28,10 +28,9 @@ import java.util.Locale;
 /**
  * The set of symbols to use for WKT parsing and formatting.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class Symbols {
     /* ----------------------------------------------------------

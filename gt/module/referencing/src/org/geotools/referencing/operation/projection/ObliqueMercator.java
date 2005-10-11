@@ -168,10 +168,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/hotine_oblique_mercator.html">hotine_oblique_mercator on Remote Sensing</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/oblique_mercator.html">oblique_mercator on Remote Sensing</A>
  *
+ * @since 2.1
  * @version $Id$
  * @author  Rueben Schulz
- *
- * @since 2.1
  */
 public class ObliqueMercator extends MapProjection {
     /**

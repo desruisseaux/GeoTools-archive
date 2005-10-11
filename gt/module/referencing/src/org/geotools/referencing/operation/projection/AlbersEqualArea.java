@@ -98,10 +98,9 @@ import org.geotools.resources.i18n.Errors;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/albers_equal_area_conic.html"> "Albers_Conic_Equal_Area" on www.remotesensing.org</A>
  * @see <A HREF="http://srmwww.gov.bc.ca/gis/bceprojection.html">British Columbia Albers Standard Projection</A>
  *
+ * @since 2.1
  * @version $Id$
  * @author Rueben Schulz
- *
- * @since 2.1
  */
 public class AlbersEqualArea extends MapProjection {       
     /**

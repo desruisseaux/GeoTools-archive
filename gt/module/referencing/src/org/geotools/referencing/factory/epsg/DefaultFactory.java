@@ -81,10 +81,9 @@ import org.geotools.util.MonolineFormatter;
  * Users should not creates instance of this class directly. They should invoke one of
  * <code>{@linkplain FactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see DataSource
  */

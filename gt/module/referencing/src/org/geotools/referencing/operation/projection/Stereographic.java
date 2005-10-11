@@ -135,12 +135,11 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/stereographic.html">Stereographic</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/random_issues.html#stereographic">Some Random Stereographic Issues</A>
  *
+ * @since 2.1
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
- *
- * @since 2.1
  */
 public abstract class Stereographic extends MapProjection {
         
@@ -167,7 +166,6 @@ public abstract class Stereographic extends MapProjection {
      *
      * @param  parameters The group of parameter values.
      * @param  expected The expected parameter descriptors.
-     * @return The created math transform.
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
     Stereographic(final ParameterValueGroup parameters, final Collection expected) 

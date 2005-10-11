@@ -65,10 +65,9 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * This writer assumes a monospaced font and an encoding capable to provide
  * drawing box characters (e.g. unicode).
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class ParameterWriter extends FilterWriter {
     /**

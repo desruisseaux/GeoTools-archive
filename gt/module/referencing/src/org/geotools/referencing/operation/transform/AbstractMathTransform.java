@@ -552,7 +552,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      *
      * If no special optimization is available for the combined transform, then this method
      * returns {@code null}.  In the later case, the concatenation will be prepared by
-     * {@link MathTransformFactory} using a generic {@link ConcatenatedTransform}.
+     * {@link DefaultMathTransformFactory} using a generic {@link ConcatenatedTransform}.
      *
      * The default implementation always returns {@code null}. This method is ought to be
      * overrided by subclasses capable of concatenating some combinaison of transforms in a

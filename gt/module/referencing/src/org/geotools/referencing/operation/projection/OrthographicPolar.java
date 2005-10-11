@@ -76,7 +76,6 @@ public class OrthographicPolar extends Orthographic {
      *
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.
-     * @param  The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
     OrthographicPolar(final ParameterValueGroup parameters, final Collection expected) 

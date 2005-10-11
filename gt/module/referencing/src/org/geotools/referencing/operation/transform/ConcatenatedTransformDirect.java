@@ -26,16 +26,13 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**
- * Concatenated transform where the transfert dimension
- * is the same than source and target dimension. This
- * fact allows some optimizations, the most important
- * one being the possibility to avoid the use of an
- * intermediate buffer.
- *
- * @version $Id$
- * @author Martin Desruisseaux
+ * Concatenated transform where the transfert dimension is the same than source and target
+ * dimension. This fact allows some optimizations, the most important one being the possibility
+ * to avoid the use of an intermediate buffer.
  *
  * @since 2.0
+ * @version $Id$
+ * @author Martin Desruisseaux
  */
 class ConcatenatedTransformDirect extends ConcatenatedTransform {
     /**

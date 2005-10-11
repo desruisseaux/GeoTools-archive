@@ -24,6 +24,7 @@ import java.awt.geom.Point2D;
 import java.io.Serializable;
 
 // OpenGIS dependencies
+import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -169,7 +170,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      * Convenience method for checking coordinate reference system validity.
      *
      * @param  crs The coordinate reference system to check.
-     * @param  dimension the dimension expected.
+     * @param  expected the dimension expected.
      * @throws IllegalArgumentException if the CRS dimension is not valid.
      */
     static void checkCoordinateReferenceSystemDimension(final CoordinateReferenceSystem crs,

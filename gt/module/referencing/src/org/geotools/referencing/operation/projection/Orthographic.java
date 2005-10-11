@@ -65,10 +65,9 @@ import org.geotools.resources.i18n.Errors;
  * @see <A HREF="http://mathworld.wolfram.com/OrthographicProjection.html">Orthographic projection on mathworld.wolfram.com</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/orthographic.html">"Orthographic" on www.remotesensing.org</A>
  *
+ * @since 2.1
  * @version $Id$
  * @author Rueben Schulz
- *
- * @since 2.1
  */
 public abstract class Orthographic extends MapProjection {
     /**
@@ -76,7 +75,6 @@ public abstract class Orthographic extends MapProjection {
      *
      * @param  parameters The group of parameter values.
      * @param  expected The expected parameter descriptors.
-     * @return The created math transform.
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
     Orthographic(final ParameterValueGroup parameters, final Collection expected) 

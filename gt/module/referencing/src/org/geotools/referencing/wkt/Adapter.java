@@ -28,10 +28,9 @@ import org.geotools.util.UnsupportedImplementationException;
  * especially {@link org.geotools.referencing.operation.transform.AffineTransform2D}.
  * This method looks for a {@code toWKT()} method using reflection.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 final class Adapter extends Formattable {
     /**

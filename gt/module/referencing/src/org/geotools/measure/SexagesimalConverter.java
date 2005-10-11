@@ -33,10 +33,9 @@ import javax.units.ConversionException;
  *
  * Unfortunatly, this pseudo-unit is extensively used in the EPSG database.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 class SexagesimalConverter extends Converter {
     /**
@@ -64,7 +63,7 @@ class SexagesimalConverter extends Converter {
     /**
      * Constructs a converter for sexagesimal units.
      *
-     * @param converter The value to divide DMS unit by.
+     * @param divider The value to divide DMS unit by.
      *        For "degree minute second" (EPSG code 9107), this is 1.
      *        For "sexagesimal degree" (EPSG code 9110), this is 10000.
      */

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ===========================================================================
          Project configuration file for the Geotools 2 project
          http://www.geotools.org/
@@ -39,20 +40,25 @@
   <licenses>
     <license>
       <name>Lesser General Public License (LGPL)</name>
-      <url>http://www.gnu.org/copyleft/lesser.html</url>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-  <issueManagement>
-    <system>JIRA</system>
-    <url>http://jira.codehaus.org/browse/GEOT</url>
-  </issueManagement>
 
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/</url>
   </scm>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Issue managements and mailing lists              -->
+  <!-- ==================================================== -->
+  <issueManagement>
+    <system>JIRA</system>
+    <url>http://jira.codehaus.org/browse/GEOT</url>
+  </issueManagement>
 
   <mailingLists>
     <mailingList>
@@ -80,7 +86,6 @@
       <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-geotools-gt2-commits</archive>
     </mailingList>
   </mailingLists>
-
 
 
 
@@ -141,7 +146,7 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le DÃ©veloppement (IRD)</organization>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
       <roles>
         <role>Java Developer</role>
         <role>Project Management Committee (PMC) Member</role>
@@ -265,8 +270,6 @@
     </developer>
     <developer>
       <name>Jianhui Jin</name>
-      <id></id>
-      <email></email>
       <organization>CCG</organization>
       <roles>
         <role>Java Developer</role>
@@ -365,29 +368,43 @@
     </dependency>
   </dependencies>
 
+
+
+  <!-- ==================================================== -->
+  <!--     Repositories (ibiblio, refractions...)           -->
+  <!-- ==================================================== -->
   <repositories>
     <repository>
       <id>ibiblio</id>
       <name>Ibiblio - the public's library and digital archive</name>
       <url>http://www.ibiblio.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
     <repository>
       <id>sicade</id>
       <name>Temporary repository (to be replaced by a more official one later)</name>
       <url>http://www.espace.ird.nc/maven-repository</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
     <repository>
       <id>Refractions</id>
       <name>Legacy repository on Refractions (do not includes transitive dependencies)</name>
       <url>http://lists.refractions.net/geotools</url>
       <layout>legacy</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
 
 
   <!-- ==================================================== -->
-  <!--     Compilation (including resources)                -->
+  <!--     Build configuration (resources, ...)             -->
   <!-- ==================================================== -->
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -432,6 +449,11 @@
       </testResource>
     </testResources>
 
+
+
+    <!-- ==================================================== -->
+    <!--     Compilation                                      -->
+    <!-- ==================================================== -->
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -444,12 +466,16 @@
         </configuration>
       </plugin>
 
+
+
+      <!-- ==================================================== -->
+      <!--     JAR packaging                                    -->
+      <!-- ==================================================== -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
-            <compress>false</compress>  <!-- Do not compress, since Geotools's JARs are usually packaged in ZIP file.   -->
             <manifest>
               <addClasspath>true</addClasspath>
             </manifest>
@@ -457,21 +483,58 @@
         </configuration>
       </plugin>
 
+
+
+      <!-- ==================================================== -->
+      <!--     Javadoc generation                               -->
+      <!-- ==================================================== -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
+          <source>1.4</source>                      <!-- Necessary to enable javadoc to handle J2SE 1.4 features.               -->
           <version>false</version>                  <!-- Specifies whether or not the version text is included.                 -->
-          <encoding>ISO-8859-1</encoding>           <!-- Specifies the encoding name of the source files.                       -->
+          <linksource>true</linksource>             <!-- Creates an HTML version of each source file (with line numbers).       -->
           <noqualifier>all</noqualifier>            <!-- Omits qualifying package name from ahead of class names in output.     -->
+          <showPackage>false</showPackage>          <!-- Shows only protected and public classes and members.                   -->
           <quiet>true</quiet>                       <!-- Shuts off non-error and non-warning messages.                          -->
-          <maxmemory>384M</maxmemory>               <!-- The maximum Java heap size to be used when launching the javadoc.      -->
+          <maxmemory>512M</maxmemory>               <!-- The maximum Java heap size to be used when launching the javadoc.      -->
+          <encoding>ISO-8859-1</encoding>           <!-- Specifies the encoding name of the source files.                       -->
           <docfilessubdirs>true</docfilessubdirs>   <!-- Enables deep copying of "doc-files" directories.                       -->
-          <tag>     <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in doc comments. -->
+<!-- TODO: Doesn't work in Maven 2 beta 3. See http://jira.codehaus.org/browse/MNG-1164
+          <additionalparam>-keywords</additionalparam>  <! Set an additional parameter on the command line.                   -->
+-->
+
+          <!-- TODO: The following doesn't work in maven 2 beta 3. See MNG-1152 -->
+          <!-- Unconditionally excludes the specified packages and their subpackages. -->
+<!--
+          <excludePackageNames>
+            org.geotools.resources
+          </excludePackageNames>
+-->
+          <!-- TODO: The following doesn't work in maven 2 beta 3. See MNG-1154 -->
+          <!-- Separates packages on the overview page into whatever groups. -->
+<!--
+          <group>
+            Feature Geometry                   org.geotools.geometry*:org.geotools.topology*:org.geotools.measure*,
+            Grid Coverage                      org.geotools.coverage*:org.geotools.image*,
+            Spatial Referencing by Coordinates org.geotools.referencing*:org.geotools.parameter*:org.geotools.axis*:org.geotools.measure*,
+            Meta Data                          org.geotools.metadata*,
+            Data stores                        org.geotools.data*:org.geotools.gml*:org.geotools.xml*,
+            Catalog Services                   org.geotools.catalog*,
+            Display object                     org.geotools.go*:org.geotools.gui*:org.geotools.renderer*,
+            Utilities                          org.geotools.factory*:org.geotools.io*:org.geotools.util*:org.geotools.resources*:org.geotools.science*:org.geotools.math*:org.geotools.nature*,
+            Legacy packages (to be removed)    org.geotools.pt*:org.geotools.cs*:org.geotools.ct*:org.geotools.cv*:org.geotools.gc*:org.geotools.gp*:org.geotools.units*
+          </group>
+-->
+          <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in doc comments. -->
+          <tag>
             todo:tfmc:TODO,
             revisit:tfmc:TODO
           </tag>
-          <link>                 <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
+
+          <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
+          <link>
             http://java.sun.com/j2se/1.5/docs/api,
             http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs,
             http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi,
@@ -480,56 +543,74 @@
           </link>
         </configuration>
       </plugin>
+
+
+
+      <!-- ==================================================== -->
+      <!--     Web site generation                              -->
+      <!-- ==================================================== -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <siteDirectory>site</siteDirectory>
+<!-- TODO The following is disabled for now because of a bug in French resources
+          <locales>en,fr</locales>   <! Generates the site in English and French -->
+          <locales>en</locales>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
 
 
   <!-- ==================================================== -->
-  <!--     All Geotools 2 modules included in the build     -->
+  <!--     Reports configuration for the web site           -->
+  <!-- ==================================================== -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Deployment to Geotools servers                   -->
+  <!-- ==================================================== -->
+  <distributionManagement>
+    <!-- The 'sicade' repository below are for testing purpose.  -->
+    <!-- They will need to be replaced by Geotools repositories. -->
+    <repository>
+      <id>sicade</id>
+      <name>Geotools release repository</name>
+      <url>scp://eaunet.espace.ird.nc/var/www/html/maven-repository/</url>
+    </repository>
+    <snapshotRepository>
+      <id>sicade</id>
+      <name>Geotools snapshot repository</name>
+      <url>scp://eaunet.espace.ird.nc/var/www/html/maven-repository/</url>
+    </snapshotRepository>
+    <site>
+      <id>sicade</id>
+      <name>Geotools web site</name>
+      <url>scp://eaunet.espace.ird.nc/var/www/html/sicade/geotools/</url>
+    </site>
+  </distributionManagement>
+
+
+
+  <!-- ==================================================== -->
+  <!--     All Geotools 2 groups included in the build      -->
   <!-- ==================================================== -->
   <modules>
     <module>maven-plugin</module>
-    <module>module/legacy</module>
-    <module>module/main</module>
-    <module>module/migrate</module>
-    <module>module/referencing</module>
-    <module>module/sample-data</module>
-    <module>module/svgsupport</module>
-    <module>plugin/arcgrid</module>
-    <module>plugin/arcsde</module>
-    <module>plugin/db2</module>
-    <module>plugin/directory</module>
-    <module>plugin/epsg-access</module>
-    <module>plugin/epsg-hsql</module>
-    <module>plugin/epsg-postgresql</module>
-    <module>plugin/epsg-wkt</module>
-    <module>plugin/geomedia</module>
-    <module>plugin/geometryless</module>
-    <module>plugin/geotiff</module>
-    <module>plugin/gml</module>
-    <module>plugin/gtopo30</module>
-    <module>plugin/hsql</module>
-    <module>plugin/image</module>
-    <module>plugin/mif</module>
-    <module>plugin/mysql</module>
-    <module>plugin/oraclespatial</module>
-    <module>plugin/postgis</module>
-    <module>plugin/shapefile</module>
-    <module>plugin/tiger</module>
-    <module>plugin/vpf</module>
-    <module>plugin/wfs</module>
-    <module>plugin/wms</module>
-    <module>ext/experimental</module>
-    <module>ext/graph</module>
-    <module>ext/legend</module>
-    <module>ext/openoffice</module>
-    <module>ext/pickle</module>
-    <module>ext/shape</module>
-    <module>ext/shaperenderer</module>
-    <module>ext/validation</module>
-    <module>ext/view</module>
-    <module>ext/widgets-swing</module>
+    <module>module</module>
+    <module>plugin</module>
+    <module>ext</module>
   </modules>
 
 </project>

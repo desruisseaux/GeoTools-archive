@@ -57,10 +57,9 @@ import org.geotools.util.UnsupportedImplementationException;
  * are inferred from the {@linkplain #transform transform}. Other implementations may have
  * to overrides the {@link #getParameterValues} method.</P>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see DefaultOperationMethod
  */

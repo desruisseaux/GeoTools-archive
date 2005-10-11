@@ -86,10 +86,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see Latitude
  * @see Longitude
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class AngleFormat extends Format {
     /**
@@ -670,7 +669,7 @@ public class AngleFormat extends Format {
     /**
      * Procède à l'écriture d'un angle, d'une latitude ou d'une longitude.
      *
-     * @param  angle      Angle ou nombre à écrire.
+     * @param  number     Angle ou nombre à écrire.
      * @param  type       Type de l'angle ou du nombre:
      *                    {@link #LONGITUDE},
      *                    {@link #LATITUDE} ou

@@ -335,7 +335,7 @@ public final class SeaWater {
      * @param P Pressure in decibars (0 to 10<sup>5</sup> dbar), not including atmospheric pressure.
      * @return  Salinity PSS-78.
      *
-     * @task TODO: What to do with pression!?! Check the equation of state.
+     * @todo What to do with pression!?! Check the equation of state.
      */
     public static double salinity(double C, final double T, final double P) {
         C /= STANDARD_CONDUCTIVITY;

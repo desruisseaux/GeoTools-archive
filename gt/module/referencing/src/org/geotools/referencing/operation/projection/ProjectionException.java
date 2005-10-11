@@ -26,11 +26,10 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * Thrown by {@link MapProjection} when a map projection failed.
  *
+ * @since 2.0
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class ProjectionException extends TransformException {
     /**

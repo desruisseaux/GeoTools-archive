@@ -41,10 +41,9 @@ import org.geotools.resources.i18n.ErrorKeys;
 /**
  * A particular parameter in a JAI's {@link ParameterList}.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 final class ImagingParameter extends AbstractParameter implements ParameterValue {
     /**

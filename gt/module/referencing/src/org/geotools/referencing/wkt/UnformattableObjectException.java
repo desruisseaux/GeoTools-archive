@@ -27,10 +27,9 @@ package org.geotools.referencing.wkt;
  * engineering CRS} with different unit for each axis), or because only some specific
  * implementations can be formatted as WKT.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class UnformattableObjectException extends UnsupportedOperationException {
     /**

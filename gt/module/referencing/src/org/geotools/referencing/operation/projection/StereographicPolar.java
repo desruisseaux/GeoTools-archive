@@ -266,7 +266,6 @@ public class StereographicPolar extends Stereographic {
          *         it overrides the latitude of origin parameter.
          * @param stereoType The type of stereographic projection (used for 
          *        creating wkt).
-         * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
         protected Spherical(final ParameterValueGroup parameters, final Collection expected,
@@ -367,16 +366,16 @@ public class StereographicPolar extends Stereographic {
     }
     
     /**
-     * Overides {@link PolarStereographic} to use the a series for the
+     * Overides {@link StereographicPolar} to use the a series for the
      * {@link #inverseTransformNormalized inverseTransformNormalized(...)}
      * method. This is the equation specified by the EPSG. Allows for a 
      * <code>"latitude_true_scale"<code> parameter to be used, but this
      * parameter is not listed by the EPSG and is not given as a parameter
      * by the provider.
      * <p>
-     * Compared to the default {@link PolarStereographic} implementation, the series
+     * Compared to the default {@link StereographicPolar} implementation, the series
      * implementation is a little bit faster at the expense of a little bit less
-     * accuracy. The default {@link PolarStereographic} implementation implementation
+     * accuracy. The default {@link StereographicPolar} implementation implementation
      * is an derivated work of Proj4, and is therefor better tested.
      *
      * @version $Id$
@@ -410,7 +409,6 @@ public class StereographicPolar extends Stereographic {
          *         it overrides the latitude of origin parameter.
          * @param stereoType The type of stereographic projection (used for 
          *        creating wkt).
-         * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
         protected Series(final ParameterValueGroup parameters, final Collection expected,

@@ -36,10 +36,9 @@ import org.opengis.referencing.operation.SingleOperation;
 /**
  * A single (not {@linkplain DefaultConcatenatedOperation concatenated}) coordinate operation.
  *  
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultSingleOperation extends AbstractCoordinateOperation implements SingleOperation {
     /**
@@ -50,7 +49,7 @@ public class DefaultSingleOperation extends AbstractCoordinateOperation implemen
     /**
      * Constructs a new single operation with the same values than the specified defining
      * conversion, together with the specified source and target CRS. This constructor
-     * is used by {@link ConversionImpl} only.
+     * is used by {@link DefaultConversion} only.
      */
     DefaultSingleOperation(final Conversion               definition,
                            final CoordinateReferenceSystem sourceCRS,

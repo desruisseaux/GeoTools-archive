@@ -80,7 +80,6 @@ public class OrthographicOblique extends Orthographic {
      *
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.
-     * @param  The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
     OrthographicOblique(final ParameterValueGroup parameters, final Collection expected) 
@@ -88,7 +87,7 @@ public class OrthographicOblique extends Orthographic {
     {
         super(parameters, expected);
         sinphi0 = Math.sin(latitudeOfOrigin);
-	cosphi0 = Math.cos(latitudeOfOrigin);
+        cosphi0 = Math.cos(latitudeOfOrigin);
         assert isSpherical;
     }
     
@@ -100,14 +99,14 @@ public class OrthographicOblique extends Orthographic {
             throws ProjectionException
     {
         double cosphi = Math.cos(y);
-	double coslam = Math.cos(x);
+        double coslam = Math.cos(x);
         double sinphi = Math.sin(y);
         
         if (sinphi0*sinphi + cosphi0*cosphi*coslam < - EPS) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
         
-	y = cosphi0 * sinphi - sinphi0 * cosphi * coslam;      
+        y = cosphi0 * sinphi - sinphi0 * cosphi * coslam;      
         x = cosphi * Math.sin(x);
         
         if (ptDst != null) {

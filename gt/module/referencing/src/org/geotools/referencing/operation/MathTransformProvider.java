@@ -74,10 +74,9 @@ import org.geotools.referencing.operation.transform.MathTransformProxy;
  * to gets all available providers on a system. If this file is bundle in many JAR files, the
  * {@linkplain DefaultCoordinateOperationFactory math transform factory} will read all of them.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public abstract class MathTransformProvider extends DefaultOperationMethod {
     /**

@@ -60,10 +60,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  * {@linkplain #DefaultParameterDescriptor(Map,Class,Object[],Object,Comparable,Comparable,Unit,boolean)
  * a single, full-featured constructor}. All other constructors are just shortcuts.
  *  
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see Parameter
  * @see DefaultParameterDescriptorGroup
@@ -249,7 +248,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
 
     /**
      * Constructs a parameter for a {@linkplain CodeList code list} (or enumeration).
-     * This constructor is used by the {@link Parameter(String,CodeList)} constructor.
+     * This constructor is used by the {@link #DefaultParameter(String,CodeList)} constructor.
      *
      * @param name         The parameter name.
      * @param valueClass   The class that describe the type of the parameter.

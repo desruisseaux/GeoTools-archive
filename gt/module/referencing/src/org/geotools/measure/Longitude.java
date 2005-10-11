@@ -24,10 +24,9 @@ package org.geotools.measure;
 /**
  * A longitude angle. Positive longitudes are East, while negative longitudes are West.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see Latitude
  * @see AngleFormat

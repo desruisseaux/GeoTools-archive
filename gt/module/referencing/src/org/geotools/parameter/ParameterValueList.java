@@ -46,10 +46,9 @@ import org.geotools.resources.i18n.Errors;
  * This class performs check on the parameter value to be added or removed.
  * This implementation supports {@link #add} and {@link #remove} operations.
  *  
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 final class ParameterValueList extends AbstractList implements RandomAccess, Serializable {
     /**
@@ -195,7 +194,6 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
     /**
      * Remove the value at the specified index.
      *
-     * @param type  The descriptor of the value to remove.
      * @param index The index of the value to remove.
      */
     public Object remove(final int index) {

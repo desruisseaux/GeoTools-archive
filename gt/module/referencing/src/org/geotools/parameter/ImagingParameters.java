@@ -60,10 +60,9 @@ import org.geotools.referencing.AbstractIdentifiedObject;
  * {@code ImagingParameters} through the {@link ImagingParameterDescriptors#createValue createValue}
  * method.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 public class ImagingParameters extends AbstractParameter implements ParameterValueGroup {
     /**

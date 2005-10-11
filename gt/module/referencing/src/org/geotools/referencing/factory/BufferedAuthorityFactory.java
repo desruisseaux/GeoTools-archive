@@ -165,7 +165,8 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      *
      * @param hints The hints, usually with a {@link FactoryGroup#HINT_KEY} entry.
      * @param priority The priority for this factory, as a number between
-     *        {@link #MIN_PRIORITY MIN_PRIORITY} and {@link #MAX_PRIORITY MAX_PRIORITY} inclusive.
+     *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
+     *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      *
      * @see DeferredAuthorityFactory#createBackingStore

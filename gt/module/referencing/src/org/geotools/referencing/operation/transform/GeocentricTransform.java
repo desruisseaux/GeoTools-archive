@@ -60,11 +60,10 @@ import org.geotools.resources.i18n.Errors;
  * geographic} points to {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric}
  * coordinate points. Input points must be longitudes, latitudes and heights above the ellipsoid.
  *
+ * @since 2.0
  * @version $Id$
  * @author Frank Warmerdam
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class GeocentricTransform extends AbstractMathTransform implements Serializable {
     /**
@@ -211,7 +210,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     /**
      * Returns the parameter values using the specified descriptor.
      *
-     * @param  The parameter descriptor.
+     * @param  descriptor The parameter descriptor.
      * @return A copy of the parameter values for this math transform.
      */
     private ParameterValueGroup getParameterValues(final ParameterDescriptorGroup descriptor) {

@@ -117,12 +117,11 @@ import org.geotools.resources.i18n.Errors;
  * @see <A HREF="http://mathworld.wolfram.com/MercatorProjection.html">Transverse Mercator projection on MathWorld</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">"Transverse_Mercator" on Remote Sensing</A>
  *
+ * @since 2.1
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
- *
- * @since 2.1
  */
 public class TransverseMercator extends MapProjection {
     /**
@@ -441,8 +440,8 @@ public class TransverseMercator extends MapProjection {
      */
     private final double inv_mlfn(double arg) throws ProjectionException {
         double s, t, phi, k = 1.0/(1.0 - excentricitySquared);
-	int i;
-	phi = arg;
+        int i;
+        phi = arg;
         for (i=MAX_ITER; true;) { // rarely goes over 5 iterations
             if (--i < 0) {
                 throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
@@ -454,7 +453,7 @@ public class TransverseMercator extends MapProjection {
             if (Math.abs(t) < TOL) {
                 return phi;
             }
-	}
+        }
     }
     
     /**

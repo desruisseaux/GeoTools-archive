@@ -30,10 +30,9 @@ import javax.units.TransformedUnit;
 /**
  * A set of units to use in addition of {@link SI} and {@link NonSI}.
  *
+ * @since 2.1
  * @version $Id$
  * @author Desruisseaux
- *
- * @since 2.1
  */
 public final class Units {
     /**

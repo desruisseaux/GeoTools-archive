@@ -77,11 +77,10 @@ import org.geotools.referencing.AbstractIdentifiedObject;
  * {@linkplain ParameterDescriptor#getMaximumOccurs maximum occurs} is always 1 for single
  * parameter), the parameter name is a suffisient key.
  *
+ * @since 2.1
  * @version $Id$
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class Parameters {
     /**

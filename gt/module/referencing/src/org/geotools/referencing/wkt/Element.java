@@ -72,7 +72,7 @@ public final class Element {
     /**
      * Constructs a root element.
      *
-     * @param element The only children for this root.
+     * @param singleton The only children for this root.
      */
     Element(final Element singleton) {
         offset  = 0;

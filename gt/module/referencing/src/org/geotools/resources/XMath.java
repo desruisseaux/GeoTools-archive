@@ -259,7 +259,7 @@ public final class XMath {
      * {@code -61.5}.
      *
      * @param  value The value to fix.
-     * @param  n0 The minimum amount of fraction digits.
+     * @param  n The minimum amount of fraction digits.
      * @return The fixed value, or the unchanged {@code value} if there is no small change
      *         that remove at least {@code n} fraction digits.
      */

@@ -35,7 +35,7 @@ import org.geotools.util.AbstractInternationalString;
 
 /**
  * A localized string for a JAI's operation parameter.
- * This is used by {@link ImagingParameterDescriptor}.
+ * This is used by {@link ImagingParameterDescriptors}.
  *
  * @since 2.2
  * @version $Id$

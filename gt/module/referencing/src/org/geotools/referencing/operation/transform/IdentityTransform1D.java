@@ -24,10 +24,9 @@ package org.geotools.referencing.operation.transform;
  * A one dimensional, identity transform. Output values are identical to input values.
  * This class is really a special case of {@link LinearTransform1D} optimized for speed.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 final class IdentityTransform1D extends LinearTransform1D {
     /**

@@ -30,10 +30,9 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * Concatenated transform in which the resulting transform is one-dimensional.
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 final class ConcatenatedTransform1D extends ConcatenatedTransform implements MathTransform1D {
     /**

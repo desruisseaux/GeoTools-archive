@@ -43,8 +43,8 @@ public class NIOUtilities {
     /**
      * Do not allows instantiation of this class.
      *
-     * @task TODO: This constructor will become private when {@code NIOBufferUtils}
-     *             will have been removed.
+     * @todo This constructor will become private when {@code NIOBufferUtils}
+     *       will have been removed.
      */
     protected NIOUtilities() {
     }

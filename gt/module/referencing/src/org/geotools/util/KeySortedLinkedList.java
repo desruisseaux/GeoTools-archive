@@ -27,8 +27,6 @@ public class KeySortedLinkedList {
     /**
      * Retrieves an iterator that points to the first element or to null for an
      * empty list.
-     *
-     * @return
      */
     public KeySortedLinkedListIterator first() {
         return new KeySortedLinkedListIterator(header.next);
@@ -60,10 +58,6 @@ public class KeySortedLinkedList {
 
     /**
      * Checks if the list contains a certain element, or better its key.
-     *
-     * @param x
-     *
-     * @return
      */
     public boolean contains(Comparable x) {
         KeySortedListNode itr = header.next;
@@ -126,10 +120,6 @@ public class KeySortedLinkedList {
     /**
      * Returns the object stored at a determined zero-based index in case it
      * exists, null otherwise.
-     *
-     * @param index
-     *
-     * @return
      */
     public KeySortedLinkedListIterator getAt(int index) {
         //index check

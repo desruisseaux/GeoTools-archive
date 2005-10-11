@@ -1213,7 +1213,9 @@ public class GeodeticCalculator {
 
     /**
      * Converts an arbitrary Java2D shape into a JTS geometry. The created JTS geometry
-     * may be any of {@link LineString}, {@link LinearRing} or {@link MultiLineString}.
+     * may be any of {@link com.vividsolutions.jts.geom.LineString},
+     * {@link com.vividsolutions.jts.geom.LinearRing} or
+     * {@link com.vividsolutions.jts.geom.MultiLineString}.
      *
      * @param  shape    The Java2D shape to create.
      * @param  factory  The JTS factory to use for creating geometry.

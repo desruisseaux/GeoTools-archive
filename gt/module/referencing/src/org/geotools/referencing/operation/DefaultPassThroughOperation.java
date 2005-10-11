@@ -43,10 +43,9 @@ import org.geotools.util.UnsupportedImplementationException;
  * A pass-through operation specifies that a subset of a coordinate tuple is subject to a specific
  * coordinate operation.
  *  
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultPassThroughOperation extends DefaultSingleOperation implements PassThroughOperation {
     /**

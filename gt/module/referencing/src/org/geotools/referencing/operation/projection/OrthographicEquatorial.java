@@ -75,7 +75,6 @@ public class OrthographicEquatorial extends OrthographicOblique {
      *
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.
-     * @param  The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
     OrthographicEquatorial(final ParameterValueGroup parameters, final Collection expected) 

@@ -253,7 +253,7 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
     /**
      * Returns the parameter value at the specified index.
      *
-     * @param  The zero-based index.
+     * @param  index The zero-based index.
      * @return The parameter value at the specified index.
      * @throws IndexOutOfBoundsException if the specified index is out of bounds.
      */

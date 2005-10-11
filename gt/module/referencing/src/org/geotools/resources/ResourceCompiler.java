@@ -420,7 +420,7 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
     /**
      * Compares two resource keys. Object {@code o1} and {@code o2} are usually {@link String}
      * objects representing resource keys (for example, "{@code MISMATCHED_DIMENSION}"), but
-     * may also be {@link Map.Entry}.
+     * may also be {@link java.util.Map.Entry}.
      */
     public int compare(Object o1, Object o2) {
         if (o1 instanceof Map.Entry) o1 = ((Map.Entry) o1).getValue();
