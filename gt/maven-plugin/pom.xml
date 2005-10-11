@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ====================================================
          Maven 2 project configuration file
          http://maven.apache.org/maven2/
@@ -76,7 +77,7 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le DÃ©veloppement (IRD)</organization>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
       <roles>
         <role>Java Developer</role>
         <role>Project Management Committee (PMC) Member</role>
@@ -126,5 +127,6 @@
   <modules>
     <module>jjtree-javacc</module>
     <module>javamaker</module>
+    <module>unopkg</module>
   </modules>
 </project>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ====================================================
          Maven 2 project configuration file
          http://maven.apache.org/maven2/
@@ -33,6 +34,25 @@
     generated files are stored in a 'target/generated-sources' directory and
     are part of the compilation phase.
   </description>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Developers and contributors                      -->
+  <!-- ==================================================== -->
+  <developers>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+  </developers>
+
 
 
   <!-- ==================================================== -->

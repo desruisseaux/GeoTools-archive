@@ -129,6 +129,20 @@
           </archive>
         </configuration>
       </plugin>
+
+      <!-- Creates the uno.pkg file -->
+      <plugin>
+        <groupId>org.geotools</groupId>
+        <artifactId>unopkg</artifactId>
+        <version>2.2-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>unopkg</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
