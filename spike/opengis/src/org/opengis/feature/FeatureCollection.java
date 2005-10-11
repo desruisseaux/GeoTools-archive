@@ -19,7 +19,7 @@ public interface FeatureCollection extends Feature, Collection<Feature> {
 	/**
 	 * Restricted to return a FeatureCollectionType.
 	 */
-    public FeatureCollectionType getType();
+    public FeatureCollectionType<?> getType();
 
     /**
 	 * Access contents of this collection.

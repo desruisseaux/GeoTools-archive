@@ -53,7 +53,7 @@ public interface GeometryAttribute extends Attribute {
 	 * needed to report CRS and Bounds constraints on data? A: It was needed
 	 * when we switched over to Attribute
 	 */
-	GeometryType getType();
+	GeometryType<? super Geometry> getType();
 
 	/**
 	 * Retrieve Geometry.

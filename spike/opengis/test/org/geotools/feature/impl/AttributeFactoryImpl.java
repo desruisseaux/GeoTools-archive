@@ -7,10 +7,10 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.geotools.feature.impl.attribute.BooleanAttribute;
-import org.geotools.feature.impl.attribute.GeometricAttributeType;
-import org.geotools.feature.impl.attribute.NumericAttributeType;
-import org.geotools.feature.impl.attribute.TemporalAttributeType;
-import org.geotools.feature.impl.attribute.TextualAttributeType;
+import org.geotools.feature.impl.attribute.GeometricAttribute;
+import org.geotools.feature.impl.attribute.NumericAttribute;
+import org.geotools.feature.impl.attribute.TemporalAttribute;
+import org.geotools.feature.impl.attribute.TextualAttribute;
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.AttributeFactory;
@@ -65,15 +65,15 @@ public class AttributeFactoryImpl implements AttributeFactory {
 		} else {
 			Class clazz = type.getBinding();
 			if (Number.class.isAssignableFrom(clazz)) {
-				att = new NumericAttributeType(type, value);
+				att = new NumericAttribute(type, value);
 			} else if (CharSequence.class.isAssignableFrom(clazz)) {
-				att = new TextualAttributeType(type, value);
+				att = new TextualAttribute(type, value);
 			} else if (java.util.Date.class.isAssignableFrom(clazz)) {
-				att = new TemporalAttributeType(type, value);
+				att = new TemporalAttribute(type, value);
 			} else if (Boolean.class.isAssignableFrom(clazz)) {
 				att = new BooleanAttribute(type, value);
 			} else if (Geometry.class.isAssignableFrom(clazz)) {
-				att = new GeometricAttributeType(type, value, id);
+				att = new GeometricAttribute(type, value, id);
 			} else {
 				att = new AttributeImpl(id, type);
 			}
@@ -102,7 +102,7 @@ public class AttributeFactoryImpl implements AttributeFactory {
 	public GeometryAttribute create(GeometryType type, String id,
 			CoordinateReferenceSystem crs, Geometry value) {
 		id = createIdIfNeeded(type, id);
-		return new GeometricAttributeType(type, crs, value, id);
+		return new GeometricAttribute(type, crs, value, id);
 	}
 
 	public SimpleFeature create(SimpleFeatureType type, String id) {

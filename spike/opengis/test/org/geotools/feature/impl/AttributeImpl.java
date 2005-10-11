@@ -3,6 +3,8 @@
  */
 package org.geotools.feature.impl;
 
+import java.util.Set;
+
 import org.geotools.filter.Filter;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.type.AttributeType;
@@ -237,6 +239,7 @@ public class AttributeImpl implements Attribute {
 	 */
 	public static void checkRestrictions(Attribute att)
 			throws IllegalStateException {
+		
 		if (!att.getType().getRestrictions().isEmpty()) {
 			for (Filter f : att.getType().getRestrictions()) {
 				if (!f.contains(att)) {

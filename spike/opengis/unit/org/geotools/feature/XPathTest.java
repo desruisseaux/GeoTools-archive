@@ -63,6 +63,9 @@ public class XPathTest extends TestCase {
 
 	}
 	
+	public void testNestedGetValue(){
+		
+	}
 	
 	public void testSimpleFeatureGetValue()throws Exception{
 		Object val;

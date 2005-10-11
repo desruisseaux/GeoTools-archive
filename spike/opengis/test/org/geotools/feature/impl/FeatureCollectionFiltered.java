@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import jj2000.j2k.NotImplementedError;
 
@@ -21,6 +22,11 @@ import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import sun.security.action.GetBooleanAction;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * This is is a sample sub collection.
  * 
@@ -28,51 +34,68 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class FeatureCollectionFiltered implements FeatureCollection {
 	protected FeatureCollection collection;
+
 	protected Filter filter;
-	
-	public FeatureCollectionFiltered( FeatureCollection collection, Filter filter){
-		if( filter.equals(Filter.ALL) ){
-			throw new IllegalArgumentException("A subcollection with Filter.ALL is a null operation");
+
+	public FeatureCollectionFiltered(FeatureCollection collection, Filter filter) {
+		if (filter.equals(Filter.ALL)) {
+			throw new IllegalArgumentException(
+					"A subcollection with Filter.ALL is a null operation");
 		}
-		if( filter.equals(Filter.NONE) ){
-			throw new IllegalArgumentException("A subcollection with Filter.NONE should be a FeatureCollectionEmpty");
+		if (filter.equals(Filter.NONE)) {
+			throw new IllegalArgumentException(
+					"A subcollection with Filter.NONE should be a FeatureCollectionEmpty");
 		}
-		if( collection instanceof FeatureCollectionFiltered){
+		if (collection instanceof FeatureCollectionFiltered) {
 			FeatureCollectionFiltered filtered = (FeatureCollectionFiltered) collection;
 			collection = filtered.collection;
-			this.filter = filtered.filter.and( filter );
-		}
-		else {
+			this.filter = filtered.filter.and(filter);
+		} else {
 			this.collection = collection;
 			this.filter = filter;
 		}
 	}
-    public FeatureCollectionFiltered( String id, FeatureCollectionType type ){~
-    	delegate = new FeatureImpl( id, type );
-    }
-    
-	public FeatureCollectionType getType() {
+
+	public FeatureCollectionType<?> getType() {
 		return collection.getType();
 	}
-	/** TODO: implement this - it is the point ;-) */
+
 	public Iterator<Feature> features() {
-		throw new NotImplementedError("ha ha");
+		Iterator<Feature>iterator = collection.iterator();
+		Iterator<Feature>filtered = new FilteringIterator(iterator, filter);
+		return filtered;
 	}
 
 	public void close(Iterator<Feature> iterator) {
 		// nop
 	}
 
+	public void add(int index, Attribute value){
+		throw new UnsupportedOperationException();
+	}
+
+	public Attribute remove(int index){
+		throw new UnsupportedOperationException();
+	}
+
 	public String getID() {
 		return collection.getID();
+	}
+
+	public Envelope getBounds(){
+		return FeatureCollectionImpl.getBounds(iterator());
 	}
 	
 	public CoordinateReferenceSystem getCRS() {
 		return collection.getCRS();
 	}
 
-	public GeometryAttribute getDefaultGeometry() {
+	public Geometry getDefaultGeometry() {
 		return collection.getDefaultGeometry();
+	}
+
+	public void setDefaultGeometry(Geometry g) {
+		throw new UnsupportedOperationException();
 	}
 
 	public List<Attribute> get() {
@@ -80,7 +103,7 @@ public class FeatureCollectionFiltered implements FeatureCollection {
 	}
 
 	public void set(List<Attribute> attributes) {
-		collection.set( attributes );	
+		collection.set(attributes);
 	}
 
 	public List<AttributeType> types() {
@@ -92,70 +115,125 @@ public class FeatureCollectionFiltered implements FeatureCollection {
 	}
 
 	public Object get(AttributeType type) {
-		return collection.get( type );
+		return collection.get(type);
 	}
 
 	public void set(Object newValue) {
-		collection.set( newValue );
+		collection.set(newValue);
 	}
 
 	public FeatureCollection subCollection(Filter filter) {
-		if( filter.equals( Filter.NONE )){
+		if (filter.equals(Filter.NONE)) {
 			return this;
 		}
-		if( filter.equals( Filter.ALL)){
+		if (filter.equals(Filter.ALL)) {
 			// TODO empty
-		}		
-		return new FeatureCollectionFiltered( this, filter );
+		}
+		return new FeatureCollectionFiltered(this, filter);
 	}
+
 	public int size() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
 	public boolean isEmpty() {
 		return !iterator().hasNext();
 	}
+
 	public boolean contains(Object arg0) {
 		return false;
 	}
+
 	public Iterator<Feature> iterator() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Object[] toArray() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public <T> T[] toArray(T[] arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public boolean add(Feature arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 	public boolean remove(Object arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 	public boolean containsAll(Collection<?> arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 	public boolean addAll(Collection<? extends Feature> arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 	public boolean removeAll(Collection<?> arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 	public boolean retainAll(Collection<?> arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 	public void clear() {
 		// TODO Auto-generated method stub
-		
 	}
+
+	private static class FilteringIterator implements Iterator<Feature> {
+		private Iterator<Feature> delegate;
+
+		private Filter filter;
+
+		private Feature next;
+
+		public FilteringIterator(Iterator<Feature> delegate, Filter filter) {
+			this.delegate = delegate;
+			this.filter = filter;
+			next = getNext();
+		}
+
+		private Feature getNext() {
+			Feature f = null;
+			while (delegate.hasNext()) {
+				f = delegate.next();
+				if (filter.contains(f)){
+					return f;
+				}
+			}
+			return null;
+		}
+
+		public boolean hasNext() {
+			return next != null;
+		}
+
+		public Feature next() {
+			if(next == null){
+				throw new NoSuchElementException();
+			}
+			Feature current = next;
+			next = getNext();
+			return current;
+		}
+
+		public void remove() {
+			delegate.remove();
+		}
+	}
+
 }

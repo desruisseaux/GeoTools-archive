@@ -45,4 +45,14 @@ public class TextualAttribute extends AttributeImpl{
         return value.toString();
     }
 
+    
+    public String toString(){
+    	StringBuffer sb = new StringBuffer("TextualAttribute[");
+    	sb.append("TYPE=").
+    	append(getType().getName())
+    	.append(", content='")
+    	.append(get())
+    	.append("']");
+    	return sb.toString();
+    }
 }

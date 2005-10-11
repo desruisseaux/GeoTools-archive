@@ -356,7 +356,7 @@ public class SimpleFeatureImplTest extends TestCase {
 
 		AttributeType geometry = testType.get("testGeometry");
 		assertSame(geometry, testType.getDefaultGeometry());
-		assertEquals(testFeature.defaultGeometry().getEnvelopeInternal(),
+		assertEquals(testFeature.getDefaultGeometry().getEnvelopeInternal(),
 				testFeature.getBounds());
 
 		/*
@@ -377,7 +377,7 @@ public class SimpleFeatureImplTest extends TestCase {
 		assertNull(f1.getDefaultGeometry());
 
 		try {
-			f1.setDefault(null);
+			f1.setDefaultGeometry(null);
 			fail("allowed bogus default geometry set ");
 			// } catch (IllegalAttributeException iae) {
 		} catch (IllegalArgumentException iae) {

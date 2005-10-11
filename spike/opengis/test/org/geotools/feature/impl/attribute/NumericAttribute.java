@@ -65,6 +65,15 @@ public class NumericAttribute extends AttributeImpl{
         super(null, type, content);
     }
 
+    public String toString(){
+    	StringBuffer sb = new StringBuffer("NumericAttribute[");
+    	sb.append("TYPE=").
+    	append(getType().getName())
+    	.append(", content='")
+    	.append(get())
+    	.append("']");
+    	return sb.toString();
+    }
     /**
      * Allows this AttributeType to convert an argument to its prefered storage
      * type. If no parsing is possible, returns the original value. If a parse

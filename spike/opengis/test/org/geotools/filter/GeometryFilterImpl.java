@@ -168,7 +168,7 @@ public class GeometryFilterImpl extends AbstractFilterImpl
         	 */
             //right = feature.getDefaultGeometry();
         	Feature f = (Feature)att;
-        	right = f.defaultGeometry();
+        	right = f.getDefaultGeometry();
         }
 
         Geometry left = null;
@@ -184,7 +184,7 @@ public class GeometryFilterImpl extends AbstractFilterImpl
         	 */
             //left = feature.getDefaultGeometry();
         	Feature f = (Feature)att;
-        	left = f.defaultGeometry();
+        	left = f.getDefaultGeometry();
         }
         
         // default behaviour: if the geometry that is to be filtered is not

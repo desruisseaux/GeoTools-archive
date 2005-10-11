@@ -47,7 +47,7 @@ public class Types {
 	 * @param collection
 	 * @param all
 	 */
-	static void memberTypes(FeatureCollectionType collection,
+	static void memberTypes(FeatureCollectionType<?> collection,
 			Set<FeatureType> all) {
 		if (collection == null)
 			return;

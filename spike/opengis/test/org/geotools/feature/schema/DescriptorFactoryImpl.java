@@ -52,7 +52,7 @@ public class DescriptorFactoryImpl implements DescriptorFactory {
 		return new OrderedImpl(sequence, min, max);
 	}
 
-	public ChoiceImpl choice(Set<Descriptor> options, int min, int max) {
+	public ChoiceImpl choice(Set<? extends Descriptor> options, int min, int max) {
 		return new ChoiceImpl(options, min, max);
 	}
 }

@@ -1,7 +1,6 @@
 package org.geotools.feature;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,7 +15,6 @@ import org.opengis.feature.schema.ChoiceDescriptor;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.schema.DescriptorFactory;
 import org.opengis.feature.schema.OrderedDescriptor;
-import org.opengis.feature.simple.SimpleDescriptor;
 import org.opengis.feature.type.AttributeType;
 
 /**
@@ -77,10 +75,10 @@ public class Descriptors {
 			return factory.ordered( all, 1, 1 );
 		}*/
 		try {
-			return restriction( schema, subtype );
+			return restriction( schema, extend );
 		}
 		catch( IllegalStateException couldNotRestrict ){
-			return extention( schema, subtype );
+			return extention( schema, extend );
 		}
 	}
 	/**

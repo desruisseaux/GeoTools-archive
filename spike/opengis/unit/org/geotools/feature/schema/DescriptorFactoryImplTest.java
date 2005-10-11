@@ -156,6 +156,7 @@ public class DescriptorFactoryImplTest extends TestCase {
 		
 	  	List<? extends Descriptor>created = ordered.sequence();
 	  	assertNotSame(attributes, created);
+	  	assertTrue(created.containsAll(attributes));
 	  	assertEquals(attributes, created);
 	}
 

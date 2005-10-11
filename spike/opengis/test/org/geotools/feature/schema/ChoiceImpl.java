@@ -10,36 +10,41 @@ import org.opengis.feature.schema.Descriptor;
 
 public class ChoiceImpl extends AbstractDescriptor implements ChoiceDescriptor {
 	Set<Descriptor> options;
-	public ChoiceImpl( Set<Descriptor> options ){
-		this.options = new HashSet<Descriptor>( options );
+
+	public ChoiceImpl(Set<? extends Descriptor> options) {
+		this.options = new HashSet<Descriptor>(options);
 	}
-	public ChoiceImpl( Set<Descriptor> options, int max ){
-		super( max );
-		this.options = new HashSet<Descriptor>( options );
-	}	
-	public ChoiceImpl( Set<Descriptor> options, int min, int max ){
-		super( min, max );
-		this.options = new HashSet<Descriptor>( options );
+
+	public ChoiceImpl(Set<? extends Descriptor> options, int max) {
+		super(max);
+		this.options = new HashSet<Descriptor>(options);
 	}
+
+	public ChoiceImpl(Set<? extends Descriptor> options, int min, int max) {
+		super(min, max);
+		this.options = new HashSet<Descriptor>(options);
+	}
+
 	public Set<Descriptor> options() {
 		return options;
 	}
 
-	public int hashCode(){
+	public int hashCode() {
 		return super.hashCode() ^ (37 * options.hashCode());
 	}
-	public boolean equals(Object o){
-		if(!(o instanceof ChoiceImpl))
+
+	public boolean equals(Object o) {
+		if (!(o instanceof ChoiceImpl))
 			return false;
-		if(!super.equals(o))
+		if (!super.equals(o))
 			return false;
-		
-		ChoiceImpl d = (ChoiceImpl)o;
+
+		ChoiceImpl d = (ChoiceImpl) o;
 		return this.options.equals(d.options);
-	}	
-	
+	}
+
 	public void validate(List<Attribute> content) throws NullPointerException,
-	IllegalArgumentException {
-		
+			IllegalArgumentException {
+
 	}
 }

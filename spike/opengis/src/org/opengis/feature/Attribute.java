@@ -19,7 +19,7 @@ public interface Attribute {
 	 * 
 	 * @return AttributeType information descirbing allowable content
 	 */
-	AttributeType getType();
+	AttributeType<?> getType();
 	
     /**
      * Unique, inmutable identification for domain object being modeled.

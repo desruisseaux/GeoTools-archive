@@ -13,7 +13,7 @@ import org.opengis.feature.type.AttributeType;
  */
 public interface AttributeDescriptor extends Descriptor {
 
-	AttributeType getType();
+	AttributeType<?> getType();
 	
 	/**
 	 * Used to mark default Geometry.

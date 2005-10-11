@@ -114,7 +114,7 @@ public class CartesianDistanceFilter extends GeometryFilterImpl
         if (rightGeometry != null) {
             right = (Geometry) rightGeometry.getValue(feature);
         } else {
-            right = feature.defaultGeometry();
+            right = feature.getDefaultGeometry();
         }
 
         Geometry left = null;
@@ -125,7 +125,7 @@ public class CartesianDistanceFilter extends GeometryFilterImpl
             //LOGGER.finer("leftGeom = " + o.toString()); 
             left = (Geometry) obj;
         } else {
-            left = feature.defaultGeometry();
+            left = feature.getDefaultGeometry();
         }
 
         // Handles all normal geometry cases
