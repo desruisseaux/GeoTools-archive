@@ -45,6 +45,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -61,7 +62,7 @@ public class IndexedShapefileDataStoreFactory
     public static final Byte TREE_QIX = new Byte(IndexedShapefileDataStore.TREE_QIX);
     public static final Param NAMESPACEP = new Param("namespace", URI.class,
             "uri to a the namespace", false); //not required
-    public static final Param URLP = new Param("url", URL.class,
+    public static final Param URLP = new Param("shapefile url", URL.class,
             "url to a .shp file");
     public static final Param MEMORY_MAPPED = new Param("memory mapped buffer",
             Boolean.class, "enable/disable the use of memory-mapped io", false);
@@ -71,7 +72,28 @@ public class IndexedShapefileDataStoreFactory
     public static final Param SPATIAL_INDEX_TYPE = new Param("index type",
             Byte.class,
             "select type of index to use or none: Valid values are: TREE_GRX (RTREE), TREE_QIX (QUADTREE), TREE_NONE (no indexing), ",
-            false);
+            false) {
+    	
+    	public Object parse(String text) throws Throwable {
+    		Object value = null;
+    		try {
+    			value = super.parse(text);
+    		}
+    		catch(Throwable t) {}
+    		
+    		if (value == null && text != null) {
+    			text = text.trim();
+    			if ("TREE_GRX".equalsIgnoreCase(text) || "RTREE".equalsIgnoreCase(text))
+    				return TREE_GRX;
+    			if ("TREE_QIX".equalsIgnoreCase(text) || "QUADTREE".equalsIgnoreCase(text)) 
+    				return TREE_QIX;
+    			if ("TREE_NONE".equalsIgnoreCase(text) || "NO INDEX".equalsIgnoreCase(text))
+    				return TREE_NONE;
+    		}
+    		
+    		return value;
+    	}
+    };
     private final static Map HINTS = new HashMap();
 
     static {
@@ -192,7 +214,7 @@ public class IndexedShapefileDataStoreFactory
     }
 
     public String getDisplayName() {
-        return "Shapefile";
+        return "Shapefile (Indexed)";
     }
 
     /**
