@@ -1,5 +1,6 @@
 package org.opengis.feature;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.opengis.feature.type.AttributeType;
@@ -14,7 +15,7 @@ public interface ComplexAttribute extends Attribute {
 	/**
 	 * Access the type of this construct.
 	 */
-	ComplexType getType();
+	ComplexType<?> getType();
 
 	/**
 	 * Access to contents of this Feature.
@@ -78,6 +79,51 @@ public interface ComplexAttribute extends Attribute {
 	 */
 	List<Object> values();
 
+	/**
+	 * Inserts the specified Attribute at the specified position in this
+	 * atttribute's contents list. Shifts the element currently at that position
+	 * (if any) and any subsequent elements to the right (adds one to their
+	 * indices).
+	 * 
+	 * @param index
+	 *            index at which the specified element is to be inserted.
+	 * @param value
+	 *            Attribute to be inserted.
+	 * 
+	 * @throws NullPointerException
+	 *             if the specified value is null.
+	 * @throws IllegalArgumentException
+	 *             if some aspect of the specified element prevents it from
+	 *             being added to this list.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of range (index &lt; 0 || index &gt;
+	 *             size()).
+	 */
+	public void add(int index, Attribute value);
+
+	/**
+	 * Removes the element at the specified position in this attribute's
+	 * contents list. Shifts any subsequent attributes to the left (subtracts
+	 * one from their indices), and revalidates the contents against the schema.
+	 * <p>
+	 * If the resulting content structure does not validates against the schema,
+	 * an IllegalArgumentException is thrown and this Attribute's contents are
+	 * not modified.
+	 * </p>
+	 * 
+	 * @param index
+	 *            the index of the element to removed.
+	 * @return the element previously at the specified position.
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if the <tt>remove</tt> method is not supported by this
+	 *             list.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of range (index &lt; 0 || index &gt;=
+	 *             size()).
+	 */
+	public Attribute remove(int index);
+	
 	/**
 	 * Access to value associated with name.
 	 * <p>

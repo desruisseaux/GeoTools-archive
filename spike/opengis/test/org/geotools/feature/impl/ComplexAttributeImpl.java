@@ -28,7 +28,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 		this(null, type);
 	}
 
-	public ComplexAttributeImpl(String id, ComplexType type) {
+	public ComplexAttributeImpl(String id, ComplexType<?> type) {
 		if (type == null) {
 			throw new NullPointerException("type");
 		}
@@ -41,7 +41,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 		attribtues = new ArrayList<Attribute>();
 	}
 
-	public ComplexType getType() {
+	public ComplexType<?> getType() {
 		return TYPE;
 	}
 
@@ -51,7 +51,12 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 
 	/* public List<Attribute> getAttributes() { */
 	public List<Attribute> get() {
-		return Collections.unmodifiableList(this.attribtues);
+		//return Collections.unmodifiableList(this.attribtues);
+		/**
+		 * GR: Really we should return a defensive copy, allowing external 
+		 * modification to be used in set(List<Attribute>)
+		 */
+		return new ArrayList<Attribute>(this.attribtues);
 	}
 
 	public void set(List<Attribute> newValue) throws IllegalArgumentException {
@@ -59,9 +64,65 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 		// since they must have been established through
 		// Attribute.set(Object) which performs content
 		// validation, so we have to perform schema validation here
-		List<Attribute> content = new ArrayList<Attribute>(newValue);
+		getType().getDescriptor().validate(newValue);
+		this.attribtues = new ArrayList<Attribute>(newValue);
+		this.values = null;
+		this.types = null;
+	}
+
+	/**
+	 * Inserts the specified Attribute at the specified position in this
+	 * atttribute's contents list. Shifts the element currently at that position
+	 * (if any) and any subsequent elements to the right (adds one to their
+	 * indices).
+	 * 
+	 * @param index
+	 *            index at which the specified element is to be inserted.
+	 * @param value
+	 *            Attribute to be inserted.
+	 * 
+	 * @throws NullPointerException
+	 *             if the specified value is null.
+	 * @throws IllegalArgumentException
+	 *             if some aspect of the specified element prevents it from
+	 *             being added to this list.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of range (index &lt; 0 || index &gt;
+	 *             size()).
+	 */
+	public void add(int index, Attribute value) {
+		List<Attribute> content = new ArrayList<Attribute>(this.attribtues);
+		content.add(index, value);
+		set(content);
+	}
+
+	/**
+	 * Removes the element at the specified position in this attribute's
+	 * contents list. Shifts any subsequent attributes to the left (subtracts
+	 * one from their indices), and revalidates the contents against the schema.
+	 * <p>
+	 * If the resulting content structure does not validates against the schema,
+	 * an IllegalArgumentException is thrown and this Attribute's contents are
+	 * not modified.
+	 * </p>
+	 * 
+	 * @param index
+	 *            the index of the element to removed.
+	 * @return the element previously at the specified position.
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if the <tt>remove</tt> method is not supported by this
+	 *             list.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of range (index &lt; 0 || index &gt;=
+	 *             size()).
+	 */
+	public Attribute remove(int index) {
+		List<Attribute> content = new ArrayList<Attribute>(this.attribtues);
+		Attribute oldValue = content.remove(index);
 		getType().getDescriptor().validate(content);
 		this.attribtues = content;
+		return oldValue;
 	}
 
 	/**
@@ -70,7 +131,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 	 */
 	public synchronized List<AttributeType> types() {
 		if (types == null) {
-			types = createTypesView(attribtues);
+			types = createTypesView(get());
 		}
 		return types;
 	}
@@ -80,17 +141,17 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 		return new AbstractList<AttributeType>() {
 			@Override
 			public AttributeType get(int index) {
-				return attribtues.get(index).getType();
+				return source.get(index).getType();
 			}
 
 			@Override
 			public int size() {
-				return attribtues.size();
+				return source.size();
 			}
 
 			@Override
 			public AttributeType remove(int index) {
-				Attribute removed = attribtues.remove(index);
+				Attribute removed = source.remove(index);
 				if (removed != null) {
 					return removed.getType();
 				}
@@ -117,7 +178,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 
 	public synchronized List<Object> values() {
 		if (values == null) {
-			values = createValuesView(attribtues);
+			values = createValuesView(get());
 		}
 		return values;
 	}
@@ -127,24 +188,24 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 		return new AbstractList<Object>() {
 			@Override
 			public Object get(int index) {
-				return attribtues.get(index).get();
+				return source.get(index).get();
 			}
 
 			@Override
 			public Object set(int index, Object value) {
-				Object replaced = attribtues.get(index).get();
-				attribtues.get(index).set(value);
+				Object replaced = source.get(index).get();
+				source.get(index).set(value);
 				return replaced;
 			}
 
 			@Override
 			public int size() {
-				return attribtues.size();
+				return source.size();
 			}
 
 			@Override
 			public AttributeType remove(int index) {
-				Attribute removed = attribtues.remove(index);
+				Attribute removed = source.remove(index);
 				if (removed != null) {
 					return removed.getType();
 				}
@@ -167,10 +228,6 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 						"Cannot add directly to types");
 			}
 		};
-	}
-
-	public String name() {
-		return getType().getName().toString();
 	}
 
 	/**
@@ -241,13 +298,6 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 
 	public Object get(AttributeType type) {
 		if (Descriptors.multiple(TYPE.getDescriptor(), type)) {
-			for (Attribute attribute : attribtues) {
-				if (attribute.getType() == type) {
-					return attribute.get();
-				}
-			}
-			return null;
-		} else {
 			List<Object> got = new ArrayList<Object>();
 			for (Attribute attribute : attribtues) {
 				if (attribute.getType() == type) {
@@ -255,6 +305,13 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 				}
 			}
 			return got;
+		} else {
+			for (Attribute attribute : attribtues) {
+				if (attribute.getType() == type) {
+					return attribute.get();
+				}
+			}
+			return null;
 		}
 	}
 
