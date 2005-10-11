@@ -16,17 +16,24 @@
  */
 package org.geotools.feature.impl.attribute;
 
+import java.util.Date;
+
 import org.geotools.feature.impl.AttributeImpl;
+import org.geotools.filter.Filter;
 import org.opengis.feature.type.AttributeType;
 
+/**
+ * A Default class that represents a Temporal attribute.
+ */
+public class TemporalAttribute extends AttributeImpl {
+    // this might be right, maybe not, but anyway, its a default formatting
+    static java.text.DateFormat format = java.text.DateFormat.getInstance();
 
-public class TextualAttributeType extends AttributeImpl{
-	
-    public TextualAttributeType(AttributeType type) {
+    public TemporalAttribute(AttributeType type) {
         super(type);
     }
 
-    public TextualAttributeType(AttributeType type, Object value) {
+    public TemporalAttribute(AttributeType type, Object value) {
         super(null, type, value);
     }
 
@@ -34,15 +41,27 @@ public class TextualAttributeType extends AttributeImpl{
         if (value == null) {
             return value;
         }
+        
+        Class type = super.TYPE.getBinding();
 
-        // string is immutable, so lets keep it
-        if (value instanceof String) {
+        if (type.isAssignableFrom(value.getClass())) {
             return value;
         }
 
-        // other char sequences are not mutable, create a String from it.
-        // this also covers any other cases...
-        return value.toString();
+        if (value instanceof Number) {
+            return new Date(((Number) value).longValue());
+        }
+
+        if (value instanceof java.util.Calendar) {
+            return ((java.util.Calendar) value).getTime();
+        }
+
+        try {
+            return format.parse(value.toString());
+        } catch (java.text.ParseException pe) {
+            throw new IllegalArgumentException("unable to parse " + value
+                + " as Date");
+        }
     }
 
 }

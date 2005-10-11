@@ -29,7 +29,7 @@ import org.opengis.feature.type.AttributeType;
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
  */
-public class NumericAttributeType extends AttributeImpl{
+public class NumericAttribute extends AttributeImpl{
     /**
      * Constructor with name, type and nillable.  Type should always be a
      * Number class.
@@ -46,7 +46,7 @@ public class NumericAttributeType extends AttributeImpl{
      *
      * @task REVISIT: protected?
      */
-    public NumericAttributeType(AttributeType type)
+    public NumericAttribute(AttributeType type)
         throws IllegalArgumentException {
         super(type);
         if (!Number.class.isAssignableFrom(type.getBinding())) {
@@ -60,7 +60,7 @@ public class NumericAttributeType extends AttributeImpl{
      * @param content
      * @throws IllegalArgumentException
      */
-    public NumericAttributeType(AttributeType type, Object content)
+    public NumericAttribute(AttributeType type, Object content)
         throws IllegalArgumentException {
         super(null, type, content);
     }

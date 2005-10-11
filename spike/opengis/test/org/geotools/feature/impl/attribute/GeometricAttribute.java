@@ -54,7 +54,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Leprosy
  * @since 0.3 TODO: test wkt geometry parse.
  */
-public class GeometricAttributeType extends AttributeImpl implements
+public class GeometricAttribute extends AttributeImpl implements
 		GeometryAttribute {
 	/** CoordianteSystem used by this GeometryAttributeType */
 	protected CoordinateReferenceSystem coordinateSystem;
@@ -63,7 +63,7 @@ public class GeometricAttributeType extends AttributeImpl implements
 	 * protected GeometryFactory geometryFactory;
 	 */
 
-	public GeometricAttributeType(GeometryType type,
+	public GeometricAttribute(GeometryType type,
 			CoordinateReferenceSystem cs, String id) {
 		this(type, cs, null, id);
 	}
@@ -76,14 +76,14 @@ public class GeometricAttributeType extends AttributeImpl implements
 	 * @param content
 	 * @param id
 	 */
-	public GeometricAttributeType(AttributeType type, Object content, String id) {
+	public GeometricAttribute(AttributeType type, Object content, String id) {
 		super(id, type, content);
 		if(!(type instanceof GeometryType)){
 			throw new IllegalArgumentException("Expected GeometryType, got " + type);
 		}
 	}
 	
-	public GeometricAttributeType(GeometryType type,
+	public GeometricAttribute(GeometryType type,
 			CoordinateReferenceSystem cs, Geometry content, String id) {
 		super(id, type, content);
 		coordinateSystem = cs;
