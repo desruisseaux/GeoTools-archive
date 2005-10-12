@@ -29,6 +29,22 @@
         maven -g            -- a lot more options
     </echo>
 	</goal>
+
+	<goal name="test:test">
+		<!-- determine if we are on/offline -->
+		<j:choose>
+			<j:when test="${maven.mode.online}">
+				<!-- online, run all tests -->
+					<attainGoal name="test:match"/>
+			</j:when>
+			<j:otherwise>
+				<!-- offline, exclude OnlineTests -->
+					<j:set var="testnotmatchpattern" value="**/*OnlineTest.*,**/*StressTest.*,**/Geot553Test.*"/>
+					<attainGoal name="test:match"/>
+			</j:otherwise>
+		</j:choose>
+	</goal>
+
 	<preGoal name="checkstyle:init">
 		<echo>preGoal in maven.xml is fudging checkstyle to use geotools config settings</echo>
 		<j:set var="maven.checkstyle.properties" value="${basedir}/../../geotools_checks.xml"/>
