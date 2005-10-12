@@ -178,7 +178,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /** OPTIMIZE constants */
     public static final int OPTIMIZE_SAFE = 0;
     public static final int OPTIMIZE_SQL = 1;
-    private static PostgisAuthorityFactory paf = null;
+    
+    //JD: GEOT-723, keeping this reference static allows the authority factory
+    // to hold onto a stale connection pool when a new datastore is created.
+    //private static PostgisAuthorityFactory paf = null;
+    private PostgisAuthorityFactory paf = null;
 
     /** The lock manager */
     //private LockingManager lockingManager = createLockingManager();
@@ -324,7 +328,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getTypeNames()
      */
     public String[] getTypeNames() throws IOException {
-    	/*
+    	
         final int TABLE_NAME_COL = 3;
         Connection conn = null;
         List list = new ArrayList();
@@ -356,7 +360,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         } finally {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
         }
-        */
+        
+    	/*
     	Connection conn = null;    	
 		String namespace = config.getNamespace();
 		try {
@@ -409,7 +414,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 	    } 
 	    finally {
 	        JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
-	    }    	    	
+	    }    
+	    */	    	
     }
     
     /**

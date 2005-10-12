@@ -28,6 +28,7 @@ import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.postgis.PostgisConnectionFactory;
+import org.geotools.data.postgis.PostgisTests;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import junit.framework.TestCase;
@@ -38,14 +39,8 @@ import junit.framework.TestCase;
  * @author jeichar
  * @since 0.6.0
  */
-public class PostgisAuthorityFactoryTest extends TestCase {
-    public void testCreateCRS() throws Exception{
-//        PostgisConnectionFactory f=new PostgisConnectionFactory("kraken",6543,"mleslietest");
-//        ConnectionPool pool=f.getConnectionPool("mleslie","");
-//        PostgisAuthorityFactory factory=new PostgisAuthorityFactory(pool);
-//        CoordinateReferenceSystem crs=factory.createCRS(getSRIDs(pool));
-//        assertNotNull(crs);
-    }
+public class PostgisAuthorityFactoryOnlineTest extends TestCase {
+    
     
     private String TABLE_NAME="SPATIAL_REF_SYS";
     private String WKT_COLUMN="SRTEXT";
@@ -78,5 +73,15 @@ public class PostgisAuthorityFactoryTest extends TestCase {
             JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
         }
     }
+    
+    public void testCreateCRS() throws Exception{
+    	PostgisTests.Fixture fx = PostgisTests.newFixture();
+      PostgisConnectionFactory f = 
+    	  new PostgisConnectionFactory(fx.host,fx.port.intValue(),fx.database);
+      ConnectionPool pool=f.getConnectionPool(fx.user,fx.password);
+      PostgisAuthorityFactory factory=new PostgisAuthorityFactory(pool);
+      CoordinateReferenceSystem crs=factory.createCRS(getSRIDs(pool));
+      assertNotNull(crs);
+  }
 
 }

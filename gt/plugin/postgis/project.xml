@@ -99,17 +99,16 @@ freely available.</description>
         <relese.bundle>true</relese.bundle>
       </properties>
     </dependency>
+
+    <dependency>
+      <id>units</id>
+      <version>0.01</version>
+    </dependency>
+
   </dependencies>
+
   <build>
     <unitTest>
-      <!-- This section excludes the tests -->
-      <excludes>
-        <exclude>**/PostgisLockingTest.java</exclude>
-        <exclude>**/PostgisTestSuite.java</exclude>
-        <exclude>**/PostgisDataStoreAPITest.java</exclude>
-        <exclude>**/PostgisDataStoreTest.java</exclude>
-      </excludes>
-      <!-- End exclude tests -->
        <resources>
           <resource>
               <directory>${basedir}/test</directory>

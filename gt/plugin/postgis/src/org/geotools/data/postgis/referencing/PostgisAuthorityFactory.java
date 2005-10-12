@@ -35,6 +35,14 @@ public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
     private String AUTH_SRID = "AUTH_SRID";
 
     /**
+//     * JD: Added this contstructor because the META_INF/services plugin
+//     * mechanism requires it. 
+//     */
+//    public PostgisAuthorityFactory( ) {
+//    	super(null);
+//    }
+    
+    /**
      * Construct <code>PostgisAuthorityFactory</code>.
      * 
      * @param pool
