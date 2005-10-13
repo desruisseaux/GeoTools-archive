@@ -51,6 +51,7 @@ public class ExpressionTest extends TestCase {
             "org.geotools.defaultcore");
 
     /** Feature on which to preform tests */
+    private static Feature testSimpleFeature = null;
     private static Feature testFeature = null;
     
     /** Schema on which to preform tests */
@@ -186,7 +187,7 @@ public class ExpressionTest extends TestCase {
 
         // Creates the feature itself
         //FlatFeatureFactory factory = new FlatFeatureFactory(testSchema);
-        testFeature = attf.create(testSchema, null, attributes);
+        testSimpleFeature = attf.create(testSchema, null, attributes);
         LOGGER.finer("...feature created");
     }
 
@@ -200,14 +201,14 @@ public class ExpressionTest extends TestCase {
         Expression testAttribute = new AttributeExpressionImpl(testSchema,
                 "testInteger");
         LOGGER.fine("integer attribute expression equals: " +
-            testAttribute.getValue(testFeature));
-        assertEquals(new Integer(1002), testAttribute.getValue(testFeature));
+            testAttribute.getValue(testSimpleFeature));
+        assertEquals(new Integer(1002), testAttribute.getValue(testSimpleFeature));
         
         // Test string attribute
         testAttribute = new AttributeExpressionImpl(testSchema, "testString");
         LOGGER.fine("string attribute expression equals: " +
-            testAttribute.getValue(testFeature));
-        assertEquals("test string data", testAttribute.getValue(testFeature));
+            testAttribute.getValue(testSimpleFeature));
+        assertEquals("test string data", testAttribute.getValue(testSimpleFeature));
     }
 
     /**
@@ -219,14 +220,14 @@ public class ExpressionTest extends TestCase {
         // Test integer attribute
         Expression testLiteral = new LiteralExpressionImpl(new Integer(1002));
         LOGGER.fine("integer literal expression equals: " +
-            testLiteral.getValue(testFeature));
-        assertEquals(new Integer(1002), testLiteral.getValue(testFeature));
+            testLiteral.getValue(testSimpleFeature));
+        assertEquals(new Integer(1002), testLiteral.getValue(testSimpleFeature));
         
         // Test string attribute
         testLiteral = new LiteralExpressionImpl("test string data");
         LOGGER.fine("string literal expression equals: " +
-            testLiteral.getValue(testFeature));
-        assertEquals("test string data", testLiteral.getValue(testFeature));
+            testLiteral.getValue(testSimpleFeature));
+        assertEquals("test string data", testLiteral.getValue(testSimpleFeature));
     }
 
     /**
@@ -241,11 +242,11 @@ public class ExpressionTest extends TestCase {
         FunctionExpression min = filterFactory.createFunctionExpression("min");
         min.setArgs(new Expression[]{a,b});
         
-        assertEquals(1002d,((Double)min.getValue(testFeature)).doubleValue(),0);
+        assertEquals(1002d,((Double)min.getValue(testSimpleFeature)).doubleValue(),0);
         
         b = filterFactory.createLiteralExpression(new Double(-100.001));
         min.setArgs(new Expression[]{a,b});
-        assertEquals(-100.001,((Double)min.getValue(testFeature)).doubleValue(),0);
+        assertEquals(-100.001,((Double)min.getValue(testSimpleFeature)).doubleValue(),0);
         
         assertEquals(FunctionExpressionImpl.FUNCTION,min.getType());
         
@@ -282,12 +283,12 @@ public class ExpressionTest extends TestCase {
         FunctionExpression max = filterFactory.createFunctionExpression(
                 "MaxFunction");
         max.setArgs(new Expression[] { a, b });
-        assertEquals(1004d, ((Double) max.getValue(testFeature)).doubleValue(),
+        assertEquals(1004d, ((Double) max.getValue(testSimpleFeature)).doubleValue(),
             0);
 
         b = new LiteralExpressionImpl(new Double(-100.001));
         max.setArgs(new Expression[]{a,b});
-        assertEquals(1002d,((Double)max.getValue(testFeature)).doubleValue(),0);
+        assertEquals(1002d,((Double)max.getValue(testSimpleFeature)).doubleValue(),0);
         
         assertEquals("Max", max.getName());
         assertEquals(2, max.getArgCount());
@@ -344,7 +345,7 @@ public class ExpressionTest extends TestCase {
         MathExpressionImpl mathTest = new MathExpressionImpl(DefaultExpression.MATH_ADD);
         mathTest.addLeftValue(testAttribute1);
         try{
-            mathTest.getValue(testFeature);
+            mathTest.getValue(testSimpleFeature);
             fail("math expressions should not work if right hand side is not set");
         }
         catch(IllegalArgumentException ife){
@@ -352,7 +353,7 @@ public class ExpressionTest extends TestCase {
         mathTest = new MathExpressionImpl(DefaultExpression.MATH_ADD);
         mathTest.addRightValue(testAttribute1);
         try{
-            mathTest.getValue(testFeature);
+            mathTest.getValue(testSimpleFeature);
             fail("math expressions should not work if left hand side is not set");
         }
         catch(IllegalArgumentException ife){
@@ -373,36 +374,36 @@ public class ExpressionTest extends TestCase {
         MathExpressionImpl mathTest = new MathExpressionImpl(DefaultExpression.MATH_ADD);
         mathTest.addLeftValue(testAttribute1);
         mathTest.addRightValue(testAttribute2);
-        LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +
-            " + " + testAttribute2.getValue(testFeature) + " = " +
-            mathTest.getValue(testFeature));
-        assertEquals(new Double(6), mathTest.getValue(testFeature));
+        LOGGER.fine("math test: " + testAttribute1.getValue(testSimpleFeature) +
+            " + " + testAttribute2.getValue(testSimpleFeature) + " = " +
+            mathTest.getValue(testSimpleFeature));
+        assertEquals(new Double(6), mathTest.getValue(testSimpleFeature));
         
         // Test subtraction
         mathTest = new MathExpressionImpl(DefaultExpression.MATH_SUBTRACT);
         mathTest.addLeftValue(testAttribute1);
         mathTest.addRightValue(testAttribute2);
-        LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +
-            " - " + testAttribute2.getValue(testFeature) + " = " +
-            mathTest.getValue(testFeature));
-        assertEquals(new Double(2), mathTest.getValue(testFeature));
+        LOGGER.fine("math test: " + testAttribute1.getValue(testSimpleFeature) +
+            " - " + testAttribute2.getValue(testSimpleFeature) + " = " +
+            mathTest.getValue(testSimpleFeature));
+        assertEquals(new Double(2), mathTest.getValue(testSimpleFeature));
         
         // Test multiplication
         mathTest = new MathExpressionImpl(DefaultExpression.MATH_MULTIPLY);
         mathTest.addLeftValue(testAttribute1);
         mathTest.addRightValue(testAttribute2);
-        LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +
-            " * " + testAttribute2.getValue(testFeature) + " = " +
-            mathTest.getValue(testFeature));
-        assertEquals(new Double(8), mathTest.getValue(testFeature));
+        LOGGER.fine("math test: " + testAttribute1.getValue(testSimpleFeature) +
+            " * " + testAttribute2.getValue(testSimpleFeature) + " = " +
+            mathTest.getValue(testSimpleFeature));
+        assertEquals(new Double(8), mathTest.getValue(testSimpleFeature));
         
         // Test division
         mathTest = new MathExpressionImpl(DefaultExpression.MATH_DIVIDE);
         mathTest.addLeftValue(testAttribute1);
         mathTest.addRightValue(testAttribute2);
-        LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +
-            " / " + testAttribute2.getValue(testFeature) + " = " +
-            mathTest.getValue(testFeature));
-        assertEquals(new Double(2), mathTest.getValue(testFeature));
+        LOGGER.fine("math test: " + testAttribute1.getValue(testSimpleFeature) +
+            " / " + testAttribute2.getValue(testSimpleFeature) + " = " +
+            mathTest.getValue(testSimpleFeature));
+        assertEquals(new Double(2), mathTest.getValue(testSimpleFeature));
     }
 }

@@ -3,18 +3,23 @@ package org.geotools.feature.impl;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.namespace.QName;
 
 import org.geotools.feature.Descriptors;
 import org.opengis.feature.Attribute;
+import org.opengis.feature.AttributeFactory;
 import org.opengis.feature.ComplexAttribute;
+import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 
 public class ComplexAttributeImpl implements ComplexAttribute {
 	private transient int HASHCODE = -1;
 
-	protected final ComplexType TYPE;
+	protected final ComplexType<?> TYPE;
 
 	protected final String ID;
 
@@ -36,6 +41,9 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 			throw new UnsupportedOperationException(type.getName()
 					+ " is abstract");
 		}
+		if(type.isIdentified() && id == null){
+			throw new NullPointerException(type.getName() + " is identified, null id not accepted");
+		}
 		ID = id;
 		TYPE = type;
 		attribtues = new ArrayList<Attribute>();
@@ -49,8 +57,11 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 		return ID;
 	}
 
-	/* public List<Attribute> getAttributes() { */
-	public List<Attribute> get() {
+	public Object get(){
+		return Collections.unmodifiableList(values());
+	}
+	
+	public List<Attribute> getAttributes() {
 		//return Collections.unmodifiableList(this.attribtues);
 		/**
 		 * GR: Really we should return a defensive copy, allowing external 
@@ -59,12 +70,33 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 		return new ArrayList<Attribute>(this.attribtues);
 	}
 
+	public List<Attribute> getAttributes( String name ){
+		List<Attribute>childs = new LinkedList<Attribute>();
+		for(Attribute att : this.attribtues){
+			if(att.getType().name().equals(name)){
+				childs.add(att);
+			}
+		}
+		return childs;
+	}
+	 
+	public List<Attribute>getAttributes(QName name){
+		List<Attribute>childs = new LinkedList<Attribute>();
+		for(Attribute att : this.attribtues){
+			if(att.getType().getName().equals(name)){
+				childs.add(att);
+			}
+		}
+		return childs;
+	}
+
 	public void set(List<Attribute> newValue) throws IllegalArgumentException {
 		// assume the Attributes contents are valid,
 		// since they must have been established through
 		// Attribute.set(Object) which performs content
 		// validation, so we have to perform schema validation here
-		getType().getDescriptor().validate(newValue);
+		Descriptor schema = TYPE.getDescriptor();
+		schema.validate(newValue);
 		this.attribtues = new ArrayList<Attribute>(newValue);
 		this.values = null;
 		this.types = null;
@@ -110,9 +142,6 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 	 *            the index of the element to removed.
 	 * @return the element previously at the specified position.
 	 * 
-	 * @throws UnsupportedOperationException
-	 *             if the <tt>remove</tt> method is not supported by this
-	 *             list.
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of range (index &lt; 0 || index &gt;=
 	 *             size()).
@@ -131,7 +160,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 	 */
 	public synchronized List<AttributeType> types() {
 		if (types == null) {
-			types = createTypesView(get());
+			types = createTypesView(getAttributes());
 		}
 		return types;
 	}
@@ -178,7 +207,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 
 	public synchronized List<Object> values() {
 		if (values == null) {
-			values = createValuesView(get());
+			values = createValuesView(getAttributes());
 		}
 		return values;
 	}
@@ -267,6 +296,52 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 	 * 
 	 * @see ComplexAttributeImpl.get()
 	 */
+	public void set(Object newValue){
+		if(null == newValue){
+			if(TYPE.isNillable()){
+				this.attribtues.clear();
+				return;
+			}else{
+				throw new NullPointerException(TYPE.getName() + " is not nillable");
+			}
+		}
+		
+		if(newValue.getClass().isArray()){
+			//client should have passed new content, which
+			//must respect the current structure
+			Object[] values = (Object[])newValue;
+			if(this.attribtues.size() != values.length){
+				throw new IllegalArgumentException("Array of values have different size than current structure");
+			}
+			int count = this.attribtues.size();
+			List<Attribute>newContent = new ArrayList<Attribute>(count);
+			List<AttributeType>types = this.types();
+			AttributeFactory af = new AttributeFactoryImpl();
+			for(int i = 0; i < count; i++){
+				newContent.add(af.create(types.get(i), null, values[i]));
+			}
+			set(newContent);
+		}else if(List.class.isAssignableFrom(newValue.getClass())){
+			//if used a list, chances are that user sets a list of
+			//Attribute instances, or a List of values for current 
+			//internal structure
+			List list = (List)newValue;
+			boolean areAttributes = true;
+			for(Object o : list){
+				if(!(o instanceof Attribute)){
+					areAttributes = false;
+					break;
+				}
+			}
+			if(!areAttributes){
+				set(list.toArray());
+			}else{
+				set((List<Attribute>)list);
+			}
+		}
+	}
+	
+	/*
 	@SuppressWarnings("unchecked")
 	public void set(Object newValue) {
 		Class binding = getType().getBinding();
@@ -291,10 +366,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 		throw new UnsupportedOperationException(
 				"No modification with out implementation!");
 	}
-
-	public Object get(String name) {
-		return get(TYPE.type(name));
-	}
+	*/
 
 	public Object get(AttributeType type) {
 		if (Descriptors.multiple(TYPE.getDescriptor(), type)) {

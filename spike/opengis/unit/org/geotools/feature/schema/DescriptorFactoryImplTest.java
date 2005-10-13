@@ -140,39 +140,71 @@ public class DescriptorFactoryImplTest extends TestCase {
 
 		AttributeDescriptor int1 = new NodeImpl(new AttributeTypeImpl("int2", Integer.class));
 		AttributeDescriptor int2 = new NodeImpl(new AttributeTypeImpl("int1", Integer.class));
-		
-		Set<AttributeDescriptor>allAtts = new HashSet<AttributeDescriptor>();
-		allAtts.add(int1);
-		allAtts.add(int2);
-		AllDescriptor all = factory.all(allAtts, 0, Integer.MAX_VALUE);
 		AttributeDescriptor s1 = new NodeImpl(new AttributeTypeImpl("s1", String.class));
 		
 		attributes.add(int1);
 		attributes.add(int2);
-		attributes.add(all);
 		attributes.add(s1);
-		
+
 		OrderedDescriptor ordered = factory.ordered(attributes, 1, 1);
 		
 	  	List<? extends Descriptor>created = ordered.sequence();
 	  	assertNotSame(attributes, created);
 	  	assertTrue(created.containsAll(attributes));
 	  	assertEquals(attributes, created);
+
+		Set<AttributeDescriptor>allAtts = new HashSet<AttributeDescriptor>();
+		allAtts.add(int1);
+		allAtts.add(int2);		
+		AllDescriptor all = factory.all(allAtts, 0, Integer.MAX_VALUE);
+		
+		attributes.add(all);
+		try{
+			factory.ordered(attributes, 0, 1);
+			fail("allowed AllDescriptor in sequence");
+		}catch(IllegalArgumentException e){
+			//OK
+		}
+		
 	}
 
 	/*
 	 * Test method for 'org.geotools.feature.schema.DescriptorFactoryImpl.choice(Collection<Descriptor>, int, int)'
 	 */
 	public void testChoice() {
-		throw new UnsupportedOperationException("not yet implemented");
+		try{
+			factory.choice(null, 0, 1);
+			fail("NullPointerException expected");
+		}catch(NullPointerException e){
+			//OK
+		}
+		Set<Descriptor> options = new HashSet<Descriptor>();
+		
+		AttributeDescriptor int1 = new NodeImpl(new AttributeTypeImpl("int2", Integer.class));
+		AttributeDescriptor int2 = new NodeImpl(new AttributeTypeImpl("int1", Integer.class));
+		
+		options.add(int1);
+		options.add(int2);
+
+		ChoiceDescriptor choice = factory.choice(options, 0, 1);
+		
+	  	Set<Descriptor>created = choice.options();
+	  	assertNotSame(options, created);
+	  	assertTrue(created.containsAll(options));
 	}
-	
+
+	/**
+	 * Verifies a descriptor created by a factory
+	 *
+	 */
 	public void testExtends(){
-		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
+	/**
+	 * 
+	 *
+	 */
 	public void testRestricts(){
-		throw new UnsupportedOperationException("not yet implemented");
 	}
 
 }

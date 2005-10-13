@@ -1,11 +1,8 @@
 package org.geotools.feature.simple;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.feature.schema.AbstractDescriptor;
 import org.geotools.feature.schema.OrderedImpl;
-import org.opengis.feature.Attribute;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.simple.SimpleDescriptor;
 import org.opengis.feature.type.ComplexType;
@@ -18,13 +15,12 @@ import org.opengis.feature.type.ComplexType;
  * @since 2.2
  * @author Gabriel Roldan, Axios Engineering
  */
-public class SimpleDescriptorImpl extends AbstractDescriptor implements
+public class SimpleDescriptorImpl extends OrderedImpl implements
 		SimpleDescriptor {
-	List<AttributeDescriptor> sequence;
 
 	public SimpleDescriptorImpl(List<AttributeDescriptor> sequence)
 			throws IllegalArgumentException {
-		this.sequence = new ArrayList<AttributeDescriptor>(sequence);
+		super(sequence, 1, 1);
 
 		for (AttributeDescriptor node : sequence) {
 			if (node.getMinOccurs() > 1 || node.getMaxOccurs() > 1) {
@@ -43,18 +39,10 @@ public class SimpleDescriptorImpl extends AbstractDescriptor implements
 		}
 	}
 
-	public int hashCode() {
-		return super.hashCode() ^ (37 * sequence.hashCode());
-	}
-
 	public boolean equals(Object o) {
 		if (!(o instanceof SimpleDescriptorImpl))
 			return false;
-		if (!super.equals(o))
-			return false;
-
-		SimpleDescriptorImpl d = (SimpleDescriptorImpl) o;
-		return this.sequence.equals(d.sequence);
+		return super.equals(o);
 	}
 
 	/**
@@ -63,13 +51,8 @@ public class SimpleDescriptorImpl extends AbstractDescriptor implements
 	 * <p>
 	 * This is used to programatically indicate simple content.
 	 */
+	@SuppressWarnings("unchecked")
 	public List<AttributeDescriptor> sequence() {
-		return sequence;
-	}
-
-	public void validate(List<Attribute> content) throws NullPointerException,
-			IllegalArgumentException {
-		// TODO: implement (same as ordered, or get this actually extend
-		// ordered)
+		return (List<AttributeDescriptor>) super.sequence();
 	}
 }

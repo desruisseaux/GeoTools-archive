@@ -7,10 +7,8 @@ import java.util.List;
 
 import org.apache.commons.jxpath.DynamicPropertyHandler;
 import org.geotools.feature.Descriptors;
-import org.geotools.feature.Types;
 import org.opengis.feature.Attribute;
-import org.opengis.feature.ComplexAttribute;
-import org.opengis.feature.schema.AttributeDescriptor;
+import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 
@@ -19,18 +17,17 @@ import org.opengis.feature.type.ComplexType;
  * 
  * @author Gabriel Roldan
  */
-public class AttributePropertyHandler implements DynamicPropertyHandler {
+public class AttributeTypePropertyHandler implements DynamicPropertyHandler {
 
 	public String[] getPropertyNames(java.lang.Object o) {
-		Attribute att = (Attribute) o;
+		AttributeType att = (AttributeType) o;
 		String[] propNames = null;
-		if (att instanceof ComplexAttribute) {
-			ComplexAttribute complex = (ComplexAttribute) att;
-			ComplexType type = complex.getType();
-			List<AttributeType> contentTypes = Descriptors.types(type.getDescriptor());
-			propNames = new String[contentTypes.size()];
+		if (att instanceof ComplexType) {
+			ComplexType complexType = (ComplexType) att;
+			List<AttributeType> childTypes = Descriptors.types(complexType.getDescriptor());
+			propNames = new String[childTypes.size()];
 			for (int i = 0; i < propNames.length; i++) {
-				propNames[i] = contentTypes.get(i).name();
+				propNames[i] = childTypes.get(i).name();
 			}
 		}
 		return propNames;
@@ -44,17 +41,11 @@ public class AttributePropertyHandler implements DynamicPropertyHandler {
 	 */
 	public Object getProperty(Object o, String propName) {
 		Object value = null;
-		if (o instanceof ComplexAttribute) {
-			ComplexAttribute complex = (ComplexAttribute) o;
-			// TODO: its just a test, still needs to handle namespaces when
-			// propName comes with a
-			// namespace prefix
-			/*
-			AttributeType type = Descriptors.type(complex.getType()
-					.getDescriptor(), propName);
-*/			
-			List<Attribute>found = complex.getAttributes(propName);
-			value = found.size() == 0? null : (found.size() == 1? found.get(0) : found);
+		if (o instanceof ComplexType) {
+			ComplexType<?> complex = (ComplexType) o;
+			Descriptor schema = complex.getDescriptor();
+			AttributeType type = Descriptors.type(schema, propName);
+			value = type;
 		}
 		return value;
 	}

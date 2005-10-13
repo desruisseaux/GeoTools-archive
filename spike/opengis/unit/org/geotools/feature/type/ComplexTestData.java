@@ -17,6 +17,7 @@ import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.TypeFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -30,99 +31,99 @@ public abstract class ComplexTestData extends TestCase {
 	/**
 	 * <pre>
 	 * <code>
-	 *    	 FeatureType[
-	 *    		name = wq_plus
-	 *    	 	identified = true
-	 *    	 	super = Feature
-	 *    	 	abstract = false
-	 *    	 	binding = Feature.class
-	 *    	 	restrictions = EMPTY_SET
-	 *    	 	nillable = false
-	 *    	 	defaultGeometry = #location
-	 *    	 	descriptor = OrderedDescriptor(1, 1)[
-	 *    	 		sequence = List[
-	 *    	 			AttributeDescriptor(1, 1)[
-	 *    	 					type = AttributeType[
-	 *    	 					name = sitename
-	 *    	 					identified = false
-	 *    	 					super = null 
-	 *    	 					abstract = false
-	 *    	 					binding = String.class
-	 *    	 					restrictions = EMPTY_SET
-	 *    	 					nillable = false
-	 *    	 				]
-	 *    	 			],
-	 *    	 			AttributeDescriptor(0, 1)[
-	 *    	 				type = AttributeType[
-	 *    						name = anzlic_no
-	 *    						identified = false
-	 *    						super = null 
-	 *    						abstract = false
-	 *    						binding = String.class
-	 *    						restrictions = EMPTY_SET
-	 *    						nillable = true
-	 *    	 				]
-	 *    	 			],
-	 *    	 			AttributeDescriptor(0, 1)[
-	 *    	 				type = GeometryAttribute[
-	 *    	 					name = location
-	 *    	 					identified = false
-	 *    	 					super = HERE WE NEED TO REFER TO  gml:LocationPropertyType
-	 *    	 					abstract = false
-	 *    	 					binding = Point.class
-	 *    	 					restrictions = EMPTY_SET
-	 *    	 					nillable = true
-	 *    	 				]
-	 *    	 			],
-	 *    	 			AttributeDescriptor (0, Integer.MAX_VALUE)[
-	 *    	 				type = ComplexType[
-	 *    	 					name = measurement
-	 *    	 					identified = true
-	 *    	 					super = null 
-	 *    	 					abstract = false
-	 *    	 					binding = null
-	 *    	 					restrictions = EMPTY_SET
-	 *    	 					nillable = true
-	 *    	 					descriptor = OrderedDescriptor(0, Integer.MAX_VALUE)[
-	 *    	 						AttributeDescriptor(1, 1)[
-	 *    	 							type = AttributeType[
-	 *    	 								name = determinand_description
-	 *    	 								identified = false
-	 *    	 								super = null 
-	 *    	 								abstract = false
-	 *    	 								binding = String.class
-	 *    	 								restrictions = EMPTY_SET
-	 *    	 								nillable = false
-	 *    	 							]
-	 *    	 						],
-	 *    	 						AttributeDescriptor(1, 1)[
-	 *    	 							type = AttributeType[
-	 *    	 								name = result
-	 *    	 								identified = false
-	 *    	 								super = null 
-	 *    	 								abstract = false
-	 *    	 								binding = String.class
-	 *    	 								restrictions = EMPTY_SET
-	 *    	 								nillable = false
-	 *    	 							]
-	 *    	 						]
-	 *    	 					]//OrderedDescriptor
-	 *    	 				] //ComplexType
-	 *    	 			], //measurement
-	 *    	 			AttributeDescriptor(0, 1)[
-	 *    	 				type = AttributeType[
-	 *    	 					name = project_no
-	 *    	 					identified = false
-	 *    	 					super = null 
-	 *    	 					abstract = false
-	 *    	 					binding = String.class
-	 *    	 					restrictions = EMPTY_SET
-	 *    	 					nillable = false
-	 *    	 				]
-	 *    	 			]
-	 *    	 		]
-	 *    	 	]
-	 *    	 ]	 
+	 *        	 FeatureType[
+	 *        		name = wq_plus
+	 *        	 	identified = true
+	 *        	 	super = Feature
+	 *        	 	abstract = false
+	 *        	 	binding = Feature.class
+	 *        	 	restrictions = EMPTY_SET
+	 *        	 	nillable = false
+	 *        	 	defaultGeometry = #location
+	 *        	 	descriptor = OrderedDescriptor(1, 1)[
+	 *        	 		sequence = List[
+	 *        	 			AttributeDescriptor(1, 1)[
+	 *        	 					type = AttributeType[
+	 *        	 					name = sitename
+	 *        	 					identified = false
+	 *        	 					super = null 
+	 *        	 					abstract = false
+	 *        	 					binding = String.class
+	 *        	 					restrictions = EMPTY_SET
+	 *        	 					nillable = false
+	 *        	 				]
+	 *        	 			],
+	 *        	 			AttributeDescriptor(0, 1)[
+	 *        	 				type = AttributeType[
+	 *        						name = anzlic_no
+	 *        						identified = false
+	 *        						super = null 
+	 *        						abstract = false
+	 *        						binding = String.class
+	 *        						restrictions = EMPTY_SET
+	 *        						nillable = true
+	 *        	 				]
+	 *        	 			],
+	 *        	 			AttributeDescriptor(0, 1)[
+	 *        	 				type = GeometryAttribute[
+	 *        	 					name = location
+	 *        	 					identified = false
+	 *        	 					super = HERE WE NEED TO REFER TO  gml:LocationPropertyType
+	 *        	 					abstract = false
+	 *        	 					binding = Point.class
+	 *        	 					restrictions = EMPTY_SET
+	 *        	 					nillable = true
+	 *        	 				]
+	 *        	 			],
+	 *        	 			AttributeDescriptor (0, Integer.MAX_VALUE)[
+	 *        	 				type = ComplexType[
+	 *        	 					name = measurement
+	 *        	 					identified = true
+	 *        	 					super = null 
+	 *        	 					abstract = false
+	 *        	 					binding = null
+	 *        	 					restrictions = EMPTY_SET
+	 *        	 					nillable = true
+	 *        	 					descriptor = OrderedDescriptor(0, Integer.MAX_VALUE)[
+	 *        	 						AttributeDescriptor(1, 1)[
+	 *        	 							type = AttributeType[
+	 *        	 								name = determinand_description
+	 *        	 								identified = false
+	 *        	 								super = null 
+	 *        	 								abstract = false
+	 *        	 								binding = String.class
+	 *        	 								restrictions = EMPTY_SET
+	 *        	 								nillable = false
+	 *        	 							]
+	 *        	 						],
+	 *        	 						AttributeDescriptor(1, 1)[
+	 *        	 							type = AttributeType[
+	 *        	 								name = result
+	 *        	 								identified = false
+	 *        	 								super = null 
+	 *        	 								abstract = false
+	 *        	 								binding = String.class
+	 *        	 								restrictions = EMPTY_SET
+	 *        	 								nillable = false
+	 *        	 							]
+	 *        	 						]
+	 *        	 					]//OrderedDescriptor
+	 *        	 				] //ComplexType
+	 *        	 			], //measurement
+	 *        	 			AttributeDescriptor(0, 1)[
+	 *        	 				type = AttributeType[
+	 *        	 					name = project_no
+	 *        	 					identified = false
+	 *        	 					super = null 
+	 *        	 					abstract = false
+	 *        	 					binding = String.class
+	 *        	 					restrictions = EMPTY_SET
+	 *        	 					nillable = false
+	 *        	 				]
+	 *        	 			]
+	 *        	 		]
+	 *        	 	]
+	 *        	 ]	 
 	 * </code>
 	 * </pre>
 	 * 
@@ -130,8 +131,8 @@ public abstract class ComplexTestData extends TestCase {
 	 * @param descFactory
 	 * @return
 	 */
-	public static FeatureType createExample01Type(TypeFactory typeFactory,
-			DescriptorFactory descFactory) {
+	public static FeatureType createExample01MultiValuesComplexProperty(
+			TypeFactory typeFactory, DescriptorFactory descFactory) {
 		FeatureType wqPlusType;
 
 		/* direct contents of wq_plus type */
@@ -185,8 +186,8 @@ public abstract class ComplexTestData extends TestCase {
 	 * @param descFactory
 	 * @return
 	 */
-	public static FeatureType createExample02Type(TypeFactory typeFactory,
-			DescriptorFactory descFactory) {
+	public static FeatureType createExample02MultipleMultivalued(
+			TypeFactory typeFactory, DescriptorFactory descFactory) {
 		FeatureType wqPlusType;
 
 		/* direct contents of wq_plus type */
@@ -216,12 +217,38 @@ public abstract class ComplexTestData extends TestCase {
 	/**
 	 * A feature may have multiple geometries
 	 * 
+	 * <pre><code>
+	 * 	 &lt;xs:complexType name=&quot;measurement_Type&quot;&gt;
+	 * 	 &lt;xs:sequence&gt;
+	 * 	 &lt;xs:element name=&quot;determinand_description&quot; type=&quot;xs:string&quot;/&gt;
+	 * 	 &lt;xs:element name=&quot;result&quot; type=&quot;xs:string&quot;/&gt;
+	 * 	 &lt;/xs:sequence&gt;            
+	 * 	 &lt;xs:attribute ref=&quot;gml:id&quot; use=&quot;optional&quot;/&gt;
+	 * 	 &lt;/xs:complexType&gt; 
+	 * 	 
+	 * 	 &lt;xs:complexType name=&quot;wq_plus_Type&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+	 * 	 &lt;xs:complexContent&gt;
+	 * 	 &lt;xs:extension base=&quot;gml:AbstractFeatureType&quot;&gt;
+	 * 	 &lt;xs:sequence&gt;
+	 * 	 &lt;xs:element name=&quot;measurement&quot; maxOccurs=&quot;unbounded&quot; type=&quot;sco:measurement_Type&quot;/&gt;
+	 * 	 
+	 * 	 &lt;xs:element name=&quot;location&quot; type=&quot;gml:LocationPropertyType&quot;/&gt;
+	 * 	 &lt;xs:element name=&quot;nearestSlimePit&quot; type=&quot;gml:PointPropertyType&quot;/&gt; 
+	 * 	 &lt;xs:element name=&quot;sitename&quot; maxOccurs=&quot;unbounded&quot; nillable=&quot;false&quot; type=&quot;xs:string&quot; /&gt;
+	 * 	 &lt;/xs:sequence&gt;
+	 * 	 &lt;/xs:extension&gt;
+	 * 	 &lt;/xs:complexContent&gt;
+	 * 	 &lt;/xs:complexType&gt;
+	 * 	 
+	 * 	 &lt;xs:element name='wq_plus' type='sco:wq_plus_Type' substitutionGroup=&quot;gml:_Feature&quot; /&gt;
+	 * </code></pre>
+	 * 
 	 * @param typeFactory
 	 * @param descFactory
 	 * @return
 	 */
-	public static FeatureType createExample03Type(TypeFactory typeFactory,
-			DescriptorFactory descFactory) {
+	public static FeatureType createExample03MultipleGeometries(
+			TypeFactory typeFactory, DescriptorFactory descFactory) {
 		FeatureType wqPlusType;
 
 		/* direct contents of wq_plus type */
@@ -256,9 +283,133 @@ public abstract class ComplexTestData extends TestCase {
 		/* content descriptor of wq_plus */
 		schema = descFactory.ordered(wq_plusContent, 1, 1);
 
-		//use the second geometry attribute as the default one just for testing
-		wqPlusType = typeFactory.createFeatureType(name, schema, nearestSlimePit);
+		// use the second geometry attribute as the default one just for testing
+		wqPlusType = typeFactory.createFeatureType(name, schema,
+				nearestSlimePit);
 		return wqPlusType;
+	}
+
+	/**
+	 * 
+	 * @param typeFactory
+	 * @param descFactory
+	 * @return
+	 */
+	public static FeatureType createExample04Type(TypeFactory typeFactory,
+			DescriptorFactory descFactory) {
+		FeatureType wqPlusType;
+
+		/* direct contents of wq_plus type */
+		List<Descriptor> wq_plusContent = new ArrayList<Descriptor>();
+
+		AttributeType scoName = typeFactory.createType(
+				new QName(NSURI, "name"), String.class, false, true, null);
+		wq_plusContent.add(descFactory.node(scoName, 1, Integer.MAX_VALUE));
+
+		AttributeType gmlName = typeFactory.createType(new QName(GML_NSURI,
+				"name"), String.class, false, true, null);
+		wq_plusContent.add(descFactory.node(gmlName, 1, Integer.MAX_VALUE));
+
+		final QName name = new QName(NSURI, "wq_plus");
+		final Descriptor schema;
+		/* content descriptor of wq_plus */
+		schema = descFactory.ordered(wq_plusContent, 1, 1);
+
+		// use the second geometry attribute as the default one just for testing
+		wqPlusType = typeFactory.createFeatureType(name, schema, null);
+		return wqPlusType;
+	}
+
+	/**
+	 * Creates a FeatureType for the Road
+	 * 
+	 * <pre><code>
+	 *   	 &lt;xs:element name=&quot;roadRef&quot; type=&quot;sco:RoadPropertyType&quot;/&gt;
+	 *   	 &lt;xs:element name=&quot;junctionRef&quot; type=&quot;sco:JunctionPropertyType&quot;/&gt;
+	 *   
+	 *   	 &lt;xs:complexType name=&quot;RoadPropertyType&quot;&gt;
+	 *   	 &lt;xs:annotation&gt;
+	 *   	 &lt;xs:documentation&gt;Container for a road - follow gml:AssociationType pattern.&lt;/xs:documentation&gt;
+	 *   	 &lt;/xs:annotation&gt;
+	 *   	 &lt;xs:sequence minOccurs=&quot;0&quot;&gt;
+	 *   	 &lt;xs:element ref=&quot;sco:Road&quot; /&gt;
+	 *   	 &lt;/xs:sequence&gt;
+	 *   	 &lt;xs:attributeGroup ref=&quot;gml:AssociationAttributeGroup&quot; /&gt;
+	 *   	 &lt;/xs:complexType&gt;
+	 *   
+	 *   	 &lt;xs:complexType name=&quot;JunctionPropertyType&quot;&gt;
+	 *   	 &lt;xs:annotation&gt;
+	 *   	 &lt;xs:documentation&gt;Container for a junction - follow gml:AssociationType pattern.&lt;/xs:documentation&gt;
+	 *   	 &lt;/xs:annotation&gt;
+	 *   	 &lt;xs:sequence minOccurs=&quot;0&quot;&gt;
+	 *   	 &lt;xs:element ref=&quot;sco:Junction&quot; /&gt;
+	 *   	 &lt;/xs:sequence&gt;
+	 *   	 &lt;xs:attributeGroup ref=&quot;gml:AssociationAttributeGroup&quot; /&gt;
+	 *   	 &lt;/xs:complexType&gt;
+	 *   
+	 *   	 &lt;xs:complexType name=&quot;RoadType&quot;&gt;
+	 *   	 &lt;xs:complexContent&gt;
+	 *   	 &lt;xs:extension base=&quot;gml:AbstractFeatureType&quot;&gt;
+	 *   	 &lt;xs:sequence&gt;
+	 *   	 &lt;xs:element name=&quot;geom&quot; type=&quot;gml:CurvePropertyType&quot; minOccurs=&quot;0&quot; /&gt;
+	 *   	 &lt;xs:element ref=&quot;sco:junctionRef&quot; minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot; /&gt;
+	 *   	 &lt;/xs:sequence&gt;
+	 *   	 &lt;/xs:extension&gt;
+	 *   	 &lt;/xs:complexContent&gt;
+	 *   	 &lt;/xs:complexType&gt;
+	 *   
+	 *   	 &lt;xs:complexType name=&quot;JunctionType&quot;&gt;
+	 *   	 &lt;xs:complexContent&gt;
+	 *   	 &lt;xs:extension base=&quot;gml:AbstractFeatureType&quot;&gt;
+	 *   	 &lt;xs:sequence&gt;
+	 *   	 &lt;xs:element ref=&quot;sco:roadRef&quot; /&gt;
+	 *   	 &lt;xs:element name=&quot;direction&quot; type=&quot;xs:int&quot; /&gt;
+	 *   	 &lt;/xs:sequence&gt;
+	 *   	 &lt;/xs:extension&gt;
+	 *   	 &lt;/xs:complexContent&gt;
+	 *   	 &lt;/xs:complexType&gt;
+	 *   
+	 *   	 &lt;xs:element name='Junction' type='sco:JunctionType' substitutionGroup=&quot;gml:_Feature&quot; /&gt;
+	 *   	 &lt;xs:element name='Road' type='sco:RoadType' substitutionGroup=&quot;gml:_Feature&quot; /&gt;
+	 *   
+	 * </code></pre>
+	 * 
+	 */
+	/*
+	 * public static FeatureType createExample05RoadType(TypeFactory
+	 * typeFactory, DescriptorFactory descFactory) { List<Descriptor>
+	 * roadContents = new ArrayList<Descriptor>();
+	 * 
+	 * //create association type to reference junction QName junctionTypeName =
+	 * new QName(NSURI, "Junction"); AttributeType junctionReference =
+	 * typeFactory.createAssociationType(junctionTypeName);
+	 * 
+	 * List<Descriptor> junctionRefContents = new ArrayList<Descriptor>();
+	 * junctionRefContents.add(descFactory.node(junctionReference, 1, 1));
+	 * 
+	 * Descriptor junctionPropertySchema =
+	 * descFactory.ordered(junctionRefContents, 0, 1); ComplexType junctionRef =
+	 * typeFactory.createType(new QName("functionRef"), junctionPropertySchema);
+	 * 
+	 * 
+	 * //create junction type List<Descriptor> junctionContents = new ArrayList<Descriptor>();
+	 * 
+	 * FeatureType roadType = typeFactory.createFeatureType(new QName(NSURI),
+	 * roadSchema, null);
+	 * 
+	 * List<Descriptor>roadRefContents = new ArrayList<Descriptor>();
+	 * 
+	 * roadRefContents.add(descFactory.node(RoadType, 1, 1)); Descriptor
+	 * roadRefDesc = descFactory.ordered(roadRefContents, 0, 1); ComplexType
+	 * roadRef = typeFactory.createType(new QName(NSURI, "roadRef"),
+	 * roadRefDesc); AttributeType direction = typeFactory.createType(new
+	 * QName(NSURI, "direction"), Integer.class);
+	 * junctionContents.add(descFactory.node(direction, 1, 1)); }
+	 */
+
+	public static FeatureType createExample05JunctionType(
+			TypeFactory typeFactory, DescriptorFactory descFactory) {
+		return null;
 	}
 
 	public static ComplexType createMeasurementType(TypeFactory typeFactory,
@@ -278,13 +429,12 @@ public abstract class ComplexTestData extends TestCase {
 				masurementContents, 1, 1);
 
 		boolean IDENTIFIED = true;
-		Class BINDING = null;
 		boolean NILLABLE = true;
 		Set<Filter> RESTRICTIONS = null;
 
 		ComplexType measurement = typeFactory.createType(new QName(NSURI,
 				"measurement"), measurementContentsDescriptor, IDENTIFIED,
-				BINDING, NILLABLE, RESTRICTIONS);
+				NILLABLE, RESTRICTIONS);
 
 		return measurement;
 
@@ -315,7 +465,9 @@ public abstract class ComplexTestData extends TestCase {
 	public static AttributeType createGmlPoint(TypeFactory typeFactory,
 			DescriptorFactory descFactory) {
 		QName name = new QName(GML_NSURI, "PointPropertyType");
-		AttributeType type = typeFactory.createType(name, Point.class);
+		CoordinateReferenceSystem fakeCrs = new CoordinateReferenceSystem(){};
+		AttributeType type = typeFactory.createGeometryType(name, Point.class,
+				false, true, fakeCrs, null, null);
 		return type;
 	}
 

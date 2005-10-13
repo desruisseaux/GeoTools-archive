@@ -31,23 +31,27 @@ public class DescriptorFactoryImpl implements DescriptorFactory {
 	/**
 	 * If simple content returns SimpleDescriptorImpl, else OrderedImpl
 	 */
-	public OrderedDescriptor  ordered(List<Descriptor> sequence, int min, int max) {
-		if(min == 1 && max == 1){
-			List<AttributeDescriptor>simpleSequence = new ArrayList<AttributeDescriptor>(sequence.size());
-			for(Descriptor d : sequence){
-				if(d.getMinOccurs() != 1 || d.getMaxOccurs() != 1 || !(d instanceof AttributeDescriptor)){
+	public OrderedDescriptor ordered(List<Descriptor> sequence, int min, int max) {
+		if (min == 1 && max == 1) {
+			List<AttributeDescriptor> simpleSequence = new ArrayList<AttributeDescriptor>(
+					sequence.size());
+			for (Descriptor d : sequence) {
+				if (d.getMinOccurs() != 1 || d.getMaxOccurs() != 1
+						|| !(d instanceof AttributeDescriptor)) {
 					break;
 				}
-				AttributeDescriptor ad = (AttributeDescriptor)d;
-				if(ad.getType() instanceof ComplexType){
+				AttributeDescriptor ad = (AttributeDescriptor) d;
+				if (ad.getType() instanceof ComplexType) {
 					break;
 				}
-				if(simpleSequence.contains(ad)){
+				if (simpleSequence.contains(ad)) {
 					break;
 				}
 				simpleSequence.add(ad);
 			}
-			return new SimpleDescriptorImpl(simpleSequence);
+			if (simpleSequence.size() == sequence.size()) {
+				return new SimpleDescriptorImpl(simpleSequence);
+			}
 		}
 		return new OrderedImpl(sequence, min, max);
 	}

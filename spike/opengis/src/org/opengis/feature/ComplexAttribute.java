@@ -1,7 +1,8 @@
 package org.opengis.feature;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.namespace.QName;
 
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -27,31 +28,48 @@ public interface ComplexAttribute extends Attribute {
 	 * <p>
 	 * For a complex type, overrides {@linkplain Attribute#get()} to denote the
 	 * prescribed content type of a complex is a list of Attribute instances.
+	 * </p> *
+	 * <p>
+	 * Java Bean property conventions are used to indicate that this is part of
+	 * our data model.
 	 * </p>
 	 * 
 	 * @see types()
 	 * @see values()
 	 */
-	List<Attribute> get();
+	List<Attribute> getAttributes();
 
-	/*
-	 * * <p> Java Bean property conventions are used to indicate that this is
-	 * part of our data model. </p> 
-	 * List<Attribute> getAttributes();
+	/**
+	 * Access to attributes associated with name, in a similar fashion to DOM's
+	 * <code>Element.getElementsByTagName(name)</code>
+	 * <p>
+	 * This method acts as a precanned search of getAttribtues() based on
+	 * AttributeType, where type is determined by getType().type( name )
+	 * <ul>
+	 * <li>AttributeType by Descriptor 1:1 - it will return an Object of the
+	 * bound java class indicated by AttributeType
+	 * <li>AttributeType by Descriptor 0:* - it will return a possibly empty
+	 * List of the bound java class indicated by AttributeType
+	 * </p>
+	 * <p>
+	 * This method is not considered useful for accessing content with
+	 * multiplicity
+	 * 
+	 * @param name
+	 * @return Attribute, or List<Attribute> based on type
 	 */
+	public List<Attribute> getAttributes(String name);
+
+	public List<Attribute> getAttributes(QName name);
 
 	/**
 	 * Sets the complete contents of this Attribute, that must be valid against
 	 * the type's schema descriptor.
-	 * <p>
-	 * Note this is the only way of modifying the internal structure of a
-	 * complex type.
-	 * </p>
 	 * 
 	 * @param attribute
 	 * @throws IllegalArgumentException
 	 */
-	void set(List<Attribute> newValue);
+	void set(List<Attribute> newValue) throws IllegalArgumentException;
 
 	/**
 	 * List view of attribtue types, in a manner similar Map.keys().
@@ -78,6 +96,8 @@ public interface ComplexAttribute extends Attribute {
 	 * our data model.
 	 */
 	List<Object> values();
+
+	// void set(int index, Attribute value)throws IllegalArgumentException;
 
 	/**
 	 * Inserts the specified Attribute at the specified position in this
@@ -123,32 +143,13 @@ public interface ComplexAttribute extends Attribute {
 	 *             size()).
 	 */
 	public Attribute remove(int index);
-	
-	/**
-	 * Access to value associated with name.
-	 * <p>
-	 * This method acts as a precanned search of getAttribtues() based on
-	 * AttributeType, where type is determined by getType().type( name )
-	 * <ul>
-	 * <li>AttributeType by Descriptor 1:1 - it will return an Object of the
-	 * bound java class indicated by AttributeType
-	 * <li>AttributeType by Descriptor 0:* - it will return a possibly empty
-	 * List of the bound java class indicated by AttributeType
-	 * </p>
-	 * <p>
-	 * This method is not considered useful for accessing content with
-	 * multiplicity
-	 * 
-	 * @param name
-	 * @return Object, or List based on type
-	 * 
-	 * Object get( String name );
-	 */
+
 	/**
 	 * Access to value associated with type.
 	 * 
 	 * @param type
-	 * @return Object, or List based on schema referencing AttributeType
+	 * @return Attribute, or List&lt;Attribute&gt; based on schema referencing
+	 *         AttributeType
 	 */
 	Object get(AttributeType type);
 }

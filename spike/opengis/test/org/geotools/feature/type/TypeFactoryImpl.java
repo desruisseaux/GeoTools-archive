@@ -15,8 +15,6 @@ import org.geotools.feature.schema.NodeImpl;
 import org.geotools.feature.simple.SimpleDescriptorImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.geotools.filter.Filter;
-import org.opengis.feature.Feature;
-import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.Descriptor;
 import org.opengis.feature.schema.DescriptorFactory;
@@ -31,7 +29,6 @@ import org.opengis.feature.type.TypeFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
 
 public class TypeFactoryImpl implements TypeFactory {
 
@@ -97,6 +94,9 @@ public class TypeFactoryImpl implements TypeFactory {
 			CoordinateReferenceSystem crs = null;
 			if (metaData instanceof CoordinateReferenceSystem)
 				crs = (CoordinateReferenceSystem) metaData;
+			if(crs == null && (superType instanceof GeometryType)){
+				crs = ((GeometryType)superType).getCRS();
+			}
 			return new GeometryTypeImpl(name, binding, identified, nillable,
 					restrictions, superType, false, crs);
 		}
@@ -106,22 +106,21 @@ public class TypeFactoryImpl implements TypeFactory {
 		// abstract
 	}
 
-	public GeometryType createGeometryType(QName name,
-			Class binding, boolean nillable,
-			CoordinateReferenceSystem crs) {
+	public GeometryType createGeometryType(QName name, Class binding,
+			boolean nillable, CoordinateReferenceSystem crs) {
 		return createGeometryType(name, binding, false, nillable, crs, null,
 				null);
 	}
 
-	public GeometryType createGeometryType(QName name,
-			Class binding, boolean identified,
-			boolean nillable, CoordinateReferenceSystem crs,
-			Set<Filter> restrictions, GeometryType superType) {
+	public GeometryType createGeometryType(QName name, Class binding,
+			boolean identified, boolean nillable,
+			CoordinateReferenceSystem crs, Set<Filter> restrictions,
+			GeometryType superType) {
 
-		if(!Geometry.class.isAssignableFrom(binding)){
+		if (!Geometry.class.isAssignableFrom(binding)) {
 			throw new IllegalArgumentException("binding");
 		}
-		
+
 		return (GeometryType) createType(name, binding, identified, nillable,
 				restrictions, superType, crs);
 	}
@@ -155,7 +154,7 @@ public class TypeFactoryImpl implements TypeFactory {
 	 *      org.opengis.feature.schema.Descriptor)
 	 */
 	public ComplexTypeImpl createType(QName name, Descriptor schema) {
-		return createType(name, schema, false, null, false, null);
+		return createType(name, schema, false, false, null);
 	}
 
 	/**
@@ -164,10 +163,9 @@ public class TypeFactoryImpl implements TypeFactory {
 	 *      boolean, java.util.Set)
 	 */
 	public ComplexTypeImpl createType(QName name, Descriptor schema,
-			boolean identified, Class binding, boolean nillable,
-			Set<Filter> restrictions) {
-		return createType(name, schema, identified, binding, nillable,
-				restrictions, null, false);
+			boolean identified, boolean nillable, Set<Filter> restrictions) {
+		return createType(name, schema, identified, nillable, restrictions,
+				null, false);
 	}
 
 	/**
@@ -177,31 +175,26 @@ public class TypeFactoryImpl implements TypeFactory {
 	 *      boolean)
 	 */
 	public ComplexTypeImpl createType(QName name, Descriptor schema,
-			boolean identified, Class binding, boolean nillable,
-			Set<Filter> restrictions, ComplexType superType, boolean isAbstract) {
+			boolean identified, boolean nillable, Set<Filter> restrictions,
+			ComplexType superType, boolean isAbstract) {
 		checkNameValidity(name);
 		if (schema == null) {
 			throw new NullPointerException(
 					"A schema descriptor must be provided");
 		}
 
-		if (binding != null) {
-			if (FeatureCollection.class.isAssignableFrom(binding)) {
-				throw new UnsupportedOperationException(
-						"needs to implement featurecollection creation");
-			} else if (Feature.class.isAssignableFrom(binding)) {
-				if (!(superType instanceof FeatureType))
-					throw new IllegalArgumentException(
-							"Feature binding implies a FeatureType super type, got "
-									+ superType);
+		if (superType != null) {
+			if (superType instanceof FeatureCollectionType) {
+				return createFeatureCollectionType(name, null, schema, null,
+						restrictions, (FeatureCollectionType) superType,
+						isAbstract);
+			} else if (superType instanceof FeatureType) {
 				return createFeatureType(name, schema, null, restrictions,
 						(FeatureType) superType, isAbstract);
 			}
 		}
-
-		return new ComplexTypeImpl(name, schema, identified, binding, nillable,
-				restrictions);
-
+		return new ComplexTypeImpl(name, schema, identified, nillable,
+				restrictions, superType, isAbstract);
 	}
 
 	/**
@@ -382,7 +375,7 @@ public class TypeFactoryImpl implements TypeFactory {
 	 *            wether the created FeatureCollectionType is abstract.
 	 * @return
 	 */
-	public FeatureCollectionType createFeatureCollectionType(QName name,
+	public FeatureCollectionTypeImpl createFeatureCollectionType(QName name,
 			Set<FeatureType> membersTypes, Descriptor schema,
 			GeometryType defaultGeom, Set<Filter> restrictions,
 			FeatureCollectionType<?> superType, boolean isAbstract) {
@@ -426,7 +419,7 @@ public class TypeFactoryImpl implements TypeFactory {
 			schema = helper.subtype(superType.getDescriptor(), schema);
 		}
 
-		final FeatureCollectionType type;
+		final FeatureCollectionTypeImpl type;
 
 		type = new FeatureCollectionTypeImpl(name, members, schema,
 				defaultGeom, restrictions, superType, isAbstract);

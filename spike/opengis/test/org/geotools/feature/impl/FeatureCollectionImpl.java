@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.geotools.filter.Filter;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
@@ -192,7 +194,18 @@ public class FeatureCollectionImpl extends AbstractCollection<Feature>
 		throw new UnsupportedOperationException();
 	}
 
-	public List<Attribute> get() {
+	public List<Attribute> getAttributes() {
+		return delegate.getAttributes();
+	}
+	
+	public List<Attribute> getAttributes(String name) {
+		return delegate.getAttributes(name);
+	}
+	public List<Attribute> getAttributes(QName name) {
+		return delegate.getAttributes(name);
+	}
+
+	public Object get(){
 		return delegate.get();
 	}
 

@@ -68,7 +68,27 @@ public class AttributeTypeImpl implements AttributeType {
 		return ABSTRACT;
 	}
 	
-    /**
+
+	public String toString(){
+		StringBuffer sb = new StringBuffer(getClass().getSimpleName());
+		sb.append("[name=")
+		.append(NAME)
+		.append(", binding=,")
+		.append(BINDING)
+		.append(", abstrsct=, ")
+		.append(ABSTRACT)
+		.append(", nillable=")
+		.append(NILLABLE)
+		.append(", identified=")
+		.append(IDENTIFIED)
+		.append(", restrictions=")
+		.append(RESTRICTIONS)
+		.append(", superType=")
+		.append(SUPER)
+		.append("]");
+		return sb.toString();
+	}
+	/**
      * Override of hashCode.
      *
      * @return hashCode for this object.

@@ -282,11 +282,13 @@ public class OrderedImplTest extends TestCase {
 		List<Attribute> contents = new ArrayList<Attribute>();
 
 		//Sequence is:
+		// <xs:sequence minOccurs="0" maxOccurs="unbounded">
 		// <xs:element name="s1" type="xs:string"/>
 		// <xs:element name="i1" type="xs:int" maxOccurs="2"/>
 		// <xs:element name="s1" type="xs:string" minOccurs="0"
 		// maxOccurs="unbounded"/>
 		// <xs:element name="i2" type="xs:int"/>
+		// </xs:sequence>
 
 		//first occurrence of the sequence
 		contents.add(attf.create(s1, null,  "s1_1_1"));

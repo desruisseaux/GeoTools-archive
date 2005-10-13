@@ -62,11 +62,13 @@ public interface TypeFactory {
 	AttributeType createType(QName name, Class binding, boolean identified,
 			boolean nillable, Set<Filter> restrictions, AttributeType superType);
 
-	GeometryType createGeometryType(QName name, Class binding, boolean nillable, 
-			CoordinateReferenceSystem crs);
+	GeometryType createGeometryType(QName name, Class binding,
+			boolean nillable, CoordinateReferenceSystem crs);
 
-	GeometryType createGeometryType(QName name, Class binding, boolean identified,
-			boolean nillable, CoordinateReferenceSystem crs, Set<Filter> restrictions, GeometryType superType);
+	GeometryType createGeometryType(QName name, Class binding,
+			boolean identified, boolean nillable,
+			CoordinateReferenceSystem crs, Set<Filter> restrictions,
+			GeometryType superType);
 
 	/**
 	 * 
@@ -89,20 +91,18 @@ public interface TypeFactory {
 	 * @param name
 	 * @param schema
 	 * @param identified
-	 * @param binding
 	 * @param nillable
 	 * @param restrictions
 	 * @return
 	 */
 	ComplexType createType(QName name, Descriptor schema, boolean identified,
-			Class binding, boolean nillable, Set<Filter> restrictions);
+			boolean nillable, Set<Filter> restrictions);
 
 	/**
 	 * 
 	 * @param name
 	 * @param schema
 	 * @param identified
-	 * @param binding
 	 * @param nillable
 	 * @param restrictions
 	 * @param superType
@@ -110,8 +110,8 @@ public interface TypeFactory {
 	 * @return
 	 */
 	ComplexType createType(QName name, Descriptor schema, boolean identified,
-			Class binding, boolean nillable, Set<Filter> restrictions,
-			ComplexType superType, boolean isAbstract);
+			boolean nillable, Set<Filter> restrictions, ComplexType superType,
+			boolean isAbstract);
 
 	/**
 	 * 

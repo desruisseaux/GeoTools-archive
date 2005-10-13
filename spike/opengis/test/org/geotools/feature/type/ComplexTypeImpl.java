@@ -14,42 +14,46 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 
 public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
-	
+
 	protected final Descriptor SCHEMA;
-	
-	public ComplexTypeImpl( String name, Descriptor schema){
-		this( new QName( name), schema );
+
+	public ComplexTypeImpl(String name, Descriptor schema) {
+		this(new QName(name), schema);
 	}
-	public ComplexTypeImpl( QName name, Descriptor schema){
-		super( name, null );
+
+	public ComplexTypeImpl(QName name, Descriptor schema) {
+		super(name, null);
 		SCHEMA = schema;
 	}
-	public ComplexTypeImpl(QName name, 
-						Descriptor schema, 
-						boolean identified, 
-						Class/*<? extends List<? extends Attribute>>*/ binding, 
-						boolean nillable, 
-						Set<Filter> restrictions){
-		super(name, binding, identified, nillable, restrictions );
-		SCHEMA = schema;
-	}	
-	public ComplexTypeImpl(QName name, Descriptor schema, boolean identified, Class binding, boolean nillable, Set<Filter> restrictions, ComplexType superType, boolean isAbstract){
-		super(name, binding, identified, nillable, restrictions, superType, isAbstract );
+
+	public ComplexTypeImpl(QName name, Descriptor schema, boolean identified,
+			boolean nillable, Set<Filter> restrictions) {
+		super(name, List.class, identified, nillable, restrictions);
 		SCHEMA = schema;
 	}
+
+	public ComplexTypeImpl(QName name, Descriptor schema, boolean identified,
+			boolean nillable, Set<Filter> restrictions, ComplexType superType,
+			boolean isAbstract) {
+		super(name, List.class, identified, nillable, restrictions, superType,
+				isAbstract);
+		SCHEMA = schema;
+	}
+
 	public ComplexType getSuper() {
 		return (ComplexType) SUPER;
 	}
+
 	public Descriptor getDescriptor() {
 		return SCHEMA;
 	}
 
 	public Collection<AttributeType> types() {
-		return Descriptors.types( SCHEMA );
+		return Descriptors.types(SCHEMA);
 	}
 
 	public AttributeType type(String name) {
-		return Descriptors.type( SCHEMA, name );
+		return Descriptors.type(SCHEMA, name);
 	}
 
 }

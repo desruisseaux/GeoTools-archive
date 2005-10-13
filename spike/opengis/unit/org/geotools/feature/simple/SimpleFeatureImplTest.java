@@ -260,18 +260,18 @@ public class SimpleFeatureImplTest extends TestCase {
 	public void testAttributeAccess() throws Exception {
 		// this ones kinda silly
 		SimpleFeature f = (SimpleFeature) SampleFeatureFixtures.createFeature();
-		List<Attribute> atts = f.get();
+		List<Attribute> atts = f.getAttributes();
 
 		for (int i = 0, ii = atts.size(); i < ii; i++) {
 			Object expected = atts.get(i).get();
 			assertEquals(expected, f.get(i));
 		}
 
-		List<Attribute> attsAgain = f.get();
+		List<Attribute> attsAgain = f.getAttributes();
 		assertTrue(atts != attsAgain);
 
 		f.set(atts);
-		attsAgain = f.get();
+		attsAgain = f.getAttributes();
 		assertTrue(atts != attsAgain);
 
 		for (int i = 0, ii = atts.size(); i < ii; i++) {

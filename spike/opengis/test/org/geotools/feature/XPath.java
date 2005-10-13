@@ -1,5 +1,6 @@
 package org.geotools.feature;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.commons.jxpath.JXPathContext;
@@ -8,8 +9,16 @@ import org.geotools.feature.impl.AttributeImpl;
 import org.geotools.feature.impl.ComplexAttributeImpl;
 import org.geotools.feature.impl.FeatureImpl;
 import org.geotools.feature.simple.SimpleFeatureImpl;
+import org.geotools.feature.simple.SimpleFeatureTypeImpl;
+import org.geotools.feature.type.AttributeTypeImpl;
+import org.geotools.feature.type.ComplexTypeImpl;
+import org.geotools.feature.type.FeatureCollectionTypeImpl;
+import org.geotools.feature.type.FeatureTypeImpl;
+import org.geotools.feature.type.GeometryTypeImpl;
 import org.geotools.feature.xpath.AttributePropertyHandler;
+import org.geotools.feature.xpath.AttributeTypePropertyHandler;
 import org.opengis.feature.Attribute;
+import org.opengis.feature.type.AttributeType;
 
 /**
  * Utility class to evaluate XPath expressions against an Attribute instance,
@@ -42,6 +51,30 @@ public class XPath {
 				AttributePropertyHandler.class);
 		LOGGER.finer("Registered " + AttributePropertyHandler.class.getName()
 				+ " to handle geotools Attribute xpath expressions");
+		
+		
+		JXPathIntrospector.registerDynamicClass(AttributeTypeImpl.class,
+				AttributeTypePropertyHandler.class);
+		JXPathIntrospector.registerDynamicClass(ComplexTypeImpl.class,
+				AttributeTypePropertyHandler.class);
+		JXPathIntrospector.registerDynamicClass(GeometryTypeImpl.class,
+				AttributeTypePropertyHandler.class);
+		JXPathIntrospector.registerDynamicClass(FeatureTypeImpl.class,
+				AttributeTypePropertyHandler.class);
+		JXPathIntrospector.registerDynamicClass(SimpleFeatureTypeImpl.class,
+				AttributeTypePropertyHandler.class);
+		JXPathIntrospector.registerDynamicClass(FeatureCollectionTypeImpl.class,
+				AttributeTypePropertyHandler.class);
+		LOGGER.finer("Registered " + AttributeTypePropertyHandler.class.getName()
+				+ " to handle geotools AttributeType xpath expressions");
+	}
+
+	public static Object get(final AttributeType type, final String xpathExpression) {
+		JXPathContext ctx = JXPathContext.newContext(type);
+
+		Object retVal = ctx.getValue(xpathExpression);
+
+		return retVal;
 	}
 
 	/**
@@ -63,6 +96,18 @@ public class XPath {
 	 */
 	public static Object get(final Attribute att, final String xpathExpression) {
 		JXPathContext ctx = JXPathContext.newContext(att);
+
+		Object retVal = ctx.getValue(xpathExpression);
+
+		return retVal;
+	}
+
+	public static Object get(final Map<String, String>namesapces, final Attribute att, final String xpathExpression) {
+		JXPathContext ctx = JXPathContext.newContext(att);
+
+		for(Map.Entry<String, String> e : namesapces.entrySet()){
+			ctx.registerNamespace(e.getKey(), e.getValue());
+		}
 
 		Object retVal = ctx.getValue(xpathExpression);
 

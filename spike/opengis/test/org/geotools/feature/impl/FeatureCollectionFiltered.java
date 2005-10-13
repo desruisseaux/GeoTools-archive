@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.xml.namespace.QName;
+
 import jj2000.j2k.NotImplementedError;
 
 import org.geotools.filter.Filter;
@@ -98,10 +100,22 @@ public class FeatureCollectionFiltered implements FeatureCollection {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<Attribute> get() {
-		return collection.get();
+	public List<Attribute> getAttributes() {
+		return collection.getAttributes();
 	}
 
+	public List<Attribute> getAttributes(String name) {
+		return collection.getAttributes(name);
+	}
+	
+	public List<Attribute> getAttributes(QName name) {
+		return collection.getAttributes(name);
+	}
+
+	public Object get(){
+		return collection.get();
+	}
+	
 	public void set(List<Attribute> attributes) {
 		collection.set(attributes);
 	}

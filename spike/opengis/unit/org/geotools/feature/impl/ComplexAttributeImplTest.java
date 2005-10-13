@@ -92,7 +92,8 @@ public class ComplexAttributeImplTest extends TestCase {
 
 
 	/**
-	 * 
+	 * tests ComplexAttributeImple.types():List<AttributeType> is actually
+	 * a types view of the current contents of a complex
 	 */
 	public void testTypes() {
 		ComplexAttributeImpl att = new ComplexAttributeImpl(null, measurementType);
@@ -118,19 +119,26 @@ public class ComplexAttributeImplTest extends TestCase {
 		atts.add(descFactory.node(determinantType, 0, Integer.MAX_VALUE));
 		atts.add(descFactory.node(resultType, 1, Integer.MAX_VALUE));
 		Descriptor descriptor = descFactory.ordered(atts, 1, 1);
+		
+		
 		//now it can contain 0:* determinants followed by 1:* results.
 		//not pretty, but useful for this test pourposes
 		measurementType = typeFactory.createType("test", descriptor);
+		att = new ComplexAttributeImpl(null, measurementType);
 		
 		testContents.clear();
 		testContents.add(attFactory.create(determinantType, null, "det1"));
 		testContents.add(attFactory.create(determinantType, null, "det2"));
 		testContents.add(attFactory.create(determinantType, null, "det3"));
+		testContents.add(attFactory.create(resultType, null, "1"));
 		
 		att.set(testContents);
 		typesView = att.types();
-		assertEquals(3, typesView.size());
-		assertFalse(typesView.contains(resultType));
+		assertEquals(4, typesView.size());
+		assertEquals(determinantType, typesView.get(0));
+		assertEquals(determinantType, typesView.get(1));
+		assertEquals(determinantType, typesView.get(2));
+		assertEquals(resultType, typesView.get(3));
 	}
 
 	/**
@@ -164,14 +172,21 @@ public class ComplexAttributeImplTest extends TestCase {
 		//not pretty, but useful for this test pourposes
 		measurementType = typeFactory.createType("test", descriptor);
 		
+		att = new ComplexAttributeImpl(null, measurementType);
+		
 		testContents.clear();
 		testContents.add(attFactory.create(determinantType, null, "det1"));
 		testContents.add(attFactory.create(determinantType, null, "det2"));
 		testContents.add(attFactory.create(determinantType, null, "det3"));
+		testContents.add(attFactory.create(resultType, null, "1"));
 		
 		att.set(testContents);
 		valuesView = att.values();
-		assertEquals(3, valuesView.size());
+		assertEquals(4, valuesView.size());
+		assertEquals("det1", valuesView.get(0));
+		assertEquals("det2", valuesView.get(1));
+		assertEquals("det3", valuesView.get(2));
+		assertEquals("1", valuesView.get(3));
 	}
 
 	/**
@@ -179,14 +194,14 @@ public class ComplexAttributeImplTest extends TestCase {
 	 */
 	public void testGet() {
 		ComplexAttributeImpl att = new ComplexAttributeImpl(null, measurementType);
-		assertNotNull(att.get());
-		assertEquals(0, att.get().size());
+		assertNotNull(att.getAttributes());
+		assertEquals(0, att.getAttributes().size());
 		
 		att.set(testContents);
 		
-		assertNotNull(att.get());
-		assertNotSame(testContents, att.get());
-		assertEquals(testContents, att.get());
+		assertNotNull(att.getAttributes());
+		assertNotSame(testContents, att.getAttributes());
+		assertEquals(testContents, att.getAttributes());
 	}
 
 	/**
@@ -274,11 +289,13 @@ public class ComplexAttributeImplTest extends TestCase {
 		//now it can contain 0:* determinants followed by 1:* results.
 		//not pretty, but useful for this test pourposes
 		measurementType = typeFactory.createType("test", descriptor);
+		att = new ComplexAttributeImpl(measurementType);
 		
 		testContents.clear();
 		testContents.add(attFactory.create(determinantType, null, "det1"));
 		testContents.add(attFactory.create(determinantType, null, "det2"));
 		testContents.add(attFactory.create(determinantType, null, "det3"));
+		testContents.add(attFactory.create(resultType, null, "1"));
 		
 		att = new ComplexAttributeImpl(null, measurementType);
 		att.set(testContents);
@@ -286,7 +303,7 @@ public class ComplexAttributeImplTest extends TestCase {
 		Object values = att.get(resultType);
 		assertNotNull(values);
 		assertTrue(values instanceof List);
-		assertEquals(0, ((List)values).size());
+		assertEquals(1, ((List)values).size());
 		
 		values = att.get(determinantType);
 		assertEquals(3, ((List)values).size());

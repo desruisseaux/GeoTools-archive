@@ -18,9 +18,11 @@ package org.geotools.filter;
 
 import java.util.logging.Logger;
 
+import org.geotools.feature.Descriptors;
 import org.geotools.feature.Types;
 import org.geotools.feature.XPath;
 import org.opengis.feature.Attribute;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 
 
@@ -41,14 +43,14 @@ public class AttributeExpressionImpl extends DefaultExpression
     protected String attPath;
 
     /** Holds all sub filters of this filter. */
-    protected FeatureType schema = null;
+    protected AttributeType schema = null;
 
     /**
      * Constructor with the schema for this attribute.
      *
      * @param schema The schema for this attribute.
      */
-    protected AttributeExpressionImpl(FeatureType schema) {
+    protected AttributeExpressionImpl(AttributeType schema) {
         this.schema = schema;
         this.expressionType = ATTRIBUTE;
     }
@@ -62,7 +64,7 @@ public class AttributeExpressionImpl extends DefaultExpression
      * @throws IllegalFilterException If the attribute path is not in the
      *         schema.
      */
-    protected AttributeExpressionImpl(FeatureType schema, String attPath)
+    protected AttributeExpressionImpl(AttributeType schema, String attPath)
         throws IllegalFilterException {
         this.schema = schema;
         this.expressionType = ATTRIBUTE;
@@ -82,7 +84,8 @@ public class AttributeExpressionImpl extends DefaultExpression
         LOGGER.finest("schema: " + schema + "\n\nattribute: " + attPath);
 
         if (schema != null) {
-        	if(schema.type(attPath) != null){
+        	//if(schema.type(attPath) != null){
+        	if(XPath.get(schema, attPath)  != null){
         		this.attPath = attPath;
         	}else{
                 throw new IllegalFilterException(

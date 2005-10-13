@@ -6,15 +6,6 @@ import org.opengis.feature.type.AttributeType;
 public interface Attribute {
 
 	/**
-	 * Access name from AttributeType, derrived property does not use Java Bean
-	 * conventions
-	 * 
-	 * @return getType().getName().toString()
-	 *
-	String name();
-     */
-
-	/**
 	 * Indicate the AttributeType of this content.
 	 * 
 	 * @return AttributeType information descirbing allowable content
@@ -40,5 +31,5 @@ public interface Attribute {
 	 * @param newValue
 	 *            Must be of type indicated by type()
 	 */
-	void set(Object newValue);
+	void set(Object newValue)throws IllegalArgumentException;
 }

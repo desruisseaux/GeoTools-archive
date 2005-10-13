@@ -1,7 +1,9 @@
 package org.opengis.feature.type;
 
 import java.util.Collection;
+import java.util.List;
 
+import org.opengis.feature.Attribute;
 import org.opengis.feature.schema.Descriptor;
 
 /**
@@ -10,7 +12,7 @@ import org.opengis.feature.schema.Descriptor;
  *
  * @param <T>
  */
-public interface ComplexType<T> extends AttributeType<T> {
+public interface ComplexType<T/* extends List<Attribute>*/> extends AttributeType<T> {
 	/**
 	 * Java class bound to this complex type.
 	 * <p>

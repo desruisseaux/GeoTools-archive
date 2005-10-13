@@ -30,4 +30,5 @@ public class GeometryTypeImpl extends AttributeTypeImpl implements GeometryType 
 	public CoordinateReferenceSystem getCRS(){
 		return CRS;
 	}
+	
 }

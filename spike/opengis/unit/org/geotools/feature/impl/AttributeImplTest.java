@@ -257,12 +257,14 @@ public class AttributeImplTest extends TestCase {
 		
 		try{
 			att.validate(new Integer(1));
+			fail("should not validate");
 		}catch(IllegalArgumentException e){
 			LOGGER.info("validation ok: " + e.getMessage());
 		}
 		
 		try{
 			att.validate(new Integer(9));
+			fail("should not validate");
 		}catch(IllegalArgumentException e){
 			LOGGER.info("validation ok: " + e.getMessage());
 		}
@@ -272,22 +274,6 @@ public class AttributeImplTest extends TestCase {
 		att.validate(new Integer(4));
 		att.validate(new Integer(5));
 		att.validate(new Integer(6));
-		
-		/*
-		FilterFactory ff = FilterFactory.createFilterFactory();
-		
-		CompareFilter gte = ff.createCompareFilter(FilterType.COMPARE_GREATER_THAN_EQUAL);
-		gte.addLeftValue(ff.createAttributeExpression(testType));
-		gte.addRightValue(ff.createLiteralExpression(3));
-		
-		restrictions.add(gte);
-
-		CompareFilter lt = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN);
-		gte.addLeftValue(ff.createAttributeExpression(testType));
-		gte.addRightValue(ff.createLiteralExpression(7));
-		
-		restrictions.add(lt);
-		*/
 	}
 
 }

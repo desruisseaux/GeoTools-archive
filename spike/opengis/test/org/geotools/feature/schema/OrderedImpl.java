@@ -30,7 +30,7 @@ public class OrderedImpl extends AbstractDescriptor implements
 		this(sequence, 1, max);
 	}
 
-	public OrderedImpl(List<Descriptor> sequence, int min, int max) {
+	public OrderedImpl(List<? extends Descriptor> sequence, int min, int max) {
 		super(min, max);
 		this.sequence = new ArrayList<Descriptor>(sequence);
 		for (Descriptor desc : this.sequence) {
@@ -42,7 +42,7 @@ public class OrderedImpl extends AbstractDescriptor implements
 		}
 	}
 
-	public List<Descriptor> sequence() {
+	public List<? extends Descriptor> sequence() {
 		return sequence;
 	}
 

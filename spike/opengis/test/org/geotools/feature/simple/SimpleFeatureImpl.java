@@ -112,7 +112,7 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
 	 * @param value
 	 */
 	public void set(int index, Object value) {
-		List<Attribute> contents = super.get();
+		List<Attribute> contents = super.getAttributes();
 		Attribute attribute = contents.get(index);
 		attribute.set(value);
 	}
