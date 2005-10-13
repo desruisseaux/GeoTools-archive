@@ -31,19 +31,33 @@
 	</goal>
 
 	<goal name="test:test">
-		<!-- determine if we are on/offline -->
 		<j:choose>
-			<j:when test="${maven.mode.online}">
-				<!-- online, run all tests -->
-					<attainGoal name="test:match"/>
+			<!-- dont run tests if maven.test.skip is set -->
+			<j:when test="${maven.test.skip}">
+				<j:set var="testmatchpattern" value=""/>
+				<attainGoal name="test:match"/>
 			</j:when>
 			<j:otherwise>
-				<!-- offline, exclude OnlineTests -->
-					<j:set var="testnotmatchpattern" value="**/*OnlineTest.*,**/*StressTest.*,**/Geot553Test.*"/>
-					<attainGoal name="test:match"/>
+				<j:set var="testmatchpattern" value="**/*Test.*"/>
+				<j:set var="excludes" value=""/>
+		 		<j:forEach var="exclude" items="${pom.build.unitTest.excludes}">
+					<j:set var="excludes" value="${excludes},${exclude}"/>
+				</j:forEach>
+		    <!-- determine if we are on/offline -->
+		    <j:choose>
+		      <j:when test="${maven.mode.online}">
+		        <!-- online, run all tests -->
+		      </j:when>
+		      <j:otherwise>
+		        <!-- offline, exclude OnlineTests -->
+		          <j:set var="excludes" value="${excludes},**/*OnlineTest.*,**/*StressTest.*,**/Geot553Test.*"/>
+		      </j:otherwise>
+		    </j:choose>
+				<j:set var="testnotmatchpattern" value="${excludes}"/>
+		     <attainGoal name="test:match"/>
 			</j:otherwise>
 		</j:choose>
-	</goal>
+  </goal>
 
 	<preGoal name="checkstyle:init">
 		<echo>preGoal in maven.xml is fudging checkstyle to use geotools config settings</echo>
