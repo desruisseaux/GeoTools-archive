@@ -1,18 +1,12 @@
 package org.geotools.feature.schema;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.geotools.feature.Descriptors;
-import org.opengis.feature.Attribute;
-import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.schema.AllDescriptor;
 import org.opengis.feature.schema.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
 
 /**
  * Implementation of AllDescriptor.
@@ -82,50 +76,5 @@ public class AllImpl extends AbstractDescriptor implements AllDescriptor {
 		AllImpl d = (AllImpl) o;
 		boolean sameContent = this.all.equals(d.all);
 		return sameContent;
-	}
-
-	public void validate(List<Attribute> content) throws NullPointerException,
-			IllegalArgumentException {
-		if (content == null) {
-			throw new NullPointerException("content");
-		}
-
-		List<AttributeType> usedTypes = new ArrayList<AttributeType>();
-		List<AttributeType> allowedTypes = Descriptors.types(this);
-		int index = 0;
-		for (Attribute att : content) {
-			// att shall not be null
-			checkAttIsNotNull(index, att);
-			// and has to be of one of the allowed types
-			checkAttIsOfAllowedType(allowedTypes, index, att);
-			AttributeType type = att.getType();
-
-			// cannot be more than one instance of its type
-			// (shortcut to multiplicity rangecheck)
-			if (usedTypes.contains(type)) {
-				throw new IllegalArgumentException("Attribute of type "
-						+ type.getName() + " encountered more than once.");
-			}
-			usedTypes.add(type);
-
-			index++;
-		}
-		// and the multiplicity specified in each AttributeDescriptor respected
-		for (AttributeDescriptor node : this.all) {
-			int min = node.getMinOccurs();
-			int max = node.getMaxOccurs();
-			AttributeType expectedType = node.getType();
-			if (max == 0 && usedTypes.contains(expectedType)) {
-				throw new IllegalArgumentException(
-						expectedType.getName()
-								+ " was fund, thus it is not allowed since maxOccurs is set to 0");
-			}
-			if (min == 1 && !usedTypes.contains(expectedType)) {
-				throw new IllegalArgumentException(
-						expectedType.getName()
-								+ " was not fund, thus it have to since minOccurs is set to 1");
-			}
-		}
-
 	}
 }

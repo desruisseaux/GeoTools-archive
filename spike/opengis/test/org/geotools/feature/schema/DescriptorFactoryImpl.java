@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.feature.Descriptors;
 import org.geotools.feature.simple.SimpleDescriptorImpl;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.Descriptor;

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.opengis.feature.Attribute;
 import org.opengis.feature.schema.Descriptor;
-import org.opengis.feature.type.AttributeType;
 
 public abstract class AbstractDescriptor implements Descriptor {
 	protected int minOccurs;
@@ -50,13 +49,13 @@ public abstract class AbstractDescriptor implements Descriptor {
 	}
 
 	/**
-	 * Calculates hashCode based on min and max occurs.
-	 * Subclases may use it and extend with their own contents
+	 * Calculates hashCode based on min and max occurs. Subclases may use it and
+	 * extend with their own contents
 	 */
-	public int hashCode(){
+	public int hashCode() {
 		return 17 + (37 * minOccurs + 37 * maxOccurs);
 	}
-	
+
 	public boolean equals(Object o) {
 		if (!(o instanceof AbstractDescriptor))
 			return false;
@@ -64,30 +63,8 @@ public abstract class AbstractDescriptor implements Descriptor {
 		return minOccurs == d.minOccurs && maxOccurs == d.maxOccurs;
 	}
 
-	/**
-	 * @param allowedTypes
-	 * @param index
-	 * @param att
-	 * @return
-	 * @throws IllegalArgumentException
-	 */
-	protected static void checkAttIsOfAllowedType(
-			List<AttributeType> allowedTypes, int index, Attribute att)
-			throws IllegalArgumentException {
-		AttributeType type = att.getType();
-		if (!allowedTypes.contains(type)) {
-			throw new IllegalArgumentException("Attribute of type "
-					+ type.getName() + " found at index " + index
-					+ " but this type is not allowed by this descriptor");
-		}
-	}
-
-	protected static void checkAttIsNotNull(int index, Attribute att) {
-		if (att == null) {
-			throw new NullPointerException(
-					"Attribute at index "
-							+ index
-							+ " is null. Attributes can't be null. Do you mean Attribute.get() == null?");
-		}
+	public void validate(List<Attribute> content) throws NullPointerException,
+			IllegalArgumentException {
+		DescriptorValidator.validate(this, content);
 	}
 }

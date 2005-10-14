@@ -1,8 +1,5 @@
 package org.geotools.feature.schema;
 
-import java.util.List;
-
-import org.opengis.feature.Attribute;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 
@@ -25,7 +22,7 @@ public class NodeImpl extends AbstractDescriptor implements AttributeDescriptor 
 		TYPE = type;
 	}
 
-	public AttributeType getType() {
+	public AttributeType<?> getType() {
 		return TYPE;
 	}
 	
@@ -43,8 +40,4 @@ public class NodeImpl extends AbstractDescriptor implements AttributeDescriptor 
 		return this.TYPE.equals(d.TYPE);
 	}	
 	
-	public void validate(List<Attribute> content) throws NullPointerException,
-	IllegalArgumentException {
-		//no-op
-	}
 }

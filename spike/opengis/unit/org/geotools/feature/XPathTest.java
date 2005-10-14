@@ -2,7 +2,6 @@ package org.geotools.feature;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -62,10 +61,6 @@ public class XPathTest extends TestCase {
 
 		val = XPath.get(simpleAtt, ".");
 		assertEquals(simpleAtt, val);
-
-	}
-
-	public void testNestedGetValue() {
 
 	}
 
@@ -167,23 +162,6 @@ public class XPathTest extends TestCase {
 		assertEquals(complex, val);
 	}
 
-	/*
-	 * public void testSimpleFeatureSetValue(){
-	 * 
-	 * FeatureXPath.setValue(simpleFeature, "oid", "newId");
-	 * assertEquals("newId", simpleFeature.getAttribute("oid"));
-	 * 
-	 * FeatureXPath.setValue(simpleFeature, "number", new Integer(2));
-	 * assertEquals(new Integer(2), simpleFeature.getAttribute("number"));
-	 * 
-	 * Point newPoint = new GeometryFactory().createPoint(new Coordinate(2,
-	 * -2)); FeatureXPath.setValue(simpleFeature, "the_geom", newPoint);
-	 * assertEquals(2D, ((Point)simpleFeature.getAttribute("the_geom")).getX(),
-	 * 0); assertEquals(-2D,
-	 * ((Point)simpleFeature.getAttribute("the_geom")).getY(), 0);
-	 *  }
-	 */
-
 	/**
 	 * Creates a simple feature with the following characteristics:
 	 * <p>
@@ -224,10 +202,5 @@ public class XPathTest extends TestCase {
 				-1)));
 		return f;
 	}
-
-	/*
-	 * private static Feature createComplexFeature(){
-	 *  }
-	 */
 
 }

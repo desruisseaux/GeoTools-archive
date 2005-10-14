@@ -62,12 +62,21 @@ public class NodeImplTest extends TestCase {
 		assertEquals(5, node.getMinOccurs());
 		assertEquals(100, node.getMaxOccurs());
 	}
-	/*
+	
+	/**
+	 * AttributeDescriptor represents the "simple" content model, so for AttributeDescriptor
+	 * <code>validate()</code> is a no-op.
+	 * 
 	 * Test method for 'org.geotools.feature.schema.NodeImpl.validate(List<Attribute>)'
 	 */
 	public void testValidate() {
 		NodeImpl node = new NodeImpl(ComplexTestData.createGmlLocation(typeFactory, descFactory));
-		node.validate(null);
+		try{
+			node.validate(null);
+			fail("allowed null type");
+		}catch(NullPointerException e){
+			//OK
+		}
 	}
 
 }

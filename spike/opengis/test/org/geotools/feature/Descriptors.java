@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.feature.schema.AllImpl;
 import org.opengis.feature.schema.AllDescriptor;
 import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.ChoiceDescriptor;
@@ -147,7 +148,7 @@ public class Descriptors {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public Descriptor restriction(Descriptor schema, Descriptor restrict) {
+	public <T extends Descriptor> Descriptor restriction(T schema, T restrict) {
 		Descriptor descriptor;
 		if (schema instanceof AllDescriptor
 				&& restrict instanceof AllDescriptor) {
@@ -245,32 +246,7 @@ public class Descriptors {
 		return restriction;
 	}
 
-	/**
-	 * Returns Map of prefix/namespace URI, with the namespaces found on a
-	 * schema allowable content nodes. If prefixes has not been assigned to the
-	 * QNames, a prefix is automattically assigned.
-	 * 
-	 * @param schema
-	 * @return
-	 */
-	static public Map<String, String> namespaces(Descriptor schema) {
-		List<AttributeType> types = types(schema);
-		Map<String, String> namespaces = new HashMap<String, String>();
-		int curr = 0;
-		for (AttributeType<?> t : types) {
-			QName name = t.getName();
-			String ns = name.getNamespaceURI();
-			String prefix = name.getPrefix();
-			if (!namespaces.containsValue(ns)) {
-				if ("".equals(prefix)) {
-					prefix = "p" + curr++;
-				}
-				namespaces.put(prefix, ns);
-			}
-		}
-		return namespaces;
-	}
-
+	
 	/**
 	 * Locate type associated with provided name, or null if not found.
 	 * <p>
@@ -380,7 +356,7 @@ public class Descriptors {
 		for (Descriptor child : list(schema)) {
 			if (child instanceof AttributeDescriptor) {
 				AttributeDescriptor node = (AttributeDescriptor) child;
-				if (node.getType() == type) {
+				if (node.getType().equals(type)) {
 					nodes.add(node);
 				}
 			}
@@ -452,15 +428,6 @@ public class Descriptors {
 	 */
 	@SuppressWarnings("unchecked")
 	static public List<? extends Descriptor> list(Descriptor schema) {
-		// ok, if SimpleDescriptor actually extends OrderedDescriptor
-		// this first comparison would bot be needed, though I couldn't
-		// get SimpleDescriptor extending OrderedDescriptor and still
-		// returning List<AttributeDescriptor> with my current/almost void,
-		// knowledge of Java5
-		/*
-		 * if( schema instanceof SimpleDescriptor ){ return
-		 * ((SimpleDescriptor)schema).sequence(); } else
-		 */
 		if (schema instanceof OrderedDescriptor) {
 			return ((OrderedDescriptor) schema).sequence();
 		} else if (schema instanceof AllDescriptor) {

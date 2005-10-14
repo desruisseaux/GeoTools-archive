@@ -1,9 +1,17 @@
 package org.geotools.feature;
 
+import org.geotools.feature.schema.DescriptorFactoryImpl;
+import org.geotools.feature.type.TypeFactoryImpl;
+import org.opengis.feature.schema.DescriptorFactory;
+import org.opengis.feature.type.TypeFactory;
+
 import junit.framework.TestCase;
 
 public class DescriptorsTest extends TestCase {
 
+	TypeFactory typeFactory = new TypeFactoryImpl();
+	DescriptorFactory descFactory = new DescriptorFactoryImpl();
+	
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
@@ -12,7 +20,8 @@ public class DescriptorsTest extends TestCase {
 		super.tearDown();
 	}
 
-	/*
+	/**
+	 * 
 	 * Test method for 'org.geotools.feature.Descriptors.subtype(Descriptor, Descriptor)'
 	 */
 	public void testSubtype() {
@@ -79,27 +88,6 @@ public class DescriptorsTest extends TestCase {
 	 * Test method for 'org.geotools.feature.Descriptors.types(Descriptor)'
 	 */
 	public void testTypes() {
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
-
-	/*
-	 * Test method for 'org.geotools.feature.Descriptors.multiple(Descriptor, AttributeType)'
-	 */
-	public void testMultiple() {
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
-
-	/*
-	 * Test method for 'org.geotools.feature.Descriptors.maxOccurs(Descriptor, AttributeType)'
-	 */
-	public void testMaxOccurs() {
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
-
-	/*
-	 * Test method for 'org.geotools.feature.Descriptors.list(Descriptor)'
-	 */
-	public void testList() {
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 

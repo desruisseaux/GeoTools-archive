@@ -275,8 +275,10 @@ public class SimpleFeatureImplTest extends TestCase {
 		assertTrue(atts != attsAgain);
 
 		for (int i = 0, ii = atts.size(); i < ii; i++) {
-			assertEquals(atts.get(i), f.get(i));
-			assertEquals(attsAgain.get(i), f.get(i));
+			Attribute att = atts.get(i);
+			AttributeType type = att.getType();
+			assertEquals(att.get(), f.get(type));
+			assertEquals(attsAgain.get(i).get(), f.get(attsAgain.get(i).getType()));
 		}
 		try {
 			f.set(1244, "x");
@@ -285,10 +287,10 @@ public class SimpleFeatureImplTest extends TestCase {
 			// OK
 		}
 		try {
-			f.set("1244", "x");
+			f.set(1244, "x");
 			fail("allowed bogus attribute setting");
 			// } catch (IllegalAttributeException iae) {
-		} catch (IllegalArgumentException iae) {
+		} catch (IndexOutOfBoundsException iae) {
 			// OK
 		}
 		try {

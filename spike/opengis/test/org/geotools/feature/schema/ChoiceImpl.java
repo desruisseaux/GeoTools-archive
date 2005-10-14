@@ -1,10 +1,13 @@
 package org.geotools.feature.schema;
 
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.opengis.feature.Attribute;
+import javax.xml.namespace.QName;
+
+import org.opengis.feature.schema.AllDescriptor;
+import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.schema.ChoiceDescriptor;
 import org.opengis.feature.schema.Descriptor;
 
@@ -12,17 +15,34 @@ public class ChoiceImpl extends AbstractDescriptor implements ChoiceDescriptor {
 	Set<Descriptor> options;
 
 	public ChoiceImpl(Set<? extends Descriptor> options) {
-		this.options = new HashSet<Descriptor>(options);
+		this(options, 1, 1);
 	}
 
 	public ChoiceImpl(Set<? extends Descriptor> options, int max) {
-		super(max);
-		this.options = new HashSet<Descriptor>(options);
+		this(options, 1, max);
 	}
 
 	public ChoiceImpl(Set<? extends Descriptor> options, int min, int max) {
 		super(min, max);
-		this.options = new HashSet<Descriptor>(options);
+		Set<Descriptor> tmpOpts = new HashSet<Descriptor>(options);
+		Set<QName> attNames = new HashSet<QName>();
+		for (Descriptor schema : tmpOpts) {
+			if (schema instanceof AttributeDescriptor) {
+				AttributeDescriptor node = (AttributeDescriptor) schema;
+				if (attNames.contains(node.getType().getName())) {
+					throw new IllegalArgumentException(
+							"Duplicated attribute names not allowed. "
+									+ node.getType().getName()
+									+ " found more than one time");
+				}
+				attNames.add(node.getType().getName());
+			}
+			if(schema instanceof AllDescriptor){
+				throw new IllegalArgumentException(
+						"AllDescriptors can't be options of a choice. Found " + schema);
+			}
+		}
+		this.options = Collections.unmodifiableSet(tmpOpts);
 	}
 
 	public Set<Descriptor> options() {
@@ -43,8 +63,4 @@ public class ChoiceImpl extends AbstractDescriptor implements ChoiceDescriptor {
 		return this.options.equals(d.options);
 	}
 
-	public void validate(List<Attribute> content) throws NullPointerException,
-			IllegalArgumentException {
-
-	}
 }
