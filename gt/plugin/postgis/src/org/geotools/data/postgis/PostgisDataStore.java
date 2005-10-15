@@ -546,6 +546,48 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         //others?
         return true;
     }
+    
+    /**
+     * Override this method to perform a few permission checks before the super 
+     * class has a chance to do its thing.
+     */
+    protected FeatureType buildSchema(String typeName, FIDMapper mapper) throws IOException {
+    	//be sure we can query the necessary tables
+    	//TODO: should spatial_ref_sys be in here?
+    	Connection conn = getConnection(Transaction.AUTO_COMMIT);
+    	
+    	try {
+			Statement st = conn.createStatement();
+			
+			try {
+				st.execute("SELECT * FROM geometry_columns LIMIT 0;");
+			} 
+			catch (Throwable t) {
+				String msg = "Error querying relation: geometry_columns." + 
+				 	" Possible cause:" + t.getLocalizedMessage();
+				throw new DataSourceException(msg,t);
+			}
+			try {
+				st.execute("SELECT * FROM \"" + typeName + "\" LIMIT 0;");
+			} 
+			catch (Throwable t) {
+				String msg = "Error querying relation:" + typeName + "."  +  
+						" Possible cause:" + t.getLocalizedMessage();
+				throw new DataSourceException(msg,t);
+			}
+		} 
+    	catch (SQLException e) {
+    		JDBCUtils.close(conn, Transaction.AUTO_COMMIT, e);
+    		throw new DataSourceException(e);
+		}
+    	finally {
+    		JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
+    	}
+		
+    	//everything is cool, keep going
+    	return super.buildSchema(typeName, mapper);
+    }
+    
 
     /*
      * (non-Javadoc)
@@ -865,7 +907,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         try {
             dbConnection = getConnection(Transaction.AUTO_COMMIT);
-
+            
             String sqlStatement = "SELECT type FROM GEOMETRY_COLUMNS WHERE "
                 + "f_table_name='" + tableName + "' AND f_geometry_column='"
                 + columnName + "';";

@@ -11,10 +11,10 @@ import java.util.PropertyResourceBundle;
  */
 public class PostgisTests {
 
-	public static Fixture newFixture() throws IOException {
+	public static Fixture newFixture(String props) throws IOException {
 		PropertyResourceBundle resource;
         resource = new PropertyResourceBundle(
-    		PostgisTests.class.getResourceAsStream("fixture.properties")
+    		PostgisTests.class.getResourceAsStream(props)
 		);
 
         Fixture f = new Fixture();
@@ -27,6 +27,10 @@ public class PostgisTests {
         f.password = resource.getString("password");	
         
         return f;
+	}
+	
+	public static Fixture newFixture() throws IOException {
+		return newFixture("fixture.properties");
 	}
 	
 	public static class Fixture {
