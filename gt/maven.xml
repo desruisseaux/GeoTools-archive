@@ -50,7 +50,7 @@
 		      </j:when>
 		      <j:otherwise>
 		        <!-- offline, exclude OnlineTests -->
-		          <j:set var="excludes" value="${excludes},**/*OnlineTest.*,**/*StressTest.*,**/Geot553Test.*"/>
+		          <j:set var="excludes" value="${excludes},**/*OnlineTest.*,**/*StressTest.*"/>
 		      </j:otherwise>
 		    </j:choose>
 				<j:set var="testnotmatchpattern" value="${excludes}"/>

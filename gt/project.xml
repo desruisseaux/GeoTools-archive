@@ -320,7 +320,11 @@
     <aspectSourceDirectories/>
     <integrationUnitTestPatterns/>
     <sourceDirectory>src</sourceDirectory>
-
+		<unitTest>
+        <excludes>
+          <exclude>**/*Geot553Test.*</exclude>
+        </excludes>
+    </unitTest>
     <resources>
       <resource>
         <directory>${basedir}/src</directory>
