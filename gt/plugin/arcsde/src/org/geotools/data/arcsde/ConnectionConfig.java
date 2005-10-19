@@ -16,6 +16,8 @@
  */
 package org.geotools.data.arcsde;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -51,6 +53,9 @@ public class ConnectionConfig {
 
 	/** constant to pass "arcsde" as DBTYPE_PARAM */
 	public static final String DBTYPE_PARAM_VALUE = "arcsde";
+
+	/** namespace URI assigned to datastore instance */
+	public static final String NAMESPACE_PARAM = "namespace";
 
 	/** ArcSDE server parameter name */
 	public static final String SERVER_NAME_PARAM = "server";
@@ -88,6 +93,9 @@ public class ConnectionConfig {
 	 */
 	protected static final String TABLE_NAME_PARAM = "table";
 
+	/** namespace URI assigned to datastore */
+	URI namespaceUri;
+	
 	/** name or IP of the ArcSDE server to connect to */
 	String serverName;
 
@@ -203,6 +211,16 @@ public class ConnectionConfig {
 	private void setUpOptionalParams(Map params)
 			throws IllegalArgumentException {
 		String exceptionMsg = null;
+		Object ns = params.get(NAMESPACE_PARAM);
+
+		if(ns != null){
+			try{
+				this.namespaceUri  = new URI(ns.toString());
+			}catch(URISyntaxException e){
+				throw new IllegalArgumentException("invalid namespace: " + ns, e);
+			}
+		}
+		
 		this.minConnections = getInt(params.get(MIN_CONNECTIONS_PARAM),
 				ArcSDEConnectionPool.DEFAULT_CONNECTIONS);
 		this.maxConnections = getInt(params.get(MAX_CONNECTIONS_PARAM),
@@ -356,6 +374,11 @@ public class ConnectionConfig {
 				+ ILLEGAL_ARGUMENT_MSG + paramName);
 	}
 
+	
+	public URI getNamespaceUri(){
+		return namespaceUri;
+	}
+	
 	/**
 	 * DOCUMENT ME!
 	 * 

@@ -144,7 +144,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
         ArcSDEDataStore sdeDStore = null;
         ConnectionConfig config = new ConnectionConfig(params);
         ArcSDEConnectionPool connPool = poolFactory.createPool(config);
-        sdeDStore = new ArcSDEDataStore(connPool);
+        sdeDStore = new ArcSDEDataStore(connPool, config.getNamespaceUri());
         
         return sdeDStore;
     }

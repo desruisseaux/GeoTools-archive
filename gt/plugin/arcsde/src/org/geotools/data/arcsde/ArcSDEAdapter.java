@@ -17,6 +17,7 @@
 package org.geotools.data.arcsde;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -264,7 +265,7 @@ public class ArcSDEAdapter {
 	 *             DOCUMENT ME!
 	 */
 	public static FeatureType fetchSchema(ArcSDEConnectionPool connPool,
-			String typeName) throws IOException {
+			String typeName, URI namespace) throws IOException {
 		SeLayer sdeLayer = connPool.getSdeLayer(typeName);
 		SeTable sdeTable = connPool.getSdeTable(typeName);
 		AttributeType[] types = createAttributeTypes(sdeLayer, sdeTable);
@@ -272,7 +273,7 @@ public class ArcSDEAdapter {
 
 		try {
 			type = FeatureTypeFactory.newFeatureType(types, sdeLayer
-					.getQualifiedName());
+					.getQualifiedName(), namespace);
 		} catch (SeException ex) {
 			throw new DataSourceException(ex.getMessage(), ex);
 		} catch (SchemaException ex) {

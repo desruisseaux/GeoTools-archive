@@ -146,7 +146,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 		try {
 			return ArcSDEAdapter.fetchSchema(
 					this.dataStore.getConnectionPool(), this.layer
-							.getQualifiedName());
+							.getQualifiedName(), this.dataStore.getNamespace());
 		} catch (SeException e) {
 			LOGGER.log(Level.WARNING, e.getMessage(), e);
 			throw new RuntimeException(e.getMessage());

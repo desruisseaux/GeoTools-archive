@@ -42,6 +42,8 @@ import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -74,6 +76,8 @@ class ArcSDEDataStore extends AbstractDataStore {
 
     /** DOCUMENT ME! */
     private ArcSDEConnectionPool connectionPool;
+    
+    private URI namespace;
 
     /** <code>Map&lt;typeName/FeatureType&gt;</code> of feature type schemas */
     private Map schemasCache = new HashMap();
@@ -91,6 +95,21 @@ class ArcSDEDataStore extends AbstractDataStore {
         this.connectionPool = connectionPool;
     }
 
+    
+    /**
+     * 
+     * @param connectionPool datastore's connection pool. Not null.
+     * @param nsUri datastore's namespace. May be null.
+     */
+    public ArcSDEDataStore(ArcSDEConnectionPool connectionPool, URI nsUri){
+        super(true);
+        if(connectionPool == null){
+        	throw new NullPointerException("connectionPool");
+        }
+        this.connectionPool = connectionPool;
+        this.namespace = nsUri;
+    }
+
     /**
      * DOCUMENT ME!
      *
@@ -98,6 +117,10 @@ class ArcSDEDataStore extends AbstractDataStore {
      */
     public ArcSDEConnectionPool getConnectionPool() {
         return this.connectionPool;
+    }
+    
+    public URI getNamespace(){
+    	return this.namespace;
     }
 
     /**
@@ -201,7 +224,7 @@ class ArcSDEDataStore extends AbstractDataStore {
         FeatureType schema = (FeatureType) schemasCache.get(typeName);
 
         if (schema == null) {
-            schema = ArcSDEAdapter.fetchSchema(getConnectionPool(), typeName);
+            schema = ArcSDEAdapter.fetchSchema(getConnectionPool(), typeName, this.namespace);
             schemasCache.put(typeName, schema);
         }
 
