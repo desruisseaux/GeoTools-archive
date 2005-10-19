@@ -110,7 +110,7 @@ freely available.</description>
   <build>
     <unitTest>
 				<excludes>
-					<exclude>**/PostgisDataStoreAPIOnlineTest.*</exclude>
+					<exclude>**/*OnlineTest.*</exclude>
 				</excludes>
        <resources>
           <resource>
