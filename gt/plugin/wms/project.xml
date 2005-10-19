@@ -90,12 +90,9 @@
   </dependencies>
   <build>
     <unitTest>
-      <!--    <includes>
-        <include>**/*Test.java</include>
-      </includes>
-  <excludes>
-        <exclude>**/Geot553Test.java</exclude>
-      </excludes> -->
+  		<excludes>
+        <exclude>**/WMS1_3_0_OnlineTest.*</exclude>
+      </excludes>
       <resources>
         <resource>
           <directory>${basedir}/test</directory>
