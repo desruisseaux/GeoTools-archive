@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ===========================================================================
          Project configuration file for the Geotools 2 project
          http://www.geotools.org/
@@ -10,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>ext</artifactId>
+    <artifactId>gt2-ext</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -19,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>openoffice</artifactId>
+  <artifactId>gt2-openoffice</artifactId>
   <packaging>jar</packaging>
   <name>Bridges to OpenOffice suite</name>
   <url>http://modules.geotools.org/openoffice</url>
@@ -38,7 +39,7 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le dÃ©veloppement</organization>
+      <organization>Institut de Recherche pour le développement</organization>
       <roles>
         <role>Java Developer</role>
         <role>Module Maintainer</role>
@@ -46,7 +47,7 @@
     </developer>
     <developer>
       <name>Richard Deplanque</name>
-      <organization>UniversitÃ© de Nouvelle-CalÃ©donie</organization>
+      <organization>Université de Nouvelle-Calédonie</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -61,12 +62,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt2-epsg-hsql</artifactId>
       <version>2.2-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
@@ -106,7 +107,7 @@
       <!-- Copies the OpenOffice-generated .class files -->
       <plugin>
         <groupId>org.geotools</groupId>
-        <artifactId>javamaker</artifactId>
+        <artifactId>gt2-javamaker</artifactId>
         <version>2.2-SNAPSHOT</version>
         <executions>
           <execution>
@@ -133,7 +134,7 @@
       <!-- Creates the uno.pkg file -->
       <plugin>
         <groupId>org.geotools</groupId>
-        <artifactId>unopkg</artifactId>
+        <artifactId>gt2-unopkg</artifactId>
         <version>2.2-SNAPSHOT</version>
         <executions>
           <execution>

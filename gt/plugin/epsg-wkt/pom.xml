@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-wkt</artifactId>
+  <artifactId>gt2-epsg-wkt</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using WKT file</name>
   <url>http://modules.geotools.org/epsg-wkt</url>
@@ -60,7 +60,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
   </dependencies>

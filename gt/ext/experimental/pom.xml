@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>ext</artifactId>
+    <artifactId>gt2-ext</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>experimental</artifactId>
+  <artifactId>gt2-experimental</artifactId>
   <packaging>jar</packaging>
   <name>Geotools experiments</name>
   <url>http://modules.geotools.org/experimental</url>
@@ -73,7 +73,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
   </dependencies>

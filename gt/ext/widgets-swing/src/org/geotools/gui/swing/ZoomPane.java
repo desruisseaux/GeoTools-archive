@@ -492,8 +492,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * extract it at will from the list of objects interested in being notified
      * of the mouse movements.
      */
-    private final MouseListener mouseSelectionTracker = new MouseSelectionTracker()
-    {
+    private final MouseListener mouseSelectionTracker = new MouseSelectionTracker() {
         /**
          * Returns the selection shape. This is usually a rectangle, but could
          * very well be an ellipse or any other kind of geometric shape. This

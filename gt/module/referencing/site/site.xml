@@ -5,15 +5,17 @@
   <!-- ========================================================= -->
   <bannerLeft>
     <name>Geotools 2</name>
-    <src>http://www.geotools.org/download/userResources/GEOTOOLS/logo</src>
+<!-- TODO: The icon needs to move somewhere else. In current location,
+           it is downloaded again and again for all pages. -->
+<!--    <src>http://www.geotools.org/download/userResources/GEOTOOLS/logo</src> -->
     <href>http://www.geotools.org/</href>
   </bannerLeft>
   <bannerRight>
-    <!-- Todo: provid a small icon here -->
+    <!-- TODO: provid a small icon here -->
     <!-- <src>http://maven.apache.org/images/maven-small.gif</src> -->
   </bannerRight>
 
-  <body>  
+  <body>
     <!-- ==================================================== -->
     <!--     Links to appears just below the right banner     -->
     <!-- ==================================================== -->

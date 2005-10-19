@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>image</artifactId>
+  <artifactId>gt2-image</artifactId>
   <packaging>jar</packaging>
   <name>WorldImage datasource module</name>
   <url>http://modules.geotools.org/image</url>
@@ -60,7 +60,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
   </dependencies>

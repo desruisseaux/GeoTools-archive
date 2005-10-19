@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>module</artifactId>
+  <artifactId>gt2-module</artifactId>
   <packaging>pom</packaging>
   <version>2.2-SNAPSHOT</version>
   <name>Geotools modules</name>
@@ -29,6 +29,11 @@
     Geotools core modules.
   </description>
 
+
+
+  <!-- ==================================================== -->
+  <!--     All modules included in the build                -->
+  <!-- ==================================================== -->
   <modules>
     <module>legacy</module>
     <module>main</module>

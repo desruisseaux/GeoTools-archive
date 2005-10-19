@@ -35,13 +35,13 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 
+// Note: javadoc in class and fields descriptions must be XHTML.
 /**
- * Creates a {@code .uno.pkg} package for OpenOffice addins.
+ * Creates a <code>.uno.pkg</code> package for <a href="http://www.openoffice.org">OpenOffice</a>
+ * addins.
  * 
  * @goal unopkg
  * @phase package
- * @execute phase="package:jar"
- * @description Creates a uno.pkg package for OpenOffice addins.
  * @version $Id$
  * @author Martin Desruisseaux
  *
@@ -52,7 +52,7 @@ import org.apache.maven.project.MavenProject;
 public class UnoPkg extends AbstractMojo implements FilenameFilter {
     /**
      * Directory where the source files are located. The plugin will looks for
-     * the {@code META-INF/manifest.xml} file in this directory.
+     * the <code>META-INF/manifest.xml</code> file in this directory.
      *
      * @parameter expression="${project.build.sourceDirectory}"
      * @required
@@ -60,7 +60,7 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
     private String sourceDirectory;
 
     /**
-     * Directory where the output uno.pkg file will be located.
+     * Directory where the output <code>uno.pkg</code> file will be located.
      *
      * @parameter expression="${project.build.directory}"
      * @required
@@ -68,7 +68,7 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
     private String outputDirectory;
 
     /**
-     * The name for the uno.pkg file to create.
+     * The name for the <code>uno.pkg</code> file to create.
      *
      * @parameter expression="${project.build.finalName}"
      * @required

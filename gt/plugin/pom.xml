@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>plugin</artifactId>
+  <artifactId>gt2-plugin</artifactId>
   <packaging>pom</packaging>
   <version>2.2-SNAPSHOT</version>
   <name>Geotools plugins</name>
@@ -29,6 +29,11 @@
     Geotools plugins.
   </description>
 
+
+
+  <!-- ==================================================== -->
+  <!--     All modules included in the build                -->
+  <!-- ==================================================== -->
   <modules>
     <module>arcgrid</module>
     <module>arcsde</module>

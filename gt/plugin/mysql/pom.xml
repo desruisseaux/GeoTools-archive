@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>mysql</artifactId>
+  <artifactId>gt2-mysql</artifactId>
   <packaging>jar</packaging>
   <name>MySQL DataStore Implementation</name>
   <url>http://modules.geotools.org/mysql</url>
@@ -75,13 +75,13 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>3.0.9</version>
+      <version>3.0.10</version>
     </dependency>
   </dependencies>
 

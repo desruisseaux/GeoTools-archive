@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>postgis</artifactId>
+  <artifactId>gt2-postgis</artifactId>
   <packaging>jar</packaging>
   <name>PostGIS module</name>
   <url>http://modules.geotools.org/postgis</url>
@@ -67,7 +67,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
     <dependency>
@@ -76,12 +76,12 @@
       <version>8.0-312.jdbc3</version>
     </dependency>
     <dependency>
-      <groupId>postgis-driver</groupId>
+      <groupId>org.postgis</groupId>
       <artifactId>postgis-driver</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>
-      <groupId>wkb4j</groupId>
+      <groupId>org.wkb4j</groupId>
       <artifactId>wkb4j</artifactId>
       <version>1.0-RC1</version>
     </dependency>
@@ -113,7 +113,8 @@
             <exclude>**/PostgisDataStoreTest.java</exclude>
           </excludes>
           <!-- End exclude tests -->
-          <skip>false</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <!-- We bypass for now because PostGIS tests are very long (20 minutes!)  -->
         </configuration>
       </plugin>
     </plugins>

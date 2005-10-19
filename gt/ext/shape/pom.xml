@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>ext</artifactId>
+    <artifactId>gt2-ext</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>indexed-shapefile</artifactId>
+  <artifactId>gt2-indexed-shapefile</artifactId>
   <packaging>jar</packaging>
   <name>Indexed shapefile module</name>
   <url>http://modules.geotools.org/indexed-shapefile</url>
@@ -87,7 +87,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>shapefile</artifactId>
+      <artifactId>gt2-shapefile</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
     <dependency>

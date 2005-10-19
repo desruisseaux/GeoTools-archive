@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>module</artifactId>
+    <artifactId>gt2-module</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>referencing</artifactId>
+  <artifactId>gt2-referencing</artifactId>
   <packaging>jar</packaging>
   <name>Referencing services</name>
   <url>http://modules.geotools.org/referencing</url>

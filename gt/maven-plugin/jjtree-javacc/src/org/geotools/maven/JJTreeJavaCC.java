@@ -30,6 +30,7 @@ import org.javacc.jjtree.JJTree;
 
 // Maven and Plexus dependencies
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
@@ -39,27 +40,29 @@ import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 import org.codehaus.plexus.util.FileUtils;
 
 
+// Note: javadoc in class and fields descriptions must be XHTML.
 /**
- * Generates {@code .java} sources from {@code .jjt} files during Geotools build. This
- * <A HREF="http://maven.apache.org/maven2/">Maven 2</A> plugin executes {@code jjtree}
- * first, followed by {@code javacc}. Both of them are part of the
+ * Generates <code>.java</code> sources from <code>.jjt</code> files during Geotools build. This
+ * <A HREF="http://maven.apache.org/maven2/">Maven 2</A> plugin executes <code>jjtree</code>
+ * first, followed by <code>javacc</code>. Both of them are part of the
  * <A HREF="https://javacc.dev.java.net/">JavaCC</A> project.
- * <p>
+ * <p/>
  * This code is a derived work from the Mojo
  * <code><A HREF="http://mojo.codehaus.org/maven-javacc-plugin/">maven-javacc-plugin</A></code>,
  * which explain why we retains the Apache copyright header. We didn't used The Mojo JavaCC plugin
  * because:
- * <p>
+ * <p/>
  * <ul>
- *   <li>It seems easier to control execution order in a single plugin (obviously {@code jjtree}
- *       must be executed before {@code javacc}, but I don't know how to enforce this order if
- *       both of them are independent plugins registered in the {@code generate-sources} build
+ *   <li>It seems easier to control execution order in a single plugin (obviously <code>jjtree</code>
+ *       must be executed before <code>javacc</code>, but I don't know how to enforce this order if
+ *       both of them are independent plugins registered in the <code>generate-sources</code> build
  *       phase).</li>
- *   <li>{@code maven-javacc-plugin} overwrites the values specified in the {@code .jjt} file with
- *       its own default values, even if no such values were specified in the {@code pom.xml} file.
- *       This behavior conflicts with Geotools setting for the {@code STATIC} option.</li>
+ *   <li><code>maven-javacc-plugin</code> overwrites the values specified in the <code>.jjt</code>
+ *       file with its own default values, even if no such values were specified in the
+ *       <code>pom.xml</code> file. This behavior conflicts with Geotools setting for the
+ *       <code>STATIC</code> option.</li>
  * </ul>
- * <p>
+ *
  * Note: The default directories in this plugin are Maven default, even if this plugin target
  *       Geotools build (which use a different directory structure).
  *
@@ -82,8 +85,8 @@ public class JJTreeJavaCC extends AbstractMojo {
     private String nodePackage;
 
     /**
-     * Directory where user-specified Node.java and SimpleNode.java files are located.
-     * If no node exist, JJTree will create ones.
+     * Directory where user-specified <code>Node.java</code> and <code>SimpleNode.java</code>
+     * files are located. If no node exist, JJTree will create ones.
      *
      * @parameter expression="${basedir}/src/main/jjtree"
      * @required
@@ -113,7 +116,7 @@ public class JJTreeJavaCC extends AbstractMojo {
     private File outputPackageDirectory;
 
     /**
-     * The directory to store the processed .jjt files.
+     * The directory to store the processed <code>.jjt</code> files.
      *
      * @parameter expression="${project.build.directory}/timestamp"
      */
@@ -142,7 +145,7 @@ public class JJTreeJavaCC extends AbstractMojo {
      *
      * @throws MojoExecutionException if the plugin execution failed.
      */
-    public void execute() throws MojoExecutionException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         outputPackageDirectory = createPackageDirectory(outputDirectory);
         if (!FileUtils.fileExists(timestampDirectory)) {
             FileUtils.mkdir(timestampDirectory);
@@ -174,7 +177,7 @@ public class JJTreeJavaCC extends AbstractMojo {
             final String[]   args = generateJJTreeArgumentList(sourceFile.getPath());
             final int      status = parser.main(args);
             if (status != 0) {
-                throw new MojoExecutionException("JJTree failed with error code " + status + '.');
+                throw new MojoFailureException("JJTree failed with error code " + status + '.');
             }
             try {
                 FileUtils.copyFileToDirectory(sourceFile, new File(timestampDirectory));
@@ -196,7 +199,7 @@ public class JJTreeJavaCC extends AbstractMojo {
                 throw new MojoExecutionException("Failed to run javacc.", e);
             }
             if (status != 0) {
-                throw new MojoExecutionException("JavaCC failed with error code " + status + '.');
+                throw new MojoFailureException("JavaCC failed with error code " + status + '.');
             }
             try {
                 FileUtils.copyFileToDirectory(sourceFile, new File(timestampDirectory));

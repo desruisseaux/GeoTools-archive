@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>ext</artifactId>
+  <artifactId>gt2-ext</artifactId>
   <packaging>pom</packaging>
   <version>2.2-SNAPSHOT</version>
   <name>Geotools extensions</name>
@@ -29,6 +29,11 @@
     Extensions to Geotools 2.
   </description>
 
+
+
+  <!-- ==================================================== -->
+  <!--     All modules included in the build                -->
+  <!-- ==================================================== -->
   <modules>
     <module>experimental</module>
     <module>graph</module>

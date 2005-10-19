@@ -189,8 +189,8 @@
       <roles>
         <role>Java Developer</role>
         <role>Module Maintainer</role>
-          <role>Project Management Committee (PMC) Member</role>
-        </roles>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
     </developer>
     <developer>
       <name>Justin Deoliveira</name>
@@ -383,18 +383,9 @@
       </snapshots>
     </repository>
     <repository>
-      <id>sicade</id>
-      <name>Temporary repository (to be replaced by a more official one later)</name>
-      <url>http://www.espace.ird.nc/maven-repository</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>Refractions</id>
-      <name>Legacy repository on Refractions (do not includes transitive dependencies)</name>
-      <url>http://lists.refractions.net/geotools</url>
-      <layout>legacy</layout>
+      <id>espace</id>
+      <name>Repository from the Sicade laboratory in New-Caledonia</name>
+      <url>http://maven.espace.ird.nc</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -486,6 +477,24 @@
 
 
       <!-- ==================================================== -->
+      <!--     Copies all JARs in a single directory            -->
+      <!-- ==================================================== -->
+      <plugin>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt2-jar-collector</artifactId>
+        <version>2.2-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>collect</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+
+
+      <!-- ==================================================== -->
       <!--     Javadoc generation                               -->
       <!-- ==================================================== -->
       <plugin>
@@ -498,20 +507,15 @@
           <noqualifier>all</noqualifier>            <!-- Omits qualifying package name from ahead of class names in output.     -->
           <showPackage>false</showPackage>          <!-- Shows only protected and public classes and members.                   -->
           <quiet>true</quiet>                       <!-- Shuts off non-error and non-warning messages.                          -->
-          <maxmemory>512M</maxmemory>               <!-- The maximum Java heap size to be used when launching the javadoc.      -->
+<!-- The following doesn't work with Maven 2 RC. See http://jira.codehaus.org/browse/MNG-1237
+          <maxmemory>512M</maxmemory>               <!- The maximum Java heap size to be used when launching the javadoc.      -->
+
           <encoding>ISO-8859-1</encoding>           <!-- Specifies the encoding name of the source files.                       -->
           <docfilessubdirs>true</docfilessubdirs>   <!-- Enables deep copying of "doc-files" directories.                       -->
-<!-- TODO: Doesn't work in Maven 2 beta 3. See http://jira.codehaus.org/browse/MNG-1164
-          <additionalparam>-keywords</additionalparam>  <! Set an additional parameter on the command line.                   -->
--->
-
-          <!-- TODO: The following doesn't work in maven 2 beta 3. See MNG-1152 -->
-          <!-- Unconditionally excludes the specified packages and their subpackages. -->
-<!--
-          <excludePackageNames>
+          <additionalparam>-keywords</additionalparam>  <!-- Set an additional parameter on the command line.                   -->
+          <excludePackageNames>                     <!-- Unconditionally excludes the specified packages and their subpackages. -->
             org.geotools.resources
           </excludePackageNames>
--->
           <!-- TODO: The following doesn't work in maven 2 beta 3. See MNG-1154 -->
           <!-- Separates packages on the overview page into whatever groups. -->
 <!--
@@ -573,6 +577,12 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
       </plugin>
+<!--
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
+-->
     </plugins>
   </reporting>
 
@@ -585,14 +595,14 @@
     <!-- The 'sicade' repository below are for testing purpose.  -->
     <!-- They will need to be replaced by Geotools repositories. -->
     <repository>
-      <id>sicade</id>
+      <id>espace</id>
       <name>Geotools release repository</name>
-      <url>scp://eaunet.espace.ird.nc/var/www/html/maven-repository/</url>
+      <url>scp://eaunet2.espace.ird.nc/opt/maven</url>
     </repository>
     <snapshotRepository>
-      <id>sicade</id>
+      <id>espace</id>
       <name>Geotools snapshot repository</name>
-      <url>scp://eaunet.espace.ird.nc/var/www/html/maven-repository/</url>
+      <url>scp://eaunet2.espace.ird.nc/opt/maven</url>
     </snapshotRepository>
     <site>
       <id>sicade</id>
