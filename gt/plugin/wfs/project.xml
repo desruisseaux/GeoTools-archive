@@ -78,6 +78,9 @@
   <build>
     <unitTest>
      
+			<excludes>
+				<exclude>**/*CubewerksOnlineTest.*</exclude>
+			</excludes>
       <resources>
         <resource>
           <directory>${basedir}/test</directory>
