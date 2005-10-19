@@ -109,6 +109,9 @@ freely available.</description>
 
   <build>
     <unitTest>
+				<excludes>
+					<exclude>**/PostgisDataStoreAPIOnlineTest.*</exclude>
+				</excludes>
        <resources>
           <resource>
               <directory>${basedir}/test</directory>
