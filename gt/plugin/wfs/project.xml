@@ -79,7 +79,7 @@
     <unitTest>
      
 			<excludes>
-				<exclude>**/*CubewerksOnlineTest.*</exclude>
+				<exclude>**/*OnlineTest.*</exclude>
 			</excludes>
       <resources>
         <resource>
