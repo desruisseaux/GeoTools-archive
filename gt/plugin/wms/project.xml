@@ -91,7 +91,7 @@
   <build>
     <unitTest>
   		<excludes>
-        <exclude>**/WMS1_3_0_OnlineTest.*</exclude>
+        <exclude>**/WMS1_3_0_OnlineTest.*,**/*Geot553Test.*</exclude>
       </excludes>
       <resources>
         <resource>
