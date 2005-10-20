@@ -469,7 +469,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
                 out.write("(");
 
                 for (int j = 0; j < attValues.length; j++) {
-                    out.write(colNames[j]);
+                    out.write( escapeName(colNames[j]) );
                     out.write(" = '");
                     out.write(attValues[j].toString()); //DJB: changed this to attValues[j] from attValues[i].
                     out.write("'");
