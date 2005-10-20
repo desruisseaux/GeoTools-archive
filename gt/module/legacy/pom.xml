@@ -65,7 +65,7 @@
   <dependencies>
     <dependency>
       <groupId>org.opengis</groupId>
-      <artifactId>legacy</artifactId>
+      <artifactId>geoapi-legacy</artifactId>
       <version>0.2</version>
     </dependency>
     <dependency>
