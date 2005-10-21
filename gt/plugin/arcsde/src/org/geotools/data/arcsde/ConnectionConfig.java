@@ -217,7 +217,7 @@ public class ConnectionConfig {
 			try{
 				this.namespaceUri  = new URI(ns.toString());
 			}catch(URISyntaxException e){
-				throw new IllegalArgumentException("invalid namespace: " + ns, e);
+				throw new IllegalArgumentException("invalid namespace: " + ns);
 			}
 		}
 		
