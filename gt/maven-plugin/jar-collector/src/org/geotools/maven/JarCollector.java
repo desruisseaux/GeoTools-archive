@@ -21,8 +21,8 @@ package org.geotools.maven;
 // J2SE dependencies
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
 import java.util.Iterator;
+import java.util.Set;
 
 // Maven and Plexus dependencies
 import org.apache.maven.plugin.AbstractMojo;

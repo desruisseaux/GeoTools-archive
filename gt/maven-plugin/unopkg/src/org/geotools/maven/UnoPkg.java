@@ -24,8 +24,9 @@ import java.io.FilenameFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.IOException;
+import java.util.Set;
+import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -33,6 +34,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.artifact.Artifact;
 
 
 // Note: javadoc in class and fields descriptions must be XHTML.
@@ -44,15 +46,11 @@ import org.apache.maven.project.MavenProject;
  * @phase package
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo We need to copy the {@code .jar} dependencies as well (e.g.
- *       {@code epsg-hsql-2.2-SNAPSHOT.jar}). This is hard to do without Mojo javadoc.
- *       We hope to improve this plugin once the Mojo javadoc is published.
  */
 public class UnoPkg extends AbstractMojo implements FilenameFilter {
     /**
-     * Directory where the source files are located. The plugin will looks for
-     * the <code>META-INF/manifest.xml</code> file in this directory.
+     * Directory where the source files are located. The plugin will looks for the
+     * <code>META-INF/manifest.xml</code> and <code>*.rdb</code> files in this directory.
      *
      * @parameter expression="${project.build.sourceDirectory}"
      * @required
@@ -76,6 +74,14 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
     private String finalName;
 
     /**
+     * Project dependencies.
+     *
+     * @parameter expression="${project.artifacts}"
+     * @required
+     */
+    private Set/*<Artifact>*/ dependencies;
+
+    /**
      * The Maven project running this plugin.
      *
      * @parameter expression="${project}"
@@ -90,11 +96,12 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
      * @param   name      the name of the file.
      */
     public boolean accept(final File directory, final String name) {
-        return name.endsWith(".jar") || name.endsWith(".JAR");
+        return name.endsWith(".jar") || name.endsWith(".JAR") ||
+               name.endsWith(".rdb") || name.endsWith(".RDB");
     }
 
     /**
-     * Generates the ZIP file from all {@code .jar} files found in the target directory.
+     * Generates the {@code .uno.pkg} file from all {@code .jar} files found in the target directory.
      *
      * @throws MojoExecutionException if the plugin execution failed.
      */
@@ -107,7 +114,7 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
     }
 
     /**
-     * Implementation of the {@link #execute} method.
+     * Creates the {@code .uno.pkg} file.
      */
     private void createPackage() throws IOException {
         final String  manifestName = "META-INF/manifest.xml";
@@ -115,19 +122,36 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
         final File         zipFile = new File(outputDirectory, finalName + ".uno.pkg");
         final File    manifestFile = new File(sourceDirectory, manifestName);
         final File[]          jars = outputDirectory.listFiles(this);
+        final File[]          rdbs = new File(sourceDirectory).listFiles(this);
         final ZipOutputStream  out = new ZipOutputStream(new FileOutputStream(zipFile));
         if (manifestFile.isFile()) {
-            final ZipEntry entry = new ZipEntry(manifestName);
-            out.putNextEntry(entry);
-            copy(manifestFile, out);
-            out.closeEntry();
+            copy(manifestFile, out, manifestName);
         }
+        /*
+         * Copies the RDB files.
+         */
+        for (int i=0; i<rdbs.length; i++) {
+            copy(rdbs[i], out, null);
+        }
+        /*
+         * Copies the JAR (and any additional JARs provided in the output directory).
+         */
         for (int i=0; i<jars.length; i++) {
-            final File jar = jars[i];
-            final ZipEntry entry = new ZipEntry(jar.getName());
-            out.putNextEntry(entry);
-            copy(jar, out);
-            out.closeEntry();
+            copy(jars[i], out, null);
+        }
+        /*
+         * Copies the dependencies.
+         */
+        if (dependencies != null) {
+            for (final Iterator it=dependencies.iterator(); it.hasNext();) {
+                final Artifact artifact = (Artifact) it.next();
+                final String scope = artifact.getScope();
+                if (scope.equalsIgnoreCase(Artifact.SCOPE_COMPILE) ||
+                    scope.equalsIgnoreCase(Artifact.SCOPE_RUNTIME))
+                {
+                    copy(artifact.getFile(), out, null);
+                }
+            }
         }
         out.close();
     }
@@ -135,7 +159,14 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
     /**
      * Copies the content of the specified file to the specified output stream.
      */
-    private static void copy(final File file, final OutputStream out) throws IOException {
+    private static void copy(final File file, final ZipOutputStream out, String name)
+            throws IOException
+    {
+        if (name == null) {
+            name = file.getName();
+        }
+        final ZipEntry entry = new ZipEntry(name);
+        out.putNextEntry(entry);
         final InputStream in = new FileInputStream(file);
         final byte[] buffer = new byte[64*1024];
         int length;
@@ -143,5 +174,6 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
             out.write(buffer, 0, length);
         }
         in.close();
+        out.closeEntry();
     }
 }

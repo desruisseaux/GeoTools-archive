@@ -72,6 +72,18 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>com.vividsolutions</groupId> <!-- TODO: Delete this dependency when the JTS dependency -->
+      <artifactId>jts</artifactId>          <!--       will be removed from the referencing module.   -->
+      <version>1.6</version>
+      <scope>provided</scope>  <!-- Hack for avoiding inclusion of JTS dependencies -->
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>        <!-- Overrides the HSQL dependency (from gt2-epsg-hsql) with -->
+      <artifactId>hsqldb</artifactId>  <!-- "provided" scope instead of "runtime", because the HSQL -->
+      <version>1.8.0.1</version>       <!-- engine is already included in OpenOffice environment.   -->
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.openoffice</groupId>
       <artifactId>juh</artifactId>
       <version>1.9</version>
@@ -136,6 +148,9 @@
         <groupId>org.geotools</groupId>
         <artifactId>gt2-unopkg</artifactId>
         <version>2.2-SNAPSHOT</version>
+        <configuration>
+          <finalName>geotools</finalName>
+        </configuration>
         <executions>
           <execution>
             <goals>
