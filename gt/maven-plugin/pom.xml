@@ -176,6 +176,7 @@
   <!-- ==================================================== -->
   <modules>
     <module>jjtree-javacc</module>
+    <module>rmic</module>
     <module>javamaker</module>
     <module>unopkg</module>
     <module>jar-collector</module>
