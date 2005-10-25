@@ -125,10 +125,9 @@ import org.geotools.resources.i18n.Errors;
  */
 public class TransverseMercator extends MapProjection {
     /**
-     * A derived quantity of excentricity, computed
-     * by <code>e'² = (a²-b²)/b² = es/(1-es)</code>
-     * where <var>a</var> is the semi-major axis length
-     * and <var>b</bar> is the semi-minor axis length.
+     * A derived quantity of excentricity, computed by <code>e'² = (a²-b²)/b² = es/(1-es)</code>
+     * where <var>a</var> is the semi-major axis length and <var>b</bar> is the semi-minor axis
+     * length.
      */
     private final double esp;
     
@@ -160,6 +159,7 @@ public class TransverseMercator extends MapProjection {
                                 C66= 0.36458333333333333333,
                                 C68= 0.00569661458333333333,
                                 C88= 0.3076171875;
+
     /**
      * Contants used for the forward and inverse transform for the eliptical
      * case of the Transverse Mercator.
@@ -178,7 +178,7 @@ public class TransverseMercator extends MapProjection {
      * overrides the value in the MapProjection class.
      */
     private static final double TOL = 1E-11;
-    
+
     /**
      * Constructs a new map projection from the supplied parameters.
      *
@@ -291,7 +291,9 @@ public class TransverseMercator extends MapProjection {
         return new Point2D.Double(x,y);        
     }
     
-    
+    /**
+     * {@inheritDoc}
+     */
     protected double getToleranceForAssertions(final double longitude, final double latitude) {
         if (Math.abs(longitude - centralMeridian) > 0.26) {   //15 degrees
             // When far from the valid area, use a larger tolerance.
@@ -461,14 +463,14 @@ public class TransverseMercator extends MapProjection {
      * Information about zones convention must be specified in argument. Two
      * widely set of arguments are of Universal Transverse Mercator (UTM) and
      * Modified Transverse Mercator (MTM) projections:<br>
-     * <br>
+     * <p>
      *
      * UTM projection (zones numbered from 1 to 60):<br>
-     * <br>
+     * <p>
      *        {@code getZone(-177, 6);}<br>
-     * <br>
+     * <p>
      * MTM projection (zones numbered from 1 to 120):<br>
-     * <br>
+     * <p>
      *        {@code getZone(-52.5, -3);}<br>
      *
      * @param  centralLongitudeZone1 Longitude in the middle of zone 1, in degrees
@@ -491,10 +493,9 @@ public class TransverseMercator extends MapProjection {
     }
     
     /**
-     * Convenience method returning the meridian in the middle of
-     * current zone. This meridian is typically the central meridian.
-     * This method may be invoked to make sure that the central meridian
-     * is correctly set.
+     * Convenience method returning the meridian in the middle of current zone. This meridian is
+     * typically the central meridian. This method may be invoked to make sure that the central
+     * meridian is correctly set.
      *
      * @param  centralLongitudeZone1 Longitude in the middle of zone 1, in degrees
      *         relative to Greenwich. Positive longitudes are toward east, and negative
@@ -533,10 +534,9 @@ public class TransverseMercator extends MapProjection {
     }
 
     /**
-     * Convenience method returning the meridian in the middle of
-     * current zone. This meridian is typically the central meridian.
-     * This method may be invoked to make sure that the central meridian
-     * is correctly set.
+     * Convenience method returning the meridian in the middle of current zone. This meridian is
+     * typically the central meridian. This method may be invoked to make sure that the central
+     * meridian is correctly set.
      *
      * @return The central meridian, using the scalefactor and false easting 
      *         to decide if this is a UTM or MTM case. Returns {@link Double#NaN}
@@ -592,11 +592,10 @@ public class TransverseMercator extends MapProjection {
      *
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
+     * @since 2.1
      * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
-     *
-     * @since 2.1
      */
     public static class Provider extends AbstractProvider {
         /**
@@ -697,10 +696,9 @@ public class TransverseMercator extends MapProjection {
      * projection with an affine transform for (<var>false easting</var>,<var>false northing</var>)
      * correction.
      *
+     * @since 2.2
      * @version $Id$
      * @author Martin Desruisseaux
-     *
-     * @since 2.2
      */
     public static final class Provider_SouthOrientated extends Provider {
         /**

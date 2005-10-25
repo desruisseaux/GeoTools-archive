@@ -321,7 +321,7 @@ public class ObliqueMercator extends MapProjection {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.LAT2_EQ_NEG_90));
             }
         } else {
-	    latitudeOf1stPoint  = Double.NaN;
+            latitudeOf1stPoint  = Double.NaN;
             longitudeOf1stPoint = Double.NaN;
             latitudeOf2ndPoint  = Double.NaN;
             longitudeOf2ndPoint = Double.NaN;
@@ -399,8 +399,8 @@ public class ObliqueMercator extends MapProjection {
         
         singamma0 = Math.sin(gamma0);
         cosgamma0 = Math.cos(gamma0);
-	sinrot = Math.sin(rectGridAngle);
-	cosrot = Math.cos(rectGridAngle);
+        sinrot = Math.sin(rectGridAngle);
+        cosrot = Math.cos(rectGridAngle);
         ArB = A/B;
         AB = A*B;
         BrA = B/A;
@@ -483,8 +483,8 @@ public class ObliqueMercator extends MapProjection {
         }
         
         u -= u_c;
-	x = v * cosrot + u * sinrot;
-	y = u * cosrot - v * sinrot;
+        x = v * cosrot + u * sinrot;
+        y = u * cosrot - v * sinrot;
 
         if (ptDst != null) {
             ptDst.setLocation(x,y);
@@ -499,7 +499,7 @@ public class ObliqueMercator extends MapProjection {
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
     {
-	double v = x * cosrot - y * sinrot;
+        double v = x * cosrot - y * sinrot;
         double u = y * cosrot + x * sinrot + u_c;
         
         double Qp = Math.exp(-BrA * v);
@@ -568,12 +568,12 @@ public class ObliqueMercator extends MapProjection {
                    equals(this.alpha_c            , that.alpha_c            ) &&
                    equals(this.rectGridAngle      , that.rectGridAngle      ) &&
                    equals(this.u_c                , that.u_c                ) &&
-		   equals(this.latitudeOf1stPoint , that.latitudeOf1stPoint ) &&
-	           equals(this.longitudeOf1stPoint, that.longitudeOf1stPoint) &&
-		   equals(this.latitudeOf2ndPoint , that.latitudeOf2ndPoint ) &&
-		   equals(this.longitudeOf2ndPoint, that.longitudeOf2ndPoint) &&
-                   this.twoPoint == that.twoPoint &&
-                   this.hotine   == that.hotine;
+                   equals(this.latitudeOf1stPoint , that.latitudeOf1stPoint ) &&
+                   equals(this.longitudeOf1stPoint, that.longitudeOf1stPoint) &&
+                   equals(this.latitudeOf2ndPoint , that.latitudeOf2ndPoint ) &&
+                   equals(this.longitudeOf2ndPoint, that.longitudeOf2ndPoint) &&
+                          this.twoPoint          == that.twoPoint             &&
+                          this.hotine            == that.hotine;
         }
         return false;
     }
@@ -843,7 +843,7 @@ public class ObliqueMercator extends MapProjection {
                 SEMI_MAJOR,          SEMI_MINOR,
                 LAT_OF_1ST_POINT,    LONG_OF_1ST_POINT,
                 LAT_OF_2ND_POINT,    LONG_OF_2ND_POINT,
-			   LAT_OF_CENTRE,       SCALE_FACTOR,
+			    LAT_OF_CENTRE,       SCALE_FACTOR,
                 FALSE_EASTING,       FALSE_NORTHING
             });
 
@@ -906,7 +906,7 @@ public class ObliqueMercator extends MapProjection {
                 SEMI_MAJOR,          SEMI_MINOR,
                 LAT_OF_1ST_POINT,    LONG_OF_1ST_POINT,
                 LAT_OF_2ND_POINT,    LONG_OF_2ND_POINT,
-		LAT_OF_CENTRE,       SCALE_FACTOR,
+                LAT_OF_CENTRE,       SCALE_FACTOR,
                 FALSE_EASTING,       FALSE_NORTHING
             });
 

@@ -601,8 +601,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * transform name.
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name, which is <code>"PARAM_MT"</code>
-     *         in the default implementation.
+     * @return The WKT element name, which is {@code "PARAM_MT"} in the default implementation.
      */
     protected String formatWKT(final Formatter formatter) {
         final ParameterValueGroup parameters = getParameterValues();
