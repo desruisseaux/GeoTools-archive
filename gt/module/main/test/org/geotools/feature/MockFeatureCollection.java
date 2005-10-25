@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.geotools.data.FeatureReader;
+import org.geotools.feature.visitor.FeatureVisitor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -215,4 +216,19 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
     public void close( FeatureIterator iterator ) {
     }
     
+    /**
+     * Accepts a visitor, which then visits each feature in the collection.
+     */
+    public void accepts(FeatureVisitor visitor) {
+        Iterator iterator = null;
+        try{
+        	for( iterator = iterator(); iterator.hasNext(); ){
+	            Feature feature = (Feature) iterator.next();
+	            visitor.visit(feature);
+	        }
+        }
+        finally {
+        	close( iterator );
+        }
+	}
 }

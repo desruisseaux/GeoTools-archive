@@ -16,9 +16,11 @@
  */
 package org.geotools.feature;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.geotools.data.FeatureResults;
+import org.geotools.feature.visitor.FeatureVisitor;
 
 
 /**
@@ -89,10 +91,10 @@ public interface FeatureCollection extends java.util.Collection, FeatureResults,
      * </ul>
      * </p>
      * Example (safe) use:<pre><code>
-     * Iterator iterator = collection.iterator();
+     * FeatureIterator iterator=collection.features();
      * try {
-     *     for( FeatureIterator i=collection.features(); i.hasNext();){
-     *          Feature feature = i.hasNext();
+     *     while( iterator.hasNext()  ){
+     *          Feature feature = iterator.next();
      *          System.out.println( feature.getID() );
      *     }
      * }
@@ -127,8 +129,8 @@ public interface FeatureCollection extends java.util.Collection, FeatureResults,
      * Example (safe) use:<pre><code>
      * Iterator iterator = collection.iterator();
      * try {
-     *     for( Iterator i=collection.iterator(); i.hasNext();){
-     *          Feature feature = (Feature) i.hasNext();
+     *     while( iterator.hasNext();){
+     *          Feature feature = (Feature) iterator.hasNext();
      *          System.out.println( feature.getID() );
      *     }
      * }
@@ -269,4 +271,14 @@ public interface FeatureCollection extends java.util.Collection, FeatureResults,
      */
     FeatureType getSchema();
         
+    /**
+     * Will visit the contents of the feature collection.
+     * <p>
+     * Note: When performing aggregate calculations please consider using
+     * the Filter/Expression/Function API as it may be optimized.
+     * </p>
+     * @param visitor
+     * @throws IOException 
+     */
+    void accepts( FeatureVisitor visitor ) throws IOException;
 }

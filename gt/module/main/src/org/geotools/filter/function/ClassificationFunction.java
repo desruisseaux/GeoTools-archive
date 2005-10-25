@@ -7,6 +7,7 @@
 package org.geotools.filter.function;
 
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FunctionExpression;
@@ -19,6 +20,7 @@ import org.geotools.filter.LiteralExpression;
  */
 public abstract class ClassificationFunction extends FunctionExpressionImpl implements FunctionExpression{
     
+    FeatureCollection fc = null;
     int classNum;
     Expression expr; 
     
@@ -42,6 +44,10 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
         return expr;
     }
     
+    public void setCollection (FeatureCollection fc) {
+    	this.fc = fc;
+    }
+    
     public void setExpression(Expression e){
         expr = e;
     }
@@ -62,5 +68,7 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
     }
     
     public abstract Object getValue(Feature feature);
+    
+    public abstract Object getRange(int index);
     
 }

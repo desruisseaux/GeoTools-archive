@@ -36,6 +36,8 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.type.FeatureAttributeType;
+import org.geotools.feature.visitor.FeatureCalc;
+import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -500,5 +502,22 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
     public void setDefaultGeometry( Geometry geometry ) throws IllegalAttributeException {
         throw new IllegalAttributeException( "DefaultGeometry not supported" );
     }
-    
+
+    /**
+     * Accepts a visitor, which then visits each feature in the collection.
+     * @throws IOException 
+     */
+    public void accepts(FeatureVisitor visitor) throws IOException {
+        Iterator iterator = null;
+        try{
+        	for( iterator = iterator(); iterator.hasNext(); ){
+	            Feature feature = (Feature) iterator.next();
+	            visitor.visit(feature);
+	        }
+        }
+        finally {
+        	close( iterator );
+        }
+	}
+
 }

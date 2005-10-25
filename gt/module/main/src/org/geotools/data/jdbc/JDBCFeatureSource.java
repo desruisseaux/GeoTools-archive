@@ -190,56 +190,7 @@ public class JDBCFeatureSource implements FeatureSource {
                     request.getFilter(), request.getMaxFeatures(),
                     request.getPropertyNames(), request.getHandle());
         }
-
-        final Query query = request;
-
-        return new DefaultFeatureResults(this, query) {
-                /**
-                 * JDBCDataStore has a more direct query method
-                 *
-                 * @return DOCUMENT ME!
-                 *
-                 * @throws IOException DOCUMENT ME!
-                 */
-                public FeatureReader reader() throws IOException {
-                    int maxFeatures = query.getMaxFeatures();
-                    FeatureReader reader = getJDBCDataStore().getFeatureReader(query,
-                            getTransaction());
-
-                    //TODO: implement Query.UNLIMITED_FEATURES or something
-                    //to that effect, instead of constraining ourselves to 
-                    //integer max as we do now.  
-                    if (maxFeatures == Integer.MAX_VALUE) {
-                        return reader;
-                    } else {
-                        return new MaxFeatureReader(reader, maxFeatures);
-                    }
-                }
-
-                /**
-                 * Performs optimizated count if possible.
-                 *
-                 * @return
-                 *
-                 * @throws IOException
-                 *
-                 * @see org.geotools.data.DefaultFeatureResults#getCount()
-                 */
-                public int getCount() throws IOException {
-                    int count = count(query, getTransaction());
-
-                    if (count != -1) {
-                        int maxFeatures = query.getMaxFeatures();
-
-                        return (count < maxFeatures) ? count : maxFeatures;
-
-                        // optimization worked, return maxFeatures if count is
-                        // greater.
-                    }
-
-                    return super.getCount();
-                }
-            };
+        return new JDBCFeatureCollection(this, request);
     }
 
     /**

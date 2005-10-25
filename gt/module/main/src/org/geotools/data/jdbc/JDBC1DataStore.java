@@ -996,7 +996,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @throws DataSourceException
 	 *             If the connection can not be obtained.
 	 */
-	protected Connection getConnection(Transaction transaction)
+	 protected Connection getConnection(Transaction transaction)
 			throws IOException {
 		if (transaction != Transaction.AUTO_COMMIT) {
 			// we will need to save a JDBC connection is

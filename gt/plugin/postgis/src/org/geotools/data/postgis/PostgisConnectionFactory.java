@@ -213,7 +213,8 @@ public class PostgisConnectionFactory {
         return getConnectionPool(user, password);
     }
     public void free(ConnectionPool connectionPool){
-        if(!connectionPool.isClosed() ){
+        if (connectionPool == null) return;
+    	if(!connectionPool.isClosed() ){
             connectionPool.close();
         }        
         ConnectionPoolManager.getInstance().free( connectionPool );

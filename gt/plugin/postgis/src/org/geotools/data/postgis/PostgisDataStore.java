@@ -1514,7 +1514,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * 
      * <p>
      * Subclass may wish to implement an optimized featureWriter for this
-     * operation. One based on prepaired statemnts is a possibility, as we do
+     * operation. One based on prepared statements is a possibility, as we do
      * not require a ResultSet.
      * </p>
      * 

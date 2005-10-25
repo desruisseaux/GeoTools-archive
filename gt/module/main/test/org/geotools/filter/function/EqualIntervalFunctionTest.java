@@ -5,7 +5,7 @@
  * Created on 09 March 2005, 12:43
  */
 
-package org.geotools.filter.functions;
+package org.geotools.filter.function;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;

@@ -16,6 +16,7 @@
  */
 package org.geotools.feature;
 
+
 /**
  * A list of Features.  Allows getting and setting of Features at an index.
  *
@@ -42,4 +43,5 @@ public interface FeatureList extends FeatureCollection {
      * @param f feature to be stored at the specified position.
      */
     void setFeature(int idx, Feature f);
+    
 }

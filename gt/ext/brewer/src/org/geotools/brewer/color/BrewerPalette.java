@@ -1,26 +1,7 @@
-/*
- * BrewerPalette.java
- *
- * Created on 29 September 2005, 22:55
- *
- * To change this template, choose Tools | Options and locate the template under
- * the Source Creation and Management node. Right-click the template and choose
- * Open. You can then make changes to the template in the Source Editor.
- */
-
 package org.geotools.brewer.color;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.util.StringTokenizer;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import java.awt.Color;
 
 /**
  *
@@ -28,7 +9,8 @@ import org.xml.sax.SAXException;
  */
 public class BrewerPalette {
     
-    SampleScheme sampler;
+    public PaletteSuitability suitability;
+	public SampleScheme sampler;
     Color colors[] = new Color[13];
     
     /** Creates a new instance of BrewerPalette */
@@ -94,10 +76,5 @@ public class BrewerPalette {
     public Color getColor(int index,int length){
         return getColors(length)[index];
     }
-    
-    
-    
-   
-    
     
 }

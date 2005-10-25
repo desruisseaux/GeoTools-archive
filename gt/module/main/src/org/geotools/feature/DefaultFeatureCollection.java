@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.type.FeatureAttributeType;
+import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -723,4 +724,20 @@ public class DefaultFeatureCollection extends AbstractFeatureCollection {
     public Set fids() {
         return Collections.unmodifiableSet( contents.keySet() );
     }
+
+    /**
+     * Accepts a visitor, which then visits each feature in the collection.
+     */
+    public void accepts(FeatureVisitor visitor) {
+        Iterator iterator = null;
+        try{
+        	for( iterator = iterator(); iterator.hasNext(); ){
+	            Feature feature = (Feature) iterator.next();
+	            visitor.visit(feature);
+	        }
+        }
+        finally {
+        	close( iterator );
+        }
+	}
 }

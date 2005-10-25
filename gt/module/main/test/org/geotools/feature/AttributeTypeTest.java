@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.geotools.feature.type.FeatureAttributeType;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -240,7 +238,7 @@ public class AttributeTypeTest extends TestCase {
         AttributeType decimal = AttributeTypeFactory.newAttributeType("decimal", BigDecimal.class,true);
         AttributeType integer = AttributeTypeFactory.newAttributeType("integer", BigInteger.class,true);
 
-        BigDecimal decimalValue = new BigDecimal(200);
+        BigDecimal decimalValue = new BigDecimal("200");
         BigInteger integerValue = new BigInteger("200");
         Object[] vals = new Object[] {
           "200",

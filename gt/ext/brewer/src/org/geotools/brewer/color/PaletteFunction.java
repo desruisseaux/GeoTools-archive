@@ -4,18 +4,17 @@
  * Created on October 27, 2004, 11:27 AM
  */
 
-package org.geotools.filter.function;
+package org.geotools.brewer.color;
 
 //import edu.psu.geovista.colorbrewer.OriginalColor;
 import java.awt.Color;
-import org.geotools.brewer.color.BrewerPalette;
-import org.geotools.brewer.color.ColorBrewer;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.function.ClassificationFunction;
 
 /**
  *

@@ -4,7 +4,7 @@
  * Created on May 11, 2005, 9:02 PM
  */
 
-package org.geotools.filter.functions;
+package org.geotools.filter.function;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;

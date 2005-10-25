@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.feature.visitor.FeatureVisitor;
+
 /**
  * Helper methods to get us started on the implementation road
  * for FeatureCollections.
@@ -58,4 +60,5 @@ public abstract class AbstractFeatureCollection implements FeatureCollection {
         }
         return true;
     }
+    
 }

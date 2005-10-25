@@ -21,44 +21,46 @@
  */
 package org.geotools.filter.function;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.visitor.UniqueVisitor;
 import org.geotools.feature.visitor.CalcResult;
-import org.geotools.feature.visitor.MinVisitor;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.visitor.AbstractFilterVisitor;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
- * Calculates the minimum value of an attribute for a given FeatureCollection
+ * Calculates the unique value of an attribute for a given FeatureCollection
  * and Expression.
- *
- * @author James
+ * 
+ * @author Cory Horner
+ * @since 2.2M2
  */
-public class Collection_MinFunction extends FunctionExpressionImpl
+public class Collection_UniqueFunction extends FunctionExpressionImpl
     implements FunctionExpression {
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter.function");
     FeatureCollection previousFeatureCollection = null;
-    Object min = null;
+    Object unique = null;
     Expression expr;
 
     /**
-     * Creates a new instance of Collection_MinFunction
+     * Creates a new instance of Collection_UniqueFunction
      */
-    public Collection_MinFunction() {
+    public Collection_UniqueFunction() {
     }
 
     public String getName() {
-        return "Collection_Min";
+        return "Collection_Unique";
     }
 
     public int getArgCount() {
@@ -66,21 +68,22 @@ public class Collection_MinFunction extends FunctionExpressionImpl
     }
 
     /**
-     * Calculate minimum (using FeatureCalc) - only one parameter is used.
+     * Calculate unique (using FeatureCalc) - only one parameter is used.
      *
-     * @param collection collection to calculate the minimum
+     * @param collection collection to calculate the unique
      * @param expression Single Expression argument
      *
-     * @return An object containing the minimum value of the attributes
+     * @return An object containing the unique value of the attributes
      *
      * @throws IllegalFilterException
-     * @throws IOException
+     * @throws IOException 
      */
-    public static CalcResult calculateMin(FeatureCollection collection,
+    public static CalcResult calculateUnique(FeatureCollection collection,
         Expression expression) throws IllegalFilterException, IOException {
-        MinVisitor minVisitor = new MinVisitor(expression);
-        collection.accepts(minVisitor);
-        return minVisitor.getResult();
+        UniqueVisitor uniqueVisitor = new UniqueVisitor(expression);
+        collection.accepts(uniqueVisitor);
+
+        return uniqueVisitor.getResult();
     }
 
     /**
@@ -88,7 +91,7 @@ public class Collection_MinFunction extends FunctionExpressionImpl
      * FeatureCollection.
      * 
      * <p>
-     * For an aggregate function (like min) please use the WFS mandated XPath
+     * For an aggregate function (like unique) please use the WFS mandated XPath
      * syntax to refer to featureMember content.
      * </p>
      * 
@@ -103,7 +106,7 @@ public class Collection_MinFunction extends FunctionExpressionImpl
     public void setArgs(Expression[] args) {
         if (args.length != 1) {
             throw new IllegalArgumentException(
-                "Require a single argument for minimum");
+                "Require a single argument for unique");
         }
 
         expr = args[0];
@@ -143,11 +146,11 @@ public class Collection_MinFunction extends FunctionExpressionImpl
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {
 				previousFeatureCollection = featureCollection;
-				min = null;
+				unique = null;
 				try {
-					CalcResult result = calculateMin(featureCollection, expr);
+					CalcResult result = calculateUnique(featureCollection, expr);
 					if (result != null) {
-						min = result.getValue();
+						unique = result.getValue();
 					}
 				} catch (IllegalFilterException e) {
 					LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
@@ -156,7 +159,7 @@ public class Collection_MinFunction extends FunctionExpressionImpl
 				}
 			}
 		}
-		return min;
+		return unique;
     }
 
     public void setExpression(Expression e) {
@@ -178,9 +181,9 @@ public class Collection_MinFunction extends FunctionExpressionImpl
     /**
      * Return this function as a string.
      *
-     * @return String representation of this min function.
+     * @return String representation of this unique function.
      */
     public String toString() {
-        return "Collection_Min(" + expr + ")";
+        return "Collection_Unique(" + expr + ")";
     }
 }
