@@ -46,7 +46,7 @@ import java.util.PropertyResourceBundle;
  *
  * @author Cory Horner, Refractions Research
  */
-public class PostgisFeatureCollectionTest extends DataTestCase {
+public class PostgisFeatureCollectionOnlineTest extends DataTestCase {
     private PostgisDataStore dstore = null;
     private JDBCFeatureCollection fc = null;
     private JDBCFeatureCollection fc2 = null;
@@ -56,7 +56,7 @@ public class PostgisFeatureCollectionTest extends DataTestCase {
     AttributeExpression att = null;
     AttributeExpression att2 = null;
 
-    public PostgisFeatureCollectionTest(String test) {
+    public PostgisFeatureCollectionOnlineTest(String test) {
         super(test);
     }
 

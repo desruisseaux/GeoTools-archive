@@ -366,7 +366,9 @@ public class DefaultFeatureType implements FeatureType {
     }
 
     public boolean equals(Object other) {
-        return equals((FeatureType) other);
+        if (other instanceof FeatureType) 
+        	return equals((FeatureType) other);
+       	return false;
     }
 
     /**
