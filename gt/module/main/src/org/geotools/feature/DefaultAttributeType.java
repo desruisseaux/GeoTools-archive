@@ -279,6 +279,10 @@ public class DefaultAttributeType implements AttributeType {
         if (other == null) {
             return false;
         }
+        
+        if( !(other instanceof AttributeType) ){
+            return false;
+        }
 
         AttributeType att = (AttributeType) other;
 
