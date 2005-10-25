@@ -123,7 +123,7 @@ public class Mercator extends MapProjection {
     Mercator(final ParameterValueGroup parameters, final Collection expected)
             throws ParameterNotFoundException
     {
-        //Fetch parameters 
+        // Fetch parameters 
         super(parameters, expected);
         if (expected.contains(Provider2SP.STANDARD_PARALLEL)) {
             // scaleFactor is not a parameter in the Mercator_2SP case and is computed from
@@ -166,7 +166,7 @@ public class Mercator extends MapProjection {
         }
         return values;
     }
-    
+
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
      * and stores the result in {@code ptDst} (linear distance on a unit sphere).
@@ -226,12 +226,12 @@ public class Mercator extends MapProjection {
         {
             super(parameters, expected);
             assert isSpherical;
-	}
+        }
 
-	/**
-	 * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
+        /**
+         * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
          * and stores the result in {@code ptDst} using equations for a Sphere.
-	 */
+         */
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException
         {
@@ -272,7 +272,7 @@ public class Mercator extends MapProjection {
                 return ptDst;
             }
             return new Point2D.Double(x,y);
-	}      
+        }      
     }
 
 

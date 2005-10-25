@@ -59,6 +59,12 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
     private static final Logger LOGGER = Logger.getLogger("org.geotools.openoffice");
 
     /**
+     * Factor for conversions of days to milliseconds.
+     * Used for date conversions as in {@link #toDate}.
+     */
+    protected static final long DAY_TO_MILLIS = 24*60*60*1000L;
+
+    /**
      * Informations about exported methods.
      */
     protected final Map/*<String,MethodInfo>*/ methods = new HashMap/*<String,MethodInfo>*/();
@@ -255,6 +261,7 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
 
     /**
      * Sets the timezone for time values to be provided to {@link #toDate}.
+     * If this method is never invoked, then the default timezone is the locale one.
      */
     protected void setTimeZone(final String timezone) {
         final TimeZone tz = TimeZone.getTimeZone(timezone);
@@ -266,19 +273,20 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
     }
 
     /**
-     * Converts a date from a spreadsheet values to a Java {@link java.util.Date} object.
+     * Returns the spreadsheet epoch. The timezone is the one specified during the
+     * last invocation of {@link #setTimeZone}. The epoch is used for date conversions
+     * as in {@link #toDate}.
      *
      * @param  xOptions Provided by OpenOffice.
-     * @param  time The spreadsheet numerical value for a date, by default in the local timezone.
-     * @return The date (in GMT) as a Java object.
+     * @return The spreedsheet epoch, always as a new Java Date object.
      */
-    protected java.util.Date toDate(final XPropertySet xOptions, final double time) {
+    protected java.util.Date getEpoch(final XPropertySet xOptions) {
         final Date date;
         try {
             date = (Date) AnyConverter.toObject(Date.class, xOptions.getPropertyValue("NullDate"));
         } catch (Exception e) {
             // Les exception lancées par la ligne ci-dessus sont nombreuses...
-            reportException("toDate", e);
+            reportException("getEpoch", e);
             return null;
         }
         if (calendar == null) {
@@ -286,9 +294,36 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
         }
         calendar.clear();
         calendar.set(date.Year, date.Month-1, date.Day);
-        final java.util.Date epoch = calendar.getTime();
-        epoch.setTime(epoch.getTime() + Math.round(time * (24*60*60*1000L)));
-        return epoch;
+        return calendar.getTime();
+    }
+
+    /**
+     * Converts a date from a spreadsheet value to a Java {@link java.util.Date} object.
+     * The timezone is the one specified during the last invocation of {@link #setTimeZone}.
+     *
+     * @param  xOptions Provided by OpenOffice.
+     * @param  time The spreadsheet numerical value for a date, by default in the local timezone.
+     * @return The date as a Java object.
+     */
+    protected java.util.Date toDate(final XPropertySet xOptions, final double time) {
+        final java.util.Date date = getEpoch(xOptions);
+        if (date != null) {
+            date.setTime(date.getTime() + Math.round(time * DAY_TO_MILLIS));
+        }
+        return date;
+    }
+
+    /**
+     * Converts a date from a Java {@link java.util.Date} object to a spreadsheet value.
+     * The timezone is the one specified during the last invocation of {@link #setTimeZone}.
+     */
+    protected double toDouble(final XPropertySet xOptions, final java.util.Date time) {
+        final java.util.Date epoch = getEpoch(xOptions);
+        if (epoch != null) {
+            return (time.getTime() - epoch.getTime()) / (double)DAY_TO_MILLIS;
+        } else {
+            return Double.NaN;
+        }
     }
 
     /**

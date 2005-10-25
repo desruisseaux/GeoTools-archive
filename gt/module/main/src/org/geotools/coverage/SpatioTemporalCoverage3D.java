@@ -80,10 +80,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  * <strong>Note:</strong> This class is not thread safe for performance reasons. If desired,
  * users should create one instance of {@code SpatioTemporalCoverage3D} for each thread.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class SpatioTemporalCoverage3D extends AbstractCoverage {
     /**
@@ -211,6 +210,15 @@ control:    for (int p=0; p<=1; p++) {
     }
 
     /**
+     * Returns the coverage specified at construction time.
+     *
+     * @since 2.2
+     */
+    public final Coverage getWrappedCoverage() {
+        return coverage;
+    }
+
+    /**
      * The number of sample dimensions in the coverage.
      * For grid coverages, a sample dimension is a band.
      *
@@ -288,6 +296,10 @@ control:    for (int p=0; p<=1; p++) {
      *         1 for <var>y</var> or
      *         2 for <var>t</var>.
      * @return The corresponding dimension in the wrapped coverage.
+     *
+     * @see #toDate
+     * @see #toPoint2D
+     * @see #toDirectPosition
      */
     public final int toSourceDimension(final int dimension) {
         switch (dimension) {
@@ -300,18 +312,56 @@ control:    for (int p=0; p<=1; p++) {
 
     /**
      * Returns a coordinate point for the given spatial position and date.
-     * Overrides this method if all {@code evaluate(Point2D, Date, ...)}
-     * methods should transform their coordinates in a different way.
      *
      * @param  point The spatial position.
      * @param  date  The date.
      * @return The coordinate point.
+     *
+     * @see #toDate
+     * @see #toPoint2D
+     *
+     * @since 2.2
      */
-    private DirectPosition toDirectPosition(final Point2D point, final Date date) {
+    public final DirectPosition toDirectPosition(final Point2D point, final Date date) {
         coordinate.ordinates[       xDimension] = point.getX();
         coordinate.ordinates[       yDimension] = point.getY();
         coordinate.ordinates[temporalDimension] = temporalCRS.toValue(date);
         return coordinate;
+    }
+
+    /**
+     * Returns the date for the specified direct position. This method (together with
+     * {@link #toPoint2D toPoint2D}) is the converse of {@link #toDirectPosition toDirectPosition}.
+     *
+     * @param  position The direct position, as computed by
+     *                  {@link #toDirectPosition toDirectPosition}.
+     * @return The date.
+     *
+     * @see #toPoint2D
+     * @see #toDirectPosition
+     *
+     * @since 2.2
+     */
+    public final Date toDate(final DirectPosition position) {
+        return temporalCRS.toDate(position.getOrdinate(temporalDimension));
+    }
+
+    /**
+     * Returns the spatial coordinate for the specified direct position. This method (together with
+     * {@link #toDate toDate}) is the converse of {@link #toDirectPosition toDirectPosition}.
+     *
+     * @param  position The direct position, as computed by
+     *                  {@link #toDirectPosition toDirectPosition}.
+     * @return The spatial coordinate.
+     *
+     * @see #toDate
+     * @see #toDirectPosition
+     *
+     * @since 2.2
+     */
+    public final Point2D toPoint2D(final DirectPosition position) {
+        return new Point2D.Double(position.getOrdinate(xDimension),
+                                  position.getOrdinate(yDimension));
     }
 
     /**

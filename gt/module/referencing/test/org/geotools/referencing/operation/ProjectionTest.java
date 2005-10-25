@@ -159,7 +159,37 @@ public class ProjectionTest extends TestCase {
         final ParameterValueGroup values = mtFactory.getDefaultParameters(proj);
         ParameterWriter.print((ParameterDescriptorGroup) values.getDescriptor());
     }
-    
+
+    /**
+     * Some tests for the Equidistant Cylindrical projection.
+     */
+    public void testEquidistantCylindrical() throws FactoryException, TransformException {
+
+        ///////////////////////////////////////
+        // Equidistant_Cylindrical tests     //
+        ///////////////////////////////////////
+        if (VERBOSE) {
+            printParameters("Equidistant_Cylindrical");
+        }
+        MathTransform transform;
+        ParameterValueGroup params;
+
+        // approx bristol UK
+        params = mtFactory.getDefaultParameters("Equidistant_Cylindrical");
+        params.parameter("semi_major")        .setValue(6378137);
+        params.parameter("semi_minor")        .setValue(6378137);
+        params.parameter("central_meridian")  .setValue(  0.000);
+        params.parameter("latitude_of_origin").setValue(  0.000);
+        params.parameter("false_easting")     .setValue(  0.0  );
+        params.parameter("false_northing")    .setValue(  0.0  );
+        transform = mtFactory.createParameterizedTransform(params);
+        if (VERBOSE) {
+            System.out.println(transform);
+        }
+        doTransform(new DirectPosition2D(-2.5, 51.37),
+                    new DirectPosition2D(-278298.73, 5718482.24), transform);
+    }
+
     /**
      * Some tests for the Mercator Projection.
      */

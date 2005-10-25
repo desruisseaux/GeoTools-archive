@@ -77,9 +77,10 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Rueben Schulz
  *
  * @see <A HREF="http://mathworld.wolfram.com/MapProjection.html">Map projections on MathWorld</A>
+ * @see <A HREF="http://atlas.gc.ca/site/english/learningresources/carto_corner/map_projections.html">Map projections on the atlas of Canada</A>
  */
-public abstract class MapProjection extends AbstractMathTransform implements MathTransform2D,
-                                                                             Serializable
+public abstract class MapProjection extends AbstractMathTransform
+                implements MathTransform2D, Serializable
 {
     /**
      * Maximum difference allowed when comparing real numbers.
