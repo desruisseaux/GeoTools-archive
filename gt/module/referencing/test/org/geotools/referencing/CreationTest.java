@@ -225,9 +225,10 @@ public class CreationTest extends TestCase {
                  * oriented variants with an affine transform.
                  */
                 out.println(classification);
-                final boolean southOrientated =
-                        (classification.equalsIgnoreCase("Transverse Mercator (South Orientated)"));
-                if (!southOrientated) {
+                final boolean skip =
+                        classification.equalsIgnoreCase("Transverse Mercator (South Orientated)") ||
+                        classification.equalsIgnoreCase("Equidistant_Cylindrical");
+                if (!skip) {
                     assertEquals(classification, ((MapProjection) mt).getParameterDescriptors().getName().getCode());
                 }
                 final ProjectedCRS projCRS =

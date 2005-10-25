@@ -35,6 +35,8 @@ import javax.imageio.spi.ServiceRegistry;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
@@ -432,13 +434,14 @@ public class FactoryRegistry extends ServiceRegistry {
                  * math transform on a machine without JAI installation. Since the service
                  * may not be essential (this is the case of WarpTransform2D), just skip it.
                  */
-                // TODO: localize
-                final LogRecord record = new LogRecord(Level.WARNING,
-                        "Can't load a service for category "+Utilities.getShortName(category));
-                record.setSourceClassName("FactoryRegistry");
-                record.setSourceMethodName("scanForPlugins");
-                record.setThrown(error);
-                LOGGER.log(record);
+                loadingFailure(category, error);
+                continue;
+            } catch (RuntimeException error) {
+                /*
+                 * Failed to register a service for a reason not related to Java Virtual Machine
+                 * errors. It may be some service-dependent missing resources.
+                 */
+                loadingFailure(category, error);
                 continue;
             }
             final Class factoryClass = factory.getClass();
@@ -522,6 +525,18 @@ public class FactoryRegistry extends ServiceRegistry {
             record.setSourceMethodName("scanForPlugins");
             LOGGER.log(record);
         }
+    }
+
+    /**
+     * Invoked when a service can't be loaded. Log a warning, but do not stop the process.
+     */
+    private static void loadingFailure(final Class category, final Throwable error) {
+        final LogRecord record = Logging.format(Level.WARNING,
+                LoggingKeys.CANT_LOAD_SERVICE_$1, Utilities.getShortName(category));
+        record.setSourceClassName("FactoryRegistry");
+        record.setSourceMethodName("scanForPlugins");
+        record.setThrown(error);
+        LOGGER.log(record);
     }
 
     /**
