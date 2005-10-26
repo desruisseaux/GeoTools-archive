@@ -136,6 +136,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 0,68,27
   </colors>
   <suitability>
+   <scheme size="2">G,G,D,G,G,G</scheme>
+   <scheme size="3">G,G,D,G,G,G</scheme>
+   <scheme size="4">G,G,D,G,D,G</scheme>
+   <scheme size="5">G,D,D,G,D,D</scheme>
+   <scheme size="6">G,B,B,D,B,D</scheme>
+   <scheme size="7">G,B,B,D,B,B</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -156,6 +164,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 1,70,54
   </colors>
   <suitability>
+   <scheme size="2">G,G,D,G,G,G</scheme>
+   <scheme size="3">G,G,D,G,G,G</scheme>
+   <scheme size="4">G,G,D,G,D,G</scheme>
+   <scheme size="5">G,D,B,D,D,D</scheme>
+   <scheme size="6">G,B,B,B,B,D</scheme>
+   <scheme size="7">G,B,B,D,B,B</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -176,6 +192,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 2,56,88
   </colors>
   <suitability>
+   <scheme size="2">G,G,G,G,G,G</scheme>
+   <scheme size="3">G,G,G,G,G,G</scheme>
+   <scheme size="4">D,G,D,G,G,G</scheme>
+   <scheme size="5">G,D,G,D,D,D</scheme>
+   <scheme size="6">G,B,B,D,D,D</scheme>
+   <scheme size="7">G,B,B,B,B,B</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">B,G,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -196,6 +220,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 77,0,75
   </colors>
   <suitability>
+   <scheme size="2">G,G,G,G,G,G</scheme>
+   <scheme size="3">G,G,G,G,G,G</scheme>
+   <scheme size="4">G,G,D,G,D,G</scheme>
+   <scheme size="5">G,D,G,D,D,D</scheme>
+   <scheme size="6">G,D,D,G,D,D</scheme>
+   <scheme size="7">G,B,B,B,B,B</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">B,G,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -216,6 +248,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 73,0,106
   </colors>
   <suitability>
+   <scheme size="2">G,G,G,G,G,G</scheme>
+   <scheme size="3">G,G,G,G,G,G</scheme>
+   <scheme size="4">G,G,D,G,G,G</scheme>
+   <scheme size="5">G,D,D,D,G,D</scheme>
+   <scheme size="6">G,B,D,D,D,D</scheme>
+   <scheme size="7">G,B,B,D,D,D</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -236,6 +276,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 103,0,31
   </colors>
   <suitability>
+   <scheme size="2">G,G,D,G,G,G</scheme>
+   <scheme size="3">G,G,D,G,G,G</scheme>
+   <scheme size="4">G,G,D,G,G,G</scheme>
+   <scheme size="5">G,D,D,G,G,D</scheme>
+   <scheme size="6">G,B,D,D,D,D</scheme>
+   <scheme size="7">G,B,B,D,D,B</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -256,6 +304,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 127,0,0
   </colors>
   <suitability>
+   <scheme size="2">G,G,D,G,G,G</scheme>
+   <scheme size="3">G,G,D,G,G,G</scheme>
+   <scheme size="4">G,G,D,G,G,G</scheme>
+   <scheme size="5">G,G,D,G,G,G</scheme>
+   <scheme size="6">G,B,D,D,D,D</scheme>
+   <scheme size="7">G,B,B,D,D,D</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -276,6 +332,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 128,0,38
   </colors>
   <suitability>
+   <scheme size="2">G,G,G,G,G,D</scheme>
+   <scheme size="3">G,G,G,G,G,D</scheme>
+   <scheme size="4">G,B,G,D,G,D</scheme>
+   <scheme size="5">G,B,G,D,G,D</scheme>
+   <scheme size="6">G,B,D,D,D,D</scheme>
+   <scheme size="7">G,B,D,D,D,B</scheme>
+   <scheme size="8">G,B,B,B,D,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -296,6 +360,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 102,37,6
   </colors>
   <suitability>
+   <scheme size="2">G,G,G,G,G,G</scheme>
+   <scheme size="3">G,G,G,G,G,G</scheme>
+   <scheme size="4">G,G,G,G,G,G</scheme>
+   <scheme size="5">G,D,D,G,G,D</scheme>
+   <scheme size="6">G,B,D,D,G,D</scheme>
+   <scheme size="7">G,B,D,D,D,D</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -316,6 +388,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 63,0,125
   </colors>
   <suitability>
+   <scheme size="2">G,G,D,G,G,G</scheme>
+   <scheme size="3">G,G,D,G,G,G</scheme>
+   <scheme size="4">G,D,D,G,D,D</scheme>
+   <scheme size="5">G,D,B,D,D,D</scheme>
+   <scheme size="6">G,B,B,B,B,D</scheme>
+   <scheme size="7">G,B,B,B,B,B</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -336,6 +416,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 8,48,107
   </colors>
   <suitability>
+   <scheme size="2">G,G,D,G,G,G</scheme>
+   <scheme size="3">G,G,D,G,G,G</scheme>
+   <scheme size="4">G,G,D,G,D,G</scheme>
+   <scheme size="5">G,D,D,G,D,D</scheme>
+   <scheme size="6">G,B,B,B,B,D</scheme>
+   <scheme size="7">G,B,B,B,B,B</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -356,6 +444,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 0,68,27
   </colors>
   <suitability>
+   <scheme size="2">G,G,D,G,G,G</scheme>
+   <scheme size="3">G,G,D,G,G,G</scheme>
+   <scheme size="4">G,G,D,G,D,G</scheme>
+   <scheme size="5">G,D,D,G,D,D</scheme>
+   <scheme size="6">G,B,B,B,B,D</scheme>
+   <scheme size="7">G,B,B,B,B,B</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -376,6 +472,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 127,39,4
   </colors>
   <suitability>
+   <scheme size="2">G,G,G,G,G,G</scheme>
+   <scheme size="3">G,G,G,G,G,G</scheme>
+   <scheme size="4">G,D,D,G,G,D</scheme>
+   <scheme size="5">G,D,D,G,G,D</scheme>
+   <scheme size="6">G,B,B,D,D,D</scheme>
+   <scheme size="7">G,B,B,B,D,D</scheme>
+   <scheme size="8">G,B,B,D,D,D</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -396,6 +500,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 103,0,13
   </colors>
   <suitability>
+   <scheme size="2">G,G,G,G,G,G</scheme>
+   <scheme size="3">G,G,G,G,G,G</scheme>
+   <scheme size="4">G,G,G,G,G,G</scheme>
+   <scheme size="5">G,D,D,G,D,D</scheme>
+   <scheme size="6">G,D,B,D,B,B</scheme>
+   <scheme size="7">G,B,B,B,B,B</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
  <palette>
@@ -416,6 +528,14 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 0,0,0
   </colors>
   <suitability>
+   <scheme size="2">G,G,G,B,G,G</scheme>
+   <scheme size="3">G,G,G,B,G,G</scheme>
+   <scheme size="4">G,G,D,G,D,G</scheme>
+   <scheme size="5">G,D,B,D,D,D</scheme>
+   <scheme size="6">G,B,B,B,B,D</scheme>
+   <scheme size="7">G,B,B,B,B,B</scheme>
+   <scheme size="8">G,B,B,B,B,B</scheme>
+   <scheme size="9">G,B,B,B,B,B</scheme>
   </suitability>
  </palette>
 </palettes>
