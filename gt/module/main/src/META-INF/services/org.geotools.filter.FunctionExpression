@@ -1,4 +1,5 @@
 org.geotools.filter.function.EqualIntervalFunction
+org.geotools.filter.function.UniqueIntervalFunction
 org.geotools.filter.function.Collection_AverageFunction
 org.geotools.filter.function.Collection_BoundsFunction
 org.geotools.filter.function.Collection_CountFunction

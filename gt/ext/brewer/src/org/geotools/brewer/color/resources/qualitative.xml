@@ -22,7 +22,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 -->
 <type>
 <name>Qualitative</name>
-<description></description>
+<description>Qualitative schemes do not imply magnitude differences between legend classes, and hues are used to create the primary visual differences between classes. They are best suited to representing nominal or categorical data.</description>
 <samples>
  <sample size="2">0,1</sample>
  <sample size="3">0,1,2</sample>
@@ -39,6 +39,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 <palettes>
  <palette>
   <name>Set1</name>
+  <description>includes bold, readily named, basic colors (such as red, green, blue)</description>
   <colors>
 228,26,28:
 55,126,184:
@@ -66,6 +67,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Pastel1</name>
+  <description>lighter version of Set 1</description>
   <colors>
 251,180,174:
 179,205,227:
@@ -90,6 +92,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Set2</name>
+  <description>includes mostly mixture colors (such as blue-green, red-orange)</description>
   <colors>
 102,194,165:
 252,141,98:
@@ -112,6 +115,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Pastel2</name>
+  <description>lighter version of Set 2</description>
   <colors>
 179,226,205:
 253,205,172:
@@ -134,6 +138,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Dark2</name>
+  <description>darker version of Set 2</description>
   <colors>
 27,158,119:
 217,95,2:
@@ -156,6 +161,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Set3</name>
+  <description>median saturation set with more lightness variation and more classes than Set 1 or 2</description>
   <colors>
 141,211,199:
 255,255,179:
@@ -186,6 +192,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Paired</name>
+  <description>light/dark pairs for namable hues</description>
   <colors>
 166,206,227:
 31,120,180:
@@ -216,6 +223,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Accents</name>
+  <description>includes lightness and saturation extremes to accent small or important areas</description>
   <colors>
 127,201,127:
 190,174,212:

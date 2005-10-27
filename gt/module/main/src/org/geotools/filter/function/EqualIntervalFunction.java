@@ -157,4 +157,40 @@ public class EqualIntervalFunction extends ClassificationFunction {
 
         return minmax;
     }
+    
+    public Object getMin(int index) {
+        if (fc == null) {
+            return null;
+        }
+
+        if (min == max) {
+            try {
+                calculateMinAndMax();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        double slotWidth = calculateSlotWidth();
+        return new Double((index * slotWidth) + min);
+    }
+
+    public Object getMax(int index) {
+        if (fc == null) {
+            return null;
+        }
+
+        if (min == max) {
+            try {
+                calculateMinAndMax();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        double slotWidth = calculateSlotWidth();
+        return new Double(max - ((classNum - index - 1) * slotWidth));
+    }
 }

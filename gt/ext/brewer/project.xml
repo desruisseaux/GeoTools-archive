@@ -39,8 +39,27 @@
       <groupId>gt2</groupId>
       <version>2.2.x</version>
     </dependency>
+    <dependency>
+      <id>junit</id>
+      <version>3.8.1</version>
+      <type>test</type>
+      <url>http://junit.org/</url>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.6</version>
+      <properties>
+        <release.bundle>true</release.bundle>
+       </properties>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+    </dependency>
   </dependencies>
   <build>
+    <resources>
+      <resource>
+         <directory>${basedir}/src/org/geotools/brewer/color/resources</directory>
+      </resource>
+    </resources>
     <unitTest>
       <includes>
         <include>**/*Test.java</include>

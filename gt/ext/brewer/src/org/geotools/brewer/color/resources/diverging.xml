@@ -22,7 +22,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 -->
 <type>
 <name>Diverging</name>
-<description></description>
+<description>Diverging schemes put equal emphasis on mid-range critical values and extremes at both ends of the data range. The critical class or break in the middle of the legend is emphasized with light colors and low and high extremes are emphasized with dark colors that have contrasting hues.</description>
 <samples>
  <sample size="2">7,10</sample>
  <sample size="3">4,7,10</sample>
@@ -38,6 +38,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 <palettes>
  <palette>
   <name>PuOr</name>
+  <description>dark orange to light to dark purple</description>
   <colors>
 127,59,8:
 179,88,6:
@@ -70,6 +71,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>BrBG</name>
+  <description>dark brown to light to dark blue-green</description>
   <colors>
 84,48,5:
 140,81,10:
@@ -102,6 +104,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>PRGn</name>
+  <description>dark reddish-purple to light to dark green</description>
   <colors>
 64,0,75:
 118,42,131:
@@ -134,6 +137,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>PiYG</name>
+  <description>dark magenta to light to dark yellow-green</description>
   <colors>
 142,1,82:
 197,27,125:
@@ -166,6 +170,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>RdBu</name>
+  <description>dark red to light to dark blue</description>
   <colors>
 103,0,31:
 178,24,43:
@@ -198,6 +203,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>RdGy</name>
+  <description>dark red to light to dark gray</description>
   <colors>
 103,0,31:
 178,24,43:
@@ -230,6 +236,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>RdYlBu</name>
+  <description>dark red to light yellow to dark blue</description>
   <colors>
 165,0,38:
 215,48,39:
@@ -262,6 +269,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Spectral</name>
+  <description>dark red, orange, light yellow, green, dark blue</description>
   <colors>
 158,1,66:
 213,62,79:
@@ -294,6 +302,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>RdYlGn</name>
+  <description>dark red, orange, light yellow, yellow-green, dark green</description>
   <colors>
 165,0,38:
 215,48,39:

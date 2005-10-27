@@ -1,5 +1,20 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.brewer.color;
-
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -8,7 +23,10 @@ import org.xml.sax.SAXException;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,7 +42,9 @@ public class ColorBrewer {
     public static final String SEQUENTIAL = "SEQUENTIAL";
     public static final String DIVERGING = "DIVERGING";
     public static final String QUALITATIVE = "QUALITATIVE";
-    String legendType;
+    String legendType = null;
+    String name = null;
+    String description = null;
     Hashtable palettes;
 
     /**
@@ -42,11 +62,47 @@ public class ColorBrewer {
     }
 
     public String[] getPaletteNames() {
-    	Object[] keys = palettes.keySet().toArray();
-    	String[] paletteList = new String[keys.length];
-    	for (int i = 0; i < keys.length; i++) {
-    		paletteList[i] = keys[i].toString();
-    	}
+        Object[] keys = palettes.keySet().toArray();
+        String[] paletteList = new String[keys.length];
+
+        for (int i = 0; i < keys.length; i++) {
+            paletteList[i] = keys[i].toString();
+        }
+
+        return paletteList;
+    }
+
+    /**
+     * Generates an array of palette names for palettes which have at least x
+     * classes and at most y classes.
+     *
+     * @param minClasses x
+     * @param maxClasses y
+     *
+     * @return filtered string array of palette names
+     */
+    public String[] getPaletteNames(int minClasses, int maxClasses) {
+        Object[] keys = palettes.keySet().toArray();
+        Set paletteSet = new HashSet();
+
+        //generate the set of palette names
+        for (int i = 0; i < keys.length; i++) {
+            BrewerPalette thisPalette = (BrewerPalette) palettes.get(keys[i]);
+            int numColors = thisPalette.getMaxColors();
+
+            if ((numColors >= minClasses) && (numColors <= maxClasses)) {
+                paletteSet.add(thisPalette.getName());
+            }
+        }
+
+        //convert set to string array
+        String[] paletteList = new String[paletteSet.size()];
+        Object[] paletteObjList = paletteSet.toArray();
+
+        for (int i = 0; i < paletteSet.size(); i++) {
+            paletteList[i] = (String) paletteObjList[i];
+        }
+
         return paletteList;
     }
 
@@ -55,7 +111,7 @@ public class ColorBrewer {
     }
 
     /**
-     * Loads the appropriate palette into the ColorBrewer
+     * Loads the appropriate set of palettes into the ColorBrewer
      *
      * @param legendType ColorBrewer.SEQUENTIAL, DIVERGING, or QUALITATIVE
      */
@@ -66,12 +122,14 @@ public class ColorBrewer {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            InputStream stream = getClass().getResourceAsStream("resources/"
-                    + legendType.toLowerCase() + ".xml");
+            String palette = legendType.toLowerCase();
+            URL url = getClass().getResource("resources/" + palette + ".xml");
+            InputStream stream = url.openStream();
             Document document = builder.parse(stream);
-            BrewerPalette seq = new BrewerPalette();
-            seq.setName(fixToString(document.getElementsByTagName("name").item(0)
-                                .getFirstChild().toString()));
+            this.name = fixToString(document.getElementsByTagName("name").item(0)
+                                            .getFirstChild().toString());
+            this.description = fixToString(document.getElementsByTagName(
+                        "description").item(0).getFirstChild().toString());
 
             SampleScheme scheme = new SampleScheme();
 
@@ -107,11 +165,23 @@ public class ColorBrewer {
                         pal.setName(fixToString(item.getFirstChild().toString()));
                     }
 
+                    if (item.getNodeName().equals("description")) {
+                        pal.setDescription(fixToString(
+                                item.getFirstChild().toString()));
+                    }
+
                     if (item.getNodeName().equals("colors")) {
-                        StringTokenizer oTok = new StringTokenizer(fixToString(item.getFirstChild().toString()));
+                        StringTokenizer oTok = new StringTokenizer(fixToString(
+                                    item.getFirstChild().toString()));
                         int numColors = 0;
-                        Color[] colors = new Color[13];
-                        for (int k = 0; k < 13; k++) { //alternate condition: "oTok.countTokens() > 0"
+                        Color[] colors = new Color[15];
+
+                        for (int k = 0; k < 15; k++) { //alternate condition: "oTok.countTokens() > 0"
+
+                            if (!oTok.hasMoreTokens()) {
+                                break;
+                            }
+
                             String entry = oTok.nextToken(":");
                             StringTokenizer iTok = new StringTokenizer(entry);
                             int r = Integer.parseInt(iTok.nextToken(",").trim());
@@ -126,23 +196,27 @@ public class ColorBrewer {
 
                     if (item.getNodeName().equals("suitability")) {
                         NodeList schemeSuitability = item.getChildNodes();
+
                         for (int k = 0; k < schemeSuitability.getLength();
                                 k++) {
                             Node palScheme = schemeSuitability.item(k);
+
                             if (palScheme.getNodeName().equals("scheme")) {
-	                            int paletteSize = Integer.parseInt(palScheme.getAttributes()
-	                                                                     .getNamedItem("size")
-	                                                                     .getNodeValue());
-	                            
-	                            String values = fixToString(palScheme.getFirstChild().toString());
-	                            String[] list = new String[6];
-	                            StringTokenizer tok = new StringTokenizer(values);
-	
-	                            //obtain all 6 values, which should each be G=GOOD, D=DOUBTFUL, B=BAD, or ?=UNKNOWN.
-	                            for (int m = 0; m < 6; m++) {
-	                                list[m] = tok.nextToken(",");
-	                            }
-	                            suitability.setSuitability(paletteSize, list);
+                                int paletteSize = Integer.parseInt(palScheme.getAttributes()
+                                                                            .getNamedItem("size")
+                                                                            .getNodeValue());
+
+                                String values = fixToString(palScheme.getFirstChild()
+                                                                     .toString());
+                                String[] list = new String[6];
+                                StringTokenizer tok = new StringTokenizer(values);
+
+                                //obtain all 6 values, which should each be G=GOOD, D=DOUBTFUL, B=BAD, or ?=UNKNOWN.
+                                for (int m = 0; m < 6; m++) {
+                                    list[m] = tok.nextToken(",");
+                                }
+
+                                suitability.setSuitability(paletteSize, list);
                             }
                         }
                     }
@@ -170,25 +244,30 @@ public class ColorBrewer {
             ioe.printStackTrace();
         }
     }
-    
+
     /**
-	 * Converts "[#text: 1,2,3]" to "1,2,3".
-	 * 
-	 * <p>
-	 * This is a brutal hack for fixing the org.w3c.dom API. Under j1.4
-	 * Node.toString() returns "1,2,3", under j1.5 Node.toString() returns
-	 * "[#text: 1,2,3]".
-	 * </p>
-	 * 
-	 * @param input
-	 * @return
-	 */
+     * Converts "[#text: 1,2,3]" to "1,2,3".
+     * 
+     * <p>
+     * This is a brutal hack for fixing the org.w3c.dom API. Under j1.4
+     * Node.toString() returns "1,2,3", under j1.5 Node.toString() returns
+     * "[#text: 1,2,3]".
+     * </p>
+     *
+     * @param input
+     *
+     * @return
+     */
     private String fixToString(String input) {
-    	if (input.startsWith("[")) {
-    		input = input.substring(1, input.length()-1); //remove []
-    		input = input.replaceAll("#text: ",""); //remove "#text: " 
-    	}
-    	return input;
-    	
+        if (input.startsWith("[")) {
+            input = input.substring(1, input.length() - 1); //remove []
+            input = input.replaceAll("#text: ", ""); //remove "#text: " 
+        }
+
+        return input;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

@@ -38,4 +38,25 @@ public class StyleGeneratorTest extends DataTestCase {
         assertNotNull(style);
 	}
 
+	public void testUniqueGeneration() {
+		ColorBrewer brewer = new ColorBrewer();
+        brewer.loadPalettes(ColorBrewer.QUALITATIVE);
+        FilterFactory ff = FilterFactory.createFilterFactory();
+        Expression expr = null; 
+        FeatureType type = roadType;
+        String attribName = type.getAttributeType(2).getName();
+        FeatureCollection fc = DataUtilities.collection(roadFeatures);
+        try {
+			expr = ff.createAttributeExpression(type, attribName);
+		} catch (IllegalFilterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        String paletteName = "Set3"; //type = Qualitative
+        //get the style
+        StyleGenerator sg = new StyleGenerator(brewer, paletteName, 2, expr, fc);
+        Style style = sg.createStyle();
+        assertNotNull(style);
+	}
+	
 }

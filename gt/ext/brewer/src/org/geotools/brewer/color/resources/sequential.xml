@@ -22,7 +22,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 -->
 <type>
 <name>Sequential</name>
-<description>Suited to ordered data that progress from low to high. Lightness steps dominate the look of these schemes, with light colors for low data values to dark colors for high data values.</description>
+<description>Sequential schemes are suited to ordered data that progress from low to high. Lightness steps dominate the look of these schemes, with light colors for low data values to dark colors for high data values.</description>
 <samples>
  <sample size="2">5,8</sample>
  <sample size="3">2,5,8</sample>
@@ -36,6 +36,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
 <palettes>
  <palette>
   <name>YlGn</name>
+  <description>light yellow to dark green</description>
   <colors>
 255,255,229:
 255,255,204:
@@ -64,6 +65,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>YlGnBu</name>
+  <description>light yellow to green to dark blue</description>
   <colors>
 255,255,217:
 255,255,204:
@@ -92,6 +94,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>GnBu</name>
+  <description>light green to dark blue</description>
   <colors>
 247,252,240:
 240,249,232:
@@ -120,6 +123,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>BuGn</name>
+  <description>light blue to dark green</description>
   <colors>
 247,252,253:
 237,248,251:
@@ -148,6 +152,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>PuBuGn</name>
+  <description>light purple to blue to dark green</description>
   <colors>
 255,247,251:
 246,239,247:
@@ -176,6 +181,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>PuBu</name>
+  <description>light purple to dark blue</description>
   <colors>
 255,247,251:
 241,238,246:
@@ -204,6 +210,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>BuPu</name>
+  <description>light blue to dark purple</description>
   <colors>
 247,252,253:
 237,248,251:
@@ -232,6 +239,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>RdPu</name>
+  <description>light red to dark purple</description>
   <colors>
 255,247,243:
 254,235,226:
@@ -260,6 +268,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>PuRd</name>
+  <description>light purple to dark red</description>
   <colors>
 247,244,249:
 241,238,246:
@@ -288,6 +297,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>OrRd</name>
+  <description>light orange to dark red</description>
   <colors>
 255,247,236:
 254,240,217:
@@ -316,6 +326,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>YlOrRd</name>
+  <description>light yellow to orange to dark red</description>
   <colors>
 255,255,204:
 255,255,178:
@@ -344,6 +355,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>YlOrBr</name>
+  <description>light yellow to orange to dark brown</description>
   <colors>
 255,255,229:
 255,255,212:
@@ -372,6 +384,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Purples</name>
+  <description>light to dark purple</description>
   <colors>
 252,251,253:
 242,240,247:
@@ -400,6 +413,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Blues</name>
+  <description>light to dark blue</description>
   <colors>
 247,251,255:
 239,243,255:
@@ -428,6 +442,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Greens</name>
+  <description>light to dark green</description>
   <colors>
 247,252,245:
 237,248,233:
@@ -456,6 +471,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Oranges</name>
+  <description>light to dark orange</description>
   <colors>
 255,245,235:
 254,237,222:
@@ -484,6 +500,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Reds</name>
+  <description>light to dark red</description>
   <colors>
 255,245,240:
 254,229,217:
@@ -512,6 +529,7 @@ suitability = Colorblind, PhotoCopy, LCD Projector, LCD, CRT, Color Printing
  </palette>
  <palette>
   <name>Grays</name>
+  <description>light to dark gray</description>
   <colors>
 255,255,255:
 247,247,247:
