@@ -55,30 +55,22 @@
     </dependency>
   </dependencies>
   <build>
-    <resources>
-      <resource>
-         <directory>${basedir}/src/org/geotools/brewer/color/resources</directory>
-      </resource>
-    </resources>
+		<resources>
+			<resource>	
+				<directory>src</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
     <unitTest>
       <includes>
         <include>**/*Test.java</include>
       </includes>
-      <excludes>
+      <!--excludes>
         <exclude>**/PaletteTest.java</exclude>
         <exclude>**/StyleGeneratorTest.java</exclude>
-      </excludes>
-      <resources>
-        <resource>
-          <directory>${basedir}/test</directory>
-          <includes>
-            <include>**/*</include>
-          </includes>
-          <excludes>
-            <exclude>**/*.class</exclude>
-          </excludes>
-        </resource>
-      </resources>
+      </excludes-->
     </unitTest>
   </build>
 </project>
