@@ -570,7 +570,7 @@ public class OperationJAI extends Operation2D {
                                                        source.getName()), exception);
                 }
             }
-            final GridGeometry2D targetGeom = new GridGeometry2D(null, toTarget);
+            final GridGeometry2D targetGeom = new GridGeometry2D(null, toTarget, targetCRS);
             final ParameterValueGroup param = processor.getOperation("Resample").getParameters();
             param.parameter("Source")                   .setValue(source);
             param.parameter("GridGeometry")             .setValue(targetGeom);
@@ -669,13 +669,14 @@ public class OperationJAI extends Operation2D {
         final CoordinateReferenceSystem crs = primarySource.getCoordinateReferenceSystem();
         final MathTransform           toCRS = primarySource.getGridGeometry().getGridToCoordinateSystem();
         final RenderedImage            data = createRenderedImage(parameters.parameters, hints);
-        return new GridCoverage2D(name,        // The grid coverage name
-                                  data,        // The underlying data
-                                  crs,         // The coordinate system (may not be 2D).
-                                  toCRS,       // The grid transform (may not be 2D).
-                                  sampleDims,  // The sample dimensions
-                                  sources,     // The source grid coverages.
-                                  null);       // Properties
+        return getFactory(parameters.hints)
+                .create(name,        // The grid coverage name
+                        data,        // The underlying data
+                        crs,         // The coordinate system (may not be 2D).
+                        toCRS,       // The grid transform (may not be 2D).
+                        sampleDims,  // The sample dimensions
+                        sources,     // The source grid coverages.
+                        null);       // Properties
     }
 
     /**
@@ -1025,15 +1026,15 @@ public class OperationJAI extends Operation2D {
          * The {@link JAI} instance to use for the {@code createNS} call will
          * be fetch from the {@link Hints#JAI_INSTANCE} key.
          */
-        public final RenderingHints hints;
+        public final Hints hints;
 
         /**
          * Constructs a new parameter block with the specified values.
          */
         Parameters(final CoordinateReferenceSystem crs,
-                   final MathTransform2D   gridToCRS,
-                   final ParameterBlockJAI parameters,
-                   final RenderingHints    hints)
+                   final MathTransform2D     gridToCRS,
+                   final ParameterBlockJAI   parameters,
+                   final Hints               hints)
         {
             this.crs        = crs;
             this.gridToCRS  = gridToCRS;

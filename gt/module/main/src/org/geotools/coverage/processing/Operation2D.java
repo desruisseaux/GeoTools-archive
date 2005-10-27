@@ -30,8 +30,10 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.referencing.IdentifiedObject;
 
 // Geotools dependencies
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.factory.Hints;
+import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.referencing.NamedIdentifier;
@@ -93,5 +95,14 @@ public abstract class Operation2D extends AbstractOperation {
             }
         }
         return GridCoverageProcessor2D.getDefault();
+    }
+
+    /**
+     * Returns the factory to use for creating new {@link GridCoverage2D} objects.
+     *
+     * @since 2.2
+     */
+    protected static GridCoverageFactory getFactory(final Hints hints) {
+        return FactoryFinder.getGridCoverageFactory(hints);
     }
 }

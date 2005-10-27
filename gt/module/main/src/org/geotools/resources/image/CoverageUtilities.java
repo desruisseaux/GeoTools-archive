@@ -20,25 +20,19 @@
 package org.geotools.resources.image;
 
 // J2SE and JAI dependencies
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.Collection;
 import java.awt.image.RenderedImage;
 import javax.media.jai.PropertySource;
 
 // OpenGIS dependencies
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.grid.GridGeometry;
-import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.operation.MathTransform1D;
-import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GeneralGridRange;
-import org.geotools.coverage.grid.InvalidGridGeometryException;
 import org.geotools.coverage.grid.RenderedCoverage;
-import org.geotools.geometry.GeneralEnvelope;
 
 
 /**
@@ -55,90 +49,6 @@ public final class CoverageUtilities {
      */
     private CoverageUtilities() {
     }
-
-    ///////////////////////////////////////////////////////////////////
-    ////////                                                   ////////
-    ////////        GridGeometry / GridRange / Envelope        ////////
-    ////////                                                   ////////
-    ///////////////////////////////////////////////////////////////////
-
-    /**
-     * Returns {@code true} if the specified geometry has a valid grid range.
-     */
-    public static boolean hasGridRange(final GridGeometry geometry) {
-        if (geometry != null) try {
-            return geometry.getGridRange() != null;
-        } catch (InvalidGridGeometryException exception) {
-            // Ignore.
-        }
-        return false;
-    }
-
-    /**
-     * Returns {@code true} if the specified geometry
-     * has a valid "grid to coordinate system" transform.
-     */
-    public static boolean hasTransform(final GridGeometry geometry) {
-        if (geometry != null) try {
-            return geometry.getGridToCoordinateSystem() != null;
-        } catch (InvalidGridGeometryException exception) {
-            // Ignore.
-        }
-        return false;
-    }
-
-    /**
-     * Cast the specified grid range into an envelope. This is sometime used before to transform
-     * the envelope using {@link CTSUtilities#transform(MathTransform, Envelope)}.
-     */
-    public static Envelope toEnvelope(final GridRange gridRange) {
-        final int dimension = gridRange.getDimension();
-        final double[] lower = new double[dimension];
-        final double[] upper = new double[dimension];
-        for (int i=0; i<dimension; i++) {
-            lower[i] = gridRange.getLower(i);
-            upper[i] = gridRange.getUpper(i);
-        }
-        return new GeneralEnvelope(lower, upper);
-    }
-
-    /**
-     * Cast the specified envelope into a grid range. This is sometime used after the envelope
-     * has been transformed using {@link CTSUtilities#transform(MathTransform, Envelope)}. The
-     * floating point values are rounded toward the nearest integer.
-     * <br><br>
-     * <strong>Note about conversion of floating point values to integers:</strong><br>
-     * In previous versions, we used {@link Math#floor} and {@link Math#ceil} in order to
-     * make sure that the grid range encompass all the envelope (something similar to what
-     * <cite>Java2D</cite> does when casting {@link java.awt.geom.Rectangle2D} to
-     * {@link java.awt.Rectangle}). But it had the undesirable effect of changing image width.
-     * For example the range {@code [-0.25  99.75]} were changed to {@code [-1  100]},
-     * which is not what the {@link javax.media.jai.operator.AffineDescriptor Affine} operation
-     * expects for instance. Rounding to nearest integer produces better results. Note that the
-     * rounding mode do not alter the significiance of the "Resample" operation, since this
-     * operation will respect the "grid to coordinate system" transform no matter what the
-     * grid range is.
-     */
-    public static GridRange toGridRange(final Envelope envelope) {
-        final int dimension = envelope.getDimension();
-        final int[] lower = new int[dimension];
-        final int[] upper = new int[dimension];
-        for (int i=0; i<dimension; i++) {
-            // See "note about conversion of floating point values to integers" in the JavaDoc.
-            lower[i] = (int)Math.round(envelope.getMinimum(i));
-            upper[i] = (int)Math.round(envelope.getMaximum(i));
-        }
-        return new GeneralGridRange(lower, upper);
-    }
-
-
-
-
-    //////////////////////////////////////////////////////////////////////
-    ////////                                                      ////////
-    ////////    GridCoverage / SampleDimension / RenderedImage    ////////
-    ////////                                                      ////////
-    //////////////////////////////////////////////////////////////////////
 
     /**
      * Returns {@code true} if at least one of the specified sample dimensions has a

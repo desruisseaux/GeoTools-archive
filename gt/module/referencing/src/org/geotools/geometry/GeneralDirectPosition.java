@@ -160,8 +160,12 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      * Set the coordinate reference system in which the coordinate is given.
      *
      * @param crs The new coordinate reference system, or {@code null}.
+     * @throws MismatchedDimensionException if the specified CRS doesn't have the expected
+     *         number of dimensions.
      */
-    public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
+    public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs)
+            throws MismatchedDimensionException
+    {
         checkCoordinateReferenceSystemDimension(crs, getDimension());
         this.crs = crs;
     }
@@ -171,15 +175,16 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      *
      * @param  crs The coordinate reference system to check.
      * @param  expected the dimension expected.
-     * @throws IllegalArgumentException if the CRS dimension is not valid.
+     * @throws MismatchedDimensionException if the CRS dimension is not valid.
      */
     static void checkCoordinateReferenceSystemDimension(final CoordinateReferenceSystem crs,
                                                         final int expected)
+            throws MismatchedDimensionException
     {
         if (crs != null) {
             final int dimension = crs.getCoordinateSystem().getDimension();
             if (dimension != expected) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
+                throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
                           crs.getName().getCode(), new Integer(dimension), new Integer(expected)));
             }
         }

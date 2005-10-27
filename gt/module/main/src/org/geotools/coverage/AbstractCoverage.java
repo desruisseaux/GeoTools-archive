@@ -89,7 +89,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.util.SimpleInternationalString;
 
 // Resources
@@ -817,11 +817,11 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                 image = tiled;
             }
             /*
-             * Add a 'gridToCoordinateSystem' property to the image. This is an important
+             * Add a 'gridToCRS' property to the image. This is an important
              * information for constructing a GridCoverage from this image later.
              */
             try {
-                image.setProperty("gridToCoordinateSystem", crsToGrid.createInverse());
+                image.setProperty("gridToCRS", crsToGrid.createInverse());
             } catch (NoninvertibleTransformException exception) {
                 // Can't add the property. Too bad, the image has been created anyway.
                 // Maybe the user know what he is doing...

@@ -100,8 +100,9 @@ public class GridGeometryTest extends TestCase {
         final int[]    upper   = new int[]    {  90,  45,  5};
         final double[] minimum = new double[] {-180, -90,  9};
         final double[] maximum = new double[] {+180, +90, 10};
-        final GridGeometry2D gg = new GridGeometry2D(new GeneralGridRange(lower,upper),
-                                                     new GeneralEnvelope(minimum, maximum), null);
+        final GridGeometry2D gg;
+        gg = new GridGeometry2D(new GeneralGridRange(lower,upper),
+                                new GeneralEnvelope(minimum, maximum), null, false);
         final AffineTransform tr = (AffineTransform) gg.getGridToCoordinateSystem2D();
         assertEquals(AffineTransform.TYPE_UNIFORM_SCALE |
                      AffineTransform.TYPE_TRANSLATION, tr.getType());

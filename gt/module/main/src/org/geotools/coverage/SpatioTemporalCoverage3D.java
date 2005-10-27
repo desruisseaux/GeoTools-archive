@@ -561,8 +561,8 @@ control:    for (int p=0; p<=1; p++) {
         for (int i=0; i<getNumSampleDimensions(); i++){
             bands[i] = GridSampleDimension.wrap(getSampleDimension(i));
         }
-        final MathTransform gridToCRS = ProjectiveTransform.create((AffineTransform)
-                                        image.getProperty("gridToCoordinateSystem"));
+        final MathTransform gridToCRS;
+        gridToCRS = ProjectiveTransform.create((AffineTransform) image.getProperty("gridToCRS"));
         if (factory == null) {
             factory = org.geotools.coverage.FactoryFinder.getGridCoverageFactory(HINTS);
         }

@@ -159,12 +159,6 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * first needed. May appears also in the {@link #sources} list.
      */
     private transient GridCoverage2D inverse;
-
-    /**
-     * The two-dimensional part of the coordinate reference system.
-     * This is usually (but not always) identical to {@link #crs}.
-     */
-    private final CoordinateReferenceSystem crs2D;
     
     /**
      * The raster data.
@@ -181,13 +175,6 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * The grid geometry.
      */
     protected final GridGeometry2D gridGeometry;
-    
-    /**
-     * The coverage's envelope. This envelope must have at least two dimensions. It may have more
-     * dimensions if the coverage has some extent in other dimensions (for example a depth, or a
-     * start and end time).
-     */
-    private final GeneralEnvelope envelope;
     
     /**
      * List of sample dimension information for the grid coverage.
@@ -216,10 +203,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                              final GridCoverage2D coverage)
     {
         super(name, coverage);
-        crs2D            = coverage.crs2D;
         image            = coverage.image;
         gridGeometry     = coverage.gridGeometry;
-        envelope         = coverage.envelope;
         sampleDimensions = coverage.sampleDimensions;
         isGeophysics     = coverage.isGeophysics;
     }
@@ -268,6 +253,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *         is not the same than the coordinate system's dimension.
      * @throws IllegalArgumentException if the number of bands differs
      *         from the number of sample dimensions.
+     *
+     * @deprecated Use {@link GridCoverageFactory} instead.
      */
     public GridCoverage2D(final CharSequence             name, final RenderedImage    image,
                           final CoordinateReferenceSystem crs, final Envelope      envelope,
@@ -275,8 +262,19 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                           final Map properties)
             throws MismatchedDimensionException, IllegalArgumentException
     {
-        this(name, PlanarImage.wrapRenderedImage(image), crs, null,
-             new GeneralEnvelope(envelope), bands, sources, properties);
+        this(name, PlanarImage.wrapRenderedImage(image),
+             new GridGeometry2D(new GeneralGridRange(image), toEnvelope(envelope, crs)),
+             bands, sources, properties);
+    }
+
+    /**
+     * @deprecated Helper method for the above constructor. Also used by deprecated methods
+     *             in {@link GridCoverageFactory}.
+     */
+    static Envelope toEnvelope(final Envelope e, final CoordinateReferenceSystem crs) {
+        final GeneralEnvelope ge = new GeneralEnvelope(e);
+        ge.setCoordinateReferenceSystem(crs);
+        return ge;
     }
 
     /**
@@ -304,6 +302,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *         is not the same than the coordinate system's dimension.
      * @throws IllegalArgumentException if the number of bands differs
      *         from the number of sample dimensions.
+     *
+     * @deprecated Use {@link GridCoverageFactory} instead.
      */
     public GridCoverage2D(final CharSequence             name, final RenderedImage     image,
                           final CoordinateReferenceSystem crs, final MathTransform gridToCRS,
@@ -311,30 +311,46 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                           final Map properties)
             throws MismatchedDimensionException, IllegalArgumentException
     {
-        this(name, PlanarImage.wrapRenderedImage(image), crs, new GridGeometry2D(null, gridToCRS),
-             null, bands, sources, properties);
+        this(name, PlanarImage.wrapRenderedImage(image),
+             new GridGeometry2D(new GeneralGridRange(image), gridToCRS, crs),
+             bands, sources, properties);
     }
 
     /**
-     * Constructs a grid coverage. This private constructor expects either an {@code envelope} or a
-     * {@code gridGeometry}. <strong>One and only one of those arguments</strong> should be non-null.
-     * The null argument will be computed from the non-null arguments.
+     * Constructs a grid coverage with the specified {@linkplain GridGeometry2D grid geometry} and
+     * {@linkplain GridSampleDimension sample dimensions}. The {@linkplain Envelope envelope}
+     * (including the {@linkplain CoordinateReferenceSystem coordinate reference system}) is
+     * inferred from the grid geometry.
+     * <p>
+     * This constructor accepts an optional set of properties. "Properties" in <cite>Java Advanced
+     * Imaging</cite> is what OpenGIS calls "Metadata". Keys are {@link String} objects
+     * ({@link CaselessStringKey} are accepted as well), while values may be any {@link Object}.
+     *
+     * @param name         The grid coverage name.
+     * @param image        The image.
+     * @param gridGeometry The grid geometry (must contains an {@linkplain Envelope envelope} with
+     *                     its {@linkplain CoordinateReferenceSystem coordinate reference system}
+     *                     and a "grid to CRS" {@linkplain MathTransform transform}).
+     * @param bands        Sample dimensions for each image band, or {@code null} for default sample
+     *                     dimensions. If non-null, then this array's length must matches the number
+     *                     of bands in {@code image}.
+     * @param sources      The sources for this grid coverage, or {@code null} if none.
+     * @param properties   The set of properties for this coverage, or {@code null} none.
+     *
+     * @throws IllegalArgumentException if the number of bands differs from the number of sample
+     *         dimensions.
+     *
+     * @since 2.2
      */
-    GridCoverage2D(final CharSequence             name,
-                   final PlanarImage             image,
-                   final CoordinateReferenceSystem crs,
-                         GridGeometry2D   gridGeometry, // ONE and only one of those two
-                         GeneralEnvelope      envelope, // arguments should be non-null.
-                   final GridSampleDimension[] sdBands,
-                   final GridCoverage[]        sources,
-                   final Map                properties)
-            throws MismatchedDimensionException, IllegalArgumentException
+    protected GridCoverage2D(final CharSequence             name,
+                             final PlanarImage             image,
+                                   GridGeometry2D   gridGeometry,
+                             final GridSampleDimension[]   bands,
+                             final GridCoverage[]        sources,
+                             final Map                properties)
+            throws IllegalArgumentException
     {
-        super(name, crs, sources, image, properties);
-        if ((gridGeometry==null) == (envelope==null)) {
-            // Should not happen
-            throw new AssertionError();
-        }
+        super(name, gridGeometry.getCoordinateReferenceSystem(), sources, image, properties);
         this.image = image;
         /*
          * Wraps the user-suplied sample dimensions into instances of Grid2DSampleDimension. This
@@ -344,99 +360,52 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
          * is thrown.
          */
         sampleDimensions = new GridSampleDimension[image.getNumBands()];
-        isGeophysics = Grid2DSampleDimension.create(name, image, sdBands, sampleDimensions);
+        isGeophysics = Grid2DSampleDimension.create(name, image, bands, sampleDimensions);
         /*
-         * Constructs the grid range and the envelope if they were not explicitly provided. The
-         * envelope computation (if needed) requires a valid 'gridToCoordinateSystem' transform
-         * in the GridGeometry object. Otherwise, no transform are required at this stage.  The
-         * range will be inferred from the image size, if needed. In any cases, the envelope must
-         * be non-empty and its dimension must matches the coordinate reference system's dimension.
+         * Computes the grid range if it was not explicitly provided. The range will be inferred
+         * from the image size, if needed. The envelope computation (if needed) requires a valid
+         * 'gridToCRS' transform in the GridGeometry object. In any cases, the envelope must be
+         * non-empty and its dimension must matches the coordinate reference system's dimension.
          */
-        final CoordinateSystem cs = crs.getCoordinateSystem();
-        final GridRange gridRange;
-        if (CoverageUtilities.hasGridRange(gridGeometry)) {
-            gridRange = gridGeometry.getGridRange();
-        } else {
-            gridRange = new GeneralGridRange(image, cs.getDimension());
-            if (CoverageUtilities.hasTransform(gridGeometry)) {
-                gridGeometry = new GridGeometry2D(gridRange, gridGeometry.getGridToCoordinateSystem());
-            }
-        }
-        if (gridGeometry != null) {
-            final String error = checkConsistency(image, gridGeometry);
-            if (error != null) {
-                throw new IllegalArgumentException(error);
-            }
-            if (envelope == null) {
-                envelope = new GeneralEnvelope(gridGeometry.getEnvelope());
+        final int dimension = crs.getCoordinateSystem().getDimension();
+        if (!gridGeometry.isDefined(GridGeometry2D.GRID_RANGE)) {
+            final GridRange r = new GeneralGridRange(image, dimension);
+            if (gridGeometry.isDefined(GridGeometry2D.GRID_TO_CRS)) {
+                gridGeometry = new GridGeometry2D(r, gridGeometry.getGridToCoordinateSystem(), crs);
+            } else {
+                /*
+                 * If the math transform was not explicitly specified by the user, then it will be
+                 * computed from the envelope. In this case, some heuristic rules are used in order
+                 * to decide if we should reverse some axis directions or swap axis. 
+                 */
+                gridGeometry = new GridGeometry2D(r, gridGeometry.getEnvelope());
             }
         } else {
-            // As of this constructor contract, envelope can't be null if the grid geometry
-            // is null. This condition has been checked at the begining of this constructor.
-        }
-        final int dimension = envelope.getDimension();
-        if (dimension != cs.getDimension()) {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                        new Integer(cs.getDimension()), new Integer(envelope.getDimension())));
-        }
-        // Our envelope is always a copy of the user-specified envelope (if any),
-        // so it is safe to modify it directly.
-        envelope.setCoordinateReferenceSystem(crs);
-        this.envelope = envelope;
-        /*
-         * Computes the grid geometry. If the math transform was not explicitly specified by the
-         * user, then it will be computed from the envelope.  In this case, some heuristic rules
-         * are used in order to decide if we should reverse some axis directions or swap axis. 
-         */
-        if (gridGeometry == null) {
-            final boolean[] reverse = new boolean[dimension];
-            for (int i=0; i<dimension; i++) {
-                final AxisDirection direction = cs.getAxis(i).getDirection();
-                final AxisDirection absolute  = direction.absolute();
-                reverse[i] = direction.equals(absolute.opposite());
-                if (AxisDirection.NORTH.equals(absolute)) {
-                    reverse[i] = !reverse[i]; // Reverses the 'row' axis.
-                }
-            }
-            boolean swapXY = false;
-            if (dimension >= 2) {
-                swapXY = AxisDirection.NORTH.equals(cs.getAxis(0).getDirection().absolute()) &&
-                         AxisDirection.EAST .equals(cs.getAxis(1).getDirection().absolute());
-            }
-            gridGeometry = new GridGeometry2D(gridRange, envelope, reverse, swapXY);
+            /*
+             * Makes sure that the 'gridToCRS' transform is defined.
+             * An exception will be thrown otherwise.
+             */
+            gridGeometry.getGridToCoordinateSystem();
         }
         this.gridGeometry = gridGeometry;
+        assert gridGeometry.isDefined(GridGeometry2D.CRS        |
+                                      GridGeometry2D.ENVELOPE   |
+                                      GridGeometry2D.GRID_RANGE |
+                                      GridGeometry2D.GRID_TO_CRS);
         /*
-         * Last argument checks. We do (or redo) some checks here because the grid geometry may
-         * not have been available before. The image size must be consistent with the grid range
+         * Last argument checks. The image size must be consistent with the grid range
          * and the envelope must be non-empty.
          */
         final String error = checkConsistency(image, gridGeometry);
         if (error != null) {
             throw new IllegalArgumentException(error);
         }
-        if (dimension <= Math.max(gridGeometry.axisDimensionX, gridGeometry.axisDimensionY) ||
-            !(envelope.getLength(gridGeometry.axisDimensionX) > 0) ||
-            !(envelope.getLength(gridGeometry.axisDimensionY) > 0))
+        if (dimension <= Math.max(gridGeometry.axisDimensionX,    gridGeometry.axisDimensionY)
+                             || !(gridGeometry.envelope.getLength(gridGeometry.axisDimensionX) > 0)
+                             || !(gridGeometry.envelope.getLength(gridGeometry.axisDimensionY) > 0))
         {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ENVELOPE));
         }
-        /*
-         * Constructs the two-dimensional CRS. This is usually identical to the user-supplied CRS.
-         * However, the user is allowed to specify a wider CRS (for example a 3D one which includes
-         * a time axis), in which case we infer which axis apply to the 2D image, and constructs a
-         * 2D CRS with only those axis.
-         */
-        try {
-            crs2D = new FactoryGroup().separate(crs, new int[] {gridGeometry.axisDimensionX,
-                                                                gridGeometry.axisDimensionY});
-        } catch (FactoryException exception) {
-            final IllegalArgumentException e = new IllegalArgumentException(
-                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs.getName()));
-            e.initCause(exception); // TODO: inline in the constructor with J2SE 1.5.
-            throw e;
-        }
-        assert crs2D.getCoordinateSystem().getDimension() == 2 : crs2D;
     }
 
     /**
@@ -506,7 +475,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * coverage has some extent in other dimensions (for example a depth, or a start and end time).
      */
     public Envelope getEnvelope() {
-        return (Envelope) envelope.clone();
+        return gridGeometry.getEnvelope();
     }
 
     /**
@@ -515,11 +484,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * dimensions used in the underlying rendered image are returned.
      */
     public Envelope2D getEnvelope2D() {
-        return new Envelope2D(crs2D,
-                envelope.getMinimum(gridGeometry.gridDimensionX),
-                envelope.getMinimum(gridGeometry.gridDimensionY),
-                envelope.getLength (gridGeometry.gridDimensionX),
-                envelope.getLength (gridGeometry.gridDimensionY));
+        return gridGeometry.getEnvelope2D();
     }
 
     /**
@@ -529,7 +494,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * @see #getCoordinateReferenceSystem
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem2D() {
-        return crs2D;
+        return gridGeometry.getCoordinateReferenceSystem2D();
     }
 
     /**
@@ -939,7 +904,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             return inverse;
         }
         if (!CoverageUtilities.hasTransform(sampleDimensions)) {
-            return inverse=this;
+            return inverse = this;
         }
         synchronized (this) {
             inverse = createGeophysics(geo);
@@ -1211,9 +1176,9 @@ testLinear: for (int i=0; i<numBands; i++) {
             record.setSourceMethodName("geophysics");
             LOGGER.log(record);
         }
-        return new GridCoverage2D(getName(), JAI.create(operation, param, hints),
-                                  crs, gridGeometry, null, targetBands,
-                                  new GridCoverage[]{this}, null);
+        final PlanarImage    view    = JAI.create(operation, param, hints);
+        final GridCoverage[] sources = new GridCoverage[]{this};
+        return new GridCoverage2D(getName(), view, gridGeometry, targetBands, sources, null);
     }
 
     /**

@@ -303,8 +303,7 @@ final class Resampler extends GridCoverage {
             }
         } else {
             if (sourceCS==null || targetCS==null) {
-                throw new CannotReprojectException(Errors.format(
-                        ErrorKeys.UNSPECIFIED_COORDINATE_SYSTEM));
+                throw new CannotReprojectException(Errors.format(ErrorKeys.UNSPECIFIED_CRS));
             }
             final MathTransform step2r;
             step2x = factory.createFromCoordinateSystems(sourceCS, targetCS).getMathTransform();

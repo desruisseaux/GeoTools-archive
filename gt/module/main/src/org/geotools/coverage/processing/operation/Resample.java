@@ -23,14 +23,10 @@
  */
 package org.geotools.coverage.processing.operation;
 
-// JAI dependencies (for javadoc)
-import javax.media.jai.operator.WarpDescriptor;
-import javax.media.jai.operator.AffineDescriptor;
-
-// J2SE dependencies
-import java.util.Locale;
-import java.util.logging.Level;
+// JAI dependencies
 import javax.media.jai.Interpolation;
+import javax.media.jai.operator.WarpDescriptor;    // For javadoc
+import javax.media.jai.operator.AffineDescriptor;  // For javadoc
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -51,10 +47,7 @@ import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
-import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
-import org.geotools.resources.image.CoverageUtilities;
 
 
 /**
@@ -215,30 +208,6 @@ public class Resample extends Operation2D {
         } catch (TransformException exception) {
             throw new CannotReprojectException(Errors.format(
                     ErrorKeys.CANT_REPROJECT_$1, source.getName()), exception);
-        }
-        /*
-         * Check if we have been able to respect the user request. We may have failed to
-         * respect the user specified grid geometry because JAI may not have honored the
-         * 'minX', 'minY', 'width' and 'height' image layout setting  (see documentation
-         * for AffineDescriptor).  Of course, we may have failed because of a bug in our
-         * implementation as well.
-         */
-        if (gridGeom != null) {
-            boolean mismatche = false;
-            final GridGeometry2D actualGeom = (GridGeometry2D) coverage.getGridGeometry();
-            if (CoverageUtilities.hasGridRange(gridGeom)) {
-                mismatche |= !gridGeom.getGridRange().equals(
-                            actualGeom.getGridRange());
-            }
-            if (CoverageUtilities.hasTransform(gridGeom)) {
-                mismatche |= !gridGeom.getGridToCoordinateSystem().equals(
-                            actualGeom.getGridToCoordinateSystem());
-            }
-            if (mismatche) {
-                final Locale locale = source.getLocale();
-                Resampler2D.log(Logging.getResources(locale).getLogRecord(Level.WARNING,
-                    LoggingKeys.ADJUSTED_GRID_GEOMETRY_$1, coverage.getName().toString(locale)));
-            }
         }
         return coverage;
     }

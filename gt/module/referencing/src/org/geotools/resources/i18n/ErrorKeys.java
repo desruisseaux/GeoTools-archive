@@ -105,6 +105,7 @@ public final class ErrorKeys {
     public static final int LINE_TOO_LONG_$3                       =    63;
     public static final int LINE_TOO_SHORT_$2                      =    64;
     public static final int LONGITUDE_OUT_OF_RANGE_$1              =    65;
+    public static final int MALFORMED_ENVELOPE                     =   179;
     public static final int MATRIX_NOT_REGULAR                     =    66;
     public static final int MISMATCHED_ARRAY_LENGTH                =    67;
     public static final int MISMATCHED_DIMENSION_$2                =    68;
@@ -191,8 +192,9 @@ public final class ErrorKeys {
     public static final int UNMODIFIABLE_GEOMETRY                  =   137;
     public static final int UNPARSABLE_NUMBER_$1                   =   138;
     public static final int UNPARSABLE_STRING_$2                   =   139;
-    public static final int UNSPECIFIED_COORDINATE_SYSTEM          =   140;
+    public static final int UNSPECIFIED_CRS                        =   140;
     public static final int UNSPECIFIED_IMAGE_SIZE                 =   141;
+    public static final int UNSPECIFIED_TRANSFORM                  =   178;
     public static final int UNSUPPORTED_COORDINATE_SYSTEM_$1       =   151;
     public static final int UNSUPPORTED_DATA_TYPE                  =   142;
     public static final int UNSUPPORTED_DATA_TYPE_$1               =   143;

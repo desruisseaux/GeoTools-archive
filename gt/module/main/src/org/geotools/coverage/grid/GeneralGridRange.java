@@ -30,8 +30,11 @@ import java.awt.image.RenderedImage;
 import java.io.Serializable;
 import java.util.Arrays;
 
-// Geotools dependencies
+// OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.spatialschema.geometry.Envelope;
+
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -40,10 +43,9 @@ import org.geotools.resources.i18n.ErrorKeys;
 /**
  * Defines a range of grid coverage coordinates.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class GeneralGridRange implements GridRange, Serializable {
     /**
@@ -168,6 +170,35 @@ public class GeneralGridRange implements GridRange, Serializable {
         index[dimension+1] = y+image.getHeight();
         Arrays.fill(index, dimension+2, index.length, 1);
         checkCoherence();
+    }
+    
+    /**
+     * Cast the specified envelope into a grid range. This is sometime useful after an
+     * envelope has been transformed from "real world" coordinates to grid coordinates
+     * using the "{@linkplain GridGeometry#getGridToCoordinateSystem grid to CRS}" transform.
+     * The floating point values are rounded toward the nearest integers.
+     * <p>
+     * <strong>Note about rounding mode:</strong><br>
+     * It would have been possible to round the {@linkplain Envelope#getMinimum minimal value}
+     * to {@linkplain Math#floor floor} and the {@linkplain Envelope#getMaximum maximal value}
+     * to {@linkplain Math#ceil ceil} in order to make sure that the grid range encompass all
+     * the envelope (something similar to what <cite>Java2D</cite> does when casting
+     * {@link java.awt.geom.Rectangle2D} to {@link Rectangle}). But this approach has an
+     * undesirable side effect: it may changes the image width or height. For example the range
+     * {@code [-0.25 ... 99.75]} would be rounded to {@code [-1 ... 100]}, which lead to unexpected
+     * result when using some operation like {@link javax.media.jai.operator.AffineDescriptor Affine}.
+     * Rounding to nearest integers produces better results.
+     *
+     * @since 2.2
+     */
+    public GeneralGridRange(final Envelope envelope) {
+        final int dimension = envelope.getDimension();
+        index = new int[dimension * 2];
+        for (int i=0; i<dimension; i++) {
+            // See "note about conversion of floating point values to integers" in the JavaDoc.
+            index[i            ] = (int)Math.round(envelope.getMinimum(i));
+            index[i + dimension] = (int)Math.round(envelope.getMaximum(i));
+        }
     }
     
     /**

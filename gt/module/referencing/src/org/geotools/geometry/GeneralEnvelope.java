@@ -39,13 +39,12 @@ import org.geotools.resources.geometry.XRectangle2D;
 
 
 /**
- * A minimum bounding box or rectangle. Regardless of dimension, an <code>Envelope</code> can
- * be represented without ambiguity as two direct positions (coordinate points). To encode an
- * <code>Envelope</code>, it is sufficient to encode these two points. This is consistent with
- * all of the data types in this specification, their state is represented by their publicly
- * accessible attributes.
- * <br><br>
- * This particular implementation of <code>Envelope</code> is said "General" because it
+ * A minimum bounding box or rectangle. Regardless of dimension, an {@code Envelope} can
+ * be represented without ambiguity as two {@linkplain DirectPosition direct positions}
+ * (coordinate points). To encode an {@code Envelope}, it is sufficient to encode these
+ * two points.
+ * <p>
+ * This particular implementation of {@code Envelope} is said "General" because it
  * uses coordinates of an arbitrary dimension.
  *
  * @since 2.0
@@ -57,7 +56,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 1752330560227688940L;
-    
+
     /**
      * Minimum and maximum ordinate values. The first half contains minimum
      * ordinates, while the last half contains maximum ordinates. Consider
@@ -69,7 +68,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * The coordinate reference system, or {@code null}.
      */
     private CoordinateReferenceSystem crs;
-    
+
     /**
      * Constructs a new envelope with the same data than the specified envelope.
      */
@@ -79,7 +78,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             ordinates = (double[]) e.ordinates.clone();
             crs = e.crs;
         } else {
-            // TODO: See if we can simplify this code with GeoAPI 1.1
+            // TODO: See if we can simplify this code with GeoAPI 2.1
             final DirectPosition lower, upper;
             lower = envelope.getLowerCorner();
             upper = envelope.getUpperCorner();
@@ -88,8 +87,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             if (!Utilities.equals(crs, upper.getCoordinateReferenceSystem()) ||
                 dimension != upper.getDimension())
             {
-                // TODO: provides a localized message.
-                throw new IllegalArgumentException("Malformed envelope");
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.MALFORMED_ENVELOPE));
             }
             ordinates = new double[2*dimension];
             for (int i=0; i<dimension; i++) {
@@ -99,7 +97,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             checkCoherence();
         }
     }
-    
+
     /**
      * Constructs an empty envelope with the specified coordinate reference system.
      * All ordinates are initialized to 0.
@@ -118,7 +116,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public GeneralEnvelope(final int dimension) {
         ordinates = new double[dimension*2];
     }
-    
+
     /**
      * Constructs one-dimensional envelope defined by a range of values.
      *
@@ -129,7 +127,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         ordinates = new double[] {min, max};
         checkCoherence();
     }
-    
+
     /**
      * Constructs a envelope defined by two positions.
      *
@@ -151,7 +149,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         System.arraycopy(maxCP, 0, ordinates, minCP.length, maxCP.length);
         checkCoherence();
     }
-    
+
     /**
      * Constructs a envelope defined by two positions.
      *
@@ -177,7 +175,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         };
         checkCoherence();
     }
-    
+
     /**
      * Checks if ordinate values in the minimum point are less than or
      * equal to the corresponding ordinate value in the maximum point.
@@ -202,6 +200,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * @return The coordinate reference system, or {@code null}.
      */
     public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        assert crs==null || crs.getCoordinateSystem().getDimension() == getDimension();
         return crs;
     }
 
@@ -209,13 +208,17 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * Set the coordinate reference system in which the coordinate are given.
      * Note: this method <strong>do not</strong> reproject the envelope.
      *
-     * @param crs The new coordinate reference system, or {@code null}.
+     * @param  crs The new coordinate reference system, or {@code null}.
+     * @throws MismatchedDimensionException if the specified CRS doesn't have the expected
+     *         number of dimensions.
      */
-    public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
+    public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs)
+            throws MismatchedDimensionException
+    {
         GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());
         this.crs = crs;
     }
-    
+
     /**
      * Returns the number of dimensions.
      */
@@ -225,7 +228,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
 
     /**
      * A coordinate position consisting of all the minimal ordinates for each
-     * dimension for all points within the <code>Envelope</code>.
+     * dimension for all points within the {@code Envelope}.
      *
      * @return The lower corner.
      */
@@ -239,7 +242,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
 
     /**
      * A coordinate position consisting of all the maximal ordinates for each
-     * dimension for all points within the <code>Envelope</code>.
+     * dimension for all points within the {@code Envelope}.
      *
      * @return The upper corner.
      */
@@ -250,7 +253,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         position.setCoordinateReferenceSystem(crs);
         return position;
     }
-    
+
     /**
      * Returns the minimal ordinate along the specified dimension.
      */
@@ -261,7 +264,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             throw new ArrayIndexOutOfBoundsException(dimension);
         }
     }
-    
+
     /**
      * Returns the maximal ordinate along the specified dimension.
      */
@@ -272,14 +275,14 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             throw new ArrayIndexOutOfBoundsException(dimension);
         }
     }
-    
+
     /**
      * Returns the center ordinate along the specified dimension.
      */
     public final double getCenter(final int dimension) {
         return 0.5*(ordinates[dimension] + ordinates[dimension+ordinates.length/2]);
     }
-    
+
     /**
      * Returns the envelope length along the specified dimension.
      * This length is equals to the maximum ordinate minus the
@@ -288,7 +291,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public final double getLength(final int dimension) {
         return ordinates[dimension+ordinates.length/2] - ordinates[dimension];
     }
-    
+
     /**
      * Set the envelope's range along the specified dimension.
      *
@@ -310,14 +313,70 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             throw new ArrayIndexOutOfBoundsException(dimension);
         }
     }
-    
+
     /**
-     * Adds a point to this envelope. The resulting envelope
-     * is the smallest envelope that contains both the original envelope and the
-     * specified point. After adding a point, a call to {@link #contains} with the
-     * added point as an argument will return <code>true</code>, except if one of
-     * the point's ordinates was {@link Double#NaN} (in which case the corresponding
-     * ordinate have been ignored).
+     * Sets all ordinate values to {@linkplain Double#NaN NaN}. The
+     * {@linkplain #getCoordinateReferenceSystem coordinate reference system} (if any) stay
+     * unchanged.
+     *
+     * @since 2.2
+     */
+    public void setToNull() {
+        Arrays.fill(ordinates, Double.NaN);
+        assert isNull() : this;
+    }
+
+    /**
+     * Returns {@code false} if at least one ordinate value is not {@linkplain Double#NaN NaN}. The
+     * {@code isNull()} check is a little bit different than {@link #isEmpty()} since it returns
+     * {@code false} for a partially initialized envelope, while {@code isEmpty()} returns
+     * {@code false} only after all dimensions have been initialized. More specifically, the
+     * following rules apply:
+     * <p>
+     * <ul>
+     *   <li>If <code>isNull() == true</code>, then <code>{@linkplain #isEmpty()} == true</code></li>
+     *   <li>If <code>{@linkplain #isEmpty()} == false</code>, then <code>isNull() == false</code></li>
+     *   <li>The converse of the above-cited rules are not always true.</li>
+     * </ul>
+     *
+     * @since 2.2
+     */
+    public boolean isNull() {
+        for (int i=0; i<ordinates.length; i++) {
+            if (!Double.isNaN(ordinates[i])) {
+                return false;
+            }
+        }
+        assert isEmpty() : this;
+        return true;
+    }
+
+    /**
+     * Determines whether or not this envelope is empty. An envelope is non-empty only if it has
+     * at least one {@linkplain #getDimension dimension}, and the {@linkplain #getLength length}
+     * is greater that 0 along all dimensions. Note that an empty envelope is always {@linkplain
+     * #isNull null}, but the converse is not always true.
+     */
+    public boolean isEmpty() {
+        final int dimension = ordinates.length/2;
+        if (dimension == 0) {
+            return true;
+        }
+        for (int i=0; i<dimension; i++) {
+            if (!(ordinates[i] < ordinates[i+dimension])) { // Use '!' in order to catch NaN
+                return true;
+            }
+        }
+        assert !isNull() : this;
+        return false;
+    }
+
+    /**
+     * Adds a point to this envelope. The resulting envelope is the smallest envelope that
+     * contains both the original envelope and the specified point. After adding a point,
+     * a call to {@link #contains} with the added point as an argument will return {@code true},
+     * except if one of the point's ordinates was {@link Double#NaN} (in which case the
+     * corresponding ordinate have been ignored).
      *
      * @param  position The point to add.
      * @throws MismatchedDimensionException if the specified point doesn't have
@@ -332,13 +391,12 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             if (value > ordinates[i+dim]) ordinates[i+dim]=value;
         }
     }
-    
+
     /**
-     * Adds an envelope object to this envelope.
-     * The resulting envelope is the union of the
-     * two <code>Envelope</code> objects.
+     * Adds an envelope object to this envelope. The resulting envelope is the union of the
+     * two {@code Envelope} objects.
      *
-     * @param  envelope the <code>Envelope</code> to add to this envelope.
+     * @param  envelope the {@code Envelope} to add to this envelope.
      * @throws MismatchedDimensionException if the specified envelope doesn't
      *         have the expected dimension.
      */
@@ -352,13 +410,13 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             if (max > ordinates[i+dim]) ordinates[i+dim]=max;
         }
     }
-    
+
     /**
      * Tests if a specified coordinate is inside the boundary of this envelope.
      *
      * @param  position The point to text.
-     * @return <code>true</code> if the specified coordinates are inside the boundary
-     *         of this envelope; <code>false</code> otherwise.
+     * @return {@code true} if the specified coordinates are inside the boundary
+     *         of this envelope; {@code false} otherwise.
      * @throws MismatchedDimensionException if the specified point doesn't have
      *         the expected dimension.
      */
@@ -373,11 +431,11 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         }
         return true;
     }
-    
+
     /**
-     * Set this envelope to the intersection if this envelope with the specified one.
+     * Sets this envelope to the intersection if this envelope with the specified one.
      *
-     * @param  envelope the <code>Envelope</code> to intersect to this envelope.
+     * @param  envelope the {@code Envelope} to intersect to this envelope.
      * @throws MismatchedDimensionException if the specified envelope doesn't
      *         have the expected dimension.
      */
@@ -396,22 +454,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             ordinates[i+dim] = max;
         }
     }
-    
-    /**
-     * Determines whether or not this envelope is empty.
-     * An envelope is non-empty only if it has a length
-     * greater that 0 along all dimensions.
-     */
-    public boolean isEmpty() {
-        final int dimension = ordinates.length/2;
-        for (int i=0; i<dimension; i++) {
-            if (!(ordinates[i] < ordinates[i+dimension])) { // Use '!' in order to catch NaN
-                return true;
-            }
-        }
-        return false;
-    }
-    
+
     /**
      * Returns a new envelope that encompass only some dimensions of this envelope.
      * This method copy this envelope's ordinates into a new envelope, beginning at
@@ -469,9 +512,9 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         System.arraycopy(ordinates, lower, envelope.ordinates, upper, curDim-upper);
         return envelope;
     }
-    
+
     /**
-     * Returns a {@link Rectangle2D} with the same bounds as this <code>Envelope</code>.
+     * Returns a {@link Rectangle2D} with the same bounds as this {@code Envelope}.
      * This is a convenience method for interoperability with Java2D.
      *
      * @throws IllegalStateException if this envelope is not two-dimensional.
@@ -485,20 +528,18 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
                     ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(getDimension())));
         }
     }
-    
+
     /**
-     * Returns a string representation of this envelope.
-     * The returned string is implementation dependent.
-     * It is usually provided for debugging purposes.
+     * Returns a string representation of this envelope. The returned string
+     * is implementation dependent. It is usually provided for debugging purposes.
      */
     public String toString() {
         return GeneralDirectPosition.toString(this, ordinates);
     }
-    
+
     /**
-     * Returns a hash value for this envelope.
-     * This value need not remain consistent between
-     * different implementations of the same class.
+     * Returns a hash value for this envelope. This value need not remain
+     * consistent between different implementations of the same class.
      */
     public int hashCode() {
         int code = GeneralDirectPosition.hashCode(ordinates) ^ (int)serialVersionUID;
@@ -507,7 +548,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         }
         return code;
     }
-    
+
     /**
      * Compares the specified object with this envelope for equality.
      */
@@ -519,7 +560,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         }
         return false;
     }
-    
+
     /**
      * Returns a deep copy of this envelope.
      */
