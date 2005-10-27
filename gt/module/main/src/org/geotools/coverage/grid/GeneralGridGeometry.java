@@ -231,7 +231,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                 envelope = CRSUtilities.transform(gridToCRS, envelope);
             } catch (TransformException exception) {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
-                                        Utilities.getShortClassName(gridToCRS)), exception);
+                                        Utilities.getShortClassName(gridToCRS))/*, exception*/);
             }
             envelope.setCoordinateReferenceSystem(crs);
             this.envelope = envelope;

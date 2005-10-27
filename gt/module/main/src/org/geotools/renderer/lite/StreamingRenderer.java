@@ -9,14 +9,24 @@
 package org.geotools.renderer.lite;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferDouble;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
+import java.awt.image.WritableRaster;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +37,17 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.ROI;
+import javax.media.jai.RasterFactory;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.TiledImage;
 import javax.media.jai.util.Range;
 
+import org.geotools.coverage.Category;
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -55,9 +74,10 @@ import org.geotools.map.MapLayer;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.GTRenderer;
-
+import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
+import org.geotools.styling.ColorMapEntry;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
@@ -69,6 +89,7 @@ import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
+import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -83,7 +104,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
-import org.geotools.renderer.RenderListener;
 
 /**
  * A streaming implementation of the GTRenderer interface. 
@@ -1230,16 +1250,48 @@ public class StreamingRenderer implements GTRenderer {
      */
     private void renderRaster( Graphics2D graphics, Feature feature, RasterSymbolizer symbolizer, CoordinateReferenceSystem destinationCRS ) {
         LOGGER.fine("rendering Raster for feature " + feature.toString() + " - " + feature.getAttribute("grid") );
-        float alpha = getOpacity(symbolizer);
+
+        GridCoverage2D grid = (GridCoverage2D) feature.getAttribute("grid");
+        
+        final WritableRaster raster				= grid.getRenderedImage().copyData(null);
+        final int numBands						= raster.getNumBands();
+        
+        final float alpha = getOpacity(symbolizer);
         graphics.setComposite(AlphaComposite.getInstance(
                 AlphaComposite.SRC_OVER, alpha));
-        GridCoverage grid = (GridCoverage) feature.getAttribute("grid");
+        
+        final GridSampleDimension[] targetBands = new GridSampleDimension[numBands];
+
+        final Map[] colorMaps = new Map[numBands];
+        for(int band=0; band<numBands; band++) { //TODO get seprated R,G,B colorMaps from symbolizer
+            final Map categories 		= getCategories(symbolizer, grid, band);
+            colorMaps[band] = categories;
+
+            /**
+             * Temporary solution, until the Recolor Operation is ported ...
+             */
+            targetBands[band] = (GridSampleDimension) transformColormap(
+            		band,
+					grid.getSampleDimension(band),
+					colorMaps
+            );
+        }
+
+        grid = new GridCoverage2D(
+        		grid.getName(), 
+				grid.getRenderedImage(), 
+				grid.getCoordinateReferenceSystem(), 
+				grid.getEnvelope(), 
+				targetBands, 
+				new GridCoverage[] {grid}, 
+				null
+		);
         GridCoverageRenderer gcr = new GridCoverageRenderer(grid, destinationCRS);
         gcr.paint(graphics);
         LOGGER.fine("Raster rendered");
     }
     
-    private float getOpacity(RasterSymbolizer sym) {
+    private float getOpacity(final RasterSymbolizer sym) {
         float alpha = 1.0f;
         Expression exp = sym.getOpacity();
         if(exp == null) return alpha;
@@ -1249,6 +1301,177 @@ public class StreamingRenderer implements GTRenderer {
         if(obj instanceof Number) num = (Number)obj;
         if(num == null) return alpha;
         return num.floatValue();
+    }
+    
+    private Map getCategories(final RasterSymbolizer sym, final GridCoverage2D grid, final int band) {
+        final String[] labels			= getLabels(sym, band);
+        final Double[] quantities		= getQuantities(sym, band);
+    	final Color[] colors			= getColors(sym, band);
+
+    	final Map categories			= new HashMap();
+    	
+    	/**
+    	 * Checking Categories
+    	 */
+    	for(int i=0; i<labels.length; i++) {
+    		if( !categories.containsKey(labels[i]) ) {
+    			categories.put(labels[i], new Color[] {colors[i]});
+    		} else {
+    			final Color[] oldCmap = (Color[]) categories.get(labels[i]);
+    			final int length = oldCmap.length;
+    			final Color[] newCmap = new Color[length + 1];
+    			System.arraycopy(oldCmap, 0, newCmap, 0, length);
+    			newCmap[length] = colors[i];
+    			categories.put(labels[i], newCmap);
+    		}
+    	}
+
+    	return categories;
+    }
+    
+    private String[] getLabels(final RasterSymbolizer sym, final int band) {
+    	String[] labels = null;
+    	if(sym.getColorMap() != null) {
+    		final ColorMapEntry[] colors = sym.getColorMap().getColorMapEntries();
+    		final int numColors = colors.length;
+    		labels = new String[numColors];
+    		for(int ci=0;ci<numColors;ci++) {
+    			labels[ci] = colors[ci].getLabel();
+    		}
+    	}
+    	
+    	return labels;
+    }
+    
+    private Double[] getQuantities(final RasterSymbolizer sym, final int band) {
+    	Double[] quantities = null;
+    	if(sym.getColorMap() != null) {
+    		final ColorMapEntry[] colors = sym.getColorMap().getColorMapEntries();
+    		final int numColors = colors.length;
+    		quantities = new Double[numColors];
+    		for(int ci=0;ci<numColors;ci++) {
+    			Expression exp = colors[ci].getQuantity();
+    			if(exp == null) return null;
+    	        Object obj = exp.getValue(null);
+    	        if(obj == null) return null;
+    	        if(obj instanceof String)
+    	        	quantities[ci] = Double.valueOf((String)obj);
+    	        else if(obj instanceof Double)
+    	        	quantities[ci] = (Double)obj;
+    	        if(quantities[ci] == null) return null;
+    		}
+    	}
+    	
+    	return quantities;
+    }
+    
+    private Color[] getColors(final RasterSymbolizer sym, final int band) {
+    	Color[] colorTable = null;
+    	if(sym.getColorMap() != null) {
+    		final ColorMapEntry[] colors = sym.getColorMap().getColorMapEntries();
+    		final int numColors = colors.length;
+    		colorTable = new Color[numColors];
+    		for(int ci=0;ci<numColors;ci++) {
+    			Expression exp = colors[ci].getColor();
+    	        if(exp == null) return null;
+    	        Object obj = exp.getValue(null);
+    	        if(obj == null) return null;
+    	        final Double opacity = (colors[ci].getOpacity() != null ?  
+    	        		(colors[ci].getOpacity().getValue(null) instanceof String ? 
+    	        				Double.valueOf((String)colors[ci].getOpacity().getValue(null)) :
+    	        				(Double) colors[ci].getOpacity().getValue(null)) : 
+    	        		new Double(1.0));
+    	        final Integer intval = Integer.decode((String)obj);
+    	    	final int i = intval.intValue();
+    	        colorTable[ci] = new Color(
+    	        		(i >> 16) & 0xFF, 
+						(i >> 8) & 0xFF, 
+						i & 0xFF, 
+    	        		new Double(Math.ceil(255.0 * opacity.floatValue())).intValue()
+				);
+    	        if(colorTable[ci] == null) return null;
+    		}
+    	}
+    	
+    	return colorTable;
+    }
+    
+    private double[] getExtrema(final RenderedImage image, final int band, final Double NaN) {
+        final double[] extrema = new double[2];
+
+        final int nX = image.getWidth();
+        final int nY = image.getHeight();
+    	double[] aMask = new double[nY * nX]; 
+    	image.getData().getSamples(0, 0, nX, nY, band, aMask);
+    	DataBufferDouble mbuffer = new DataBufferDouble(aMask, nY * nX);
+    	SampleModel mSampleModel = RasterFactory.createBandedSampleModel(
+				DataBuffer.TYPE_DOUBLE, nX, nY, 1);
+        SampleModel iSampleModel = RasterFactory.createBandedSampleModel(
+				DataBuffer.TYPE_DOUBLE, nX, nY, 1);
+		ColorModel mColorModel =
+			PlanarImage.createColorModel(mSampleModel);
+        ColorModel iColorModel =
+			PlanarImage.createColorModel(iSampleModel);
+		Raster mRaster = RasterFactory.createWritableRaster(mSampleModel,
+				mbuffer,
+				new Point(0,0));
+		TiledImage mask = new TiledImage(0, 0, nX, nY, 0, 0,
+				mSampleModel, mColorModel);
+		mask.setData(mRaster);
+		TiledImage img = new TiledImage(0, 0, nX, nY, 0, 0,
+				iSampleModel, iColorModel);
+		img.setData(mRaster);
+
+		ParameterBlock ePb = new ParameterBlock();
+		ePb.addSource(img);
+		if( NaN != null )
+			ePb.add( new ROI(mask, (new Double(Math.floor(NaN.doubleValue())).intValue()) ) ); //ROI
+		RenderedOp op = JAI.create("Extrema", ePb);
+		double[][] extremas = (double[][]) op.getProperty("extrema");
+		extrema[0] = (!Double.isInfinite(extremas[0][0]) && !Double.isNaN(extremas[0][0]) ? extremas[0][0] : -Double.MAX_VALUE);
+		extrema[1] = (!Double.isInfinite(extremas[1][0]) && !Double.isNaN(extremas[1][0]) ? extremas[1][0] : Double.MAX_VALUE);
+		
+		return extrema;
+    }
+    
+    /**
+     * Transform the supplied RGB colors.
+     */
+    protected SampleDimension transformColormap(final int   band,
+                                                SampleDimension dimension,
+                                                final Map[] colorMaps)
+    {
+        if (colorMaps==null || colorMaps.length==0) {
+            return dimension;
+        }
+        boolean changed = false;
+        final Map colorMap = colorMaps[Math.min(band, colorMaps.length-1)];
+        final Category categories[] = (Category[]) ((GridSampleDimension) dimension).getCategories().toArray();
+        for (int j=categories.length; --j>=0;) {
+            Category category = categories[j];
+            Color[] colors = (Color[]) colorMap.get(category.getName().toString());
+            if (colors == null) {
+                if (!category.isQuantitative()) {
+                    continue;
+                }
+                colors = (Color[]) colorMap.get(null);
+                if (colors == null) {
+                    continue;
+                }
+            }
+            final Range range = category.getRange();
+            int lower = ((Number) range.getMinValue()).intValue();
+            int upper = ((Number) range.getMaxValue()).intValue();
+            if (!range.isMinIncluded()) lower++;
+            if ( range.isMaxIncluded()) upper++;
+            category = category.recolor(colors);
+            if (!categories[j].equals(category)) {
+                categories[j] = category;
+                changed = true;
+            }
+        }
+        return changed ? new GridSampleDimension(categories, dimension.getUnits())
+                       : dimension;
     }
     
     /**

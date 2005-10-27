@@ -23,16 +23,30 @@ import java.awt.image.RenderedImage;
 
 import javax.media.jai.ImageMIPMap;
 
+import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.RenderedCoverage;
 import org.geotools.coverage.processing.Operations;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.matrix.MatrixFactory;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.Envelope;
 
 
 /**
@@ -135,34 +149,71 @@ public final class GridCoverageRenderer {
      *         coordinate system in the GridCoverage is not an AffineTransform
      */
     public void paint(final Graphics2D graphics) {
+    	
+    	/**
+    	 * STEP 1
+    	 * setting the destination crs for the display device
+    	 * 
+    	 */
     	final CoordinateReferenceSystem displayCRS = this.destinationCRS;
+    	
+    	/**
+    	 * STEP 2
+    	 * converting the envelope of the provided coverage to the destiantion crs\
+    	 * WHEN NEEDED!
+    	 */
+    	GeneralEnvelope newEnvelope = new GeneralEnvelope(
+    			(GeneralDirectPosition) this.gridCoverage.getEnvelope().getLowerCorner(),
+    			(GeneralDirectPosition) this.gridCoverage.getEnvelope().getUpperCorner()
+    	);
+    	newEnvelope.setCoordinateReferenceSystem(displayCRS);
+    	try{
+	    	//checking if we need tp transform coordinate reference system from source to display
+	          //getting an operation between source and destination crs
+	        final CoordinateOperation operation=opFactory.createOperation(
+	        		this.gridCoverage.getCoordinateReferenceSystem(),
+					displayCRS);
+	        final MathTransform crsTransform=operation.getMathTransform();
+	        
+	
+	        if( !crsTransform.isIdentity() ) {
+	        	newEnvelope = CRSUtilities.transform(crsTransform, newEnvelope);
+	        	newEnvelope.setCoordinateReferenceSystem(displayCRS);
+	        }
+    	}
+    	catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	
+    	/**
+    	 * STEP 3
+    	 * Creating the parameters for the reprojection of the coverage.
+    	 */
     	GridGeometry2D newGridGeometry = new GridGeometry2D(
     			this.gridCoverage.getGridGeometry().getGridRange(),
-				this.gridCoverage.getEnvelope(),
-				new boolean[] {false, true},
-				false
+				(MathTransform) crsToDeviceGeometry(this.gridCoverage.getGridGeometry().getGridRange(), newEnvelope),
+				newEnvelope.getCoordinateReferenceSystem()
     	);
     	GridCoverage2D prjGridCoverage = (GridCoverage2D) Operations.DEFAULT.resample(
     			this.gridCoverage,
     			displayCRS,
-				newGridGeometry, 
+				newGridGeometry,
 				null
     	);
 
-        final MathTransform2D mathTransform;
-        mathTransform = (MathTransform2D) prjGridCoverage.getGridGeometry()
-                                    .getGridToCoordinateSystem();
+        final MathTransform2D mathTransform =(MathTransform2D) prjGridCoverage.getGridGeometry().getGridToCoordinateSystem();
 
         if (!(mathTransform instanceof AffineTransform)) {
             throw new UnsupportedOperationException(
                 "Non-affine transformations not yet implemented"); // TODO
         }
 
-        final AffineTransform gridToDevice = (AffineTransform) mathTransform;
+        final AffineTransform gridToDevice = new AffineTransform((AffineTransform) mathTransform);
+
+        //gridToDevice.concatenate(crsToDeviceGeometry(this.gridCoverage.getGridGeometry().getGridRange(), newEnvelope));
         
         if (images == null) {
-            final AffineTransform transform;
-            transform = new AffineTransform(gridToDevice);
+        	AffineTransform transform = new AffineTransform(gridToDevice);
             transform.translate(-0.5, -0.5); // Map to upper-left corner.
 
             try {
@@ -205,6 +256,55 @@ public final class GridCoverageRenderer {
             graphics.drawRenderedImage(images.getImage(level), transform);
         }
     }
+
+	/**
+	 * @param gridRange
+	 * @return
+	 */
+	private AffineTransform crsToDeviceGeometry(final GridRange gridRange, final GeneralEnvelope userRange) {
+        final int dimension = gridRange.getDimension();
+    	final CoordinateSystem cs = userRange.getCoordinateReferenceSystem().getCoordinateSystem();
+    	boolean lonFirst = true;
+    	
+    	if (cs.getAxis(0).getDirection().absolute().equals(AxisDirection.NORTH)) {
+    		lonFirst = false;
+    	}
+    	final boolean swapXY = false;
+        // latitude index
+        final int latIndex = lonFirst ? 1 : 0;
+
+        final AxisDirection latitude = cs.getAxis(latIndex).getDirection();
+        final AxisDirection longitude = cs.getAxis((latIndex + 1) % 2).getDirection();
+        final boolean[] reverse = new boolean[] {false, true};
+        
+        /* 
+         * Setup the multi-dimensional affine transform for use with OpenGIS.
+         * According OpenGIS specification, transforms must map pixel center.
+         * This is done by adding 0.5 to grid coordinates.
+         */
+        final Matrix matrix = MatrixFactory.create(dimension+1);
+        for (int i=0; i<dimension; i++) {
+            // NOTE: i is a dimension in the 'gridRange' space (source coordinates).
+            //       j is a dimension in the 'userRange' space (target coordinates).
+            int j = i;
+            if (swapXY && j<=1) {
+                j = 1-j;
+            }
+            double scale = userRange.getLength(j) / gridRange.getLength(i);
+            double offset;
+            if (reverse==null || !reverse[j]) {
+                offset = userRange.getMinimum(j);
+            } else {
+                scale  = -scale;
+                offset = userRange.getMaximum(j);
+            }
+            offset -= scale * (gridRange.getLower(i)-0.5);
+            matrix.setElement(j, j,         0.0   );
+            matrix.setElement(j, i,         scale );
+            matrix.setElement(j, dimension, offset);
+        }
+        return (AffineTransform) ProjectiveTransform.create(matrix);
+	}
 
 	/**
      * Work around a bug in older JDKs

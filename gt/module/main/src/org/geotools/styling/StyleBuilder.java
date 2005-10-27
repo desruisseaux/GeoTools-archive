@@ -1829,16 +1829,16 @@ public class StyleBuilder {
      * @param colors The colors that will be associated to the categories, break points, or isolated values 
      * @param type Either @link ColorMap#TYPE_RAMP, @link ColorMap#TYPE_INTERVALS or @link ColorMap#TYPE_VALUES   
      */
-    public ColorMap createColorMap(double[] quantities, Color[] colors, int type) {
+    public ColorMap createColorMap(String[] labels, double[] quantities, Color[] colors, int type) {
         ColorMap colorMap = sf.createColorMap();
         colorMap.setType(type);
 
-        if ((quantities == null) || (colors == null) || (quantities.length != colors.length)) {
-            throw new IllegalArgumentException("Quantities and colors arrays should be not null and have the same size");
+        if ((labels == null) || (quantities == null) || (colors == null) || (labels.length != quantities.length) || (quantities.length != colors.length)) {
+            throw new IllegalArgumentException("Labels, quantities and colors arrays should be not null and have the same size");
         }
 
         for (int i = 0; i < colors.length; i++) {
-            colorMap.addColorMapEntry(createColorMapEntry(quantities[i], colors[i]));
+            colorMap.addColorMapEntry(createColorMapEntry(labels[i], quantities[i], colors[i]));
         }
 
         return colorMap;
@@ -1851,12 +1851,12 @@ public class StyleBuilder {
      * @param color The entry's color. 
      * @return
      */
-    private ColorMapEntry createColorMapEntry(double quantity, Color color) {
+    private ColorMapEntry createColorMapEntry(String label, double quantity, Color color) {
         ColorMapEntry entry = sf.createColorMapEntry();
         entry.setQuantity(literalExpression(quantity));
         entry.setColor(colorExpression(color));
         entry.setOpacity(literalExpression(color.getAlpha() / 255.0));
-        entry.setLabel(String.valueOf(quantity));
+        entry.setLabel(label);
         return entry;
     }
 
