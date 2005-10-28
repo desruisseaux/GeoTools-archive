@@ -81,7 +81,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>3.0.10</version>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>
 

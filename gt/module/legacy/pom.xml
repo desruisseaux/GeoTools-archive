@@ -66,7 +66,7 @@
     <dependency>
       <groupId>org.opengis</groupId>
       <artifactId>geoapi-legacy</artifactId>
-      <version>0.2</version>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>

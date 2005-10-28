@@ -348,6 +348,7 @@
 
   <!-- ==================================================== -->
   <!--     External dependencies                            -->
+  <!--     POM in subdirectories will inherit them.         -->
   <!-- ==================================================== -->
   <dependencies>
     <dependency>
@@ -363,10 +364,96 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <!-- Version number provided below. -->
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Dependencies management                          -->
+  <!--     If a POM declares one of those dependencies,     -->
+  <!--     then it will use the version specified here.     -->
+  <!--     Otherwise, those dependencies are ignored.       -->
+  <!-- ==================================================== -->
+  <dependencyManagement>
+    <dependencies>
+
+      <!-- Mathematic, geometries, SVG... -->
+      <dependency>
+        <groupId>java3d</groupId>
+        <artifactId>vecmath</artifactId>
+        <version>1.3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.vividsolutions</groupId>
+        <artifactId>jts</artifactId>
+        <version>1.6</version>
+      </dependency>
+      <dependency>
+        <groupId>batik</groupId>
+        <artifactId>batik-transcoder</artifactId>
+        <version>1.5</version>
+      </dependency>
+      <dependency>
+        <groupId>batik</groupId>
+        <artifactId>batik-svggen</artifactId>
+        <version>1.5</version>
+      </dependency>
+       <dependency>
+        <groupId>batik</groupId>
+        <artifactId>batik-awt-util</artifactId>
+        <version>1.5</version>
+      </dependency>
+
+      <!-- Databases -->
+      <dependency>
+        <groupId>org.postgis</groupId>
+        <artifactId>postgis-driver</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>8.0-312.jdbc3</version>
+      </dependency>
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>3.0.10</version>
+      </dependency>
+      <dependency>
+        <groupId>hsqldb</groupId>
+        <artifactId>hsqldb</artifactId>
+        <version>1.8.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openplans</groupId>
+        <artifactId>spatialdb</artifactId>
+        <version>0.1</version>
+      </dependency>
+
+      <!-- Tests or legacy -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.mockrunner</groupId>
+        <artifactId>mockrunner</artifactId>
+        <version>0.3.6</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.opengis</groupId>
+        <artifactId>geoapi-legacy</artifactId>
+        <version>0.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
 
 
@@ -378,6 +465,14 @@
       <id>ibiblio</id>
       <name>Ibiblio - the public's library and digital archive</name>
       <url>http://www.ibiblio.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>planetmirror</id>
+      <name>PlanetMirror - mirror of Ibiblio</name>
+      <url>http://public.planetmirror.com/pub/maven2</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>

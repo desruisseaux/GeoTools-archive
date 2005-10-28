@@ -61,7 +61,7 @@
     <dependency>
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>8.0-312.jdbc3</version>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>
 

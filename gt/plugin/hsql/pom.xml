@@ -62,12 +62,12 @@
     <dependency>
       <groupId>hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
-      <version>1.8.0.1</version>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
       <groupId>org.openplans</groupId>
       <artifactId>spatialdb</artifactId>
-      <version>0.1</version>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>
 
