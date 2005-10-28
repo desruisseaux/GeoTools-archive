@@ -268,4 +268,8 @@ public class PlugIn {
 
         return defaultType;
     }
+
+	public Map getPropertyMap() {
+		return propertyMap;
+	}
 }
