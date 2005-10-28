@@ -1446,7 +1446,11 @@ public class StreamingRenderer implements GTRenderer {
         }
         boolean changed = false;
         final Map colorMap = colorMaps[Math.min(band, colorMaps.length-1)];
-        final Category categories[] = (Category[]) ((GridSampleDimension) dimension).getCategories().toArray();
+        final List categoryList = ((GridSampleDimension) dimension).getCategories();
+        if (categoryList == null) {
+            return dimension;
+        }
+        final Category categories[] = (Category[]) categoryList.toArray();
         for (int j=categories.length; --j>=0;) {
             Category category = categories[j];
             Color[] colors = (Color[]) colorMap.get(category.getName().toString());
