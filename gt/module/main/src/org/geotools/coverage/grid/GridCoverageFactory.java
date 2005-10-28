@@ -23,6 +23,7 @@ import java.util.Map;
 import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
@@ -42,7 +43,6 @@ import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -160,7 +160,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                final GridGeometry2D            gridGeometry,
                                final GridSampleDimension[]     bands,
                                final Map                       properties)
-            throws MismatchedDimensionException
     {
         return create(name, function, new GridGeometry2D(gridGeometry.getGridRange(),
                 gridGeometry.getGridToCoordinateSystem(), crs), bands, properties);
@@ -177,9 +176,6 @@ public class GridCoverageFactory extends AbstractFactory {
      *                     default sample dimensions.
      * @param properties The set of properties for this coverage, or {@code null} if there is none.
      *
-     * @throws MismatchedDimensionException If the grid range's dimension
-     *         is not the same than the coordinate system's dimension.
-     *
      * @since 2.2
      */
     public GridCoverage2D create(final CharSequence          name,
@@ -187,7 +183,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final GridGeometry2D        gridGeometry,
                                  final GridSampleDimension[] bands,
                                  final Map                   properties)
-            throws MismatchedDimensionException
     {
         final MathTransform transform = gridGeometry.getGridToCoordinateSystem2D();
         if (!(transform instanceof AffineTransform)) {
@@ -218,6 +213,48 @@ public class GridCoverageFactory extends AbstractFactory {
     }
 
     /**
+     * Constructs a grid coverage from the specified matrix and {@linkplain Envelope envelope}.
+     * A default color palette is built from the minimal and maximal values found in the matrix.
+     *
+     * @param name     The grid coverage name.
+     * @param raster   The matrix data in a {@code [row][column]} layout.
+     *                 {@linkplain Float#NaN NaN} values are mapped to a transparent color.
+     * @param envelope The envelope.
+     *
+     * @since 2.2
+     */
+    public GridCoverage2D create(final CharSequence name,
+                                 final float[][]    matrix,
+                                 final Envelope     envelope)
+    {
+        int width  = 0;
+        int height = matrix.length;
+        for (int j=0; j<height; j++) {
+            final float[] row = matrix[j];
+            if (row != null) {
+                if (row.length > width) {
+                    width = row.length;
+                }
+            }
+        }
+        final WritableRaster raster;
+        raster = WritableRaster.createBandedRaster(DataBuffer.TYPE_FLOAT, width, height, 1, null);
+        for (int j=0; j<height; j++) {
+            int i=0;
+            final float[] row = matrix[j];
+            if (row != null) {
+                while (i < row.length) {
+                    raster.setSample(i++, j, 0, row[i]);
+                }
+            }
+            while (i < width) {
+                raster.setSample(i++, j, 0, Float.NaN);
+            }
+        }
+        return create(name, raster, envelope);
+    }
+
+    /**
      * Constructs a grid coverage from the specified {@linkplain WritableRaster raster} and
      * {@linkplain Envelope envelope}. A default color palette is built from the minimal and
      * maximal values found in the raster.
@@ -226,13 +263,10 @@ public class GridCoverageFactory extends AbstractFactory {
      * @param raster   The data (may be floating point numbers). {@linkplain Float#NaN NaN}
      *                 values are mapped to a transparent color.
      * @param envelope The envelope.
-     *
-     * @throws MismatchedDimensionException If the envelope's dimension is not 2.
      */
     public GridCoverage2D create(final CharSequence   name,
                                  final WritableRaster raster,
                                  final Envelope       envelope)
-            throws MismatchedDimensionException
     {
         return create(name, raster, envelope, null, null, null, null, null);
     }
@@ -251,7 +285,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                final Unit                      units,
                                final Color[][]                 colors,
                                final RenderingHints            hints)
-            throws MismatchedDimensionException, IllegalArgumentException
     {
         return create(name, raster, GridCoverage2D.toEnvelope(envelope, crs),
                       minValues, maxValues, units, colors, hints);
@@ -290,11 +323,6 @@ public class GridCoverageFactory extends AbstractFactory {
      *                    which can be one of {@link SampleDimensionType#UNSIGNED_8BITS UNSIGNED_8BITS}
      *                    or {@link SampleDimensionType#UNSIGNED_16BITS UNSIGNED_16BITS}.
      *
-     * @throws MismatchedDimensionException If the envelope's dimension
-     *         is not the same than the coordinate system's dimension.
-     * @throws IllegalArgumentException if the number of bands differs
-     *         from the number of sample dimensions.
-     *
      * @since 2.2
      */
     public GridCoverage2D create(final CharSequence              name,
@@ -305,7 +333,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final Unit                      units,
                                  final Color[][]                 colors,
                                  final RenderingHints            hints)
-            throws MismatchedDimensionException, IllegalArgumentException
     {
         final GridSampleDimension[] bands =
             Grid2DSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints);
@@ -341,11 +368,6 @@ public class GridCoverageFactory extends AbstractFactory {
      *                    specifies the {@link SampleDimensionType} to be used at rendering time,
      *                    which can be one of {@link SampleDimensionType#UNSIGNED_8BITS UNSIGNED_8BITS}
      *                    or {@link SampleDimensionType#UNSIGNED_16BITS UNSIGNED_16BITS}.
-     *
-     * @throws MismatchedDimensionException If the {@code gridToCRS} dimension
-     *         is not the same than the coordinate system's dimension.
-     * @throws IllegalArgumentException if the number of bands differs
-     *         from the number of sample dimensions.
      */
     public GridCoverage2D create(final CharSequence              name,
                                  final WritableRaster            raster,
@@ -356,7 +378,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final Unit                      units,
                                  final Color[][]                 colors,
                                  final RenderingHints            hints)
-            throws MismatchedDimensionException, IllegalArgumentException
     {
         final GridSampleDimension[] bands =
             Grid2DSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints);
@@ -383,18 +404,12 @@ public class GridCoverageFactory extends AbstractFactory {
      *                     sample dimensions. If non-null, then this array's length must matches
      *                     the number of bands in {@code image}.
      *
-     * @throws MismatchedDimensionException If the envelope's dimension
-     *         is not the same than the coordinate system's dimension.
-     * @throws IllegalArgumentException if the number of bands differs
-     *         from the number of sample dimensions.
-     *
      * @since 2.2
      */
     public GridCoverage2D create(final CharSequence              name,
                                  final WritableRaster            raster,
                                  final Envelope                  envelope,
                                  final GridSampleDimension[]     bands)
-            throws MismatchedDimensionException, IllegalArgumentException
     {
         final ColorModel    model = bands[0].getColorModel(0, bands.length);
         final RenderedImage image = new BufferedImage(model, raster, false, null);
@@ -416,11 +431,6 @@ public class GridCoverageFactory extends AbstractFactory {
      *                     default sample dimensions. If non-null, then this array's length
      *                     must matches the number of bands in {@code image}.
      *
-     * @throws MismatchedDimensionException If the transform's dimension
-     *         is not the same than the coordinate system's dimension.
-     * @throws IllegalArgumentException if the number of bands differs
-     *         from the number of sample dimensions.
-     *
      * @since 2.2
      */
     public GridCoverage2D create(final CharSequence              name,
@@ -428,7 +438,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final CoordinateReferenceSystem crs,
                                  final MathTransform             gridToCRS,
                                  final GridSampleDimension[]     bands)
-            throws MismatchedDimensionException, IllegalArgumentException
     {
         final ColorModel    model = bands[0].getColorModel(0, bands.length);
         final RenderedImage image = new BufferedImage(model, raster, false, null);
@@ -443,7 +452,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                final RenderedImage             image,
                                final CoordinateReferenceSystem crs,
                                final Envelope                  envelope)
-            throws MismatchedDimensionException
     {
         return create(name, image, crs, envelope, null, null, null);
     }
@@ -462,15 +470,11 @@ public class GridCoverageFactory extends AbstractFactory {
      * @param image    The image.
      * @param envelope The grid coverage cordinates.
      *
-     * @throws MismatchedDimensionException If the envelope's dimension
-     *         is not the same than the coordinate system's dimension.
-     *
      * @since 2.2
      */
     public GridCoverage2D create(final CharSequence  name,
                                  final RenderedImage image,
                                  final Envelope      envelope)
-            throws MismatchedDimensionException
     {
         return create(name, image, envelope, null, null, null);
     }
@@ -487,7 +491,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                final GridSampleDimension[]     bands,
                                final GridCoverage[]            sources,
                                final Map                       properties)
-            throws MismatchedDimensionException, IllegalArgumentException
     {
         return create(name, image, GridCoverage2D.toEnvelope(envelope, crs),
                       bands, sources, properties);
@@ -528,11 +531,6 @@ public class GridCoverageFactory extends AbstractFactory {
      * @param sources    The sources for this grid coverage, or {@code null} if none.
      * @param properties The set of properties for this coverage, or {@code null} if there is none.
      *
-     * @throws MismatchedDimensionException If the envelope's dimension
-     *         is not the same than the coordinate system's dimension.
-     * @throws IllegalArgumentException if the number of bands differs
-     *         from the number of sample dimensions.
-     *
      * @since 2.2
      */
     public GridCoverage2D create(final CharSequence          name,
@@ -541,7 +539,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final GridSampleDimension[] bands,
                                  final GridCoverage[]        sources,
                                  final Map                   properties)
-            throws MismatchedDimensionException, IllegalArgumentException
     {
         /*
          * Makes sure that the specified envelope has a CRS.
@@ -572,11 +569,6 @@ public class GridCoverageFactory extends AbstractFactory {
      *                   of bands in the {@code image}.
      * @param sources    The sources for this grid coverage, or {@code null} if none.
      * @param properties The set of properties for this coverage, or {@code null} if there is none.
-     *
-     * @throws MismatchedDimensionException If the transform's dimension
-     *         is not the same than the coordinate system's dimension.
-     * @throws IllegalArgumentException if the number of bands differs
-     *         from the number of sample dimensions.
      */
     public GridCoverage2D create(final CharSequence              name,
                                  final RenderedImage             image,
@@ -585,7 +577,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final GridSampleDimension[]     bands,
                                  final GridCoverage[]            sources,
                                  final Map                       properties)
-            throws MismatchedDimensionException, IllegalArgumentException
     {
         final GridGeometry2D gm = new GridGeometry2D(new GeneralGridRange(image), gridToCRS, crs);
         return create(name, image, gm, bands, sources, properties);
@@ -614,9 +605,6 @@ public class GridCoverageFactory extends AbstractFactory {
      * @param sources      The sources for this grid coverage, or {@code null} if none.
      * @param properties   The set of properties for this coverage, or {@code null} none.
      *
-     * @throws IllegalArgumentException if the number of bands differs from the number of sample
-     *         dimensions.
-     *
      * @since 2.2
      */
     public GridCoverage2D create(final CharSequence          name,
@@ -625,7 +613,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final GridSampleDimension[] bands,
                                  final GridCoverage[]        sources,
                                  final Map                   properties)
-            throws IllegalArgumentException
     {
         /*
          * Makes sure that the specified grid geometry has a CRS.
