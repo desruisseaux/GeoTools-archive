@@ -65,6 +65,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public abstract class AbstractGridCoverage extends AbstractCoverage implements GridCoverage {
     /**
+     * For compatibility during cross-version serialization.
+     */
+    private static final long serialVersionUID = 6476934258101450793L;
+
+    /**
      * The logger for grid coverage operations.
      */
     public static final Logger LOGGER = Logger.getLogger("org.geotools.coverage.grid");

@@ -46,6 +46,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.AbstractFactory;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -56,34 +57,33 @@ import org.geotools.resources.i18n.Errors;
 /**
  * A factory for {@linkplain GridCoverage2D grid coverage} objects. This factory expects various
  * combinaisons of the following informations:
- *
+ * <p>
  * <ul>
- *   <li><p>A name as a {@linkplain CharSequence character sequence}.</p></li>
+ *   <li>A name as a {@linkplain CharSequence character sequence}.</li>
  *
- *   <li><p>A {@linkplain WritableRaster raster}, <strong>or</strong> an {@linkplain RenderedImage
- *       image}, <strong>or</strong> an {@linkplain ImageFunction image function}, <strong>or</strong>
- *       a matrix of kind {@code float[][]}.</p></li>
+ *   <li>A {@linkplain WritableRaster raster}, <strong>or</strong> an {@linkplain RenderedImage image},
+ *       <strong>or</strong> an {@linkplain ImageFunction image function}, <strong>or</strong>
+ *       a matrix of kind {@code float[][]}.</li>
  *
- *   <li><p>A ({@linkplain CoordinateReferenceSystem coordinate reference system} - grid to CRS
+ *   <li>A ({@linkplain CoordinateReferenceSystem coordinate reference system} -
  *       {@linkplain MathTransform transform}) pair, <strong>or</strong> an {@linkplain Envelope
  *       envelope}, <strong>or</strong> a {@linkplain GridGeometry2D grid geometry}. The envelope
- *       is easier to use, while the transform provides more control.</p></li>
+ *       is easier to use, while the transform provides more control.</li>
  *
- *   <li><p>Information about each {@linkplain GridSampleDimension sample dimensions} (often
+ *   <li>Information about each {@linkplain GridSampleDimension sample dimensions} (often
  *       called <cite>bands</cite> in the particular case of images), <strong>or</strong> minimal
- *       and maximal expected values for each bands.</p></li>
+ *       and maximal expected values for each bands.</li>
  *
- *   <li><p>Optional properties as a {@linkplain Map map} of <cite>key</cite>-<cite>value</cite>
- *        pairs. "Properties" in <cite>Java Advanced Imaging</cite> are called "Metadata" by OpenGIS.
- *        Keys are {@link String} objects ({@link CaselessStringKey} are accepted as well), while
- *        values may be any {@link Object}.</p></li>
+ *   <li>Optional properties as a {@linkplain Map map} of <cite>key</cite>-<cite>value</cite> pairs.
+ *       "Properties" in <cite>Java Advanced Imaging</cite> are called "Metadata" by OpenGIS.
+ *       Keys are {@link String} objects ({@link CaselessStringKey} are accepted as well), while
+ *       values may be any {@link Object}.</li>
  * </ul>
  *
  * <p>The {@linkplain CoordinateReferenceSystem coordinate reference system} is inferred from the
  * supplied {@linkplain Envelope envelope} or {@linkplain GridGeometry2D grid geometry} parameters.
  * If those parameters do not have CRS information, then this factory fallback on a {@linkplain
- * #getDefaultCRS default CRS}, which is a {@linkplain DefaultGeographicCRS#WGS84 geographic CRS
- * on the WGS 1984 ellipsoid} in the default factory implementation.</p>
+ * #getDefaultCRS default CRS}.</p>
  *
  * <p>Every {@code create} methods will ultimately delegate their work to a master
  * {@link #create(CharSequence, RenderedImage, GridGeometry2D, GridSampleDimension[],
@@ -94,25 +94,53 @@ import org.geotools.resources.i18n.Errors;
  * @author Martin Desruisseaux
  * @version $Id$
  */
-public class GridCoverageFactory {
+public class GridCoverageFactory extends AbstractFactory {
     /**
      * Creates a default factory. Users should not need to creates instance of this class
-     * directly. Invoke {@link org.opengis.coverage.FactoryFinder#getGridCoverageFactory}
+     * directly. Invoke {@link org.geotools.coverage.FactoryFinder#getGridCoverageFactory}
      * instead.
      */
     public GridCoverageFactory() {
     }
 
     /**
-     * Returns the default coordinate reference system to use when no CRS were explicitly specified
-     * by the user. The default implementation returns {@link DefaultGeographicCRS#WGS84} or its 3D
-     * variant. Subclasses should override this method if they want to use different defaults.
+     * Creates a factory using the specified set of hints.
+     * The factory recognizes the following hints:
+     * <p>
+     * <ul>
+     *   <li>{@link Hints#DEFAULT_COORDINATE_REFERENCE_SYSTEM}</li>
+     * </ul>
+     */
+    public GridCoverageFactory(final Hints hints) {
+        if (hints != null) {
+            Object value;
+            value = hints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+            if (value!=null && !value.equals(DefaultGeographicCRS.WGS84) &&
+                               !value.equals(DefaultGeographicCRS.WGS84_3D))
+            {
+                this.hints.put(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM, value);
+            }
+        }
+    }
+
+    /**
+     * Returns the default coordinate reference system to use when no CRS were explicitly
+     * specified by the user. If a {@link Hints#DEFAULT_COORDINATE_REFERENCE_SYSTEM
+     * DEFAULT_COORDINATE_REFERENCE_SYSTEM} hint were provided at factory construction
+     * time, then the specified CRS is returned. Otherwise, the default implementation
+     * returns {@link DefaultGeographicCRS#WGS84} or its 3D variant. Subclasses should
+     * override this method if they want to use different defaults.
      *
      * @param dimension The number of dimension expected in the CRS to be returned.
      *
      * @since 2.2
      */
     protected CoordinateReferenceSystem getDefaultCRS(final int dimension) {
+        final CoordinateReferenceSystem candidate =
+                (CoordinateReferenceSystem) hints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+        if (candidate != null) {
+            return candidate;
+        }
         switch (dimension) {
             case  2: return DefaultGeographicCRS.WGS84;
             case  3: return DefaultGeographicCRS.WGS84_3D;
@@ -489,10 +517,6 @@ public class GridCoverageFactory {
      *
      * @param name       The grid coverage name.
      * @param image      The image.
-     * @param crs        The coordinate reference system. This specifies the CRS used when
-     *                   accessing a grid coverage with the {@code evaluate} methods. The
-     *                   number of dimensions must matches the number of dimensions
-     *                   of {@code envelope}.
      * @param envelope   The grid coverage cordinates. This envelope must have at least two
      *                   dimensions.   The two first dimensions describe the image location
      *                   along <var>x</var> and <var>y</var> axis. The other dimensions are
@@ -580,9 +604,10 @@ public class GridCoverageFactory {
      *
      * @param name         The grid coverage name.
      * @param image        The image.
-     * @param gridGeometry The grid geometry (must contains an {@linkplain Envelope envelope} with
-     *                     its {@linkplain CoordinateReferenceSystem coordinate reference system}
-     *                     and a "grid to CRS" {@linkplain MathTransform transform}).
+     * @param gridGeometry The grid geometry (must contains an {@linkplain GridGeometry2D#getEnvelope
+     *                     envelope} with its {@linkplain GridGeometry2D#getCoordinateReferenceSystem
+     *                     coordinate reference system} and a "{@linkplain
+     *                     GridGeometry2D#getGridToCoordinateSystem grid to CRS}" transform).
      * @param bands        Sample dimensions for each image band, or {@code null} for default sample
      *                     dimensions. If non-null, then this array's length must matches the number
      *                     of bands in {@code image}.

@@ -27,11 +27,13 @@ package org.geotools.coverage.grid;
 import java.awt.Rectangle;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
+import java.awt.geom.Rectangle2D; // For javadoc
 import java.io.Serializable;
 import java.util.Arrays;
 
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridGeometry; // For javadoc
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
@@ -180,14 +182,17 @@ public class GeneralGridRange implements GridRange, Serializable {
      * <p>
      * <strong>Note about rounding mode:</strong><br>
      * It would have been possible to round the {@linkplain Envelope#getMinimum minimal value}
-     * to {@linkplain Math#floor floor} and the {@linkplain Envelope#getMaximum maximal value}
-     * to {@linkplain Math#ceil ceil} in order to make sure that the grid range encompass all
+     * toward {@linkplain Math#floor floor} and the {@linkplain Envelope#getMaximum maximal value}
+     * toward {@linkplain Math#ceil ceil} in order to make sure that the grid range encompass all
      * the envelope (something similar to what <cite>Java2D</cite> does when casting
-     * {@link java.awt.geom.Rectangle2D} to {@link Rectangle}). But this approach has an
-     * undesirable side effect: it may changes the image width or height. For example the range
-     * {@code [-0.25 ... 99.75]} would be rounded to {@code [-1 ... 100]}, which lead to unexpected
-     * result when using some operation like {@link javax.media.jai.operator.AffineDescriptor Affine}.
-     * Rounding to nearest integers produces better results.
+     * {@link Rectangle2D} to {@link Rectangle}). But this approach has an undesirable
+     * side effect: it may changes the image {@linkplain RenderedImage#getWidth width} or
+     * {@linkplain RenderedImage#getHeight height}. For example the range {@code [-0.25 ... 99.75]}
+     * would be casted to {@code [-1 ... 100]}, which leads to unexpected result when using grid
+     * range with image operations like "{@link javax.media.jai.operator.AffineDescriptor Affine}".
+     * For avoiding such changes in size, it is necessary to use the same rounding mode for both
+     * minimal and maximal values. The selected rounding mode is {@linkplain Math#round nearest
+     * integer} in this implementation.
      *
      * @since 2.2
      */
@@ -209,8 +214,7 @@ public class GeneralGridRange implements GridRange, Serializable {
     }
     
     /**
-     * Returns the valid minimum inclusive grid
-     * coordinate along the specified dimension.
+     * Returns the valid minimum inclusive grid coordinate along the specified dimension.
      *
      * @see #getLowers
      */
@@ -222,8 +226,7 @@ public class GeneralGridRange implements GridRange, Serializable {
     }
     
     /**
-     * Returns the valid maximum exclusive grid
-     * coordinate along the specified dimension.
+     * Returns the valid maximum exclusive grid coordinate along the specified dimension.
      *
      * @see #getUppers
      */
@@ -304,9 +307,8 @@ public class GeneralGridRange implements GridRange, Serializable {
     }
     
     /**
-     * Returns a hash value for this grid range.
-     * This value need not remain consistent between
-     * different implementations of the same class.
+     * Returns a hash value for this grid range. This value need not remain
+     * consistent between different implementations of the same class.
      */
     public int hashCode() {
         int code = (int)serialVersionUID;
@@ -319,8 +321,7 @@ public class GeneralGridRange implements GridRange, Serializable {
     }
     
     /**
-     * Compares the specified object with
-     * this grid range for equality.
+     * Compares the specified object with this grid range for equality.
      */
     public boolean equals(final Object object) {
         if (object instanceof GeneralGridRange) {
@@ -331,9 +332,8 @@ public class GeneralGridRange implements GridRange, Serializable {
     }
     
     /**
-     * Returns a string représentation of this grid range.
-     * The returned string is implementation dependent. It
-     * is usually provided for debugging purposes.
+     * Returns a string représentation of this grid range. The returned string is
+     * implementation dependent. It is usually provided for debugging purposes.
      */
     public String toString() {
         final int dimension = index.length/2;

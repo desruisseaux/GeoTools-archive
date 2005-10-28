@@ -232,6 +232,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             } catch (TransformException exception) {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
                                         Utilities.getShortClassName(gridToCRS))/*, exception*/);
+                // TODO: uncomment the exception cause when we will be allowed to target J2SE 1.5.
             }
             envelope.setCoordinateReferenceSystem(crs);
             this.envelope = envelope;
@@ -503,6 +504,8 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *         <code>{@linkplain #isDefined isDefined}({@linkplain #CRS})</code>
      *         returned {@code false}).
      *
+     * @see GridGeometry2D#getCoordinateReferenceSystem2D
+     *
      * @since 2.2
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem()
@@ -529,8 +532,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *         <code>{@linkplain #isDefined isDefined}({@linkplain #ENVELOPE})</code>
      *         returned {@code false}).
      *
-     * @see #getGridRange
-     * @see #getGridToCoordinateSystem
+     * @see GridGeometry2D#getEnvelope2D
      */
     public Envelope getEnvelope() throws InvalidGridGeometryException {
         if (envelope!=null && !envelope.isNull()) {
@@ -553,10 +555,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *         <code>{@linkplain #isDefined isDefined}({@linkplain #GRID_RANGE})</code>
      *         returned {@code false}).
      *
-     * @see RenderedImage#getMinX
-     * @see RenderedImage#getMinY
-     * @see RenderedImage#getWidth
-     * @see RenderedImage#getHeight
+     * @see GridGeometry2D#getGridRange2D
      */
     public GridRange getGridRange() throws InvalidGridGeometryException {
         if (gridRange != null) {
@@ -581,6 +580,8 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * @throws InvalidGridGeometryException if this grid geometry has no transform (i.e.
      *         <code>{@linkplain #isDefined isDefined}({@linkplain #GRID_TO_CRS})</code>
      *         returned {@code false}).
+     *
+     * @see GridGeometry2D#getGridToCoordinateSystem2D
      */
     public MathTransform getGridToCoordinateSystem() throws InvalidGridGeometryException {
         if (gridToCRS != null) {

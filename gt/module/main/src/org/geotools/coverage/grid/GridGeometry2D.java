@@ -496,6 +496,10 @@ public class GridGeometry2D extends GeneralGridGeometry {
      *         returned {@code false}).
      *
      * @see #getGridRange
+     * @see RenderedImage#getMinX
+     * @see RenderedImage#getMinY
+     * @see RenderedImage#getWidth
+     * @see RenderedImage#getHeight
      */
     public Rectangle getGridRange2D() throws InvalidGridGeometryException {
         if (gridRange != null) {
@@ -519,6 +523,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
      *         make it convenient for interoperability with Java2D.
      * @throws InvalidGridGeometryException if a two-dimensional transform is not available
      *         for this grid geometry.
+     *
+     * @see #getGridToCoordinateSystem
      */
     public MathTransform2D getGridToCoordinateSystem2D() throws InvalidGridGeometryException {
         if (gridToCRS2D != null) {

@@ -33,7 +33,7 @@ import org.geotools.resources.Utilities;
  * Those hints are typically used by renderers or
  * {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage processors}
  * for example. They provides a way to control low-level details. Example:
- * </p>
+ * <p>
  * <blockquote><pre>
  * CoordinateOperationFactory myFactory = &hellip;
  * RenderingHints hints = new RenderingHints(Hints.{@link #COORDINATE_OPERATION_FACTORY}, myFactory);
@@ -43,16 +43,15 @@ import org.geotools.resources.Utilities;
  * Any hint mentioned by this interface is considered to be API, failure to make use of a hint by
  * a geotools factory implementation is considered a bug (as it will prevent the use of this library
  * for application specific tasks).
- * </p>
  * <p>
  * When hints are used in conjuction with the Factory service discovery mechanism we have the
  * complete geotools plugin system. By using hints to allow application code to effect service
  * discovery we allow client code to retarget the geotools library for their needs.
- * </p>
  * <p>
  * While this works in practice for services which we control (like Feature creation), we also make
  * use of other services.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -184,6 +183,16 @@ public final class Hints extends RenderingHints {
      */
     public static final Key SAMPLE_DIMENSION_TYPE =
             new Key("org.opengis.coverage.SampleDimensionType");
+
+    /**
+     * Hint for the default {@link org.opengis.referencing.crs.CoordinateReferenceSystem} to use.
+     * This is used by some factories capable to provide a default CRS when no one were explicitly
+     * specified by the user.
+     *
+     * @since 2.2
+     */
+    public static final Key DEFAULT_COORDINATE_REFERENCE_SYSTEM =
+            new Key("org.opengis.referencing.crs.CoordinateReferenceSystem");
 
     /**
      * Hint for the preferred datum shift method to use for coordinate operation.

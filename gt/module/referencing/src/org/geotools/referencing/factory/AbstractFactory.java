@@ -40,7 +40,8 @@ import org.geotools.resources.i18n.Errors;
 
 
 /**
- * Base class for all factories. Factories can be grouped in two categories:
+ * Base class for all factories in the referencing module.
+ * Factories can be grouped in two categories:
  * <P>
  * <UL>
  *   <LI>{@linkplain AuthorityFactory Authority factories} creates objects from

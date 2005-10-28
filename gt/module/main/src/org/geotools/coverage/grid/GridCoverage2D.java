@@ -142,6 +142,11 @@ import org.geotools.util.NumberRange;
  */
 public class GridCoverage2D extends AbstractGridCoverage implements RenderedCoverage {
     /**
+     * For compatibility during cross-version serialization.
+     */
+    private static final long serialVersionUID = 667472989475027853L;
+
+    /**
      * Slight number for rounding errors in floating point comparaison.
      */
     private static final float EPS = 1E-5f;
@@ -328,9 +333,10 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *
      * @param name         The grid coverage name.
      * @param image        The image.
-     * @param gridGeometry The grid geometry (must contains an {@linkplain Envelope envelope} with
-     *                     its {@linkplain CoordinateReferenceSystem coordinate reference system}
-     *                     and a "grid to CRS" {@linkplain MathTransform transform}).
+     * @param gridGeometry The grid geometry (must contains an {@linkplain GridGeometry2D#getEnvelope
+     *                     envelope} with its {@linkplain GridGeometry2D#getCoordinateReferenceSystem
+     *                     coordinate reference system} and a "{@linkplain
+     *                     GridGeometry2D#getGridToCoordinateSystem grid to CRS}" transform).
      * @param bands        Sample dimensions for each image band, or {@code null} for default sample
      *                     dimensions. If non-null, then this array's length must matches the number
      *                     of bands in {@code image}.
