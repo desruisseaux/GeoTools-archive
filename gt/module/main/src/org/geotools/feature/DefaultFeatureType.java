@@ -127,7 +127,7 @@ public class DefaultFeatureType implements FeatureType {
      * @throws SchemaException
      */
     private DefaultFeatureType() {
-        this.typeName = "emtpyFeatureType";
+        this.typeName = "emptyFeatureType";
             namespace = GMLSchema.NAMESPACE;
         this.types = new AttributeType[0];
         this.ancestors = new FeatureType[0];

@@ -19,7 +19,6 @@ package org.geotools.feature.visitor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -122,48 +121,57 @@ public class AbstractCalcResult implements CalcResult {
         if (value instanceof Set) {
             Set set = (Set) value;
 
-            return Collections.unmodifiableSet(set);
+            return set;
         }
 
         if (value.getClass().isArray()) {
             Set set = new HashSet(Arrays.asList((Object[]) value));
 
-            return Collections.unmodifiableSet(set);
+            return set;
         }
 
         if (value instanceof Collection) {
             Set set = new HashSet((Collection) value);
 
-            return Collections.unmodifiableSet(set);
+            return set;
         }
 
         return null;
     }
 
     public List toList() {
-        Object value = getValue();
+		Object value = getValue();
 
-        if (value == null) {
-            return null;
-        }
+		if (value == null) {
+			return null;
+		}
 
-        if (value instanceof List) {
-            List list = (List) value;
+		if (value instanceof List) {
+			List list = (List) value;
 
-            return Collections.unmodifiableList(list);
-        }
+			return list;
+		}
 
-        if (value.getClass().isArray()) {
-            return Collections.unmodifiableList(Arrays.asList((Object[]) value));
-        }
+		if (value.getClass().isArray()) {
+			return Arrays.asList((Object[]) value);
+		}
 
-        if (value instanceof Collection) {
-            return Collections.unmodifiableList(new ArrayList(
-                    (Collection) value));
-        }
+		if (value instanceof HashSet) {
+			Set set = (HashSet) value;
+			// Object[] values = set.toArray();
+			return Arrays.asList(set.toArray());
+			// List list = new ArrayList();
+			// for (int i = 0; i < values.length; i++)
+			// list.add(values[i]);
+			// return list;
+		}
 
-        return null;
-    }
+		if (value instanceof Collection) {
+			return new ArrayList((Collection) value);
+		}
+
+		return null;
+	}
 
     public Object[] toArray() {
         List list = toList();

@@ -87,7 +87,7 @@ public class DefaultFeatureCollection extends AbstractFeatureCollection {
     	if(featureType == null){
     		List ats = new LinkedList();
     		ats.add(new FeatureAttributeType("_Feature",new DefaultFeatureType("AbstractFeatureType",GMLSchema.NAMESPACE,new LinkedList(),new LinkedList(),null),false));
-    		featureType = new DefaultFeatureType("AbstractFeatureColletionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);
+    		featureType = new DefaultFeatureType("AbstractFeatureCollectionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);
     	}
     	this.featureType = featureType;
         this.childType = null; // no children yet

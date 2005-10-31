@@ -7,28 +7,12 @@
 
 package org.geotools.filter.function;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import junit.framework.*;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
-import org.geotools.filter.ExpressionBuilder;
-import org.geotools.filter.ExpressionSAXParser;
 import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFilter;
 import org.geotools.filter.FunctionExpression;
-import org.geotools.filter.TestFilterHandler;
-import org.geotools.filter.function.EqualIntervalFunction;
 import org.geotools.filter.parser.ParseException;
-import org.geotools.gml.GMLFilterDocument;
-import org.geotools.gml.GMLFilterGeometry;
-import org.geotools.resources.TestData;
-import org.xml.sax.helpers.ParserAdapter;
 
 /**
  *
@@ -99,7 +83,7 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
         while(list.hasNext()){
             Feature f = list.next();
             int slot = ((Number)func.getValue(f)).intValue();
-            
+            System.out.println(slot);
         }
         
     }

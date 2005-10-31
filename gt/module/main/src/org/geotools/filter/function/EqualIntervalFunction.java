@@ -16,29 +16,35 @@
  */
 package org.geotools.filter.function;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.MaxVisitor;
 import org.geotools.feature.visitor.MinVisitor;
+import org.geotools.feature.visitor.UniqueVisitor;
 import org.geotools.filter.Expression;
 import org.geotools.filter.IllegalFilterException;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**
- * DOCUMENT ME!
- *
- * @author jfc173
+ * Classification function for breaking a feature collection into edible chunks
+ * of "equal" size.
+ * 
+ * @author James Macgill
+ * @author Cory Horner, Refractions Research
  */
 public class EqualIntervalFunction extends ClassificationFunction {
-    double min = 0;
-    double max = 0;
-
-    /**
-     * Creates a new instance of EqualRangesClassificationFunction
-     */
+	Comparable globalMin = null;
+    Comparable globalMax = null;
+    Comparable[] localMin = null;
+    Comparable[] localMax = null;
+    Object[] values = null;
+    boolean isValid = false;
+    boolean isNumber = false;
+    
     public EqualIntervalFunction() {
     }
 
@@ -46,44 +52,99 @@ public class EqualIntervalFunction extends ClassificationFunction {
         return "EqualInterval";
     }
 
-    private void calculateMinAndMax()
-        throws IllegalFilterException, IOException {
-        //TODO: don't assume double
-        MinVisitor minVisit = new MinVisitor(expr);
-        fc.accepts(minVisit);
-        min = minVisit.getResult().toDouble();
+    private void calculateMinAndMax() {
+        MinVisitor minVisit;
+		try {
+			minVisit = new MinVisitor(expr);
+			fc.accepts(minVisit);
+			globalMin = (Comparable) minVisit.getResult().getValue();
 
-        MaxVisitor maxVisit = new MaxVisitor(expr);
-        fc.accepts(maxVisit);
-        max = maxVisit.getResult().toDouble();
+			MaxVisitor maxVisit = new MaxVisitor(expr);
+			fc.accepts(maxVisit);
+			globalMax = (Comparable) maxVisit.getResult().getValue();
+			
+			if (!((globalMin instanceof Number) && (globalMax instanceof Number))) {
+				//obtain of list of unique values, so we can enumerate
+				UniqueVisitor uniqueVisit = new UniqueVisitor(expr);
+				fc.accepts(uniqueVisit);
+		        List result = uniqueVisit.getResult().toList();
+		        //sort the results and put them in an array
+		        Collections.sort(result);
+				values = result.toArray();
+			}
+		} catch (IllegalFilterException e) { //accepts exploded
+			e.printStackTrace();
+			isValid = false;
+			return;
+		} catch (IOException e) { //getResult().getValue() exploded
+			e.printStackTrace();
+			isValid = false;
+			return;
+		}
+        
+    	//resize arrays
+        localMin = new Comparable[classNum];
+    	localMax = new Comparable[classNum];
 
-        //    	FeatureIterator it = fc.features();
-        //        min = Double.POSITIVE_INFINITY;
-        //        max = Double.NEGATIVE_INFINITY;
-        //        while (it.hasNext()){
-        //            Feature f = it.next();
-        //            double value = ((Number) expr.getValue(f)).doubleValue();
-        //            if (value > max){
-        //                max = value;
-        //            }
-        //            if (value < min){
-        //                min = value;
-        //            }            
-        //        }
+    	//calculate all the little min and max values
+    	if ((globalMin instanceof Number) && (globalMax instanceof Number)) {
+        	double slotWidth = calculateSlotWidth();
+        	isNumber = true;
+        	for (int i = 0; i < classNum; i++) {
+        		localMin[i] = new Double(((Number) globalMin).doubleValue() + (i * slotWidth));
+        		localMax[i] = new Double(((Number) globalMax).doubleValue() - ((classNum - i - 1) * slotWidth));
+        	}
+        } else {
+        	isNumber = false;
+        	//we have 2 options here:
+        	//1. break apart by numeric value: (aaa, aab, aac, bbb) --> [aaa, aab, aac], [bbb]
+        	//2. break apart by item count:                         --> [aaa, aab], [aac, bbb]
+
+        	// this code currently implements option #2
+        	
+        	//calculate number of items to put in each of the larger bins
+        	int binPop = new Double(Math.ceil((double) values.length / classNum)).intValue();
+        	//determine index of bin where the next bin has one less item
+        	int lastBigBin = classNum - (values.length % binPop) - 1;
+        	int itemIndex = 0;
+        	//for each bin
+        	for (int binIndex = 0; binIndex < classNum; binIndex++) {
+        		//store min
+        		localMin[binIndex] = (Comparable) values[itemIndex];
+        		itemIndex+=binPop;
+        		//store max
+        		if (binIndex == classNum - 1) {
+        			localMax[binIndex] = (Comparable) values[itemIndex];
+        		} else {
+        			localMax[binIndex] = (Comparable) values[itemIndex+1];
+        		}
+        		if (lastBigBin == binIndex)
+					binPop--; // decrease the number of items in a bin for the
+								// next iteration
+        	}
+        }
+        isValid = true;
     }
 
     private double calculateSlotWidth() {
-        return (max - min) / classNum;
+    	//this method assumes isNumber and isValid are asserted
+    	return (((Number) globalMax).doubleValue() - ((Number) globalMin).doubleValue()) / classNum;
     }
 
-    protected int calculateSlot(double val) {
-        if (val >= max) {
+    protected int calculateSlot(Object val) {
+        if (!isValid) return -1;
+    	if (globalMax.compareTo(val) < 1) { //if val => max, put it in the last slot
             return classNum - 1;
         }
-
-        double slotWidth = calculateSlotWidth();
-
-        return (int) Math.floor((val - min) / slotWidth);
+    	Double doubleVal = new Double(((Number) val).doubleValue());
+    	//check each slot and see if: min <= val < max
+    	for (int i = 0; i < classNum; i++) {
+    		if (localMin[i].compareTo(doubleVal) < 1 && localMax[i].compareTo(doubleVal) > 0) {
+    			return i;
+    		}
+    	}
+    	//we didn't find it
+    	return -1;
     }
 
     public Object getValue(Feature feature) {
@@ -95,102 +156,39 @@ public class EqualIntervalFunction extends ClassificationFunction {
 
         if (!(coll.equals(fc))) {
             fc = coll;
-
-            try {
-                calculateMinAndMax();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            calculateMinAndMax();
         }
 
-        int slot = calculateSlot(((Number) expr.getValue(feature)).doubleValue());
+        int slot = calculateSlot(expr.getValue(feature));
 
         return new Integer(slot);
     }
 
     public void setExpression(Expression e) {
         super.setExpression(e);
-
+        //If the expression has changed, should we recalculate regardless of the state of fc?
         if (fc != null) {
-            try {
-                calculateMinAndMax();
-            } catch (Exception e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+            calculateMinAndMax();
         }
-    }
-
-    /**
-     * Determines the range (min and max values) for the indexed slot/bin/bucket.
-     * 
-     * @return a 2 element set containing the min and max values
-     */
-    public Object getRange(int index) {
-        if (fc == null) {
-            return null;
-        }
-
-        if (min == max) {
-            try {
-                calculateMinAndMax();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        Set minmax = new HashSet();
-        double slotWidth = calculateSlotWidth();
-        Double localMin = new Double((index * slotWidth) + min);
-        Double localMax = new Double(max - ((classNum - index - 1) * slotWidth));
-
-        if (index != classNum) { //trim the upper range for all except last
-            localMax = new Double(localMax.doubleValue() - 0.00000000000001);
-
-            //TODO: fix the upper bound of the interval (don't use -0.000...1)
-        }
-
-        minmax.add(localMin);
-        minmax.add(localMax);
-
-        return minmax;
     }
     
     public Object getMin(int index) {
-        if (fc == null) {
+        if (fc == null) 
             return null;
-        }
 
-        if (min == max) {
-            try {
-                calculateMinAndMax();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+        if (!isValid) 
+            calculateMinAndMax();
 
-        double slotWidth = calculateSlotWidth();
-        return new Double((index * slotWidth) + min);
+        return localMin[index];
     }
 
     public Object getMax(int index) {
-        if (fc == null) {
-            return null;
-        }
+		if (fc == null)
+			return null;
 
-        if (min == max) {
-            try {
-                calculateMinAndMax();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+		if (!isValid)
+			calculateMinAndMax();
 
-        double slotWidth = calculateSlotWidth();
-        return new Double(max - ((classNum - index - 1) * slotWidth));
-    }
+		return localMax[index];
+	}
 }
