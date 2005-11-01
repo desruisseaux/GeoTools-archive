@@ -22,12 +22,10 @@ import java.util.Set;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LogicFilter;
-import org.geotools.filter.MathExpression;
 import org.geotools.filter.function.ClassificationFunction;
 import org.geotools.filter.function.EqualIntervalFunction;
 import org.geotools.filter.function.UniqueIntervalFunction;
@@ -93,10 +91,9 @@ public class StyleGenerator {
 
         if (colorBrewer.getLegendType().equals(ColorBrewer.SEQUENTIAL) || 
         		colorBrewer.getLegendType().equals(ColorBrewer.DIVERGING)) {
-        	//TODO: create a ClassicationFunction for Diverging sets
+        	//TODO: create a ClassificationFunction for Diverging sets
         	EqualIntervalFunction eiClassifier = (EqualIntervalFunction) classifier;
         	
-        	//TODO: don't assume double
 	        Object localMin = null;
 	        Object localMax = null;
 	
@@ -106,15 +103,15 @@ public class StyleGenerator {
 	        	localMin = eiClassifier.getMin(i);
 	        	localMax = eiClassifier.getMax(i);
 	
-	            System.out.println("min="+localMin);
-	            System.out.println("max="+localMax);
-	
+	        	//generate a title
+	        	String title = localMin+" --> "+localMax;
+	        	System.out.println("Range = "+title);
+	            
 	            // construct a filter (this was a between filter, but now it's a
 				// LogicFilter + >= + <
 	            LogicFilter andFilter = null;
 	            CompareFilter gteFilter = null;  //greater than or equal
 	            CompareFilter ltFilter = null; //less than 
-	            MathExpression math;
 	            try {
 					gteFilter = ff.createCompareFilter(CompareFilter.COMPARE_GREATER_THAN_EQUAL);
 					gteFilter.addLeftValue(ff.createLiteralExpression(localMin));
@@ -135,6 +132,7 @@ public class StyleGenerator {
 	            //create a rule
 	            Rule rule = sb.createRule(ps);
 	            rule.setFilter(andFilter);
+	            rule.setTitle(title);
 	            fts.addRule(rule);
 	        }
         } else if (colorBrewer.getLegendType().equals(ColorBrewer.QUALITATIVE)) {
@@ -152,18 +150,21 @@ public class StyleGenerator {
 	            	//construct a filter
 	            	try {
 		                filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-		                filter.addLeftValue(ff.createLiteralExpression(items[item]));
-		                filter.addRightValue(expression); //the attribute we're looking at
+		                filter.addLeftValue(expression); //the attribute we're looking at
+		                filter.addRightValue(ff.createLiteralExpression(items[item]));
 		            } catch (IllegalFilterException e) {
 		                // TODO Auto-generated catch block
 		                e.printStackTrace();
 		                return null;
 		            }
+		            //generate a title
+		            String title = items[item].toString();
 		            //construct a symbolizer
 		            ps = sb.createPolygonSymbolizer(colors[i]);
 		            //create a rule
 		            rule = sb.createRule(ps);
 		            rule.setFilter(filter);
+		            rule.setTitle(title);
 		            fts.addRule(rule);
 	            }	
 	        }

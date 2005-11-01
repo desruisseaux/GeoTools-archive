@@ -17,7 +17,7 @@ public class StyleGeneratorTest extends DataTestCase {
         super(arg0);
 	}
 	
-	public void testStyleGeneration() {
+	public void testSequential() {
 		ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes(ColorBrewer.SEQUENTIAL);
         FilterFactory ff = FilterFactory.createFilterFactory();
@@ -38,7 +38,28 @@ public class StyleGeneratorTest extends DataTestCase {
         assertNotNull(style);
 	}
 
-	public void testUniqueGeneration() {
+	public void testDiverging() {
+		ColorBrewer brewer = new ColorBrewer();
+        brewer.loadPalettes(ColorBrewer.DIVERGING);
+        FilterFactory ff = FilterFactory.createFilterFactory();
+        Expression expr = null; 
+        FeatureType type = roadType;
+        String attribName = type.getAttributeType(0).getName();
+        FeatureCollection fc = DataUtilities.collection(roadFeatures);
+        try {
+			expr = ff.createAttributeExpression(type, attribName);
+		} catch (IllegalFilterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        String paletteName = "BrBG"; //type = Diverging
+        //get the style
+        StyleGenerator sg = new StyleGenerator(brewer, paletteName, 2, expr, fc);
+        Style style = sg.createStyle();
+        assertNotNull(style);
+	}
+	
+	public void testQualitative() {
 		ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes(ColorBrewer.QUALITATIVE);
         FilterFactory ff = FilterFactory.createFilterFactory();
