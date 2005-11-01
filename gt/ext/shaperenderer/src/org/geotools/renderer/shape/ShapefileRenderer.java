@@ -89,6 +89,9 @@ import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleAttributeExtractor;
+import org.geotools.styling.StyleBuilder;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleVisitor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
@@ -289,10 +292,10 @@ public class ShapefileRenderer implements GTRenderer{
                         scaleDenominator);
 
                 Set modifiedFIDs = processTransaction(graphics, bbox, mt,
-                        datastore, transaction, typeName, ruleList,
+                        datastore, transaction, typeName, query, ruleList,
                         elseRuleList, scaleRange);
 
-                processShapefile(graphics, datastore, bbox, mt, info, type,
+                processShapefile(graphics, datastore, bbox, mt, info, type, query,
                     ruleList, elseRuleList, modifiedFIDs, scaleRange);
             }
         }
@@ -300,7 +303,7 @@ public class ShapefileRenderer implements GTRenderer{
 
     private Set processTransaction(Graphics2D graphics, Envelope bbox,
         MathTransform transform, DataStore ds, Transaction transaction,
-        String typename, List ruleList, List elseRuleList,
+        String typename, Query query, List ruleList, List elseRuleList,
         NumberRange scaleRange) {
         if (transaction == Transaction.AUTO_COMMIT) {
             return Collections.EMPTY_SET;
@@ -336,6 +339,9 @@ public class ShapefileRenderer implements GTRenderer{
                 fid = (String) iter.next();
                 feature = (Feature) diff.get(fid);
 
+                if( !query.getFilter().contains(feature) )
+                    continue;
+                
                 if (feature != null) {
                     //					 applicable rules
                     for (Iterator it = ruleList.iterator(); it.hasNext();) {
@@ -417,7 +423,7 @@ public class ShapefileRenderer implements GTRenderer{
 
     private void processShapefile(Graphics2D graphics,
         ShapefileDataStore datastore, Envelope bbox, MathTransform mt,
-        IndexInfo info, FeatureType type, List ruleList, List elseRuleList,
+        IndexInfo info, FeatureType type, Query query, List ruleList, List elseRuleList,
         Set modifiedFIDs, NumberRange scaleRange) throws IOException {
         int index = 0;
         DbaseFileReader dbfreader = null;
@@ -483,7 +489,9 @@ public class ShapefileRenderer implements GTRenderer{
 
                     Feature feature = createFeature(type, record, dbfreader,
                             type.getTypeName() + "." + index);
-
+                    if( !query.getFilter().contains(feature) )
+                        continue;
+                    
                     if (renderingStopRequested) {
                         break;
                     }
@@ -654,7 +662,8 @@ public class ShapefileRenderer implements GTRenderer{
                 for (Iterator iter = geometryCache.iterator(); iter.hasNext();) {
                     SimpleGeometry geom = (SimpleGeometry) iter.next();
                     Feature feature = (Feature) featureIter.next();
-
+                    if( !query.getFilter().contains(feature) )
+                        continue;
                     try {
                         if (renderingStopRequested) {
                             break;
@@ -861,16 +870,28 @@ public class ShapefileRenderer implements GTRenderer{
         FeatureType schema) {
         StyleAttributeExtractor sae = new StyleAttributeExtractor() {
                 public void visit(Rule rule) {
+                    
+                    Rule clone=StyleFactory.createStyleFactory().createRule();
+                    clone.setAbstract(rule.getAbstract());
+                    clone.setFilter(rule.getFilter());
+                    clone.setSymbolizers(rule.getSymbolizers());
+                    clone.setIsElseFilter(rule.hasElseFilter());
+                    clone.setLegendGraphic(rule.getLegendGraphic());
+                    clone.setMaxScaleDenominator(rule.getMaxScaleDenominator());
+                    clone.setMinScaleDenominator(rule.getMinScaleDenominator());
+                    clone.setName(rule.getName());
+                    clone.setTitle(rule.getTitle());
+                    
                     if ((query != Query.ALL)
-                            || !query.getFilter().equals(Filter.NONE)) {
-                        if (rule.getFilter() == null) {
-                            rule.setFilter(query.getFilter());
+                            && !query.getFilter().equals(Filter.NONE)) {
+                        if (clone.getFilter() == null) {
+                            clone.setFilter(query.getFilter());
                         } else {
-                            rule.setFilter(rule.getFilter().and(query.getFilter()));
+                            clone.setFilter(clone.getFilter().and(query.getFilter()));
                         }
                     }
 
-                    super.visit(rule);
+                    super.visit(clone);
                 }
             };
 
