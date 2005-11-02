@@ -16,9 +16,6 @@
  */
 package org.geotools.brewer.color;
 
-import java.awt.Color;
-import java.util.Set;
-
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -36,6 +33,8 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
+import java.awt.Color;
+import java.util.Set;
 
 
 /**
@@ -114,29 +113,36 @@ public class StyleGenerator {
 
                 //construct filters
                 Filter filter = null;
-                
+
                 if (localMin == localMax) {
-                	//build filter: =
-                	CompareFilter eqFilter = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
-                	eqFilter.addLeftValue(expression);
-                	eqFilter.addRightValue(ff.createLiteralExpression(localMax));
-                	filter = eqFilter;
+                    //build filter: =
+                    CompareFilter eqFilter = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
+                    eqFilter.addLeftValue(expression);
+                    eqFilter.addRightValue(ff.createLiteralExpression(localMax));
+                    filter = eqFilter;
                 } else {
-	                //build filter: >= AND <
-                	LogicFilter andFilter = null;
-	                CompareFilter gteFilter = null; //greater than or equal
-	                CompareFilter ltFilter = null; //less than 
-	                gteFilter = ff.createCompareFilter(CompareFilter.COMPARE_GREATER_THAN_EQUAL);
-	                gteFilter.addLeftValue(ff.createLiteralExpression(localMin));
-	                gteFilter.addRightValue(expression);
-	                ltFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
-	                ltFilter.addLeftValue(expression);
-	                ltFilter.addRightValue(ff.createLiteralExpression(localMax));
-	                andFilter = ff.createLogicFilter(ltFilter, gteFilter,
-	                        LogicFilter.LOGIC_AND);
-	                filter = andFilter;
+                    //build filter: [min <= x] AND [x < max]
+                    LogicFilter andFilter = null;
+                    CompareFilter lowBoundFilter = null; //less than or equal
+                    CompareFilter hiBoundFilter = null; //less than 
+                    lowBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
+                    lowBoundFilter.addLeftValue(ff.createLiteralExpression(
+                            localMin)); //min
+                    lowBoundFilter.addRightValue(expression); //x
+                    //if this is the global maximum, include the max value
+                    if (i == numClasses - 1) {
+                    	hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
+                    } else {
+                    	hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
+                    }
+                    hiBoundFilter.addLeftValue(expression); //x
+                    hiBoundFilter.addRightValue(ff.createLiteralExpression(
+                            localMax)); //max
+                    andFilter = ff.createLogicFilter(lowBoundFilter,
+                            hiBoundFilter, LogicFilter.LOGIC_AND);
+                    filter = andFilter;
                 }
-                
+
                 //construct a symbolizer
                 PolygonSymbolizer ps = sb.createPolygonSymbolizer(colors[i]);
 

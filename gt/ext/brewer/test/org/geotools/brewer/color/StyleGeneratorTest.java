@@ -16,14 +16,20 @@
  */
 package org.geotools.brewer.color;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.styling.PolygonSymbolizer;
@@ -37,6 +43,7 @@ public class StyleGeneratorTest extends DataTestCase {
     }
 
     public void testSequential() throws Exception {
+        System.out.println("Sequential");
         ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes(ColorBrewer.SEQUENTIAL);
 
@@ -45,6 +52,7 @@ public class StyleGeneratorTest extends DataTestCase {
         FeatureType type = roadType;
         String attribName = type.getAttributeType(0).getName();
         FeatureCollection fc = DataUtilities.collection(roadFeatures);
+        FeatureSource fs = DataUtilities.source(fc);
 
         try {
             expr = ff.createAttributeExpression(type, attribName);
@@ -59,15 +67,34 @@ public class StyleGeneratorTest extends DataTestCase {
         StyleGenerator sg = new StyleGenerator(brewer, paletteName, 2, expr, fc);
         Style style = sg.createStyle();
         assertNotNull(style);
-        //String filter = style.getFeatureTypeStyles()[0].getRules()[0].getFilter().toString();
-        // if we put in an int, we have to get an int back in the filter
-		// expression (otherwise the style doesn't work and we won't know why)
-        //assertEquals("[[ id < 2 ] AND [ 1 >= id ]]", filter);
-        //System.out.println("Filter="+filter);
+        
+        //test each filter
+        Rule[] rule = style.getFeatureTypeStyles()[0].getRules();
+        //do a preliminary test to make sure each rule's filter returns some results
+        checkFilteredResultNotEmpty(rule, fs, attribName);
+        //do a proper test to ensure that the results we get are dead on:
+        
+        //Filter "[[ id < 2.0 ] AND [ 1.0 >= id ]]" contains 1 element(s) ('1')
+        Filter filter = rule[0].getFilter();
+        FeatureCollection filteredCollection = fs.getFeatures(filter).collection();
+        assertEquals(1, filteredCollection.size());
+        FeatureIterator it = filteredCollection.features();
+        Feature feature1 = it.next();
+        assertEquals("1", feature1.getAttribute(attribName).toString());
+        //Filter "[[ id < 3.0 ] AND [ 2.0 >= id ]]" contains 2 element(s) ('1', '2')
+        filter = rule[1].getFilter();
+        filteredCollection = fs.getFeatures(filter).collection();
+        assertEquals(2, filteredCollection.size());
+        it = filteredCollection.features();
+        feature1 = it.next();
+        Feature feature2 = it.next();
+        assertEquals("2", feature1.getAttribute(attribName).toString());
+        assertEquals("3", feature2.getAttribute(attribName).toString());
     }
 
     public void testDiverging() throws Exception {
-        ColorBrewer brewer = new ColorBrewer();
+        System.out.println("Diverging");
+    	ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes(ColorBrewer.DIVERGING);
 
         FilterFactory ff = FilterFactory.createFilterFactory();
@@ -75,6 +102,7 @@ public class StyleGeneratorTest extends DataTestCase {
         FeatureType type = roadType;
         String attribName = type.getAttributeType(0).getName();
         FeatureCollection fc = DataUtilities.collection(roadFeatures);
+        FeatureSource fs = DataUtilities.source(fc);
 
         try {
             expr = ff.createAttributeExpression(type, attribName);
@@ -89,14 +117,33 @@ public class StyleGeneratorTest extends DataTestCase {
         StyleGenerator sg = new StyleGenerator(brewer, paletteName, 2, expr, fc);
         Style style = sg.createStyle();
         assertNotNull(style);
-        //String filter = style.getFeatureTypeStyles()[0].getRules()[0].getFilter().toString();
-        // if we put in an int, we have to get an int back in the filter
-		// expression (otherwise the style doesn't work and we won't know why)
-        //assertEquals("[[ id < 2 ] AND [ 1 >= id ]]", filter);
-        //System.out.println("Filter="+filter);
+
+        //test each filter
+        Rule[] rule = style.getFeatureTypeStyles()[0].getRules();
+        //do a preliminary test to make sure each rule's filter returns some results
+        checkFilteredResultNotEmpty(rule, fs, attribName);
+        //do a proper test to ensure that the results we get are dead on:
+        
+        //Filter "[[ id < 2.0 ] AND [ 1.0 >= id ]]" contains 1 element(s) ('1')
+        Filter filter = rule[0].getFilter();
+        FeatureCollection filteredCollection = fs.getFeatures(filter).collection();
+        assertEquals(1, filteredCollection.size());
+        FeatureIterator it = filteredCollection.features();
+        Feature feature1 = it.next();
+        assertEquals("1", feature1.getAttribute(attribName).toString());
+        //Filter "[[ id < 3.0 ] AND [ 2.0 >= id ]]" contains 2 element(s) ('1', '2')
+        filter = rule[1].getFilter();
+        filteredCollection = fs.getFeatures(filter).collection();
+        assertEquals(2, filteredCollection.size());
+        it = filteredCollection.features();
+        feature1 = it.next();
+        Feature feature2 = it.next();
+        assertEquals("2", feature1.getAttribute(attribName).toString());
+        assertEquals("3", feature2.getAttribute(attribName).toString());
     }
 
     public void testQualitative() throws Exception {
+        System.out.println("Qualitative");
         ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes(ColorBrewer.QUALITATIVE);
 
@@ -106,6 +153,7 @@ public class StyleGeneratorTest extends DataTestCase {
         FeatureType type = roadType;
         String attribName = type.getAttributeType(2).getName();
         FeatureCollection fc = DataUtilities.collection(roadFeatures);
+        FeatureSource fs = DataUtilities.source(fc);
 
         try {
             expr = ff.createAttributeExpression(type, attribName);
@@ -157,5 +205,26 @@ public class StyleGeneratorTest extends DataTestCase {
         	colors.add(ps.getFill().getColor());
         }
         assertEquals(2, colors.size()); //# colors == # classes
+        
+        //test each filter
+        Rule[] rule = style.getFeatureTypeStyles()[0].getRules();
+        //do a preliminary test to make sure each rule's filter returns some results
+        checkFilteredResultNotEmpty(rule, fs, attribName);
+    }
+    
+    public void checkFilteredResultNotEmpty(Rule[] rule, FeatureSource fs, String attribName) throws IOException {
+        for (int i = 0; i < rule.length; i++) {
+        	Filter filter = rule[i].getFilter();
+        	FeatureCollection filteredCollection = fs.getFeatures(filter).collection();
+        	assertTrue(filteredCollection.size() > 0); 
+        	String filterInfo = "Filter \""+filter.toString()+"\" contains "+filteredCollection.size()+" element(s) (";
+        	FeatureIterator it = filteredCollection.features();
+        	while (it.hasNext()) {
+        		Feature feature = it.next();
+        		filterInfo+="'"+feature.getAttribute(attribName)+"'";
+        		if (it.hasNext()) filterInfo+=", ";
+        	}
+        	System.out.println(filterInfo+")");
+        }
     }
 }
