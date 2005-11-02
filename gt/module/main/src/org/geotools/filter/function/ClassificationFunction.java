@@ -69,4 +69,8 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
     
     public abstract Object getValue(Feature feature);
     
+	public Object getValue(int index) {
+		return null;
+	}
+
 }

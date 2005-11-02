@@ -22,6 +22,7 @@ import java.util.Set;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
@@ -39,7 +40,7 @@ import org.geotools.styling.StyleFactory;
 
 /**
  * Generates a style using ColorBrewer
- * 
+ *
  * @author Cory Horner, Refractions Research
  */
 public class StyleGenerator {
@@ -58,7 +59,7 @@ public class StyleGenerator {
         this.collection = collection;
     }
 
-    public Style createStyle() {
+    public Style createStyle() throws IllegalFilterException {
         //make our factories and builders
         StyleBuilder sb = new StyleBuilder();
         FilterFactory ff = FilterFactory.createFilterFactory();
@@ -72,7 +73,7 @@ public class StyleGenerator {
         } else if (colorBrewer.getLegendType().equals(ColorBrewer.DIVERGING)) {
             classifier = new EqualIntervalFunction();
         } else if (colorBrewer.getLegendType().equals(ColorBrewer.QUALITATIVE)) {
-        	classifier = new UniqueIntervalFunction();
+            classifier = new UniqueIntervalFunction();
         } else {
             return null;
         }
@@ -81,93 +82,111 @@ public class StyleGenerator {
         classifier.setExpression(expression);
         classifier.setCollection(collection);
 
+        // attempt to calculate the first value (this is done so any changes to
+        // the number of classes are made before we grab our colour data, etc)
+        classifier.getValue(0);
+
         //extract the palette
-        int classNum = classifier.getNumberOfClasses();
+        numClasses = classifier.getNumberOfClasses(); //update the number of classes
+
         BrewerPalette pal = colorBrewer.getPalette(paletteName);
-        Color[] colors = pal.getColors(classNum);
+        Color[] colors = pal.getColors(numClasses);
 
         //play with styles
         FeatureTypeStyle fts = sf.createFeatureTypeStyle();
 
-        if (colorBrewer.getLegendType().equals(ColorBrewer.SEQUENTIAL) || 
-        		colorBrewer.getLegendType().equals(ColorBrewer.DIVERGING)) {
-        	//TODO: create a ClassificationFunction for Diverging sets
-        	EqualIntervalFunction eiClassifier = (EqualIntervalFunction) classifier;
-        	
-	        Object localMin = null;
-	        Object localMax = null;
-	
-	        //for each class
-	        for (int i = 0; i < numClasses; i++) {
-	            //obtain min/max values
-	        	localMin = eiClassifier.getMin(i);
-	        	localMax = eiClassifier.getMax(i);
-	
-	        	//generate a title
-	        	String title = localMin+" --> "+localMax;
-	        	System.out.println("Range = "+title);
-	            
-	            // construct a filter (this was a between filter, but now it's a
-				// LogicFilter + >= + <
-	            LogicFilter andFilter = null;
-	            CompareFilter gteFilter = null;  //greater than or equal
-	            CompareFilter ltFilter = null; //less than 
-	            try {
-					gteFilter = ff.createCompareFilter(CompareFilter.COMPARE_GREATER_THAN_EQUAL);
-					gteFilter.addLeftValue(ff.createLiteralExpression(localMin));
-					gteFilter.addRightValue(expression); 
-					ltFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
-					ltFilter.addLeftValue(expression);
-					ltFilter.addRightValue(ff.createLiteralExpression(localMax));
-					andFilter = ff.createLogicFilter(ltFilter, gteFilter, LogicFilter.LOGIC_AND);
-				} catch (IllegalFilterException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					return null;
-				}
-	
-	            //construct a symbolizer
-	            PolygonSymbolizer ps = sb.createPolygonSymbolizer(colors[i]);
-	
-	            //create a rule
-	            Rule rule = sb.createRule(ps);
-	            rule.setFilter(andFilter);
-	            rule.setTitle(title);
-	            fts.addRule(rule);
-	        }
+        if (colorBrewer.getLegendType().equals(ColorBrewer.SEQUENTIAL)
+                || colorBrewer.getLegendType().equals(ColorBrewer.DIVERGING)) {
+            //TODO: create a ClassificationFunction for Diverging sets
+            EqualIntervalFunction eiClassifier = (EqualIntervalFunction) classifier;
+
+            Object localMin = null;
+            Object localMax = null;
+
+            //for each class
+            for (int i = 0; i < numClasses; i++) {
+                //obtain min/max values
+                localMin = eiClassifier.getMin(i);
+                localMax = eiClassifier.getMax(i);
+
+                //generate a title
+                String title = localMin + " --> " + localMax;
+
+                //construct filters
+                Filter filter = null;
+                
+                if (localMin == localMax) {
+                	//build filter: =
+                	CompareFilter eqFilter = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
+                	eqFilter.addLeftValue(expression);
+                	eqFilter.addRightValue(ff.createLiteralExpression(localMax));
+                	filter = eqFilter;
+                } else {
+	                //build filter: >= AND <
+                	LogicFilter andFilter = null;
+	                CompareFilter gteFilter = null; //greater than or equal
+	                CompareFilter ltFilter = null; //less than 
+	                gteFilter = ff.createCompareFilter(CompareFilter.COMPARE_GREATER_THAN_EQUAL);
+	                gteFilter.addLeftValue(ff.createLiteralExpression(localMin));
+	                gteFilter.addRightValue(expression);
+	                ltFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
+	                ltFilter.addLeftValue(expression);
+	                ltFilter.addRightValue(ff.createLiteralExpression(localMax));
+	                andFilter = ff.createLogicFilter(ltFilter, gteFilter,
+	                        LogicFilter.LOGIC_AND);
+	                filter = andFilter;
+                }
+                
+                //construct a symbolizer
+                PolygonSymbolizer ps = sb.createPolygonSymbolizer(colors[i]);
+
+                //create a rule
+                Rule rule = sb.createRule(ps);
+                rule.setFilter(filter);
+                rule.setTitle(title);
+                fts.addRule(rule);
+            }
         } else if (colorBrewer.getLegendType().equals(ColorBrewer.QUALITATIVE)) {
-	        UniqueIntervalFunction uniqueClassifier = (UniqueIntervalFunction) classifier;
-        	CompareFilter filter = null;
-        	PolygonSymbolizer ps = null;
-        	Rule rule = null;
-        	//for each class
-	        for (int i = 0; i < numClasses; i++) {
-	        	//obtain the set of values for the current bin
-	            Set value = (Set) uniqueClassifier.getValue(i);
-	            //create a rule for each unique value
-	            Object[] items = value.toArray();
-	            for (int item = 0; item < value.size(); item++) {
-	            	//construct a filter
-	            	try {
-		                filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-		                filter.addLeftValue(expression); //the attribute we're looking at
-		                filter.addRightValue(ff.createLiteralExpression(items[item]));
-		            } catch (IllegalFilterException e) {
-		                // TODO Auto-generated catch block
-		                e.printStackTrace();
-		                return null;
-		            }
-		            //generate a title
-		            String title = items[item].toString();
-		            //construct a symbolizer
-		            ps = sb.createPolygonSymbolizer(colors[i]);
-		            //create a rule
-		            rule = sb.createRule(ps);
-		            rule.setFilter(filter);
-		            rule.setTitle(title);
-		            fts.addRule(rule);
-	            }	
-	        }
+            UniqueIntervalFunction uniqueClassifier = (UniqueIntervalFunction) classifier;
+            CompareFilter filter = null;
+            PolygonSymbolizer ps = null;
+            Rule rule = null;
+
+            //for each class
+            for (int i = 0; i < numClasses; i++) {
+                //obtain the set of values for the current bin
+                Set value = (Set) uniqueClassifier.getValue(i);
+
+                //create a rule for each unique value
+                Object[] items = value.toArray();
+
+                for (int item = 0; item < value.size(); item++) {
+                    //construct a filter
+                    try {
+                        filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
+                        filter.addLeftValue(expression); //the attribute we're looking at
+                        filter.addRightValue(ff.createLiteralExpression(
+                                items[item]));
+                    } catch (IllegalFilterException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+
+                        return null;
+                    }
+
+                    //generate a title
+                    String title = items[item].toString();
+
+                    //construct a symbolizer
+                    ps = sb.createPolygonSymbolizer(colors[i]);
+
+                    //create a rule
+                    rule = sb.createRule(ps);
+                    rule.setFilter(filter);
+                    rule.setTitle(title);
+                    fts.addRule(rule);
+                }
+            }
         }
 
         //create the style
