@@ -77,13 +77,13 @@ public class GridGeometryTest extends TestCase {
         final MathTransform identity = factory.createAffineTransform(MatrixFactory.create(4));
         GridGeometry2D gg;
         try {
-            gg = new GridGeometry2D(new GeneralGridRange(lower,upper), identity);
+            gg = new GridGeometry2D(new GeneralGridRange(lower,upper), identity, null);
             fail();
         } catch (IllegalArgumentException e) {
             // This is the expected dimension.
         }
         upper[2] = 3;
-        gg = new GridGeometry2D(new GeneralGridRange(lower,upper), identity);
+        gg = new GridGeometry2D(new GeneralGridRange(lower,upper), identity, null);
         assertTrue(identity.isIdentity());
         assertTrue(gg.getGridToCoordinateSystem().isIdentity());
         assertTrue(gg.getGridToCoordinateSystem2D().isIdentity());

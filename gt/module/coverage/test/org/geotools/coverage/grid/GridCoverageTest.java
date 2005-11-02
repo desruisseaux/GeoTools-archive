@@ -222,8 +222,9 @@ public class GridCoverageTest extends TestCase {
         for (int i=envelope.getDimension(); --i>=2;) {
             envelope.setRange(i, 10*i, 10*i+5);
         }
+        envelope.setCoordinateReferenceSystem(crs);
         final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
-        final GridCoverage2D original = (GridCoverage2D)factory.create("Test", image, crs, envelope,
+        final GridCoverage2D original = (GridCoverage2D)factory.create("Test", image, envelope,
                                         new GridSampleDimension[]{band}, null, null);
         coverage = transform(original);
         /*
@@ -349,10 +350,11 @@ public class GridCoverageTest extends TestCase {
         final GridSampleDimension[] bands = new GridSampleDimension[] {
             new GridSampleDimension(categories, null)
         };
-        final Envelope   envelope = new GeneralEnvelope(bounds);
-        final RenderedImage image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));
-        final String     filename = new File(path).getName();
+        final GeneralEnvelope    envelope = new GeneralEnvelope(bounds);
+        final RenderedImage         image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));
+        final String             filename = new File(path).getName();
         final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
-        return (GridCoverage2D) factory.create(filename, image, crs, envelope, bands, null, null);
+        envelope.setCoordinateReferenceSystem(crs);
+        return (GridCoverage2D) factory.create(filename, image, envelope, bands, null, null);
     }
 }

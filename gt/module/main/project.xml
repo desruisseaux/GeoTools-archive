@@ -129,6 +129,11 @@
       <version>2.2.x</version>
     </dependency>
     <dependency>
+      <artifactId>coverage</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
       <id>commons-jxpath</id>
       <version>1.2</version>
       <properties>

@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>gt2-module</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -20,13 +20,13 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-db2</artifactId>
+  <artifactId>gt2-coverage</artifactId>
   <packaging>jar</packaging>
-  <name>DB2 Spatial Extender module</name>
-  <url>http://modules.geotools.org/db2</url>
+  <name>Grid Coverage module</name>
+  <url>http://modules.geotools.org/coverage</url>
   <description>
-    Provides a standard interface to the DB2 Spatial Extender.
-    More information can be found at: http://www.software.ibm.com/data/spatial.
+    Implementation of Grid Coverage specification. Provides support
+    for rasters and some image processing like reprojection.
   </description>
 
 
@@ -36,15 +36,45 @@
   <!-- ==================================================== -->
   <developers>
     <developer>
-      <name>David Adler</name>
-      <id>dadler</id>
-      <email>dadler@us.ibm.com</email>
-      <organization>IBM</organization>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Bryce Nordgren</name>
+      <id>bnordgren</id>
+      <email>bnordgren@fs.fed.us</email>
+      <organization>USDA Forest Service</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
     </developer>
+    <developer>
+      <name>Alessio Fabiani</name>
+      <id>alfa</id>
+      <email>alessio.fabiani@gmail.com</email>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>    
+    <developer>
+      <name>Simone Giannecchini</name>
+      <id>simboss</id>
+      <email>simboss_nl@tiscali.it</email>
+      <roles>
+        <role>Java Developer</role>
+        <role>Documentation</role>
+      </roles>
+    </developer>    
   </developers>
+
+  <contributors>
+  </contributors>
 
 
 
@@ -54,31 +84,9 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
-    <dependency>
-      <groupId>com.ibm</groupId>
-      <artifactId>db2jcc_dummy</artifactId>
-      <version>8.2.1</version>
-    </dependency>
   </dependencies>
-
-
-
-  <!-- ==================================================== -->
-  <!--     Plugins configuration                            -->
-  <!-- ==================================================== -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

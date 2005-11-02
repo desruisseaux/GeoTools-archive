@@ -35,6 +35,7 @@
   <!--     All modules included in the build                -->
   <!-- ==================================================== -->
   <modules>
+    <module>coverage</module>
     <module>legacy</module>
     <module>main</module>
     <module>migrate</module>

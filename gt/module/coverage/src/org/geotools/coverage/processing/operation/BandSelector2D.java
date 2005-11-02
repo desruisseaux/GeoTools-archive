@@ -27,9 +27,9 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
 // JAI dependencies
-import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
-import javax.media.jai.WritablePropertySource;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.ImageLayout;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
@@ -75,14 +75,14 @@ final class BandSelector2D extends GridCoverage2D {
      *       detect by itself the case were no copy is required.
      */
     private BandSelector2D(final GridCoverage2D       source,
-                           final RenderedImage         image,
+                           final PlanarImage          image,
                            final GridSampleDimension[] bands,
                            final int[]           bandIndices)
     {
         super(source.getName(),                      // The grid source name
               image,                                 // The underlying data
-              source.getCoordinateReferenceSystem(), // The coordinate system.
-              source.getGridGeometry().getGridToCoordinateSystem(),
+              (org.geotools.coverage.grid.GridGeometry2D)
+              source.getGridGeometry(),              // The grid geometry (unchanged).
               bands,                                 // The sample dimensions
               new GridCoverage2D[] {source},         // The source grid coverages.
               null);                                 // Properties
@@ -120,7 +120,7 @@ final class BandSelector2D extends GridCoverage2D {
         int visibleTargetBand;
         GridSampleDimension[] sourceBands;
         GridSampleDimension[] targetBands;
-        RenderedImage image;
+        RenderedImage sourceImage;
         while (true) {
             sourceBands = source.getSampleDimensions();
             targetBands = sourceBands;
@@ -140,8 +140,8 @@ final class BandSelector2D extends GridCoverage2D {
                     bandIndices = null;
                 }
             }
-            image             = source.getRenderedImage();
-            visibleSourceBand = CoverageUtilities.getVisibleBand(image);
+            sourceImage       = source.getRenderedImage();
+            visibleSourceBand = CoverageUtilities.getVisibleBand(sourceImage);
             visibleTargetBand = (visibleBand!=null) ? visibleBand.intValue() :
                                 (bandIndices!=null) ? bandIndices[visibleSourceBand] :
                                                                   visibleSourceBand;
@@ -185,7 +185,7 @@ final class BandSelector2D extends GridCoverage2D {
             layout = new ImageLayout();
         }
         if (visibleBand!=null || !layout.isValid(ImageLayout.COLOR_MODEL_MASK)) {
-            ColorModel colors = image.getColorModel();
+            ColorModel colors = sourceImage.getColorModel();
             if (colors instanceof IndexColorModel &&
                 sourceBands[visibleSourceBand].equals(targetBands[visibleTargetBand]))
             {
@@ -214,13 +214,13 @@ final class BandSelector2D extends GridCoverage2D {
         if (visibleBand == null) {
             visibleBand = new Integer(visibleTargetBand);
         }
-        ParameterBlock params = new ParameterBlock().addSource(image);
+        ParameterBlock params = new ParameterBlock().addSource(sourceImage);
         if (targetBands != sourceBands) {
             operation = "BandSelect";
             params = params.add(bandIndices);
         }
-        image = OperationJAI.getJAI(hints).createNS(operation, params, hints);
-        ((WritablePropertySource) image).setProperty("GC_VisibleBand", visibleBand);
+        final PlanarImage image = OperationJAI.getJAI(hints).createNS(operation, params, hints);
+        image.setProperty("GC_VisibleBand", visibleBand);
         return new BandSelector2D(source, image, targetBands, bandIndices);
     }
 

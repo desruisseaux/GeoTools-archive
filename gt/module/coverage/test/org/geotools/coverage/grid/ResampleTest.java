@@ -215,7 +215,8 @@ public final class ResampleTest extends GridCoverageTest {
      */
     public void testCrop() {
         assertEquals("Crop", projectTo(null, new GridGeometry2D(
-                             new GeneralGridRange(new Rectangle(50,50,200,200)), (MathTransform)null)));
+                             new GeneralGridRange(new Rectangle(50,50,200,200)),
+                             (MathTransform)null, null)));
     }
 
     /**
@@ -241,7 +242,7 @@ public final class ResampleTest extends GridCoverageTest {
          *       one provided in the <code>org.geotools.renderer</code> package.
          */
         assertEquals("Lookup", projectTo(crs, null));
-        assertEquals("Affine", projectTo(null, new GridGeometry2D(null, tr)));
+        assertEquals("Affine", projectTo(null, new GridGeometry2D(null, tr, null)));
     }
     
     /**
@@ -266,8 +267,7 @@ public final class ResampleTest extends GridCoverageTest {
          */
         AffineTransform expected = getAffineTransform(grid);
         grid = (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null).create("Translated",
-                                  img,  grid.getCoordinateReferenceSystem(),
-                                  grid.getEnvelope(), grid.getSampleDimensions(),
+                                  img, grid.getEnvelope(), grid.getSampleDimensions(),
                                   new GridCoverage2D[]{grid}, grid.getProperties());
         expected.translate(-transX, -transY);
         assertEquals(expected, getAffineTransform(grid));
@@ -278,7 +278,7 @@ public final class ResampleTest extends GridCoverageTest {
          */
         final AffineTransform at = AffineTransform.getScaleInstance(scaleX, scaleY);
         final MathTransform   tr = ProjectiveTransform.create(at);
-        final GridGeometry2D geometry = new GridGeometry2D(null, tr);
+        final GridGeometry2D geometry = new GridGeometry2D(null, tr, null);
         grid = (GridCoverage2D) Operations.DEFAULT.resample(grid,
                 grid.getCoordinateReferenceSystem(), geometry, null);
         assertEquals(at, getAffineTransform(grid));
