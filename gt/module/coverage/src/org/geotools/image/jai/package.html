@@ -5,9 +5,12 @@
     <TITLE>package org.geotools.image.jai</TITLE>
   </HEAD>
   <BODY>
-    A set of <A HREF="http://java.sun.com/products/java-media/jai/">Java
-    Advanced Imaging</A> operations. All operations defined here work on J2SE's
-    {@link java.awt.image.RenderedImage rendered images}; there is no OpenGIS's
-    {@linkplain org.opengis.coverage.grid.GridCoverage grid coverage} depencencies here.
+    A set of <A HREF="http://java.sun.com/products/java-media/jai/">Java Advanced Imaging</A>
+    operations. All operations defined here work on J2SE's {@link java.awt.image.RenderedImage
+    rendered images}; there is no OpenGIS's {@linkplain org.opengis.coverage.grid.GridCoverage
+    grid coverage} depencencies here.
+
+    <P ALIGN="justify">Before to use any Geotools's JAI operations, it is necessary to invoke
+    {@link org.geotools.image.jai.Registry#init} at least once.</P>
   </BODY>
 </HTML>

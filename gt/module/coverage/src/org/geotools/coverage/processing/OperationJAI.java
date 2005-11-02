@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import javax.units.Unit;
 
 // JAI dependencies
@@ -67,6 +65,7 @@ import org.geotools.parameter.ImagingParameters;
 import org.geotools.parameter.ImagingParameterDescriptors;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.transform.DimensionFilter;
+import org.geotools.image.jai.Registry;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
@@ -135,11 +134,6 @@ public class OperationJAI extends Operation2D {
      * This constant is used merely as a flag for spotting those places in the code.
      */
     private static final int PRIMARY_SOURCE_INDEX = 0;
-
-    /**
-     * {@code true} if {@link #loadRegistryFileJAI} has been invoked at least once.
-     */
-    private static boolean registryFileLoaded;
 
     /**
      * The JAI's operation descriptor.
@@ -216,34 +210,8 @@ public class OperationJAI extends Operation2D {
             if (operation != null) {
                 return operation;
             }
-        } while (name.startsWith("org.geotools.") && loadRegistryFileJAI(registry));
+        } while (name.startsWith("org.geotools.") && Registry.init());
         throw new OperationNotFoundException(Errors.format(ErrorKeys.OPERATION_NOT_FOUND_$1, name));
-    }
-
-    /**
-     * If Geotools operations doesn't seems to be available, load the {@code registryFile.jai} file
-     * programmatically. JAI may not find the registry file by itself if the Geotools JAR file is
-     * loaded from a different class loader, so we may need to do it here.
-     */
-    private static synchronized boolean loadRegistryFileJAI(final OperationRegistry registry) {
-        if (!registryFileLoaded) try {
-            registry.registerServices(OperationJAI.class.getClassLoader());
-            registryFileLoaded = true;
-            return true;
-        } catch (IOException exception) {
-            /*
-             * Logs a message with the SEVERE level, because DefaultProcessing class initialization
-             * is likely to fails (since it tries to load operations declared in META-INF/services,
-             * and some of them depend on JAI operations).
-             */
-            final LogRecord record = Errors.getResources(null).getLogRecord(Level.SEVERE,
-                                     ErrorKeys.CANT_READ_$1, "META-INF/registryFile.jai");
-            record.setSourceClassName(Utilities.getShortClassName(ImageUtilities.class));
-            record.setSourceMethodName("loadRegistryFileJAI");
-            record.setThrown(exception);
-            AbstractProcessor.LOGGER.log(record);
-        }
-        return false;
     }
 
     /**
