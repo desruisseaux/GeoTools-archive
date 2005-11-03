@@ -37,7 +37,7 @@ package org.geotools.image.jai;
  */
 public interface CombineTransform {
     /**
-     * Transform the sample values for one pixel before the linear combinaison.
+     * Transforms the sample values for one pixel before the linear combinaison.
      *
      * @param values The sampel values to transformation.
      *               Transformation are performed in-place.

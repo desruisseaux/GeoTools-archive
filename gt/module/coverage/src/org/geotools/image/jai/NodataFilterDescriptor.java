@@ -44,7 +44,7 @@ public class NodataFilterDescriptor extends OperationDescriptorImpl {
     private static final Range ARGUMENT_RANGE = new Range(Integer.class, new Integer(0), null);
 
     /**
-     * Construct the descriptor.
+     * Constructs the descriptor.
      */
     public NodataFilterDescriptor() {
         super(new String[][]{{"GlobalName",  OPERATION_NAME},

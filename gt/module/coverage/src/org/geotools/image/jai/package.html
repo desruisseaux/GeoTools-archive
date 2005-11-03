@@ -10,7 +10,12 @@
     rendered images}; there is no OpenGIS's {@linkplain org.opengis.coverage.grid.GridCoverage
     grid coverage} depencencies here.
 
-    <P ALIGN="justify">Before to use any Geotools's JAI operations, it is necessary to invoke
-    {@link org.geotools.image.jai.Registry#init} at least once.</P>
+    <P ALIGN="justify">The JAI operations provided in this package should be registered automatically at
+    JAI startup time, since they are declared in the {@code META-INF/registryFile.jai} file. However, this
+    default JAI mechanism may fail in some occasions, for example when the Geotools JAR file is unreachable
+    from the JAI class loader. In such case, the {@link org.geotools.image.jai.Registry#registerServices}
+    method may be invoked programmatically as a fallback. This is done automatically by the
+    {@link org.geotools.coverage.processing} package; users need to care only if
+    they want to use directly the custom JAI operations provided in this package.</P>
   </BODY>
 </HTML>

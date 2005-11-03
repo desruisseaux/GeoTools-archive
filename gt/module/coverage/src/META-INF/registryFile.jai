@@ -1,8 +1,9 @@
 #
 # The registry file for Geotools Grid Coverage implementation. This file should be automatically
-# parsed by JAI under initialization. If it is not, then OperationRegistry.registerServices(...)
-# can parse it. This may happen if this file is not visible from JAI core because it live in a
-# claspath known only to a different class loader.
+# parsed by JAI under initialization. If it is not, then Registry.registerServices(...) can parse
+# it. This may happen if this file is unreachable from the JAI class loader.
+#
+# If this file is updated, remember to update Registry.registerServices(...) accordingly.
 #
 # Version: $Id$
 #

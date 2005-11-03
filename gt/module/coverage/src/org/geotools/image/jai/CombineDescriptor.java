@@ -34,7 +34,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * The operation descriptor for the {@link Combine} operation. While this descriptor declare
+ * The operation descriptor for the {@link Combine} operation. While this descriptor declares
  * to support 0 {@link RenderedImage} sources, an arbitrary amount of sources can really be
  * specified. The "0" should be understood as the <em>minimal</em> number of sources required.
  *

@@ -39,7 +39,7 @@ import javax.media.jai.JAI;
  */
 public class NodataFilterCRIF extends CRIFImpl {
     /**
-     * Construct a default factory.
+     * Constructs a default factory.
      */
     public NodataFilterCRIF() {
     }

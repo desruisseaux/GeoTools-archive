@@ -20,9 +20,6 @@
 package org.geotools.image.jai;
 
 // J2SE dependencies
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
@@ -30,6 +27,7 @@ import java.util.logging.LogRecord;
 // JAI dependencies
 import javax.media.jai.JAI;
 import javax.media.jai.OperationRegistry;
+import javax.media.jai.registry.RIFRegistry;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -49,61 +47,55 @@ import org.geotools.resources.i18n.LoggingKeys;
  */
 public final class Registry {
     /**
-     * The JAI registry file for Geotools operations.
-     */
-    private static final String REGISTRY_FILE = "META-INF/org.geotools.registryFile.jai";
-
-    /**
-     * {@code true} if {@link #init} has been invoked at least once.
-     */
-    private static boolean registryFileLoaded;
-
-    /**
      * Do not allows instantiation of this class.
      */
     private Registry() {
     }
 
     /**
-     * Loads the Geotools's {@code registryFile.jai} file programmatically. This method is needed
-     * because JAI may not find the registry file by itself if the Geotools JAR file is loaded
-     * from a different class loader. Consequently, this method need to be invoked explicitly
-     * at least once before the operations provided in the {@link org.geotools.image.jai} package
-     * are available.
+     * Unconditionnaly registers all JAI operations provided in the {@link org.geotools.image.jai}
+     * package. This method usually don't need to be invoked, since JAI should parse automatically
+     * the {@code META-INF/registryFile.jai} file at startup time. However, this default mechanism
+     * may fail when the geotools JAR file is unreachable from the JAI class loader, in which case
+     * the {@link org.geotools.coverage.processing} package will invoke this method as a fallback.
+     * <p>
+     * Note to module maintainer: if this method is updated, remember to update the
+     * {@code META-INF/registryFile.jai} file accordingly.
      *
-     * @return {@code true} if the Geotools's {@code registryFile.jai} has been loaded, or
-     *         {@code false} if it was already loaded.
+     * @param  registry The operation registry to register with.
+     * @return {@code true} if all registrations have been successful.
      */
-    public static synchronized boolean init() {
-        if (registryFileLoaded) {
-            return false;
-        }
+    public static boolean registerServices(final OperationRegistry registry) {
         LogRecord record;
+        String op = "org.geotools";
         try {
-            final ClassLoader loader = Registry.class.getClassLoader();
-            final InputStream input  = loader.getResourceAsStream(REGISTRY_FILE);
-            if (input == null) {
-                // Force logging in the 'catch' block just below.
-                throw new FileNotFoundException(REGISTRY_FILE);
-            }
-            final OperationRegistry registry = JAI.getDefaultInstance().getOperationRegistry();
-            registry.updateFromStream(input);
-            input.close();
-            registryFileLoaded = true;
-            record = Logging.format(Level.CONFIG, LoggingKeys.LOADED_JAI_REGISTRY_FILE);
-        } catch (IOException exception) {
+            op = CombineDescriptor.OPERATION_NAME;
+            registry.registerDescriptor(new CombineDescriptor());
+            RIFRegistry.register(registry, op, "org.geotools", new CombineCRIF());
+
+            op = HysteresisDescriptor.OPERATION_NAME;
+            registry.registerDescriptor(new HysteresisDescriptor());
+            RIFRegistry.register(registry, op, "org.geotools", new HysteresisCRIF());
+
+            op = NodataFilterDescriptor.OPERATION_NAME;
+            registry.registerDescriptor(new NodataFilterDescriptor());
+            RIFRegistry.register(registry, op, "org.geotools", new NodataFilterCRIF());
+
+            record  = Logging.format(Level.CONFIG, LoggingKeys.REGISTERED_JAI_OPERATIONS);
+            op = null;
+        } catch (IllegalArgumentException exception) {
             /*
-             * Logs a message with the SEVERE level, because DefaultProcessing class initialization
+             * Logs a message with the WARNING level, because DefaultProcessing class initialization
              * is likely to fails (since it tries to load operations declared in META-INF/services,
              * and some of them depend on JAI operations).
              */
-            record = Errors.getResources(null).getLogRecord(Level.SEVERE,
-                     ErrorKeys.CANT_READ_$1, REGISTRY_FILE);
+            record = Logging.getResources(null).getLogRecord(Level.WARNING,
+                     LoggingKeys.CANT_REGISTER_JAI_OPERATION_$1, op);
             record.setThrown(exception);
         }
         record.setSourceClassName(Utilities.getShortClassName(Registry.class));
-        record.setSourceMethodName("init");
+        record.setSourceMethodName("registerServices");
         Logger.getLogger("org.geotools.image").log(record);
-        return registryFileLoaded;
+        return op == null;
     }
 }

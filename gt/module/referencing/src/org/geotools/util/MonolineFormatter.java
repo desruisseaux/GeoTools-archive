@@ -217,7 +217,7 @@ public class MonolineFormatter extends Formatter {
 
         // Configure this formatter
         final LogManager manager = LogManager.getLogManager();
-	final String   classname = MonolineFormatter.class.getName();
+        final String   classname = MonolineFormatter.class.getName();
         try {
             setTimeFormat(manager.getProperty(classname + ".time"));
         } catch (IllegalArgumentException exception) {
@@ -238,8 +238,7 @@ public class MonolineFormatter extends Formatter {
      * pattern <code>"HH:mm:ss.SSS"</code> will display the ellapsed time
      * in hours, minutes, seconds and milliseconds.
      *
-     * @param pattern The time patter, or {@code null} to disable time
-     *        formatting.
+     * @param pattern The time patter, or {@code null} to disable time formatting.
      */
     public synchronized void setTimeFormat(final String pattern) {
         if (pattern == null) {
@@ -417,7 +416,7 @@ public class MonolineFormatter extends Formatter {
      * argument. If the level is non-null, then all {@link Handler}s using the monoline formatter
      * will be set to the specified level. The logger named {@code base} will also be set to
      * this level.
-     * <br><br>
+     * <p>
      * Note: Avoid this method as much as possible,  since it overrides user's level setting for
      *       the {@code base} logger. A user trying to configure its logging properties may
      *       find confusing to see his setting ignored.
