@@ -70,6 +70,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.image.jai.Registry;
 import org.geotools.util.NumberRange;
 
 
@@ -98,7 +99,7 @@ final class Resampler2D extends GridCoverage2D {
      *       http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4906854
      */
     static {
-        ImageUtilities.allowNativeAcceleration("Affine", false);
+        Registry.setNativeAccelerationAllowed("Affine", false);
     }
 
     /**

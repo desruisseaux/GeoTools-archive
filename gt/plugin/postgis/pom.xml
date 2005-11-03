@@ -89,7 +89,7 @@
       <!-- TODO: this dependency should appears in wkb4j -->
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-      <version>1.2.12</version>
+      <!-- The version number is specified in the parent POM. -->
       <scope>runtime</scope>
     </dependency>
   </dependencies>

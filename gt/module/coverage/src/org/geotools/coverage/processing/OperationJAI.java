@@ -210,7 +210,7 @@ public class OperationJAI extends Operation2D {
             if (operation != null) {
                 return operation;
             }
-        } while (name.startsWith("org.geotools.") && Registry.registerServices(registry));
+        } while (name.startsWith("org.geotools.") && Registry.registerGeotoolsServices(registry));
         throw new OperationNotFoundException(Errors.format(ErrorKeys.OPERATION_NOT_FOUND_$1, name));
     }
 

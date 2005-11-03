@@ -407,6 +407,23 @@
         <version>1.5</version>
       </dependency>
 
+      <!-- Apache -->
+      <dependency>
+        <groupId>oro</groupId>
+        <artifactId>oro</artifactId>
+        <version>2.0.8</version>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.12</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.0.4</version>
+      </dependency>
+
       <!-- Databases -->
       <dependency>
         <groupId>org.postgis</groupId>
@@ -552,6 +569,24 @@
           <target>1.4</target>              <!-- The -target argument for the Java compiler.                            -->
           <debug>true</debug>               <!-- Whether to include debugging information in the compiled class files.  -->
           <encoding>ISO-8859-1</encoding>   <!-- The -encoding argument for the Java compiler.                          -->
+        </configuration>
+      </plugin>
+
+
+
+      <!-- ==================================================== -->
+      <!--     Tests                                            -->
+      <!-- ==================================================== -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/*OnlineTest.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
 
