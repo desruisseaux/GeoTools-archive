@@ -162,7 +162,7 @@ public final class Registry {
      * Log the specified record.
      */
     private static void log(final String method, final LogRecord record) {
-        record.setSourceClassName(Utilities.getShortClassName(Registry.class));
+        record.setSourceClassName(Utilities.getShortName(Registry.class));
         record.setSourceMethodName(method);
         Logger.getLogger("org.geotools.image").log(record);
     }

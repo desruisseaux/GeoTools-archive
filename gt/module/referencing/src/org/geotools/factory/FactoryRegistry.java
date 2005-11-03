@@ -312,7 +312,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * Returns {@code true} if the specified {@code provider} meets the requirements specified by a
      * map of {@code hints}. This method is invoked automatically when the {@code provider} is known
      * to meets standard requirements.
-     * <br><br>
+     * <p>
      * The default implementation always returns {@code true}. Override this method if
      * more checks are needed, typically for non-Geotools implementation. For example a
      * JTS geometry factory finder may overrides this method in order to check if a
@@ -427,6 +427,9 @@ public class FactoryRegistry extends ServiceRegistry {
             Object factory;
             try {
                 factory = factories.next();
+            } catch (OutOfMemoryError error) {
+                // Makes sure that we don't try to handle this error.
+                throw error;
             } catch (NoClassDefFoundError error) {
                 /*
                  * A provider can't be registered because of some missing dependencies.
@@ -436,10 +439,15 @@ public class FactoryRegistry extends ServiceRegistry {
                  */
                 loadingFailure(category, error);
                 continue;
-            } catch (RuntimeException error) {
+            } catch (Error error) {
+                if (!Utilities.getShortClassName(error).equals("ServiceConfigurationError")) {
+                    // We want to handle sun.misc.ServiceConfigurationError only. Unfortunatly, we
+                    // need to rely on reflection because this error class is not a commited API.
+                    throw error;
+                }
                 /*
-                 * Failed to register a service for a reason not related to Java Virtual Machine
-                 * errors. It may be some service-dependent missing resources.
+                 * Failed to register a service for a reason probably related to the plugin
+                 * initialisation. It may be some service-dependent missing resources.
                  */
                 loadingFailure(category, error);
                 continue;

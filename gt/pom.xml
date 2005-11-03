@@ -416,7 +416,7 @@
       <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
-        <version>1.2.12</version>
+        <version>1.2.6</version>  <!-- Same than the dependency in commons-logging -->
       </dependency>
       <dependency>
         <groupId>commons-logging</groupId>
