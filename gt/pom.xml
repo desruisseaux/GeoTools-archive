@@ -495,9 +495,9 @@
       </snapshots>
     </repository>
     <repository>
-      <id>espace</id>
-      <name>Repository from the Sicade laboratory in New-Caledonia</name>
-      <url>http://maven.espace.ird.nc</url>
+      <id>geotools</id>
+      <name>Geotools repository</name>
+      <url>http://maven.geotools.org/gt2</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -730,12 +730,12 @@
     <repository>
       <id>espace</id>
       <name>Geotools release repository</name>
-      <url>scp://eaunet2.espace.ird.nc/opt/maven</url>
+      <url>scp://eaunet2.espace.ird.nc/home/latical/maven</url>
     </repository>
     <snapshotRepository>
       <id>espace</id>
       <name>Geotools snapshot repository</name>
-      <url>scp://eaunet2.espace.ird.nc/opt/maven</url>
+      <url>scp://eaunet2.espace.ird.nc/home/latical/maven</url>
     </snapshotRepository>
     <site>
       <id>sicade</id>

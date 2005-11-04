@@ -155,12 +155,12 @@
     <repository>
       <id>espace</id>
       <name>Geotools release repository</name>
-      <url>scp://eaunet2.espace.ird.nc/opt/maven</url>
+      <url>scp://eaunet2.espace.ird.nc/home/latical/maven</url>
     </repository>
     <snapshotRepository>
       <id>espace</id>
       <name>Geotools snapshot repository</name>
-      <url>scp://eaunet2.espace.ird.nc/opt/maven</url>
+      <url>scp://eaunet2.espace.ird.nc/home/latical/maven</url>
     </snapshotRepository>
     <site>
       <id>sicade</id>

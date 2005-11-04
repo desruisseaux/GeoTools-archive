@@ -35,6 +35,7 @@
   <!--     All modules included in the build                -->
   <!-- ==================================================== -->
   <modules>
+    <module>brewer</module>
     <module>experimental</module>
     <module>graph</module>
     <module>legend</module>
