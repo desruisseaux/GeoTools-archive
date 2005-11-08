@@ -107,9 +107,14 @@ public class StyleGenerator {
                 //obtain min/max values
                 localMin = eiClassifier.getMin(i);
                 localMax = eiClassifier.getMax(i);
-
+                // 1.0 --> 1 
+                //(this makes our styleExpressions more readable. Note that the
+				//filter always converts to double, so it doesn't care what we do).
+                localMin = chopInteger(localMin);
+                localMax = chopInteger(localMax);
+                
                 //generate a title
-                String title = localMin + " --> " + localMax;
+                String title = localMin + ".." + localMax;
 
                 //construct filters
                 Filter filter = null;
@@ -200,5 +205,14 @@ public class StyleGenerator {
         style.addFeatureTypeStyle(fts);
 
         return style;
+    }
+    
+    private Object chopInteger(Object value) {
+    	if ((value instanceof Number) && (value.toString().endsWith(".0"))) {
+    		return new Integer(((Number) value).intValue());
+    	} else {
+    		return value;
+    	}
+    	
     }
 }
