@@ -47,39 +47,39 @@ public class Styles {
 		return attrib;
 	}
 	
-	public static Color[] getColors(Rule rule) {
+	public static String[] getColors(Rule rule) {
 		Set colorSet = new HashSet();
 		Symbolizer[] symbolizer = rule.getSymbolizers();
 		for (int i = 0; i < symbolizer.length; i++) {
 			if (symbolizer[i] instanceof PolygonSymbolizer) {
 				PolygonSymbolizer symb = (PolygonSymbolizer) symbolizer[i];
-				colorSet.add(toColor(symb.getFill().getColor().toString()));
+				colorSet.add(symb.getFill().getColor().toString());
 			}
 		}
 		if (colorSet.size() > 0) {
-			return toColorArray(colorSet.toArray());
+			return toStringArray(colorSet.toArray());
 		} else {
-			return new Color[0];
+			return new String[0];
 		}
 	}
 
-	public static Color[] getColors(Style style) {
+	public static String[] getColors(Style style) {
 		Set colorSet = new HashSet();
 		Rule[] rules = getRules(style);
 		for (int i = 0; i < rules.length; i++) {
-			Color[] colors = getColors(rules[i]);
+			String[] colors = getColors(rules[i]);
 			for (int j = 0; j < colors.length; j++) {
 				colorSet.add(colors[j]);
 			}
 		}
 		if (colorSet.size() > 0) {
-			return toColorArray(colorSet.toArray());
+			return toStringArray(colorSet.toArray());
 		} else {
-			return new Color[0];
+			return new String[0];
 		}
 	}
 
-	private static Color toColor(String htmlColor) {
+	public static Color toColor(String htmlColor) {
 		return new Color(Integer.parseInt(htmlColor.substring(1), 16));
 	}
 	

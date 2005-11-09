@@ -91,8 +91,20 @@ public class EqualIntervalFunction extends ClassificationFunction {
         	double slotWidth = calculateSlotWidth();
         	isNumber = true;
         	for (int i = 0; i < classNum; i++) {
+        		//calculate the min + max values
         		localMin[i] = new Double(((Number) globalMin).doubleValue() + (i * slotWidth));
         		localMax[i] = new Double(((Number) globalMax).doubleValue() - ((classNum - i - 1) * slotWidth));
+        		//determine number of decimal places to allow
+        		int decPlaces = decimalPlaces(slotWidth);
+        		//clean up truncation error
+        		if (decPlaces > -1) {
+        			localMin[i] = new Double(round(((Number) localMin[i]).doubleValue(), decPlaces));
+        			localMax[i] = new Double(round(((Number) localMax[i]).doubleValue(), decPlaces));
+        		}
+        		//synchronize min with previous max
+        		if ((i != 0) && (!localMin[i].equals(localMax[i-1]))) {
+        			localMin[i] = localMax[i-1];
+        		}
         	}
         } else {
         	isNumber = false;
@@ -126,6 +138,36 @@ public class EqualIntervalFunction extends ClassificationFunction {
         isValid = true;
     }
 
+    /**
+	 * Determines the number of decimal places to truncate the interval at
+	 * (public for testing purposes only).
+	 * 
+	 * @param slotWidth
+	 * @return
+	 */
+    public int decimalPlaces(double slotWidth) {
+    	int val = (new Double(Math.log(1.0/slotWidth)/2.0)).intValue();
+    	if (val < 0) return 0;
+    	else return val+1;
+    }
+    
+    /**
+	 * Truncates a double to a certain number of decimals places (public for
+	 * testing purposes only). Note: truncation at zero decimal places will
+	 * still show up as x.0, since we're using the double type.
+	 * 
+	 * @param value
+	 * @param decimalPlaces
+	 * @return
+	 */
+    public double round(double value, int decimalPlaces) {
+    	double divisor = Math.pow(10, decimalPlaces);
+    	double newVal = value * divisor;
+    	//newVal = (new Double(newVal).intValue())/divisor; 
+    	newVal =  (new Long(Math.round(newVal)).intValue())/divisor; 
+    	return newVal;
+    }
+    
     private double calculateSlotWidth() {
     	//this method assumes isNumber and isValid are asserted
     	return (((Number) globalMax).doubleValue() - ((Number) globalMin).doubleValue()) / classNum;
@@ -166,7 +208,8 @@ public class EqualIntervalFunction extends ClassificationFunction {
 
     public void setExpression(Expression e) {
         super.setExpression(e);
-        //If the expression has changed, should we recalculate regardless of the state of fc?
+        isValid = false; // the expression has changed, so we set the flag
+						 // which will cause it to be recalculated.
         if (fc != null) {
             calculateMinAndMax();
         }
