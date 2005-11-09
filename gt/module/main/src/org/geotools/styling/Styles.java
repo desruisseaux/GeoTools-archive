@@ -1,5 +1,6 @@
 package org.geotools.styling;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,38 +47,42 @@ public class Styles {
 		return attrib;
 	}
 	
-	public static String[] getColors(Rule rule) {
+	public static Color[] getColors(Rule rule) {
 		Set colorSet = new HashSet();
 		Symbolizer[] symbolizer = rule.getSymbolizers();
 		for (int i = 0; i < symbolizer.length; i++) {
 			if (symbolizer[i] instanceof PolygonSymbolizer) {
 				PolygonSymbolizer symb = (PolygonSymbolizer) symbolizer[i];
-				colorSet.add(symb.getFill().getColor().toString());
+				colorSet.add(toColor(symb.getFill().getColor().toString()));
 			}
 		}
 		if (colorSet.size() > 0) {
-			return toStringArray(colorSet.toArray());
+			return toColorArray(colorSet.toArray());
 		} else {
-			return new String[0];
+			return new Color[0];
 		}
 	}
 
-	public static String[] getColors(Style style) {
+	public static Color[] getColors(Style style) {
 		Set colorSet = new HashSet();
 		Rule[] rules = getRules(style);
 		for (int i = 0; i < rules.length; i++) {
-			String[] colors = getColors(rules[i]);
+			Color[] colors = getColors(rules[i]);
 			for (int j = 0; j < colors.length; j++) {
 				colorSet.add(colors[j]);
 			}
 		}
 		if (colorSet.size() > 0) {
-			return toStringArray(colorSet.toArray());
+			return toColorArray(colorSet.toArray());
 		} else {
-			return new String[0];
+			return new Color[0];
 		}
 	}
 
+	private static Color toColor(String htmlColor) {
+		return new Color(Integer.parseInt(htmlColor.substring(1), 16));
+	}
+	
 	public static Filter[] getFilters(Rule[] rule) {
 		Filter[] filter = new Filter[rule.length];
 		for (int i = 0; i < rule.length; i++) {
@@ -275,6 +280,22 @@ public class Styles {
 	}
 
 	/**
+	 * Converts a java.awt.Color into an HTML Colour
+	 * 
+	 * @param color
+	 * @return HTML Color (fill) in hex #RRGGBB
+	 */
+	public static String toHTMLColor(Color color) {
+		String red = "0" + Integer.toHexString(color.getRed());
+		red = red.substring(red.length() - 2);
+		String grn = "0" + Integer.toHexString(color.getGreen());
+		grn = grn.substring(grn.length() - 2);
+		String blu = "0" + Integer.toHexString(color.getBlue());
+		blu = blu.substring(blu.length() - 2);
+		return ("#" + red + grn + blu).toUpperCase();
+	}
+	
+	/**
 	 * <p>
 	 * Creates a filter for a range of values.
 	 * </p>
@@ -387,6 +408,14 @@ public class Styles {
 		return result;
 	}
 
+	private static Color[] toColorArray(Object[] object) {
+		Color[] result = new Color[object.length];
+		for (int i = 0; i < object.length; i++) {
+			result[i] = (Color) object[i];
+		}
+		return result;
+	}
+	
 	private static String[] toStringArray(Object[] object) {
 		String[] result = new String[object.length];
 		for (int i = 0; i < object.length; i++) {

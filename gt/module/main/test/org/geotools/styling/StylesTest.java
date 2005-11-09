@@ -94,23 +94,25 @@ public class StylesTest extends TestCase {
 
 	public void testGetColors_Rule() {
 		Rule[] rule = Styles.getRules(style);
-		String[] color = Styles.getColors(rule[0]);
-		assertNotNull(color);
-		assertEquals(1, color.length);
-		String[] color2 = Styles.getColors(rule[1]);
-		assertNotNull(color2);
-		assertEquals(1, color2.length);
-		if (color[0].startsWith("#FF")) {
-			assertEquals("#FF0000", color[0]);
-			assertEquals("#808080", color2[0]);
+		Color[] colors = Styles.getColors(rule[0]);
+		assertNotNull(colors);
+		assertEquals(1, colors.length);
+		Color[] colors2 = Styles.getColors(rule[1]);
+		assertNotNull(colors2);
+		assertEquals(1, colors2.length);
+		String color0 = Styles.toHTMLColor(colors[0]); 
+		String color1 = Styles.toHTMLColor(colors2[0]); 
+		if (color0.startsWith("#FF")) {
+			assertEquals("#FF0000", color0);
+			assertEquals("#808080", color1);
 		} else {
-			assertEquals("#808080", color[0]);
-			assertEquals("#FF0000", color2[0]);
+			assertEquals("#808080", color0);
+			assertEquals("#FF0000", color1);
 		}
 	}
 	
 	public void testGetColors_Style() {
-		String[] color = Styles.getColors(style);
+		Color[] color = Styles.getColors(style);
 		assertNotNull(color);
 		assertEquals(2, color.length);
 	}

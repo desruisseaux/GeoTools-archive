@@ -16,6 +16,10 @@
  */
 package org.geotools.brewer.color;
 
+import java.awt.Color;
+import java.util.Arrays;
+import java.util.Set;
+
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -33,9 +37,6 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
-import java.awt.Color;
-import java.util.Set;
-
 
 /**
  * Generates a style using ColorBrewer
@@ -49,7 +50,47 @@ public class StyleGenerator {
     private Expression expression;
     private FeatureCollection collection;
 
-    public StyleGenerator(ColorBrewer colorBrewer, String paletteName,
+    public FeatureCollection getCollection() {
+		return collection;
+	}
+
+	public void setCollection(FeatureCollection collection) {
+		this.collection = collection;
+	}
+
+	public ColorBrewer getColorBrewer() {
+		return colorBrewer;
+	}
+
+	public void setColorBrewer(ColorBrewer colorBrewer) {
+		this.colorBrewer = colorBrewer;
+	}
+
+	public Expression getExpression() {
+		return expression;
+	}
+
+	public void setExpression(Expression expression) {
+		this.expression = expression;
+	}
+
+	public int getNumClasses() {
+		return numClasses;
+	}
+
+	public void setNumClasses(int numClasses) {
+		this.numClasses = numClasses;
+	}
+
+	public String getPaletteName() {
+		return paletteName;
+	}
+
+	public void setPaletteName(String paletteName) {
+		this.paletteName = paletteName;
+	}
+
+	public StyleGenerator(ColorBrewer colorBrewer, String paletteName,
         int numClasses, Expression expression, FeatureCollection collection) {
         this.colorBrewer = colorBrewer;
         this.paletteName = paletteName;
@@ -155,10 +196,12 @@ public class StyleGenerator {
                 Rule rule = sb.createRule(ps);
                 rule.setFilter(filter);
                 rule.setTitle(title);
+                rule.setName(getRuleName(i+1));
                 fts.addRule(rule);
             }
         } else if (colorBrewer.getLegendType().equals(ColorBrewer.QUALITATIVE)) {
             UniqueIntervalFunction uniqueClassifier = (UniqueIntervalFunction) classifier;
+            LogicFilter orFilter = null;
             CompareFilter filter = null;
             PolygonSymbolizer ps = null;
             Rule rule = null;
@@ -168,10 +211,14 @@ public class StyleGenerator {
                 //obtain the set of values for the current bin
                 Set value = (Set) uniqueClassifier.getValue(i);
 
-                //create a rule for each unique value
+                // create a sub filter for each unique value, and merge them
+				// into the logic filter
                 Object[] items = value.toArray();
-
-                for (int item = 0; item < value.size(); item++) {
+                Arrays.sort(items);
+                orFilter = ff.createLogicFilter(FilterType.LOGIC_OR);
+                String title = "";
+                
+                for (int item = 0; item < items.length; item++) {
                     //construct a filter
                     try {
                         filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
@@ -185,18 +232,28 @@ public class StyleGenerator {
                         return null;
                     }
 
-                    //generate a title
-                    String title = items[item].toString();
-
-                    //construct a symbolizer
-                    ps = sb.createPolygonSymbolizer(colors[i]);
-
-                    //create a rule
-                    rule = sb.createRule(ps);
-                    rule.setFilter(filter);
-                    rule.setTitle(title);
-                    fts.addRule(rule);
+                    //add to the title
+                    title+=items[item].toString();
+                    if (item + 1 != items.length) title+=", ";
+                    
+                    //add the filter to the logicFilter
+                    orFilter.addFilter(filter);
                 }
+
+                //construct a symbolizer
+                ps = sb.createPolygonSymbolizer(colors[i]);
+
+                //create the rule
+                rule = sb.createRule(ps);
+                if (items.length > 1) {
+                    rule.setFilter(orFilter);
+                } else {
+                    rule.setFilter(filter);
+                }
+                rule.setTitle(title);
+                rule.setName(getRuleName(i+1));
+                fts.addRule(rule);
+
             }
         }
 
@@ -207,12 +264,29 @@ public class StyleGenerator {
         return style;
     }
     
+    /**
+	 * Truncates an unneeded trailing decimal zero (1.0 --> 1) by converting to
+	 * an Integer object.
+	 * 
+	 * @param value
+	 * @return Integer(value) if applicable
+	 */
     private Object chopInteger(Object value) {
     	if ((value instanceof Number) && (value.toString().endsWith(".0"))) {
     		return new Integer(((Number) value).intValue());
     	} else {
     		return value;
     	}
-    	
+    }
+    
+    /**
+     * Generates a quick name for each rule with a leading zero.
+     * @param count
+     * @return
+     */
+    private String getRuleName(int count) {
+    	String strVal = new Integer(count).toString();
+    	if (strVal.length() == 1) return "rule0"+strVal;
+    	else return "rule"+strVal;
     }
 }

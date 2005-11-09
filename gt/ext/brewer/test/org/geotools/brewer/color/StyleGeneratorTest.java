@@ -31,6 +31,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.MathExpression;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
@@ -196,7 +197,7 @@ public class StyleGeneratorTest extends DataTestCase {
         style = null;
         style = sg.createStyle();
         assertNotNull(style);
-        assertEquals(3, style.getFeatureTypeStyles()[0].getRules().length); //three rules are created, even though there are only 2 classes
+        assertEquals(2, style.getFeatureTypeStyles()[0].getRules().length);
         rules = style.getFeatureTypeStyles()[0].getRules();
         colors = new HashSet();
         for (int i = 0; i < rules.length; i++) {
@@ -225,5 +226,43 @@ public class StyleGeneratorTest extends DataTestCase {
         	}
         	System.out.println(filterInfo+")");
         }
+    }
+    
+    public void testComplexExpression() throws Exception {
+        System.out.println("Complex Expression (using Sequential)");
+        ColorBrewer brewer = new ColorBrewer();
+        brewer.loadPalettes(ColorBrewer.SEQUENTIAL);
+
+        FilterFactory ff = FilterFactory.createFilterFactory();
+        MathExpression expr = null;
+        MathExpression expr2 = null;
+        FeatureType type = roadType;
+        String attribName = type.getAttributeType(0).getName();
+        FeatureCollection fc = DataUtilities.collection(roadFeatures);
+        FeatureSource fs = DataUtilities.source(fc);
+
+        try {
+            expr = ff.createMathExpression(MathExpression.MATH_MULTIPLY);
+            expr.addLeftValue(ff.createAttributeExpression(type, attribName));
+            expr.addRightValue(ff.createAttributeExpression(type, attribName));
+            expr2 = ff.createMathExpression(MathExpression.MATH_ADD);
+            expr2.addLeftValue(expr);
+            expr2.addRightValue(ff.createLiteralExpression(3));
+        } catch (IllegalFilterException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        String paletteName = "YlGn"; //type = Sequential
+
+        //get the style
+        StyleGenerator sg = new StyleGenerator(brewer, paletteName, 2, expr2, fc);
+        Style style = sg.createStyle();
+        assertNotNull(style);
+        
+        //test each filter
+        Rule[] rule = style.getFeatureTypeStyles()[0].getRules();
+        //do a preliminary test to make sure each rule's filter returns some results
+        checkFilteredResultNotEmpty(rule, fs, attribName);
     }
 }
