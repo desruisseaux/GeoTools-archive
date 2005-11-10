@@ -130,18 +130,6 @@ public interface AttributeType{
     int getMaxOccurs();
 
     /**
-     * Whether the attribute is a geometry.
-     *
-     * @return true if the attribute's type is a geometry.
-     * 
-     * @deprecated Replaced with the use of instanceof or Geometry.class.isAssignableFrom(attributeTypes[j].getType())
-     * @TODO check order for class check
-     * @TODO refactor this method away before 2.1 final
-     */
-    boolean isGeometry();
-
-
-    /**
      * Allows this AttributeType to convert an argument to its prefered storage
      * type. If no parsing is possible, returns the original value. If a parse
      * is attempted, yet fails (i.e. a poor decimal format) throw the

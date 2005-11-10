@@ -63,12 +63,11 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.geometry.JTS;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.Renderer;
 import org.geotools.renderer.Renderer2D;
@@ -589,7 +588,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
                     {
                        // Envelope eee=  JTS.transform(envelope, transform);// this is the old way
                     	    //10 = make 10 points on each side of the bbox & transform the polygon
-                        envelope = JTS.transform(envelope, transform,10); // this will usually be a "bigger" bbox
+                        envelope = org.geotools.geometry.JTS.transform(envelope, transform,10); // this will usually be a "bigger" bbox
                     }
                     else
                     	transform = null; //reset transform
@@ -709,7 +708,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
             //DJB: This geometry check was commented out.  I think it should actually be back in or
             //     you get ALL the attributes back, which isnt what you want.
 	    //ALX: For rasters I need even the "grid" attribute.
-            if ((attTypes[i].isGeometry() || attTypes[i].getName().equalsIgnoreCase("grid")) && !atts.contains(attName)) {
+            if ((attTypes[i] instanceof GeometryAttributeType || attTypes[i].getName().equalsIgnoreCase("grid")) && !atts.contains(attName)) {
                 atts.add(attName);
                 LOGGER.fine("added attribute " + attName);
             }
@@ -745,7 +744,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
             if (attType == null)
             	throw new IllegalFilterException("Could not find '"+attributes[j]+"' in the FeatureType ("+schema.getTypeName()+")");
 
-            if (attType.isGeometry()) {
+            if (attType instanceof GeometryAttributeType) {
                 GeometryFilter gfilter = filterFactory.createGeometryFilter(Filter.GEOMETRY_BBOX);
 
                 // TODO: how do I get the full xpath of an attribute should

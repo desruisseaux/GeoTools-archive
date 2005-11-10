@@ -6378,7 +6378,7 @@ public class GMLComplexTypes {
         		typeFactory.addType(attrs[i]);
 
         if ((geometryAttribute == null)
-                && attrs[i].isGeometry()) {
+                && attrs[i] instanceof GeometryAttributeType) {
             if (!attrs[i].getName()
 //                    .equalsIgnoreCase(BoxType.getInstance().getName())) {
                 .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
@@ -6418,7 +6418,7 @@ public class GMLComplexTypes {
             typeFactory.addType(attrs[i]);
 
             if ((geometryAttribute == null)
-                && attrs[i].isGeometry()) {
+                && attrs[i] instanceof GeometryAttributeType) {
                 if (!attrs[i].getName()
                     .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
                     geometryAttribute = (GeometryAttributeType) attrs[i];

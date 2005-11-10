@@ -30,6 +30,7 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 
 
 /**
@@ -131,7 +132,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
 
         for (int i = 0; i < attributeTypes.length; i++) {
-            if (attributeTypes[i].isGeometry()) {
+            if (attributeTypes[i] instanceof GeometryAttributeType ) {
                 String geomName = attributeTypes[i].getName();
                 int srid = ftInfo.getSRID(geomName);
                 // ((Geometry) attributes[i]).setSRID(srid); // SRID is a bad assumption
@@ -185,7 +186,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
 
         // append attribute columns placeholders
         for (int i = 0; i < attributeTypes.length; i++) {
-            if (attributeTypes[i].isGeometry()) {
+            if (attributeTypes[i] instanceof GeometryAttributeType) {
                 statementSQL.append("?");
             } else {
                 statementSQL.append(getGeometryPlaceHolder(attributeTypes[i]));
@@ -339,7 +340,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
 
         // set new vales for other fields
         for (int i = 0; i < attributeTypes.length; i++) {
-            if (attributeTypes[i].isGeometry()) {
+            if (attributeTypes[i] instanceof GeometryAttributeType) {
                 String geomName = attributeTypes[i].getName();
                 int srid = ftInfo.getSRID(geomName);
                 // ((Geometry) attributes[i]).setSRID(srid); // SRID is a bad assumption
@@ -385,7 +386,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
         for (int i = 0; i < attributeTypes.length; i++) {
             statementSQL.append(attributeTypes[i].getName()).append(" = ");
 
-            if (attributeTypes[i].isGeometry()) {
+            if (attributeTypes[i] instanceof GeometryAttributeType) {
                 statementSQL.append("?");
             } else {
                 statementSQL.append(getGeometryPlaceHolder(attributeTypes[i]));

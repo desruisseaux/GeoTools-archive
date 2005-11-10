@@ -35,13 +35,11 @@ import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
-import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.BBoxExpression;
@@ -680,7 +678,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             //DJB: This geometry check was commented out.  I think it should actually be back in or
             //     you get ALL the attributes back, which isnt what you want.
 	    //ALX: For rasters I need even the "grid" attribute.
-            if ((attTypes[i].isGeometry() || attTypes[i].getName().equalsIgnoreCase("grid")) && !atts.contains(attName)) {
+            if ((attTypes[i] instanceof GeometryAttributeType || attTypes[i].getName().equalsIgnoreCase("grid")) && !atts.contains(attName)) {
                 atts.add(attName);
                 LOGGER.fine("added attribute " + attName);
             }
@@ -716,7 +714,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             if (attType == null)
             	throw new IllegalFilterException("Could not find '"+attributes[j]+"' in the FeatureType ("+schema.getTypeName()+")");
 
-            if (attType.isGeometry()) {
+            if (attType instanceof GeometryAttributeType) {
                 GeometryFilter gfilter = filterFactory.createGeometryFilter(Filter.GEOMETRY_BBOX);
 
                 // TODO: how do I get the full xpath of an attribute should

@@ -112,9 +112,9 @@ public class ChoiceAttrTypeTest extends TestCase {
 
     public void testIsGeometry() {
         AttributeType type = SampleFeatureFixtures.getChoiceAttrType2();
-        assertEquals(false, type.isGeometry());
+        assertEquals(false, type instanceof GeometryAttributeType);
         type = SampleFeatureFixtures.getChoiceGeomType();
-        assertEquals(true, type.isGeometry());
+        assertEquals(true, type instanceof GeometryAttributeType);
     }
 
     

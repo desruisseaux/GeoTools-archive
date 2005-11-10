@@ -341,7 +341,7 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
             bounds = new Envelope();
 
             for (int i = 0, n = schema.getAttributeCount(); i < n; i++) {
-                if (schema.getAttributeType(i).isGeometry()) {
+                if (schema.getAttributeType(i) instanceof GeometryAttributeType ) {
                     Geometry g = (Geometry) attributes[i];
 
                     // IanS - check for null geometry!

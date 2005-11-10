@@ -86,11 +86,11 @@ public class AttributeTypeTest extends TestCase {
     
     public void testIsGeometry(){
         AttributeType type = AttributeTypeFactory.newAttributeType("testAttribute", Double.class);
-        assertEquals(false, type.isGeometry());
+        assertEquals(false, type instanceof GeometryAttributeType);
         type = AttributeTypeFactory.newAttributeType("testAttribute", Point.class);
-        assertEquals(true, type.isGeometry());
+        assertEquals(true, type instanceof GeometryAttributeType);
         type = AttributeTypeFactory.newAttributeType("testAttribute", Geometry.class);
-        assertEquals(true, type.isGeometry());
+        assertEquals(true, type instanceof GeometryAttributeType);
     }
     
     public void testValidate(){

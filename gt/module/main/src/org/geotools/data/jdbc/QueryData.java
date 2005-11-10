@@ -31,6 +31,7 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 
 
 /**
@@ -98,7 +99,7 @@ public class QueryData implements AttributeReader, AttributeWriter {
         this.attributeHandlers = new AttributeIO[attributeTypes.length];
 
         for (int i = 0; i < attributeHandlers.length; i++) {
-            if (attributeTypes[i].isGeometry()) {
+            if (attributeTypes[i] instanceof GeometryAttributeType) {
                 attributeHandlers[i] = parentDataStore.getGeometryAttributeIO(attributeTypes[i], this);
             } else {
                 attributeHandlers[i] = parentDataStore.getAttributeIO(attributeTypes[i]);

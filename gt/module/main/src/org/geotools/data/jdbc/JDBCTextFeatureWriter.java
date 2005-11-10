@@ -30,6 +30,7 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -176,7 +177,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         Object[] attributes = feature.getAttributes(null);
 
         for (int i = 0; i < attributeTypes.length; i++) {
-            if (attributeTypes[i].isGeometry()) {
+            if (attributeTypes[i] instanceof GeometryAttributeType) {
                 String geomName = attributeTypes[i].getName();
                 int srid = ftInfo.getSRID(geomName);
                 attrValue = getGeometryInsertText((Geometry) attributes[i], srid);
@@ -371,7 +372,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                     LOGGER.fine("modifying att# " + i + " to " + currAtt);
                 }
 		String attrValue = null;
-		if (attributes[i].isGeometry()) {
+		if (attributes[i] instanceof GeometryAttributeType) {
 		    String geomName = attributes[i].getName();
 		    int srid = ftInfo.getSRID(geomName);
 		    attrValue = getGeometryInsertText((Geometry) currAtt, srid);
