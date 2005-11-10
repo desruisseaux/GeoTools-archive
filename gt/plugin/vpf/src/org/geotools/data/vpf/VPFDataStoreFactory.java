@@ -116,6 +116,16 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
     private DataStore create(Map params) throws IOException {
         DataStore result = null;
         File file = getLhtFile(params);
+        //CH I'd like to check existence here, so that geoserver can get
+        //a better error message, but I've spent way too long on this, so
+        //I'm giving up for now.  Ideally canProcess just figures out if
+        //the params are valid, and doesn't throw the not existing error, but
+        //since we need a directory, not the actual file, it's hard to check
+        //for anything.
+        if (!file.exists() || !file.canRead()) {
+            throw new IOException(
+                "File either doesn't exist or is unreadable : " + file);
+        }
         URI namespace = (URI) NAMESPACEP.lookUp(params); //null if not exist
         LOGGER.finer("creating new vpf datastore with params: " + params);
             try {
@@ -151,11 +161,11 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
                 lhtFile = new File(file, FileConstants.LIBRARY_HEADER_TABLE);
             } else {
                 lhtFile = file;
+		if (!lhtFile.getName().equalsIgnoreCase(FileConstants.LIBRARY_HEADER_TABLE)) {
+		    throw new IOException("File: " + file + "is not a lht file");
+		}
             }
-            if (!lhtFile.exists() || !file.canRead()) {
-        	throw new IOException(
-                  "File either doesn't exist or is unreadable : " + file);
-            }
+
         } else {
             throw new IOException("only file protocol supported");
         }
