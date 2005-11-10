@@ -52,10 +52,15 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.data.postgis.fidmapper.OIDFidMapper;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.AbstractFilter;
@@ -66,6 +71,7 @@ import org.geotools.filter.FilterFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -97,17 +103,14 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Jody Garnett, Refractions Research
  */
-public class PostgisDataStoreAPIOnlineTest extends DataTestCase {
-    private static final boolean WKB_ENABLED = true;
+public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
+    
     private static final int LOCK_DURATION = 3600 * 1000; // one hour
 
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.postgis");
-    static boolean CHECK_TYPE = false;
-    PostgisDataStore data;
-    ConnectionPool pool;
-    String database;
+    
     String victim = null; //"testGetFeatureWriterRemoveAll";
 
     /**
@@ -123,46 +126,6 @@ public class PostgisDataStoreAPIOnlineTest extends DataTestCase {
         if ((victim != null) && !test.equals(victim)) {
             throw new AssertionError("test supressed " + test);
         }
-    }
-
-    /**
-     * @see TestCase#setUp()
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        PostgisTests.Fixture f = PostgisTests.newFixture();
-        this.database = f.database;
-        
-      
-        PostgisConnectionFactory factory1 = new PostgisConnectionFactory(f.host,
-                f.port.intValue(), database);
-        pool = factory1.getConnectionPool(f.user, f.password);
-
-        setUpRoadTable();
-        setUpRiverTable();
-        setUpLakeTable();
-
-        if (CHECK_TYPE) {
-            checkTypesInDataBase();
-            CHECK_TYPE = false; // just once
-        }
-
-        data = new PostgisDataStore(pool, "public", getName(),
-                PostgisDataStore.OPTIMIZE_SAFE);
-        data.setWKBEnabled(WKB_ENABLED);
-        data.setFIDMapper("road",
-            new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "road"));
-        data.setFIDMapper("river",
-            new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "river"));
-        data.setFIDMapper("testset",
-            new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
-
-        //
-        // Update Fixture to reflect the actual data in the database
-        // I am doing this because it
-//        updateRoadFeaturesFixture();
-//        updateRiverFeaturesFixture();
     }
 
     /**
@@ -286,222 +249,7 @@ public class PostgisDataStoreAPIOnlineTest extends DataTestCase {
         rv1Filter = tFilter;
     }
 
-    protected void checkTypesInDataBase() throws SQLException {
-        Connection conn = pool.getConnection();
-
-        try {
-            DatabaseMetaData md = conn.getMetaData();
-            ResultSet rs = 
-                //md.getTables( catalog, null, null, null );
-                md.getTables(null, "public", "%", new String[] { "TABLE", });
-            ResultSetMetaData rsmd = rs.getMetaData();
-            int NUM = rsmd.getColumnCount();
-            System.out.print(" ");
-
-            for (int i = 1; i <= NUM; i++) {
-                System.out.print(rsmd.getColumnName(i));
-                System.out.flush();
-                System.out.print(":");
-                System.out.flush();
-                System.out.print(rsmd.getColumnClassName(i));
-                System.out.flush();
-
-                if (i < NUM) {
-                    System.out.print(",");
-                    System.out.flush();
-                }
-            }
-
-            System.out.println();
-
-            while (rs.next()) {
-                System.out.print(rs.getRow());
-                System.out.print(":");
-                System.out.flush();
-
-                for (int i = 1; i <= NUM; i++) {
-                    System.out.print(rsmd.getColumnName(i));
-                    System.out.flush();
-                    System.out.print("=");
-                    System.out.flush();
-                    System.out.print(rs.getString(i));
-                    System.out.flush();
-
-                    if (i < NUM) {
-                        System.out.print(",");
-                        System.out.flush();
-                    }
-                }
-
-                System.out.println();
-            }
-        } finally {
-            conn.close();
-        }
-    }
-
-    protected void setUpRoadTable() throws Exception {
-        Connection conn = pool.getConnection();
-        conn.setAutoCommit(true);
-
-        try {
-            Statement s = conn.createStatement();
-            s.execute("SELECT dropgeometrycolumn( '" + database
-                + "','road','geom')");
-        } catch (Exception ignore) {}
-
-        try {
-            Statement s = conn.createStatement();
-            s.execute("DROP TABLE road");
-        } catch (Exception ignore) {
-        }
-
-        try {
-            Statement s = conn.createStatement();
-
-            //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
-            s.execute("CREATE TABLE road (fid varchar PRIMARY KEY, id int )");
-            s.execute("SELECT AddGeometryColumn('" + database
-                + "', 'road', 'geom', 0, 'LINESTRING', 2);");
-            s.execute("ALTER TABLE road add name varchar;");
-
-            for (int i = 0; i < roadFeatures.length; i++) {
-                Feature f = roadFeatures[i];
-
-                //strip out the road. 
-                String fid = f.getID().substring("road.".length());
-                String ql = "INSERT INTO road (fid,id,geom,name) VALUES ("
-                    + "'" + fid + "'," + f.getAttribute("id") + ","
-                    + "GeometryFromText('"
-                    + ((Geometry) f.getAttribute("geom")).toText() + "', 0 ),"
-                    + "'" + f.getAttribute("name") + "')";
-
-                s.execute(ql);
-            }
-        } finally {
-            conn.close();
-        }
-    }
-
-    protected void setUpLakeTable() throws Exception {
-        Connection conn = pool.getConnection();
-        conn.setAutoCommit(true);
-
-        try {
-            Statement s = conn.createStatement();
-            s.execute("SELECT dropgeometrycolumn( '" + database
-                + "','lake','geom')");
-        } catch (Exception ignore) {}
-
-        try {
-            Statement s = conn.createStatement();
-            s.execute("DROP TABLE lake");
-        } catch (Exception ignore) {
-        }
-
-        try {
-            Statement s = conn.createStatement();
-
-            //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
-            s.execute("CREATE TABLE lake ( id int )");
-            s.execute("SELECT AddGeometryColumn('" + database
-                + "', 'lake', 'geom', 0, 'POLYGON', 2);");
-            s.execute("ALTER TABLE lake add name varchar;");
-
-            for (int i = 0; i < lakeFeatures.length; i++) {
-                Feature f = lakeFeatures[i];
-
-                //strip out the road. 
-                String fid = f.getID().substring("lake.".length());
-                String ql = "INSERT INTO lake (id,geom,name) VALUES ("
-                    + f.getAttribute("id") + "," + "GeometryFromText('"
-                    + ((Geometry) f.getAttribute("geom")).toText() + "', 0 ),"
-                    + "'" + f.getAttribute("name") + "')";
-
-                s.execute(ql);
-            }
-        } finally {
-            conn.close();
-        }
-    }
-
-    protected void killTestTables() throws Exception {
-        Connection conn = pool.getConnection();
-
-        try {
-            Statement s = conn.createStatement();
-            s.execute("SELECT dropgeometrycolumn( '" + database
-                + "','road','geom')");
-            s.execute("SELECT dropgeometrycolumn( '" + database
-                + "','river','geom')");
-        } catch (Exception ignore) {
-        }
-
-        try {
-            Statement s = conn.createStatement();
-            s.execute("DROP TABLE road");
-            s.execute("DROP TABLE river");
-        } catch (Exception ignore) {
-        } finally {
-            conn.close();
-        }
-    }
-
-    protected void setUpRiverTable() throws Exception {
-        Connection conn = pool.getConnection();
-
-        try {
-            Statement s = conn.createStatement();
-            s.execute("SELECT dropgeometrycolumn( '" + database
-                + "','river','geom')");
-        } catch (Exception ignore) {
-        }
-
-        try {
-            Statement s = conn.createStatement();
-            s.execute("DROP TABLE river");
-        } catch (Exception ignore) {
-        }
-
-        try {
-            Statement s = conn.createStatement();
-
-            //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
-            s.execute("CREATE TABLE river(fid varchar PRIMARY KEY, id int)");
-            s.execute("SELECT AddGeometryColumn('" + database
-                + "', 'river', 'geom', 0, 'MULTILINESTRING', 2);");
-            s.execute("ALTER TABLE river add river varchar");
-            s.execute("ALTER TABLE river add flow float8");
-
-            for (int i = 0; i < riverFeatures.length; i++) {
-                Feature f = riverFeatures[i];
-                String fid = f.getID().substring("river.".length());
-                s.execute(
-                    "INSERT INTO river (fid, id, geom, river, flow) VALUES ("
-                    + "'" + fid + "'," + f.getAttribute("id") + ","
-                    + "GeometryFromText('" + f.getAttribute("geom").toString()
-                    + "', 0 )," + "'" + f.getAttribute("river") + "',"
-                    + f.getAttribute("flow") + ")");
-            }
-        } finally {
-            conn.close();
-        }
-    }
-
-    /*
-     * @see TestCase#tearDown()
-     */
-    protected void tearDown() throws Exception {
-        data = null;
-
-        PostgisConnectionFactory factory1 = new PostgisConnectionFactory("hydra",
-                "5432", "jody");
-        factory1.free(pool);
-
-        //pool.close();
-        super.tearDown();
-    }
-
+   
     public void testGetFeatureTypes() {
         try {
             String[] names = data.getTypeNames();
@@ -1775,4 +1523,6 @@ public class PostgisDataStoreAPIOnlineTest extends DataTestCase {
         assertTrue(!id.trim().equals(""));
         Long.parseLong(id.substring(5)); // make sure it's a number
     }
+    
+    
 }

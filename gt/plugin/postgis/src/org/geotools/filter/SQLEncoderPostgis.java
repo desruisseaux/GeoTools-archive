@@ -190,7 +190,9 @@ public class SQLEncoderPostgis extends SQLEncoder
 
             try {
                 if (!looseBbox) {
-                    out.write("NOT disjoint(");
+                	//JD: disjoint not supported without geos
+                	out.write("distance(");
+                    //out.write("NOT disjoint(");
                 }
 
                 if (left == null) {
@@ -212,7 +214,8 @@ public class SQLEncoderPostgis extends SQLEncoder
                 }
 
                 if (!looseBbox) {
-                    out.write(")");
+                	out.write(") = 0");
+                    //out.write(")");
                 }
             } catch (java.io.IOException ioe) {
                 LOGGER.warning("Unable to export filter" + ioe);

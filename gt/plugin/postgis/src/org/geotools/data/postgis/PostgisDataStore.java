@@ -312,6 +312,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 if (version.indexOf("USE_GEOS=1") != -1) {
                     this.useGeos = true;
                 }
+                else {
+                	//warn about not using GEOS
+                	LOGGER.warning("GEOS is NOT enabled. This will result in limited functionality and performance.");
+                }
             }
         } catch (SQLException sqle) {
             String message = sqle.getMessage();

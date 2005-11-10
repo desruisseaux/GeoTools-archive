@@ -6,9 +6,6 @@ import java.util.Map;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.filter.Filter;
 
