@@ -24,6 +24,7 @@ public class ScreenMap {
     int width;
     int height;
 
+    public ScreenMap(){}
     public ScreenMap(int x, int y) {
         width = x;
         height = y;

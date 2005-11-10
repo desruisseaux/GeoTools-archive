@@ -25,8 +25,7 @@ public class ScreenMapTest extends TestCase {
      */
     public void testSet() {
         ScreenMap map = new ScreenMap(8, 8);
-        assertTrue((map.pixels.length * 32) > (8 * 8));
-
+        
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 assertEquals(false, map.get(x, y));

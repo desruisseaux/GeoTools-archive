@@ -17,6 +17,7 @@
 package org.geotools.renderer.shape;
 
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 import org.geotools.data.shapefile.shp.ShapeHandler;
 import org.geotools.data.shapefile.shp.ShapeType;
@@ -37,7 +38,10 @@ public class PointHandler implements ShapeHandler {
 	private Envelope bbox;
 	private MathTransform mt;
 	private ScreenMap screenMap;
+    Logger LOGGER=ShapefileRenderer.LOGGER;
 
+    int skipped=0;
+    
 	/**
 	 * Create new instance
 	 * @param type the type of shape.
@@ -67,6 +71,7 @@ public class PointHandler implements ShapeHandler {
 	 */
 	public Object read(ByteBuffer buffer, ShapeType type) {
 		if (type == ShapeType.NULL) {
+            LOGGER.finest("shape type is NULL");
             return null;
         }
 
@@ -86,10 +91,13 @@ public class PointHandler implements ShapeHandler {
         	transformed=coords;
         }
         
-        if( !bbox.intersects(geomBBox) )
+        if( !bbox.intersects(geomBBox) ){
+            LOGGER.finest("Point doesn't intersect with envelope");
             return null;
+        }
 
         if( screenMap.get((int)(transformed[0][0]), (int)transformed[0][1]) ){
+            LOGGER.finest("Point already rendered"+transformed[0][0]+" "+transformed[0][1]);
         	return null;
         }
         screenMap.set( (int)(transformed[0][0]), (int)(transformed[0][1]), true);

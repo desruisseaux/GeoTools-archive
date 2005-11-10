@@ -482,6 +482,7 @@ public class ShapefileRenderer implements GTRenderer{
                     SimpleGeometry geom = (SimpleGeometry) record.shape();
 
                     if (geom == null) {
+                        LOGGER.finest("skipping geometry");
                         dbfreader.skip();
 
                         continue;
@@ -595,161 +596,6 @@ public class ShapefileRenderer implements GTRenderer{
         }
 
         return new Class[] { PointSymbolizer.class, LineSymbolizer.class };
-    }
-
-    private void processStylersCaching(Graphics2D graphics,
-        ShapefileDataStore datastore, Query query, Envelope bbox,
-        MathTransform mt, Style style) throws IOException {
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("processing " + style.getFeatureTypeStyles().length
-                + " stylers");
-        }
-
-        FeatureTypeStyle[] featureStylers = style.getFeatureTypeStyles();
-        FeatureType type;
-
-        try {
-            type = createFeatureType(query, style, datastore.getSchema());
-        } catch (Exception e) {
-            fireErrorEvent(e);
-
-            return;
-        }
-
-        for (int i = 0; i < featureStylers.length; i++) {
-            if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.fine("processing style " + i);
-            }
-
-            FeatureTypeStyle fts = featureStylers[i];
-            String typeName = datastore.getSchema().getTypeName();
-
-            if ((typeName != null)
-                    && (datastore.getSchema().isDescendedFrom(null,
-                        fts.getFeatureTypeName())
-                    || typeName.equalsIgnoreCase(fts.getFeatureTypeName()))) {
-                // get applicable rules at the current scale
-                Rule[] rules = fts.getRules();
-                List ruleList = new ArrayList();
-                List elseRuleList = new ArrayList();
-
-                for (int j = 0; j < rules.length; j++) {
-                    if (LOGGER.isLoggable(Level.FINE)) {
-                        LOGGER.fine("processing rule " + j);
-                    }
-
-                    Rule r = rules[j];
-
-                    if (isWithInScale(r)) {
-                        if (r.hasElseFilter()) {
-                            elseRuleList.add(r);
-                        } else {
-                            ruleList.add(r);
-                        }
-                    }
-                }
-
-                // process the features according to the rules
-                // TODO: find a better way to declare the scale ranges so that
-                // we
-                // get style caching also between multiple rendering runs
-                NumberRange scaleRange = new NumberRange(scaleDenominator,
-                        scaleDenominator);
-
-                int index = 0;
-                Iterator featureIter = featureCache.iterator();
-
-                for (Iterator iter = geometryCache.iterator(); iter.hasNext();) {
-                    SimpleGeometry geom = (SimpleGeometry) iter.next();
-                    Feature feature = (Feature) featureIter.next();
-                    if( !query.getFilter().contains(feature) )
-                        continue;
-                    try {
-                        if (renderingStopRequested) {
-                            break;
-                        }
-
-                        boolean doElse = true;
-
-                        if (LOGGER.isLoggable(Level.FINER)) {
-                            LOGGER.fine("trying to read geometry ...");
-                        }
-
-                        if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.finest("... done: " + geom.toString());
-                        }
-
-                        if (LOGGER.isLoggable(Level.FINER)) {
-                            LOGGER.fine("... done: " + typeName);
-                        }
-
-                        // applicable rules
-                        for (Iterator it = ruleList.iterator(); it.hasNext();) {
-                            Rule r = (Rule) it.next();
-
-                            if (LOGGER.isLoggable(Level.FINER)) {
-                                LOGGER.finer("applying rule: " + r.toString());
-                            }
-
-                            if (LOGGER.isLoggable(Level.FINER)) {
-                                LOGGER.finer("this rule applies ...");
-                            }
-
-                            Filter filter = r.getFilter();
-
-                            if ((filter == null) || filter.contains(feature)) {
-                                doElse = false;
-
-                                if (LOGGER.isLoggable(Level.FINER)) {
-                                    LOGGER.finer("processing Symobolizer ...");
-                                }
-
-                                Symbolizer[] symbolizers = r.getSymbolizers();
-
-                                processSymbolizers(graphics, feature, geom,
-                                    symbolizers, scaleRange);
-
-                                if (LOGGER.isLoggable(Level.FINER)) {
-                                    LOGGER.finer("... done!");
-                                }
-                            }
-                        }
-
-                        if (doElse) {
-                            // rules with an else filter
-                            if (LOGGER.isLoggable(Level.FINER)) {
-                                LOGGER.finer("rules with an else filter");
-                            }
-
-                            for (Iterator it = elseRuleList.iterator();
-                                    it.hasNext();) {
-                                Rule r = (Rule) it.next();
-                                Symbolizer[] symbolizers = r.getSymbolizers();
-
-                                if (LOGGER.isLoggable(Level.FINER)) {
-                                    LOGGER.finer("processing Symobolizer ...");
-                                }
-
-                                processSymbolizers(graphics, feature, geom,
-                                    symbolizers, scaleRange);
-
-                                if (LOGGER.isLoggable(Level.FINER)) {
-                                    LOGGER.finer("... done!");
-                                }
-                            }
-                        }
-
-                        if (LOGGER.isLoggable(Level.FINER)) {
-                            LOGGER.finer("feature rendered event ...");
-                        }
-
-                        fireFeatureRenderedEvent(null);
-                    } catch (Exception e) {
-                        fireErrorEvent(e);
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -1452,10 +1298,7 @@ public class ShapefileRenderer implements GTRenderer{
                 // graphics.setTransform(transform);
                 // extract the feature type stylers from the style object
                 // and process them
-                if (isCaching() && (geometryCache.size() > 0)) {
-                    processStylersCaching(graphics, ds, currLayer.getQuery(),
-                        bbox, mt, currLayer.getStyle());
-                } else {
+                
                     Transaction transaction = null;
 
                     if (currLayer.getFeatureSource() instanceof FeatureStore) {
@@ -1466,7 +1309,6 @@ public class ShapefileRenderer implements GTRenderer{
                     processStylersNoCaching(graphics, ds, currLayer.getQuery(),
                         bbox, mt, currLayer.getStyle(), layerIndexInfo[i],
                         transaction);
-                }
             } catch (Exception exception) {
                 fireErrorEvent(new Exception("Exception rendering layer "
                         + currLayer, exception));

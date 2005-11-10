@@ -35,6 +35,7 @@ import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.feature.Feature;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.RenderListener;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
@@ -169,9 +170,9 @@ public class TestUtilites {
      *
      * @throws Exception DOCUMENT ME!
      */
-    public static void showRender(String testName, ShapefileRenderer renderer,
+    public static BufferedImage showRender(String testName, GTRenderer renderer,
         long timeOut, Envelope bounds) throws Exception {
-        showRender(testName, renderer, timeOut, bounds, -1);
+        return showRender(testName, renderer, timeOut, bounds, -1);
     }
 
     /**
@@ -182,10 +183,11 @@ public class TestUtilites {
      * @param timeOut DOCUMENT ME!
      * @param bounds DOCUMENT ME!
      * @param expectedFeatureCount DOCUMENT ME!
+     * @return 
      *
      * @throws Exception DOCUMENT ME!
      */
-    public static void showRender(String testName, ShapefileRenderer renderer,
+    public static BufferedImage showRender(String testName, GTRenderer renderer,
         long timeOut, Envelope bounds, int expectedFeatureCount)
         throws Exception {
         CountingRenderListener listener = new CountingRenderListener();
@@ -203,6 +205,7 @@ public class TestUtilites {
         g.fillRect(0, 0, w, h);
         TestUtilites.render(renderer, g, new Rectangle(w, h), bounds);
 
+        g.dispose();
         if (((System.getProperty("java.awt.headless") == null)
                 || !System.getProperty("java.awt.headless").equals("true"))
                 && TestUtilites.INTERACTIVE) {
@@ -228,6 +231,7 @@ public class TestUtilites {
 
             Thread.sleep(timeOut);
             frame.dispose();
+            
         }
 
         boolean hasData = false; //All I can seem to check reliably.
@@ -246,6 +250,8 @@ public class TestUtilites {
             renderer.removeRenderListener(listener);
             TestCase.assertEquals(expectedFeatureCount, listener.count);
         }
+        
+        return image;
     }
 
     /**
@@ -260,8 +266,8 @@ public class TestUtilites {
      */
     static void render(Object obj, Graphics g, Rectangle rect, Envelope bounds)
         throws IOException {
-        if (obj instanceof ShapefileRenderer) {
-            ShapefileRenderer renderer = (ShapefileRenderer) obj;
+        if (obj instanceof GTRenderer) {
+            GTRenderer renderer = (GTRenderer) obj;
 
             if (bounds == null) {
                 bounds = renderer.getContext().getLayerBounds();

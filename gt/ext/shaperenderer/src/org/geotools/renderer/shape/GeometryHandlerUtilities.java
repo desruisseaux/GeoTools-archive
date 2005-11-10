@@ -129,8 +129,8 @@ public class GeometryHandlerUtilities {
         double[] screenSize = new double[4];
         mt.transform(worldSize, 0, screenSize, 0, 2);
 
-        int width = Math.abs((int) (screenSize[1] - screenSize[0]));
-        int height = Math.abs((int) (screenSize[3] - screenSize[2]));
+        int height = Math.abs((int) (screenSize[1] - screenSize[0]));
+        int width = Math.abs((int) (screenSize[3] - screenSize[2]));
 
         return new ScreenMap(width + 1, height + 1);
     }
