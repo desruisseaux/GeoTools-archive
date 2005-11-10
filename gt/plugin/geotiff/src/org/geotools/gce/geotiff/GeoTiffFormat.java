@@ -18,8 +18,6 @@
  */
 package org.geotools.gce.geotiff;
 
-import org.geotools.catalog.CatalogEntry;
-
 // Geotools dependencies
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.parameter.DefaultParameterDescriptor;
@@ -84,10 +82,6 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
     public boolean accepts(Object o) {
         boolean goodfile = false;
 
-        if (o instanceof CatalogEntry) {
-            o = ((CatalogEntry) o).resource();
-        }
-
         goodfile = o instanceof File;
 
         if (goodfile) {
@@ -116,9 +110,6 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
      * @return a GeoTiffReader object initialized to the specified File.
      */
     public GridCoverageReader getReader(Object source) {
-        if (source instanceof CatalogEntry) {
-            source = ((CatalogEntry) source).resource();
-        }
 
         GridCoverageReader reader = null;
 

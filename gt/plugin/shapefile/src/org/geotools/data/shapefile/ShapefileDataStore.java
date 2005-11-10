@@ -65,7 +65,6 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultFIDReader;
-import org.geotools.data.DefaultTypeEntry;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
@@ -73,7 +72,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.TypeEntry;
 import org.geotools.data.shapefile.dbf.DbaseFileException;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
@@ -211,58 +209,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         this(url);
         this.namespace = namespace;
         this.useMemoryMappedBuffer = useMemoryMapped;
-    }
-
-    /**
-     * Create our own TypeEntry that will calculate BBox based on available metadata.
-     * 
-     * @param typeName DOCUMENT ME!
-     * @return DOCUMENT ME!
-     */
-    protected TypeEntry createTypeEntry( final String typeName ) {
-        URI namespace;
-
-        try {
-            namespace = getSchema(typeName).getNamespace();
-        } catch (IOException e) {
-            namespace = null;
-        }
-
-        return new DefaultTypeEntry(this, namespace, typeName){
-            /**
-             * Use ShapefileDataStore createMetadata method
-             * 
-             * @return DOCUMENT ME!
-             */
-            protected Map createMetadata() {
-                return ShapefileDataStore.this.createMetadata(typeName);
-            }
-
-            /**
-             * Grab bounds from metadata, if possible.
-             * 
-             * @return geographic bounding box
-             */
-            protected Envelope createBounds() {
-                Envelope bbox = null;
-                Metadata meta = (Metadata) metadata().get("shp.xml");
-
-                if (meta != null) {
-                    bbox = meta.getIdinfo().getLbounding();
-
-                    if (bbox != null) {
-                        return bbox;
-                    }
-
-                    bbox = meta.getIdinfo().getBounding();
-
-                    // we would need to reproject this :-P
-                    // so lets not bother right now ...
-                }
-
-                return super.createBounds();
-            }
-        };
     }
 
     /**
@@ -1178,7 +1124,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
             for( int i = 0, ii = featureType.getAttributeCount(); i < ii; i++ ) {
                 // if its a geometry, we don't want to write it to the dbf...
-                if (!featureType.getAttributeType(i).isGeometry()) {
+                if (!(featureType.getAttributeType(i) instanceof GeometryAttributeType)) {
                     cnt++;
                     writeFlags[i] = (byte) 1;
                 }

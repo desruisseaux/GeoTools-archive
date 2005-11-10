@@ -277,7 +277,7 @@ public class GeoTiffTest extends TestCase {
         gce.add(testFile);
 
         // get an iterator over catalog entries
-        Iterator it = gce.iterator();
+        Iterator it = gce.getFiles().iterator();
         assertNotNull("Can't get iterator from FileSystemGCE.", it);
 
         // Get the file object

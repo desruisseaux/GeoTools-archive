@@ -27,6 +27,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -251,7 +252,7 @@ public class PropertyAttributeReader implements AttributeReader {
 
         Object value = null;
 
-        if (attType.isGeometry()) {
+        if (attType instanceof GeometryAttributeType) {
             try {
                 value = wktReader.read(stringValue);
             } catch (ParseException e) {

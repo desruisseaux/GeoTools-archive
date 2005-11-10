@@ -17,12 +17,8 @@
 package org.geotools.data.wms.test;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -30,12 +26,8 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
-import junit.framework.TestCase;
-
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.WMSLayerCatalogEntry;
-import org.geotools.data.wms.WMSLayerMetadataEntity;
 import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
@@ -44,7 +36,6 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -202,25 +193,7 @@ public class WebMapServerOnlineTest extends ServerTestCase {
         assertTrue(textFound);
 */
     }
-    
-    public void testIterator() throws SAXException, URISyntaxException, IOException {
-        WebMapServer wms = new WebMapServer(serverURL);
-        wms.getCapabilities();
         
-        Iterator iter = wms.entries().iterator();
-        assertNotNull(iter);
-        
-        while(iter.hasNext()) {
-            WMSLayerCatalogEntry entry = (WMSLayerCatalogEntry) iter.next();
-            assertNotNull(entry);            
-            assertTrue( entry.metadata().keySet().contains( WMSLayerMetadataEntity.TYPE_NAME) );
-            assertNotNull(entry.getDataName());            
-            WMSLayerMetadataEntity metadata = (WMSLayerMetadataEntity) entry.metadata().get(WMSLayerMetadataEntity.TYPE_NAME);
-            assertNotNull(metadata);
-            assertNotNull(metadata.getName());
-        }
-    }
-    
     public void testGetEnvelope() throws Exception {
         WebMapServer wms = new WebMapServer(featureURL);
         

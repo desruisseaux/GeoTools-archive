@@ -89,7 +89,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
                 r.add(f.getID());
             	AttributeType[] atrs = f.getFeatureType().getAttributeTypes();
             	for(int i=0;i<atrs.length;i++){
-            		if(atrs[i].isGeometry()){
+            		if(atrs[i] instanceof GeometryAttributeType){
             			Geometry g = (Geometry)f.getAttribute(i);
                 		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
                 		g.setUserData(cs.getIdentifiers().iterator().next().toString());
@@ -154,7 +154,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         Map props = new HashMap();
 
         for (int i = 0; i < type.length; i++) {
-        	if(type[i].isGeometry()){
+        	if(type[i] instanceof GeometryAttributeType){
         		Geometry g = (Geometry)value[i];
         		CoordinateReferenceSystem cs = ((GeometryAttributeType)type[i]).getCoordinateSystem();
         		g.setUserData(cs.getIdentifiers().iterator().next().toString());
@@ -200,7 +200,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             	Feature f = reader.next();
             	AttributeType[] atrs = f.getFeatureType().getAttributeTypes();
             	for(int i=0;i<atrs.length;i++){
-            		if(atrs[i].isGeometry()){
+            		if(atrs[i] instanceof GeometryAttributeType){
             			Geometry g = (Geometry)f.getAttribute(i);
                 		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
                 		g.setUserData(cs.getIdentifiers().iterator().next().toString());

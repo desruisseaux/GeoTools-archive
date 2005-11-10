@@ -12,14 +12,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-import org.geotools.catalog.CatalogEntry;
-import org.geotools.catalog.Discovery;
-import org.geotools.catalog.QueryRequest;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
@@ -78,7 +74,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Richard Gould, Refractions Research
  */
-public class WebMapServer implements Discovery {
+public class WebMapServer {
     private final URL serverURL;
     private WMSCapabilities capabilities;
 
@@ -494,52 +490,6 @@ public class WebMapServer implements Discovery {
         
         PutStylesRequest request = specification.createPutStylesRequest(onlineResource);
         return request;
-    }
-    
-    /**
-     * Metadata search through entries.
-     * 
-     * @see org.geotools.catalog.Discovery#search(org.geotools.catalog.QueryRequest)
-     * @param queryRequest
-     * @return List of matching TypeEntry
-     */
-    public List search( QueryRequest queryRequest ) {
-        if (queryRequest == QueryRequest.ALL) {
-            return entries();
-        }
-        List queryResults = new ArrayList();
-        CATALOG: for( Iterator i = entries().iterator(); i.hasNext(); ) {
-            CatalogEntry entry = (CatalogEntry) i.next();
-            METADATA: for( Iterator m = entry.metadata().values().iterator(); m.hasNext(); ) {
-                if (queryRequest.match(m.next())) {
-                    queryResults.add(entry);
-                    break METADATA;
-                }
-            }
-        }
-        return queryResults;
-    }
-
-    /**
-     * Catalog of the Layers known to this Web Map Server.
-     * <p>
-     * It flattens the hierarchy. Each element is of type Layer.
-     * </p>
-     * 
-     * @return a List containing each Layer
-     */
-    public List entries() {
-        ArrayList layers = new ArrayList();
-
-        for( int i = 0; i < capabilities.getLayerList().size(); i++ ) {
-            Layer layer = (Layer) capabilities.getLayerList().get(i);
-
-            if ((layer.getName() != null) && (layer.getName().length() != 0)) { //$NON-NLS-1$
-
-                layers.add(new WMSLayerCatalogEntry(this, layer));
-            }
-        }
-        return Collections.unmodifiableList(layers);
     }
     
     /**

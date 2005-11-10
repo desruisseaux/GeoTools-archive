@@ -19,6 +19,7 @@ package org.geotools.data.postgis;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
@@ -86,7 +87,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
         for (int i = 0; i < attributes.length; i++) {
             String colName = attributes[i].getName();
 
-            if (attributes[i].isGeometry()) {
+            if (attributes[i] instanceof GeometryAttributeType) {
                 
                 if (WKBEnabled) {
                     if(byteaEnabled) {

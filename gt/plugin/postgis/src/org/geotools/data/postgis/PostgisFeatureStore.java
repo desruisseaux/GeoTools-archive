@@ -43,6 +43,7 @@ import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.AbstractFilter;
@@ -574,7 +575,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                 String newValue;
 
                 //check her to make sure object matches attribute type.
-                if (curType.isGeometry()) {
+                if (curType  instanceof GeometryAttributeType) {
                     //create the text to add geometry
                     int srid = getSRID(curType.getName());
                     String geoText = geometryWriter.write((Geometry) curValue);

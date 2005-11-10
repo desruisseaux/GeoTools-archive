@@ -39,6 +39,7 @@ import org.geotools.data.Transaction;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.BBoxExpression;
@@ -528,7 +529,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         List propNames = new ArrayList(type.getAttributeCount() - 1);
 
         for (int i = 0; i < type.getAttributeCount(); i++) {
-            if (type.getAttributeType(i).isGeometry()) {
+            if (type.getAttributeType(i) instanceof GeometryAttributeType) {
                 continue;
             }
 
