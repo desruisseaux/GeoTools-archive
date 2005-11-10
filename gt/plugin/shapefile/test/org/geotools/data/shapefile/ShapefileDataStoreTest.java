@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
@@ -131,6 +132,18 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureType schema = firstFeature(features).getFeatureType();
         assertTrue(schema.isDescendedFrom(BasicFeatureTypes.POLYGON));
         assertTrue(schema.isDescendedFrom(GMLSchema.NAMESPACE,"polygonFeature"));
+    }
+    
+    public void testCreateSchema() throws Exception {
+        File file = new File( "test.shp" );
+        URL toURL = file.toURL();
+        ShapefileDataStore ds=new ShapefileDataStore(toURL);
+        ds.createSchema( DataUtilities.createType("test", "geom:MultiPolygon") );
+        
+        ds = new ShapefileDataStore(toURL);
+        
+        assertEquals("test", ds.getSchema().getTypeName());
+        file.delete();
     }
     
     private ShapefileDataStore createDataStore(File f) throws Exception {

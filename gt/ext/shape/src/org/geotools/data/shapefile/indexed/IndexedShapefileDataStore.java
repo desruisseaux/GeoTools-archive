@@ -284,28 +284,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     }
 
     /**
-     * Delete existing files.
-     */
-    private void clear() {
-        if (isLocal()) {
-            delete(shpURL);
-            delete(dbfURL);
-            delete(shxURL);
-            delete(treeURL);
-        }
-    }
-
-    /**
-     * Delete a URL (file)
-     *
-     * @param u DOCUMENT ME!
-     */
-    private void delete(URL u) {
-        File f = new File(u.getFile());
-        f.delete();
-    }
-
-    /**
      * Obtain a ReadableByteChannel from the given URL. If the url protocol is
      * file, a FileChannel will be returned. Otherwise a generic channel will
      * be obtained from the urls input stream.
@@ -957,23 +935,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         }
     }
 
-    /**
-     * Set the FeatureType of this DataStore. This method will delete any
-     * existing local resources or throw an IOException if the DataStore is
-     * remote.
-     *
-     * @param featureType The desired FeatureType.
-     *
-     * @throws IOException If the DataStore is remote.
-     */
-    public void createSchema(FeatureType featureType) throws IOException {
-        if (!isLocal()) {
-            throw new IOException("Cannot create FeatureType on remote shape");
-        }
-
-        clear();
-        schema = featureType;
-    }
 
     /**
      * Gets the bounding box of the file represented by this data store as a
