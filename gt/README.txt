@@ -7,7 +7,7 @@ This release was created on: @DATE@
 This release contains only a subset of the current GeoTools codebase.
 The full GeoTools codebase is made up of over 30 modules; 
 Only the modules which are considered to be stable will be included in this
-release.  DELETE ME!
+release.
 
 For this release the following modules comprise the geotools library:
 @REQUIRED@
