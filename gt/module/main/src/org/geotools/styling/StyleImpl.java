@@ -199,4 +199,12 @@ public class StyleImpl implements org.geotools.styling.Style, Cloneable {
         return false;
     }
 
+	public void addListener(StyleListener listener) {
+				
+	}
+
+	public void removeListener(StyleListener listener) {
+		
+	}
+
 }

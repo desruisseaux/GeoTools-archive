@@ -16,63 +16,12 @@
  */
 package org.geotools.data.jdbc;
 
-import org.geotools.catalog.CatalogEntry;
-import org.geotools.catalog.QueryRequest;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.DefaultTypeEntry;
-import org.geotools.data.EmptyFeatureReader;
-import org.geotools.data.FeatureListenerManager;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureWriter;
-import org.geotools.data.FilteringFeatureReader;
-import org.geotools.data.FilteringFeatureWriter;
-import org.geotools.data.InProcessLockingManager;
-import org.geotools.data.LockingManager;
-import org.geotools.data.Query;
-import org.geotools.data.ReTypeFeatureReader;
-import org.geotools.data.SchemaNotFoundException;
-import org.geotools.data.Transaction;
-import org.geotools.data.TypeEntry;
-import org.geotools.data.jdbc.attributeio.AttributeIO;
-import org.geotools.data.jdbc.attributeio.BasicAttributeIO;
-import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
-import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
-import org.geotools.data.view.DefaultView;
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
-import org.geotools.filter.SQLEncoder;
-import org.geotools.filter.SQLEncoderException;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
+import org.geotools.feature.AttributeType;
+import org.geotools.filter.Filter;
 
 
 /**

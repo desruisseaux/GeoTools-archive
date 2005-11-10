@@ -3,7 +3,6 @@ package org.geotools.data.coverage.grid.file.test;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -11,8 +10,6 @@ import junit.framework.TestCase;
 import org.geotools.data.coverage.grid.GridFormatFinder;
 import org.geotools.data.coverage.grid.file.FileMetadataImpl;
 import org.geotools.resources.TestData;
-import org.opengis.catalog.MetadataEntity;
-import org.opengis.catalog.MetadataEntity.EntityType;
 
 /**
  * TODO type description
@@ -86,82 +83,15 @@ public class FileMetadataImplTest extends TestCase {
 //      test begins
         assertEquals(metadata.getPath(), f.getPath());
     }
-
-    /*
-     * Calls getElements(null)
-     */
-    public void testElementType() {
-    	init();
-    	EntityType type = metadata.getEntityType();
-    	for( Iterator i = type.getElements().iterator(); i.hasNext(); ){
-    	    MetadataEntity.Element e = (MetadataEntity.Element) i.next();
-    	    System.out.println( e.getName() );
-    	}
-    	assertNotNull( type.getElement( "name" ) );
-    	assertNotNull( type.getElement( "path" ) );
-    	assertNotNull( type.getElement( "file" ) );
-    	assertNotNull( type.getElement( "lastModified" ) );
-    	assertNotNull( type.getElement( "extension" ) );
-    	assertNotNull( type.getElement( "format" ) );    	
-    }
     
-    /*
-     * Calls getElements(null)
-     */
-    public void testGetElementsPassedNull() {
-    	init();
-
-    	EntityType type = metadata.getEntityType();
-    	
-        // test begins
-        List ret=metadata.elements();
-        assertNotNull(ret);
-        assertEquals(ret.size(), metadata.getEntityType().getElements().size() );
-   }
-
-    public void xtestGetEntity() {
-    	init();
-        // test begins
-        assertNotNull(metadata.getEntityType());
-    }
-
-    /*
-     * Class under test for Object getElement(ElementType)
-     */
-    public void testGetElementElementType() {
-    	init();
-
-        // test begins
-    	EntityType entity=metadata.getEntityType();
-        List elements=entity.getElements();
-        List values=metadata.elements();
-        int i=0;
-        for (Iterator iter = elements.iterator(); iter.hasNext();i++) {
-            MetadataEntity.Element element = (MetadataEntity.Element) iter.next();
-            assertEquals(metadata.getElement(element), values.get(i));
-        }
-    }
-
     /*
      * Class under test for Object getElement(String)
      */
     public void testGetElementString() {
     
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        String element=(String)data.getElement("fileData/name");
+        String element=(String)data.getFileData().getName();
         assertEquals("Stupid",element);
-        
-        //Test xpath with wildcards
-        List list=(List) data.getElement("fileData/\\w*");
-        assertEquals(3,list.size());
-    
-        String name=(String) data.getElement("\\w*/name");
-        assertEquals("Stupid",name);
-    
-        //Test xpath with wildcards
-        list=(List) data.getElement("\\w*/\\w*");
-        assertEquals(3,list.size());
-    
     }
 
  }

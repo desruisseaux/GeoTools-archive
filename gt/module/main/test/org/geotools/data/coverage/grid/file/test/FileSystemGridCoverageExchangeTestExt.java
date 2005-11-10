@@ -9,10 +9,10 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-import org.opengis.coverage.grid.Format;
 import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
 import org.geotools.resources.TestData;
 import org.opengis.catalog.CatalogEntry;
+import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageWriter;
 
 
@@ -47,13 +47,13 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 		assertNotNull(exchange);
 
 		exchange.add(new File(new URI(URLDecoder.decode(url.toString(),"UTF-8"))));
-		Iterator iter=exchange.iterator();
+		Iterator iter=exchange.getFiles().iterator();
 		assertTrue(iter.hasNext());
 		CatalogEntry f= (CatalogEntry)iter.next();
 		assertEquals( url.getFile(), f.getDataName() );
 
 		init();
-		iter=exchange.iterator();
+		iter=exchange.getFiles().iterator();
 		assertTrue(iter.hasNext());
 		f= (CatalogEntry)iter.next();
 		assertTrue(f.getResource() instanceof File );

@@ -2,7 +2,6 @@ package org.geotools.data.store;
 
 import java.io.IOException;
 
-import org.geotools.catalog.CatalogEntry;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Transaction;
 import org.geotools.feature.Feature;
@@ -44,7 +43,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author jgarnett
  */
-public interface TypeEntry extends CatalogEntry {
+public interface TypeEntry {
     
     /**
      * @return user name for this feature collection

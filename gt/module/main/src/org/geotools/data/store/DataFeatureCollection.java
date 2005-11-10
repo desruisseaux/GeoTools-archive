@@ -36,7 +36,6 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.type.FeatureAttributeType;
-import org.geotools.feature.visitor.FeatureCalc;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.xml.gml.GMLSchema;
 

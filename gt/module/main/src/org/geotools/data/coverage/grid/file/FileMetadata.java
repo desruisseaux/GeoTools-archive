@@ -18,8 +18,6 @@ package org.geotools.data.coverage.grid.file;
 
 import org.opengis.coverage.grid.Format;
 
-import org.opengis.catalog.MetadataEntity;
-
 
 /**
  * A simple unstandard metadata that describes files
@@ -27,7 +25,7 @@ import org.opengis.catalog.MetadataEntity;
  * @author jeichar
  *
  */
-public interface FileMetadata extends MetadataEntity {
+public interface FileMetadata {
     /**
      * Returns the File name
      * @return Returns the File name

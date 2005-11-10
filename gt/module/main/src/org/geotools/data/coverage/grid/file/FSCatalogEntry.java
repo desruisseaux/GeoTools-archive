@@ -19,14 +19,9 @@ package org.geotools.data.coverage.grid.file;
 import java.io.File;
 import java.util.Iterator;
 
-import org.opengis.coverage.grid.Format;
-
-
-import org.opengis.catalog.CatalogEntry;
-import org.opengis.catalog.MetadataEntity;
-
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.UnknownFormat;
+import org.opengis.coverage.grid.Format;
 
 /**
  * A CatalogEntry that refers to a file and a metadata that describes the file
@@ -36,7 +31,7 @@ import org.geotools.data.coverage.grid.UnknownFormat;
  * @author $author$
  * @version $Revision: 1.9 $
  */
-public class FSCatalogEntry implements CatalogEntry {
+public class FSCatalogEntry {
     private File resource;
     private FileMetadata metadata;
 
@@ -78,7 +73,7 @@ public class FSCatalogEntry implements CatalogEntry {
     /**
      * @see opengis.catalog.CatalogEntry#getMetadata(java.lang.String)
      */
-    public MetadataEntity getMetadata(String name) {
+    public FileMetadata getMetadata(String name) {
         return metadata;
     }
 
@@ -106,7 +101,7 @@ public class FSCatalogEntry implements CatalogEntry {
     /* (non-Javadoc)
      * @see org.geotools.catalog.CatalogEntry#getMetadata(int)
      */
-    public MetadataEntity getMetadata(int index) {
+    public FileMetadata getMetadata(int index) {
         if (index < 0) {
             return null;
         }

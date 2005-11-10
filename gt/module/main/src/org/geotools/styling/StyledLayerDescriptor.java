@@ -21,6 +21,35 @@ package org.geotools.styling;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Holds styling information (from a StyleLayerDescriptor document).
+ * <p>
+ * This class is based on version 1.0 of the SLD specification.
+ * </p>
+ * <p>
+ * For many of us in geotools *this* is the reason we came along for the
+ * ride - a pretty picture. For documentation on the use of this class
+ * please consult the SLD 1.0 specification.
+ * </p>
+ * <p>
+ * We may experiment with our own (or SLD 1.1) ideas but will mark
+ * such experiments for you. This is only an issue of you are considering
+ * writing out these objects for interoptability with other systems.
+ * </p>
+ * <p>
+ * General stratagy for supporting multiple SLD versions (and experiments):
+ * <ul>
+ * <li>These classes will be <b>BIGGER</b> and more capabile then any one specification
+ * <li>We can define (and support) explicit interfaces tracking each version (perferably GeoAPI would hold these)
+ * <li>We can use Factories (aka SLD1Factory and SLD1_1Factory and SEFactory) to support the creation of conformant
+ *     datastructures. Code (such as user interfaces) can be parameratized with these factories when they
+ *     need to confirm to an exact version supported by an individual service. We
+ *     hope that specifications are always adative, and will be forced to throw
+ *     unsupported exceptions when functionality is removed from a specification.
+ * </ul>
+ * </p>
+ * @author jgarnett
+ */
 public class StyledLayerDescriptor{
     
     /** Holds value of property name. */
@@ -93,4 +122,28 @@ public class StyledLayerDescriptor{
         this.abstractStr = abstractStr;
     }
     
+    /**
+     * Listens to changes in the Style content.
+     * <p>
+     * Changes are provided:
+     * <ul>
+     * <li>Before: deletion
+     * <li>After: modification
+     * </ul>
+     * </p>
+     * <p>
+     * Since the Style data structure can be vast and complicated
+     * a trail of breadcrumbs (a delta) is provided to help find your
+     * way to the change.
+     * </p> 
+     * @param listener
+     */
+    void addListener( StyleListener listener ){
+    	
+    }
+    
+    /** Remove a style listener */
+    void removeListener( StyleListener listener ){
+    	
+    }
 }

@@ -31,8 +31,6 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 
 /**
  * An abstract class that uses prepared statements to insert, update and delete

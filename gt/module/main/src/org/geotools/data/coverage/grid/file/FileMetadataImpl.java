@@ -18,8 +18,6 @@ package org.geotools.data.coverage.grid.file;
 
 import java.io.File;
 
-import org.geotools.catalog.AbstractMetadataEntity;
-
 import org.opengis.coverage.grid.Format;
 
 
@@ -30,7 +28,7 @@ import org.opengis.coverage.grid.Format;
  * @author jeichar
  * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  */
-public class FileMetadataImpl extends AbstractMetadataEntity implements FileMetadata {
+public class FileMetadataImpl implements FileMetadata {
     String name;
     String path;
     String extension;

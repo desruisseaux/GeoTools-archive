@@ -17,17 +17,11 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.catalog.CatalogEntry;
-import org.geotools.catalog.QueryRequest;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
@@ -107,12 +101,6 @@ public abstract class AbstractDataStore implements DataStore {
      */
     private InProcessLockingManager lockingManager;
 
-    /** List<TypeEntry> subclass control provided by createContents.
-     * <p>
-     * Access via entries(), creation by createContents.
-     */
-    private List contents = null;
-    
     /** Default (Writeable) DataStore */
     public AbstractDataStore() {
         this(true);
@@ -157,61 +145,7 @@ public abstract class AbstractDataStore implements DataStore {
 //        bounds.expandToInclude( after.getBounds() );
 //        listenerManager.fireFeaturesChanged( typeName, Transaction.AUTO_COMMIT, bounds, false );
 //    }
-
-    /** List of TypeEntry entries - one for each featureType provided by this Datastore */
-    public List entries() {
-        if( contents == null ) {
-            contents = createContents();
-        }
-        return Collections.unmodifiableList( contents );
-    }
-    
-    /**
-     * Create TypeEntries based on typeName.
-     * <p>
-     * This method is lazyly called to create a List of TypeEntry for
-     * each FeatureCollection in this DataStore.
-     * </p>
-     * @return List<TypeEntry>.
-     */
-    protected List createContents() {
-        String typeNames[];
-        try {
-            typeNames = getTypeNames();
-            List list = new ArrayList( typeNames.length );
-            for( int i=0; i<typeNames.length; i++){
-                list.add( createTypeEntry( typeNames[i] ));
-            }
-            return Collections.unmodifiableList( list );
-        }
-        catch (IOException help) {
-            // Contents are not available at this time!
-            LOGGER.warning( "Could not aquire getTypeName() to build contents" );
-            return null;
-        }
-    }
-    
-    /**
-     * Create a TypeEntry for the requested typeName.
-     * <p>
-     * Default implementation is not that smart, subclass is free to override.
-     * This method should expand to take in the namespace URI.
-     * Or featureType schema - see AbstractDataStore2.
-     * </p>
-     */
-    protected TypeEntry createTypeEntry( final String typeName ) {
-        URI namespace;
-        try {
-            namespace = getSchema( typeName ).getNamespace();
-        } catch (IOException e) {
-            namespace = null;
-        }
-        return new DefaultTypeEntry( this, namespace, typeName ) {
-            protected Map createMetadata() {
-                return AbstractDataStore.this.createMetadata( typeName );
-            }  
-        };
-    }    
+           
     /**
      * Subclass override to provide access to metadata.
      * <p>
@@ -222,31 +156,7 @@ public abstract class AbstractDataStore implements DataStore {
     protected Map createMetadata( String typeName ) {
         return Collections.EMPTY_MAP;
     }
-    
-    /**
-     * Metadata search through entries. 
-     * 
-     * @see org.geotools.catalog.Discovery#search(org.geotools.catalog.QueryRequest)
-     * @param queryRequest
-     * @return List of matching TypeEntry
-     */
-    public List search( QueryRequest queryRequest ) {
-        if( queryRequest == QueryRequest.ALL ) {
-            return entries();
-        }
-        List queryResults = new ArrayList();
-CATALOG: for( Iterator i=entries().iterator(); i.hasNext(); ) {
-            CatalogEntry entry = (CatalogEntry) i.next();
-METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); ) {
-                if( queryRequest.match( m.next() ) ) {
-                    queryResults.add( entry );
-                    break METADATA;
-                }
-            }
-        }
-        return queryResults;
-    }
-    
+       
     /** Convience method for retriving all the names from the Catalog Entires */
     public abstract String[] getTypeNames() throws IOException;
 

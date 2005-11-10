@@ -16,15 +16,13 @@
  */
 package org.geotools.data.coverage.grid.file.test;
 
-import org.opengis.catalog.MetadataEntity;
-
 /**
  * TODO type description
  * 
  * @author jeichar
  *
  */
-public interface StupidNestedMetadata extends MetadataEntity {
+public interface StupidNestedMetadata {
     StupidFileData getFileData();
     String getData();
 }

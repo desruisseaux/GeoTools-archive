@@ -40,7 +40,6 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.DefaultTypeEntry;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
@@ -54,7 +53,6 @@ import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
-import org.geotools.data.TypeEntry;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.BasicAttributeIO;
 import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
@@ -313,34 +311,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *             throws IOException { this(connectionPool, null, new
 	 *             HashMap(), ""); }
 	 */
-
-	/**
-	 * Create a TypeEntry for the requested typeName.
-	 * 
-	 * <p>
-	 * Default implementation is not that smart, subclass is free to override.
-	 * This method should expand to take in the namespace URI. Or featureType
-	 * schema - see AbstractDataStore2.
-	 * </p>
-	 * 
-	 * @param typeName
-	 *            DOCUMENT ME!
-	 * 
-	 * @return DOCUMENT ME!
-	 */
-	protected TypeEntry createTypeEntry(final String typeName) {
-		URI namespace;
-
-		try {
-			namespace = getSchema(typeName).getNamespace();
-		} catch (IOException e) {
-			namespace = null;
-		}
-
-		// can optimize with a custom JDBCTypeEntry to allow
-		// access to database metadata.
-		return new DefaultTypeEntry(this, namespace, typeName);
-	}
 
 	/**
 	 * DOCUMENT ME!

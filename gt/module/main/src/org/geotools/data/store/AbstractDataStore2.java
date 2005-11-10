@@ -17,15 +17,11 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.geotools.catalog.CatalogEntry;
-import org.geotools.catalog.Discovery;
-import org.geotools.catalog.QueryRequest;
 import org.geotools.data.DataStore;
 import org.geotools.data.EmptyFeatureWriter;
 import org.geotools.data.FeatureReader;
@@ -101,7 +97,7 @@ import org.geotools.filter.Filter;
  *
  * @author jgarnett
  */
-public class AbstractDataStore2 implements DataStore, Discovery {
+public class AbstractDataStore2 implements DataStore {
     /** The logger for the filter module. */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
 
@@ -158,22 +154,6 @@ public class AbstractDataStore2 implements DataStore, Discovery {
      */
     protected List createContents() {
         throw new UnsupportedOperationException("createContent not implemented");
-    }
-    public List search( QueryRequest queryRequest ) {
-        if( queryRequest == QueryRequest.ALL ) {
-            return entries();
-        }
-        List queryResults = new ArrayList();
-CATALOG: for( Iterator i=entries().iterator(); i.hasNext(); ) {
-            CatalogEntry entry = (CatalogEntry) i.next();
-METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); ) {
-                if( queryRequest.match( m.next() ) ) {
-                    queryResults.add( entry );
-                    break METADATA;
-                }
-            }
-        }
-        return queryResults;
     }
     
     /** Convience method for retriving all the names from the Catalog Entires */

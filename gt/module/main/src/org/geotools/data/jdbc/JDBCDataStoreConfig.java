@@ -20,7 +20,6 @@
  */
 package org.geotools.data.jdbc;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 

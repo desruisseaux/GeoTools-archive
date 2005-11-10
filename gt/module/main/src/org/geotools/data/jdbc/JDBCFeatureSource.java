@@ -25,13 +25,9 @@ import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
@@ -39,7 +35,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.JTS.ReferencedEnvelope;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 import com.vividsolutions.jts.geom.Envelope;
 

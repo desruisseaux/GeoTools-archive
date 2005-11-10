@@ -23,20 +23,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Collections;
+import java.util.List;
 
-import org.geotools.catalog.AbstractCatalog;
-
-
+import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.data.coverage.grid.GridFormatFinder;
+import org.opengis.catalog.CatalogEntry;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageExchange;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
-
-
-import org.geotools.data.coverage.grid.GridFormatFinder;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.opengis.catalog.CatalogEntry;
 
 
 /**
@@ -49,13 +45,11 @@ import org.opengis.catalog.CatalogEntry;
  * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  * @version $Revision: 1.9 $
  */
-public class FileSystemGridCoverageExchange extends AbstractCatalog
-    implements GridCoverageExchange {
-    private static Set extensions;
+public class FileSystemGridCoverageExchange implements GridCoverageExchange {
     private File root;
     private boolean recursive;
     private Format[] formats;
-
+    private List entries;
     /**
      * Creates a new FileSystemGridCoverageExchange object.
      */
@@ -231,4 +225,8 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog
             refresh(root);
         }
     }
+
+	public List getFiles() {
+		return Collections.unmodifiableList( entries );
+	}
 }

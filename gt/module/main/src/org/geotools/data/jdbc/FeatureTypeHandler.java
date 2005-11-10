@@ -23,7 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +33,7 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 
 
 /**
@@ -83,7 +83,7 @@ public class FeatureTypeHandler {
             // type names cache timeout, better sync with the actual
             // list of type names while we're at it    
             String[] newTypeNames = loadTypeNamesFromDatabase();
-            HashSet newTypeNamesSet = new HashSet();
+            
             HashMap newFeatureTypeMap = new HashMap();
 
             // get the already parsed feature type info from the old map and put them
@@ -204,7 +204,7 @@ public class FeatureTypeHandler {
 
             // get srdid for each geometry
             for (int i = 0; i < types.length; i++) {
-                if (types[i].isGeometry()) {
+                if (types[i] instanceof GeometryAttributeType ) {
                     int srid = dataStore.determineSRID(featureTypeName, types[i].getName());
                     info.putSRID(types[i].getName(), srid);
                 }

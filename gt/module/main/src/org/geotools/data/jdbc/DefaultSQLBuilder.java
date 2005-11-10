@@ -18,6 +18,7 @@ package org.geotools.data.jdbc;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.SQLEncoder;
@@ -200,7 +201,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
         }
 
         for (int i = 0; i < attributes.length; i++) {
-            if (attributes[i].isGeometry()) {
+            if (attributes[i] instanceof GeometryAttributeType) {
                 sqlGeometryColumn(sql, attributes[i]);
             } else {
                 sql.append(encoder.escapeName(attributes[i].getName()));
