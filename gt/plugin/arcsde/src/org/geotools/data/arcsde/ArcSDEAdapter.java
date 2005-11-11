@@ -18,6 +18,7 @@ package org.geotools.data.arcsde;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.channels.SelectableChannel;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -439,77 +440,110 @@ public class ArcSDEAdapter {
 	 */
 	public static Class getGeometryType(int seShapeType) {
 		Class clazz = com.vividsolutions.jts.geom.Geometry.class;
+		final int MULTIPART_MASK = SeLayer.SE_MULTIPART_TYPE_MASK;
+		final int POINT_MASK = SeLayer.SE_POINT_TYPE_MASK;
+		final int SIMPLE_LINE_MASK = SeLayer.SE_SIMPLE_LINE_TYPE_MASK;
+		final int LINESTRING_MASK = SeLayer.SE_LINE_TYPE_MASK;
+		final int AREA_MASK = SeLayer.SE_AREA_TYPE_MASK;
+		
+		switch (seShapeType) {
+		case SeLayer.TYPE_NIL:
+			break;
+		case SeLayer.TYPE_MULTI_MASK:
+			clazz = GeometryCollection.class;
+		case SeLayer.TYPE_LINE:
+		case SeLayer.TYPE_SIMPLE_LINE:
+			clazz = LineString.class;
+			break;
+		case SeLayer.TYPE_MULTI_LINE:
+		case SeLayer.TYPE_MULTI_SIMPLE_LINE:
+			clazz = MultiLineString.class;
+			break;
+		case SeLayer.TYPE_MULTI_POINT:
+			clazz = MultiPoint.class;
+			break;
+		case SeLayer.TYPE_MULTI_POLYGON:
+			clazz = MultiPolygon.class;
+			break;
+		case SeLayer.TYPE_POINT:
+			clazz = Point.class;
+			break;
+		case SeLayer.TYPE_POLYGON:
+			clazz = Polygon.class;
+			break;
+		default:
+			
+			// in all this assignments, 1 means true and 0 false
+			final int isCollection = ((seShapeType & MULTIPART_MASK) == MULTIPART_MASK) ? 1
+					: 0;
 
-		// in all this assignments, 1 means true and 0 false
-		final int isCollection = ((seShapeType & SeLayer.SE_MULTIPART_TYPE_MASK) == SeLayer.SE_MULTIPART_TYPE_MASK) ? 1
-				: 0;
+			final int isPoint = ((seShapeType & POINT_MASK) == POINT_MASK) ? 1
+					: 0;
 
-		final int isPoint = ((seShapeType & SeLayer.SE_POINT_TYPE_MASK) == SeLayer.SE_POINT_TYPE_MASK) ? 1
-				: 0;
+			final int isLineString = (((seShapeType & SIMPLE_LINE_MASK) == SIMPLE_LINE_MASK) || ((seShapeType & LINESTRING_MASK) == LINESTRING_MASK)) ? 1
+					: 0;
 
-		final int isLineString = (((seShapeType & SeLayer.SE_SIMPLE_LINE_TYPE_MASK) == SeLayer.SE_SIMPLE_LINE_TYPE_MASK) || ((seShapeType & SeLayer.SE_LINE_TYPE_MASK) == SeLayer.SE_LINE_TYPE_MASK)) ? 1
-				: 0;
+			final int isPolygon = ((seShapeType & AREA_MASK) == AREA_MASK) ? 1
+					: 0;
 
-		final int isPolygon = ((seShapeType & SeLayer.SE_AREA_TYPE_MASK) == SeLayer.SE_AREA_TYPE_MASK) ? 1
-				: 0;
+			boolean isError = false;
 
-		boolean isError = false;
+			// first check if the shape type supports more than one geometry type.
+			// In that case, it is *highly* recomended that it support all the
+			// geometry types, so we can safely return Geometry.class. If this is
+			// not
+			// the case and the shape type supports just a few geometry types, then
+			// we give it a chance and return Geometry.class anyway, but be aware
+			// that transactions over that layer could fail if a Geometry that is
+			// not supported is tried for insertion.
+			if ((isPoint + isLineString + isPolygon) > 1) {
+				clazz = Geometry.class;
 
-		// first check if the shape type supports more than one geometry type.
-		// In that case, it is *highly* recomended that it support all the
-		// geometry types, so we can safely return Geometry.class. If this is
-		// not
-		// the case and the shape type supports just a few geometry types, then
-		// we give it a chance and return Geometry.class anyway, but be aware
-		// that transactions over that layer could fail if a Geometry that is
-		// not supported is tried for insertion.
-		if ((isPoint + isLineString + isPolygon) > 1) {
-			clazz = Geometry.class;
-
-			if (4 < (isCollection + isPoint + isLineString + isPolygon)) {
-				LOGGER
-						.warning("Be careful!! we're mapping an ArcSDE Shape type "
-								+ "to the generic Geometry class, but the shape type "
-								+ "does not really allows all geometry types!: "
-								+ "isCollection="
-								+ isCollection
-								+ ", isPoint="
-								+ isPoint
-								+ ", isLineString="
-								+ isLineString
-								+ ", isPolygon=" + isPolygon);
+				if (4 < (isCollection + isPoint + isLineString + isPolygon)) {
+					LOGGER
+							.warning("Be careful!! we're mapping an ArcSDE Shape type "
+									+ "to the generic Geometry class, but the shape type "
+									+ "does not really allows all geometry types!: "
+									+ "isCollection="
+									+ isCollection
+									+ ", isPoint="
+									+ isPoint
+									+ ", isLineString="
+									+ isLineString
+									+ ", isPolygon=" + isPolygon);
+				} else {
+					LOGGER.info("safely mapping SeShapeType to abstract Geometry");
+				}
+			} else if (isCollection == 1) {
+				if (isPoint == 1) {
+					clazz = MultiPoint.class;
+				} else if (isLineString == 1) {
+					clazz = MultiLineString.class;
+				} else if (isPolygon == 1) {
+					clazz = MultiPolygon.class;
+				} else {
+					isError = true;
+				}
 			} else {
-				LOGGER.info("safely mapping SeShapeType to abstract Geometry");
+				if (isPoint == 1) {
+					clazz = Point.class;
+				} else if (isLineString == 1) {
+					clazz = LineString.class;
+				} else if (isPolygon == 1) {
+					clazz = Polygon.class;
+				} else {
+					isError = true;
+				}
 			}
-		} else if (isCollection == 1) {
-			if (isPoint == 1) {
-				clazz = MultiPoint.class;
-			} else if (isLineString == 1) {
-				clazz = MultiLineString.class;
-			} else if (isPolygon == 1) {
-				clazz = MultiPolygon.class;
-			} else {
-				isError = true;
+
+			if (isError) {
+				throw new IllegalArgumentException("Cannot map the shape type to "
+						+ "a Geometry class: isCollection=" + isCollection
+						+ ", isPoint=" + isPoint + ", isLineString=" + isLineString
+						+ ", isPolygon=" + isPolygon);
 			}
-		} else {
-			if (isPoint == 1) {
-				clazz = Point.class;
-			} else if (isLineString == 1) {
-				clazz = LineString.class;
-			} else if (isPolygon == 1) {
-				clazz = Polygon.class;
-			} else {
-				isError = true;
-			}
+
 		}
-
-		if (isError) {
-			throw new IllegalArgumentException("Cannot map the shape type to "
-					+ "a Geometry class: isCollection=" + isCollection
-					+ ", isPoint=" + isPoint + ", isLineString=" + isLineString
-					+ ", isPolygon=" + isPolygon);
-		}
-
 		return clazz;
 	}
 

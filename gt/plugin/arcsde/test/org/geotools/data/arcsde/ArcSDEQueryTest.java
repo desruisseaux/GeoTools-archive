@@ -16,6 +16,22 @@
  */
 package org.geotools.data.arcsde;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.Query;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.FidFilter;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+
+import com.esri.sde.sdk.client.SeException;
+import com.vividsolutions.jts.geom.Envelope;
+
 import junit.framework.TestCase;
 
 
@@ -27,8 +43,18 @@ import junit.framework.TestCase;
  */
 public class ArcSDEQueryTest extends TestCase {
 
-	private ArcSDEQuery query;
+    private TestData testData;
+
+    private ArcSDEQuery queryAll;
+    private ArcSDEQuery queryFiltered;
+    
+    private ArcSDEDataStore dstore;
+    
+    private String typeName;
 	
+    private Query filteringQuery;
+    
+    private static final int FILTERING_COUNT = 3;
 	/**
      * Constructor for ArcSDEQueryTest.
      *
@@ -39,61 +65,142 @@ public class ArcSDEQueryTest extends TestCase {
     }
 
     /**
-     * DOCUMENT ME!
+     * loads /testData/testparams.properties into a Properties object, wich is
+     * used to obtain test tables names and is used as parameter to find the
+     * DataStore
      *
-     * @param args DOCUMENT ME!
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(ArcSDEQueryTest.class);
-    }
-
-    /*
-     * @see TestCase#setUp()
+     * @throws Exception DOCUMENT ME!
      */
     protected void setUp() throws Exception {
         super.setUp();
+        this.testData = new TestData();
+        this.testData.setUp();
+        dstore = testData.getDataStore();
+        typeName = testData.getLine_table();
+        FeatureType ftype = dstore.getSchema(typeName);
+        this.queryAll = ArcSDEQuery.createQuery(dstore, ftype, Query.ALL);
+        
+        //grab some fids
+        FeatureReader reader = dstore.getFeatureReader(typeName);
+        List fids = new ArrayList();
+        for(int i = 0; i < FILTERING_COUNT; i++){
+        	fids.add(reader.next().getID());
+        }
+        reader.close();
+        FidFilter filter = FilterFactory.createFilterFactory().createFidFilter();
+        filter.addAllFids(fids);
+        filteringQuery = new DefaultQuery(typeName, filter);
+        this.queryFiltered = ArcSDEQuery.createQuery(dstore, filteringQuery);
     }
 
-    /*
-     * @see TestCase#tearDown()
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
         super.tearDown();
-        this.query = null;
+        try{
+        	this.queryAll.close();
+        }catch(Exception e){
+        	//no-op
+        }
+        try{
+        	this.queryFiltered.close();
+        }catch(Exception e){
+        	//no-op
+        }
+        this.queryAll = null;
+        this.queryFiltered = null;
+        testData.tearDown(true, false);
+        testData = null;
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testCalculateResultCount() {
-    	throw new UnsupportedOperationException("Implement!");
+    public void testClose()throws IOException {
+    	assertNotNull(queryAll.connectionPool);
+    	assertNull(queryAll.connection);
+    	
+    	this.queryAll.execute();
+    	
+    	assertNotNull(queryAll.connectionPool);
+    	assertNotNull(queryAll.connection);
+    	
+    	this.queryAll.close();
+
+    	assertNull(queryAll.connectionPool);
+    	assertNull(queryAll.connection);
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testCalculateQueryExtent() {
-    	throw new UnsupportedOperationException("Implement!");
+    public void testFetch()throws IOException {
+    	try {
+    		queryAll.fetch();
+    		fail("fetch without calling execute");
+    	}catch(IOException e){
+    		//ok
+    	}
+    	
+    	queryAll.execute();
+    	assertNotNull(queryAll.fetch());
+    	
+    	queryAll.close();
+    	try{
+    		queryAll.fetch();
+    		fail("fetch after close!");
+    	}catch(IllegalStateException e){
+    		//ok
+    	}
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testClose() {
-    	throw new UnsupportedOperationException("Implement!");
+    public void testCalculateResultCount() throws Exception{
+    	FeatureReader reader = dstore.getFeatureReader(typeName);
+    	int readed = 0;
+    	while(reader.hasNext()){
+    		reader.next();
+    		readed++;
+    	}
+    	
+    	int calculated = queryAll.calculateResultCount();
+    	assertEquals(readed, calculated);
+    	
+    	calculated = queryFiltered.calculateResultCount();
+    	assertEquals(FILTERING_COUNT, calculated);
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testFetch() {
-    	throw new UnsupportedOperationException("Implement!");
+    public void testCalculateQueryExtent()throws Exception {
+    	FeatureReader reader = dstore.getFeatureReader(typeName);
+    	Envelope real = new Envelope();
+    	while(reader.hasNext()){
+    		real.expandToInclude(reader.next().getBounds());
+    	}
+    	
+    	Envelope e = queryAll.calculateQueryExtent();
+    	assertNotNull(e);
+    	assertEquals(real, e);
+    	
+    	reader.close();
+    
+    	reader = dstore.getFeatureReader(typeName, filteringQuery);
+    	real = new Envelope();
+    	while(reader.hasNext()){
+    		real.expandToInclude(reader.next().getBounds());
+    	}
+    	
+    	e = queryFiltered.calculateQueryExtent();
+    	assertNotNull(e);
+    	assertEquals(real, e);
+    	reader.close();
     }
 
-    /**
-     * DOCUMENT ME!
-     */
-    public void testFetchRow() {
-    	throw new UnsupportedOperationException("Implement!");
-    }
 }

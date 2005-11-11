@@ -53,6 +53,7 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LogicFilter;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
+import org.geotools.util.MonolineFormatter;
 import org.xml.sax.helpers.ParserAdapter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -115,7 +116,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
-        this.testData.tearDown();
+        this.testData.tearDown(false, true);
         this.testData = null;
         super.tearDown();
     }
@@ -181,7 +182,7 @@ public class ArcSDEDataStoreTest extends TestCase {
                     layerBounds.getMaxY() - 10);
             bbox.addRightGeometry(ff.createBBoxExpression(bounds));
 
-            for(int i = 0; i < 2; i++){
+            for(int i = 0; i < 20; i++){
             	LOGGER.info("Running iteration #" + i);
             	
             	FeatureResults res = source.getFeatures(bbox);

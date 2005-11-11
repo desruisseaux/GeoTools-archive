@@ -97,13 +97,14 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 *             DOCUMENT ME!
 	 */
 	protected void tearDown() throws Exception {
-		this.testData.tearDown();
+		this.testData.tearDown(false, true);
 		this.testData = null;
 		super.tearDown();
 	}
 
 	public void testNullSQLConstruct() throws Exception {
-		ArcSDEConnectionPool pool = this.testData.getDataStore().getConnectionPool();
+		ArcSDEConnectionPool pool = this.testData.getDataStore()
+				.getConnectionPool();
 		String typeName = this.testData.getPolygon_table();
 
 		String[] columns = { "POP_ADMIN" };
@@ -121,7 +122,8 @@ public class ArcSDEJavaApiTest extends TestCase {
 	}
 
 	public void testEmptySQLConstruct() throws Exception {
-		ArcSDEConnectionPool pool = this.testData.getDataStore().getConnectionPool();
+		ArcSDEConnectionPool pool = this.testData.getDataStore()
+				.getConnectionPool();
 		String typeName = this.testData.getPolygon_table();
 
 		String[] columns = { "POP_ADMIN" };
@@ -596,8 +598,8 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 */
 	public void testCreateBaseTable() throws SeException, IOException,
 			UnavailableConnectionException {
-		ArcSDEConnectionPool connPool = this.testData
-				.getDataStore().getConnectionPool();
+		ArcSDEConnectionPool connPool = this.testData.getDataStore()
+				.getConnectionPool();
 		SeConnection conn = connPool.getConnection();
 
 		SeLayer layer = new SeLayer(conn);
@@ -713,8 +715,8 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 */
 	public void testCreateNonStandardSchema() throws SeException, IOException,
 			UnavailableConnectionException {
-		ArcSDEConnectionPool connPool = this.testData
-				.getDataStore().getConnectionPool();
+		ArcSDEConnectionPool connPool = this.testData.getDataStore()
+				.getConnectionPool();
 		SeConnection conn = connPool.getConnection();
 
 		SeLayer layer = new SeLayer(conn);
@@ -836,4 +838,5 @@ public class ArcSDEJavaApiTest extends TestCase {
 			connPool.release(conn);
 		}
 	} // End method createBaseTable
+
 }

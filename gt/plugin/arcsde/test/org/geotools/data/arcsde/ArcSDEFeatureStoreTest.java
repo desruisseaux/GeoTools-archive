@@ -19,10 +19,12 @@ package org.geotools.data.arcsde;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
@@ -88,7 +90,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
-        testData.tearDown();
+        testData.tearDown(true, false);
         testData = null;
         super.tearDown();
     }
@@ -190,14 +192,15 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     }
 
     /**
-     * Tests the creation of new feature types, wich CRS and all.
+     * Tests the creation of new feature types, with CRS and all.
      * 
      * <p>
      * This test also ensures that the arcsde datastore is able of creating
      * schemas where the geometry attribute is not the last one. This is
      * important since to do so, the ArcSDE datastore must break the usual way
      * of creating schemas with the ArcSDE Java API, in which one first
-     * creates the table with all the non spatial attributes and finally
+     * creates the (non spatially enabled) "table" with all the non spatial 
+     * attributes and finally
      * creates the "layer", adding the spatial attribute to the previously
      * created table. So, this test ensures the datastore correctly works
      * arround this limitation.
@@ -321,6 +324,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         //(the count is wraped inside an array to be able of declaring
         //the variable as final and accessing it from inside the anonymous
         //inner class)
+        /*
         final int[] featureAddedEventCount = { 0 };
 
         fsource.addFeatureListener(new FeatureListener() {
@@ -334,7 +338,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
                     ++featureAddedEventCount[0];
                 }
             });
-
+        */
+        
         final int initialCount = fsource.getCount(Query.ALL);
 
         FeatureWriter writer = ds.getFeatureWriter(typeName,
@@ -356,9 +361,9 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         int fcount = fsource.getCount(Query.ALL);
         assertEquals(features.size() + initialCount, fcount);
 
-        String msg = "a FEATURES_ADDED event should have been called "
+        /*String msg = "a FEATURES_ADDED event should have been called "
             + features.size() + " times";
-        assertEquals(msg, features.size(), featureAddedEventCount[0]);
+        assertEquals(msg, features.size(), featureAddedEventCount[0]);*/
     }
 
     /**
@@ -366,8 +371,60 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      *
      * @throws UnsupportedOperationException DOCUMENT ME!
      */
-    public void testFeatureWriterTransaction() {
-        throw new UnsupportedOperationException("Don't forget to implement");
+    public void testFeatureWriterTransaction()throws Exception {
+        //the table created here is test friendly since it can hold
+        //any kind of geometries.
+        this.testData.createTemptTable(true);
+
+        String typeName = this.testData.getTemp_table();
+
+        DataStore ds = this.testData.getDataStore();
+        FeatureSource fsource = ds.getFeatureSource(typeName);
+
+        final int initialCount = fsource.getCount(Query.ALL);
+        final int writeCount = initialCount + 2;
+        FeatureCollection features = this.testData.createTestFeatures(LineString.class, writeCount);
+
+        //incremented on each feature added event to
+        //ensure events are being raised as expected
+        //(the count is wraped inside an array to be able of declaring
+        //the variable as final and accessing it from inside the anonymous
+        //inner class)
+        final int[] featureAddedEventCount = { 0 };
+
+        Transaction transaction = new DefaultTransaction();
+        FeatureWriter writer = ds.getFeatureWriter(typeName, Filter.NONE,
+                transaction);
+
+        Feature source;
+        SimpleFeature dest;
+
+        int count = 0;
+        for (FeatureIterator fi = features.features(); fi.hasNext(); count++) {
+        	if(count < initialCount){
+        		assertTrue("at index " + count, writer.hasNext());
+        	}else{
+        		assertFalse("at index " + count,writer.hasNext());
+        	}
+
+        	source = fi.next();
+            dest = (SimpleFeature)writer.next();
+            dest.setAttributes(source.getAttributes((Object[]) null));
+            writer.write();
+        }
+
+        transaction.commit();
+        writer.close();
+
+        //was the features really inserted?
+        int fcount = fsource.getCount(Query.ALL);
+        assertEquals(writeCount, fcount);
+
+        /*
+        String msg = "a FEATURES_ADDED event should have been called "
+            + features.size() + " times";
+        assertEquals(msg, features.size(), featureAddedEventCount[0]);
+        */
     }
 
     /**
@@ -375,8 +432,38 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      *
      * @throws UnsupportedOperationException DOCUMENT ME!
      */
-    public void testFeatureWriterAppend() {
-        throw new UnsupportedOperationException("Don't forget to implement");
+    public void testFeatureWriterAppend()throws Exception {
+        //the table created here is test friendly since it can hold
+        //any kind of geometries.
+        this.testData.createTemptTable(true);
+
+        String typeName = this.testData.getTemp_table();
+        FeatureCollection features = this.testData.createTestFeatures(LineString.class, 2);
+
+        DataStore ds = this.testData.getDataStore();
+        FeatureSource fsource = ds.getFeatureSource(typeName);
+
+        final int initialCount = fsource.getCount(Query.ALL);
+
+        FeatureWriter writer = ds.getFeatureWriterAppend(typeName,
+                Transaction.AUTO_COMMIT);
+        
+        Feature source;
+        SimpleFeature dest;
+
+        for (FeatureIterator fi = features.features(); fi.hasNext();) {
+            assertFalse(writer.hasNext());
+            source = fi.next();
+            dest = (SimpleFeature)writer.next();
+            dest.setAttributes(source.getAttributes((Object[]) null));
+            writer.write();
+        }
+
+        writer.close();
+
+        //was the features really inserted?
+        int fcount = fsource.getCount(Query.ALL);
+        assertEquals(features.size() + initialCount, fcount);
     }
 
     /**

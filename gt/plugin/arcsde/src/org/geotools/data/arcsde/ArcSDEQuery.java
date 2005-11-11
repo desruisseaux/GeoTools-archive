@@ -60,8 +60,22 @@ class ArcSDEQuery {
     /**
      * the pool from where to take a connection to pass to the new stream (the
      * stream is the SeQuery object, not the connection itself)
+     * <p>
+     * NOTE: this member is package visible only for unit test pourposes
+     * </p>
      */
-    private ArcSDEConnectionPool connectionPool;
+    ArcSDEConnectionPool connectionPool;
+
+    /**
+     * The connection to the ArcSDE server obtained when first created the
+     * SeQuery in <code>getSeQuery</code>. It is retained until
+     * <code>close()</code> is called. Do not use it directly, but through
+     * <code>getConnection()</code>.
+     * <p>
+     * NOTE: this member is package visible only for unit test pourposes
+     * </p>
+     */
+    SeConnection connection = null;
 
     /**
      * The exact feature type this query is about to request from the arcsde
@@ -83,14 +97,6 @@ class ArcSDEQuery {
      * ArcSDE Java API
      */
     private ArcSDEQuery.FilterSet filters;
-
-    /**
-     * The connection to the ArcSDE server obtained when first created the
-     * SeQuery in <code>getSeQuery</code>. It is retained until
-     * <code>close()</code> is called. Do not use it directly, but through
-     * <code>getConnection()</code>.
-     */
-    private SeConnection connection = null;
 
     /** The lazyly calculated result count */
     private int resultCount = -1;
@@ -269,7 +275,9 @@ class ArcSDEQuery {
 			} catch (SeException e) {
 				throw e;
 			}finally{
-				releaseConnection();
+				//as for GEOT-765, we no longer release the
+				//connection here
+				//releaseConnection();
 			}
         }
 
@@ -560,6 +568,7 @@ class ArcSDEQuery {
     private void releaseConnection() {
         if (this.connectionPool != null && this.connection != null) {
             this.connectionPool.release(this.connection);
+            this.connection = null;
         }
     }
 
@@ -573,6 +582,9 @@ class ArcSDEQuery {
     private SeConnection getConnection() throws DataSourceException {
         if (this.connection == null) {
             try {
+            	if(this.connectionPool == null){
+            		throw new IllegalStateException("query is closed");
+            	}
                 this.connection = this.connectionPool.getConnection();
             } catch (UnavailableConnectionException e) {
                 throw new DataSourceException("Can't obtain a connection: "
@@ -611,6 +623,7 @@ class ArcSDEQuery {
      */
     public void close() {
         close(this.query);
+        this.query = null;
         releaseConnection();
 
         if (this.connectionPool != null) {

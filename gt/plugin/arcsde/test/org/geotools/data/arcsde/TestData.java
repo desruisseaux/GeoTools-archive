@@ -148,12 +148,15 @@ public class TestData {
     /**
      * Must be called from inside the test's tearDown() method.
      */
-    public void tearDown() {
-        deleteTempTable();
+    public void tearDown(boolean cleanTestTable, boolean cleanPool) {
+    	if(cleanTestTable){
+    		deleteTempTable();
+    	}
+        if(cleanPool){
+	        ConnectionPoolFactory pfac = ConnectionPoolFactory.getInstance();
+	        pfac.clear();
+        }
         this.dataStore = null;
-
-        ConnectionPoolFactory pfac = ConnectionPoolFactory.getInstance();
-        pfac.clear();
     }
 
     /**
@@ -956,7 +959,7 @@ public class TestData {
             };
 
         MultiPolygon mp = gf.createMultiPolygon(polys);
-        System.out.println(mp);
+        //System.out.println(mp);
 
         return mp;
     }
