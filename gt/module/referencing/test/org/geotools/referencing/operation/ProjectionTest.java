@@ -176,12 +176,12 @@ public class ProjectionTest extends TestCase {
 
         // approx bristol UK
         params = mtFactory.getDefaultParameters("Equidistant_Cylindrical");
-        params.parameter("semi_major")        .setValue(6378137);
-        params.parameter("semi_minor")        .setValue(6378137);
-        params.parameter("central_meridian")  .setValue(  0.000);
-        params.parameter("latitude_of_origin").setValue(  0.000);
-        params.parameter("false_easting")     .setValue(  0.0  );
-        params.parameter("false_northing")    .setValue(  0.0  );
+        params.parameter("semi_major")         .setValue(6378137);
+        params.parameter("semi_minor")         .setValue(6378137);
+        params.parameter("central_meridian")   .setValue(  0.000);
+        params.parameter("standard_parallel_1").setValue(  0.000);
+        params.parameter("false_easting")      .setValue(  0.0  );
+        params.parameter("false_northing")     .setValue(  0.0  );
         transform = mtFactory.createParameterizedTransform(params);
         if (VERBOSE) {
             System.out.println(transform);
