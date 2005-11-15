@@ -60,6 +60,11 @@
       <url>http://java.sun.com/products/java-media/3D/</url>
     </dependency>
     <dependency>
+      <artifactId>api</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>    
+    <dependency>  
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
       <version>2.2.x</version>

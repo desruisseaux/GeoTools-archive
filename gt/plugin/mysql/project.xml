@@ -56,6 +56,11 @@
         <version>3.0.9</version>
     </dependency>
     <dependency>
+      <artifactId>api</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>    
+    <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
       <version>2.2.x</version>

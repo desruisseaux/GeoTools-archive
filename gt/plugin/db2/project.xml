@@ -24,6 +24,11 @@ http://www.software.ibm.com/data/spatial.
   </developers>
   <dependencies>
     <dependency>
+      <artifactId>api</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>  
+    <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
       <version>2.2.x</version>

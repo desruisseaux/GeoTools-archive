@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
@@ -123,6 +123,11 @@
   </developers>
 
   <dependencies>
+    <dependency>
+      <artifactId>api</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>
     <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
