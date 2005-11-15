@@ -273,8 +273,9 @@ public class GeoTiffTest extends TestCase {
         File testFile = TestData.file(GeoTiffTest.class, "cir.tif");
         assertNotNull("Framework error: no test data!", testFile);
 
-        FileSystemGridCoverageExchange gce = new FileSystemGridCoverageExchange();
-        gce.add(testFile);
+        FileSystemGridCoverageExchange gce = new FileSystemGridCoverageExchange( testFile.getParentFile() );
+        gce.refresh();
+        // gce.add(testFile);
 
         // get an iterator over catalog entries
         Iterator it = gce.getFiles().iterator();
