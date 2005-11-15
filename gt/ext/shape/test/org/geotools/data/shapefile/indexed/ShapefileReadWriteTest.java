@@ -107,8 +107,10 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
     }
 
     public void testWriteTwice() throws Exception {
-    	IndexedShapefileDataStore s1 = new IndexedShapefileDataStore(getTestResource(
-    			 "statepop.shp"));
+//    	IndexedShapefileDataStore s1 = new IndexedShapefileDataStore(getTestResource("statepop.shp"));
+//    	IndexedShapefileDataStore s1 = new IndexedShapefileDataStore(getTestResource("pointtest.shp"));
+//    	IndexedShapefileDataStore s1 = new IndexedShapefileDataStore(getTestResource("polygontest.shp"));
+    	IndexedShapefileDataStore s1 = new IndexedShapefileDataStore(getTestResource("stream.shp"));
     String typeName = s1.getTypeNames()[0];
     FeatureSource source = s1.getFeatureSource(typeName);
     FeatureType type = source.getSchema();

@@ -272,6 +272,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         f.delete();
     }
 
+
     /**
      * Obtain a ReadableByteChannel from the given URL. If the url protocol is file, a FileChannel
      * will be returned. Otherwise a generic channel will be obtained from the urls input stream.
@@ -318,8 +319,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @return DOCUMENT ME!
      * @throws IOException DOCUMENT ME!
      */
-    protected WritableByteChannel getWriteChannel( URL url ) throws IOException {
-        WritableByteChannel channel;
+    protected WritableByteChannel getWriteChannel(URL url) throws IOException  {
+    	WritableByteChannel channel;
 
         if (url.getProtocol().equals("file")) { // && useMemoryMappedBuffer) {
 
@@ -343,9 +344,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         }
 
         return channel;
-    }
+	}
 
-    /**
+	/**
      * Create a FeatureReader for the provided type name.
      * 
      * @param typeName The name of the FeatureType to create a reader for.
@@ -661,7 +662,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         clear();
         schema = featureType;
         
-        
         CoordinateReferenceSystem cs = featureType.getDefaultGeometry().getCoordinateSystem();
 
         long temp=System.currentTimeMillis();
@@ -686,7 +686,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             }
 
             FileChannel shpChannel = (FileChannel) getWriteChannel(getStorageURL(shpURL,temp));
-            FileChannel shxChannel = (FileChannel) getWriteChannel(getStorageURL(shpURL,temp));
+            FileChannel shxChannel = (FileChannel) getWriteChannel(getStorageURL(shxURL,temp));
 
             ShapefileWriter writer = new ShapefileWriter( shpChannel, shxChannel, readWriteLock);
             try {
@@ -721,23 +721,20 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             }
         }
 
-        copyAndDelete(shpURL, temp);
-        copyAndDelete(dbfURL, temp);
-
-        File prj = new File(prjURL.getFile());
-
         if (cs != null) {
-            prj.createNewFile();
-
             String s = cs.toWKT();
-            FileWriter out = new FileWriter(prj);
+            FileWriter out = new FileWriter(getStorageFile(prjURL, temp));
             try{
-            out.write(s);
+            	out.write(s);
             }finally{
-            out.close();
+            	out.close();
             }
         }
-            
+
+        copyAndDelete(shpURL, temp);
+        copyAndDelete(shxURL, temp);
+        copyAndDelete(dbfURL, temp);
+        copyAndDelete(prjURL, temp);
 
     }
 
@@ -1106,7 +1103,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         }
         
         try {
-        	if( !storage.renameTo(dest) ){
+        	if( storage.exists() && !storage.renameTo(dest) ){
 	            readWriteLock.lockWrite();
 	            in = new FileInputStream(storage).getChannel();
 	            out = new FileOutputStream(dest).getChannel();

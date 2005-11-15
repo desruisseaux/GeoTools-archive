@@ -36,8 +36,6 @@
 package org.geotools.data.shapefile.indexed;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -45,8 +43,6 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -279,61 +275,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      */
     public boolean isLocal() {
         return shpURL.getProtocol().equals("file");
-    }
-
-    /**
-     * Obtain a ReadableByteChannel from the given URL. If the url protocol is
-     * file, a FileChannel will be returned. Otherwise a generic channel will
-     * be obtained from the urls input stream.
-     *
-     * @param url DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     */
-    protected ReadableByteChannel getReadChannel(URL url)
-        throws IOException {
-        ReadableByteChannel channel = super.getReadChannel(url);
-
-        if (url.getProtocol().equals("file")) {
-            if (useMemoryMappedBuffer || url.getFile().endsWith("shx")
-                    || url.getFile().endsWith("qix")
-                    || url.getFile().endsWith("grx")) {
-                ((FileChannel) channel).map(MapMode.READ_ONLY, 0,
-                    ((FileChannel) channel).size());
-            }
-        } 
-
-        return channel;
-    }
-
-    /**
-     * Obtain a WritableByteChannel from the given URL. If the url protocol is
-     * file, a FileChannel will be returned. Currently, this method will
-     * return a generic channel for remote urls, however both shape and dbf
-     * writing can only occur with a local FileChannel channel.
-     *
-     * @param url DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     */
-    protected WritableByteChannel getWriteChannel(URL url)
-        throws IOException {
-        WritableByteChannel channel=super.getWriteChannel(url);
-
-        if (url.getProtocol().equals("file")) {
-            if (useMemoryMappedBuffer || url.getFile().endsWith("shx")
-                    || url.getFile().endsWith("qix")
-                    || url.getFile().endsWith("grx")) {
-                ((FileChannel) channel).map(MapMode.READ_WRITE, 0,
-                    ((FileChannel) channel).size());
-            }
-        } 
-
-        return channel;
     }
 
     /**
