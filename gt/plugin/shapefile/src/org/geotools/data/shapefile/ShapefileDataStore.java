@@ -48,7 +48,6 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Collections;
@@ -84,7 +83,6 @@ import org.geotools.data.shapefile.shp.ShapefileException;
 import org.geotools.data.shapefile.shp.ShapefileHeader;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileWriter;
-import org.geotools.data.shapefile.shp.xml.Metadata;
 import org.geotools.data.shapefile.shp.xml.ShpXmlFileReader;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -338,7 +336,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
             channel = raf.getChannel();
 
-            FileLock lock = ((FileChannel) channel).lock();
+            ((FileChannel) channel).lock();
         } else {
             OutputStream out = url.openConnection().getOutputStream();
             channel = Channels.newChannel(out);
@@ -535,6 +533,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected FeatureWriter createFeatureWriter( String typeName, Transaction transaction )
             throws IOException {
         typeCheck(typeName);
+        FileOutputStream out = new FileOutputStream(shpURL.getFile());
+        out.close();
 
         return new Writer(typeName);
     }
@@ -660,10 +660,14 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
         clear();
         schema = featureType;
+        
+        
+        CoordinateReferenceSystem cs = featureType.getDefaultGeometry().getCoordinateSystem();
 
-            CoordinateReferenceSystem cs = featureType.getDefaultGeometry().getCoordinateSystem();
-
-            Class geomType = featureType.getDefaultGeometry().getType();
+        long temp=System.currentTimeMillis();
+        if (isLocal()) {
+        	
+        	Class geomType = featureType.getDefaultGeometry().getType();
             ShapeType shapeType;
 
             if (Point.class.isAssignableFrom(geomType)) {
@@ -680,53 +684,61 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 // can't determine what type because type is Geometry so just return.
                 return;
             }
-            
-            if (!new File(shpURL.getFile()).exists()) {
-                ShapefileWriter writer = new ShapefileWriter((FileChannel) this
-                        .getWriteChannel(shpURL), (FileChannel) getWriteChannel(shxURL),
-                        this.readWriteLock);
-                try {
-                    Envelope env = new Envelope(-179, 179, -89, 89);
-                    Envelope transformedBounds;
-                    if (cs != null) {
-                        try {
-                            transformedBounds = JTS.transform(env, CRS.transform(
-                                    DefaultGeographicCRS.WGS84, cs, true));
-                        } catch (Exception e) {
-                            cs = null;
-                            transformedBounds = env;
-                        }
-                    } else {
+
+            FileChannel shpChannel = (FileChannel) getWriteChannel(getStorageURL(shpURL,temp));
+            FileChannel shxChannel = (FileChannel) getWriteChannel(getStorageURL(shpURL,temp));
+
+            ShapefileWriter writer = new ShapefileWriter( shpChannel, shxChannel, readWriteLock);
+            try {
+                Envelope env = new Envelope(-179, 179, -89, 89);
+                Envelope transformedBounds;
+                if (cs != null) {
+                    try {
+                        transformedBounds = JTS.transform(env, CRS.transform(
+                                DefaultGeographicCRS.WGS84, cs, true));
+                    } catch (Exception e) {
+                        cs = null;
                         transformedBounds = env;
                     }
-
-                    
-
-                    writer.writeHeaders(transformedBounds, shapeType, 0, 100);
-                } finally {
-                    writer.close();
+                } else {
+                    transformedBounds = env;
                 }
-                DbaseFileHeader dbfheader = createDbaseHeader(featureType);
 
-                dbfheader.setNumRecords(0);
-                WritableByteChannel writeChannel = getWriteChannel(dbfURL);
-                try {
-                    dbfheader.writeHeader(writeChannel);
-                } finally {
-                    writeChannel.close();
-                }
+                writer.writeHeaders(transformedBounds, shapeType, 0, 100);
+            } finally {
+                writer.close();
             }
+            
 
-            File prj = new File(prjURL.getFile());
+            DbaseFileHeader dbfheader = createDbaseHeader(featureType);
 
-            if (cs != null) {
-                prj.createNewFile();
-
-                String s = cs.toWKT();
-                FileWriter out = new FileWriter(prj);
-                out.write(s);
-                out.close();
+            dbfheader.setNumRecords(0);
+            WritableByteChannel writeChannel = getWriteChannel(getStorageURL(dbfURL, temp));
+            try {
+                dbfheader.writeHeader(writeChannel);
+            } finally {
+                writeChannel.close();
             }
+        }
+
+        copyAndDelete(shpURL, temp);
+        copyAndDelete(dbfURL, temp);
+
+        File prj = new File(prjURL.getFile());
+
+        if (cs != null) {
+            prj.createNewFile();
+
+            String s = cs.toWKT();
+            FileWriter out = new FileWriter(prj);
+            try{
+            out.write(s);
+            }finally{
+            out.close();
+            }
+        }
+            
+
     }
 
 
@@ -1048,6 +1060,78 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             }
         }
     }
+    
+
+    /**
+     * Get a temporary URL for storage based on the one passed in
+     * 
+     * @param url DOCUMENT ME!
+     * @return DOCUMENT ME!
+     * @throws java.net.MalformedURLException DOCUMENT ME!
+     */
+    protected URL getStorageURL( URL url , long temp) throws java.net.MalformedURLException {
+        return (temp == 0) ? url : getStorageFile(url, temp).toURL();
+    }
+
+    /**
+     * Get a temproray File based on the URL passed in
+     * 
+     * @param url DOCUMENT ME!
+     * @return DOCUMENT ME!
+     */
+    protected File getStorageFile( URL url , long temp ) {
+        String f = url.getFile();
+        f = temp + f.substring(f.lastIndexOf("/") + 1);
+
+        File tf = new File(System.getProperty("java.io.tmpdir"), f);
+
+        return tf;
+    }
+
+    
+    /**
+     * Copy the file at the given URL to the original
+     * 
+     * @param src DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
+     */
+    protected void copyAndDelete( URL src, long temp ) throws IOException {
+        File storage = getStorageFile(src, temp);
+        File dest = new File(src.getFile());
+        FileChannel in = null;
+        FileChannel out = null;
+
+        if(dest.exists()){
+        	dest.delete();
+        }
+        
+        try {
+        	if( !storage.renameTo(dest) ){
+	            readWriteLock.lockWrite();
+	            in = new FileInputStream(storage).getChannel();
+	            out = new FileOutputStream(dest).getChannel();
+	
+	            long len = in.size();
+	            long copied = out.transferFrom(in, 0, in.size());
+	
+	            if (len != copied) {
+	                throw new IOException("unable to complete write");
+	            }
+	
+	            storage.delete();
+        	}
+        } finally {
+            readWriteLock.unlockWrite();
+
+            if (in != null) {
+                in.close();
+            }
+
+            if (out != null) {
+                out.close();
+            }
+        }
+    }
 
     /**
      * A FeatureWriter for ShapefileDataStore. Uses a write and annotate technique to avoid
@@ -1134,38 +1218,12 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             transferCache = new Object[cnt];
 
             // open underlying writers
-            shpWriter = new ShapefileWriter((FileChannel) getWriteChannel(getStorageURL(shpURL)),
-                    (FileChannel) getWriteChannel(getStorageURL(shxURL)), readWriteLock);
+            shpWriter = new ShapefileWriter((FileChannel) getWriteChannel(getStorageURL(shpURL, temp)),
+                    (FileChannel) getWriteChannel(getStorageURL(shxURL,temp)), readWriteLock);
 
-            dbfChannel = (FileChannel) getWriteChannel(getStorageURL(dbfURL));
+            dbfChannel = (FileChannel) getWriteChannel(getStorageURL(dbfURL,temp));
             dbfHeader = createDbaseHeader(featureType);
             dbfWriter = new DbaseFileWriter(dbfHeader, dbfChannel);
-        }
-
-        /**
-         * Get a temporary URL for storage based on the one passed in
-         * 
-         * @param url DOCUMENT ME!
-         * @return DOCUMENT ME!
-         * @throws java.net.MalformedURLException DOCUMENT ME!
-         */
-        protected URL getStorageURL( URL url ) throws java.net.MalformedURLException {
-            return (temp == 0) ? url : getStorageFile(url).toURL();
-        }
-
-        /**
-         * Get a temproray File based on the URL passed in
-         * 
-         * @param url DOCUMENT ME!
-         * @return DOCUMENT ME!
-         */
-        protected File getStorageFile( URL url ) {
-            String f = url.getFile();
-            f = temp + f.substring(f.lastIndexOf("/") + 1);
-
-            File tf = new File(System.getProperty("java.io.tmpdir"), f);
-
-            return tf;
         }
 
         /**
@@ -1216,48 +1274,12 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 return;
             }
 
-            copyAndDelete(shpURL);
-            copyAndDelete(shxURL);
-            copyAndDelete(dbfURL);
+            copyAndDelete(shpURL,temp);
+            copyAndDelete(shxURL,temp);
+            copyAndDelete(dbfURL,temp);
         }
 
-        /**
-         * Copy the file at the given URL to the original
-         * 
-         * @param src DOCUMENT ME!
-         * @throws IOException DOCUMENT ME!
-         */
-        protected void copyAndDelete( URL src ) throws IOException {
-            File storage = getStorageFile(src);
-            File dest = new File(src.getFile());
-            FileChannel in = null;
-            FileChannel out = null;
-
-            try {
-                readWriteLock.lockWrite();
-                in = new FileInputStream(storage).getChannel();
-                out = new FileOutputStream(dest).getChannel();
-
-                long len = in.size();
-                long copied = out.transferFrom(in, 0, in.size());
-
-                if (len != copied) {
-                    throw new IOException("unable to complete write");
-                }
-
-                storage.delete();
-            } finally {
-                readWriteLock.unlockWrite();
-
-                if (in != null) {
-                    in.close();
-                }
-
-                if (out != null) {
-                    out.close();
-                }
-            }
-        }
+        
 
         /**
          * Release resources and flush the header information.

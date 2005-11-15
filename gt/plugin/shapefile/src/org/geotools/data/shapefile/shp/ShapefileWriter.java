@@ -64,14 +64,12 @@ public class ShapefileWriter {
   int offset;
   int lp;
   int cnt;
-private Lock lock;
   
   /** Creates a new instance of ShapeFileWriter 
  * @throws IOException */
   public ShapefileWriter(FileChannel shpChannel, FileChannel shxChannel, Lock lock) throws IOException {
     this.shpChannel = shpChannel;
     this.shxChannel = shxChannel;
-    this.lock=lock;
   }
   
 //  private void allocateBuffers(int geomCnt, int fileLength) throws IOException {
@@ -226,7 +224,7 @@ private Lock lock;
     if(indexBuffer instanceof MappedByteBuffer) {
         NIOUtilities.clean(indexBuffer);
     }
-    if(indexBuffer instanceof MappedByteBuffer) {
+    if(shapeBuffer instanceof MappedByteBuffer) {
         NIOUtilities.clean(shapeBuffer);
     }
     indexBuffer = null;

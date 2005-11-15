@@ -35,14 +35,22 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.nio.channels.FileChannel.MapMode;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+
 import org.geotools.data.AbstractAttributeIO;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
@@ -97,25 +105,15 @@ import org.geotools.index.rtree.fs.FileSystemPageStore;
 import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.xml.gml.GMLSchema;
 import org.opengis.referencing.FactoryException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -296,29 +294,16 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      */
     protected ReadableByteChannel getReadChannel(URL url)
         throws IOException {
-        ReadableByteChannel channel = null;
+        ReadableByteChannel channel = super.getReadChannel(url);
 
         if (url.getProtocol().equals("file")) {
-            File file = new File(url.getFile());
-
-            if (!file.exists() || !file.canRead()) {
-                throw new IOException(
-                    "File either doesn't exist or is unreadable : " + file);
-            }
-
-            FileInputStream in = new FileInputStream(file);
-            channel = in.getChannel();
-
             if (useMemoryMappedBuffer || url.getFile().endsWith("shx")
                     || url.getFile().endsWith("qix")
                     || url.getFile().endsWith("grx")) {
                 ((FileChannel) channel).map(MapMode.READ_ONLY, 0,
                     ((FileChannel) channel).size());
             }
-        } else {
-            InputStream in = url.openConnection().getInputStream();
-            channel = Channels.newChannel(in);
-        }
+        } 
 
         return channel;
     }
@@ -337,55 +322,18 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      */
     protected WritableByteChannel getWriteChannel(URL url)
         throws IOException {
-        WritableByteChannel channel;
+        WritableByteChannel channel=super.getWriteChannel(url);
 
         if (url.getProtocol().equals("file")) {
-            File f = new File(url.getFile());
-
-            if (!f.exists() && !f.createNewFile()) {
-                throw new IOException("Cannot create file " + f);
-            }
-
-            RandomAccessFile raf = new RandomAccessFile(f, "rw");
-            channel = raf.getChannel();
-
             if (useMemoryMappedBuffer || url.getFile().endsWith("shx")
                     || url.getFile().endsWith("qix")
                     || url.getFile().endsWith("grx")) {
                 ((FileChannel) channel).map(MapMode.READ_WRITE, 0,
                     ((FileChannel) channel).size());
             }
-        } else {
-            OutputStream out = url.openConnection().getOutputStream();
-            channel = Channels.newChannel(out);
-        }
+        } 
 
         return channel;
-    }
-
-    /**
-     * Create a FeatureReader for the provided type name.
-     *
-     * @param typeName The name of the FeatureType to create a reader for.
-     *
-     * @return A new FeatureReader.
-     *
-     * @throws IOException If an error occurs during creation
-     */
-    protected FeatureReader getFeatureReader(String typeName)
-        throws IOException {
-        typeCheck(typeName);
-
-        return getFeatureReader();
-    }
-
-    protected FeatureReader getFeatureReader() throws IOException {
-        try {
-            return createFeatureReader(getSchema().getTypeName(),
-                getAttributesReader(true, null), schema);
-        } catch (SchemaException se) {
-            throw new DataSourceException("Error creating schema", se);
-        }
     }
 
     /**
@@ -1403,43 +1351,14 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
             // open underlying writers
             shpWriter = new ShapefileWriter((FileChannel) getWriteChannel(
-                        getStorageURL(shpURL)),
-                    (FileChannel) getWriteChannel(getStorageURL(shxURL)),
+                        getStorageURL(shpURL, temp)),
+                    (FileChannel) getWriteChannel(getStorageURL(shxURL, temp)),
                     readWriteLock);
 
-            dbfChannel = (FileChannel) getWriteChannel(getStorageURL(dbfURL));
+            dbfChannel = (FileChannel) getWriteChannel(getStorageURL(dbfURL, temp));
             dbfHeader = createDbaseHeader();
             dbfWriter = new DbaseFileWriter(dbfHeader, dbfChannel);
-        }
 
-        /**
-         * Get a temporary URL for storage based on the one passed in
-         *
-         * @param url DOCUMENT ME!
-         *
-         * @return DOCUMENT ME!
-         *
-         * @throws java.net.MalformedURLException DOCUMENT ME!
-         */
-        protected URL getStorageURL(URL url)
-            throws java.net.MalformedURLException {
-            return (temp == 0) ? url : getStorageFile(url).toURL();
-        }
-
-        /**
-         * Get a temproray File based on the URL passed in
-         *
-         * @param url DOCUMENT ME!
-         *
-         * @return DOCUMENT ME!
-         */
-        protected File getStorageFile(URL url) {
-            String f = url.getFile();
-            f = temp + f.substring(f.lastIndexOf("/") + 1);
-
-            File tf = new File(System.getProperty("java.io.tmpdir"), f);
-
-            return tf;
         }
 
         /**
@@ -1545,49 +1464,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                 return;
             }
 
-            copyAndDelete(shpURL);
-            copyAndDelete(shxURL);
-            copyAndDelete(dbfURL);
+            copyAndDelete(shpURL, temp);
+            copyAndDelete(shxURL, temp);
+            copyAndDelete(dbfURL, temp);
         }
 
-        /**
-         * Copy the file at the given URL to the original
-         *
-         * @param src DOCUMENT ME!
-         *
-         * @throws IOException DOCUMENT ME!
-         */
-        protected void copyAndDelete(URL src) throws IOException {
-            File storage = getStorageFile(src);
-            File dest = new File(src.getFile());
-            FileChannel in = null;
-            FileChannel out = null;
-
-            try {
-                readWriteLock.lockWrite();
-                in = new FileInputStream(storage).getChannel();
-                out = new FileOutputStream(dest).getChannel();
-
-                long len = in.size();
-                long copied = out.transferFrom(in, 0, in.size());
-
-                if (len != copied) {
-                    throw new IOException("unable to complete write");
-                }
-
-                storage.delete();
-            } finally {
-                readWriteLock.unlockWrite();
-
-                if (in != null) {
-                    in.close();
-                }
-
-                if (out != null) {
-                    out.close();
-                }
-            }
-        }
 
         /**
          * Release resources and flush the header information.
@@ -1598,6 +1479,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             if (featureReader == null) {
                 throw new IOException("Writer closed");
             }
+            
 
             // make sure to write the last feature...
             if (currentFeature != null) {
@@ -1676,19 +1558,19 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                             buildRTree();
                             filename = shpURL.getFile().substring(0,
                                     shpURL.getFile().length() - 4);
-                            file = new File(filename + ".qix");
+                            File toDelete= new File(filename + ".qix");
 
-                            if (file.exists()) {
-                                file.delete();
+                            if (toDelete.exists()) {
+                            	toDelete.delete();
                             }
                         } else if (treeType == TREE_QIX) {
                             buildQuadTree();
                             filename = shpURL.getFile().substring(0,
                                     shpURL.getFile().length() - 4);
-                            file = new File(filename + ".grx");
+                            File otherIndex= new File(filename + ".grx");
 
-                            if (file.exists()) {
-                                file.delete();
+                            if (otherIndex.exists()) {
+                            	otherIndex.delete();
                             }
                         }
                     }

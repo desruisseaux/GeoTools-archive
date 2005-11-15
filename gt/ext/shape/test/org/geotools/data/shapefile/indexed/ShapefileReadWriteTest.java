@@ -27,6 +27,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
+import org.geotools.data.Query;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -34,6 +35,7 @@ import org.geotools.feature.FeatureType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -77,8 +79,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
 
         for (int i = 0, ii = files.length; i < ii; i++) {
             try {
-                test(files[i], false);
-                test(files[i], true);
+                test(files[i]);
             } catch (Exception e) {
                 e.printStackTrace();
                 errors.append("\nFile " + files[i] + " : " + e.getMessage());
@@ -105,6 +106,43 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         throw fail;
     }
 
+    public void testWriteTwice() throws Exception {
+    	IndexedShapefileDataStore s1 = new IndexedShapefileDataStore(getTestResource(
+    			 "statepop.shp"));
+    String typeName = s1.getTypeNames()[0];
+    FeatureSource source = s1.getFeatureSource(typeName);
+    FeatureType type = source.getSchema();
+    FeatureCollection one = source.getFeatures();
+    File tmp = getTempFile();
+
+    IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();
+    
+	doubleWrite(type, one, tmp, maker, false);
+	doubleWrite(type, one, tmp, maker, true);
+	}
+
+	private void doubleWrite(FeatureType type, FeatureCollection one, File tmp, IndexedShapefileDataStoreFactory maker, boolean memorymapped) throws IOException, MalformedURLException {
+		IndexedShapefileDataStore s;
+		s = (IndexedShapefileDataStore) maker.createDataStore(tmp.toURL(),
+		        memorymapped);
+
+
+		
+		s.createSchema(type);
+
+		
+		FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
+		FeatureReader reader = one.reader();
+		
+		
+		store.addFeatures(reader);
+		reader = one.reader();
+		store.addFeatures(reader);
+
+		s = new IndexedShapefileDataStore(tmp.toURL());
+		assertEquals(one.getCount()*2, store.getCount(Query.ALL));
+	}
+    
     public void testConcurrentReadWrite() throws Exception {
         final File file = getTempFile();
         Runnable reader = new Runnable() {
@@ -160,11 +198,10 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
             Thread.yield();
         }
 
-        test(files[0], true);
-        test(files[0], false);
+        test(files[0]);
     }
 
-    void test(String f, boolean memorymapped) throws Exception {
+    void test(String f) throws Exception {
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(getTestResource(
                     f));
         String typeName = s.getTypeNames()[0];
@@ -174,7 +211,8 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         File tmp = getTempFile();
 
         IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();
-        test(type, one, tmp, maker, memorymapped);
+        test(type, one, tmp, maker, false);
+        test(type, one, tmp, maker, true);
     }
 
     private void test(FeatureType type, FeatureCollection one, File tmp,
@@ -185,10 +223,15 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         s = (IndexedShapefileDataStore) maker.createDataStore(tmp.toURL(),
                 memorymapped);
 
+
+        
         s.createSchema(type);
 
+        
         FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
         FeatureReader reader = one.reader();
+        
+        
         store.addFeatures(reader);
 
         s = new IndexedShapefileDataStore(tmp.toURL());
