@@ -121,10 +121,10 @@ public class FileSystemGridCoverageExchange implements GridCoverageExchange {
      */
     public GridCoverageReader getReader(Object source)
         throws IOException {
-        assert (source instanceof CatalogEntry);
+        assert (source instanceof FSCatalogEntry);
 
-        CatalogEntry entry = (CatalogEntry) source;
-        Format format = ((FileMetadata) entry.getMetadata(0)).getFormat();
+        FSCatalogEntry entry = (FSCatalogEntry) source;
+        Format format = entry.getMetadata(0).getFormat();
 
         return ((AbstractGridFormat)format).getReader(source);
     }
