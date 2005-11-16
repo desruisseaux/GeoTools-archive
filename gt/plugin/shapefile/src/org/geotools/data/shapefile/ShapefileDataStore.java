@@ -534,8 +534,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected FeatureWriter createFeatureWriter( String typeName, Transaction transaction )
             throws IOException {
         typeCheck(typeName);
-        FileOutputStream out = new FileOutputStream(shpURL.getFile());
-        out.close();
 
         return new Writer(typeName);
     }

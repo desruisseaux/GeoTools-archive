@@ -148,7 +148,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     
     private ShapefileDataStore createDataStore(File f) throws Exception {
         FeatureCollection fc = createFeatureCollection();
-        f.createNewFile();
         ShapefileDataStore sds = new ShapefileDataStore(f.toURL());
         writeFeatures(sds, fc);
         return sds;
