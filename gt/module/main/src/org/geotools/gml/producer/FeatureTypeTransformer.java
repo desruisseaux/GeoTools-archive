@@ -110,6 +110,11 @@ import com.vividsolutions.jts.geom.Polygon;
  * xs:dateTime
  * </td></tr>
  * <tr><td>
+ * java.lang.Boolean
+ * </td><td>
+ * xs:boolean
+ * </td></tr>
+ * <tr><td>
  * com.vividsolutions.jts.geom.Point
  * </td><td>
  * gml:PointPropertyType
@@ -304,6 +309,8 @@ public class FeatureTypeTransformer extends TransformerBase {
                 encodeString(attribute);
             } else if (Geometry.class.isAssignableFrom(type)) {
                 encodeGeometry(attribute);
+            } else if (type == Boolean.class) {
+                encodeBoolean(attribute);
 
                 /*} else if (FeatureType.class.isAssignableFrom(type)) {
                 
@@ -313,6 +320,24 @@ public class FeatureTypeTransformer extends TransformerBase {
             }
         }
 
+        /**
+         * Encode an AttributeType whose value type is a Boolean.
+         *
+         * @param attribute
+         *
+         * @throws SAXException
+         */
+        protected void encodeBoolean(AttributeType attribute)
+            throws SAXException {
+            AttributesImpl atts = createStandardAttributes(attribute);
+
+            atts.addAttribute("", "type", "type", "", "xs:boolean");
+
+            contentHandler.startElement(SCHEMA_NS, "element", "xs:element", atts);
+
+            contentHandler.endElement(SCHEMA_NS, "element", "xs:element");
+        }
+        
         /**
          * Encode an AttributeType whose value type is a String.
          *
