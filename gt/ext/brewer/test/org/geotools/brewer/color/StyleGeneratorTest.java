@@ -90,6 +90,10 @@ public class StyleGeneratorTest extends DataTestCase {
         Feature feature2 = it.next();
         assertEquals("2", feature1.getAttribute(attribName).toString());
         assertEquals("3", feature2.getAttribute(attribName).toString());
+        
+        //test the sort order of the items
+        assertEquals("rule01", rule[0].getName());
+        assertEquals("rule02", rule[1].getName());
     }
 
     public void testDiverging() throws Exception {

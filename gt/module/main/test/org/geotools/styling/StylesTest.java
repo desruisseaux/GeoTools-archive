@@ -2,6 +2,7 @@ package org.geotools.styling;
 
 import java.awt.Color;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -167,6 +168,33 @@ public class StylesTest extends TestCase {
 		String[] styleExpr = Styles.toStyleExpression(new Filter[] {newFilter1, newFilter2});
 		assertEquals("40..50", styleExpr[0]);
 		assertEquals("66", styleExpr[1]);
+	}
+	
+	public void testModifyFTS() throws Exception {
+		System.out.println("testModifyFTS_Ranged");
+		FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
+		System.out.println("old="+Styles.toStyleExpression(fts.getRules()[1].getFilter()));
+		Styles.modifyFTS(fts, 1, "45..80");
+		Rule[] newRules = fts.getRules();
+		System.out.println("new="+Styles.toStyleExpression(newRules[1].getFilter()));
+		assertEquals("45..80", Styles.toStyleExpression(newRules[1].getFilter()));
+		assertTrue(newRules[1].getFilter().getFilterType() == Filter.LOGIC_AND);
+		Iterator iterator = ((LogicFilter) newRules[1].getFilter()).getFilterIterator();
+		// we're expecting 2 compare subfilters
+		CompareFilter filter1 = (CompareFilter) iterator.next();
+		CompareFilter filter2 = (CompareFilter) iterator.next();
+		assertFalse(iterator.hasNext());
+		//filter1
+		System.out.println("filter1="+filter1.toString());
+		//filter2
+		System.out.println("filter2="+filter2.toString());
+		
+		System.out.println("testModifyFTS_Explicit");
+		System.out.println("old="+Styles.toStyleExpression(fts.getRules()[0].getFilter()));
+		Styles.modifyFTS(fts, 0, "90,91, 92, 93");
+		newRules = fts.getRules();
+		System.out.println("new="+Styles.toStyleExpression(newRules[0].getFilter()));
+		assertEquals("90, 91, 92, 93", Styles.toStyleExpression(newRules[0].getFilter()));
 	}
 	
 	public void testGetAttributeTypes() {

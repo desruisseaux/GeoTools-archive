@@ -15,6 +15,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
@@ -177,6 +178,48 @@ public class Styles {
 		return lFilter;
 	}
 
+	/**
+	 * <p>
+	 * Creates a filter with each value explicitly defined.
+	 * </p>
+	 * <p>
+	 * Examples:<br>
+	 * "LIB" --> [PARTY = LIB]<br>
+	 * "LIB, NDP" --> [[PARTY = LIB] OR [PARTY = NDP]]
+	 * </p>
+	 * 
+	 * @param styleExpression
+	 *            the list of attribute values, separated by commas (and
+	 *            optional spaces)
+	 * @param attribExpr 
+	 *            an Expression to compare each value with (simple case = attributeExpression)
+	 * @return a filter
+	 * @throws IllegalFilterException
+	 */
+	public static Filter toExplicitFilter(String styleExpression, Expression attribExpr) throws IllegalFilterException {
+		// eliminate spaces after commas
+		String expr = styleExpression.replaceAll(",\\s+", ","); //$NON-NLS-1$//$NON-NLS-2$
+		String[] attribValue = expr.split(","); //$NON-NLS-1$
+		FilterFactory ff = FilterFactory.createFilterFactory();
+		// create the first filter
+		CompareFilter cFilter = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+		cFilter.addLeftValue(attribExpr);
+		cFilter.addRightValue(ff.createLiteralExpression(attribValue[0]));
+		if (attribValue.length == 1) {
+			return cFilter;
+		}
+		// more than one value exists, so wrap them inside a logical OR
+		LogicFilter lFilter = ff.createLogicFilter(Filter.LOGIC_OR);
+		lFilter.addFilter(cFilter);
+		for (int i = 1; i < attribValue.length; i++) {
+			cFilter = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+			cFilter.addLeftValue(attribExpr);
+			cFilter.addRightValue(ff.createLiteralExpression(attribValue[i]));
+			lFilter.addFilter(cFilter);
+		}
+		return lFilter;
+	}
+	
 	/**
 	 * <p>
 	 * Converts a filter into a styleExpression with explicitly defined values.
@@ -440,4 +483,58 @@ public class Styles {
 		}
 		return styleExpression;
 	}
+	
+	public static void modifyFTS(FeatureTypeStyle fts, int ruleIndex, String styleExpression) throws IllegalFilterException {
+		FilterFactory ff = FilterFactory.createFilterFactory();
+		
+		Rule[] rule = fts.getRules();
+		Filter filter = rule[ruleIndex].getFilter();
+		short filterType = filter.getFilterType();
+//		boolean isFirst = false;
+//		if (ruleIndex == 1) isFirst = true;
+//		boolean isLast = false;
+//		if (ruleIndex == rule.length-1) isLast = true;
+		if (filterType == Filter.LOGIC_AND) { //ranged expression
+			//figure out the appropriate values
+			String[] newValue = styleExpression.split("\\.\\."); //$NON-NLS-1$
+			if (newValue.length != 2) {
+				throw new IllegalArgumentException("StyleExpression has incorrect syntax; min..max expected.");
+			}
+			Iterator iterator = ((LogicFilter) filter).getFilterIterator();
+			// we're expecting 2 compare subfilters
+			CompareFilter filter1 = (CompareFilter) iterator.next();
+			CompareFilter filter2 = (CompareFilter) iterator.next();
+			if (iterator.hasNext())
+				throw new IllegalArgumentException(
+					"This method currently only supports logical filters with exactly 2 children.");
+			//filter1 should be 1 <= x and filter2 should be x <(=) 5
+			if (!(filter1.getRightValue().equals(filter2.getLeftValue()))) {
+				throw new IllegalArgumentException("Subfilters or subExpressions in incorrect order");
+			}
+			if (filter1.getLeftValue().toString() != newValue[0]) {
+				//lower bound value has changed, update
+				filter1.addLeftValue(ff.createLiteralExpression(newValue[0]));
+			}
+			if (filter2.getRightValue().toString() != newValue[1]) {
+				//upper bound value has changed, update
+				filter2.addRightValue(ff.createLiteralExpression(newValue[1]));
+			}
+			//TODO: adjust the previous and next filters (uses isFirst, isLast)
+		} else if ((filterType == Filter.LOGIC_OR) || (filterType == Filter.COMPARE_EQUALS)) { //explicit expression 
+			//obtain the expression containing the attribute
+			Expression attrExpression;
+			if (filterType == Filter.LOGIC_OR) {
+				Iterator iterator = ((LogicFilter) filter).getFilterIterator();
+				attrExpression = ((CompareFilter) iterator.next()).getLeftValue();
+			} else { //COMPARE_EQUALS (simple explicit expression)
+				attrExpression = ((CompareFilter) filter).getLeftValue();
+			}
+			//recreate the filter with the new values
+			rule[ruleIndex].setFilter(toExplicitFilter(styleExpression, attrExpression));
+			//TODO: remove duplicate values from other filters
+		} else {
+			throw new IllegalArgumentException("Unrecognized filter type.");
+		}
+	}
+	
 }

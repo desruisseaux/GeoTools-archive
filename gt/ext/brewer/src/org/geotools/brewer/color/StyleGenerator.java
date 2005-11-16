@@ -20,7 +20,9 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
@@ -32,25 +34,38 @@ import org.geotools.filter.function.ClassificationFunction;
 import org.geotools.filter.function.EqualIntervalFunction;
 import org.geotools.filter.function.UniqueIntervalFunction;
 import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Graphic;
+import org.geotools.styling.Mark;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.Symbolizer;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Generates a style using ColorBrewer
- *
+ * 
  * @author Cory Horner, Refractions Research
  */
 public class StyleGenerator {
-    private ColorBrewer colorBrewer;
-    private String paletteName;
-    private int numClasses;
-    private Expression expression;
-    private FeatureCollection collection;
+	private ColorBrewer colorBrewer;
 
-    public FeatureCollection getCollection() {
+	private String paletteName;
+
+	private int numClasses;
+
+	private Expression expression;
+
+	private FeatureCollection collection;
+
+	public FeatureCollection getCollection() {
 		return collection;
 	}
 
@@ -91,21 +106,21 @@ public class StyleGenerator {
 	}
 
 	public StyleGenerator(ColorBrewer colorBrewer, String paletteName,
-        int numClasses, Expression expression, FeatureCollection collection) {
-        this.colorBrewer = colorBrewer;
-        this.paletteName = paletteName;
-        this.numClasses = numClasses;
-        this.expression = expression;
-        this.collection = collection;
-    }
+			int numClasses, Expression expression, FeatureCollection collection) {
+		this.colorBrewer = colorBrewer;
+		this.paletteName = paletteName;
+		this.numClasses = numClasses;
+		this.expression = expression;
+		this.collection = collection;
+	}
 
-    public Style createStyle() throws IllegalFilterException {
-        //make our factories and builders
+public Style createStyle() throws IllegalFilterException {
+        // make our factories and builders
         StyleBuilder sb = new StyleBuilder();
         FilterFactory ff = FilterFactory.createFilterFactory();
         StyleFactory sf = StyleFactory.createStyleFactory();
 
-        //create our classifier
+        // create our classifier
         ClassificationFunction classifier = null;
 
         if (colorBrewer.getLegendType().equals(ColorBrewer.SEQUENTIAL)) {
@@ -126,74 +141,101 @@ public class StyleGenerator {
         // the number of classes are made before we grab our colour data, etc)
         classifier.getValue(0);
 
-        //extract the palette
-        numClasses = classifier.getNumberOfClasses(); //update the number of classes
+        // extract the palette
+        numClasses = classifier.getNumberOfClasses(); // update the number of
+														// classes
 
         BrewerPalette pal = colorBrewer.getPalette(paletteName);
         Color[] colors = pal.getColors(numClasses);
 
-        //play with styles
+        // play with styles
         FeatureTypeStyle fts = sf.createFeatureTypeStyle();
 
         if (colorBrewer.getLegendType().equals(ColorBrewer.SEQUENTIAL)
                 || colorBrewer.getLegendType().equals(ColorBrewer.DIVERGING)) {
-            //TODO: create a ClassificationFunction for Diverging sets
+            // TODO: create a ClassificationFunction for Diverging sets
             EqualIntervalFunction eiClassifier = (EqualIntervalFunction) classifier;
 
             Object localMin = null;
             Object localMax = null;
 
-            //for each class
+            // for each class
             for (int i = 0; i < numClasses; i++) {
-                //obtain min/max values
+                // obtain min/max values
                 localMin = eiClassifier.getMin(i);
                 localMax = eiClassifier.getMax(i);
-                // 1.0 --> 1 
-                //(this makes our styleExpressions more readable. Note that the
-				//filter always converts to double, so it doesn't care what we do).
+                // 1.0 --> 1
+                // (this makes our styleExpressions more readable. Note that the
+				// filter always converts to double, so it doesn't care what we
+				// do).
                 localMin = chopInteger(localMin);
                 localMax = chopInteger(localMax);
                 
-                //generate a title
+                // generate a title
                 String title = localMin + ".." + localMax;
 
-                //construct filters
+                // construct filters
                 Filter filter = null;
 
                 if (localMin == localMax) {
-                    //build filter: =
+                    // build filter: =
                     CompareFilter eqFilter = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
                     eqFilter.addLeftValue(expression);
                     eqFilter.addRightValue(ff.createLiteralExpression(localMax));
                     filter = eqFilter;
                 } else {
-                    //build filter: [min <= x] AND [x < max]
+                    // build filter: [min <= x] AND [x < max]
                     LogicFilter andFilter = null;
-                    CompareFilter lowBoundFilter = null; //less than or equal
-                    CompareFilter hiBoundFilter = null; //less than 
+                    CompareFilter lowBoundFilter = null; // less than or
+															// equal
+                    CompareFilter hiBoundFilter = null; // less than
                     lowBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
                     lowBoundFilter.addLeftValue(ff.createLiteralExpression(
-                            localMin)); //min
-                    lowBoundFilter.addRightValue(expression); //x
-                    //if this is the global maximum, include the max value
+                            localMin)); // min
+                    lowBoundFilter.addRightValue(expression); // x
+                    // if this is the global maximum, include the max value
                     if (i == numClasses - 1) {
                     	hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
                     } else {
                     	hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
                     }
-                    hiBoundFilter.addLeftValue(expression); //x
+                    hiBoundFilter.addLeftValue(expression); // x
                     hiBoundFilter.addRightValue(ff.createLiteralExpression(
-                            localMax)); //max
+                            localMax)); // max
                     andFilter = ff.createLogicFilter(lowBoundFilter,
                             hiBoundFilter, LogicFilter.LOGIC_AND);
                     filter = andFilter;
                 }
 
-                //construct a symbolizer
-                PolygonSymbolizer ps = sb.createPolygonSymbolizer(colors[i]);
+                // figure out what kind of symbolizer to create and make it
+                FeatureIterator it = collection.features();
+                Feature firstFeature = it.next();
+                Geometry geometry = firstFeature.getDefaultGeometry();
 
-                //create a rule
-                Rule rule = sb.createRule(ps);
+                // TODO: move this into some sort of structure
+                Symbolizer symb = null;
+                if (geometry instanceof LineString) {
+                	symb = sb.createLineSymbolizer(colors[i]);
+                } else if (geometry instanceof Polygon) {
+                	symb = sb.createPolygonSymbolizer(colors[i]);
+                } else if (geometry instanceof MultiPoint || geometry instanceof Point) {
+                	Mark square = sb.createMark(StyleBuilder.MARK_SQUARE, colors[i]);
+                	Graphic graphic = sb.createGraphic(null, square, null); //, 1, 4, 0);
+                	symb = sb.createPointSymbolizer(graphic);
+
+            	//} else if (geometry instanceof ?Text) {
+                	//symb = sb.createTextSymbolizer(colors[i], ?, "");
+
+                //} else if (geometry instanceof ?Raster) {
+                	//symb = sb.createRasterSymbolizer(?, ?);
+
+                } else {
+                	//we don't know what the heck you are, *snip snip* you're a line.
+                    symb = sb.createLineSymbolizer(colors[i]);
+                }
+
+                // create a rule
+                Rule rule = sb.createRule(symb);
                 rule.setFilter(filter);
                 rule.setTitle(title);
                 rule.setName(getRuleName(i+1));
@@ -206,9 +248,9 @@ public class StyleGenerator {
             PolygonSymbolizer ps = null;
             Rule rule = null;
 
-            //for each class
+            // for each class
             for (int i = 0; i < numClasses; i++) {
-                //obtain the set of values for the current bin
+                // obtain the set of values for the current bin
                 Set value = (Set) uniqueClassifier.getValue(i);
 
                 // create a sub filter for each unique value, and merge them
@@ -219,10 +261,11 @@ public class StyleGenerator {
                 String title = "";
                 
                 for (int item = 0; item < items.length; item++) {
-                    //construct a filter
+                    // construct a filter
                     try {
                         filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-                        filter.addLeftValue(expression); //the attribute we're looking at
+                        filter.addLeftValue(expression); // the attribute
+															// we're looking at
                         filter.addRightValue(ff.createLiteralExpression(
                                 items[item]));
                     } catch (IllegalFilterException e) {
@@ -232,18 +275,18 @@ public class StyleGenerator {
                         return null;
                     }
 
-                    //add to the title
+                    // add to the title
                     title+=items[item].toString();
                     if (item + 1 != items.length) title+=", ";
                     
-                    //add the filter to the logicFilter
+                    // add the filter to the logicFilter
                     orFilter.addFilter(filter);
                 }
 
-                //construct a symbolizer
+                // construct a symbolizer
                 ps = sb.createPolygonSymbolizer(colors[i]);
 
-                //create the rule
+                // create the rule
                 rule = sb.createRule(ps);
                 if (items.length > 1) {
                     rule.setFilter(orFilter);
@@ -256,37 +299,56 @@ public class StyleGenerator {
 
             }
         }
-
-        //create the style
+        // sort the FeatureTypeStyle rules
+        Rule[] rule = fts.getRules();
+        for (int i = 0; i < rule.length; i++) {
+        	String properRuleName = getRuleName(i+1);
+        	if (!rule[i].getName().equals(properRuleName)) {
+        		// is in incorrect order, find where the rule for this index
+				// actually is
+        		for (int j = i+1; j < rule.length; j++) {
+        			if (rule[j].getName().equals(properRuleName)) {
+        				// switch the 2 rules
+        				Rule tempRule = rule[i];
+        				rule[i] = rule[j];
+        				rule[j] = tempRule;
+        				break;
+        			}
+        		}
+        	}
+        }
+        
+        // create the style
         Style style = sf.createStyle();
         style.addFeatureTypeStyle(fts);
 
         return style;
-    }
-    
-    /**
-	 * Truncates an unneeded trailing decimal zero (1.0 --> 1) by converting to
-	 * an Integer object.
+    }	/**
+		 * Truncates an unneeded trailing decimal zero (1.0 --> 1) by converting
+		 * to an Integer object.
+		 * 
+		 * @param value
+		 * @return Integer(value) if applicable
+		 */
+	private Object chopInteger(Object value) {
+		if ((value instanceof Number) && (value.toString().endsWith(".0"))) {
+			return new Integer(((Number) value).intValue());
+		} else {
+			return value;
+		}
+	}
+
+	/**
+	 * Generates a quick name for each rule with a leading zero.
 	 * 
-	 * @param value
-	 * @return Integer(value) if applicable
+	 * @param count
+	 * @return
 	 */
-    private Object chopInteger(Object value) {
-    	if ((value instanceof Number) && (value.toString().endsWith(".0"))) {
-    		return new Integer(((Number) value).intValue());
-    	} else {
-    		return value;
-    	}
-    }
-    
-    /**
-     * Generates a quick name for each rule with a leading zero.
-     * @param count
-     * @return
-     */
-    private String getRuleName(int count) {
-    	String strVal = new Integer(count).toString();
-    	if (strVal.length() == 1) return "rule0"+strVal;
-    	else return "rule"+strVal;
-    }
+	private String getRuleName(int count) {
+		String strVal = new Integer(count).toString();
+		if (strVal.length() == 1)
+			return "rule0" + strVal;
+		else
+			return "rule" + strVal;
+	}
 }
