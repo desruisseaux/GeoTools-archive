@@ -32,6 +32,9 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.MathExpression;
+import org.geotools.styling.Symbolizer;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
@@ -177,8 +180,17 @@ public class StyleGeneratorTest extends DataTestCase {
         Rule[] rules = style.getFeatureTypeStyles()[0].getRules();
         Set colors = new HashSet();
         for (int i = 0; i < rules.length; i++) {
-        	PolygonSymbolizer ps = (PolygonSymbolizer) rules[i].getSymbolizers()[0];
-        	colors.add(ps.getFill().getColor());
+        	Symbolizer symb = rules[i].getSymbolizers()[0];
+		if (symb instanceof PolygonSymbolizer) {
+			PolygonSymbolizer ps = (PolygonSymbolizer) symb;
+			colors.add(ps.getFill().getColor());
+		} else if (symb instanceof LineSymbolizer) {
+			LineSymbolizer ls = (LineSymbolizer) symb;
+			colors.add(ls.getStroke().getColor());			
+		} else if (symb instanceof PointSymbolizer) {
+			PointSymbolizer ps = (PointSymbolizer) symb;
+			//colors.add(ps.getFillColor());				
+		}
         }
         assertEquals(3, colors.size()); //# colors == # classes
 
@@ -191,8 +203,17 @@ public class StyleGeneratorTest extends DataTestCase {
         rules = style.getFeatureTypeStyles()[0].getRules();
         colors = new HashSet();
         for (int i = 0; i < rules.length; i++) {
-        	PolygonSymbolizer ps = (PolygonSymbolizer) rules[i].getSymbolizers()[0];
-        	colors.add(ps.getFill().getColor());
+        	Symbolizer symb = rules[i].getSymbolizers()[0];
+		if (symb instanceof PolygonSymbolizer) {
+			PolygonSymbolizer ps = (PolygonSymbolizer) symb;
+			colors.add(ps.getFill().getColor());
+		} else if (symb instanceof LineSymbolizer) {
+			LineSymbolizer ls = (LineSymbolizer) symb;
+			colors.add(ls.getStroke().getColor());			
+		} else if (symb instanceof PointSymbolizer) {
+			PointSymbolizer ps = (PointSymbolizer) symb;
+			//colors.add(ps.getFillColor());				
+		}
         }
         assertEquals(3, colors.size()); //# colors == # classes
 
@@ -205,8 +226,17 @@ public class StyleGeneratorTest extends DataTestCase {
         rules = style.getFeatureTypeStyles()[0].getRules();
         colors = new HashSet();
         for (int i = 0; i < rules.length; i++) {
-        	PolygonSymbolizer ps = (PolygonSymbolizer) rules[i].getSymbolizers()[0];
-        	colors.add(ps.getFill().getColor());
+        	Symbolizer symb = rules[i].getSymbolizers()[0];
+		if (symb instanceof PolygonSymbolizer) {
+			PolygonSymbolizer ps = (PolygonSymbolizer) symb;
+			colors.add(ps.getFill().getColor());
+		} else if (symb instanceof LineSymbolizer) {
+			LineSymbolizer ls = (LineSymbolizer) symb;
+			colors.add(ls.getStroke().getColor());			
+		} else if (symb instanceof PointSymbolizer) {
+			PointSymbolizer ps = (PointSymbolizer) symb;
+			//colors.add(ps.getFillColor());				
+		}
         }
         assertEquals(2, colors.size()); //# colors == # classes
         

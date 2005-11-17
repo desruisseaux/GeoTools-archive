@@ -15,7 +15,6 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
@@ -55,6 +54,12 @@ public class Styles {
 			if (symbolizer[i] instanceof PolygonSymbolizer) {
 				PolygonSymbolizer symb = (PolygonSymbolizer) symbolizer[i];
 				colorSet.add(symb.getFill().getColor().toString());
+			} else if (symbolizer[i] instanceof LineSymbolizer) {
+				LineSymbolizer symb = (LineSymbolizer) symbolizer[i];
+				colorSet.add(symb.getStroke().getColor().toString());		
+			} else if (symbolizer[i] instanceof PointSymbolizer) {
+				PointSymbolizer symb = (PointSymbolizer) symbolizer[i];
+				colorSet.add(symb.getGraphic().getMarks()[0].getFill().getColor().toString());	
 			}
 		}
 		if (colorSet.size() > 0) {

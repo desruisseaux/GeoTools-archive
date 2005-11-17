@@ -16,11 +16,10 @@
  */
 package org.geotools.brewer.color;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.awt.Color;
+import java.util.Arrays;
+import java.util.Set;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -42,9 +41,13 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
-import java.awt.Color;
-import java.util.Arrays;
-import java.util.Set;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -330,10 +333,10 @@ public class StyleGenerator {
         Color color) {
         Symbolizer symb;
 
-        if (geometry instanceof LineString) {
+    	if (geometry instanceof MultiPolygon || geometry instanceof Polygon) {
+    		symb = sb.createPolygonSymbolizer(color);
+    	} else if (geometry instanceof LineString) {
             symb = sb.createLineSymbolizer(color);
-        } else if (geometry instanceof Polygon) {
-            symb = sb.createPolygonSymbolizer(color);
         } else if (geometry instanceof MultiPoint || geometry instanceof Point) {
             Mark square = sb.createMark(StyleBuilder.MARK_SQUARE, color);
             Graphic graphic = sb.createGraphic(null, square, null); //, 1, 4, 0);
