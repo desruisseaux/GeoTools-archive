@@ -383,7 +383,7 @@ public class DefaultFeatureCollection extends AbstractFeatureCollection {
         if( !(o instanceof Feature)) return false;
         
         Feature f = (Feature) o;
-        boolean changed = contents.values().remove(f.getID());
+        boolean changed = contents.values().remove(f);
 
         if (changed) {
             fireChange(f, CollectionEvent.FEATURES_REMOVED);
