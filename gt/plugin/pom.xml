@@ -44,7 +44,7 @@
     <module>epsg-postgresql</module>
     <module>epsg-wkt</module>
     <module>geomedia</module>
-    <module>geometryless</module>
+<!-- <module>geometryless</module> -->
     <module>geotiff</module>
     <module>gml</module>
     <module>gtopo30</module>
