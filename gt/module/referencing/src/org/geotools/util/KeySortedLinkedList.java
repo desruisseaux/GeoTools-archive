@@ -3,14 +3,19 @@ package org.geotools.util;
 /**
  * List of elements sorted by a key which is not the element itself.
  *
- * Note: this class may change in the future, or by replaced by
- *       a {@link java.util.TreeMap}-based solution.
- *
+ * @version $Id$
  * @author Simone Giannecchini
+ *
+ * @deprecated Replaced by {@link KeySortedList}. The new implementation fits better in the Java
+ *             Collection framework, and is also built on top of {@link java.util.TreeMap}, which
+ *             should provides O(log(n)) performance instead of O(n) for most operations.
  */
 public class KeySortedLinkedList {
     KeySortedListNode header;
 
+    /**
+     * @deprecated Replaced by {@link KeySortedList}.
+     */
     public KeySortedLinkedList() {
         header = new KeySortedListNode(null, null);
     }
@@ -19,6 +24,8 @@ public class KeySortedLinkedList {
      * Is the list empty?
      *
      * @return true if the list is empty flase otherwise.
+     *
+     * @deprecated Replaced by {@link KeySortedList#isEmpty}.
      */
     public boolean isEmpty() {
         return header.next == null;
@@ -27,6 +34,8 @@ public class KeySortedLinkedList {
     /**
      * Retrieves an iterator that points to the first element or to null for an
      * empty list.
+     *
+     * @deprecated Replaced by {@link KeySortedList#iterator}.
      */
     public KeySortedLinkedListIterator first() {
         return new KeySortedLinkedListIterator(header.next);
@@ -39,6 +48,10 @@ public class KeySortedLinkedList {
      *
      * @param x Key to be used to find the right location.
      * @param o Object to be inserted.
+     *
+     * @deprecated Replaced by {@link KeySortedList#add}. The new method name is {@code add}
+     *             instead of {@code insert} for consistency with other {@code add} methods
+     *             in the {@link List} interface.
      */
     public void insert(Comparable x, Object o) {
         KeySortedLinkedListIterator location = this.findPrevious(x);
@@ -58,6 +71,8 @@ public class KeySortedLinkedList {
 
     /**
      * Checks if the list contains a certain element, or better its key.
+     *
+     * @deprecated Replaced by {@link KeySortedList#containsKey}.
      */
     public boolean contains(Comparable x) {
         KeySortedListNode itr = header.next;
@@ -71,6 +86,9 @@ public class KeySortedLinkedList {
         return found;
     }
 
+    /**
+     * @deprecated Replaced by {@link KeySortedList#toString}.
+     */
     public String toString() {
         KeySortedListNode itr = header.next;
         String s = new String();
@@ -86,6 +104,10 @@ public class KeySortedLinkedList {
         return s;
     }
 
+    /**
+     * @deprecated Replaced by {@link KeySortedList#listIterator(Comparable)}, or
+     *             {@link KeySortedList#first} if only a single value is wanted.
+     */
     public KeySortedLinkedListIterator find(Comparable x) {
         KeySortedListNode itr = header.next;
 
@@ -95,6 +117,10 @@ public class KeySortedLinkedList {
         return new KeySortedLinkedListIterator(itr);
     }
 
+    /**
+     * @deprecated Replaced by {@link KeySortedList#listIterator(Comparable)} folllowed by
+     *             calls to {@link java.util.ListIterator#previous}.
+     */
     public KeySortedLinkedListIterator findPrevious(Comparable x) {
         KeySortedListNode itr = header;
 
@@ -105,6 +131,9 @@ public class KeySortedLinkedList {
         return new KeySortedLinkedListIterator(itr);
     }
 
+    /**
+     * @deprecated Replaced by {@link KeySortedList#removeAll}.
+     */
     public void remove(Comparable x) {
         if (this.isEmpty()) {
             return;
@@ -120,6 +149,8 @@ public class KeySortedLinkedList {
     /**
      * Returns the object stored at a determined zero-based index in case it
      * exists, null otherwise.
+     *
+     * @deprecated Replaced by {@link KeySortedList#get}.
      */
     public KeySortedLinkedListIterator getAt(int index) {
         //index check

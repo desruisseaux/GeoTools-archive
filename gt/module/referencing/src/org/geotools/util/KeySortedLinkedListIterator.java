@@ -3,26 +3,38 @@ package org.geotools.util;
 /**
  * Iterator for {@link KeySortedLinkedList}.
  *
- * Note: this class may change in the future, or by replaced by
- *       a {@link java.util.TreeMap}-based solution.
- *
+ * @version $Id$
  * @author Simone Giannecchini
+ *
+ * @deprecated Replaced by the standard J2SE {@link java.util.Iterator}.
  */
 public class KeySortedLinkedListIterator {
     KeySortedListNode current;
 
+    /**
+     * @deprecated
+     */
     KeySortedLinkedListIterator(KeySortedListNode theNode) {
         current = theNode;
     }
 
+    /**
+     * @deprecated Replaced by <code>!{@linkplain java.util.Iterator#hasNext}</code>.
+     */
     public boolean isPastEnd() {
         return (current == null);
     }
 
+    /**
+     * @deprecated Replaced by {@link java.util.Iterator#next}.
+     */
     public Object retrieve() {
         return isPastEnd() ? null : current.element;
     }
 
+    /**
+     * @deprecated Replaced by {@link java.util.Iterator#next}.
+     */
     public void advance() {
         if (!isPastEnd()) {
             current = current.next;

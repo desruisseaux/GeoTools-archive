@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.io.Serializable;
 
 
 /**
@@ -49,11 +50,16 @@ import java.util.Set;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DisjointSet extends AbstractSet {
+public class DisjointSet extends AbstractSet implements Serializable {
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = -7933552571588598563L;
+
     /**
      * The underlying map. {@code add} and {@code remove} operations
      * on this set are translated into {@link Map} operations as below:
-     * <br><br>
+     * <p>
      * <strong>Adding a new element to this {@link Set}:</strong>
      * <ul>
      *   <li>Puts the corresponding key-value pair in the underlying {@link Map}, where:
@@ -65,7 +71,7 @@ public class DisjointSet extends AbstractSet {
      *     This is equivalents to removing the element from an other {@code DisjointSet}
      *     prior to add it to this set (in other words, moving the element).</li>
      * </ul>
-     * <br>
+     * <p>
      * <strong>Removing an element from this {@link Set}:</strong>
      * <ul>
      *   <li>If the element is not an existing key in the underlying map, nothing is done.</li>
@@ -93,7 +99,7 @@ public class DisjointSet extends AbstractSet {
      * exclusive with this one. Mutually exclusive sets must be created using the
      * {@code DisjointSet(DisjointSet)} constructor with this newly created
      * set as argument.
-     * <br><br>
+     * <p>
      * {@code DisjointSet}s constructed using this constructor has no trash.
      * All remove operations on this set really remove all references to the
      * removed element, like a usual {@link Set}. This is opposed to moving the

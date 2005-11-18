@@ -57,6 +57,7 @@ public class AllTests extends TestCase {
         suite.addTest(InternationalStringTest        .suite());
         suite.addTest(RangeSetTest                   .suite());
         suite.addTest(DisjointSetTest                .suite());
+        suite.addTest(KeySortedListTest              .suite());
         suite.addTest(WeakHashSetTest                .suite());
         suite.addTest(WeakValueHashMapTest           .suite());
         return suite;
