@@ -71,40 +71,13 @@ public class MySQLDataStoreFactory
     static final Param PASSWD = new Param("passwd", String.class,
             "password used to login", false);
 
-    /**
-     * Param, package visibiity for JUnit tests.
-     * 
-     * <p>
-     * Example of a non simple Param type where custom parse method is
-     * required.
-     * </p>
-     * 
-     * <p>
-     * When we convert to BeanInfo custom PropertyEditors will be required for
-     * this Param.
-     * </p>
-     * @task TODO: Remove this param, as it does not do anything, I am 
-     *       pretty positive there is not charset param that does anything 
-     *       in mysql
-     */
-    static final Param CHARSET = new Param("charset", Charset.class,
-            "character set", false, Charset.forName("ISO-8859-1")) {
-            public Object parse(String text) throws IOException {
-                return Charset.forName(text);
-            }
-
-            public String text(Object value) {
-                return ((Charset) value).name();
-            }
-        };
-
     /** Param, package visibiity for JUnit tests */
     static final Param NAMESPACE = new Param("namespace", String.class,
             "namespace prefix used", false);
 
     /** Array with all of the params */
     static final Param[] arrayParameters = {
-        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE
+        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, NAMESPACE
     };
 
     /**
@@ -135,9 +108,6 @@ public class MySQLDataStoreFactory
      * </li>
      * <li>
      * database
-     * </li>
-     * <li>
-     * charset
      * </li>
      * </ul>
      * 
@@ -198,7 +168,6 @@ public class MySQLDataStoreFactory
         String passwd = (String) PASSWD.lookUp(params);
         String port = (String) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
-        Charset charSet = (Charset) CHARSET.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
 
         if (!canProcess(params)) {
@@ -211,10 +180,6 @@ public class MySQLDataStoreFactory
                 new Integer(port).intValue(), database);
 
         connFact.setLogin(user, passwd);
-
-        if (charSet != null) {
-            connFact.setCharSet(charSet.name());
-        }
 
         ConnectionPool pool;
 
@@ -303,7 +268,7 @@ public class MySQLDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE
+            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, NAMESPACE
         };
     }
 

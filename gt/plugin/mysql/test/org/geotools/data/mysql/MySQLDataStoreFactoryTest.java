@@ -64,7 +64,6 @@ public class MySQLDataStoreFactoryTest extends TestCase {
         remote.put("database", "testdb");
         remote.put("user", "postgres");
         remote.put("passwd", "postgres");
-        remote.put("charset", "");
         remote.put("namesapce", "topp");
         //remote.put( remote, "topp");
         
@@ -81,49 +80,9 @@ public class MySQLDataStoreFactoryTest extends TestCase {
         super.setUp();
     }
     
-    public void testParamCHARSET() throws Throwable {
-        Param p = MySQLDataStoreFactory.CHARSET;
-        try {
-            p.parse(null);
-            fail("expected error for parse null");
-        }
-        catch( Exception e){}
-        
-        try {
-            p.parse("");
-            fail("expected error for parse empty");
-        }
-        catch( Exception e){}
-        assertNotNull( "parse ISO-8859-1", p.parse("ISO-8859-1"));
-        
-        assertNull("handle null", p.handle(null) );
-        assertNull("handle empty", p.handle("") );
-        assertNotNull( "handle ISO-8859-1", p.handle("ISO-8859-1"));
-        
-        Map map = new HashMap();
-        Charset latin1=Charset.forName("ISO-8859-1");
-        map.put("charset", latin1 );
-        assertEquals( latin1, p.lookUp( map ));
-        
-        try {
-            assertNotNull( "handle ISO-LATIN-1", p.handle("ISO-LATIN-1"));            
-        } catch (IOException expected){            
-        }
-        System.out.println( latin1.toString() );
-        System.out.println( latin1.name() );
-        System.out.println( p.text( latin1 ));
-        assertEquals("ISO-8859-1", p.text(latin1) );
-        try {
-            assertEquals("ISO-8859-1", p.text("ISO-8859-1") );
-            fail("Should not handle bare text");
-        }
-        catch( ClassCastException expected ){            
-        }
-    }
     public void testLocal() throws Exception {
         Map map = local;
         System.out.println( "local:"+map );
-        assertEquals( null, MySQLDataStoreFactory.CHARSET.lookUp(map) );
         assertEquals( "cite", MySQLDataStoreFactory.DATABASE.lookUp(map) );        
         assertEquals( "postgis", MySQLDataStoreFactory.DBTYPE.lookUp(map) );
         assertEquals( "hydra", MySQLDataStoreFactory.HOST.lookUp(map) );
@@ -144,7 +103,6 @@ public class MySQLDataStoreFactoryTest extends TestCase {
     public void testRemote() throws Exception {
         Map map = remote;
         System.out.println( "local:"+map );
-        assertEquals( null, MySQLDataStoreFactory.CHARSET.lookUp(map) );
         assertEquals( "testdb", MySQLDataStoreFactory.DATABASE.lookUp(map) );        
         assertEquals( "postgis", MySQLDataStoreFactory.DBTYPE.lookUp(map) );
         assertEquals( "localhost", MySQLDataStoreFactory.HOST.lookUp(map) );

@@ -29,8 +29,6 @@ public class MySQLConnectionFactory {
     private String _dbURL;
     private String _username = "";
     private String _password = "";
-    /** An alternate character set to use. */
-    private String charSet;
 
     /**
      * Creates a new MySQLConnectionFactory object from a MySQL database URL.  This
@@ -96,11 +94,6 @@ public class MySQLConnectionFactory {
         Properties props = new Properties();
         props.put("user", user);
         props.put("password", password);
-
-        if (charSet != null) {
-            props.put("charSet", charSet);
-        }
-
         return getConnection(props);
     }
 
@@ -175,15 +168,6 @@ public class MySQLConnectionFactory {
             connectionPool.close();
         }
         ConnectionPoolManager.getInstance().free(connectionPool);
-    }
-
-    /**
-         * Sets a different character set for the postgis driver to use.
-         *
-         * @param charSet the string of a valid charset name.
-         */
-    public void setCharSet(String charSet) {
-        this.charSet = charSet;
     }
 
 }
