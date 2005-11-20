@@ -2687,7 +2687,10 @@ HOLES:
 		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.POINT))
 		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POINT");
-		if (!(INTERPRETATION > 1)){
+		//CH- changed to >= 1, for GEOS-437, Jody and I looked at docs
+		//and multipoint is a superset of point, so it should be fine,
+		//for cases when there is just one point.  Bart is testing.
+		if (!(INTERPRETATION >= 1)){
 		    LOGGER.warning( "Could not create MultiPoint with INTERPRETATION "+INTERPRETATION+" - representing the number of points");
 			return null;
 		}
