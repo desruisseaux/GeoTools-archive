@@ -268,8 +268,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             throws MismatchedDimensionException, IllegalArgumentException
     {
         this(name, PlanarImage.wrapRenderedImage(image),
-             new GridGeometry2D(new GeneralGridRange(image), toEnvelope(envelope, crs)),
-             bands, sources, properties);
+             new GridGeometry2D(new GeneralGridRange(image, envelope.getDimension()),
+                                toEnvelope(envelope, crs)), bands, sources, properties);
     }
 
     /**

@@ -549,7 +549,8 @@ public class GridCoverageFactory extends AbstractFactory {
             e.setCoordinateReferenceSystem(getDefaultCRS(e.getDimension()));
             envelope = e;
         }
-        final GridGeometry2D gm = new GridGeometry2D(new GeneralGridRange(image), envelope);
+        final GridGeometry2D gm = new GridGeometry2D(
+                new GeneralGridRange(image, envelope.getDimension()), envelope);
         return create(name, image, gm, bands, sources, properties);
     }
 
@@ -578,7 +579,8 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final GridCoverage[]            sources,
                                  final Map                       properties)
     {
-        final GridGeometry2D gm = new GridGeometry2D(new GeneralGridRange(image), gridToCRS, crs);
+        final GridGeometry2D gm = new GridGeometry2D(new GeneralGridRange(image,
+                crs.getCoordinateSystem().getDimension()), gridToCRS, crs);
         return create(name, image, gm, bands, sources, properties);
     }
 
