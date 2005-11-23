@@ -28,8 +28,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.geotools.catalog.AbstractCatalog;
 import org.geotools.catalog.Catalog;
 import org.geotools.catalog.CatalogInfo;
+import org.geotools.catalog.DefaultCatalogInfo;
 import org.geotools.catalog.GeoResource;
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.catalog.ResolveChangeEvent;
@@ -49,13 +51,13 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Justin Deoliveira, jdeolive@openplans.org
  * @since 0.6
  */
-public class DefaultCatalog extends Catalog {
+public class DefaultCatalog extends AbstractCatalog {
     private HashSet services = new HashSet();
     private CatalogInfo metadata;
     private ListenerList catalogListeners;
 
     public DefaultCatalog() {
-        DefaultCatalogInfo metadata = new DefaultCatalogInfo();
+        DefaultCatalogInfo metadata = new DefaultCatalogInfo(){};
         metadata.setTitle("Default Catalog"); //$NON-NLS-1$
         try {
 			metadata.setSource(new URI("http://localhost"));
@@ -453,9 +455,9 @@ public class DefaultCatalog extends Catalog {
     	
     	if (adaptee == null)
             return null;
-        if (adaptee.isAssignableFrom(DefaultCatalog.class))
+        if (adaptee.isAssignableFrom(Catalog.class))
             return this;
-        if (adaptee.isAssignableFrom(CatalogInfoImpl.class))
+        if (adaptee.isAssignableFrom(CatalogInfo.class))
             return metadata;
         if (adaptee.isAssignableFrom(services.getClass()))
             return services;
@@ -503,46 +505,46 @@ public class DefaultCatalog extends Catalog {
         return metadata.getSource();
     }
     
-    static class DefaultCatalogInfo extends CatalogInfo {
-    	
-    	 DefaultCatalogInfo() {
-	        super(null, null, null, null);
-	    }
-
-	    /**
-	     * Construct <code>CatalogInfoImpl</code>.
-	     * 
-	     * @param title
-	     * @param description
-	     * @param source
-	     * @param keywords
-	     */
-	    public DefaultCatalogInfo( String title, String description, URI source, String[] keywords ) {
-	        super(title, description, source, keywords);
-	    }
-	    /**
-	     * @param desc The desc to set.
-	     */
-	    void setDesc( String desc ) {
-	        this.description = desc;
-	    }
-	    /**
-	     * @param keywords The keywords to set.
-	     */
-	    void setKeywords( String[] keywords ) {
-	        this.keywords = keywords;
-	    }
-	    /**
-	     * @param source The source to set.
-	     */
-	    void setSource( URI source ) {
-	        this.source = source;
-	    }
-	    /**
-	     * @param title The title to set.
-	     */
-	    void setTitle( String title ) {
-	        this.title = title;
-	    }
-    }
+//    static class DefaultCatalogInfo extends CatalogInfo {
+//    	
+//    	 DefaultCatalogInfo() {
+//	        super(null, null, null, null);
+//	    }
+//
+//	    /**
+//	     * Construct <code>CatalogInfoImpl</code>.
+//	     * 
+//	     * @param title
+//	     * @param description
+//	     * @param source
+//	     * @param keywords
+//	     */
+//	    public DefaultCatalogInfo( String title, String description, URI source, String[] keywords ) {
+//	        super(title, description, source, keywords);
+//	    }
+//	    /**
+//	     * @param desc The desc to set.
+//	     */
+//	    void setDesc( String desc ) {
+//	        this.description = desc;
+//	    }
+//	    /**
+//	     * @param keywords The keywords to set.
+//	     */
+//	    void setKeywords( String[] keywords ) {
+//	        this.keywords = keywords;
+//	    }
+//	    /**
+//	     * @param source The source to set.
+//	     */
+//	    void setSource( URI source ) {
+//	        this.source = source;
+//	    }
+//	    /**
+//	     * @param title The title to set.
+//	     */
+//	    void setTitle( String title ) {
+//	        this.title = title;
+//	    }
+//    }
 }

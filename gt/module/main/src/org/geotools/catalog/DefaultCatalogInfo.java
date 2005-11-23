@@ -18,64 +18,73 @@ package org.geotools.catalog;
 
 import java.net.URI;
 
-/**
- * Represents a bean style metadata accessor for metadata about a catalog. This may be the result of
- * a request to a metadata service. All methods within an implementation of this interface should
- * NOT block. Much of this is based on Dublin Core and the RDF application profile.
- * 
- * @author David Zwiers, Refractions Research
- * @since 0.6
- */
-public class CatalogInfo {
+
+public class DefaultCatalogInfo implements CatalogInfo {
     protected String title, description;
     protected URI source;
     protected String[] keywords;
 
-    protected CatalogInfo() {
+    public DefaultCatalogInfo() {
         // for sub-classes
     }
 
-    public CatalogInfo( String title, String description, URI source, String[] keywords ) {
+    public DefaultCatalogInfo( String title, String description, URI source, String[] keywords ) {
         this.title = title;
         this.description = description;
         this.source = source;
         this.keywords = keywords;
     }
 
-    /**
-     * returns the catalog title May Not Block.
-     * 
-     * @return
-     */
+    /* (non-Javadoc)
+	 * @see org.geotools.catalog.CatalogInfo#getTitle()
+	 */
     public String getTitle() {
         return title;
     }
 
-    /**
-     * returns the keywords assocaited with this catalog May Not Block. Maps to Dublin Core's
-     * Subject element
-     * 
-     * @return
-     */
+    /* (non-Javadoc)
+	 * @see org.geotools.catalog.CatalogInfo#getKeywords()
+	 */
     public String[] getKeywords() { // aka Subject
         return keywords;
     }
 
-    /**
-     * returns the catalog description.
-     * 
-     * @return
-     */
+    /* (non-Javadoc)
+	 * @see org.geotools.catalog.CatalogInfo#getDescription()
+	 */
     public String getDescription() {
         return description;
     }
 
-    /**
-     * Returns the catalog source. May Not Block. Maps to the Dublin Core Server Element
-     * 
-     * @return
-     */
+    /* (non-Javadoc)
+	 * @see org.geotools.catalog.CatalogInfo#getSource()
+	 */
     public URI getSource() { // aka server
         return source;
+    }
+    
+    /**
+     * @param desc The desc to set.
+     */
+    public void setDesc( String desc ) {
+        this.description = desc;
+    }
+    /**
+     * @param keywords The keywords to set.
+     */
+    public void setKeywords( String[] keywords ) {
+        this.keywords = keywords;
+    }
+    /**
+     * @param source The source to set.
+     */
+    public void setSource( URI source ) {
+        this.source = source;
+    }
+    /**
+     * @param title The title to set.
+     */
+    public void setTitle( String title ) {
+        this.title = title;
     }
 }

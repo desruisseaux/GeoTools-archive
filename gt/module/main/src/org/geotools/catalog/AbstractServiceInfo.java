@@ -21,17 +21,12 @@ import java.net.URI;
 import javax.swing.Icon;
 
 /**
- * Provides metadata information about a service.
- * <p>
- * A bean - style metadata which must already be loaded. Much of the names and motivation have been
- * taken from Dublin Code and it's application profile for RDF.
- * </p>
+ * Implementation of ServiceInfo.
  * 
- * @author David Zwiers, Refractions Research
  * @author Justin Deoliveira, The Open Planning Project
- * @since 0.6
+ *
  */
-public class ServiceInfo {
+public class AbstractServiceInfo implements ServiceInfo {
 
     protected String title, description, _abstract;
     protected URI schema;
@@ -39,11 +34,11 @@ public class ServiceInfo {
     protected String[] keywords;
     protected Icon icon;
 
-    protected ServiceInfo() {
+    protected AbstractServiceInfo() {
         // to be used in an over-ride
     }
 
-    public ServiceInfo( String title, String description, String _abstract, URI source,
+    public AbstractServiceInfo( String title, String description, String _abstract, URI source,
             URI publisher, URI schema, String[] keywords, Icon icon ) {
         this.title = title;
         this.description = description;

@@ -21,67 +21,15 @@ import java.util.List;
 
 import org.geotools.util.ProgressListener;
 
-
-
 /**
- * Represents a handle to a spatial resource.
- * <p>
- * The resource is not guaranteed to exist, nor do we guarantee that we can connect with the
- * resource. Some/All potions of this handle may be loaded as required. This resource handle may
- * also be the result a metadata service query.
+ * Abstract implementation of GeoResource.
  * 
- * @author David Zwiers, Refractions Research
  * @author Justin Deoliveira, The Open Planning Project
- * @since 0.6
+ *
  */
-public abstract class GeoResource implements Resolve {
+public abstract class AbstractGeoResource implements GeoResource {
 
-    /**
-     * Blocking operation to resolve into the adaptee, if available.
-     * <p>
-     * Required adaptions:
-     * <ul>
-     * <li>IGeoResourceInfo.class
-     * <li>IService.class
-     * </ul>
-     * </p>
-     * <p>
-     * Example (no casting required):
-     * 
-     * <pre><code>
-     * IGeoResourceInfo info = resovle(IGeoResourceInfo.class);
-     * </code></pre>
-     * 
-     * </p>
-     * <p>
-     * Recommendated adaptions:
-     * <ul>
-     * <li>ImageDescriptor.class (for icon provided by external service)
-     * </ul>
-     * </p>
-     * 
-     * @param adaptee
-     * @param monitor
-     * @return instance of adaptee, or null if unavailable (IGeoResourceInfo and IService must be
-     *         supported)
-     * @see GeoResourceInfo
-     * @see IService
-     * @see IResolve#resolve(Class, ProgressListener)
-     */
-    public abstract Object resolve( Class adaptee, ProgressListener monitor ) throws IOException;
-
-    /**
-     * Blocking operation to describe this service.
-     * <p>
-     * As an example this method is used by LabelDecorators to aquire title, and icon.
-     * </p>
-     * 
-     * @return IGeoResourceInfo resolve(IGeoResourceInfo.class,ProgressListener monitor);
-     * @see GeoResource#resolve(Class, ProgressListener)
-     */
-    public abstract GeoResourceInfo getInfo( ProgressListener monitor ) throws IOException;
-
-    /**
+	/**
      * This method is shorthand for 
      * <pre>
      * 	<code>
@@ -90,7 +38,7 @@ public abstract class GeoResource implements Resolve {
      * </pre>
      * 
      * @return The service containg the resource, an object of type Service.
-     * @see GeoResource#resolve(Class, ProgressListener)
+     * @see AbstractGeoResource#resolve(Class, ProgressListener)
      */
     public Resolve parent( ProgressListener monitor ) throws IOException {
         return (Service) resolve(Service.class, monitor);
