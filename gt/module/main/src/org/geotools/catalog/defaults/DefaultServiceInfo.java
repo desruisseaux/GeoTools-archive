@@ -1,24 +1,10 @@
-/*
- *    uDig - User Friendly Desktop Internet GIS client
- *    http://udig.refractions.net
- *    (C) 2004, Refractions Research Inc.
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- */
-package org.geotools.catalog;
+package org.geotools.catalog.defaults;
 
 import java.net.URI;
 
 import javax.swing.Icon;
+
+import org.geotools.catalog.ServiceInfo;
 
 /**
  * Implementation of ServiceInfo.
@@ -26,7 +12,7 @@ import javax.swing.Icon;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class AbstractServiceInfo implements ServiceInfo {
+public class DefaultServiceInfo implements ServiceInfo {
 
     protected String title, description, _abstract;
     protected URI schema;
@@ -34,11 +20,11 @@ public class AbstractServiceInfo implements ServiceInfo {
     protected String[] keywords;
     protected Icon icon;
 
-    protected AbstractServiceInfo() {
+    protected DefaultServiceInfo() {
         // to be used in an over-ride
     }
 
-    public AbstractServiceInfo( String title, String description, String _abstract, URI source,
+    public DefaultServiceInfo( String title, String description, String _abstract, URI source,
             URI publisher, URI schema, String[] keywords, Icon icon ) {
         this.title = title;
         this.description = description;

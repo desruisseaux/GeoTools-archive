@@ -1,26 +1,10 @@
-/*
- *    uDig - User Friendly Desktop Internet GIS client
- *    http://udig.refractions.net
- *    (C) 2004, Refractions Research Inc.
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- */
-package org.geotools.catalog;
+package org.geotools.catalog.defaults;
 
 import java.net.URI;
 
 import javax.swing.Icon;
 
-
+import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.geometry.JTS.ReferencedEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -32,7 +16,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class AbstractGeoResourceInfo implements GeoResourceInfo {
+public class DefaultGeoResourceInfo implements GeoResourceInfo {
 
     protected String title, description, name;
     protected String[] keywords;
@@ -40,11 +24,11 @@ public class AbstractGeoResourceInfo implements GeoResourceInfo {
     protected Icon icon;
     protected ReferencedEnvelope bounds;
 
-    protected AbstractGeoResourceInfo() {
+    protected DefaultGeoResourceInfo() {
         // for over-riding
     }
 
-    public AbstractGeoResourceInfo( String title, String name, String description, URI schema,
+    public DefaultGeoResourceInfo( String title, String name, String description, URI schema,
             Envelope bounds, CoordinateReferenceSystem crs, String[] keywords, Icon icon ) {
         this.title = title;
         this.description = description;
