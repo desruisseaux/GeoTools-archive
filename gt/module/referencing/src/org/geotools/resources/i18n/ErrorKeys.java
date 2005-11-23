@@ -95,6 +95,7 @@ public final class ErrorKeys {
     public static final int INCOMPATIBLE_UNIT_$1                   =    54;
     public static final int INCONSISTENT_PROPERTY_$1               =    55;
     public static final int INDEX_OUT_OF_BOUNDS_$1                 =    56;
+    public static final int INFINITE_VALUE_$1                      =   147;
     public static final int INSEPARABLE_TRANSFORM                  =    57;
     public static final int INVALID_WKT_FORMAT                     =   159;
     public static final int IN_$1                                  =    58;
@@ -196,11 +197,11 @@ public final class ErrorKeys {
     public static final int UNSPECIFIED_IMAGE_SIZE                 =   141;
     public static final int UNSPECIFIED_TRANSFORM                  =   178;
     public static final int UNSUPPORTED_COORDINATE_SYSTEM_$1       =   151;
+    public static final int UNSUPPORTED_CRS_$1                     =   180;
     public static final int UNSUPPORTED_DATA_TYPE                  =   142;
     public static final int UNSUPPORTED_DATA_TYPE_$1               =   143;
     public static final int UNSUPPORTED_FILE_TYPE_$2               =   144;
     public static final int VALUE_OUT_OF_BOUNDS_$3                 =   145;
     public static final int VALUE_TEND_TOWARD_INFINITY             =   146;
-    public static final int V_INFINITE                             =   147;
     public static final int ZVALUE_OUTSIDE_COVERAGE_$1             =   148;
 }

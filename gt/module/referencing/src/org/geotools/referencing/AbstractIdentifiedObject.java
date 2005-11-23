@@ -513,9 +513,10 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
 
     /**
      * Returns the properties to be given to an identified object derived from the specified one.
-     * An example of typical usage is creating a new CRS identical to an existing one except for
-     * axis units. This methods returns the same properties than the supplied argument (as of
-     * <code>{@linkplain #getProperties getProperties}(info)</code>), except for the following:
+     * This method is typically used for creating a new CRS identical to an existing one except
+     * for axis units. This method returns the same properties than the supplied argument (as of
+     * <code>{@linkplain #getProperties(IdentifiedObject) getProperties}(info)</code>), except for
+     * the following:
      * <p>
      * <ul>
      *   <li>The {@linkplain #getName() name}'s authority is replaced by the specified one.</li>

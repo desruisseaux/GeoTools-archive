@@ -468,7 +468,7 @@ public class ObliqueMercator extends MapProjection {
             double V = Math.sin(B * x);
             double U = (S * singamma0 - V * cosgamma0) / (0.5 * (Q + temp));
             if (Math.abs(Math.abs(U) - 1.0) < EPS) {
-                throw new ProjectionException(Errors.format(ErrorKeys.V_INFINITE));
+                throw new ProjectionException(Errors.format(ErrorKeys.INFINITE_VALUE_$1, "v"));
             }
             v = 0.5 * ArB * Math.log((1.0 - U) / (1.0 + U));
             temp = Math.cos(B * x);

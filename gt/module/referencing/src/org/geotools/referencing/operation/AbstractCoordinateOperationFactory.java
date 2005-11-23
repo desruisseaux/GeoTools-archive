@@ -24,9 +24,9 @@
 package org.geotools.referencing.operation;
 
 // J2SE dependencies and extensions
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 import javax.units.ConversionException;
 
 // OpenGIS dependencies
@@ -222,7 +222,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * Returns an affine transform between two coordinate systems. Only units and
      * axis order (e.g. transforming from (NORTH,WEST) to (EAST,NORTH)) are taken
      * in account.
-     * <br><br>
+     * <p>
      * Example: If coordinates in {@code sourceCS} are (x,y) pairs in metres and
      * coordinates in {@code targetCS} are (-y,x) pairs in centimetres, then the
      * transformation can be performed as below:

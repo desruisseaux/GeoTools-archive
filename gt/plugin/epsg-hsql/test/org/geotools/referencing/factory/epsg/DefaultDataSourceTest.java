@@ -79,7 +79,7 @@ import org.geotools.resources.Arguments;
  * the default plugin. If the MS-Access database is installed and the {@code epsg-access}
  * plugin is in the classpath, then the default plugin will be the factory backed by the
  * MS-Access database. Otherwise, the default will probably be the one backed by the HSQL
- * database.
+ * database, since this test live in the {@code epsg-hsql} module.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -93,18 +93,8 @@ public class DefaultDataSourceTest extends TestCase {
 
     /**
      * The EPSG factory to test. Will be setup only when first needed.
-     * This is a static field because we ant to setup only once, keep
-     * the cached CRS (for faster test execution) and avoid closing it
-     * before all tests are run (which lead to trouble).
      */
-    static DefaultFactory factory;
-
-    /**
-     * {@code true} if {@link #setUp} has been invoked at least once and failed to make a
-     * connection. This flag is used in order to log a warning only once and avoid any new
-     * useless tentative to get a connection.
-     */
-    static boolean noConnection;
+    private DefaultFactory factory;
 
     /**
      * Run the suite from the command line. If {@code "-log"} flag is specified on the
@@ -123,24 +113,7 @@ public class DefaultDataSourceTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new Suite(DefaultDataSourceTest.class);
-    }
-
-    /**
-     * A custom suite for EPSG data source test, which closes the connection only after all
-     * tests have been run.
-     */
-    protected static class Suite extends TestSuite {
-        /** Creates a suite from the specified TestCase class. */
-        public Suite(final Class type) {
-            super(type);
-        }
-
-        /** Run the suite and dispose only when fully finished. */
-        public void run(final TestResult result) {
-            super.run(result);
-            dispose();
-        }
+        return new TestSuite(DefaultDataSourceTest.class);
     }
 
     /**
@@ -151,187 +124,14 @@ public class DefaultDataSourceTest extends TestCase {
     }
 
     /**
-     * Sets up the authority factory, or lets it to null if the initialisation failed.
-     * In the last case, a warning will be logged but no test will be performed. We will
-     * not throws an exception for peoples who don't have an EPSG database on their machine.
+     * Sets up the authority factory.
      */
     protected void setUp() throws SQLException {
-        if (factory != null) {
-            /*
-             * The factory is already up and running.
-             */
-            return;
-        }
-        if (noConnection) {
-            /*
-             * This method was already invoked before and failed.
-             * Do not try again.
-             */
-            return;
-        }
-        boolean isReady = false;
-        try {
+        if (factory == null) {
             factory = (DefaultFactory) FactoryFinder.getCRSAuthorityFactory("EPSG",
                         new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class));
-            isReady = factory.isReady();
-        } catch (Throwable error) {
-            factory = null;
-            noConnection = true;
-            final LogRecord record = new LogRecord(Level.WARNING,
-                    "An error occured while setting up the date source for the EPSG database.\n" +
-                    "Maybe there is no JDBC-ODBC bridge for the current platform.\n" +
-                    "No test will be performed for this class.");
-            record.setSourceClassName(DefaultDataSourceTest.class.getName());
-            record.setSourceMethodName("setUp");
-            record.setThrown(error);
-            Logger.getLogger("org.geotools.referencing").log(record);
-            return;
         }
-        if (!isReady) {
-            factory = null;
-            noConnection = true;
-            Logger.getLogger("org.geotools.referencing").warning(
-                "Failed to connect to the EPSG authority factory.\n" +
-                "This is a normal failure when no EPSG database is available on the current machine.\n" +
-                "No test will be performed for this class.");
-            return;
-        }
-        if (factory.getDataSource() instanceof HSQLDataSource) {
-            factory = null;
-            noConnection = true;
-            Logger.getLogger("org.geotools.referencing").info(
-                "No data source other than HSQL found.\n" +
-                "Skip this suite, since HSQL data source will be tested by an other suite.");
-            return;
-        }
-    }
-
-    /**
-     * Releases any resources holds by the EPSG factory.
-     * Note: the shutdown is performed in a separated thread because the thread
-     * name is used by HSQL as a flag meaning to stop the database process.
-     *
-     * Note 2: We don't overrides {@link #tearDown} because we don't want to close the
-     *         connection after every method tested. Some classes like AuthorityBackedFactory
-     *         keep a connexion to the factory, which lead to a lot of trouble if we close it
-     *         here.
-     */
-    private static void dispose() {
-        if (factory != null) {
-            final DefaultFactory f = factory;
-            final Thread shutdown = new Thread(FactoryUsingSQL.SHUTDOWN_THREAD) {
-                public void run() {
-                    try {
-                        f.dispose();
-                    } catch (FactoryException exception) {
-                        exception.printStackTrace();
-                    }
-                }
-            };
-            shutdown.start();
-            factory = null;
-            try {
-                shutdown.join();
-            } catch (InterruptedException ignore) {
-                // Exit anyway.
-            }
-        }
-    }
-
-    /**
-     * Tests the {@code getAuthorityCodes()} method.
-     */
-    public void testAuthorityCodes() throws FactoryException {
-        if (factory == null) return;
-
-        final Set crs = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
-        assertFalse(crs.isEmpty());
-        assertTrue (crs.size() > 0);
-        assertEquals("Check size() consistency", crs.size(), crs.size());
-
-        final Set geographicCRS = factory.getAuthorityCodes(GeographicCRS.class);
-        assertFalse(geographicCRS.isEmpty());
-        assertTrue (geographicCRS.size() > 0);
-        assertTrue (geographicCRS.size() < crs.size());
-        assertFalse(geographicCRS.containsAll(crs));
-        assertTrue (crs.containsAll(geographicCRS));
-
-        final Set projectedCRS = factory.getAuthorityCodes(ProjectedCRS.class);
-        assertFalse(projectedCRS.isEmpty());
-        assertTrue (projectedCRS.size() > 0);
-        assertTrue (projectedCRS.size() < crs.size());
-        assertFalse(projectedCRS.containsAll(crs));
-        assertTrue (crs.containsAll(projectedCRS));
-//        assertTrue(Collections.disjoint(geographicCRS, projectedCRS));
-        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
-
-        final Set datum = factory.getAuthorityCodes(Datum.class);
-        assertFalse(datum.isEmpty());
-        assertTrue (datum.size() > 0);
-//        assertTrue(Collections.disjoint(datum, crs));
-        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
-
-        final Set geodeticDatum = factory.getAuthorityCodes(GeodeticDatum.class);
-        assertFalse(geodeticDatum.isEmpty());
-        assertTrue (geodeticDatum.size() > 0);
-        assertFalse(geodeticDatum.containsAll(datum));
-        assertTrue (datum.containsAll(geodeticDatum));
-
-        // Ensures that the factory keept the set in its cache.
-        assertSame(crs,           factory.getAuthorityCodes(CoordinateReferenceSystem.class));
-        assertSame(geographicCRS, factory.getAuthorityCodes(            GeographicCRS.class));
-        assertSame(projectedCRS,  factory.getAuthorityCodes(             ProjectedCRS.class));
-        assertSame(datum,         factory.getAuthorityCodes(                    Datum.class));
-        assertSame(geodeticDatum, factory.getAuthorityCodes(            GeodeticDatum.class));
-        assertSame(geodeticDatum, factory.getAuthorityCodes(     DefaultGeodeticDatum.class));
-
-        // Try a dummy type.
-        assertTrue("Dummy type", factory.getAuthorityCodes(String.class).isEmpty());
-
-        // Tests projections, which are handle in a special way.
-        final Set operations      = factory.getAuthorityCodes(Operation     .class);
-        final Set conversions     = factory.getAuthorityCodes(Conversion    .class);
-        final Set projections     = factory.getAuthorityCodes(Projection    .class);
-        final Set transformations = factory.getAuthorityCodes(Transformation.class);
-
-        assertTrue (conversions    .size() < operations .size());
-        assertTrue (projections    .size() < operations .size());
-        assertTrue (transformations.size() < operations .size());
-        assertTrue (projections    .size() < conversions.size());
-
-        assertFalse(projections.containsAll(conversions));
-        assertTrue (conversions.containsAll(projections));
-        assertTrue (operations .containsAll(conversions));
-        assertTrue (operations .containsAll(transformations));
-
-        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
-//        assertTrue (Collections.disjoint(conversions, transformations));
-//        assertFalse(Collections.disjoint(conversions, projections));
-
-        assertFalse(operations     .isEmpty());
-        assertFalse(conversions    .isEmpty());
-        assertFalse(projections    .isEmpty());
-        assertFalse(transformations.isEmpty());
-
-        assertTrue (conversions.contains("101"));
-        assertFalse(projections.contains("101"));
-        assertTrue (projections.contains("16001"));
-
-        final Set units = factory.getAuthorityCodes(Unit.class);
-        assertFalse(units.isEmpty());
-        assertTrue (units.size() > 0);
-    }
-
-    /**
-     * Tests the {@link AuthorityFactory#getDescriptionText} method.
-     */
-    public void testDescriptionText() throws FactoryException {
-        if (factory == null) return;
-
-        assertEquals("World Geodetic System 1984", factory.getDescriptionText( "6326").toString(Locale.ENGLISH));
-        assertEquals("Mean Sea Level",             factory.getDescriptionText( "5100").toString(Locale.ENGLISH));
-        assertEquals("NTF (Paris) / Nord France",  factory.getDescriptionText("27591").toString(Locale.ENGLISH));
-        assertEquals("Ellipsoidal height",         factory.getDescriptionText(   "84").toString(Locale.ENGLISH));
+        // No 'tearDown()' method: we rely on the DefaultFactory shutdown hook.
     }
 
     /**
@@ -342,52 +142,9 @@ public class DefaultDataSourceTest extends TestCase {
     }
 
     /**
-     * Tests the creation of CRS using name instead of primary keys.
-     */
-    public void testNameUsage() throws FactoryException {
-        if (factory == null) return;
-        /*
-         * Tests unit
-         */
-        assertSame   (factory.createUnit("9002"), factory.createUnit("foot"));
-        assertNotSame(factory.createUnit("9001"), factory.createUnit("foot"));
-        /*
-         * Tests CRS
-         */
-        final CoordinateReferenceSystem primary, byName;
-        primary = factory.createCoordinateReferenceSystem("27581");
-        assertEquals("27581", getIdentifier(primary));
-        assertTrue(primary instanceof ProjectedCRS);
-        assertEquals(2, primary.getCoordinateSystem().getDimension());
-        /*
-         * Gets the CRS by name. It should be the same.
-         */
-        byName = factory.createCoordinateReferenceSystem("NTF (Paris) / France I");
-        assertEquals(primary, byName);
-        /*
-         * Gets the CRS using 'createObject'. It will requires ony more
-         * SQL statement internally in order to determines the object type.
-         */
-        factory.dispose(); // Clear the cache. This is not a real disposal.
-        assertEquals(primary, factory.createObject("27581"));
-        assertEquals(byName,  factory.createObject("NTF (Paris) / France I"));
-        /*
-         * Tests descriptions.
-         */
-        assertEquals("NTF (Paris) / France I", factory.getDescriptionText("27581").toString());
-        /*
-         * Tests fetching an object with name containing semi-colon.
-         */
-        final IdentifiedObject cs = factory.createCoordinateSystem(
-                "Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east.  UoM: DMS");
-        assertEquals("6411", getIdentifier(cs));
-    }
-
-    /**
      * Tests creations of CRS objects.
      */
     public void testCreation() throws FactoryException {
-        if (factory == null) return;
         final CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory(null);
         CoordinateReferenceSystem sourceCRS, targetCRS;
         CoordinateOperation operation;
@@ -468,10 +225,13 @@ public class DefaultDataSourceTest extends TestCase {
 
         assertSame(sourceCRS, factory.createCoordinateReferenceSystem(" EPSG : 4273 "));
         assertSame(targetCRS, factory.createCoordinateReferenceSystem(" EPSG : 4979 "));
+    }
 
-        /*
-         * Tests closing the factory after the timeout.
-         */
+    /**
+     * Tests closing the factory after the timeout. <strong>IMPORTANT:</strong> This test must
+     * be run after {@link #testCreation} and before any call to {@code getAuthorityCodes()}.
+     */
+    public void testTimeout() throws FactoryException {
         factory.setTimeout(200);
         try {
             assertTrue(factory.isConnected());
@@ -487,13 +247,150 @@ public class DefaultDataSourceTest extends TestCase {
         // Was not in the cache
         assertEquals("4275", getIdentifier(factory.createCoordinateReferenceSystem("4275")));
         assertTrue(factory.isConnected());
+        factory.setTimeout(30*60*1000L);
+    }
+
+    /**
+     * Tests the creation of CRS using name instead of primary keys. Note that this test
+     * contains a call to {@code getDescriptionText(...)}, and concequently must be run
+     * after {@link #testTimeout}. See {@link #testDescriptionText}.
+     */
+    public void testNameUsage() throws FactoryException {
+        /*
+         * Tests unit
+         */
+        assertSame   (factory.createUnit("9002"), factory.createUnit("foot"));
+        assertNotSame(factory.createUnit("9001"), factory.createUnit("foot"));
+        /*
+         * Tests CRS
+         */
+        final CoordinateReferenceSystem primary, byName;
+        primary = factory.createCoordinateReferenceSystem("27581");
+        assertEquals("27581", getIdentifier(primary));
+        assertTrue(primary instanceof ProjectedCRS);
+        assertEquals(2, primary.getCoordinateSystem().getDimension());
+        /*
+         * Gets the CRS by name. It should be the same.
+         */
+        byName = factory.createCoordinateReferenceSystem("NTF (Paris) / France I");
+        assertEquals(primary, byName);
+        /*
+         * Gets the CRS using 'createObject'. It will requires ony more
+         * SQL statement internally in order to determines the object type.
+         */
+        factory.dispose(); // Clear the cache. This is not a real disposal.
+        assertEquals(primary, factory.createObject("27581"));
+        assertEquals(byName,  factory.createObject("NTF (Paris) / France I"));
+        /*
+         * Tests descriptions.
+         */
+        assertEquals("NTF (Paris) / France I", factory.getDescriptionText("27581").toString());
+        /*
+         * Tests fetching an object with name containing semi-colon.
+         */
+        final IdentifiedObject cs = factory.createCoordinateSystem(
+                "Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east.  UoM: DMS");
+        assertEquals("6411", getIdentifier(cs));
+    }
+
+    /**
+     * Tests the {@link AuthorityFactory#getDescriptionText} method. Note that the default
+     * implementation of {@code getDescriptionText(...)} invokes {@code getAuthorityCodes()},
+     * and concequently this test must be run after {@link #testTimeout}.
+     */
+    public void testDescriptionText() throws FactoryException {
+        assertEquals("World Geodetic System 1984", factory.getDescriptionText( "6326").toString(Locale.ENGLISH));
+        assertEquals("Mean Sea Level",             factory.getDescriptionText( "5100").toString(Locale.ENGLISH));
+        assertEquals("NTF (Paris) / Nord France",  factory.getDescriptionText("27591").toString(Locale.ENGLISH));
+        assertEquals("Ellipsoidal height",         factory.getDescriptionText(   "84").toString(Locale.ENGLISH));
+    }
+
+    /**
+     * Tests the {@code getAuthorityCodes()} method.
+     */
+    public void testAuthorityCodes() throws FactoryException {
+        final Set crs = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
+        assertFalse(crs.isEmpty());
+        assertTrue (crs.size() > 0);
+        assertEquals("Check size() consistency", crs.size(), crs.size());
+
+        final Set geographicCRS = factory.getAuthorityCodes(GeographicCRS.class);
+        assertFalse(geographicCRS.isEmpty());
+        assertTrue (geographicCRS.size() > 0);
+        assertTrue (geographicCRS.size() < crs.size());
+        assertFalse(geographicCRS.containsAll(crs));
+        assertTrue (crs.containsAll(geographicCRS));
+
+        final Set projectedCRS = factory.getAuthorityCodes(ProjectedCRS.class);
+        assertFalse(projectedCRS.isEmpty());
+        assertTrue (projectedCRS.size() > 0);
+        assertTrue (projectedCRS.size() < crs.size());
+        assertFalse(projectedCRS.containsAll(crs));
+        assertTrue (crs.containsAll(projectedCRS));
+//        assertTrue(Collections.disjoint(geographicCRS, projectedCRS));
+        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
+
+        final Set datum = factory.getAuthorityCodes(Datum.class);
+        assertFalse(datum.isEmpty());
+        assertTrue (datum.size() > 0);
+//        assertTrue(Collections.disjoint(datum, crs));
+        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
+
+        final Set geodeticDatum = factory.getAuthorityCodes(GeodeticDatum.class);
+        assertFalse(geodeticDatum.isEmpty());
+        assertTrue (geodeticDatum.size() > 0);
+        assertFalse(geodeticDatum.containsAll(datum));
+        assertTrue (datum.containsAll(geodeticDatum));
+
+        // Ensures that the factory keept the set in its cache.
+        assertSame(crs,           factory.getAuthorityCodes(CoordinateReferenceSystem.class));
+        assertSame(geographicCRS, factory.getAuthorityCodes(            GeographicCRS.class));
+        assertSame(projectedCRS,  factory.getAuthorityCodes(             ProjectedCRS.class));
+        assertSame(datum,         factory.getAuthorityCodes(                    Datum.class));
+        assertSame(geodeticDatum, factory.getAuthorityCodes(            GeodeticDatum.class));
+        assertSame(geodeticDatum, factory.getAuthorityCodes(     DefaultGeodeticDatum.class));
+
+        // Try a dummy type.
+        assertTrue("Dummy type", factory.getAuthorityCodes(String.class).isEmpty());
+
+        // Tests projections, which are handle in a special way.
+        final Set operations      = factory.getAuthorityCodes(Operation     .class);
+        final Set conversions     = factory.getAuthorityCodes(Conversion    .class);
+        final Set projections     = factory.getAuthorityCodes(Projection    .class);
+        final Set transformations = factory.getAuthorityCodes(Transformation.class);
+
+        assertTrue (conversions    .size() < operations .size());
+        assertTrue (projections    .size() < operations .size());
+        assertTrue (transformations.size() < operations .size());
+        assertTrue (projections    .size() < conversions.size());
+
+        assertFalse(projections.containsAll(conversions));
+        assertTrue (conversions.containsAll(projections));
+        assertTrue (operations .containsAll(conversions));
+        assertTrue (operations .containsAll(transformations));
+
+        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
+//        assertTrue (Collections.disjoint(conversions, transformations));
+//        assertFalse(Collections.disjoint(conversions, projections));
+
+        assertFalse(operations     .isEmpty());
+        assertFalse(conversions    .isEmpty());
+        assertFalse(projections    .isEmpty());
+        assertFalse(transformations.isEmpty());
+
+        assertTrue (conversions.contains("101"));
+        assertFalse(projections.contains("101"));
+        assertTrue (projections.contains("16001"));
+
+        final Set units = factory.getAuthorityCodes(Unit.class);
+        assertFalse(units.isEmpty());
+        assertTrue (units.size() > 0);
     }
 
     /**
      * Tests the serialization of many {@link CoordinateOperation} objects.
      */
     public void testSerialization() throws FactoryException, IOException, ClassNotFoundException {
-        if (factory == null) return;
         CoordinateReferenceSystem crs1 = factory.createCoordinateReferenceSystem("4326");
         CoordinateReferenceSystem crs2 = factory.createCoordinateReferenceSystem("4322");
         CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory(null);
@@ -545,7 +442,6 @@ public class DefaultDataSourceTest extends TestCase {
      * Tests the creation of {@link Conversion} objects.
      */
     public void testConversions() throws FactoryException {
-        if (factory == null) return;
         /*
          * UTM zone 10N
          */
@@ -589,7 +485,6 @@ public class DefaultDataSourceTest extends TestCase {
      * Tests the creation of {@link Transformation} objects.
      */
     public void testTransformations() throws FactoryException {
-        if (factory == null) return;
         /*
          * Longitude rotation
          */
@@ -677,7 +572,6 @@ public class DefaultDataSourceTest extends TestCase {
      * Fetchs the accuracy declared in all coordinate operations found in the database.
      */
     public void testAccuracy() throws FactoryException {
-        if (factory == null) return;
         final Set identifiers = factory.getAuthorityCodes(CoordinateOperation.class);
         double min   = Double.POSITIVE_INFINITY;
         double max   = Double.NEGATIVE_INFINITY;

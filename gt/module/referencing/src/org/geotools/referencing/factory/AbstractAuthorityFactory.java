@@ -115,15 +115,9 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     protected final FactoryGroup factories;
 
     /**
-     * The operation factory to use for {@link #createFromCoordinateReferenceSystemCodes}.
-     * Will be fetch only when first needed.
-     */
-    private transient CoordinateOperationFactory operationFactory;
-
-    /**
      * Constructs an instance using the specified set of factories.
      *
-     * @param factories The factories to use.
+     * @param factories The low-level factories to use.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
@@ -617,7 +611,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     }
     
     /**
-     * Create a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
+     * Creates a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
      *
      * @param code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
@@ -668,7 +662,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     }
 
     /**
-     * Create a {@linkplain ImageCRS image coordinate reference system} from a code.
+     * Creates a {@linkplain ImageCRS image coordinate reference system} from a code.
      *
      * @param code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
@@ -702,7 +696,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     }
 
     /**
-     * Create a {@linkplain TemporalCRS temporal coordinate reference system} from a code.
+     * Creates a {@linkplain TemporalCRS temporal coordinate reference system} from a code.
      *
      * @param code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
@@ -720,7 +714,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     }
 
     /**
-     * Create a {@linkplain VerticalCRS vertical coordinate reference system} from a code.
+     * Creates a {@linkplain VerticalCRS vertical coordinate reference system} from a code.
      *
      * @param code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
@@ -808,16 +802,10 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     {
         ensureNonNull("sourceCode", sourceCode);
         ensureNonNull("targetCode", targetCode);
-        final CoordinateReferenceSystem sourceCRS = createCoordinateReferenceSystem(sourceCode);
-        final CoordinateReferenceSystem targetCRS = createCoordinateReferenceSystem(targetCode);
-        /*
-         * No need to synchronize. This is not a big deal if FactoryFinder is invoked twice.
-         */
-        if (operationFactory == null) {
-            operationFactory = FactoryFinder.getCoordinateOperationFactory(
-                               new Hints(FactoryGroup.HINT_KEY, factories));
-        }
-        return Collections.singleton(operationFactory.createOperation(sourceCRS, targetCRS));
+        final CoordinateReferenceSystem  sourceCRS = createCoordinateReferenceSystem(sourceCode);
+        final CoordinateReferenceSystem  targetCRS = createCoordinateReferenceSystem(targetCode);
+        final CoordinateOperationFactory opFactory = factories.getCoordinateOperationFactory();
+        return Collections.singleton(opFactory.createOperation(sourceCRS, targetCRS));
     }
 
     /**

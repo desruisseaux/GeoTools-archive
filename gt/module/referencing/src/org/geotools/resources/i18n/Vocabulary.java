@@ -83,7 +83,7 @@ public class Vocabulary extends ResourceBundle {
      *       {@code toString(Locale)} is invoked.
      */
     public static InternationalString formatInternational(final int    key,
-                                                          final String arg0)
+                                                          final Object arg0)
     {
         return new org.geotools.util.SimpleInternationalString(format(key, arg0));
     }
@@ -102,8 +102,8 @@ public class Vocabulary extends ResourceBundle {
      *       {@code toString(Locale)} is invoked.
      */
     public static InternationalString formatInternational(final int    key,
-                                                          final String arg0,
-                                                          final String arg1)
+                                                          final Object arg0,
+                                                          final Object arg1)
     {
         return new org.geotools.util.SimpleInternationalString(format(key, arg0, arg1));
     }
@@ -123,9 +123,9 @@ public class Vocabulary extends ResourceBundle {
      *       {@code toString(Locale)} is invoked.
      */
     public static InternationalString formatInternational(final int    key,
-                                                          final String arg0,
-                                                          final String arg1,
-                                                          final String arg2)
+                                                          final Object arg0,
+                                                          final Object arg1,
+                                                          final Object arg2)
     {
         return new org.geotools.util.SimpleInternationalString(format(key, arg0, arg1, arg2));
     }

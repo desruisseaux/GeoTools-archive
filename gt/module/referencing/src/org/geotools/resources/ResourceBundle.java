@@ -34,6 +34,7 @@ import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -79,6 +80,16 @@ public class ResourceBundle extends java.util.ResourceBundle {
     private String[] values;
 
     /**
+     * The locale for formatting objects like number, date, etc. There are two possible Locales
+     * we could use: default locale or resource bundle locale. If the default locale uses the same
+     * language as this ResourceBundle's locale, then we will use the default locale. This allows
+     * dates and numbers to be formatted according to user conventions (e.g. French Canada) even
+     * if the ResourceBundle locale is different (e.g. standard French). However, if languages
+     * don't match, then we will use ResourceBundle locale for better coherence.
+     */
+    private transient Locale locale;
+
+    /**
      * The object to use for formatting messages. This object
      * will be constructed only when first needed.
      */
@@ -116,6 +127,20 @@ public class ResourceBundle extends java.util.ResourceBundle {
      */
     protected ResourceBundle(final String filename) {
         this.filename = filename;
+    }
+
+    /**
+     * Returns the locale to use for formatters.
+     */
+    private Locale getFormatLocale() {
+        if (locale == null) {
+            locale = Locale.getDefault();
+            final Locale resourceLocale = getLocale();
+            if (!locale.getLanguage().equalsIgnoreCase(resourceLocale.getLanguage())) {
+                locale = resourceLocale;
+            }
+        }
+        return locale;
     }
 
     /**
@@ -350,7 +375,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * @param  arguments The object to check.
      * @return {@code arguments} as an array.
      */
-    private static Object[] toArray(final Object arguments) {
+    private Object[] toArray(final Object arguments) {
         Object[] array;
         if (arguments instanceof Object[]) {
             array = (Object[]) arguments;
@@ -358,12 +383,18 @@ public class ResourceBundle extends java.util.ResourceBundle {
             array = new Object[] {arguments};
         }
         for (int i=0; i<array.length; i++) {
-            if (array[i] instanceof CharSequence) {
-                final String s0 = array[i].toString();
+            final Object element = array[i];
+            if (element instanceof CharSequence) {
+                final String s0;
+                if (element instanceof InternationalString) {
+                    s0 = ((InternationalString) element).toString(getFormatLocale());
+                } else {
+                    s0 = element.toString();
+                }
                 final String s1 = summarize(s0, MAX_STRING_LENGTH);
                 if (s0!=s1 && !s0.equals(s1)) {
-                    if (array==arguments) {
-                        array=new Object[array.length];
+                    if (array == arguments) {
+                        array = new Object[array.length];
                         System.arraycopy(arguments, 0, array, 0, array.length);
                     }
                     array[i] = s1;
@@ -441,20 +472,9 @@ public class ResourceBundle extends java.util.ResourceBundle {
         synchronized (this) {
             if (format == null) {
                 /*
-                 * Constructs a new MessageFormat for formatting the arguments. There are two
-                 * possible Locale we could use: default locale or resource bundle locale. If
-                 * the default locale uses the same language as this ResourceBundle's locale,
-                 * then we will use the default locale. This allows dates and numbers to be
-                 * formatted according to user conventions (e.g. French Canada) even if the
-                 * ResourceBundle locale is different (e.g. standard French). However, if languages
-                 * don't match, then we will use ResourceBundle locale for better coherence.
+                 * Constructs a new MessageFormat for formatting the arguments.
                  */
-                Locale locale = Locale.getDefault();
-                final Locale resourceLocale = getLocale();
-                if (!locale.getLanguage().equalsIgnoreCase(resourceLocale.getLanguage())) {
-                    locale = resourceLocale;
-                }
-                format = new MessageFormat(object.toString(), locale);
+                format = new MessageFormat(object.toString(), getFormatLocale());
             } else if (key != lastKey) {
                 /*
                  * Method MessageFormat.applyPattern(...) is costly! We will avoid

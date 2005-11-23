@@ -22,6 +22,11 @@
  */
 package org.geotools.referencing.cs;
 
+// J2SE dependencies
+import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
+
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -53,6 +58,11 @@ public class DefaultCompoundCS extends AbstractCS {
      * The coordinate systems.
      */
     private final CoordinateSystem[] cs;
+
+    /**
+     * An immutable view of {@link #cs} as a list. Will be created only when first needed.
+     */
+    private transient List/*<CoordinateSystem>*/ asList;
 
     /**
      * Constructs a compound coordinate system. A name for this CS will
@@ -117,7 +127,18 @@ public class DefaultCompoundCS extends AbstractCS {
     }
 
     /**
-     * Compare this coordinate system with the specified object for equality.
+     * Returns all coordinate systems in this compound CS.
+     */
+    public List/*<CoordinateSystem>*/ getCoordinateSystems() {
+        if (asList == null) {
+            // No need to synchronize; this is not a big deal if two lists are created.
+            asList = Collections.unmodifiableList(Arrays.asList(cs));
+        }
+        return asList;
+    }
+
+    /**
+     * Compares this coordinate system with the specified object for equality.
      *
      * @param  object The object to compare to {@code this}.
      * @param  compareMetadata {@code true} for performing a strict comparaison, or

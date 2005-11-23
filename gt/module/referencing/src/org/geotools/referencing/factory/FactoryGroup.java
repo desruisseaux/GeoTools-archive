@@ -62,6 +62,8 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -122,6 +124,14 @@ public class FactoryGroup {
     private CRSFactory crsFactory;
 
     /**
+     * The {@linkplain CoordinateOperation coordinate operation} factory.
+     * If null, then a default factory will be created only when first needed.
+     *
+     * @since 2.2
+     */
+    private CoordinateOperationFactory opFactory;
+
+    /**
      * The {@linkplain MathTransform math transform} factory.
      * If null, then a default factory will be created only when first needed.
      */
@@ -167,7 +177,7 @@ public class FactoryGroup {
      *
      * @see #createInstance
      */
-    public FactoryGroup(final Hints hints) {
+    public FactoryGroup(Hints hints) {
         /*
          * If hints are provided, we will fetch factory immediately (instead of storing the hints
          * in an inner field) because most factories will retain few hints, while the Hints map
@@ -175,10 +185,15 @@ public class FactoryGroup {
          * when first needed.
          */
         if (hints!=null && !hints.isEmpty()) {
-            datumFactory = FactoryFinder.getDatumFactory        (hints);
-            csFactory    = FactoryFinder.getCSFactory           (hints);
-            crsFactory   = FactoryFinder.getCRSFactory          (hints);
-            mtFactory    = FactoryFinder.getMathTransformFactory(hints);
+            if (!hints.containsKey(HINT_KEY)) {
+                hints = new Hints(hints);
+                hints.putAll(hints());
+            }
+            datumFactory = FactoryFinder.getDatumFactory              (hints);
+            csFactory    = FactoryFinder.getCSFactory                 (hints);
+            crsFactory   = FactoryFinder.getCRSFactory                (hints);
+            opFactory    = FactoryFinder.getCoordinateOperationFactory(hints);
+            mtFactory    = FactoryFinder.getMathTransformFactory      (hints);
         }
     }
 
@@ -216,11 +231,23 @@ public class FactoryGroup {
      * @since 2.2
      */
     public void getHints(final Map hints) {
-        hints.put(Hints.           CRS_FACTORY, getCRSFactory());
-        hints.put(Hints.            CS_FACTORY, getCSFactory());
-        hints.put(Hints.         DATUM_FACTORY, getDatumFactory());
-        hints.put(Hints.MATH_TRANSFORM_FACTORY, getMathTransformFactory());
-        hints.put(HINT_KEY, this);
+        hints.put(Hints.                 CRS_FACTORY, getCRSFactory());
+        hints.put(Hints.                  CS_FACTORY, getCSFactory());
+        hints.put(Hints.               DATUM_FACTORY, getDatumFactory());
+        hints.put(Hints.COORDINATE_OPERATION_FACTORY, getCoordinateOperationFactory());
+        hints.put(Hints.      MATH_TRANSFORM_FACTORY, getMathTransformFactory());
+        hints.putAll(hints());
+    }
+
+    /**
+     * Returns the hints to be used for lazy creation of <em>default</em> factories in various
+     * {@code getFoo} methods. This is different from {@link #getHints} because the later may
+     * returns non-default factories. The hint provided by this method is needed in order to
+     * avoid never-ending loop when a factory creation requires a {@code FactoryGroup} instance
+     * (for example in {@link DefaultCoordinateOperationFactory}).
+     */
+    private Hints hints() {
+        return new Hints(HINT_KEY, this);
     }
 
     /**
@@ -228,7 +255,7 @@ public class FactoryGroup {
      */
     public DatumFactory getDatumFactory() {
         if (datumFactory == null) {
-            datumFactory = FactoryFinder.getDatumFactory(null);
+            datumFactory = FactoryFinder.getDatumFactory(hints());
         }
         return datumFactory;
     }
@@ -238,7 +265,7 @@ public class FactoryGroup {
      */
     public CSFactory getCSFactory() {
         if (csFactory == null) {
-            csFactory = FactoryFinder.getCSFactory(null);
+            csFactory = FactoryFinder.getCSFactory(hints());
         }
         return csFactory;
     }
@@ -248,9 +275,21 @@ public class FactoryGroup {
      */
     public CRSFactory getCRSFactory() {
         if (crsFactory == null) {
-            crsFactory = FactoryFinder.getCRSFactory(null);
+            crsFactory = FactoryFinder.getCRSFactory(hints());
         }
         return crsFactory;
+    }
+
+    /**
+     * Returns the {@linkplain CoordinateOperation coordinate operation} factory.
+     *
+     * @since 2.2
+     */
+    public CoordinateOperationFactory getCoordinateOperationFactory() {
+        if (opFactory == null) {
+            opFactory = FactoryFinder.getCoordinateOperationFactory(hints());
+        }
+        return opFactory;
     }
 
     /**
@@ -258,7 +297,7 @@ public class FactoryGroup {
      */
     public MathTransformFactory getMathTransformFactory() {
         if (mtFactory == null) {
-            mtFactory = FactoryFinder.getMathTransformFactory(null);
+            mtFactory = FactoryFinder.getMathTransformFactory(hints());
         }
         return mtFactory;
     }

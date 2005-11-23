@@ -60,10 +60,9 @@ import org.geotools.resources.CRSUtilities;
  * {@linkplain CoordinateOperation#getScope scope} and
  * {@linkplain CoordinateOperation#getPositionalAccuracy positional accuracy}.
  *
+ * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                                  implements OptionalFactory

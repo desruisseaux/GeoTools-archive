@@ -23,24 +23,20 @@
 package org.geotools.referencing.cs;
 
 // J2SE dependencies and extensions
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
-import javax.units.ConversionException;
-import javax.units.Converter;
-import javax.units.NonSI;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Collections;
 import javax.units.SI;
+import javax.units.NonSI;
 import javax.units.Unit;
+import javax.units.Converter;
+import javax.units.ConversionException;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.cs.CartesianCS;
-import org.opengis.referencing.cs.EllipsoidalCS;
-import org.opengis.referencing.cs.SphericalCS;
-import org.opengis.referencing.cs.VerticalCS;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.util.InternationalString;
@@ -54,7 +50,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
-import org.geotools.resources.i18n.VocabularyKeys;
+
 
 
 /**
@@ -269,7 +265,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      * @param  sourceCS The source coordinate system.
      * @param  targetCS The target coordinate system.
      * @return The conversion from {@code sourceCS} to {@code targetCS} as
-     *         an affine transform. Only axis orientation and units are taken in account.
+     *         an affine transform. Only axis direction and units are taken in account.
      * @throws IllegalArgumentException if axis doesn't matches, or the CS doesn't have the
      *         same geometry.
      * @throws ConversionException if the unit conversion is non-linear.
@@ -337,7 +333,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
     }
 
     /**
-     * Returns a coordinate system with standard axis order and units. This method returns one
+     * Returns a coordinate system with "standard" axis order and units. This method returns one
      * of the predefined constants with axis in (<var>longitude</var>,<var>latitude</var>) or
      * (<var>X</var>,<var>Y</var>) order, and units in degree or metres. This method is typically
      * used together with {@link #swapAndScaleAxis swapAndScaleAxis} for the creation of a
@@ -351,43 +347,19 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      * </pre></blockquote>
      * <p>
      * A rational for standard axis order and units is explained in the <cite>Axis units and
-     * orientation</cite> section in the {@linkplain org.geotools.referencing.operation.projection
+     * direction</cite> section in the {@linkplain org.geotools.referencing.operation.projection
      * description of map projection package}.
      *
      * @param  cs The coordinate system.
-     * @return A constant similar to the specified {@code cs} with standard axis.
-     * @throws IllegalArgumentException if the specified {@code cs} is unknow to this method.
+     * @return A constant similar to the specified {@code cs} with "standard" axis.
+     * @throws IllegalArgumentException if the specified coordinate system is unknow to this method.
      *
      * @since 2.2
      */
     public static CoordinateSystem standard(final CoordinateSystem cs)
             throws IllegalArgumentException
     {
-        final int dimension = cs.getDimension();
-        if (cs instanceof CartesianCS) {
-            switch (dimension) {
-                case 2: return DefaultCartesianCS.GENERIC_2D;
-                case 3: return DefaultCartesianCS.GENERIC_3D;
-            }
-        }
-        if (cs instanceof EllipsoidalCS) {
-            switch (dimension) {
-                case 2: return DefaultEllipsoidalCS.GEODETIC_2D;
-                case 3: return DefaultEllipsoidalCS.GEODETIC_3D;
-            }
-        }
-        if (cs instanceof SphericalCS) {
-            switch (dimension) {
-                case 3: return DefaultSphericalCS.GEOCENTRIC;
-            }
-        }
-        if (cs instanceof VerticalCS) {
-            switch (dimension) {
-                case 1: return DefaultVerticalCS.ELLIPSOIDAL_HEIGHT;
-            }
-        }
-        throw new IllegalArgumentException(
-                Errors.format(ErrorKeys.UNSUPPORTED_COORDINATE_SYSTEM_$1, cs.getName().getCode()));
+        return PredefinedCS.standard(cs);
     }
 
     /**

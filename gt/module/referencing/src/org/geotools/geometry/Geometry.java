@@ -35,7 +35,7 @@ import org.geotools.referencing.operation.TransformPathNotFoundException;
 
 
 /**
- * Root class of the Geotools default implementation of geometric object. <code>Geometry</code>
+ * Root class of the Geotools default implementation of geometric object. {@code Geometry}
  * instances are sets of direct positions in a particular coordinate reference system.
  *
  * @since 2.0
@@ -61,7 +61,7 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
     protected final CoordinateReferenceSystem crs;
 
     /**
-     * Construct a geometry with the specified coordinate reference system.
+     * Constructs a geometry with the specified coordinate reference system.
      *
      * @param crs The coordinate reference system used in
      *            {@linkplain GeneralDirectPosition direct position} coordinates.
@@ -84,9 +84,9 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
     }
 
     /**
-     * Returns the dimension of the coordinates that define this <code>Geometry</code>, which must
+     * Returns the dimension of the coordinates that define this {@code Geometry}, which must
      * be the same as the coordinate dimension of the coordinate reference system for this
-     * <code>Geometry</code>.
+     * {@code Geometry}.
      *
      * @return The coordinate dimension.
      *
@@ -98,12 +98,12 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
     }
 
     /**
-     * Returns a new <code>Geometry</code> that is the coordinate transformation of this
-     * <code>Geometry</code> into the passed coordinate reference system within the accuracy
+     * Returns a new {@code Geometry} that is the coordinate transformation of this
+     * {@code Geometry} into the passed coordinate reference system within the accuracy
      * of the transformation.
      *
      * @param  newCRS The new coordinate reference system.
-     * @return The transformed <code>Geometry</code>.
+     * @return The transformed {@code Geometry}.
      * @throws TransformException if the transformation failed.
      */
     public org.opengis.spatialschema.geometry.Geometry
@@ -133,9 +133,9 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
      * will have no impact on the returned clone, and conversely. For big geometries, implementations
      * are encouraged to share as much internal data as possible (as opposed to performing a real
      * copy of the data), while preserving the deep copy semantic.
-     *
-     * <P>The default implementation throws {@link CloneNotSupportedException}. If subclasses
-     * implements {@link Cloneable}, then they should overrides this method.</P>
+     * <P>
+     * The default implementation throws {@link CloneNotSupportedException}. If subclasses
+     * implements {@link Cloneable}, then they should overrides this method.
      *
      * @throws CloneNotSupportedException if this object do not support clone. This exception is
      *         never throws if this object implements {@link Cloneable}.
