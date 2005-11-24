@@ -30,6 +30,7 @@ import org.opengis.referencing.cs.*;
 // Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 
 
 /**
@@ -163,13 +164,23 @@ final class PredefinedCS implements Comparator {
         for (int i=0; i<userNames.length; i++) {
             userNames[i] = userCS.getAxis(i).getName().getCode().trim();
         }
-        for (int i=stdCS.getDimension(); --i>=0;) {
-            final String name = stdCS.getAxis(i).getName().getCode().trim();
+check:  for (int i=stdCS.getDimension(); --i>=0;) {
+            final CoordinateSystemAxis axis = stdCS.getAxis(i);
+            final String name = axis.getName().getCode().trim();
+            String opposite = null;
+            if (axis instanceof DefaultCoordinateSystemAxis) {
+                final CoordinateSystemAxis op = ((DefaultCoordinateSystemAxis) axis).getOpposite();
+                if (op != null) {
+                    opposite = op.getName().getCode().trim();
+                }
+            }
             for (int j=userNames.length; --j>=0;) {
                 final String userName = userNames[j];
-                if (userName!=null && name.equalsIgnoreCase(userName)) {
+                if (userName!=null && (userName.equalsIgnoreCase(name) ||
+                   (opposite!=null && userName.equalsIgnoreCase(opposite))))
+                {
                     userNames[j] = null; // Do not compare the same axis twice.
-                    continue;
+                    continue check;
                 }
             }
             return false; // At least one axis doesn't match.

@@ -417,6 +417,10 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis WESTING = new DefaultCoordinateSystemAxis(
             VocabularyKeys.WESTING, "W", AxisDirection.WEST, SI.METER);
+    static {
+        EASTING.opposite = WESTING;
+        WESTING.opposite = EASTING;
+    }
     
     /**
      * Default axis info for Northing values in a
@@ -453,6 +457,10 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis SOUTHING = new DefaultCoordinateSystemAxis(
             VocabularyKeys.SOUTHING, "S", AxisDirection.SOUTH, SI.METER);
+    static {
+        NORTHING.opposite = SOUTHING;
+        SOUTHING.opposite = NORTHING;
+    }
     
     /**
      * A default axis for time values in a {@linkplain org.opengis.referencing.cs.TimeCS time CS}.
@@ -502,6 +510,12 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * The unit of measure used for this coordinate system axis.
      */
     private final Unit unit;
+
+    /**
+     * The axis with opposite direction, or {@code null} if unknow.
+     * Not serialized because only used for the predefined constants.
+     */
+    private transient DefaultCoordinateSystemAxis opposite;
 
     /**
      * Constructs a new coordinate system axis with the same values than the specified one.
@@ -675,6 +689,14 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public Unit getUnit() {
         return unit;
+    }
+
+    /**
+     * Returns an axis with the opposite direction of this one, or {@code null} if unknown.
+     * This method is not yet public because only a few predefined constants have this information.
+     */
+    final CoordinateSystemAxis getOpposite() {
+        return opposite;
     }
 
     /**

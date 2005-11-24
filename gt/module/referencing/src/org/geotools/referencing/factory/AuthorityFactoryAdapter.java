@@ -41,6 +41,7 @@ import org.opengis.referencing.crs.*;
 import org.opengis.referencing.operation.*;
 
 // Geotools dependencies
+import org.geotools.util.WeakValueHashMap;
 import org.geotools.resources.Utilities;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;
@@ -100,6 +101,12 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     protected final CoordinateOperationAuthorityFactory opFactory;
 
     /**
+     * A pool of modified objects created up to date. Will be created only when
+     * first needed.
+     */
+    private transient Map pool;
+
+    /**
      * Creates a factory wrapping the specified one. The priority level will be equals to the
      * specified {@linkplain AbstractAuthorityFactory#priority factory's priority} plus one.
      */
@@ -136,6 +143,25 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
         this.   csFactory =    csFactory;
         this.  crsFactory =   crsFactory;
         this.   opFactory =    opFactory;
+    }
+
+    /**
+     * Cache a modified object in the internal pool.
+     * @todo Use generic types once we will be allowed to compile for J2SE 1.5.
+     */
+    final void cache(final IdentifiedObject original, final IdentifiedObject modified) {
+        if (pool == null) {
+            pool = new WeakValueHashMap();
+        }
+        pool.put(original, modified);
+    }
+
+    /**
+     * Returns a modified object from the pool.
+     * @todo Use generic types once we will be allowed to compile for J2SE 1.5.
+     */
+    final IdentifiedObject getFromCache(final IdentifiedObject original) {
+        return (pool!=null) ? (IdentifiedObject) pool.get(original) : null;
     }
 
     /**
@@ -178,6 +204,10 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     protected CoordinateReferenceSystem replace(final CoordinateReferenceSystem crs)
             throws FactoryException
     {
+        CoordinateReferenceSystem candidate = (CoordinateReferenceSystem) getFromCache(crs);
+        if (candidate != null) {
+            return candidate;
+        }
         /*
          * Gets the replaced coordinate system and datum, and checks if there is any change.
          */
@@ -190,59 +220,68 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
         } else {
             datum = oldDatum = null;
         }
-        if (Utilities.equals(cs, oldCS) && Utilities.equals(datum, oldDatum)) {
-            return crs;
-        }
+        final boolean sameCS = Utilities.equals(cs, oldCS) && Utilities.equals(datum, oldDatum);
         /*
          * Creates a new coordinate reference system using the same properties than the
          * original CRS, except for the coordinate system, datum and authority code.
          */
-        final Map properties = getProperties(crs);
-        final CRSFactory crsFactory = factories.getCRSFactory();
         if (crs instanceof GeneralDerivedCRS) {
             final GeneralDerivedCRS         derivedCRS = (GeneralDerivedCRS) crs;
             final CoordinateReferenceSystem oldBaseCRS = derivedCRS.getBaseCRS();
             final CoordinateReferenceSystem    baseCRS = replace(oldBaseCRS);
+            if (sameCS && Utilities.equals(baseCRS, oldBaseCRS)) {
+                return crs;
+            }
+            final Map properties = getProperties(crs);
+            final CRSFactory crsFactory = factories.getCRSFactory();
             Conversion fromBase = derivedCRS.getConversionFromBase();
             fromBase = new DefiningConversion(getProperties(fromBase),
                            fromBase.getMethod(), fromBase.getParameterValues());
             if (crs instanceof ProjectedCRS) {
-                return factories.createProjectedCRS(properties, (GeographicCRS) baseCRS,
+                candidate = factories.createProjectedCRS(properties, (GeographicCRS) baseCRS,
                                                     fromBase, (CartesianCS) cs);
+            } else {
+                // TODO: Need a createDerivedCRS method.
+                throw new FactoryException(Errors.format(ErrorKeys.UNSUPPORTED_CRS_$1,
+                                           crs.getName().getCode()));
+            }
+        } else if (sameCS) {
+            return crs;
+        } else {
+            final Map properties = getProperties(crs);
+            final CRSFactory crsFactory = factories.getCRSFactory();
+            if (crs instanceof GeographicCRS) {
+                candidate = crsFactory.createGeographicCRS(properties, (GeodeticDatum) datum, (EllipsoidalCS) cs);
+            } else if (crs instanceof GeocentricCRS) {
+                final GeodeticDatum gd = (GeodeticDatum) datum;
+                if (cs instanceof CartesianCS) {
+                    candidate = crsFactory.createGeocentricCRS(properties, gd, (CartesianCS) cs);
+                } else {
+                    candidate = crsFactory.createGeocentricCRS(properties, gd, (SphericalCS) cs);
+                }
+            } else if (crs instanceof VerticalCRS) {
+                candidate = crsFactory.createVerticalCRS(properties, (VerticalDatum) datum, (VerticalCS) cs);
+            } else if (crs instanceof TemporalCRS) {
+                candidate = crsFactory.createTemporalCRS(properties, (TemporalDatum) datum, (TimeCS) cs);
+            } else if (crs instanceof ImageCRS) {
+                candidate = crsFactory.createImageCRS(properties, (ImageDatum) datum, (AffineCS) cs);
+            } else if (crs instanceof EngineeringCRS) {
+                candidate = crsFactory.createEngineeringCRS(properties, (EngineeringDatum) datum, cs);
+            } else if (crs instanceof CompoundCRS) {
+                final List/*<CoordinateReferenceSystem>*/ elements =
+                        ((CompoundCRS) crs).getCoordinateReferenceSystems();
+                final CoordinateReferenceSystem[] modified = new CoordinateReferenceSystem[elements.size()];
+                for (int i=0; i<modified.length; i++) {
+                    modified[i] = replace((CoordinateReferenceSystem) elements.get(i));
+                }
+                candidate = crsFactory.createCompoundCRS(properties, modified);
+            } else {
+                throw new FactoryException(Errors.format(ErrorKeys.UNSUPPORTED_CRS_$1,
+                                                         crs.getName().getCode()));
             }
         }
-        if (crs instanceof GeographicCRS) {
-            return crsFactory.createGeographicCRS(properties, (GeodeticDatum) datum, (EllipsoidalCS) cs);
-        }
-        if (crs instanceof GeocentricCRS) {
-            final GeodeticDatum gd = (GeodeticDatum) datum;
-            if (cs instanceof CartesianCS) {
-                return crsFactory.createGeocentricCRS(properties, gd, (CartesianCS) cs);
-            }
-            return crsFactory.createGeocentricCRS(properties, gd, (SphericalCS) cs);
-        }
-        if (crs instanceof VerticalCRS) {
-            return crsFactory.createVerticalCRS(properties, (VerticalDatum) datum, (VerticalCS) cs);
-        }
-        if (crs instanceof TemporalCRS) {
-            return crsFactory.createTemporalCRS(properties, (TemporalDatum) datum, (TimeCS) cs);
-        }
-        if (crs instanceof ImageCRS) {
-            return crsFactory.createImageCRS(properties, (ImageDatum) datum, (AffineCS) cs);
-        }
-        if (crs instanceof EngineeringCRS) {
-            return crsFactory.createEngineeringCRS(properties, (EngineeringDatum) datum, cs);
-        }
-        if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ elements =
-                    ((CompoundCRS) crs).getCoordinateReferenceSystems();
-            final CoordinateReferenceSystem[] modified = new CoordinateReferenceSystem[elements.size()];
-            for (int i=0; i<modified.length; i++) {
-                modified[i] = replace((CoordinateReferenceSystem) elements.get(i));
-            }
-            return crsFactory.createCompoundCRS(properties, modified);
-        }
-        throw new FactoryException(Errors.format(ErrorKeys.UNSUPPORTED_CRS_$1, crs.getName().getCode()));
+        cache(crs, candidate);
+        return candidate;
     }
 
     /**
@@ -257,14 +296,19 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     protected CoordinateOperation replace(final CoordinateOperation operation)
             throws FactoryException
     {
-        final CoordinateReferenceSystem oldSrcCRS = operation.getSourceCRS();
-        final CoordinateReferenceSystem oldTgtCRS = operation.getTargetCRS();
-        final CoordinateReferenceSystem sourceCRS = replace(oldSrcCRS);
-        final CoordinateReferenceSystem targetCRS = replace(oldTgtCRS);
-        if (Utilities.equals(oldSrcCRS, sourceCRS) && Utilities.equals(oldTgtCRS, targetCRS)) {
-            return operation;
+        CoordinateOperation candidate = (CoordinateOperation) getFromCache(operation);
+        if (candidate == null) {
+            final CoordinateReferenceSystem oldSrcCRS = operation.getSourceCRS();
+            final CoordinateReferenceSystem oldTgtCRS = operation.getTargetCRS();
+            final CoordinateReferenceSystem sourceCRS = replace(oldSrcCRS);
+            final CoordinateReferenceSystem targetCRS = replace(oldTgtCRS);
+            if (Utilities.equals(oldSrcCRS, sourceCRS) && Utilities.equals(oldTgtCRS, targetCRS)) {
+                return operation;
+            }
+            candidate = factories.getCoordinateOperationFactory().createOperation(sourceCRS, targetCRS);
+            cache(operation, candidate);
         }
-        return factories.getCoordinateOperationFactory().createOperation(sourceCRS, targetCRS);
+        return candidate;
     }
 
     /**

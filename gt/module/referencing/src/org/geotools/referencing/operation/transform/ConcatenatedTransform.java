@@ -203,6 +203,10 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
             tr1 = create(tr1, ctr.transform1);
             tr2 = ctr.transform2;
         }
+        // Tests again, because one of the 'create' methods
+        // above may have returned an identity transform.
+        if (tr1.isIdentity()) return tr2;
+        if (tr2.isIdentity()) return tr1;
 
         // Before to create a general ConcatenatedTransform object, give a
         // chance to AbstractMathTransform to returns an optimized object.

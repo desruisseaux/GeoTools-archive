@@ -19,8 +19,9 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
+import javax.units.ConversionException;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.*;
@@ -42,6 +43,14 @@ import org.geotools.referencing.cs.AbstractCS;
  * some pre-determined order. This factory is mostly used by application expecting geographic
  * coordinates in (<var>longitude</var>, <var>latitude</var>) order, while most geographic CRS
  * specified in the EPSG database use the opposite axis order.
+ * <p>
+ * <strong>Avoid this class as much as possible.</strong> A good client application should
+ * work correctly with arbitrary axis order. This class exists only for compatibility with
+ * external data or applications that assume (<var>longitude</var>, <var>latitude</var>)
+ * axis order no matter what the EPSG database said. Examples include <cite>Proj4</cite>
+ * and applications that uses it, like <cite>PostGIS</cite>. Note that using this "ordered
+ * axis authority factory" may have a negative impact on performance, accuracy and range of
+ * supported CRS.
  *
  * @since 2.2
  * @version $Id$
@@ -115,20 +124,39 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
      * @throws FactoryException If this method can't rearange the axis for the specified {@code cs}.
      */
     protected CoordinateSystem replace(CoordinateSystem cs) throws FactoryException {
-        final CoordinateSystem candidate;
+        CoordinateSystem candidate = (CoordinateSystem) getFromCache(cs);
+        if (candidate != null) {
+            return candidate;
+        }
         final Matrix changes;
         try {
             candidate = AbstractCS.standard(cs);
-            if (!fixUnits) {
+            try {
+                changes = AbstractCS.swapAndScaleAxis(cs, candidate);
+            } catch (ConversionException e) {
+                /*
+                 * At least one axis uses a non-convertible units. The most typical case are axis
+                 * using sexagesimal degrees (DMS), which are not convertibles to degrees through
+                 * a linear relationship. Returns the "standard" coordinate system and hopes that
+                 * it is compatible with the original one. We are not quite sure, since the "swap
+                 * and scale axis" method didn't completed successfully. I know that it is really
+                 * not rigourous, but hey, users are highly discouraged to use this class if they
+                 * can avoid it.
+                 */
                 return candidate;
             }
-            changes = AbstractCS.swapAndScaleAxis(cs, candidate);
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             /*
-             * Catchs all runtime exceptions for simplicity, but the only two ones that we
-             * really want to catch are IllegalArgumentException and ConversionException.
+             * The coordinate system is unrecognized, or axis directions
+             * are not colinear with "standard" directions.
              */
             throw new FactoryException(getErrorMessage(cs), e);
+        }
+        if (changes.isIdentity()) {
+            return cs;
+        }
+        if (fixUnits) {
+            return candidate;
         }
         /*
          * Reorder the axis according the information provided in the changes matrix. Each
@@ -141,27 +169,48 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
         assert changes.getNumRow() == axis.length + 1 : changes;
         boolean changed = false;
         for (int i=0; i<axis.length; i++) {
-            int pos = -1;
+            int nj = -1;
             for (int j=0; j<axis.length; j++) {
                 if (changes.getElement(j,i) != 0) {
-                    if (pos >= 0) {
+                    if (nj >= 0) {
                         throw new FactoryException(getErrorMessage(cs));
                     }
-                    pos = j;
+                    nj = j;
                 }
             }
-            if (pos < 0 || axis[pos] != null) {
+            if (nj < 0 || axis[nj] != null) {
                 throw new FactoryException(getErrorMessage(cs));
             }
-            axis[pos] = cs.getAxis(i);
-            if (pos != i) {
+            if (nj != i) {
                 changed = true;
             }
+            /*
+             * We now know the new axis position (nj). The old axis position is (i).
+             * Before to stores in the array, checks if the axis direction needs to
+             * be reversed.
+             */
+            CoordinateSystemAxis axe = cs.getAxis(i);
+            if (changes.getElement(nj, i) < 0) {
+                changed = true;
+                final Map properties = getProperties(candidate.getAxis(i));
+                final CSFactory csFactory = factories.getCSFactory();
+                axe = csFactory.createCoordinateSystemAxis(properties,
+                        axe.getAbbreviation(), axe.getDirection().opposite(), axe.getUnit());
+            }
+            axis[nj] = axe;
         }
         /*
          * If the axis order changed, creates a new coordinate system using the new axis.
+         * Note: we use 'candidate' as the coordinate system model instead of 'cs' because
+         * the original CS name and remarks are often not anymore appropriate. The name from
+         * Geotools predefined CS are more neutral.
          */
-        return (changed) ? createCS(cs, axis) : cs;
+        if (!changed) {
+            return cs;
+        }
+        candidate = createCS(candidate, axis);
+        cache(cs, candidate);
+        return candidate;
     }
 
     /**
@@ -170,7 +219,7 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
      * it determined that the axis order need to be changed. Subclasses can override this method
      * if they want to performs some extra processing on the axis order.
      *
-     * @param  cs   The original coordinate system.
+     * @param  cs   The coordinate system to use as a model.
      * @param  axis The axis to give to the new coordinate system. Subclasses are allowed to write
      *              directly in this array (no need to copy it).
      * @return A new coordinate system of the same kind than {@code cs} but with the specified axis.
@@ -181,7 +230,7 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
     protected CoordinateSystem createCS(final CoordinateSystem cs, final CoordinateSystemAxis[] axis)
             throws FactoryException
     {
-        final int dimension = cs.getDimension();
+        final int dimension  = cs.getDimension();
         final Map properties = getProperties(cs);
         final CSFactory csFactory = factories.getCSFactory();
         if (cs instanceof CartesianCS) {
