@@ -98,7 +98,7 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
 
     /**
      * Returns the organization or party responsible for definition and maintenance of the
-     * database. The default implementation returns the authority of the {@linkplain #factory
+     * database. The default implementation returns the authority of the {@linkplain #crsFactory
      * underlying factory} with "(modified axis)" label appended.
      */
     public Citation getAuthority() {

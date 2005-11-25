@@ -51,7 +51,7 @@ public class KeySortedLinkedList {
      *
      * @deprecated Replaced by {@link KeySortedList#add}. The new method name is {@code add}
      *             instead of {@code insert} for consistency with other {@code add} methods
-     *             in the {@link List} interface.
+     *             in the {@link java.util.List} interface.
      */
     public void insert(Comparable x, Object o) {
         KeySortedLinkedListIterator location = this.findPrevious(x);

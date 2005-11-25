@@ -397,7 +397,7 @@ public class KeySortedList/*<K extends Comparable,V>*/ extends AbstractSequentia
      * {@code fromKey}. The returned list is backed by this list, so changes in the returned
      * list are reflected in this list, and vice-versa.
      *
-     * @param  toKey low endpoint (inclusive) of the sub list.
+     * @param  fromKey low endpoint (inclusive) of the sub list.
      * @return A view of the specified final range of this list.
      */
     public KeySortedList tailList(final Comparable fromKey) {

@@ -192,8 +192,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
 
     /**
      * Replaces (if needed) the specified coordinate reference system. The default
-     * implementation checks if there is a {@linplain #replace(Datum) datum replacement} or a
-     * {@linplain #replace(CoordinateSystem) coordinate system replacement}. If there is at
+     * implementation checks if there is a {@linkplain #replace(Datum) datum replacement} or a
+     * {@linkplain #replace(CoordinateSystem) coordinate system replacement}. If there is at
      * least one of those, then this method returns a new coordinate reference system using
      * the new datum and coordinate system.
      *
@@ -286,7 +286,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
 
     /**
      * Replaces (if needed) the specified coordinate operation. The default implementation checks
-     * if there is a source or target {@linplain #replace(CRS) CRS replacement}. If there is at
+     * if there is a source or target {@linkplain #replace(CRS) CRS replacement}. If there is at
      * least one of those, then this method returns a new coordinate operation using the new CRS.
      *
      * @param  operation The coordinate operation to replace.

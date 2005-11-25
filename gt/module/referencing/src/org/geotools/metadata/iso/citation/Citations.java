@@ -311,11 +311,11 @@ public final class Citations {
     }
 
     /**
-     * The <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0</A> "Automatic
-     * Projections" authority. An {@linkplain Citation#getAlternateTitles alternate title} for this
-     * citation is "AUTO2" (according ISO 19115, alternate titles often contain abreviations). In
-     * addition, this citation contains the "AUTO2" {@linkplain Citation#getIdentifiers identifier}
-     * for the "Authority name" {@linkplain Citation#getIdentifierTypes identifier type}.
+     * The WMS 1.3.0 "Automatic Projections" authority. An {@linkplain Citation#getAlternateTitles
+     * alternate title} for this citation is "AUTO2" (according ISO 19115, alternate titles often
+     * contain abreviations). In addition, this citation contains the "AUTO2"
+     * {@linkplain Citation#getIdentifiers identifier} for the "Authority name"
+     * {@linkplain Citation#getIdentifierTypes identifier type}.
      * <p>
      * <strong>Warning:</strong> {@code AUTO2} is different from {@link #AUTO} used for WMS 1.1.1
      * and earlier.
@@ -489,7 +489,7 @@ public final class Citations {
      * titleMatches} method.
      *
      * @param  citation The citation to check for.
-     * @param  title The title or alternate title to compare.
+     * @param  identifier The identifier to compare.
      * @return {@code true} if the title or alternate title matches the given string.
      */
     public static boolean identifierMatches(final Citation citation, final String identifier) {
