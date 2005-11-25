@@ -39,7 +39,7 @@ import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.Matrix;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
@@ -70,13 +70,13 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
     public static final DefaultGeodeticDatum WGS84;
     static {
         final Identifier[] identifiers = {
-            new NamedIdentifier(CitationImpl.OGC,    "WGS84"),
-            new NamedIdentifier(CitationImpl.ORACLE, "WGS 84"),
-            new NamedIdentifier(null,                "WGS_84"),
-            new NamedIdentifier(null,                "WGS 1984"),
-            new NamedIdentifier(CitationImpl.EPSG,   "WGS_1984"),
-            new NamedIdentifier(CitationImpl.ESRI,   "D_WGS_1984"),
-            new NamedIdentifier(CitationImpl.EPSG,   "World Geodetic System 1984")
+            new NamedIdentifier(Citations.OGC,    "WGS84"),
+            new NamedIdentifier(Citations.ORACLE, "WGS 84"),
+            new NamedIdentifier(null,             "WGS_84"),
+            new NamedIdentifier(null,             "WGS 1984"),
+            new NamedIdentifier(Citations.EPSG,   "WGS_1984"),
+            new NamedIdentifier(Citations.ESRI,   "D_WGS_1984"),
+            new NamedIdentifier(Citations.EPSG,   "World Geodetic System 1984")
         };
         final Map properties = new HashMap(4);
         properties.put(NAME_KEY,  identifiers[0]);

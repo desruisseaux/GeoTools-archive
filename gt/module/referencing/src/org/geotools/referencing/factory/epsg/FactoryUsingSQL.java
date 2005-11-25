@@ -103,6 +103,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.measure.Units;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -461,20 +462,20 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 final String version = result.getString(1);
                 final Date   date    = result.getDate  (2);
                 final String engine  = metadata.getDatabaseProductName();
-                final CitationImpl c = new CitationImpl(CitationImpl.EPSG);
+                final CitationImpl c = new CitationImpl(Citations.EPSG);
                 c.getAlternateTitles().add(Vocabulary.formatInternational(
                         VocabularyKeys.DATA_BASE_$3, "EPSG", version, engine));
                 c.setEdition(new SimpleInternationalString(version));
                 c.setEditionDate(date);
                 authority = c;
             } else {
-                authority = CitationImpl.EPSG;
+                authority = Citations.EPSG;
             }
             result.close();
             statement.close();
         } catch (SQLException exception) {
             Utilities.unexpectedException(LOGGER.getName(), "FactoryUsingSQL", "getAuthority", exception);
-            return CitationImpl.EPSG;
+            return Citations.EPSG;
         }
         return authority;
     }

@@ -48,7 +48,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.util.GrowableInternationalString;
 import org.geotools.util.WeakValueHashMap;
 
@@ -176,8 +176,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * constructor for commonly-used parameters. If more control are wanted (for example adding
      * remarks), use the {@linkplain #NamedIdentifier(Map) constructor with a properties map}.
      *
-     * @param authority The authority (e.g. {@link CitationImpl#OGC OGC}
-     *                  or {@link CitationImpl#EPSG EPSG}).
+     * @param authority The authority (e.g. {@link Citations#OGC OGC} or {@link Citations#EPSG EPSG}).
      * @param code      The code. The {@linkplain Locale#US English name} is used
      *                  for the code, and the international string is used for the
      *                  {@linkplain GenericName generic name}.
@@ -192,8 +191,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * constructor for commonly-used parameters. If more control are wanted (for example adding
      * remarks), use the {@linkplain #NamedIdentifier(Map) constructor with a properties map}.
      *
-     * @param authority The authority (e.g. {@link CitationImpl#OGC OGC}
-     *                  or {@link CitationImpl#EPSG EPSG}).
+     * @param authority The authority (e.g. {@link Citations#OGC OGC} or {@link Citations#EPSG EPSG}).
      * @param code      The code. This parameter is mandatory.
      */
     public NamedIdentifier(final Citation authority, final String code) {
@@ -205,8 +203,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * constructor for commonly-used parameters. If more control are wanted (for example adding
      * remarks), use the {@linkplain #NamedIdentifier(Map) constructor with a properties map}.
      *
-     * @param authority The authority (e.g. {@link CitationImpl#OGC OGC}
-     *                  or {@link CitationImpl#EPSG EPSG}).
+     * @param authority The authority (e.g. {@link Citations#OGC OGC} or {@link Citations#EPSG EPSG}).
      * @param code      The code. This parameter is mandatory.
      * @param version   The version, or {@code null} if none.
      */
@@ -293,7 +290,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
                 case 1475610435: {
                     if (key.equals(AUTHORITY_KEY)) {
                         if (value instanceof String) {
-                            value = new CitationImpl(value.toString());
+                            value = Citations.fromName(value.toString());
                         }
                         authority = value;
                         continue;

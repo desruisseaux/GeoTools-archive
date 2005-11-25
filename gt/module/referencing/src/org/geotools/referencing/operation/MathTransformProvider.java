@@ -49,7 +49,7 @@ import org.opengis.referencing.operation.Projection;
 import org.opengis.util.GenericName;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.Utilities;
@@ -177,7 +177,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
     /**
      * Constructs a parameter descriptor from a set of alias. The parameter is
      * identified by codes provided by one or more authorities. Common authorities are
-     * {@link CitationImpl#OGC OGC} and {@link CitationImpl#EPSG EPSG} for example.
+     * {@link Citations#OGC OGC} and {@link Citations#EPSG EPSG} for example.
      *
      * <P>The first entry in the {@code identifiers} array is both the
      * {@linkplain ParameterDescriptor#getName main name} and the
@@ -221,7 +221,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
     /**
      * Constructs a parameter group from a set of alias. The parameter group is
      * identified by codes provided by one or more authorities. Common authorities are
-     * {@link CitationImpl#OGC OGC} and {@link CitationImpl#EPSG EPSG} for example.
+     * {@link Citations#OGC OGC} and {@link Citations#EPSG EPSG} for example.
      * <P>
      * Special rules:
      * <ul>

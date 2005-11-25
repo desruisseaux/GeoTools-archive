@@ -33,7 +33,7 @@ import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.projection.Mercator.Provider2SP;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -190,9 +190,9 @@ public class EquidistantCylindrical extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
+                    new NamedIdentifier(Citations.OGC,      "standard_parallel_1"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of 1st standard parallel"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel1")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
               
@@ -201,11 +201,11 @@ public class EquidistantCylindrical extends MapProjection {
          * of "standard_parallel_1". I have sided with ESRI and Snyder in this case.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-        		new NamedIdentifier(CitationImpl.OGC,      "Equidistant_Cylindrical"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Equidistant Cylindrical"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Equidistant_Cylindrical"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9823"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+        		new NamedIdentifier(Citations.OGC,      "Equidistant_Cylindrical"),
+                new NamedIdentifier(Citations.EPSG,     "Equidistant Cylindrical"),
+                new NamedIdentifier(Citations.ESRI,     "Equidistant_Cylindrical"),
+                new NamedIdentifier(Citations.EPSG,     "9823"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
                                     VocabularyKeys.EQUIDISTANT_CYLINDRICAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
@@ -263,10 +263,10 @@ public class EquidistantCylindrical extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.ESRI,     "Plate_Carree"),
-                new NamedIdentifier(CitationImpl.OGC,      "Equirectangular"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Equirectangular"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                new NamedIdentifier(Citations.ESRI,     "Plate_Carree"),
+                new NamedIdentifier(Citations.OGC,      "Equirectangular"),
+                new NamedIdentifier(Citations.GEOTIFF,  "CT_Equirectangular"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
                                     VocabularyKeys.EQUIDISTANT_CYLINDRICAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,

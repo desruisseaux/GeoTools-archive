@@ -58,6 +58,7 @@ import org.geotools.util.NameFactory;
 import org.geotools.resources.Utilities;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.metadata.iso.IdentifierImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.ContactImpl;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.citation.OnLineResourceImpl;
@@ -86,8 +87,8 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
      * and the citation for know authorities.
      */
     private static final Object[] AUTHORITIES = {
-            "com.sun.media.jai", CitationImpl.JAI,
-            "org.geotools",      CitationImpl.GEOTOOLS
+            "com.sun.media.jai", Citations.JAI,
+            "org.geotools",      Citations.GEOTOOLS
     };
 
     /**
@@ -219,7 +220,7 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
      *  </tr>
      *  <tr>
      *   <td>{@link Identifier#AUTHORITY_KEY AUTHORITY_KEY}</td>
-     *   <td>{@linkplain CitationImpl#JAI JAI} or {@linkplain CitationImpl#GEOTOOLS Geotools}
+     *   <td>{@linkplain Citations#JAI JAI} or {@linkplain Citations#GEOTOOLS Geotools}
      *       inferred from the vendor, extented with {@code "DocURL"}
      *       {@linkplain OperationDescriptor#getResources resources} as
      *       {@linkplain ResponsibleParty#getContactInfo contact information}.</td></td>

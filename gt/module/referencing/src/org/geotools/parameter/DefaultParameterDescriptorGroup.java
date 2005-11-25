@@ -104,7 +104,7 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
      * This parameter group will be required exactly once.
      *
      * @param authority The authority (e.g.
-     *        {@link org.geotools.metadata.iso.citation.CitationImpl#OGC OGC}).
+     *        {@link org.geotools.metadata.iso.citation.Citations#OGC OGC}).
      * @param name The parameter group name.
      * @param parameters The {@linkplain #descriptors() parameter descriptors} for this group.
      *

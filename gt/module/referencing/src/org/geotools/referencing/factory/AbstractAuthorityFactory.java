@@ -80,7 +80,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.Utilities;
@@ -870,7 +870,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
         if (scope == null) {
             return code;
         }
-        if (CitationImpl.titleMatches(getAuthority(), scope.toString())) {
+        if (Citations.titleMatches(getAuthority(), scope.toString())) {
             return name.asLocalName().toString().trim();
         }
         return code;

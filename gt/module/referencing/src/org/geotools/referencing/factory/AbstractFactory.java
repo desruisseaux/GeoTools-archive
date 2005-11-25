@@ -33,7 +33,7 @@ import org.opengis.referencing.Factory;
 import org.opengis.referencing.ObjectFactory;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.FactoryFinder;  // For javadoc
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -83,12 +83,12 @@ public class AbstractFactory extends org.geotools.factory.AbstractFactory implem
     /**
      * Returns the vendor responsible for creating this factory implementation. Many implementations
      * may be available for the same factory interface. The default implementation returns
-     * {@linkplain CitationImpl#GEOTOOLS Geotools}.
+     * {@linkplain Citations#GEOTOOLS Geotools}.
      *
      * @return The vendor for this factory implementation.
      */
     public Citation getVendor() {
-        return CitationImpl.GEOTOOLS;
+        return Citations.GEOTOOLS;
     }
 
     /**

@@ -300,7 +300,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * Constructs a parameter from an authority and a name.
      *
      * @param authority The authority (e.g.
-     *        {@link org.geotools.metadata.iso.citation.CitationImpl#OGC OGC}).
+     *        {@link org.geotools.metadata.iso.citation.Citations#OGC OGC}).
      * @param name The parameter name.
      * @param valueClass The class that describe the type of the parameter.
      * @param validValues A finite set of valid values (usually from a

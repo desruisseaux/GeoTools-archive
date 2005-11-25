@@ -38,7 +38,7 @@ import org.opengis.referencing.crs.ProjectedCRS;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.util.SimpleInternationalString;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 
@@ -111,10 +111,10 @@ public class AutoCRSFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns the authority for this factory, which is {@link CitationImpl#AUTO2 AUTO2}.
+     * Returns the authority for this factory, which is {@link Citations#AUTO2 AUTO2}.
      */
     public Citation getAuthority() {
-        return CitationImpl.AUTO2;
+        return Citations.AUTO2;
     }
 
     /**

@@ -34,11 +34,9 @@ import org.geotools.factory.Hints;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.referencing.NamedIdentifier;
-
-
 
 
 /**
@@ -62,8 +60,8 @@ public abstract class Operation2D extends AbstractOperation {
     public static final ParameterDescriptor SOURCE_0;
     static {
         final Map properties = new HashMap(4);
-        properties.put(IdentifiedObject.NAME_KEY,  new NamedIdentifier(CitationImpl.OGC, "Source"));
-        properties.put(IdentifiedObject.ALIAS_KEY, new NamedIdentifier(CitationImpl.JAI, "source0"));
+        properties.put(IdentifiedObject.NAME_KEY,  new NamedIdentifier(Citations.OGC, "Source"));
+        properties.put(IdentifiedObject.ALIAS_KEY, new NamedIdentifier(Citations.JAI, "source0"));
         SOURCE_0 = new DefaultParameterDescriptor(properties, GridCoverage2D.class,
                         null, null, null, null, null, true);
     }

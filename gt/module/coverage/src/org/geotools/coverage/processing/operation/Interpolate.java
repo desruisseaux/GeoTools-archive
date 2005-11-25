@@ -39,7 +39,7 @@ import org.geotools.factory.Hints;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.coverage.processing.Operation2D;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.image.ImageUtilities;
@@ -115,7 +115,7 @@ public class Interpolate extends Operation2D {
      * The parameter descriptor for the interpolation type.
      */
     public static final ParameterDescriptor TYPE =
-            new DefaultParameterDescriptor(CitationImpl.OGC, "Type",
+            new DefaultParameterDescriptor(Citations.OGC, "Type",
                 Object.class,                       // Value class (mandatory)
                 null,                               // Array of valid values
                 "NearestNeighbor",                  // Default value
@@ -128,7 +128,7 @@ public class Interpolate extends Operation2D {
      * Constructs an {@code "Interpolate"} operation.
      */
     public Interpolate() {
-        super(new DefaultParameterDescriptorGroup(CitationImpl.OGC, "Interpolate",
+        super(new DefaultParameterDescriptorGroup(Citations.OGC, "Interpolate",
               new ParameterDescriptor[] {
                     SOURCE_0,
                     TYPE

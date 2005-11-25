@@ -43,7 +43,7 @@ import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.FactoryFinder;
 
 /**
@@ -200,7 +200,7 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
     }    
     
     public Citation getAuthority() {
-        return CitationImpl.EPSG;
+        return Citations.EPSG;
     }
     
     /**  
@@ -266,7 +266,7 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
     }
     
     public Citation getVendor() {
-         return CitationImpl.GEOTOOLS;
+         return Citations.GEOTOOLS;
     }
     
     public InternationalString getDescriptionText(String code) throws FactoryException { 

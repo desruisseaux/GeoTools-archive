@@ -48,7 +48,7 @@ import org.opengis.referencing.operation.Transformation;
 import org.geotools.resources.Utilities;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.parameter.Parameter;
@@ -598,7 +598,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.GEOTOOLS, "WarpPolynomial")
+                new NamedIdentifier(Citations.GEOTOOLS, "WarpPolynomial")
             }, new ParameterDescriptor[] {
                 DEGREE, X_COEFFS, Y_COEFFS, PRE_SCALE_X, PRE_SCALE_Y, POST_SCALE_X, POST_SCALE_Y
             });

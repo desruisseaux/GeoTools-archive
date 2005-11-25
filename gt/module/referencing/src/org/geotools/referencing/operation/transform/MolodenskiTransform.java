@@ -36,7 +36,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.FloatParameter;
 import org.geotools.parameter.Parameter;
@@ -548,7 +548,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          */
         public static final ParameterDescriptor DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_KEY,
-                        new NamedIdentifier(CitationImpl.OGC, "dim")),
+                        new NamedIdentifier(Citations.OGC, "dim")),
                     DEFAULT_DIMENSION, 2, 3, false);
 
         /**
@@ -627,11 +627,11 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Molodenski"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Molodenski"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9604"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
-                                                           VocabularyKeys.MOLODENSKI_TRANSFORM))
+                new NamedIdentifier(Citations.OGC,      "Molodenski"),
+                new NamedIdentifier(Citations.EPSG,     "Molodenski"),
+                new NamedIdentifier(Citations.EPSG,     "9604"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
+                                                        VocabularyKeys.MOLODENSKI_TRANSFORM))
             }, new ParameterDescriptor[] {
                 DIM, DX, DY, DZ,
                 SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
@@ -759,10 +759,10 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Abridged_Molodenski"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Abridged Molodenski"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9605"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.format(
+                new NamedIdentifier(Citations.OGC,      "Abridged_Molodenski"),
+                new NamedIdentifier(Citations.EPSG,     "Abridged Molodenski"),
+                new NamedIdentifier(Citations.EPSG,     "9605"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.format(
                                     VocabularyKeys.ABRIDGED_MOLODENSKI_TRANSFORM))
             }, new ParameterDescriptor[] {
                 DIM, DX, DY, DZ,

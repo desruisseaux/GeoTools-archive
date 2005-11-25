@@ -53,7 +53,7 @@ import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
@@ -968,11 +968,11 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "NADCON"),
-                new NamedIdentifier(CitationImpl.EPSG,     "NADCON"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9613"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
-                                                           VocabularyKeys.NADCON_TRANSFORM))
+                new NamedIdentifier(Citations.OGC,      "NADCON"),
+                new NamedIdentifier(Citations.EPSG,     "NADCON"),
+                new NamedIdentifier(Citations.EPSG,     "9613"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
+                                                        VocabularyKeys.NADCON_TRANSFORM))
             }, new ParameterDescriptor[] {
                 LAT_DIFF_FILE,
                 LONG_DIFF_FILE

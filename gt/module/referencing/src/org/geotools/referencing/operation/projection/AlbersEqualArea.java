@@ -60,7 +60,7 @@ import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.measure.Latitude;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -376,9 +376,9 @@ public class AlbersEqualArea extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
+                    new NamedIdentifier(Citations.OGC,      "standard_parallel_1"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of 1st standard parallel"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel1")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
                 
@@ -388,9 +388,9 @@ public class AlbersEqualArea extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_2"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel2")
+                    new NamedIdentifier(Citations.OGC,      "standard_parallel_2"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of 2nd standard parallel"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel2")
                 },
                 -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -398,13 +398,13 @@ public class AlbersEqualArea extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Albers_Conic_Equal_Area"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Albers Equal Area"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9822"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_AlbersEqualArea"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Albers"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Albers Equal Area Conic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                new NamedIdentifier(Citations.OGC,      "Albers_Conic_Equal_Area"),
+                new NamedIdentifier(Citations.EPSG,     "Albers Equal Area"),
+                new NamedIdentifier(Citations.EPSG,     "9822"),
+                new NamedIdentifier(Citations.GEOTIFF,  "CT_AlbersEqualArea"),
+                new NamedIdentifier(Citations.ESRI,     "Albers"),
+                new NamedIdentifier(Citations.ESRI,     "Albers Equal Area Conic"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
                                     VocabularyKeys.ALBERS_EQUAL_AREA_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,

@@ -44,7 +44,7 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 
 
 /**
@@ -80,7 +80,7 @@ public class ImagingParametersTest extends TestCase {
      * Tests {@link ImagingParameters}.
      */
     public void testDescriptors() {
-        final String author = CitationImpl.JAI.getTitle().toString();
+        final String author = Citations.JAI.getTitle().toString();
         final String vendor = "com.sun.media.jai";
         final String mode   = RenderedRegistryMode.MODE_NAME;
         final RegistryElementDescriptor   descriptor;

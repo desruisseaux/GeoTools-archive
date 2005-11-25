@@ -57,7 +57,7 @@ import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 
 
 /**
@@ -154,7 +154,7 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
     }
      
     public Citation getAuthority() {
-        return CitationImpl.AUTO;
+        return Citations.AUTO;
     }
     
     /**
@@ -184,7 +184,7 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
     }
     
     public Citation getVendor() {
-        return CitationImpl.GEOTOOLS;
+        return Citations.GEOTOOLS;
     }
     
     public org.opengis.util.InternationalString getDescriptionText(String str) throws FactoryException {

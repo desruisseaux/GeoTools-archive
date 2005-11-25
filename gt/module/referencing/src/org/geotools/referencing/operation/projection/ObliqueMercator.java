@@ -59,7 +59,7 @@ import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -605,10 +605,10 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor LAT_OF_CENTRE = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "latitude_of_center"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of projection centre"),
-                    new NamedIdentifier(CitationImpl.ESRI,     "Latitude_Of_Center"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "CenterLat")
+                    new NamedIdentifier(Citations.OGC,      "latitude_of_center"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of projection centre"),
+                    new NamedIdentifier(Citations.ESRI,     "Latitude_Of_Center"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "CenterLat")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
         
@@ -618,10 +618,10 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor LONG_OF_CENTRE = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "longitude_of_center"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Longitude of projection centre"),
-                    new NamedIdentifier(CitationImpl.ESRI,     "Longitude_Of_Center"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "CenterLong")
+                    new NamedIdentifier(Citations.OGC,      "longitude_of_center"),
+                    new NamedIdentifier(Citations.EPSG,     "Longitude of projection centre"),
+                    new NamedIdentifier(Citations.ESRI,     "Longitude_Of_Center"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "CenterLong")
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
                 
@@ -632,10 +632,10 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor AZIMUTH = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "azimuth"),
-                    new NamedIdentifier(CitationImpl.ESRI,     "Azimuth"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Azimuth of initial line"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "AzimuthAngle")
+                    new NamedIdentifier(Citations.OGC,      "azimuth"),
+                    new NamedIdentifier(Citations.ESRI,     "Azimuth"),
+                    new NamedIdentifier(Citations.EPSG,     "Azimuth of initial line"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "AzimuthAngle")
                 },
                 0, -360, 360, NonSI.DEGREE_ANGLE);
                 
@@ -646,10 +646,10 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor RECTIFIED_GRID_ANGLE = createOptionalDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "rectified_grid_angle"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Angle from Rectified to Skew Grid"),
-                    new NamedIdentifier(CitationImpl.ESRI,     "XY_Plane_Rotation"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "RectifiedGridAngle")
+                    new NamedIdentifier(Citations.OGC,      "rectified_grid_angle"),
+                    new NamedIdentifier(Citations.EPSG,     "Angle from Rectified to Skew Grid"),
+                    new NamedIdentifier(Citations.ESRI,     "XY_Plane_Rotation"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "RectifiedGridAngle")
                 },
                 -360, 360, NonSI.DEGREE_ANGLE);
                 
@@ -657,14 +657,14 @@ public class ObliqueMercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Oblique_Mercator"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Oblique Mercator"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9815"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_ObliqueMercator"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Hotine_Oblique_Mercator_Azimuth_Center"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Rectified_Skew_Orthomorphic_Center"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
-                                                           VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
+                new NamedIdentifier(Citations.OGC,      "Oblique_Mercator"),
+                new NamedIdentifier(Citations.EPSG,     "Oblique Mercator"),
+                new NamedIdentifier(Citations.EPSG,     "9815"),
+                new NamedIdentifier(Citations.GEOTIFF,  "CT_ObliqueMercator"),
+                new NamedIdentifier(Citations.ESRI,     "Hotine_Oblique_Mercator_Azimuth_Center"),
+                new NamedIdentifier(Citations.ESRI,     "Rectified_Skew_Orthomorphic_Center"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
+                                                        VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 LONG_OF_CENTRE,      LAT_OF_CENTRE,
@@ -723,14 +723,14 @@ public class ObliqueMercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Hotine_Oblique_Mercator"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Hotine Oblique Mercator"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9812"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_ObliqueMercator_Hotine"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Hotine_Oblique_Mercator_Azimuth_Natural_Origin"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Rectified_Skew_Orthomorphic_Natural_Origin"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
-                                                           VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
+                new NamedIdentifier(Citations.OGC,      "Hotine_Oblique_Mercator"),
+                new NamedIdentifier(Citations.EPSG,     "Hotine Oblique Mercator"),
+                new NamedIdentifier(Citations.EPSG,     "9812"),
+                new NamedIdentifier(Citations.GEOTIFF,  "CT_ObliqueMercator_Hotine"),
+                new NamedIdentifier(Citations.ESRI,     "Hotine_Oblique_Mercator_Azimuth_Natural_Origin"),
+                new NamedIdentifier(Citations.ESRI,     "Rectified_Skew_Orthomorphic_Natural_Origin"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
+                                                        VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 LONG_OF_CENTRE,      LAT_OF_CENTRE,
@@ -785,10 +785,10 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor LAT_OF_CENTRE = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "latitude_of_center"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of projection centre"),
-                    new NamedIdentifier(CitationImpl.ESRI,     "Latitude_Of_Center"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "CenterLat")
+                    new NamedIdentifier(Citations.OGC,      "latitude_of_center"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of projection centre"),
+                    new NamedIdentifier(Citations.ESRI,     "Latitude_Of_Center"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "CenterLat")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
         
@@ -798,7 +798,7 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor LAT_OF_1ST_POINT = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.ESRI, "Latitude_Of_1st_Point")
+                    new NamedIdentifier(Citations.ESRI, "Latitude_Of_1st_Point")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
         
@@ -808,7 +808,7 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor LONG_OF_1ST_POINT = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.ESRI, "Longitude_Of_1st_Point")
+                    new NamedIdentifier(Citations.ESRI, "Longitude_Of_1st_Point")
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
         
@@ -818,7 +818,7 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor LAT_OF_2ND_POINT = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.ESRI, "Latitude_Of_2nd_Point")
+                    new NamedIdentifier(Citations.ESRI, "Latitude_Of_2nd_Point")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
         
@@ -828,7 +828,7 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor LONG_OF_2ND_POINT = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.ESRI, "Longitude_Of_2nd_Point")
+                    new NamedIdentifier(Citations.ESRI, "Longitude_Of_2nd_Point")
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
         
@@ -836,9 +836,9 @@ public class ObliqueMercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.ESRI,     "Hotine_Oblique_Mercator_Two_Point_Center"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
-                                                           VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
+                new NamedIdentifier(Citations.ESRI,     "Hotine_Oblique_Mercator_Two_Point_Center"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
+                                                        VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 LAT_OF_1ST_POINT,    LONG_OF_1ST_POINT,
@@ -899,9 +899,9 @@ public class ObliqueMercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.ESRI,     "Hotine_Oblique_Mercator_Two_Point_Natural_Origin"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
-                                                           VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
+                new NamedIdentifier(Citations.ESRI,     "Hotine_Oblique_Mercator_Two_Point_Natural_Origin"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
+                                                        VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 LAT_OF_1ST_POINT,    LONG_OF_1ST_POINT,

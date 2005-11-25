@@ -35,7 +35,7 @@ import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
 import org.geotools.measure.Units;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.FloatParameter;
 import org.geotools.parameter.ParameterGroup;
@@ -208,7 +208,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor SRC_DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_KEY,
-                        new NamedIdentifier(CitationImpl.GEOTOOLS, "src_dim")),
+                        new NamedIdentifier(Citations.GEOTOOLS, "src_dim")),
                     DEFAULT_DIMENSION, 2, 3, false);
 
         /**
@@ -218,7 +218,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor TGT_DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_KEY,
-                        new NamedIdentifier(CitationImpl.GEOTOOLS, "tgt_dim")),
+                        new NamedIdentifier(Citations.GEOTOOLS, "tgt_dim")),
                     DEFAULT_DIMENSION, 2, 3, false);
 
         /**
@@ -229,7 +229,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor SRC_SEMI_MAJOR = createOptionalDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC, "src_semi_major")
+                    new NamedIdentifier(Citations.OGC, "src_semi_major")
                 },
                 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -241,7 +241,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
          public static final ParameterDescriptor SRC_SEMI_MINOR = createOptionalDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC, "src_semi_minor"),
+                    new NamedIdentifier(Citations.OGC, "src_semi_minor"),
                 },
                 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -253,7 +253,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor TGT_SEMI_MAJOR = createOptionalDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC, "tgt_semi_major")
+                    new NamedIdentifier(Citations.OGC, "tgt_semi_major")
                 },
                 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -265,7 +265,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor TGT_SEMI_MINOR = createOptionalDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC, "tgt_semi_minor")
+                    new NamedIdentifier(Citations.OGC, "tgt_semi_minor")
                 },
                 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -275,8 +275,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor DX = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "dx"),
-                    new NamedIdentifier(CitationImpl.EPSG, "X-axis translation")
+                    new NamedIdentifier(Citations.OGC,  "dx"),
+                    new NamedIdentifier(Citations.EPSG, "X-axis translation")
                 },
                 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -286,8 +286,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor DY = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "dy"),
-                    new NamedIdentifier(CitationImpl.EPSG, "Y-axis translation")
+                    new NamedIdentifier(Citations.OGC,  "dy"),
+                    new NamedIdentifier(Citations.EPSG, "Y-axis translation")
                 },
                 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -297,8 +297,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor DZ = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "dz"),
-                    new NamedIdentifier(CitationImpl.EPSG, "Z-axis translation")
+                    new NamedIdentifier(Citations.OGC,  "dz"),
+                    new NamedIdentifier(Citations.EPSG, "Z-axis translation")
                 },
                 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -306,8 +306,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.EPSG, "Geocentric translations"),
-                new NamedIdentifier(CitationImpl.EPSG, "9603")
+                new NamedIdentifier(Citations.EPSG, "Geocentric translations"),
+                new NamedIdentifier(Citations.EPSG, "9603")
             }, new ParameterDescriptor[] {
                 DX, DY, DZ,
                 SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
@@ -434,8 +434,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor EX = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "ex"),
-                    new NamedIdentifier(CitationImpl.EPSG, "X-axis rotation")
+                    new NamedIdentifier(Citations.OGC,  "ex"),
+                    new NamedIdentifier(Citations.EPSG, "X-axis rotation")
                 },
                 0.0, -MAX_ROTATION, MAX_ROTATION, NonSI.SECOND_ANGLE);
 
@@ -445,8 +445,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor EY = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "ey"),
-                    new NamedIdentifier(CitationImpl.EPSG, "Y-axis rotation")
+                    new NamedIdentifier(Citations.OGC,  "ey"),
+                    new NamedIdentifier(Citations.EPSG, "Y-axis rotation")
                 },
                 0.0, -MAX_ROTATION, MAX_ROTATION, NonSI.SECOND_ANGLE);
 
@@ -456,8 +456,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor EZ = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "ez"),
-                    new NamedIdentifier(CitationImpl.EPSG, "Z-axis rotation")
+                    new NamedIdentifier(Citations.OGC,  "ez"),
+                    new NamedIdentifier(Citations.EPSG, "Z-axis rotation")
                 },
                 0.0, -MAX_ROTATION, MAX_ROTATION, NonSI.SECOND_ANGLE);
 
@@ -468,8 +468,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         public static final ParameterDescriptor PPM = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "ppm"),
-                    new NamedIdentifier(CitationImpl.EPSG, "Scale difference")
+                    new NamedIdentifier(Citations.OGC,  "ppm"),
+                    new NamedIdentifier(Citations.EPSG, "Scale difference")
                 },
                 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Units.PPM);
 
@@ -484,8 +484,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          */
         static ParameterDescriptorGroup createDescriptorGroup(final String name, final String code) {
             return createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.EPSG, name),
-                new NamedIdentifier(CitationImpl.EPSG, code)
+                new NamedIdentifier(Citations.EPSG, name),
+                new NamedIdentifier(Citations.EPSG, code)
             }, new ParameterDescriptor[] {
                 DX, DY, DZ, EX, EY, EZ, PPM,
                 SRC_SEMI_MAJOR, SRC_SEMI_MINOR,

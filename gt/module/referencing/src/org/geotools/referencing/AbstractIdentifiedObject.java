@@ -53,7 +53,7 @@ import org.opengis.util.LocalName;
 import org.opengis.util.ScopedName;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -543,7 +543,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * Returns an identifier according the given authority. This method checks first all
      * {@link #getIdentifiers identifiers} in their iteration order. It returns the first
      * identifier with an {@linkplain Identifier#getAuthority identifier authority} title
-     * {@linkplain CitationImpl#titleMatches(Citation,Citation) matching} at least one title
+     * {@linkplain Citations#titleMatches(Citation,Citation) matching} at least one title
      * from the specified authority.
      *
      * @param  authority The authority for the identifier to return.
@@ -586,7 +586,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             }
             final Citation infoAuthority = identifier.getAuthority();
             if (infoAuthority != null) {
-                if (CitationImpl.titleMatches(authority, infoAuthority)) {
+                if (Citations.titleMatches(authority, infoAuthority)) {
                     return identifier;
                 }
             }
@@ -607,10 +607,10 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * <p>
      * <ul>
      *   <li>An {@linkplain Identifier#getAuthority identifier authority} title
-     *       {@linkplain CitationImpl#titleMatches(Citation,Citation) matching}
+     *       {@linkplain Citations#titleMatches(Citation,Citation) matching}
      *       at least one title from the specified authority.</li>
      *   <li>A {@linkplain GenericName#getScope name scope}
-     *       {@linkplain CitationImpl#titleMatches(Citation,String) matching}
+     *       {@linkplain Citations#titleMatches(Citation,String) matching}
      *       at least one title from the specified authority.</li>
      * </ul>
      *
@@ -659,7 +659,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         String name = null;
         Citation infoAuthority = identifier.getAuthority();
         if (infoAuthority != null) {
-            if (CitationImpl.titleMatches(authority, infoAuthority)) {
+            if (Citations.titleMatches(authority, infoAuthority)) {
                 name = identifier.getCode();
             } else {
                 for (final Iterator it=info.getAlias().iterator(); it.hasNext();) {
@@ -668,7 +668,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                         identifier = (Identifier) alias;
                         infoAuthority = identifier.getAuthority();
                         if (infoAuthority != null) {
-                            if (CitationImpl.titleMatches(authority, infoAuthority)) {
+                            if (Citations.titleMatches(authority, infoAuthority)) {
                                 name = identifier.getCode();
                                 break;
                             }
@@ -676,7 +676,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                     } else {
                         final GenericName scope = alias.getScope();
                         if (scope != null) {
-                            if (CitationImpl.titleMatches(authority, scope.toString())) {
+                            if (Citations.titleMatches(authority, scope.toString())) {
                                 name = alias.asLocalName().toString();
                                 break;
                             }

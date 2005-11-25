@@ -47,7 +47,7 @@ import org.opengis.referencing.operation.TransformException;
 // Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
@@ -1050,8 +1050,8 @@ public abstract class MapProjection extends AbstractMathTransform
          */
         public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "semi_major"),
-                    new NamedIdentifier(CitationImpl.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
+                    new NamedIdentifier(Citations.OGC,  "semi_major"),
+                    new NamedIdentifier(Citations.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -1063,8 +1063,8 @@ public abstract class MapProjection extends AbstractMathTransform
          */
         public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "semi_minor"),
-                    new NamedIdentifier(CitationImpl.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
+                    new NamedIdentifier(Citations.OGC,  "semi_minor"),
+                    new NamedIdentifier(Citations.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -1074,12 +1074,12 @@ public abstract class MapProjection extends AbstractMathTransform
          */
         public static final ParameterDescriptor CENTRAL_MERIDIAN = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,     "central_meridian"),
-                    new NamedIdentifier(CitationImpl.EPSG,    "Longitude of natural origin"),
-                    new NamedIdentifier(CitationImpl.EPSG,    "Longitude of false origin"),
-                    new NamedIdentifier(CitationImpl.ESRI,    "Longitude_Of_Origin"),
-                    new NamedIdentifier(CitationImpl.ESRI,    "Longitude_Of_Center"),  //ESRI uses this in orthographic (not to be confused with Longitude_Of_Center in oblique mercator)
-                    new NamedIdentifier(CitationImpl.GEOTIFF, "NatOriginLong")
+                    new NamedIdentifier(Citations.OGC,     "central_meridian"),
+                    new NamedIdentifier(Citations.EPSG,    "Longitude of natural origin"),
+                    new NamedIdentifier(Citations.EPSG,    "Longitude of false origin"),
+                    new NamedIdentifier(Citations.ESRI,    "Longitude_Of_Origin"),
+                    new NamedIdentifier(Citations.ESRI,    "Longitude_Of_Center"),  //ESRI uses this in orthographic (not to be confused with Longitude_Of_Center in oblique mercator)
+                    new NamedIdentifier(Citations.GEOTIFF, "NatOriginLong")
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
 
@@ -1089,11 +1089,11 @@ public abstract class MapProjection extends AbstractMathTransform
          */
         public static final ParameterDescriptor LATITUDE_OF_ORIGIN = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "latitude_of_origin"),
-                    new NamedIdentifier(CitationImpl.EPSG, "Latitude of false origin"),
-                    new NamedIdentifier(CitationImpl.EPSG, "Latitude of natural origin"),
-                    new NamedIdentifier(CitationImpl.ESRI, "Latitude_Of_Center"),  //ESRI uses this in orthographic 
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "NatOriginLat")
+                    new NamedIdentifier(Citations.OGC,  "latitude_of_origin"),
+                    new NamedIdentifier(Citations.EPSG, "Latitude of false origin"),
+                    new NamedIdentifier(Citations.EPSG, "Latitude of natural origin"),
+                    new NamedIdentifier(Citations.ESRI, "Latitude_Of_Center"),  //ESRI uses this in orthographic 
+                    new NamedIdentifier(Citations.GEOTIFF,  "NatOriginLat")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -1105,10 +1105,10 @@ public abstract class MapProjection extends AbstractMathTransform
          */
         public static final ParameterDescriptor SCALE_FACTOR = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,     "scale_factor"),
-                    new NamedIdentifier(CitationImpl.EPSG,    "Scale factor at natural origin"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF, "ScaleAtNatOrigin"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF, "ScaleAtCenter")
+                    new NamedIdentifier(Citations.OGC,     "scale_factor"),
+                    new NamedIdentifier(Citations.EPSG,    "Scale factor at natural origin"),
+                    new NamedIdentifier(Citations.GEOTIFF, "ScaleAtNatOrigin"),
+                    new NamedIdentifier(Citations.GEOTIFF, "ScaleAtCenter")
                 },
                 1, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
@@ -1118,10 +1118,10 @@ public abstract class MapProjection extends AbstractMathTransform
          */
         public static final ParameterDescriptor FALSE_EASTING = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,     "false_easting"),
-                    new NamedIdentifier(CitationImpl.EPSG,    "False easting"),
-                    new NamedIdentifier(CitationImpl.EPSG,    "Easting at false origin"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF, "FalseEasting")
+                    new NamedIdentifier(Citations.OGC,     "false_easting"),
+                    new NamedIdentifier(Citations.EPSG,    "False easting"),
+                    new NamedIdentifier(Citations.EPSG,    "Easting at false origin"),
+                    new NamedIdentifier(Citations.GEOTIFF, "FalseEasting")
                 },
                 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -1131,10 +1131,10 @@ public abstract class MapProjection extends AbstractMathTransform
          */
         public static final ParameterDescriptor FALSE_NORTHING = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,     "false_northing"),
-                    new NamedIdentifier(CitationImpl.EPSG,    "False northing"),
-                    new NamedIdentifier(CitationImpl.EPSG,    "Northing at false origin"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF, "FalseNorthing")
+                    new NamedIdentifier(Citations.OGC,     "false_northing"),
+                    new NamedIdentifier(Citations.EPSG,    "False northing"),
+                    new NamedIdentifier(Citations.EPSG,    "Northing at false origin"),
+                    new NamedIdentifier(Citations.GEOTIFF, "FalseNorthing")
                 },
                 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 

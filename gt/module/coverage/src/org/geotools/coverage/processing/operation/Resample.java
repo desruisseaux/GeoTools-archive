@@ -42,7 +42,7 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.Operation2D;
 import org.geotools.coverage.processing.CannotReprojectException;
 import org.geotools.factory.Hints;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.i18n.Errors;
@@ -137,7 +137,7 @@ public class Resample extends Operation2D {
      * The parameter descriptor for the interpolation type.
      */
     public static final ParameterDescriptor INTERPOLATION_TYPE =
-            new DefaultParameterDescriptor(CitationImpl.OGC, "InterpolationType",
+            new DefaultParameterDescriptor(Citations.OGC, "InterpolationType",
                 Object.class,                       // Value class (mandatory)
                 null,                               // Array of valid values
                 "NearestNeighbor",                  // Default value
@@ -150,7 +150,7 @@ public class Resample extends Operation2D {
      * The parameter descriptor for the coordinate reference system.
      */
     public static final ParameterDescriptor COORDINATE_REFERENCE_SYSTEM =
-            new DefaultParameterDescriptor(CitationImpl.OGC, "CoordinateReferenceSystem",
+            new DefaultParameterDescriptor(Citations.OGC, "CoordinateReferenceSystem",
                 CoordinateReferenceSystem.class,    // Value class (mandatory)
                 null,                               // Array of valid values
                 null,                               // Default value
@@ -163,7 +163,7 @@ public class Resample extends Operation2D {
      * The parameter descriptor for the grid geometry.
      */
     public static final ParameterDescriptor GRID_GEOMETRY =
-            new DefaultParameterDescriptor(CitationImpl.OGC, "GridGeometry",
+            new DefaultParameterDescriptor(Citations.OGC, "GridGeometry",
                 GridGeometry2D.class,               // Value class (mandatory)
                 null,                               // Array of valid values
                 null,                               // Default value
@@ -176,7 +176,7 @@ public class Resample extends Operation2D {
      * Constructs a {@code "Resample"} operation.
      */
     public Resample() {
-        super(new DefaultParameterDescriptorGroup(CitationImpl.OGC, "Resample",
+        super(new DefaultParameterDescriptorGroup(Citations.OGC, "Resample",
               new ParameterDescriptor[] {
                     SOURCE_0,
                     INTERPOLATION_TYPE,

@@ -49,7 +49,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Projection;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.parameter.ParameterWriter;
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -149,12 +149,12 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
     /**
      * Returns the vendor responsible for creating this factory implementation. Many implementations
      * may be available for the same factory interface. The default implementation returns
-     * {@linkplain CitationImpl#GEOTOOLS Geotools}.
+     * {@linkplain Citations#GEOTOOLS Geotools}.
      *
      * @return The vendor for this factory implementation.
      */
     public Citation getVendor() {
-        return CitationImpl.GEOTOOLS;
+        return Citations.GEOTOOLS;
     }
 
     /**

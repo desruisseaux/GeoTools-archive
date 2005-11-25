@@ -61,7 +61,7 @@ import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -614,13 +614,13 @@ public class TransverseMercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Transverse_Mercator"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Transverse Mercator"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Gauss-Kruger"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9807"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_TransverseMercator"),
-                new NamedIdentifier(CitationImpl.ESRI,     "Transverse_Mercator"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                new NamedIdentifier(Citations.OGC,      "Transverse_Mercator"),
+                new NamedIdentifier(Citations.EPSG,     "Transverse Mercator"),
+                new NamedIdentifier(Citations.EPSG,     "Gauss-Kruger"),
+                new NamedIdentifier(Citations.EPSG,     "9807"),
+                new NamedIdentifier(Citations.GEOTIFF,  "CT_TransverseMercator"),
+                new NamedIdentifier(Citations.ESRI,     "Transverse_Mercator"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
                                     VocabularyKeys.TRANSVERSE_MERCATOR_PROJECTION))
             });
 
@@ -706,8 +706,8 @@ public class TransverseMercator extends MapProjection {
          */
         public Provider_SouthOrientated() {
             super(createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.EPSG, "Transverse Mercator (South Orientated)"),
-                new NamedIdentifier(CitationImpl.EPSG, "9808")
+                new NamedIdentifier(Citations.EPSG, "Transverse Mercator (South Orientated)"),
+                new NamedIdentifier(Citations.EPSG, "9808")
             }));
         }
 

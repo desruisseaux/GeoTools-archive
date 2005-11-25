@@ -52,7 +52,7 @@ import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
@@ -88,7 +88,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * The identifier for an identity operation.
      */
     protected static final Identifier IDENTITY =
-            new NamedIdentifier(CitationImpl.GEOTOOLS,
+            new NamedIdentifier(Citations.GEOTOOLS,
                                 Vocabulary.formatInternational(VocabularyKeys.IDENTITY));
 
     /**
@@ -96,7 +96,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * unit conversions.
      */
     protected static final Identifier AXIS_CHANGES =
-            new NamedIdentifier(CitationImpl.GEOTOOLS,
+            new NamedIdentifier(Citations.GEOTOOLS,
                                 Vocabulary.formatInternational(VocabularyKeys.AXIS_CHANGES));
 
     /**
@@ -105,7 +105,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @see PositionalAccuracyImpl#DATUM_SHIFT_APPLIED
      */
     protected static final Identifier DATUM_SHIFT =
-            new NamedIdentifier(CitationImpl.GEOTOOLS,
+            new NamedIdentifier(Citations.GEOTOOLS,
                                 Vocabulary.formatInternational(VocabularyKeys.DATUM_SHIFT));
 
     /**
@@ -119,21 +119,21 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @see PositionalAccuracyImpl#DATUM_SHIFT_OMITTED
      */
     protected static final Identifier ELLIPSOID_SHIFT =
-            new NamedIdentifier(CitationImpl.GEOTOOLS,
+            new NamedIdentifier(Citations.GEOTOOLS,
                                 Vocabulary.formatInternational(VocabularyKeys.ELLIPSOID_SHIFT));
 
     /**
      * The identifier for a geocentric conversion.
      */
     protected static final Identifier GEOCENTRIC_CONVERSION =
-            new NamedIdentifier(CitationImpl.GEOTOOLS,
+            new NamedIdentifier(Citations.GEOTOOLS,
                 Vocabulary.formatInternational(VocabularyKeys.GEOCENTRIC_TRANSFORM));
 
     /**
      * The identifier for an inverse operation.
      */
     protected static final Identifier INVERSE_OPERATION =
-            new NamedIdentifier(CitationImpl.GEOTOOLS,
+            new NamedIdentifier(Citations.GEOTOOLS,
                 Vocabulary.formatInternational(VocabularyKeys.INVERSE_OPERATION));
 
     /**
@@ -554,7 +554,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
 
         /** Work around for RFE #4093999 in Sun's bug database */
         private TemporaryIdentifier(final Identifier parent, final int count) {
-            super(CitationImpl.GEOTOOLS, unwrap(parent).getCode() + " (step " + count + ')');
+            super(Citations.GEOTOOLS, unwrap(parent).getCode() + " (step " + count + ')');
             this.parent = parent;
             this.count  = count;
         }

@@ -49,7 +49,7 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.io.TableWriter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
@@ -465,7 +465,7 @@ public final class FactoryFinder {
 
         /** Returns {@code true} if the specified provider is built by the vendor. */
         public boolean filter(final Object provider) {
-            return CitationImpl.titleMatches(((Factory)provider).getVendor(), vendor);
+            return Citations.titleMatches(((Factory)provider).getVendor(), vendor);
         }
     }
 
@@ -518,7 +518,7 @@ public final class FactoryFinder {
 
         /** Returns {@code true} if the specified provider is for the authority. */
         public boolean filter(final Object provider) {
-            return CitationImpl.titleMatches(((AuthorityFactory)provider).getAuthority(), authority);
+            return Citations.titleMatches(((AuthorityFactory)provider).getAuthority(), authority);
         }
     }
 

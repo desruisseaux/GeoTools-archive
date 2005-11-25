@@ -68,7 +68,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
@@ -234,7 +234,7 @@ public class Parser extends MathTransformParser {
         for (int i=0; i<values.length; i++) {
             directions.put(values[i].name().trim().toUpperCase(), values[i]);
         }
-        predefinedAxis = CitationImpl.GEOTOOLS.equals(csFactory.getVendor()) ? GEOTOOLS_AXIS : NO_AXIS;
+        predefinedAxis = Citations.GEOTOOLS.equals(csFactory.getVendor()) ? GEOTOOLS_AXIS : NO_AXIS;
     }
 
     /**
@@ -331,7 +331,7 @@ public class Parser extends MathTransformParser {
         final String code = element.pullString("code");
         element.close();
         final Map     properties = new HashMap(4);
-        final Citation authority = CitationImpl.createCitation(auth);
+        final Citation authority = Citations.fromName(auth);
         properties.put(IdentifiedObject.       NAME_KEY, new NamedIdentifier(authority, name));
         properties.put(IdentifiedObject.IDENTIFIERS_KEY, new NamedIdentifier(authority, code));
         return properties;
@@ -1033,7 +1033,7 @@ public class Parser extends MathTransformParser {
         try {
             final Parser parser = new Parser();
             if (authority != null) {
-                parser.setAuthority(CitationImpl.createCitation(authority));
+                parser.setAuthority(Citations.fromName(authority));
             }
             parser.reformat(in, arguments.out, arguments.err);
         } catch (Exception exception) {

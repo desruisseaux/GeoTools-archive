@@ -30,7 +30,7 @@ import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
@@ -87,10 +87,10 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory {
     }
 
     /**
-     * Returns the authority, which is {@link CitationImpl#EPSG EPSG}.
+     * Returns the authority, which is {@link Citations#EPSG EPSG}.
      */
     public Citation getAuthority() {
-        return CitationImpl.EPSG;
+        return Citations.EPSG;
     }
 
     /**

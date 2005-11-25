@@ -29,7 +29,7 @@ import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.util.SimpleInternationalString;
 
 
@@ -77,8 +77,8 @@ public class PositionalAccuracyImpl extends ElementImpl implements PositionalAcc
         // TODO: localize.
         final InternationalString   desc = new SimpleInternationalString("Transformation accuracy");
         final InternationalString   eval = new SimpleInternationalString("Is a datum shift method applied?");
-        final ConformanceResultImpl pass = new ConformanceResultImpl(CitationImpl.GEOTOOLS, eval, true );
-        final ConformanceResultImpl fail = new ConformanceResultImpl(CitationImpl.GEOTOOLS, eval, false);
+        final ConformanceResultImpl pass = new ConformanceResultImpl(Citations.GEOTOOLS, eval, true );
+        final ConformanceResultImpl fail = new ConformanceResultImpl(Citations.GEOTOOLS, eval, false);
         pass.freeze();
         fail.freeze();
         final PositionalAccuracyImpl APPLIED, OMITTED;

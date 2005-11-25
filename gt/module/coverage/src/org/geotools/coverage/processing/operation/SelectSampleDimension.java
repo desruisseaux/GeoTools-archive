@@ -34,7 +34,7 @@ import org.opengis.parameter.ParameterDescriptor;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.coverage.processing.Operation2D;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 
@@ -107,7 +107,7 @@ public class SelectSampleDimension extends Operation2D {
      * The parameter descriptor for the sample dimension indices.
      */
     public static final ParameterDescriptor SAMPLE_DIMENSIONS =
-            new DefaultParameterDescriptor(CitationImpl.OGC, "SampleDimensions",
+            new DefaultParameterDescriptor(Citations.OGC, "SampleDimensions",
                 int[].class,                        // Value class (mandatory)
                 null,                               // Array of valid values
                 null,                               // Default value
@@ -121,7 +121,7 @@ public class SelectSampleDimension extends Operation2D {
      * This is a Geotools-specific parameter.
      */
     public static final ParameterDescriptor VISIBLE_SAMPLE_DIMENSION =
-            new DefaultParameterDescriptor(CitationImpl.GEOTOOLS, "VisibleSampleDimension",
+            new DefaultParameterDescriptor(Citations.GEOTOOLS, "VisibleSampleDimension",
                 Integer.class,                      // Value class (mandatory)
                 null,                               // Array of valid values
                 null,                               // Default value

@@ -46,7 +46,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.MatrixParameterDescriptors;
 import org.geotools.parameter.MatrixParameters;
 import org.geotools.referencing.NamedIdentifier;
@@ -502,14 +502,14 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          */
         static final ParameterDescriptorGroup PARAMETERS;
         static {
-            final NamedIdentifier name = new NamedIdentifier(CitationImpl.OGC, "Affine");
+            final NamedIdentifier name = new NamedIdentifier(Citations.OGC, "Affine");
             final Map  properties = new HashMap(4, 0.8f);
             properties.put(NAME_KEY,        name);
             properties.put(IDENTIFIERS_KEY, name);
             properties.put(ALIAS_KEY, new NamedIdentifier[] {name,
-                new NamedIdentifier(CitationImpl.EPSG, "Affine general parametric transformation"),
-                new NamedIdentifier(CitationImpl.EPSG, "9624"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS,
+                new NamedIdentifier(Citations.EPSG, "Affine general parametric transformation"),
+                new NamedIdentifier(Citations.EPSG, "9624"),
+                new NamedIdentifier(Citations.GEOTOOLS,
                     Vocabulary.formatInternational(VocabularyKeys.AFFINE_TRANSFORM))
             });
             PARAMETERS = new MatrixParameterDescriptors(properties);
@@ -592,7 +592,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          */
         public static final ParameterDescriptor OFFSET = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.EPSG, "Longitude offset")
+                    new NamedIdentifier(Citations.EPSG, "Longitude offset")
                 },
                 Double.NaN, -180, +180, NonSI.DEGREE_ANGLE);
 
@@ -600,8 +600,8 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.EPSG, "Longitude rotation"),
-                    new NamedIdentifier(CitationImpl.EPSG, "9601")
+                    new NamedIdentifier(Citations.EPSG, "Longitude rotation"),
+                    new NamedIdentifier(Citations.EPSG, "9601")
                 }, new ParameterDescriptor[] {
                     OFFSET
                 });

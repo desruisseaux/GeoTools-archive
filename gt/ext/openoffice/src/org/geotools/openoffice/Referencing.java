@@ -74,7 +74,7 @@ import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Logging;
@@ -441,7 +441,7 @@ public final class Referencing extends Formulas implements XReferencing {
             authorityString = AnyConverter.toString(authority);
         }
         if (object instanceof Formattable) {
-            return ((Formattable) object).toWKT(CitationImpl.createCitation(authorityString), 2);
+            return ((Formattable) object).toWKT(Citations.fromName(authorityString), 2);
         }
         if (object instanceof MathTransform) {
             return ((MathTransform) object).toWKT();

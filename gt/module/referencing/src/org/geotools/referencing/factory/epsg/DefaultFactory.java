@@ -48,7 +48,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 import org.geotools.factory.JNDI;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
@@ -139,7 +139,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      */
     public Citation getAuthority() {
         final Citation authority = super.getAuthority();
-        return (authority!=null) ? authority : CitationImpl.EPSG;
+        return (authority!=null) ? authority : Citations.EPSG;
     }
 
     /**

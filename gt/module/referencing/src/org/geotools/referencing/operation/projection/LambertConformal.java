@@ -39,7 +39,7 @@ import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.measure.Latitude;
-import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -357,11 +357,11 @@ public class LambertConformal extends MapProjection{
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Lambert_Conformal_Conic_1SP"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Lambert Conic Conformal (1SP)"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9801"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_LambertConfConic_1SP"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
+                new NamedIdentifier(Citations.OGC,      "Lambert_Conformal_Conic_1SP"),
+                new NamedIdentifier(Citations.EPSG,     "Lambert Conic Conformal (1SP)"),
+                new NamedIdentifier(Citations.EPSG,     "9801"),
+                new NamedIdentifier(Citations.GEOTIFF,  "CT_LambertConfConic_1SP"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
                                     VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
@@ -417,9 +417,9 @@ public class LambertConformal extends MapProjection{
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
+                    new NamedIdentifier(Citations.OGC,      "standard_parallel_1"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of 1st standard parallel"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel1")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
                 
@@ -429,9 +429,9 @@ public class LambertConformal extends MapProjection{
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_2"),
-                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
-                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel2")
+                    new NamedIdentifier(Citations.OGC,      "standard_parallel_2"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of 2nd standard parallel"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel2")
                 },
                 -90, 90, NonSI.DEGREE_ANGLE);
         
@@ -439,13 +439,13 @@ public class LambertConformal extends MapProjection{
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Lambert_Conformal_Conic_2SP"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Lambert Conic Conformal (2SP)"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9802"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_LambertConfConic_2SP"),
-                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_LambertConfConic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
-                                                           VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
+                new NamedIdentifier(Citations.OGC,      "Lambert_Conformal_Conic_2SP"),
+                new NamedIdentifier(Citations.EPSG,     "Lambert Conic Conformal (2SP)"),
+                new NamedIdentifier(Citations.EPSG,     "9802"),
+                new NamedIdentifier(Citations.GEOTIFF,  "CT_LambertConfConic_2SP"),
+                new NamedIdentifier(Citations.GEOTIFF,  "CT_LambertConfConic"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
+                                                        VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
@@ -504,11 +504,11 @@ public class LambertConformal extends MapProjection{
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.OGC,      "Lambert_Conformal_Conic_2SP_Belgium"),
-                new NamedIdentifier(CitationImpl.EPSG,     "Lambert Conic Conformal (2SP Belgium)"),
-                new NamedIdentifier(CitationImpl.EPSG,     "9803"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
-                                                           VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
+                new NamedIdentifier(Citations.OGC,      "Lambert_Conformal_Conic_2SP_Belgium"),
+                new NamedIdentifier(Citations.EPSG,     "Lambert Conic Conformal (2SP Belgium)"),
+                new NamedIdentifier(Citations.EPSG,     "9803"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
+                                                        VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
@@ -560,9 +560,9 @@ public class LambertConformal extends MapProjection{
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(CitationImpl.ESRI,     "Lambert_Conformal_Conic"),
-                new NamedIdentifier(CitationImpl.GEOTOOLS, Vocabulary.formatInternational(
-                                                           VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
+                new NamedIdentifier(Citations.ESRI,     "Lambert_Conformal_Conic"),
+                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
+                                                        VocabularyKeys.LAMBERT_CONFORMAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
