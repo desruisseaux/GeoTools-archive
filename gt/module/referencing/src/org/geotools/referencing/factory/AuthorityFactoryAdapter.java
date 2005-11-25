@@ -285,9 +285,10 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     }
 
     /**
-     * Replaces (if needed) the specified coordinate operation. The default implementation checks
-     * if there is a source or target {@linkplain #replace(CRS) CRS replacement}. If there is at
-     * least one of those, then this method returns a new coordinate operation using the new CRS.
+     * Replaces (if needed) the specified coordinate operation. The default implementation checks if
+     * there is a source or target {@linkplain #replace(CoordinateReferenceSystem) CRS replacement}.
+     * If there is at least one of those, then this method returns a new coordinate operation using
+     * the new CRS.
      *
      * @param  operation The coordinate operation to replace.
      * @return A new operation, or {@code operation} if no change were needed.

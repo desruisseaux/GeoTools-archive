@@ -171,12 +171,15 @@ public final class Citations {
     ////////                                                       ////////
     ///////////////////////////////////////////////////////////////////////
 
+    // Do not put the ...files/?artifact... link in the head sentence: it break javadoc formatting.
     /**
-     * The <A HREF="http://portal.opengis.org/files/?artifact_id=5316">Web Map Service</A>
-     * specification. {@linkplain Citation#getAlternateTitles Alternate titles} for this
-     * citation are "WMS", "WMS 1.3.0", "OGC 04-024" and "ISO 19128". Note that the version
-     * numbers may be upgrated in future Geotools versions.
+     * The Web Map Service specification. {@linkplain Citation#getAlternateTitles Alternate titles}
+     * for this citation are "WMS", "WMS 1.3.0", "OGC 04-024" and "ISO 19128". Note that the
+     * version numbers may be upgrated in future Geotools versions.
      *
+     * @see <A HREF="http://www.opengeospatial.org/">Open Geospatial Consortium</A>
+     * @see <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1 specification</A>
+     * @see <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0 specification</A>
      * @see ResponsiblePartyImpl#OGC
      * @see OnLineResourceImpl#WMS
      */
@@ -287,7 +290,7 @@ public final class Citations {
      *
      * @see <A HREF="http://www.opengeospatial.org/">Open Geospatial Consortium</A>
      * @see <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1 specification</A>
-     * @see ResponsiblePartyImpl#OGC
+     * @see #WMS
      * @see #AUTO2
      * @see #CRS
      * @see #EPSG
@@ -310,6 +313,7 @@ public final class Citations {
         AUTO = c;
     }
 
+    // Do not put the ...files/?artifact... link in the head sentence: it break javadoc formatting.
     /**
      * The WMS 1.3.0 "Automatic Projections" authority. An {@linkplain Citation#getAlternateTitles
      * alternate title} for this citation is "AUTO2" (according ISO 19115, alternate titles often
@@ -329,7 +333,7 @@ public final class Citations {
      *
      * @see <A HREF="http://www.opengeospatial.org/">Open Geospatial Consortium</A>
      * @see <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0 specification</A>
-     * @see ResponsiblePartyImpl#OGC
+     * @see #WMS
      * @see #AUTO
      * @see #CRS
      * @see #EPSG
@@ -351,10 +355,11 @@ public final class Citations {
         AUTO2 = c;
     }
 
+    // Do not put the ...files/?artifact... link in the head sentence: it break javadoc formatting.
     /**
-     * The <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0</A> "CRS"
-     * authority. This is defined in the same document than {@link #AUTO2}.
+     * The WMS 1.3.0 "CRS" authority. This is defined in the same document than {@link #AUTO2}.
      *
+     * @see #WMS
      * @see #AUTO
      * @see #AUTO2
      * @see #CRS
