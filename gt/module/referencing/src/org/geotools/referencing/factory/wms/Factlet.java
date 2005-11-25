@@ -1,0 +1,83 @@
+/*
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2004 Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+package org.geotools.referencing.factory.wms;
+
+// J2SE dependencies
+import java.util.Collections;
+
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.crs.ProjectedCRS;
+
+// Geotools dependencies
+import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+
+
+/**
+ * Mini Plug-In API for {@linkplain ProjectedCRS projected CRS} from the {@code AUTO} authority.
+ *
+ * @version $Id$
+ * @author Jody Garnett
+ * @author Rueben Schulz
+ * @author Martin Desruisseaux
+ */
+abstract class Factlet {
+    /**
+     * Returns the {@code AUTO} code for this plugin.
+     */
+    public abstract int code();
+
+    /**
+     * Returns the name for the CRS to be created by this plugin.
+     */
+    public abstract String getName();
+
+    /**
+     * Returns the classification of projection method.
+     * For example {@code "Transverse_Mercator"}.
+     */
+    public abstract String getClassification();
+
+    /**
+     * Creates a coordinate reference system from the specified code. The default
+     * implementation creates a {@linkplain ParameterValueGroup parameter group}
+     * for the {@linkplain #getClassification projection classification}, and then
+     * invokes {@link #setProjectionParameters} in order to fill the parameter values.
+     */
+    public final ProjectedCRS create(final Code code, final FactoryGroup factories)
+            throws FactoryException
+    {
+        final String classification = getClassification();
+        final ParameterValueGroup parameters;
+        parameters = factories.getMathTransformFactory().getDefaultParameters(classification);
+        setProjectionParameters(parameters, code);
+        return factories.createProjectedCRS(
+                Collections.singletonMap(IdentifiedObject.NAME_KEY, getName()),
+                DefaultGeographicCRS.WGS84, null, parameters, DefaultCartesianCS.PROJECTED);
+    }
+
+    /**
+     * Fills the parameter values for the specified code.
+     */
+    protected abstract void setProjectionParameters(ParameterValueGroup parameters, Code code);
+}

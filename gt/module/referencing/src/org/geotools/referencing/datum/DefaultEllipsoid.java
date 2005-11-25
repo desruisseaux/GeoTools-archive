@@ -54,29 +54,44 @@ import org.geotools.resources.i18n.ErrorKeys;
  *       {@linkplain #getSemiMinorAxis semi-minor axis}.</li>
  * </ul>
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellipsoid {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -1149451543954764081L;
-    
+
     /**
      * WGS 1984 ellipsoid with axis in {@linkplain SI#METER metres}. This ellipsoid is used
      * in GPS systems and is the default for most {@code org.geotools} packages.
      */
     public static final DefaultEllipsoid WGS84 =
             createFlattenedSphere("WGS84", 6378137.0, 298.257223563, SI.METER);
-    
+
+    /**
+     * GRS 80 ellipsoid with axis in {@linkplain SI#METER metres}.
+     *
+     * @since 2.2
+     */
+    public static final DefaultEllipsoid GRS80 =
+            createFlattenedSphere("GRS80", 6378137.0, 298.257222101, SI.METER);
+
     /**
      * International 1924 ellipsoid with axis in {@linkplain SI#METER metres}.
      */
     public static final DefaultEllipsoid INTERNATIONAL_1924 =
             createFlattenedSphere("International 1924", 6378388.0, 297.0, SI.METER);
+
+    /**
+     * Clarke 1866 ellipsoid with axis in {@linkplain SI#METER metres}.
+     *
+     * @since 2.2
+     */
+    public static final DefaultEllipsoid CLARKE_1866 =
+            createFlattenedSphere("Clarke 1866", 6378206.4, 294.9786982, SI.METER);
 
     /**
      * A sphere with a radius of 6371000 {@linkplain SI#METER metres}. Spheres use a simplier

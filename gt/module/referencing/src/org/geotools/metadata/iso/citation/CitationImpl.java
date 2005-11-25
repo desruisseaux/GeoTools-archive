@@ -40,6 +40,8 @@ import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.citation.Series;
 import org.opengis.util.InternationalString;
+import org.opengis.referencing.crs.CRSAuthorityFactory;       // For javadoc
+import org.opengis.referencing.crs.CoordinateReferenceSystem; // For javadoc
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
@@ -50,11 +52,10 @@ import org.geotools.util.SimpleInternationalString;
 /**
  * Standardized resource reference.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett
- *
- * @since 2.1
  */
 public class CitationImpl extends MetadataEntity implements Citation {
     /**
@@ -63,224 +64,88 @@ public class CitationImpl extends MetadataEntity implements Citation {
     private static final long serialVersionUID = -4415559967618358778L;
 
     /**
-     * Create a a responsible party metadata entry for OGC involvement.
-     * The organisation name is automatically set to "Open Geospatial Consortium".
-     *
-     * @param role           The OGC role (point of contact, owner, etc.) for a resource.
-     * @param function       The OGC function (information, download, etc.) for a resource.
-     * @param onlineResource The URI on the resource.
-     * @return ResponsibleParty describing OGC involvement
-     */ 
-    private static ResponsibleParty OGC(Role role, OnLineFunction function, String onlineResource) {
-        try {
-            return ResponsiblePartyImpl.OGC(role, function, new URI(onlineResource));
-        }
-        catch (URISyntaxException badContact) {
-            Utilities.unexpectedException("org.geotools.metadata.iso", "Citation", "OGC", badContact);
-            return ResponsiblePartyImpl.OGC;
-        }
-    }
-
-    /**
-     * The WMS 1.1.1 "Automatic Projections" Authority.
-     * Source: <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1</A> (01-068r3)
-     * <p>
-     * Here is the assumptions used by the {@link org.opengis.referencing.crs.CRSAuthorityFactory}
-     * to locate an authority on AUTO data:
-     * <ul>
-     *   <li>{@link #getTitle()} returns something human readable.</li>
-     *   <li>{@link #getIdentifiers()} contains "AUTO".</li>
-     * </ul>
-     * <p>
-     * <strong>Warning:</strong> different from {@link #AUTO2} used for WMS 1.3.0.
-     *
-     * @see <A HREF="http://www.opengeospatial.org/">Open Geospatial Consortium</A>
-     * @see <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1 specification</A>
-     * @see ResponsiblePartyImpl#OGC
-     */
-    public static final Citation AUTO;
-    static { // Sanity check ensure that all @see tags are actually available in the metadata
-        final CitationImpl c = new CitationImpl("Automatic Projections");
-        c.getPresentationForm().add(PresentationForm.MODEL_DIGITAL);
-
-        final Collection titles = c.getAlternateTitles();
-        titles.add(new SimpleInternationalString("AUTO"));        
-        titles.add(new SimpleInternationalString("WMS 1.1.1"));
-        titles.add(new SimpleInternationalString("OGC 01-068r2"));                
-
-        final Collection parties = c.getCitedResponsibleParties();
-        parties.add(OGC(Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/"));
-        parties.add(OGC(Role.OWNER, OnLineFunction.INFORMATION, "http://www.opengis.org/docs/01-068r3.pdf"));
-
-        c.getIdentifiers().add("AUTO");
-        c.freeze();
-        AUTO = c;
-    }
-    
-    /**
-     * The WMS 1.3.0 "Automatic Projections" Authority.
-     * Source: <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0</A> (01-068r3)
-     * <p>
-     * Here is the assumptions used by the {@link org.opengis.referencing.crs.CRSAuthorityFactory}
-     * to locate an authority on AUTO2 data:
-     * <ul>
-     *   <li>{@link #getTitle()} returns something human readable.</li>
-     *   <li>{@link #getIdentifiers()} contains "AUTO2".</li>
-     * </ul>
-     * <p>
-     * <strong>Warning:</strong> different from {@link #AUTO} used for WMS 1.1.1. and earlier.
-     *
-     * @see <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0 specification</A>
-     * @see ResponsiblePartyImpl#OGC
-     */
-    public static final Citation AUTO2;
-    static {
-        final CitationImpl c = new CitationImpl("Automatic Projections");
-        c.getPresentationForm().add(PresentationForm.MODEL_DIGITAL);
-
-        final Collection titles = c.getAlternateTitles();
-        titles.add(new SimpleInternationalString("AUTO2"));        
-        titles.add(new SimpleInternationalString("WMS 1.3.0"));
-        titles.add(new SimpleInternationalString("OGC 04-024"));                
-
-        final Collection parties = c.getCitedResponsibleParties();
-        parties.add(OGC(Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/"));
-        parties.add(OGC(Role.OWNER, OnLineFunction.INFORMATION, "http://portal.opengis.org/files/?artifact_id=5316"));
-
-        c.getIdentifiers().add("AUTO2");
-        c.freeze();
-        AUTO2 = c;
-    }
-
-    /**
-     * The <A HREF="http://www.opengeospatial.org">Open Geospatial consortium</A> authority.
+     * The <A HREF="http://www.opengeospatial.org">Open Geospatial consortium</A> organisation.
      * "Open Geospatial consortium" is the new name for "OpenGIS consortium".
      * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "OGC"
-     * (according ISO 19115, alternate titles often contains abreviation).
+     * (according ISO 19115, alternate titles often contain abreviations).
      *
-     * @see ResponsiblePartyImpl#OGC
+     * @deprecated Moved into the {@link Citations} class.
      */
-    public static final Citation OGC;
-    static {
-        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.OGC);
-        c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL);
-        c.getAlternateTitles().add(new SimpleInternationalString("OGC"));
-        c.freeze();
-        OGC = c;
-    }
+    public static final Citation OGC = Citations.OGC;
 
     /**
-     * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> authority.
+     * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> organisation.
      * "OpenGIS consortium" is the old name for "Open Geospatial consortium".
+     * {@linkplain Citation#getAlternateTitles Alternate titles} for this citation are
+     * "OpenGIS" and "OGC" (according ISO 19115, alternate titles often contain abreviations).
      *
-     * @see ResponsiblePartyImpl#OPEN_GIS
+     * @deprecated Moved into the {@link Citations} class.
      */
-    public static final Citation OPEN_GIS;
-    static {
-        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.OPEN_GIS);
-        c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL);
-        c.getAlternateTitles().add(new SimpleInternationalString("OpenGIS"));
-        c.freeze();
-        OPEN_GIS = c;
-    }
+    public static final Citation OPEN_GIS = Citations.OPEN_GIS;
 
     /**
-     * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> authority.
-     * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "EPSG"
-     * (according ISO 19115, alternate titles often contains abreviation).
-     * <p>
-     * Here is the assumptions used by the {@link org.opengis.referencing.crs.CRSAuthorityFactory}
-     * to locate an authority on EPSG data:
-     * <ul>
-     *   <li>{@link #getTitle()} returns something human readable.</li>
-     *   <li>{@link #getIdentifiers()} contains "EPSG".</li>
-     * </ul>
+     * The <A HREF="http://www.esri.com">ESRI</A> organisation.
      *
-     * @see ResponsiblePartyImpl#EPSG
-     */    
-    public static final Citation EPSG;
-    static {
-        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.EPSG);
-        c.getPresentationForm().add(PresentationForm.TABLE_DIGITAL);
-        c.getAlternateTitles().add(new SimpleInternationalString("EPSG"));
-        c.getIdentifiers().add("EPSG");
-        c.freeze();
-        EPSG = c;
-    }
-
-    /**
-     * The <A HREF="http://www.remotesensing.org/geotiff/geotiff.html">GeoTIFF</A> authority.
-     *
-     * @see ResponsiblePartyImpl#GEOTIFF
+     * @deprecated Moved into the {@link Citations} class.
      */
-    public static final Citation GEOTIFF;
-    static {
-        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.GEOTIFF);
-        c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL);
-        c.freeze();
-        GEOTIFF = c;
-    }
-
-    /**
-     * The <A HREF="http://www.esri.com">ESRI</A> authority.
-     *
-     * @see ResponsiblePartyImpl#ESRI
-     */
-    public static final Citation ESRI;
-    static {
-        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.ESRI);
-        c.freeze();
-        ESRI = c;
-    }
+    public static final Citation ESRI = Citations.ESRI;
     
     /**
-     * The <A HREF="http://www.oracle.com">Oracle</A> authority.
+     * The <A HREF="http://www.oracle.com">Oracle</A> organisation.
      *
-     * @see ResponsiblePartyImpl#ORACLE
+     * @deprecated Moved into the {@link Citations} class.
      */
-    public static final Citation ORACLE;
-    static {
-        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.ORACLE);
-        c.freeze();
-        ORACLE = c;
-    }
-
-    /**
-     * The <A HREF="http://java.sun.com/products/java-media/jai">Java Advanced Imaging</A> library.
-     * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "JAI"
-     * (according ISO 19115, alternate titles often contains abreviation).
-     *
-     * @see ResponsiblePartyImpl#SUN_MICROSYSTEMS
-     *
-     * @since 2.2
-     */
-    public static final Citation JAI;
-    static {
-        final CitationImpl c = new CitationImpl("Java Advanced Imaging");
-        c.getAlternateTitles().add(new SimpleInternationalString("JAI"));
-        c.getCitedResponsibleParties().add(ResponsiblePartyImpl.SUN_MICROSYSTEMS);
-        c.freeze();
-        JAI = c;
-    }
+    public static final Citation ORACLE = Citations.ORACLE;
 
     /**
      * The <A HREF="http://www.geotools.org">Geotools</A> project.
      *
-     * @see ResponsiblePartyImpl#GEOTOOLS
+     * @deprecated Moved into the {@link Citations} class.
      */
-    public static final Citation GEOTOOLS;
-    static {
-        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.GEOTOOLS);
-        c.freeze();
-        GEOTOOLS = c;
-    }
+    public static final Citation GEOTOOLS = Citations.GEOTOOLS;
 
     /**
-     * List of authorities declared in this class.
+     * The <A HREF="http://www.remotesensing.org/geotiff/geotiff.html">GeoTIFF</A> specification.
+     *
+     * @deprecated Moved into the {@link Citations} class.
      */
-    private static final Citation[] AUTHORITIES = {
-        OPEN_GIS, EPSG, GEOTIFF, ESRI, ORACLE, JAI, GEOTOOLS, AUTO, AUTO2
-    };
+    public static final Citation GEOTIFF = Citations.GEOTIFF;
+
+    /**
+     * The <A HREF="http://java.sun.com/products/java-media/jai">Java Advanced Imaging</A> library.
+     * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "JAI"
+     * (according ISO 19115, alternate titles often contain abreviations).
+     *
+     * @deprecated Moved into the {@link Citations} class.
+     */
+    public static final Citation JAI = Citations.JAI;
+
+    /**
+     * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> authority.
+     * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "EPSG"
+     * (according ISO 19115, alternate titles often contain abreviations).
+     *
+     * @deprecated Moved into the {@link Citations} class.
+     */    
+    public static final Citation EPSG = Citations.EPSG;
+
+    /**
+     * The <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1</A> "Automatic Projections"
+     * Authority. An {@linkplain Citation#getAlternateTitles alternate title} for this citation is
+     * "AUTO" (according ISO 19115, alternate titles often contain abreviations).
+     *
+     * @deprecated Moved into the {@link Citations} class.
+     */
+    public static final Citation AUTO = Citations.AUTO;
+
+    /**
+     * The <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0</A> "Automatic
+     * Projections" authority. An {@linkplain Citation#getAlternateTitles alternate title} for this
+     * citation is "AUTO2" (according ISO 19115, alternate titles often contain abreviations).
+     *
+     * @deprecated Moved into the {@link Citations} class.
+     */
+    public static final Citation AUTO2 = Citations.AUTO2;
 
     /**
      * Name by which the cited resource is known.
@@ -431,23 +296,23 @@ public class CitationImpl extends MetadataEntity implements Citation {
     }
 
     /**
-     * Returns a citation of the given name. If the given name matches a
-     * {@linkplain #getTitle title} or an {@linkplain #getAlternateTitles
-     * alternate titles} of one of the pre-defined constants
-     * (e.g. {@link #EPSG}, {@link #GEOTIFF}, <cite>etc.</cite>),
-     * then this constant is returned. Otherwise, a new citation is created
-     * with the specified name as the title.
+     * Adds the specified identifier as a CRS authority factory. This is used as a convenience
+     * method for the creation of constants, and for making sure that all of them use the same
+     * identifier type.
+     */
+    final void addAuthority(final String identifier) {
+        getAlternateTitles().add(new SimpleInternationalString(identifier));
+        getIdentifierTypes().add("Authority name");
+        getIdentifiers().add(identifier);
+    }
+
+    /**
+     * Returns a citation of the given name.
      *
-     * @param name The citation name (or title).
+     * @deprecated Moved as {@link Citations#fromName}.
      */
     public static Citation createCitation(final String name) {
-        for (int i=0; i<AUTHORITIES.length; i++) {
-            final Citation citation = AUTHORITIES[i];
-            if (titleMatches(citation, name)) {
-                return citation;
-            }
-        }
-        return new CitationImpl(name);
+        return Citations.fromName(name);
     }
 
     /**
@@ -460,33 +325,10 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * @param  c2 the second citation to compare.
      * @return {@code true} if at least one title or alternate title matches.
      *
-     * @since 2.2
+     * @deprecated Moved into the {@link Citations} class.
      */
     public static boolean titleMatches(final Citation c1, final Citation c2) {
-        InternationalString candidate = c2.getTitle();
-        Iterator iterator = null;
-        do {
-            final String asString = candidate.toString(Locale.US);
-            if (titleMatches(c1, asString)) {
-                return true;
-            }
-            final String asLocalized = candidate.toString();
-            if (asLocalized!=asString && titleMatches(c1, asLocalized)) {
-                return true;
-            }
-            if (iterator == null) {
-                final Collection titles = c2.getAlternateTitles();
-                if (titles == null) {
-                    break;
-                }
-                iterator = titles.iterator();
-            }
-            if (!iterator.hasNext()) {
-                break;
-            }
-            candidate = (InternationalString) iterator.next();
-        } while (true);
-        return false;
+        return Citations.titleMatches(c1, c2);
     }
 
     /**
@@ -497,33 +339,11 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * @param  citation The citation to check for.
      * @param  title The title or alternate title to compare.
      * @return {@code true} if the title or alternate title matches the given string.
+     *
+     * @deprecated Moved into the {@link Citations} class.
      */
     public static boolean titleMatches(final Citation citation, String title) {
-        title = title.trim();
-        InternationalString candidate = citation.getTitle();
-        Iterator iterator = null;
-        do {
-            final String asString = candidate.toString(Locale.US);
-            if (asString.trim().equalsIgnoreCase(title)) {
-                return true;
-            }
-            final String asLocalized = candidate.toString();
-            if (asLocalized!=asString && asLocalized.trim().equalsIgnoreCase(title)) {
-                return true;
-            }
-            if (iterator == null) {
-                final Collection titles = citation.getAlternateTitles();
-                if (titles == null) {
-                    break;
-                }
-                iterator = titles.iterator();
-            }
-            if (!iterator.hasNext()) {
-                break;
-            }
-            candidate = (InternationalString) iterator.next();
-        } while (true);
-        return false;
+        return Citations.titleMatches(citation, title);
     }
 
     /**

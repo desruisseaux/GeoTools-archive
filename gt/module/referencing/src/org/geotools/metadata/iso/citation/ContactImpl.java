@@ -37,11 +37,10 @@ import org.geotools.resources.Utilities;
 /**
  * Information required to enable contact with the responsible person and/or organization.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
- *
- * @since 2.1
  */
 public class ContactImpl extends MetadataEntity implements Contact {
     /**
