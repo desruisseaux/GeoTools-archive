@@ -407,8 +407,7 @@ public class SLDStyleFactory {
 
         // extract base properties
         Graphic sldGraphic = symbolizer.getGraphic();
-        float opacity = Float.parseFloat(sldGraphic.getOpacity().getValue(feature).toString());
-
+        float opacity = evalOpacity(sldGraphic.getOpacity(), feature);
         int size;
 
         try {
