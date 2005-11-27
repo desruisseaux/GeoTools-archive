@@ -136,7 +136,40 @@ public class StyledShapePainter {
             double x = 0;
             double y = 0;
 
-            if (ts2d.isAbsoluteLineDisplacement()) {
+            	/* DJB: this used to be ts2d.isAbsoluteLineDisplacement()
+            	 *      but was changed to false because the TextStyle2D no longer does supports that.
+            	 *      That code was buggy and highly likly to never actually execute (unless you were using actual LINESTRING(..)) .
+            	 *      It also didnt support static styles!
+            	 *      Its also really rare to see a LinePlacement in an SLD document anyways.
+            	 * 
+            	 *  HERE IS THE ORIGNAL CODE IN SLDStyleFactory:
+            	 * 
+            	 * 
+			            if (placement instanceof LinePlacement && geom instanceof LineString) {
+			            // @TODO: if the geometry is a ring or a polygon try to find out
+			            // some "axis" to follow in the label placement
+			            if (LOGGER.isLoggable(Level.FINER)) {
+			                LOGGER.finer("setting line placement");
+			            }
+			
+			            LineString ls = (LineString) geom;
+			            Coordinate s = ls.getStartPoint().getCoordinate();
+			            Coordinate e = ls.getEndPoint().getCoordinate();
+			            double dx = e.x - s.x;
+			            double dy = e.y - s.y;
+			
+			            double offset = ((Number) ((LinePlacement) placement).getPerpendicularOffset().getValue(feature))
+			                .doubleValue();
+			            rotation = Math.atan2(dx, dy) - (Math.PI / 2.0);
+			            anchorX = -0.5;
+			            anchorY = -0.5;
+			            dispX = 0;
+			            dispY = offset;
+			            ts2d.setAbsoluteLineDisplacement(true);
+			        }
+        
+            	 */
+            if (false) {
                 double offset = ts2d.getDisplacementY();
 
                 if (offset > 0.0) { // to the left of the line

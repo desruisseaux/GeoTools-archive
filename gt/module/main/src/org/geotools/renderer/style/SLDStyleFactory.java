@@ -89,10 +89,47 @@ import com.vividsolutions.jts.geom.LineString;
 
 
 /**
- * Factory object that converts SLD style into rendered styles
+ * Factory object that converts SLD style into rendered styles.
+ * 
+ * DJB:  I've made a few changes to this.
+ *       The old behavior was for this class to convert <LinePlacement> tags to <PointPlacement> tags.
+ *       (ie. there never was a LinePlacement option)
+ *       This is *certainly* not the correct place to do this, and it was doing a very poor job of it too,
+ *       and the renderer was not expecting it to be doing it!
+ * 
+ *       I added support in TextStyle3D for this and had this class correctly set Line/Point placement selection.
+ *       NOTE: PointPlacement is the default if not present.
  *
  * @author aaime
+ * @author dblasby
  */
+
+/*
+ *  orginal message on the subject:
+ * 
+ * I was attempting to write documentation for label placement (plus fix
+all the inconsistencies with the spec), and I noticed some problems
+with the SLDStyleFactory and TextStyle2D.
+
+It turns out the SLDStyleFactory is actually trying to do [poor] label
+placement (see around line 570)! This also results in a loss of
+information if you're using a <LinePlacement> element in your SLD.
+
+
+1. remove the placement code from SLDStyleFactory!
+2. get rid of the "AbsoluteLineDisplacement" stuff and replace it with
+something that represents <PointPlacement>/<LinePlacement> elements in
+the TextSymbolizer.
+
+The current implementation seems to try to convert a <LinePlacement> and
+an actual line into a <PointPlacement> (and setting the
+AbsoluteLineDisplacement flag)!! This should be done by the real
+labeling code.
+
+This change could affect the j2d renderer as it appears to use the
+"AbsoluteLineDisplacement" flag.
+*/
+ 
 public class SLDStyleFactory {
     /** The logger for the rendering module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
@@ -179,7 +216,7 @@ public class SLDStyleFactory {
     WeakHashMap dynamicSymbolizers = new WeakHashMap();
 
     /** Symbolizers that do not depend on attributes */
-    WeakHashMap staticSymbolizers = new WeakHashMap();
+    HashMap staticSymbolizers = new HashMap();  //DJB: your system should have a max number of static symbolizers, so this isnt going to leak that much memory. it used to be a weakhash -- this is faster.
 
     private static Set getSupportedGraphicFormats() {
         if (supportedGraphicFormats == null) {
@@ -370,7 +407,7 @@ public class SLDStyleFactory {
 
         // extract base properties
         Graphic sldGraphic = symbolizer.getGraphic();
-        float opacity = evalOpacity(sldGraphic.getOpacity(), feature);
+        float opacity = Float.parseFloat(sldGraphic.getOpacity().getValue(feature).toString());
 
         int size;
 
@@ -541,7 +578,8 @@ public class SLDStyleFactory {
         double dispX = 0;
         double dispY = 0;
 
-        if (placement instanceof PointPlacement) {
+        if (placement instanceof PointPlacement) 
+        {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("setting pointPlacement");
             }
@@ -557,27 +595,18 @@ public class SLDStyleFactory {
             // rotation
             rotation = ((Number) p.getRotation().getValue(feature)).doubleValue();
             rotation *= (Math.PI / 180.0);
-        } else if (placement instanceof LinePlacement && geom instanceof LineString) {
-            // @TODO: if the geometry is a ring or a polygon try to find out
-            // some "axis" to follow in the label placement
-            if (LOGGER.isLoggable(Level.FINER)) {
-                LOGGER.finer("setting line placement");
+            ts2d.setPointPlacement(true);
+        } 
+        else if (placement instanceof LinePlacement) 
+        {
+        	  // this code used to really really really really suck, so I removed it!
+        	if (LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.finer("setting pointPlacement");
             }
-
-            LineString ls = (LineString) geom;
-            Coordinate s = ls.getStartPoint().getCoordinate();
-            Coordinate e = ls.getEndPoint().getCoordinate();
-            double dx = e.x - s.x;
-            double dy = e.y - s.y;
-
-            double offset = ((Number) ((LinePlacement) placement).getPerpendicularOffset().getValue(feature))
-                .doubleValue();
-            rotation = Math.atan2(dx, dy) - (Math.PI / 2.0);
-            anchorX = -0.5;
-            anchorY = -0.5;
-            dispX = 0;
-            dispY = offset;
-            ts2d.setAbsoluteLineDisplacement(true);
+            ts2d.setPointPlacement(false);
+            LinePlacement p = (LinePlacement) placement;
+            int displace =  ((Number) p.getPerpendicularOffset().getValue(feature)).intValue();
+            ts2d.setPerpendicularOffset( displace );
         }
 
         ts2d.setAnchorX(anchorX);

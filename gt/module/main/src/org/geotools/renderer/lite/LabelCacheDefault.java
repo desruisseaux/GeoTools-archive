@@ -124,7 +124,7 @@ public class LabelCacheDefault implements LabelCache {
 	/** non-grouped labels get thrown in here**/
 	protected ArrayList labelCacheNonGrouped = new ArrayList();
 	
-	public boolean DEFAULT_GROUP=true; //what to do if there's no grouping option
+	public boolean DEFAULT_GROUP=false; //what to do if there's no grouping option
 	public int DEFAULT_SPACEAROUND = 0;
 	
 	
@@ -245,6 +245,9 @@ public class LabelCacheDefault implements LabelCache {
 	
 	/**
 	 * pull space around from the sybolizer options - defaults to DEFAULT_SPACEAROUND.
+	 * 
+	 *  <0 means "I can overlap other labels"  be careful with this.
+	 * 
 	 * @param symbolizer
 	 * @return
 	 */
@@ -278,7 +281,8 @@ public class LabelCacheDefault implements LabelCache {
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#endLayer(java.awt.Graphics2D, java.awt.Rectangle)
 	 */
-	public void endLayer(Graphics2D graphics, Rectangle displayArea) {
+	public void endLayer(Graphics2D graphics, Rectangle displayArea) 
+	{
 	}
 
 	/**
@@ -300,7 +304,8 @@ public class LabelCacheDefault implements LabelCache {
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#end(java.awt.Graphics2D, java.awt.Rectangle)
 	 */
-	public void end(Graphics2D graphics, Rectangle displayArea) {
+	public void end(Graphics2D graphics, Rectangle displayArea) 
+	{
 		List glyphs=new ArrayList();
 		
 		GeometryFactory factory=new GeometryFactory();
@@ -346,8 +351,12 @@ public class LabelCacheDefault implements LabelCache {
 				if (offscreen(glyphVector, tempTransform,displayArea ))  // is this offscreen?
 					continue;
 				
-				if( overlappingItems(glyphVector, tempTransform, glyphs, labelItem.getSpaceAround())  )
-					continue;
+				int space = labelItem.getSpaceAround();
+				if (space >=0) // if <0 then its okay to have overlapping items (!!)
+				{
+					if( overlappingItems(glyphVector, tempTransform, glyphs, space)  )
+						continue;
+				}
 				
 				if (goodnessOfFit(glyphVector, tempTransform, representativeGeom ) < MIN_GOODNESS_FIT)
 					continue;
@@ -385,10 +394,13 @@ public class LabelCacheDefault implements LabelCache {
 				        graphics.drawGlyphVector(glyphVector, 0, 0);
 				        Rectangle bounds = glyphVector.getPixelBounds(new FontRenderContext(tempTransform, true, false), 0,0);
 				        int extraSpace = labelItem.getSpaceAround();
-				        bounds = new Rectangle(bounds.x-extraSpace,bounds.y-extraSpace,
+				        if (extraSpace >=0) // if <0 then we dont record (something can overwrite it)
+				        {
+				        	bounds = new Rectangle(bounds.x-extraSpace,bounds.y-extraSpace,
 				        		bounds.width+extraSpace, bounds.height+extraSpace );
-
-				        glyphs.add(bounds);
+				        
+				        	glyphs.add(bounds);
+				        }
 				    }
 				} finally {
 				    graphics.setTransform(oldTransform);
@@ -535,6 +547,17 @@ public class LabelCacheDefault implements LabelCache {
         return line;
 	}
 
+	/**
+	 *  This handles point and line placement.
+	 * 
+	 * 1. lineplacement --  calculate a rotation and location (and does the perp offset)
+	 * 2. pointplacement -- reduce line to a point and ignore the calculated rotation
+	 * 
+	 * @param glyphVector
+	 * @param line
+	 * @param textStyle
+	 * @param tempTransform
+	 */
 	private void paintLineStringLabel(GlyphVector glyphVector, LineString line, TextStyle2D textStyle, AffineTransform tempTransform) 
 	{		
 		Point start = line.getStartPoint();
@@ -546,30 +569,44 @@ public class LabelCacheDefault implements LabelCache {
 		double rotation=theta;
 		
 		
+		
+		
 		Rectangle2D textBounds = glyphVector.getVisualBounds();
 		Point centroid=middleLine(line,0.5); //DJB: changed from centroid to "middle point" -- see middleLine() dox
 		//DJB: this is also where you could do "voting" and looking at other locations on the line to label (ie. 0.33,0.66)
 		tempTransform.translate(centroid.getX(), centroid.getY());
 		double displacementX = 0;
 		double displacementY = 0;
-		if (textStyle.isAbsoluteLineDisplacement()) {
-		    double offset = textStyle.getDisplacementY();
-
-		    if (offset > 0.0) { // to the left of the line
-		        displacementY = -offset;
-		    } else if (offset < 0) {
-		        displacementY = -offset + textBounds.getHeight();
-		    } else {
-		        displacementY = textBounds.getHeight() / 2;
-		    }
-
-		    displacementX = -textBounds.getWidth() / 2;
-		} else { // DJB: this now does "centering"
-		    displacementX = (textStyle.getAnchorX() + (-textBounds.getWidth()/2.0))
-		        + textStyle.getDisplacementX();
-		    displacementY = (textStyle.getAnchorY() + (textBounds.getHeight()/2.0))
-		        + textStyle.getDisplacementY();
+		
+		// DJB: this now does "centering"
+		//    displacementX = (textStyle.getAnchorX() + (-textBounds.getWidth()/2.0))
+		//        + textStyle.getDisplacementX();
+		//    displacementY = (textStyle.getAnchorY() + (textBounds.getHeight()/2.0))
+		//        - textStyle.getDisplacementY();
+		
+		double anchorX = textStyle.getAnchorX();
+		double anchorY = textStyle.getAnchorY();
+		
+		//	   undo the above if its point placement!
+		if (textStyle.isPointPlacement())
+		{
+			rotation = textStyle.getRotation(); // use the one the user supplied!
 		}
+		else  //lineplacement
+		{
+			displacementY -= textStyle.getPerpendicularOffset(); // move it off the line
+			anchorX = 0.5;  // centered
+			anchorY = 0.5;   // centered, sitting on line
+		}
+		
+		 displacementX = ( anchorX* (-textBounds.getWidth()))
+	        + textStyle.getDisplacementX();
+	     displacementY = (anchorY * (textBounds.getHeight()))
+	        - textStyle.getDisplacementY();
+	    
+          
+			
+		
 		if (rotation != rotation) // IEEE def'n x=x for all x except when x is NaN
 			rotation = 0.0;
 		if (Double.isInfinite(rotation))
@@ -596,31 +633,34 @@ public class LabelCacheDefault implements LabelCache {
 		tempTransform.translate(point.getX(), point.getY());
 		double displacementX = 0;
 		double displacementY = 0;
-		if (textStyle.isAbsoluteLineDisplacement()) {
-		    double offset = textStyle.getDisplacementY();
-
-		    if (offset > 0.0) { // to the left of the line
-		        displacementY = -offset;
-		    } else if (offset < 0) {
-		        displacementY = -offset + textBounds.getHeight();
-		    } else {
-		        displacementY = textBounds.getHeight() / 2;
-		    }
-
-		    displacementX = -textBounds.getWidth() / 2;
-		} else {  //DJB: this probably isnt doing what you think its doing - see others
+		
+             //DJB: this probably isnt doing what you think its doing - see others
 		    displacementX = (textStyle.getAnchorX() * (-textBounds.getWidth()))
 		        + textStyle.getDisplacementX();
 		    displacementY = (textStyle.getAnchorY() * (textBounds.getHeight()))
-		        + textStyle.getDisplacementY();
-		}
-		tempTransform.rotate(textStyle.getRotation());
-		tempTransform.translate(displacementX, displacementY);
+		        - textStyle.getDisplacementY();
+		
+		 if (!textStyle.isPointPlacement())
+	        {
+	        	//lineplacement.   We're cheating here, since we cannot line label a point
+	        	displacementY -= textStyle.getPerpendicularOffset(); // just move it up (yes, its cheating)
+	        }
+	        
+			double rotation = textStyle.getRotation();
+			if (rotation != rotation) // IEEE def'n x=x for all x except when x is NaN
+				rotation = 0.0;
+			if (Double.isInfinite(rotation))
+				rotation = 0; //weird number
+			
+			tempTransform.rotate(rotation);
+		    tempTransform.translate(displacementX, displacementY);
 		return point;
 	}
 	
 	/**
 	 *  returns the representative geometry (for further processing)
+	 * 
+	 *  TODO: handle lineplacement for a polygon (perhaps we're supposed to grab the outside line and label it, but spec is unclear)
 	 */
 	private Geometry paintPolygonLabel(GlyphVector glyphVector, LabelCacheItem labelItem, AffineTransform tempTransform, Geometry displayGeom) 
 	{
@@ -657,29 +697,30 @@ public class LabelCacheDefault implements LabelCache {
 		tempTransform.translate(centroid.getX(), centroid.getY());
 		double displacementX = 0;
 		double displacementY = 0;
-		if (textStyle.isAbsoluteLineDisplacement()) {
-		    double offset = textStyle.getDisplacementY();
+		
 
-		    if (offset > 0.0) { // to the left of the line
-		        displacementY = -offset;
-		    } else if (offset < 0) {
-		        displacementY = -offset + textBounds.getHeight();
-		    } else {
-		        displacementY = textBounds.getHeight() / 2;
-		    }
-
-		    displacementX = -textBounds.getWidth() / 2;
-		} else {
+		
 			
 		// DJB: this now does "centering"
-			
-			
-		    displacementX = (textStyle.getAnchorX() + (-textBounds.getWidth()/2.0))
-		        + textStyle.getDisplacementX();
-		    displacementY = (textStyle.getAnchorY() + (textBounds.getHeight()/2.0))
-		        + textStyle.getDisplacementY();
-		}
-		tempTransform.rotate(textStyle.getRotation());
+		displacementX = (textStyle.getAnchorX() * (-textBounds.getWidth()))
+                       + textStyle.getDisplacementX();
+        displacementY = (textStyle.getAnchorY() * (textBounds.getHeight()))
+                       - textStyle.getDisplacementY();
+        
+        if (!textStyle.isPointPlacement())
+        {
+        	//lineplacement.   We're cheating here, since we've reduced the polygon to a point, when we should be trying to do something
+        	//                 a little smarter (like find its median axis!)
+        	displacementY -= textStyle.getPerpendicularOffset(); // just move it up (yes, its cheating)
+        }
+        
+		double rotation = textStyle.getRotation();
+		if (rotation != rotation) // IEEE def'n x=x for all x except when x is NaN
+			rotation = 0.0;
+		if (Double.isInfinite(rotation))
+			rotation = 0; //weird number
+		
+		tempTransform.rotate(rotation);
 		tempTransform.translate(displacementX, displacementY);
         return geom;        
 	}

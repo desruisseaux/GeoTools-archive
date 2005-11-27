@@ -30,17 +30,57 @@ import org.geotools.resources.Utilities;
 
 /**
  * Style used to represent labels over lines, polygons and points
+ * 
  *
  * @author Andrea Aime
+ * @author dblasby
  * @version $Id$
  */
+
+/** DJB:
+	 * 
+	 *  This class was fundamentally wrong - it tried to convert <LinePlacement> into <PointPlacement>. 
+	 *   Not only was it doing a really crappy job, but its fundamentally the wrong place to do it.
+	 * 
+	 *   The SLD spec defines a <PointPlacement> as:
+	 * <xsd:sequence>
+	 *    <xsd:element ref="sld:AnchorPoint" minOccurs="0"/>
+	 *    <xsd:element ref="sld:Displacement" minOccurs="0"/>
+	 *    <xsd:element ref="sld:Rotation" minOccurs="0"/>
+	 * </xsd:sequence>
+	 * 
+	 *  and <LinePlacement> as:
+	 * <xsd:sequence>
+	 *  <xsd:element ref="sld:PerpendicularOffset "minOccurs="0"/>
+	 * </xsd:sequence>
+	 * 
+	 *   its annotated as:
+	 * A "PerpendicularOffset" gives the perpendicular distance away from a line to draw a label.
+     * which is a bit vague, but there's a little more details here:
+     * 
+     * The PerpendicularOffset element of a LinePlacement gives the perpendicular distance away from a line to draw a label.   ...
+     * The distance is in pixels and is positive to the left-hand.
+     * 
+     *  Left hand/right hand for perpendicularOffset is just crap - I'm assuming them mean +ive --> "up" and -ive --> "down".
+     *  See the actual label code for how it deals with this.
+     * 
+     *  I've removed all the absoluteLineDisplacement stuff and replaced it with
+     *     isPointPlacement() (true) --> render normally (PointPlacement Attributes)
+     *     isPointPlacement() (false) --> render LinePlacement 
+     * 
+     *   This replaces the old behavior which converted a LinePlacement -> pointplacement and set the absoluteLineDisplacement flag!
+	 * 
+	 * */
+	 
 public class TextStyle2D extends Style2D {
     GlyphVector textGlyphVector;
     Shape haloShape;
     String label;
     Font font;
     double rotation;
-    boolean absoluteLineDisplacement;
+      /** yes = <PointPlacement> no = <LinePlacement>  default = yes**/
+    boolean pointPlacement = true;
+    int     perpendicularOffset =0; // only valid when using a LinePlacement
     double anchorX;
     double anchorY;
     double displacementX;
@@ -191,17 +231,17 @@ public class TextStyle2D extends Style2D {
     }
 
     /**
-     * @return Returns the absoluteLineDisplacement.
+     * @return Returns the pointPlacement (true => point placement, false => line placement)
      */
-    public boolean isAbsoluteLineDisplacement() {
-        return absoluteLineDisplacement;
+    public boolean isPointPlacement() {
+        return pointPlacement;
     }
 
     /**
-     * @param absoluteLineDisplacement The absoluteLineDisplacement to set.
+     * @param pointPlacement (true => point placement, false => line placement.)
      */
-    public void setAbsoluteLineDisplacement(boolean absoluteLineDisplacement) {
-        this.absoluteLineDisplacement = absoluteLineDisplacement;
+    public void setPointPlacement(boolean pointPlacement) {
+        this.pointPlacement = pointPlacement;
     }
 
     /**
@@ -249,6 +289,26 @@ public class TextStyle2D extends Style2D {
     public void setFill(Paint fill) {
         this.fill = fill;
     }
+    
+    /**
+     *  only valid for a isPointPlacement=false (ie. a lineplacement)
+     * @param displace in pixels
+     */
+    public void setPerpendicularOffset(int displace)
+    {
+    	perpendicularOffset = displace;
+    }
+    
+    /**
+     * only valid for a isPointPlacement=false (ie. a lineplacement)
+     * @return displacement in pixels
+     */
+    public int getPerpendicularOffset()
+    {
+    	return perpendicularOffset;
+    }
+	
+	
 
     /**
      * Getter for property composite.
