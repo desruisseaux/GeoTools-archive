@@ -743,7 +743,10 @@ public class StreamingRenderer implements GTRenderer {
             
             //DJB: added this for better error messages!
             if (attType == null)
+            {
+            	LOGGER.fine("Could not find '"+attributes[j]+"' in the FeatureType ("+schema.getTypeName()+")");
                 throw new IllegalFilterException("Could not find '"+attributes[j]+"' in the FeatureType ("+schema.getTypeName()+")");
+            }
             
             if (attType instanceof GeometryAttributeType) {
                 GeometryFilter gfilter = filterFactory.createGeometryFilter(Filter.GEOMETRY_BBOX);
