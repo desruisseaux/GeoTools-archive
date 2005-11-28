@@ -21,6 +21,9 @@ package org.geotools.referencing.factory;
 
 // J2SE dependencies and extensions
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Collection;
 import javax.units.ConversionException;
 
 // OpenGIS dependencies
@@ -28,14 +31,18 @@ import org.opengis.referencing.cs.*;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.FactoryException;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.cs.AbstractCS;
 
 
 /**
@@ -51,12 +58,30 @@ import org.geotools.referencing.cs.AbstractCS;
  * and applications that uses it, like <cite>PostGIS</cite>. Note that using this "ordered
  * axis authority factory" may have a negative impact on performance, accuracy and range of
  * supported CRS.
+ * <p>
+ * If you need to override an official factory by an <cite>ordered axis</cite> instance on a
+ * system-wide level, the {@link #register register} convenience method can performs this task
+ * for the current Java Virtual Machine running instance. For example an application using the
+ * EPSG authority factory with (<var>longitude</var>, <var>latitude</var>) order instead of the
+ * official one can invoke the following methods:
+ *
+ * <blockquote><pre>
+ * OrderedAxisAuthorityFactory.register("EPSG"); // Invoke this only once (usually at startup time)
+ * CRSAuthorityFactory f = FactoryFinder.getCRSAuthorityFactory("EPSG", null);
+ * </pre></blockquote>
  *
  * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
+    /**
+     * Instances of {@link OrderedAxisAuthorityFactory} registered in {@link FactoryFinder} for
+     * the specified authority names. This is used by {@link #register} and {@link #unregister}
+     * methods.
+     */
+    private static final Map REGISTERED = new HashMap();
+
     /**
      * {@code true} if this authority factory should also force all angular units to degrees
      * and linear units to meters. The default value is {@code false}.
@@ -75,19 +100,9 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
      * {@linkplain AbstractAuthorityFactory#priority factory's priority} plus one.
      *
      * @param factory  The factory that produces objects using arbitrary axis order.
-     */
-    public OrderedAxisAuthorityFactory(final AbstractAuthorityFactory factory) {
-        this(factory, false);
-    }
-
-    /**
-     * Creates a factory which will optionally fix units in addition of axis order.
-     * The priority level will be equals to the specified
-     * {@linkplain AbstractAuthorityFactory#priority factory's priority} plus one.
-     *
-     * @param factory  The factory that produces objects using arbitrary axis order.
      * @param fixUnits {@code true} if this authority factory should also force all angular units
-     *                 to degrees and linear units to meters. The default value is {@code false}.
+     *                 to degrees and linear units to meters, or {@code false} if the units should
+     *                 be left unchanged.
      */
     public OrderedAxisAuthorityFactory(final AbstractAuthorityFactory factory,
                                        final boolean fixUnits)
@@ -97,18 +112,116 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
     }
 
     /**
+     * Creates a factory which will reorder the axis of all objects created by the default
+     * authority factories. The factories are fetched using {@link FactoryFinder}.
+     *
+     * @param  authority The authority to wraps (example: {@code "EPSG"}).
+     * @param  hints An optional set of hints, or {@code null} if none.
+     * @param  fixUnits {@code true} if this authority factory should also force all angular units
+     *                 to degrees and linear units to meters, or {@code false} if the units should
+     *                 be left unchanged.
+     * @throws FactoryRegistryException if at least one factory can not be obtained.
+     */
+    public OrderedAxisAuthorityFactory(String authority, Hints hints, final boolean fixUnits) {
+        super(authority, hints);
+        this.fixUnits = fixUnits;
+    }
+
+    /**
+     * Registers an <cite>ordered axis authority factory</cite> as a replacement of the specified
+     * authority. If this method has already been invoked previously for the same authority, then
+     * this method invocation does nothing. Otherwise, it performs the following steps:
+     * <p>
+     * <ul>
+     *   <li>A new {@code OrderedAxisAuthorityFactory} instance is created as a wrapper around
+     *       the default authority factories provided by
+     * <code>{@linkplain FactoryFinder}.get<var>Foo</var>AuthorityFactory(authority)</code></li>
+     *
+     *   <li>This new instance is registered in {@link FactoryFinder} with a priority slightly
+     *       higher than the priority of wrapped factories. Consequently, the <cite>reordered
+     *       axis authority factory</cite> should become the default one for the specified
+     *       authority.</li>
+     * </ul>
+     * <p>
+     * <strong>WARNING:</strong> this method has a system-wide effect. Any user asking for the
+     * specified {@code authority} will get an <cite>ordered axis authority factory</cite>
+     * instance. It may be misleading for client code expecting the official factory. Avoid
+     * this method unless you really need reordered axis for all code in the current Java
+     * Virtual Machine.
+     *
+     * @param  authority The name of the authority factories to override with an ordered axis
+     *         instance.
+     * @throws FactoryRegistryException if the registration failed.
+     */
+    public static void register(String authority) throws FactoryRegistryException {
+        authority = authority.toUpperCase().trim();
+        synchronized (REGISTERED) {
+            if (REGISTERED.containsKey(authority)) {
+                return;
+            }
+            final OrderedAxisAuthorityFactory candidate =
+                    new OrderedAxisAuthorityFactory(authority, null, false);
+            FactoryFinder.addAuthorityFactory(candidate);
+            if (REGISTERED.put(authority, candidate) != null) {
+                // Paranoïac check: should never happen because of the 'containsKey' check above.
+                throw new AssertionError();
+            }
+        }
+    }
+
+    /**
+     * Unregisters an <cite>ordered axis authority factory</cite> previously registered with
+     * the {@link #register register} method.
+     *
+     * @param  authority The authority name given to the {@link #register register} method.
+     * @throws FactoryRegistryException if the unregistration failed.
+     */
+    public static void unregister(String authority) throws FactoryRegistryException {
+        authority = authority.toUpperCase().trim();
+        synchronized (REGISTERED) {
+            final AbstractAuthorityFactory candidate;
+            candidate = (AbstractAuthorityFactory) REGISTERED.remove(authority);
+            if (candidate != null) {
+                FactoryFinder.removeAuthorityFactory(candidate);
+            }
+        }
+    }
+
+    /**
      * Returns the organization or party responsible for definition and maintenance of the
      * database. The default implementation returns the authority of the {@linkplain #crsFactory
      * underlying factory} with "(modified axis)" label appended.
+     * <p>
+     * <strong>Note:</strong> the {@linkplain Citation#getTitle title} and {@linkplain
+     * Citation#getAlternateTitles alternates titles} are modified as described above in order
+     * to make it clear for human readers that objects to be created are not from the official
+     * authority. However, this method copies the {@linkplain Citation#getIdentifiers identifiers}
+     * unchanged in order to allow applications to use this factory as a replacement of the
+     * official one.
      */
     public Citation getAuthority() {
         // No need to synchronize; not a big deal if the citation is created twice.
         if (authority == null) {
             final Citation fc = crsFactory.getAuthority();
-            authority = new CitationImpl(Vocabulary.formatInternational(
-                            VocabularyKeys.MODIFIED_AXIS_$1, fc.getTitle()));
+            final CitationImpl ac = new CitationImpl(fc);
+            ac.setTitle(replace(fc.getTitle()));
+            final Collection alt = ac.getAlternateTitles();
+            alt.clear();
+            for (final Iterator it=fc.getAlternateTitles().iterator(); it.hasNext();) {
+                alt.add(replace((InternationalString) it.next()));
+            }
+            authority = (Citation) ac.unmodifiable();
         }
         return authority;
+    }
+
+    /**
+     * Replaces an authority name. This method is invoked by {@link #getAuthority} for deriving
+     * an authority name from the {@linkplain #crsFactory underlying factory}. The default
+     * implementation add "(axis modified)" to the specified name.
+     */
+    private static InternationalString replace(final InternationalString name) {
+        return Vocabulary.formatInternational(VocabularyKeys.MODIFIED_AXIS_$1, name);
     }
 
     /**

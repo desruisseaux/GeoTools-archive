@@ -540,11 +540,11 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Returns an identifier according the given authority. This method checks first all
+     * Returns an identifier according the given authority. This method first checks all
      * {@link #getIdentifiers identifiers} in their iteration order. It returns the first
-     * identifier with an {@linkplain Identifier#getAuthority identifier authority} title
-     * {@linkplain Citations#titleMatches(Citation,Citation) matching} at least one title
-     * from the specified authority.
+     * identifier with an {@linkplain Identifier#getAuthority authority} citation
+     * {@linkplain Citations#identifierMatches(Citation,Citation) matching} the specified
+     * authority.
      *
      * @param  authority The authority for the identifier to return.
      * @return The object's identifier, or {@code null} if no identifier matching the specified
@@ -586,7 +586,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             }
             final Citation infoAuthority = identifier.getAuthority();
             if (infoAuthority != null) {
-                if (Citations.titleMatches(authority, infoAuthority)) {
+                if (Citations.identifierMatches(authority, infoAuthority)) {
                     return identifier;
                 }
             }
@@ -597,22 +597,24 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     /**
      * Returns this object's name according the given authority. This method checks first the
      * {@linkplain #getName() primary name}, then all {@link #getAlias() alias} in their iteration
-     * order. The objects being examined are {@link Identifier}s or {@link GenericName}s. If a
-     * generic name implements the {@code Identifier} interface (e.g. {@link NamedIdentifier}),
-     * then the identifier view has precedence.
-     * <p>
-     * This method returns the {@linkplain Identifier#getCode code} (for identifiers) or the
-     * {@linkplain GenericName#asLocalName local name} (for alias) of the first object that
-     * meets the following conditions:
-     * <p>
+     * order.
+     *
      * <ul>
-     *   <li>An {@linkplain Identifier#getAuthority identifier authority} title
-     *       {@linkplain Citations#titleMatches(Citation,Citation) matching}
-     *       at least one title from the specified authority.</li>
-     *   <li>A {@linkplain GenericName#getScope name scope}
-     *       {@linkplain Citations#titleMatches(Citation,String) matching}
-     *       at least one title from the specified authority.</li>
+     *   <li><p>If the name or alias implements the {@link Identifier} interface, then this method
+     *       compares the {@linkplain Identifier#getAuthority identifier authority} against the
+     *       specified citation using the {@link Citations#identifierMatches(Citation,Citation)
+     *       identifierMatches} method. If a matching is found, then this method returns the
+     *       {@linkplain Identifier#getCode identifier code} of this object.</p></li>
+     *
+     *   <li><p>Otherwise, if the alias implements the {@link GenericName} interface, then this
+     *       method compares the {@linkplain GenericName#getScope name scope} against the specified
+     *       citation using the {@linkplain Citations#identifierMatches(Citation,String)
+     *       identifierMatches} method. If a matching is found, then this method returns the
+     *       {@linkplain GenericName#asLocalName local name} of this object.</p></li>
      * </ul>
+     *
+     * Note that alias may implement both the {@link Identifier} and {@link GenericName} interfaces
+     * (for example {@link NamedIdentifier}). In such cases, the identifier view has precedence.
      *
      * @param  authority The authority for the name to return.
      * @return The object's name (either a {@linkplain Identifier#getCode code} or a
@@ -659,7 +661,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         String name = null;
         Citation infoAuthority = identifier.getAuthority();
         if (infoAuthority != null) {
-            if (Citations.titleMatches(authority, infoAuthority)) {
+            if (Citations.identifierMatches(authority, infoAuthority)) {
                 name = identifier.getCode();
             } else {
                 for (final Iterator it=info.getAlias().iterator(); it.hasNext();) {
@@ -668,7 +670,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                         identifier = (Identifier) alias;
                         infoAuthority = identifier.getAuthority();
                         if (infoAuthority != null) {
-                            if (Citations.titleMatches(authority, infoAuthority)) {
+                            if (Citations.identifierMatches(authority, infoAuthority)) {
                                 name = identifier.getCode();
                                 break;
                             }
@@ -676,7 +678,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                     } else {
                         final GenericName scope = alias.getScope();
                         if (scope != null) {
-                            if (Citations.titleMatches(authority, scope.toString())) {
+                            if (Citations.identifierMatches(authority, scope.toString())) {
                                 name = alias.asLocalName().toString();
                                 break;
                             }

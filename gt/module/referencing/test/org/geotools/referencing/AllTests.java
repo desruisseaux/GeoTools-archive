@@ -71,6 +71,22 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing.operation.transform.LocalizationGridTest     .suite());
         suite.addTest(org.geotools.referencing.operation.transform.WarpTransformTest        .suite());
         suite.addTest(org.geotools.referencing                    .ScriptTest               .suite());
+        /*
+         * If the EPSG authority factory on HSQL is available in the class path, add its tests.
+         * It is never the case when the referencing module is build by Maven  (the EPSG tests
+         * will be run at plugin/epsg-hsql building time instead). But it is sometime the case
+         * when the tests are run from the command line.
+         */
+        try {
+            final Class c = Class.forName("org.geotools.referencing.factory.epsg.AllTests");
+            suite.addTest((Test) c.getMethod("suite", (Class[]) null).invoke(null, (Object[])null));
+        } catch (Exception ignore) {
+            /*
+             * EPSG tests not found on the class path (which may be normal), or method invocation
+             * failed (which should not happen). Ignore, because the addition of those tests here
+             * was just a convenience. All tests will be run at Maven build anyway.
+             */
+        }
         return suite;
     }
 }

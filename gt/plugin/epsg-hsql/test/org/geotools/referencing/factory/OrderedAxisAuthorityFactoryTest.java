@@ -20,6 +20,9 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies
+import java.util.Set;
+import java.util.Locale;
+import java.util.Iterator;
 import java.util.logging.Level;
 
 // JUnit dependencies
@@ -28,9 +31,11 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
@@ -40,9 +45,12 @@ import org.opengis.referencing.operation.Matrix;
 import org.geotools.factory.Hints;
 import org.geotools.resources.Arguments;
 import org.geotools.util.MonolineFormatter;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.metadata.iso.citation.Citations;
 
 
 /**
@@ -53,8 +61,14 @@ import org.geotools.referencing.operation.matrix.GeneralMatrix;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Jody Garnett
  */
 public class OrderedAxisAuthorityFactoryTest extends TestCase {
+    /**
+     * {@code true} for tracing operations on the standard output.
+     */
+    private static boolean verbose;
+
     /**
      * Run the suite from the command line. If {@code "-log"} flag is specified on the
      * command-line, then the logger will be set to {@link Level#CONFIG}. This is usefull
@@ -63,6 +77,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
     public static void main(final String[] args) {
         final Arguments arguments = new Arguments(args);
         final boolean log = arguments.getFlag("-log");
+        verbose = arguments.getFlag("-verbose");
         arguments.getRemainingArguments(0);
         MonolineFormatter.initGeotools(log ? Level.CONFIG : null);
         junit.textui.TestRunner.run(suite());
@@ -86,11 +101,29 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
      * Tests the axis reordering.
      */
     public void testAxisReordering() throws FactoryException {
+        final String EPSG = "EPSG"; // For safety.
         final AbstractAuthorityFactory factory0, factory1;
-        factory0 = (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory("EPSG",
-                        new Hints(Hints.CRS_AUTHORITY_FACTORY, AbstractAuthorityFactory.class));
-        factory1 = new OrderedAxisAuthorityFactory(factory0);
-
+        final Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, AbstractAuthorityFactory.class);
+        factory0 = (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+        assertFalse(factory0 instanceof OrderedAxisAuthorityFactory);
+        if (true) {
+            // The following line should be enough...
+            factory1 = new OrderedAxisAuthorityFactory(factory0, false);
+        } else {
+            // ... but we want to test the registration mechanism.
+            // TODO: Disabled for now, until MNG-441 get fixed.
+            try {
+                OrderedAxisAuthorityFactory.register(EPSG);
+                factory1 = (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+            } finally {
+                OrderedAxisAuthorityFactory.unregister(EPSG);
+            }
+            assertNotSame(factory0, factory1);
+            assertTrue(factory1 instanceof OrderedAxisAuthorityFactory);
+            final AbstractAuthorityFactory afterUnregister =
+                    (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+            assertSame(factory0, afterUnregister);
+        }
         String code;
         CoordinateReferenceSystem crs0, crs1;
         CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(null);
@@ -194,5 +227,195 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
          * Tests the cache.
          */
         assertSame(cacheTest, factory1.createCoordinateReferenceSystem("4326"));
+    }
+
+    // -------------------------------------------------------------------------
+    // The following tests are copied from the legacy plugin/epsg-wkt test suite
+    // -------------------------------------------------------------------------
+
+    /**
+     * Makes sure that the authority factory has the proper name.
+     */
+    public void testAuthority() {
+        CRSAuthorityFactory factory;
+        Citation authority;
+
+        // Tests the official factory.
+        factory   = FactoryFinder.getCRSAuthorityFactory("EPSG", null);
+        authority = factory.getAuthority();
+        assertNotNull(authority);
+        assertEquals("European Petroleum Survey Group", authority.getTitle().toString(Locale.US));
+        assertTrue(authority.getIdentifiers().contains("EPSG"));
+
+        // Tests the modified factory.
+        factory   = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        authority = factory.getAuthority();
+        assertNotNull(authority);
+        assertTrue(authority.getIdentifiers().contains("EPSG"));
+    }
+
+    /**
+     * Tests the vendor name.
+     */
+    public void testVendor() {
+        CRSAuthorityFactory factory;
+        Citation vendor;
+
+        factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        vendor  = factory.getVendor();
+        assertNotNull(vendor);
+        assertEquals("Geotools", vendor.getTitle().toString(Locale.US));
+        assertFalse(vendor.getIdentifiers().contains("EPSG"));
+    }
+
+    /**
+     * Tests the amount of codes available.
+     */
+    public void testCodes() throws FactoryException {
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
+        assertNotNull(codes);
+        assertTrue(codes.size() >= 3000);
+    }
+
+    /**
+     * A random CRS for fun.
+     */
+    public void test26910() throws FactoryException {
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:26910");
+        assertNotNull(crs);
+        assertSame(crs, factory.createObject("EPSG:26910"));
+    }
+
+    /**
+     * UDIG requires this to work.
+     */
+    public void test4326() throws FactoryException {
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:4326");
+        assertNotNull(crs);
+        assertSame(crs, factory.createObject("EPSG:4326"));
+    }
+
+    /**
+     * UDIG requires this to work.
+     */
+    public void test4269() throws FactoryException {
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:4269");
+        assertNotNull(crs);
+        assertSame(crs, factory.createObject("EPSG:4269"));
+    }
+
+    /**
+     * UDIG requires this to work.
+     */
+    public void test42102() throws FactoryException {
+        if (true) {
+            // TODO: not yet implemented: this CRS doesn't exists in the EPSG database.
+            return;
+        }
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:42102");
+        assertNotNull(crs);
+        assertNotNull(crs.getIdentifiers());
+        assertFalse(crs.getIdentifiers().isEmpty());
+        NamedIdentifier expected = new NamedIdentifier(Citations.EPSG, "42102");
+        assertTrue(crs.getIdentifiers().contains(expected));
+    }
+
+    /**
+     * Tests the number of CRS that can be created. This test will be executed only if this test
+     * suite is run with the {@code -verbose} option provided on the command line.
+     */
+    public void testSuccess() throws FactoryException {
+        if (!verbose) {
+            return;
+        }
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        Set codes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
+        int total = codes.size();
+        int count = 0;
+        for (Iterator i=codes.iterator(); i.hasNext();) {
+            CoordinateReferenceSystem crs;
+            String code = (String) i.next();
+            try {
+                crs = factory.createCoordinateReferenceSystem(code);
+                assertNotNull(crs);
+                count++;
+            } catch (FactoryException e) {
+                System.err.println("WARNING (CRS: "+code+" ):" + e.getMessage());
+            }            
+        }
+        System.out.println("Success: " + count + "/" + total + " (" + (count*100)/total + "%)");
+    }
+
+    /**
+     * A random CRS for fun.
+     */
+    public void test26910Lower() throws FactoryException {
+        CoordinateReferenceSystem crs = CRS.decode("epsg:26910");
+        assertNotNull(crs);                
+    }
+
+    /**
+     * A random CRS for fun.
+     */
+    public void test26986Lower() throws FactoryException {
+        CoordinateReferenceSystem crs = CRS.decode("epsg:26986");
+        assertNotNull(crs);                
+    }
+
+    /**
+     * WFS requires this to work.
+     */
+    public void test4326Lower() throws FactoryException {
+        CoordinateReferenceSystem crs = CRS.decode("epsg:4326");
+        assertNotNull(crs);
+    }
+
+    /**
+     * WFS requires this to work.
+     */
+    public void test26742Lower() throws FactoryException {
+        CoordinateReferenceSystem crs = CRS.decode("epsg:26742");
+        assertNotNull(crs);
+    }
+
+    /**
+     * WFS requires this to work.
+     */
+    public void test4269Lower() throws FactoryException {
+        CoordinateReferenceSystem crs = CRS.decode("epsg:4269");
+        assertNotNull(crs);
+    }
+
+    /**
+     * WFS requires this to work.
+     */
+    public void test42304Lower() throws FactoryException {
+        if (true) {
+            // TODO: not yet implemented: this CRS doesn't exists in the EPSG database.
+            return;
+        }
+        CoordinateReferenceSystem crs = CRS.decode("epsg:42304");
+        assertNotNull(crs);
+    }
+
+    /**
+     * WFS requires this to work.
+     */
+    public void test42102Lower() throws FactoryException {
+        if (true) {
+            // TODO: not yet implemented: this CRS doesn't exists in the EPSG database.
+            return;
+        }
+        CoordinateReferenceSystem crs = CRS.decode("epsg:42102");
+        assertNotNull(crs);
+        assertNotNull(crs.getIdentifiers());
+        assertFalse(crs.getIdentifiers().isEmpty());
+        NamedIdentifier expected = new NamedIdentifier(Citations.EPSG, "42102");
+        assertTrue(crs.getIdentifiers().contains(expected));
     }
 }

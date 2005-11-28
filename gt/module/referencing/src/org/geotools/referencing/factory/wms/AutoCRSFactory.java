@@ -39,11 +39,13 @@ import org.opengis.referencing.crs.ProjectedCRS;
 import org.geotools.factory.Hints;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 
 /**
- * The factory for {@linkplain ProjectedCRS projected CRS} in the {@code AUTO2} space.
+ * The factory for {@linkplain ProjectedCRS projected CRS} in the {@code AUTO} and {@code AUTO2}
+ * space.
  *
  * @since 2.2
  * @version $Id$
@@ -54,6 +56,17 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @todo Consider renaming this class as {@code Auto2CRSFactory}.
  */
 public class AutoCRSFactory extends AbstractAuthorityFactory {
+    /**
+     * The authority code. We use {@code AUTO2} citation, but merge {@code AUTO} and
+     * {@code AUTO2} identifiers in order to use the same factory for both authority.
+     */
+    private static final Citation AUTHORITY;
+    static {
+        final CitationImpl c = new CitationImpl(Citations.AUTO2);
+        c.getIdentifiers().addAll(Citations.AUTO.getIdentifiers());
+        AUTHORITY = (Citation) c.unmodifiable();
+    }
+
     /**
      * Map of Factlets by integer code (from {@code AUTO:code}).
      *
@@ -73,11 +86,11 @@ public class AutoCRSFactory extends AbstractAuthorityFactory {
      */
     public AutoCRSFactory(final Hints hints) {
         super(hints, NORMAL_PRIORITY);
-        add(new Auto42001());
-        add(new Auto42002());
-        add(new Auto42003());
-        add(new Auto42004());
-        add(new Auto42005());
+        add(Auto42001.DEFAULT);
+        add(Auto42002.DEFAULT);
+        add(Auto42003.DEFAULT);
+        add(Auto42004.DEFAULT);
+        add(Auto42005.DEFAULT);
     }
 
     /**
@@ -111,10 +124,10 @@ public class AutoCRSFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns the authority for this factory, which is {@link Citations#AUTO2 AUTO2}.
+     * Returns the authority for this factory.
      */
     public Citation getAuthority() {
-        return Citations.AUTO2;
+        return AUTHORITY;
     }
 
     /**

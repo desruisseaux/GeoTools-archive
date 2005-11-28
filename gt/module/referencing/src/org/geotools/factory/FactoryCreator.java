@@ -19,10 +19,11 @@
 package org.geotools.factory;
 
 // J2SE dependencies
-import javax.imageio.spi.ServiceRegistry; // For javadoc
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.Collection;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.InvocationTargetException;
+import javax.imageio.spi.ServiceRegistry; // For javadoc
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -109,7 +110,10 @@ public class FactoryCreator extends FactoryRegistry {
                     // have been accepted by 'getServiceProvider(...)'.
                 }
                 if (type!=null && category.isAssignableFrom(type)) {
-                    return createServiceProvider(category, type, hints);
+                    final int modifiers = type.getModifiers();
+                    if (!Modifier.isAbstract(modifiers)) {
+                        return createServiceProvider(category, type, hints);
+                    }
                 }
             }
         }

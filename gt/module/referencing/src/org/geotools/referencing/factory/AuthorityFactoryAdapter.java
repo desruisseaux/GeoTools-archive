@@ -34,6 +34,7 @@ import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.feature.BackingStoreException;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.cs.*;
@@ -42,11 +43,15 @@ import org.opengis.referencing.operation.*;
 
 // Geotools dependencies
 import org.geotools.util.WeakValueHashMap;
-import org.geotools.resources.Utilities;
+import org.geotools.factory.Hints;
+import org.geotools.factory.AbstractFactory;
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -107,7 +112,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     private transient Map pool;
 
     /**
-     * Creates a factory wrapping the specified one. The priority level will be equals to the
+     * Creates a wrapper around the specified factory. The priority level will be equals to the
      * specified {@linkplain AbstractAuthorityFactory#priority factory's priority} plus one.
      */
     public AuthorityFactoryAdapter(final AbstractAuthorityFactory factory) {
@@ -119,26 +124,28 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a factory wrapping the specified ones.
+     * Creates a wrapper around the specified factories. The priority level will be equals to the
+     * highest specified {@linkplain AbstractAuthorityFactory#priority factory's priority} plus
+     * one.
      *
-     * @param datumFactory The {@linkplain Datum datum} authority factory.
-     * @param csFactory    The {@linkplain CoordinateSystem coordinate system} authority factory.
      * @param crsFactory   The {@linkplain CoordinateReferenceSystem coordinate reference system}
      *                     authority factory.
-     * @param opFactory    The {@linkplain CoordinateOperation coordinate operation} authority factory.
-     * @param factories    The low-level factories to use.
-     * @param priority     The priority for this factory, as a number between
-     *                     {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
-     *                     {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
+     * @param csFactory    The {@linkplain CoordinateSystem coordinate system} authority factory.
+     * @param datumFactory The {@linkplain Datum datum} authority factory.
+     * @param opFactory    The {@linkplain CoordinateOperation coordinate operation} authority
+     *                     factory.
      */
-    public AuthorityFactoryAdapter(final DatumAuthorityFactory               datumFactory,
-                                   final CSAuthorityFactory                     csFactory,
-                                   final CRSAuthorityFactory                   crsFactory,
-                                   final CoordinateOperationAuthorityFactory    opFactory,
-                                   final FactoryGroup                           factories,
-                                   final int                                     priority)
+    public AuthorityFactoryAdapter(final CRSAuthorityFactory                crsFactory,
+                                   final CSAuthorityFactory                  csFactory,
+                                   final DatumAuthorityFactory            datumFactory,
+                                   final CoordinateOperationAuthorityFactory opFactory)
     {
-        super(factories, priority);
+        super(getFactoryGroup(new AuthorityFactory[] {crsFactory, csFactory, datumFactory, opFactory}),
+                Math.max(getPriority(datumFactory),
+                Math.max(getPriority(   csFactory),
+                Math.max(getPriority(  crsFactory),
+                Math.max(getPriority(   opFactory), NORMAL_PRIORITY)))));
+
         this.datumFactory = datumFactory;
         this.   csFactory =    csFactory;
         this.  crsFactory =   crsFactory;
@@ -146,7 +153,46 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     }
 
     /**
-     * Cache a modified object in the internal pool.
+     * Creates a wrappers around the default factories for the specified authority.
+     * The factories are fetched using {@link FactoryFinder}.
+     *
+     * @param  authority The authority to wraps (example: {@code "EPSG"}).
+     * @param  hints An optional set of hints, or {@code null} if none.
+     * @throws FactoryRegistryException if at least one factory can not be obtained.
+     */
+    public AuthorityFactoryAdapter(final String authority, final Hints hints)
+            throws FactoryRegistryException
+    {
+        this(FactoryFinder.getCRSAuthorityFactory                (authority, hints),
+             FactoryFinder.getCSAuthorityFactory                 (authority, hints),
+             FactoryFinder.getDatumAuthorityFactory              (authority, hints),
+             FactoryFinder.getCoordinateOperationAuthorityFactory(authority, hints));
+    }
+
+    /**
+     * Returns the priority of the specified factory plus one, or 0 if unknown.
+     */
+    private static int getPriority(final AuthorityFactory factory) {
+        return (factory instanceof AbstractFactory) ? ((AbstractFactory) factory).priority + 1 : 0;
+    }
+
+    /**
+     * Infers the factory group from the specified factories. This method is a work around for
+     * RFE #4093999 in Sun's bug database ("Relax constraint on placement of this()/super() call
+     * in constructors").
+     */
+    private static FactoryGroup getFactoryGroup(AuthorityFactory[] factories) {
+        for (int i=0; i<factories.length; i++) {
+            final AuthorityFactory factory = factories[i];
+            if (factory instanceof AbstractAuthorityFactory) {
+                return ((AbstractAuthorityFactory) factory).factories;
+            }
+        }
+        return new FactoryGroup();
+    }
+
+    /**
+     * Caches a modified object in the internal pool.
      * @todo Use generic types once we will be allowed to compile for J2SE 1.5.
      */
     final void cache(final IdentifiedObject original, final IdentifiedObject modified) {
@@ -355,6 +401,15 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     public String getBackingStoreDescription() throws FactoryException {
         final AbstractAuthorityFactory factory = getFactory(null);
         return (factory!=null) ? factory.getBackingStoreDescription() : null;
+    }
+
+    /**
+     * Returns the vendor responsible for creating this factory implementation. The default
+     * implementation delegates to the {@linkplain #crsFactory underlying CRS factory} with
+     * no change.
+     */
+    public Citation getVendor() {
+        return crsFactory.getVendor();
     }
 
     /**

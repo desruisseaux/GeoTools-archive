@@ -870,7 +870,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
         if (scope == null) {
             return code;
         }
-        if (Citations.titleMatches(getAuthority(), scope.toString())) {
+        if (Citations.identifierMatches(getAuthority(), scope.toString())) {
             return name.asLocalName().toString().trim();
         }
         return code;

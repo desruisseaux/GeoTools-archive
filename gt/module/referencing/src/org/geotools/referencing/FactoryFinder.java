@@ -518,7 +518,7 @@ public final class FactoryFinder {
 
         /** Returns {@code true} if the specified provider is for the authority. */
         public boolean filter(final Object provider) {
-            return Citations.titleMatches(((AuthorityFactory)provider).getAuthority(), authority);
+            return Citations.identifierMatches(((AuthorityFactory)provider).getAuthority(), authority);
         }
     }
 

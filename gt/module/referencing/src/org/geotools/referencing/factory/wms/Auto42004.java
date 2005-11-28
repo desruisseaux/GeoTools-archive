@@ -56,6 +56,17 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 final class Auto42004 extends Factlet {
     /**
+     * A shared (thread-safe) instance.
+     */
+    public static final Auto42004 DEFAULT = new Auto42004();
+
+    /**
+     * Do not allows instantiation except the {@link #DEFAULT} constant.
+     */
+    private Auto42004() {
+    }
+
+    /**
      * {@inheritDoc}
      */
     public int code() {
