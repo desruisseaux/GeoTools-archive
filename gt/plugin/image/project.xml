@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <project>
  <pomVersion>3</pomVersion>
  <extend>${basedir}/../../project.xml</extend>
@@ -12,8 +12,9 @@
   <developer>
    <name>Simone Giannecchini</name>
    <id>simboss</id>
-   <email>simboss_ml@tiscali.it</email>
+   <email>simboss1@gmail.com</email>
    <roles>
+   <role>Module Mantainer</role>
     <role>Java Developer</role>
    </roles>
   </developer>
