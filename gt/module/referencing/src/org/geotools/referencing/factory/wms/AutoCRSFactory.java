@@ -52,8 +52,6 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @author Jody Garnett
  * @author Rueben Schulz
  * @author Martin Desruisseaux
- *
- * @todo Consider renaming this class as {@code Auto2CRSFactory}.
  */
 public class AutoCRSFactory extends AbstractAuthorityFactory {
     /**

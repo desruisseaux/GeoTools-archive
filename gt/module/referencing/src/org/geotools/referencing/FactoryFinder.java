@@ -22,24 +22,25 @@ package org.geotools.referencing;
 // J2SE direct dependencies
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.NoSuchElementException;
 import java.util.Set;
-import javax.imageio.spi.RegisterableService;
+import java.util.Locale;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Collections;
 import javax.imageio.spi.ServiceRegistry;
+import javax.imageio.spi.RegisterableService;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.cs.CSAuthorityFactory;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.cs.CSFactory;
-import org.opengis.referencing.datum.DatumAuthorityFactory;
+import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.datum.DatumFactory;
+import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.referencing.operation.MathTransformFactory;
@@ -50,12 +51,8 @@ import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.io.TableWriter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.Vocabulary;
-import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -88,10 +85,9 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * {@link FactoryRegistry}. This {@code FactoryFinder} class is simply a convenience
  * wrapper around a {@code FactoryRegistry} instance.</P>
  *
+ * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public final class FactoryFinder {
     /**
@@ -99,6 +95,11 @@ public final class FactoryFinder {
      * Will be initialized only when first needed.
      */
     private static FactoryRegistry registry;
+
+    /**
+     * The authority names. Will be created only when first needed.
+     */
+    private static Set/*<String>*/ authorityNames;
 
     /**
      * Do not allows any instantiation of this class.
@@ -137,6 +138,7 @@ public final class FactoryFinder {
      */
     public static synchronized void addAuthorityFactory(final AuthorityFactory authority) {
         getServiceRegistry().registerServiceProvider(authority);
+        authorityNames = null;
     }
 
     /**
@@ -148,6 +150,32 @@ public final class FactoryFinder {
      */
     public static synchronized void removeAuthorityFactory(final AuthorityFactory authority) {
         getServiceRegistry().deregisterServiceProvider(authority);
+        authorityNames = null;
+    }
+
+    /**
+     * Returns the names of all currently registered authorities.
+     */
+    public static synchronized Set/*<String>*/ getAuthorityNames() {
+        if (authorityNames == null) {
+            authorityNames = new HashSet();
+loop:       for (int i=0; ; i++) {
+                final Set/*<AuthorityFactory>*/ factories;
+                switch (i) {
+                    case 0:  factories = getCRSAuthorityFactories();                 break;
+                    case 1:  factories = getCSAuthorityFactories();                  break;
+                    case 2:  factories = getDatumAuthorityFactories();               break;
+                    case 3:  factories = getCoordinateOperationAuthorityFactories(); break;
+                    default: break loop;
+                }
+                for (final Iterator it=factories.iterator(); it.hasNext();) {
+                    final Citation authority = ((AuthorityFactory) it.next()).getAuthority();
+                    authorityNames.addAll(authority.getIdentifiers());
+                }
+            }
+            authorityNames = Collections.unmodifiableSet(authorityNames);
+        }
+        return authorityNames;
     }
 
     /**
@@ -533,6 +561,7 @@ public final class FactoryFinder {
      * available at runtime.
      */
     public static void scanForPlugins() {
+        authorityNames = null;
         if (registry != null) {
             registry.scanForPlugins();
         }
@@ -550,33 +579,9 @@ public final class FactoryFinder {
     public static synchronized void listProviders(final Writer out, final Locale locale)
             throws IOException
     {
-        final Vocabulary resources = Vocabulary.getResources(locale);
-        getServiceRegistry().getServiceProviders(DatumFactory.class); // Force the initialization of ServiceRegistry
-        final TableWriter table  = new TableWriter(out, " \u2502 ");
-        table.setMultiLinesCells(true);
-        table.writeHorizontalSeparator();
-        table.write(resources.getString(VocabularyKeys.FACTORY));
-        table.nextColumn();
-        table.write(resources.getString(VocabularyKeys.IMPLEMENTATIONS));
-        table.writeHorizontalSeparator();
-        for (final Iterator categories=getServiceRegistry().getCategories(); categories.hasNext();) {
-            final Class category = (Class)categories.next();
-            table.write(Utilities.getShortName(category));
-            table.nextColumn();
-            boolean first = true;
-            for (final Iterator providers=getServiceRegistry().getServiceProviders(category); providers.hasNext();) {
-                if (!first) {
-                    table.write('\n');
-                }
-                first = false;
-                final Factory provider = (Factory)providers.next();
-                final Citation vendor = provider.getVendor();
-                table.write(vendor.getTitle().toString(locale));
-            }
-            table.nextLine();
-        }
-        table.writeHorizontalSeparator();
-        table.flush();
+        final FactoryRegistry registry = getServiceRegistry();
+        registry.getServiceProviders(DatumFactory.class); // Force the initialization of ServiceRegistry
+        FactoryPrinter.DEFAULT.list(registry, out, locale);
     }
 
     /**

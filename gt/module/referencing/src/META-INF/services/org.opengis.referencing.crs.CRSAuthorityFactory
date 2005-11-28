@@ -1,1 +1,3 @@
 org.geotools.referencing.factory.epsg.DefaultFactory
+org.geotools.referencing.factory.wms.AutoCRSFactory
+org.geotools.referencing.factory.wms.WebCRSFactory

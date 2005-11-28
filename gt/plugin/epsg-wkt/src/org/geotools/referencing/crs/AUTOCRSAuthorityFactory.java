@@ -81,6 +81,8 @@ import org.geotools.metadata.iso.citation.Citations;
  * @version $Id$
  * @author Jody Garnett
  * @author Rueben Schulz
+ *
+ * @deprecated Moved to {@link org.geotools.referencing.factory.wms.AutoCRSFactory}.
  */
 //how is this going to work with the factory finder
 public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {

@@ -29,6 +29,7 @@ public final class VocabularyKeys {
     public static final int ALBERS_EQUAL_AREA_PROJECTION       =     3;
     public static final int ALL                                =     4;
     public static final int ALTITUDE                           =     5;
+    public static final int AUTHORITY                          =   223;
     public static final int AXIS_CHANGES                       =   204;
     public static final int BAND                               =   193;
     public static final int BAROMETRIC_ALTITUDE                =     6;

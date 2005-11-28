@@ -29,23 +29,24 @@ import junit.framework.TestSuite;
 
 // OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.util.MonolineFormatter;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 
 /**
- * Tests {@link AutoCRSFactory}.
+ * Tests {@link WebCRSFactory}.
  *
  * @version $Id$
- * @author Jody Garnett
  * @author Martin Desruisseaux
  */
-public class AUTOTest extends TestCase {
+public class CRSTest extends TestCase {
     /**
      * The factory to test.
      */
@@ -66,7 +67,7 @@ public class AUTOTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(AUTOTest.class);
+        return new TestSuite(CRSTest.class);
     }
 
     /**
@@ -74,7 +75,7 @@ public class AUTOTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        factory = new AutoCRSFactory();
+        factory = new WebCRSFactory();
     }
 
     /**
@@ -82,11 +83,9 @@ public class AUTOTest extends TestCase {
      */
     public void testFactoryFinder() {
         final Collection authorities = FactoryFinder.getAuthorityNames();
-        assertTrue(authorities.contains("AUTO"));
-        assertTrue(authorities.contains("AUTO2"));
-        factory = FactoryFinder.getCRSAuthorityFactory("AUTO", null);
-        assertTrue(factory instanceof AutoCRSFactory);
-        assertSame(factory, FactoryFinder.getCRSAuthorityFactory("AUTO2", null));
+        assertTrue(authorities.contains("CRS"));
+        factory = FactoryFinder.getCRSAuthorityFactory("CRS", null);
+        assertTrue(factory instanceof WebCRSFactory);
     }
 
     /**
@@ -94,21 +93,21 @@ public class AUTOTest extends TestCase {
      */
     public void testAuthority() {
         final Collection identifiers = factory.getAuthority().getIdentifiers();
-        assertTrue (identifiers.contains("AUTO"));
-        assertTrue (identifiers.contains("AUTO2"));
+        assertTrue (identifiers.contains("CRS"));
         assertFalse(identifiers.contains("EPSG"));
-        assertFalse(identifiers.contains("CRS"));
+        assertFalse(identifiers.contains("AUTO"));
+        assertFalse(identifiers.contains("AUTO2"));
     }
 
     /**
-     * UDIG requires this to work.
+     * Tests the CRS factory.
      */
-    public void test42001() throws FactoryException {
-        final ProjectedCRS utm = factory.createProjectedCRS("AUTO:42001,0.0,0.0");
-        assertNotNull("auto-utm", utm);
-        assertSame   (utm, factory.createObject("AUTO :42001, 0,0"));
-        assertSame   (utm, factory.createObject("AUTO2:42001, 0,0"));
-        assertNotSame(utm, factory.createObject("AUTO :42001,30,0"));
-        assertEquals ("Transverse_Mercator", utm.getConversionFromBase().getMethod().getName().getCode());
+    public void testCRS() throws FactoryException {
+        GeographicCRS crs = factory.createGeographicCRS("CRS:84");
+        assertFalse(DefaultGeographicCRS.WGS84.equals(crs));
+        assertTrue(CRSUtilities.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
+
+        crs = factory.createGeographicCRS("CRS:83");
+        assertFalse(CRSUtilities.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
     }
 }

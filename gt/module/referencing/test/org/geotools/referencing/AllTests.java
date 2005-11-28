@@ -71,6 +71,8 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing.operation.transform.LocalizationGridTest     .suite());
         suite.addTest(org.geotools.referencing.operation.transform.WarpTransformTest        .suite());
         suite.addTest(org.geotools.referencing                    .ScriptTest               .suite());
+        suite.addTest(org.geotools.referencing.factory.wms        .AUTOTest                 .suite());
+        suite.addTest(org.geotools.referencing.factory.wms        .CRSTest                  .suite());
         /*
          * If the EPSG authority factory on HSQL is available in the class path, add its tests.
          * It is never the case when the referencing module is build by Maven  (the EPSG tests
