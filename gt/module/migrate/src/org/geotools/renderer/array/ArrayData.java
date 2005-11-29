@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.array;
 
@@ -52,6 +39,10 @@ import org.geotools.resources.XArray;
  *
  * @version $Id: ArrayData.java 10796 2005-01-28 19:09:18Z dzwiers $
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.geometry.array.ArrayData}
+ *             as part of the port of J2D-renderer to the new API. See
+ *             <A HREF="http://jira.codehaus.org/browse/GEOT-776">GEOT-776</A> work.
  */
 public class ArrayData {
     /**

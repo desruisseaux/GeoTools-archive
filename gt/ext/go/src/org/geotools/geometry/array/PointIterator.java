@@ -18,81 +18,75 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.renderer.array;
+package org.geotools.geometry.array;
 
-// Divers
+// J2SE dependencies
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
+// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 
 
 /**
- * Itérateur balayant les données d'un tableau {@link PointArray}. Cet itérateur est obtenu par
- * un appel à {@link PointArray#iterator}.  Le balayage se fait généralement par des appels aux
- * aux méthodes {@link #nextX} et {@link #nextY}, qui retournent les données sous forme de nombres
- * réels <code>float</code>. Toutefois, ces méthodes <g>doivent toujours</g> être appellées dans
- * cet ordre: {@link #nextX} d'abord, suivit de {@link #nextY}. Tout manquement à cette règle (par
- * exemple appeller {@link #nextX} deux fois de suite) peut produire des résultats erronées.
+ * An iterator over the points in an {@link PointArray2D}. This iterator is obtained by calls to
+ * {@link PointArray2D#iterator}. Methods {@link #nextX} and {@link #nextY} provides a fast way to
+ * get the floating point ordinate values. However, the above-cited methods <strong>must</strong>
+ * be invoked in this order: {@link #nextX} first, and {@link #nextY} after. The iterator
+ * behavior is undertermined if those methods are not invoked in this order.
  *
+ * @since 2.2
  * @version $Id: PointIterator.java 10796 2005-01-28 19:09:18Z dzwiers $
  * @author Martin Desruisseaux
  *
- * @task TODO: Once J2SE 1.5 will be available, this class should implements
- *             Iterator<Point2D> and method next() should returns Point2D.
- *             Method clone() should returns PointIterator.
- *
- * @deprecated Replaced by {@link org.geotools.geometry.array.PointIterator}
- *             as part of the port of J2D-renderer to the new API. See
- *             <A HREF="http://jira.codehaus.org/browse/GEOT-776">GEOT-776</A> work.
+ * @todo Once J2SE 1.5 will be available, this class should implements {@code Iterator<Point2D>}
+ *       and method {@code next()} should returns {@link Point2D}. Method {@link #clone()} should
+ *       returns {@code PointIterator}.
  */
 public abstract class PointIterator implements Iterator, Cloneable {
     /**
-     * Constructeur par défaut.
+     * Default constructor.
      */
     protected PointIterator() {
     }
 
     /**
-     * Indique si les méthodes {@link #next} peuvent retourner d'autres données.
+     * Returns if {@link #next} or {@link #nextX} has more values.
      */
     public abstract boolean hasNext();
 
     /**
-     * Retourne la valeur de la longitude courante. Avant d'appeller
-     * une seconde fois cette méthode, il faudra <g>obligatoirement</g>
-     * avoir appelé {@link #nextY}.
+     * Returns the next <var>x</var> value. Before to invoke this method one more time,
+     * the method {@link #nextY} <strong>must</strong> be invoked.
      */
     public abstract float nextX();
 
     /**
-     * Retourne la valeur de la latitude courante, puis avance au point
-     * suivant. Chaque appel de cette méthode doit <g>obligatoirement</g>
-     * avoir été précédée d'un appel à la méthode {@link #nextX}.
+     * Returns the next <var>y</var> value, and move this iterator to the next coordinate.
+     * Before to invoke this method one more time, the method {@link #nextX} <strong>must</strong>
+     * be invoked.
      */
     public abstract float nextY();
 
     /**
-     * Retourne la valeur du point courant dans un objet {@link Point2D},
-     * puis avance au point suivant. Cette méthode combine un appel de
-     * {@link #nextX} suivit de {@link #nextY}.
+     * Returns the current coordinates as a {@link Point2D} object, and move this iterator to
+     * the next coordinate. This method invokes {@link #nextX} followed by {@link #nextY}.
      */
     public Object next() {
         return new Point2D.Float(nextX(), nextY());
     }
 
     /**
-     * Opération non-supportée.
+     * Unsupported operation.
      */
     public final void remove() {
         throw new UnsupportedOperationException();
     }
 
     /**
-     * Retourne une copie conforme de cet itérateur. Cette
-     * copie peut être utile pour balayer une seconde fois
-     * les mêmes données à partir du point où se trouve cet
-     * itérateur.
+     * Returns a copy of this iterator. This copy may be useful in order to iterate one more
+     * time over the same data starting at the position of this iterator at the time it has
+     * been cloned.
      */
     public final Object clone() {
         try {

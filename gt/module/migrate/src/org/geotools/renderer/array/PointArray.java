@@ -41,7 +41,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * doivent obligatoirement passer par un itérateur retourné par {@link #iterator}. Cette
  * limitation est nécessaire pour faciliter l'implémentation de certains algorithmes de
  * compression des données.
- * <br><br>
+ * <p>
  * <strong>Note sur le vocabulaire employé:</strong> Dans la documentation de cette classe,
  * le terme <em>point</em> se réfère à une paire de coordonnées (<var>x</var>,<var>y</var>)
  * tandis que le terme  <em>coordonnée</em>  se réfère à une seule valeur  <var>x</var> ou
@@ -59,6 +59,10 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see DefaultArray#getInstance
  * @see org.geotools.renderer.j2d.Renderer
  * @see org.geotools.gui.swing.MapPane
+ *
+ * @deprecated Replaced by {@link org.geotools.geometry.array.PointArray2D}
+ *             as part of the port of J2D-renderer to the new API. See
+ *             <A HREF="http://jira.codehaus.org/browse/GEOT-776">GEOT-776</A> work.
  */
 public abstract class PointArray implements Serializable {
     /**
