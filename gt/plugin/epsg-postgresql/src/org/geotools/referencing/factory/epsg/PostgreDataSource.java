@@ -149,11 +149,10 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
                              final String user,
                              final String password)
     {
-        Properties p;
+        final Properties p = new Properties();
         try {
-            p = load();
+            load(p);
         } catch (IOException exception) {
-            p = new Properties();
             Utilities.unexpectedException("org.geotools.referencing.factory", "DataSource",
                                           "<init>", exception);
         }
@@ -176,24 +175,22 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
     /**
      * Loads the {@linkplain #CONFIGURATION_FILE configuration file}.
      *
-     * @return The properties from the configuration file, or {@code null} if the file has not
-     *         been found.
+     * @param  The properties in which to stores the configuration informations.
      * @throws IOException if the configuration file was found, but an error occured while
      *         reading it.
      */
-    private static Properties load() throws IOException {
+    private static void load(final Properties p) throws IOException {
         File file = new File(CONFIGURATION_FILE);
         if (!file.isFile()) {
             file = new File(System.getProperty("user.home", "."), CONFIGURATION_FILE);
             if (!file.isFile()) {
-                return null;
+                return;
             }
         }
-        final Properties properties = new Properties();
         final InputStream in = new FileInputStream(file);
-        properties.load(in);
+        p.load(in);
         in.close();
-        return properties;
+        return;
     }
 
     /**
