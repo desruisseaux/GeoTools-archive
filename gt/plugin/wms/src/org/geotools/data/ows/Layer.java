@@ -60,6 +60,10 @@ public class Layer implements Comparable {
     /** A list of type String */
     private List styles;
     private Boolean queryable = null;
+    
+    private double scaleHintMin = Double.NaN;
+    private double scaleHintMax = Double.NaN;
+    
     private Layer parent;
     private Layer[] children;
     
@@ -331,4 +335,20 @@ public class Layer implements Comparable {
     public void setKeywords( String[] keywords ) {
         this.keywords = keywords;
     }
+
+	public double getScaleHintMax() {
+		return scaleHintMax;
+	}
+
+	public void setScaleHintMax(double scaleHintMax) {
+		this.scaleHintMax = scaleHintMax;
+	}
+
+	public double getScaleHintMin() {
+		return scaleHintMin;
+	}
+
+	public void setScaleHintMin(double scaleHintMin) {
+		this.scaleHintMin = scaleHintMin;
+	}
 }

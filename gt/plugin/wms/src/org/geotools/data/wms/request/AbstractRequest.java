@@ -109,6 +109,9 @@ public abstract class AbstractRequest implements Request{
      * @see org.geotools.data.wms.request.Request#getFinalURL()
      */
     public URL getFinalURL() {
+    	if (onlineResource.getProtocol().equalsIgnoreCase("file")) {
+    		return onlineResource;
+    	}
         String url = onlineResource.toExternalForm();
 
         if (!url.endsWith("?")) { //$NON-NLS-1$
@@ -163,7 +166,11 @@ public abstract class AbstractRequest implements Request{
      * @see org.geotools.data.wms.request.Request#setProperty(java.lang.String, java.lang.String)
      */
     public void setProperty(String name, String value) {
-        properties.setProperty(name, value);
+    	if (value == null) {
+    		properties.remove(name);
+    	} else {
+    		properties.setProperty(name, value);
+    	}
     }
     
     /**

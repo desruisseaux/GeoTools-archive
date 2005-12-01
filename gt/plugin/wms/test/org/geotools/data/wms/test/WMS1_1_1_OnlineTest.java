@@ -109,6 +109,8 @@ public class WMS1_1_1_OnlineTest extends WMS1_1_0_OnlineTest {
             assertEquals(bbox.getMinY(), 6540200.0, 0.0);
             assertEquals(bbox.getMaxX(), 670200.0, 0.0);
             assertEquals(bbox.getMaxY(), 6794800.0, 0.0);
+            assertEquals(10, layer.getScaleHintMin(), 0);
+            assertEquals(10000, layer.getScaleHintMax(), 0);
             
             bbox = (CRSEnvelope) layer.getBoundingBoxes().get("EPSG:26920");
             assertNotNull(bbox);
@@ -133,6 +135,7 @@ public class WMS1_1_1_OnlineTest extends WMS1_1_0_OnlineTest {
                     -168.67, 17.84, -65.15, 71.55);
             
             
+            
             layer = (Layer) capabilities.getLayerList().get(2);
             assertNotNull(layer);
             assertEquals(layer.getName(), "DRG");
@@ -141,6 +144,8 @@ public class WMS1_1_1_OnlineTest extends WMS1_1_0_OnlineTest {
             validateBoundingBox(layer.getLatLonBoundingBox(),
                     -168.67, 17.84, -65.15, 71.55);
             
+            assertEquals(50, layer.getScaleHintMin(), 0);
+            
             layer = (Layer) capabilities.getLayerList().get(3);
             assertNotNull(layer);
             assertEquals(layer.getName(), "UrbanArea");
@@ -148,7 +153,7 @@ public class WMS1_1_1_OnlineTest extends WMS1_1_0_OnlineTest {
             // Added test to verify inheritance, should be same as previous llbbox
             validateBoundingBox(layer.getLatLonBoundingBox(),
                     -168.67, 17.84, -65.15, 71.55);
-            
+            assertEquals(50000, layer.getScaleHintMax(), 0);
             
         } catch(java.net.ConnectException ce){
             if(ce.getMessage().indexOf("timed out")>0){

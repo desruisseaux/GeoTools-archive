@@ -2557,6 +2557,11 @@ public class WMSComplexTypes {
 					childLayer.setParent(layer);
 					childLayers.add(childLayer);
 				}
+				if (sameName(elems[21], value[i])) {
+					double[] scaleHint = (double[]) value[i].getValue();
+					layer.setScaleHintMin(scaleHint[0]);
+					layer.setScaleHintMax(scaleHint[1]);
+				}
 
 			}
 
@@ -4354,8 +4359,10 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			// TODO don't care about scaleHint
-			return null;
+			double[] scaleHint = new double[2];
+			scaleHint[0] = Double.parseDouble(attrs.getValue("min"));
+			scaleHint[1] = Double.parseDouble(attrs.getValue("max"));
+			return scaleHint;
 		}
 
 		/*
@@ -4373,7 +4380,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return null;
+			return double[].class;
 		}
 
 		/*

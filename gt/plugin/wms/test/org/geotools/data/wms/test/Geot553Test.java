@@ -30,8 +30,8 @@ import org.opengis.spatialschema.geometry.Envelope;
 public class Geot553Test extends TestCase {
     
     public void testGeot553 () throws Exception {
-       // File getCaps = TestData.file(this, "geot553capabilities.xml");
-        
+        File getCaps = TestData.file(this, "geot553capabilities.xml");
+    	
         URL getCapsURL = TestData.getResource(this, "geot553capabilities.xml");
         
         WebMapServer wms = new WebMapServer(getCapsURL);

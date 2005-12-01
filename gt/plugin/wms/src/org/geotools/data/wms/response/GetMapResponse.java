@@ -38,7 +38,7 @@ public class GetMapResponse extends AbstractResponse {
     public GetMapResponse(String contentType, InputStream response) throws ServiceException, SAXException {
         super(contentType, response);
         
-        if (contentType.toLowerCase().indexOf("text/xml") != -1) {
+        if (contentType.toLowerCase().indexOf("application/vnd.ogc.se_xml") != -1) {
         	throw parseException(response);
         }
     }

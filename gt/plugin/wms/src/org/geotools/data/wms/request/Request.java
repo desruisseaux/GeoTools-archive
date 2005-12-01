@@ -50,6 +50,8 @@ public interface Request {
      * that you are familiar with this. See section 6.2.1 of the WMS 1.1.1 spec
      * and 6.3.2 of the WMS 1.3.0 spec. 
      * 
+     * If value is null, "name" is removed from the properties table.
+     * 
      * @param name the name of the property
      * @param value the value of the property
      */

@@ -320,6 +320,7 @@
         <Title>Gray Grid Lines on Geographic coordinates</Title>
         <Abstract>Display grid lines in Gray color on the DOQ image</Abstract>
       </Style>
+      <ScaleHint min="10" max="10000"/>
     </Layer>
     <Layer queryable="0" cascaded="0" opaque="1" noSubsets="0" fixedWidth="0" fixedHeight="0">
       <Name>DRG</Name> 
@@ -528,6 +529,7 @@
         <Title>Gray Grid Lines on Geographic coordinates</Title>
         <Abstract>Display grid lines in Gray color on the DRG image</Abstract>
       </Style>
+      <ScaleHint min="50" max="0"/>
     </Layer>
     <Layer queryable="0" cascaded="0" opaque="1" noSubsets="0" fixedWidth="0" fixedHeight="0">
       <Name>UrbanArea</Name> 
@@ -733,6 +735,7 @@
         <Title>Gray Grid Lines on Geographic coordinates</Title>
         <Abstract>Display grid lines in Gray color on the UrbanArea image</Abstract>
       </Style>
+      <ScaleHint min="0" max="50000"/>
     </Layer>
 
   </Layer>
