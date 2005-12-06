@@ -17,11 +17,13 @@
 package org.geotools.gui.swing.sldeditor;
 
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.gui.swing.sldeditor.property.PropertyEditorFactory;
 import org.geotools.gui.swing.sldeditor.symbolizer.SymbolizerEditorFactory;
 import org.geotools.gui.swing.sldeditor.util.StyleCloner;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 
 
 /**
@@ -30,10 +32,10 @@ import org.geotools.styling.StyleFactory;
  * @author jianhuij
  */
 public interface SLDEditor {
-    public static StyleFactory styleFactory = StyleFactory.createStyleFactory();
+    public static StyleFactory styleFactory = StyleFactoryFinder.createStyleFactory();
     public static PropertyEditorFactory propertyEditorFactory = PropertyEditorFactory.createPropertyEditorFactory();
     public static SymbolizerEditorFactory symbolizerEditorFactory = SymbolizerEditorFactory.createPropertyEditorFactory();
-    public static FilterFactory filterFactory = FilterFactory.createFilterFactory();
+    public static FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     public static StyleCloner styleCloner = new StyleCloner(styleFactory);
     public static StyleBuilder styleBuilder = new StyleBuilder(styleFactory, filterFactory);
 }

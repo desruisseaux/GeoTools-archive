@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,18 +12,16 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.feature;
 
 /**
  * Indicates client class has attempted to create an invalid feature.
- *
- * @author Rob Hranac, Vision for New York
- * @version $Id: IllegalAttributeException.java,v 1.4 2003/08/05 23:24:40 cholmesny Exp $
  */
 public class IllegalAttributeException extends Exception {
-    /** The expected attribute type. */
+    private static final long serialVersionUID = -4964013824521988182L;
+
+	/** The expected attribute type. */
     private final AttributeType expected;
 
     /** The object that does not match the expected type. */
@@ -51,8 +49,8 @@ public class IllegalAttributeException extends Exception {
     }
 
     /**
-     * Constructor that makes the message given the expected and invalid,
-     * along with the root cause.
+     * Constructor that makes the message given the expected and invalid, along
+     * with the root cause.
      *
      * @param expected the expected AttributeType.
      * @param invalid the attribute that does not validate against expected.
@@ -65,6 +63,13 @@ public class IllegalAttributeException extends Exception {
         this.invalid = invalid;
     }
 
+    public String toString() {
+    	String message = "IllegalAttribute: " + expected.getType().getName();
+        message += (" , but got "
+        + ((invalid == null) ? "null" : invalid.getClass().getName()));
+
+        return message;
+    }
     /**
      * Constructs an error message based on expected and invalid.
      *

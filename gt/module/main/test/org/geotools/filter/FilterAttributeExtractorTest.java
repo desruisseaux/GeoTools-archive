@@ -102,7 +102,7 @@ public class FilterAttributeExtractorTest extends TestCase {
 
         fae = new FilterAttributeExtractor();
 
-        fac = FilterFactory.createFilterFactory();
+        fac = FilterFactoryFinder.createFilterFactory();
 
         // Create the schema attributes
         AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType("testGeometry",

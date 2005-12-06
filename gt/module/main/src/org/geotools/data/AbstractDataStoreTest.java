@@ -28,6 +28,8 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -164,7 +166,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         store1.addFeatureListener(listener1);
         store2.addFeatureListener(listener2);
 
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
 
         //test that only the listener listening with the current transaction gets the event.
         final Feature feature = roadFeatures[0];

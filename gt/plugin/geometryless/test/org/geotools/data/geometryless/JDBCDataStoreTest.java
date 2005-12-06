@@ -72,7 +72,7 @@ public class JDBCDataStoreTest extends TestCase {
     private static String FEATURE_TABLE = "testset";
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
     private static GeometryFactory geomFac = new GeometryFactory();
-    private FilterFactory filterFac = FilterFactory.createFilterFactory();
+    private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
   
     private FeatureCollection collection = FeatureCollections.newCollection();
     private FeatureType schema;

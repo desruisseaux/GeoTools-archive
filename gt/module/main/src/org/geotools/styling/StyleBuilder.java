@@ -30,6 +30,7 @@ import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 /**
@@ -58,6 +59,7 @@ public class StyleBuilder {
     public static final String FONT_STYLE_OBLIQUE = "oblique";
     public static final String FONT_WEIGHT_NORMAL = "normal";
     public static final String FONT_WEIGHT_BOLD = "bold";
+    
     private StyleFactory sf;
     private FilterFactory ff;
 
@@ -65,8 +67,7 @@ public class StyleBuilder {
      * use the default StyleFactory and FilterFactory
      */
     public StyleBuilder() {
-        sf = StyleFactory.createStyleFactory();
-        ff = FilterFactory.createFilterFactory();
+    	this( StyleFactoryFinder.createStyleFactory() );
     }
 
     /**
@@ -74,9 +75,8 @@ public class StyleBuilder {
      *
      * @param styleFactory the StyleFactory to use in building Styles
      */
-    public StyleBuilder(StyleFactory styleFactory) {
-        this.sf = styleFactory;
-        ff = FilterFactory.createFilterFactory();
+    public StyleBuilder(StyleFactory styleFactory ) {
+        this( styleFactory, FilterFactoryFinder.createFilterFactory() );
     }
 
     /**
@@ -84,9 +84,8 @@ public class StyleBuilder {
      *
      * @param filterFactory Use this FilterFactory to build the style
      */
-    public StyleBuilder(FilterFactory filterFactory) {
-        this.ff = filterFactory;
-        this.sf = StyleFactory.createStyleFactory();
+    public StyleBuilder(FilterFactory filterFactory ) {
+        this( StyleFactoryFinder.createStyleFactory(), filterFactory );
     }
 
     /**
@@ -101,6 +100,14 @@ public class StyleBuilder {
     }
 
     /**
+     * Documented setter injection, StyleBuilder uses a StyleFactory for creation.
+     * 
+     * @param factory
+     */
+     public void setStyleFactory( StyleFactory factory ){
+    	 sf = factory;
+     }
+    /**
      * getter for StyleFactory
      *
      * @return the StyleFactory being used
@@ -110,6 +117,15 @@ public class StyleBuilder {
     }
 
     /**
+     * Documented setter injection, StyleBuilder uses a StyleFactory for creation.
+     * 
+     * @param factory
+     */
+     public void setFilterFactory( FilterFactory factory ){
+    	 ff = factory;
+     }
+     
+    /**
      * getter for filterFactory
      *
      * @return the FilterFactory being used
@@ -117,7 +133,7 @@ public class StyleBuilder {
     public FilterFactory getFilterFactory() {
         return ff;
     }
-
+    
     /**
      * create a default Stroke
      *
@@ -493,7 +509,7 @@ public class StyleBuilder {
         Graphic gr = sf.getDefaultGraphic();
 
         Mark mark = createMark(MARK_SQUARE, Color.decode("#808080"), Color.BLACK, 1);
-        gr.setMarks(new Mark[] { mark });
+        gr.setMarks( new Mark[] { mark });
         gr.setSize(literalExpression(6.0));
 
         return gr;
@@ -1257,7 +1273,7 @@ public class StyleBuilder {
         }
 
         if (labelPlacement != null) {
-            ts.setLabelPlacement(labelPlacement);
+            ts.setPlacement(labelPlacement);
         }
 
         if (geometryPropertyName != null) {

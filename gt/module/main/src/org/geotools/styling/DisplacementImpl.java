@@ -20,7 +20,10 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -29,20 +32,22 @@ import org.opengis.util.Cloneable;
  * @version $Id: DisplacementImpl.java,v 1.6 2003/09/06 04:52:31 seangeo Exp $
  * @author Ian Turton, CCG
  */
-public class DisplacementImpl implements Displacement, Cloneable {
+public class DisplacementImpl extends AbstractGTComponent implements Displacement, Cloneable {
     /**
      * The logger for the default core module.
      */
     private static final java.util.logging.Logger LOGGER = 
             java.util.logging.Logger.getLogger("org.geotools.core");
-    private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactory.createFilterFactory();
+    private FilterFactory filterFactory;
     private Expression displacementX = null;
     private Expression displacementY = null;
 
-    /** Creates a new instance of DefaultDisplacement */
-    public DisplacementImpl() {
-        try {
+    public DisplacementImpl(){
+    	this( FilterFactoryFinder.createFilterFactory() );
+    }
+    public DisplacementImpl(FilterFactory factory) {
+    	filterFactory = factory;
+    	try {
             displacementX = filterFactory.createLiteralExpression(
                                     new Integer(0));
             displacementY = filterFactory.createLiteralExpression(
@@ -50,6 +55,18 @@ public class DisplacementImpl implements Displacement, Cloneable {
         } catch (org.geotools.filter.IllegalFilterException ife) {
             LOGGER.severe("Failed to build defaultDisplacement: " + ife);
         }
+	}
+    public void setFilterFactory( FilterFactory factory ){
+    	filterFactory = factory;
+    	try {
+            displacementX = filterFactory.createLiteralExpression(
+                                    new Integer(0));
+            displacementY = filterFactory.createLiteralExpression(
+                                    new Integer(0));
+        } catch (org.geotools.filter.IllegalFilterException ife) {
+            LOGGER.severe("Failed to build defaultDisplacement: " + ife);
+        }
+        fireChanged();
     }
 
     /** Setter for property displacementX.
@@ -57,6 +74,7 @@ public class DisplacementImpl implements Displacement, Cloneable {
      */
     public void setDisplacementX(Expression displacementX) {
         this.displacementX = displacementX;
+        fireChanged();
     }
 
     /** Setter for property displacementY.
@@ -64,6 +82,7 @@ public class DisplacementImpl implements Displacement, Cloneable {
      */
     public void setDisplacementY(Expression displacementY) {
         this.displacementY = displacementY;
+        fireChanged();
     }
 
     /** Getter for property displacementX.

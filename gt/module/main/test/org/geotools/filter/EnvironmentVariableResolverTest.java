@@ -28,7 +28,7 @@ import org.geotools.filter.visitor.EnvironmentVariableResolver;
  * @task REVISIT: validate these so we know if they break.
  */
 public class EnvironmentVariableResolverTest extends FilterTestSupport {
-    private FilterFactory filterFac = FilterFactory.createFilterFactory();
+    private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
 //
 //    /** Test suite for this test case */
 //    TestSuite suite = null;

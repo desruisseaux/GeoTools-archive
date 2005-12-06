@@ -5,16 +5,18 @@
  */
 package org.geotools.styling;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 
 /**
  *
  * @author  iant
  */
-public class SelectedChannelTypeImpl implements SelectedChannelType {
-    private static  FilterFactory filterFactory = FilterFactory.createFilterFactory();
+public class SelectedChannelTypeImpl extends AbstractGTComponent implements SelectedChannelType {
+    private static  FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     private Expression contrastEnhancement;
     private String name = "channel";
 
@@ -33,9 +35,12 @@ public class SelectedChannelTypeImpl implements SelectedChannelType {
 
     public void setChannelName(String name) {
         this.name = name;
+        fireChanged();        
     }
 
-    public void setContrastEnhancement(Expression enhancement) {
-        this.contrastEnhancement = enhancement;
+    public void setContrastEnhancement(Expression contrastEnhancement) {
+    	fireChildRemoved( this.contrastEnhancement );
+        this.contrastEnhancement = contrastEnhancement;
+        fireChildAdded( contrastEnhancement );        
     }
 }

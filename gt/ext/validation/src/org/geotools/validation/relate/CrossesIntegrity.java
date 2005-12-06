@@ -35,6 +35,7 @@ import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.validation.ValidationResults;
@@ -164,7 +165,7 @@ public class CrossesIntegrity extends RelationIntegrity
 	{
 		boolean success = true;
 		
-		FilterFactory ff = FilterFactory.createFilterFactory();
+		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		Filter filter = null;
 
 		filter = (Filter) ff.createBBoxExpression(bBox);
@@ -329,7 +330,7 @@ public class CrossesIntegrity extends RelationIntegrity
 	private Filter filterBBox(Envelope bBox, FeatureType ft)
 		throws FactoryConfigurationError, IllegalFilterException
 	{
-		FilterFactory ff = FilterFactory.createFilterFactory();
+		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		BBoxExpression bboxExpr = ff.createBBoxExpression(bBox);
 		AttributeExpression geomExpr = ff.createAttributeExpression(ft, ft.getDefaultGeometry().getName());
 		GeometryFilter containsFilter = ff.createGeometryFilter(Filter.GEOMETRY_DISJOINT);

@@ -268,8 +268,8 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor implements
             text.getLabel().accept(this);
         }
 
-        if (text.getLabelPlacement() != null) {
-            text.getLabelPlacement().accept(this);
+        if (text.getPlacement() != null) {
+            text.getPlacement().accept(this);
         }
         
         if (text.getPriority() != null) {

@@ -26,6 +26,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LiteralExpression;
@@ -61,7 +62,7 @@ public class DB2SQLBuilderTest extends DB2TestCase {
         String typeName = "Places";
         FeatureSource fs = dataStore.getFeatureSource("Places");
         FeatureType ft = fs.getSchema();
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         LikeFilter lf = ff.createLikeFilter();
         AttributeExpression nameColumn = ff.createAttributeExpression(ft, "Name");
         String pattern = "s.met*s";       

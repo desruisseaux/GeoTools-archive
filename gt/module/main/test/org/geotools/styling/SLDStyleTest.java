@@ -86,7 +86,7 @@ public class SLDStyleTest extends TestCase {
         //java.net.URL base = getClass().getResource("testData/");
         // base = getClass().getResource("testData");
         // base = getClass().getResource("/testData");
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
 
         //java.net.URL surl = new java.net.URL(base + "/test-sld.xml");
         java.net.URL surl = TestData.getResource(this, "test-sld.xml");
@@ -121,7 +121,7 @@ public class SLDStyleTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testParseSLDNamedLayersOnly() throws Exception {
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
         java.net.URL surl = TestData.getResource(this, "namedLayers.sld");
         SLDParser stylereader = new SLDParser(factory, surl);
 
@@ -157,7 +157,7 @@ public class SLDStyleTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testParseSLDNamedAndUserLayers() throws Exception {
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
         java.net.URL surl = TestData.getResource(this, "mixedLayerTypes.sld");
         SLDParser stylereader = new SLDParser(factory, surl);
 
@@ -180,7 +180,7 @@ public class SLDStyleTest extends TestCase {
 	public void testParseGeometryFilters()throws IOException{
         final String TYPE_NAME = "testType";
 		final String GEOMETRY_ATTR = "Polygons";
-		StyleFactory factory = StyleFactory.createStyleFactory();
+		StyleFactory factory = StyleFactoryFinder.createStyleFactory();
         java.net.URL surl = TestData.getResource(this, "spatialFilter.xml");
         SLDParser stylereader = new SLDParser(factory, surl);
 

@@ -34,6 +34,7 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.feature.Feature;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.RenderListener;
@@ -47,6 +48,7 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -60,8 +62,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * @since 2.1.x
  */
 public class TestUtilites {
-    static final FilterFactory filterFactory = FilterFactory
-        .createFilterFactory();
+    static final FilterFactory filterFactory =
+    	FilterFactoryFinder.createFilterFactory();
     public static boolean INTERACTIVE = false;
 
     public static ShapefileDataStore getPolygons() throws IOException {
@@ -106,7 +108,7 @@ public class TestUtilites {
             pointName = "pointtest";
         }
 
-        StyleFactory sFac = StyleFactory.createStyleFactory();
+        StyleFactory sFac = StyleFactoryFinder.createStyleFactory();
 
         // The following is complex, and should be built from
         // an SLD document and not by hand

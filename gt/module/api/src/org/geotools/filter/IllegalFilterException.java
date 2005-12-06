@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,18 +12,16 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.filter;
 
 /**
  * Defines an exception for illegal filters.
- *
- * @author Rob Hranac, Vision for New York
- * @author Chris Holmes, TOPP
- * @version $Id: IllegalFilterException.java,v 1.4 2003/08/07 21:30:36 cholmesny Exp $
  */
 public class IllegalFilterException extends Exception {
+    /** Prevent warning. */
+    private static final long serialVersionUID = 6991878877158220201L;
+
     /**
      * Constructor with a message.
      *

@@ -11,6 +11,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.parser.ParseException;
 
@@ -38,7 +39,7 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
      * Test of getName method, of class org.geotools.filter.functions.EqualIntervalFunction.
      */
     public void testInstance() {
-        FunctionExpression equInt = FilterFactory.createFilterFactory().createFunctionExpression("EqualInterval");
+        FunctionExpression equInt = FilterFactoryFinder.createFilterFactory().createFunctionExpression("EqualInterval");
         assertNotNull(equInt);
     }
     
@@ -47,7 +48,7 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
      * Test of getName method, of class org.geotools.filter.functions.EqualIntervalFunction.
      */
     public void testGetName() {
-        FunctionExpression equInt = FilterFactory.createFilterFactory().createFunctionExpression("EqualInterval");
+        FunctionExpression equInt = FilterFactoryFinder.createFilterFactory().createFunctionExpression("EqualInterval");
         System.out.println("testGetName");
         assertEquals("EqualInterval",equInt.getName());
     }

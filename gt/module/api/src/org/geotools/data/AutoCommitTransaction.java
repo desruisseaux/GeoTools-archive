@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  * Created on 15-Mar-2005
  *
  * TODO To change the template for this generated file go to
@@ -9,6 +25,7 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.Set;
 
+
 /**
  * This is used to represent the absense of a Transaction and the use of
  * AutoCommit.
@@ -16,11 +33,7 @@ import java.util.Set;
  * <p>
  * This class serves as the implementation of the constant Transaction.NONE.
  * </p>
- *
- * @author jgarnett
- * @author dzwiers -- just split it into it's own file
  */
-
 class AutoCommitTransaction implements Transaction {
     /**
      * Authorization IDs are not stored by AutoCommit.
@@ -112,19 +125,18 @@ class AutoCommitTransaction implements Transaction {
      * }
      * </code>
      * </pre>
-     *
-     * @throws IOException If commit fails
      */
-    public void commit(){
+    public void commit() {
         // implement a NOP
     }
 
     /**
      * Implements a NOP since AUTO_COMMIT does not maintain State.
      */
-    public void close(){
+    public void close() {
         // no state to clean up after
     }
+
     /**
      * Auto commit mode cannot support the rollback opperation.
      *
@@ -160,24 +172,29 @@ class AutoCommitTransaction implements Transaction {
      * </p>
      *
      * @param key Key that is not used to Store Property
+     *
+     * @return Property associated with key, or null
+     *
      * @throws UnsupportedOperationException AutoCommit does not support State
      */
-     public Object getProperty(Object key) {
-         throw new UnsupportedOperationException(
-             "AutoCommit does not support the getProperty opperations");
+    public Object getProperty(Object key) {
+        throw new UnsupportedOperationException(
+            "AutoCommit does not support the getProperty opperations");
     }
 
     /**
      * Implementation of addProperty.
-     * 
-     * @see org.geotools.data.Transaction#addProperty(java.lang.Object, java.lang.Object)
-     * 
+     *
      * @param key
      * @param value
-     * @throws IOException
+     *
+     * @throws UnsupportedOperationException
+     *
+     * @see org.geotools.data.Transaction#addProperty(java.lang.Object,
+     *      java.lang.Object)
      */
     public void putProperty(Object key, Object value) {
         throw new UnsupportedOperationException(
-            "AutoCommit does not support the addProperty opperations");        
+            "AutoCommit does not support the addProperty opperations");
     }
 }

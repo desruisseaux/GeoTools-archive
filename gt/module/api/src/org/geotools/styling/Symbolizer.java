@@ -1,0 +1,82 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+/*
+ *    Geotools - OpenSource mapping toolkit
+ *    (C) 2002, Centre for Computational Geography
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *
+ * Contacts:
+ *     UNITED KINGDOM: James Macgill.  j.macgill@geog.leeds.ac.uk
+ */
+package org.geotools.styling;
+
+import org.geotools.event.GTComponent;
+
+/**
+ * This is the parent interface of all Symbolizers.
+ * 
+ * <p>
+ * A symbolizer describes how a feature should appear on a map. The symbolizer
+ * describes not just the shape that should appear but also  such graphical
+ * properties as color and opacity.
+ * </p>
+ * 
+ * <p>
+ * A symbolizer is obtained by specifying one of a small number of  different
+ * types of symbolizer and then supplying parameters to overide its default
+ * behaviour.
+ * </p>
+ * 
+ * <p>
+ * The details of this object are taken from the <a
+ * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
+ * Styled-Layer Descriptor Report (OGC 02-070) version 1.0.0.</a>
+ * </p>
+ * 
+ * <p>
+ * Renderers can use this information when displaying styled features,  though
+ * it must be remembered that not all renderers will be able to fully
+ * represent strokes as set out by this interface.  For example, opacity may
+ * not be supported.
+ * </p>
+ * 
+ * <p>
+ * The graphical parameters and their values are derived from SVG/CSS2
+ * standards with names and semantics which are as close as possible.
+ * </p>
+ * 
+ * <p></p>
+ *
+ * @author James Macgill, CCG
+ * @version $Id: Symbolizer.java,v 1.7 2003/09/06 04:14:12 seangeo Exp $
+ */
+public interface Symbolizer extends GTComponent {
+    void accept(StyleVisitor visitor);
+}

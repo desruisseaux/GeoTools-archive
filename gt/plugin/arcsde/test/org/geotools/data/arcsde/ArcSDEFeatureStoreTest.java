@@ -45,6 +45,7 @@ import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LogicFilter;
 
@@ -112,7 +113,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         String fid = reader.next().getID();
         reader.close();
 
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         Filter fidFilter = ff.createFidFilter(fid);
 
         FeatureWriter writer = ds.getFeatureWriter(typeName, fidFilter,
@@ -157,7 +158,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         Object val2 = reader.next().getAttribute(0);
         reader.close();
 
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         LogicFilter or = ff.createLogicFilter(FilterType.LOGIC_OR);
         CompareFilter eq = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
         eq.addLeftValue(ff.createLiteralExpression(val1));

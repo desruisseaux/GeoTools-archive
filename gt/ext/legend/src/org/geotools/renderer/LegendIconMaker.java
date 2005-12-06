@@ -43,13 +43,12 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.gui.swing.sldeditor.util.StyleCloner;
 import org.geotools.renderer.lite.LiteRenderer;
 import org.geotools.resources.TestData;
@@ -63,6 +62,7 @@ import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -95,7 +95,7 @@ public class LegendIconMaker {
      * if the rule already has defined legendGraphic the stylefactory could
      * create symbolizer to contain it
      */
-    public static StyleFactory sFac = StyleFactory.createStyleFactory();
+    public static StyleFactory sFac = StyleFactoryFinder.createStyleFactory();
     
     /**
      * offset for icon, otherwise icons will be connected to others in the
@@ -319,18 +319,18 @@ public class LegendIconMaker {
 
             DataStore data = DataStoreFinder.getDataStore(params1);
             int width = UIManager.getIcon("Tree.openIcon").getIconWidth();
-            Expression fcolor1 = FilterFactory.createFilterFactory()
+            Expression fcolor1 = FilterFactoryFinder.createFilterFactory()
                                               .createLiteralExpression(Color.PINK
                     .getRGB() + "");
-            Expression fcolor2 = FilterFactory.createFilterFactory()
+            Expression fcolor2 = FilterFactoryFinder.createFilterFactory()
                                               .createLiteralExpression(Color.BLACK
                     .getRGB() + "");
-            Expression lineWidth = FilterFactory.createFilterFactory()
+            Expression lineWidth = FilterFactoryFinder.createFilterFactory()
                                                 .createLiteralExpression(3.0);
-            Fill fill = StyleFactory.createStyleFactory().createFill(fcolor1);
-            Stroke stroke = StyleFactory.createStyleFactory().createStroke(fcolor2,
+            Fill fill = StyleFactoryFinder.createStyleFactory().createFill(fcolor1);
+            Stroke stroke = StyleFactoryFinder.createStyleFactory().createStroke(fcolor2,
                     lineWidth);
-            PolygonSymbolizer polySymbolizer = StyleFactory.createStyleFactory()
+            PolygonSymbolizer polySymbolizer = StyleFactoryFinder.createStyleFactory()
                                                            .createPolygonSymbolizer(stroke,
                     fill, "testGeometry");
             JLabel iconJLabel = new JLabel("Legend Icon Example");

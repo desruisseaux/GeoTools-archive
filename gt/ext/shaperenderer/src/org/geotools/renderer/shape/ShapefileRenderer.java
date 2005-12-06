@@ -91,6 +91,7 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.StyleVisitor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
@@ -717,7 +718,7 @@ public class ShapefileRenderer implements GTRenderer{
         StyleAttributeExtractor sae = new StyleAttributeExtractor() {
                 public void visit(Rule rule) {
                     
-                    Rule clone=StyleFactory.createStyleFactory().createRule();
+                    Rule clone=StyleFactoryFinder.createStyleFactory().createRule();
                     clone.setAbstract(rule.getAbstract());
                     clone.setFilter(rule.getFilter());
                     clone.setSymbolizers(rule.getSymbolizers());

@@ -16,12 +16,10 @@
  */
 package org.geotools.data;
 
-import java.io.IOException;
-
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
 
 
 /**
@@ -84,14 +82,16 @@ import com.vividsolutions.jts.geom.Envelope;
 public interface FeatureResults {
     /**
      * Returns the FeatureType of the contents of this collection.
+     * 
      * <p>
      * Please note that for a collection with a mixed contents the FeatureType
-     * may be degenerate (ie very generic). For many applications (like shapefiles
-     * or tables) the FeatureType can safely be used to describe all the Features
-     * in the result set. 
+     * may be degenerate (ie very generic). For many applications (like
+     * shapefiles or tables) the FeatureType can safely be used to describe
+     * all the Features in the result set.
      * </p>
+     *
      * @return A FeatureType that describes the contents of this collection.
-     * 
+     *
      * @throws IOException if their is a problem getting the FeatureType.
      */
     FeatureType getSchema() throws IOException;
@@ -99,14 +99,19 @@ public interface FeatureResults {
     /**
      * Provides access to the Features, please note that FeatureReader is a
      * blocking api.
-     * 
-     * @deprecated please use FeatureCollections.features() to obtain a FeatureIterator
+     *
      * @return A FeatureReader streaming over the FeatureResults
+     *
+     * @throws IOException DOCUMENT ME!
+     *
+     * @deprecated please use FeatureCollections.features() to obtain a
+     *             FeatureIterator
      */
     FeatureReader reader() throws IOException;
 
     /**
      * Returns the bounding box of this FeatureResults.
+     * 
      * <p>
      * This opperation may be expensive. Consider
      * <code>FeatureSource.getBounds( Query )</code> as an alternative.
@@ -128,13 +133,14 @@ public interface FeatureResults {
      * }
      * </code>
      * </pre>
-     * 
+     *
      * @return Bounding box of this FeatureResults, or an empty Envelope
      */
     Envelope getBounds();
 
     /**
      * Returns the number of Features in this FeatureResults.
+     * 
      * <p>
      * This opperation may be expensive. Consider <code>FeatureSource.getCount(
      * Query )</code> as an alternative.
@@ -153,14 +159,17 @@ public interface FeatureResults {
      * </pre>
      *
      * @return The number of Features in this FeatureResults.
+     *
      * @throws IOException If there are problems getting the count
      */
-    int getCount() throws IOException;    
-    
+    int getCount() throws IOException;
+
     /**
      * Convert this set of results to a FeatureCollection.
+     * 
      * <p>
-     * This method is logically the same as:<pre><code>
+     * This method is logically the same as:
+     * <pre><code>
      * <b>public</b> FeatureCollection collection() <b>throws</b> IOException {
      *     FeatureCollection collection = FeatureCollections.newCollection()
      *     <b>for</b> (FeatureReader r = reader(); r.hasNext();) {
@@ -170,11 +179,14 @@ public interface FeatureResults {
      * }
      * </code></pre>
      * </p>
-     * @depricated please consider explicitly constructing a feaure collection
+     *
+     * @return DOCUMENT ME!
+     *
      * @throws IOException If any problems occur aquiring Features
+     *
+     * @deprecated please consider explicitly constructing a feaure collection
      */
+
     //@deprecated This method will be removed with as the Renderers convert
     FeatureCollection collection() throws IOException;
-    
-    
 }

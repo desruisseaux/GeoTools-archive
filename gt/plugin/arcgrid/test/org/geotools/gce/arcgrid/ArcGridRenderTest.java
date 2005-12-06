@@ -33,6 +33,7 @@ import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -162,7 +163,7 @@ public class ArcGridRenderTest extends TestCaseSupport {
 
         //FeatureCollection ft = ds.getFeatures(filter);
         MapContext mapContext = new DefaultMapContext();
-        StyleFactory sFac = StyleFactory.createStyleFactory();
+        StyleFactory sFac = StyleFactoryFinder.createStyleFactory();
 
         Format format = reader.getFormat();
 

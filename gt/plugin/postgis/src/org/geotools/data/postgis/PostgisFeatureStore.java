@@ -50,6 +50,7 @@ import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLUnpacker;
@@ -502,7 +503,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
         FeatureResults features = getFeatures(unEncodableFilter);
 
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         FidFilter fidFilter = ff.createFidFilter();
         for (FeatureReader it = features.reader(); it.hasNext();) {
             Feature feature = it.next();

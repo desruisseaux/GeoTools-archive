@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.opengis.util.Cloneable;
 
 
@@ -44,8 +45,8 @@ public class StyleObjectTest extends TestCase {
      * @see TestCase#setUp()
      */
     protected void setUp() throws Exception {
-        styleFactory = StyleFactory.createStyleFactory();
-        filterFactory = FilterFactory.createFilterFactory();
+        styleFactory = StyleFactoryFinder.createStyleFactory();
+        filterFactory = FilterFactoryFinder.createFilterFactory();
     }
 
     /*

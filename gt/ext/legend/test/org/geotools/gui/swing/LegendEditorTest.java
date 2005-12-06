@@ -27,9 +27,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 
 import org.geotools.gui.swing.sldeditor.style.StyleEditorChooser;
-import org.geotools.styling.SLDStyle;
+import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 
 
 /**
@@ -51,11 +51,11 @@ public class LegendEditorTest extends TestCase {
         URL base = getClass().getResource("testdata/");
         
         
-        SLDStyle sld = null;
+        SLDParser sld = null;
         
         try {
             File sldFile = new File(URLDecoder.decode(base.getPath(),"UTF-8") + "/color.sld");
-            sld = new SLDStyle(StyleFactory.createStyleFactory(), sldFile);
+            sld = new SLDParser(StyleFactoryFinder.createStyleFactory(), sldFile);
         } catch (java.io.FileNotFoundException e) {
             e.printStackTrace();
         }

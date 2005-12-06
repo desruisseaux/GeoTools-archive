@@ -16,9 +16,6 @@
  */
 package org.geotools.xml.styling;
 
-import org.geotools.xml.schema.Attribute;
-import org.geotools.xml.schema.ComplexType;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -40,7 +37,9 @@ import org.geotools.styling.LinePlacement;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
 import org.geotools.styling.NamedLayer;
+import org.geotools.styling.NamedLayerImpl;
 import org.geotools.styling.NamedStyle;
+import org.geotools.styling.NamedStyleImpl;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.RasterSymbolizer;
@@ -48,13 +47,16 @@ import org.geotools.styling.RemoteOWS;
 import org.geotools.styling.ShadedRelief;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyledLayer;
+import org.geotools.styling.StyleFactoryFinder;
+import org.geotools.styling.StyledLayerImpl;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.UserLayer;
+import org.geotools.styling.UserLayerImpl;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
@@ -347,7 +349,7 @@ public class sldComplexTypes2 {
                 	offset = (Expression)value[i].getValue();
             }
         	
-        	LinePlacement dlp = StyleFactory.createStyleFactory().createLinePlacement(offset);
+        	LinePlacement dlp = StyleFactoryFinder.createStyleFactory().createLinePlacement(offset);
         	return dlp;
         }
     }
@@ -426,7 +428,7 @@ public class sldComplexTypes2 {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
-            LineSymbolizer symbol = StyleFactory.createStyleFactory().getDefaultLineSymbolizer();
+            LineSymbolizer symbol = StyleFactoryFinder.createStyleFactory().getDefaultLineSymbolizer();
             // symbol.setGraphic(null);
     
             for (int i = 0; i < value.length; i++) {
@@ -526,7 +528,7 @@ public class sldComplexTypes2 {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
-            Mark symbol = StyleFactory.createStyleFactory().getDefaultMark();
+            Mark symbol = StyleFactoryFinder.createStyleFactory().getDefaultMark();
     
             for (int i = 0; i < value.length; i++) {
                 if ((value[i] == null) || value[i].getElement() == null) {
@@ -629,7 +631,7 @@ public class sldComplexTypes2 {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
-                NamedLayer sld = new NamedLayer();
+                NamedLayer sld = new NamedLayerImpl();
             
                 for (int i = 0; i < value.length; i++) {
                     if ((value[i] == null) || value[i].getElement() == null) {
@@ -731,7 +733,7 @@ public class sldComplexTypes2 {
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ){
-                NamedStyle sld = new NamedStyle();
+                NamedStyle sld = new NamedStyleImpl();
             
                 for (int i = 0; i < value.length; i++) {
                     if ((value[i] == null) || value[i].getElement() == null) {
@@ -1153,7 +1155,7 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException {
-            PointSymbolizer symbol = StyleFactory.createStyleFactory().getDefaultPointSymbolizer();
+            PointSymbolizer symbol = StyleFactoryFinder.createStyleFactory().getDefaultPointSymbolizer();
             // symbol.setGraphic(null);
     
             for (int i = 0; i < value.length; i++) {
@@ -1250,7 +1252,7 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException {
-            PolygonSymbolizer symbol = StyleFactory.createStyleFactory().getDefaultPolygonSymbolizer();
+            PolygonSymbolizer symbol = StyleFactoryFinder.createStyleFactory().getDefaultPolygonSymbolizer();
             // symbol.setGraphic(null);
     
             for (int i = 0; i < value.length; i++) {
@@ -1439,7 +1441,7 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException {
-            RasterSymbolizer symbol = StyleFactory.createStyleFactory().getDefaultRasterSymbolizer();
+            RasterSymbolizer symbol = StyleFactoryFinder.createStyleFactory().getDefaultRasterSymbolizer();
             // symbol.setGraphic(null);
     
             for (int i = 0; i < value.length; i++) {
@@ -1838,7 +1840,7 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException {
-            Stroke symbol = StyleFactory.createStyleFactory().getDefaultStroke();
+            Stroke symbol = StyleFactoryFinder.createStyleFactory().getDefaultStroke();
     
             for (int i = 0; i < value.length; i++) {
                 if ((value[i] == null) || value[i].getElement() == null) {
@@ -1953,7 +1955,7 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException, SAXException {
-            StyledLayerDescriptor sld = new StyledLayerDescriptor();
+            StyledLayerDescriptor sld = StyleFactoryFinder.createStyleFactory().createStyledLayerDescriptor();
     
                 for (int i = 0; i < value.length; i++) {
                     if ((value[i] == null) || value[i].getElement() == null) {
@@ -1971,10 +1973,10 @@ public class sldComplexTypes2 {
                         sld.setAbstract((String)value[i].getValue());
                     
                     if(elems[NAMEDLAYER].getName().equals(e.getName()))
-                        sld.addStyledLayer((StyledLayer)value[i].getValue());
+                        sld.addStyledLayer((StyledLayerImpl)value[i].getValue());
                     
                     if(elems[USERLAYER].getName().equals(e.getName()))
-                        sld.addStyledLayer((StyledLayer)value[i].getValue());
+                        sld.addStyledLayer((StyledLayerImpl)value[i].getValue());
                 }
                 
                 return sld;
@@ -2066,7 +2068,7 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException {
-            TextSymbolizer symbol = StyleFactory.createStyleFactory().createTextSymbolizer();
+            TextSymbolizer symbol = StyleFactoryFinder.createStyleFactory().createTextSymbolizer();
             symbol.setFill(null);
             
             ArrayList fonts = new ArrayList();
@@ -2184,7 +2186,7 @@ public class sldComplexTypes2 {
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
                 throws OperationNotSupportedException, SAXException {
-                UserLayer sld = new UserLayer();
+                UserLayer sld = new UserLayerImpl();
             
                 for (int i = 0; i < value.length; i++) {
                     if ((value[i] == null) || value[i].getElement() == null) {

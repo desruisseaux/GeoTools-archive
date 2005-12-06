@@ -16,12 +16,11 @@
  */
 package org.geotools.data;
 
-import java.io.IOException;
-import java.util.NoSuchElementException;
-
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import java.io.IOException;
+import java.util.NoSuchElementException;
 
 
 /**
@@ -101,6 +100,8 @@ public interface FeatureReader {
 
     /**
      * Release the underlying resources associated with this stream.
+     *
+     * @throws IOException DOCUMENT ME!
      */
     void close() throws IOException;
 }

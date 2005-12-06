@@ -55,7 +55,7 @@ public class ExpressionTest extends TestCase {
     /** Schema on which to preform tests */
     private static FeatureType testSchema = null;
     private static AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
-    static FilterFactory filterFactory = FilterFactory.createFilterFactory();
+    static FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     boolean set = false;
 
     /** Test suite for this test case */

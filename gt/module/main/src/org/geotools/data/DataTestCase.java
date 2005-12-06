@@ -27,6 +27,7 @@ import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -142,7 +143,7 @@ public class DataTestCase extends TestCase {
         roadBounds.expandToInclude( roadFeatures[1].getBounds() );
         roadBounds.expandToInclude( roadFeatures[2].getBounds() );
         
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         rd1Filter = factory.createFidFilter("road.rd1");
         rd2Filter = factory.createFidFilter("road.rd2");
 
@@ -199,7 +200,7 @@ public class DataTestCase extends TestCase {
         riverBounds.expandToInclude( riverFeatures[0].getBounds());
         riverBounds.expandToInclude( riverFeatures[1].getBounds());
                 
-        rv1Filter = FilterFactory.createFilterFactory().createFidFilter("river.rv1");
+        rv1Filter = FilterFactoryFinder.createFilterFactory().createFidFilter("river.rv1");
 
         //  9,5   11,5   
         //   +-----+

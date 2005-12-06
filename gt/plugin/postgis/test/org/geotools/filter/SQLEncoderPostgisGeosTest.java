@@ -199,7 +199,7 @@ public void test2() throws Exception {
 }
 
 public void testFid() throws Exception {
-    FilterFactory filterFac = FilterFactory.createFilterFactory();
+    FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
 
     FidFilter fidFilter = filterFac.createFidFilter("road.345");
     SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos();
@@ -213,7 +213,7 @@ public void testFid() throws Exception {
 }
 
 public void test3() throws Exception {
-    FilterFactory filterFac = FilterFactory.createFilterFactory();
+    FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
     CompareFilter compFilter = filterFac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
     compFilter.addLeftValue(filterFac.createAttributeExpression(
             testSchema, "testInteger"));

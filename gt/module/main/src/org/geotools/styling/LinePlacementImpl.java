@@ -22,7 +22,10 @@ package org.geotools.styling;
 // J2SE dependencies
 import java.util.logging.Logger;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -31,17 +34,27 @@ import org.opengis.util.Cloneable;
  * @version $Id: LinePlacementImpl.java,v 1.6 2003/09/06 04:52:31 seangeo Exp $
  * @author Ian Turton, CCG
  */
-public class LinePlacementImpl implements LinePlacement, Cloneable {
+public class LinePlacementImpl extends AbstractGTComponent implements LinePlacement, Cloneable {
     /**
      * The logger for the default core module.
      */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
-    private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactory.createFilterFactory();
+    private FilterFactory filterFactory;
     private Expression perpendicularOffset = null;
 
+    public LinePlacementImpl(){
+    	this( FilterFactoryFinder.createFilterFactory() );
+	}
+	public LinePlacementImpl(FilterFactory factory) {
+		filterFactory = factory;
+		init();
+	}
+	public void setFilterFactory( FilterFactory factory ){
+		filterFactory = factory;
+		init();
+	}
     /** Creates a new instance of DefaultLinePlacement */
-    public LinePlacementImpl() {
+    private void init() {
         try {
             perpendicularOffset = filterFactory.createLiteralExpression(
                                           new Integer(0));
@@ -62,6 +75,7 @@ public class LinePlacementImpl implements LinePlacement, Cloneable {
      */
     public void setPerpendicularOffset(Expression perpendicularOffset) {
         this.perpendicularOffset = perpendicularOffset;
+        fireChanged();
     }
     
     public void accept(StyleVisitor visitor) {

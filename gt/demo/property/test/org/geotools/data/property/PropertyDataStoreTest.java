@@ -25,6 +25,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 /**
  * @author jgarnett
@@ -109,7 +110,7 @@ public class PropertyDataStoreTest extends TestCase {
         
         Filter filter;
         
-        filter = FilterFactory.createFilterFactory().createFidFilter("fid1");
+        filter = FilterFactoryFinder.createFilterFactory().createFidFilter("fid1");
         reader = store.getFeatureReader( new DefaultQuery("road", filter ), Transaction.AUTO_COMMIT );
         assertEquals( 1, count( reader ) );
         
@@ -342,8 +343,8 @@ public class PropertyDataStoreTest extends TestCase {
         road1.setTransaction( t1 );
         road2.setTransaction( t2 );
 
-        Filter filter1 = FilterFactory.createFilterFactory().createFidFilter("fid1");
-        Filter filter2 = FilterFactory.createFilterFactory().createFidFilter("fid2");        
+        Filter filter1 = FilterFactoryFinder.createFilterFactory().createFidFilter("fid1");
+        Filter filter2 = FilterFactoryFinder.createFilterFactory().createFidFilter("fid2");        
         
         Feature feature =
             type.create( new Object[]{ new Integer(5), "chris"}, "fid5" );

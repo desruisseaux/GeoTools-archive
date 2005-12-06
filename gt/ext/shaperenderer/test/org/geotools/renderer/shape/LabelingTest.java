@@ -26,6 +26,8 @@ import org.geotools.resources.TestData;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
+
 import java.io.IOException;
 
 
@@ -43,7 +45,7 @@ public class LabelingTest extends TestCase {
     private long timout = 1000;
 
     static Style loadStyle(String sldFilename) throws IOException {
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
 
         java.net.URL surl = TestData.getResource(LabelingTest.class, sldFilename);
         SLDParser stylereader = new SLDParser(factory, surl);

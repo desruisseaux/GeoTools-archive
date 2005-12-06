@@ -157,7 +157,7 @@ public class SpatialTestCase extends TestCase
 		lineBounds.expandToInclude( lineFeatures[2].getBounds() );
 		lineBounds.expandToInclude( lineFeatures[3].getBounds() );
 
-//		filterFactory = FilterFactory.createFilterFactory();
+//		filterFactory = FilterFactoryFinder.createFilterFactory();
 //		BBoxExpression bbex = filterFactory.createBBoxExpression(lineBounds);
 
 		mds.addFeature(lineFeatures[0]);

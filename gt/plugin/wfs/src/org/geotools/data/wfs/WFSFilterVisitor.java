@@ -16,6 +16,7 @@ import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilitiesMask;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.FilterVisitor;
 import org.geotools.filter.FunctionExpression;
@@ -715,7 +716,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        // ~(a|b) == (~a + ~b) modus ponens
 	        // ~~(a|b) == ~(~a + ~b) substitution
 	        // a|b == ~(~a + ~b) negative simpilification
-	        FilterFactory ff = FilterFactory.createFilterFactory();
+	        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 	        LogicFilter and = ff.createLogicFilter(FilterType.LOGIC_AND);
 	        Iterator i = filter.getFilterIterator();
 	

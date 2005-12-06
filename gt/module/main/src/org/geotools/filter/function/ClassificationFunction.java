@@ -10,6 +10,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.LiteralExpression;
@@ -55,7 +56,7 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
     public Expression[] getArgs(){
         Expression[] ret = new Expression[2];
         ret[0] = expr;
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         ret[1] = ff.createLiteralExpression(classNum);
         return ret;
     }

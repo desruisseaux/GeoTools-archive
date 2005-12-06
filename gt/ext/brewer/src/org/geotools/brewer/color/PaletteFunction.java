@@ -11,6 +11,7 @@ import java.awt.Color;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.LiteralExpression;
@@ -24,19 +25,26 @@ public class PaletteFunction extends FunctionExpressionImpl implements FunctionE
     
     ClassificationFunction classifier;
     String paletteName;
+    FilterFactory ff;
     
     /** Creates a new instance of PaletteFunction */
     public PaletteFunction() {
+    	this( FilterFactoryFinder.createFilterFactory() );
     }
     
-    public int getArgCount() {
+    public PaletteFunction(FilterFactory factory) {
+		ff = factory;
+	}
+    public void setFilterFactory( FilterFactory factory ){
+    	ff = factory;
+    }
+	public int getArgCount() {
         return 2;
     }
     
     public Expression[] getArgs() {
         Expression[] ret = new Expression[2];
         ret[0] = classifier;
-        FilterFactory ff = FilterFactory.createFilterFactory();
         ret[1] = ff.createLiteralExpression(paletteName);
         return ret;
     }

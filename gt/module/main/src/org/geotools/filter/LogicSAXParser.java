@@ -123,8 +123,7 @@ public class LogicSAXParser {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
     /** factory for creating filters. */
-    private static final FilterFactory FILTER_FACT = FilterFactory
-        .createFilterFactory();
+    private FilterFactory ff;
 
     /** AbstractFilter filte type. */
     private short logicType = -1;
@@ -142,7 +141,16 @@ public class LogicSAXParser {
      * Constructor which flags the operator as between.
      */
     public LogicSAXParser() {
-        LOGGER.finer("made new logic factory");
+    	this( FilterFactoryFinder.createFilterFactory() );    	
+    }
+    /** Constructor injection */
+    public LogicSAXParser( FilterFactory factory ){
+    	ff = factory;
+    	LOGGER.finer("made new logic factory");
+    }
+    /** Setter injection */
+    public void setFilterFactory( FilterFactory factory ){
+    	ff = factory;
     }
 
     /**
@@ -236,10 +244,10 @@ public class LogicSAXParser {
             LOGGER.finer("filter is complete, with type: " + this.logicType);
 
             if (logicType == AbstractFilter.LOGIC_NOT) {
-                filter = FILTER_FACT.createLogicFilter((Filter) subFilters.get(
+                filter = ff.createLogicFilter((Filter) subFilters.get(
                             0), this.logicType);
             } else {
-                filter = FILTER_FACT.createLogicFilter(this.logicType);
+                filter = ff.createLogicFilter(this.logicType);
 
                 Iterator iterator = subFilters.iterator();
 

@@ -16,7 +16,6 @@
  */
 package org.geotools.feature;
 
-import java.util.Iterator;
 
 /**
  * A convenience class for dealing with FeatureCollection Iterators. DOES NOT

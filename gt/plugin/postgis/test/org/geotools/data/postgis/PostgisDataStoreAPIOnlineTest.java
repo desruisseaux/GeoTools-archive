@@ -68,6 +68,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -180,7 +181,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         }
 
         FeatureType schema = roadFeatures[0].getFeatureType();
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         CompareFilter tFilter = factory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
         Expression rd1Literal = factory.createLiteralExpression("r1");
         tFilter.addLeftValue(rd1Literal);
@@ -238,7 +239,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
             riverBounds = bounds;
         }
 
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         CompareFilter tFilter = factory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
         Expression rvLiteral = factory.createLiteralExpression("rv1");
         tFilter.addLeftValue(rvLiteral);
@@ -1236,7 +1237,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     public void testGetFeatureStoreModifyFeatures1() throws IOException {
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
 
-        //FilterFactory factory = FilterFactory.createFilterFactory();
+        //FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         //rd1Filter = factory.createFidFilter( roadFeatures[0].getID() );
         Object changed = new Integer(5);
         AttributeType name = roadType.getAttributeType("id");
@@ -1249,7 +1250,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     public void testGetFeatureStoreModifyFeatures2() throws IOException {
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
 
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         rd1Filter = factory.createFidFilter(roadFeatures[0].getID());
 
         AttributeType name = roadType.getAttributeType("name");

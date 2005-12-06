@@ -26,6 +26,7 @@ import java.util.Collections;
  */
 public abstract class FunctionExpressionImpl
     extends org.geotools.filter.DefaultExpression implements FunctionExpression {
+	
     /**
      * Creates a new instance of FunctionExpression
      */

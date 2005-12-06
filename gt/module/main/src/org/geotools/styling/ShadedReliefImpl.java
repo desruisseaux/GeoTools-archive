@@ -5,16 +5,18 @@
  */
 package org.geotools.styling;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 
 /**
  *
  * @author  iant
  */
-public class ShadedReliefImpl implements ShadedRelief {
-    private static FilterFactory filterFactory = FilterFactory.createFilterFactory();
+public class ShadedReliefImpl extends AbstractGTComponent implements ShadedRelief {
+    private static FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     private Expression reliefFactor;
     private boolean brightness = false;
 
@@ -56,6 +58,8 @@ public class ShadedReliefImpl implements ShadedRelief {
      *
      */
     public void setReliefFactor(Expression reliefFactor) {
+    	fireChildRemoved( this.reliefFactor );
         this.reliefFactor = reliefFactor;
+        fireChildAdded( reliefFactor );
     }
 }

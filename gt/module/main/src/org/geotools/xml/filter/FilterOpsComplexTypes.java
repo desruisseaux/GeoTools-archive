@@ -29,6 +29,7 @@ import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilitiesMask;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryDistanceFilter;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
@@ -908,7 +909,7 @@ public class FilterOpsComplexTypes {
                         FeatureIdType.attrs[0].getName());
             }
 
-            FidFilter r = FilterFactory.createFilterFactory().createFidFilter(fid);
+            FidFilter r = FilterFactoryFinder.createFilterFactory().createFidFilter(fid);
 
             return r;
         }

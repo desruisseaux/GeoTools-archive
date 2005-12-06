@@ -16,20 +16,20 @@
  */
 package org.geotools.feature;
 
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LengthFunction;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.feature.type.NumericAttributeType;
 import org.geotools.feature.type.TemporalAttributeType;
 import org.geotools.feature.type.TextualAttributeType;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.LengthFunction;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -40,6 +40,16 @@ import com.vividsolutions.jts.geom.Geometry;
  * @version $Id: DefaultAttributeTypeFactory.java,v 1.11 2004/02/16 06:53:38 aaime Exp $
  */
 public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
+	private FilterFactory ff;
+	public DefaultAttributeTypeFactory(){
+		this( FilterFactoryFinder.createFilterFactory());
+	}
+	public DefaultAttributeTypeFactory( FilterFactory factory ){
+		ff = factory;
+	}
+	public void setFilterFactory( FilterFactory factory ){
+		ff = factory;
+	}
     /**
      * Create an AttributeType with the given name, Class, nillability, and
      * fieldLength meta-data. This method will itself call <code>
@@ -80,7 +90,6 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     protected AttributeType createAttributeType(String name, Class clazz, 
         boolean isNillable, int fieldLength, Object defaultValue) {
 
-    	FilterFactory ff = FilterFactory.createFilterFactory();
     	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
     	length.setArgs(new Expression[]{null});
     	CompareFilter cf = null;
@@ -113,7 +122,6 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     protected AttributeType createAttributeType(String name, Class clazz, 
         boolean isNillable, Filter filter, Object defaultValue, Object metadata) {
 
-    	FilterFactory ff = FilterFactory.createFilterFactory();
     	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
     	length.setArgs(new Expression[]{null});
     	if (Number.class.isAssignableFrom(clazz)) {
@@ -134,8 +142,6 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         Object metaData ){
             
         if( Geometry.class.isAssignableFrom( clazz) && metaData instanceof CoordinateReferenceSystem ){
-
-            FilterFactory ff = FilterFactory.createFilterFactory();
             LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
             length.setArgs(new Expression[]{null});
             CompareFilter cf = null;

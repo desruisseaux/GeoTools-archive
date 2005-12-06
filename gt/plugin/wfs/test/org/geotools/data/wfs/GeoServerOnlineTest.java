@@ -222,7 +222,7 @@ public class GeoServerOnlineTest extends TestCase {
 //        }
 //        count.close();       
 //        //
-//        fp = FilterFactory.createFilterFactory().createFidFilter(f.getID());
+//        fp = FilterFactoryFinder.createFilterFactory().createFidFilter(f.getID());
 //        
 //        WFSDataStoreWriteTest.doDelete(post,ft,fp);
 //        WFSDataStoreWriteTest.doUpdate(post,ft);

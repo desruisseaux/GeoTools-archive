@@ -16,9 +16,8 @@
  */
 package org.geotools.data;
 
-import java.util.EventObject;
-
 import com.vividsolutions.jts.geom.Envelope;
+import java.util.EventObject;
 
 
 /**
@@ -40,10 +39,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * <p>
  * The commit opperation will also need to provide notification.
  * </p>
- *
- * @author Jody Garnett
- * @author Ray Gallagher
- * @version $Id: FeatureEvent.java,v 1.1 2003/12/01 22:00:38 cholmesny Exp $
  */
 public class FeatureEvent extends EventObject {
     private static final long serialVersionUID = 1L;

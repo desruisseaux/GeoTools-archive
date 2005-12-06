@@ -17,13 +17,7 @@
 package org.geotools.feature;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.Iterator;
-
-import org.geotools.feature.type.NestedAttributeType;
-import org.geotools.filter.Filter;
-import org.geotools.xml.gml.GMLSchema;
 
 /**
  * A basic implementation of FeatureType.

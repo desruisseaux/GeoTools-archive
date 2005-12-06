@@ -17,8 +17,8 @@
 
 package org.geotools.feature;
 
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
 
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryFinder;

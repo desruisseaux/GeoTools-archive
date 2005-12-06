@@ -28,6 +28,7 @@ import java.util.Map;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 
 /**
@@ -235,7 +236,7 @@ public interface Action {
          */
         public Filter getFilter() {
             return (feature.getID() == null) ? null
-                                             : (FilterFactory.createFilterFactory()
+                                             : (FilterFactoryFinder.createFilterFactory()
                                                              .createFidFilter(feature
                 .getID()));
         }

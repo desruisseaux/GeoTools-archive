@@ -19,7 +19,10 @@ package org.geotools.styling;
 // J2SE depedencies
 import java.util.Arrays;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.opengis.util.Cloneable;
 
 
@@ -30,9 +33,8 @@ import org.opengis.util.Cloneable;
  * @author James Macgill, CCG
  * @version $Id: StrokeImpl.java,v 1.14 2003/09/06 04:52:31 seangeo Exp $
  */
-public class StrokeImpl implements Stroke, Cloneable {
-    private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactory
-        .createFilterFactory();
+public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable {
+    private FilterFactory filterFactory;    
     private Expression color;
     private float[] dashArray;
     private Expression dashOffset;
@@ -47,6 +49,13 @@ public class StrokeImpl implements Stroke, Cloneable {
      * Creates a new instance of Stroke
      */
     protected StrokeImpl() {
+    	this( FilterFactoryFinder.createFilterFactory() );
+    }
+    protected StrokeImpl( FilterFactory factory  ){
+    	filterFactory = factory; 
+    }
+    public void setFilterFactory( FilterFactory factory ){
+    	filterFactory = factory;
     }
 
     /**
@@ -80,10 +89,13 @@ public class StrokeImpl implements Stroke, Cloneable {
      */
     public void setColor(Expression color) {
         if (color == null) {
-            return;
+        	throw new IllegalArgumentException("Color must be provided");
         }
-
-        this.color = color;
+    	if (this.color == color) return;
+    	fireChildRemoved( this.color );
+    	this.color = color;
+    	if (this.color == null)	fireChildAdded(color);
+		else fireChildChanged(color);
     }
 
     /**
@@ -144,6 +156,7 @@ public class StrokeImpl implements Stroke, Cloneable {
      */
     public void setDashArray(float[] dashPattern) {
         dashArray = dashPattern;
+        fireChanged();
     }
 
     /**
@@ -161,12 +174,13 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @param offset The distance into the dash pattern that should act as the
      *        start.
      */
-    public void setDashOffset(Expression offset) {
-        if (offset == null) {
+    public void setDashOffset(Expression dashOffset) {
+        if (dashOffset == null) {
             return;
         }
-
-        dashOffset = offset;
+        fireChildRemoved( this.dashOffset );
+        this.dashOffset = dashOffset;
+        fireChildAdded( dashOffset );
     }
 
     /**
@@ -187,8 +201,11 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @param graphic The graphic to use as a stipple fill. If null, then no
      *        Stipple fill should be used.
      */
-    public void setGraphicFill(Graphic graphic) {
-        fillGraphic = graphic;
+    public void setGraphicFill(Graphic fillGraphic) {
+    	if( this.fillGraphic == fillGraphic ) return;
+    	fireChildRemoved( this.fillGraphic );
+        this.fillGraphic = fillGraphic;
+        fireChildAdded( fillGraphic );
     }
 
     /**
@@ -219,8 +236,11 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @param graphic The graphic to use as a linear graphic. If null, then no
      *        graphic stroke should be used.
      */
-    public void setGraphicStroke(Graphic graphic) {
-        strokeGraphic = graphic;
+    public void setGraphicStroke(Graphic strokeGraphic) {
+    	if( this.strokeGraphic == strokeGraphic ) return;
+    	fireChildRemoved(this.strokeGraphic);
+        this.strokeGraphic = strokeGraphic;
+        fireChildAdded(strokeGraphic);
     }
 
     /**
@@ -239,12 +259,13 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @param cap The cap style. This can be one of "butt", "round" and
      *        "square" There is no defined default.
      */
-    public void setLineCap(Expression cap) {
-        if (cap == null) {
+    public void setLineCap(Expression lineCap) {
+        if (lineCap == null) {
             return;
         }
-
-        lineCap = cap;
+        fireChildRemoved( this.lineCap );
+        this.lineCap = lineCap;
+        fireChildAdded( lineCap );
     }
 
     /**
@@ -263,12 +284,13 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @param join The join style.  This will be one of "mitre", "round" and
      *        "bevel". There is no defined default.
      */
-    public void setLineJoin(Expression join) {
-        if (join == null) {
+    public void setLineJoin(Expression lineJoin) {
+        if (lineJoin == null) {
             return;
         }
-
-        lineJoin = join;
+        fireChildRemoved( this.lineJoin );
+        this.lineJoin = lineJoin;
+        fireChildAdded( lineJoin );
     }
 
     /**
@@ -297,12 +319,13 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @param level The opacity of the stroke, where 0.0 is completely
      *        transparent and 1.0 is completely opaque.
      */
-    public void setOpacity(Expression level) {
-        if (level == null) {
+    public void setOpacity(Expression opacity) {
+        if (opacity == null) {
             return;
         }
-
-        opacity = level;
+        fireChildRemoved( this.opacity );
+        this.opacity = opacity;
+        fireChildAdded( opacity );
     }
 
     /**
@@ -325,12 +348,13 @@ public class StrokeImpl implements Stroke, Cloneable {
      * @param expr The width of the stroke in pixels.  This may be fractional
      *        but not negative.
      */
-    public void setWidth(Expression expr) {
-        if (expr == null) {
+    public void setWidth(Expression width) {
+        if (width == null) {
             return;
-        }
-
-        width = expr;
+        }        
+        fireChildRemoved( this.width );
+        this.width = width;
+        fireChildAdded( width );
     }
 
     public String toString() {

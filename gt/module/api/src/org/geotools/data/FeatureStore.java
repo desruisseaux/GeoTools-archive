@@ -16,11 +16,10 @@
  */
 package org.geotools.data;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.geotools.feature.AttributeType;
 import org.geotools.filter.Filter;
+import java.io.IOException;
+import java.util.Set;
 
 
 /**
@@ -50,9 +49,7 @@ public interface FeatureStore extends FeatureSource {
      *
      * @return the FeatureIds of the newly added features.
      *
-     * @throws DataSourceException if anything goes wrong.
-     * @throws UnsupportedOperationException if the addFeatures method is not
-     *         supported by this datasource.
+     * @throws IOException if anything goes wrong.
      */
     Set addFeatures(FeatureReader reader) throws IOException;
 
@@ -62,9 +59,7 @@ public interface FeatureStore extends FeatureSource {
      *
      * @param filter An OpenGIS filter; specifies which features to remove.
      *
-     * @throws DataSourceException If anything goes wrong.
-     * @throws UnsupportedOperationException if the removeFeatures method is
-     *         not supported by this datasource.
+     * @throws IOException If anything goes wrong.
      */
     void removeFeatures(Filter filter) throws IOException;
 
@@ -76,11 +71,9 @@ public interface FeatureStore extends FeatureSource {
      * @param value The values to put in the attribute types.
      * @param filter An OGC filter to note which attributes to modify.
      *
-     * @throws DataSourceException if the attribute and object arrays are not
-     *         eqaul length, if the object types do not match the attribute
-     *         types, or if there are backend errors.
-     * @throws UnsupportedOperationException if the modifyFeatures method is
-     *         not supported by this datasource.
+     * @throws IOException if the attribute and object arrays are not eqaul
+     *         length, if the object types do not match the attribute types,
+     *         or if there are backend errors.
      */
     void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
         throws IOException;
@@ -94,10 +87,8 @@ public interface FeatureStore extends FeatureSource {
      * @param value The values to put in the attribute types.
      * @param filter An OGC filter to note which attributes to modify.
      *
-     * @throws DataSourceException If modificaton is not supported, if the
-     *         object type do not match the attribute type.
-     * @throws UnsupportedOperationException if the modifyFeatures method is
-     *         not supported by this datasource.
+     * @throws IOException If modificaton is not supported, if the object type
+     *         do not match the attribute type.
      */
     void modifyFeatures(AttributeType type, Object value, Filter filter)
         throws IOException;
@@ -109,9 +100,7 @@ public interface FeatureStore extends FeatureSource {
      *
      * @param reader - the collection to be written
      *
-     * @throws DataSourceException if there are any datasource errors.
-     * @throws UnsupportedOperationException if the setFeatures method is not
-     *         supported by this datasource.
+     * @throws IOException if there are any datasource errors.
      */
     void setFeatures(FeatureReader reader) throws IOException;
 
@@ -129,7 +118,7 @@ public interface FeatureStore extends FeatureSource {
      * previous Transaction will be commited.
      * </p>
      *
-     * @throws DataSourceException if there are any datasource errors.
+     * @param transaction DOCUMENT ME!
      */
     void setTransaction(Transaction transaction);
 

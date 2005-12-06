@@ -177,7 +177,7 @@ public class AreaFunctionTest extends TestCase {
         //_log.getLoggerRepository().setThreshold(Level.DEBUG);
     }
 
-    static FilterFactory filterFactory = FilterFactory.createFilterFactory();
+    static FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
      /** 
      * Tests the min function expression.
      */

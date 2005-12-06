@@ -187,7 +187,7 @@ public class FilterVisitorTest extends TestCase implements FilterVisitor {
     public void testFunctionExpression() {
         checkcode = 0;
         
-        FunctionExpression min = FilterFactory.createFilterFactory().createFunctionExpression("min");
+        FunctionExpression min = FilterFactoryFinder.createFilterFactory().createFunctionExpression("min");
         min.accept(this);
         assertEquals(6,checkcode);
     }

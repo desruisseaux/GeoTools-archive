@@ -17,6 +17,7 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import org.geotools.event.AbstractGTComponent;
 import org.opengis.util.Cloneable;
 
 
@@ -27,7 +28,7 @@ import org.opengis.util.Cloneable;
  * @author James Macgill
  * @version $Id: LineSymbolizerImpl.java,v 1.15 2003/10/17 22:50:59 ianschneider Exp $
  */
-public class LineSymbolizerImpl implements LineSymbolizer, Cloneable {
+public class LineSymbolizerImpl extends AbstractGTComponent implements LineSymbolizer, Cloneable {
     private Stroke stroke = null;
     private String geometryName = null;
 
@@ -72,6 +73,7 @@ public class LineSymbolizerImpl implements LineSymbolizer, Cloneable {
      */
     public void setGeometryPropertyName(String name) {
         geometryName = name;
+        fireChanged();
     }
 
     /**
@@ -91,7 +93,10 @@ public class LineSymbolizerImpl implements LineSymbolizer, Cloneable {
      * @param stroke The Stroke style to use when rendering lines.
      */
     public void setStroke(Stroke stroke) {
-        this.stroke = stroke;
+    	if( this.stroke == stroke ) return;
+    	fireChildRemoved( this.stroke );
+    	this.stroke = stroke;
+    	fireChildAdded( stroke );    
     }
 
     /**

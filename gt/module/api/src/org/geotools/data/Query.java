@@ -16,12 +16,9 @@
  */
 package org.geotools.data;
 
-import java.net.URI;
-import java.util.Arrays;
-
 import org.geotools.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
+import java.net.URI;
 
 /**
  * Encapsulates a data request.
@@ -39,23 +36,21 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * <ul>
  * <li>
- * Transient CoordianteSystem override
- * done getCoordianteSystem()
+ * Transient CoordianteSystem override done getCoordianteSystem()
  * </li>
  * <li>
- * Transient Geometry reproject to an alternate CoordinateSystem
- * - done getCoordinateSystemReproject()
+ * Transient Geometry reproject to an alternate CoordinateSystem - done
+ * getCoordinateSystemReproject()
  * </li>
  * <li>
- * Consider Namespace, FeatueType name override
- * - not done considered evil
+ * Consider Namespace, FeatueType name override - not done considered evil
  * </li>
  * <li>
  * DataStore.getFeatureReader( Query, Transaction )
  * </li>
  * <li>
- * DataStore.getView( Query )
- * - prototype in AbstractDataStore (not really ready for primetime, see Expr)
+ * DataStore.getView( Query ) - prototype in AbstractDataStore (not really
+ * ready for primetime, see Expr)
  * </li>
  * </ul>
  * 
@@ -64,12 +59,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @version $Id: Query.java,v 1.13 2004/03/07 02:08:58 cholmesny Exp $
  */
 public interface Query {
-    
-    /**
-     * TODO: should this be ANY_URI
-     */
+    /** TODO: should this be ANY_URI */
     static final URI NO_NAMESPACE = null;
-    
+
     /** So getMaxFeatures does not return null we use a very large number. */
     static final int DEFAULT_MAX = Integer.MAX_VALUE;
 
@@ -86,18 +78,17 @@ public interface Query {
      * filtering, and the a featureType with no attribtues.
      */
     final Query FIDS = new FIDSQuery();
-    
+
     /**
      * Ask for no properties when used with setPropertyNames.
+     * 
      * <p>
      * Note the query will still return a result - limited to FeatureIDs.
      * </p>
      */
     final String[] NO_NAMES = new String[0];
-    
-    /**
-     * Ask for all properties when used with setPropertyNames.
-     */
+
+    /** Ask for all properties when used with setPropertyNames. */
     final String[] ALL_NAMES = null;
 
     /**
@@ -190,21 +181,22 @@ public interface Query {
     /**
      * The typeName attribute is used to indicate the name of the feature type
      * to be queried.  If no typename is specified, then the default typeName
-     * should be returned from the dataStore.  If the datasstore only
-     * supports one feature type then this part of the query may be ignored.
-     * 
+     * should be returned from the dataStore.  If the datasstore only supports
+     * one feature type then this part of the query may be ignored.
+     *
      * @return the name of the feature type to be returned with this query.
      */
     String getTypeName();
 
     /**
-     * The namespace attribute is used to indicate the namespace of the
-     * schema being represented. 
-     * 
-     * @return the gml namespace of the feature type to be returned with this query
+     * The namespace attribute is used to indicate the namespace of the schema
+     * being represented.
+     *
+     * @return the gml namespace of the feature type to be returned with this
+     *         query
      */
     URI getNamespace();
-    
+
     /**
      * The handle attribute is included to allow a client to associate  a
      * mnemonic name to the Query request. The purpose of the handle attribute
@@ -225,19 +217,21 @@ public interface Query {
      * the latest version is return. The default action shall be for the query
      * to return the latest version. Systems that do not support versioning
      * can ignore the parameter and return the only version  that they have.
-     * 
+     *
      * @return the version of the feature to return, or null for latest.
      */
     String getVersion();
 
     /**
      * Temporarily override the coordinate system.
+     * 
      * <p>
-     * This denotes a request to Temporarily to override the coordinate
-     * system contained in the FeatureSource being queried. The same coordinate
+     * This denotes a request to Temporarily to override the coordinate system
+     * contained in the FeatureSource being queried. The same coordinate
      * values will be used, but the features created will appear in this
      * Coordinate System.
      * </p>
+     * 
      * <p>
      * This change is not persistant at all, indeed it is only for the Features
      * returned by this Query.  It may be used in conjunction with the
@@ -252,18 +246,21 @@ public interface Query {
 
     /**
      * Request data reprojection.
+     * 
      * <p>
      * Gets the coordinate System to reproject the data contained in the
      * backend datastore to.
      * </p>
+     * 
      * <p>
      * If the DataStore can optimize the reprojection it should, if not then a
      * decorator on the reader should perform the reprojection on the fly.
      * </p>
+     * 
      * <p>
      * If the datastore has the wrong CS then getOverrideCS() should be set to
-     * the CS to be used, this will perform
-     * the reprojection on that.
+     * the CS to be used, this will perform the reprojection on that.
+     * </p>
      *
      * @return The coordinate system that Features from the datasource should
      *         be reprojected to.

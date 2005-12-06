@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.feature;
 
@@ -22,18 +21,14 @@ import java.util.EventObject;
 /**
  * A simple event object to represent all events triggered by FeatureCollection
  * instances (typically change events).
- *
- * @author Ray Gallagher
- * @version $Id: CollectionEvent.java,v 1.9 2003/12/04 23:17:23 aaime Exp $
  */
 public class CollectionEvent extends EventObject {
+    private static final long serialVersionUID = -1864190177730929948L;
+
     /*
      * Design Notes:
      *  - Must look at other classes for hints on how to implement nicely.
-     *
-     *
      */
-
     /** event type constant denoting the adding of a feature */
     public static final int FEATURES_ADDED = 0;
 
@@ -48,17 +43,19 @@ public class CollectionEvent extends EventObject {
 
     /** Indicates one of FEATURES_ADDED, FEATURES_REMOVED, FEATURES_CHANGED */
     private int type;
-    
+
     /** Holds value of property features. */
-    private Feature[] features;    
-    
+    private Feature[] features;
 
     /**
      * Constructs a new CollectionEvent.
      *
      * @param source the collection which triggered the event
+     * @param involvedFeatures DOCUMENT ME!
+     * @param type DOCUMENT ME!
      */
-    public CollectionEvent(FeatureCollection source, Feature[] involvedFeatures, int type) {
+    public CollectionEvent(FeatureCollection source,
+        Feature[] involvedFeatures, int type) {
         super(source);
         this.type = type;
         this.features = involvedFeatures;
@@ -83,13 +80,13 @@ public class CollectionEvent extends EventObject {
     public int getEventType() {
         return type;
     }
-    
-    /** Getter for property features.
-     * @return Value of property features.
+
+    /**
+     * Getter for property features.
      *
+     * @return Value of property features.
      */
     public Feature[] getFeatures() {
         return this.features;
     }
-    
 }

@@ -34,6 +34,7 @@ import org.geotools.resources.TestData;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -90,7 +91,7 @@ public class LabelingTest extends TestCase {
 	}
 
 	private Style loadStyle(String sldFilename) throws IOException {
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
 
         java.net.URL surl = TestData.getResource(this, sldFilename);
         SLDParser stylereader = new SLDParser(factory, surl);

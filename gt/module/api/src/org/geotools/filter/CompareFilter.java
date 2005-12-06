@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.filter;
 
@@ -29,10 +28,10 @@ import org.geotools.feature.Feature;
  * meaningful.  This means that it considers itself a valid filter as long as
  * the expression comparison returns a valid result.  It does no checking to
  * see whether or not the expression comparison is meaningful with regard to
- * checking feature attributes.  In other words, this is a valid filter:
- * <b>52 = 92</b>, even though it will always return the same result and could
- * be simplified away.  It is up the the filter creator, therefore, to attempt
- * to simplify/make meaningful filter logic.
+ * checking feature attributes.  In other words, this is a valid filter: <b>52
+ * = 92</b>, even though it will always return the same result and could be
+ * simplified away.  It is up the the filter creator, therefore, to attempt to
+ * simplify/make meaningful filter logic.
  *
  * @author Rob Hranac, Vision for New York
  * @version $Id: CompareFilter.java,v 1.3 2003/08/07 19:55:21 cholmesny Exp $

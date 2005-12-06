@@ -42,8 +42,7 @@ public final class FilterDOMParser {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
     /** Factory to create filters. */
-    private static final FilterFactory FILTER_FACT = FilterFactory
-        .createFilterFactory();
+    private static final FilterFactory FILTER_FACT = FilterFactoryFinder.createFilterFactory();
 
     /** Number of children in a between filter. */
     private static final int NUM_BETWEEN_CHILDREN = 3;

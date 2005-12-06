@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 /**
  *
@@ -19,7 +20,7 @@ public class GlyphPropertiesList {
     
     private Vector list = new Vector();
     private Vector names = new Vector();
-    private FilterFactory factory = FilterFactory.createFilterFactory();
+    private FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         
     /** Creates a new instance of GlyphPropertiesList */
     public GlyphPropertiesList() {

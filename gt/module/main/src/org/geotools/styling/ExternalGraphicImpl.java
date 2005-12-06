@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -32,7 +33,7 @@ import org.opengis.util.Cloneable;
  * @version $Id: ExternalGraphicImpl.java,v 1.10 2004/04/08 13:26:05 jfc173 Exp $
  * @author Ian Turton, CCG
  */
-public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
+public class ExternalGraphicImpl extends AbstractGTComponent implements ExternalGraphic, Symbol, Cloneable {
     /**
      * The logger for the default core module.
      */
@@ -44,7 +45,8 @@ public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
     private Map customProps = null;
 
     public void setURI(String uri) {
-        this.uri = uri;   
+        this.uri = uri;
+        fireChanged();
     }
 
     /**

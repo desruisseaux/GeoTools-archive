@@ -15,7 +15,7 @@ import org.geotools.filter.parser.ParseException;
  */
 public class ExpressionBuilderTest extends FilterTestSupport {
     
-    private FilterFactory filterFac = FilterFactory.createFilterFactory();
+    private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
     
     public ExpressionBuilderTest(String testName) {
         super(testName);

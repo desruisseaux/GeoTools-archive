@@ -20,7 +20,10 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -29,14 +32,13 @@ import org.opengis.util.Cloneable;
  * @version $Id: AnchorPointImpl.java,v 1.7 2003/09/06 04:52:31 seangeo Exp $
  * @author Ian Turton, CCG
  */
-public class AnchorPointImpl implements AnchorPoint, Cloneable {
+public class AnchorPointImpl extends AbstractGTComponent implements AnchorPoint, Cloneable {
     /**
      * The logger for the default core module.
      */
     private static final java.util.logging.Logger LOGGER = 
             java.util.logging.Logger.getLogger("org.geotools.core");
-    private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactory.createFilterFactory();
+    private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     private Expression anchorPointX = null;
     private Expression anchorPointY = null;
 
@@ -64,6 +66,7 @@ public class AnchorPointImpl implements AnchorPoint, Cloneable {
      */
     public void setAnchorPointX(Expression anchorPointX) {
         this.anchorPointX = anchorPointX;
+        fireChanged();
     }
 
     /** Getter for property anchorPointY.
@@ -78,6 +81,7 @@ public class AnchorPointImpl implements AnchorPoint, Cloneable {
      */
     public void setAnchorPointY(Expression anchorPointY) {
         this.anchorPointY = anchorPointY;
+        fireChanged();
     }
     
     public void accept(StyleVisitor visitor){

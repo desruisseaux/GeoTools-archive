@@ -5,8 +5,10 @@
  */
 package org.geotools.styling;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 
 /** The ContrastEnhancement object defines contrast enhancement for a channel of a false-color image or
@@ -44,12 +46,22 @@ import org.geotools.filter.FilterFactory;
  *
  * @author  iant
  */
-public class ContrastEnhancementImpl implements ContrastEnhancement {
-    private FilterFactory filterFactory = FilterFactory.createFilterFactory();
+public class ContrastEnhancementImpl extends AbstractGTComponent implements ContrastEnhancement {
+	
+    private FilterFactory filterFactory;
     private Expression gamma;
     private Expression type;
-
-    public Expression getGammaValue() {
+    
+    public ContrastEnhancementImpl(){
+    	this( FilterFactoryFinder.createFilterFactory() );
+    }
+    public ContrastEnhancementImpl(FilterFactory factory) {
+    	filterFactory = factory;
+	}
+    public void setFilterFactory( FilterFactory factory ){
+    	filterFactory = factory;
+    }
+	public Expression getGammaValue() {
         return gamma;
     }
 
@@ -59,17 +71,21 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
 
     public void setGammaValue(Expression gamma) {
         this.gamma = gamma;
+        fireChanged();
     }
 
     public void setHistogram() {
         type = filterFactory.createLiteralExpression("HISTOGRAM");
+        fireChanged();
     }
 
     public void setNormalize() {
         type = filterFactory.createLiteralExpression("NORMALIZE");
+        fireChanged();
     }
 
     public void setType(Expression type) {
         this.type = type;
+        fireChanged();
     }
 }

@@ -33,6 +33,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.validation.ValidationResults;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -131,7 +132,7 @@ public class WithinIntegrity extends RelationIntegrity {
 	{
 		boolean success = true;
 		
-		FilterFactory ff = FilterFactory.createFilterFactory();
+		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		Filter filter = null;
 
 		filter = (Filter) ff.createBBoxExpression(bBox);
@@ -218,7 +219,7 @@ public class WithinIntegrity extends RelationIntegrity {
 	{
 		boolean success = true;
 		
-		FilterFactory ff = FilterFactory.createFilterFactory();
+		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		Filter filter = null;
 
 		filter = (Filter) ff.createBBoxExpression(bBox);

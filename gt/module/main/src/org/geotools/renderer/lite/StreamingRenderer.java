@@ -66,6 +66,7 @@ import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.JTS;
@@ -143,7 +144,7 @@ public class StreamingRenderer implements GTRenderer {
     public static final DefaultRenderListener DEFAULT_LISTENER=new DefaultRenderListener();
     
     /** Filter factory for creating bounding box filters */
-    private FilterFactory filterFactory = FilterFactory.createFilterFactory();
+    private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     private final static CoordinateOperationFactory operationFactory;
     static {
         Hints hints=new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);

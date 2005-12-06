@@ -30,6 +30,7 @@ import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryDistanceFilter;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
@@ -89,7 +90,7 @@ public class SQLEncoderDB2Test extends DB2TestCase {
         super.setUp();
         encoder = new SQLEncoderDB2();
         encoder.setSqlNameEscape("\"");
-        ff = FilterFactory.createFilterFactory();
+        ff = FilterFactoryFinder.createFilterFactory();
         bboxLiteral = null;
         types = new AttributeType[1];
         types[0] = AttributeTypeFactory.newAttributeType("Geom", Point.class);

@@ -56,6 +56,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
 
@@ -79,7 +80,7 @@ public class MySQLDataStoreTest extends TestCase {
     private static String FEATURE_TABLE = "testset";
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
     private static GeometryFactory geomFac = new GeometryFactory();
-    private FilterFactory filterFac = FilterFactory.createFilterFactory();
+    private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
     private FeatureCollection collection = FeatureCollections.newCollection();
     private FeatureType schema;
     private int srid = -1;

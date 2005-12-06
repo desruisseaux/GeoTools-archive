@@ -20,6 +20,9 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import org.geotools.event.AbstractGTComponent;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -28,27 +31,36 @@ import org.opengis.util.Cloneable;
  * @version $Id: HaloImpl.java,v 1.7 2003/09/06 04:52:31 seangeo Exp $
  * @author Ian Turton, CCG
  */
-public class HaloImpl implements Halo, Cloneable {
+public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
     /**
      * The logger for the default core module.
      */
     private static final java.util.logging.Logger LOGGER = 
             java.util.logging.Logger.getLogger("org.geotools.core");
-    private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactory.createFilterFactory();
+    private FilterFactory filterFactory;
     private Fill fill = new FillImpl();
     private org.geotools.filter.Expression radius = null;
-
-    /** Creates a new instance of DefaultHalo */
-    public HaloImpl() {
-        try {
+    
+    public HaloImpl(){
+    	this( FilterFactoryFinder.createFilterFactory() );
+	}
+    public HaloImpl( FilterFactory factory ){
+    	filterFactory = factory;
+    	init();
+	}
+	public void setFilterFactory( FilterFactory factory ){
+		filterFactory = factory;
+		init();
+	}
+	private void init(){
+		try {
             radius = filterFactory.createLiteralExpression(new Integer(1));
         } catch (org.geotools.filter.IllegalFilterException ife) {
             LOGGER.severe("Failed to build defaultHalo: " + ife);
         }
-
         fill.setColor(filterFactory.createLiteralExpression("#FFFFFF")); // default halo is white
-    }
+	}
+    
 
     /** Getter for property fill.
      * @return Value of property fill.
@@ -62,6 +74,7 @@ public class HaloImpl implements Halo, Cloneable {
      */
     public void setFill(org.geotools.styling.Fill fill) {
         this.fill = fill;
+        fireChildChanged( fill );
     }
 
     /** Getter for property radius.
@@ -76,6 +89,7 @@ public class HaloImpl implements Halo, Cloneable {
      */
     public void setRadius(org.geotools.filter.Expression radius) {
         this.radius = radius;
+        fireChildChanged( radius );
     }
     
     public void accept(StyleVisitor visitor) {

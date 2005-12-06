@@ -33,6 +33,7 @@ import org.geotools.feature.visitor.UniqueVisitor;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.MathExpression;
 import java.util.HashMap;
@@ -52,7 +53,7 @@ public class PostgisFeatureCollectionOnlineTest extends DataTestCase {
     private JDBCFeatureCollection fc2 = null;
     private FeatureType featureType = null;
     private FeatureType featureType2 = null;
-    private FilterFactory ff = FilterFactory.createFilterFactory();
+    private FilterFactory ff = FilterFactoryFinder.createFilterFactory();
     AttributeExpression att = null;
     AttributeExpression att2 = null;
 

@@ -15,6 +15,7 @@ import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LogicFilter;
 
@@ -35,8 +36,8 @@ public class StylesTest extends TestCase {
     }
 
     protected void setUp() throws Exception {
-        sf = StyleFactory.createStyleFactory();
-        ff = FilterFactory.createFilterFactory();
+        sf = StyleFactoryFinder.createStyleFactory();
+        ff = FilterFactoryFinder.createFilterFactory();
         sb = new StyleBuilder();
         
         style = sf.createStyle();

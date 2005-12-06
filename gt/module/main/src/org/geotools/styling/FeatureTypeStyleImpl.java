@@ -20,8 +20,12 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
+import org.geotools.event.AbstractGTComponent;
+import org.geotools.event.GTList;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -30,8 +34,8 @@ import org.opengis.util.Cloneable;
  * @version $Id: FeatureTypeStyleImpl.java,v 1.14 2003/09/06 04:52:31 seangeo Exp $
  * @author James Macgill
  */
-public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
-    private java.util.List ruleList = new java.util.ArrayList();
+public class FeatureTypeStyleImpl extends AbstractGTComponent implements FeatureTypeStyle, Cloneable {
+    private java.util.List ruleList;
     private String featureTypeName = "Feature";
     private String name = "name";
     private String title = "title";
@@ -40,20 +44,27 @@ public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.styling");
     
     /** Creates a new instance of FeatureTypeStyleImpl */
-    protected FeatureTypeStyleImpl() {
-    }
-
-    /** Creates a new instance of FeatureTypeStyleImpl */
     protected FeatureTypeStyleImpl(Rule[] rules) {
-        setRules(rules);
+        this( Arrays.asList( rules ) );
     }
-
+    protected FeatureTypeStyleImpl( List rules ){
+    	ruleList = new GTList( this );
+    	ruleList.addAll( rules );
+    }
+    /** Creates a new instance of FeatureTypeStyleImpl */
+    protected FeatureTypeStyleImpl() {
+    	ruleList = new GTList( this );
+    }
+    
     public String getFeatureTypeName() {
         return featureTypeName;
     }
 
     public Rule[] getRules() {
         return (Rule[]) ruleList.toArray(new Rule[0]);
+    }
+    public List rules(){
+    	return ruleList;
     }
 
     public String[] getSemantecTypeIdentifiers() {
@@ -66,14 +77,13 @@ public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
 
     public void setRules(Rule[] rules) {
         ruleList.clear();
-
-        for (int i = 0; i < rules.length; i++) {
-            addRule(rules[i]);
-        }
+        ruleList.addAll( Arrays.asList( rules ));
+        // fireChanged();
     }
 
     public void addRule(Rule rule) {
         ruleList.add(rule);
+        // fireChildAdded(rule);
     }
 
     public void setFeatureTypeName(String name) 
@@ -81,6 +91,7 @@ public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
     	if (name.equals("feature"))
     		LOGGER.warning("FeatureTypeStyle with typename 'feature' - you probably meant to say 'Feature' (capital F) for the 'generic' FeatureType");
         featureTypeName = name;
+        fireChanged();
     }
 
     /**
@@ -97,6 +108,7 @@ public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
      */
     public void setAbstract(java.lang.String abstractStr) {
         this.abstractStr = abstractStr;
+        fireChanged();
     }
 
     /**
@@ -113,6 +125,7 @@ public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
      */
     public void setName(java.lang.String name) {
         this.name = name;
+        fireChanged();
     }
 
     /**
@@ -129,6 +142,7 @@ public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
      */
     public void setTitle(java.lang.String title) {
         this.title = title;
+        fireChanged();
     }
 
     public void accept(StyleVisitor visitor) {

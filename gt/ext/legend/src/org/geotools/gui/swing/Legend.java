@@ -52,7 +52,7 @@ import org.geotools.renderer.LegendIconMaker;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 
 
 /**
@@ -227,7 +227,7 @@ public class Legend extends javax.swing.JPanel implements MapLayerListListener, 
         //Graphic[] legendGraphic = rule.getLegendGraphic();
         Filter filter = rule.getFilter();
 
-        if (rule.getTitle().equalsIgnoreCase(StyleFactory.createStyleFactory().createRule()
+        if (rule.getTitle().equalsIgnoreCase(StyleFactoryFinder.createStyleFactory().createRule()
                                                              .getTitle()) && (filter != null)) {
             rule.setTitle(filter.toString());
         }

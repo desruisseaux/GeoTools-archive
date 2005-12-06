@@ -130,9 +130,9 @@ public class SLDTransformer extends TransformerBase {
                 end("Font");
             }
             
-            if( text.getLabelPlacement() != null ){
+            if( text.getPlacement() != null ){
                 start("LabelPlacement");
-                text.getLabelPlacement().accept(this);
+                text.getPlacement().accept(this);
                 end("LabelPlacement");
             }
             if( text.getHalo() != null ) text.getHalo().accept(this);
@@ -432,7 +432,7 @@ public class SLDTransformer extends TransformerBase {
      */
     public static final void main(String[] args) throws Exception {
         java.net.URL url = new java.io.File(args[0]).toURL();
-        SLDParser s = new SLDParser(StyleFactory.createStyleFactory(),url);
+        SLDParser s = new SLDParser(StyleFactoryFinder.createStyleFactory(),url);
         SLDTransformer transformer = new SLDTransformer();
         transformer.setIndentation(4);
         transformer.transform(s.readXML(), new FileOutputStream(System.getProperty("java.io.tmpdir") + "/junk.eraseme"));

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,33 +12,22 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.feature;
 
 /**
  * Indicates client class has attempted to create an invalid schema.
- *
- * @author Rob Hranac, Vision for New York
- * @version $Id: SchemaException.java,v 1.5 2003/07/17 07:09:52 ianschneider Exp $
  */
 public class SchemaException extends Exception {
     /**
-     * Constructor with no argument.
-     */
-  // ARRRGGGGHHHHH!!!!
-//    public SchemaException() {
-//        super();
-//    }
+	 * 
+	 */
+	private static final long serialVersionUID = 5453903672192802976L;
 
-    /**
-     * SchemeException with cause.
-     *
-     * @param cause Cause of SchemaException
-     */
-    public SchemaException( Throwable cause ) {
-        super( cause);
-    }  
+    public SchemaException(Throwable cause) {
+        super(cause);
+    }
+
     /**
      * Constructor with message argument.
      *
@@ -47,13 +36,14 @@ public class SchemaException extends Exception {
     public SchemaException(String message) {
         super(message);
     }
+
     /**
      * Constructor with message argument and cause.
      *
      * @param message Reason for the exception being thrown
      * @param cause Cause of SchemaException
      */
-    public SchemaException(String message, Throwable cause ) {
-        super(message, cause );
-    }    
+    public SchemaException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

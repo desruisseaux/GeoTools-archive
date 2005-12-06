@@ -61,6 +61,7 @@ import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.map.MapContext;
@@ -87,6 +88,7 @@ import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
@@ -138,7 +140,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
     public static final DefaultRenderListener DEFAULT_LISTENER=new DefaultRenderListener();
 
     /** Filter factory for creating bounding box filters */
-    private FilterFactory filterFactory = FilterFactory.createFilterFactory();
+    private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     private final static CoordinateOperationFactory operationFactory;
     static {
         Hints hints=new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
@@ -1593,7 +1595,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
             Mark mark = getMark(gr, feature);
 
             if (mark == null) {
-                mark = StyleFactory.createStyleFactory().getDefaultMark();
+                mark = StyleFactoryFinder.createStyleFactory().getDefaultMark();
             }
 
             int size = 200;

@@ -47,6 +47,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterFilter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
@@ -78,7 +79,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     private DataStore store;
 
     /** a filter factory for testing */
-    FilterFactory ff = FilterFactory.createFilterFactory();
+    FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 
     /**
      * Creates a new ArcSDEDataStoreTest object.
@@ -171,7 +172,7 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertEquals("After getCount()", initialAvailableCount, pool.getAvailableCount());
             assertEquals("After getCount()", initialPoolSize, pool.getPoolSize());
             
-            FilterFactory ff = FilterFactory.createFilterFactory();
+            FilterFactory ff = FilterFactoryFinder.createFilterFactory();
             GeometryFilter bbox = ff.createGeometryFilter(FilterType.GEOMETRY_BBOX);
 
             bbox.addLeftGeometry(ff.createAttributeExpression(schema,
@@ -473,7 +474,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         LOGGER.info("Geometry filter: " + bboxFilter);
         LOGGER.info("SQL filter: " + sqlFilter);
 
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         LogicFilter mixedFilter = ff.createLogicFilter(sqlFilter,
                 FilterType.LOGIC_AND);
         mixedFilter.addFilter(bboxFilter);
@@ -589,7 +590,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         reader.close();
 
-        FidFilter filter = FilterFactory.createFilterFactory().createFidFilter();
+        FidFilter filter = FilterFactoryFinder.createFilterFactory().createFidFilter();
         filter.addAllFids(fids);
 
         FeatureSource source = ds.getFeatureSource(typeName);

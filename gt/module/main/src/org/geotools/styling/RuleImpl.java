@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Filter;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
-
 
 /**
  * Provides the default implementation of Rule.
@@ -35,270 +35,323 @@ import org.opengis.util.Cloneable;
  * @version $Id: RuleImpl.java,v 1.13 2003/09/06 04:52:31 seangeo Exp $
  * @author James Macgill
  */
-public class RuleImpl implements Rule, Cloneable {
-    private List symbolizers = new ArrayList();
-    private List graphics = new ArrayList();
-    private String name = "name";
-    private String title = "title";
-    private String abstractStr = "Abstract";
-    private Filter filter = null;
-    private boolean hasElseFilter = false;
-    private double maxScaleDenominator = Double.POSITIVE_INFINITY;
-    private double minScaleDenominator = 0.0;
+public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
+	private List symbolizers = new ArrayList();
 
-    /** Creates a new instance of DefaultRule */
-    protected RuleImpl() {
-    }
+	private List graphics = new ArrayList();
 
-    /** Creates a new instance of DefaultRule */
-    protected RuleImpl(Symbolizer[] symbolizers) {
-        this.symbolizers.addAll(Arrays.asList(symbolizers));
-    }
+	private String name = "name";
 
-    public Graphic[] getLegendGraphic() {
-        return (Graphic[]) graphics.toArray(new Graphic[0]);
-    }
+	private String title = "title";
 
-    public void addLegendGraphic(Graphic graphic) {
-        graphics.add(graphic);
-    }
+	private String abstractStr = "Abstract";
 
-    /** A set of equivalent Graphics in different formats which can be used
-     * as a legend against features stylized by the symbolizers in this
-     * rule.
-     *
-     * @param graphics An array of Graphic objects, any of which can be used as
-     *         the legend.
-     *
-     */
-    public void setLegendGraphic(Graphic[] graphics) {
-        this.graphics.clear();
+	private Filter filter = null;
 
-        for (int i = 0; i < graphics.length; i++) {
-            addLegendGraphic(graphics[i]);
-        }
-    }
+	private boolean hasElseFilter = false;
 
-    public void addSymbolizer(Symbolizer symb) {
-        this.symbolizers.add(symb);
-    }
-    
-    public void setSymbolizers(Symbolizer[] syms) {
-        this.symbolizers.clear();
-        for (int i = 0; i < syms.length; i++) {
-            addSymbolizer(syms[i]);
-        }
-    }
+	private double maxScaleDenominator = Double.POSITIVE_INFINITY;
 
-    public Symbolizer[] getSymbolizers() {
-        return (Symbolizer[]) symbolizers.toArray(new Symbolizer[symbolizers.size()]);
-    }
+	private double minScaleDenominator = 0.0;
 
-    /**
-     * Getter for property abstractStr.
-     * @return Value of property abstractStr.
-     */
-    public java.lang.String getAbstract() {
-        return abstractStr;
-    }
+	/** Creates a new instance of DefaultRule */
+	protected RuleImpl() {
+	}
 
-    /**
-     * Setter for property abstractStr.
-     * @param abstractStr New value of property abstractStr.
-     */
-    public void setAbstract(java.lang.String abstractStr) {
-        this.abstractStr = abstractStr;
-    }
+	/** Creates a new instance of DefaultRule */
+	protected RuleImpl(Symbolizer[] symbolizers) {
+		this.symbolizers.addAll(Arrays.asList(symbolizers));
+	}
 
-    /**
-     * Getter for property name.
-     * @return Value of property name.
-     */
-    public java.lang.String getName() {
-        return name;
-    }
+	public Graphic[] getLegendGraphic() {
+		return (Graphic[]) graphics.toArray(new Graphic[0]);
+	}
 
-    /**
-     * Setter for property name.
-     * @param name New value of property name.
-     */
-    public void setName(java.lang.String name) {
-        this.name = name;
-    }
+	public void addLegendGraphic(Graphic graphic) {
+		graphics.add(graphic);
+		fireChildAdded(graphic);
+	}
 
-    /**
-     * Getter for property title.
-     * @return Value of property title.
-     */
-    public java.lang.String getTitle() {
-        return title;
-    }
+	/**
+	 * A set of equivalent Graphics in different formats which can be used as a
+	 * legend against features stylized by the symbolizers in this rule.
+	 * 
+	 * @param graphics
+	 *            An array of Graphic objects, any of which can be used as the
+	 *            legend.
+	 * 
+	 */
+	public void setLegendGraphic(Graphic[] graphics) {
+		this.graphics.clear();
 
-    /**
-     * Setter for property title.
-     * @param title New value of property title.
-     */
-    public void setTitle(java.lang.String title) {
-        this.title = title;
-    }
+		for (int i = 0; i < graphics.length; i++) {
+			// add graphic
+			addLegendGraphic(graphics[i]);
+			// set parent
+			graphics[i].setParent(this);
+		}
+		fireChanged();
+	}
 
-    public Filter getFilter() {
-        return filter;
-    }
+	public void addSymbolizer(Symbolizer symb) {
+		this.symbolizers.add(symb);
+		fireChildAdded(symb);
+	}
 
-    public void setFilter(Filter filter) {
-        this.filter = filter;
-    }
+	public void setSymbolizers(Symbolizer[] syms) {
+		this.symbolizers.clear();
+		for (int i = 0; i < syms.length; i++) {
+			// add symbolizer
+			addSymbolizer(syms[i]);
+			// set parent
+			syms[i].setParent(this);
+		}
+		fireChanged(); // TODO: Handle lists!
+	}
 
-    public boolean hasElseFilter() {
-        return hasElseFilter;
-    }
+	public Symbolizer[] getSymbolizers() {
+		return (Symbolizer[]) symbolizers.toArray(new Symbolizer[symbolizers
+				.size()]);
+	}
 
-    public void setIsElseFilter(boolean flag) {
-        hasElseFilter = flag;
-    }
+	/**
+	 * Getter for property abstractStr.
+	 * 
+	 * @return Value of property abstractStr.
+	 */
+	public java.lang.String getAbstract() {
+		return abstractStr;
+	}
 
-    public void setHasElseFilter() {
-        hasElseFilter = true;
-    }
+	/**
+	 * Setter for property abstractStr.
+	 * 
+	 * @param abstractStr
+	 *            New value of property abstractStr.
+	 */
+	public void setAbstract(java.lang.String abstractStr) {
+		this.abstractStr = abstractStr;
+		fireChanged();
+	}
 
-    /** Getter for property maxScaleDenominator.
-     * @return Value of property maxScaleDenominator.
-     *
-     */
-    public double getMaxScaleDenominator() {
-        return maxScaleDenominator;
-    }
+	/**
+	 * Getter for property name.
+	 * 
+	 * @return Value of property name.
+	 */
+	public java.lang.String getName() {
+		return name;
+	}
 
-    /** Setter for property maxScaleDenominator.
-     * @param maxScaleDenominator New value of property maxScaleDenominator.
-     *
-     */
-    public void setMaxScaleDenominator(double maxScaleDenominator) {
-        this.maxScaleDenominator = maxScaleDenominator;
-    }
+	/**
+	 * Setter for property name.
+	 * 
+	 * @param name
+	 *            New value of property name.
+	 */
+	public void setName(java.lang.String name) {
+		this.name = name;
+		fireChanged();
+	}
 
-    /** Getter for property minScaleDenominator.
-     * @return Value of property minScaleDenominator.
-     *
-     */
-    public double getMinScaleDenominator() {
-        return minScaleDenominator;
-    }
+	/**
+	 * Getter for property title.
+	 * 
+	 * @return Value of property title.
+	 */
+	public java.lang.String getTitle() {
+		return title;
+	}
 
-    /** Setter for property minScaleDenominator.
-     * @param minScaleDenominator New value of property minScaleDenominator.
-     *
-     */
-    public void setMinScaleDenominator(double minScaleDenominator) {
-        this.minScaleDenominator = minScaleDenominator;
-    }
-    
-    public void accept(StyleVisitor visitor){
-        visitor.visit(this);
-    }
-    
-    /**
-     * Creates a deep copy clone of the rule.
-     * @see org.geotools.styling.Rule#clone()
-     */
-    public Object clone() {        
-        try {
-            RuleImpl clone = (RuleImpl) super.clone();
-            clone.graphics = new ArrayList();
-            clone.symbolizers = new ArrayList();  
-            
-            Graphic[] legends = new Graphic[graphics.size()];
-            for (int i = 0; i < legends.length; i++) {
-                Graphic legend = (Graphic) graphics.get(i);
-                legends[i] = (Graphic) ((Cloneable)legend).clone();
-            } 
-            clone.setLegendGraphic(legends);
-            
-            Symbolizer[] symbArray = new Symbolizer[symbolizers.size()];
-            for (int i = 0; i < symbArray.length; i++) {
-                Symbolizer symb = (Symbolizer) symbolizers.get(i);
-                symbArray[i] = (Symbolizer) ((Cloneable)symb).clone();
-            }
-            clone.setSymbolizers(symbArray);
-            
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException("This will never happen",e);
-        }
-    }
+	/**
+	 * Setter for property title.
+	 * 
+	 * @param title
+	 *            New value of property title.
+	 */
+	public void setTitle(java.lang.String title) {
+		this.title = title;
+		fireChanged();
+	}
 
-    /** Generates a hashcode for the Rule.
-     * 
-     *  <p>For complex styles this can be an expensive operation
-     *  since the hash code is computed using all the hashcodes
-     *  of the object within the style.
-     * 
-     *  @return The hashcode.
-     */
-    public int hashCode() {
-        final int PRIME = 1000003;
-        int result = 0;
-        result = PRIME * result + symbolizers.hashCode();
-        if (graphics != null) {
-            result = PRIME * result + graphics.hashCode();
-        }
-        if (name != null) {
-            result = PRIME * result + name.hashCode();
-        }
-        if (title != null) {
-            result = PRIME * result + title.hashCode();
-        }
-        if (abstractStr != null) {
-            result = PRIME * result + abstractStr.hashCode();
-        }
-        if (filter != null) {
-            result = PRIME * result + filter.hashCode();
-        }
-        result = PRIME * result + (hasElseFilter ? 1 : 0);
-        long temp = Double.doubleToLongBits(maxScaleDenominator);
-        result = PRIME * result + (int) (temp >>> 32);
-        result = PRIME * result + (int) (temp & 0xFFFFFFFF);
-        temp = Double.doubleToLongBits(minScaleDenominator);
-        result = PRIME * result + (int) (temp >>> 32);
-        result = PRIME * result + (int) (temp & 0xFFFFFFFF);
+	public Filter getFilter() {
+		return filter;
+	}
 
-        return result;
-    }
+	public void setFilter(Filter filter) {
+		//TODO: descend into filters
+		this.filter = filter;
+		fireChildChanged(filter);
+	}
 
-    /** Compares this Rule with another for equality.
-     *  
-     *  <p>Two RuleImpls are equal if all their properties
-     *  are equal.
-     * 
-     *  <p>For complex styles this can be an expensive operation
-     *  since it checks all objects for equality.
-     * 
-     *  @param oth The other rule to compare with.
-     *  @return True if this and oth are equal.
-     */
-    public boolean equals(Object oth) {
-        if (this == oth) {
-            return true;
-        }
+	public boolean hasElseFilter() {
+		return hasElseFilter;
+	}
 
-        if (oth instanceof RuleImpl) {
-            RuleImpl other = (RuleImpl) oth;
-            return Utilities.equals(name, other.name) && 
-                   Utilities.equals(title, other.title) &&
-                   Utilities.equals(abstractStr, other.abstractStr) &&
-                   Utilities.equals(filter, other.filter) &&
-                   hasElseFilter == other.hasElseFilter &&
-                   Utilities.equals(graphics, other.graphics) &&
-                   Utilities.equals(symbolizers, other.symbolizers) &&
-                   Double.doubleToLongBits(maxScaleDenominator) == 
-                   Double.doubleToLongBits(other.maxScaleDenominator) &&
-                   Double.doubleToLongBits(minScaleDenominator) ==
-                   Double.doubleToLongBits(other.minScaleDenominator);
-                
-        }
-        
-        return false;
-    }
+	public void setIsElseFilter(boolean flag) {
+		hasElseFilter = flag;
+		fireChanged();
+	}
+
+	public void setHasElseFilter() {
+		hasElseFilter = true;
+		fireChanged();
+	}
+
+	/**
+	 * Getter for property maxScaleDenominator.
+	 * 
+	 * @return Value of property maxScaleDenominator.
+	 * 
+	 */
+	public double getMaxScaleDenominator() {
+		return maxScaleDenominator;
+	}
+
+	/**
+	 * Setter for property maxScaleDenominator.
+	 * 
+	 * @param maxScaleDenominator
+	 *            New value of property maxScaleDenominator.
+	 * 
+	 */
+	public void setMaxScaleDenominator(double maxScaleDenominator) {
+		this.maxScaleDenominator = maxScaleDenominator;
+		fireChanged();
+	}
+
+	/**
+	 * Getter for property minScaleDenominator.
+	 * 
+	 * @return Value of property minScaleDenominator.
+	 * 
+	 */
+	public double getMinScaleDenominator() {
+		return minScaleDenominator;
+	}
+
+	/**
+	 * Setter for property minScaleDenominator.
+	 * 
+	 * @param minScaleDenominator
+	 *            New value of property minScaleDenominator.
+	 * 
+	 */
+	public void setMinScaleDenominator(double minScaleDenominator) {
+		this.minScaleDenominator = minScaleDenominator;
+		fireChanged();
+	}
+
+	public void accept(StyleVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	/**
+	 * Creates a deep copy clone of the rule.
+	 * 
+	 * @see org.geotools.styling.Rule#clone()
+	 */
+	public Object clone() {
+		try {
+			RuleImpl clone = (RuleImpl) super.clone();
+			clone.graphics = new ArrayList();
+			clone.symbolizers = new ArrayList();
+
+			Graphic[] legends = new Graphic[graphics.size()];
+			for (int i = 0; i < legends.length; i++) {
+				Graphic legend = (Graphic) graphics.get(i);
+				legends[i] = (Graphic) ((Cloneable) legend).clone();
+			}
+			clone.setLegendGraphic(legends);
+
+			Symbolizer[] symbArray = new Symbolizer[symbolizers.size()];
+			for (int i = 0; i < symbArray.length; i++) {
+				Symbolizer symb = (Symbolizer) symbolizers.get(i);
+				symbArray[i] = (Symbolizer) ((Cloneable) symb).clone();
+			}
+			clone.setSymbolizers(symbArray);
+
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException("This will never happen", e);
+		}
+	}
+
+	/**
+	 * Generates a hashcode for the Rule.
+	 * 
+	 * <p>
+	 * For complex styles this can be an expensive operation since the hash code
+	 * is computed using all the hashcodes of the object within the style.
+	 * 
+	 * @return The hashcode.
+	 */
+	public int hashCode() {
+		final int PRIME = 1000003;
+		int result = 0;
+		result = PRIME * result + symbolizers.hashCode();
+		if (graphics != null) {
+			result = PRIME * result + graphics.hashCode();
+		}
+		if (name != null) {
+			result = PRIME * result + name.hashCode();
+		}
+		if (title != null) {
+			result = PRIME * result + title.hashCode();
+		}
+		if (abstractStr != null) {
+			result = PRIME * result + abstractStr.hashCode();
+		}
+		if (filter != null) {
+			result = PRIME * result + filter.hashCode();
+		}
+		result = PRIME * result + (hasElseFilter ? 1 : 0);
+		long temp = Double.doubleToLongBits(maxScaleDenominator);
+		result = PRIME * result + (int) (temp >>> 32);
+		result = PRIME * result + (int) (temp & 0xFFFFFFFF);
+		temp = Double.doubleToLongBits(minScaleDenominator);
+		result = PRIME * result + (int) (temp >>> 32);
+		result = PRIME * result + (int) (temp & 0xFFFFFFFF);
+
+		return result;
+	}
+
+	/**
+	 * Compares this Rule with another for equality.
+	 * 
+	 * <p>
+	 * Two RuleImpls are equal if all their properties are equal.
+	 * 
+	 * <p>
+	 * For complex styles this can be an expensive operation since it checks all
+	 * objects for equality.
+	 * 
+	 * @param oth
+	 *            The other rule to compare with.
+	 * @return True if this and oth are equal.
+	 */
+	public boolean equals(Object oth) {
+		if (this == oth) {
+			return true;
+		}
+
+		if (oth instanceof RuleImpl) {
+			RuleImpl other = (RuleImpl) oth;
+			return Utilities.equals(name, other.name)
+					&& Utilities.equals(title, other.title)
+					&& Utilities.equals(abstractStr, other.abstractStr)
+					&& Utilities.equals(filter, other.filter)
+					&& hasElseFilter == other.hasElseFilter
+					&& Utilities.equals(graphics, other.graphics)
+					&& Utilities.equals(symbolizers, other.symbolizers)
+					&& Double.doubleToLongBits(maxScaleDenominator) == Double
+							.doubleToLongBits(other.maxScaleDenominator)
+					&& Double.doubleToLongBits(minScaleDenominator) == Double
+							.doubleToLongBits(other.minScaleDenominator);
+
+		}
+
+		return false;
+	}
 
 }

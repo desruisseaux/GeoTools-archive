@@ -103,7 +103,7 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         roadBounds.expandToInclude( roadFeatures[1].getBounds() );
         roadBounds.expandToInclude( roadFeatures[2].getBounds() );
         
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         rd1Filter = factory.createFidFilter("0");
         rd2Filter = factory.createFidFilter("1");
 
@@ -160,7 +160,7 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         riverBounds.expandToInclude( riverFeatures[0].getBounds());
         riverBounds.expandToInclude( riverFeatures[1].getBounds());
                 
-        rv1Filter = FilterFactory.createFilterFactory().createFidFilter("0");
+        rv1Filter = FilterFactoryFinder.createFilterFactory().createFidFilter("0");
 
         //  9,5   11,5   
         //   +-----+

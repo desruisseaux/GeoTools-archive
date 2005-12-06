@@ -21,6 +21,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 
@@ -51,7 +52,7 @@ public class AverageVisitor implements FeatureCalc {
      */
     public AverageVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         AttributeType attributeType = type.getAttributeType(attributeTypeIndex);
         expr = factory.createAttributeExpression(type, attributeType.getName());
         createStrategy(attributeType.getType());
@@ -67,7 +68,7 @@ public class AverageVisitor implements FeatureCalc {
      */
     public AverageVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         AttributeType attributeType = type.getAttributeType(attrName);
         expr = factory.createAttributeExpression(type, attributeType.getName());
         createStrategy(attributeType.getType());

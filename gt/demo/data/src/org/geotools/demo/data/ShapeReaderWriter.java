@@ -102,7 +102,7 @@ public class ShapeReaderWriter {
             FeatureType ft = source.getSchema();
             
             // create filter to select only features that satify 20000 >= "field" >= 10000
-            FilterFactory ff = FilterFactory.createFilterFactory();
+            FilterFactory ff = FilterFactoryFinder.createFilterFactory();
             
             LiteralExpression literal200 = ff.createLiteralExpression(upperBound);
             LiteralExpression literal100 = ff.createLiteralExpression(lowerBound);

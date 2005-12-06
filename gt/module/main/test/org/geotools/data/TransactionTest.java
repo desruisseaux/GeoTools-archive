@@ -26,6 +26,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -72,7 +73,7 @@ public class TransactionTest extends TestCase {
         Set fid=store.addFeatures(new TestReader(type, f1));
 
         count(store, 2);
-        Filter f=FilterFactory.createFilterFactory().createFidFilter((String) fid.iterator().next());
+        Filter f=FilterFactoryFinder.createFilterFactory().createFidFilter((String) fid.iterator().next());
         store.removeFeatures(f);
         
         count(store, 1);

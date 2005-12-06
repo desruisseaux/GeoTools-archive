@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,16 +12,16 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.feature;
 
 import org.geotools.filter.Filter;
 
+
 /**
  * <p>
- * Stores metadata about a single attribute object. 
- *  
+ * Stores metadata about a single attribute object.
+ * 
  * <ol>
  * <li>
  * Name: A string that is used to reference the attribute.
@@ -59,34 +59,29 @@ import org.geotools.filter.Filter;
  * @author Rob Hranac, VFNY
  * @author Chris Holmes, TOPP
  * @version $Id: AttributeType.java,v 1.11 2003/11/06 23:34:54 ianschneider Exp $
- *
  */
-public interface AttributeType{
-	
-	/**
-	 * Represents any number of elements. Same '*' in a reg-ex
-	 */
-	public static int UNBOUNDED = Integer.MAX_VALUE;
+public interface AttributeType {
+    /** Represents any number of elements. Same '' in a reg-ex */
+    public static int UNBOUNDED = Integer.MAX_VALUE;
 
-	/* feature-exp2 redesign notes:
-	 * 1) removed isNested() from the api as are going to incorporating 
-	 * more complex attribute sequences ... including sets and choices.
-         * isNested() was used very little, and was never fully thought through
-         * So killing it should not have too much of an effect.
-         * 
-         * 2) Added minOccurs and maxOccurs since we are going to get into
-         * multiplicity, where this matters.  The isNilleable is not enough
-         * 
-         * 3) deprecated isGeometry() as it is a convenience method that can
-         * be accomplished in different ways, and it means nothing for a 
-         * featureType
-         * 
-         * 4) We are planning on killing getFieldLength, as it is extremely
-	 * impercise, has no general meaning.  We are going to replace it
-	 * with the concept of xml facets, hopefully we will have time to.
-         * 
-	 */
-	
+    /* feature-exp2 redesign notes:
+     * 1) removed isNested() from the api as are going to incorporating
+     * more complex attribute sequences ... including sets and choices.
+     * isNested() was used very little, and was never fully thought through
+     * So killing it should not have too much of an effect.
+     *
+     * 2) Added minOccurs and maxOccurs since we are going to get into
+     * multiplicity, where this matters.  The isNilleable is not enough
+     *
+     * 3) deprecated isGeometry() as it is a convenience method that can
+     * be accomplished in different ways, and it means nothing for a
+     * featureType
+     *
+     * 4) We are planning on killing getFieldLength, as it is extremely
+     * impercise, has no general meaning.  We are going to replace it
+     * with the concept of xml facets, hopefully we will have time to.
+     *
+     */
     /**
      * Gets the name of this attribute.
      *
@@ -100,11 +95,11 @@ public interface AttributeType{
      * @return Type.
      */
     Class getType();
-    
+
     /**
-     * This represents a Facet in XML schema ... for example can be used to represent the max length of 20 for
-     * a string.
-     * 
+     * This represents a Facet in XML schema ... for example can be used to
+     * represent the max length of 20 for a string.
+     *
      * @return Filter, or Filter.NONE if no restriction is needed.
      */
     Filter getRestriction();
@@ -115,16 +110,17 @@ public interface AttributeType{
      * @return true if nulls are permitted, false otherwise.
      */
     boolean isNillable();
-    
+
     /**
      * Returns the Min number of occurences ...
-     * 
-     * @return 
+     *
+     * @return
      */
     int getMinOccurs();
-    
+
     /**
      * Returns the Max number of occurences ...
+     *
      * @return
      */
     int getMaxOccurs();
@@ -162,18 +158,23 @@ public interface AttributeType{
     void validate(Object obj) throws IllegalArgumentException;
 
     /**
-     * Create a duplicate value of the passed Object. For immutable Objects,
-     * it is not neccessary to create a new Object.
+     * Create a duplicate value of the passed Object. For immutable Objects, it
+     * is not neccessary to create a new Object.
      *
      * @param src The Object to duplicate.
-     * @throws IllegalAttributeException If the src Object is not the correct type.
+     *
+     * @return Duplicate of provided object
+     *
+     * @throws IllegalAttributeException If the src Object is not the correct
+     *         type.
      */
-    Object duplicate(Object src) throws IllegalAttributeException;    
-    
+    Object duplicate(Object src) throws IllegalAttributeException;
+
     /**
      * Create a default value for this AttributeType. If the type is nillable,
      * the Object may or may not be null.
+     *
+     * @return Default value, note may be null if isNillable is true
      */
     Object createDefaultValue();
- 
 }

@@ -39,7 +39,10 @@ package org.geotools.styling;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -50,12 +53,11 @@ import org.opengis.util.Cloneable;
  * @author Ian Turton, CCG
  * @version $Id: GraphicImpl.java,v 1.20 2004/02/12 11:17:04 aaime Exp $
  */
-public class GraphicImpl implements Graphic, Cloneable {
+public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneable {
     /** The logger for the default core module. */
     private static final java.util.logging.Logger LOGGER = 
             java.util.logging.Logger.getLogger("org.geotools.core");
-    private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactory.createFilterFactory();
+    private FilterFactory filterFactory;
     private String geometryPropertyName = "";
     private java.util.List externalGraphics = new java.util.ArrayList();
     private java.util.List marks = new java.util.ArrayList();
@@ -69,6 +71,14 @@ public class GraphicImpl implements Graphic, Cloneable {
      * Creates a new instance of DefaultGraphic
      */
     protected GraphicImpl() {
+    	this( FilterFactoryFinder.createFilterFactory() );
+    }
+
+    public GraphicImpl(FilterFactory factory) {
+		filterFactory = factory;
+	}
+    public void setFilterFactory( FilterFactory factory ){
+    	filterFactory = factory;
     }
 
     /**
@@ -120,12 +130,12 @@ public class GraphicImpl implements Graphic, Cloneable {
                 i++;
             }
         }
-
         if(externalGraphics != null) {
             for (int i = 0; i < externalGraphics.length; i++) {
                 addExternalGraphic(externalGraphics[i]);
             }
         }
+        fireChanged();
     }
 
     public void addExternalGraphic(ExternalGraphic externalGraphic) {
@@ -167,6 +177,7 @@ public class GraphicImpl implements Graphic, Cloneable {
         for (int i = 0; i < marks.length; i++) {
             addMark(marks[i]);
         }
+        fireChanged();
     }
 
     public void addMark(Mark mark) {
@@ -210,6 +221,7 @@ public class GraphicImpl implements Graphic, Cloneable {
                 addSymbol(symbols[i]);
             }
         }
+        fireChanged();
     }
 
     public void addSymbol(Symbol symbol) {
@@ -281,6 +293,7 @@ public class GraphicImpl implements Graphic, Cloneable {
     
     public void setDisplacement(Displacement offset){
         this.displacement = offset;
+        fireChildChanged( offset );
     }
 
     /**
@@ -290,15 +303,13 @@ public class GraphicImpl implements Graphic, Cloneable {
      */
     public void setOpacity(Expression opacity) {
         this.opacity = opacity;
+        fireChildChanged( opacity );
     }
 
     public void setOpacity(double opacity) {
-        try {
-            this.opacity = filterFactory.createLiteralExpression(
-                                   new Double(opacity));
-        } catch (org.geotools.filter.IllegalFilterException mfe) {
-            severe("setOpacity", "Problem setting Opacity", mfe);
-        }
+        setOpacity(
+    			filterFactory.createLiteralExpression( opacity )
+    	);
     }
 
     /**
@@ -314,15 +325,11 @@ public class GraphicImpl implements Graphic, Cloneable {
         while (iter.hasNext()) {
             ((MarkImpl) iter.next()).setRotation(rotation);
         }
+        fireChildChanged( rotation );
     }
 
     public void setRotation(double rotation) {
-        try {
-            setRotation(filterFactory.createLiteralExpression(
-                                new Double(rotation)));
-        } catch (org.geotools.filter.IllegalFilterException mfe) {
-            severe("setRotation", "Problem setting Rotation", mfe);
-        }
+        setRotation(filterFactory.createLiteralExpression( rotation ));        
     }
 
     /**
@@ -338,18 +345,16 @@ public class GraphicImpl implements Graphic, Cloneable {
         while (iter.hasNext()) {
             ((MarkImpl) iter.next()).setSize(size);
         }
+        fireChildChanged( size );
     }
 
     public void setSize(int size) {
-        try {
-            setSize(filterFactory.createLiteralExpression(new Integer(size)));
-        } catch (org.geotools.filter.IllegalFilterException mfe) {
-            severe("setSize", "Problem setting Size", mfe);
-        }
+        setSize(filterFactory.createLiteralExpression( size ));        
     }
 
     public void setGeometryPropertyName(String name) {
         geometryPropertyName = name;
+        fireChanged();
     }
 
     /**

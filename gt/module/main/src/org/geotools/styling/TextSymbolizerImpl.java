@@ -23,8 +23,8 @@ package org.geotools.styling;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -36,16 +36,16 @@ import org.opengis.util.Cloneable;
  * @version $Id: TextSymbolizerImpl.java,v 1.17 2003/09/06 04:52:31 seangeo Exp $
  * @author Ian Turton, CCG
  */
-public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
+public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbolizer2, Cloneable {
     private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactory.createFilterFactory();
+            org.geotools.filter.FilterFactoryFinder.createFilterFactory();
     private Fill fill;
     private java.util.List fonts = new java.util.ArrayList();
     private Halo halo;
     private LabelPlacement labelPlacement;
     private String geometryPropertyName = null;
     private org.geotools.filter.Expression label = null;
-    
+    private Graphic graphic = null;    
     private Expression priority = null;
     private HashMap  optionsMap = null;  //null=nothing in it
     
@@ -91,7 +91,10 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
      * @param fill New value of property fill.
      */
     public void setFill(org.geotools.styling.Fill fill) {
-        this.fill = fill;
+    	if( this.fill == fill ) return;
+    	fireChildRemoved( this.fill );
+    	this.fill = fill;
+    	fireChildAdded( fill );    
     }
 
     /**
@@ -103,7 +106,6 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
         if (fonts.size() == 0) {
             fonts.add(new FontImpl());
         }
-
         return (Font[]) fonts.toArray(new Font[] {  });
     }
 
@@ -113,6 +115,7 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
      */
     public void addFont(org.geotools.styling.Font font) {
         this.fonts.add(font);
+        fireChildAdded( font );
     }
 
     /** Sets the list of fonts in the TextSymbolizer to the
@@ -123,8 +126,12 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
     public void setFonts(Font[] fonts) {
         this.fonts.clear();
         for (int i = 0; i < fonts.length; i++) {
-            addFont(fonts[i]);
+        	//add font
+        	addFont(fonts[i]);
+    		//set parent
+        	fonts[i].setParent(this);
         }
+        fireChanged(); // TODO Handle font list
     }
 
     /**
@@ -140,7 +147,10 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
      * @param halo New value of property halo.
      */
     public void setHalo(org.geotools.styling.Halo halo) {
-        this.halo = halo;
+    	if( this.halo == halo ) return;
+    	fireChildRemoved( this.halo );
+    	this.halo = halo;
+    	fireChildAdded( halo );    
     }
 
     /**
@@ -156,7 +166,10 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
      * @param label New value of property label.
      */
     public void setLabel(org.geotools.filter.Expression label) {
-        this.label = label;
+    	if( this.label == label ) return;
+    	fireChildRemoved( this.label );
+    	this.label = label;
+    	fireChildAdded( label );    
     }
 
     /**
@@ -164,7 +177,7 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
      * relative to its geometric point.
      * @return Value of property labelPlacement.
      */
-    public LabelPlacement getLabelPlacement() {
+    public LabelPlacement getPlacement() {
         return labelPlacement;
     }
 
@@ -172,8 +185,31 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
      * Setter for property labelPlacement.
      * @param labelPlacement New value of property labelPlacement.
      */
+    public void setPlacement(org.geotools.styling.LabelPlacement labelPlacement) {
+    	if( this.labelPlacement == labelPlacement ) return;
+    	fireChildRemoved( this.labelPlacement );
+    	this.labelPlacement = labelPlacement;
+    	fireChildAdded( labelPlacement );    
+    }
+
+    
+    /**
+     * A pointPlacement specifies how a text element should be rendered
+     * relative to its geometric point.
+     * @deprecated use getPlacement()
+     * @return Value of property labelPlacement.
+     */
+    public LabelPlacement getLabelPlacement() {
+        return getPlacement();
+    }
+
+    /**
+     * Setter for property labelPlacement.
+     * @param labelPlacement New value of property labelPlacement.
+     * @deprecated use setPlacement(LabelPlacement)
+     */
     public void setLabelPlacement(org.geotools.styling.LabelPlacement labelPlacement) {
-        this.labelPlacement = labelPlacement;
+        setPlacement(labelPlacement);
     }
 
     /**
@@ -189,7 +225,8 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
      * @param geometryPropertyName New value of property geometryPropertyName.
      */
     public void setGeometryPropertyName(java.lang.String geometryPropertyName) {
-        this.geometryPropertyName = geometryPropertyName;
+    	this.geometryPropertyName = geometryPropertyName;
+        fireChanged();
     }
     
     /** Accept a StyleVisitor to perform an operation
@@ -266,8 +303,11 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
 	/* (non-Javadoc)
 	 * @see org.geotools.styling.TextSymbolizer#setPriority(org.geotools.filter.Expression)
 	 */
-	public void setPriority(Expression e) {
-		priority = e;
+	public void setPriority(Expression priority) {
+    	if( this.priority == priority ) return;
+    	fireChildRemoved( this.priority );
+    	this.priority = priority;
+    	fireChildAdded( priority );    
 	}
 
 	/* (non-Javadoc)
@@ -284,9 +324,11 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
 	 */
 	public void addToOptions(String key, String value) 
 	{
-		if (optionsMap == null)
+		if (optionsMap == null){
 			optionsMap = new HashMap();
-	    optionsMap.put(key,value.trim());			
+		}
+	    optionsMap.put(key,value.trim());
+	    fireChanged(); // TODO: Handle Options Map?
 	}
 
 	/* (non-Javadoc)
@@ -307,4 +349,13 @@ public class TextSymbolizerImpl implements TextSymbolizer, Cloneable {
 		return optionsMap;
 	}
 
+	public Graphic getGraphic() {
+		return graphic;
+	}
+	public void setGraphic( Graphic graphic ) {
+    	if( this.graphic == graphic ) return;
+    	fireChildRemoved( this.graphic );
+    	this.graphic = graphic;
+    	fireChildAdded( graphic );    
+	}
 }

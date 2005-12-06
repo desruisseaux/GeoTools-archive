@@ -20,6 +20,7 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -28,14 +29,15 @@ import org.opengis.util.Cloneable;
  * @version $Id: PointPlacementImpl.java,v 1.10 2003/09/06 04:52:31 seangeo Exp $
  * @author Ian Turton, CCG
  */
-public class PointPlacementImpl implements PointPlacement, Cloneable {
+public class PointPlacementImpl extends AbstractGTComponent implements PointPlacement, Cloneable {
     /**
      * The logger for the default core module.
      */
     private static final java.util.logging.Logger LOGGER = 
             java.util.logging.Logger.getLogger("org.geotools.core");
+    // TODO: make container ready
     private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactory.createFilterFactory();
+            org.geotools.filter.FilterFactoryFinder.createFilterFactory();
     private AnchorPoint anchorPoint = new AnchorPointImpl();
     private Displacement displacement = new DisplacementImpl();
     private org.geotools.filter.Expression rotation = null;
@@ -69,6 +71,7 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
         } else {
             this.anchorPoint = anchorPoint;
         }
+        fireChanged();
     }
 
     /**
@@ -76,20 +79,22 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
      * to use for rendering a text label near a point.
      * @return The label displacement.
      */
-    public org.geotools.styling.Displacement getDisplacement() {
+    public Displacement getDisplacement() {
         return displacement;
     }
 
     /**
      * Setter for property displacement.
+     * 
      * @param displacement New value of property displacement.
      */
-    public void setDisplacement(org.geotools.styling.Displacement displacement) {
+    public void setDisplacement(Displacement displacement) {
         if (displacement == null) {
             this.displacement = new DisplacementImpl();
         } else {
             this.displacement = displacement;
         }
+        fireChanged();
     }
 
     /**
@@ -106,6 +111,7 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
      */
     public void setRotation(org.geotools.filter.Expression rotation) {
         this.rotation = rotation;
+        fireChanged();
     }
     
     public void accept(StyleVisitor visitor) {

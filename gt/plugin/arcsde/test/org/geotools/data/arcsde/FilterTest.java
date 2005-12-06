@@ -37,6 +37,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 
@@ -206,7 +207,7 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_DISJOINT);
         filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
 
@@ -229,7 +230,7 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_CONTAINS);
         filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
 
@@ -252,7 +253,7 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_BBOX);
         filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
 
@@ -275,7 +276,7 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_INTERSECTS);
         filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
 
@@ -298,7 +299,7 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_OVERLAPS);
         filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
 
@@ -321,7 +322,7 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_WITHIN);
         filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
 
@@ -344,7 +345,7 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_CROSSES);
         filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
 
@@ -366,7 +367,7 @@ public class FilterTest extends TestCase {
     public void testEqualFilter() throws Exception {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 
         // Get a geometry for equality comparison
         Filter fidFilter = ff.createFidFilter("SDE.SDE.JAKARTA.101");

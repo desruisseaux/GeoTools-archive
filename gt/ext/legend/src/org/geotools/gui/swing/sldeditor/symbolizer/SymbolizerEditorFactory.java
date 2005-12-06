@@ -4,8 +4,8 @@
 package org.geotools.gui.swing.sldeditor.symbolizer;
 
 import java.awt.Component;
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
 
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;

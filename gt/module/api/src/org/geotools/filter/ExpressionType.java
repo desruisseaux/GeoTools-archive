@@ -1,17 +1,32 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.filter;
 
 /**
- * The ExpressionType interface lists all the possible type of filter.
- * Should be replaced by a type safe enum when we move to Java 1.5 
- * 
+ * The ExpressionType interface lists all the possible type of filter. Should
+ * be replaced by a type safe enum when we move to Java 1.5
+ *
  * @author wolf
  */
 public interface ExpressionType {
     /* This is a listing of all possible expression types, grouped by
-           expressions that are implemented by a single expression class
-           (ie. all math types are implemented by ExpressionMath). */
-    /* Types implemented by ExpressionLiteral */
+       expressions that are implemented by a single expression class
+       (ie. all math types are implemented by ExpressionMath). */
 
+    /* Types implemented by ExpressionLiteral */
     /** Defines a literal expression with a declared double type. */
     public static final short LITERAL_DOUBLE = 101;
 
@@ -25,7 +40,6 @@ public interface ExpressionType {
     public static final short LITERAL_GEOMETRY = 104;
 
     /* Types implemented by ExpressionMath. */
-
     /** Defines a math expression for adding. */
     public static final short MATH_ADD = 105;
 
@@ -39,7 +53,6 @@ public interface ExpressionType {
     public static final short MATH_DIVIDE = 108;
 
     /* Types implemented by ExpressionAttribute. */
-
     /** Defines an attribute expression with a declared double type. */
     public static final short ATTRIBUTE_DOUBLE = 109;
 
@@ -60,5 +73,4 @@ public interface ExpressionType {
 
     /** Defines a function expression */
     public static final short FUNCTION = 114;
-
 }

@@ -14,6 +14,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 /**
  *
@@ -22,7 +23,7 @@ import org.geotools.filter.FilterFactory;
 public class FunctionTestSupport extends TestCase {
     
     protected FeatureCollection fc;
-    protected FilterFactory fac = FilterFactory.createFilterFactory();
+    protected FilterFactory fac = FilterFactoryFinder.createFilterFactory();
     protected ExpressionBuilder builder = new ExpressionBuilder();
     protected FeatureType dataType;
     

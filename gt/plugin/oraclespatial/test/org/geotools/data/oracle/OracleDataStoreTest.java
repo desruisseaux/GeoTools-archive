@@ -53,6 +53,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
 import org.geotools.geometry.JTS.ReferencedEnvelope;
@@ -71,7 +72,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class OracleDataStoreTest extends TestCase {
     private ConnectionPool cPool;
-    private FilterFactory filterFactory = FilterFactory.createFilterFactory();
+    private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     private Properties properties;
     private GeometryFactory jtsFactory = new GeometryFactory();
     private String schemaName;

@@ -23,6 +23,7 @@ package org.geotools.styling;
 //import java.util.logging.Logger;
 
 // OpenGIS dependencies
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
@@ -32,7 +33,7 @@ import org.opengis.util.Cloneable;
  * @version $Id: FontImpl.java,v 1.6 2003/09/06 04:52:31 seangeo Exp $
  * @author Ian Turton, CCG
  */
-public class FontImpl implements Font, Cloneable {
+public class FontImpl extends AbstractGTComponent implements Font, Cloneable {
     /**
      * The logger for the default core module.
      */
@@ -58,7 +59,8 @@ public class FontImpl implements Font, Cloneable {
      * @param fontFamily New value of property fontFamily.
      */
     public void setFontFamily(Expression fontFamily) {
-        this.fontFamily = fontFamily;
+    	this.fontFamily = fontFamily;
+		fireChanged();
     }
 
     /** Getter for property fontSize.
@@ -73,6 +75,7 @@ public class FontImpl implements Font, Cloneable {
      */
     public void setFontSize(Expression fontSize) {
         this.fontSize = fontSize;
+        fireChanged();
     }
 
     /** Getter for property fontStyle.
@@ -87,6 +90,7 @@ public class FontImpl implements Font, Cloneable {
      */
     public void setFontStyle(Expression fontStyle) {
         this.fontStyle = fontStyle;
+        fireChanged();
     }
 
     /** Getter for property fontWeight.
@@ -101,6 +105,7 @@ public class FontImpl implements Font, Cloneable {
      */
     public void setFontWeight(Expression fontWeight) {
         this.fontWeight = fontWeight;
+        fireChanged();
     }
     
     /** Creates a clone of the font.

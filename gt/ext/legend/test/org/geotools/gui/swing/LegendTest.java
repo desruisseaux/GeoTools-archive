@@ -52,9 +52,10 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.BasicLineStyle;
 import org.geotools.styling.BasicPolygonStyle;
-import org.geotools.styling.SLDStyle;
+import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.units.Unit;
 
 
@@ -96,12 +97,12 @@ public class LegendTest extends TestCase {
         URL[] data = new URL[] { shpData0, shpData1, shpData2 };
 
         File sldFile = new File(URLDecoder.decode(base.getPath(),"UTF-8") + "/color.sld");
-        SLDStyle sld = null;
+        SLDParser sld = null;
         
         SLDEditor.propertyEditorFactory.setInExpertMode(true);
 
         try {
-            sld = new SLDStyle(StyleFactory.createStyleFactory(), sldFile);
+            sld = new SLDParser(StyleFactoryFinder.createStyleFactory(), sldFile);
         } catch (java.io.FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -121,7 +122,7 @@ public class LegendTest extends TestCase {
                 dataStores[i] = new ShapefileDataStore(data[i]);
             }
 
-            StyleFactory styleFactory = StyleFactory.createStyleFactory();
+            StyleFactory styleFactory = StyleFactoryFinder.createStyleFactory();
             BasicPolygonStyle style = new BasicPolygonStyle(styleFactory.getDefaultFill(),
                     styleFactory.getDefaultStroke());
             style.setTitle("Leeds ED Poly");

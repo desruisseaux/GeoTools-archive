@@ -16,13 +16,13 @@
  */
 package org.geotools.feature;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import org.opengis.util.Cloneable;
-
-// J2SE dependencies
 import java.rmi.server.UID;
 import java.util.List;
+
+import org.opengis.util.Cloneable;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

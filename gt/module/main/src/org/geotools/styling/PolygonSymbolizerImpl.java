@@ -17,6 +17,7 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -28,7 +29,7 @@ import org.opengis.util.Cloneable;
  * @author James Macgill, CCG
  * @version $Id: PolygonSymbolizerImpl.java,v 1.15 2003/10/17 22:50:59 ianschneider Exp $
  */
-public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
+public class PolygonSymbolizerImpl extends AbstractGTComponent implements PolygonSymbolizer, Cloneable {
     private Fill fill = new FillImpl();
     private Stroke stroke = new StrokeImpl();
     private String geometryPropertyName = null;
@@ -68,6 +69,7 @@ public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
      */
     public void setGeometryPropertyName(String name) {
         geometryPropertyName = name;
+        fireChanged();
     }
 
     /**
@@ -87,7 +89,10 @@ public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
      * @param fill The Fill style to use when rendering the area.
      */
     public void setFill(Fill fill) {
-        this.fill = fill;
+    	if( this.fill == fill ) return;
+    	fireChildRemoved( this.fill );
+    	this.fill = fill;
+    	fireChildAdded( fill );    
     }
 
     /**
@@ -107,7 +112,10 @@ public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
      * @param stroke The Stroke style to use when rendering lines.
      */
     public void setStroke(Stroke stroke) {
-        this.stroke = stroke;
+    	if( this.stroke == stroke ) return;
+    	fireChildRemoved( this.stroke );
+    	this.stroke = stroke;
+    	fireChildAdded( stroke );    
     }
 
     /**

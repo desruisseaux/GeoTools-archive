@@ -30,6 +30,7 @@ import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -58,8 +59,8 @@ public class StyleAttributeExtractorTest extends TestCase {
      * @see TestCase#setUp()
      */
     protected void setUp() throws Exception {
-        styleFactory = StyleFactory.createStyleFactory();
-        filterFactory = FilterFactory.createFilterFactory();
+        styleFactory = StyleFactoryFinder.createStyleFactory();
+        filterFactory = FilterFactoryFinder.createFilterFactory();
 
         // Create the schema attributes
         AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType("testGeometry",

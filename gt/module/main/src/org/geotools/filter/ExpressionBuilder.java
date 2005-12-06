@@ -40,17 +40,37 @@ import com.vividsolutions.jts.io.WKTReader;
 /**
  * ExpressionBuilder is the main entry point for parsing Expressions and Filters
  * from a non-xml language.
- *
+ * <p>
+ * @version GeoTools 2.2 Revised to take a FilterFactory.
  * @author  Ian Schneider
  */
 public class ExpressionBuilder {
-    
-    
+	private FilterFactory factory;
+	public ExpressionBuilder(){
+		this( FilterFactoryFinder.createFilterFactory() );
+	}
+	public ExpressionBuilder( FilterFactory factory ){
+		this.factory = factory;
+	}
+    public void setFilterFactory( FilterFactory factory ){
+    	this.factory = factory;
+    }
+    /**
+     * @deprecated please use parser
+     * @param schema
+     * @param input
+     * @return
+     * @throws ParseException
+     */
+    public static Object parse(FeatureType schema, String input) throws ParseException {
+    	ExpressionBuilder builder = new ExpressionBuilder();
+    	return builder.parser( schema, input );
+    }
     /**
      * Parse the input string into either a Filter or an Expression.
      */
-    public static Object parse(FeatureType schema, String input) throws ParseException {
-        ExpressionCompiler c = new ExpressionCompiler(schema,input);
+    public Object parser(FeatureType schema, String input) throws ParseException {
+        ExpressionCompiler c = new ExpressionCompiler( schema,input);
         try {
             c.CompilationUnit();
         } catch (TokenMgrError tme) {
@@ -66,10 +86,19 @@ public class ExpressionBuilder {
     
     /**
      * Parse the input string into either a Filter or an Expression.
+     * @deprecated Please make use of parser( input )
      */
     public static Object parse(String input) throws ParseException {
-        return parse(null,input);
-        
+        return parse(null,input);        
+    }
+    /**
+     * Parse the input string into either a Filter or an Expression.
+     * <p>
+     * Not schema is provided for reference during construction.
+     * </p>
+     */
+    public Object parser( String input ){
+    	return parser( input );
     }
     
     /**
@@ -91,9 +120,8 @@ public class ExpressionBuilder {
         return sb.toString();
     }
     
-    static class ExpressionCompiler extends ExpressionParser implements ExpressionParserTreeConstants {
-        Stack stack = new Stack();
-        FilterFactory factory = FilterFactory.createFilterFactory();
+    class ExpressionCompiler extends ExpressionParser implements ExpressionParserTreeConstants {
+    	Stack stack = new Stack();
         ExpressionException exception = null;
         String input;
         FeatureType schema;

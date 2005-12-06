@@ -31,6 +31,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
@@ -77,7 +78,7 @@ public class DataUtilitiesTest extends DataTestCase {
      * Test for String[] attributeNames(Filter)
      */
     public void testAttributeNamesFilter() throws IllegalFilterException {
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         String[] names;
 
         Filter filter = null;
@@ -319,7 +320,7 @@ public class DataUtilitiesTest extends DataTestCase {
     	//now use some filters
     	Filter filter1 = null;
     	Filter filter2 = null;
-    	FilterFactory ffac = FilterFactory.createFilterFactory();
+    	FilterFactory ffac = FilterFactoryFinder.createFilterFactory();
 
     	String typeSpec = "geom:Point,att1:String,att2:String,att3:String,att4:String";
     	FeatureType testType = DataUtilities.createType("testType", typeSpec);

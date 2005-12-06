@@ -9,10 +9,12 @@ package org.geotools.renderer.style;
 
 import junit.framework.*;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.util.NumberRange;
 
 /**
@@ -120,13 +122,13 @@ public class SLDStyleFactoryTest extends TestCase {
     public void testCreateIncompletePolygonStyle() {
         SLDStyleFactory sFac = new SLDStyleFactory();
         NumberRange range = new NumberRange(1,1);
-        StyleFactory fac = StyleFactory.createStyleFactory();
+        StyleFactory fac = StyleFactoryFinder.createStyleFactory();
         
         PolygonSymbolizer symb;
         Mark myMark;
         //full symbolizer
-        symb = StyleFactory.createStyleFactory().createPolygonSymbolizer();
-        //symb.setFill(fac.createFill(FilterFactory.createFilterFactory().createLiteralExpression("#ffff00")));
+        symb = StyleFactoryFinder.createStyleFactory().createPolygonSymbolizer();
+        //symb.setFill(fac.createFill(FilterFactoryFinder.createFilterFactory().createLiteralExpression("#ffff00")));
         
         sFac.createPolygonStyle(null, symb,range);
     }
@@ -161,18 +163,18 @@ public class SLDStyleFactoryTest extends TestCase {
     public void testCreateCompletePointStyle() {
         SLDStyleFactory sFac = new SLDStyleFactory();
         NumberRange range = new NumberRange(1,1);
-        StyleFactory fac = StyleFactory.createStyleFactory();
+        StyleFactory fac = StyleFactoryFinder.createStyleFactory();
         
         PointSymbolizer symb;
         Mark myMark;
         //full symbolizer
-        symb = StyleFactory.createStyleFactory().createPointSymbolizer();
+        symb = StyleFactoryFinder.createStyleFactory().createPointSymbolizer();
         myMark = fac.createMark();
-        myMark.setFill(fac.createFill(FilterFactory.createFilterFactory().createLiteralExpression("#ffff00")));
-        symb.getGraphic().setSize(FilterFactory.createFilterFactory().createLiteralExpression(10));
+        myMark.setFill(fac.createFill(FilterFactoryFinder.createFilterFactory().createLiteralExpression("#ffff00")));
+        symb.getGraphic().setSize(FilterFactoryFinder.createFilterFactory().createLiteralExpression(10));
         symb.getGraphic().addMark(myMark);
-        symb.getGraphic().setOpacity(FilterFactory.createFilterFactory().createLiteralExpression(1));
-        symb.getGraphic().setRotation(FilterFactory.createFilterFactory().createLiteralExpression(0));
+        symb.getGraphic().setOpacity(FilterFactoryFinder.createFilterFactory().createLiteralExpression(1));
+        symb.getGraphic().setRotation(FilterFactoryFinder.createFilterFactory().createLiteralExpression(0));
         sFac.createPointStyle(null, symb,range);
         
     }
@@ -180,12 +182,12 @@ public class SLDStyleFactoryTest extends TestCase {
     public void testCreateIncompletePointStyle() {
         SLDStyleFactory sFac = new SLDStyleFactory();
         NumberRange range = new NumberRange(1,1);
-        StyleFactory fac = StyleFactory.createStyleFactory();
+        StyleFactory fac = StyleFactoryFinder.createStyleFactory();
         
         PointSymbolizer symb;
         Mark myMark;
         //full symbolizer
-        symb = StyleFactory.createStyleFactory().createPointSymbolizer();
+        symb = StyleFactoryFinder.createStyleFactory().createPointSymbolizer();
         myMark = fac.createMark();
         
         symb.getGraphic().addMark(myMark);

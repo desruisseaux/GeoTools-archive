@@ -38,7 +38,7 @@ public class CapabilitiesTest extends TestCase {
     private Filter compFilter;
     private Filter logFilter;
     private FilterCapabilities capabilities;
-    private FilterFactory fact = FilterFactory.createFilterFactory();
+    private FilterFactory fact = FilterFactoryFinder.createFilterFactory();
 
     /** Test suite for this test case */
     TestSuite suite = null;

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,13 +12,12 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.filter;
 
+import org.geotools.feature.Feature;
 import java.util.Collection;
 
-import org.geotools.feature.Feature;
 
 /**
  * Defines a feature ID filter, which holds a list of feature IDs. This filter
@@ -52,26 +51,25 @@ public interface FidFilter extends Filter {
      * @return An array of all the fids in this filter.
      */
     String[] getFids();
-    
-	/** 
-	 * Adds a collection of feature IDs to the filter. 
-	 * 
-	 * @param fids A collection of feature IDs. 
-	 */ 
-	void addAllFids(Collection fidsToAdd); 
 
-	/** 
-	 * Removes a collection of feature IDs from the filter. 
-	 * 
-	 * @param fids A collection of feature IDs. 
-	 */ 
-	void removeAllFids(Collection fidsToRemove); 
+    /**
+     * Adds a collection of feature IDs to the filter.
+     *
+     * @param fidsToAdd A collection of feature IDs.
+     */
+    void addAllFids(Collection fidsToAdd);
 
-	/** 
-	 * Removes a feature ID from the filter. 
-	 * 
-	 * @param fid A single feature ID. 
-	 */ 
-	void removeFid(String fid);
+    /**
+     * Removes a collection of feature IDs from the filter.
+     *
+     * @param fidsToRemove A collection of feature IDs.
+     */
+    void removeAllFids(Collection fidsToRemove);
 
+    /**
+     * Removes a feature ID from the filter.
+     *
+     * @param fid A single feature ID.
+     */
+    void removeFid(String fid);
 }

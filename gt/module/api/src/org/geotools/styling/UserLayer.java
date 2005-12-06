@@ -1,0 +1,71 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package org.geotools.styling;
+
+import org.geotools.data.DataStore;
+import org.geotools.feature.FeatureType;
+
+
+/**
+ * A UserLayer allows a user-defined layer to be built from WFS and WCS data.
+ * 
+ * <p>
+ * The details of this object are taken from the <a
+ * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
+ * Styled-Layer Descriptor Report (OGC 02-070) version 1.0.0.</a>:
+ * <pre><code>
+ * &lt;xsd:element name="UserLayer"&gt;
+ *   &lt;xsd:annotation&gt;
+ *     &lt;xsd:documentation&gt;
+ *       A UserLayer allows a user-defined layer to be built from WFS and
+ *       WCS data.
+ *     &lt;/xsd:documentation&gt;
+ *   &lt;/xsd:annotation&gt;
+ *   &lt;xsd:complexType&gt;
+ *     &lt;xsd:sequence&gt;
+ *       &lt;xsd:element ref="sld:Name" minOccurs="0"/&gt;
+ *       &lt;xsd:element ref="sld:RemoteOWS" minOccurs="0"/&gt;
+ *       &lt;xsd:element ref="sld:LayerFeatureConstraints"/&gt;
+ *       &lt;xsd:element ref="sld:UserStyle" maxOccurs="unbounded"/&gt;
+ *     &lt;/xsd:sequence&gt;
+ *   &lt;/xsd:complexType&gt;
+ * &lt;/xsd:element&gt;
+ * </code></pre>
+ * </p>
+ */
+public interface UserLayer extends StyledLayer {
+    public RemoteOWS getRemoteOWS();
+
+    public DataStore getInlineFeatureDatastore();
+
+    public FeatureType getInlineFeatureType();
+
+    public void setInlineFeatureDatastore(DataStore store);
+
+    public void setInlineFeatureType(FeatureType ft);
+
+    public void setRemoteOWS(RemoteOWS service);
+
+    public FeatureTypeConstraint[] getLayerFeatureConstraints();
+
+    public void setLayerFeatureConstraints(FeatureTypeConstraint[] constraints);
+
+    public Style[] getUserStyles();
+
+    public void setUserStyles(Style[] styles);
+
+    public void addUserStyle(Style style);
+}

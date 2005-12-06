@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>package org.geotools.event</TITLE>
+  </HEAD>
+  <BODY>
+  Allows for events on GeoTools nested data structures.
+  <p>
+  Several of the GeoTools objects are produced in reference to
+  specifications, in particular XML based specifications. Often
+  we try and match the same abstractions present in a specification
+  like SLD or Filter. But rather then make use of pure Java Beans, and
+  make user interface code responsible for managing a host of listeners
+  we are providing a single set of listeners located at the object
+  matching the document base.
+  <p>
+  For more Details:
+  <ul>
+  <li>This design is similar to EMF, or JFace use (aka borrow code examples)
+  <li>Not specific to Documents (just nesting),
+      the Catalog api will use these events
+  <li>We do try and match the document structure perfectly for Feature/FeatureCollection/GML
+  (so that the same XPath expressions can be respected). FeatureCollection and
+  Feature have their own well explored structure and issues and will not be using
+  this event system. Given the size of FeatureCollections it is not practicle for each
+  child to "know" its parent.
+  </ul>
+  <p>
+  </p>
+  <h3>References</h2>
+  The following links will be of interest:
+  <ul>
+  <li>Eclipse Modeling Framework
+  <li>JFace
+  </ul>  
+  @author Jody Garnett, Refractions Research
+  </BODY>
+</HTML>

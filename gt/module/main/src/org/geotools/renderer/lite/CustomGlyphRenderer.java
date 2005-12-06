@@ -20,6 +20,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.Graphic;
 
@@ -35,7 +36,7 @@ public class CustomGlyphRenderer implements GlyphRenderer {
     
     /** Creates a new instance of CustomGlyphRenderer */
     public CustomGlyphRenderer() {
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         list.addProperty("radius", Expression.class, factory.createLiteralExpression(50));
         list.addProperty("circle color", Expression.class, factory.createLiteralExpression("#000066"));
         list.addProperty("bar height", Expression.class, factory.createLiteralExpression(150));

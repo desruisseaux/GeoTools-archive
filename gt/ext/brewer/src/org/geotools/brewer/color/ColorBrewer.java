@@ -61,6 +61,15 @@ public class ColorBrewer {
         return legendType;
     }
 
+    public BrewerPalette[] getPalettes() {
+    	Object[] entry = this.palettes.keySet().toArray();
+    	BrewerPalette[] palettes = new BrewerPalette[entry.length];
+        for (int i = 0; i < entry.length; i++) {
+            palettes[i] = (BrewerPalette) getPalette(entry[i].toString());
+        }
+    	return palettes;
+    }
+    
     public String[] getPaletteNames() {
         Object[] keys = palettes.keySet().toArray();
         String[] paletteList = new String[keys.length];
@@ -259,11 +268,10 @@ public class ColorBrewer {
      * @return
      */
     private String fixToString(String input) {
-        if (input.startsWith("[")) {
+        if (input.startsWith("[") && input.endsWith("]")) {
             input = input.substring(1, input.length() - 1); //remove []
             input = input.replaceAll("#text: ", ""); //remove "#text: " 
         }
-
         return input;
     }
 

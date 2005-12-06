@@ -6,6 +6,7 @@ import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 
@@ -22,63 +23,63 @@ public class BoundsExtractorTest extends TestCase {
 		schema=DataUtilities.createType("type","the_geom:Geometry,name:String");
 	}
 	public void testBBoxFilter() throws Exception {
-		FilterFactory factory=FilterFactory.createFilterFactory();
+		FilterFactory factory=FilterFactoryFinder.createFilterFactory();
 		
 		GeometryFilter filter=factory.createGeometryFilter(org.geotools.filter.Filter.GEOMETRY_BBOX);
 
 		testFilter(factory, filter);
 	}
 	public void testCONTAINSFilter() throws Exception {
-		FilterFactory factory=FilterFactory.createFilterFactory();
+		FilterFactory factory=FilterFactoryFinder.createFilterFactory();
 		
 		GeometryFilter filter=factory.createGeometryFilter(org.geotools.filter.Filter.GEOMETRY_CONTAINS);
 
 		testFilter(factory, filter);
 	}
 	public void testCROSSESFilter() throws Exception {
-		FilterFactory factory=FilterFactory.createFilterFactory();
+		FilterFactory factory=FilterFactoryFinder.createFilterFactory();
 		
 		GeometryFilter filter=factory.createGeometryFilter(org.geotools.filter.Filter.GEOMETRY_CROSSES);
 
 		testFilter(factory, filter);
 	}
 	public void testDWITHINFilter() throws Exception {
-		FilterFactory factory=FilterFactory.createFilterFactory();
+		FilterFactory factory=FilterFactoryFinder.createFilterFactory();
 		
 		GeometryFilter filter=factory.createGeometryFilter(org.geotools.filter.Filter.GEOMETRY_DWITHIN);
 
 		testFilter(factory, filter);
 	}
 	public void testEQUALSFilter() throws Exception {
-		FilterFactory factory=FilterFactory.createFilterFactory();
+		FilterFactory factory=FilterFactoryFinder.createFilterFactory();
 		
 		GeometryFilter filter=factory.createGeometryFilter(org.geotools.filter.Filter.GEOMETRY_EQUALS);
 
 		testFilter(factory, filter);
 	}
 	public void testINTERSECTSFilter() throws Exception {
-		FilterFactory factory=FilterFactory.createFilterFactory();
+		FilterFactory factory=FilterFactoryFinder.createFilterFactory();
 		
 		GeometryFilter filter=factory.createGeometryFilter(org.geotools.filter.Filter.GEOMETRY_INTERSECTS);
 
 		testFilter(factory, filter);
 	}
 	public void testOVERLAPSFilter() throws Exception {
-		FilterFactory factory=FilterFactory.createFilterFactory();
+		FilterFactory factory=FilterFactoryFinder.createFilterFactory();
 		
 		GeometryFilter filter=factory.createGeometryFilter(org.geotools.filter.Filter.GEOMETRY_OVERLAPS);
 
 		testFilter(factory, filter);
 	}
 	public void testTOUCHESFilter() throws Exception {
-		FilterFactory factory=FilterFactory.createFilterFactory();
+		FilterFactory factory=FilterFactoryFinder.createFilterFactory();
 		
 		GeometryFilter filter=factory.createGeometryFilter(org.geotools.filter.Filter.GEOMETRY_TOUCHES);
 
 		testFilter(factory, filter);
 	}
 	public void testWITHINFilter() throws Exception {
-		FilterFactory factory=FilterFactory.createFilterFactory();
+		FilterFactory factory=FilterFactoryFinder.createFilterFactory();
 		
 		GeometryFilter filter=factory.createGeometryFilter(org.geotools.filter.Filter.GEOMETRY_WITHIN);
 

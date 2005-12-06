@@ -20,6 +20,7 @@ import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -31,7 +32,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 //import org.geotools.data.mysql;
 
 public class MysqlTestSuite extends TestCase {
-   private static final FilterFactory filterFactory = FilterFactory.createFilterFactory();
+   private static final FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
 
      /** Standard logging instance */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.defaultcore");

@@ -46,6 +46,7 @@ import org.geotools.styling.SLDParser;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.UserLayer;
@@ -92,7 +93,7 @@ public class Rendering2DTest extends TestCase {
     }
 
     Style loadTestStyle() throws IOException {
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
 
         java.net.URL surl = TestData.getResource(this, "test-sld.xml");
         SLDParser stylereader = new SLDParser(factory, surl);

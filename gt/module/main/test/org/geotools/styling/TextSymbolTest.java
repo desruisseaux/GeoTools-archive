@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Point;
  * is deprecated - cholmes.
  */
 public class TextSymbolTest extends TestCase {
-    private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactory.createFilterFactory();
+    private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactoryFinder.createFilterFactory();
 
     /** factory for attributes */
     private static AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();

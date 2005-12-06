@@ -7,6 +7,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.event.GTComponent;
+import org.geotools.event.GTDelta;
+import org.geotools.event.GTDeltaImpl;
+import org.geotools.event.GTDeltaVisitor;
+import org.geotools.event.GTRoot;
+import org.geotools.event.GTDelta.Kind;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
@@ -15,18 +21,21 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 
 /**
  * Utility class for Styles.
- * 
+ * <p>
+ * Warning: these methods are subject to change in the near future. 
+ * <p>
  * @author Cory Horner, Refractions Research
- * 
  */
 public class Styles {
 
+	/** @deprecated */
 	public static AttributeType[] getAttributeTypes(Filter[] filter, AttributeType[] availableAttributeTypes) throws IllegalFilterException {
 		//visit each attribute in the filter and find the attributeType of any AttributeExpressions
 		AttributeType[] attrib = new AttributeType[filter.length];
@@ -118,6 +127,25 @@ public class Styles {
 		}
 	}
 	
+	
+	/**
+	 * Climbs the style hierarchy until null or an SLD is found.
+	 * 
+	 * @param object
+	 * @return SLD
+	 */
+	public static StyledLayerDescriptor getStyledLayerDescriptor(Object gtComponent) {
+		if (!(gtComponent instanceof GTComponent)) return null;
+		GTComponent component = (GTComponent) gtComponent;
+		while (component.getParent() != GTRoot.NO_PARENT) {
+			component = component.getParent();
+			if (component instanceof StyledLayerDescriptor) {
+				return (StyledLayerDescriptor) component;
+			}
+		}
+		return null;
+	}
+	
 	private static boolean isRanged(String styleExpression) {
 		return styleExpression.matches(".+\\.{2}.+");
 	}
@@ -126,6 +154,7 @@ public class Styles {
 	 * Overwrites each filter, which will modify our style object assuming there
 	 * are no clones in oldFilters.  Note: made private since it doesn't work.
 	 * 
+	 * @deprecated
 	 * @param oldFilters
 	 *            references to the Filters we want to overwrite
 	 * @param newFilters
@@ -136,6 +165,28 @@ public class Styles {
 		for (int i = 0; i < oldFilters.length; i++) {
 			oldFilters[i] = newFilters[i];
 		}
+	}
+	
+	/**
+	 * Event-friendly replacement of a style.
+	 * @deprecated
+	 * @param oldStyle
+	 * @param newStyle
+	 */
+	public static void replaceStyle(Style oldStyle, Style newStyle) {
+//		if (oldStyle instanceof StyleImpl && newStyle instanceof StyleImpl) {
+//			GTComponent parent = ((StyleImpl) oldStyle).parent;
+//			oldStyle = newStyle;
+//			((GTComponent) oldStyle).parent = parent; //maintain the parent
+//			parent.fireChildChanged(oldStyle);
+//		}
+		GTComponent parent = oldStyle.getParent();
+		oldStyle = newStyle;
+		oldStyle.setParent(parent);
+		//TODO: fire event
+//		parent.changed(new GTDeltaImpl(?, ?) {
+//			//fireChildChanged(oldStyle)
+//		});
 	}
 	
 	/**
@@ -161,7 +212,7 @@ public class Styles {
 		// eliminate spaces after commas
 		String expr = styleExpression.replaceAll(",\\s+", ","); //$NON-NLS-1$//$NON-NLS-2$
 		String[] attribValue = expr.split(","); //$NON-NLS-1$
-		FilterFactory ff = FilterFactory.createFilterFactory();
+		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		// create the first filter
 		CompareFilter cFilter = ff.createCompareFilter(Filter.COMPARE_EQUALS);
 		AttributeExpression attribExpr = ff
@@ -205,7 +256,7 @@ public class Styles {
 		// eliminate spaces after commas
 		String expr = styleExpression.replaceAll(",\\s+", ","); //$NON-NLS-1$//$NON-NLS-2$
 		String[] attribValue = expr.split(","); //$NON-NLS-1$
-		FilterFactory ff = FilterFactory.createFilterFactory();
+		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		// create the first filter
 		CompareFilter cFilter = ff.createCompareFilter(Filter.COMPARE_EQUALS);
 		cFilter.addLeftValue(attribExpr);
@@ -365,7 +416,7 @@ public class Styles {
 	public static Filter toRangedFilter(String styleExpression,
 			FeatureType featureType, String attributeTypeName, boolean upperBoundClosed)
 			throws IllegalFilterException {
-		FilterFactory ff = FilterFactory.createFilterFactory();
+		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		AttributeExpression attrib = ff.createAttributeExpression(featureType, attributeTypeName);
 		String[] strs = styleExpression.split("\\.\\."); //$NON-NLS-1$
 		if (strs.length != 2) {
@@ -490,10 +541,11 @@ public class Styles {
 	}
 	
 	public static void modifyFTS(FeatureTypeStyle fts, int ruleIndex, String styleExpression) throws IllegalFilterException {
-		FilterFactory ff = FilterFactory.createFilterFactory();
+		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		
 		Rule[] rule = fts.getRules();
-		Filter filter = rule[ruleIndex].getFilter();
+		Rule thisRule = rule[ruleIndex];
+		Filter filter = thisRule.getFilter();
 		short filterType = filter.getFilterType();
 //		boolean isFirst = false;
 //		if (ruleIndex == 1) isFirst = true;
@@ -524,6 +576,8 @@ public class Styles {
 				//upper bound value has changed, update
 				filter2.addRightValue(ff.createLiteralExpression(newValue[1]));
 			}
+			//style events don't handle filters yet, so fire the change event for filter
+			thisRule.changed(new GTDeltaImpl(Kind.CHANGED, filter)); 
 			//TODO: adjust the previous and next filters (uses isFirst, isLast)
 		} else if ((filterType == Filter.LOGIC_OR) || (filterType == Filter.COMPARE_EQUALS)) { //explicit expression 
 			//obtain the expression containing the attribute

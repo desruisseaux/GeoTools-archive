@@ -40,7 +40,7 @@ public class XMLEncoderTest extends TestCase {
     
     public void testSimpleEncoder() throws Exception{
 
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
         
         java.net.URL surl = org.geotools.resources.TestData.getResource(this, "markTest.sld");
         LOGGER.info("reading "+surl);
@@ -61,11 +61,11 @@ public class XMLEncoderTest extends TestCase {
     }
     public void testMarkDisplacment() throws Exception{
 
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
                                                                                
         java.net.URL surl = org.geotools.resources.TestData.getResource(this, "markDisplacementTest.sld");
         LOGGER.info("reading "+surl);
-        SLDStyle stylereader = new SLDStyle(factory,surl);
+        SLDParser stylereader = new SLDParser (factory,surl);
         Style[] style = stylereader.readXML();
         StringWriter output = new StringWriter();
 //        Writer output = new PrintWriter(System.out); 
@@ -82,11 +82,11 @@ public class XMLEncoderTest extends TestCase {
     }
     public void testComplexEncoder() throws Exception{
         
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
        
         java.net.URL surl = org.geotools.resources.TestData.getResource(this, "sample.sld");
         LOGGER.info("reading "+surl);
-        SLDStyle stylereader = new SLDStyle(factory,surl);
+        SLDParser stylereader = new SLDParser(factory,surl);
         Style[] style = stylereader.readXML();
         StringWriter output = new StringWriter();
 //        Writer output = new PrintWriter(System.out); 
@@ -96,11 +96,11 @@ public class XMLEncoderTest extends TestCase {
     
     }
     public void testComplexTextEncoder() throws Exception{
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
         java.net.URL surl = org.geotools.resources.TestData.getResource(this, "textTest.sld");
         
         LOGGER.info("reading "+surl);
-        SLDStyle stylereader = new SLDStyle(factory,surl);
+        SLDParser stylereader = new SLDParser(factory,surl);
         Style[] style = stylereader.readXML();
         StringWriter output = new StringWriter();
 //        Writer output = new PrintWriter(System.out); 

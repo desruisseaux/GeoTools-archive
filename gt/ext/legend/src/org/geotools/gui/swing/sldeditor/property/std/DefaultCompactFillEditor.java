@@ -40,7 +40,7 @@ import org.geotools.gui.swing.sldeditor.util.FormUtils;
 import org.geotools.gui.swing.sldeditor.util.StyleCloner;
 import org.geotools.renderer.lite.LiteRenderer;
 import org.geotools.styling.Fill;
-import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 
 
 /**
@@ -63,7 +63,7 @@ public class DefaultCompactFillEditor extends FillEditor {
     }
 
     public DefaultCompactFillEditor(FeatureType featureType, Fill fill) {
-        styleCloner = new StyleCloner(StyleFactory.createStyleFactory());
+        styleCloner = new StyleCloner(StyleFactoryFinder.createStyleFactory());
 
         this.featureType = featureType;
         this.fill = fill;

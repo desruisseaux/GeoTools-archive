@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  * Created on 15-Mar-2005
  *
  * TODO To change the template for this generated file go to
@@ -6,11 +22,11 @@
  */
 package org.geotools.data;
 
+import org.geotools.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.net.URI;
 import java.util.Arrays;
 
-import org.geotools.filter.Filter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Implementation of Query.ALL.
@@ -26,8 +42,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * <pre><code>
  * featureSource.getFeatures( Query.FIDS );
  * </code></pre>
- *
- * @author Jody Garnett, Refractions Research, Inc
  */
 class ALLQuery implements Query {
     public final String[] getPropertyNames() {
@@ -49,9 +63,11 @@ class ALLQuery implements Query {
     public final String getTypeName() {
         return null;
     }
+
     public URI getNamespace() {
         return NO_NAMESPACE;
     }
+
     public final String getHandle() {
         return "Request All Features";
     }
@@ -69,13 +85,15 @@ class ALLQuery implements Query {
         String[] n = getPropertyNames();
 
         return ((n == null) ? (-1)
-                                    : ((n.length == 0) ? 0 : (n.length
-                | n[0].hashCode()))) | getMaxFeatures()
-                | ((getFilter() == null) ? 0 : getFilter().hashCode())
-                | ((getTypeName() == null) ? 0 : getTypeName().hashCode())
-                | ((getVersion() == null) ? 0 : getVersion().hashCode())
-                | ((getCoordinateSystem() == null) ? 0 : getCoordinateSystem().hashCode())
-                | ((getCoordinateSystemReproject() == null) ? 0 : getCoordinateSystemReproject().hashCode());
+                            : ((n.length == 0) ? 0 : (n.length
+        | n[0].hashCode()))) | getMaxFeatures()
+        | ((getFilter() == null) ? 0 : getFilter().hashCode())
+        | ((getTypeName() == null) ? 0 : getTypeName().hashCode())
+        | ((getVersion() == null) ? 0 : getVersion().hashCode())
+        | ((getCoordinateSystem() == null) ? 0 : getCoordinateSystem().hashCode())
+        | ((getCoordinateSystemReproject() == null) ? 0
+                                                    : getCoordinateSystemReproject()
+                                                          .hashCode());
     }
 
     /**
@@ -94,11 +112,13 @@ class ALLQuery implements Query {
         if ((obj == null) || !(obj instanceof Query)) {
             return false;
         }
-        if (this == obj) return true;
-        
+
+        if (this == obj) {
+            return true;
+        }
+
         Query other = (Query) obj;
-        
-        
+
         return Arrays.equals(getPropertyNames(), other.getPropertyNames())
         && (retrieveAllProperties() == other.retrieveAllProperties())
         && (getMaxFeatures() == other.getMaxFeatures())
@@ -108,11 +128,13 @@ class ALLQuery implements Query {
                                     : getTypeName().equals(other.getTypeName()))
         && ((getVersion() == null) ? (other.getVersion() == null)
                                    : getVersion().equals(other.getVersion()))
-        && ((getCoordinateSystem() == null) ? (other.getCoordinateSystem() == null)
-                                           : getCoordinateSystem().equals(other.getCoordinateSystem()))
-        && ((getCoordinateSystemReproject() == null) ? (other.getCoordinateSystemReproject() == null)
-                                                   : getCoordinateSystemReproject().equals(other.getCoordinateSystemReproject()))                                           
-        ;
+        && ((getCoordinateSystem() == null)
+        ? (other.getCoordinateSystem() == null)
+        : getCoordinateSystem().equals(other.getCoordinateSystem()))
+        && ((getCoordinateSystemReproject() == null)
+        ? (other.getCoordinateSystemReproject() == null)
+        : getCoordinateSystemReproject()
+              .equals(other.getCoordinateSystemReproject()));
     }
 
     public String toString() {
@@ -121,10 +143,10 @@ class ALLQuery implements Query {
 
     /**
      * Return <code>null</code> as ALLQuery does not require a CS.
-     * 
-     * @see org.geotools.data.Query#getCoordinateSystem()
-     * 
+     *
      * @return <code>null</code> as override is not required.
+     *
+     * @see org.geotools.data.Query#getCoordinateSystem()
      */
     public CoordinateReferenceSystem getCoordinateSystem() {
         return null;
@@ -132,10 +154,10 @@ class ALLQuery implements Query {
 
     /**
      * Return <code>null</code> as ALLQuery does not require a CS.
-     * 
-     * @see org.geotools.data.Query#getCoordinateSystemReproject()
-     * 
+     *
      * @return <code>null</code> as reprojection is not required.
+     *
+     * @see org.geotools.data.Query#getCoordinateSystemReproject()
      */
     public CoordinateReferenceSystem getCoordinateSystemReproject() {
         return null;

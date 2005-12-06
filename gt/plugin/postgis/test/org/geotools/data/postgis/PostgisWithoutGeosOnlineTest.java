@@ -13,6 +13,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -52,7 +53,7 @@ public class PostgisWithoutGeosOnlineTest extends AbstractPostgisDataTestCase {
 		
 		//query each feature
 		FeatureType type = data.getSchema("road");
-		FilterFactory ff = FilterFactory.createFilterFactory();
+		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		
 		for (int i = 0; i < bbox.size(); i++) {
 			Envelope box = (Envelope)bbox.get(i);

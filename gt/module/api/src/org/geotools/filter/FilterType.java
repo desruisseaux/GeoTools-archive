@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,14 +12,12 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
-
 package org.geotools.filter;
 
 /**
- * The FilterType interface lists all the possible type of filter.
- * Should be replaced by a type safe enum when we move to Java 1.5 
+ * The FilterType interface lists all the possible type of filter. Should be
+ * replaced by a type safe enum when we move to Java 1.5
  *
  * @author aaime
  */
@@ -29,8 +27,8 @@ public interface FilterType {
      * are implemented by a single filter (ie. all logic types are implemented
      * by FilterLogic).
      * **********************************************************************/
-    /* Types implemented by FilterLogic */
 
+    /* Types implemented by FilterLogic */
     /** Defines a logical 'OR' filter. */
     public static final short LOGIC_OR = 1;
 
@@ -41,7 +39,6 @@ public interface FilterType {
     public static final short LOGIC_NOT = 3;
 
     /* Types implemented by FilterGeometry */
-
     /** Defines a geometric bounding box filter. */
     public static final short GEOMETRY_BBOX = 4;
 
@@ -76,7 +73,6 @@ public interface FilterType {
     public static final short GEOMETRY_DWITHIN = 24;
 
     /* Types implemented by FilterCompare */
-
     /** Defines a comparative equals filter (may be a math filter). */
     public static final short COMPARE_EQUALS = 14;
 
@@ -96,8 +92,8 @@ public interface FilterType {
     public static final short COMPARE_NOT_EQUALS = 23;
 
     /**
-     * Defines a between filter, which is implemented by FilterBetween. Note that this filter is
-     * defined as a math filter.
+     * Defines a between filter, which is implemented by FilterBetween. Note
+     * that this filter is defined as a math filter.
      */
     public static final short BETWEEN = 19;
 

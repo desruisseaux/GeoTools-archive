@@ -19,6 +19,8 @@ package org.geotools.styling;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.event.AbstractGTComponent;
+
 
 /**
  * A simple implementation of the color map interface.
@@ -26,7 +28,7 @@ import java.util.List;
  * @author iant
  * @author aaime
  */
-public class ColorMapImpl implements ColorMap {
+public class ColorMapImpl extends AbstractGTComponent implements ColorMap {
     private List list = new ArrayList();
     private int type = ColorMap.TYPE_RAMP;
 
@@ -56,7 +58,7 @@ public class ColorMapImpl implements ColorMap {
         if ((type < TYPE_RAMP) || (type > TYPE_VALUES)) {
             throw new IllegalArgumentException();
         }
-
         this.type = type;
+        fireChanged();
     }
 }

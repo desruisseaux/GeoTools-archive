@@ -112,7 +112,7 @@ public class FilterTest extends TestCase {
 
         set = true;
         
-        fac = FilterFactory.createFilterFactory();
+        fac = FilterFactoryFinder.createFilterFactory();
 
         // Create the schema attributes
         //LOGGER.debug("creating flat feature...");

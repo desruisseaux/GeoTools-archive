@@ -40,6 +40,7 @@ import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.JTS;
@@ -63,6 +64,7 @@ import org.geotools.styling.SLDParser;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.UserLayer;
@@ -92,7 +94,7 @@ public class Rendering2DTest extends TestCase {
      */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
     public static boolean INTERACTIVE=false;
-    private static final FilterFactory filterFactory = FilterFactory.createFilterFactory();
+    private static final FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     static final String LINE = "linefeature";
     static final String POLYGON = "polygonfeature";
     static final String POINT = "pointfeature";
@@ -117,7 +119,7 @@ public class Rendering2DTest extends TestCase {
     }
      
     Style loadTestStyle() throws IOException {
-        StyleFactory factory = StyleFactory.createStyleFactory();
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
 
         java.net.URL surl = TestData.getResource(this, "test-sld.xml");
         SLDParser stylereader = new SLDParser(factory, surl);
@@ -130,7 +132,7 @@ public class Rendering2DTest extends TestCase {
     }
     
     Style createTestStyle() throws IllegalFilterException {
-        StyleFactory sFac = StyleFactory.createStyleFactory();
+        StyleFactory sFac = StyleFactoryFinder.createStyleFactory();
         // The following is complex, and should be built from
         // an SLD document and not by hand
         PointSymbolizer pointsym = sFac.createPointSymbolizer();
@@ -569,7 +571,7 @@ public class Rendering2DTest extends TestCase {
         // the mixed filter to a given layer.
         FeatureReader reader;
         Filter filter = Filter.NONE;
-        FilterFactory ffac = FilterFactory.createFilterFactory();
+        FilterFactory ffac = FilterFactoryFinder.createFilterFactory();
 
         // test maxFeatures, render just the first 2 features
         layerQuery = new DefaultQuery("querytest", filter, 2, null, "handle");
@@ -745,7 +747,7 @@ public class Rendering2DTest extends TestCase {
     }
 
     private Style createDefQueryTestStyle() throws IllegalFilterException {
-        StyleFactory sFac = StyleFactory.createStyleFactory();
+        StyleFactory sFac = StyleFactoryFinder.createStyleFactory();
 
         PointSymbolizer pointsym = sFac.createPointSymbolizer();
         pointsym.setGraphic(sFac.getDefaultGraphic());

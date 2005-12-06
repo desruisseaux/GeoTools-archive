@@ -28,6 +28,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 import com.esri.sde.sdk.client.SeException;
 import com.vividsolutions.jts.geom.Envelope;
@@ -87,7 +88,7 @@ public class ArcSDEQueryTest extends TestCase {
         	fids.add(reader.next().getID());
         }
         reader.close();
-        FidFilter filter = FilterFactory.createFilterFactory().createFidFilter();
+        FidFilter filter = FilterFactoryFinder.createFilterFactory().createFidFilter();
         filter.addAllFids(fids);
         filteringQuery = new DefaultQuery(typeName, filter);
         this.queryFiltered = ArcSDEQuery.createQuery(dstore, filteringQuery);

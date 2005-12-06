@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.filter;
 
@@ -34,8 +33,7 @@ public interface LiteralExpression extends Expression {
      *
      * @throws IllegalFilterException This literal type is not in scope.
      */
-    void setLiteral(Object literal)
-        throws IllegalFilterException;
+    void setLiteral(Object literal) throws IllegalFilterException;
 
     /**
      * Gets the value of this literal.

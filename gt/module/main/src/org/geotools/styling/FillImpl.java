@@ -26,7 +26,10 @@ package org.geotools.styling;
 // J2SE dependencies
 import java.util.logging.Logger;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -35,13 +38,12 @@ import org.opengis.util.Cloneable;
  * @version $Id: FillImpl.java,v 1.10 2003/09/06 04:52:31 seangeo Exp $
  * @author James Macgill, CCG
  */
-public class FillImpl implements Fill, Cloneable {
+public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
     /**
      * The logger for the default core module.
      */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
-    private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactory.createFilterFactory();
+    private FilterFactory filterFactory;
     private Expression color = null;
     private Expression backgroundColor = null;
     private Expression opacity = null;
@@ -49,9 +51,17 @@ public class FillImpl implements Fill, Cloneable {
 
     /** Creates a new instance of DefaultFill */
     protected FillImpl() {
+    	this( FilterFactoryFinder.createFilterFactory() );
     }
 
-    /**
+    public FillImpl(FilterFactory factory) {
+		filterFactory = factory;
+	}
+    public void setFilterFactory( FilterFactory factory ){
+    	filterFactory = factory;
+    }
+
+	/**
      * This parameter gives the solid color that will be used for a Fill.<br>
      * The color value is RGB-encoded using two hexidecimal digits per
      * primary-color component, in the order Red, Green, Blue, prefixed with
@@ -83,11 +93,17 @@ public class FillImpl implements Fill, Cloneable {
      * @param rgb The color of the Fill encoded as a hexidecimal RGB value.
      */
     public void setColor(Expression rgb) {
+    	if( color == rgb ) return;
+    	fireChildRemoved( color );
         color = rgb;
+    	fireChildAdded( rgb );    
     }
 
     public void setColor(String rgb) {
+    	if( color.toString() == rgb ) return;
+    	fireChildRemoved( color );
         color = filterFactory.createLiteralExpression(rgb);
+    	fireChildAdded( rgb );    
     }
 
     /**
@@ -121,12 +137,18 @@ public class FillImpl implements Fill, Cloneable {
      * @param rgb The color of the Fill encoded as a hexidecimal RGB value.
      */
     public void setBackgroundColor(Expression rgb) {
-        backgroundColor = rgb;
+    	if( this.backgroundColor == rgb ) return;
+    	fireChildRemoved( backgroundColor );
+    	backgroundColor = rgb;
+    	fireChildAdded( rgb );    
     }
 
     public void setBackgroundColor(String rgb) {
         LOGGER.fine("setting bg color with " + rgb + " as a string");
+    	if( backgroundColor.toString() == rgb ) return;
+    	fireChildRemoved( backgroundColor );
         backgroundColor = filterFactory.createLiteralExpression(rgb);
+    	fireChildAdded( backgroundColor );    
     }
 
     /**
@@ -150,11 +172,17 @@ public class FillImpl implements Fill, Cloneable {
      * @param opacity New value of property opacity.
      */
     public void setOpacity(Expression opacity) {
+    	if( this.opacity == opacity ) return;
+    	fireChildRemoved( this.opacity );
         this.opacity = opacity;
+    	fireChildAdded( opacity );    
     }
 
     public void setOpacity(String opacity) {
+    	if( this.opacity.toString() == opacity ) return;
+    	fireChildRemoved( this.opacity );
         this.opacity = filterFactory.createLiteralExpression(opacity);
+    	fireChildAdded( opacity );    
     }
 
     /**
@@ -173,7 +201,10 @@ public class FillImpl implements Fill, Cloneable {
      * @param graphicFill New value of property graphic.
      */
     public void setGraphicFill(org.geotools.styling.Graphic graphicFill) {
-        this.graphicFill = graphicFill;
+    	if( this.graphicFill == graphicFill ) return;
+    	fireChildRemoved( this.graphicFill );
+    	this.graphicFill = graphicFill;
+    	fireChildAdded( graphicFill );    
     }
     
     public void accept(StyleVisitor visitor) {

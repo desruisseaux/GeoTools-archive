@@ -25,6 +25,7 @@ import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
 import org.geotools.xml.DocumentWriter;
@@ -57,7 +58,7 @@ public class ExpresionEncodeTest extends FilterTestSupport {
     }
     
     public void testPropBetweenFilter() throws IllegalFilterException, OperationNotSupportedException, IOException{
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         BetweenFilter bf = ff.createBetweenFilter();
         bf.addLeftValue(ff.createLiteralExpression(60000));
         bf.addMiddleValue(ff.createAttributeExpression(testSchema,"testDouble"));
@@ -72,7 +73,7 @@ public class ExpresionEncodeTest extends FilterTestSupport {
     }
     
     public void testLikeFilter() throws IllegalFilterException, OperationNotSupportedException, IOException{
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         Expression testAttribute = ff.createAttributeExpression(testSchema, "testString");
 
         LikeFilter lf = ff.createLikeFilter();
@@ -87,7 +88,7 @@ public class ExpresionEncodeTest extends FilterTestSupport {
     }
     
     public void testFidFilter() throws OperationNotSupportedException, IOException{
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         FidFilter fif = ff.createFidFilter();
         fif.addFid("f1");
         fif.addFid("f2");

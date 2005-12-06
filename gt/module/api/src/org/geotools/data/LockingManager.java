@@ -41,7 +41,7 @@ public interface LockingManager {
      * (remember that the lock may have expired)
      * </p>
      *
-     * @param lockID Authorization for lock
+     * @param authID Authorization for lock
      *
      * @return <code>true</code> if lock was found
      */
@@ -54,28 +54,34 @@ public interface LockingManager {
      * (remember that the lock may have expired)
      * </p>
      *
-     * @param lockID Authorization for lock
+     * @param authID Authorization for lock
      * @param transaction Transaction with authorization for lockID
      *
      * @return <code>true</code> if lock was found and released
+     *
+     * @throws IOException DOCUMENT ME!
      */
     boolean release(String authID, Transaction transaction)
         throws IOException;
 
     /**
      * Refresh locks held by the authorization <code>lockID</code>.
+     * 
      * <p>
      * All features locked with the provied <code>lockID</code> will be locked
      * for additional time (the origional duration requested).
      * </p>
+     * 
      * <p>
      * (remember that the lock may have expired)
      * </p>
      *
-     * @param lockID Authorization for lock
+     * @param authID Authorization for lock
      * @param transaction Transaction with authorization for lockID
      *
      * @return <code>true</code> if lock was found and refreshed
+     *
+     * @throws IOException DOCUMENT ME!
      */
     boolean refresh(String authID, Transaction transaction)
         throws IOException;
@@ -87,6 +93,8 @@ public interface LockingManager {
      * @param authID
      * @param transaction
      * @param featureLock
+     *
+     * @throws IOException DOCUMENT ME!
      */
     void unLockFeatureID(String typeName, String authID,
         Transaction transaction, FeatureLock featureLock)
@@ -96,9 +104,11 @@ public interface LockingManager {
      * FeatureID based locking.
      *
      * @param typeName
-     * @param autID
+     * @param authID
      * @param transaction
      * @param featureLock
+     *
+     * @throws IOException DOCUMENT ME!
      */
     void lockFeatureID(String typeName, String authID, Transaction transaction,
         FeatureLock featureLock) throws IOException;

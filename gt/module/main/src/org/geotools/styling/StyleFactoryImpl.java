@@ -32,16 +32,16 @@ import org.geotools.filter.Expression;
  * @author iant
  * @version $Id: StyleFactoryImpl.java,v 1.15 2004/03/01 15:41:59 aaime Exp $
  */
-public class StyleFactoryImpl extends StyleFactory {
+public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFactory2 {
     private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactory.createFilterFactory();
+            org.geotools.filter.FilterFactoryFinder.createFilterFactory();
 
     public Style createStyle() {
         return new StyleImpl();
     }
 
     public NamedStyle createNamedStyle(){
-    	return new NamedStyle();
+    	return new NamedStyleImpl();
     }
 
     public PointSymbolizer createPointSymbolizer() {
@@ -99,9 +99,24 @@ public class StyleFactoryImpl extends StyleFactory {
 
         tSymb.setHalo(halo);
         tSymb.setLabel(label);
-        tSymb.setLabelPlacement(labelPlacement);
+        tSymb.setPlacement(labelPlacement);
 
         return tSymb;
+    }
+    public TextSymbolizer2 createTextSymbolizer(Fill fill, Font[] fonts, 
+            Halo halo, Expression label, 
+            LabelPlacement labelPlacement, 
+            String geometryPropertyName, Graphic graphic ) {
+		TextSymbolizer2 tSymb = new TextSymbolizerImpl();
+        tSymb.setFill(fill);
+        tSymb.setFonts(fonts);
+        tSymb.setGeometryPropertyName(geometryPropertyName);
+
+        tSymb.setHalo(halo);
+        tSymb.setLabel(label);
+        tSymb.setPlacement(labelPlacement);
+		tSymb.setGraphic( graphic );
+		return tSymb;
     }
 
     public FeatureTypeStyle createFeatureTypeStyle() {
@@ -660,4 +675,12 @@ public class StyleFactoryImpl extends StyleFactory {
 
         return sct;
     }
+
+	public StyledLayerDescriptor createStyledLayerDescriptor() {
+		return new StyledLayerDescriptorImpl();
+	}
+
+	public UserLayer createUserLayer() {
+		return new UserLayerImpl();
+	}
 }

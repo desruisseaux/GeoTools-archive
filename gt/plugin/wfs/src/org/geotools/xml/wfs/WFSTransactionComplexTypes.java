@@ -38,6 +38,7 @@ import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.feature.Feature;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.filter.FilterSchema;
@@ -1695,7 +1696,7 @@ public class WFSTransactionComplexTypes {
                 fidSet.addAll(Arrays.asList(
                         ((FidFilter) value[i].getValue()).getFids()));
 
-            FidFilter r = FilterFactory.createFilterFactory().createFidFilter();
+            FidFilter r = FilterFactoryFinder.createFilterFactory().createFidFilter();
             r.addAllFids(fidSet);
 
             return r;
@@ -1801,7 +1802,7 @@ public class WFSTransactionComplexTypes {
                 fidSet.addAll(Arrays.asList(
                         ((FidFilter) value[i].getValue()).getFids()));
 
-            FidFilter r = FilterFactory.createFilterFactory().createFidFilter();
+            FidFilter r = FilterFactoryFinder.createFilterFactory().createFidFilter();
             r.addAllFids(fidSet);
 
             return r;
@@ -1951,7 +1952,7 @@ public class WFSTransactionComplexTypes {
                 fidSet.addAll(Arrays.asList(
                         ((FidFilter) value[i].getValue()).getFids()));
 
-            FidFilter r = FilterFactory.createFilterFactory().createFidFilter();
+            FidFilter r = FilterFactoryFinder.createFilterFactory().createFidFilter();
             r.addAllFids(fidSet);
 
             Object[] t = (Object[]) value[value.length - 1].getValue();
@@ -2240,7 +2241,7 @@ public class WFSTransactionComplexTypes {
                 fidSet.addAll(Arrays.asList(
                         ((FidFilter) value[i].getValue()).getFids()));
 
-            FidFilter r = FilterFactory.createFilterFactory().createFidFilter();
+            FidFilter r = FilterFactoryFinder.createFilterFactory().createFidFilter();
             r.addAllFids(fidSet);
 
             return r;

@@ -24,6 +24,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
@@ -141,7 +142,7 @@ public class DB2FeatureSourceTest extends DB2TestCase {
 
     private GeometryFilter getBBOXFilter(FeatureSource featureSource,
         Envelope env) throws IllegalFilterException {
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         GeometryFilter gf = ff.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
         LiteralExpression envelope = ff.createBBoxExpression(env);
         FeatureType ft = featureSource.getSchema();

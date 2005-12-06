@@ -9,25 +9,27 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.logging.Level;
 
 import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionBuilder;
-import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.LiteralExpressionImpl;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+/**
+ * TODO: This really needs to be container ready
+ * @author jgarnett
+ *
+ */
 public class SLDParser {
 
 	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
 			.getLogger("org.geotools.styling");
 
-	private static final org.geotools.filter.FilterFactory FILTERFACTORY = org.geotools.filter.FilterFactory
+	private static final org.geotools.filter.FilterFactory FILTERFACTORY = org.geotools.filter.FilterFactoryFinder
 			.createFilterFactory();
 
 	// protected java.io.InputStream instream;
@@ -311,7 +313,7 @@ public class SLDParser {
 	}
 
 	public StyledLayerDescriptor parseDescriptor(Node root) {
-		StyledLayerDescriptor sld = new StyledLayerDescriptor();
+		StyledLayerDescriptor sld = factory.createStyledLayerDescriptor();
 		// StyledLayer layer = null;
 		// LineSymbolizer symbol = factory.createLineSymbolizer();
 
@@ -353,7 +355,7 @@ public class SLDParser {
 	}
 
 	private StyledLayer parseUserLayer(Node root) {
-		UserLayer layer = new UserLayer();
+		UserLayer layer = new UserLayerImpl();
 		// LineSymbolizer symbol = factory.createLineSymbolizer();
 
 		NodeList children = root.getChildNodes();
@@ -445,7 +447,7 @@ public class SLDParser {
 	 * @return
 	 */
 	private NamedLayer parseNamedLayer(Node root) {
-		NamedLayer layer = new NamedLayer();
+		NamedLayer layer = new NamedLayerImpl();
 
 		NodeList children = root.getChildNodes();
 
@@ -548,8 +550,8 @@ public class SLDParser {
 	 * @return
 	 * @deprecated this method is not being used
 	 */
-	private StyledLayer parseLayer(Node root) {
-		StyledLayer layer = null;
+	private StyledLayerImpl parseLayer(Node root) {
+		StyledLayerImpl layer = null;
 		// LineSymbolizer symbol = factory.createLineSymbolizer();
 
 		NodeList children = root.getChildNodes();
@@ -565,12 +567,12 @@ public class SLDParser {
 				childName = child.getNodeName();
 			}
 			if (childName.equalsIgnoreCase("NamedLayer")) {
-				layer = new NamedLayer();
+				layer = new NamedLayerImpl();
 			}
 
 			if (childName.equalsIgnoreCase("UserLayer")) {
 
-				layer = new UserLayer();
+				layer = new UserLayerImpl();
 
 				// symbol.setStroke(parseStroke(child));
 			}
@@ -940,7 +942,7 @@ public class SLDParser {
 			}
 
 			if (childName.equalsIgnoreCase("LabelPlacement")) {
-				symbol.setLabelPlacement(parseLabelPlacement(child));
+				symbol.setPlacement(parseLabelPlacement(child));
 			}
 
 			if (childName.equalsIgnoreCase("Halo")) {

@@ -30,6 +30,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.MathExpression;
 import org.geotools.styling.Symbolizer;
@@ -50,7 +51,7 @@ public class StyleGeneratorTest extends DataTestCase {
         ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes(ColorBrewer.SEQUENTIAL);
 
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         Expression expr = null;
         FeatureType type = roadType;
         String attribName = type.getAttributeType(0).getName();
@@ -104,7 +105,7 @@ public class StyleGeneratorTest extends DataTestCase {
     	ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes(ColorBrewer.DIVERGING);
 
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         Expression expr = null;
         FeatureType type = roadType;
         String attribName = type.getAttributeType(0).getName();
@@ -154,7 +155,7 @@ public class StyleGeneratorTest extends DataTestCase {
         ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes(ColorBrewer.QUALITATIVE);
 
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         Expression expr = null;
         Style style = null;
         FeatureType type = roadType;
@@ -267,7 +268,7 @@ public class StyleGeneratorTest extends DataTestCase {
         ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes(ColorBrewer.SEQUENTIAL);
 
-        FilterFactory ff = FilterFactory.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         MathExpression expr = null;
         MathExpression expr2 = null;
         FeatureType type = roadType;

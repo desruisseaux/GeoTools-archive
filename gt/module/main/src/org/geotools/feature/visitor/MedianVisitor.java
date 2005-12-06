@@ -24,6 +24,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 
@@ -48,14 +49,14 @@ public class MedianVisitor implements FeatureCalc {
 
     public MedianVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         expr = factory.createAttributeExpression(type,
                 type.getAttributeType(attributeTypeIndex).getName());
     }
 
     public MedianVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         expr = factory.createAttributeExpression(type,
                 type.getAttributeType(attrName).getName());
     }

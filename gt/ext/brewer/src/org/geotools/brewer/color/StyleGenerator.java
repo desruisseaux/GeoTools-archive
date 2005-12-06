@@ -16,10 +16,12 @@
  */
 package org.geotools.brewer.color;
 
-import java.awt.Color;
-import java.util.Arrays;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -27,6 +29,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LogicFilter;
@@ -34,20 +37,19 @@ import org.geotools.filter.function.ClassificationFunction;
 import org.geotools.filter.function.EqualIntervalFunction;
 import org.geotools.filter.function.UniqueIntervalFunction;
 import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Mark;
 import org.geotools.styling.Rule;
+import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.awt.Color;
+import java.util.Arrays;
+import java.util.Set;
 
 
 /**
@@ -61,6 +63,11 @@ public class StyleGenerator {
     private int numClasses;
     private Expression expression;
     private FeatureCollection collection;
+    private FilterFactory ff;
+    private StyleFactory sf;
+    private StyleBuilder sb;
+    private double opacity = 0.5;
+    private Stroke defaultStroke;
 
     public StyleGenerator(ColorBrewer colorBrewer, String paletteName,
         int numClasses, Expression expression, FeatureCollection collection) {
@@ -69,6 +76,10 @@ public class StyleGenerator {
         this.numClasses = numClasses;
         this.expression = expression;
         this.collection = collection;
+        ff = FilterFactoryFinder.createFilterFactory();
+        sf = StyleFactoryFinder.createStyleFactory();
+        sb = new StyleBuilder(sf, ff);
+        defaultStroke = sb.createStroke();
     }
 
     public FeatureCollection getCollection() {
@@ -103,6 +114,22 @@ public class StyleGenerator {
         this.numClasses = numClasses;
     }
 
+    public double getOpacity() {
+        return opacity;
+    }
+
+    public void setOpacity(double opacity) {
+        this.opacity = opacity;
+    }
+
+    public Stroke getDefaultStroke() {
+        return defaultStroke;
+    }
+
+    public void setDefaultStroke(Stroke defaultStroke) {
+        this.defaultStroke = defaultStroke;
+    }
+
     public String getPaletteName() {
         return paletteName;
     }
@@ -112,11 +139,6 @@ public class StyleGenerator {
     }
 
     public Style createStyle() throws IllegalFilterException {
-        // make our factories and builders
-        StyleBuilder sb = new StyleBuilder();
-        FilterFactory ff = FilterFactory.createFilterFactory();
-        StyleFactory sf = StyleFactory.createStyleFactory();
-
         // create our classifier
         ClassificationFunction classifier = null;
 
@@ -138,10 +160,10 @@ public class StyleGenerator {
         // the number of classes are made before we grab our colour data, etc)
         classifier.getValue(0);
 
-        // extract the palette
-        numClasses = classifier.getNumberOfClasses(); // update the number of
+        // update the number of classes
+        numClasses = classifier.getNumberOfClasses();
 
-        // classes
+        // extract the palette
         BrewerPalette pal = colorBrewer.getPalette(paletteName);
         Color[] colors = pal.getColors(numClasses);
 
@@ -175,7 +197,7 @@ public class StyleGenerator {
                 localMax = chopInteger(localMax);
 
                 // generate a title
-                String title = localMin + ".." + localMax;
+                String title = localMin + " to " + localMax;
 
                 // construct filters
                 Filter filter = null;
@@ -216,7 +238,8 @@ public class StyleGenerator {
                 // create a symbolizer
                 Symbolizer symb = null;
                 Color color = colors[i];
-                symb = createSymbolizer(sb, geometry, color);
+                symb = createSymbolizer(sb, geometry, color, opacity,
+                        defaultStroke);
 
                 // create a rule
                 Rule rule = sb.createRule(symb);
@@ -274,7 +297,8 @@ public class StyleGenerator {
                 // create the symbolizer
                 Symbolizer symb = null;
                 Color color = colors[i];
-                symb = createSymbolizer(sb, geometry, color);
+                symb = createSymbolizer(sb, geometry, color, opacity,
+                        defaultStroke);
 
                 // create the rule
                 rule = sb.createRule(symb);
@@ -326,16 +350,20 @@ public class StyleGenerator {
      * @param sb
      * @param geometry
      * @param color
+     * @param opacity
+     * @param defaultStroke stroke used for borders
      *
      * @return
      */
     private Symbolizer createSymbolizer(StyleBuilder sb, Geometry geometry,
-        Color color) {
+        Color color, double opacity, Stroke defaultStroke) {
         Symbolizer symb;
 
-    	if (geometry instanceof MultiPolygon || geometry instanceof Polygon) {
-    		symb = sb.createPolygonSymbolizer(color);
-    	} else if (geometry instanceof LineString) {
+        if (geometry instanceof MultiPolygon || geometry instanceof Polygon) {
+            //symb = sb.createPolygonSymbolizer(color);
+            Fill fill = sb.createFill(color, opacity);
+            symb = sb.createPolygonSymbolizer(defaultStroke, fill);
+        } else if (geometry instanceof LineString) {
             symb = sb.createLineSymbolizer(color);
         } else if (geometry instanceof MultiPoint || geometry instanceof Point) {
             Mark square = sb.createMark(StyleBuilder.MARK_SQUARE, color);

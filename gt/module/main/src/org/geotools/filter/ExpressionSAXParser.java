@@ -37,8 +37,7 @@ public class ExpressionSAXParser {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
     /** Factory to construct filters. */
-    private static final FilterFactory FILTER_FACT = FilterFactory
-        .createFilterFactory();
+    private FilterFactory ff;
 
     /** A nested expression parser for math sub expressions */
     private ExpressionSAXParser expFactory = null;
@@ -73,6 +72,12 @@ public class ExpressionSAXParser {
      */
     private boolean readChars = false;
 
+    public ExpressionSAXParser(){
+    	this( FilterFactoryFinder.createFilterFactory() );    	
+	}
+    public ExpressionSAXParser(FilterFactory factory ){
+        this( null, factory );    	
+    }
     /**
      * Constructor with a schema to read the attribute againset.
      *
@@ -80,7 +85,16 @@ public class ExpressionSAXParser {
      *        this is not in place.
      */
     public ExpressionSAXParser(FeatureType schema) {
-        this.schema = schema;
+        this( schema, FilterFactoryFinder.createFilterFactory() );    	
+    }
+    /** Constructor injection */
+    public ExpressionSAXParser( FeatureType schema, FilterFactory factory ){
+    	this.schema = schema;
+        ff = factory;    	
+    }
+    /** Setter injection */
+    public void setFilterFactory( FilterFactory factory ){
+    	ff = factory;
     }
 
     /**
@@ -104,17 +118,17 @@ public class ExpressionSAXParser {
             // sub expressions, otherwise just instantiate the main expression
             if (DefaultExpression.isMathExpression(convertType(declaredType))) {
                 expFactory = new ExpressionSAXParser(schema);
-                curExprssn = FILTER_FACT.createMathExpression(convertType(
+                curExprssn = ff.createMathExpression(convertType(
                             declaredType));
                 LOGGER.finer("is math expression");
             } else if (DefaultExpression.isLiteralExpression(convertType(
                             declaredType))) {
-                curExprssn = FILTER_FACT.createLiteralExpression();
+                curExprssn = ff.createLiteralExpression();
                 readChars = true;
                 LOGGER.finer("is literal expression");
             } else if (DefaultExpression.isAttributeExpression(convertType(
                             declaredType))) {
-                curExprssn = FILTER_FACT.createAttributeExpression(schema);
+                curExprssn = ff.createAttributeExpression(schema);
                 readChars = true;
                 LOGGER.finer("is attribute expression");
             }
@@ -297,7 +311,7 @@ public class ExpressionSAXParser {
 
         //if(curExprssn.getType()==ExpressionDefault.LITERAL_GEOMETRY){
         //LOGGER.finer("got geometry: ");
-        curExprssn = FILTER_FACT.createLiteralExpression();
+        curExprssn = ff.createLiteralExpression();
         ((LiteralExpression) curExprssn).setLiteral(geometry);
         LOGGER.finer("set expression: " + curExprssn.toString());
         currentState = "complete";

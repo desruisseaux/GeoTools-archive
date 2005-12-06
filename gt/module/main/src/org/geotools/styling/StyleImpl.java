@@ -26,6 +26,8 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.geotools.resources.Utilities;
+import org.geotools.event.GTComponent;
+import org.geotools.event.AbstractGTComponent;
 import org.opengis.util.Cloneable;
 
 
@@ -33,7 +35,7 @@ import org.opengis.util.Cloneable;
  * @version $Id: StyleImpl.java,v 1.19 2003/10/10 18:33:24 ianschneider Exp $
  * @author James Macgill, CCG
  */
-public class StyleImpl implements org.geotools.styling.Style, Cloneable {
+public class StyleImpl extends AbstractGTComponent implements org.geotools.styling.Style, Cloneable {
     /**
      * The logger for the default core module.
      */
@@ -69,16 +71,26 @@ public class StyleImpl implements org.geotools.styling.Style, Cloneable {
     }
 
     public void setFeatureTypeStyles(FeatureTypeStyle[] featureTypeStyles) {
-        featureTypeStyleList.clear();
+    	featureTypeStyleList.clear();
 
         for (int i = 0; i < featureTypeStyles.length; i++) {
-            addFeatureTypeStyle(featureTypeStyles[i]);
+            //add the FTS
+        	addFeatureTypeStyle(featureTypeStyles[i]);
+    		//set the parent object
+        	if (featureTypeStyles[i] instanceof GTComponent){
+        		GTComponent myChild = (GTComponent) featureTypeStyles[i];
+        		myChild.setParent(this);
+            }
         }
-
         LOGGER.fine("StyleImpl added " + featureTypeStyleList.size() + 
                     " feature types");
+        fireChanged(); // TODO: Handle FeatureTypeStyle list
     }
-
+    public void addFeatureTypeStyle(FeatureTypeStyle type) {
+        featureTypeStyleList.add(type);
+        fireChildAdded( type );
+    }
+    
     public String getName() {
         return name;
     }
@@ -93,22 +105,22 @@ public class StyleImpl implements org.geotools.styling.Style, Cloneable {
 
     public void setAbstract(String abstractStr) {
         abstractText = abstractStr;
+        fireChanged();
     }
 
     public void setDefault(boolean isDefault) {
         defaultB = isDefault;
+        fireChanged();
     }
 
     public void setName(String name) {
         this.name = name;
+        fireChanged();
     }
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public void addFeatureTypeStyle(FeatureTypeStyle type) {
-        featureTypeStyleList.add(type);
+        fireChanged();
     }
 
     /**
@@ -198,13 +210,4 @@ public class StyleImpl implements org.geotools.styling.Style, Cloneable {
         
         return false;
     }
-
-	public void addListener(StyleListener listener) {
-				
-	}
-
-	public void removeListener(StyleListener listener) {
-		
-	}
-
 }

@@ -16,10 +16,9 @@
  */
 package org.geotools.data;
 
+import org.geotools.filter.Filter;
 import java.io.IOException;
 import java.util.Set;
-
-import org.geotools.filter.Filter;
 
 
 /**
@@ -84,6 +83,8 @@ public interface FeatureLocking extends FeatureStore {
      * not having pass in the same FeatureLock object multiple times
      * </li>
      * </ul>
+     *
+     * @param lock DOCUMENT ME!
      */
     void setFeatureLock(FeatureLock lock);
 
@@ -100,7 +101,7 @@ public interface FeatureLocking extends FeatureStore {
      *
      * @return Number of features locked
      *
-     * @throws DataSourceException Thrown if anything goes wrong
+     * @throws IOException Thrown if anything goes wrong
      */
     int lockFeatures(Query query) throws IOException;
 
@@ -117,7 +118,7 @@ public interface FeatureLocking extends FeatureStore {
      *
      * @return Number of features locked
      *
-     * @throws DataSourceException Thrown if anything goes wrong
+     * @throws IOException Thrown if anything goes wrong
      */
     int lockFeatures(Filter filter) throws IOException;
 
@@ -131,7 +132,7 @@ public interface FeatureLocking extends FeatureStore {
      *
      * @return Number of Features locked by this opperation
      *
-     * @throws DataSourceException
+     * @throws IOException
      */
     int lockFeatures() throws IOException;
 
@@ -148,7 +149,7 @@ public interface FeatureLocking extends FeatureStore {
      * }
      * </code></pre>
      *
-     * @throws DataSourceException
+     * @throws IOException
      */
     void unLockFeatures() throws IOException;
 
@@ -161,7 +162,7 @@ public interface FeatureLocking extends FeatureStore {
      *
      * @param filter
      *
-     * @throws DataSourceException
+     * @throws IOException
      */
     void unLockFeatures(Filter filter) throws IOException;
 
@@ -174,31 +175,33 @@ public interface FeatureLocking extends FeatureStore {
      *
      * @param query Specifies fatures to unlock
      *
-     * @throws DataSourceException
+     * @throws IOException
      */
     void unLockFeatures(Query query) throws IOException;
- 
+
     /**
      * Idea for a response from a high-level lock( Query ) function.
-     * 
-     * @author jgarnett
      */
     public static class Response {
         String authID;
         Set locked;
         Set notLocked;
-        public Response( FeatureLock lock, Set lockedFids, Set notLockedFids ){
+
+        public Response(FeatureLock lock, Set lockedFids, Set notLockedFids) {
             authID = lock.getAuthorization();
             locked = lockedFids;
             notLocked = notLockedFids;
         }
-        public String getAuthorizationID(){
+
+        public String getAuthorizationID() {
             return authID;
         }
-        public Set getLockedFids(){
+
+        public Set getLockedFids() {
             return locked;
         }
-        public Set getNotLockedFids(){
+
+        public Set getNotLockedFids() {
             return notLocked;
         }
     }

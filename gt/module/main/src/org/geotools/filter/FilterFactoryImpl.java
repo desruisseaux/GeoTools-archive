@@ -21,6 +21,8 @@
  */
 package org.geotools.filter;
 
+import java.util.Map;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 
@@ -34,7 +36,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Ian Turton, CCG
  * @version $Id: FilterFactoryImpl.java,v 1.7 2003/08/20 20:09:30 cholmesny Exp $
  */
-public class FilterFactoryImpl extends FilterFactory {
+public class FilterFactoryImpl implements FilterFactory {
     /**
      * Creates a new instance of FilterFactoryImpl
      */
@@ -351,4 +353,9 @@ public class FilterFactoryImpl extends FilterFactory {
         }
          throw new RuntimeException("Unknown environment variable:" + name);
     }
+
+	public Map getImplementationHints() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

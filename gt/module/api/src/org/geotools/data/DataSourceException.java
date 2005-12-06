@@ -18,16 +18,12 @@ package org.geotools.data;
 
 /**
  * Thrown when there is an error in a datasource.
- *
- * @author Ray Gallagher
- * @version $Id: DataSourceException.java,v 1.8 2003/10/31 18:05:26 ianschneider Exp $
  */
 public class DataSourceException extends java.io.IOException {
     
-    private static final long serialVersionUID = 1L;
-    
-    private Throwable cause;
-    /**
+	private static final long serialVersionUID = -602847953059978370L;
+
+	/**
      * Constructs a new instance of DataSourceException
      *
      * @param msg A message explaining the exception
@@ -35,23 +31,25 @@ public class DataSourceException extends java.io.IOException {
     public DataSourceException(String msg) {
         super(msg);
     }
+
     /**
      * Constructs a new instance of DataSourceException
      *
-     * @param msg A message explaining the exception
+     * @param cause A message explaining the exception
      */
     public DataSourceException(Throwable cause) {
-    	super( cause.getMessage() );
-        initCause( cause );
+        super(cause.getMessage());
+        initCause(cause);
     }
+
     /**
      * Constructs a new instance of DataSourceException
      *
      * @param msg A message explaining the exception
-     * @param exp the throwable object which caused this exception
+     * @param cause the throwable object which caused this exception
      */
     public DataSourceException(String msg, Throwable cause) {
         super(msg);
-        initCause( cause );        
-    }  
+        initCause(cause);
+    }
 }

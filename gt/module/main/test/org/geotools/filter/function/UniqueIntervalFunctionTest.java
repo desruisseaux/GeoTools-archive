@@ -18,6 +18,7 @@ package org.geotools.filter.function;
 
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 
 
@@ -45,7 +46,7 @@ public class UniqueIntervalFunctionTest extends FunctionTestSupport {
      * org.geotools.filter.functions.UniqueIntervalFunction.
      */
     public void testInstance() {
-        FunctionExpression equInt = FilterFactory.createFilterFactory()
+        FunctionExpression equInt = FilterFactoryFinder.createFilterFactory()
                                                  .createFunctionExpression("UniqueInterval");
         assertNotNull(equInt);
     }
@@ -55,7 +56,7 @@ public class UniqueIntervalFunctionTest extends FunctionTestSupport {
      * org.geotools.filter.functions.UniqueIntervalFunction.
      */
     public void testGetName() {
-        FunctionExpression equInt = FilterFactory.createFilterFactory()
+        FunctionExpression equInt = FilterFactoryFinder.createFilterFactory()
                                                  .createFunctionExpression("UniqueInterval");
         System.out.println("testGetName");
         assertEquals("UniqueInterval", equInt.getName());

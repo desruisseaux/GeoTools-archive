@@ -1,7 +1,6 @@
 package org.geotools.styling;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -9,14 +8,9 @@ import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureTypeFactory;
-
-
-
-
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
-
+import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.filter.ExpressionDOMParser;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

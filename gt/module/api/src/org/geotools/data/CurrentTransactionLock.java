@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  * Created on 15-Mar-2005
  *
  * TODO To change the template for this generated file go to
@@ -7,17 +23,13 @@
 package org.geotools.data;
 
 /**
-* A request for a Lock that last the duration of a transaction.
-* 
-* <p>
-* The single instance of this class is available as
-* <code>FeatureLock.TRANSACTION</code>.
-* </p>
-*
-* @author jgarnett
- * @author dzwiers -- just split it into it's own file
+ * A request for a Lock that last the duration of a transaction.
+ * 
+ * <p>
+ * The single instance of this class is available as
+ * <code>FeatureLock.TRANSACTION</code>.
+ * </p>
  */
-
 class CurrentTransactionLock implements FeatureLock {
     /**
      * Transaction locks do not require Authorization.

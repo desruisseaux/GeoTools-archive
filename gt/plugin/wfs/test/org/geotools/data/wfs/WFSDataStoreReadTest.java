@@ -20,6 +20,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
@@ -162,7 +163,7 @@ public class WFSDataStoreReadTest extends TestCase {
         // take atleast attributeType 3 to avoid the undeclared one .. inherited optional attrs
         
         
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         
         DefaultQuery query = new DefaultQuery(ft.getTypeName());
         BBoxExpression theBBox = factory.createBBoxExpression( bbox );

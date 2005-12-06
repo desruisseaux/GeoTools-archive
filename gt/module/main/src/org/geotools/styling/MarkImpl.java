@@ -20,6 +20,7 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
 import org.opengis.util.Cloneable;
 
@@ -28,13 +29,14 @@ import org.opengis.util.Cloneable;
  * @version $Id: MarkImpl.java,v 1.13 2003/09/06 04:52:31 seangeo Exp $
  * @author Ian Turton, CCG
  */
-public class MarkImpl implements Mark, Cloneable {
+public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
     /**
      * The logger for the default core module.
      */
     private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger("org.geotools.styling");
+    //TODO: Make container ready
     private static final org.geotools.filter.FilterFactory filterFactory =
-        org.geotools.filter.FilterFactory.createFilterFactory();
+        org.geotools.filter.FilterFactoryFinder.createFilterFactory();
     private Fill fill;
     private Stroke stroke;
 
@@ -114,6 +116,7 @@ public class MarkImpl implements Mark, Cloneable {
      */
     public void setFill(org.geotools.styling.Fill fill) {
         this.fill = fill;
+        fireChildChanged( fill );
     }
 
     /**
@@ -122,18 +125,16 @@ public class MarkImpl implements Mark, Cloneable {
      */
     public void setStroke(org.geotools.styling.Stroke stroke) {
         this.stroke = stroke;
+        fireChildChanged( stroke );
     }
 
     public void setSize(Expression size) {
         this.size = size;
+        fireChildChanged( size );
     }
 
     public void setSize(int size) {
-        try {
-            setSize(filterFactory.createLiteralExpression(new Integer(size)));
-        } catch (org.geotools.filter.IllegalFilterException mfe) {
-            severe("setSize", "Problem setting Opacity", mfe);
-        }
+        setSize(filterFactory.createLiteralExpression( size ));        
     }
 
     /**
@@ -143,6 +144,7 @@ public class MarkImpl implements Mark, Cloneable {
     public void setWellKnownName(Expression wellKnownName) {
         LOGGER.entering("DefaultMark", "setWellKnownName");
         this.wellKnownName = wellKnownName;
+        fireChildChanged( wellKnownName );
     }
 
     public void setWellKnownName(String name) {
@@ -151,14 +153,10 @@ public class MarkImpl implements Mark, Cloneable {
 
     public void setRotation(Expression rotation) {
         this.rotation = rotation;
+        fireChildChanged( rotation );
     }
-
     public void setRotation(double rotation) {
-        try {
-            setRotation(filterFactory.createLiteralExpression(new Double(rotation)));
-        } catch (org.geotools.filter.IllegalFilterException mfe) {
-            severe("setRotation", "Problem setting Rotation", mfe);
-        }
+        setRotation(filterFactory.createLiteralExpression( rotation ));        
     }
 
     /**
@@ -302,5 +300,4 @@ public class MarkImpl implements Mark, Cloneable {
 
         return true;
     }
-
 }

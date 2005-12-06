@@ -17,6 +17,7 @@ import junit.framework.TestSuite;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 /**
  *
@@ -24,7 +25,7 @@ import org.geotools.filter.FilterFactory;
  */
 public class StyleFactoryImplTest extends TestCase {
     static StyleFactory styleFactory;
-    static FilterFactory filterFactory = FilterFactory.createFilterFactory();
+    static FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     
     static Feature feature;
     public StyleFactoryImplTest(java.lang.String testName) {
@@ -47,7 +48,7 @@ public class StyleFactoryImplTest extends TestCase {
     public void testCreateStyle() {
         System.out.println("testCreateStyle");
         
-        styleFactory = StyleFactory.createStyleFactory();
+        styleFactory = StyleFactoryFinder.createStyleFactory();
         
         assertNotNull("Failed to build styleFactory", styleFactory);
         

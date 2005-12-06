@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.filter.FilterComplexTypes.BinaryOperatorType;
 import org.geotools.xml.filter.FilterComplexTypes.Comparison_OperatorsType;
@@ -86,13 +87,13 @@ public class FilterSchema implements Schema {
     
     /**
      * Grab provided FilterFactory from hints, or
-     * use default provided by FilterFactory.createFilterFactory();
+     * use default provided by FilterFactoryFinder.createFilterFactory();
      * 
      * @param hints
      * @return FilterFactory
      */
     static FilterFactory filterFactory(Map hints){
-    	return FilterFactory.createFilterFactory();
+    	return FilterFactoryFinder.createFilterFactory();
     }
     
     private static final ComplexType[] complexTypes = new ComplexType[] {

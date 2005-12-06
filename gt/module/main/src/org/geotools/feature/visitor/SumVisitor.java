@@ -23,6 +23,7 @@ import org.geotools.feature.visitor.AverageVisitor.AverageResult;
 import org.geotools.feature.visitor.CountVisitor.CountResult;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 
@@ -39,7 +40,7 @@ public class SumVisitor implements FeatureCalc {
 
     public SumVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         AttributeType attributeType = type.getAttributeType(attributeTypeIndex);
         expr = factory.createAttributeExpression(type, attributeType.getName());
         createStrategy(attributeType.getType());
@@ -47,7 +48,7 @@ public class SumVisitor implements FeatureCalc {
 
     public SumVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactory.createFilterFactory();
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         AttributeType attributeType = type.getAttributeType(attrName);
         expr = factory.createAttributeExpression(type, attributeType.getName());
         createStrategy(attributeType.getType());

@@ -21,6 +21,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 
@@ -37,7 +38,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
 //        WFSDataStore ds = getDataStore(u);
 //        FeatureType ft = ds.getSchema("states");
 //        Feature f = ds.getFeatureReader("states").next();
-//        doDelete(ds,ft,FilterFactory.createFilterFactory().createFidFilter(f.getID()));
+//        doDelete(ds,ft,FilterFactoryFinder.createFilterFactory().createFidFilter(f.getID()));
 //        FeatureCollection fc = DefaultFeatureCollections.newCollection();
 //        fc.add(f);
 //        doInsert(ds,ft,(new CollectionDataStore(fc)).getFeatureReader("states"));
@@ -81,7 +82,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     	assertTrue("Read 1 == "+count1+", Read 2 == "+count2+" but Read 3 = "+count3,count2==count3);
     	
     	WFSTransactionState ts = (WFSTransactionState)t.getState(ds);
-    	FidFilter ff = FilterFactory.createFilterFactory().createFidFilter();
+    	FidFilter ff = FilterFactoryFinder.createFilterFactory().createFidFilter();
     	String[] fids = ts.getFids();
     	assertNotNull(fids);
     	for(int i=0;i<fids.length;i++)
@@ -137,9 +138,9 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     	AttributeType at = ft.getAttributeType("LAND_KM");
     	assertNotNull("Attribute LAND_KM does not exist",at);
     	
-    	CompareFilter f = FilterFactory.createFilterFactory().createCompareFilter(FilterType.COMPARE_EQUALS);
-    	f.addLeftValue(FilterFactory.createFilterFactory().createAttributeExpression(ft,at.getName()));
-    	f.addRightValue(FilterFactory.createFilterFactory().createLiteralExpression(3.0));
+    	CompareFilter f = FilterFactoryFinder.createFilterFactory().createCompareFilter(FilterType.COMPARE_EQUALS);
+    	f.addLeftValue(FilterFactoryFinder.createFilterFactory().createAttributeExpression(ft,at.getName()));
+    	f.addRightValue(FilterFactoryFinder.createFilterFactory().createLiteralExpression(3.0));
 
     	System.out.println("Update Read 1");
     	FeatureReader fr = fs.getFeatures(f).reader();

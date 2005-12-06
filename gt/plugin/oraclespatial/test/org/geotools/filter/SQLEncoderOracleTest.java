@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class SQLEncoderOracleTest extends TestCase {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
-    private static final FilterFactory filterFactory = FilterFactory.createFilterFactory();
+    private static final FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     private static final GeometryFactory geometryFactory = new GeometryFactory();
     private SQLEncoder encoder;
 

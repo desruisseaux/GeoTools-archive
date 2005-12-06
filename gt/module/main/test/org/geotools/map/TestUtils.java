@@ -18,6 +18,7 @@ import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -67,7 +68,7 @@ public class TestUtils {
     }
     
     public static Style buildStyle(String styleName) {
-        StyleFactory sf = StyleFactory.createStyleFactory();
+        StyleFactory sf = StyleFactoryFinder.createStyleFactory();
         PointSymbolizer ps = sf.getDefaultPointSymbolizer();
         Rule r = sf.createRule();
         r.setSymbolizers(new Symbolizer[] {ps});

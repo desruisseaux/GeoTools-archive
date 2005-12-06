@@ -39,6 +39,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LogicFilter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -279,7 +280,7 @@ public class DefaultView implements FeatureSource {
         Filter constraintFilter = constraintQuery.getFilter();
         try {
             if (constraintFilter != Filter.NONE) {
-                FilterFactory ff = FilterFactory.createFilterFactory();
+                FilterFactory ff = FilterFactoryFinder.createFilterFactory();
                 newFilter = ff.createLogicFilter(FilterType.LOGIC_AND);
                 ((LogicFilter) newFilter).addFilter(constraintFilter);
                 ((LogicFilter) newFilter).addFilter(filter);

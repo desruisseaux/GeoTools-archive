@@ -21,8 +21,10 @@
  */
 package org.geotools.styling;
 
+import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 
 /**
@@ -30,9 +32,10 @@ import org.geotools.filter.FilterFactory;
  *
  * @author iant
  */
-public class RasterSymbolizerImpl implements RasterSymbolizer {
-    private FilterFactory filterFactory = FilterFactory.createFilterFactory();
-    private ChannelSelection channelSelction = new ChannelSelectionImpl();
+public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterSymbolizer {
+	// TODO: make container ready
+    private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
+    private ChannelSelection channelSelection = new ChannelSelectionImpl();
     private ColorMap colorMap = new ColorMapImpl();
     private ContrastEnhancement contrastEnhancement = new ContrastEnhancementImpl();
     private ShadedRelief shadedRelief = new ShadedReliefImpl();
@@ -51,7 +54,7 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
 
     public int hashcode() {
         int key = 0;
-        key = channelSelction.hashCode();
+        key = channelSelection.hashCode();
         key = (key * 13) + colorMap.hashCode();
         key = (key * 13) + contrastEnhancement.hashCode();
         key = (key * 13) + shadedRelief.hashCode();
@@ -76,7 +79,7 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      * @return the ChannelSelection object set or null if none is available.
      */
     public ChannelSelection getChannelSelection() {
-        return channelSelction;
+        return channelSelection;
     }
 
     /**
@@ -222,7 +225,10 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      * @param channel the channel selected
      */
     public void setChannelSelection(ChannelSelection channel) {
-        channelSelction = channel;
+    	if( this.channelSelection == channel ) return;
+    	fireChildRemoved( this.channelSelection );
+    	this.channelSelection = channel;
+    	fireChildAdded( channel );    
     }
 
     /**
@@ -242,7 +248,10 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      * @param colorMap the ColorMap for the raster
      */
     public void setColorMap(ColorMap colorMap) {
-        this.colorMap = colorMap;
+    	if (this.colorMap == colorMap) return;
+		fireChildRemoved(this.colorMap);
+		this.colorMap = colorMap;
+		fireChildAdded(colorMap);    
     }
 
     /**
@@ -263,8 +272,11 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @param cEnhancement the contrastEnhancement
      */
-    public void setContrastEnhancement(ContrastEnhancement cEnhancement) {
-        contrastEnhancement = cEnhancement;
+    public void setContrastEnhancement(ContrastEnhancement contrastEnhancement) {
+    	if( this.contrastEnhancement == contrastEnhancement ) return;
+    	fireChildRemoved( this.contrastEnhancement );
+    	this.contrastEnhancement = contrastEnhancement;
+    	fireChildAdded( contrastEnhancement );    
     }
 
     /**
@@ -276,8 +288,11 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @param geometryPropertyName the name of the Geometry
      */
-    public void setGeometryPropertyName(String geometryPropertyName) {
-        this.geometryName = geometryPropertyName;
+    public void setGeometryPropertyName(String geometryName) {
+        if( this.geometryName == geometryName ) return;        
+    	fireChildRemoved( this.geometryName);
+    	this.geometryName = geometryName;
+        fireChildAdded( geometryName );    	         
     }
 
     /**
@@ -305,15 +320,15 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *        may be thrown by an implementing class.
      */
     public void setImageOutline(Symbolizer symbolizer) {
-        if (symbolizer instanceof LineSymbolizer
-                || symbolizer instanceof PolygonSymbolizer) {
+        if (symbolizer instanceof LineSymbolizer || symbolizer instanceof PolygonSymbolizer) {
+        	if( this.symbolizer == symbolizer ) return;
+        	fireChildRemoved( this.symbolizer );
             this.symbolizer = symbolizer;
-
-            return;
+            fireChildAdded( symbolizer );
+        } else {
+        	throw new IllegalArgumentException(
+            	"Only a line or polygon symbolizer may be used to outline a raster");
         }
-
-        throw new IllegalArgumentException(
-            "Only a line or polygon symbolizer may be used to outline a raster");
     }
 
     /**
@@ -322,7 +337,10 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      * @param opacity An expression which evaluates to the the opacity (0-1)
      */
     public void setOpacity(Expression opacity) {
-        this.opacity = opacity;
+    	if( this.opacity == opacity ) return;
+    	fireChildRemoved( this.opacity );
+    	this.opacity = opacity;
+    	fireChildAdded( opacity );    
     }
 
     /**
@@ -341,7 +359,10 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *        EARLIEST_ON_TOP, AVERAGE or RANDOM
      */
     public void setOverlap(Expression overlap) {
-        this.overlap = overlap;
+    	if( this.overlap == overlap ) return;
+    	fireChildRemoved( this.overlap );
+    	this.overlap = overlap;
+    	fireChildAdded( overlap );    
     }
 
     /**
@@ -360,8 +381,11 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
      *
      * @param relief the shadedrelief object
      */
-    public void setShadedRelief(ShadedRelief relief) {
-        shadedRelief = relief;
+    public void setShadedRelief(ShadedRelief shadedRelief) {
+    	if( this.shadedRelief == shadedRelief ) return;
+    	fireChildRemoved( this.shadedRelief );
+    	this.shadedRelief = shadedRelief;
+    	fireChildAdded( shadedRelief );    
     }
 
     public void accept(StyleVisitor visitor) {

@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  * Created on 15-Mar-2005
  *
  * TODO To change the template for this generated file go to
@@ -6,11 +22,11 @@
  */
 package org.geotools.data;
 
+import org.geotools.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.net.URI;
 import java.util.Arrays;
 
-import org.geotools.filter.Filter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Implementation for Query.FIDS.
@@ -26,8 +42,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * <pre><code>
  * featureSource.getFeatures( Query.FIDS );
  * </code></pre>
- *
- * @author Jody Garnett, Refractions Research, Inc
  */
 class FIDSQuery implements Query {
     static final String[] NO_PROPERTIES = new String[0];
@@ -51,6 +65,7 @@ class FIDSQuery implements Query {
     public String getTypeName() {
         return null;
     }
+
     public URI getNamespace() {
         return NO_NAMESPACE;
     }
@@ -78,7 +93,9 @@ class FIDSQuery implements Query {
         | ((getTypeName() == null) ? 0 : getTypeName().hashCode())
         | ((getVersion() == null) ? 0 : getVersion().hashCode())
         | ((getCoordinateSystem() == null) ? 0 : getCoordinateSystem().hashCode())
-        | ((getCoordinateSystemReproject() == null) ? 0 : getCoordinateSystemReproject().hashCode());
+        | ((getCoordinateSystemReproject() == null) ? 0
+                                                    : getCoordinateSystemReproject()
+                                                          .hashCode());
     }
 
     /**
@@ -97,7 +114,11 @@ class FIDSQuery implements Query {
         if ((obj == null) || !(obj instanceof Query)) {
             return false;
         }
-        if (this == obj) return true;
+
+        if (this == obj) {
+            return true;
+        }
+
         Query other = (Query) obj;
 
         return Arrays.equals(getPropertyNames(), other.getPropertyNames())
@@ -109,11 +130,13 @@ class FIDSQuery implements Query {
                                     : getTypeName().equals(other.getTypeName()))
         && ((getVersion() == null) ? (other.getVersion() == null)
                                    : getVersion().equals(other.getVersion()))
-        && ((getCoordinateSystem() == null) ? (other.getCoordinateSystem() == null)
-                                           : getCoordinateSystem().equals(other.getCoordinateSystem()))
-        && ((getCoordinateSystemReproject() == null) ? (other.getCoordinateSystemReproject() == null)
-                                                   : getCoordinateSystemReproject().equals(other.getCoordinateSystemReproject()))                                           
-        ;
+        && ((getCoordinateSystem() == null)
+        ? (other.getCoordinateSystem() == null)
+        : getCoordinateSystem().equals(other.getCoordinateSystem()))
+        && ((getCoordinateSystemReproject() == null)
+        ? (other.getCoordinateSystemReproject() == null)
+        : getCoordinateSystemReproject()
+              .equals(other.getCoordinateSystemReproject()));
     }
 
     public String toString() {
@@ -122,10 +145,10 @@ class FIDSQuery implements Query {
 
     /**
      * Return <code>null</code> as FIDSQuery does not require a CS.
-     * 
-     * @see org.geotools.data.Query#getCoordinateSystem()
-     * 
+     *
      * @return <code>null</code> as override is not required.
+     *
+     * @see org.geotools.data.Query#getCoordinateSystem()
      */
     public CoordinateReferenceSystem getCoordinateSystem() {
         return null;
@@ -133,10 +156,10 @@ class FIDSQuery implements Query {
 
     /**
      * Return <code>null</code> as FIDSQuery does not require a CS.
-     * 
-     * @see org.geotools.data.Query#getCoordinateSystemReproject()
-     * 
+     *
      * @return <code>null</code> as reprojection is not required.
+     *
+     * @see org.geotools.data.Query#getCoordinateSystemReproject()
      */
     public CoordinateReferenceSystem getCoordinateSystemReproject() {
         return null;

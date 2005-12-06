@@ -16,13 +16,11 @@
  */
 package org.geotools.data;
 
-import java.io.IOException;
-
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
-
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
 
 
 /**
@@ -98,7 +96,7 @@ public interface FeatureSource {
      *
      * @return Collection The collection to put the features into.
      *
-     * @throws DataSourceException For all data source errors.
+     * @throws IOException For all data source errors.
      *
      * @see Query
      */
@@ -113,7 +111,7 @@ public interface FeatureSource {
      *
      * @return Collection The collection to put the features into.
      *
-     * @throws DataSourceException For all data source errors.
+     * @throws IOException For all data source errors.
      */
     FeatureCollection getFeatures(Filter filter) throws IOException;
 
@@ -127,19 +125,21 @@ public interface FeatureSource {
      *
      * @return Collection The collection to put the features into.
      *
-     * @throws DataSourceException For all data source errors.
+     * @throws IOException For all data source errors.
      */
     FeatureCollection getFeatures() throws IOException;
 
     /**
      * Retrieves the featureType that features extracted from this datasource
      * will be created with.
+     * 
      * <p>
-     * The schema returned is the LCD supported by all available Features.
-     * In the common case of shapfiles and database table this schema
-     * will match that of every feature available. In the degenerate GML
-     * case this will simply reflect the gml:AbstractFeatureType.
+     * The schema returned is the LCD supported by all available Features. In
+     * the common case of shapfiles and database table this schema will match
+     * that of every feature available. In the degenerate GML case this will
+     * simply reflect the gml:AbstractFeatureType.
      * </p>
+     *
      * @return the schema of features created by this datasource.
      *
      * @task REVISIT: Our current FeatureType model is not yet advanced enough
@@ -198,6 +198,8 @@ public interface FeatureSource {
      *
      * @return The bounding box of the datasource or null if unknown and too
      *         expensive for the method to calculate or any errors occur.
+     *
+     * @throws IOException DOCUMENT ME!
      */
     Envelope getBounds(Query query) throws IOException;
 

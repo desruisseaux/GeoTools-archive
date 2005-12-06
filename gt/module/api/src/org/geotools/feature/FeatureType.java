@@ -10,6 +10,8 @@ package org.geotools.feature;
 
 import java.net.URI;
 
+import org.opengis.feature.FeatureTypeFactory;
+
 /**
  * A metadata template for a Feature of arbitrary complexity.
  * <p>

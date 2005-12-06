@@ -34,11 +34,7 @@ import org.xml.sax.Attributes;
 public class FilterSAXParser {
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
-
-    /** factory for creating filters. */
-    private static final FilterFactory FILTER_FACT = FilterFactory
-        .createFilterFactory();
-
+    
     /** The number of attributes to be found in a like filter */
     private static final int NUM_LIKE_ATTS = 3;
 
@@ -51,6 +47,9 @@ public class FilterSAXParser {
     /** The short representation of this type of filter */
     private short filterType;
 
+    /** factory for creating filters. */
+    private FilterFactory ff;
+
     /**
      * the Attributes of the filter (only applicable to LIKE filters, I think)
      */
@@ -60,8 +59,17 @@ public class FilterSAXParser {
      * Constructor which flags the operator as between.
      */
     public FilterSAXParser() {
+    	this( FilterFactoryFinder.createFilterFactory() );
+    }
+    /** Constructor injdection */
+    public FilterSAXParser( FilterFactory factory ){
+    	ff = factory;
     }
 
+    /** Setter injection */
+    public void setFilterFactory( FilterFactory factory ){
+    	ff = factory;
+    }
     /**
      * Handles all incoming generic string 'messages,' including a message to
      * create the filter, based on the XML tag that represents the start of
@@ -76,19 +84,19 @@ public class FilterSAXParser {
 
         if ((filterType == AbstractFilter.FID) && !curState.equals("fid")) {
             LOGGER.finer("creating the FID filter");
-            curFilter = FILTER_FACT.createFidFilter();
+            curFilter = ff.createFidFilter();
         } else if (AbstractFilter.isGeometryDistanceFilter(filterType)) {
-            curFilter = FILTER_FACT.createGeometryDistanceFilter(filterType);
+            curFilter = ff.createGeometryDistanceFilter(filterType);
         } else if (AbstractFilter.isGeometryFilter(filterType)) {
-            curFilter = FILTER_FACT.createGeometryFilter(filterType);
+            curFilter = ff.createGeometryFilter(filterType);
         } else if (filterType == AbstractFilter.BETWEEN) {
-            curFilter = FILTER_FACT.createBetweenFilter();
+            curFilter = ff.createBetweenFilter();
         } else if (filterType == AbstractFilter.NULL) {
-            curFilter = FILTER_FACT.createNullFilter();
+            curFilter = ff.createNullFilter();
         } else if (filterType == AbstractFilter.LIKE) {
-            curFilter = FILTER_FACT.createLikeFilter();
+            curFilter = ff.createLikeFilter();
         } else if (AbstractFilter.isCompareFilter(filterType)) {
-            curFilter = FILTER_FACT.createCompareFilter(filterType);
+            curFilter = ff.createCompareFilter(filterType);
         } else {
             throw new IllegalFilterException(
                 "Attempted to start a new filter with invalid type: "

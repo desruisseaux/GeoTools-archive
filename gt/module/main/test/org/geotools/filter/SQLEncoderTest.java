@@ -27,7 +27,7 @@ import java.io.StringWriter;
  * @task REVISIT: validate these so we know if they break.
  */
 public class SQLEncoderTest extends SQLFilterTestSupport {
-    private FilterFactory filterFac = FilterFactory.createFilterFactory();
+    private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
 //
 //    /** Test suite for this test case */
 //    TestSuite suite = null;

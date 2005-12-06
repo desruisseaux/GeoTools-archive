@@ -10,6 +10,7 @@ import java.util.HashSet;
 
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 
 /**
@@ -26,7 +27,7 @@ public class Collection_FunctionsTest extends FunctionTestSupport{
     
     
     public void testInstance() {
-        FunctionExpression cmin = FilterFactory.createFilterFactory().createFunctionExpression("Collection_Min");
+        FunctionExpression cmin = FilterFactoryFinder.createFilterFactory().createFunctionExpression("Collection_Min");
         assertNotNull(cmin);
     }
     
