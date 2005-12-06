@@ -1,12 +1,28 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.catalog;
 
 import java.io.IOException;
 
+
 /**
  * Allows processing of resolve deltas.
+ * 
  * <p>
  * Usage:
- * 
  * <pre>
  *  class Visitor implements IResolveDeltaVisitor {
  *      public boolean visit(IResolveDelta delta) {
@@ -30,23 +46,26 @@ import java.io.IOException;
  *  ICatalogDelta rootDelta = ...;
  *  rootDelta.accept(new Visitor());
  * </pre>
- * 
  * </p>
+ * 
  * <p>
  * Clients may implement this interface.
  * </p>
- * 
+ *
  * @author Jody Garnett, Refractions Research
+ *
  * @since 0.9.0
  */
 public interface ResolveDeltaVisitor {
-
     /**
      * Visits the given resolve delta.
-     * 
-     * @return <code>true</code> if the resource delta's children should be visited;
-     *         <code>false</code> if they should be skipped.
-     * @exception CoreException if the visit fails for some reason.
+     *
+     * @param delta DOCUMENT ME!
+     *
+     * @return <code>true</code> if the resource delta's children should be
+     *         visited; <code>false</code> if they should be skipped.
+     *
+     * @exception IOException if the visit fails for some reason.
      */
-    boolean visit( ResolveDelta delta ) throws IOException;
+    boolean visit(ResolveDelta delta) throws IOException;
 }

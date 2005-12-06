@@ -1,24 +1,35 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.catalog.defaults;
 
-import java.net.URI;
-
-import javax.swing.Icon;
-
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.geometry.JTS.ReferencedEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import java.net.URI;
+import javax.swing.Icon;
 
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Implementation of GeoResourceInfo.
- * 
- * @author Justin Deoliveira, The Open Planning Project
- *
  */
 public class DefaultGeoResourceInfo implements GeoResourceInfo {
-
-    protected String title, description, name;
+    protected String title;
+    protected String description;
+    protected String name;
     protected String[] keywords;
     protected URI schema;
     protected Icon icon;
@@ -28,8 +39,9 @@ public class DefaultGeoResourceInfo implements GeoResourceInfo {
         // for over-riding
     }
 
-    public DefaultGeoResourceInfo( String title, String name, String description, URI schema,
-            Envelope bounds, CoordinateReferenceSystem crs, String[] keywords, Icon icon ) {
+    public DefaultGeoResourceInfo(String title, String name,
+        String description, URI schema, Envelope bounds,
+        CoordinateReferenceSystem crs, String[] keywords, Icon icon) {
         this.title = title;
         this.description = description;
         this.name = name;
@@ -40,58 +52,63 @@ public class DefaultGeoResourceInfo implements GeoResourceInfo {
     }
 
     /* (non-Javadoc)
-	 * @see org.geotools.catalog.GeoResourceInfo#getTitle()
-	 */
+     * @see org.geotools.catalog.GeoResourceInfo#getTitle()
+     */
     public String getTitle() {
         return title;
     }
 
     /* (non-Javadoc)
-	 * @see org.geotools.catalog.GeoResourceInfo#getKeywords()
-	 */
+     * @see org.geotools.catalog.GeoResourceInfo#getKeywords()
+     */
     public String[] getKeywords() { // aka Subject
+
         return keywords;
     }
 
     /* (non-Javadoc)
-	 * @see org.geotools.catalog.GeoResourceInfo#getDescription()
-	 */
+     * @see org.geotools.catalog.GeoResourceInfo#getDescription()
+     */
     public String getDescription() {
         return description;
     }
 
     /* (non-Javadoc)
-	 * @see org.geotools.catalog.GeoResourceInfo#getSchema()
-	 */
+     * @see org.geotools.catalog.GeoResourceInfo#getSchema()
+     */
     public URI getSchema() { // aka namespace
+
         return schema;
     }
 
     /* (non-Javadoc)
-	 * @see org.geotools.catalog.GeoResourceInfo#getName()
-	 */
+     * @see org.geotools.catalog.GeoResourceInfo#getName()
+     */
     public String getName() { // aka layer/type name
+
         return name;
     }
 
     /* (non-Javadoc)
-	 * @see org.geotools.catalog.GeoResourceInfo#getIcon()
-	 */
+     * @see org.geotools.catalog.GeoResourceInfo#getIcon()
+     */
     public Icon getIcon() {
         return icon;
     }
 
     /* (non-Javadoc)
-	 * @see org.geotools.catalog.GeoResourceInfo#getBounds()
-	 */
+     * @see org.geotools.catalog.GeoResourceInfo#getBounds()
+     */
     public Envelope getBounds() { // part of Coverage
+
         return bounds;
     }
 
     /* (non-Javadoc)
-	 * @see org.geotools.catalog.GeoResourceInfo#getCRS()
-	 */
+     * @see org.geotools.catalog.GeoResourceInfo#getCRS()
+     */
     public CoordinateReferenceSystem getCRS() { // part of Coverage
+
         return bounds.getCRS();
     }
 }
