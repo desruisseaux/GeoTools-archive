@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, 2004 Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ import org.geotools.resources.TestData;
  * This is probably the most important test case for the whole CRS module.
  *
  * @version $Id$
- * @author Yann Cézard
+ * @author Yann Cï¿½zard
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
@@ -190,6 +190,15 @@ public class ScriptTest extends TestCase {
      */
     public void testOrthographic() throws Exception {
         runScript("scripts/Orthographic.txt");
+    }
+    
+    /**
+     * Run "NZMG.txt"
+     * 
+     * @throws Exception If a test failed.
+     */
+    public void testNZMG() throws Exception {
+    	runScript("scripts/NZMG.txt");
     }
     
     /**
