@@ -226,9 +226,9 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      */
     public void setChannelSelection(ChannelSelection channel) {
     	if( this.channelSelection == channel ) return;
-    	fireChildRemoved( this.channelSelection );
+    	ChannelSelection old = this.channelSelection;
     	this.channelSelection = channel;
-    	fireChildAdded( channel );    
+    	fireChildChanged( "channelSelection", channel, old );    
     }
 
     /**
@@ -249,9 +249,9 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      */
     public void setColorMap(ColorMap colorMap) {
     	if (this.colorMap == colorMap) return;
-		fireChildRemoved(this.colorMap);
-		this.colorMap = colorMap;
-		fireChildAdded(colorMap);    
+		ColorMap old = colorMap;
+    	this.colorMap = colorMap;
+    	fireChildChanged("colorMap",colorMap, old);    
     }
 
     /**
@@ -274,9 +274,9 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      */
     public void setContrastEnhancement(ContrastEnhancement contrastEnhancement) {
     	if( this.contrastEnhancement == contrastEnhancement ) return;
-    	fireChildRemoved( this.contrastEnhancement );
+    	ContrastEnhancement old = this.contrastEnhancement;
     	this.contrastEnhancement = contrastEnhancement;
-    	fireChildAdded( contrastEnhancement );    
+    	fireChildChanged( "contrastEnhancement", contrastEnhancement, old );    
     }
 
     /**
@@ -289,10 +289,11 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      * @param geometryPropertyName the name of the Geometry
      */
     public void setGeometryPropertyName(String geometryName) {
-        if( this.geometryName == geometryName ) return;        
-    	fireChildRemoved( this.geometryName);
+        if( this.geometryName == geometryName ) return;
+        
+        String old = this.geometryName;
     	this.geometryName = geometryName;
-        fireChildAdded( geometryName );    	         
+        fireChildChanged( "geometryName", geometryName, old );
     }
 
     /**
@@ -322,9 +323,10 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
     public void setImageOutline(Symbolizer symbolizer) {
         if (symbolizer instanceof LineSymbolizer || symbolizer instanceof PolygonSymbolizer) {
         	if( this.symbolizer == symbolizer ) return;
-        	fireChildRemoved( this.symbolizer );
+        	
+        	Symbolizer old = this.symbolizer; 
             this.symbolizer = symbolizer;
-            fireChildAdded( symbolizer );
+            fireChildChanged( "symbolizer", symbolizer, old );
         } else {
         	throw new IllegalArgumentException(
             	"Only a line or polygon symbolizer may be used to outline a raster");
@@ -338,9 +340,10 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      */
     public void setOpacity(Expression opacity) {
     	if( this.opacity == opacity ) return;
-    	fireChildRemoved( this.opacity );
+    	
+    	Expression old = this.opacity;
     	this.opacity = opacity;
-    	fireChildAdded( opacity );    
+    	fireChildChanged( "opacity", opacity, old );    
     }
 
     /**
@@ -360,9 +363,10 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      */
     public void setOverlap(Expression overlap) {
     	if( this.overlap == overlap ) return;
-    	fireChildRemoved( this.overlap );
+    	
+    	Expression old = this.overlap;
     	this.overlap = overlap;
-    	fireChildAdded( overlap );    
+    	fireChildChanged( "overlap", overlap, old );    
     }
 
     /**
@@ -383,9 +387,10 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      */
     public void setShadedRelief(ShadedRelief shadedRelief) {
     	if( this.shadedRelief == shadedRelief ) return;
-    	fireChildRemoved( this.shadedRelief );
+    	
+    	ShadedRelief old = this.shadedRelief;
     	this.shadedRelief = shadedRelief;
-    	fireChildAdded( shadedRelief );    
+    	fireChildChanged( "shadedRelief", shadedRelief, old );    
     }
 
     public void accept(StyleVisitor visitor) {

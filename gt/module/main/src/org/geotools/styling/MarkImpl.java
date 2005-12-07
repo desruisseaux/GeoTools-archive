@@ -115,22 +115,25 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
      * @param fill New value of property fill.
      */
     public void setFill(org.geotools.styling.Fill fill) {
+    	Fill old = this.fill;
         this.fill = fill;
-        fireChildChanged( fill );
+        fireChildChanged( "fill", fill, old );
     }
 
     /**
      * Setter for property stroke.
      * @param stroke New value of property stroke.
      */
-    public void setStroke(org.geotools.styling.Stroke stroke) {
+    public void setStroke(Stroke stroke) {
+    	Stroke old = this.stroke;
         this.stroke = stroke;
-        fireChildChanged( stroke );
+        fireChildChanged( "stroke", stroke, old );
     }
 
     public void setSize(Expression size) {
+    	Expression old = this.size;
         this.size = size;
-        fireChildChanged( size );
+        fireChildChanged( "size", size, old );
     }
 
     public void setSize(int size) {
@@ -143,8 +146,10 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
      */
     public void setWellKnownName(Expression wellKnownName) {
         LOGGER.entering("DefaultMark", "setWellKnownName");
+        Expression old = this.wellKnownName;
         this.wellKnownName = wellKnownName;
-        fireChildChanged( wellKnownName );
+        
+        fireChildChanged( "wellKnownName", wellKnownName, old );
     }
 
     public void setWellKnownName(String name) {
@@ -152,8 +157,9 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
     }
 
     public void setRotation(Expression rotation) {
+    	Expression old = this.rotation;
         this.rotation = rotation;
-        fireChildChanged( rotation );
+        fireChildChanged( "rotation", rotation, old );
     }
     public void setRotation(double rotation) {
         setRotation(filterFactory.createLiteralExpression( rotation ));        

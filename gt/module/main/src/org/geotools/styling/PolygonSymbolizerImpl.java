@@ -90,9 +90,10 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent implements Polygo
      */
     public void setFill(Fill fill) {
     	if( this.fill == fill ) return;
-    	fireChildRemoved( this.fill );
+    	
+    	Fill old = this.fill;
     	this.fill = fill;
-    	fireChildAdded( fill );    
+    	fireChildChanged( "fill", fill, old );    
     }
 
     /**
@@ -113,9 +114,9 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent implements Polygo
      */
     public void setStroke(Stroke stroke) {
     	if( this.stroke == stroke ) return;
-    	fireChildRemoved( this.stroke );
+    	Stroke old = this.stroke;
     	this.stroke = stroke;
-    	fireChildAdded( stroke );    
+    	fireChildChanged( "stroke", stroke, old );    
     }
 
     /**

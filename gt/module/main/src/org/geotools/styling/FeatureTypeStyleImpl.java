@@ -48,12 +48,12 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent implements Feature
         this( Arrays.asList( rules ) );
     }
     protected FeatureTypeStyleImpl( List rules ){
-    	ruleList = new GTList( this );
+    	ruleList = new GTList( this, "rules" );
     	ruleList.addAll( rules );
     }
     /** Creates a new instance of FeatureTypeStyleImpl */
     protected FeatureTypeStyleImpl() {
-    	ruleList = new GTList( this );
+    	ruleList = new GTList( this, "rules" );
     }
     
     public String getFeatureTypeName() {

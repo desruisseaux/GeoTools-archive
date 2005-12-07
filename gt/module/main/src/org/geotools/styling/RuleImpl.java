@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.event.GTList;
 import org.geotools.filter.Filter;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
@@ -36,9 +37,9 @@ import org.opengis.util.Cloneable;
  * @author James Macgill
  */
 public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
-	private List symbolizers = new ArrayList();
+	private List symbolizers = new GTList( this, "symbolizers");
 
-	private List graphics = new ArrayList();
+	private List graphics = new GTList( this, "graphics");
 
 	private String name = "name";
 
@@ -68,8 +69,7 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
 	}
 
 	public void addLegendGraphic(Graphic graphic) {
-		graphics.add(graphic);
-		fireChildAdded(graphic);
+		graphics.add(graphic);	
 	}
 
 	/**
@@ -94,19 +94,13 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
 	}
 
 	public void addSymbolizer(Symbolizer symb) {
-		this.symbolizers.add(symb);
-		fireChildAdded(symb);
+		this.symbolizers.add(symb);		
 	}
 
 	public void setSymbolizers(Symbolizer[] syms) {
+		List symbols = Arrays.asList( syms );
 		this.symbolizers.clear();
-		for (int i = 0; i < syms.length; i++) {
-			// add symbolizer
-			addSymbolizer(syms[i]);
-			// set parent
-			syms[i].setParent(this);
-		}
-		fireChanged(); // TODO: Handle lists!
+		this.symbolizers.addAll( symbols );
 	}
 
 	public Symbolizer[] getSymbolizers() {
@@ -179,9 +173,9 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
 	}
 
 	public void setFilter(Filter filter) {
-		//TODO: descend into filters
+		Filter old = this.filter;
 		this.filter = filter;
-		fireChildChanged(filter);
+		fireChildChanged("filder",filter,old);
 	}
 
 	public boolean hasElseFilter() {

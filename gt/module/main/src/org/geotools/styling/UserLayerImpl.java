@@ -9,6 +9,7 @@ package org.geotools.styling;
 import java.util.ArrayList;
 
 import org.geotools.data.DataStore;
+import org.geotools.event.GTList;
 import org.geotools.feature.FeatureType;
 
 /**
@@ -63,7 +64,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
 	private DataStore   inlineFeatureDatastore = null;
 	private FeatureType inlineFeatureType = null;
 	
-    ArrayList styles = new ArrayList();
+    ArrayList styles = new GTList( this, "styles" );
     
     public RemoteOWS getRemoteOWS()
     {
@@ -116,7 +117,6 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     }    
     public void addUserStyle(Style style){
         styles.add(style);
-		fireChildAdded(style);
     }
     
     

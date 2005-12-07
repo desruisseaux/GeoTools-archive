@@ -16,6 +16,7 @@
  */
 package org.geotools.event;
 
+
 /**
  * Captures changes to Style.
  * 
@@ -37,30 +38,26 @@ package org.geotools.event;
  * @since 2.2.M2
  */
 public interface GTEvent {
+	
     /**
-     * Returns a delta, rooted at style, describing the set of changes that
-     * happened. Returns <code>null</code> if not applicable to this type of
-     * event.
+     * Returns a delta, from the root, describing the set of changes that
+     * happened.
+     * <p>
+     * May be <code>null</code> if not applicable, available
+     * to this type of event.
      *
      * @return the style delta, or <code>null</code> if not applicable
      */
     public GTDelta getDelta();
 
     /**
-     * Style being changed, handy if you are listening to several styles at
-     * once.
-     *
-     * @return Style being changed
+     * Root construct issuing the event.
+     * <p>
+     * Handy if you are listening to several things at once.
+     * </p>
+     * @return Root construct issuing event
      */
-    public Object getRoot();
-
-    /**
-     * If this change is limited to a single strand, Style being changed, handy
-     * if you are listening to several styles at once.
-     *
-     * @return Style being changed
-     */
-    public Object getAffected();
+    public Object getSource();
 
     /**
      * Returns the type of event being reported.
@@ -77,24 +74,42 @@ public interface GTEvent {
      */
     public class Type {
         /**
-         * Event type constant (bit mask) indicating an after-the-fact report
-         * of creations, deletions, and modifications to one or more style
+         * Event type indicating an after-the-fact report
+         * of creations, deletions, and modifications to one or more
          * constructs expressed as a hierarchical delta as returned by
          * <code>getDelta</code>.
          *
          * @see #getType()
-         * @see #getDelta()
          */
         public static final Type POST_CHANGE = new Type();
 
         /**
-         * Event type constant (bit mask) indicating a before-the-fact report
-         * of the impending deletion of a single style construct.
-         *
+         * Event type indicating a before-the-fact report
+         * of the impending deletion of a single construct.
+         * <p>
+         * The data is being removed, if you were keeping any
+         * metadata about this information it is time to throw
+         * away.
+         * </p>
          * @see #getType()
-         * @see #getService()
          */
         public static final Type PRE_DELETE = new Type();
+        
+        /**
+         * Event type indicating a before-the-fact report
+         * of the impending closure of a single construct.
+         * <p>
+         * This is applicable when manging system resources,
+         * such as network connections and icons.
+         * </p>
+         * <p>
+         * We are simply tearing dow the data structure because
+         * the system is shutting down,  you can keep metadata
+         * but be sure to return any resources you were using!
+         * </p>
+         * @see #getType()
+         */
+        public static final Type PRE_CLOSE = new Type();
 
         private Type() {
         }

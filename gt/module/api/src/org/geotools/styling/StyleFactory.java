@@ -221,6 +221,9 @@ public interface StyleFactory extends Factory {
      */
     public TextSymbolizer getDefaultTextSymbolizer();
 
+    public Graphic createDefaultGraphic();
+    
+    /** @deprecated Please use createDefaultGraphic */
     public Graphic getDefaultGraphic();
 
     public Font getDefaultFont();

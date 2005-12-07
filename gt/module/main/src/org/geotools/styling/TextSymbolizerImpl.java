@@ -20,10 +20,13 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.event.GTList;
 import org.geotools.filter.Expression;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
@@ -40,9 +43,9 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
     private static final org.geotools.filter.FilterFactory filterFactory = 
             org.geotools.filter.FilterFactoryFinder.createFilterFactory();
     private Fill fill;
-    private java.util.List fonts = new java.util.ArrayList();
+    private java.util.List fonts = new GTList( this, "fonts");
     private Halo halo;
-    private LabelPlacement labelPlacement;
+    private LabelPlacement placement;
     private String geometryPropertyName = null;
     private org.geotools.filter.Expression label = null;
     private Graphic graphic = null;    
@@ -55,7 +58,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
         fill = new FillImpl();
         fill.setColor(filterFactory.createLiteralExpression("#000000")); // default text fill is black
         halo = null;
-        labelPlacement = new PointPlacementImpl();
+        placement = new PointPlacementImpl();
     }
 
     /**
@@ -90,11 +93,11 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
     /** Setter for property fill.
      * @param fill New value of property fill.
      */
-    public void setFill(org.geotools.styling.Fill fill) {
+    public void setFill(Fill fill) {
     	if( this.fill == fill ) return;
-    	fireChildRemoved( this.fill );
+    	Fill old = this.fill;
     	this.fill = fill;
-    	fireChildAdded( fill );    
+    	fireChildChanged( "fill", fill, old );    
     }
 
     /**
@@ -114,8 +117,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
      * @param font New value of property font.
      */
     public void addFont(org.geotools.styling.Font font) {
-        this.fonts.add(font);
-        fireChildAdded( font );
+    	this.fonts.add(font);
     }
 
     /** Sets the list of fonts in the TextSymbolizer to the
@@ -124,14 +126,9 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
      *  @param fonts The array of fonts to use in the symbolizer.
      */
     public void setFonts(Font[] fonts) {
+    	List newFonts = Arrays.asList( fonts );
         this.fonts.clear();
-        for (int i = 0; i < fonts.length; i++) {
-        	//add font
-        	addFont(fonts[i]);
-    		//set parent
-        	fonts[i].setParent(this);
-        }
-        fireChanged(); // TODO Handle font list
+        this.fonts.addAll( newFonts );        
     }
 
     /**
@@ -146,11 +143,11 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
      * Setter for property halo.
      * @param halo New value of property halo.
      */
-    public void setHalo(org.geotools.styling.Halo halo) {
+    public void setHalo(Halo halo) {
     	if( this.halo == halo ) return;
-    	fireChildRemoved( this.halo );
+    	Halo old = this.halo;
     	this.halo = halo;
-    	fireChildAdded( halo );    
+    	fireChildChanged( "halo", halo, this );    
     }
 
     /**
@@ -165,11 +162,10 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
      * Setter for property label.
      * @param label New value of property label.
      */
-    public void setLabel(org.geotools.filter.Expression label) {
-    	if( this.label == label ) return;
-    	fireChildRemoved( this.label );
+    public void setLabel(Expression label) {
+    	Expression old = this.label;
     	this.label = label;
-    	fireChildAdded( label );    
+    	fireChildChanged( "label", label, old );    
     }
 
     /**
@@ -178,18 +174,19 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
      * @return Value of property labelPlacement.
      */
     public LabelPlacement getPlacement() {
-        return labelPlacement;
+        return placement;
     }
 
     /**
      * Setter for property labelPlacement.
      * @param labelPlacement New value of property labelPlacement.
      */
-    public void setPlacement(org.geotools.styling.LabelPlacement labelPlacement) {
-    	if( this.labelPlacement == labelPlacement ) return;
-    	fireChildRemoved( this.labelPlacement );
-    	this.labelPlacement = labelPlacement;
-    	fireChildAdded( labelPlacement );    
+    public void setPlacement(LabelPlacement labelPlacement) {
+    	if( this.placement == labelPlacement ) return;
+    	
+    	LabelPlacement old = this.placement;
+    	this.placement = labelPlacement;
+    	fireChildChanged( "placement", labelPlacement, old );    
     }
 
     
@@ -265,8 +262,8 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
         if (halo != null) {
             result = PRIME * result + halo.hashCode();
         }
-        if (labelPlacement != null) {
-            result = PRIME * result + labelPlacement.hashCode();
+        if (placement != null) {
+            result = PRIME * result + placement.hashCode();
         }
         if (geometryPropertyName != null) {
             result = PRIME * result + geometryPropertyName.hashCode();
@@ -293,7 +290,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
                    Utilities.equals(this.label, other.label) &&
                    Utilities.equals(this.halo, other.halo) &&
                    Utilities.equals(this.fonts, other.fonts) &&
-                   Utilities.equals(this.labelPlacement, other.labelPlacement) &&
+                   Utilities.equals(this.placement, other.placement) &&
                    Utilities.equals(this.fill, other.fill);
         }
 
@@ -305,9 +302,9 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
 	 */
 	public void setPriority(Expression priority) {
     	if( this.priority == priority ) return;
-    	fireChildRemoved( this.priority );
+    	Expression old = this.priority;
     	this.priority = priority;
-    	fireChildAdded( priority );    
+    	fireChildChanged( "priority", priority, old );    
 	}
 
 	/* (non-Javadoc)
@@ -354,8 +351,8 @@ public class TextSymbolizerImpl extends AbstractGTComponent implements TextSymbo
 	}
 	public void setGraphic( Graphic graphic ) {
     	if( this.graphic == graphic ) return;
-    	fireChildRemoved( this.graphic );
+    	Graphic old = this.graphic;
     	this.graphic = graphic;
-    	fireChildAdded( graphic );    
+    	fireChildChanged( "graphic", graphic, old );    
 	}
 }

@@ -37,14 +37,16 @@ import java.util.List;
 
 
 public class GTList extends ArrayList implements List {
+	private List delegate;
+	
     private static final long serialVersionUID = -4849245752797538846L;
-    GTComponent host;
-
+    private GTComponent host;
+    private String notificationName;
     /**
      * Package visiable constructor for test purposes
      */
     GTList() {
-        this(GTRoot.NO_PARENT);
+        this(GTRoot.NO_PARENT, "");
     }
 
     /**
@@ -53,87 +55,121 @@ public class GTList extends ArrayList implements List {
      *
      * @param host Host for this list
      */
-    public GTList(GTComponent host) {
+    public GTList(GTComponent host, String listName ) {
         this.host = host;
+        this.notificationName = listName;
     }
 
+
+
     /**
-     * Notify parent that a new child has been added.
-     * 
+     * Indicate that the range has been added.
      * <p>
-     * Cigars optional
+     * Performs all the book keeping but does not actually add,
+     * or fire notifications.
      * </p>
-     *
-     * @param child
      */
-    final protected void fireChildAdded(Object child) {
-        if (child == null) {
-            return;
+    private List deltaAdded( int fromIndex, int toIndex ){    	
+        int position = fromIndex;
+        List range = subList( fromIndex, toIndex );
+        List added = new ArrayList( range.size() );
+    	
+        for (Iterator i = range.iterator(); i.hasNext(); position++) {
+            Object item = i.next();
+            added.add( deltaAdded( position, item ));            
         }
-
-        if (child instanceof GTComponent) {
-            GTComponent myChild = (GTComponent) child;
-            myChild.setParent(host);
-        }
-
-        GTDelta delta;
-        delta = new GTDeltaImpl(GTDelta.Kind.ADDED, child);
-        delta = new GTDeltaImpl(GTDelta.Kind.CHANGED, host, delta);
-        host.getParent().changed(delta);
+        return added;
     }
-
-    /**
-     * Call this before removing Child
-     * 
-     * <p>
-     * Use this for non StyleComponent children - like Color. Can be used to
-     * indicate a color has been removed from a list.
-     * </p>
-     *
-     * @param child
-     */
-    final protected void fireChildRemoved(Object child) {
-        if (child == null) {
-            return;
+    
+    private GTDelta deltaAdded( int position, Object item ){
+    	if (item instanceof GTComponent) {
+            GTComponent myChild = (GTComponent) item;
+            myChild.setParent( host );
+            myChild.setNotificationName( notificationName );
+            myChild.setNotificationPosition( position );                
         }
-
-        if (child instanceof GTComponent) {
-            GTComponent myChild = (GTComponent) child;
+        GTDelta delta = new GTDeltaImpl(notificationName, position,
+                GTDelta.Kind.ADDED, item, null);
+        return delta;
+    }
+    /**
+     * Indicate that the range has been moved
+     * <p>
+     * Performs all the book keeping but does not actually move,
+     * or fire notifications.
+     * </p>
+     */    
+    private List deltaMove( int fromIndex, int toIndex ){
+    	int position = fromIndex;
+        List rest = subList( fromIndex, toIndex );
+        List moved = new ArrayList( rest.size() );
+        
+        for (Iterator i = rest.iterator(); i.hasNext(); position++) {
+            Object item = i.next();
+            moved.add( deltaSync( position, item ));
+        }
+        return moved;
+    }
+    
+    private GTDelta deltaSync( int position, Object item ){
+    	if (item instanceof GTComponent) {
+            GTComponent myChild = (GTComponent) item;
+            myChild.setNotificationPosition( position );                
+        }
+        GTDelta delta = new GTDeltaImpl(notificationName, position,
+                GTDelta.Kind.NO_CHANGE, item, null);
+        return delta;
+    }
+    /**
+     * Indicate that the range has been removed.
+     * <p>
+     * Performs all the book keeping but does not actually remove,
+     * or fire notifications.
+     * </p>
+     */    
+    private List deltaRemoved( int fromIndex, int toIndex ){
+    	
+        int position = fromIndex;
+        List rest = subList( fromIndex, toIndex );
+        List removed = new ArrayList( rest.size() );
+        
+        for (Iterator i = rest.iterator(); i.hasNext(); position++) {
+            Object item = i.next();
+            removed.add( deltaRemoved( position, item ) );
+        }
+        return removed;
+    }
+    private List deltaRemoved( Collection collection ){
+    	List removed = new ArrayList( collection.size() );        
+        for (Iterator i = collection.iterator(); i.hasNext(); ) {
+            Object item = i.next();
+            int position = indexOf( item );
+            removed.add( deltaRemoved( position, item ) );
+        }
+        return removed;
+    }
+    private GTDelta deltaRemoved( int position, Object item ){
+    	if (item instanceof GTComponent) {
+            GTComponent myChild = (GTComponent) item;
             myChild.setParent(GTRoot.NO_PARENT);
+            myChild.setNotificationName("");
+            myChild.setNotificationPosition( GTDelta.NO_INDEX );              
         }
+        GTDelta delta = new GTDeltaImpl(notificationName, position,
+                GTDelta.Kind.REMOVED, null, item );
+        return delta;
+    }    
 
+
+    public boolean add(Object item ) {
+        boolean added = super.add( item );
+        
         GTDelta delta;
-        delta = new GTDeltaImpl(GTDelta.Kind.REMOVED, child);
-        delta = new GTDeltaImpl(GTDelta.Kind.CHANGED, host, delta);
+        delta = deltaAdded( size()-1, item );
+        delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
+                    GTDelta.Kind.CHANGED, host, delta );        
         host.getParent().changed(delta);
-    }
-
-    /**
-     * Call this after child has been moved in a list.
-     * 
-     * <p>
-     * Used mostly for for non StyleComponent children - like Color. When items
-     * are moved in a list, two items are effected, a single delta can be sent
-     * out describe this atomic change.
-     * </p>
-     *
-     * @param child1
-     * @param child2
-     */
-    final protected void fireChildChanged(Object child1, Object child2) {
-        GTDelta delta1 = new GTDeltaImpl(GTDelta.Kind.NO_CHANGE, child1);
-        GTDelta delta2 = new GTDeltaImpl(GTDelta.Kind.NO_CHANGE, child2);
-        List list = new ArrayList(2);
-        list.add(delta1);
-        list.add(delta2);
-
-        GTDelta delta = new GTDeltaImpl(GTDelta.Kind.CHANGED, host, list);
-        host.getParent().changed(delta);
-    }
-
-    public boolean add(Object child) {
-        boolean added = super.add(child);
-        fireChildAdded(child);
+        
         return added;
     }
 
@@ -143,76 +179,90 @@ public class GTList extends ArrayList implements List {
      * @param index
      * @param child
      */
-    public void add(int index, Object child) {
-        super.add(index, child);
+    public void add(int index, Object item ) {
+        super.add(index, item );
+        
+        GTDelta delta;
+        delta = deltaAdded( index, item );
+        delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
+                    GTDelta.Kind.CHANGED, host, delta );        
+        host.getParent().changed(delta);
     }
 
     public boolean addAll(Collection list) {
-        boolean added = super.addAll(list);
-        fireChildrenAdded(list);
+    	int position = isEmpty()? 0 : size()-1;
+    	boolean added = super.addAll(list);
+        
+    	List changed = deltaAdded( position, size() );
+        GTDelta delta;
+        delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
+                    GTDelta.Kind.CHANGED, host, changed );        
+        host.getParent().changed(delta);
+        
         return added;
     }
     public boolean addAll(int index, Collection list) {
+    	int start = index;
+    	int end = start+list.size();
+    	
 		boolean added = super.addAll(index, list);
-		fireChildrenAdded(list);
+		List changed = deltaAdded( start, end );
+		changed.addAll( deltaMove( end, size() ));
+		GTDelta delta;
+        delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
+                    GTDelta.Kind.CHANGED, host, changed );        
+        host.getParent().changed(delta);        	
 		return added;
 	}
-    public void clear() {
-    	fireChildRemoved( this );
+    public void clear() {    	
     	super.clear();
+        GTDelta delta;
+        delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
+                    GTDelta.Kind.CHANGED, host );        
+        host.getParent().changed(delta);    	
     }
-    public Object remove(int index) {
-    	fireChildRemoved( get( index ) );    	
-    	return super.remove(index);
-    }
-    public boolean remove(Object child) {
-        fireChildRemoved(child);
-        return super.remove(child);
-    }
-    public boolean removeAll(Collection collection) {
-    	fireChildrenRemoved( collection );
-    	return super.removeAll( collection );
-    }
-    protected void removeRange(int fromIndex, int toIndex) {
-    	fireChildRemoved( subList( fromIndex, toIndex ));
-    	super.removeRange(fromIndex, toIndex);
+    public Object remove(int index) {    	
+    	List changed = deltaRemoved( index, index+1 );    	
+    	Object item = super.remove(index);
+    	
+    	changed.addAll( deltaMove( index, size() ));
+    	GTDelta delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
+                    GTDelta.Kind.CHANGED, host, changed );        
+        host.getParent().changed(delta);        
+    	return item;
     }
     
-    //
-    // Utility Methods (event notification)
-    //
-	private void fireChildrenAdded(Collection list) {
-		List delta = new ArrayList(list.size());
-
-        for (Iterator i = list.iterator(); i.hasNext();) {
-            Object child = i.next();
-
-            if (child instanceof GTComponent) {
-                GTComponent myChild = (GTComponent) child;
-                myChild.setParent(host);
-            }
-
-            delta.add(new GTDeltaImpl(GTDelta.Kind.ADDED, child));
-        }
-
-        host.getParent()
-            .changed(new GTDeltaImpl(GTDelta.Kind.CHANGED, host, delta));
-	}
-	private void fireChildrenRemoved(Collection list) {
-		List delta = new ArrayList(list.size());
-
-        for (Iterator i = list.iterator(); i.hasNext();) {
-            Object child = i.next();
-
-            if (child instanceof GTComponent) {
-                GTComponent myChild = (GTComponent) child;
-                myChild.setParent(host);
-            }
-
-            delta.add(new GTDeltaImpl(GTDelta.Kind.REMOVED, child));
-        }
-
-        host.getParent()
-            .removed(new GTDeltaImpl(GTDelta.Kind.CHANGED, host, delta));
-	}
+    public boolean remove(Object item ) {
+    	int index = indexOf( item );
+    	if( index == -1 ){
+    		return false;
+    	}
+    	remove( index );
+    	return true;        
+    }
+    
+    public boolean removeAll(Collection collection) {
+    	
+    	List changed = deltaRemoved( collection );    	
+    	boolean removed = super.removeAll( collection );
+    	changed.addAll( deltaMove( 0, size() ));
+    	
+    	GTDelta delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
+                    GTDelta.Kind.CHANGED, host, changed );        
+        host.getParent().changed(delta);        
+    	return removed;
+    }
+    
+    protected void removeRange(int fromIndex, int toIndex) {    	
+    	List changed = deltaRemoved( fromIndex, toIndex );
+    	
+    	super.removeRange(fromIndex, toIndex);
+    	
+    	changed.addAll( deltaMove( 0, size() ));
+    	
+    	GTDelta delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
+                    GTDelta.Kind.CHANGED, host, changed );        
+        host.getParent().changed(delta);        
+    }
+    
 }

@@ -25,13 +25,13 @@ public interface StyleFactory2 extends StyleFactory {
     /**
      * Label Shield hack, non SLD 1.1
      *
-     * @param fill DOCUMENT ME!
-     * @param fonts DOCUMENT ME!
-     * @param halo DOCUMENT ME!
-     * @param label DOCUMENT ME!
-     * @param labelPlacement DOCUMENT ME!
-     * @param geometryPropertyName DOCUMENT ME!
-     * @param graphic DOCUMENT ME!
+     * @param fill Fill
+     * @param fonts Font information (CSS)
+     * @param halo Describes Halo
+     * @param label Expression for label
+     * @param labelPlacement Captures label position
+     * @param geometryPropertyName With respect to this geometry 
+     * @param graphic Used to draw a backdrop behind label
      *
      * @return DOCUMENT ME!
      */

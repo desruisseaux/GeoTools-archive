@@ -58,8 +58,8 @@ public class ShadedReliefImpl extends AbstractGTComponent implements ShadedRelie
      *
      */
     public void setReliefFactor(Expression reliefFactor) {
-    	fireChildRemoved( this.reliefFactor );
+    	Expression old = this.reliefFactor;
         this.reliefFactor = reliefFactor;
-        fireChildAdded( reliefFactor );
+        fireChildChanged( "reliefFactor", reliefFactor, old );
     }
 }

@@ -69,7 +69,8 @@ public class TestUtils {
     
     public static Style buildStyle(String styleName) {
         StyleFactory sf = StyleFactoryFinder.createStyleFactory();
-        PointSymbolizer ps = sf.getDefaultPointSymbolizer();
+        PointSymbolizer ps = sf.createPointSymbolizer();
+        
         Rule r = sf.createRule();
         r.setSymbolizers(new Symbolizer[] {ps});
         

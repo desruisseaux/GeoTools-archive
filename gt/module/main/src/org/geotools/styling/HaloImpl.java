@@ -21,6 +21,7 @@ package org.geotools.styling;
 
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.resources.Utilities;
@@ -73,8 +74,9 @@ public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
      * @param fill New value of property fill.
      */
     public void setFill(org.geotools.styling.Fill fill) {
+    	Fill old = this.fill;
         this.fill = fill;
-        fireChildChanged( fill );
+        fireChildChanged( "fill", fill, old );
     }
 
     /** Getter for property radius.
@@ -87,9 +89,10 @@ public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
     /** Setter for property radius.
      * @param radius New value of property radius.
      */
-    public void setRadius(org.geotools.filter.Expression radius) {
+    public void setRadius(Expression radius) {
+    	Expression old = this.radius;
         this.radius = radius;
-        fireChildChanged( radius );
+        fireChildChanged( "radius", radius, old );
     }
     
     public void accept(StyleVisitor visitor) {

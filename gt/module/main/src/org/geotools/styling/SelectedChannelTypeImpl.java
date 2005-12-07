@@ -39,8 +39,9 @@ public class SelectedChannelTypeImpl extends AbstractGTComponent implements Sele
     }
 
     public void setContrastEnhancement(Expression contrastEnhancement) {
-    	fireChildRemoved( this.contrastEnhancement );
+    	Expression old = this.contrastEnhancement;
+    	
         this.contrastEnhancement = contrastEnhancement;
-        fireChildAdded( contrastEnhancement );        
+        fireChildChanged( "contrastEnhancement", contrastEnhancement, old );        
     }
 }

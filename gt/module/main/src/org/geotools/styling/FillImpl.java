@@ -94,16 +94,15 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
      */
     public void setColor(Expression rgb) {
     	if( color == rgb ) return;
-    	fireChildRemoved( color );
-        color = rgb;
-    	fireChildAdded( rgb );    
+    	Expression old = color;
+    	color = rgb;
+    	fireChildChanged( "color", rgb, old );
     }
 
     public void setColor(String rgb) {
     	if( color.toString() == rgb ) return;
-    	fireChildRemoved( color );
-        color = filterFactory.createLiteralExpression(rgb);
-    	fireChildAdded( rgb );    
+    	
+    	setColor( filterFactory.createLiteralExpression(rgb) );    	    
     }
 
     /**
@@ -138,17 +137,16 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
      */
     public void setBackgroundColor(Expression rgb) {
     	if( this.backgroundColor == rgb ) return;
-    	fireChildRemoved( backgroundColor );
+    	Expression old = backgroundColor;
     	backgroundColor = rgb;
-    	fireChildAdded( rgb );    
+    	fireChildChanged( "backgroundColor", rgb, old );    
     }
 
     public void setBackgroundColor(String rgb) {
         LOGGER.fine("setting bg color with " + rgb + " as a string");
     	if( backgroundColor.toString() == rgb ) return;
-    	fireChildRemoved( backgroundColor );
-        backgroundColor = filterFactory.createLiteralExpression(rgb);
-    	fireChildAdded( backgroundColor );    
+    	
+    	setBackgroundColor( filterFactory.createLiteralExpression(rgb) );
     }
 
     /**
@@ -173,16 +171,17 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
      */
     public void setOpacity(Expression opacity) {
     	if( this.opacity == opacity ) return;
-    	fireChildRemoved( this.opacity );
-        this.opacity = opacity;
-    	fireChildAdded( opacity );    
+    	
+    	Expression old = this.opacity;
+    	this.opacity = opacity;
+    	
+    	fireChildChanged( "opacity", opacity, old );    
     }
 
     public void setOpacity(String opacity) {
     	if( this.opacity.toString() == opacity ) return;
-    	fireChildRemoved( this.opacity );
-        this.opacity = filterFactory.createLiteralExpression(opacity);
-    	fireChildAdded( opacity );    
+    	
+    	setOpacity( filterFactory.createLiteralExpression(opacity) );
     }
 
     /**
@@ -202,9 +201,9 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
      */
     public void setGraphicFill(org.geotools.styling.Graphic graphicFill) {
     	if( this.graphicFill == graphicFill ) return;
-    	fireChildRemoved( this.graphicFill );
-    	this.graphicFill = graphicFill;
-    	fireChildAdded( graphicFill );    
+    	Graphic old = this.graphicFill;
+    	this.graphicFill = graphicFill;    	
+    	fireChildChanged( "graphicFill", graphicFill, old );    
     }
     
     public void accept(StyleVisitor visitor) {

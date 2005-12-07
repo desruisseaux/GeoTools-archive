@@ -19,15 +19,15 @@
 package org.geotools.styling;
 
 // J2SE dependencies
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.geotools.resources.Utilities;
-import org.geotools.event.GTComponent;
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.event.GTList;
 import org.opengis.util.Cloneable;
 
 
@@ -41,7 +41,7 @@ public class StyleImpl extends AbstractGTComponent implements org.geotools.styli
      */
     private static final Logger LOGGER = Logger.getLogger(
                                                  "org.geotools.styling");
-    private List featureTypeStyleList = new ArrayList();
+    private List featureTypeStyles = new GTList( this,"featureTypeStyles");
     private String abstractText = "";
     private String name = "Default Styler";
     private String title = "Default Styler";
@@ -60,35 +60,27 @@ public class StyleImpl extends AbstractGTComponent implements org.geotools.styli
             new FeatureTypeStyleImpl()
         };
 
-        if ((featureTypeStyleList != null) 
-               && (featureTypeStyleList.size() != 0)) {
-            LOGGER.fine("number of fts set " + featureTypeStyleList.size());
-            ret = (FeatureTypeStyle[]) featureTypeStyleList.toArray(
+        if ((featureTypeStyles != null) 
+               && (featureTypeStyles.size() != 0)) {
+            LOGGER.fine("number of fts set " + featureTypeStyles.size());
+            ret = (FeatureTypeStyle[]) featureTypeStyles.toArray(
                             new FeatureTypeStyle[] {  });
         }
 
         return ret;
     }
 
-    public void setFeatureTypeStyles(FeatureTypeStyle[] featureTypeStyles) {
-    	featureTypeStyleList.clear();
-
-        for (int i = 0; i < featureTypeStyles.length; i++) {
-            //add the FTS
-        	addFeatureTypeStyle(featureTypeStyles[i]);
-    		//set the parent object
-        	if (featureTypeStyles[i] instanceof GTComponent){
-        		GTComponent myChild = (GTComponent) featureTypeStyles[i];
-        		myChild.setParent(this);
-            }
-        }
-        LOGGER.fine("StyleImpl added " + featureTypeStyleList.size() + 
-                    " feature types");
-        fireChanged(); // TODO: Handle FeatureTypeStyle list
+    public void setFeatureTypeStyles(FeatureTypeStyle[] styles) {
+    	List newStyles = Arrays.asList( styles );
+    	
+    	this.featureTypeStyles.clear();
+    	this.featureTypeStyles.addAll( newStyles );
+        
+        LOGGER.fine("StyleImpl added " + featureTypeStyles.size() + 
+                    " feature types");        
     }
     public void addFeatureTypeStyle(FeatureTypeStyle type) {
-        featureTypeStyleList.add(type);
-        fireChildAdded( type );
+        featureTypeStyles.add(type);        
     }
     
     public String getName() {
@@ -151,10 +143,10 @@ public class StyleImpl extends AbstractGTComponent implements org.geotools.styli
             throw new RuntimeException(e); // this should never happen since we implement Cloneable
         }
         
-        FeatureTypeStyle[] ftsArray = new FeatureTypeStyle[featureTypeStyleList.size()];
+        FeatureTypeStyle[] ftsArray = new FeatureTypeStyle[featureTypeStyles.size()];
         
         for (int i = 0; i < ftsArray.length; i++) {
-            FeatureTypeStyle fts = (FeatureTypeStyle) featureTypeStyleList.get(i);
+            FeatureTypeStyle fts = (FeatureTypeStyle) featureTypeStyles.get(i);
             ftsArray[i] = (FeatureTypeStyle) ((Cloneable)fts).clone();
         }
         
@@ -170,8 +162,8 @@ public class StyleImpl extends AbstractGTComponent implements org.geotools.styli
     public int hashCode() {
         final int PRIME = 1000003;
         int result = 0;
-        if (featureTypeStyleList != null) {
-            result = PRIME * result + featureTypeStyleList.hashCode();
+        if (featureTypeStyles != null) {
+            result = PRIME * result + featureTypeStyles.hashCode();
         }
         if (abstractText != null) {
             result = PRIME * result + abstractText.hashCode();
@@ -205,7 +197,7 @@ public class StyleImpl extends AbstractGTComponent implements org.geotools.styli
             return Utilities.equals(name, other.name) &&
                    Utilities.equals(title, other.title) &&
                    Utilities.equals(abstractText, other.abstractText) &&
-                   Utilities.equals(featureTypeStyleList, other.featureTypeStyleList);
+                   Utilities.equals(featureTypeStyles, other.featureTypeStyles);
         }
         
         return false;

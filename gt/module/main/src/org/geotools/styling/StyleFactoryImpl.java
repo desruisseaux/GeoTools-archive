@@ -22,6 +22,8 @@
 package org.geotools.styling;
 
 import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 
 /**
@@ -33,8 +35,9 @@ import org.geotools.filter.Expression;
  * @version $Id: StyleFactoryImpl.java,v 1.15 2004/03/01 15:41:59 aaime Exp $
  */
 public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFactory2 {
-    private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactoryFinder.createFilterFactory();
+	
+    private static final FilterFactory filterFactory = 
+            FilterFactoryFinder.createFilterFactory();
 
     public Style createStyle() {
         return new StyleImpl();
@@ -142,10 +145,9 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
      * @see org.geotools.stroke
      */
     public Stroke createStroke(Expression color, Expression width) {
-        return createStroke(color, width, 
-                            filterFactory.createLiteralExpression(1.0));
+        return createStroke(color, width, filterFactory.createLiteralExpression(1.0));
     }
-
+    
     /**
      * A convienice method to make a simple stroke
      *
@@ -499,7 +501,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
     }
 
     public PointSymbolizer getDefaultPointSymbolizer() {
-        return createPointSymbolizer(getDefaultGraphic(), null);
+        return createPointSymbolizer(createDefaultGraphic(), null);
     }
 
     public PolygonSymbolizer getDefaultPolygonSymbolizer() {
@@ -569,19 +571,16 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         return font;
     }
 
-    public Graphic getDefaultGraphic() {
-        Graphic graphic = new GraphicImpl();
+    public Graphic createDefaultGraphic() {
+    	Graphic graphic = new GraphicImpl();
 
-        try {
-            graphic.setSize(filterFactory.createLiteralExpression(new Integer(6)));
-            graphic.setOpacity(filterFactory.createLiteralExpression(new Double(1.0)));
-            graphic.setRotation(filterFactory.createLiteralExpression(
-                                   new Double(0.0)));
-        } catch (org.geotools.filter.IllegalFilterException ife) {
-            throw new RuntimeException("Error creating graphic", ife);
-        }
-
+        graphic.setSize(filterFactory.createLiteralExpression(6));
+        graphic.setOpacity(filterFactory.createLiteralExpression(1.0));
+        graphic.setRotation(filterFactory.createLiteralExpression( 0.0 ) );    
         return graphic;
+    }
+    public Graphic getDefaultGraphic() {
+    	return createDefaultGraphic();
     }
 
     /** returns a default PointPlacement with a 0,0 anchorPoint and a displacement of 0,0 and a rotation of 0

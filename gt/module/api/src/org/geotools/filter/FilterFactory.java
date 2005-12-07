@@ -211,7 +211,7 @@ public interface FilterFactory extends Factory {
      * @return The new Null Filter.
      */
     public NullFilter createNullFilter();
-
+    
     /**
      * Creates an empty Between Filter.
      *

@@ -25,9 +25,8 @@ package org.geotools.catalog;
  * references you have to the oldObject with the newObject.
  * </p>
  *
- * @author jgarnett
- *
- * @since 0.6.0
+ * @author Jody Garnett, Refractions Research
+ * @since 2.2.M3
  */
 public interface ResolveChangeEvent {
     /**

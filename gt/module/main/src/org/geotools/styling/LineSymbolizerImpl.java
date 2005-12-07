@@ -94,9 +94,10 @@ public class LineSymbolizerImpl extends AbstractGTComponent implements LineSymbo
      */
     public void setStroke(Stroke stroke) {
     	if( this.stroke == stroke ) return;
-    	fireChildRemoved( this.stroke );
+    	
+    	Stroke old = this.stroke;
     	this.stroke = stroke;
-    	fireChildAdded( stroke );    
+    	fireChildChanged( "stroke", stroke, old );    
     }
 
     /**

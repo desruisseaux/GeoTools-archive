@@ -292,8 +292,9 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
     }
     
     public void setDisplacement(Displacement offset){
+    	Displacement old = this.displacement;
         this.displacement = offset;
-        fireChildChanged( offset );
+        fireChildChanged( "offset", offset, old );
     }
 
     /**
@@ -302,8 +303,9 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
      * @param opacity New value of property opacity.
      */
     public void setOpacity(Expression opacity) {
+    	Expression old = opacity;
         this.opacity = opacity;
-        fireChildChanged( opacity );
+        fireChildChanged( "opacity", opacity, old );
     }
 
     public void setOpacity(double opacity) {
@@ -318,14 +320,14 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
      * @param rotation New value of property rotation.
      */
     public void setRotation(Expression rotation) {
+    	Expression old = this.rotation;
         this.rotation = rotation;
 
         java.util.Iterator iter = marks.iterator();
-
         while (iter.hasNext()) {
             ((MarkImpl) iter.next()).setRotation(rotation);
-        }
-        fireChildChanged( rotation );
+        }        
+        fireChildChanged( "rotation", rotation, old );
     }
 
     public void setRotation(double rotation) {
@@ -338,6 +340,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
      * @param size New value of property size.
      */
     public void setSize(Expression size) {
+    	Expression old = this.size;
         this.size = size;
 
         java.util.Iterator iter = marks.iterator();
@@ -345,7 +348,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
         while (iter.hasNext()) {
             ((MarkImpl) iter.next()).setSize(size);
         }
-        fireChildChanged( size );
+        fireChildChanged( "size", size, old );
     }
 
     public void setSize(int size) {

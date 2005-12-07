@@ -92,10 +92,10 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
         	throw new IllegalArgumentException("Color must be provided");
         }
     	if (this.color == color) return;
-    	fireChildRemoved( this.color );
+    	
+    	Expression old = this.color;
     	this.color = color;
-    	if (this.color == null)	fireChildAdded(color);
-		else fireChildChanged(color);
+    	fireChildChanged("color",color, old);
     }
 
     /**
@@ -178,9 +178,9 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
         if (dashOffset == null) {
             return;
         }
-        fireChildRemoved( this.dashOffset );
+        Expression old = this.dashOffset;
         this.dashOffset = dashOffset;
-        fireChildAdded( dashOffset );
+        fireChildChanged( "dashOffset", dashOffset, old );
     }
 
     /**
@@ -203,9 +203,10 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
      */
     public void setGraphicFill(Graphic fillGraphic) {
     	if( this.fillGraphic == fillGraphic ) return;
-    	fireChildRemoved( this.fillGraphic );
+    	Graphic old = this.fillGraphic;
+    	
         this.fillGraphic = fillGraphic;
-        fireChildAdded( fillGraphic );
+        fireChildChanged( "fillGraphic", fillGraphic, old );
     }
 
     /**
@@ -238,9 +239,9 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
      */
     public void setGraphicStroke(Graphic strokeGraphic) {
     	if( this.strokeGraphic == strokeGraphic ) return;
-    	fireChildRemoved(this.strokeGraphic);
-        this.strokeGraphic = strokeGraphic;
-        fireChildAdded(strokeGraphic);
+    	Graphic old = this.strokeGraphic;
+    	this.strokeGraphic = strokeGraphic;
+        fireChildChanged("strokeGraphic", strokeGraphic, old);
     }
 
     /**
@@ -263,9 +264,9 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
         if (lineCap == null) {
             return;
         }
-        fireChildRemoved( this.lineCap );
+        Expression old = this.lineCap;
         this.lineCap = lineCap;
-        fireChildAdded( lineCap );
+        fireChildChanged( "lineCap", lineCap, old );
     }
 
     /**
@@ -288,9 +289,9 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
         if (lineJoin == null) {
             return;
         }
-        fireChildRemoved( this.lineJoin );
-        this.lineJoin = lineJoin;
-        fireChildAdded( lineJoin );
+        Expression old = this.lineJoin;
+        this.lineJoin = lineJoin;        
+        fireChildChanged( "lineJoin", lineJoin, old );
     }
 
     /**
@@ -323,9 +324,9 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
         if (opacity == null) {
             return;
         }
-        fireChildRemoved( this.opacity );
+        Expression old = this.opacity;
         this.opacity = opacity;
-        fireChildAdded( opacity );
+        fireChildChanged( "opacity", opacity, old );
     }
 
     /**
@@ -352,9 +353,9 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
         if (width == null) {
             return;
         }        
-        fireChildRemoved( this.width );
+        Expression old = width;
         this.width = width;
-        fireChildAdded( width );
+        fireChildChanged( "width", width, old);
     }
 
     public String toString() {

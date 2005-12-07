@@ -153,6 +153,7 @@ public class Rendering2DTest extends TestCase {
         myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
         myStroke.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
         polysym.setStroke(myStroke);
+        
         Rule rule = sFac.createRule();
         rule.setSymbolizers(new Symbolizer[]{polysym});
         FeatureTypeStyle fts = sFac.createFeatureTypeStyle(new Rule[]{rule});

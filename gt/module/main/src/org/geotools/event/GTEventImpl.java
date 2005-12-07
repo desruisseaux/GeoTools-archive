@@ -15,6 +15,8 @@
  */
 package org.geotools.event;
 
+import java.util.EventObject;
+
 import org.geotools.event.GTDelta;
 import org.geotools.event.GTEvent;
 
@@ -37,11 +39,22 @@ import org.geotools.event.GTEvent;
  *
  * @since 2.2.M3
  */
-public class GTEventImpl implements GTEvent {
-    private GTDelta delta;
-    private GTComponent root;
+public class GTEventImpl extends EventObject implements GTEvent {	
+	private static final long serialVersionUID = -5304196462694574579L;
+	private GTDelta delta;
     private Type type;
 
+	public GTEventImpl(GTRoot source) {
+		this( source, new GTDeltaImpl("", GTDelta.NO_INDEX, GTDelta.Kind.CHANGED,source,null));
+	}
+	public GTEventImpl(GTRoot source, GTDelta delta) {
+		this( source, Type.POST_CHANGE, delta );
+	}
+	public GTEventImpl(GTRoot source, Type type, GTDelta delta) {
+		super(source);
+		this.type = type;
+		this.delta = delta;
+	}	
     /**
      * Returns a delta, rooted at style, describing the set of changes that
      * happened. Returns <code>null</code> if not applicable to this type of
@@ -52,33 +65,7 @@ public class GTEventImpl implements GTEvent {
     public GTDelta getDelta() {
         return delta;
     }
-
-    /**
-     * Style being changed, handy if you are listening to several styles at
-     * once.
-     *
-     * @return Style being changed
-     */
-
-    //    public StyledLayerDescriptor getSLD(){
-    //    	return root;
-    //    }
-    /**
-     * If this change is limited to a single strand, Style being changed, handy
-     * if you are listening to several styles at once.
-     *
-     * @return Style being changed
-     */
-    public Object getAffected() {
-        GTDelta here = delta;
-
-        while (here.getChildren().size() == 1) {
-            here = (GTDelta) here.getChildren().get(0);
-        }
-
-        return here.getAffected();
-    }
-
+    
     /**
      * Returns the type of event being reported.
      *
@@ -97,13 +84,5 @@ public class GTEventImpl implements GTEvent {
 
     public void setType(Type type) {
         this.type = type;
-    }
-
-    public Object getRoot() {
-        return root;
-    }
-
-    public void setRoot(GTComponent root) {
-        this.root = root;
     }
 }

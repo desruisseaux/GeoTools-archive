@@ -35,22 +35,22 @@ import org.geotools.filter.NullFilter;
 
 /**
  * A basic implemenation of the FilterVisitor interface.
+ * <p>
  * This class implements the full FilterVisitor interface and will visit every
  * member of a Filter object.  This class performs no actions and is not intended
  * to be used directly, instead extend it and overide the methods for the
  * expression types you are interested in.  Remember to call the super method
  * if you want to ensure that the entier filter tree is still visited.
- *
+ * </p>
+ * <p>
  * You may still need to implement FilterVisitor directly if the visit order
  * set out in this class does not meet your needs.  This class visits in sequence
  * i.e. Left - Middle - Right for all expressions which have sub-expressions.
- *
+ * </p>
  * @author James Macgill, Penn State
  */
 public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor {
-   
-
-  
+    
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter.visitor");
 
@@ -64,7 +64,7 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor 
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
      */
     public void visit(Filter filter) {
-       // unknown filter type (not good, should not happen)
+       // James - unknown filter type (not good, should not happen)
     }
 
     /**

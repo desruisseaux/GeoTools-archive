@@ -42,6 +42,7 @@ package org.geotools.event;
  *
  */
 public interface GTComponent {
+	
 	/**
 	 * Used to locate our parent.
 	 * <p>
@@ -54,11 +55,20 @@ public interface GTComponent {
 	GTComponent getParent();
 
 	/**
-	 * Used to set the parent.
+	 * Used to set the parent, and associated placement information.
 	 * 
 	 * @param newParent GTComponent or NULLGTRoot if none
 	 */
-	void setParent(GTComponent newParent);
+	void setParent(GTComponent newParent );		
+	
+	/** Indicate name used during notification */
+	public void setNotificationName( String name );
+	/** Indicate name used during notification */	
+	public String getNotificationName();
+	/** Indicate name position used during notification */	
+	public void setNotificationPosition( int index );
+	/** Indicate position used during notification */	
+	public int getNotificationPosition();
 	
 	/**
 	 * A child has been removed, issued before change.

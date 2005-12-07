@@ -100,9 +100,9 @@ public class TextMarkImpl extends MarkImpl implements TextMark {
     }
 
     public void setSymbol(Expression symbol) {
-        fireChildRemoved(this.symbol);
+    	Expression old = this.symbol;
         this.symbol = symbol;
-        fireChildAdded(symbol);
+        fireChildChanged("symbol", symbol, old);
     }
 
     /**

@@ -67,11 +67,11 @@ public class PointSymbolizerImpl extends AbstractGTComponent implements PointSym
      * Setter for property graphic.
      * @param graphic New value of property graphic.
      */
-    public void setGraphic(org.geotools.styling.Graphic graphic) {
+    public void setGraphic( Graphic graphic) {
     	if( this.graphic == graphic ) return;
-    	fireChildRemoved( this.graphic );
+    	Graphic old = this.graphic;
     	this.graphic = graphic;
-    	fireChildAdded( graphic );    
+    	fireChildChanged( "graphic", graphic, old );    
     }
     
     /** Accept a StyleVisitor to perform an operation

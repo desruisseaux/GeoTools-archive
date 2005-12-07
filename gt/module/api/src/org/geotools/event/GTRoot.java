@@ -29,7 +29,7 @@ package org.geotools.event;
  * 
  * <p></p>
  *
- * @author jgarnett
+ * @author Jody Garnett, Refractions Research
  */
 public interface GTRoot extends GTComponent {
     public static GTRoot NO_PARENT = new GTRoot() {
@@ -43,13 +43,27 @@ public interface GTRoot extends GTComponent {
             public void removed(GTDelta delta) {
             }
 
-            public void addGTListener(GTListener listener) {
+            public void addListener(GTListener listener) {
             }
 
-            public void removeGTListener(GTListener listener) {
+            public void removeListener(GTListener listener) {
             }
 
             public void setParent(GTComponent newParent) {
+            }
+
+            public void setNotificationName(String name) {
+            }
+
+            public String getNotificationName() {
+                return "";
+            }
+
+            public void setNotificationPosition(int index) {
+            }
+
+            public int getNotificationPosition() {
+                return GTDelta.NO_INDEX;
             }
         };
 
@@ -81,12 +95,12 @@ public interface GTRoot extends GTComponent {
      *
      * @param listener Listener to change events
      */
-    public void addGTListener(GTListener listener);
+    public void addListener(GTListener listener);
 
     /**
      * Removes a previously installed GTListener
      *
      * @param listener Listener to change events
      */
-    public void removeGTListener(GTListener listener);
+    public void removeListener(GTListener listener);
 }

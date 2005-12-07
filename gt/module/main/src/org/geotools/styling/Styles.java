@@ -8,11 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.geotools.event.GTComponent;
-import org.geotools.event.GTDelta;
-import org.geotools.event.GTDeltaImpl;
-import org.geotools.event.GTDeltaVisitor;
 import org.geotools.event.GTRoot;
-import org.geotools.event.GTDelta.Kind;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
@@ -576,8 +572,8 @@ public class Styles {
 				//upper bound value has changed, update
 				filter2.addRightValue(ff.createLiteralExpression(newValue[1]));
 			}
-			//style events don't handle filters yet, so fire the change event for filter
-			thisRule.changed(new GTDeltaImpl(Kind.CHANGED, filter)); 
+			thisRule.setFilter( filter ); // style events don't handle filters yet, so fire the change event for filter
+			 
 			//TODO: adjust the previous and next filters (uses isFirst, isLast)
 		} else if ((filterType == Filter.LOGIC_OR) || (filterType == Filter.COMPARE_EQUALS)) { //explicit expression 
 			//obtain the expression containing the attribute
