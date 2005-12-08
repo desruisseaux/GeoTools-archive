@@ -17,6 +17,8 @@ package org.geotools.styling;
 
 import org.geotools.factory.Factory;
 import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
+
 import java.net.URL;
 
 
@@ -85,6 +87,29 @@ public interface StyleFactory extends Factory {
      */
     public Mark getTriangleMark();
 
+    /**
+     * Creates a new extent.
+     * 
+     * @param name The name of the extent.
+     * @param value The value of the extent.
+     * 
+     * @return The new extent.
+     */
+    public Extent createExtent(String name, String value);
+    
+    /**
+     * Creates a new feature type constraint.
+     *  
+     * @param featureTypeName The feature type name.
+     * @param filter The filter.
+     * @param extents The extents.
+     * 
+     * @return The new feature type constaint.
+     */
+    public FeatureTypeConstraint createFeatureTypeConstraint(
+		String featureTypeName, Filter filter, Extent[] extents
+	);
+    
     public FeatureTypeStyle createFeatureTypeStyle(Rule[] rules);
 
     public LinePlacement createLinePlacement(Expression offset);

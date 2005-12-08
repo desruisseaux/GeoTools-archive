@@ -55,6 +55,7 @@ import org.geotools.filter.Filter;
  * @author James Macgill
  */
 public interface FeatureTypeConstraint {
+	
     public String getFeatureTypeName();
 
     public void setFeatureTypeName(String name);
@@ -62,4 +63,8 @@ public interface FeatureTypeConstraint {
     public Filter getFilter();
 
     public void setFilter(Filter filter);
+    
+    public Extent[] getExtents();
+    
+    public void setExtents(Extent[] extents);
 }

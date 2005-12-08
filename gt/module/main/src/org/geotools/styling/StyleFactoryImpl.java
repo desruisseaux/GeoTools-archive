@@ -22,6 +22,7 @@
 package org.geotools.styling;
 
 import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
@@ -122,6 +123,23 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
 		return tSymb;
     }
 
+    public Extent createExtent(String name, String value) {
+    	Extent extent = new ExtentImpl();
+    	extent.setName(name);
+    	extent.setValue(value);
+    	
+    	return extent;
+    }
+    
+    public FeatureTypeConstraint createFeatureTypeConstraint(String featureTypeName, Filter filter, Extent[] extents) {
+    	FeatureTypeConstraint constraint = new FeatureTypeConstraintImpl();
+    	constraint.setFeatureTypeName(featureTypeName);
+    	constraint.setFilter(filter);
+    	constraint.setExtents(extents);
+    	
+    	return constraint;
+    }
+    
     public FeatureTypeStyle createFeatureTypeStyle() {
         return new FeatureTypeStyleImpl();
     }
