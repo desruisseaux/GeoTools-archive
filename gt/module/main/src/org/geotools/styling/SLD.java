@@ -17,6 +17,7 @@ package org.geotools.styling;
 
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
+import org.geotools.filter.Filters;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.styling.ExternalGraphic;
@@ -66,7 +67,7 @@ import java.net.URL;
  */
 public class SLD {
     /** <code>NOTFOUND</code> indicates int value was unavailable */
-    public static final int NOTFOUND = -1;
+    public static final int NOTFOUND = Filters.NOTFOUND;
     public static final StyleBuilder builder = new StyleBuilder();
 
     /**
@@ -1189,65 +1190,13 @@ public class SLD {
     }
 
     /**
-     * Navigate through the expression seaching for TYPE.
+     * This method is here for backwards compatability.
      * 
-     * <p>
-     * This will work even with dynamic expression that would normall require a
-     * feature. It works especially well when the Expression is a Literal
-     * literal (which is usually the case).
-     * </p>
-     * 
-     * <p>
-     * If you have a specific Feature, please do this:
-     * <pre><code>
-     * Object value = expr.getValue( feature );
-     * return value instanceof Color ? (Color) value : null;
-     * </code></pre>
-     * </p>
-     *
-     * @param expr
-     * @param TYPE DOCUMENT ME!
-     *
-     * @return First available color, or null.
+     * @deprecated
+     * @see org.geotools.filter.Filters#value(Expression, Class)
      */
-    protected static Object value(Expression expr, Class TYPE) {
-        if (expr == null) {
-            return null;
-        } else if (expr instanceof LiteralExpression) {
-            LiteralExpression literal = (LiteralExpression) expr;
-            Object value = literal.getLiteral();
-
-            if (TYPE.isInstance(value)) {
-                return value;
-            }
-        } else if (expr instanceof FunctionExpression) {
-            FunctionExpression function = (FunctionExpression) expr;
-
-            if (function.getArgCount() != 0) {
-                for (int i = 0; i < function.getArgCount(); i++) {
-                    Expression e = function.getArgs()[i];
-                    Object value = value(e, TYPE);
-
-                    if (value != null) {
-                        return value;
-                    }
-                }
-            }
-        } else {
-            try { // this is a bad idea, not expected to work much
-
-                Object value = expr.getValue(null);
-
-                if (TYPE.isInstance(value)) {
-                    return value;
-                }
-            } catch (NullPointerException expected) {
-                return null; // well that was not unexpected
-            } catch (Throwable ignore) { // I did say that was a bad idea                
-            }
-        }
-
-        return null; // really need a Feature to acomplish this one
+    public static Object value(Expression expr, Class TYPE) {
+    	return Filters.value(expr,TYPE);
     }
 
     /**
@@ -1292,87 +1241,43 @@ public class SLD {
     }
 
     /**
-     * Uses number( expr ), will turn result into an interger, or NOTFOUND
-     *
-     * @param expr
-     *
-     * @return int value of first Number, or NOTFOUND
+     * This method is here for backward compatability.
+     * 
+     * @deprecated
+     * @see Filters#intValue(Expression)
      */
     public static int intValue(Expression expr) {
-        Number number = (Number) value(expr, Number.class);
-        
-        if (number != null) {
-            return number.intValue();
-        }
-
-        //look for a string
-        String string = (String) value(expr,String.class);
-        if (string != null) {
-        	//try parsing into a integer
-        	try {
-        		return Integer.parseInt(string);
-        	}
-        	catch(NumberFormatException e) {}
-        }
-        
-        //no dice
-        return NOTFOUND;
+       return Filters.intValue(expr);
     }
 
     /**
-     * Uses string( expr ), will turn result into a String
-     *
-     * @param expr
-     *
-     * @return value of first String
+     * This method is here for backward compatability.
+     * 
+     * @deprecated
+     * @see Filters#stringValue(Expression)
      */
     public static String stringValue(Expression expr) {
-        String string = (String) value(expr, String.class);
-
-        return string;
+        return Filters.stringValue(expr);
     }
 
     /**
-     * Uses number( expr ), will turn result into an interger, or NaN.
-     *
-     * @param expr
-     *
-     * @return int value of first Number, or Double.NaN
+     * This method is here for backward compatability.
+     * 
+     * @deprecated
+     * @see Filters#doubleValue(Expression)
      */
     public static double doubleValue(Expression expr) {
-        Number number = (Number) value(expr, Number.class);
-
-        if (number != null) {
-            return number.doubleValue();
-        }
-        
-        //try for a string
-        String string = (String) value(expr,String.class);
-        if (string != null) {
-        	//try parsing into a double
-        	try {
-        		return Double.parseDouble(string);
-        	}
-        	catch(NumberFormatException e) {}
-        }
-
-        //too bad
-        return Double.NaN;
+       return Filters.doubleValue(expr);
     }
 
     /**
-     * Navigate through the expression finding the first mentioned Integer.
+     * This method is here for backward compatability.
      * 
-     * <p>
-     * Does not evaulate math expression (yet).
-     * </p>
-     *
-     * @param expr
-     *
-     * @return Number or null
+     * @deprecated
+     * @see Filters#number(Expression)
      */
-    public Number number(Expression expr) {
-        return (Number) value(expr, Number.class);
+    public static Number number(Expression expr) {
+        return Filters.number(expr);
     }
 
     /**
