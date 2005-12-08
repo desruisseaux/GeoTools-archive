@@ -230,11 +230,18 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
     }
 
     public void visit(AttributeExpression expression) {
-        // TODO Auto-generated method stub
+    	AttributeExpression copy = null;
+    	try {
+			copy = ff.createAttributeExpression(null, expression.getAttributePath()); //not a true copy, but what the heck...
+		} catch (IllegalFilterException erp) {
+            throw new RuntimeException(erp);
+		} 
+    	
+        pages.push(copy);
     }
 
     public void visit(Expression expression) {
-        // TODO Auto-generated method stub
+    	// TODO Auto-generated method stub
     }
 
     public void visit(LiteralExpression expression) {
