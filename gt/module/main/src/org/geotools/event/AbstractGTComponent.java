@@ -117,80 +117,6 @@ public abstract class AbstractGTComponent implements GTComponent {
         }
     }
 
-    /**
-     * Call this after adding child, called by GTList - although will be
-     * helpful for those using arrays.
-     *
-     * @param list name of list being modified
-     * @param position in list where child was added
-     * @param child
-     *
-    final protected void fireChildAdded(String list, int position, Object child) {
-        if (child == null) {
-            return;
-        }
-
-        if (child instanceof GTComponent) {
-            GTComponent myChild = (GTComponent) child;
-            myChild.setParent(this);
-            myChild.setNotificationName(list);
-            myChild.setNotificationPosition(position);
-        }
-
-        GTDelta delta;
-        delta = new GTDeltaImpl(notificationName, notificationPosition,
-                GTDelta.Kind.ADDED, child);
-        delta = new GTDeltaImpl(notificationName, notificationPosition,
-                GTDelta.Kind.CHANGED, this);
-        notificationParent.changed(delta);
-    }*/
-
-    /**
-     * Call this when removing a Child.
-     *
-     * @param list name of list being modified
-     * @param index in list where child was added
-     * @param child
-     * @param rest List of children that have moved up one
-     *
-    final protected void fireChildRemoved(String list, int index, Object child,
-        List rest) {
-        if (child == null) {
-            return;
-        }
-
-        List changed = new ArrayList(1);
-
-        if (child instanceof GTComponent) {
-            GTComponent myChild = (GTComponent) child;
-            myChild.setParent(GTRoot.NO_PARENT);
-            myChild.setNotificationName("");
-            myChild.setNotificationPosition(GTDelta.NO_INDEX);
-        }
-
-        changed.add(new GTDeltaImpl(notificationName, notificationPosition,
-                GTDelta.Kind.REMOVED, null, child));
-
-        int position = index;
-
-        for (Iterator i = rest.iterator(); i.hasNext(); position++) {
-            Object element = i.next();
-
-            if (element instanceof GTComponent) {
-                GTComponent aChild = (GTComponent) element;
-                aChild.setNotificationPosition(position);
-            }
-
-            changed.add(new GTDeltaImpl(notificationName, position,
-                    GTDelta.Kind.NO_CHANGE, element, null));
-        }
-
-        GTDelta delta;
-        delta = delta = new GTDeltaImpl(notificationName, notificationPosition,
-                    GTDelta.Kind.CHANGED, this);
-        notificationParent.changed(delta);
-    }*/
-
     public GTComponent getParent() {
         return notificationParent;
     }
@@ -202,7 +128,7 @@ public abstract class AbstractGTComponent implements GTComponent {
 		if( notificationParent != GTRoot.NO_PARENT ){
 			// TODO: Freek out if Construct is adopted by a new parent
 			//       Previous parents need to disown children beforehand
-			// throw new IllegalStateException("Please remove from existing parent first");
+			throw new IllegalStateException("Please remove from existing parent first");
 		}
 		notificationParent = newParent;
 	}

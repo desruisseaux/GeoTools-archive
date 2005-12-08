@@ -76,10 +76,10 @@ public class StylesTest extends TestCase {
         rules = new Rule[2];
         rules[0] = sb.createRule(ps1);
         rules[0].setFilter(explicitFilter);
-        rules[0].setSymbolizers(new Symbolizer[] {ps1});
+        
         rules[1] = sb.createRule(ps2);
         rules[1].setFilter(rangedFilter);
-        rules[1].setSymbolizers(new Symbolizer[] {ps2});
+        
         style.addFeatureTypeStyle(sf.createFeatureTypeStyle(rules));
     }
 	

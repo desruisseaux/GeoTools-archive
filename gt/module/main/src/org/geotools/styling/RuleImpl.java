@@ -248,9 +248,10 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
 	public Object clone() {
 		try {
 			RuleImpl clone = (RuleImpl) super.clone();
-			clone.graphics = new ArrayList();
-			clone.symbolizers = new ArrayList();
-
+			clone.graphics = new GTList(clone,"graphics");
+			clone.symbolizers = new GTList(clone,"symbolizers");
+			clone.filter = filter; // TODO: we must duplicate!
+			
 			Graphic[] legends = new Graphic[graphics.size()];
 			for (int i = 0; i < legends.length; i++) {
 				Graphic legend = (Graphic) graphics.get(i);

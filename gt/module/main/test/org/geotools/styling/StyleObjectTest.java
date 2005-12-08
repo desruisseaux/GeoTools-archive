@@ -59,10 +59,7 @@ public class StyleObjectTest extends TestCase {
     public void testStyle() throws Exception {
         FeatureTypeStyle fts = styleFactory.createFeatureTypeStyle();
         fts.setFeatureTypeName("feature-type-1");
-        FeatureTypeStyle fts2 = styleFactory.createFeatureTypeStyle();
-        Rule rule = styleFactory.createRule();
-        fts2.addRule(rule);
-        fts2.setFeatureTypeName("feature-type-2");
+        FeatureTypeStyle fts2 = fts2();
         
         Style style = styleFactory.getDefaultStyle();
         style.addFeatureTypeStyle(fts);
@@ -71,16 +68,29 @@ public class StyleObjectTest extends TestCase {
         assertClone(style,clone);
         
         Style notEq = styleFactory.getDefaultStyle();
+        
+        fts2 = fts2();
         notEq.addFeatureTypeStyle(fts2);
         assertEqualsContract(clone,notEq,style);
     }
 
+	private FeatureTypeStyle fts2() {
+		FeatureTypeStyle fts2 = styleFactory.createFeatureTypeStyle();
+        Rule rule = styleFactory.createRule();
+        fts2.addRule(rule);
+        fts2.setFeatureTypeName("feature-type-2");
+		return fts2;
+	}
+
     public void testFeatureTypeStyle() throws Exception {
         FeatureTypeStyle fts = styleFactory.createFeatureTypeStyle();
         fts.setFeatureTypeName("feature-type");
-        Rule rule1 = styleFactory.createRule();
+        Rule rule1;
+        
+        rule1 = styleFactory.createRule();
         rule1.setName("rule1");
         rule1.setFilter(filterFactory.createFidFilter("FID"));
+        
         Rule rule2 = styleFactory.createRule();
         rule2.setIsElseFilter(true);
         rule2.setName("rule2");
@@ -89,6 +99,10 @@ public class StyleObjectTest extends TestCase {
         
         FeatureTypeStyle clone = (FeatureTypeStyle) ((Cloneable)fts).clone();
         assertClone(fts,clone);
+        
+        rule1 = styleFactory.createRule();
+        rule1.setName("rule1");
+        rule1.setFilter(filterFactory.createFidFilter("FID"));
         
         FeatureTypeStyle notEq = styleFactory.createFeatureTypeStyle();
         notEq.setName("fts-not-equal");
@@ -100,20 +114,29 @@ public class StyleObjectTest extends TestCase {
         Symbolizer symb1 = styleFactory.createLineSymbolizer(
                                 styleFactory.getDefaultStroke(), 
                                 "geometry");
+        
         Symbolizer symb2 = styleFactory.createPolygonSymbolizer(
                                 styleFactory.getDefaultStroke(),
                                 styleFactory.getDefaultFill(), 
                                 "shape");
+        
         Rule rule = styleFactory.createRule();
         rule.setSymbolizers(new Symbolizer[]{ symb1,symb2});        
         Rule clone = (Rule) ((Cloneable)rule).clone();
         assertClone(rule,clone);
         
         
+        symb2 = styleFactory.createPolygonSymbolizer(
+                styleFactory.getDefaultStroke(),
+                styleFactory.getDefaultFill(), 
+                "shape");        
         Rule notEq = styleFactory.createRule();
         notEq.setSymbolizers(new Symbolizer[]{symb2});
         assertEqualsContract(clone,notEq,rule);
         
+        symb1 = styleFactory.createLineSymbolizer(
+                styleFactory.getDefaultStroke(), 
+                "geometry");        
         clone.setSymbolizers(new Symbolizer[]{symb1});
         assertTrue(!rule.equals(clone));   
     }

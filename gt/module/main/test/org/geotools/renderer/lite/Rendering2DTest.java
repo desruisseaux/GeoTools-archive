@@ -138,29 +138,13 @@ public class Rendering2DTest extends TestCase {
         PointSymbolizer pointsym = sFac.createPointSymbolizer();
         pointsym.setGraphic(sFac.getDefaultGraphic());
 
-        LineSymbolizer linesym = sFac.createLineSymbolizer();
-        Stroke myStroke = sFac.getDefaultStroke();
-        myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
-        myStroke.setWidth(filterFactory.createLiteralExpression(new Integer(5)));
-        LOGGER.info("got new Stroke " + myStroke);
-        linesym.setStroke(myStroke);
-
-        PolygonSymbolizer polysym = sFac.createPolygonSymbolizer();
-        Fill myFill = sFac.getDefaultFill();
-        myFill.setColor(filterFactory.createLiteralExpression("#ff0000"));
-        polysym.setFill(myFill);
-        myStroke = sFac.getDefaultStroke();
-        myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
-        myStroke.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
-        polysym.setStroke(myStroke);
-        
         Rule rule = sFac.createRule();
-        rule.setSymbolizers(new Symbolizer[]{polysym});
+        rule.setSymbolizers(new Symbolizer[]{polysym(sFac)});
         FeatureTypeStyle fts = sFac.createFeatureTypeStyle(new Rule[]{rule});
         fts.setFeatureTypeName("polygonfeature");
 
         Rule rule2 = sFac.createRule();
-        rule2.setSymbolizers(new Symbolizer[]{linesym});
+        rule2.setSymbolizers(new Symbolizer[]{linesym(sFac)});
         FeatureTypeStyle fts2 = sFac.createFeatureTypeStyle();
         fts2.setRules(new Rule[]{rule2});
         fts2.setFeatureTypeName("linefeature");
@@ -172,13 +156,13 @@ public class Rendering2DTest extends TestCase {
         fts3.setFeatureTypeName("pointfeature");
 
         Rule rule4 = sFac.createRule();
-        rule4.setSymbolizers(new Symbolizer[]{polysym, linesym});
+        rule4.setSymbolizers(new Symbolizer[]{polysym(sFac), linesym(sFac)});
         FeatureTypeStyle fts4 = sFac.createFeatureTypeStyle();
         fts4.setRules(new Rule[]{rule4});
         fts4.setFeatureTypeName("collFeature");
 
         Rule rule5 = sFac.createRule();
-        rule5.setSymbolizers(new Symbolizer[]{linesym});
+        rule5.setSymbolizers(new Symbolizer[]{linesym(sFac)});
         FeatureTypeStyle fts5 = sFac.createFeatureTypeStyle();
         fts5.setRules(new Rule[]{rule5});
         fts5.setFeatureTypeName("ringFeature");
@@ -188,6 +172,29 @@ public class Rendering2DTest extends TestCase {
 
         return style;
     }
+
+	private LineSymbolizer linesym(StyleFactory sFac) throws IllegalFilterException {
+		LineSymbolizer linesym = sFac.createLineSymbolizer();
+        Stroke myStroke = sFac.getDefaultStroke();
+        myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
+        myStroke.setWidth(filterFactory.createLiteralExpression(new Integer(5)));
+        LOGGER.info("got new Stroke " + myStroke);
+        linesym.setStroke(myStroke);
+		return linesym;
+	}
+
+	private PolygonSymbolizer polysym(StyleFactory sFac) throws IllegalFilterException {
+		Stroke myStroke;
+		PolygonSymbolizer polysym = sFac.createPolygonSymbolizer();
+        Fill myFill = sFac.getDefaultFill();
+        myFill.setColor(filterFactory.createLiteralExpression("#ff0000"));
+        polysym.setFill(myFill);
+        myStroke = sFac.getDefaultStroke();
+        myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
+        myStroke.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
+        polysym.setStroke(myStroke);
+		return polysym;
+	}
 
     FeatureCollection createTestFeatureCollection( CoordinateReferenceSystem crs, String typeName  ) throws Exception {
         GeometryFactory geomFac = new GeometryFactory();
