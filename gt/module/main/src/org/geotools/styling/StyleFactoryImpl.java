@@ -666,12 +666,33 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         return new ColorMapEntryImpl();
     }
 
+    public ContrastEnhancement createContrastEnhancement() {
+    	return new ContrastEnhancementImpl();
+    }
+    
+    public ContrastEnhancement createContrastEnhancement(Expression gammaValue) {
+    	ContrastEnhancement ce = new ContrastEnhancementImpl();
+    	ce.setGammaValue(gammaValue);
+    	
+    	return ce;
+    }
+    
+    public SelectedChannelType createSelectedChannelType(
+		String name, ContrastEnhancement enhancement
+    ) {
+    	 SelectedChannelType sct = new SelectedChannelTypeImpl();
+         sct.setChannelName(name);
+         sct.setContrastEnhancement(enhancement);
+
+         return sct;
+    }
+    
     public SelectedChannelType createSelectedChannelType(String name, 
-                                                         Expression enhancement) {
+                                                         Expression gammaValue) {
         SelectedChannelType sct = new SelectedChannelTypeImpl();
         sct.setChannelName(name);
-        sct.setContrastEnhancement(enhancement);
-
+        sct.setContrastEnhancement(createContrastEnhancement(gammaValue));
+        
         return sct;
     }
 

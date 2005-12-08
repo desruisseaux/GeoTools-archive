@@ -43,7 +43,13 @@ public interface SelectedChannelType extends GTComponent {
 
     public String getChannelName();
 
-    public void setContrastEnhancement(Expression enhancement);
+    /**
+     * @deprecated Use {@link #setContrastEnhancement(ContrastEnhancement)) instead.
+     */
+    public void setContrastEnhancement(Expression gammaValue);
 
-    public Expression getContrastEnhancement();
+    public void setContrastEnhancement(ContrastEnhancement enhancement);
+    
+    public ContrastEnhancement getContrastEnhancement();
+    //public Expression getContrastEnhancement();
 }

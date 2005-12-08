@@ -1300,12 +1300,23 @@ public class SLD {
      */
     public static int intValue(Expression expr) {
         Number number = (Number) value(expr, Number.class);
-
-        if (number == null) {
-            return NOTFOUND;
+        
+        if (number != null) {
+            return number.intValue();
         }
 
-        return number.intValue();
+        //look for a string
+        String string = (String) value(expr,String.class);
+        if (string != null) {
+        	//try parsing into a integer
+        	try {
+        		return Integer.parseInt(string);
+        	}
+        	catch(NumberFormatException e) {}
+        }
+        
+        //no dice
+        return NOTFOUND;
     }
 
     /**
@@ -1331,11 +1342,22 @@ public class SLD {
     public static double doubleValue(Expression expr) {
         Number number = (Number) value(expr, Number.class);
 
-        if (number == null) {
-            return Double.NaN;
+        if (number != null) {
+            return number.doubleValue();
+        }
+        
+        //try for a string
+        String string = (String) value(expr,String.class);
+        if (string != null) {
+        	//try parsing into a double
+        	try {
+        		return Double.parseDouble(string);
+        	}
+        	catch(NumberFormatException e) {}
         }
 
-        return number.doubleValue();
+        //too bad
+        return Double.NaN;
     }
 
     /**

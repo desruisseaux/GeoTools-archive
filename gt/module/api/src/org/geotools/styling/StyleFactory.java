@@ -191,8 +191,18 @@ public interface StyleFactory extends Factory {
     public ChannelSelection createChannelSelection(
         SelectedChannelType[] channels);
 
+    public ContrastEnhancement createContrastEnhancement();
+    
+    public ContrastEnhancement createContrastEnhancement(Expression gammaValue);
+    
     public SelectedChannelType createSelectedChannelType(String name,
-        Expression enhancement);
+            ContrastEnhancement enhancement);
+    
+    /**
+     * @deprecated Use {@link #createSelectedChannelType(String, ContrastEnhancement)
+     */
+    public SelectedChannelType createSelectedChannelType(String name,
+        Expression gammaValue);
 
     public ColorMap createColorMap();
 
