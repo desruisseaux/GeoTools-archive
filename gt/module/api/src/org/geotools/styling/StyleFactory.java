@@ -233,7 +233,6 @@ public interface StyleFactory extends Factory {
 
     public Graphic createDefaultGraphic();
     
-    /** @deprecated Please use createDefaultGraphic */
     public Graphic getDefaultGraphic();
 
     public Font getDefaultFont();

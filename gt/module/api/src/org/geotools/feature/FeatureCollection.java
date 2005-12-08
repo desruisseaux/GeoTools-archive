@@ -25,7 +25,8 @@ import org.geotools.feature.visitor.FeatureVisitor;
 
 /**
  * Represents a collection of features.
- * <p>Implementations (and client code) should adhere to the rules set forth
+ * <p>
+ * Implementations (and client code) should adhere to the rules set forth
  * by java.util.Collection. That is, some methods are
  * optional to implement, and may throw an UnsupportedOperationException.
  * </p>
@@ -33,7 +34,7 @@ import org.geotools.feature.visitor.FeatureVisitor;
  * FeatureCollection house rules:
  * <ul>
  * <li>FeatureCollection.close( iterator ) must be called (see example below)
- * <li>the Features are unordered within the FeatureCollection
+ * <li>Features are not specifically ordered within the FeatureCollection (see FeatureList)
  * <li>Two instances cannot exist with the same Feature ID (Feature contract)
  * <li>(unsure) the same Instance can be in the collection more then once  
  * </ul>
@@ -59,13 +60,27 @@ import org.geotools.feature.visitor.FeatureVisitor;
  *     collection.close( iterator );
  * }
  * </code></pre>
- * 
  * </p>
  * <p>
- * Implementation Note: Although many resource backed collections will choose
- * to release resources at 
- * to close when the iterator has reached the end of its contents
+ * Handy Tip: Although many resource backed collections will choose
+ * to release resources at when the iterator has reached the end of its contents
+ * this is not something you should rely on.
  * </p>
+ * <h2>Notes for Implementors</h2>
+ * <p>
+ * Many users will be treating this as a straight forward Collection,
+ * there code will break often enough due to latency - try and close
+ * up resources for them when you can detect that an Iterator is not
+ * useful anymore.
+ * </p> 
+ * <p>
+ * Collections are used in two fashions, basically as you see them,
+ * and also as "range" for common opperations. You can see this with
+ * List.subList( fromIndex, toIndex ). Existing RnD effort is going
+ * towards supporting this kind of use at the FeatureCollection
+ * level.
+ * </p>
+ * 
  * @see java.util.Collection
  * @author Ian Turton, CCG
  * @author Rob Hranac, VFNY
