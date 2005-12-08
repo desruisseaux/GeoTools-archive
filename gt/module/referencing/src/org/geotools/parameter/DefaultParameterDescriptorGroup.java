@@ -87,6 +87,19 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
     private transient List asList;
 
     /**
+     * Constructs a group with the same values than the specified one. This copy constructor
+     * may be used in order to wraps an arbitrary implementation into a Geotools one.
+     *
+     * @since 2.2
+     */
+    public DefaultParameterDescriptorGroup(final ParameterDescriptorGroup group) {
+        super(group);
+        maximumOccurs = group.getMaximumOccurs();
+        final List/*<GeneralParameterDescriptor>*/ c = group.descriptors();
+        parameters = (GeneralParameterDescriptor[]) c.toArray(new GeneralParameterDescriptor[c.size()]);
+    }
+
+    /**
      * Constructs a parameter group from a name.
      * This parameter group will be required exactly once.
      *

@@ -164,12 +164,9 @@ public abstract class Orthographic extends MapProjection {
         protected MathTransform createMathTransform(final ParameterValueGroup parameters) 
                 throws ParameterNotFoundException
         {
+            // Values here are in radians (the standard units for the map projection package)
+            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
             final Collection descriptors = PARAMETERS.descriptors();
-            
-            //values here are in degrees (the standard units for this parameter)
-            final double latitudeOfOrigin = Math.abs(
-                MapProjection.doubleValue(descriptors, Provider.LATITUDE_OF_ORIGIN, parameters));
-            
             if (isSpherical(parameters)) {
                 // Polar case.
                 if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {

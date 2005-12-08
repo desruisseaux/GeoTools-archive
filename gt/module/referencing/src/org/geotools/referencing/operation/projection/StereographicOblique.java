@@ -90,8 +90,8 @@ public class StereographicOblique extends Stereographic {
      * @param  stereoType The type of stereographic projection (used for creating wkt).
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
-    protected StereographicOblique(final ParameterValueGroup parameters, final Collection expected,
-                                   final short stereoType) 
+    StereographicOblique(final ParameterValueGroup parameters, final Collection expected,
+                         final short stereoType) 
             throws ParameterNotFoundException
     {
         super(parameters, expected);

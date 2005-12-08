@@ -81,7 +81,7 @@ public class EquidistantCylindrical extends MapProjection {
      * @param  parameters The parameter values in standard units.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    protected EquidistantCylindrical(final ParameterValueGroup parameters, final Collection expected)
+    EquidistantCylindrical(final ParameterValueGroup parameters, final Collection expected)
             throws ParameterNotFoundException
     {
         // Fetch parameters 

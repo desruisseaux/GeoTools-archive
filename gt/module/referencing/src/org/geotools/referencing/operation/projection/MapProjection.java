@@ -254,13 +254,25 @@ public abstract class MapProjection extends AbstractMathTransform
     }
 
     /**
+     * Returns {@code true} if the specified parameter can apply to this map projection.
+     * The set of expected parameters must be supplied. The default implementation just
+     * invokes {@code expected.contains(param)}. Some subclasses will override this method
+     * in order to handle {@link ModifiedParameterDescriptor} in a special way.
+     *
+     * @see #doubleValue
+     * @see #set
+     */
+    boolean isExpectedParameter(final Collection expected, final ParameterDescriptor param) {
+        return expected.contains(param);
+    }
+
+    /**
      * Returns the parameter value for the specified operation parameter. Values are
      * automatically converted into the standard units specified by the supplied
      * {@code param} argument, except {@link NonSI#DEGREE_ANGLE degrees} which
      * are converted to {@link SI#RADIAN radians}.
      *
-     * @param  descriptors The value returned by
-     *         {@code getParameterDescriptors().descriptors()}.
+     * @param  expected The value returned by {@code getParameterDescriptors().descriptors()}.
      * @param  param The parameter to look for.
      * @param  group The parameter value group to search into.
      * @return The requested parameter value, or {@code NaN} if {@code param} is
@@ -270,28 +282,32 @@ public abstract class MapProjection extends AbstractMathTransform
      *
      * @see MathTransformProvider#doubleValue
      */
-    static double doubleValue(final Collection    descriptors,
-                              final ParameterDescriptor param,
-                              final ParameterValueGroup group)
+    final double doubleValue(final Collection       expected,
+                             final ParameterDescriptor param,
+                             final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
+        if (isExpectedParameter(expected, param)) {
+            /*
+             * Gets the value supplied by the user. The conversion from
+             * degrees to radians (if needed) is performed by AbstractProvider.
+             */
+            return AbstractProvider.doubleValue(param, group);
+        }
+        /*
+         * The constructor asked for a parameter value that do not apply to the type of the
+         * projection to be created. Returns a default value common to all projection types,
+         * but this value should not be used in projection computations.
+         */
         double v;
-        final Unit unit = param.getUnit();
-        if (descriptors.contains(param)) {
-            v = AbstractProvider.doubleValue(param, group);
-            if (NonSI.DEGREE_ANGLE.equals(unit)) {
+        final Object value = param.getDefaultValue();
+        if (value instanceof Number) {
+            v = ((Number) value).doubleValue();
+            if (NonSI.DEGREE_ANGLE.equals(param.getUnit())) {
                 v = Math.toRadians(v);
             }
         } else {
-            final Object value = param.getDefaultValue();
-            if (value instanceof Number) {
-                v = ((Number) value).doubleValue();
-                if (NonSI.DEGREE_ANGLE.equals(unit)) {
-                    v = Math.toRadians(v);
-                }
-            } else {
-                v = Double.NaN;
-            }
+            v = Double.NaN;
         }
         return v;
     }
@@ -345,19 +361,18 @@ public abstract class MapProjection extends AbstractMathTransform
      * by subclasses for {@link #getParameterValues} implementation. Values
      * are automatically converted from radians to degrees if needed.
      *
-     * @param descriptors The value returned by
-     *        {@code getParameterDescriptors().descriptors()}.
-     * @param descriptor  One of the {@link AbstractProvider} constants.
-     * @param values      The group in which to set the value.
-     * @param value       The value to set.
+     * @param expected  The value returned by {@code getParameterDescriptors().descriptors()}.
+     * @param param     One of the {@link AbstractProvider} constants.
+     * @param group     The group in which to set the value.
+     * @param value     The value to set.
      */
-    static void set(final Collection          descriptors,
-                    final ParameterDescriptor descriptor,
-                    final ParameterValueGroup values,
-                    double value)
+    final void set(final Collection       expected,
+                   final ParameterDescriptor param,
+                   final ParameterValueGroup group,
+                   double value)
     {
-        if (descriptors.contains(descriptor)) {
-            if (NonSI.DEGREE_ANGLE.equals(descriptor.getUnit())) {
+        if (isExpectedParameter(expected, param)) {
+            if (NonSI.DEGREE_ANGLE.equals(param.getUnit())) {
                 /*
                  * Converts radians to degrees and try to fix rounding error
                  * (e.g. -61.500000000000014  -->  -61.5). This is necessary
@@ -381,7 +396,7 @@ public abstract class MapProjection extends AbstractMathTransform
                     }
                 }
             }
-            values.parameter(descriptor.getName().getCode()).setValue(value);
+            group.parameter(param.getName().getCode()).setValue(value);
         }
     }
 
@@ -1172,9 +1187,14 @@ public abstract class MapProjection extends AbstractMathTransform
         }
 
         /**
-         * Returns the parameter value for the specified operation parameter.
-         * Values are automatically converted into the standard units specified
-         * by the supplied {@code param} argument.
+         * Returns the parameter value for the specified operation parameter in standard units.
+         * Values are automatically converted into the standard units specified by the supplied
+         * {@code param} argument, except {@link NonSI#DEGREE_ANGLE degrees} which are converted
+         * to {@link SI#RADIAN radians}. This conversion is performed because the radians units
+         * are standard for all internal computations in the map projection package. For example
+         * they are the standard units for {@link MapProjection#latitudeOfOrigin latitudeOfOrigin}
+         * and {@link MapProjection#centralMeridian centralMeridian} fields in the
+         * {@link MapProjection} class.
          *
          * @param  param The parameter to look for.
          * @param  group The parameter value group to search into.
@@ -1185,12 +1205,11 @@ public abstract class MapProjection extends AbstractMathTransform
                                             final ParameterValueGroup group)
                 throws ParameterNotFoundException
         {
-            /*
-             * Just forward to the super-class method. This method is redefined
-             * here in order to gives to {@link MapProjection} an access to the
-             * protected method from {@link MathTransformProvider}.
-             */
-            return MathTransformProvider.doubleValue(param, group);
+            double v = MathTransformProvider.doubleValue(param, group);
+            if (NonSI.DEGREE_ANGLE.equals(param.getUnit())) {
+                v = Math.toRadians(v);
+            }
+            return v;
         }
     }
 }

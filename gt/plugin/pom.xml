@@ -48,7 +48,7 @@
     <module>geotiff</module>
     <module>gml</module>
     <module>gtopo30</module>
-    <module>hsql</module>
+<!-- <module>hsql</module> -->
     <module>image</module>
     <module>mif</module>
     <module>mysql</module>

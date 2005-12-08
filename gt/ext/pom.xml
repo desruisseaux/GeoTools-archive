@@ -36,7 +36,6 @@
   <!-- ==================================================== -->
   <modules>
     <module>brewer</module>
-    <module>experimental</module>
     <module>graph</module>
     <module>go</module>
     <module>legend</module>
@@ -45,7 +44,6 @@
     <module>shape</module>
     <module>shaperenderer</module>
     <module>validation</module>
-    <module>view</module>
     <module>widgets-swing</module>
   </modules>
 

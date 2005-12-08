@@ -117,6 +117,24 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
     private final Unit unit;
 
     /**
+     * Constructs a descriptor with the same values than the specified one. This copy constructor
+     * may be used in order to wraps an arbitrary implementation into a Geotools one.
+     *
+     * @since 2.2
+     */
+    public DefaultParameterDescriptor(final ParameterDescriptor descriptor) {
+        super(descriptor);
+        valueClass   = descriptor.getValueClass();
+        validValues  = descriptor.getValidValues();
+        defaultValue = descriptor.getDefaultValue();
+        minimum      = descriptor.getMinimumValue();
+        maximum      = descriptor.getMaximumValue();
+        unit         = descriptor.getUnit();
+        primitiveClass = (descriptor instanceof DefaultParameterDescriptor) ?
+            ((DefaultParameterDescriptor) descriptor).primitiveClass : valueClass;
+    }
+
+    /**
      * Constructs a mandatory parameter for a range of integer values.
      *
      * @param name The parameter name.
@@ -247,8 +265,8 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
     }
 
     /**
-     * Constructs a parameter for a {@linkplain CodeList code list} (or enumeration).
-     * This constructor is used by the {@link #DefaultParameter(String,CodeList)} constructor.
+     * Constructs a parameter for a {@linkplain CodeList code list} (or enumeration). This
+     * constructor is used by the {@link #DefaultParameterDescriptor(String,CodeList)} constructor.
      *
      * @param name         The parameter name.
      * @param valueClass   The class that describe the type of the parameter.
@@ -364,9 +382,8 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
     }
 
     /**
-     * Constructs a parameter from a set of properties. The properties map is
-     * given unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
-     * super-class constructor}.
+     * Constructs a parameter from a set of properties. The properties map is given unchanged to the
+     * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      * <p>
      * This constructor assumes that minimum, maximum and default values are
      * already replaced by their cached values, if available.
@@ -444,13 +461,13 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * initialized with the {@linkplain #getDefaultValue default value}.
      * The {@linkplain org.geotools.parameter.Parameter#getDescriptor parameter value
      * descriptor} for the created parameter value will be {@code this} object.
-     *
-     * <P>If the {@linkplain #getValueClass value class} specified at construction time was
+     * <P>
+     * If the {@linkplain #getValueClass value class} specified at construction time was
      * a primitive type (e.g. <code>Double.{@linkplain Double#TYPE TYPE}</code> instead
      * of <code>{@linkplain Double}.class</code>), then this method may returns a specialized
      * parameter value implementation for this primitive type. Specialized implementations may
-     * use less storage space and be more flexible during conversions, but this flexibility is
-     * not always wanted.</P>
+     * use less storage space and be more flexible during conversions (for example from
+     * {@code float} to {@link String}), but this flexibility is not always wanted.
      */
     public GeneralParameterValue createValue() {
         if (Double.TYPE.equals(primitiveClass)) {

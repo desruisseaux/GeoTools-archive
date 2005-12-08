@@ -39,6 +39,7 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.CoordinateOperation;
 
+// JTS dependencies (to be removed)
 import com.vividsolutions.jts.geom.Coordinate;
 
 
@@ -86,7 +87,7 @@ public class CRS {
 
 
     /**
-     * Grab transform between two CoordianteReference Systems.
+     * Grab transform between two Coordinate Reference Systems.
      * <p>
      * Sample use:<pre><code>
      * MathTransform transform = CRS.transform( CRS.decode("EPSG:42102"), CRS.decode("EPSG:4326") ); 
@@ -100,12 +101,17 @@ public class CRS {
      * @return MathTransform, or null if unavailable
      * @throws FactoryException only if MathTransform is unavailable due to error
      */
-    public static MathTransform transform( final CoordinateReferenceSystem from, final CoordinateReferenceSystem to, boolean lenientTransforms ) throws FactoryException {
+    public static MathTransform transform(final CoordinateReferenceSystem from,
+                                          final CoordinateReferenceSystem to,
+                                          boolean lenientTransforms)
+            throws FactoryException
+    {
         if( lenientTransforms )
             return FactoryFinder.getCoordinateOperationFactory(new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE)).createOperation(from, to).getMathTransform();
         else
             return transform(from, to);
     }
+
     /**
      * Grab transform between two CoordianteReference Systems.
      * <p>
@@ -119,7 +125,10 @@ public class CRS {
      * @return MathTransform, or null if unavailable
      * @throws FactoryException only if MathTransform is unavailable due to error
      */
-    public static MathTransform transform( final CoordinateReferenceSystem from, final CoordinateReferenceSystem to ) throws FactoryException {
+    public static MathTransform transform(final CoordinateReferenceSystem from,
+                                          final CoordinateReferenceSystem to)
+            throws FactoryException
+    {
         List list = visit( new OperationVisitor() {
             public Object factory( CoordinateOperationFactory factory ) throws FactoryException {
                 CoordinateOperation operation = factory.createOperation( from, to );                
@@ -162,8 +171,7 @@ public class CRS {
      *   For example, "EPSG" -->   "EPSG:2000", "EPSG:2001", "EPSG:2002" because we know what
      *   they mean.
      */
-    public static Set getSupportedCodes(String AUTHORITY)
-    {
+    public static Set getSupportedCodes(String AUTHORITY) {
     	 TreeSet result = new TreeSet();
     	 for( Iterator i = FactoryFinder.getCRSAuthorityFactories().iterator(); i.hasNext(); )  //for each authority factory
     	 {        

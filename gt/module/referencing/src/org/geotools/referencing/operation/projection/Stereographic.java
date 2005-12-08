@@ -261,10 +261,9 @@ public abstract class Stereographic extends MapProjection {
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
+            // Values here are in radians (the standard units for the map projection package)
+            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
             final Collection descriptors = PARAMETERS.descriptors();
-            //values here are in degrees (the standard units for this parameter)
-            final double latitudeOfOrigin = Math.abs(MapProjection.doubleValue(
-                                            descriptors, LATITUDE_OF_ORIGIN, parameters));
             if (isSpherical(parameters)) {
                 // Polar case.
                 if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
@@ -421,11 +420,9 @@ public abstract class Stereographic extends MapProjection {
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            final Collection descriptors = PARAMETERS.descriptors();
-            final double latitudeTrueScale = MapProjection.doubleValue(
-                                             descriptors, LATITUDE_TRUE_SCALE, parameters);
-            final double latitudeOfOrigin = (latitudeTrueScale < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
-
+            final double latitudeTrueScale = doubleValue(LATITUDE_TRUE_SCALE, parameters);
+            final double latitudeOfOrigin  = (latitudeTrueScale < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
+            final Collection descriptors   = PARAMETERS.descriptors();
             if (isSpherical(parameters)) {
                 return new StereographicPolar.Spherical(parameters, descriptors, latitudeOfOrigin, POLAR_B);
             } else {
@@ -609,10 +606,9 @@ public abstract class Stereographic extends MapProjection {
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
+            // Values here are in radians (the standard units for the map projection package)
+            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
             final Collection descriptors = PARAMETERS.descriptors();
-            //values here are in degrees (the standard units for this parameter)
-            final double latitudeOfOrigin = Math.abs(MapProjection.doubleValue(
-                                            descriptors, LATITUDE_OF_ORIGIN, parameters));
             if (isSpherical(parameters)) {
                 // Polar case.
                 if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {

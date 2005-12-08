@@ -134,7 +134,7 @@ public class AlbersEqualArea extends MapProjection {
     AlbersEqualArea(final ParameterValueGroup parameters, final Collection expected) 
             throws ParameterNotFoundException
     {
-        //Fetch parameters 
+        // Fetch parameters 
         super(parameters, expected);
 
         phi1 = doubleValue(expected, Provider.STANDARD_PARALLEL_1, parameters);
@@ -145,7 +145,7 @@ public class AlbersEqualArea extends MapProjection {
         }
         ensureLatitudeInRange(Provider.STANDARD_PARALLEL_2, phi2, true);
 
-	//Compute Constants
+        // Compute Constants
         if (Math.abs(phi1 + phi2) < EPS) 
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ANTIPODE_LATITUDES_$2,
                                                new Latitude(Math.toDegrees(phi1)),

@@ -98,21 +98,21 @@ public class StereographicPolar extends Stereographic {
      *        creating wkt).
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
-    protected StereographicPolar(final ParameterValueGroup parameters, final Collection expected, 
-                                 final double latitudeOfOrigin, final short stereoType) 
+    StereographicPolar(final ParameterValueGroup parameters, final Collection expected, 
+                       final double latitudeOfOrigin, final short stereoType) 
             throws ParameterNotFoundException
     {
         super(parameters, expected);
         this.stereoType = stereoType;
         
-        //over-ride the latitude of origin parameter
+        // over-ride the latitude of origin parameter
         if (!Double.isNaN(latitudeOfOrigin)) {
             this.latitudeOfOrigin = latitudeOfOrigin;
         }
         southPole = (this.latitudeOfOrigin < 0);
         this.latitudeOfOrigin = (southPole) ? -(Math.PI/2) : +(Math.PI/2);
 
-        //get standard_parallel_1 parameter value
+        // get standard_parallel_1 parameter value
         latitudeTrueScale = doubleValue(expected, Provider_Polar_B.LATITUDE_TRUE_SCALE, parameters);
         if (Double.isNaN(latitudeTrueScale)) {
             latitudeTrueScale = this.latitudeOfOrigin;

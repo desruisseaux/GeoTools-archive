@@ -85,8 +85,8 @@ public class StereographicEquatorial extends StereographicOblique {
      *         creating wkt).
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
-    protected StereographicEquatorial(final ParameterValueGroup parameters, final Collection expected,
-                                      final short stereoType) 
+    StereographicEquatorial(final ParameterValueGroup parameters, final Collection expected,
+                            final short stereoType) 
             throws ParameterNotFoundException
     {
         super(parameters, expected, stereoType);

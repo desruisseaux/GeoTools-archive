@@ -61,6 +61,17 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
     private final int minimumOccurs;
 
     /**
+     * Constructs a descriptor with the same values than the specified one. This copy constructor
+     * may be used in order to wraps an arbitrary implementation into a Geotools one.
+     *
+     * @since 2.2
+     */
+    protected AbstractParameterDescriptor(final GeneralParameterDescriptor descriptor) {
+        super(descriptor);
+        minimumOccurs = descriptor.getMinimumOccurs();
+    }
+
+    /**
      * Constructs a parameter from a set of properties. The properties map is given unchanged to the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      *
