@@ -128,15 +128,14 @@ public class AlbersEqualArea extends MapProjection {
      * Constructs a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
-     * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    AlbersEqualArea(final ParameterValueGroup parameters, final Collection expected) 
+    protected AlbersEqualArea(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
         // Fetch parameters 
-        super(parameters, expected);
-
+        super(parameters);
+        final Collection expected = getParameterDescriptors().descriptors();
         phi1 = doubleValue(expected, Provider.STANDARD_PARALLEL_1, parameters);
         ensureLatitudeInRange(       Provider.STANDARD_PARALLEL_1, phi1, true);
         phi2 = doubleValue(expected, Provider.STANDARD_PARALLEL_2, parameters);
@@ -283,7 +282,7 @@ public class AlbersEqualArea extends MapProjection {
      * @param qs arcsin(q/2), used in the first step of itteration
      * @return the latitude
      */
-    private double phi1(double qs) throws ProjectionException {
+    private double phi1(final double qs) throws ProjectionException {
         final double tone_es = 1 - excentricitySquared;
         double phi = Math.asin(0.5 * qs);
         if (excentricity < EPS) {
@@ -311,7 +310,7 @@ public class AlbersEqualArea extends MapProjection {
      * @param sinphi sin of the latitude q is calculated for
      * @return q from Snyder equation (3-12)
      */
-    private double qsfn(double sinphi) {
+    private double qsfn(final double sinphi) {
         final double one_es = 1 - excentricitySquared;
         if (excentricity >= EPS) {
             final double con = excentricity * sinphi;
@@ -362,38 +361,14 @@ public class AlbersEqualArea extends MapProjection {
     
     /**
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for a {@link AlbersEqualArea} projection.
+     * for an {@linkplain AlbersEqualArea Albers Equal Area} projection.
      *
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
      */
-    public static final class Provider extends AbstractProvider {
-        /**
-         * The operation parameter descriptor for the {@link #phi1 standard parallel 1}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
-         */
-        public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(Citations.OGC,      "standard_parallel_1"),
-                    new NamedIdentifier(Citations.EPSG,     "Latitude of 1st standard parallel"),
-                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel1")
-                },
-                0, -90, 90, NonSI.DEGREE_ANGLE);
-                
-        /**
-         * The operation parameter descriptor for the {@link #phi2 standard parallel 2}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
-         */
-        public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(Citations.OGC,      "standard_parallel_2"),
-                    new NamedIdentifier(Citations.EPSG,     "Latitude of 2nd standard parallel"),
-                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel2")
-                },
-                -90, 90, NonSI.DEGREE_ANGLE);
-
+    public static class Provider extends AbstractProvider {
         /**
          * The parameters group.
          */
@@ -437,8 +412,7 @@ public class AlbersEqualArea extends MapProjection {
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            final Collection descriptors = PARAMETERS.descriptors();
-            return new AlbersEqualArea(parameters, descriptors);
+            return new AlbersEqualArea(parameters);
         }
     }
 }

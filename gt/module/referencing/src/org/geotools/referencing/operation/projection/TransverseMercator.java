@@ -70,6 +70,7 @@ import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
+
 /**
  * Transverse Mercator Projection (EPSG code 9807). This
  * is a cylindrical projection, in which the cylinder has been rotated 90°.
@@ -183,14 +184,13 @@ public class TransverseMercator extends MapProjection {
      * Constructs a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
-     * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    TransverseMercator(final ParameterValueGroup parameters, final Collection expected) 
+    protected TransverseMercator(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
         //Fetch parameters 
-        super(parameters, expected);
+        super(parameters);
         
         //  Compute constants
         esp = excentricitySquared / (1.0 - excentricitySquared);
@@ -322,13 +322,12 @@ public class TransverseMercator extends MapProjection {
          * Constructs a new map projection from the suplied parameters.
          *
          * @param  parameters The parameter values in standard units.
-         * @param  expected The expected parameter descriptors.
          * @throws ParameterNotFoundException if a mandatory parameter is missing.
          */
-        protected Spherical(final ParameterValueGroup parameters, final Collection expected)
+        protected Spherical(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            super(parameters, expected);
+            super(parameters);
             assert isSpherical;
         }
         
@@ -655,11 +654,10 @@ public class TransverseMercator extends MapProjection {
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            final Collection descriptors = PARAMETERS.descriptors();
             if (isSpherical(parameters)) {
-                return new Spherical(parameters, descriptors);
+                return new Spherical(parameters);
             } else {
-                return new TransverseMercator(parameters, descriptors);
+                return new TransverseMercator(parameters);
             }
         }
     }
@@ -700,7 +698,7 @@ public class TransverseMercator extends MapProjection {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static final class Provider_SouthOrientated extends Provider {
+    public static class Provider_SouthOrientated extends Provider {
         /**
          * Constructs a new provider.
          */

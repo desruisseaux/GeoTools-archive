@@ -142,7 +142,6 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @author Rueben Schulz
  */
 public abstract class Stereographic extends MapProjection {
-        
     /** Projection mode for switch statement. */
     protected static final short EPSG = 0;
     /** Projection mode for switch statement. */

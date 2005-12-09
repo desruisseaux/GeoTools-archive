@@ -22,8 +22,6 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
-import javax.units.NonSI;
-
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -35,17 +33,17 @@ import org.opengis.referencing.operation.MathTransform;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.operation.projection.Mercator.Provider2SP;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
- * Equidistant cylindrical projection (EPSG code 9823).  In the particular case where the standard_parallel_1
- * is 0ï¿½, this projection is also called Plate Carree or Equirectangular.
- * 
+ * Equidistant cylindrical projection (EPSG code 9823).  In the particular case where the
+ * {@code standard_parallel_1} is 0°, this projection is also called
+ * {@linkplain PlateCarree Plate Carree} or Equirectangular.
+ *
  * This is used in, for example, <cite>WGS84 / Plate Carree</cite> (EPSG:32662).
  * 
  * <strong>References:</strong><ul>
@@ -55,8 +53,8 @@ import org.geotools.resources.i18n.Vocabulary;
  *       EPSG Guidence Note Number 7 part 2, Version 24.</li>
  * </ul>
  *
- * @see <A HREF="http://mathworld.wolfram.com/CylindricalEquidistantProjection.html">Mercator projection on MathWorld</A>
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/equirectangular.html">Equirectangular</A>
+ * @see <A HREF="http://mathworld.wolfram.com/CylindricalEquidistantProjection.html">Cylindrical Equidistant projection on MathWorld</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/equirectangular.html">"Equirectangular" on Remote Sensing</A>
  *
  * @since 2.2
  * @version $Id$
@@ -81,15 +79,15 @@ public class EquidistantCylindrical extends MapProjection {
      * @param  parameters The parameter values in standard units.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    EquidistantCylindrical(final ParameterValueGroup parameters, final Collection expected)
+    protected EquidistantCylindrical(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
         // Fetch parameters 
-        super(parameters, expected);
-
+        super(parameters);
+        final Collection expected = getParameterDescriptors().descriptors();
         if (expected.contains(Provider.STANDARD_PARALLEL)) {
             standardParallel = Math.abs(doubleValue(expected,
-                                        Provider2SP.STANDARD_PARALLEL, parameters));
+                                        Provider.STANDARD_PARALLEL, parameters));
             ensureLatitudeInRange(Provider.STANDARD_PARALLEL, standardParallel, false);
             cosStandardParallel = Math.cos(standardParallel);
         } else {
@@ -104,8 +102,7 @@ public class EquidistantCylindrical extends MapProjection {
      * {@inheritDoc}
      */
     public ParameterDescriptorGroup getParameterDescriptors() {
-        return (Double.isNaN(standardParallel)) ? Provider_PlateCarree.PARAMETERS
-                               					: Provider.PARAMETERS;
+        return Provider.PARAMETERS;
     }
     
     /**
@@ -134,7 +131,7 @@ public class EquidistantCylindrical extends MapProjection {
         }
         return new Point2D.Double(x,y);
     }
-    
+
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
      * and stores the result in <code>ptDst</code>.
@@ -149,7 +146,7 @@ public class EquidistantCylindrical extends MapProjection {
         }
         return new Point2D.Double(x,y);
     }
-    
+
     /**
      * Returns a hash value for this projection.
      */
@@ -157,7 +154,7 @@ public class EquidistantCylindrical extends MapProjection {
         final long code = Double.doubleToLongBits(standardParallel);
         return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
     }
-    
+
     /**
      * Compares the specified object with this map projection for equality.
      */
@@ -175,7 +172,8 @@ public class EquidistantCylindrical extends MapProjection {
 
     /**
      * The {@link org.geotools.referencing.operation.MathTransformProvider} for an
-     * {@link org.geotools.referencing.operation.projection.EquidistantCylindrical}.
+     * {@linkplain org.geotools.referencing.operation.projection.EquidistantCylindrical
+     * Equidistant Cylindrical} projection.
      *
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
@@ -183,19 +181,7 @@ public class EquidistantCylindrical extends MapProjection {
      * @version $Id$
      * @author John Grange
      */
-    public static final class Provider extends AbstractProvider {
-        /**
-         * The operation parameter descriptor for the {@link #standardParallel standard parallel}
-         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
-         */
-        public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(Citations.OGC,      "standard_parallel_1"),
-                    new NamedIdentifier(Citations.EPSG,     "Latitude of 1st standard parallel"),
-                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel1")
-                },
-                0, -90, 90, NonSI.DEGREE_ANGLE);
-              
+    public static class Provider extends AbstractProvider {
         /**
          * The parameters group. Note the EPSG includes a "Latitude of natural origin" parameter instead
          * of "standard_parallel_1". I have sided with ESRI and Snyder in this case.
@@ -212,9 +198,9 @@ public class EquidistantCylindrical extends MapProjection {
                 CENTRAL_MERIDIAN, STANDARD_PARALLEL,
                 FALSE_EASTING,    FALSE_NORTHING
             });
-        
+
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
@@ -232,78 +218,17 @@ public class EquidistantCylindrical extends MapProjection {
          *
          * @param  parameters The group of parameter values.
          * @return The created math transform.
-         * @throws org.opengis.parameter.ParameterNotFoundException if a required parameter was not found.
+         * @throws ParameterNotFoundException if a required parameter was not found.
          */
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
             if (isSpherical(parameters)) {
-				final Collection descriptors = PARAMETERS.descriptors();
-				return new EquidistantCylindrical(parameters, descriptors);
+				return new EquidistantCylindrical(parameters);
 			} else {
 				throw new UnsupportedOperationException(Errors.format(
-	                    ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
+	                      ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
 			}
         }
-    }
-    
-    /**
-     * Another {@link org.geotools.referencing.operation.MathTransformProvider} for an
-     * {@link org.geotools.referencing.operation.projection.EquidistantCylindrical}.
-     *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     * 
-     * @since 2.2
-     * @version $Id$
-     * @author Rueben Schulz
-     */
-    public static final class Provider_PlateCarree extends AbstractProvider {
-    	
-    	/**
-         * The parameters group.
-         */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(Citations.ESRI,     "Plate_Carree"),
-                new NamedIdentifier(Citations.OGC,      "Equirectangular"),
-                new NamedIdentifier(Citations.GEOTIFF,  "CT_Equirectangular"),
-                new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
-                                    VocabularyKeys.EQUIDISTANT_CYLINDRICAL_PROJECTION))
-            }, new ParameterDescriptor[] {
-                SEMI_MAJOR,       SEMI_MINOR,
-                                  CENTRAL_MERIDIAN, 
-                FALSE_EASTING,    FALSE_NORTHING
-            });
-        
-        /**
-         * Constructs a new provider. 
-         */
-		public Provider_PlateCarree() {
-			super(PARAMETERS);
-		}
-
-        /**
-         * Returns the operation type for this map projection.
-         */
-        protected Class getOperationType() {
-            return CylindricalProjection.class;
-        }
-        
-        /**
-         * Creates a transform from the specified group of parameter values.
-         *
-         * @param  parameters The group of parameter values.
-         * @return The created math transform.
-         * @throws org.opengis.parameter.ParameterNotFoundException if a required parameter was not found.
-         */
-		protected MathTransform createMathTransform(ParameterValueGroup parameters) 
-				throws ParameterNotFoundException {
-			if (isSpherical(parameters)) {
-				final Collection descriptors = PARAMETERS.descriptors();
-				return new EquidistantCylindrical(parameters, descriptors);
-			} else {
-				throw new UnsupportedOperationException(Errors.format(
-	                    ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
-			}
-		}
     }
 }

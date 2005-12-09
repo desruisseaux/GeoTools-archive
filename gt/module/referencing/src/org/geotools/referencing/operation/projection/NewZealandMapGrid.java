@@ -32,20 +32,35 @@ import org.geotools.math.Complex;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.Citations;
 
+
 /**
  * Implementation of the NZMG (New Zealand Map Grid) projection.
- * 
  * <p>
- * This is an implementation of algorithm published by  <a
- * href="http://www.govt.nz/record?recordid=28">Land Information New
- * Zealand.</a> The algorithm is documented <a
- * href="http://www.linz.govt.nz/rcs/linz/6137/">here.</a>
- * </p>
+ * This is an implementation of algorithm published by
+ * <a href="http://www.govt.nz/record?recordid=28">Land Information New Zealand</a>.
+ * The algorithm is documented <a href="http://www.linz.govt.nz/rcs/linz/6137/">here</a>.
  *
  * @since 2.2
  * @version $Id$
  * @author Justin Deoliveira
  * @author Martin Desruisseaux
+ *
+ * @todo The algorithm uses complex numbers, which is not very well supported in Java. This
+ *       implementation uses {@linkplain Complex} as a support class. Various instances of
+ *       {@link Complex} are created once for ever at {@code NewZealandMapGrid} construction
+ *       time, in order to avoid creating up to 6 objects for every point to be projected.
+ *       The downside is that transformation methods must be synchronized. The cost should
+ *       be small for simple applications, but may become important for multi-thread applications.
+ *       Furthermore, those fields raise a slight serialization issue.
+ *       <p>
+ *       The most efficient fix in Java would be to expand inline all {@link Complex} operations
+ *       like {@link Complex#add add} (easy), {@link Complex#multiply multiply} (more tedious),
+ *       <cite>etc.</cite>, until we get a code using only {@code double} primitives on the stack
+ *       and no {@link Complex} objects on the heap (except the {@code A} and {@code B} constants).
+ *       But it would make the code significantly more complex and difficult to read.
+ *       <p>
+ *       An elegant fix would have been "lightweight objects" allocated on the stack (something
+ *       similar to {@code struct} in C#), if such thing existed in the Java language.
  */
 public class NewZealandMapGrid extends MapProjection {
     /**
@@ -131,7 +146,7 @@ public class NewZealandMapGrid extends MapProjection {
     protected NewZealandMapGrid(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
-        super(parameters, Provider.PARAMETERS.descriptors());
+        super(parameters);
     }
 
     /**
@@ -235,10 +250,8 @@ public class NewZealandMapGrid extends MapProjection {
     }
 
     /**
-     * The provider for {@link NewZealandMapGrid}. This provider will construct transforms
-     * from {@linkplain org.opengis.referencing.crs.GeographicCRS geographic} to
-     * {@linkplain org.opengis.referencing.crs.ProjectedCRS projected} coordinate
-     * reference systems.
+     * The {@link org.geotools.referencing.operation.MathTransformProvider} for
+     * {@linkplain NewZealandMapGrid New Zealand Map Grid}.
      *
      * @since 2.2
      * @version $Id$
@@ -260,7 +273,7 @@ public class NewZealandMapGrid extends MapProjection {
                 },
                 new ParameterDescriptor[] {
                     new ModifiedParameterDescriptor(SEMI_MAJOR,         6378388.0),
-                    new ModifiedParameterDescriptor(SEMI_MINOR,         6378388.0),
+                    new ModifiedParameterDescriptor(SEMI_MINOR,         6378388.0*(1-1/297.0)),
                     new ModifiedParameterDescriptor(LATITUDE_OF_ORIGIN,     -41.0),
                     new ModifiedParameterDescriptor(CENTRAL_MERIDIAN,       173.0),
                     new ModifiedParameterDescriptor(FALSE_EASTING,      2510000.0),
@@ -275,7 +288,9 @@ public class NewZealandMapGrid extends MapProjection {
         }    
 
         /**
-         * Creates a transform from the specified group of parameter values.
+         * Creates a transform from the specified group of parameter values. This method doesn't
+         * check for the spherical case, since the New Zealand Map Grid projection is used with
+         * the International 1924 ellipsoid.
          *
          * @param  parameters The group of parameter values.
          * @return The created math transform.
@@ -284,7 +299,6 @@ public class NewZealandMapGrid extends MapProjection {
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            final Collection descriptors = PARAMETERS.descriptors();
             return new NewZealandMapGrid(parameters);
         }
     }

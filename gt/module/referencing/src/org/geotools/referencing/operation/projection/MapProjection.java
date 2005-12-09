@@ -1058,8 +1058,8 @@ public abstract class MapProjection extends AbstractMathTransform
         private static final long serialVersionUID = 6280666068007678702L;
 
         /**
-         * The operation parameter descriptor for the {@link #semiMajor semiMajor} parameter value.
-         * Valid values range is from 0 to infinity. This parameter is mandatory.
+         * The operation parameter descriptor for the {@linkplain #semiMajor semi major} parameter
+         * value. Valid values range is from 0 to infinity. This parameter is mandatory.
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
@@ -1071,8 +1071,8 @@ public abstract class MapProjection extends AbstractMathTransform
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
-         * The operation parameter descriptor for the {@link #semiMinor semiMinor} parameter value.
-         * Valid values range is from 0 to infinity. This parameter is mandatory.
+         * The operation parameter descriptor for the {@linkplain #semiMinor semi minor} parameter
+         * value. Valid values range is from 0 to infinity. This parameter is mandatory.
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
@@ -1084,7 +1084,7 @@ public abstract class MapProjection extends AbstractMathTransform
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
-         * The operation parameter descriptor for the {@link #centralMeridian centralMeridian}
+         * The operation parameter descriptor for the {@linkplain #centralMeridian central meridian}
          * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
         public static final ParameterDescriptor CENTRAL_MERIDIAN = createDescriptor(
@@ -1099,7 +1099,7 @@ public abstract class MapProjection extends AbstractMathTransform
                 0, -180, 180, NonSI.DEGREE_ANGLE);
 
         /**
-         * The operation parameter descriptor for the {@link #latitudeOfOrigin latitudeOfOrigin}
+         * The operation parameter descriptor for the {@linkplain #latitudeOfOrigin latitude of origin}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor LATITUDE_OF_ORIGIN = createDescriptor(
@@ -1111,6 +1111,42 @@ public abstract class MapProjection extends AbstractMathTransform
                     new NamedIdentifier(Citations.GEOTIFF,  "NatOriginLat")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The operation parameter descriptor for the {@linkplain Mercator#standardParallel standard
+         * parallel} parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         */
+        public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
+                new NamedIdentifier[] {
+                    new NamedIdentifier(Citations.OGC,      "standard_parallel_1"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of 1st standard parallel"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel1")
+                },
+                0, -90, 90, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The operation parameter descriptor for the standard parallel 1 parameter value.
+         * Valid values range is from -90 to 90°. Default value is 0.
+         */
+        public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
+                new NamedIdentifier[] {
+                    new NamedIdentifier(Citations.OGC,      "standard_parallel_1"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of 1st standard parallel"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel1")
+                },
+                0, -90, 90, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The operation parameter descriptor for the standard parallel 2 parameter value.
+         * Valid values range is from -90 to 90°. Default value is 0.
+         */
+        public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
+                new NamedIdentifier[] {
+                    new NamedIdentifier(Citations.OGC,      "standard_parallel_2"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of 2nd standard parallel"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel2")
+                },
+                -90, 90, NonSI.DEGREE_ANGLE);
 
         /**
          * The operation parameter descriptor for the {@link #scaleFactor scaleFactor}
