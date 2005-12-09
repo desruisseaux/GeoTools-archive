@@ -16,6 +16,8 @@
 package org.geotools.styling;
 
 import org.geotools.event.GTComponent;
+import org.geotools.event.GTConstant;
+import org.geotools.filter.ConstantExpression;
 import org.geotools.filter.Expression;
 
 
@@ -87,6 +89,46 @@ import org.geotools.filter.Expression;
  *       problem?
  */
 public interface Graphic extends GTComponent {
+	/**
+	 * Indicates an absense of graphic.
+	 * <p>
+	 * This value is used to indicate that the Graphics based opperation
+	 * should be skipped. Aka this is used by Stroke.Stroke as place holders
+	 * for GRAPHIC_FILL and GRAPHIC_STROKE.
+	 * </p>
+	 */
+	public static final Graphic GRAPHIC_NULL = new ConstantGraphic(){
+
+		public ExternalGraphic[] getExternalGraphics() {
+			return ExternalGraphic.EXTERNAL_GRAPHICS_EMPTY;
+		}
+		public Mark[] getMarks() {
+			return Mark.MARKS_EMPTY;
+		}
+		public Symbol[] getSymbols() {
+			return Symbol.SYMBOLS_EMPTY;
+		}
+		public Expression getOpacity() {
+			return ConstantExpression.ZERO;
+		}
+		public Expression getSize() {
+			return ConstantExpression.ONE;
+		}
+		public Displacement getDisplacement() {
+			return Displacement.DISPLACEMENT;
+		}
+
+		public Expression getRotation() {
+			return ConstantExpression.ZERO;
+		}
+
+		public String getGeometryPropertyName() {
+			return "";
+		}		
+	};
+	
+	/** The default Graphic */
+	public static final Graphic GRAPHIC = GRAPHIC_NULL; // TODO: please set up as default GRAPHIC	
     /**
      * Provides a list of external graphics which can be used to represent this
      * graphic. Each one should be an equivalent representation but in a
@@ -212,4 +254,56 @@ public interface Graphic extends GTComponent {
      * @param visitor - the visitor object
      */
     void accept(StyleVisitor visitor);
+}
+
+abstract class ConstantGraphic extends GTConstant implements Graphic {
+	private void cannotModifyConstant(){
+		throw new UnsupportedOperationException("Constant Graphic may not be modified");
+	}	
+	public void setExternalGraphics(ExternalGraphic[] externalGraphics) {
+		cannotModifyConstant();
+	}
+
+	public void addExternalGraphic(ExternalGraphic externalGraphic) {
+		cannotModifyConstant();
+	}
+
+	public void setMarks(Mark[] marks) {
+		cannotModifyConstant();
+	}
+
+	public void addMark(Mark mark) {
+		cannotModifyConstant();
+	}
+
+	public void setSymbols(Symbol[] symbols) {
+		cannotModifyConstant();
+	}
+
+	public void addSymbol(Symbol symbol) {
+		cannotModifyConstant();
+	}
+
+	public void setOpacity(Expression opacity) {
+		cannotModifyConstant();
+	}
+
+	public void setSize(Expression size) {
+		cannotModifyConstant();
+	}
+
+	public void setDisplacement(Displacement offset) {
+		cannotModifyConstant();
+	}
+
+	public void setRotation(Expression rotation) {
+		cannotModifyConstant();
+	}
+
+	public void setGeometryPropertyName(String geometryPropertyName) {
+		cannotModifyConstant();
+	}	
+	public void accept(StyleVisitor visitor) {
+		visitor.visit( this );
+	}	
 }

@@ -17,10 +17,12 @@
 package org.geotools.feature;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.geotools.data.FeatureResults;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.filter.Filter;
 
 
 /**
@@ -66,7 +68,7 @@ import org.geotools.feature.visitor.FeatureVisitor;
  * to release resources at when the iterator has reached the end of its contents
  * this is not something you should rely on.
  * </p>
- * <h2>Notes for Implementors</h2>
+ * <h2>Notes for FeatureCollection Implementors</h2>
  * <p>
  * Many users will be treating this as a straight forward Collection,
  * there code will break often enough due to latency - try and close
@@ -76,18 +78,19 @@ import org.geotools.feature.visitor.FeatureVisitor;
  * <p>
  * Collections are used in two fashions, basically as you see them,
  * and also as "range" for common opperations. You can see this with
- * List.subList( fromIndex, toIndex ). Existing RnD effort is going
- * towards supporting this kind of use at the FeatureCollection
+ * List.subCollection( Filter ). Existing RnD effort is
+ * going towards supporting this kind of use at the FeatureCollection
  * level.
  * </p>
  * 
- * @see java.util.Collection
+ * @see java.util.Collection, org.geotools.Feature
  * @author Ian Turton, CCG
  * @author Rob Hranac, VFNY
  * @author Ian Schneider, USDA-ARS
+ * @author Jody Garnett, Refractions Research, Inc.
  * @version $Id: FeatureCollection.java,v 1.12 2003/07/30 21:31:41 jmacgill Exp $
  */
-public interface FeatureCollection extends java.util.Collection, FeatureResults, Feature {
+public interface FeatureCollection extends Collection, FeatureResults, Feature {
     
     /**
      * Obtain a FeatureIterator of the Features within this collection.
@@ -154,6 +157,18 @@ public interface FeatureCollection extends java.util.Collection, FeatureResults,
      * }
      * </code></pre>
      * </p>
+     * <h3>GML Notes</h3>
+     * <p>
+	 * Note XPath: the contents of a GML collection are represented by either
+	 * featureMember or featureMembers. When interpretting an XPath expression,
+	 * you should consider this function to visit both elements for you.
+	 * </p>
+	 * <p>
+	 * XPath Mapping:
+	 * <ul>
+	 * <li>Preferred:<code>featureMember/*</code>
+	 * <li>Legal:<code>featureMembers</code>
+	 * </ul>
      * @see features()
      */
     public Iterator iterator();
@@ -219,7 +234,7 @@ public interface FeatureCollection extends java.util.Collection, FeatureResults,
     void removeListener(CollectionListener listener) throws NullPointerException;
 
     /**
-     * Gets a reference to the schema for this feature.
+     * Gets a reference to the type of this feature collection.
      * <p>
      * There are several limitations on the use of FeatureType with respect to a FeatureCollection.
      * </p>
@@ -252,14 +267,14 @@ public interface FeatureCollection extends java.util.Collection, FeatureResults,
      * <ul>
      * <li>The degenerate case returns the "_Feature" FeatureType, where the
      * onlything known is that the contents are Features.
-     * <li>For a collection backed by a shapefiles (or database tables) the FeatureType returned by getSchema() will
-     * complete describe each and every child in the collection.
-     * <li>For mixed content FeatureCollections you will need to check the FeatureType of each Feature as it
-     * is retrived from the collection
+     * <li>For a collection backed by a shapefiles (or database tables) the
+     *     FeatureType returned by getSchema() will complete describe each and every child in the collection.
+     * <li>For mixed content FeatureCollections you will need to check the FeatureType
+     *     of each Feature as it is retrived from the collection
      * </ul>
      * </p>
      * 
-     * @return A reference to this feature's schema
+     * @return A reference to this collections type
      */
     FeatureType getFeatureType();
     
@@ -296,4 +311,36 @@ public interface FeatureCollection extends java.util.Collection, FeatureResults,
      * @throws IOException 
      */
     void accepts( FeatureVisitor visitor ) throws IOException;
+    
+    /**
+     * FeatureCollection "view" indicated by provided filter.
+     * <p>
+     * The contents of the returned FeatureCollection are determined by
+     * applying the provider Fitler to the entire contents of this
+     * FeatureCollection. The result is "live" and modifications will
+     * be shared.
+     * <p>
+     * This method is used cut down on the number of filter based methods
+     * required for a useful FeatureCollection construct. The FeatureCollections
+     * returned really should be considered as a temporary "view" used to
+     * control the range of a removeAll, or modify opperation.
+     * <p>
+     * Example Use:
+     * <pre><code>
+     * collection.subCollection( filter ).clear();
+     * </code></pre>
+     * The above recommended use is agreement with the Collections API precident of
+     * List.subList( start, end ). 
+     * <p>
+     * The results of subCollection:
+     * <ul>
+     * <li>are to be considered unordered
+     * <li>may be an ordered FeatureList if requested when sortBy is indicated
+     * </ul>
+     * </p>
+     * @see FeatureList
+     * @param filter
+     * @return FeatureCollection identified as subset.
+     */
+    public FeatureCollection subCollection( Filter filter );    
 }

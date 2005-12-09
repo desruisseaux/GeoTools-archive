@@ -80,6 +80,7 @@ import java.io.IOException;
  * @version $Id: FeatureResults.java,v 1.1 2003/12/01 22:00:44 cholmesny Exp $
  */
 public interface FeatureResults {
+	
     /**
      * Returns the FeatureType of the contents of this collection.
      * 
@@ -157,9 +158,8 @@ public interface FeatureResults {
      * }
      * </code>
      * </pre>
-     *
+     * @deprecated Please use FeatureCollection.size() instead
      * @return The number of Features in this FeatureResults.
-     *
      * @throws IOException If there are problems getting the count
      */
     int getCount() throws IOException;

@@ -93,6 +93,7 @@ import java.util.Map;
  * @version $Id: ExternalGraphic.java,v 1.11 2004/04/08 13:27:07 jfc173 Exp $
  */
 public interface ExternalGraphic extends Symbol {
+	public static final ExternalGraphic[] EXTERNAL_GRAPHICS_EMPTY = new ExternalGraphic[0];
     /**
      * converts a URI in a string to the location URL
      *

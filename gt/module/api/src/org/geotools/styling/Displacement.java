@@ -49,7 +49,9 @@ import org.geotools.filter.Expression;
  * @author Ian Turton, CCG
  */
 public interface Displacement extends GTComponent {
-    //TODO: add Displacement to GeoAPI
+    static final Displacement DISPLACEMENT = null; // TODO: ConstantDeplacement 
+
+	//TODO: add Displacement to GeoAPI
     /**
      * Returns an expression that computes a pixel offset from the geometry
      * point.  This offset point is where the text's anchor point gets

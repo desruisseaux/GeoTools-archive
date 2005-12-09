@@ -109,5 +109,5 @@ public interface GTComponent {
 	 * viewed as stable data. But yes we should ask them about this...
 	 * </p>
 	 */
-	void changed(GTDelta delta);	
+	void changed(GTDelta delta); 
 }

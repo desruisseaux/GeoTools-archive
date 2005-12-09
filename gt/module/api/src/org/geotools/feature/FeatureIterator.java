@@ -18,29 +18,14 @@ package org.geotools.feature;
 
 
 /**
- * A convenience class for dealing with FeatureCollection Iterators. DOES NOT
- * implement Iterator.
+ * A drop in replacement for Iterator that does not require casting for Java 1.4 code.
  * <p>
  * We are sorry but this does not implement Iteartor<Feature>, although it should
  * be a drop in replacement when Geotools is able to upgrade to Java 5.
  * </p>
  * @author Ian Schneider
  */
-public class FeatureIterator {
-    /** The iterator from the FeatureCollection to return features from. */
-     java.util.Iterator iterator;
-     FeatureCollection collection;
-    /**
-     * Create a new FeatureIterator using the Iterator from the given
-     * FeatureCollection.
-     *
-     * @param collection The FeatureCollection to perform the iteration on.
-     */
-    public FeatureIterator(FeatureCollection collection) {
-        this.collection = collection;
-        this.iterator = collection.iterator();
-    }
-
+public interface FeatureIterator {
     /**
      * Does another Feature exist in this Iteration.
      * <p>
@@ -48,9 +33,7 @@ public class FeatureIterator {
      * </p>
      * @return true if more Features exist, false otherwise.
      */
-    public boolean hasNext() {
-        return iterator.hasNext();
-    }
+    public boolean hasNext();
 
     /**
      * Get the next Feature in this iteration.
@@ -59,17 +42,10 @@ public class FeatureIterator {
      *
      * @throws java.util.NoSuchElementException If no more Features exist.
      */
-    public Feature next() throws java.util.NoSuchElementException {
-        return (Feature) iterator.next();
-    }
+    public Feature next() throws java.util.NoSuchElementException;
+    
     /**
      * Required so FeatureCollection classes can implement close( FeatureIterator ).
      */
-    public void close(){
-        if( iterator != null ){
-            collection.close( iterator );
-            iterator = null;
-            collection = null;
-        }
-    }
+    //public void close();
 }

@@ -28,5 +28,6 @@ import org.geotools.event.GTComponent;
  * @author iant
  */
 public interface Symbol extends GTComponent {
+	public static final Symbol[] SYMBOLS_EMPTY = new Symbol[0];
     void accept(StyleVisitor visitor);
 }

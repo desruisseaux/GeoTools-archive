@@ -36,7 +36,7 @@ public interface ExpressionType {
     /** Defines a literal expression with a declared string type. */
     public static final short LITERAL_STRING = 103;
 
-    /** Defines a literal expression with a declared string type. */
+    /** Defines a literal expression with a declared geometry type. */
     public static final short LITERAL_GEOMETRY = 104;
 
     /* Types implemented by ExpressionMath. */

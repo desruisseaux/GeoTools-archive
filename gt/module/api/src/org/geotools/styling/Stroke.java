@@ -23,8 +23,11 @@ package org.geotools.styling;
 import java.awt.Color;
 
 import org.geotools.event.GTComponent;
+import org.geotools.event.GTConstant;
 import org.geotools.feature.Feature;
+import org.geotools.filter.ConstantExpression;
 import org.geotools.filter.Expression;
+import org.geotools.filter.LiteralExpression;
 
 /**
  * The Stroke object encapsulates the graphical-symbolization parameters for
@@ -80,6 +83,105 @@ import org.geotools.filter.Expression;
  * @author James Macgill
  */
 public interface Stroke extends GTComponent {
+	public static final LiteralExpression COLOR = ConstantExpression.BLACK;
+	public static final LiteralExpression WIDTH = ConstantExpression.ONE;
+	public static final LiteralExpression OPACTITY = ConstantExpression.ONE;
+	public static final LiteralExpression LINE_CAP = ConstantExpression.constant( "butt" );
+	public static final LiteralExpression LINE_JOIN = ConstantExpression.constant( "miter" );
+	public static final LiteralExpression DASH_OFFSET = ConstantExpression.ZERO;
+	public static final Graphic GRAPHIC_FILL = Graphic.GRAPHIC_NULL;
+	public static final Graphic GRAPHIC_STROKE = Graphic.GRAPHIC_NULL;
+	
+	/**
+	 * Indicate an absense of Stroke - uses opacity 0 to prevent drawing.
+	 * <p>
+	 * This should only be used as a default by things like a PolygonSymbolizer
+	 * that can function with out a Stroke.
+	 * </p>
+	 * <p>
+	 * To prevent drawing this Stroke has opactiy set to zero. This is a proper
+	 * null object (not part of the standard) and the renderer implementors should
+	 * feel free to modify this class between them to prevent the need for <code>null</code> checks.
+	 * <p> 
+	 */
+	public static final Stroke STROKE_NULL = new ConstantStroke(){
+		public Expression getColor() {
+			return COLOR;
+		}
+		public Color getColor(Feature f) {
+			return Color.BLACK;
+		}
+		public Expression getWidth() {
+			return WIDTH;
+		}
+		public Expression getOpacity() {
+			return ConstantExpression.ZERO;
+		}
+		public Expression getLineJoin() {
+			return LINE_JOIN;
+		}
+		public Expression getLineCap() {
+			return LINE_CAP;
+		}
+		public float[] getDashArray() {
+			return new float[]{1,0};
+		}
+		public Expression getDashOffset() {
+			return DASH_OFFSET;
+		}
+		public Graphic getGraphicFill() {
+			return Graphic.GRAPHIC;
+		}
+		public Graphic getGraphicStroke() {
+			return Graphic.GRAPHIC_NULL;
+		}
+		public Object clone() {
+			return this; // we are constant
+		}
+    };	
+    
+	/**
+	 * Constant Stroke capturing the defaults indicated by the standard.
+	 * <p>
+	 * This is a NullObject, rendering code should be able to make use
+	 * of this object rather then having to perform null checks.
+	 * </p>
+	 */
+	public static final Stroke STROKE = new ConstantStroke(){    	
+		public Expression getColor() {
+			return COLOR;
+		}
+		public Color getColor(Feature f) {
+			return Color.BLACK;
+		}
+		public Expression getWidth() {
+			return WIDTH;
+		}
+		public Expression getOpacity() {
+			return OPACTITY;
+		}
+		public Expression getLineJoin() {
+			return LINE_JOIN;
+		}
+		public Expression getLineCap() {
+			return LINE_CAP;
+		}
+		public float[] getDashArray() {
+			return new float[]{1,0};
+		}
+		public Expression getDashOffset() {
+			return DASH_OFFSET;
+		}
+		public Graphic getGraphicFill() {
+			return Graphic.GRAPHIC;
+		}
+		public Graphic getGraphicStroke() {
+			return Graphic.GRAPHIC_NULL;
+		}
+		public Object clone() {
+			return this; // we are constant
+		}
+    };
     
     /**
      * This parameter gives the solid color that will be used for a stroke.<br>
@@ -278,6 +380,42 @@ public interface Stroke extends GTComponent {
      */
     Object clone();
 }
+
+abstract class ConstantStroke extends GTConstant implements Stroke {
+	private void cannotModifyConstant(){
+		throw new UnsupportedOperationException("Constant Stroke may not be modified");
+	}
+	public void setColor(Expression color) {
+		cannotModifyConstant();
+	}
+	public void setWidth(Expression width) {
+		cannotModifyConstant();		;	
+	}
+	public void setOpacity(Expression opacity) {
+		cannotModifyConstant();
+	}
+	public void setLineJoin(Expression lineJoin) {
+		cannotModifyConstant();
+	}
+	public void setLineCap(Expression lineCap) {
+		cannotModifyConstant();
+	}
+	public void setDashArray(float[] dashArray) {
+		cannotModifyConstant();
+	}
+	public void setDashOffset(Expression dashOffset) {
+		cannotModifyConstant();
+	}
+	public void setGraphicFill(Graphic graphicFill) {
+		cannotModifyConstant();
+	}
+	public void setGraphicStroke(Graphic graphicStroke) {
+		cannotModifyConstant();
+	}
+	public void accept(StyleVisitor visitor) {
+		cannotModifyConstant();
+	}
+};
 
 /*
  * $Log: Stroke.java,v $
