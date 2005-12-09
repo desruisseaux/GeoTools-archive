@@ -34,7 +34,7 @@ import org.geotools.filter.NullFilter;
 
 
 /**
- * A basic implemenation of the FilterVisitor interface.
+ * A basic implementation of the FilterVisitor interface.
  * <p>
  * This class implements the full FilterVisitor interface and will visit every
  * member of a Filter object.  This class performs no actions and is not intended

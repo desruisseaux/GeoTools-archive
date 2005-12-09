@@ -721,4 +721,8 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
 	public UserLayer createUserLayer() {
 		return new UserLayerImpl();
 	}
+
+	public NamedLayer createNamedLayer() {
+		return new NamedLayerImpl();
+	}
 }

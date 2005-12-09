@@ -267,4 +267,7 @@ public interface StyleFactory extends Factory {
     public StyledLayerDescriptor createStyledLayerDescriptor();
 
     public UserLayer createUserLayer();
+    
+    public NamedLayer createNamedLayer();
+    
 }

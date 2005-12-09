@@ -61,6 +61,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.geometry.JTS;
 import org.geotools.index.quadtree.StoreException;
 import org.geotools.map.DefaultMapContext;
@@ -95,6 +96,7 @@ import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.StyleVisitor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.styling.visitor.DuplicatorStyleVisitor;
 import org.geotools.util.NumberRange;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -718,25 +720,30 @@ public class ShapefileRenderer implements GTRenderer{
         StyleAttributeExtractor sae = new StyleAttributeExtractor() {
                 public void visit(Rule rule) {
                     
-                    Rule clone=StyleFactoryFinder.createStyleFactory().createRule();
-                    clone.setAbstract(rule.getAbstract());
-                    clone.setFilter(rule.getFilter());
-                    clone.setSymbolizers(rule.getSymbolizers());
-                    clone.setIsElseFilter(rule.hasElseFilter());
-                    clone.setLegendGraphic(rule.getLegendGraphic());
-                    clone.setMaxScaleDenominator(rule.getMaxScaleDenominator());
-                    clone.setMinScaleDenominator(rule.getMinScaleDenominator());
-                    clone.setName(rule.getName());
-                    clone.setTitle(rule.getTitle());
-                    
-                    if ((query != Query.ALL)
-                            && !query.getFilter().equals(Filter.NONE)) {
-                        if (clone.getFilter() == null) {
-                            clone.setFilter(query.getFilter());
-                        } else {
-                            clone.setFilter(clone.getFilter().and(query.getFilter()));
-                        }
-                    }
+                	
+                	DuplicatorStyleVisitor dupeStyleVisitor = new DuplicatorStyleVisitor(StyleFactoryFinder.createStyleFactory(), FilterFactoryFinder.createFilterFactory());
+                	dupeStyleVisitor.visit(rule);
+                	Rule clone = (Rule) dupeStyleVisitor.getCopy();
+                	
+//                    Rule clone=StyleFactoryFinder.createStyleFactory().createRule();
+//                    clone.setAbstract(rule.getAbstract());
+//                    clone.setFilter(rule.getFilter());
+//                    clone.setSymbolizers(rule.getSymbolizers());
+//                    clone.setIsElseFilter(rule.hasElseFilter());
+//                    clone.setLegendGraphic(rule.getLegendGraphic());
+//                    clone.setMaxScaleDenominator(rule.getMaxScaleDenominator());
+//                    clone.setMinScaleDenominator(rule.getMinScaleDenominator());
+//                    clone.setName(rule.getName());
+//                    clone.setTitle(rule.getTitle());
+//                    
+//                    if ((query != Query.ALL)
+//                            && !query.getFilter().equals(Filter.NONE)) {
+//                        if (clone.getFilter() == null) {
+//                            clone.setFilter(query.getFilter());
+//                        } else {
+//                            clone.setFilter(clone.getFilter().and(query.getFilter()));
+//                        }
+//                    }
 
                     super.visit(clone);
                 }

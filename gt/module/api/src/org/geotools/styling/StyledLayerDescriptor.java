@@ -175,4 +175,11 @@ public interface StyledLayerDescriptor extends GTComponent {
      * @param listener DOCUMENT ME!
      */
     void removeListener(GTListener listener);
+    
+    /**
+     * Used to navigate a Style/SLD.
+     * 
+     * @param visitor
+     */
+    void accept(StyleVisitor visitor);    
 }

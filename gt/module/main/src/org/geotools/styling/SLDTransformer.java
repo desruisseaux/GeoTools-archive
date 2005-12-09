@@ -8,6 +8,7 @@ package org.geotools.styling;
 
 import java.io.FileOutputStream;
 
+import org.geotools.event.GTRoot;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterTransformer;
@@ -318,8 +319,63 @@ public class SLDTransformer extends TransformerBase {
             end("Graphic");
         }
         
+        public void visit(StyledLayerDescriptor sld) {
+        	start("StyledLayerDescriptor");
+        	StyledLayer[] layers = sld.getStyledLayers();
+        	for (int i = 0; i < layers.length; i++) {
+        		if (layers[i] instanceof NamedLayer) {
+        			visit((NamedLayer) layers[i]);
+        		} else if (layers[i] instanceof UserLayer) {
+        			visit((UserLayer) layers[i]);
+        		} else {
+        			throw new IllegalArgumentException("StyledLayer '"+layers[i].getClass().toString()+"' not found");
+        		}
+        	}
+        	end("StyledLayerDescriptor");
+        }
+        
+        public void visit(NamedLayer layer) {
+        	start("NamedLayer");
+        	element("Name", layer.getName());
+        	FeatureTypeConstraint[] lfc = layer.getLayerFeatureConstraints();
+        	for (int i = 0; i < lfc.length; i++) {
+        		visit(lfc[i]);
+        	}
+        	Style[] styles = layer.getStyles();
+        	for (int i = 0; i < styles.length; i++) {
+        		visit(styles[i]);
+        	}
+        	end("NamedLayer");
+        }
+
+        public void visit(UserLayer layer) {
+        	start("UserLayer");
+            if ((layer.getName() != null) && (layer.getName().length() > 0)) {
+            	element("Name", layer.getName()); //optional
+            }
+        	if (layer.getRemoteOWS() != null) {
+        		visit(layer.getRemoteOWS());
+        	}
+        	FeatureTypeConstraint[] lfc = layer.getLayerFeatureConstraints();
+        	for (int i = 0; i < lfc.length; i++) {
+        		visit(lfc[i]);
+        	}
+            Style[] styles = layer.getUserStyles();
+            for (int i = 0; i < styles.length; i++) {
+            	visit(styles[i]);
+            }
+        	end("UserLayer");
+        }
+        
+        public void visit(RemoteOWS remoteOWS) {
+        	//TODO: implement this visitor (RemoteOWS needs to be implemented first)
+        }
+        
+        public void visit(FeatureTypeConstraint ftc) {
+        	//TODO: implement this visitor (NamedLayer/UserLayer needs to implement FeatureTypeConstraint first)
+        }
+        
         public void visit(Style style) {
-            start("NamedLayer");
             start("UserStyle");
             element("Name",style.getName());
             element("Title",style.getTitle());
@@ -332,22 +388,33 @@ public class SLDTransformer extends TransformerBase {
             }
             
             end("UserStyle");
-            end("NamedLayer");
         }
         
         public void visit(FeatureTypeStyle fts) {
-            start("FeatureTypeStyle");
-            if(fts.getName()!=null){
-                element("FeatureTypeName",fts.getFeatureTypeName());
-            }
-            Rule[] rules = fts.getRules();
-            
-            for (int i = 0; i < rules.length; i++) {
-                rules[i].accept(this);
-            }
-            
-            end("FeatureTypeStyle");
-        }
+			start("FeatureTypeStyle");
+			if ((fts.getName() != null) && (fts.getName().length() > 0)) {
+				element("Name", fts.getName());
+			}
+			if ((fts.getTitle() != null) && (fts.getTitle().length() > 0)) {
+				element("Title", fts.getTitle());
+			}
+			if ((fts.getAbstract() != null) && (fts.getAbstract().length() > 0)) {
+				element("Abstract", fts.getAbstract());
+			}
+			if ((fts.getFeatureTypeName() != null)
+					&& (fts.getFeatureTypeName().length() > 0)) {
+				element("FeatureTypeName", fts.getFeatureTypeName());
+			}
+			String[] sti = fts.getSemantecTypeIdentifiers();
+			for (int i = 0; i < sti.length; i++) {
+				element("SemanticTypeIndentier", sti[i]);
+			}
+			Rule[] rules = fts.getRules();
+			for (int i = 0; i < rules.length; i++) {
+				rules[i].accept(this);
+			}
+			end("FeatureTypeStyle");
+		}
         
         public void visit(Displacement dis) {
             start("Displacement");
@@ -390,11 +457,13 @@ public class SLDTransformer extends TransformerBase {
             contentHandler.startDocument();
 
             start("StyledLayerDescriptor",NULL_ATTS);
+            start("NamedLayer"); //this is correct?
             
             for (int i = 0, ii = styles.length; i < ii; i++) {
                 styles[i].accept(this);
             }
             
+            end("NamedLayer");
             end("StyledLayerDescriptor");
             
             contentHandler.endDocument();
@@ -402,9 +471,21 @@ public class SLDTransformer extends TransformerBase {
                 throw new RuntimeException(se);
             }
         }
+
+        public void encode(StyledLayerDescriptor sld) {
+            try {
+            contentHandler.startDocument();
+            sld.accept(this);
+            contentHandler.endDocument();
+            } catch (SAXException se) {
+                throw new RuntimeException(se);
+            }
+        }
         
         public void encode(Object o) throws IllegalArgumentException {
-            if (o instanceof Style[]) {
+        	if (o instanceof StyledLayerDescriptor) {
+        		encode( (StyledLayerDescriptor) o );
+        	} else if (o instanceof Style[]) {
                 encode( (Style[]) o);
             } else {
                 Class c = o.getClass();
@@ -422,7 +503,6 @@ public class SLDTransformer extends TransformerBase {
         
     }
     
-    
     /**
      * Currently does nothing.
      *
@@ -436,11 +516,7 @@ public class SLDTransformer extends TransformerBase {
         SLDTransformer transformer = new SLDTransformer();
         transformer.setIndentation(4);
         transformer.transform(s.readXML(), new FileOutputStream(System.getProperty("java.io.tmpdir") + "/junk.eraseme"));
-        
-        
     }
-    
-    
     
 }
 

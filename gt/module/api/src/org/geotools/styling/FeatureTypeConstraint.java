@@ -20,6 +20,7 @@
  */
 package org.geotools.styling;
 
+import org.geotools.event.GTComponent;
 import org.geotools.filter.Filter;
 
 
@@ -54,7 +55,7 @@ import org.geotools.filter.Filter;
  *
  * @author James Macgill
  */
-public interface FeatureTypeConstraint {
+public interface FeatureTypeConstraint extends GTComponent {
 	
     public String getFeatureTypeName();
 
@@ -67,4 +68,6 @@ public interface FeatureTypeConstraint {
     public Extent[] getExtents();
     
     public void setExtents(Extent[] extents);
+
+	public void accept(StyleVisitor visitor);
 }

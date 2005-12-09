@@ -17,10 +17,6 @@ package org.geotools.event;
 
 import org.geotools.event.GTComponent;
 import org.geotools.event.GTDelta;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 
 /**
  * Provides basic StyleEvent notification, may be used in conjuction with
@@ -128,7 +124,7 @@ public abstract class AbstractGTComponent implements GTComponent {
 		if( notificationParent != GTRoot.NO_PARENT ){
 			// TODO: Freek out if Construct is adopted by a new parent
 			//       Previous parents need to disown children beforehand
-			//throw new IllegalStateException("Please remove from existing parent first");
+			throw new IllegalStateException("Please remove from existing parent first");
 		}
 		notificationParent = newParent;
 	}

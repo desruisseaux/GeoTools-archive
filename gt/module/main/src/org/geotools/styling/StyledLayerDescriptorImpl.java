@@ -238,4 +238,8 @@ public class StyledLayerDescriptorImpl extends AbstractGTRoot
             fire(new GTDeltaImpl("", GTDelta.NO_INDEX, GTDelta.Kind.NO_CHANGE,
                     this, delta));
         }
+        
+        public void accept(StyleVisitor visitor) {
+            visitor.visit(this);
+        }
     }

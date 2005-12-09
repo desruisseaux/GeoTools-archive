@@ -44,9 +44,13 @@ import org.geotools.filter.NullFilter;
  * @author Jody Garnett, Refractions Research Inc.
  */
 public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
-    Stack pages; // need a Stack as Filter structure is recursive
+    Stack pages = new Stack(); // need a Stack as Filter structure is recursive
     FilterFactory ff;
 
+    public Stack getPages() {
+    	return pages;
+    }
+    
     public DuplicatorFilterVisitor(FilterFactory factory) {
         ff = factory;
     }
@@ -241,7 +245,8 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
     }
 
     public void visit(Expression expression) {
-    	// TODO Auto-generated method stub
+        // Should not happen?
+    	throw new RuntimeException("visit(Expression) unsupported");
     }
 
     public void visit(LiteralExpression expression) {

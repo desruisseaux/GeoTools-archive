@@ -395,4 +395,34 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor implements
             halo.getRadius().accept(this);
         }
     }
+
+	public void visit(StyledLayerDescriptor sld) {
+		StyledLayer[] layers = sld.getStyledLayers();
+		for (int i = 0; i < layers.length; i++) {
+			if (layers[i] instanceof NamedLayer) {
+				((NamedLayer) layers[i]).accept(this);
+			} else if (layers[i] instanceof UserLayer) {
+				((UserLayer) layers[i]).accept(this);
+			}
+		}
+	}
+
+	public void visit(NamedLayer layer) {
+		Style[] styles = layer.getStyles();
+		for (int i = 0; i < styles.length; i++) {
+			styles[i].accept(this);
+		}
+	}
+
+	public void visit(UserLayer layer) {
+		Style[] styles = layer.getUserStyles();
+		for (int i = 0; i < styles.length; i++) {
+			styles[i].accept(this);
+		}
+	}
+
+	public void visit(FeatureTypeConstraint ftc) {
+		// TODO Auto-generated method stub
+		
+	}
 }

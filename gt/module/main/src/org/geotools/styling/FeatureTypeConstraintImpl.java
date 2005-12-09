@@ -62,4 +62,8 @@ public class FeatureTypeConstraintImpl extends AbstractGTComponent
 
         fireChildChanged("extents", this.extents, old);
     }
+    
+    public void accept(StyleVisitor visitor) {
+        visitor.visit(this);
+    }
 }

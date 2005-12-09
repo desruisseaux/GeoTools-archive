@@ -97,7 +97,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     }
     
     public FeatureTypeConstraint[] getLayerFeatureConstraints(){
-        return null;
+        return new FeatureTypeConstraint[0]; // was null
     }
     public void setLayerFeatureConstraints(FeatureTypeConstraint[] constraints){
     }
@@ -105,6 +105,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     public Style[] getUserStyles(){
        return (Style[])styles.toArray(new Style[0]);
     }
+    
     public void setUserStyles(Style[] styles){ 
     	this.styles.clear();
     	for(int i = 0; i < styles.length; i++){
@@ -115,10 +116,13 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     	}
     	fireChanged(); // TODO: Handle Style List
     }    
+
     public void addUserStyle(Style style){
         styles.add(style);
+        fireChanged();
     }
     
-    
-    
+    public void accept(StyleVisitor visitor) {
+        visitor.visit(this);
+    }
 }

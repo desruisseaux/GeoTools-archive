@@ -30,7 +30,36 @@ package org.geotools.styling;
  * @version $Id: StyleVisitor.java,v 1.2 2003/08/19 13:03:03 ianturton Exp $
  */
 public interface StyleVisitor {
-    /**
+	
+	/**
+     * Called when accept is called on a StyledLayerDescriptor.
+     *
+     * @param sld The StyledLayerDescriptor to visit
+     */
+	void visit(StyledLayerDescriptor sld);
+
+	/**
+     * Called when accept is called on a NamedLayer.
+     *
+     * @param layer The NamedLayer to visit
+     */
+	void visit(NamedLayer layer);
+
+	/**
+     * Called when accept is called on a UserLayer.
+     *
+     * @param layer The UserLayer to visit
+     */
+	void visit(UserLayer layer);
+
+	/**
+     * Called when accept is called on a FeatureTypeConstraint.
+     *
+     * @param ftc The FeatureTypeConstraint to visit
+     */
+	void visit(FeatureTypeConstraint ftc);
+	
+	/**
      * Called when accept is called on a Style.
      *
      * @param style The style to visit

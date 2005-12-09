@@ -114,6 +114,19 @@ public class SLDStyleTest extends TestCase {
             ((Number) lineSym.getStroke().getWidth().getValue(null)).intValue());
     }
 
+    public void testParseSLD() throws Exception {
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
+        java.net.URL surl = TestData.getResource(this, "example-sld.xml");
+        SLDParser stylereader = new SLDParser(factory, surl);
+        StyledLayerDescriptor sld = stylereader.parseSLD();
+        
+        //convert back to xml again
+        SLDTransformer aTransformer = new SLDTransformer();
+        String xml = aTransformer.transform(sld);
+        //System.out.println(xml);
+        //we're content if this didn't throw an exception...
+    }
+    
     /**
      * Test of parseSLD method to ensure NamedLayer/Name and
      * NamedLayer/NamedStyle are parsed correctly

@@ -502,4 +502,20 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
     public void visit(RasterSymbolizer raster) {
         throw new UnsupportedOperationException();
     }
+
+	public void visit(StyledLayerDescriptor arg0) {
+        throw new UnsupportedOperationException();
+	}
+
+	public void visit(NamedLayer arg0) {
+        throw new UnsupportedOperationException();
+	}
+
+	public void visit(UserLayer arg0) {
+        throw new UnsupportedOperationException();
+	}
+
+	public void visit(FeatureTypeConstraint arg0) {
+        throw new UnsupportedOperationException();
+	}
 }

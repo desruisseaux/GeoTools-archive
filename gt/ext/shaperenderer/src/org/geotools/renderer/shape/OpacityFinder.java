@@ -24,6 +24,7 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.Displacement;
 import org.geotools.styling.ExternalGraphic;
+import org.geotools.styling.FeatureTypeConstraint;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
@@ -31,6 +32,7 @@ import org.geotools.styling.Halo;
 import org.geotools.styling.LinePlacement;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
+import org.geotools.styling.NamedLayer;
 import org.geotools.styling.PointPlacement;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
@@ -39,8 +41,10 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleVisitor;
+import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.styling.UserLayer;
 
 
 /**
@@ -326,4 +330,24 @@ public class OpacityFinder implements StyleVisitor {
     public static void main(String[] args) {
         // TODO Auto-generated method stub
     }
+
+	public void visit(StyledLayerDescriptor sld) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void visit(NamedLayer layer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void visit(UserLayer layer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void visit(FeatureTypeConstraint ftc) {
+		// TODO Auto-generated method stub
+		
+	}
 }
