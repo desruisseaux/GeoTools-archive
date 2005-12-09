@@ -18,6 +18,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Jody Garnett, Refractions Research
  */
 public class ConstantExpression implements LiteralExpression, Cloneable {
+	public static final ConstantExpression NULL = constant( null );		
 	public static final ConstantExpression BLACK = constant( Color.BLACK );	
 	public static final ConstantExpression ZERO = constant( 0 );	
 	public static final ConstantExpression ONE = constant( 1 );
@@ -55,7 +56,7 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
 	}
 
 	public static ConstantExpression constant( Color color ){
-		if( color == null ) throw new IllegalArgumentException("null is not an acceptable default literal");		
+		if( color == null ) return NULL;		
 
         String redCode = Integer.toHexString(color.getRed());
         String greenCode = Integer.toHexString(color.getGreen());
@@ -75,7 +76,6 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
 		return new ConstantExpression( new Integer( number ) );
 	}	
 	public static ConstantExpression constant( Object value ){
-		if( value == null ) throw new IllegalArgumentException("null is not an acceptable default literal");		
 		return new ConstantExpression( value );
 	}
 	
