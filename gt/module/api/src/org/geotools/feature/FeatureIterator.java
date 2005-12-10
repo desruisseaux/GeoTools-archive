@@ -47,5 +47,5 @@ public interface FeatureIterator {
     /**
      * Required so FeatureCollection classes can implement close( FeatureIterator ).
      */
-    //public void close();
+    public void close();
 }
