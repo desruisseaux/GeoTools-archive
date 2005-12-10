@@ -13,7 +13,7 @@ public class GTConstant implements GTComponent {
 		return this; // we are constant
 	}
 	public GTComponent getParent() {
-		return SHARED;
+		return getNote().getParent();
 	}
 
 	public void removed(GTDelta delta) {
@@ -24,11 +24,9 @@ public class GTConstant implements GTComponent {
 		throw new IllegalStateException("A child has changed in an immutable Default!");
 	}
 	public GTNote getNote() {
-		// TODO Auto-generated method stub
-		return null;
+		return GTNote.EMPTY;
 	}
 	public void setNote(GTNote container) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
 }

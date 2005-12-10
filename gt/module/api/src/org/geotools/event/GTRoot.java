@@ -49,23 +49,6 @@ public interface GTRoot extends GTComponent {
             public void removeListener(GTListener listener) {
             }
 
-//            public void setParent(GTComponent newParent) {
-//            }
-//
-//            public void setNotificationName(String name) {
-//            }
-//
-//            public String getNotificationName() {
-//                return "";
-//            }
-//
-//            public void setNotificationPosition(int index) {
-//            }
-//
-//            public int getNotificationPosition() {
-//                return GTDelta.NO_INDEX;
-//            }
-
 			public GTNote getNote() {
 				return GTNote.EMPTY;
 			}

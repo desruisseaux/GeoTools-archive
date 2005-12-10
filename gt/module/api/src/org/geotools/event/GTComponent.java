@@ -49,10 +49,10 @@ public interface GTComponent {
 	 * This method will return a "NULLObject", called GTRoot.NO_PARENT when
 	 * no parent is present, client code should never have to be concerned
 	 * this method return <code>null</code>.
-	 * 
+	 * @deprecated use getNote().getParent()
 	 * @return Parent GTComponent or GTRoot.NO_PARENT if none
 	 */
-	GTComponent getParent();
+	GTComponent getParent(); 
 
 //	/**
 //	 * Used to set the parent, and associated placement information.
