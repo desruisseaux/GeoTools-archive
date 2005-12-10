@@ -39,7 +39,7 @@ import java.util.List;
 
 public class GTList extends ArrayList implements List {
     private static final long serialVersionUID = -4849245752797538846L;
-    private List delegate;
+    // private List delegate; // TODO use a list delegate
     private GTComponent host;
     private String notificationName;
 
@@ -91,9 +91,7 @@ public class GTList extends ArrayList implements List {
     private GTDelta deltaAdded(int position, Object item) {
         if (item instanceof GTComponent) {
             GTComponent myChild = (GTComponent) item;
-            myChild.getNote().setParent(host);
-            myChild.getNote().setNotificationName(notificationName);
-            myChild.getNote().setNotificationPosition(position);
+            myChild.setNote( note( position) );
         }
 
         GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
@@ -102,6 +100,9 @@ public class GTList extends ArrayList implements List {
         return delta;
     }
 
+    protected GTNote note( int position ){
+    	return new GTNoteImpl( host, notificationName, position );
+    }
     /**
      * Indicate that the range has been moved
      * 
@@ -130,10 +131,10 @@ public class GTList extends ArrayList implements List {
 
     private GTDelta deltaSync(int position, Object item) {
         if (item instanceof GTComponent) {
-            GTComponent myChild = (GTComponent) item;
-            myChild.getNote().setNotificationPosition(position);
+            GTComponent myChild = (GTComponent) item;            
+            myChild.setNote( GTNote.EMPTY );            
+            myChild.setNote( note( position ) );            
         }
-
         GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
                     position), GTDelta.Kind.NO_CHANGE, item, null);
 
@@ -181,11 +182,8 @@ public class GTList extends ArrayList implements List {
     private GTDelta deltaRemoved(int position, Object item) {
         if (item instanceof GTComponent) {
             GTComponent myChild = (GTComponent) item;
-            myChild.getNote().setParent(GTRoot.NO_PARENT);
-            myChild.getNote().setNotificationName("");
-            myChild.getNote().setNotificationPosition(GTDelta.NO_INDEX);
+            myChild.setNote( GTNote.EMPTY );            
         }
-
         GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
                     position), GTDelta.Kind.REMOVED, null, item);
 
@@ -199,7 +197,7 @@ public class GTList extends ArrayList implements List {
         delta = deltaAdded(size() - 1, item);
         delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
                     GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, delta);
-        host.getParent().changed(delta);
+        host.getNote().getParent().changed(delta);
 
         return added;
     }
@@ -217,7 +215,7 @@ public class GTList extends ArrayList implements List {
         delta = deltaAdded(index, item);
         delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
                     GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, delta);
-        host.getParent().changed(delta);
+        host.getNote().getParent().changed(delta);
     }
 
     public boolean addAll(Collection list) {
@@ -228,7 +226,7 @@ public class GTList extends ArrayList implements List {
         GTDelta delta;
         delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
                     GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, changed);
-        host.getParent().changed(delta);
+        host.getNote().getParent().changed(delta);
 
         return added;
     }
@@ -244,7 +242,7 @@ public class GTList extends ArrayList implements List {
         GTDelta delta;
         delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
                     GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, changed);
-        host.getParent().changed(delta);
+        host.getNote().getParent().changed(delta);
 
         return added;
     }
@@ -255,7 +253,7 @@ public class GTList extends ArrayList implements List {
         GTDelta delta;
         delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
                     GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host);
-        host.getParent().changed(delta);
+        host.getNote().getParent().changed(delta);
     }
 
     public Object remove(int index) {
@@ -266,7 +264,7 @@ public class GTList extends ArrayList implements List {
 
         GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
                     GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, changed);
-        host.getParent().changed(delta);
+        host.getNote().getParent().changed(delta);
 
         return item;
     }
@@ -290,7 +288,7 @@ public class GTList extends ArrayList implements List {
 
         GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
                     GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, changed);
-        host.getParent().changed(delta);
+        host.getNote().getParent().changed(delta);
 
         return removed;
     }
@@ -304,6 +302,6 @@ public class GTList extends ArrayList implements List {
 
         GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
                     GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, changed);
-        host.getParent().changed(delta);
+        host.getNote().getParent().changed(delta);
     }
 }

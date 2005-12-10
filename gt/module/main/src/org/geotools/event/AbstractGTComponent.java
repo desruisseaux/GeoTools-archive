@@ -80,7 +80,7 @@ public abstract class AbstractGTComponent implements GTComponent {
     public void changed(GTDelta childDelta) {
         GTDelta delta = new GTDeltaImpl(notification, GTDelta.Kind.NO_CHANGE,
                 this, null, childDelta);
-        notification.getParent().removed(delta);
+        notification.getParent().changed(delta);
     }
 
     /**
@@ -95,7 +95,6 @@ public abstract class AbstractGTComponent implements GTComponent {
                 this, null);
         notification.getParent().changed(delta);
     }
-
     /**
      * Create a child delta and send it off.
      * 
@@ -107,16 +106,27 @@ public abstract class AbstractGTComponent implements GTComponent {
      * @param child
      * @param oldValue DOCUMENT ME!
      */
-    protected void fireChildChanged(String childName, Object child,
-        Object oldValue) {
+    protected synchronized void fireChildChanged( String name, Object child, Object oldValue) {
+    	GTNote here = new GTNoteImpl( this, name, GTDelta.NO_INDEX );
+    	
+    	if( oldValue instanceof GTComponent ){
+    		GTNote note = new GTNoteImpl( GTRoot.NO_PARENT, "", GTDelta.NO_INDEX );
+    		
+    		GTComponent myDeath = (GTComponent) oldValue ;
+    		myDeath.setNote( note );
+    	}
+    	
+    	if( child instanceof GTComponent ){
+    		GTComponent myChild = (GTComponent) child;
+    		myChild.setNote( here );
+    	}
+    	
         if (child == null) {
             fireChanged(); // well something changed			
-        } else {
-            GTDelta delta;
-            delta = new GTDeltaImpl(new GTNoteImpl(childName, GTDelta.NO_INDEX),
-                    GTDelta.Kind.CHANGED, child);
-            delta = new GTDeltaImpl(notification, GTDelta.Kind.NO_CHANGE, this);
-            notification.getParent().changed(delta);
+        } else {        	
+            GTDelta delta;            
+            delta = new GTDeltaImpl( here, GTDelta.Kind.CHANGED, child, oldValue );             // <-- child delta
+            changed( delta );            
         }
     }
 
