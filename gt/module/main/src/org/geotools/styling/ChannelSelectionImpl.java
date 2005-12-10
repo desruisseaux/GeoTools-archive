@@ -18,12 +18,14 @@ package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
 
+
 /**
  * DOCUMENT ME!
  *
  * @author iant
  */
-public class ChannelSelectionImpl extends AbstractGTComponent implements ChannelSelection {
+public class ChannelSelectionImpl extends AbstractGTComponent
+    implements ChannelSelection {
     private SelectedChannelType gray;
     private SelectedChannelType red;
     private SelectedChannelType blue;
@@ -57,18 +59,18 @@ public class ChannelSelectionImpl extends AbstractGTComponent implements Channel
     public void setRGBChannels(SelectedChannelType[] channels) {
         if (channels.length != 3) {
             throw new IllegalArgumentException(
-                    "Three channels are required in setRGBChannels, got " + 
-                    channels.length);
+                "Three channels are required in setRGBChannels, got "
+                + channels.length);
         }
+
         red = channels[0];
         green = channels[1];
         blue = channels[2];
         fireChanged();
     }
 
-    public void setRGBChannels(SelectedChannelType red, 
-                               SelectedChannelType green, 
-                               SelectedChannelType blue) {
+    public void setRGBChannels(SelectedChannelType red,
+        SelectedChannelType green, SelectedChannelType blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;
@@ -84,10 +86,10 @@ public class ChannelSelectionImpl extends AbstractGTComponent implements Channel
             blue = channels[2];
         } else {
             throw new IllegalArgumentException(
-                    "Wrong number of elements in setSelectedChannels, expected 1 or 3, got " + 
-                    channels.length);
+                "Wrong number of elements in setSelectedChannels, expected 1 or 3, got "
+                + channels.length);
         }
+
         fireChanged();
     }
-          
 }

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,6 +12,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.event;
 
@@ -33,24 +34,29 @@ import java.util.logging.Logger;
  *
  * @since 2.2.M3
  */
-public abstract class AbstractGTRoot extends AbstractGTComponent implements GTRoot {
+public abstract class AbstractGTRoot extends AbstractGTComponent
+    implements GTRoot {
     /** The logger for the default core module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.event");	
-	
-    GTComponent notificationParent = GTRoot.NO_PARENT;
-    protected String notificationName = "";
-    protected int notificationPosition = GTDelta.NO_INDEX;
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.event");
+
+    //    GTComponent notificationParent = GTRoot.NO_PARENT;
+    //    protected String notificationName = "";
+    //    protected int notificationPosition = GTDelta.NO_INDEX;
+    GTNote notification = new GTNoteImpl(GTRoot.NO_PARENT, "", GTDelta.NO_INDEX);
     private HashSet listeners;
-    
+
     protected Object clone() throws CloneNotSupportedException {
-    	AbstractGTRoot copy = (AbstractGTRoot) super.clone();
-    	copy.notificationParent = GTRoot.NO_PARENT;
-    	copy.notificationName = "";
-    	copy.notificationPosition = GTDelta.NO_INDEX;
-    	
-    	return copy;
+        AbstractGTRoot copy = (AbstractGTRoot) super.clone();
+
+        //    	copy.notificationParent = GTRoot.NO_PARENT;
+        //    	copy.notificationName = "";
+        //    	copy.notificationPosition = GTDelta.NO_INDEX;
+        copy.notification = new GTNoteImpl(GTRoot.NO_PARENT, "",
+                GTDelta.NO_INDEX);
+
+        return copy;
     }
-    
+
     /**
      * Provide notification based on the provided delta.
      * 
@@ -68,9 +74,9 @@ public abstract class AbstractGTRoot extends AbstractGTComponent implements GTRo
      * @param childDelta object containing change information
      */
     public void removed(GTDelta childDelta) {
-        GTDelta delta = new GTDeltaImpl(notificationName, notificationPosition,
-                GTDelta.Kind.NO_CHANGE, this, null, childDelta);
-        notificationParent.removed(delta);
+        GTDelta delta = new GTDeltaImpl(notification, GTDelta.Kind.NO_CHANGE,
+                this, null, childDelta);
+        notification.getParent().removed(delta);
     }
 
     /**
@@ -79,9 +85,9 @@ public abstract class AbstractGTRoot extends AbstractGTComponent implements GTRo
      * @param childDelta object containing change information
      */
     public void changed(GTDelta childDelta) {
-        GTDelta delta = new GTDeltaImpl(notificationName, notificationPosition,
-                GTDelta.Kind.NO_CHANGE, this, null, childDelta);
-        notificationParent.removed(delta);
+        GTDelta delta = new GTDeltaImpl(notification, GTDelta.Kind.NO_CHANGE,
+                this, null, childDelta);
+        notification.getParent().removed(delta);
     }
 
     /**
@@ -92,9 +98,9 @@ public abstract class AbstractGTRoot extends AbstractGTComponent implements GTRo
      * </p>
      */
     protected void fireChanged() {
-        GTDelta delta = new GTDeltaImpl(notificationName, notificationPosition,
-                GTDelta.Kind.CHANGED, this, null);
-        notificationParent.changed(delta);
+        GTDelta delta = new GTDeltaImpl(notification, GTDelta.Kind.CHANGED,
+                this, null);
+        notification.getParent().changed(delta);
     }
 
     /**
@@ -106,52 +112,44 @@ public abstract class AbstractGTRoot extends AbstractGTComponent implements GTRo
      *
      * @param childName used to the child (often bean propertyName or map key)
      * @param child
+     * @param oldValue DOCUMENT ME!
      */
-    final protected void fireChildChanged(String childName, Object child, Object oldValue) {
+    final protected void fireChildChanged(String childName, Object child,
+        Object oldValue) {
         if (child == null) {
             fireChanged(); // well something changed			
         } else {
             GTDelta delta;
-            delta = new GTDeltaImpl(childName, GTDelta.NO_INDEX,
+            delta = new GTDeltaImpl(new GTNoteImpl(childName, GTDelta.NO_INDEX),
                     GTDelta.Kind.CHANGED, child);
-            delta = new GTDeltaImpl(notificationName, notificationPosition,
-                    GTDelta.Kind.NO_CHANGE, this);
-            notificationParent.changed(delta);
+            delta = new GTDeltaImpl(notification, GTDelta.Kind.NO_CHANGE, this);
+            notification.getParent().changed(delta);
         }
     }
 
-   
-    public GTComponent getParent() {
-        return notificationParent;
-    }
+    //    public GTComponent getParent() {
+    //        return notification.getParent();
+    //    }
+    //	public void setParent(GTComponent newParent) {
+    //		notification.setParent(newParent);
+    //	}
+    //	public void setNotificationName(String name) {
+    //		if( name == null ) name = "";
+    //		notificationName = name;
+    //	}
+    //
+    //	public String getNotificationName() {
+    //		return notificationName;
+    //	}
+    //
+    //	public void setNotificationPosition(int index) {
+    //		notificationPosition = index;
+    //	}
+    //
+    //	public int getNotificationPosition() {
+    //		return notificationPosition;
+    //	}
 
-	public void setParent(GTComponent newParent) {
-		if( newParent == null ) {
-			newParent = GTRoot.NO_PARENT;
-		}
-		if( notificationParent != GTRoot.NO_PARENT ){
-			throw new IllegalStateException("Please remove from existing parent first");
-		}
-		notificationParent = newParent;
-	}
-
-	public void setNotificationName(String name) {
-		if( name == null ) name = "";
-		notificationName = name;
-	}
-
-	public String getNotificationName() {
-		return notificationName;
-	}
-
-	public void setNotificationPosition(int index) {
-		notificationPosition = index;
-	}
-
-	public int getNotificationPosition() {
-		return notificationPosition;
-	}
-	
     /**
      * Listens to changes in the Style content.
      * 
@@ -169,9 +167,8 @@ public abstract class AbstractGTRoot extends AbstractGTComponent implements GTRo
      * </p>
      * 
      * <p>
-     * Since the Style data structure can be vast and complicated a trail
-     * of breadcrumbs (a delta) is provided to help find your way to the
-     * change.
+     * Since the Style data structure can be vast and complicated a trail of
+     * breadcrumbs (a delta) is provided to help find your way to the change.
      * </p>
      *
      * @param listener
@@ -192,6 +189,7 @@ public abstract class AbstractGTRoot extends AbstractGTComponent implements GTRo
     public synchronized void removeListener(GTListener listener) {
         listeners.remove(listener);
     }
+
     /**
      * Provides notification of daring do (and undo) in style space.
      *
@@ -219,13 +217,16 @@ public abstract class AbstractGTRoot extends AbstractGTComponent implements GTRo
      * @param delta Used to quickly fire off a child delta
      */
     protected synchronized void fire(GTDelta delta) {
-        if( !hasListeners() ) return;
+        if (!hasListeners()) {
+            return;
+        }
 
         GTEventImpl event = new GTEventImpl(this, GTEvent.Type.POST_CHANGE,
                 delta);
         fire(event);
     }
+
     protected boolean hasListeners() {
-    	return listeners != null && !listeners.isEmpty();
-	}    
+        return (listeners != null) && !listeners.isEmpty();
+    }
 }

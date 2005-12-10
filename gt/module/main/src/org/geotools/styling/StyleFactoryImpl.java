@@ -35,25 +35,25 @@ import org.geotools.filter.FilterFactoryFinder;
  * @author iant
  * @version $Id: StyleFactoryImpl.java,v 1.15 2004/03/01 15:41:59 aaime Exp $
  */
-public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFactory2 {
-	
-    private static final FilterFactory filterFactory = 
-            FilterFactoryFinder.createFilterFactory();
+public class StyleFactoryImpl extends AbstractStyleFactory
+    implements StyleFactory2 {
+    private static final FilterFactory filterFactory = FilterFactoryFinder
+        .createFilterFactory();
 
     public Style createStyle() {
         return new StyleImpl();
     }
 
-    public NamedStyle createNamedStyle(){
-    	return new NamedStyleImpl();
+    public NamedStyle createNamedStyle() {
+        return new NamedStyleImpl();
     }
 
     public PointSymbolizer createPointSymbolizer() {
         return new PointSymbolizerImpl();
     }
 
-    public PointSymbolizer createPointSymbolizer(Graphic graphic, 
-                                                 String geometryPropertyName) {
+    public PointSymbolizer createPointSymbolizer(Graphic graphic,
+        String geometryPropertyName) {
         PointSymbolizer pSymb = new PointSymbolizerImpl();
         pSymb.setGeometryPropertyName(geometryPropertyName);
         pSymb.setGraphic(graphic);
@@ -65,8 +65,8 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         return new PolygonSymbolizerImpl();
     }
 
-    public PolygonSymbolizer createPolygonSymbolizer(Stroke stroke, Fill fill, 
-                                                     String geometryPropertyName) {
+    public PolygonSymbolizer createPolygonSymbolizer(Stroke stroke, Fill fill,
+        String geometryPropertyName) {
         PolygonSymbolizer pSymb = new PolygonSymbolizerImpl();
         pSymb.setGeometryPropertyName(geometryPropertyName);
         pSymb.setStroke(stroke);
@@ -79,8 +79,8 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         return new LineSymbolizerImpl();
     }
 
-    public LineSymbolizer createLineSymbolizer(Stroke stroke, 
-                                               String geometryPropertyName) {
+    public LineSymbolizer createLineSymbolizer(Stroke stroke,
+        String geometryPropertyName) {
         LineSymbolizer lSymb = new LineSymbolizerImpl();
         lSymb.setGeometryPropertyName(geometryPropertyName);
         lSymb.setStroke(stroke);
@@ -92,10 +92,9 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         return new TextSymbolizerImpl();
     }
 
-    public TextSymbolizer createTextSymbolizer(Fill fill, Font[] fonts, 
-                                               Halo halo, Expression label, 
-                                               LabelPlacement labelPlacement, 
-                                               String geometryPropertyName) {
+    public TextSymbolizer createTextSymbolizer(Fill fill, Font[] fonts,
+        Halo halo, Expression label, LabelPlacement labelPlacement,
+        String geometryPropertyName) {
         TextSymbolizer tSymb = new TextSymbolizerImpl();
         tSymb.setFill(fill);
         tSymb.setFonts(fonts);
@@ -107,11 +106,11 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
 
         return tSymb;
     }
-    public TextSymbolizer2 createTextSymbolizer(Fill fill, Font[] fonts, 
-            Halo halo, Expression label, 
-            LabelPlacement labelPlacement, 
-            String geometryPropertyName, Graphic graphic ) {
-		TextSymbolizer2 tSymb = new TextSymbolizerImpl();
+
+    public TextSymbolizer2 createTextSymbolizer(Fill fill, Font[] fonts,
+        Halo halo, Expression label, LabelPlacement labelPlacement,
+        String geometryPropertyName, Graphic graphic) {
+        TextSymbolizer2 tSymb = new TextSymbolizerImpl();
         tSymb.setFill(fill);
         tSymb.setFonts(fonts);
         tSymb.setGeometryPropertyName(geometryPropertyName);
@@ -119,27 +118,29 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         tSymb.setHalo(halo);
         tSymb.setLabel(label);
         tSymb.setPlacement(labelPlacement);
-		tSymb.setGraphic( graphic );
-		return tSymb;
+        tSymb.setGraphic(graphic);
+
+        return tSymb;
     }
 
     public Extent createExtent(String name, String value) {
-    	Extent extent = new ExtentImpl();
-    	extent.setName(name);
-    	extent.setValue(value);
-    	
-    	return extent;
+        Extent extent = new ExtentImpl();
+        extent.setName(name);
+        extent.setValue(value);
+
+        return extent;
     }
-    
-    public FeatureTypeConstraint createFeatureTypeConstraint(String featureTypeName, Filter filter, Extent[] extents) {
-    	FeatureTypeConstraint constraint = new FeatureTypeConstraintImpl();
-    	constraint.setFeatureTypeName(featureTypeName);
-    	constraint.setFilter(filter);
-    	constraint.setExtents(extents);
-    	
-    	return constraint;
+
+    public FeatureTypeConstraint createFeatureTypeConstraint(
+        String featureTypeName, Filter filter, Extent[] extents) {
+        FeatureTypeConstraint constraint = new FeatureTypeConstraintImpl();
+        constraint.setFeatureTypeName(featureTypeName);
+        constraint.setFilter(filter);
+        constraint.setExtents(extents);
+
+        return constraint;
     }
-    
+
     public FeatureTypeStyle createFeatureTypeStyle() {
         return new FeatureTypeStyleImpl();
     }
@@ -163,9 +164,10 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
      * @see org.geotools.stroke
      */
     public Stroke createStroke(Expression color, Expression width) {
-        return createStroke(color, width, filterFactory.createLiteralExpression(1.0));
+        return createStroke(color, width,
+            filterFactory.createLiteralExpression(1.0));
     }
-    
+
     /**
      * A convienice method to make a simple stroke
      *
@@ -177,13 +179,12 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
      *
      * @see org.geotools.stroke
      */
-    public Stroke createStroke(Expression color, Expression width, 
-                               Expression opacity) {
-        return createStroke(color, width, opacity, 
-                            filterFactory.createLiteralExpression("miter"), 
-                            filterFactory.createLiteralExpression("butt"), 
-                            null, filterFactory.createLiteralExpression(0.0), 
-                            null, null);
+    public Stroke createStroke(Expression color, Expression width,
+        Expression opacity) {
+        return createStroke(color, width, opacity,
+            filterFactory.createLiteralExpression("miter"),
+            filterFactory.createLiteralExpression("butt"), null,
+            filterFactory.createLiteralExpression(0.0), null, null);
     }
 
     /**
@@ -205,44 +206,43 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
      *
      * @see org.geotools.stroke
      */
-    public Stroke createStroke(Expression color, Expression width, 
-                               Expression opacity, Expression lineJoin, 
-                               Expression lineCap, float[] dashArray, 
-                               Expression dashOffset, Graphic graphicFill, 
-                               Graphic graphicStroke) {
+    public Stroke createStroke(Expression color, Expression width,
+        Expression opacity, Expression lineJoin, Expression lineCap,
+        float[] dashArray, Expression dashOffset, Graphic graphicFill,
+        Graphic graphicStroke) {
         Stroke stroke = new StrokeImpl();
 
         if (color == null) {
             throw new IllegalArgumentException(
-                    "Color may not be null in a stroke");
+                "Color may not be null in a stroke");
         }
 
         stroke.setColor(color);
 
         if (width == null) {
             throw new IllegalArgumentException(
-                    "Width may not be null in a stroke");
+                "Width may not be null in a stroke");
         }
 
         stroke.setWidth(width);
 
         if (opacity == null) {
             throw new IllegalArgumentException(
-                    "Opacity may not be null in a stroke");
+                "Opacity may not be null in a stroke");
         }
 
         stroke.setOpacity(opacity);
 
         if (lineJoin == null) {
             throw new IllegalArgumentException(
-                    "LineJoin may not be null in a stroke");
+                "LineJoin may not be null in a stroke");
         }
 
         stroke.setLineJoin(lineJoin);
 
         if (lineCap == null) {
             throw new IllegalArgumentException(
-                    "LineCap may not be null in a stroke");
+                "LineCap may not be null in a stroke");
         }
 
         stroke.setLineCap(lineCap);
@@ -254,13 +254,13 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         return stroke;
     }
 
-    public Fill createFill(Expression color, Expression backgroundColor, 
-                           Expression opacity, Graphic graphicFill) {
+    public Fill createFill(Expression color, Expression backgroundColor,
+        Expression opacity, Graphic graphicFill) {
         Fill fill = new FillImpl();
 
         if (color == null) {
             throw new IllegalArgumentException(
-                    "Color may not be null in a fill");
+                "Color may not be null in a fill");
         }
 
         fill.setColor(color);
@@ -268,9 +268,8 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
 
         if (opacity == null) {
             throw new IllegalArgumentException(
-                    "Opacity may not be null in a fill");
+                "Opacity may not be null in a fill");
         }
-
 
         // would be nice to check if this was within bounds but we have to wait until use since it may depend on an attribute
         fill.setOpacity(opacity);
@@ -284,17 +283,17 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
     }
 
     public Fill createFill(Expression color) {
-        return createFill(color, null, 
-                          filterFactory.createLiteralExpression(1.0), null);
+        return createFill(color, null,
+            filterFactory.createLiteralExpression(1.0), null);
     }
 
-    public Mark createMark(Expression wellKnownName, Stroke stroke, Fill fill, 
-                           Expression size, Expression rotation) {
+    public Mark createMark(Expression wellKnownName, Stroke stroke, Fill fill,
+        Expression size, Expression rotation) {
         Mark mark = new MarkImpl();
 
         if (wellKnownName == null) {
             throw new IllegalArgumentException(
-                    "WellKnownName can not be null in mark");
+                "WellKnownName can not be null in mark");
         }
 
         mark.setWellKnownName(wellKnownName);
@@ -309,7 +308,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
 
         if (rotation == null) {
             throw new IllegalArgumentException(
-                    "Rotation can not be null in mark");
+                "Rotation can not be null in mark");
         }
 
         mark.setRotation(rotation);
@@ -318,10 +317,10 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
     }
 
     public Mark getSquareMark() {
-        Mark mark = createMark(filterFactory.createLiteralExpression("Square"), 
-                               getDefaultStroke(), getDefaultFill(), 
-                               filterFactory.createLiteralExpression(6), 
-                               filterFactory.createLiteralExpression(0));
+        Mark mark = createMark(filterFactory.createLiteralExpression("Square"),
+                getDefaultStroke(), getDefaultFill(),
+                filterFactory.createLiteralExpression(6),
+                filterFactory.createLiteralExpression(0));
 
         return mark;
     }
@@ -367,10 +366,9 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         return mark;
     }
 
-    public Graphic createGraphic(ExternalGraphic[] externalGraphics, 
-                                 Mark[] marks, Symbol[] symbols, 
-                                 Expression opacity, Expression size, 
-                                 Expression rotation) {
+    public Graphic createGraphic(ExternalGraphic[] externalGraphics,
+        Mark[] marks, Symbol[] symbols, Expression opacity, Expression size,
+        Expression rotation) {
         Graphic graphic = new GraphicImpl();
         graphic.setSymbols(symbols);
         graphic.setExternalGraphics(externalGraphics);
@@ -378,21 +376,21 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
 
         if (opacity == null) {
             throw new IllegalArgumentException(
-                    "Opacity can not be null in graphic");
+                "Opacity can not be null in graphic");
         }
 
         graphic.setOpacity(opacity);
 
         if (size == null) {
             throw new IllegalArgumentException(
-                    "Size can not be null in graphic");
+                "Size can not be null in graphic");
         }
 
         graphic.setSize(size);
 
         if (rotation == null) {
             throw new IllegalArgumentException(
-                    "Rotation can not be null in graphic");
+                "Rotation can not be null in graphic");
         }
 
         graphic.setRotation(rotation);
@@ -408,8 +406,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         return extg;
     }
 
-    public ExternalGraphic createExternalGraphic(java.net.URL url, 
-                                                 String format) {
+    public ExternalGraphic createExternalGraphic(java.net.URL url, String format) {
         ExternalGraphic extg = new ExternalGraphicImpl();
         extg.setLocation(url);
         extg.setFormat(format);
@@ -417,8 +414,8 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         return extg;
     }
 
-    public Font createFont(Expression fontFamily, Expression fontStyle, 
-                           Expression fontWeight, Expression fontSize) {
+    public Font createFont(Expression fontFamily, Expression fontStyle,
+        Expression fontWeight, Expression fontSize) {
         Font font = new FontImpl();
 
         if (fontFamily == null) {
@@ -461,9 +458,8 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
     //    public PointPlacement createPointPlacement(){
     //        return new PointPlacementImpl();
     //    }
-    public PointPlacement createPointPlacement(AnchorPoint anchorPoint, 
-                                               Displacement displacement, 
-                                               Expression rotation) {
+    public PointPlacement createPointPlacement(AnchorPoint anchorPoint,
+        Displacement displacement, Expression rotation) {
         PointPlacement pointp = new PointPlacementImpl();
         pointp.setAnchorPoint(anchorPoint);
         pointp.setDisplacement(displacement);
@@ -502,7 +498,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
         try {
             fill.setColor(filterFactory.createLiteralExpression("#808080"));
             fill.setOpacity(filterFactory.createLiteralExpression(
-                                    new Double(1.0)));
+                    new Double(1.0)));
         } catch (org.geotools.filter.IllegalFilterException ife) {
             throw new RuntimeException("Error creating fill", ife);
         }
@@ -523,23 +519,22 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
     }
 
     public PolygonSymbolizer getDefaultPolygonSymbolizer() {
-        return createPolygonSymbolizer(getDefaultStroke(), getDefaultFill(), 
-                                       null);
+        return createPolygonSymbolizer(getDefaultStroke(), getDefaultFill(),
+            null);
     }
 
     public Stroke getDefaultStroke() {
         try {
             Stroke stroke = createStroke(filterFactory.createLiteralExpression(
-                                                 "#000000"), 
-                                         filterFactory.createLiteralExpression(
-                                                 new Integer(1)));
+                        "#000000"),
+                    filterFactory.createLiteralExpression(new Integer(1)));
 
             stroke.setDashOffset(filterFactory.createLiteralExpression(
-                                         new Integer(0)));
+                    new Integer(0)));
             stroke.setLineCap(filterFactory.createLiteralExpression("butt"));
             stroke.setLineJoin(filterFactory.createLiteralExpression("miter"));
             stroke.setOpacity(filterFactory.createLiteralExpression(
-                                      new Integer(1)));
+                    new Integer(1)));
 
             return stroke;
         } catch (org.geotools.filter.IllegalFilterException ife) {
@@ -555,30 +550,32 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
     }
 
     /**
-     * Creates a default Text Symbolizer, using the defaultFill, defaultFont and defaultPointPlacement, 
-     * Sets the geometry attribute name to be geometry:text. No Halo is set.
-     * <b>The label is not set</b>
+     * Creates a default Text Symbolizer, using the defaultFill, defaultFont
+     * and defaultPointPlacement,  Sets the geometry attribute name to be
+     * geometry:text. No Halo is set. <b>The label is not set</b>
      *
      * @return A default TextSymbolizer
-     *
      */
     public TextSymbolizer getDefaultTextSymbolizer() {
-        return createTextSymbolizer(getDefaultFill(), 
-                                    new Font[] { getDefaultFont() }, null, null, 
-                                    getDefaultPointPlacement(), "geometry:text");
+        return createTextSymbolizer(getDefaultFill(),
+            new Font[] { getDefaultFont() }, null, null,
+            getDefaultPointPlacement(), "geometry:text");
     }
 
-    /** Creates a defaultFont which is valid on all machines.
-     *  The font is of size 10, Style and Weight normal and uses a serif font.
+    /**
+     * Creates a defaultFont which is valid on all machines. The font is of
+     * size 10, Style and Weight normal and uses a serif font.
      *
      * @return the default Font
+     *
+     * @throws RuntimeException DOCUMENT ME!
      */
     public Font getDefaultFont() {
         Font font = new FontImpl();
 
         try {
             font.setFontSize(filterFactory.createLiteralExpression(
-                                     new Integer(10)));
+                    new Integer(10)));
             font.setFontStyle(filterFactory.createLiteralExpression("normal"));
             font.setFontWeight(filterFactory.createLiteralExpression("normal"));
             font.setFontFamily(filterFactory.createLiteralExpression("serif"));
@@ -590,39 +587,39 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
     }
 
     public Graphic createDefaultGraphic() {
-    	Graphic graphic = new GraphicImpl();
+        Graphic graphic = new GraphicImpl();
 
         graphic.setSize(filterFactory.createLiteralExpression(6));
         graphic.setOpacity(filterFactory.createLiteralExpression(1.0));
-        graphic.setRotation(filterFactory.createLiteralExpression( 0.0 ) );    
+        graphic.setRotation(filterFactory.createLiteralExpression(0.0));
+
         return graphic;
     }
+
     public Graphic getDefaultGraphic() {
-    	return createDefaultGraphic();
+        return createDefaultGraphic();
     }
 
-    /** returns a default PointPlacement with a 0,0 anchorPoint and a displacement of 0,0 and a rotation of 0
+    /**
+     * returns a default PointPlacement with a 0,0 anchorPoint and a
+     * displacement of 0,0 and a rotation of 0
      *
-     *  @return a default PointPlacement.
+     * @return a default PointPlacement.
      */
     public PointPlacement getDefaultPointPlacement() {
         return this.createPointPlacement(this.createAnchorPoint(
-                                                 filterFactory.createLiteralExpression(0), 
-                                                 filterFactory.createLiteralExpression(0.5)), 
-                                         this.createDisplacement(
-                                                 filterFactory.createLiteralExpression(0), 
-                                                 filterFactory.createLiteralExpression(0)), 
-                                         filterFactory.createLiteralExpression(0));
+                filterFactory.createLiteralExpression(0),
+                filterFactory.createLiteralExpression(0.5)),
+            this.createDisplacement(filterFactory.createLiteralExpression(0),
+                filterFactory.createLiteralExpression(0)),
+            filterFactory.createLiteralExpression(0));
     }
 
-    public RasterSymbolizer createRasterSymbolizer(String geometryPropertyName, 
-                                                   Expression opacity, 
-                                                   ChannelSelection channel, 
-                                                   Expression overlap, 
-                                                   ColorMap colorMap, 
-                                                   ContrastEnhancement cenhancement, 
-                                                   ShadedRelief relief, 
-                                                   Symbolizer outline) {
+    public RasterSymbolizer createRasterSymbolizer(
+        String geometryPropertyName, Expression opacity,
+        ChannelSelection channel, Expression overlap, ColorMap colorMap,
+        ContrastEnhancement cenhancement, ShadedRelief relief,
+        Symbolizer outline) {
         RasterSymbolizer rastersym = new RasterSymbolizerImpl();
 
         if (geometryPropertyName != null) {
@@ -661,12 +658,13 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
     }
 
     public RasterSymbolizer getDefaultRasterSymbolizer() {
-        return createRasterSymbolizer("geom", 
-                                      filterFactory.createLiteralExpression(1.0), 
-                                      null, null, null, null, null, null);
+        return createRasterSymbolizer("geom",
+            filterFactory.createLiteralExpression(1.0), null, null, null, null,
+            null, null);
     }
 
-    public ChannelSelection createChannelSelection(SelectedChannelType[] channels) {
+    public ChannelSelection createChannelSelection(
+        SelectedChannelType[] channels) {
         ChannelSelection channelSel = new ChannelSelectionImpl();
 
         if ((channels != null) && (channels.length > 0)) {
@@ -679,50 +677,49 @@ public class StyleFactoryImpl extends AbstractStyleFactory implements StyleFacto
     public ColorMap createColorMap() {
         return new ColorMapImpl();
     }
-    
+
     public ColorMapEntry createColorMapEntry() {
         return new ColorMapEntryImpl();
     }
 
     public ContrastEnhancement createContrastEnhancement() {
-    	return new ContrastEnhancementImpl();
+        return new ContrastEnhancementImpl();
     }
-    
-    public ContrastEnhancement createContrastEnhancement(Expression gammaValue) {
-    	ContrastEnhancement ce = new ContrastEnhancementImpl();
-    	ce.setGammaValue(gammaValue);
-    	
-    	return ce;
-    }
-    
-    public SelectedChannelType createSelectedChannelType(
-		String name, ContrastEnhancement enhancement
-    ) {
-    	 SelectedChannelType sct = new SelectedChannelTypeImpl();
-         sct.setChannelName(name);
-         sct.setContrastEnhancement(enhancement);
 
-         return sct;
+    public ContrastEnhancement createContrastEnhancement(Expression gammaValue) {
+        ContrastEnhancement ce = new ContrastEnhancementImpl();
+        ce.setGammaValue(gammaValue);
+
+        return ce;
     }
-    
-    public SelectedChannelType createSelectedChannelType(String name, 
-                                                         Expression gammaValue) {
+
+    public SelectedChannelType createSelectedChannelType(String name,
+        ContrastEnhancement enhancement) {
         SelectedChannelType sct = new SelectedChannelTypeImpl();
         sct.setChannelName(name);
-        sct.setContrastEnhancement(createContrastEnhancement(gammaValue));
-        
+        sct.setContrastEnhancement(enhancement);
+
         return sct;
     }
 
-	public StyledLayerDescriptor createStyledLayerDescriptor() {
-		return new StyledLayerDescriptorImpl();
-	}
+    public SelectedChannelType createSelectedChannelType(String name,
+        Expression gammaValue) {
+        SelectedChannelType sct = new SelectedChannelTypeImpl();
+        sct.setChannelName(name);
+        sct.setContrastEnhancement(createContrastEnhancement(gammaValue));
 
-	public UserLayer createUserLayer() {
-		return new UserLayerImpl();
-	}
+        return sct;
+    }
 
-	public NamedLayer createNamedLayer() {
-		return new NamedLayerImpl();
-	}
+    public StyledLayerDescriptor createStyledLayerDescriptor() {
+        return new StyledLayerDescriptorImpl();
+    }
+
+    public UserLayer createUserLayer() {
+        return new UserLayerImpl();
+    }
+
+    public NamedLayer createNamedLayer() {
+        return new NamedLayerImpl();
+    }
 }

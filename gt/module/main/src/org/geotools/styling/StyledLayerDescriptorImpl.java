@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,6 +12,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 /*
  *    Geotools - OpenSource mapping toolkit
@@ -33,15 +34,15 @@
  */
 package org.geotools.styling;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
 import org.geotools.event.AbstractGTRoot;
 import org.geotools.event.GTDelta;
 import org.geotools.event.GTDeltaImpl;
 import org.geotools.event.GTEvent;
 import org.geotools.event.GTEventImpl;
+import org.geotools.event.GTNoteImpl;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 
 /**
@@ -101,7 +102,7 @@ public class StyledLayerDescriptorImpl extends AbstractGTRoot
     /** Holds value of property abstract. */
     private String abstractStr;
     private List layers = new ArrayList();
-    
+
     /**
      * Convenience method for grabbing the default style from the
      * StyledLayerDescriptor.
@@ -134,112 +135,114 @@ public class StyledLayerDescriptorImpl extends AbstractGTRoot
 
     public StyledLayer[] getStyledLayers() {
         return (StyledLayerImpl[]) layers.toArray(new StyledLayerImpl[layers
-                .size()]);
-        }
-
-        public void setStyledLayers(StyledLayer[] layers) {
-            this.layers.clear();
-
-            for (int i = 0; i < layers.length; i++) {
-                addStyledLayer(layers[i]);
-            }
-
-            LOGGER.fine("StyleLayerDescriptorImpl added " + this.layers.size()
-                + " styled layers");
-            fireChanged(); // TODO Handle StyledLayer List
-        }
-
-        public void addStyledLayer(StyledLayer layer) {
-            layer.setParent(this);
-            layers.add(layer);
-        }
-
-        /**
-         * Getter for property name.
-         *
-         * @return Value of property name.
-         */
-        public String getName() {
-            return this.name;
-        }
-
-        /**
-         * Setter for property name.
-         *
-         * @param name New value of property name.
-         */
-        public void setName(String name) {
-            this.name = name;
-            fireChanged();
-        }
-
-        /**
-         * Getter for property title.
-         *
-         * @return Value of property title.
-         */
-        public String getTitle() {
-            return this.title;
-        }
-
-        /**
-         * Setter for property title.
-         *
-         * @param title New value of property title.
-         */
-        public void setTitle(String title) {
-            this.title = title;
-            fireChanged();
-        }
-
-        /**
-         * Getter for property abstractStr.
-         *
-         * @return Value of property abstractStr.
-         */
-        public java.lang.String getAbstract() {
-            return abstractStr;
-        }
-
-        /**
-         * Setter for property abstractStr.
-         *
-         * @param abstractStr New value of property abstractStr.
-         */
-        public void setAbstract(java.lang.String abstractStr) {
-            this.abstractStr = abstractStr;
-            fireChanged();
-        }
-
-
-        /**
-         * Issue a change event w/ PRE_DELETE
-         *
-         * @param childDelta Delta describing change
-         */
-        public void removed(GTDelta childDelta) {
-        	if( !hasListeners() ) return;
-            
-            GTDelta delta = new GTDeltaImpl("", GTDelta.NO_INDEX,
-                    GTDelta.Kind.NO_CHANGE, this, childDelta);
-            GTEventImpl event = new GTEventImpl(this, GTEvent.Type.PRE_DELETE,
-                    delta);
-            fire(event);
-        }
-
-		/**
-         * Used to pass on "We changed" notification from children.
-         *
-         * @param delta Describes change
-         */
-        public void changed(GTDelta delta) {
-        	if( !hasListeners() ) return;
-
-            fire(new GTDeltaImpl("", GTDelta.NO_INDEX, GTDelta.Kind.NO_CHANGE,
-                    this, delta));
-        }
-        
-        public void accept(StyleVisitor visitor) {
-            visitor.visit(this);
-        }
+            .size()]);
     }
+
+    public void setStyledLayers(StyledLayer[] layers) {
+        this.layers.clear();
+
+        for (int i = 0; i < layers.length; i++) {
+            addStyledLayer(layers[i]);
+        }
+
+        LOGGER.fine("StyleLayerDescriptorImpl added " + this.layers.size()
+            + " styled layers");
+        fireChanged(); // TODO Handle StyledLayer List
+    }
+
+    public void addStyledLayer(StyledLayer layer) {
+        layer.getNote().setParent(this);
+        layers.add(layer);
+    }
+
+    /**
+     * Getter for property name.
+     *
+     * @return Value of property name.
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * Setter for property name.
+     *
+     * @param name New value of property name.
+     */
+    public void setName(String name) {
+        this.name = name;
+        fireChanged();
+    }
+
+    /**
+     * Getter for property title.
+     *
+     * @return Value of property title.
+     */
+    public String getTitle() {
+        return this.title;
+    }
+
+    /**
+     * Setter for property title.
+     *
+     * @param title New value of property title.
+     */
+    public void setTitle(String title) {
+        this.title = title;
+        fireChanged();
+    }
+
+    /**
+     * Getter for property abstractStr.
+     *
+     * @return Value of property abstractStr.
+     */
+    public java.lang.String getAbstract() {
+        return abstractStr;
+    }
+
+    /**
+     * Setter for property abstractStr.
+     *
+     * @param abstractStr New value of property abstractStr.
+     */
+    public void setAbstract(java.lang.String abstractStr) {
+        this.abstractStr = abstractStr;
+        fireChanged();
+    }
+
+    /**
+     * Issue a change event w/ PRE_DELETE
+     *
+     * @param childDelta Delta describing change
+     */
+    public void removed(GTDelta childDelta) {
+        if (!hasListeners()) {
+            return;
+        }
+
+        GTDelta delta = new GTDeltaImpl(new GTNoteImpl("", GTDelta.NO_INDEX),
+                GTDelta.Kind.NO_CHANGE, this, childDelta);
+        GTEventImpl event = new GTEventImpl(this, GTEvent.Type.PRE_DELETE, delta);
+        fire(event);
+    }
+
+    /**
+     * Used to pass on "We changed" notification from children.
+     *
+     * @param delta Describes change
+     */
+    public void changed(GTDelta delta) {
+        if (!hasListeners()) {
+            return;
+        }
+
+        fire(new GTDeltaImpl(new GTNoteImpl("", GTDelta.NO_INDEX),
+                GTDelta.Kind.NO_CHANGE, this, delta));
+    }
+
+    public void accept(StyleVisitor visitor) {
+        visitor.visit(this);
+    }
+}

@@ -98,7 +98,6 @@ public interface Style extends GTComponent {
     /**
      * Used to navigate Style information during portrayal.
      * 
-     * @StyleVisitor for an example 
      * @param visitor
      */
     void accept(StyleVisitor visitor);    

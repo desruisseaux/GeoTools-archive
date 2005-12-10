@@ -15,23 +15,20 @@ public class GTConstant implements GTComponent {
 	public GTComponent getParent() {
 		return SHARED;
 	}
-	public void setParent(GTComponent newParent) {
-	}
-	public void setNotificationName(String name) {
-	}
-	public String getNotificationName() {
-		return "";
-	}
-	public void setNotificationPosition(int index) {
-	}
-	public int getNotificationPosition() {
-		return GTDelta.NO_INDEX;
-	}
+
 	public void removed(GTDelta delta) {
 		throw new IllegalStateException("A child has changed in an immutable Default!");
 	}
 
 	public void changed(GTDelta delta) {
 		throw new IllegalStateException("A child has changed in an immutable Default!");
+	}
+	public GTNote getNote() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public void setNote(GTNote container) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -22,10 +22,12 @@
  */
 package org.geotools.styling;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -35,23 +37,22 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.filter.AttributeExpression;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-
 
 /**
  * Test for text symbols.
  *
  * @author jamesm
- * @task REVISIT: redo the Map stuff - I commented it out since DefaultMap
- * is deprecated - cholmes.
+ *
+ * @task REVISIT: redo the Map stuff - I commented it out since DefaultMap is
+ *       deprecated - cholmes.
  */
 public class TextSymbolTest extends TestCase {
-    private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactoryFinder.createFilterFactory();
+    private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactoryFinder
+        .createFilterFactory();
 
     /** factory for attributes */
-    private static AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
+    private static AttributeTypeFactory attFactory = AttributeTypeFactory
+        .newInstance();
     String dataFolder;
 
     public TextSymbolTest(java.lang.String testName) {
@@ -84,11 +85,15 @@ public class TextSymbolTest extends TestCase {
         AttributeType[] pointAttribute = new AttributeType[4];
         pointAttribute[0] = AttributeTypeFactory.newAttributeType("centre",
                 com.vividsolutions.jts.geom.Point.class);
-        pointAttribute[1] = AttributeTypeFactory.newAttributeType("size", Double.class);
-        pointAttribute[2] = AttributeTypeFactory.newAttributeType("rotation", Double.class);
-        pointAttribute[3] = AttributeTypeFactory.newAttributeType("symbol", String.class);
+        pointAttribute[1] = AttributeTypeFactory.newAttributeType("size",
+                Double.class);
+        pointAttribute[2] = AttributeTypeFactory.newAttributeType("rotation",
+                Double.class);
+        pointAttribute[3] = AttributeTypeFactory.newAttributeType("symbol",
+                String.class);
 
-        FeatureTypeFactory feaTypeFactory = FeatureTypeFactory.newInstance("test");
+        FeatureTypeFactory feaTypeFactory = FeatureTypeFactory.newInstance(
+                "test");
         feaTypeFactory.addTypes(pointAttribute);
         feaTypeFactory.setName("testPoint");
 
@@ -100,8 +105,9 @@ public class TextSymbolTest extends TestCase {
 
         // load font 
         String[] symbol = {
-            "\uF04A", "\uF04B", "\uF059", "\uF05A", "\uF06B", "\uF06C", "\uF06E"
-        };
+                "\uF04A", "\uF04B", "\uF059", "\uF05A", "\uF06B", "\uF06C",
+                "\uF06E"
+            };
         double size = 16;
         double rotation = 0.0;
         int rows = 8;
@@ -120,8 +126,10 @@ public class TextSymbolTest extends TestCase {
             size += 2;
             rotation += 45;
         }
+
         String typeName = data.getTypeNames()[0];
-        FeatureCollection ft = data.getFeatureSource( typeName ).getFeatures().collection();
+        FeatureCollection ft = data.getFeatureSource(typeName).getFeatures()
+                                   .collection();
 
         //REVISIT: Removed since it is deprecated, not sure what this test is
         //is doing, what should replace it.  If someone with more knowledge of
@@ -131,8 +139,8 @@ public class TextSymbolTest extends TestCase {
         //an SLD document and not by hand
         org.geotools.styling.FontImpl font = new org.geotools.styling.FontImpl();
 
-        font.setFontFamily(filterFactory.createLiteralExpression(dataFolder +
-                "geog.ttf"));
+        font.setFontFamily(filterFactory.createLiteralExpression(dataFolder
+                + "geog.ttf"));
         font.setFontSize(filterFactory.createAttributeExpression(pointType,
                 "size"));
 

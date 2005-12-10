@@ -16,6 +16,7 @@
  */
 package org.geotools.styling;
 
+
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
 import org.opengis.util.Cloneable;
@@ -28,7 +29,8 @@ import org.opengis.util.Cloneable;
  * @author James Macgill
  * @version $Id: LineSymbolizerImpl.java,v 1.15 2003/10/17 22:50:59 ianschneider Exp $
  */
-public class LineSymbolizerImpl extends AbstractGTComponent implements LineSymbolizer, Cloneable {
+public class LineSymbolizerImpl extends AbstractGTComponent
+    implements LineSymbolizer, Cloneable {
     private Stroke stroke = null;
     private String geometryName = null;
 
@@ -37,28 +39,24 @@ public class LineSymbolizerImpl extends AbstractGTComponent implements LineSymbo
      */
     protected LineSymbolizerImpl() {
     }
-    
+
     /**
      * This property defines the geometry to be used for styling.<br>
      * The property is optional and if it is absent (null) then the "default"
-     * geometry property of the feature should be used.
-     * 
-     * Geometry types other than inherently linear types can be used. 
-     * If a point geometry is used, it should be interpreted as a line of zero
-     * length and two end caps.  If a polygon is used (or other "area" type)
-     * then its closed outline should be used as the line string
-     * (with no end caps).
+     * geometry property of the feature should be used.  Geometry types other
+     * than inherently linear types can be used.  If a point geometry is used,
+     * it should be interpreted as a line of zero length and two end caps.  If
+     * a polygon is used (or other "area" type) then its closed outline should
+     * be used as the line string (with no end caps). The geometryPropertyName
+     * is the name of a geometry property in the Feature being styled.
+     * Typically, features only have one geometry so, in general, the need to
+     * select one is not required. Note: this moves a little away from the SLD
+     * spec which provides an XPath reference to a Geometry object, but does
+     * follow it in spirit.
      *
-     * The geometryPropertyName is the name of a geometry property in the
-     * Feature being styled.  Typically, features only have one geometry so,
-     * in general, the need to select one is not required.
-     *
-     * Note: this moves a little away from the SLD spec which provides an XPath
-     * reference to a Geometry object, but does follow it in spirit.
-     *
-     * @return The name of the attribute in the feature being styled 
-     *  that should be used.  If null then the default geometry should be used.
-     * 
+     * @return The name of the attribute in the feature being styled  that
+     *         should be used.  If null then the default geometry should be
+     *         used.
      */
     public String getGeometryPropertyName() {
         return geometryName;
@@ -93,11 +91,13 @@ public class LineSymbolizerImpl extends AbstractGTComponent implements LineSymbo
      * @param stroke The Stroke style to use when rendering lines.
      */
     public void setStroke(Stroke stroke) {
-    	if( this.stroke == stroke ) return;
-    	
-    	Stroke old = this.stroke;
-    	this.stroke = stroke;
-    	fireChildChanged( "stroke", stroke, old );    
+        if (this.stroke == stroke) {
+            return;
+        }
+
+        Stroke old = this.stroke;
+        this.stroke = stroke;
+        fireChildChanged("stroke", stroke, old);
     }
 
     /**
@@ -113,6 +113,8 @@ public class LineSymbolizerImpl extends AbstractGTComponent implements LineSymbo
      * Creates a deep copy clone.
      *
      * @return The deep copy clone.
+     *
+     * @throws RuntimeException DOCUMENT ME!
      */
     public Object clone() {
         LineSymbolizerImpl clone;

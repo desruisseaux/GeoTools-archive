@@ -16,6 +16,7 @@
  */
 package org.geotools.styling;
 
+
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
 import org.geotools.resources.Utilities;
@@ -29,7 +30,8 @@ import org.opengis.util.Cloneable;
  * @author James Macgill, CCG
  * @version $Id: PolygonSymbolizerImpl.java,v 1.15 2003/10/17 22:50:59 ianschneider Exp $
  */
-public class PolygonSymbolizerImpl extends AbstractGTComponent implements PolygonSymbolizer, Cloneable {
+public class PolygonSymbolizerImpl extends AbstractGTComponent
+    implements PolygonSymbolizer, Cloneable {
     private Fill fill = new FillImpl();
     private Stroke stroke = new StrokeImpl();
     private String geometryPropertyName = null;
@@ -89,11 +91,13 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent implements Polygo
      * @param fill The Fill style to use when rendering the area.
      */
     public void setFill(Fill fill) {
-    	if( this.fill == fill ) return;
-    	
-    	Fill old = this.fill;
-    	this.fill = fill;
-    	fireChildChanged( "fill", fill, old );    
+        if (this.fill == fill) {
+            return;
+        }
+
+        Fill old = this.fill;
+        this.fill = fill;
+        fireChildChanged("fill", fill, old);
     }
 
     /**
@@ -113,10 +117,13 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent implements Polygo
      * @param stroke The Stroke style to use when rendering lines.
      */
     public void setStroke(Stroke stroke) {
-    	if( this.stroke == stroke ) return;
-    	Stroke old = this.stroke;
-    	this.stroke = stroke;
-    	fireChildChanged( "stroke", stroke, old );    
+        if (this.stroke == stroke) {
+            return;
+        }
+
+        Stroke old = this.stroke;
+        this.stroke = stroke;
+        fireChildChanged("stroke", stroke, old);
     }
 
     /**
@@ -133,6 +140,8 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent implements Polygo
      * currently only shallow copy.
      *
      * @return The deep copy clone.
+     *
+     * @throws RuntimeException DOCUMENT ME!
      */
     public Object clone() {
         PolygonSymbolizerImpl clone;
@@ -141,11 +150,11 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent implements Polygo
             clone = (PolygonSymbolizerImpl) super.clone();
 
             if (fill != null) {
-                clone.fill = (Fill) ((Cloneable)fill).clone();
+                clone.fill = (Fill) ((Cloneable) fill).clone();
             }
 
             if (stroke != null) {
-                clone.stroke = (Stroke) ((Cloneable)stroke).clone();
+                clone.stroke = (Stroke) ((Cloneable) stroke).clone();
             }
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e); // this should never happen.
@@ -197,9 +206,11 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent implements Polygo
 
         if (oth instanceof PolygonSymbolizerImpl) {
             PolygonSymbolizerImpl other = (PolygonSymbolizerImpl) oth;
-            return Utilities.equals(this.geometryPropertyName, other.geometryPropertyName) &&
-                   Utilities.equals(fill, other.fill) &&
-                   Utilities.equals(stroke, other.stroke);
+
+            return Utilities.equals(this.geometryPropertyName,
+                other.geometryPropertyName)
+            && Utilities.equals(fill, other.fill)
+            && Utilities.equals(stroke, other.stroke);
         }
 
         return false;

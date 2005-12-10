@@ -112,7 +112,7 @@
 		<echo>
   BUILD REPORT (from buildReport.txt):
   ------------
-  Sucessfull modules should read 'cleaned, compiled, tested, INSTALLED HHMM'
+  Successful modules should read 'cleaned, compiled, tested, INSTALLED HHMM'
 
 
       ${build.report}
@@ -122,11 +122,11 @@
   failures lower in the list will probaly be caused by ones higher up.
 
 
-  If modules cleanded and compiled but were not tested look in the
+  If modules cleaned and compiled but were not tested look in the
   /target/test-reports direcotry of your module for details.
   For more information see http://geotools.codehaus.org/2+Build
   
-  Maven always says 'Build Sucessful', please check the above report.
+  Maven always says 'Build Successful', please check the above report.
       </echo>
 	</goal>
 	<postGoal name="test:test">

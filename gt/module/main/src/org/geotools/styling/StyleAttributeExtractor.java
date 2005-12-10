@@ -21,12 +21,14 @@ import org.geotools.filter.FilterAttributeExtractor;
 
 
 /**
- * A simple visitor whose purpose is to extract the set of attributes used by a Style, that is,
- * those that the Style expects to find in order to work properly
+ * A simple visitor whose purpose is to extract the set of attributes used by a
+ * Style, that is, those that the Style expects to find in order to work
+ * properly
  *
  * @author wolf
  */
-public class StyleAttributeExtractor extends FilterAttributeExtractor implements StyleVisitor {
+public class StyleAttributeExtractor extends FilterAttributeExtractor
+    implements StyleVisitor {
     /**
      * @see org.geotools.styling.StyleVisitor#visit(org.geotools.styling.Style)
      */
@@ -152,26 +154,26 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor implements
         if (sym instanceof TextSymbolizer) {
             visit((TextSymbolizer) sym);
         }
-        
+
         if (sym instanceof RasterSymbolizer) {
             visit((RasterSymbolizer) sym);
         }
     }
-    
+
     public void visit(RasterSymbolizer rs) {
         if (rs.getGeometryPropertyName() != null) {
             attributeNames.add(rs.getGeometryPropertyName());
+
             // FIXME
             // LiteRenderer2 trhwos an Exception:
             //  Do not know how to deep copy org.geotools.coverage.grid.GridCoverage2D
-            
             // attributeNames.add("grid");
         }
-        
+
         if (rs.getImageOutline() != null) {
             rs.getImageOutline().accept(this);
         }
-        
+
         if (rs.getOpacity() != null) {
             rs.getOpacity().accept(this);
         }
@@ -271,7 +273,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor implements
         if (text.getPlacement() != null) {
             text.getPlacement().accept(this);
         }
-        
+
         if (text.getPriority() != null) {
             text.getPriority().accept(this);
         }
@@ -396,33 +398,35 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor implements
         }
     }
 
-	public void visit(StyledLayerDescriptor sld) {
-		StyledLayer[] layers = sld.getStyledLayers();
-		for (int i = 0; i < layers.length; i++) {
-			if (layers[i] instanceof NamedLayer) {
-				((NamedLayer) layers[i]).accept(this);
-			} else if (layers[i] instanceof UserLayer) {
-				((UserLayer) layers[i]).accept(this);
-			}
-		}
-	}
+    public void visit(StyledLayerDescriptor sld) {
+        StyledLayer[] layers = sld.getStyledLayers();
 
-	public void visit(NamedLayer layer) {
-		Style[] styles = layer.getStyles();
-		for (int i = 0; i < styles.length; i++) {
-			styles[i].accept(this);
-		}
-	}
+        for (int i = 0; i < layers.length; i++) {
+            if (layers[i] instanceof NamedLayer) {
+                ((NamedLayer) layers[i]).accept(this);
+            } else if (layers[i] instanceof UserLayer) {
+                ((UserLayer) layers[i]).accept(this);
+            }
+        }
+    }
 
-	public void visit(UserLayer layer) {
-		Style[] styles = layer.getUserStyles();
-		for (int i = 0; i < styles.length; i++) {
-			styles[i].accept(this);
-		}
-	}
+    public void visit(NamedLayer layer) {
+        Style[] styles = layer.getStyles();
 
-	public void visit(FeatureTypeConstraint ftc) {
-		// TODO Auto-generated method stub
-		
-	}
+        for (int i = 0; i < styles.length; i++) {
+            styles[i].accept(this);
+        }
+    }
+
+    public void visit(UserLayer layer) {
+        Style[] styles = layer.getUserStyles();
+
+        for (int i = 0; i < styles.length; i++) {
+            styles[i].accept(this);
+        }
+    }
+
+    public void visit(FeatureTypeConstraint ftc) {
+        // TODO Auto-generated method stub
+    }
 }

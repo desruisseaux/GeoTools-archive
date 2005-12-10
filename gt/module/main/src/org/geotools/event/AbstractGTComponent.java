@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,11 +12,13 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.event;
 
 import org.geotools.event.GTComponent;
 import org.geotools.event.GTDelta;
+
 
 /**
  * Provides basic StyleEvent notification, may be used in conjuction with
@@ -31,19 +33,23 @@ import org.geotools.event.GTDelta;
  * @since 2.2.M3
  */
 public abstract class AbstractGTComponent implements GTComponent {
-    GTComponent notificationParent = GTRoot.NO_PARENT;
-    protected String notificationName = "";
-    protected int notificationPosition = GTDelta.NO_INDEX;
+    //    GTComponent notificationParent = GTRoot.NO_PARENT;
+    //    protected String notificationName = "";
+    //    protected int notificationPosition = GTDelta.NO_INDEX;
+    GTNote notification = new GTNoteImpl(GTRoot.NO_PARENT, "", GTDelta.NO_INDEX);
 
     protected Object clone() throws CloneNotSupportedException {
-    	AbstractGTComponent copy = (AbstractGTComponent) super.clone();
-    	copy.notificationParent = GTRoot.NO_PARENT;
-    	copy.notificationName = "";
-    	copy.notificationPosition = GTDelta.NO_INDEX;
-    	
-    	return copy;
+        AbstractGTComponent copy = (AbstractGTComponent) super.clone();
+
+        //    	copy.notificationParent = GTRoot.NO_PARENT;
+        //    	copy.notificationName = "";
+        //    	copy.notificationPosition = GTDelta.NO_INDEX;
+        copy.notification = new GTNoteImpl(GTRoot.NO_PARENT, "",
+                GTDelta.NO_INDEX);
+
+        return copy;
     }
-    
+
     /**
      * Provide notification based on the provided delta.
      * 
@@ -61,9 +67,9 @@ public abstract class AbstractGTComponent implements GTComponent {
      * @param childDelta object containing change information
      */
     public void removed(GTDelta childDelta) {
-        GTDelta delta = new GTDeltaImpl(notificationName, notificationPosition,
-                GTDelta.Kind.NO_CHANGE, this, null, childDelta);
-        notificationParent.removed(delta);
+        GTDelta delta = new GTDeltaImpl(notification, GTDelta.Kind.NO_CHANGE,
+                this, null, childDelta);
+        notification.getParent().removed(delta);
     }
 
     /**
@@ -72,9 +78,9 @@ public abstract class AbstractGTComponent implements GTComponent {
      * @param childDelta object containing change information
      */
     public void changed(GTDelta childDelta) {
-        GTDelta delta = new GTDeltaImpl(notificationName, notificationPosition,
-                GTDelta.Kind.NO_CHANGE, this, null, childDelta);
-        notificationParent.removed(delta);
+        GTDelta delta = new GTDeltaImpl(notification, GTDelta.Kind.NO_CHANGE,
+                this, null, childDelta);
+        notification.getParent().removed(delta);
     }
 
     /**
@@ -85,9 +91,9 @@ public abstract class AbstractGTComponent implements GTComponent {
      * </p>
      */
     protected void fireChanged() {
-        GTDelta delta = new GTDeltaImpl(notificationName, notificationPosition,
-                GTDelta.Kind.CHANGED, this, null);
-        notificationParent.changed(delta);
+        GTDelta delta = new GTDeltaImpl(notification, GTDelta.Kind.CHANGED,
+                this, null);
+        notification.getParent().changed(delta);
     }
 
     /**
@@ -99,50 +105,58 @@ public abstract class AbstractGTComponent implements GTComponent {
      *
      * @param childName used to the child (often bean propertyName or map key)
      * @param child
+     * @param oldValue DOCUMENT ME!
      */
-    protected void fireChildChanged(String childName, Object child, Object oldValue) {
+    protected void fireChildChanged(String childName, Object child,
+        Object oldValue) {
         if (child == null) {
             fireChanged(); // well something changed			
         } else {
             GTDelta delta;
-            delta = new GTDeltaImpl(childName, GTDelta.NO_INDEX,
+            delta = new GTDeltaImpl(new GTNoteImpl(childName, GTDelta.NO_INDEX),
                     GTDelta.Kind.CHANGED, child);
-            delta = new GTDeltaImpl(notificationName, notificationPosition,
-                    GTDelta.Kind.NO_CHANGE, this);
-            notificationParent.changed(delta);
+            delta = new GTDeltaImpl(notification, GTDelta.Kind.NO_CHANGE, this);
+            notification.getParent().changed(delta);
         }
     }
 
     public GTComponent getParent() {
-        return notificationParent;
+        return notification.getParent();
     }
 
-	public void setParent(GTComponent newParent) {
-		if( newParent == null ) {
-			newParent = GTRoot.NO_PARENT;
-		}		
-		if( notificationParent != GTRoot.NO_PARENT ){
-			// TODO: Freek out if Construct is adopted by a new parent
-			//       Previous parents need to disown children beforehand
-			throw new IllegalStateException("Please remove from existing parent first");
-		}
-		notificationParent = newParent;
-	}
+    //	public void setParent(GTComponent newParent) {
+    //		if( newParent == null ) {
+    //			newParent = GTRoot.NO_PARENT;
+    //		}		
+    //		if( notificationParent != GTRoot.NO_PARENT ){
+    //			// TODO: Freek out if Construct is adopted by a new parent
+    //			//       Previous parents need to disown children beforehand
+    //			throw new IllegalStateException("Please remove from existing parent first");
+    //		}
+    //		notificationParent = newParent;
+    //	}
+    //
+    //	public void setNotificationName(String name) {
+    //		if( name == null ) name = "";
+    //		notificationName = name;
+    //	}
+    //
+    //	public String getNotificationName() {
+    //		return notificationName;
+    //	}
+    //
+    //	public void setNotificationPosition(int index) {
+    //		notificationPosition = index;
+    //	}
+    //
+    //	public int getNotificationPosition() {
+    //		return notificationPosition;
+    //	}
+    public GTNote getNote() {
+        return notification;
+    }
 
-	public void setNotificationName(String name) {
-		if( name == null ) name = "";
-		notificationName = name;
-	}
-
-	public String getNotificationName() {
-		return notificationName;
-	}
-
-	public void setNotificationPosition(int index) {
-		notificationPosition = index;
-	}
-
-	public int getNotificationPosition() {
-		return notificationPosition;
-	}
+    public void setNote(GTNote container) {
+        notification = container;
+    }
 }

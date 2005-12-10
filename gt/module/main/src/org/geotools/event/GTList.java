@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,6 +12,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.event;
 
@@ -37,11 +38,11 @@ import java.util.List;
 
 
 public class GTList extends ArrayList implements List {
-	private List delegate;
-	
     private static final long serialVersionUID = -4849245752797538846L;
+    private List delegate;
     private GTComponent host;
     private String notificationName;
+
     /**
      * Package visiable constructor for test purposes
      */
@@ -54,122 +55,152 @@ public class GTList extends ArrayList implements List {
      * events).
      *
      * @param host Host for this list
+     * @param listName DOCUMENT ME!
      */
-    public GTList(GTComponent host, String listName ) {
+    public GTList(GTComponent host, String listName) {
         this.host = host;
         this.notificationName = listName;
     }
 
-
-
     /**
      * Indicate that the range has been added.
+     * 
      * <p>
-     * Performs all the book keeping but does not actually add,
-     * or fire notifications.
+     * Performs all the book keeping but does not actually add, or fire
+     * notifications.
      * </p>
+     *
+     * @param fromIndex DOCUMENT ME!
+     * @param toIndex DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
      */
-    private List deltaAdded( int fromIndex, int toIndex ){    	
+    private List deltaAdded(int fromIndex, int toIndex) {
         int position = fromIndex;
-        List range = subList( fromIndex, toIndex );
-        List added = new ArrayList( range.size() );
-    	
+        List range = subList(fromIndex, toIndex);
+        List added = new ArrayList(range.size());
+
         for (Iterator i = range.iterator(); i.hasNext(); position++) {
             Object item = i.next();
-            added.add( deltaAdded( position, item ));            
+            added.add(deltaAdded(position, item));
         }
+
         return added;
     }
-    
-    private GTDelta deltaAdded( int position, Object item ){
-    	if (item instanceof GTComponent) {
+
+    private GTDelta deltaAdded(int position, Object item) {
+        if (item instanceof GTComponent) {
             GTComponent myChild = (GTComponent) item;
-            myChild.setParent( host );
-            myChild.setNotificationName( notificationName );
-            myChild.setNotificationPosition( position );                
+            myChild.getNote().setParent(host);
+            myChild.getNote().setNotificationName(notificationName);
+            myChild.getNote().setNotificationPosition(position);
         }
-        GTDelta delta = new GTDeltaImpl(notificationName, position,
-                GTDelta.Kind.ADDED, item, null);
+
+        GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    position), GTDelta.Kind.ADDED, item, null);
+
         return delta;
     }
+
     /**
      * Indicate that the range has been moved
+     * 
      * <p>
-     * Performs all the book keeping but does not actually move,
-     * or fire notifications.
+     * Performs all the book keeping but does not actually move, or fire
+     * notifications.
      * </p>
-     */    
-    private List deltaMove( int fromIndex, int toIndex ){
-    	int position = fromIndex;
-        List rest = subList( fromIndex, toIndex );
-        List moved = new ArrayList( rest.size() );
-        
+     *
+     * @param fromIndex DOCUMENT ME!
+     * @param toIndex DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    private List deltaMove(int fromIndex, int toIndex) {
+        int position = fromIndex;
+        List rest = subList(fromIndex, toIndex);
+        List moved = new ArrayList(rest.size());
+
         for (Iterator i = rest.iterator(); i.hasNext(); position++) {
             Object item = i.next();
-            moved.add( deltaSync( position, item ));
+            moved.add(deltaSync(position, item));
         }
+
         return moved;
     }
-    
-    private GTDelta deltaSync( int position, Object item ){
-    	if (item instanceof GTComponent) {
+
+    private GTDelta deltaSync(int position, Object item) {
+        if (item instanceof GTComponent) {
             GTComponent myChild = (GTComponent) item;
-            myChild.setNotificationPosition( position );                
+            myChild.getNote().setNotificationPosition(position);
         }
-        GTDelta delta = new GTDeltaImpl(notificationName, position,
-                GTDelta.Kind.NO_CHANGE, item, null);
+
+        GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    position), GTDelta.Kind.NO_CHANGE, item, null);
+
         return delta;
     }
+
     /**
      * Indicate that the range has been removed.
+     * 
      * <p>
-     * Performs all the book keeping but does not actually remove,
-     * or fire notifications.
+     * Performs all the book keeping but does not actually remove, or fire
+     * notifications.
      * </p>
-     */    
-    private List deltaRemoved( int fromIndex, int toIndex ){
-    	
+     *
+     * @param fromIndex DOCUMENT ME!
+     * @param toIndex DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    private List deltaRemoved(int fromIndex, int toIndex) {
         int position = fromIndex;
-        List rest = subList( fromIndex, toIndex );
-        List removed = new ArrayList( rest.size() );
-        
+        List rest = subList(fromIndex, toIndex);
+        List removed = new ArrayList(rest.size());
+
         for (Iterator i = rest.iterator(); i.hasNext(); position++) {
             Object item = i.next();
-            removed.add( deltaRemoved( position, item ) );
+            removed.add(deltaRemoved(position, item));
         }
+
         return removed;
     }
-    private List deltaRemoved( Collection collection ){
-    	List removed = new ArrayList( collection.size() );        
-        for (Iterator i = collection.iterator(); i.hasNext(); ) {
+
+    private List deltaRemoved(Collection collection) {
+        List removed = new ArrayList(collection.size());
+
+        for (Iterator i = collection.iterator(); i.hasNext();) {
             Object item = i.next();
-            int position = indexOf( item );
-            removed.add( deltaRemoved( position, item ) );
+            int position = indexOf(item);
+            removed.add(deltaRemoved(position, item));
         }
+
         return removed;
     }
-    private GTDelta deltaRemoved( int position, Object item ){
-    	if (item instanceof GTComponent) {
+
+    private GTDelta deltaRemoved(int position, Object item) {
+        if (item instanceof GTComponent) {
             GTComponent myChild = (GTComponent) item;
-            myChild.setParent(GTRoot.NO_PARENT);
-            myChild.setNotificationName("");
-            myChild.setNotificationPosition( GTDelta.NO_INDEX );              
+            myChild.getNote().setParent(GTRoot.NO_PARENT);
+            myChild.getNote().setNotificationName("");
+            myChild.getNote().setNotificationPosition(GTDelta.NO_INDEX);
         }
-        GTDelta delta = new GTDeltaImpl(notificationName, position,
-                GTDelta.Kind.REMOVED, null, item );
+
+        GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    position), GTDelta.Kind.REMOVED, null, item);
+
         return delta;
-    }    
+    }
 
+    public boolean add(Object item) {
+        boolean added = super.add(item);
 
-    public boolean add(Object item ) {
-        boolean added = super.add( item );
-        
         GTDelta delta;
-        delta = deltaAdded( size()-1, item );
-        delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
-                    GTDelta.Kind.CHANGED, host, delta );        
+        delta = deltaAdded(size() - 1, item);
+        delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, delta);
         host.getParent().changed(delta);
-        
+
         return added;
     }
 
@@ -177,92 +208,102 @@ public class GTList extends ArrayList implements List {
      * Fire even when added
      *
      * @param index
-     * @param child
+     * @param item
      */
-    public void add(int index, Object item ) {
-        super.add(index, item );
-        
+    public void add(int index, Object item) {
+        super.add(index, item);
+
         GTDelta delta;
-        delta = deltaAdded( index, item );
-        delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
-                    GTDelta.Kind.CHANGED, host, delta );        
+        delta = deltaAdded(index, item);
+        delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, delta);
         host.getParent().changed(delta);
     }
 
     public boolean addAll(Collection list) {
-    	int position = isEmpty()? 0 : size()-1;
-    	boolean added = super.addAll(list);
-        
-    	List changed = deltaAdded( position, size() );
+        int position = isEmpty() ? 0 : (size() - 1);
+        boolean added = super.addAll(list);
+
+        List changed = deltaAdded(position, size());
         GTDelta delta;
-        delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
-                    GTDelta.Kind.CHANGED, host, changed );        
+        delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, changed);
         host.getParent().changed(delta);
-        
+
         return added;
     }
+
     public boolean addAll(int index, Collection list) {
-    	int start = index;
-    	int end = start+list.size();
-    	
-		boolean added = super.addAll(index, list);
-		List changed = deltaAdded( start, end );
-		changed.addAll( deltaMove( end, size() ));
-		GTDelta delta;
-        delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
-                    GTDelta.Kind.CHANGED, host, changed );        
-        host.getParent().changed(delta);        	
-		return added;
-	}
-    public void clear() {    	
-    	super.clear();
+        int start = index;
+        int end = start + list.size();
+
+        boolean added = super.addAll(index, list);
+        List changed = deltaAdded(start, end);
+        changed.addAll(deltaMove(end, size()));
+
         GTDelta delta;
-        delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
-                    GTDelta.Kind.CHANGED, host );        
-        host.getParent().changed(delta);    	
+        delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, changed);
+        host.getParent().changed(delta);
+
+        return added;
     }
-    public Object remove(int index) {    	
-    	List changed = deltaRemoved( index, index+1 );    	
-    	Object item = super.remove(index);
-    	
-    	changed.addAll( deltaMove( index, size() ));
-    	GTDelta delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
-                    GTDelta.Kind.CHANGED, host, changed );        
-        host.getParent().changed(delta);        
-    	return item;
+
+    public void clear() {
+        super.clear();
+
+        GTDelta delta;
+        delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host);
+        host.getParent().changed(delta);
     }
-    
-    public boolean remove(Object item ) {
-    	int index = indexOf( item );
-    	if( index == -1 ){
-    		return false;
-    	}
-    	remove( index );
-    	return true;        
+
+    public Object remove(int index) {
+        List changed = deltaRemoved(index, index + 1);
+        Object item = super.remove(index);
+
+        changed.addAll(deltaMove(index, size()));
+
+        GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, changed);
+        host.getParent().changed(delta);
+
+        return item;
     }
-    
+
+    public boolean remove(Object item) {
+        int index = indexOf(item);
+
+        if (index == -1) {
+            return false;
+        }
+
+        remove(index);
+
+        return true;
+    }
+
     public boolean removeAll(Collection collection) {
-    	
-    	List changed = deltaRemoved( collection );    	
-    	boolean removed = super.removeAll( collection );
-    	changed.addAll( deltaMove( 0, size() ));
-    	
-    	GTDelta delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
-                    GTDelta.Kind.CHANGED, host, changed );        
-        host.getParent().changed(delta);        
-    	return removed;
+        List changed = deltaRemoved(collection);
+        boolean removed = super.removeAll(collection);
+        changed.addAll(deltaMove(0, size()));
+
+        GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, changed);
+        host.getParent().changed(delta);
+
+        return removed;
     }
-    
-    protected void removeRange(int fromIndex, int toIndex) {    	
-    	List changed = deltaRemoved( fromIndex, toIndex );
-    	
-    	super.removeRange(fromIndex, toIndex);
-    	
-    	changed.addAll( deltaMove( 0, size() ));
-    	
-    	GTDelta delta = new GTDeltaImpl(notificationName, GTDelta.NO_INDEX,
-                    GTDelta.Kind.CHANGED, host, changed );        
-        host.getParent().changed(delta);        
+
+    protected void removeRange(int fromIndex, int toIndex) {
+        List changed = deltaRemoved(fromIndex, toIndex);
+
+        super.removeRange(fromIndex, toIndex);
+
+        changed.addAll(deltaMove(0, size()));
+
+        GTDelta delta = new GTDeltaImpl(new GTNoteImpl(notificationName,
+                    GTDelta.NO_INDEX), GTDelta.Kind.CHANGED, host, changed);
+        host.getParent().changed(delta);
     }
-    
 }

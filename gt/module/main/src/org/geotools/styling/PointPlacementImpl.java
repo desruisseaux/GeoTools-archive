@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  *    Geotools - OpenSource mapping toolkit
  *    (C) 2002, Centre for Computational Geography
  *
@@ -19,6 +35,7 @@
  */
 package org.geotools.styling;
 
+
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
 import org.geotools.resources.Utilities;
@@ -26,23 +43,27 @@ import org.opengis.util.Cloneable;
 
 
 /**
- * @version $Id: PointPlacementImpl.java,v 1.10 2003/09/06 04:52:31 seangeo Exp $
+ * DOCUMENT ME!
+ *
  * @author Ian Turton, CCG
+ * @version $Id: PointPlacementImpl.java,v 1.10 2003/09/06 04:52:31 seangeo Exp $
  */
-public class PointPlacementImpl extends AbstractGTComponent implements PointPlacement, Cloneable {
-    /**
-     * The logger for the default core module.
-     */
-    private static final java.util.logging.Logger LOGGER = 
-            java.util.logging.Logger.getLogger("org.geotools.core");
+public class PointPlacementImpl extends AbstractGTComponent
+    implements PointPlacement, Cloneable {
+    /** The logger for the default core module. */
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
+        .getLogger("org.geotools.core");
+
     // TODO: make container ready
-    private static final org.geotools.filter.FilterFactory filterFactory = 
-            org.geotools.filter.FilterFactoryFinder.createFilterFactory();
+    private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactoryFinder
+        .createFilterFactory();
     private AnchorPoint anchorPoint = new AnchorPointImpl();
     private Displacement displacement = new DisplacementImpl();
     private org.geotools.filter.Expression rotation = null;
 
-    /** Creates a new instance of DefaultPointPlacement */
+    /**
+     * Creates a new instance of DefaultPointPlacement
+     */
     public PointPlacementImpl() {
         try {
             rotation = filterFactory.createLiteralExpression(new Integer(0));
@@ -55,6 +76,7 @@ public class PointPlacementImpl extends AbstractGTComponent implements PointPlac
      * Returns the AnchorPoint which identifies the location inside a text
      * label to use as an "anchor" for positioning it relative to a point
      * geometry.
+     *
      * @return Label's AnchorPoint.
      */
     public org.geotools.styling.AnchorPoint getAnchorPoint() {
@@ -63,6 +85,7 @@ public class PointPlacementImpl extends AbstractGTComponent implements PointPlac
 
     /**
      * Setter for property anchorPoint.
+     *
      * @param anchorPoint New value of property anchorPoint.
      */
     public void setAnchorPoint(org.geotools.styling.AnchorPoint anchorPoint) {
@@ -71,12 +94,14 @@ public class PointPlacementImpl extends AbstractGTComponent implements PointPlac
         } else {
             this.anchorPoint = anchorPoint;
         }
+
         fireChanged();
     }
 
     /**
-     * Returns the Displacement which gives X and Y offset displacements
-     * to use for rendering a text label near a point.
+     * Returns the Displacement which gives X and Y offset displacements to use
+     * for rendering a text label near a point.
+     *
      * @return The label displacement.
      */
     public Displacement getDisplacement() {
@@ -85,7 +110,7 @@ public class PointPlacementImpl extends AbstractGTComponent implements PointPlac
 
     /**
      * Setter for property displacement.
-     * 
+     *
      * @param displacement New value of property displacement.
      */
     public void setDisplacement(Displacement displacement) {
@@ -94,11 +119,13 @@ public class PointPlacementImpl extends AbstractGTComponent implements PointPlac
         } else {
             this.displacement = displacement;
         }
+
         fireChanged();
     }
 
     /**
      * Returns the rotation of the label.
+     *
      * @return The rotation of the label.
      */
     public org.geotools.filter.Expression getRotation() {
@@ -107,25 +134,28 @@ public class PointPlacementImpl extends AbstractGTComponent implements PointPlac
 
     /**
      * Setter for property rotation.
+     *
      * @param rotation New value of property rotation.
      */
     public void setRotation(org.geotools.filter.Expression rotation) {
         this.rotation = rotation;
         fireChanged();
     }
-    
+
     public void accept(StyleVisitor visitor) {
         visitor.visit(this);
-     }
-    
+    }
+
     /* (non-Javadoc)
      * @see Cloneable#clone()
      */
     public Object clone() {
         try {
             PointPlacementImpl clone = (PointPlacementImpl) super.clone();
-            clone.anchorPoint = (AnchorPoint) ((Cloneable)anchorPoint).clone();
-            clone.displacement = (Displacement) ((Cloneable)displacement).clone();
+            clone.anchorPoint = (AnchorPoint) ((Cloneable) anchorPoint).clone();
+            clone.displacement = (Displacement) ((Cloneable) displacement)
+                .clone();
+
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Won't happen");
@@ -139,14 +169,15 @@ public class PointPlacementImpl extends AbstractGTComponent implements PointPlac
         if (this == obj) {
             return true;
         }
-        
+
         if (obj instanceof PointPlacementImpl) {
             PointPlacementImpl other = (PointPlacementImpl) obj;
-            return Utilities.equals(anchorPoint, other.anchorPoint) &&
-                   Utilities.equals(displacement, other.displacement) &&
-                   Utilities.equals(rotation, other.rotation);
+
+            return Utilities.equals(anchorPoint, other.anchorPoint)
+            && Utilities.equals(displacement, other.displacement)
+            && Utilities.equals(rotation, other.rotation);
         }
-        
+
         return false;
     }
 
@@ -156,20 +187,19 @@ public class PointPlacementImpl extends AbstractGTComponent implements PointPlac
     public int hashCode() {
         final int PRIME = 37;
         int result = 17;
-        
+
         if (anchorPoint != null) {
-            result = result * PRIME + anchorPoint.hashCode();
+            result = (result * PRIME) + anchorPoint.hashCode();
         }
-        
+
         if (displacement != null) {
-            result = result * PRIME + displacement.hashCode();
+            result = (result * PRIME) + displacement.hashCode();
         }
-        
+
         if (rotation != null) {
-            result = result * PRIME + rotation.hashCode();
+            result = (result * PRIME) + rotation.hashCode();
         }
-        
+
         return result;
     }
-
 }

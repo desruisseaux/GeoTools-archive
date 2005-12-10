@@ -178,7 +178,7 @@ public class Styles {
 //		}
 		GTComponent parent = oldStyle.getParent();
 		oldStyle = newStyle;
-		oldStyle.setParent(parent);
+		oldStyle.getNote().setParent(parent);
 		//TODO: fire event
 //		parent.changed(new GTDeltaImpl(?, ?) {
 //			//fireChildChanged(oldStyle)

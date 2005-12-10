@@ -16,14 +16,14 @@
  */
 package org.geotools.styling;
 
-// J2SE depedencies
-import java.util.Arrays;
-
 import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.opengis.util.Cloneable;
+
+// J2SE depedencies
+import java.util.Arrays;
 
 
 /**
@@ -33,8 +33,9 @@ import org.opengis.util.Cloneable;
  * @author James Macgill, CCG
  * @version $Id: StrokeImpl.java,v 1.14 2003/09/06 04:52:31 seangeo Exp $
  */
-public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable {
-    private FilterFactory filterFactory;    
+public class StrokeImpl extends AbstractGTComponent implements Stroke,
+    Cloneable {
+    private FilterFactory filterFactory;
     private Expression color;
     private float[] dashArray;
     private Expression dashOffset;
@@ -49,13 +50,15 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
      * Creates a new instance of Stroke
      */
     protected StrokeImpl() {
-    	this( FilterFactoryFinder.createFilterFactory() );
+        this(FilterFactoryFinder.createFilterFactory());
     }
-    protected StrokeImpl( FilterFactory factory  ){
-    	filterFactory = factory; 
+
+    protected StrokeImpl(FilterFactory factory) {
+        filterFactory = factory;
     }
-    public void setFilterFactory( FilterFactory factory ){
-    	filterFactory = factory;
+
+    public void setFilterFactory(FilterFactory factory) {
+        filterFactory = factory;
     }
 
     /**
@@ -86,16 +89,21 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
      *
      * @param color The color of the stroke encoded as a hexidecimal RGB value.
      *        This must not be null.
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
      */
     public void setColor(Expression color) {
         if (color == null) {
-        	throw new IllegalArgumentException("Color must be provided");
+            throw new IllegalArgumentException("Color must be provided");
         }
-    	if (this.color == color) return;
-    	
-    	Expression old = this.color;
-    	this.color = color;
-    	fireChildChanged("color",color, old);
+
+        if (this.color == color) {
+            return;
+        }
+
+        Expression old = this.color;
+        this.color = color;
+        fireChildChanged("color", color, old);
     }
 
     /**
@@ -171,16 +179,17 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
     /**
      * This param determines where the dash pattern should start from.
      *
-     * @param offset The distance into the dash pattern that should act as the
-     *        start.
+     * @param dashOffset The distance into the dash pattern that should act as
+     *        the start.
      */
     public void setDashOffset(Expression dashOffset) {
         if (dashOffset == null) {
             return;
         }
+
         Expression old = this.dashOffset;
         this.dashOffset = dashOffset;
-        fireChildChanged( "dashOffset", dashOffset, old );
+        fireChildChanged("dashOffset", dashOffset, old);
     }
 
     /**
@@ -198,15 +207,18 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
      * This parameter indicates that a stipple-fill repeated graphic will be
      * used and specifies the fill graphic to use.
      *
-     * @param graphic The graphic to use as a stipple fill. If null, then no
-     *        Stipple fill should be used.
+     * @param fillGraphic The graphic to use as a stipple fill. If null, then
+     *        no Stipple fill should be used.
      */
     public void setGraphicFill(Graphic fillGraphic) {
-    	if( this.fillGraphic == fillGraphic ) return;
-    	Graphic old = this.fillGraphic;
-    	
+        if (this.fillGraphic == fillGraphic) {
+            return;
+        }
+
+        Graphic old = this.fillGraphic;
+
         this.fillGraphic = fillGraphic;
-        fireChildChanged( "fillGraphic", fillGraphic, old );
+        fireChildChanged("fillGraphic", fillGraphic, old);
     }
 
     /**
@@ -234,13 +246,16 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
      * assumed to be the middle pixel row of the image, starting from the
      * first pixel column and ending at the last pixel column.
      *
-     * @param graphic The graphic to use as a linear graphic. If null, then no
-     *        graphic stroke should be used.
+     * @param strokeGraphic The graphic to use as a linear graphic. If null,
+     *        then no graphic stroke should be used.
      */
     public void setGraphicStroke(Graphic strokeGraphic) {
-    	if( this.strokeGraphic == strokeGraphic ) return;
-    	Graphic old = this.strokeGraphic;
-    	this.strokeGraphic = strokeGraphic;
+        if (this.strokeGraphic == strokeGraphic) {
+            return;
+        }
+
+        Graphic old = this.strokeGraphic;
+        this.strokeGraphic = strokeGraphic;
         fireChildChanged("strokeGraphic", strokeGraphic, old);
     }
 
@@ -257,16 +272,17 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
     /**
      * This parameter controls how line strings should be capped.
      *
-     * @param cap The cap style. This can be one of "butt", "round" and
+     * @param lineCap The cap style. This can be one of "butt", "round" and
      *        "square" There is no defined default.
      */
     public void setLineCap(Expression lineCap) {
         if (lineCap == null) {
             return;
         }
+
         Expression old = this.lineCap;
         this.lineCap = lineCap;
-        fireChildChanged( "lineCap", lineCap, old );
+        fireChildChanged("lineCap", lineCap, old);
     }
 
     /**
@@ -282,16 +298,17 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
     /**
      * This parameter controls how line strings should be joined together.
      *
-     * @param join The join style.  This will be one of "mitre", "round" and
-     *        "bevel". There is no defined default.
+     * @param lineJoin The join style.  This will be one of "mitre", "round"
+     *        and "bevel". There is no defined default.
      */
     public void setLineJoin(Expression lineJoin) {
         if (lineJoin == null) {
             return;
         }
+
         Expression old = this.lineJoin;
-        this.lineJoin = lineJoin;        
-        fireChildChanged( "lineJoin", lineJoin, old );
+        this.lineJoin = lineJoin;
+        fireChildChanged("lineJoin", lineJoin, old);
     }
 
     /**
@@ -317,16 +334,17 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
      * For example, "0.65" would represent 65% opacity. The default value is
      * 1.0 (opaque).
      *
-     * @param level The opacity of the stroke, where 0.0 is completely
+     * @param opacity The opacity of the stroke, where 0.0 is completely
      *        transparent and 1.0 is completely opaque.
      */
     public void setOpacity(Expression opacity) {
         if (opacity == null) {
             return;
         }
+
         Expression old = this.opacity;
         this.opacity = opacity;
-        fireChildChanged( "opacity", opacity, old );
+        fireChildChanged("opacity", opacity, old);
     }
 
     /**
@@ -346,16 +364,17 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
      * encoded as a float. The default is 1.0.  Fractional numbers are allowed
      * but negative numbers are not.
      *
-     * @param expr The width of the stroke in pixels.  This may be fractional
+     * @param width The width of the stroke in pixels.  This may be fractional
      *        but not negative.
      */
     public void setWidth(Expression width) {
         if (width == null) {
             return;
-        }        
+        }
+
         Expression old = width;
         this.width = width;
-        fireChildChanged( "width", width, old);
+        fireChildChanged("width", width, old);
     }
 
     public String toString() {
@@ -403,11 +422,12 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke, Cloneable
             }
 
             if (fillGraphic != null) {
-                clone.fillGraphic = (Graphic) ((Cloneable)fillGraphic).clone();
+                clone.fillGraphic = (Graphic) ((Cloneable) fillGraphic).clone();
             }
 
             if (strokeGraphic != null) {
-                clone.strokeGraphic = (Graphic) ((Cloneable)strokeGraphic).clone();
+                clone.strokeGraphic = (Graphic) ((Cloneable) strokeGraphic)
+                    .clone();
             }
 
             return clone;

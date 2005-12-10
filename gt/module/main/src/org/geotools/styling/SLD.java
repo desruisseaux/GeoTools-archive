@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,6 +12,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.styling;
 
@@ -1191,12 +1192,17 @@ public class SLD {
 
     /**
      * This method is here for backwards compatability.
-     * 
-     * @deprecated
+     *
+     * @param expr DOCUMENT ME!
+     * @param TYPE DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
      * @see org.geotools.filter.Filters#value(Expression, Class)
+     * @deprecated
      */
     public static Object value(Expression expr, Class TYPE) {
-    	return Filters.value(expr,TYPE);
+        return Filters.value(expr, TYPE);
     }
 
     /**
@@ -1242,19 +1248,27 @@ public class SLD {
 
     /**
      * This method is here for backward compatability.
-     * 
-     * @deprecated
+     *
+     * @param expr DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
      * @see Filters#intValue(Expression)
+     * @deprecated
      */
     public static int intValue(Expression expr) {
-       return Filters.intValue(expr);
+        return Filters.intValue(expr);
     }
 
     /**
      * This method is here for backward compatability.
-     * 
-     * @deprecated
+     *
+     * @param expr DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
      * @see Filters#stringValue(Expression)
+     * @deprecated
      */
     public static String stringValue(Expression expr) {
         return Filters.stringValue(expr);
@@ -1262,19 +1276,27 @@ public class SLD {
 
     /**
      * This method is here for backward compatability.
-     * 
-     * @deprecated
+     *
+     * @param expr DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
      * @see Filters#doubleValue(Expression)
+     * @deprecated
      */
     public static double doubleValue(Expression expr) {
-       return Filters.doubleValue(expr);
+        return Filters.doubleValue(expr);
     }
 
     /**
      * This method is here for backward compatability.
-     * 
-     * @deprecated
+     *
+     * @param expr DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
      * @see Filters#number(Expression)
+     * @deprecated
      */
     public static Number number(Expression expr) {
         return Filters.number(expr);
@@ -1402,8 +1424,8 @@ public class SLD {
      * @param styles Array of style objects.
      * @param schema Feature schema.
      *
-     * @return The first object to match the feature type, otherwise null if
-     *         no match.
+     * @return The first object to match the feature type, otherwise null if no
+     *         match.
      */
     public static Style matchingStyle(Style[] styles, FeatureType schema) {
         if ((styles == null) || (styles.length == 0)) {

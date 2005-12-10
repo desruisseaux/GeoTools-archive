@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,13 +12,13 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.event;
 
-import java.util.EventObject;
-
 import org.geotools.event.GTDelta;
 import org.geotools.event.GTEvent;
+import java.util.EventObject;
 
 
 /**
@@ -39,22 +39,27 @@ import org.geotools.event.GTEvent;
  *
  * @since 2.2.M3
  */
-public class GTEventImpl extends EventObject implements GTEvent {	
-	private static final long serialVersionUID = -5304196462694574579L;
-	private GTDelta delta;
+public class GTEventImpl extends EventObject implements GTEvent {
+    private static final long serialVersionUID = -5304196462694574579L;
+    private GTDelta delta;
     private Type type;
 
-	public GTEventImpl(GTRoot source) {
-		this( source, new GTDeltaImpl("", GTDelta.NO_INDEX, GTDelta.Kind.CHANGED,source,null));
-	}
-	public GTEventImpl(GTRoot source, GTDelta delta) {
-		this( source, Type.POST_CHANGE, delta );
-	}
-	public GTEventImpl(GTRoot source, Type type, GTDelta delta) {
-		super(source);
-		this.type = type;
-		this.delta = delta;
-	}	
+    public GTEventImpl(GTRoot source) {
+        this(source,
+            new GTDeltaImpl(new GTNoteImpl("", GTDelta.NO_INDEX),
+                GTDelta.Kind.CHANGED, source, null));
+    }
+
+    public GTEventImpl(GTRoot source, GTDelta delta) {
+        this(source, Type.POST_CHANGE, delta);
+    }
+
+    public GTEventImpl(GTRoot source, Type type, GTDelta delta) {
+        super(source);
+        this.type = type;
+        this.delta = delta;
+    }
+
     /**
      * Returns a delta, rooted at style, describing the set of changes that
      * happened. Returns <code>null</code> if not applicable to this type of
@@ -65,7 +70,7 @@ public class GTEventImpl extends EventObject implements GTEvent {
     public GTDelta getDelta() {
         return delta;
     }
-    
+
     /**
      * Returns the type of event being reported.
      *

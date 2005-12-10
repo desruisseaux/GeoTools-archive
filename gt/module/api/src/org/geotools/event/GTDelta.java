@@ -178,7 +178,7 @@ public interface GTDelta {
      * 
      * @return Position in "list" or NO_INDEX.
      */
-    public int getPoisition();
+    public int getPosition();
     
     /**
      * Name of property being affected.

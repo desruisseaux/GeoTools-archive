@@ -112,7 +112,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     		//add the style
     		this.styles.add( styles[i] );
             //set the parent
-    		styles[i].setParent(this);
+    		styles[i].getNote().setParent(this);
     	}
     	fireChanged(); // TODO: Handle Style List
     }    

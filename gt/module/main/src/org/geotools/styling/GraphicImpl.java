@@ -35,16 +35,16 @@
  */
 package org.geotools.styling;
 
-// J2SE dependencies
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
+
+// J2SE dependencies
+import java.util.ArrayList;
+import java.util.Iterator;
 
 
 /**
@@ -53,10 +53,11 @@ import org.opengis.util.Cloneable;
  * @author Ian Turton, CCG
  * @version $Id: GraphicImpl.java,v 1.20 2004/02/12 11:17:04 aaime Exp $
  */
-public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneable {
+public class GraphicImpl extends AbstractGTComponent implements Graphic,
+    Cloneable {
     /** The logger for the default core module. */
-    private static final java.util.logging.Logger LOGGER = 
-            java.util.logging.Logger.getLogger("org.geotools.core");
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
+        .getLogger("org.geotools.core");
     private FilterFactory filterFactory;
     private String geometryPropertyName = "";
     private java.util.List externalGraphics = new java.util.ArrayList();
@@ -71,28 +72,28 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
      * Creates a new instance of DefaultGraphic
      */
     protected GraphicImpl() {
-    	this( FilterFactoryFinder.createFilterFactory() );
+        this(FilterFactoryFinder.createFilterFactory());
     }
 
     public GraphicImpl(FilterFactory factory) {
-		filterFactory = factory;
-	}
-    public void setFilterFactory( FilterFactory factory ){
-    	filterFactory = factory;
+        filterFactory = factory;
+    }
+
+    public void setFilterFactory(FilterFactory factory) {
+        filterFactory = factory;
     }
 
     /**
      * Convenience method for logging a message with an exception.
      *
-     * @param method the name of the calling method 
+     * @param method the name of the calling method
      * @param message the error message
      * @param exception The exception thrown
      */
-    private static void severe(final String method, final String message, 
-                               final Exception exception) {
-        final java.util.logging.LogRecord record = new java.util.logging.LogRecord(
-                                                           java.util.logging.Level.SEVERE, 
-                                                           message);
+    private static void severe(final String method, final String message,
+        final Exception exception) {
+        final java.util.logging.LogRecord record = new java.util.logging.LogRecord(java.util.logging.Level.SEVERE,
+                message);
         record.setSourceMethodName(method);
         record.setThrown(exception);
         LOGGER.log(record);
@@ -112,8 +113,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
         ExternalGraphic[] ret = null;
 
         if (externalGraphics.size() > 0) {
-            ret = (ExternalGraphic[]) externalGraphics.toArray(
-                            new ExternalGraphic[0]);
+            ret = (ExternalGraphic[]) externalGraphics.toArray(new ExternalGraphic[0]);
         }
 
         return ret;
@@ -121,20 +121,23 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
 
     public void setExternalGraphics(ExternalGraphic[] externalGraphics) {
         this.externalGraphics.clear();
-        
-        for(int i = 0; i < symbols.size(); ) {
+
+        for (int i = 0; i < symbols.size();) {
             Object symbol = symbols.get(i);
-            if(symbol instanceof ExternalGraphic) {
+
+            if (symbol instanceof ExternalGraphic) {
                 symbols.remove(i);
             } else {
                 i++;
             }
         }
-        if(externalGraphics != null) {
+
+        if (externalGraphics != null) {
             for (int i = 0; i < externalGraphics.length; i++) {
                 addExternalGraphic(externalGraphics[i]);
             }
         }
+
         fireChanged();
     }
 
@@ -164,10 +167,11 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
 
     public void setMarks(Mark[] marks) {
         this.marks.clear();
-        
-        for(int i = 0; i < symbols.size(); ) {
+
+        for (int i = 0; i < symbols.size();) {
             Object symbol = symbols.get(i);
-            if(symbol instanceof Mark) {
+
+            if (symbol instanceof Mark) {
                 symbols.remove(i);
             } else {
                 i++;
@@ -177,6 +181,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
         for (int i = 0; i < marks.length; i++) {
             addMark(marks[i]);
         }
+
         fireChanged();
     }
 
@@ -216,11 +221,12 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
     public void setSymbols(Symbol[] symbols) {
         this.symbols.clear();
 
-        if(symbols != null) {
+        if (symbols != null) {
             for (int i = 0; i < symbols.length; i++) {
                 addSymbol(symbols[i]);
             }
         }
+
         fireChanged();
     }
 
@@ -269,7 +275,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
     /**
      * This paramteter gives the absolute size of the graphic in pixels encoded
      * as a floating point number.
-     *
+     * 
      * <p>
      * The default size of an image format (such as GIFD) is the inherent size
      * of the image.  The default size of a format without an inherent size
@@ -285,16 +291,15 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
     public Expression getSize() {
         return size;
     }
-    
-      
-    public Displacement getDisplacement(){
+
+    public Displacement getDisplacement() {
         return displacement;
     }
-    
-    public void setDisplacement(Displacement offset){
-    	Displacement old = this.displacement;
+
+    public void setDisplacement(Displacement offset) {
+        Displacement old = this.displacement;
         this.displacement = offset;
-        fireChildChanged( "offset", offset, old );
+        fireChildChanged("offset", offset, old);
     }
 
     /**
@@ -303,15 +308,13 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
      * @param opacity New value of property opacity.
      */
     public void setOpacity(Expression opacity) {
-    	Expression old = opacity;
+        Expression old = opacity;
         this.opacity = opacity;
-        fireChildChanged( "opacity", opacity, old );
+        fireChildChanged("opacity", opacity, old);
     }
 
     public void setOpacity(double opacity) {
-        setOpacity(
-    			filterFactory.createLiteralExpression( opacity )
-    	);
+        setOpacity(filterFactory.createLiteralExpression(opacity));
     }
 
     /**
@@ -320,18 +323,20 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
      * @param rotation New value of property rotation.
      */
     public void setRotation(Expression rotation) {
-    	Expression old = this.rotation;
+        Expression old = this.rotation;
         this.rotation = rotation;
 
         java.util.Iterator iter = marks.iterator();
+
         while (iter.hasNext()) {
             ((MarkImpl) iter.next()).setRotation(rotation);
-        }        
-        fireChildChanged( "rotation", rotation, old );
+        }
+
+        fireChildChanged("rotation", rotation, old);
     }
 
     public void setRotation(double rotation) {
-        setRotation(filterFactory.createLiteralExpression( rotation ));        
+        setRotation(filterFactory.createLiteralExpression(rotation));
     }
 
     /**
@@ -340,7 +345,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
      * @param size New value of property size.
      */
     public void setSize(Expression size) {
-    	Expression old = this.size;
+        Expression old = this.size;
         this.size = size;
 
         java.util.Iterator iter = marks.iterator();
@@ -348,11 +353,12 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
         while (iter.hasNext()) {
             ((MarkImpl) iter.next()).setSize(size);
         }
-        fireChildChanged( "size", size, old );
+
+        fireChildChanged("size", size, old);
     }
 
     public void setSize(int size) {
-        setSize(filterFactory.createLiteralExpression( size ));        
+        setSize(filterFactory.createLiteralExpression(size));
     }
 
     public void setGeometryPropertyName(String name) {
@@ -368,78 +374,91 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
     public java.lang.String getGeometryPropertyName() {
         return geometryPropertyName;
     }
-    
+
     public void accept(StyleVisitor visitor) {
         visitor.visit(this);
     }
-    
-    /** Creates a deep copy clone. 
-     *  
+
+    /**
+     * Creates a deep copy clone.
+     *
      * @return The deep copy clone.
-     * 
+     *
+     * @throws RuntimeException DOCUMENT ME!
      */
-    public Object clone()  {
+    public Object clone() {
         GraphicImpl clone;
+
         try {
             clone = (GraphicImpl) super.clone();
             clone.marks = new ArrayList();
             clone.externalGraphics = new ArrayList();
             clone.symbols = new ArrayList();
-            
+
             // Because ExternalGraphics and Marks are stored twice
             // and we only want to clone them once, we should use
             // the setter methods to place them in the proper lists
             for (Iterator iter = externalGraphics.iterator(); iter.hasNext();) {
                 ExternalGraphic exGraphic = (ExternalGraphic) iter.next();
-                clone.addExternalGraphic((ExternalGraphic) ((Cloneable)exGraphic).clone());
+                clone.addExternalGraphic((ExternalGraphic) ((Cloneable) exGraphic)
+                    .clone());
             }
-            
+
             for (Iterator iter = marks.iterator(); iter.hasNext();) {
                 Mark mark = (Mark) iter.next();
-                clone.addMark((Mark) ((Cloneable)mark).clone());
+                clone.addMark((Mark) ((Cloneable) mark).clone());
             }
-            
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e); // this should never happen.
         }
+
         return clone;
     }
-    
-    /** Override of hashcode
-     * 
-     *  @return The hashcode.
+
+    /**
+     * Override of hashcode
+     *
+     * @return The hashcode.
      */
     public int hashCode() {
         final int PRIME = 1000003;
         int result = 0;
+
         if (geometryPropertyName != null) {
-            result = PRIME * result + geometryPropertyName.hashCode();
+            result = (PRIME * result) + geometryPropertyName.hashCode();
         }
+
         if (symbols != null) {
-            result = PRIME * result + symbols.hashCode();
+            result = (PRIME * result) + symbols.hashCode();
         }
+
         if (rotation != null) {
-            result = PRIME * result + rotation.hashCode();
+            result = (PRIME * result) + rotation.hashCode();
         }
+
         if (size != null) {
-            result = PRIME * result + size.hashCode();
+            result = (PRIME * result) + size.hashCode();
         }
+
         if (opacity != null) {
-            result = PRIME * result + opacity.hashCode();
+            result = (PRIME * result) + opacity.hashCode();
         }
 
         return result;
     }
 
-    /** Compares this GraphicImpl with another for equality.
+    /**
+     * Compares this GraphicImpl with another for equality.
      * 
-     *  <p>Two graphics are equal if and only if they both
-     *  have the same geometry property name and the same list
-     *  of symbols and the same rotation, size and opacity.
-     * 
+     * <p>
+     * Two graphics are equal if and only if they both have the same geometry
+     * property name and the same list of symbols and the same rotation, size
+     * and opacity.
+     * </p>
+     *
      * @param oth The other GraphicsImpl to compare with.
-     * @return True if this is equal to oth according to the above
-     * conditions.
+     *
+     * @return True if this is equal to oth according to the above conditions.
      */
     public boolean equals(Object oth) {
         if (this == oth) {
@@ -448,14 +467,15 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic, Cloneab
 
         if (oth instanceof GraphicImpl) {
             GraphicImpl other = (GraphicImpl) oth;
-            return Utilities.equals(this.geometryPropertyName, other.geometryPropertyName) &&
-                   Utilities.equals(this.size, other.size) &&
-                   Utilities.equals(this.rotation, other.rotation) &&
-                   Utilities.equals(this.opacity, other.opacity) &&
-                   Utilities.equals(this.symbols, other.symbols);
+
+            return Utilities.equals(this.geometryPropertyName,
+                other.geometryPropertyName)
+            && Utilities.equals(this.size, other.size)
+            && Utilities.equals(this.rotation, other.rotation)
+            && Utilities.equals(this.opacity, other.opacity)
+            && Utilities.equals(this.symbols, other.symbols);
         }
-        
+
         return false;
     }
-
 }

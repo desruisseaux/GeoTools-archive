@@ -54,21 +54,25 @@ public interface GTComponent {
 	 */
 	GTComponent getParent();
 
-	/**
-	 * Used to set the parent, and associated placement information.
-	 * 
-	 * @param newParent GTComponent or NULLGTRoot if none
-	 */
-	void setParent(GTComponent newParent );		
+//	/**
+//	 * Used to set the parent, and associated placement information.
+//	 * 
+//	 * @param newParent GTComponent or NULLGTRoot if none
+//	 */
+//	void setParent(GTComponent newParent );		
+//	
+//	/** Indicate name used during notification */
+//	public void setNotificationName( String name );
+//	/** Indicate name used during notification */	
+//	public String getNotificationName();
+//	/** Indicate name position used during notification */	
+//	public void setNotificationPosition( int index );
+//	/** Indicate position used during notification */	
+//	public int getNotificationPosition();
 	
-	/** Indicate name used during notification */
-	public void setNotificationName( String name );
-	/** Indicate name used during notification */	
-	public String getNotificationName();
-	/** Indicate name position used during notification */	
-	public void setNotificationPosition( int index );
-	/** Indicate position used during notification */	
-	public int getNotificationPosition();
+	public GTNote getNote();
+	
+	public void setNote(GTNote container);
 	
 	/**
 	 * A child has been removed, issued before change.

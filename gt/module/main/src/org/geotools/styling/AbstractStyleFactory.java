@@ -16,18 +16,16 @@
  */
 package org.geotools.styling;
 
+import org.geotools.filter.Expression;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
-
-import org.geotools.filter.Expression;
 
 
 /**
  * Abstract base class for implementing style factories.
  */
 public abstract class AbstractStyleFactory implements StyleFactory {
-
     public abstract TextSymbolizer createTextSymbolizer(Fill fill,
         Font[] fonts, Halo halo, Expression label,
         LabelPlacement labelPlacement, String geometryPropertyName);
@@ -160,8 +158,6 @@ public abstract class AbstractStyleFactory implements StyleFactory {
      *
      * @return The completed stroke.
      *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     *
      * @see org.geotools.stroke
      */
     public abstract Stroke createStroke(Expression color, Expression width,
@@ -202,7 +198,7 @@ public abstract class AbstractStyleFactory implements StyleFactory {
         Expression enhancement);
 
     public abstract ColorMap createColorMap();
-    
+
     public abstract ColorMapEntry createColorMapEntry();
 
     public abstract Style getDefaultStyle();
@@ -235,8 +231,10 @@ public abstract class AbstractStyleFactory implements StyleFactory {
     public abstract PointPlacement getDefaultPointPlacement();
 
     /**
-     * Returns implementation hints for this factory.
-     * The default implementation returns an empty map.
+     * Returns implementation hints for this factory. The default
+     * implementation returns an empty map.
+     *
+     * @return DOCUMENT ME!
      */
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;

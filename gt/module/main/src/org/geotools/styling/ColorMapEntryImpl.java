@@ -27,10 +27,12 @@ import org.geotools.filter.FilterFactoryFinder;
  *
  * @author aaime
  */
-public class ColorMapEntryImpl extends AbstractGTComponent implements ColorMapEntry {
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(
-            "org.geotools.core");
-    private static final FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
+public class ColorMapEntryImpl extends AbstractGTComponent
+    implements ColorMapEntry {
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
+        .getLogger("org.geotools.core");
+    private static final FilterFactory filterFactory = FilterFactoryFinder
+        .createFilterFactory();
     private Expression quantity;
     private Expression opacity;
     private Expression color;

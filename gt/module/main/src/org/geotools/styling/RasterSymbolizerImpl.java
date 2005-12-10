@@ -32,9 +32,11 @@ import org.geotools.filter.FilterFactoryFinder;
  *
  * @author iant
  */
-public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterSymbolizer {
-	// TODO: make container ready
-    private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
+public class RasterSymbolizerImpl extends AbstractGTComponent
+    implements RasterSymbolizer {
+    // TODO: make container ready
+    private FilterFactory filterFactory = FilterFactoryFinder
+        .createFilterFactory();
     private ChannelSelection channelSelection = new ChannelSelectionImpl();
     private ColorMap colorMap = new ColorMapImpl();
     private ContrastEnhancement contrastEnhancement = new ContrastEnhancementImpl();
@@ -225,10 +227,13 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      * @param channel the channel selected
      */
     public void setChannelSelection(ChannelSelection channel) {
-    	if( this.channelSelection == channel ) return;
-    	ChannelSelection old = this.channelSelection;
-    	this.channelSelection = channel;
-    	fireChildChanged( "channelSelection", channel, old );    
+        if (this.channelSelection == channel) {
+            return;
+        }
+
+        ChannelSelection old = this.channelSelection;
+        this.channelSelection = channel;
+        fireChildChanged("channelSelection", channel, old);
     }
 
     /**
@@ -248,10 +253,13 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      * @param colorMap the ColorMap for the raster
      */
     public void setColorMap(ColorMap colorMap) {
-    	if (this.colorMap == colorMap) return;
-		ColorMap old = colorMap;
-    	this.colorMap = colorMap;
-    	fireChildChanged("colorMap",colorMap, old);    
+        if (this.colorMap == colorMap) {
+            return;
+        }
+
+        ColorMap old = colorMap;
+        this.colorMap = colorMap;
+        fireChildChanged("colorMap", colorMap, old);
     }
 
     /**
@@ -270,13 +278,16 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      * of Normalize, Histogram, or GammaValue are selected in a
      * ContrastEnhancement, then no enhancement is performed.
      *
-     * @param cEnhancement the contrastEnhancement
+     * @param contrastEnhancement the contrastEnhancement
      */
     public void setContrastEnhancement(ContrastEnhancement contrastEnhancement) {
-    	if( this.contrastEnhancement == contrastEnhancement ) return;
-    	ContrastEnhancement old = this.contrastEnhancement;
-    	this.contrastEnhancement = contrastEnhancement;
-    	fireChildChanged( "contrastEnhancement", contrastEnhancement, old );    
+        if (this.contrastEnhancement == contrastEnhancement) {
+            return;
+        }
+
+        ContrastEnhancement old = this.contrastEnhancement;
+        this.contrastEnhancement = contrastEnhancement;
+        fireChildChanged("contrastEnhancement", contrastEnhancement, old);
     }
 
     /**
@@ -286,14 +297,16 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      * transformations are also system-dependent and it is assumed that this
      * capability will be little used.
      *
-     * @param geometryPropertyName the name of the Geometry
+     * @param geometryName the name of the Geometry
      */
     public void setGeometryPropertyName(String geometryName) {
-        if( this.geometryName == geometryName ) return;
-        
+        if (this.geometryName == geometryName) {
+            return;
+        }
+
         String old = this.geometryName;
-    	this.geometryName = geometryName;
-        fireChildChanged( "geometryName", geometryName, old );
+        this.geometryName = geometryName;
+        fireChildChanged("geometryName", geometryName, old);
     }
 
     /**
@@ -319,17 +332,22 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      * @param symbolizer the symbolizer to be used. If this is <B>not</B> a
      *        polygon or a line symbolizer an unexpected argument exception
      *        may be thrown by an implementing class.
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
      */
     public void setImageOutline(Symbolizer symbolizer) {
-        if (symbolizer instanceof LineSymbolizer || symbolizer instanceof PolygonSymbolizer) {
-        	if( this.symbolizer == symbolizer ) return;
-        	
-        	Symbolizer old = this.symbolizer; 
+        if (symbolizer instanceof LineSymbolizer
+                || symbolizer instanceof PolygonSymbolizer) {
+            if (this.symbolizer == symbolizer) {
+                return;
+            }
+
+            Symbolizer old = this.symbolizer;
             this.symbolizer = symbolizer;
-            fireChildChanged( "symbolizer", symbolizer, old );
+            fireChildChanged("symbolizer", symbolizer, old);
         } else {
-        	throw new IllegalArgumentException(
-            	"Only a line or polygon symbolizer may be used to outline a raster");
+            throw new IllegalArgumentException(
+                "Only a line or polygon symbolizer may be used to outline a raster");
         }
     }
 
@@ -339,11 +357,13 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      * @param opacity An expression which evaluates to the the opacity (0-1)
      */
     public void setOpacity(Expression opacity) {
-    	if( this.opacity == opacity ) return;
-    	
-    	Expression old = this.opacity;
-    	this.opacity = opacity;
-    	fireChildChanged( "opacity", opacity, old );    
+        if (this.opacity == opacity) {
+            return;
+        }
+
+        Expression old = this.opacity;
+        this.opacity = opacity;
+        fireChildChanged("opacity", opacity, old);
     }
 
     /**
@@ -362,11 +382,13 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      *        EARLIEST_ON_TOP, AVERAGE or RANDOM
      */
     public void setOverlap(Expression overlap) {
-    	if( this.overlap == overlap ) return;
-    	
-    	Expression old = this.overlap;
-    	this.overlap = overlap;
-    	fireChildChanged( "overlap", overlap, old );    
+        if (this.overlap == overlap) {
+            return;
+        }
+
+        Expression old = this.overlap;
+        this.overlap = overlap;
+        fireChildChanged("overlap", overlap, old);
     }
 
     /**
@@ -383,14 +405,16 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      * the “hills.”  A value of around 55 (times) gives reasonable results for
      * Earth-based DEMs. The default value is system-dependent.
      *
-     * @param relief the shadedrelief object
+     * @param shadedRelief the shadedrelief object
      */
     public void setShadedRelief(ShadedRelief shadedRelief) {
-    	if( this.shadedRelief == shadedRelief ) return;
-    	
-    	ShadedRelief old = this.shadedRelief;
-    	this.shadedRelief = shadedRelief;
-    	fireChildChanged( "shadedRelief", shadedRelief, old );    
+        if (this.shadedRelief == shadedRelief) {
+            return;
+        }
+
+        ShadedRelief old = this.shadedRelief;
+        this.shadedRelief = shadedRelief;
+        fireChildChanged("shadedRelief", shadedRelief, old);
     }
 
     public void accept(StyleVisitor visitor) {
@@ -402,6 +426,8 @@ public class RasterSymbolizerImpl extends AbstractGTComponent implements RasterS
      * currently only shallow copy.
      *
      * @return The deep copy clone.
+     *
+     * @throws RuntimeException DOCUMENT ME!
      */
     public Object clone() {
         Object clone;
