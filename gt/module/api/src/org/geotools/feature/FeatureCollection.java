@@ -342,5 +342,5 @@ public interface FeatureCollection extends Collection, FeatureResults, Feature {
      * @param filter
      * @return FeatureCollection identified as subset.
      */
-    public FeatureCollection subCollection( Filter filter );    
+    //public FeatureCollection subCollection( Filter filter );    
 }
