@@ -47,7 +47,7 @@ package org.geotools.filter;
 public interface SortBy {
 	
 	/**
-	 * Indicate property to sort by.
+	 * Indicate property to sort by, specification is limited to PropertyName.
 	 * <p>
 	 * Not sure if this is allowed to be a xPath expression?
 	 * <ul>
@@ -58,14 +58,14 @@ public interface SortBy {
 	 * </p>
 	 * @return Name of property to sort by.
 	 */
-	public String getPropertyName();
+	public AttributeExpression getPropertyName();	
 	
 	/**
 	 * Indicate property.
 	 *   
 	 * @param name
 	 */
-	public void setPropertyName( String name );
+	public void setPropertyName( AttributeExpression name );
 	
 	/**
 	 * The the sort order - one of ASC or DESC.
