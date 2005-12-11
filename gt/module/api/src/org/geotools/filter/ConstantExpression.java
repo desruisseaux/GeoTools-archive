@@ -2,6 +2,7 @@ package org.geotools.filter;
 
 import java.awt.Color;
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.geotools.feature.Feature;
 
@@ -54,11 +55,51 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
 		return this; // we are immutable!
 	}
 	public boolean equals(Object obj) {
-		if(!(obj instanceof LiteralExpression)) return false;
-		LiteralExpression other = (LiteralExpression) obj;		
-		return type == other.getType() && value.equals( other.getLiteral() );
+		if(!(obj instanceof LiteralExpression)) return false;		
+		LiteralExpression other = (LiteralExpression) obj;
+		Object otherLiteral = other.getLiteral();
+		if( value == null ) return otherLiteral == null;
+		
+		if( value.getClass().isAssignableFrom( otherLiteral.getClass() ) ){
+			return value.equals( other.getLiteral() );	
+		}
+		if( value instanceof Number ){
+			if( otherLiteral instanceof Number ){
+				Number myNumber = (Number) value;
+				Number otherNumber = (Number) otherLiteral;
+				
+				return myNumber.doubleValue() == otherNumber.doubleValue();
+			}
+		}
+		// Okay we are into String Compare land!
+		String myString = value.toString();
+		String otherString = otherLiteral.toString();
+		return myString.equals( otherString );		
 	}
+	
+	public int hashCode() {
+		if( value instanceof Geometry ||
+			value instanceof Date ){
+			// forms of complex content ...
+			return value.hashCode();
+		}
+		return value == null ? 0 : value.toString().hashCode();
+	}
+	
+	public String toString() {
+		if( value instanceof Color ){
+			Color color = (Color) value;
+			String redCode = Integer.toHexString(color.getRed());
+	        String greenCode = Integer.toHexString(color.getGreen());
+	        String blueCode = Integer.toHexString(color.getBlue());
 
+	        if (redCode.length() == 1) redCode = "0" + redCode;
+	        if (greenCode.length() == 1) greenCode = "0" + greenCode;
+	        if (blueCode.length() == 1) blueCode = "0" + blueCode;
+		}
+		return value == null ? "NULL" : value.toString();
+	}
+	
 	/** Encode provided color as a String */
 	public static ConstantExpression color( Color color ){
 		if( color == null ) return NULL;		

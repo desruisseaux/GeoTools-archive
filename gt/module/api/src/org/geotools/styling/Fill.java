@@ -165,7 +165,7 @@ public interface Fill extends GTComponent {
      * either upper or lower case.  For example, full red is encoded as
      * "#ff0000" (with no quotation marks).
      *
-     * @param color DOCUMENT ME!
+     * @param color solid color that will be used for a Fill
      */
     void setColor(Expression color);
 
@@ -193,7 +193,7 @@ public interface Fill extends GTComponent {
      * either upper or lower case.  For example, full red is encoded as
      * "#ff0000" (with no quotation marks).
      *
-     * @param backgroundColor DOCUMENT ME!
+     * @param backgroundColor solid color that will be used as a background
      */
     void setBackgroundColor(Expression backgroundColor);
 
