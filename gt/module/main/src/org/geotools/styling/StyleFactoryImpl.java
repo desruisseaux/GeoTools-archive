@@ -273,6 +273,9 @@ public class StyleFactoryImpl extends AbstractStyleFactory
             color = Fill.DEFAULT.getColor();
         }
         fill.setColor(color);
+        if (backgroundColor == null) {
+        	backgroundColor = Fill.DEFAULT.getBackgroundColor();
+        }
         fill.setBackgroundColor(backgroundColor);
 
         if (opacity == null) {

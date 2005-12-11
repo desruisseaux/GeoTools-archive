@@ -167,7 +167,7 @@ public class LiteralExpressionImpl extends DefaultExpression
      * @return String representation of this geometry filter.
      */
     public String toString() {
-        return literal.toString();
+        return literal == null ? "NULL" : literal.toString();
     }
 
     /**
