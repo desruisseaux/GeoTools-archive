@@ -97,7 +97,7 @@ public class CollectionDataStore extends AbstractDataStore {
      */
     public FeatureReader getFeatureReader(final String typeName)
         throws IOException {
-        return new DelegateFeatureReader( getSchema(typeName), collection.features() );
+    	return new DelegateFeatureReader( getSchema(typeName), collection.features() );
     }
 
     /**

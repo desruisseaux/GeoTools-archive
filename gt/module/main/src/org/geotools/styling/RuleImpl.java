@@ -95,17 +95,10 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
      *        the legend.
      */
     public void setLegendGraphic(Graphic[] graphics) {
+        List graphicList = Arrays.asList(graphics);
+    	
         this.graphics.clear();
-
-        for (int i = 0; i < graphics.length; i++) {
-            // add graphic
-            addLegendGraphic(graphics[i]);
-
-            // set parent
-            graphics[i].getNote().setParent(this);
-        }
-
-        fireChanged();
+        this.graphics.addAll(graphicList);
     }
 
     public void addSymbolizer(Symbolizer symb) {
