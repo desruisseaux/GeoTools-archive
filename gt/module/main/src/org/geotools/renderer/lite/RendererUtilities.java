@@ -3,8 +3,13 @@ package org.geotools.renderer.lite;
 import java.awt.Rectangle;
 import java.awt.geom.*;
 
+import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -105,17 +110,88 @@ public class RendererUtilities
      * @param DPI screen dots per inch (OGC standard is 90)
      * @return
      */
-    public static double calculateScale(Envelope envelope, CoordinateReferenceSystem coordinateReferenceSystem,int imageWidth,int imageHeight,double DPI) throws Exception {
-        double diagonalGroundDistance = CRS.distance(
-                new Coordinate(envelope.getMinX(),envelope.getMinY()),
-                new Coordinate(envelope.getMaxX(),envelope.getMaxY()),
-                coordinateReferenceSystem
-                );
-        // pythagorus theorm
-        double diagonalPixelDistancePixels = Math.sqrt( imageWidth*imageWidth+imageHeight*imageHeight);
-        double diagonalPixelDistanceMeters = diagonalPixelDistancePixels / DPI * 2.54 / 100; // 2.54 = cm/inch, 100= cm/m
+    public static double calculateScale(Envelope envelope, CoordinateReferenceSystem coordinateReferenceSystem,int imageWidth,int imageHeight,double DPI)
+    throws Exception 
+	{
+    	//DJB: be much wiser if the requested image is larger than the world (this happens VERY OFTEN)
+        // we first convert to WSG and check to see if we're outside the 'world' bbox
+	       	double[] cs        = new double[4];
+	    	double[] csLatLong = new double[4];
+	    	Coordinate p1 = new Coordinate(envelope.getMinX(),envelope.getMinY());
+	    	Coordinate p2 = new Coordinate(envelope.getMaxX(),envelope.getMaxY());
+	    	cs[0] = p1.x;
+	    	cs[1] = p1.y;
+	    	cs[2] = p2.x;
+	    	cs[3] = p2.y;    	 
+	    	
+	    	Hints hints=new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+	        CoordinateOperationFactory distanceOperationFactory = FactoryFinder.getCoordinateOperationFactory(hints);
+	        
+	         
+	    	MathTransform transform = distanceOperationFactory.createOperation(coordinateReferenceSystem,DefaultGeographicCRS.WGS84).getMathTransform();
+	    	transform.transform(cs, 0, csLatLong, 0, 2);
+	    	
+	    	//in long/lat format
+	    	if  ( (csLatLong[0] <-180) || (csLatLong[0] >180) || (csLatLong[2] <-180) || (csLatLong[2] >180)
+	    			|| (csLatLong[1] <-90) || (csLatLong[1] >90) || (csLatLong[3] <-90) || (csLatLong[3] >90)
+			     )
+	    	{
+	    	      // we have a problem -- the bbox is outside the 'world' so distance will fail	
+	    	      // we handle this by making a new measurement for a smaller portion of the image - the portion thats inside the world.
+	    		  // if the request is outside the world then we need to throw an error
+	    		
+	    		if  ( (csLatLong[0] > csLatLong[2]) || (csLatLong[1] > csLatLong[3]) )
+	    		  throw new Exception ("box is backwards");	
+	    		if  ( ((csLatLong[0] <-180) || (csLatLong[0] >180)) && ((csLatLong[2] <-180) || (csLatLong[2] >180))
+		    			&& ((csLatLong[1] <-90) || (csLatLong[1] >90)) && ((csLatLong[3] <-90) || (csLatLong[3] >90))
+				     )
+	    			throw new Exception ("world isnt in the requested bbox");
+	    		//okay, all good.  We need to find the world bbox intersect the requested bbox
+	    		// then we're going to convert that back to the original coordinate reference system
+	    		// and from there we can find the (x1,y2) and (x2,y2) of this new bbox.
+	    		// then we can do simple math to find the distance.
+	    		
+	    		double[] newCsLatLong = new double[4]; // intersected with the world bbox
+	    		
+	    		newCsLatLong[0] = Math.min(Math.max(csLatLong[0],-180),180) ;
+	    		newCsLatLong[1] = Math.min(Math.max(csLatLong[1],-90),90) ;
+	    		newCsLatLong[2] = Math.min(Math.max(csLatLong[2],-180),180) ;
+	    		newCsLatLong[3] = Math.min(Math.max(csLatLong[3],-90),90) ;
+	    		
+	    		MathTransform transform2 = distanceOperationFactory.createOperation(DefaultGeographicCRS.WGS84,coordinateReferenceSystem).getMathTransform();
+	    		double[] origProject        = new double[4];
+		    	transform.transform(newCsLatLong, 0, origProject, 0, 2);
+		    	
+		    	//have the truncated bbox in the original projection, so we can find the image (x,y) for the two points.
+		    	
+		    	double image_min_x = (origProject[0] - envelope.getMinX() )/envelope.getWidth() *imageWidth;
+		    	double image_max_x = (origProject[2] - envelope.getMinX() )/envelope.getWidth() *imageWidth;
+		    	
+		    	double image_min_y = (origProject[1] - envelope.getMinY() )/envelope.getHeight() *imageHeight;
+		    	double image_max_y = (origProject[3] - envelope.getMinY() )/envelope.getHeight() *imageHeight;
+		    	
+		    	double distance_ground = CRS.distance(
+		    			         new Coordinate(newCsLatLong[0],newCsLatLong[1] ),
+		    			         new Coordinate(newCsLatLong[2],newCsLatLong[3] ),
+		    			         DefaultGeographicCRS.WGS84
+		    			                        );
+		    	double pixel_distance =  Math.sqrt( (image_max_x-image_min_x) *(image_max_x-image_min_x) + (image_max_y-image_min_y)*(image_max_y-image_min_y));
+		    	double pixel_distance_m = pixel_distance/ DPI * 2.54 / 100.0;
+		    	return distance_ground/ pixel_distance_m; // remember, this is the denominator, not the actual scale;
+	    	}
+
+    	
+    	
+	        double diagonalGroundDistance = CRS.distance(
+	               p1,p2,	          
+	                coordinateReferenceSystem
+	                );
+	        // pythagorus theorm
+	        double diagonalPixelDistancePixels = Math.sqrt( imageWidth*imageWidth+imageHeight*imageHeight);
+	        double diagonalPixelDistanceMeters = diagonalPixelDistancePixels / DPI * 2.54 / 100; // 2.54 = cm/inch, 100= cm/m
+	        return diagonalGroundDistance/diagonalPixelDistanceMeters; // remember, this is the denominator, not the actual scale;
+    	}
+    	
         
-        
-        return diagonalGroundDistance/diagonalPixelDistanceMeters; // remember, this is the denominator, not the actual scale;
-    }
+     
 }
