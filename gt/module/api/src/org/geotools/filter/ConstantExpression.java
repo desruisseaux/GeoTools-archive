@@ -99,6 +99,8 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
 		else if( value instanceof Geometry  ){
 			return Expression.LITERAL_GEOMETRY;
 		}
-		return Expression.LITERAL_STRING;		
+		
+		return Expression.LITERAL_STRING;
+		
 	}
 }

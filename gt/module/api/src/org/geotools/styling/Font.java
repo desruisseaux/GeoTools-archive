@@ -50,6 +50,27 @@ import org.geotools.filter.Expression;
  * @author Ian Turton, CCG
  */
 public interface Font extends GTComponent {
+	
+	/** default font-size value **/
+	static final int DEFAULT_FONTSIZE = 10;
+	
+	/**
+	 * Enumeration of allow font-style values.
+	 */
+	interface Style {
+		static final String NORMAL = "normal";
+		static final String ITALIC = "italic";
+		static final String OBLIQUE = "oblique";
+	}
+	
+	/**
+	 * Enumeration of allow font-weight values.
+	 */
+	interface Weight {
+		static final String NORMAL = "normal";
+		static final String BOLD = "bold";
+	}
+	
     Expression getFontFamily();
 
     void setFontFamily(Expression family);

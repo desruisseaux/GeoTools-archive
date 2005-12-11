@@ -1503,4 +1503,8 @@ SYMBOLIZER:
 
         return null;
     }
+    
+    public static String colorToHex(Color c) {
+    	return "#" + Integer.toHexString(c.getRGB() & 0x00ffffff);
+    }
 }

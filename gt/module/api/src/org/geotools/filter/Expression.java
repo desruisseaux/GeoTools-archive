@@ -27,7 +27,8 @@ import org.geotools.feature.Feature;
  * @version $Id: Expression.java,v 1.10 2004/04/04 16:01:21 aaime Exp $
  */
 public interface Expression extends ExpressionType {
-    /**
+    
+	/**
      * Gets the type of this expression.
      *
      * @return Expression type.

@@ -89,15 +89,15 @@ import org.geotools.filter.Expression;
  *       problem?
  */
 public interface Graphic extends GTComponent {
+	
 	/**
-	 * Indicates an absense of graphic.
+	 * A default Graphic instance.
 	 * <p>
-	 * This value is used to indicate that the Graphics based opperation
-	 * should be skipped. Aka this is used by Stroke.Stroke as place holders
-	 * for GRAPHIC_FILL and GRAPHIC_STROKE.
+	 * For some attributes the standard does not define a default, so a 
+	 * reasonable value is supplied.
 	 * </p>
 	 */
-	public static final Graphic GRAPHIC_NULL = new ConstantGraphic(){
+	public static final Graphic DEFAULT = new ConstantGraphic(){
 
 		public ExternalGraphic[] getExternalGraphics() {
 			return ExternalGraphic.EXTERNAL_GRAPHICS_EMPTY;
@@ -109,13 +109,13 @@ public interface Graphic extends GTComponent {
 			return Symbol.SYMBOLS_EMPTY;
 		}
 		public Expression getOpacity() {
-			return ConstantExpression.ZERO;
-		}
-		public Expression getSize() {
 			return ConstantExpression.ONE;
 		}
+		public Expression getSize() {
+			return ConstantExpression.constant(16);
+		}
 		public Displacement getDisplacement() {
-			return Displacement.DISPLACEMENT;
+			return Displacement.DEFAULT;
 		}
 
 		public Expression getRotation() {
@@ -127,9 +127,45 @@ public interface Graphic extends GTComponent {
 		}		
 	};
 	
-	/** The default Graphic */
-	public static final Graphic GRAPHIC = GRAPHIC_NULL; // TODO: please set up as default GRAPHIC	
-    /**
+	/**
+	 * Indicates an absense of graphic.
+	 * <p>
+	 * This value is used to indicate that the Graphics based opperation
+	 * should be skipped. Aka this is used by Stroke.Stroke as place holders
+	 * for GRAPHIC_FILL and GRAPHIC_STROKE.
+	 * </p>
+	 */
+	public static final Graphic NULL = new ConstantGraphic(){
+
+		public ExternalGraphic[] getExternalGraphics() {
+			return ExternalGraphic.EXTERNAL_GRAPHICS_EMPTY;
+		}
+		public Mark[] getMarks() {
+			return Mark.MARKS_EMPTY;
+		}
+		public Symbol[] getSymbols() {
+			return Symbol.SYMBOLS_EMPTY;
+		}
+		public Expression getOpacity() {
+			return ConstantExpression.NULL;
+		}
+		public Expression getSize() {
+			return ConstantExpression.NULL;
+		}
+		public Displacement getDisplacement() {
+			return Displacement.NULL;
+		}
+
+		public Expression getRotation() {
+			return ConstantExpression.NULL;
+		}
+
+		public String getGeometryPropertyName() {
+			return "";
+		}		
+	};
+	
+	/**
      * Provides a list of external graphics which can be used to represent this
      * graphic. Each one should be an equivalent representation but in a
      * different format. If none are provided, or if none of the formats are

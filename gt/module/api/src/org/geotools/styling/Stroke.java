@@ -83,104 +83,99 @@ import org.geotools.filter.LiteralExpression;
  * @author James Macgill
  */
 public interface Stroke extends GTComponent {
-	public static final LiteralExpression COLOR = ConstantExpression.BLACK;
-	public static final LiteralExpression WIDTH = ConstantExpression.ONE;
-	public static final LiteralExpression OPACTITY = ConstantExpression.ONE;
-	public static final LiteralExpression LINE_CAP = ConstantExpression.constant( "butt" );
-	public static final LiteralExpression LINE_JOIN = ConstantExpression.constant( "miter" );
-	public static final LiteralExpression DASH_OFFSET = ConstantExpression.ZERO;
-	public static final Graphic GRAPHIC_FILL = Graphic.GRAPHIC_NULL;
-	public static final Graphic GRAPHIC_STROKE = Graphic.GRAPHIC_NULL;
 	
-	/**
-	 * Indicate an absense of Stroke - uses opacity 0 to prevent drawing.
+   /**
+	 * Default Stroke capturing the defaults indicated by the standard.
 	 * <p>
-	 * This should only be used as a default by things like a PolygonSymbolizer
-	 * that can function with out a Stroke.
+	 * For some attributes the standard does not define a default, so a 
+	 * reasonable value is supplied.
 	 * </p>
-	 * <p>
-	 * To prevent drawing this Stroke has opactiy set to zero. This is a proper
-	 * null object (not part of the standard) and the renderer implementors should
-	 * feel free to modify this class between them to prevent the need for <code>null</code> checks.
-	 * <p> 
 	 */
-	public static final Stroke STROKE_NULL = new ConstantStroke(){
+	static final Stroke DEFAULT = new ConstantStroke(){    	
 		public Expression getColor() {
-			return COLOR;
+			return ConstantExpression.BLACK;
 		}
 		public Color getColor(Feature f) {
 			return Color.BLACK;
 		}
 		public Expression getWidth() {
-			return WIDTH;
+			return ConstantExpression.ONE;
 		}
 		public Expression getOpacity() {
+			return ConstantExpression.ONE;
+		}
+		public Expression getLineJoin() {
+			return ConstantExpression.constant( "butt" );
+		}
+		public Expression getLineCap() {
+			return ConstantExpression.constant( "miter" );
+		}
+		public float[] getDashArray() {
+			return new float[]{1,0};
+		}
+		public Expression getDashOffset() {
 			return ConstantExpression.ZERO;
 		}
-		public Expression getLineJoin() {
-			return LINE_JOIN;
-		}
-		public Expression getLineCap() {
-			return LINE_CAP;
-		}
-		public float[] getDashArray() {
-			return new float[]{1,0};
-		}
-		public Expression getDashOffset() {
-			return DASH_OFFSET;
-		}
 		public Graphic getGraphicFill() {
-			return Graphic.GRAPHIC;
+			return Graphic.DEFAULT;
 		}
 		public Graphic getGraphicStroke() {
-			return Graphic.GRAPHIC_NULL;
+			return Graphic.NULL;
 		}
 		public Object clone() {
 			return this; // we are constant
 		}
-    };	
+    };
     
-	/**
-	 * Constant Stroke capturing the defaults indicated by the standard.
+    /**
+	 * Null Stroke capturing the defaults indicated by the standard.
 	 * <p>
-	 * This is a NullObject, rendering code should be able to make use
-	 * of this object rather then having to perform null checks.
+	 * This is a NullObject, it purpose is to prevent client code from having 
+	 * to do null checking.
 	 * </p>
 	 */
-	public static final Stroke STROKE = new ConstantStroke(){    	
+    static final Stroke NULL = new ConstantStroke() {
+
 		public Expression getColor() {
-			return COLOR;
+			return ConstantExpression.NULL;
 		}
+
 		public Color getColor(Feature f) {
 			return Color.BLACK;
 		}
+
 		public Expression getWidth() {
-			return WIDTH;
+			return ConstantExpression.NULL;
 		}
+
 		public Expression getOpacity() {
-			return OPACTITY;
+			return ConstantExpression.NULL;
 		}
+
 		public Expression getLineJoin() {
-			return LINE_JOIN;
+			return ConstantExpression.NULL;
 		}
+
 		public Expression getLineCap() {
-			return LINE_CAP;
+			return ConstantExpression.NULL;
 		}
+
 		public float[] getDashArray() {
-			return new float[]{1,0};
+			return new float[]{};
 		}
+
 		public Expression getDashOffset() {
-			return DASH_OFFSET;
+			return ConstantExpression.NULL;
 		}
+
 		public Graphic getGraphicFill() {
-			return Graphic.GRAPHIC;
+			return Graphic.NULL;
 		}
+
 		public Graphic getGraphicStroke() {
-			return Graphic.GRAPHIC_NULL;
+			return Graphic.NULL;
 		}
-		public Object clone() {
-			return this; // we are constant
-		}
+    	
     };
     
     /**

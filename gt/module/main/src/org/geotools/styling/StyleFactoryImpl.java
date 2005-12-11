@@ -21,6 +21,9 @@
  */
 package org.geotools.styling;
 
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
@@ -213,36 +216,29 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         Stroke stroke = new StrokeImpl();
 
         if (color == null) {
-            throw new IllegalArgumentException(
-                "Color may not be null in a stroke");
+        	//use default
+        	color = Stroke.DEFAULT.getColor();
         }
-
         stroke.setColor(color);
 
         if (width == null) {
-            throw new IllegalArgumentException(
-                "Width may not be null in a stroke");
+        	//use default
+        	width = Stroke.DEFAULT.getWidth();
         }
-
         stroke.setWidth(width);
 
         if (opacity == null) {
-            throw new IllegalArgumentException(
-                "Opacity may not be null in a stroke");
+        	opacity = Stroke.DEFAULT.getOpacity();;
         }
-
         stroke.setOpacity(opacity);
 
         if (lineJoin == null) {
-            throw new IllegalArgumentException(
-                "LineJoin may not be null in a stroke");
+        	lineJoin = Stroke.DEFAULT.getLineJoin();
         }
-
         stroke.setLineJoin(lineJoin);
 
         if (lineCap == null) {
-            throw new IllegalArgumentException(
-                "LineCap may not be null in a stroke");
+        	lineCap = Stroke.DEFAULT.getLineCap();
         }
 
         stroke.setLineCap(lineCap);
@@ -259,16 +255,13 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         Fill fill = new FillImpl();
 
         if (color == null) {
-            throw new IllegalArgumentException(
-                "Color may not be null in a fill");
+            color = Fill.DEFAULT.getColor();
         }
-
         fill.setColor(color);
         fill.setBackgroundColor(backgroundColor);
 
         if (opacity == null) {
-            throw new IllegalArgumentException(
-                "Opacity may not be null in a fill");
+        	opacity = Fill.DEFAULT.getOpacity();
         }
 
         // would be nice to check if this was within bounds but we have to wait until use since it may depend on an attribute
@@ -370,27 +363,28 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         Mark[] marks, Symbol[] symbols, Expression opacity, Expression size,
         Expression rotation) {
         Graphic graphic = new GraphicImpl();
+        
+        symbols = symbols != null ? symbols : new Symbol[0];
         graphic.setSymbols(symbols);
+        
+        externalGraphics = externalGraphics != null ? externalGraphics : new ExternalGraphic[0];
         graphic.setExternalGraphics(externalGraphics);
+        
+        marks = marks != null ? marks : new Mark[0];
         graphic.setMarks(marks);
 
         if (opacity == null) {
-            throw new IllegalArgumentException(
-                "Opacity can not be null in graphic");
+        	opacity = Graphic.DEFAULT.getOpacity();
         }
-
         graphic.setOpacity(opacity);
 
         if (size == null) {
-            throw new IllegalArgumentException(
-                "Size can not be null in graphic");
+        	size = Graphic.DEFAULT.getSize();
         }
-
         graphic.setSize(size);
 
         if (rotation == null) {
-            throw new IllegalArgumentException(
-                "Rotation can not be null in graphic");
+            rotation = Graphic.DEFAULT.getRotation();
         }
 
         graphic.setRotation(rotation);
@@ -419,9 +413,8 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         Font font = new FontImpl();
 
         if (fontFamily == null) {
-            throw new IllegalArgumentException("Null font family specified");
+    		throw new IllegalArgumentException("Null font family specified");	
         }
-
         font.setFontFamily(fontFamily);
 
         if (fontSize == null) {

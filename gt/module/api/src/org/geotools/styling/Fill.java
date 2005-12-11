@@ -37,7 +37,11 @@
  */
 package org.geotools.styling;
 
+import java.awt.Color;
+
 import org.geotools.event.GTComponent;
+import org.geotools.event.GTConstant;
+import org.geotools.filter.ConstantExpression;
 import org.geotools.filter.Expression;
 
 
@@ -94,7 +98,52 @@ import org.geotools.filter.Expression;
  * @version $Id: Fill.java,v 1.12 2003/09/06 04:14:12 seangeo Exp $
  */
 public interface Fill extends GTComponent {
-    /**
+	
+	static final Fill DEFAULT = new ConstantFill() {
+
+		final Expression COLOR = ConstantExpression.constant(new Color(128,128,128));
+		final Expression BGCOLOR = ConstantExpression.constant(new Color(255,255,255,0));
+		final Expression OPACITY = ConstantExpression.ONE;
+		
+		public Expression getColor() {
+			return COLOR;
+		}
+
+		public Expression getBackgroundColor() {
+			return BGCOLOR; 
+		}
+
+		public Expression getOpacity() {
+			return OPACITY;
+		}
+
+		public Graphic getGraphicFill() {
+			return Graphic.NULL;
+		}
+		
+	};
+	
+	static final Fill NULL = new ConstantFill() {
+
+		public Expression getColor() {
+			return ConstantExpression.NULL;
+		}
+
+		public Expression getBackgroundColor() {
+			return ConstantExpression.NULL;
+		}
+
+		public Expression getOpacity() {
+			return ConstantExpression.NULL;
+		}
+
+		public Graphic getGraphicFill() {
+			return Graphic.NULL;
+		}
+		
+	};
+	
+	/**
      * This parameter gives the solid color that will be used for a Fill.<br>
      * The color value is RGB-encoded using two hexidecimal digits per
      * primary-color component, in the order Red, Green, Blue, prefixed with
@@ -191,3 +240,29 @@ public interface Fill extends GTComponent {
 
     void accept(StyleVisitor visitor);
 }
+
+abstract class ConstantFill extends GTConstant implements Fill {
+	private void cannotModifyConstant(){
+		throw new UnsupportedOperationException("Constant Fill may not be modified");
+	}
+
+	public void setColor(Expression color) {
+		cannotModifyConstant();
+	}
+
+	public void setBackgroundColor(Expression backgroundColor) {
+		cannotModifyConstant();
+	}
+
+	public void setOpacity(Expression opacity) {
+		cannotModifyConstant();
+	}
+
+	public void setGraphicFill(Graphic graphicFill) {
+		cannotModifyConstant();
+	}
+
+	public void accept(StyleVisitor visitor) {
+		cannotModifyConstant();
+	}
+};

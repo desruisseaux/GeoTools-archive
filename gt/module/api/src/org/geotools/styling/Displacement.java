@@ -38,6 +38,8 @@
 package org.geotools.styling;
 
 import org.geotools.event.GTComponent;
+import org.geotools.event.GTConstant;
+import org.geotools.filter.ConstantExpression;
 import org.geotools.filter.Expression;
 
 
@@ -49,8 +51,36 @@ import org.geotools.filter.Expression;
  * @author Ian Turton, CCG
  */
 public interface Displacement extends GTComponent {
-    static final Displacement DISPLACEMENT = null; // TODO: ConstantDeplacement 
+     
+	/**
+	 * Default Displacment instance. 
+	 */
+    static final Displacement DEFAULT = new ConstantDisplacement() {
 
+		public Expression getDisplacementX() {
+			return ConstantExpression.ZERO;
+		}
+
+		public Expression getDisplacementY() {
+			return ConstantExpression.ZERO;
+		}
+    	
+    };
+    
+    /**
+     * Null Displacement instance.
+     */
+    static final Displacement NULL = new ConstantDisplacement() {
+    
+    	public Expression getDisplacementX() {
+    		return ConstantExpression.NULL;
+    	}
+    	
+    	public Expression getDisplacementY() {
+    		return ConstantExpression.NULL;
+    	}
+    };
+    
 	//TODO: add Displacement to GeoAPI
     /**
      * Returns an expression that computes a pixel offset from the geometry
@@ -90,3 +120,22 @@ public interface Displacement extends GTComponent {
 
     void accept(StyleVisitor visitor);
 }
+
+abstract class ConstantDisplacement extends GTConstant implements Displacement {
+
+	private void cannotModifyConstant(){
+		throw new UnsupportedOperationException("Constant Displacement may not be modified");
+	}
+	
+	public void setDisplacementX(Expression x) {
+		cannotModifyConstant();
+	}
+
+	public void setDisplacementY(Expression y) {
+		cannotModifyConstant();
+	}
+
+	public void accept(StyleVisitor visitor) {
+		cannotModifyConstant();
+	}
+};
