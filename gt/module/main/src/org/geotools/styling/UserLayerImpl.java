@@ -7,6 +7,7 @@
 package org.geotools.styling;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.geotools.data.DataStore;
 import org.geotools.event.GTList;
@@ -20,7 +21,7 @@ import org.geotools.feature.FeatureType;
  *expecting the definition in the spec to be a bit "nicer".  Right now
  *its just:
  *
- *<element name=”InlineFeature”>
+ *<element name=ï¿½InlineFeatureï¿½>
  *  <complexType>
  *    <sequence>
  *      <element ref="gml:_Feature"
@@ -64,11 +65,12 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
 	private DataStore   inlineFeatureDatastore = null;
 	private FeatureType inlineFeatureType = null;
 	
+	RemoteOWS remoteOWS;
     ArrayList styles = new GTList( this, "styles" );
     
     public RemoteOWS getRemoteOWS()
     {
-        return null;
+        return remoteOWS;
     }
     
     public DataStore getInlineFeatureDatastore()
@@ -94,6 +96,10 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     
     public void setRemoteOWS(RemoteOWS service)
     {
+    	RemoteOWS old = this.remoteOWS;
+    	this.remoteOWS = service;
+    	
+    	fireChildChanged("remoteOWS",this.remoteOWS,old);
     }
     
     public FeatureTypeConstraint[] getLayerFeatureConstraints(){
@@ -108,13 +114,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     
     public void setUserStyles(Style[] styles){ 
     	this.styles.clear();
-    	for(int i = 0; i < styles.length; i++){
-    		//add the style
-    		this.styles.add( styles[i] );
-            //set the parent
-    		styles[i].getNote().setParent(this);
-    	}
-    	fireChanged(); // TODO: Handle Style List
+    	this.styles.addAll(Arrays.asList(styles));
     }    
 
     public void addUserStyle(Style style){

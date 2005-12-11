@@ -110,8 +110,21 @@ public interface StyleFactory extends Factory {
 		String featureTypeName, Filter filter, Extent[] extents
 	);
     
+    public LayerFeatureConstraints createLayerFeatureConstraints(
+		FeatureTypeConstraint[] featureTypeConstraints
+    );
+    		
     public FeatureTypeStyle createFeatureTypeStyle(Rule[] rules);
 
+    /**
+     * Creates a new ImageOutline.
+     * 
+     * @param symbolizer A line or polygon symbolizer.
+     * 
+     * @return The new image outline.
+     */
+    public ImageOutline createImageOutline(Symbolizer symbolizer);
+    
     public LinePlacement createLinePlacement(Expression offset);
 
     public PolygonSymbolizer createPolygonSymbolizer();
@@ -269,5 +282,7 @@ public interface StyleFactory extends Factory {
     public UserLayer createUserLayer();
     
     public NamedLayer createNamedLayer();
+    
+    public RemoteOWS createRemoteOWS(String service, String onlineResource);
     
 }

@@ -49,7 +49,12 @@ package org.geotools.styling;
  * @author James Macgill
  */
 public interface RemoteOWS {
-    public String getService();
-
-    public String getOnlineResource();
+    
+	String getService();
+    
+	void setService(String service);
+		
+    String getOnlineResource();
+    
+    void setOnlineResource(String onlineResource);
 }

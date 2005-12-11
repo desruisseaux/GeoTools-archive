@@ -18,6 +18,7 @@ package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
 import org.geotools.filter.Filter;
+import org.geotools.resources.Utilities;
 
 
 public class FeatureTypeConstraintImpl extends AbstractGTComponent
@@ -66,5 +67,40 @@ public class FeatureTypeConstraintImpl extends AbstractGTComponent
 
     public void accept(StyleVisitor visitor) {
         visitor.visit(this);
+    }
+    
+    public int hashCode() {
+    	final int PRIME = 1000003;
+		int result = 0;
+		
+		if (featureTypeName != null) {
+			result = (PRIME * result) + featureTypeName.hashCode();
+		}
+		
+		if (filter != null) {
+			result =  (PRIME * result) + filter.hashCode();
+		}
+		
+		if (extents != null) {
+			result =  (PRIME * result) + extents.hashCode();
+	
+		}
+		return result;
+    }
+    
+    public boolean equals(Object obj) {
+    	if (this == obj) {
+    		return true;
+    	}
+    	
+    	if (obj instanceof FeatureTypeConstraintImpl) {
+    		FeatureTypeConstraintImpl other = (FeatureTypeConstraintImpl)obj;
+    		return Utilities.equals(featureTypeName,other.featureTypeName) && 
+    			Utilities.equals(filter,other.filter) && 
+    			Utilities.equals(extents,other.extents);
+    	}
+    	
+    	return false;
+    		
     }
 }

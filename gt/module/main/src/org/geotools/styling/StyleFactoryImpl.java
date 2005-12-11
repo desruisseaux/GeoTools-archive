@@ -40,6 +40,7 @@ import org.geotools.filter.FilterFactoryFinder;
  */
 public class StyleFactoryImpl extends AbstractStyleFactory
     implements StyleFactory2 {
+	
     private static final FilterFactory filterFactory = FilterFactoryFinder
         .createFilterFactory();
 
@@ -143,6 +144,13 @@ public class StyleFactoryImpl extends AbstractStyleFactory
 
         return constraint;
     }
+    
+    public LayerFeatureConstraints createLayerFeatureConstraints(FeatureTypeConstraint[] featureTypeConstraints) {
+    	LayerFeatureConstraints constraints = new LayerFeatureConstraintsImpl();
+    	constraints.setFeatrureTypeConstraints(featureTypeConstraints);
+    	
+    	return constraints;
+    }
 
     public FeatureTypeStyle createFeatureTypeStyle() {
         return new FeatureTypeStyleImpl();
@@ -156,6 +164,13 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         return new RuleImpl();
     }
 
+    public ImageOutline createImageOutline(Symbolizer symbolizer) {
+    	ImageOutline outline = new ImageOutlineImpl();
+    	outline.setSymbolizer(symbolizer);
+    	
+    	return outline;
+    }
+    
     /**
      * A convienice method to make a simple stroke
      *
@@ -714,5 +729,13 @@ public class StyleFactoryImpl extends AbstractStyleFactory
 
     public NamedLayer createNamedLayer() {
         return new NamedLayerImpl();
+    }
+    
+    public RemoteOWS createRemoteOWS(String service, String onlineResource) {
+    	RemoteOWSImpl remoteOWS = new RemoteOWSImpl();
+    	remoteOWS.setService(service);
+    	remoteOWS.setOnlineResource(onlineResource);
+    	
+    	return remoteOWS;
     }
 }
