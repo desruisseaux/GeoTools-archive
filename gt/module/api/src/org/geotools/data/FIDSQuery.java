@@ -23,6 +23,8 @@
 package org.geotools.data;
 
 import org.geotools.filter.Filter;
+import org.geotools.filter.SortBy;
+import org.geotools.filter.SortBy2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.net.URI;
 import java.util.Arrays;
@@ -164,4 +166,8 @@ class FIDSQuery implements Query {
     public CoordinateReferenceSystem getCoordinateSystemReproject() {
         return null;
     }
+
+	public SortBy2[] getSortyBy() {
+		return SortBy.UNSORTED;
+	}
 }

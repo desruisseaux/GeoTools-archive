@@ -21,9 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -33,8 +31,11 @@ import java.util.TreeMap;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
+import org.geotools.feature.collection.FeatureIteratorImpl;
+import org.geotools.feature.collection.SubFeatureCollection;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.filter.Filter;
 import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -42,18 +43,14 @@ import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
- * A basic implementation of FeatureCollection which use a {@link LinkedHashSet} for
- * its internal storage. This preserves ordering and allows a faster iteration
- * speed then a {@link HashSet}.
+ * A basic implementation of FeatureCollection which use a {@link TreeMap} for
+ * its internal storage.
  *
  * @author Ian Schneider
  * @version $Id: DefaultFeatureCollection.java,v 1.6 2003/12/04 23:17:23 aaime Exp $
  */
 public class DefaultFeatureCollection extends AbstractFeatureCollection {
     
-    /** Internal feature storage list */
-    //private List features = new LinkedList();
-
     /**
      * Contents of collection, referenced by FeatureID.
      * <p>
@@ -363,7 +360,7 @@ public class DefaultFeatureCollection extends AbstractFeatureCollection {
      * @return the FeatureIterator for this collection.
      */
     public FeatureIterator features() {
-        return new FeatureIterator(this);
+        return new FeatureIteratorImpl(this);
     }
 
     /**
@@ -667,7 +664,10 @@ public class DefaultFeatureCollection extends AbstractFeatureCollection {
 	}
 
     public void close( FeatureIterator close ) {
-        // nop
+        if( close instanceof FeatureIteratorImpl){
+        	FeatureIteratorImpl wrapper = (FeatureIteratorImpl) close;
+        	wrapper.close();
+        }
     }
 
     public void close( Iterator close ) {
@@ -739,5 +739,12 @@ public class DefaultFeatureCollection extends AbstractFeatureCollection {
         finally {
         	close( iterator );
         }
+	}
+
+	public FeatureCollection subCollection(Filter filter) {
+		if( filter == Filter.ALL || filter.equals( Filter.ALL )){
+			return this;
+		}		
+		return new SubFeatureCollection( this, filter );
 	}
 }

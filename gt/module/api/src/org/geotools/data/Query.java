@@ -17,6 +17,7 @@
 package org.geotools.data;
 
 import org.geotools.filter.Filter;
+import org.geotools.filter.SortBy2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.net.URI;
 
@@ -266,4 +267,35 @@ public interface Query {
      *         be reprojected to.
      */
     CoordinateReferenceSystem getCoordinateSystemReproject();
+    
+    /**
+     * SortBy results according to indicated property and order.
+     * <p>
+     * SortBy is part of the Filter 1.1 specification, it is referenced
+     * by WFS1.1 and Catalog 2.0.x specifications and is used to organize
+     * results.
+     * </p>
+     * The SortBy's are ment to be applied in order:
+     * <ul>
+     * <li>SortBy( year, ascending )
+     * <li>SortBy( month, decsending )
+     * </ul>
+     * Would produce something like: <pre><code>
+     * [year=2002 month=4],[year=2002 month=3],[year=2002 month=2],
+     * [year=2002 month=1],[year=2003 month=12],[year=2002 month=4],
+     * </code></pre>
+     * </p>
+     * SortBy should be considered at the same level of abstraction as Filter,
+     * and like Filter you may sort using properties not listed in
+     * getPropertyNames.
+     * </p>
+     * <p>
+     * At a technical level the interface SortBy2 is used to indicate the
+     * additional requirements of a GeoTools implementation. The WFS 1.1
+     * specification itself is limited to SortBy.
+     * </p>
+     * 
+     * @return SortBy array or order of application
+     */
+    SortBy2[] getSortyBy();
 }

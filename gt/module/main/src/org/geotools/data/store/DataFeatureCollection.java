@@ -35,6 +35,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.xml.gml.GMLSchema;
@@ -172,7 +173,7 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
      * out of the box.
      */
     public FeatureIterator features() {
-        return new FeatureIterator( this );
+        return new DelegateFeatureIterator( iterator() );
     }
    
     /**
@@ -518,5 +519,4 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
         	close( iterator );
         }
 	}
-
 }

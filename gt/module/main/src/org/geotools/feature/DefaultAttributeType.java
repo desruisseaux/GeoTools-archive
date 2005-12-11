@@ -140,9 +140,12 @@ public class DefaultAttributeType implements AttributeType {
         return nillable;
     }
 
-    /** Return a safe Object copy.
+    /**
+     * Return a safe Object copy.
+     * <p>
      * Obtain a duplicate Object if the object is mutable, or the same Object
      * reference if it is immutable.
+     * </p>
      * @return A duplicated Object if the type is mutable or the same Object
      *         if it is immutable or null if the passed Object is null.
      * @throws IllegalAttributeException if the Object cannot be duplicated.

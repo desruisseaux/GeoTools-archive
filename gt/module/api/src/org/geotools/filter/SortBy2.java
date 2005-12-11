@@ -18,7 +18,7 @@ package org.geotools.filter;
  * <p>
  * @author Jody Garnett, Refractions Research.
  */
-public interface SortBy2 extends SortBy {
+public interface SortBy2 extends SortBy {		
 	/**
 	 * GeoTools allows for more pervase use of Expression then is strictly
      * supported by the specification.

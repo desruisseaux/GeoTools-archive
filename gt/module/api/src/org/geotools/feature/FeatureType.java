@@ -412,8 +412,7 @@ public interface FeatureType {
      * copy.
      * </p>
      * 
-     * @deprecated This method will be removed in 2.2, please use FeatureFactory obtained from
-     *             FactoryFinder
+     * //@deprecated This method will be removed in 2.2, please use FeatureFactory obtained from FactoryFinder
      * @param feature
      * @return a deep copy of feature
      * @throws IllegalAttributeException

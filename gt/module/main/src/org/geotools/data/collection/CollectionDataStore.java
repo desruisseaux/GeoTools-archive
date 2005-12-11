@@ -17,7 +17,6 @@
 package org.geotools.data.collection;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
@@ -32,7 +31,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -99,41 +97,7 @@ public class CollectionDataStore extends AbstractDataStore {
      */
     public FeatureReader getFeatureReader(final String typeName)
         throws IOException {
-        return new FeatureReader() {
-                FeatureType featureType = getSchema(typeName);
-                FeatureIterator iterator = collection.features();
-
-                public FeatureType getFeatureType() {
-                    return featureType;
-                }
-
-                public Feature next()
-                    throws IOException, IllegalAttributeException, NoSuchElementException {
-                    if (iterator == null) {
-                        throw new IOException("Feature Reader has been closed");
-                    }
-
-                    try {
-                        return iterator.next();
-                    } catch (NoSuchElementException end) {
-                        throw new DataSourceException("There are no more Features", end);
-                    }
-                }
-
-                public boolean hasNext(){
-                    return (iterator != null) && iterator.hasNext();
-                }
-
-                public void close(){
-                    if (iterator != null) {
-                        iterator = null;
-                    }
-
-                    if (featureType != null) {
-                        featureType = null;
-                    }
-                }
-            };
+        return new DelegateFeatureReader( getSchema(typeName), collection.features() );
     }
 
     /**

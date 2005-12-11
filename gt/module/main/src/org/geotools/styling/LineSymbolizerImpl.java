@@ -97,7 +97,7 @@ public class LineSymbolizerImpl extends AbstractGTComponent
 
         Stroke old = this.stroke;
         this.stroke = stroke;
-        fireChildChanged("stroke", stroke, old);
+        fireChildChanged( "stroke", stroke, old);
     }
 
     /**

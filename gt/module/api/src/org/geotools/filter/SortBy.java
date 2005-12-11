@@ -45,7 +45,7 @@ package org.geotools.filter;
  * @author Jody Garnett, Refractions Research, Inc.
  */
 public interface SortBy {
-	
+	public static final SortBy2[] UNSORTED = new SortBy2[0];	
 	/**
 	 * Indicate property to sort by, specification is limited to PropertyName.
 	 * <p>

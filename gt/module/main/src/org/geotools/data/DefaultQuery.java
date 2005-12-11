@@ -17,10 +17,12 @@
 package org.geotools.data;
 
 import org.geotools.filter.Filter;
+import org.geotools.filter.SortBy2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -53,6 +55,8 @@ public class DefaultQuery implements Query {
 
     /** The namespace to get */
     private URI namespace =Query.NO_NAMESPACE;
+
+    private List sorted = Collections.EMPTY_LIST;
     
     /** The handle associated with this query. */
     private String handle;
@@ -476,5 +480,15 @@ public class DefaultQuery implements Query {
     public void setCoordinateSystemReproject(CoordinateReferenceSystem system) {
         coordinateSystemReproject = system;
     }
-
+    
+    /**
+     * Retrive list of SortBy information.
+     * <p>
+     * Note we are using SortBy2, to be standards complient
+     * you may limit yourself to to SortBy information.
+     * </p>
+     */
+    public SortBy2[] getSortyBy() {
+		return (SortBy2[]) sorted.toArray( new SortBy2[ sorted.size() ] );
+	}   
 }

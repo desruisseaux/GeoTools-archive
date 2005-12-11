@@ -18,8 +18,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Jody Garnett, Refractions Research
  */
 public class ConstantExpression implements LiteralExpression, Cloneable {
+	
 	public static final ConstantExpression NULL = constant( null );		
-	public static final ConstantExpression BLACK = constant( Color.BLACK );	
+	public static final ConstantExpression BLACK = color( Color.BLACK );	
 	public static final ConstantExpression ZERO = constant( 0 );	
 	public static final ConstantExpression ONE = constant( 1 );
 	public static final ConstantExpression TWO = constant( 2 );
@@ -28,8 +29,11 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
 	final short type;
 	final Object value;
 	private ConstantExpression( Object value ){
+		this( type( value ), value );
+	}
+	private ConstantExpression( short type, Object value ){
+		this.type = type;
 		this.value = value;
-		this.type = type( value );			
 	}
 	public void setLiteral(Object literal) throws IllegalFilterException {
 		throw new UnsupportedOperationException("Default value is immutable");
@@ -55,7 +59,8 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
 		return type == other.getType() && value.equals( other.getLiteral() );
 	}
 
-	public static ConstantExpression constant( Color color ){
+	/** Encode provided color as a String */
+	public static ConstantExpression color( Color color ){
 		if( color == null ) return NULL;		
 
         String redCode = Integer.toHexString(color.getRed());
