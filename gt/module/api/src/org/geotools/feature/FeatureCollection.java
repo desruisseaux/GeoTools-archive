@@ -22,8 +22,6 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureResults;
 import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.filter.Filter;
-
 
 /**
  * Represents a collection of features.

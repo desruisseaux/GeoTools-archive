@@ -287,5 +287,5 @@ public interface StyleFactory extends Factory {
     
     public RemoteOWS createRemoteOWS(String service, String onlineResource);
  
-    public ShadedRelief createShadedReleif(Expression releifFactor);
+    public ShadedRelief createShadedRelief(Expression reliefFactor);
 }

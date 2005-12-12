@@ -180,7 +180,7 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
     public void visit(LogicFilter filter) {
     	LogicFilter copy = null;
     	
-    	Iterator iterator = copy.getFilterIterator();
+    	Iterator iterator = filter.getFilterIterator();
     	
     	List subFilters = new ArrayList();
     	while (iterator.hasNext()) {
@@ -225,7 +225,7 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
     public void visit(FidFilter filter) {
     	FidFilter copy = ff.createFidFilter();
     	
-    	String[] fids = copy.getFids();
+    	String[] fids = filter.getFids();
     	for (int i = 0; i < fids.length; i++) {
     		copy.addFid(fids[i]);
     	}
@@ -250,15 +250,52 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
     }
 
     public void visit(LiteralExpression expression) {
-        // TODO Auto-generated method stub
+    	LiteralExpression copy = null;
+    	
+    	try {
+			copy = ff.createLiteralExpression(expression.getLiteral());
+		} catch (IllegalFilterException erp) {
+            throw new RuntimeException(erp);
+		} 
+		
+		pages.push(copy);
     }
 
     public void visit(MathExpression expression) {
-        // TODO Auto-generated method stub
+    	MathExpression copy = null;
+    	
+    	try {
+			copy = ff.createMathExpression(expression.getType());
+		
+			if (expression.getLeftValue() != null) {
+				expression.getLeftValue().accept(this);
+				copy.addLeftValue((Expression) pages.pop());
+			}
+			if (expression.getRightValue() != null) {
+				expression.getRightValue().accept(this);
+				copy.addRightValue((Expression) pages.pop());
+			}
+		} catch (IllegalFilterException erp) {
+            throw new RuntimeException(erp);
+		} 
+
+		pages.push(copy);
     }
 
     public void visit(FunctionExpression expression) {
-        // TODO Auto-generated method stub
+    	FunctionExpression copy = null;
+    	
+		Expression[] args = expression.getArgs();
+		Expression[] copyArgs = new Expression[args.length];
+		for (int i = 0; i < args.length; i++) {
+			args[i].accept(this);
+			copyArgs[i] = (Expression) pages.pop();
+		}
+
+		copy = ff.createFunctionExpression(expression.getName());
+		copy.setArgs(copyArgs);
+		
+		pages.push(copy);
     }
 
     public Object getCopy() {

@@ -1,7 +1,6 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.event.GTList;
 import org.geotools.resources.Utilities;
 
 public class LayerFeatureConstraintsImpl extends AbstractGTComponent

@@ -42,7 +42,6 @@ import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
 // J2SE dependencies
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

@@ -40,7 +40,6 @@ import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
-import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleVisitor;
 import org.geotools.styling.StyledLayer;
@@ -50,10 +49,14 @@ import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.UserLayer;
 
-
 /**
- * Used to duplicate a Style object (anything in the SLD hierarchy)
- *
+ * Used to duplicate a Style object (anything in the SLD hierarchy).
+ * <p>
+ * Some methods in this visitor use a clone method to duplicate, rather than
+ * constructing a new object. This should be made consistent with the other
+ * methods, and tested.
+ * </p>
+ * 
  * @author Cory Horner, Refractions Research Inc.
  */
 public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
@@ -125,7 +128,7 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
             copy.addStyle(styleCopy[i]);
         }
 
-        //copy.setLayerFeatureConstraints(); //TODO: add setLayerFeatureConstraints?
+        copy.setLayerFeatureConstraints(lfcCopy);
         getPages().push(copy);
     }
 

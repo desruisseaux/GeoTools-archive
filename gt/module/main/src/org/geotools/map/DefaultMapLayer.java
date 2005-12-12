@@ -370,7 +370,7 @@ public class DefaultMapLayer implements MapLayer {
     		buf.append( title );
     	}
     	if( visible ){
-    		buf.append(", VISIABLE");
+    		buf.append(", VISIBLE");
     	}
     	else {
     		buf.append(", HIDDEN");

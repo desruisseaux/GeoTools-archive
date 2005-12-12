@@ -179,7 +179,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
 
         Halo old = this.halo;
         this.halo = halo;
-        fireChildChanged("halo", halo, this);
+        fireChildChanged("halo", halo, old);
     }
 
     /**

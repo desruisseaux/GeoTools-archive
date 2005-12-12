@@ -133,8 +133,8 @@ public class Styles {
 	public static StyledLayerDescriptor getStyledLayerDescriptor(Object gtComponent) {
 		if (!(gtComponent instanceof GTComponent)) return null;
 		GTComponent component = (GTComponent) gtComponent;
-		while (component.getParent() != GTRoot.NO_PARENT) {
-			component = component.getParent();
+		while (component.getNote().getParent() != GTRoot.NO_PARENT) {
+			component = component.getNote().getParent();
 			if (component instanceof StyledLayerDescriptor) {
 				return (StyledLayerDescriptor) component;
 			}
@@ -144,23 +144,6 @@ public class Styles {
 	
 	private static boolean isRanged(String styleExpression) {
 		return styleExpression.matches(".+\\.{2}.+");
-	}
-	
-	/**
-	 * Overwrites each filter, which will modify our style object assuming there
-	 * are no clones in oldFilters.  Note: made private since it doesn't work.
-	 * 
-	 * @deprecated
-	 * @param oldFilters
-	 *            references to the Filters we want to overwrite
-	 * @param newFilters
-	 *            the new filters we now want to use
-	 */
-	private static void overwriteFilters(Filter[] oldFilters, Filter[] newFilters) {
-		if (oldFilters.length != newFilters.length) { throw new IllegalArgumentException("Filter arrays are of a different length."); }
-		for (int i = 0; i < oldFilters.length; i++) {
-			oldFilters[i] = newFilters[i];
-		}
 	}
 	
 	/**
@@ -503,14 +486,6 @@ public class Styles {
 		return result;
 	}
 
-	private static Color[] toColorArray(Object[] object) {
-		Color[] result = new Color[object.length];
-		for (int i = 0; i < object.length; i++) {
-			result[i] = (Color) object[i];
-		}
-		return result;
-	}
-	
 	private static String[] toStringArray(Object[] object) {
 		String[] result = new String[object.length];
 		for (int i = 0; i < object.length; i++) {

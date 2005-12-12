@@ -16,8 +16,6 @@
  */
 package org.geotools.event;
 
-import sun.security.x509.OtherName;
-
 public class GTNoteImpl implements GTNote {
     GTComponent notificationParent = GTRoot.NO_PARENT;
     protected String notificationName = "";

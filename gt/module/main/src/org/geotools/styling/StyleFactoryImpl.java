@@ -21,15 +21,10 @@
  */
 package org.geotools.styling;
 
-import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-
-import sun.security.x509.ReasonFlags;
 
 
 /**
@@ -748,10 +743,10 @@ public class StyleFactoryImpl extends AbstractStyleFactory
     	return remoteOWS;
     }
     
-    public ShadedRelief createShadedReleif(Expression releifFactor) {
-    	ShadedRelief releif = new ShadedReliefImpl();
-    	releif.setReliefFactor(releifFactor);
+    public ShadedRelief createShadedRelief(Expression reliefFactor) {
+    	ShadedRelief relief = new ShadedReliefImpl();
+    	relief.setReliefFactor(reliefFactor);
     	
-    	return releif;
+    	return relief;
     }
 }

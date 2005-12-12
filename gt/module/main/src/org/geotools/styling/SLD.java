@@ -19,8 +19,6 @@ package org.geotools.styling;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filters;
-import org.geotools.filter.FunctionExpression;
-import org.geotools.filter.LiteralExpression;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
