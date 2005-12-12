@@ -38,6 +38,7 @@ import org.geotools.styling.Style;
  * @author wolf
  */
 public class DefaultMapLayer implements MapLayer {
+	
     /** Holds value of property FeatureSource. */
     protected FeatureSource featureSource;
 
@@ -358,5 +359,31 @@ public class DefaultMapLayer implements MapLayer {
                 .layerHidden(event);
             }
         }
+    }
+    public String toString() {
+    	StringBuffer buf = new StringBuffer();
+    	buf.append("DefaultMapLayer[ ");
+    	if( title == null || title.length()==0){
+    		buf.append("UNNAMED");
+    	}
+    	else {
+    		buf.append( title );
+    	}
+    	if( visible ){
+    		buf.append(", VISIABLE");
+    	}
+    	else {
+    		buf.append(", HIDDEN");
+    	}
+    	buf.append(", style=");
+    	buf.append( style );
+    	buf.append( ", data=");
+    	buf.append( featureSource );
+    	if( query != Query.ALL ){
+    		buf.append( ", query=");
+    		buf.append( query );
+    	}
+    	buf.append("]");
+    	return buf.toString();
     }
 }

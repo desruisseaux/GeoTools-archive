@@ -16,6 +16,8 @@
  */
 package org.geotools.event;
 
+import sun.security.x509.OtherName;
+
 public class GTNoteImpl implements GTNote {
     GTComponent notificationParent = GTRoot.NO_PARENT;
     protected String notificationName = "";
@@ -67,5 +69,19 @@ public class GTNoteImpl implements GTNote {
 
     public int getNotificationPosition() {
         return notificationPosition;
+    }    
+    public String toString() {
+    	StringBuffer buf = new StringBuffer();
+    	buf.append( notificationParent.getNote() );
+    	if( notificationName != null && notificationName.length() != 0 ){
+    		buf.append( "." );    		
+    		buf.append( notificationName );
+    		if( notificationPosition != GTDelta.NO_INDEX ){
+    			buf.append( "[" );
+    			buf.append( notificationPosition );
+    	    	buf.append("]");		
+    		}
+    	}
+    	return buf.toString();
     }
 }

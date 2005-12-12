@@ -48,7 +48,6 @@ public class GridCoverageRendererTest extends TestCase {
     public void testPaint() throws Exception {
        
         FileInputStream inTest = new FileInputStream(TestData.file(this, FILENAME));
-
         BufferedImage imageTest = ImageIO.read(inTest);
         
         GridSampleDimension[] bands=new GridSampleDimension[imageTest.getColorModel().getNumComponents()];
@@ -63,19 +62,19 @@ public class GridCoverageRendererTest extends TestCase {
                 bands, null, null);  
         
         MapContext context=new DefaultMapContext();
-        context.addLayer(coverage, getStyle());
+        Style style = getStyle();
+        context.addLayer(coverage, style );
         StreamingRenderer renderer=new StreamingRenderer();
         renderer.setContext(context);
         Envelope env = context.getLayerBounds();
         int boundary=1;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
                 env.getMinY() - boundary, env.getMaxY() + boundary);
-//        Rendering2DTest.INTERACTIVE=true;
+        //Rendering2DTest.INTERACTIVE=true;
         Rendering2DTest.showRender("testGridCoverage", renderer, TIMEOUT, env);
-
     }    
     
-    public void disabledtestReproject() throws Exception {
+    public void testReproject() throws Exception {
        
     	 FileInputStream inTest = new FileInputStream(TestData.file(this, FILENAME));
 
@@ -93,7 +92,8 @@ public class GridCoverageRendererTest extends TestCase {
                  bands, null, null);  
          
          MapContext context=new DefaultMapContext();
-         context.addLayer(coverage, getStyle());
+         Style style = getStyle();
+         context.addLayer(coverage, style );
          
          CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
          "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
@@ -111,7 +111,7 @@ public class GridCoverageRendererTest extends TestCase {
                  env.getMinY() - boundary, env.getMaxY() + boundary);
          
          env=JTS.transform(env, CRS.transform(DefaultGeographicCRS.WGS84, crs, true), 10);
-         Rendering2DTest.INTERACTIVE=true;
+         //Rendering2DTest.INTERACTIVE=true;
          Rendering2DTest.showRender("testReproject", renderer, TIMEOUT, env);
     }
 

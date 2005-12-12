@@ -274,4 +274,33 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
 
         return false;
     }
+    public String toString() {
+    	StringBuffer buf = new StringBuffer();
+    	buf.append( "FeatureTyleStyleImpl<" );
+    	buf.append( notification );
+    	buf.append(">");
+        buf.append( "[");
+    	if( name != null ) {
+    		buf.append(" name=");
+    		buf.append( name );
+    	}
+    	else {
+    		buf.append( " UNNAMED");
+    	}
+    	buf.append( ", ");
+    	buf.append( featureTypeName );
+    	buf.append( ", rules=<");
+    	buf.append( ruleList.size() );
+    	buf.append( ">" );
+    	if( ruleList.size() > 0 ){
+    		buf.append( "(" );
+    		buf.append( ruleList.get(0));
+    		if( ruleList.size() > 1 ){
+    			buf.append(",...");
+    		}
+    		buf.append( ")");
+    	}    	
+    	buf.append("]");
+    	return buf.toString();
+    }
 }

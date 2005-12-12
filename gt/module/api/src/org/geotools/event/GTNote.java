@@ -25,6 +25,9 @@ public interface GTNote {
         public int getNotificationPosition() {
             return GTDelta.NO_INDEX;
         }
+        public String toString() {
+        	return "NO_PARENT";
+        }
     };
 
 	/**

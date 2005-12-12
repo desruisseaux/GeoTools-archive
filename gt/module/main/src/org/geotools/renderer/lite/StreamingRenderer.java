@@ -1014,7 +1014,10 @@ public class StreamingRenderer implements GTRenderer {
     	 *     required.   see geos-469
     	 */
     	FeatureTypeStyle[] featureStylers =currLayer.getStyle().getFeatureTypeStyles();
-    	CoordinateReferenceSystem sourceCrs = currLayer.getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem();
+    	FeatureSource source = currLayer.getFeatureSource();
+    	FeatureType schema = source.getSchema();
+    	GeometryAttributeType geometryAttribute = schema.getDefaultGeometry();
+    	CoordinateReferenceSystem sourceCrs = geometryAttribute.getCoordinateSystem();
     	
 
     	
@@ -1027,7 +1030,7 @@ public class StreamingRenderer implements GTRenderer {
         
         
         symbolizerAssociationHT = new HashMap();
-        ArrayList lfts= createLiteFeatureTypeStyles(featureStylers,currLayer.getFeatureSource().getSchema(),graphics);
+        ArrayList lfts= createLiteFeatureTypeStyles(featureStylers, schema,graphics);
         if (lfts.size() ==0)
             return; // nothing to do
         

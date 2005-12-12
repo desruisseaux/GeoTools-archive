@@ -37,7 +37,9 @@ public class DelegateFeatureReader implements FeatureReader {
             throw new IOException("Feature Reader has been closed");
         }		
         try {
-        	return schema.duplicate( delegate.next() );    		
+        	Feature feature = delegate.next();
+        	// obj = schema.duplicate( obj );
+        	return feature;        	
         } catch (NoSuchElementException end) {
             throw new DataSourceException("There are no more Features", end);
         }		

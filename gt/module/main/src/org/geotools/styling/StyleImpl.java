@@ -237,4 +237,27 @@ public class StyleImpl extends AbstractGTComponent
 
         return false;
     }
+    public String toString() {
+    	StringBuffer buf = new StringBuffer();
+    	buf.append( "StyleImpl<" );
+    	buf.append( notification );
+    	buf.append(">");
+        buf.append( "[");
+    	if( name != null ) {
+    		buf.append(" name=");
+    		buf.append( name );
+    	}
+    	else {
+    		buf.append( " UNNAMED");
+    	}
+    	if( defaultB ) {
+    		buf.append( ", DEFAULT");
+    	}
+//    	if( title != null && title.length() != 0 ){
+//    		buf.append(", title=");
+//    		buf.append( title );
+//    	}
+    	buf.append("]");
+    	return buf.toString();
+    }
 }

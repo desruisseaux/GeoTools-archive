@@ -52,8 +52,10 @@ public interface GTRoot extends GTComponent {
 			public GTNote getNote() {
 				return GTNote.EMPTY;
 			}
-
 			public void setNote(GTNote container) {
+			}
+			public String toString() {
+				return "NO_PARENT";
 			}
         };
 

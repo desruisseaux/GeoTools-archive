@@ -36,7 +36,7 @@ public abstract class AbstractGTComponent implements GTComponent {
     //    GTComponent notificationParent = GTRoot.NO_PARENT;
     //    protected String notificationName = "";
     //    protected int notificationPosition = GTDelta.NO_INDEX;
-    GTNote notification = new GTNoteImpl(GTRoot.NO_PARENT, "", GTDelta.NO_INDEX);
+    protected GTNote notification = new GTNoteImpl(GTRoot.NO_PARENT, "", GTDelta.NO_INDEX);
 
     protected Object clone() throws CloneNotSupportedException {
         AbstractGTComponent copy = (AbstractGTComponent) super.clone();
