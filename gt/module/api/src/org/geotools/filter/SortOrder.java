@@ -29,16 +29,25 @@ import org.opengis.util.CodeList;
  */
 public final class SortOrder extends CodeList {
 	private static final long serialVersionUID = 7840334200112859571L;
-	private static final List all = new ArrayList();
+	private static final List all = new ArrayList(2);
 
 	/**
 	 * Represents acending order.
+	 * <p>
+	 * Note this has the string representation of ASC to agree
+	 * with the Filter 1.1 specification.
+	 * </p>
 	 */
-	public static final SortOrder ASC = new SortOrder("ASC");
+	public static final SortOrder ASCENDING  = new SortOrder("ASC");
+	
 	/**
 	 * Represents descending order.
+	 * <p>
+	 * Note this has the string representation of DESC to agree
+	 * with the Filter 1.1 specification.
+	 * </p> 
 	 */	
-	public static final SortOrder DESC= new SortOrder("DESC");
+	public static final SortOrder DESCENDING = new SortOrder("DESC");
 	
 	private SortOrder( String name ){
 		super(name, all );
