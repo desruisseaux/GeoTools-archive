@@ -315,6 +315,8 @@ public class Rendering2DTest extends TestCase {
 
         FeatureCollection ft = createTestFeatureCollection(null, LINE);
         Style style = createTestStyle();
+        
+
 
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
@@ -336,6 +338,8 @@ public class Rendering2DTest extends TestCase {
 
         FeatureCollection ft = createTestFeatureCollection(null, POINT);
         Style style = createTestStyle();
+        
+        System.out.println("DAVE:" + style.toString() );
 
         MapContext map = new DefaultMapContext();
         map.addLayer(ft, style);
@@ -585,10 +589,10 @@ public class Rendering2DTest extends TestCase {
         layerQuery = new DefaultQuery("querytest", filter, 2, null, "handle");
         layer.setQuery(layerQuery);
 
-        results = renderer.queryLayer(layer, envelope, DefaultGeographicCRS.WGS84);
+        results = renderer.queryLayer(layer, null,envelope, DefaultGeographicCRS.WGS84);
         assertEquals(2, results.getCount());
         // just the 3 geometric atts should get be loaded
-        assertEquals(3, results.getSchema().getAttributeCount());
+        assertEquals(4, results.getSchema().getAttributeCount());
 
         showRender("testDefinitionQuery1", renderer, 1000, null);
 
@@ -606,7 +610,7 @@ public class Rendering2DTest extends TestCase {
                 "handle");
         layer.setQuery(layerQuery);
 
-        results = renderer.queryLayer(layer, envelope, DefaultGeographicCRS.WGS84);
+        results = renderer.queryLayer(layer, null,envelope, DefaultGeographicCRS.WGS84);
         assertEquals(1, results.getCount());
         // the 4 atts should be loaded since the definition query includes "id"
         assertEquals(4, results.getSchema().getAttributeCount());
@@ -642,10 +646,10 @@ public class Rendering2DTest extends TestCase {
         layerQuery = new DefaultQuery("querytest", filter, Integer.MAX_VALUE, null, "handle");
         layer.setQuery(layerQuery);
 
-        results = renderer.queryLayer(layer, envelope, DefaultGeographicCRS.WGS84);
+        results = renderer.queryLayer(layer, null,envelope, DefaultGeographicCRS.WGS84);
         assertEquals(2, results.getCount());
         // the 4 atts should be loaded since the definition query includes "id"
-        assertEquals(3, results.getSchema().getAttributeCount());
+        assertEquals(4, results.getSchema().getAttributeCount());
 
         showRender("testDefinitionQuery3", renderer, 1000, null);
 
