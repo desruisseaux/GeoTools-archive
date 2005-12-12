@@ -29,6 +29,24 @@ import org.geotools.filter.FilterAttributeExtractor;
  */
 public class StyleAttributeExtractor extends FilterAttributeExtractor
     implements StyleVisitor {
+	
+	
+	/**
+	 *   if the default geometry is used, this will be true.  See GEOS-469
+	 */
+	boolean defaultGeometryUsed = false;
+	
+	/**
+	 * reads the read-only-property.
+	 * See GEOS-469
+	 * 
+	 * @return true if any of the symbolizers visted use the default geometry.
+	 */
+	public boolean getDefaultGeometryUsed()
+	{
+		return defaultGeometryUsed;
+	}
+	
     /**
      * @see org.geotools.styling.StyleVisitor#visit(org.geotools.styling.Style)
      */
@@ -186,10 +204,15 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         if (ps.getGeometryPropertyName() != null) {
             attributeNames.add(ps.getGeometryPropertyName());
         }
-
+        else
+        {
+        	this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
+        }
+        
         if (ps.getGraphic() != null) {
             ps.getGraphic().accept(this);
         }
+       
     }
 
     /**
@@ -199,7 +222,11 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         if (line.getGeometryPropertyName() != null) {
             attributeNames.add(line.getGeometryPropertyName());
         }
-
+        else
+        {
+        	this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
+        }
+        
         if (line.getStroke() != null) {
             line.getStroke().accept(this);
         }
@@ -211,6 +238,10 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
     public void visit(PolygonSymbolizer poly) {
         if (poly.getGeometryPropertyName() != null) {
             attributeNames.add(poly.getGeometryPropertyName());
+        }
+        else
+        {
+        	this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
         }
 
         if (poly.getStroke() != null) {
@@ -228,6 +259,10 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
     public void visit(TextSymbolizer text) {
         if (text.getGeometryPropertyName() != null) {
             attributeNames.add(text.getGeometryPropertyName());
+        }
+        else
+        {
+        	this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
         }
 
         if (text.getFill() != null) {
