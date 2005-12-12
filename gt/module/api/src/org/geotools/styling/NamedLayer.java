@@ -44,8 +44,12 @@ package org.geotools.styling;
  * </p>
  */
 public interface NamedLayer extends StyledLayer {
-    public FeatureTypeConstraint[] getLayerFeatureConstraints();
 
+	public FeatureTypeConstraint[] getLayerFeatureConstraints();
+
+	public void setLayerFeatureConstraints(FeatureTypeConstraint[] constraints);
+	
+	
     public Style[] getStyles();
 
     public void addStyle(Style sl);

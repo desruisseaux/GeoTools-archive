@@ -33,10 +33,16 @@ import java.util.List;
 public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
     List styles = new ArrayList();
 
+    FeatureTypeConstraint[] featureTypeConstraints = new FeatureTypeConstraint[0];
+    
     public FeatureTypeConstraint[] getLayerFeatureConstraints() {
-        return new FeatureTypeConstraint[0]; //was null
+        return featureTypeConstraints;
     }
 
+    public void setLayerFeatureConstraints(FeatureTypeConstraint[] featureTypeConstraints) {
+    	this.featureTypeConstraints = featureTypeConstraints;
+    }
+    
     public Style[] getStyles() {
         return (Style[]) styles.toArray(new Style[0]);
     }

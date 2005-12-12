@@ -29,6 +29,8 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
+import sun.security.x509.ReasonFlags;
+
 
 /**
  * Factory for creating Styles. All style elements are returned as Interfaces
@@ -626,6 +628,10 @@ public class StyleFactoryImpl extends AbstractStyleFactory
             filterFactory.createLiteralExpression(0));
     }
 
+    public RasterSymbolizer createRasterSymbolizer() {
+    	return new RasterSymbolizerImpl();
+    }
+    
     public RasterSymbolizer createRasterSymbolizer(
         String geometryPropertyName, Expression opacity,
         ChannelSelection channel, Expression overlap, ColorMap colorMap,
@@ -740,5 +746,12 @@ public class StyleFactoryImpl extends AbstractStyleFactory
     	remoteOWS.setOnlineResource(onlineResource);
     	
     	return remoteOWS;
+    }
+    
+    public ShadedRelief createShadedReleif(Expression releifFactor) {
+    	ShadedRelief releif = new ShadedReliefImpl();
+    	releif.setReliefFactor(releifFactor);
+    	
+    	return releif;
     }
 }

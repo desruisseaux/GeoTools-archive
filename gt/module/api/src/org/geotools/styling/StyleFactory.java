@@ -219,6 +219,8 @@ public interface StyleFactory extends Factory {
     public PolygonSymbolizer createPolygonSymbolizer(Stroke stroke, Fill fill,
         String geometryPropertyName);
 
+    public RasterSymbolizer createRasterSymbolizer();
+    
     public RasterSymbolizer createRasterSymbolizer(
         String geometryPropertyName, Expression opacity,
         ChannelSelection channel, Expression overlap, ColorMap colorMap,
@@ -284,5 +286,6 @@ public interface StyleFactory extends Factory {
     public NamedLayer createNamedLayer();
     
     public RemoteOWS createRemoteOWS(String service, String onlineResource);
-    
+ 
+    public ShadedRelief createShadedReleif(Expression releifFactor);
 }

@@ -33,13 +33,31 @@ package org.geotools.styling;
  */
 public interface OverlapBehavior {
 
-	static final OverlapBehavior LATEST_ON_TOP = new OverlapBehavior(){};
+	static final OverlapBehavior LATEST_ON_TOP = new OverlapBehavior(){
+		public String getValue() {
+			return "LATEST_ON_TOP";
+		}
+	};
 	
-	static final OverlapBehavior EARLIEST_ON_TOP = new OverlapBehavior(){};
+	static final OverlapBehavior EARLIEST_ON_TOP = new OverlapBehavior(){
+		public String getValue() {
+			return "EARLIEST_ON_TOP";
+		}
+	};
 	
-	static final OverlapBehavior AVERAGE = new OverlapBehavior(){};
+	static final OverlapBehavior AVERAGE = new OverlapBehavior(){
+		public String getValue() {
+			return "AVERAGE";
+		}
+	};
 	
-	static final OverlapBehavior RANDOM = new OverlapBehavior(){};
+	static final OverlapBehavior RANDOM = new OverlapBehavior(){
+		public String getValue() {
+			return "RANDOM";
+		}
+	};
+	
+	String getValue();
 }
 
 
