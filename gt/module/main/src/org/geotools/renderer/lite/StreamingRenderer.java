@@ -496,15 +496,11 @@ public class StreamingRenderer implements GTRenderer {
             }
             labelCache.startLayer();
             try {
-                // DJB: get a featureresults (so you can get a feature reader) for the data
-                FeatureResults results = queryLayer(currLayer, mapArea, destinationCrs);
                 
                 // extract the feature type stylers from the style object
                 // and process them
                 this.screenSize = paintArea;
-                processStylers(graphics, results, currLayer.getStyle().getFeatureTypeStyles(), at,
-                        context.getCoordinateReferenceSystem(),
-                        currLayer.getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem()); //src CRS
+                processStylers(graphics, currLayer, at,destinationCrs,mapArea ); 
             } catch (Exception exception) {
                 fireErrorEvent(new Exception("Exception rendering layer " + currLayer,exception));
             }
@@ -563,9 +559,10 @@ public class StreamingRenderer implements GTRenderer {
     /*
      * Default visibility for testing purposes
      */
-    FeatureResults queryLayer( MapLayer currLayer, Envelope envelope,
+    FeatureResults queryLayer( MapLayer currLayer, LiteFeatureTypeStyle[] styles, Envelope envelope,
             CoordinateReferenceSystem destinationCrs ) throws IllegalFilterException, IOException,
-            IllegalAttributeException {
+            IllegalAttributeException 
+	{
         FeatureResults results = null;
         FeatureSource featureSource = currLayer.getFeatureSource();
         FeatureType schema = featureSource.getSchema();
@@ -574,7 +571,22 @@ public class StreamingRenderer implements GTRenderer {
         
         if (isOptimizedDataLoadingEnabled()) {
             // see what attributes we really need by exploring the styles
-            String[] attributes = findStyleAttributes(currLayer, schema);
+        	//for testing purposes we have a null case --> 
+        	String[] attributes;
+			
+        	if (styles == null)
+        	{
+        		AttributeType[] ats = schema.getAttributeTypes();
+        		attributes = new String[ats.length];
+        		for (int t=0;t<ats.length;t++)
+        		{
+        			attributes[t] = ats[t].getName();
+        		}
+        	}
+        	else
+        	{
+        		attributes = findStyleAttributes(styles, schema);
+        	}
             
             try {
                 // Then create the geometry filters. We have to create one for each
@@ -649,8 +661,7 @@ public class StreamingRenderer implements GTRenderer {
         
         ((DefaultQuery)query).setCoordinateSystem(
                 currLayer.getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
-        
-        
+
         if (isMemoryPreloadingEnabled()) {
             // TODO: attache a feature listener, we must erase the memory cache if
             // anything changes in the data store
@@ -687,13 +698,30 @@ public class StreamingRenderer implements GTRenderer {
      * @param schema the <code>layer</code>'s featuresource schema
      * @return the minimun set of attribute names needed to render <code>layer</code>
      */
-    private String[] findStyleAttributes( MapLayer layer, FeatureType schema ) {
+    private String[] findStyleAttributes( LiteFeatureTypeStyle[] styles, FeatureType schema ) {
         StyleAttributeExtractor sae = new StyleAttributeExtractor();
-        sae.visit(layer.getStyle());
         
+        for (int t=0;t<styles.length;t++)
+        {
+        	LiteFeatureTypeStyle lfts = styles[t];
+        	Rule[] rules = lfts.elseRules;
+        	for (int j=0;j<rules.length;j++)
+        	{
+        		sae.visit(rules[j]);
+        	}
+        	rules = lfts.ruleList;
+        	for (int j=0;j<rules.length;j++)
+        	{
+        		sae.visit(rules[j]);
+        	}
+        }
+
+
         String[] ftsAttributes = sae.getAttributeNames();
         
         /*
+         * DJB:  this is an old comment - erase it soon (see geos-469 and below) - we only add the default geometry if it was used.
+         * 
          * GR: if as result of sae.getAttributeNames() ftsAttributes already contains geometry
          * attribue names, they gets duplicated, wich produces an error in AbstracDatastore when
          * trying to create a derivate FeatureType. So I'll add the default geometry only if it is
@@ -710,11 +738,31 @@ public class StreamingRenderer implements GTRenderer {
             //DJB: This geometry check was commented out.  I think it should actually be back in or
             //     you get ALL the attributes back, which isnt what you want.
             //ALX: For rasters I need even the "grid" attribute.
-            if ((attTypes[i] instanceof GeometryAttributeType || attTypes[i].getName().equalsIgnoreCase("grid")) && !atts.contains(attName)) {
+            
+            //DJB:geos-469, we do not grab all the geometry columns.
+            //  for symbolizers, if a geometry is required it is either explicitly named ("<Geometry><PropertyName>the_geom</PropertyName></Geometry>")
+            //  or the default geometry is assumed (no <Geometry> element).
+            // I've modified the style attribute extractor so it tracks if the default geometry is used.  So, we no longer add EVERY geometry
+            // column to the query!!
+            
+            if (( attTypes[i].getName().equalsIgnoreCase("grid")) && !atts.contains(attName)) {
                 atts.add(attName);
                 LOGGER.fine("added attribute " + attName);
             }
         }
+        
+        try
+		{
+	        //      DJB:geos-469  if the default geometry was used in the style, we need to grab it.
+	        if (sae.getDefaultGeometryUsed() && (!atts.contains(schema.getDefaultGeometry().getName())) )
+	        {
+	        	atts.add(schema.getDefaultGeometry().getName());
+	        }
+		}
+        catch (Exception e)
+		{
+        	// might not be a geometry column.  That will cause problems down the road (why render a non-geometry layer)
+		}
         
         ftsAttributes = new String[atts.size()];
         atts.toArray(ftsAttributes);
@@ -770,58 +818,7 @@ public class StreamingRenderer implements GTRenderer {
         return filter;
     }
     
-    /**
-     * Performs the actual rendering process to the graphics context set in setOutput.
-     * <p>
-     * The style parameter controls the appearance features. Rules within the style object may cause
-     * some features to be rendered multiple times or not at all.
-     * </p>
-     *
-     * @param features the feature collection to be rendered
-     * @param map Controls the full extent of the input space. Used in the calculation of scale.
-     * @param s A style object. Contains a set of FeatureTypeStylers that are to be applied in order
-     *        to control the rendering process.
-     */
-    private void render( FeatureCollection features, Envelope map, Style s ) {
-        if (outputGraphics == null) {
-            LOGGER.info("renderer passed null graphics");
-            
-            return;
-        }
-        
-        // reset the abort flag
-        renderingStopRequested = false;
-        
-        
-        mapExtent = map;
-        
-        // set up the affine transform and calculate scale values
-        AffineTransform at = RendererUtilities.worldToScreenTransform(mapExtent, screenSize);
-        
-        /*
-         * If we are rendering to a component which has already set up some form of transformation
-         * then we can concatenate our transformation to it. An example of this is the ZoomPane
-         * component of the swinggui module.
-         */
-        // if (concatTransforms) {
-        // outputGraphics.getTransform().concatenate(at);
-        // } else {
-        // outputGraphics.setTransform(at);
-        // }
-        scaleDenominator = 1 / outputGraphics.getTransform().getScaleX();
-        
-        // extract the feature type stylers from the style object and process them
-        FeatureTypeStyle[] featureStylers = s.getFeatureTypeStyles();
-        
-        try {
-            processStylers(outputGraphics, DataUtilities.results(features), featureStylers, at,
-                    null,null);
-        } catch (IOException ioe) {
-            fireErrorEvent(new Exception("I/O error while rendering the layer" ,ioe));
-        } catch (IllegalAttributeException iae) {
-            fireErrorEvent(new Exception("Illegal attribute exception while rendering the layer" ,iae));
-        }
-    }
+   
        
     /**
      * Converts a coordinate expressed on the device space back to real world coordinates
@@ -887,7 +884,9 @@ public class StreamingRenderer implements GTRenderer {
      * @return
      * @throws Exception
      */
-    private ArrayList createLiteFeatureTypeStyles( FeatureTypeStyle[] featureStylers,FeatureResults features, Graphics2D graphics) throws IOException {
+    private ArrayList createLiteFeatureTypeStyles( FeatureTypeStyle[] featureStylers,FeatureType ftype, Graphics2D graphics) throws IOException 
+	{
+    	LOGGER.fine("creating rules for scale denominator- "+scaleDenominator);
         ArrayList result  = new ArrayList();
         
         int itemNumber =0;
@@ -895,10 +894,10 @@ public class StreamingRenderer implements GTRenderer {
         for( int i = 0; i < featureStylers.length; i++ ) //DJB: for each FeatureTypeStyle in the SLD (each on is drawn indpendently)
         {
             FeatureTypeStyle fts = featureStylers[i];
-            String typeName = features.getSchema().getTypeName();
+            String typeName = ftype.getTypeName();
             
             if ((typeName != null)
-            && (features.getSchema().isDescendedFrom(null,
+            && (ftype.isDescendedFrom(null,
                     fts.getFeatureTypeName()) || typeName.equalsIgnoreCase(fts
                     .getFeatureTypeName()))) {
                 //DJB: this FTS is compatible with this FT.
@@ -996,19 +995,31 @@ public class StreamingRenderer implements GTRenderer {
      * @param featureStylers An array of feature stylers to be applied
      * @param at DOCUMENT ME!
      * @param destinationCrs - The destination CRS, or null if no reprojection is required
-     * @throws IOException DOCUMENT ME!
-     * @throws IllegalAttributeException DOCUMENT ME!
+     * @throws IOException
+     * @throws IllegalAttributeException
+     * @throws IllegalFilterException
      */
     private void processStylers(final Graphics2D graphics,
-            final FeatureResults features,
-            final FeatureTypeStyle[] featureStylers,
+            MapLayer currLayer,
             AffineTransform at,
             CoordinateReferenceSystem destinationCrs,
-            CoordinateReferenceSystem sourceCrs
+			Envelope mapArea
             )
-            throws IOException,  IllegalAttributeException {
+            throws IllegalFilterException, IOException, IllegalAttributeException 
+	{
+    	
+    	/* DJB:
+    	 *     changed this a wee bit so that it now does the layer query AFTER it has evaluated the rules for scale inclusion.
+    	 *     This makes it so that geometry columns (and other columns) will not be queried unless they are actually going to be
+    	 *     required.   see geos-469
+    	 */
+    	FeatureTypeStyle[] featureStylers =currLayer.getStyle().getFeatureTypeStyles();
+    	CoordinateReferenceSystem sourceCrs = currLayer.getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem();
+    	
+
+    	
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("processing " + featureStylers.length + " stylers for "+features.getSchema().getTypeName());
+            LOGGER.fine("processing " + featureStylers.length + " stylers for "+currLayer.getFeatureSource().getSchema().getTypeName());
         }
         
         transformMap = new HashMap();
@@ -1016,9 +1027,13 @@ public class StreamingRenderer implements GTRenderer {
         
         
         symbolizerAssociationHT = new HashMap();
-        ArrayList lfts= createLiteFeatureTypeStyles(featureStylers,features,graphics);
+        ArrayList lfts= createLiteFeatureTypeStyles(featureStylers,currLayer.getFeatureSource().getSchema(),graphics);
         if (lfts.size() ==0)
             return; // nothing to do
+        
+//   	 DJB: get a featureresults (so you can get a feature reader) for the data
+    	FeatureResults features = queryLayer(currLayer, (LiteFeatureTypeStyle[]) lfts.toArray(new LiteFeatureTypeStyle[lfts.size()]), mapArea, destinationCrs);
+    	
         FeatureReader reader = getReader(features,sourceCrs);
         int n_lfts = lfts.size();
         LiteFeatureTypeStyle[]  fts_array = (LiteFeatureTypeStyle[]) lfts.toArray( new LiteFeatureTypeStyle[n_lfts] );
@@ -1141,10 +1156,10 @@ public class StreamingRenderer implements GTRenderer {
                                     .createConcatenatedTransform(
                                     transform,
                                     mathTransformFactory.createAffineTransform(
-                                    new GeneralMatrix(at)));
+                                    new org.geotools.referencing.operation.GeneralMatrix(at)));
                         } else {
                             transform = (MathTransform2D) mathTransformFactory
-                                    .createAffineTransform(new GeneralMatrix(at));
+                                    .createAffineTransform(new org.geotools.referencing.operation.GeneralMatrix(at));
                         }
                     } catch (Exception e) {
                         // fall through
