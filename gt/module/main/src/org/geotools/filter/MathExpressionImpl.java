@@ -73,15 +73,11 @@ public class MathExpressionImpl extends DefaultExpression
      */
     public void addLeftValue(Expression leftValue)
         throws IllegalFilterException {
-        // Check to see if this is a valid math expression before adding.
-        if (!isGeometryExpression(leftValue.getType())
-                && (leftValue.getType() != LITERAL_STRING)) {
-            this.leftValue = leftValue;
-        } else {
-            throw new IllegalFilterException(
-                "Attempted to add Geometry or String expression to "
-                + "math expression.");
-        }
+    	if (isGeometryExpression(leftValue.getType()) ) {
+    		throw new IllegalFilterException(
+            "Attempted to add Geometry expression to math expression.");
+    	}
+        this.leftValue = leftValue;
     }
 
     /**
@@ -94,14 +90,11 @@ public class MathExpressionImpl extends DefaultExpression
     public void addRightValue(Expression rightValue)
         throws IllegalFilterException {
         // Check to see if this is a valid math expression before adding.
-        if (!isGeometryExpression(rightValue.getType())
-                && (rightValue.getType() != LITERAL_STRING)) {
-            this.rightValue = rightValue;
-        } else {
-            throw new IllegalFilterException(
-                "Attempted to add Geometry or String sub expression to "
-                + "math expression.");
+        if (isGeometryExpression(rightValue.getType()) ) {
+        	throw new IllegalFilterException(
+            "Attempted to add Geometry expression to math expression.");
         }
+        this.rightValue = rightValue;        
     }
 
     /**
@@ -145,22 +138,19 @@ public class MathExpressionImpl extends DefaultExpression
         if ((leftValue == null) || (rightValue == null)) {
             throw new IllegalArgumentException(
                 "Attempted read math expression with missing sub expressions.");
-        }
-
-        double leftDouble = ((Number) leftValue.getValue(feature))
-            .doubleValue();
-        double rightDouble = ((Number) rightValue.getValue(feature))
-            .doubleValue();
-
+        }                
+        double leftDouble = Filters.number( leftValue.getValue(feature) );
+        double rightDouble = Filters.number( rightValue.getValue(feature) );
+        
         // Standard return values.
         if (expressionType == MATH_ADD) {
-            return new Double(leftDouble + rightDouble);
+            return number(leftDouble + rightDouble);
         } else if (expressionType == MATH_SUBTRACT) {
-            return new Double(leftDouble - rightDouble);
+            return number(leftDouble - rightDouble);
         } else if (expressionType == MATH_MULTIPLY) {
-            return new Double(leftDouble * rightDouble);
+            return number(leftDouble * rightDouble);
         } else if (expressionType == MATH_DIVIDE) {
-            return new Double(leftDouble / rightDouble);
+            return number(leftDouble / rightDouble);
         } else {
             // If the type has somehow been mis-set (can't happen externally)
             // then throw an exception.
@@ -169,7 +159,11 @@ public class MathExpressionImpl extends DefaultExpression
                 + "(ie. Add, Subtract, etc.).");
         }
     }
-
+    protected Object number( double number ){
+    	//return Filters.puts( number );  // non strongly typed
+    	return new Double( number );      // Getools 2.1 style
+    }
+    
     /**
      * Returns a string representation of this expression
      *

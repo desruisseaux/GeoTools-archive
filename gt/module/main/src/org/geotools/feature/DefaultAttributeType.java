@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.geotools.filter.Filter;
+import org.opengis.coverage.grid.GridCoverage;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -243,6 +244,9 @@ public class DefaultAttributeType implements AttributeType {
             return Collections.unmodifiableMap(copy);
         }
         
+        if( src instanceof GridCoverage ){
+        	return src; // inmutable
+        }
         
 
         //

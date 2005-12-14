@@ -317,18 +317,6 @@ public class ExpressionTest extends TestCase {
         }
         catch(IllegalFilterException ife){
         }
-        try{
-            mathTest.addLeftValue(text);
-            fail("text strings are not allowed in math expressions");
-        }
-        catch(IllegalFilterException ife){
-        }
-        try{
-            mathTest.addRightValue(text);
-            fail("text strings are not allowed in math expressions");
-        }
-        catch(IllegalFilterException ife){
-        }
     }
     
     public void testIncompleteMathExpression() throws IllegalFilterException {

@@ -16,29 +16,13 @@
  */
 package org.geotools.styling;
 
-import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filters;
-import org.geotools.styling.ExternalGraphic;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Fill;
-import org.geotools.styling.Font;
-import org.geotools.styling.Graphic;
-import org.geotools.styling.Halo;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.Mark;
-import org.geotools.styling.PointSymbolizer;
-import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.RasterSymbolizer;
-import org.geotools.styling.Rule;
-import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
-import org.geotools.styling.StyleBuilder;
-import org.geotools.styling.Symbolizer;
-import org.geotools.styling.TextSymbolizer;
 import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filters;
 
 
 /**
@@ -1200,7 +1184,7 @@ public class SLD {
      * @deprecated
      */
     public static Object value(Expression expr, Class TYPE) {
-        return Filters.value(expr, TYPE);
+        return Filters.asType(expr, TYPE);
     }
 
     /**
@@ -1255,7 +1239,7 @@ public class SLD {
      * @deprecated
      */
     public static int intValue(Expression expr) {
-        return Filters.intValue(expr);
+        return Filters.asInt(expr);
     }
 
     /**
@@ -1269,7 +1253,7 @@ public class SLD {
      * @deprecated
      */
     public static String stringValue(Expression expr) {
-        return Filters.stringValue(expr);
+        return Filters.asString(expr);
     }
 
     /**
@@ -1283,7 +1267,7 @@ public class SLD {
      * @deprecated
      */
     public static double doubleValue(Expression expr) {
-        return Filters.doubleValue(expr);
+        return Filters.asDouble(expr);
     }
 
     /**
@@ -1297,7 +1281,7 @@ public class SLD {
      * @deprecated
      */
     public static Number number(Expression expr) {
-        return Filters.number(expr);
+        return (Number) Filters.asType(expr, Number.class);
     }
 
     /**
