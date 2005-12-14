@@ -70,25 +70,30 @@ import org.geotools.resources.image.ColorUtilities;
  * The number of RGB codes doesn't have to match an {@link IndexColorModel}'s
  * map size. RGB codes will be automatically interpolated RGB values when needed.
  *
+ * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class PaletteFactory {
     /**
-     * The parent factory, or {@code null} if there is none.
-     * The parent factory will be queried if a palette was not
-     * found in current factory.
+     * The parent factory, or {@code null} if there is none. The parent factory
+     * will be queried if a palette was not found in current factory.
      */
     private final PaletteFactory parent;
     
     /**
-     * The class loader from which to load the palette definition files.
-     * If {@code null}, loading will occurs from the system current
+     * The class loader from which to load the palette definition files. If {@code null} and
+     * {@link #altLoader} is null as well, then loading will occurs from the system current
      * working directory.
      */
     private final ClassLoader loader;
+    
+    /**
+     * An alternative to {@link #loader} for loading resources. At most one of {@code loader}
+     * and {@code altLoader} can be non-null. If both are {@code null}, then loading will occurs
+     * from the system current working directory.
+     */
+    private final Class altLoader;
     
     /**
      * The base directory from which to search for palette definition files.
@@ -102,35 +107,32 @@ public class PaletteFactory {
     private final String extension;
     
     /**
-     * The charset to use for parsing files, or
-     * {@code null} for the current default.
+     * The charset to use for parsing files, or {@code null} for the current default.
      */
     private final Charset charset;
     
     /**
-     * The locale to use for parsing files. or
-     * {@code null} for the current default.
+     * The locale to use for parsing files. or {@code null} for the current default.
      */
     private final Locale locale;
     
     /**
-     * Construct a palette factory.
+     * Constructs a palette factory using an optional {@linkplain ClassLoader class loader}
+     * for loading palette definition files.
      *
-     * @param parent    The parent factory, or {@code null} if there is none.
-     *                  The parent factory will be queried if a palette was not
-     *                  found in current factory.
-     * @param loader    The class loader from which to load the palette definition files.
-     *                  If {@code null}, loading will occurs from the system current
-     *                  working directory.
-     * @param directory The base directory from which to search for palette definition files.
-     *                  If {@code null}, then <code>"."</code> is assumed.
+     * @param parent    An optional parent factory, or {@code null} if there is none. The parent
+     *                  factory will be queried if a palette was not found in the current factory.
+     * @param loader    An optional class loader to use for loading the palette definition files.
+     *                  If {@code null}, loading will occurs from the system current working
+     *                  directory.
+     * @param directory The base directory for palette definition files. It may be a Java package
+     *                  if a {@code loader} were specified. If {@code null}, then {@code "."} is
+     *                  assumed.
      * @param extension File name extension, or {@code null} if there is no extension
      *                  to add to filename. If non-null, this extension will be automatically
-     *                  appended to filename. It should starts with the character <code>'.'</code>.
-     * @param charset   The charset to use for parsing files, or
-     *                  {@code null} for the current default.
-     * @param locale    The locale to use for parsing files. or
-     *                  {@code null} for the current default.
+     *                  appended to filename. It should starts with the {@code '.'} character.
+     * @param charset   The charset to use for parsing files, or {@code null} for the default.
+     * @param locale    The locale to use for parsing files. or {@code null} for the default.
      */
     public PaletteFactory(final PaletteFactory parent,
                           final ClassLoader    loader,
@@ -144,6 +146,49 @@ public class PaletteFactory {
         }
         this.parent    = parent;
         this.loader    = loader;
+        this.altLoader = null;
+        this.directory = directory;
+        this.extension = extension;
+        this.charset   = charset;
+        this.locale    = locale;
+    }
+    
+    /**
+     * Constructs a palette factory using an optional {@linkplain Class class} for loading
+     * palette definition files. Using a {@linkplain Class class} instead of a {@linkplain
+     * ClassLoader class loader} can avoid security issue on some platforms (some platforms
+     * do not allow to load resources from a {@code ClassLoader} because it can load from the
+     * root package).
+     *
+     * @param parent    An optional parent factory, or {@code null} if there is none. The parent
+     *                  factory will be queried if a palette was not found in the current factory.
+     * @param loader    An optional class to use for loading the palette definition files.
+     *                  If {@code null}, loading will occurs from the system current working
+     *                  directory.
+     * @param directory The base directory for palette definition files. It may be a Java package
+     *                  if a {@code loader} were specified. If {@code null}, then {@code "."} is
+     *                  assumed.
+     * @param extension File name extension, or {@code null} if there is no extension
+     *                  to add to filename. If non-null, this extension will be automatically
+     *                  appended to filename. It should starts with the {@code '.'} character.
+     * @param charset   The charset to use for parsing files, or {@code null} for the default.
+     * @param locale    The locale to use for parsing files. or {@code null} for the default.
+     *
+     * @since 2.2
+     */
+    public PaletteFactory(final PaletteFactory parent,
+                          final Class          loader,
+                          final File        directory,
+                                String      extension,
+                          final Charset       charset,
+                          final Locale         locale)
+    {
+        if (extension!=null && !extension.startsWith(".")) {
+            extension = '.' + extension;
+        }
+        this.parent    = parent;
+        this.loader    = null;
+        this.altLoader = loader;
         this.directory = directory;
         this.extension = extension;
         this.charset   = charset;
@@ -161,6 +206,12 @@ public class PaletteFactory {
         File dir = (directory != null) ? directory : new File(".");
         if (loader != null) {
             dir = toFile(loader.getResource(dir.getPath()));
+            if (dir == null) {
+                // Directory not found.
+                return null;
+            }
+        } else if (altLoader != null) {
+            dir = toFile(altLoader.getResource(dir.getPath()));
             if (dir == null) {
                 // Directory not found.
                 return null;
@@ -209,6 +260,8 @@ public class PaletteFactory {
         final InputStream stream;
         if (loader!=null) {
             stream = loader.getResourceAsStream(file.getPath());
+        } else if (altLoader != null) {
+            stream = altLoader.getResourceAsStream(file.getPath());
         } else {
             stream = file.exists() ? new FileInputStream(file) : null;
         }

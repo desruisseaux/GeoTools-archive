@@ -85,4 +85,12 @@ public class NewZealandMapGridTest extends TestCase {
 			assertEquals(GEOGRAPHIC[i], dst[i], 0.0001); // About 10 m precision
 		}
 	}
+
+    /**
+     * Tests WKT formatting.
+     */
+    public void testWKT() {
+        final String wkt = new NewZealandMapGrid().toWKT();
+        assertTrue(wkt.indexOf("central_meridian") >= 0);
+    }
 }

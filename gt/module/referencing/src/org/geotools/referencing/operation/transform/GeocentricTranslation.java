@@ -61,7 +61,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  *   <tr><td>Coordinate Frame rotation</td>               <td>9607</td></tr>
  * </table>
  * <p>
- * The conversion between geographic and geocentric coordinates is usually not <strong>not</strong>
+ * The conversion between geographic and geocentric coordinates is usually <strong>not</strong>
  * part of this transform. However, the Geotools implementation of the
  * {@linkplain GeocentricTranslation.Provider provider} accepts the following extensions:
  * <p>
