@@ -16,13 +16,8 @@
  */
 package org.geotools.gml.producer;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.feature.AttributeType;
@@ -35,9 +30,12 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 
 /**
@@ -94,10 +92,10 @@ public class FeatureTransformer extends TransformerBase {
     private SchemaLocationSupport schemaLocation = new SchemaLocationSupport();
     private int maxFeatures = -1;
     private boolean prefixGml = false;
+    private boolean featureBounding = false;
     private String srsName;
     private String lockId;
     private int numDecimals = 4;
-    
 
     public void setCollectionNamespace(String nsURI) {
         collectionNamespace = nsURI;
@@ -115,6 +113,16 @@ public class FeatureTransformer extends TransformerBase {
         return collectionPrefix;
     }
 
+    /**
+     * Sets the number of decimals to be used in the geometry coordinates of
+     * the response.  This allows for more efficient results, since often the
+     * storage format itself won't specify as many decimal places as the
+     * response might want.  The default is 4, but should generally be set by
+     * the user of this class.
+     *
+     * @param numDecimals the number of significant digits past the decimal to
+     *        include in the response.
+     */
     public void setNumDecimals(int numDecimals) {
         this.numDecimals = numDecimals;
     }
@@ -147,7 +155,7 @@ public class FeatureTransformer extends TransformerBase {
     /**
      * Used to set a lockId attribute after a getFeatureWithLock.
      *
-     * @param lockId DOCUMENT ME!
+     * @param lockId The lockId of the lock on the WFS.
      *
      * @task REVISIT: Ian, this is probably the most wfs specific addition. If
      *       you'd like I can subclass and add it there.  It has to be added
@@ -171,7 +179,8 @@ public class FeatureTransformer extends TransformerBase {
      * could be declared in the gt2  namespace, instead of a gml:pointProperty
      * it would be a gt2:pointProperty.
      *
-     * @param prefixGml DOCUMENT ME!
+     * @param prefixGml <tt>true</tt> if prefixing gml should be enabled.
+     *        Default is disabled, no gml prefixing.
      *
      * @task REVISIT: only prefix name, description, and boundedBy if they
      *       occur in their proper places.  Right now names always get gml
@@ -200,6 +209,32 @@ public class FeatureTransformer extends TransformerBase {
         }
     }
 
+    /**
+     * Sets whether a gml:boundedBy element should automatically be generated
+     * and included.  The element will not be updateable, and is simply
+     * derived from the geometries present in the feature.
+     * 
+     * <p>
+     * Note that the <tt>setGmlPrefixing()</tt> interacts with this
+     * occasionally, since it will hack in a gml prefix to a boundedBy
+     * attribute included in the featureType.  If gml prefixing is on, and
+     * featureBounding is on, then the bounds from the attribute will be used.
+     * If gml prefixing is off, then that boundedBy attribute will
+     * presumably be in its own namespace, and so the automatic gml boundedBy
+     * will not conflict, so both will be printed, with the automatic one
+     * deriving its bounds from the boundedBy attribute and any other
+     * geometries in the feature
+     * </p>
+     *
+     * @param featureBounding <tt>true</tt> if the bounds of the feature should
+     *        be automatically calculated and included as a gml:boundedBy in
+     *        the gml output.  Note this puts a good bit of bandwidth overhead
+     *        on the  output.  Default is <tt>false</tt>
+     */
+    public void setFeatureBounding(boolean featureBounding) {
+        this.featureBounding = featureBounding;
+    }
+
     public org.geotools.xml.transform.Translator createTranslator(
         ContentHandler handler) {
         FeatureTranslator t = new FeatureTranslator(handler, collectionPrefix,
@@ -211,6 +246,7 @@ public class FeatureTransformer extends TransformerBase {
         t.setGmlPrefixing(prefixGml);
         t.setSrsName(srsName);
         t.setLockId(lockId);
+        t.setFeatureBounding(featureBounding);
 
         while (prefixes.hasMoreElements()) {
             String prefix = prefixes.nextElement().toString();
@@ -251,10 +287,10 @@ public class FeatureTransformer extends TransformerBase {
             return pre;
         }
 
-	public String toString() {
-	    return "FeatureTypeNamespaces[Default: " + defaultPrefix + 
-		", lookUp: " + lookup;
-	}
+        public String toString() {
+            return "FeatureTypeNamespaces[Default: " + defaultPrefix
+            + ", lookUp: " + lookup;
+        }
     }
 
     /**
@@ -268,6 +304,7 @@ public class FeatureTransformer extends TransformerBase {
         String currentPrefix;
         FeatureTypeNamespaces types;
         boolean prefixGml = false;
+        boolean featureBounding = false;
         String srsName = null;
         String lockId = null;
         ContentHandler handler;
@@ -299,6 +336,10 @@ public class FeatureTransformer extends TransformerBase {
             this.prefixGml = prefixGml;
         }
 
+        void setFeatureBounding(boolean bounding) {
+            this.featureBounding = bounding;
+        }
+
         void setSrsName(String srsName) {
             this.srsName = srsName;
         }
@@ -306,6 +347,11 @@ public class FeatureTransformer extends TransformerBase {
         void setNumDecimals(int numDecimals) {
             geometryTranslator = new GeometryTransformer.GeometryTranslator(handler,
                     numDecimals);
+        }
+
+        void setUseDummyZ(boolean useDummyZ) {
+            geometryTranslator = new GeometryTransformer.GeometryTranslator(handler,
+                    geometryTranslator.getNumDecimals(), useDummyZ);
         }
 
         public void setLockId(String lockId) {
@@ -387,7 +433,6 @@ public class FeatureTransformer extends TransformerBase {
 
         public void startFeatureCollection() {
             try {
-                
                 String element = (getDefaultPrefix() == null) ? fc
                                                               : (getDefaultPrefix()
                     + ":" + fc);
@@ -485,10 +530,18 @@ public class FeatureTransformer extends TransformerBase {
                 if (value != null) {
                     String name = type.getName();
 
-                    //HACK: this should be user configurable, along with the 
+                    //HACK: this should be user configurable, along with the
+
                     //other gml substitutions I shall add.
-                    if (name.equals("boundedBy")
-                            && Geometry.class.isAssignableFrom(value.getClass())) {
+
+                    if (prefixGml //adding this in since the extra boundedBy
+                            //hacking should only need to be done for the weird
+                        //cite tests, and having this check before the string
+                        //equals should get us better performance.  Albeit
+                        //very slightly, but this method gets called millions
+                            && (name.equals("boundedBy")
+                            && Geometry.class.isAssignableFrom(value.getClass()))) {
+
                         writeBounds(((Geometry) value).getEnvelopeInternal());
                     } else {
                         String thisPrefix = currentPrefix;
@@ -536,7 +589,8 @@ public class FeatureTransformer extends TransformerBase {
                 FeatureType type = f.getFeatureType();
                 String name = type.getTypeName();
                 currentPrefix = getNamespaceSupport().getPrefix(f.getFeatureType()
-                                                                 .getNamespace().toString());
+                                                                 .getNamespace()
+                                                                 .toString());
 
                 if (currentPrefix == null) {
                     currentPrefix = types.findPrefix(f.getFeatureType());
@@ -545,8 +599,8 @@ public class FeatureTransformer extends TransformerBase {
                 if (currentPrefix == null) {
                     throw new RuntimeException(
                         "Could not locate namespace for FeatureType : "
-                        + type.getTypeName() + ":" + type.getNamespace() + 
-                        "look up in: " + types);
+                        + type.getTypeName() + ":" + type.getNamespace()
+                        + "look up in: " + types);
                 }
 
                 if (currentPrefix != null) {
@@ -561,6 +615,17 @@ public class FeatureTransformer extends TransformerBase {
                 }
 
                 contentHandler.startElement("", "", name, fidAtts);
+
+                if (featureBounding) {
+                    //HACK pt.2 see line 511, if the cite stuff wanted to hack
+                    //in a boundedBy geometry, we don't want to do it twice.
+                    //So if 
+                    if (prefixGml && (f.getAttribute("boundedBy") != null)) {
+                        //do nothing, since our hack will handle it.
+                    } else {
+                        writeBounds(f.getBounds());
+                    }
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
