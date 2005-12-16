@@ -16,10 +16,12 @@
  */
 package org.geotools.data;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import java.io.IOException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

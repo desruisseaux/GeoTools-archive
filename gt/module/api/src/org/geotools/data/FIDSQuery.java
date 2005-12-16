@@ -22,12 +22,12 @@
  */
 package org.geotools.data;
 
-import org.geotools.filter.Filter;
-import org.geotools.filter.SortBy;
-import org.geotools.filter.SortBy2;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.net.URI;
 import java.util.Arrays;
+
+import org.geotools.filter.Filter;
+import org.geotools.filter.SortBy;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -167,7 +167,7 @@ class FIDSQuery implements Query {
         return null;
     }
 
-	public SortBy2[] getSortyBy() {
+	public SortBy[] getSortyBy() {
 		return SortBy.UNSORTED;
 	}
 }

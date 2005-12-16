@@ -58,28 +58,17 @@ import org.geotools.filter.Filter;
  * Suggestions:
  * 
  * <ul>
- * <li>
- * Aadrea - Support for a reprojection based FeautreSource. Needs to be added
- * to DataStore (rather than a wrapper based) to allow for DataStores  
+ * <li>Aadrea - Support for a reprojection based FeautreSource. Needs to be added
+ *               to DataStore (rather than a wrapper based) to allow for DataStores
+ * <br>Jody - You can see it as part of Query now.
+ * <br>OGC - apparenty they agree as well - it is part of WFS 1.1.
  * </li>
- * <li>
- * Jody - I agree, propose:
- * <pre><code>
- * getFeatureReader( Query, Transaction )
- * - Transaction is still orthognal
- * 
- * getFeatureSource( Query )
- * - Query allows override, and reprojection...
- * 
- * getFeatureStore( typeName )
- * - write access is till by typeName
- *   (just like getFeatureWriter)
- * - consider spliting API into to based on read-only, read/write ability? 
- * </code></pre>
+ * <li>GeoAPI - has reduced this to api to the FeatureStore construct
+ *     Jody - since we are no longer using the FeatureReader/ReaderWriter in client
+ *            code this would not be a bad idea.
  * </li>
  * </ul>
  * 
- *
  * @author Jody Garnett, Refractions Research
  * @version $Id: DataStore.java,v 1.4 2004/01/11 02:31:07 jive Exp $
  */

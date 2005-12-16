@@ -348,6 +348,10 @@ public class Filters {
     		Color color = (Color) obj;
     		return puts( color );
     	}
+    	if( obj instanceof Number ){
+    		Number number = (Number) obj;
+    		return puts( number.doubleValue() );    		
+    	}
     	return obj.toString();
     }
     

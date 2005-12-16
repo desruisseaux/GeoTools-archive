@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,18 +12,22 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data;
 
 /**
  * Thrown when there is an error in a datasource.
+ * <p>
+ * This class was used back in Java 1.3 before the initCause() method
+ * was available for IOException. Since this class is used to pass on
+ * problems from external services, providing the root cause is
+ * important.
+ * </p> 
  */
 public class DataSourceException extends java.io.IOException {
-    
-	private static final long serialVersionUID = -602847953059978370L;
+    private static final long serialVersionUID = -602847953059978370L;
 
-	/**
+    /**
      * Constructs a new instance of DataSourceException
      *
      * @param msg A message explaining the exception

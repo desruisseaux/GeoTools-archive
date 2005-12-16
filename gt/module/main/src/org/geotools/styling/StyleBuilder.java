@@ -20,7 +20,6 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
@@ -1696,9 +1695,8 @@ public class StyleBuilder {
      */
     public Expression attributeExpression(String attributeName)
         throws org.geotools.filter.IllegalFilterException {
-        org.geotools.filter.AttributeExpression attribute = ff.createAttributeExpression((AttributeType)null);
-        attribute.setAttributePath(attributeName);
-
+        org.geotools.filter.AttributeExpression attribute =
+        	ff.createAttributeExpression( attributeName );
         return attribute;
     }
 
@@ -1722,7 +1720,7 @@ public class StyleBuilder {
         FeatureType schema)
         throws IllegalFilterException {
         //grab attribute col
-        AttributeExpression value = ff.createAttributeExpression(schema, name);
+        AttributeExpression value = ff.createAttributeExpression(name);
         String geomName = schema.getDefaultGeometry().getName();
 
         double[] values = new double[fc.size()];

@@ -45,7 +45,82 @@ package org.geotools.filter;
  * @author Jody Garnett, Refractions Research, Inc.
  */
 public interface SortBy {
-	public static final SortBy2[] UNSORTED = new SortBy2[0];	
+	/**
+	 * Used to indicate lack of a sorting order.
+	 * <p>
+	 * This is the default value for used when setting up a Query.
+	 * </p>
+	 */	
+	public static final SortBy[] UNSORTED = new SortBy[0];
+	
+	/**
+	 * Used to indicate "natural" sorting order, usually according
+	 * FID (hopefully based on Key attribtues).
+	 * <p>
+	 * This is the order that is most likely to be available in optimzied
+	 * form, if an Attribute is marked as "key" an optimized ordering should
+	 * be considered avaialble.
+	 * </p>
+	 * <p>
+	 * Non optimized orderings are will at the very least require as pass
+	 * through the data to bring it into memory, you can assume somekind
+	 * of TreeSet would be used. Where the nodes in the tree would indicate
+	 * a list of FeatureIds assoicated with the node, in the order encountered.
+	 * </p>
+	 * <p>
+	 * This is a "NullObject".
+	 * </p> 
+	 */
+	public static final SortBy2 NATRUAL_ORDER= new SortBy2(){
+		public Expression getExpression() {
+			return null;
+		}
+		public void setExpression(Expression expression) {
+			throw new UnsupportedOperationException("Natural Ordering cannot be modified");
+		}
+		/** Natural order usually associated with FID, or Key Attribtues */
+		public AttributeExpression getPropertyName() {
+			return null;
+		}
+		public void setPropertyName(AttributeExpression name) {
+			throw new UnsupportedOperationException("Natural Ordering cannot be modified");
+		}
+		public SortOrder getSortOrderType() {
+			return SortOrder.ASCENDING;
+		}
+		public void setSortOrder(SortOrder order) {
+			throw new UnsupportedOperationException("Natural Ordering cannot be modified");
+		}			
+	};
+	
+	/**
+	 * Indicate the reverse order, usually assoicated with "Fid".
+	 * <p>
+	 * This is a "NullObject".
+	 * </p> 
+	 */
+	public static final SortBy2 REVERSE_ORDER= new SortBy2(){
+		public Expression getExpression() {
+			return null;
+		}
+		public void setExpression(Expression expression) {
+			throw new UnsupportedOperationException("Natural Ordering cannot be modified");
+		}
+		/** Natural order usually associated with FID, or Key Attribtues */
+		public AttributeExpression getPropertyName() {
+			return null;
+		}
+		public void setPropertyName(AttributeExpression name) {
+			throw new UnsupportedOperationException("Natural Ordering cannot be modified");
+		}
+		public SortOrder getSortOrderType() {
+			return SortOrder.DESCENDING;
+		}
+		public void setSortOrder(SortOrder order) {
+			throw new UnsupportedOperationException("Natural Ordering cannot be modified");
+		}			
+	};
+	
 	/**
 	 * Indicate property to sort by, specification is limited to PropertyName.
 	 * <p>

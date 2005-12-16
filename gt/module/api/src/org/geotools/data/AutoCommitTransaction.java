@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 /*
  * Created on 15-Mar-2005
@@ -32,6 +31,7 @@ import java.util.Set;
  * 
  * <p>
  * This class serves as the implementation of the constant Transaction.NONE.
+ * It is a NullObject and we feel no need to make this class public.
  * </p>
  */
 class AutoCommitTransaction implements Transaction {

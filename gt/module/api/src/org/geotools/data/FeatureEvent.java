@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data;
 
@@ -39,9 +38,11 @@ import java.util.EventObject;
  * <p>
  * The commit opperation will also need to provide notification.
  * </p>
+ *
+ * @since GeoTools 2.0
  */
 public class FeatureEvent extends EventObject {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3154238322369916485L;
 
     /**
      * Event type constant denoting the adding of a feature.

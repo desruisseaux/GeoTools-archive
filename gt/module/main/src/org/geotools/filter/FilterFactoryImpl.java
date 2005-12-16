@@ -44,6 +44,17 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     /**
+     * Creates an AttributeExpression using the supplied xpath.
+     * <p>
+     * The supplied xpath can be used to query a varity of
+     * content - most notably Features.
+     * </p>
+     * @return The new Attribtue Expression
+     */
+    public AttributeExpression createAttributeExpression( String xpath){
+    	return new AttributeExpressionImpl( xpath );
+    }
+    /**
      * Creates a Attribute Expression with an initial schema.
      *
      * @param schema the schema to create with.

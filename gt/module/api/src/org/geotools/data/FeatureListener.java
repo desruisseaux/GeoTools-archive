@@ -24,8 +24,8 @@ package org.geotools.data;
  * (if known).
  * </p>
  *
- * @author Jody Garnett
- * @version $Id: FeatureListener.java,v 1.1 2003/12/01 22:00:40 cholmesny Exp $
+ * @author Jody Garnett, Refractions Research, Inc.
+ * @since GeoTools 2.0
  */
 public interface FeatureListener extends java.util.EventListener {
     /**

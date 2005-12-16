@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data;
 
@@ -74,6 +73,25 @@ import java.util.Map;
  * FeatureSource = postgis.getFeatureSource( "table" );
  * </code></pre>
  * </p>
+ * <h2>
+ * 
+ * <ul>
+ * <li>
+ * Jody - can we please get something better then Param to describe what is
+ * allowed? <br>
+ * Jody - ISO19119 has something that looks okay, WSDL/SOAP could be used?
+ * </li>
+ * <li>
+ * Jody - can we seperate out Identification of a Service from configration of
+ * the service? <br>
+ * Jody - this is mostly a problem when managing user supplied configurations
+ * in GeoServer and uDig. <br>
+ * Jody - the "Catalog API" has now been ported and contains a URI as
+ * indentification, while still allowing configuration using a Map of
+ * parameters
+ * </li>
+ * </ul>
+ * 
  *
  * @author Jody Garnett, Refractions Research
  */
@@ -137,29 +155,6 @@ public interface DataStoreFactorySpi extends Factory {
     //     * @throws IOException
     //     */
     //    DataSourceMetadataEnity createMetadata( Map params ) throws IOException;
-    /**
-     * Construct a <b>new</b> data source using the params specified.
-     * 
-     * <p>
-     * I am not sure how "cool" this idea is; often you need more/different
-     * parameters for DataStore construction (then the params used to
-     * createDataStore).
-     * </p>
-     * 
-     * <p>
-     * Many data sources will not be able to create "new" construct; you cannot
-     * use this method to define a new Database for example. This is the
-     * method you would use to set up a new shapefile though.
-     * </p>
-     *
-     * @param params The full set of information needed to construct a new data
-     *        store.
-     *
-     * @return The created Data Store
-     *
-     * @throws IOException IOException for any problems creating the new data
-     *         source.
-     */
     DataStore createNewDataStore(Map params) throws IOException;
 
     /**

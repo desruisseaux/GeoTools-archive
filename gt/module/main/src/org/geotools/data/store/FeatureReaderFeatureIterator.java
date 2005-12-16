@@ -17,10 +17,11 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 
 /**
@@ -33,9 +34,9 @@ import org.geotools.feature.IllegalAttributeException;
  * @author jgarnett
  * @since 2.1.RC0
  */
-final class FeatureReaderIterator implements Iterator {
+final class FeatureReaderFeatureIterator implements FeatureIterator {
     FeatureReader reader;
-    public FeatureReaderIterator( FeatureReader reader ){
+    public FeatureReaderFeatureIterator( FeatureReader reader ){
         this.reader = reader;
     }
     public boolean hasNext() {
@@ -56,7 +57,7 @@ final class FeatureReaderIterator implements Iterator {
         }        
     }
 
-    public Object next() {
+    public Feature next() {
         if( reader == null ) {
             throw new NoSuchElementException( "Iterator has been closed" );            
         }
@@ -79,7 +80,8 @@ final class FeatureReaderIterator implements Iterator {
         throw new UnsupportedOperationException("Modification of contents is not supported");
     }
     /**
-     * Close the reader please.
+     * This method only needs package visability as only AbstractFeatureCollection
+     * is trusted enough to call it.
      */
     public void close(){
         if( reader != null){

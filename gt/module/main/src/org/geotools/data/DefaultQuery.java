@@ -16,14 +16,14 @@
  */
 package org.geotools.data;
 
-import org.geotools.filter.Filter;
-import org.geotools.filter.SortBy2;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import org.geotools.filter.Filter;
+import org.geotools.filter.SortBy;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -488,7 +488,7 @@ public class DefaultQuery implements Query {
      * you may limit yourself to to SortBy information.
      * </p>
      */
-    public SortBy2[] getSortyBy() {
-		return (SortBy2[]) sorted.toArray( new SortBy2[ sorted.size() ] );
+    public SortBy[] getSortyBy() {
+		return (SortBy[]) sorted.toArray( new SortBy[ sorted.size() ] );
 	}   
 }

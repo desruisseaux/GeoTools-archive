@@ -120,18 +120,52 @@ public interface FilterFactory extends Factory {
     public FidFilter createFidFilter();
 
     /**
-     * Creates a Attribute Expression given a schema and attribute path.
+     * Creates an AttributeExpression using the supplied xpath.
+     * 
+     * <p>
+     * The supplied xpath can be used to query a varity of content - most
+     * notably Features.
+     * </p>
      *
-     * @param schema the schema to get the attribute from.
-     * @param path the xPath of the attribute to compare.
+     * @param xpath XPath used to retrive value
+     *
+     * @return The new Attribtue Expression
+     */
+    public AttributeExpression createAttributeExpression(String xpath);
+
+    /**
+     * Creates a Attribute Expression given a schema and attribute path.
+     * 
+     * <p>
+     * If you supply a schema, it will be used as a sanitch check for the
+     * provided path.
+     * </p>
+     *
+     * @param schema the schema to get the attribute from, or null
+     * @param xpath the xPath of the attribute to compare.
      *
      * @return The new Attribute Expression.
      *
      * @throws IllegalFilterException if there were creation problems.
+     *
+     * @deprecated use createAttributeExpression( xpath ), will be removed for
+     *             GeoTools 2.3
      */
     public AttributeExpression createAttributeExpression(FeatureType schema,
-        String path) throws IllegalFilterException;
+        String xpath) throws IllegalFilterException;
 
+    /**
+     * Shortcut the process - will only grab values matching AttributeType.
+     *
+     * @param at
+     *
+     * @return The new Attribtue Expression
+     *
+     * @throws IllegalFilterException if there were creation problems
+     *
+     * @deprecated use createAttributeExpression( at ), will be removed for
+     *             GeoTools 2.3
+     */
     public AttributeExpression createAttributeExpression(AttributeType at)
         throws IllegalFilterException;
 
@@ -211,7 +245,7 @@ public interface FilterFactory extends Factory {
      * @return The new Null Filter.
      */
     public NullFilter createNullFilter();
-    
+
     /**
      * Creates an empty Between Filter.
      *

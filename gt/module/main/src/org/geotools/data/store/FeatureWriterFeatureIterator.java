@@ -17,78 +17,81 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.geotools.data.FeatureReader;
-import org.geotools.feature.IllegalAttributeException;
+import org.geotools.data.FeatureWriter;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
 
 /**
- * An iterator wrapper for a FeatureReader - for use with
+ * An iterator wrapper for a FeatureWriter - for use with
  * an AbstractFeatureCollection.
  * <p>
  * There is no reason modify this class, subclasses that wish
  * to work with a custom iterator need just that - a custom iterator.
  * <p>
+ * <p>
+ * The use of this class against a FeatureSource not backed by
+ * a Transaction may *really* cut into performance. Consider if
+ * you will the overhead involved in writing out each feature into
+ * a temporary file (when the user may not even modify anything).
+ * </p>
  * @author jgarnett
  * @since 2.1.RC0
  */
-final class FeatureReaderIterator implements Iterator {
-    FeatureReader reader;
-    public FeatureReaderIterator( FeatureReader reader ){
-        this.reader = reader;
+final class FeatureWriterFeatureIterator implements FeatureIterator {
+    FeatureWriter writer;    
+    public FeatureWriterFeatureIterator( FeatureWriter writer ){
+        this.writer = writer;
     }
     public boolean hasNext() {
         try {
-            if( reader == null ) return false;
-            if( reader.hasNext() ){
-                return true;                
+            if( writer == null ) {
+                return false;
+            }
+            writer.write(); // write out any "changes" made
+            if( writer.hasNext() ){
+                return true;
             }
             else {
-                // auto close because we don't trust
-                // client code to call closed :-)
                 close();
                 return false;
-            }            
+                // auto close because we don't trust client
+                // code to call close 
+            }
         } catch (IOException e) {
             close();
             return false; // failure sounds like lack of next to me
         }        
     }
 
-    public Object next() {
-        if( reader == null ) {
+    public Feature next() {
+        if( writer == null ) {
             throw new NoSuchElementException( "Iterator has been closed" );            
         }
         try {
-            return reader.next();
+            return writer.next();
         } catch (IOException io) {
-            close();
             NoSuchElementException problem = new NoSuchElementException( "Could not obtain the next feature:"+io );
             problem.initCause( io );
             throw problem;
-        } catch (IllegalAttributeException create) {
-            close();
-            NoSuchElementException problem = new NoSuchElementException( "Could not create the next feature:"+create );
-            problem.initCause( create );
-            throw problem;
+        }       
+    }
+    public void remove() {
+        try {
+            writer.remove();
+        } catch (IOException problem) {
+            throw (IllegalStateException) new IllegalStateException( "Could not remove feature" ).initCause( problem ); 
         }        
     }
-    /** If this is a problem, a different iterator can be made based on FeatureWriter */
-    public void remove() {
-        throw new UnsupportedOperationException("Modification of contents is not supported");
-    }
-    /**
-     * Close the reader please.
-     */
     public void close(){
-        if( reader != null){
+        if( writer != null){
             try {
-                reader.close();
+                writer.close();
             } catch (IOException e) {
                 // sorry but iterators die quitely in the night
             }
-            reader = null;
+            writer = null;
         }
     }
 };

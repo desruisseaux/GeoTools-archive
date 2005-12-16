@@ -11,6 +11,8 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.filter.Filter;
+import org.geotools.filter.SortBy;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -230,5 +232,20 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
         finally {
         	close( iterator );
         }
+	}
+
+	public FeatureCollection subCollection(Filter filter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public FeatureList sort(SortBy order) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void purge() {
+		// TODO Auto-generated method stub
+		
 	}
 }

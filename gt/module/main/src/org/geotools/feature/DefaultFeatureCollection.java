@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,11 +32,14 @@ import java.util.TreeMap;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
+import org.geotools.feature.collection.FeatureDelegate;
 import org.geotools.feature.collection.FeatureIteratorImpl;
 import org.geotools.feature.collection.SubFeatureCollection;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Filter;
+import org.geotools.filter.SortBy;
+import org.geotools.filter.SortBy2;
 import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -45,11 +49,14 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * A basic implementation of FeatureCollection which use a {@link TreeMap} for
  * its internal storage.
- *
+ * <p>
+ * This should be considered a MemoryFeatureCollection.
+ * </p>
+ * 
  * @author Ian Schneider
  * @version $Id: DefaultFeatureCollection.java,v 1.6 2003/12/04 23:17:23 aaime Exp $
  */
-public class DefaultFeatureCollection extends AbstractFeatureCollection {
+public class DefaultFeatureCollection implements FeatureCollection {
     
     /**
      * Contents of collection, referenced by FeatureID.
@@ -617,7 +624,7 @@ public class DefaultFeatureCollection extends AbstractFeatureCollection {
 	public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
 		if(position == 0 && val instanceof List){
             List nw = (List)val;
-			if( !isFeatures( nw )) return;
+			if( !FeatureDelegate.isFeatures( nw )) return;
             
             contents.clear();
             for( Iterator i = nw.iterator(); i.hasNext(); ){
@@ -633,7 +640,7 @@ public class DefaultFeatureCollection extends AbstractFeatureCollection {
 	 * @see org.geotools.feature.Feature#getNumberOfAttributes()
 	 */
 	public int getNumberOfAttributes() {
-		return contents.size();
+		return featureType == null ? 1 : featureType.getAttributeCount();		
 	}
 
 	/* (non-Javadoc)
@@ -741,10 +748,75 @@ public class DefaultFeatureCollection extends AbstractFeatureCollection {
         }
 	}
 
+    /**
+     * Will return an optimized subCollection based on access
+     * to the origional MemoryFeatureCollection.
+     * <p>
+     * This method is intended in a manner similar to subList,
+     * example use:
+     * <code>
+     * collection.subCollection( myFilter ).clear()
+     * </code>
+     * </p>    
+     * @param filter Filter used to determine sub collection.
+     * @since GeoTools 2.2, Filter 1.1
+     */
 	public FeatureCollection subCollection(Filter filter) {
 		if( filter == Filter.ALL || filter.equals( Filter.ALL )){
 			return this;
 		}		
 		return new SubFeatureCollection( this, filter );
 	}
+
+    /**
+     * Construct a sorted view of this content.
+     * <p>
+     * Sorts may be combined togther in a stable fashion, in congruence
+     * with the Filter 1.1 specification.
+     * </p>
+     * <p>
+     * This method should also be able to handle GeoTools specific
+     * sorting through detecting order as a SortBy2 instance.
+     * </p>
+     * @param SortBy Construction of a Sort
+     * @since GeoTools 2.2, Filter 1.1
+     * @param order Filter 1.1 SortBy
+     * @return FeatureList sorted according to provided order
+
+     */
+    public FeatureList sort(SortBy order) {
+    	if( order == SortBy.NATRUAL_ORDER ){
+    		// return new FeatureListImpl( this );
+    	}
+    	if( order instanceof SortBy2){
+    		SortBy2 advanced = (SortBy2) order;
+    		return sort( advanced );
+    	}
+    	return null;
+    }
+    /**
+     * Allows for "Advanced" sort capabilities specific to the
+     * GeoTools platform!
+     * <p>
+     * Advanced in this case really means making use of a generic
+     * Expression, rather then being limited to PropertyName.
+     * </p>
+     * @param order GeoTools SortBy
+     * @return FeatureList sorted according to provided order
+     */
+    public FeatureList sort(SortBy2 order ){
+    	Comparator compare;    	
+    	if( order == SortBy.NATRUAL_ORDER ){
+    		// forward
+    	}
+    	else if ( order == SortBy.REVERSE_ORDER ){
+    		// backwards
+    	}
+    	// custom
+    	return null; // new OrderedFeatureList( order, compare );
+    }
+
+	public void purge() {
+		// no resources were harmed in the making of this FeatureCollection
+	}	
 }

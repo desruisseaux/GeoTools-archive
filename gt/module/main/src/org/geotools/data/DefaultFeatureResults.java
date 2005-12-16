@@ -17,23 +17,17 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
 
 import org.geotools.data.store.DataFeatureCollection;
-import org.geotools.feature.CollectionListener;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.JTS;
 
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

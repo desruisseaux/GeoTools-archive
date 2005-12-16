@@ -16,9 +16,10 @@
  */
 package org.geotools.data;
 
-import org.geotools.filter.Filter;
 import java.io.IOException;
 import java.util.Set;
+
+import org.geotools.filter.Filter;
 
 
 /**
@@ -28,13 +29,16 @@ import java.util.Set;
  * Features from individual shapefiles, database tables, etc. can be protected
  * or reserved from modification through this interface.
  * </p>
- * 
  * <p>
- * This is a prototype DataSource replacement please see FeatureSource form
- * more information
- * </p>
+ * To use please cast your FeatureSource to this interface.
+ * <pre><code>
+ * FeatureSource source = dataStore.getFeatureSource("roads");
+ * if( source instanceof FeatureLocking ) {
+ *     FeatureLocking locking = (FeatureLocking) source;
+ *     ...
+ * }
  *
- * @author Jody Garnett
+ * @author Jody Garnett, Refractions Research, Inc.
  * @author Ray Gallagher
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP

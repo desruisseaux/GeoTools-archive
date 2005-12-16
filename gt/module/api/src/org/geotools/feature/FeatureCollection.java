@@ -17,11 +17,13 @@
 package org.geotools.feature;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.geotools.data.FeatureResults;
+import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.filter.Filter;
+import org.geotools.filter.SortBy;
 
 /**
  * Represents a collection of features.
@@ -88,7 +90,7 @@ import org.geotools.feature.visitor.FeatureVisitor;
  * @author Jody Garnett, Refractions Research, Inc.
  * @version $Id: FeatureCollection.java,v 1.12 2003/07/30 21:31:41 jmacgill Exp $
  */
-public interface FeatureCollection extends Collection, FeatureResults, Feature {
+public interface FeatureCollection extends ResourceCollection, FeatureResults, Feature {
     
     /**
      * Obtain a FeatureIterator of the Features within this collection.
@@ -129,47 +131,6 @@ public interface FeatureCollection extends Collection, FeatureResults, Feature {
      * @return A FeatureIterator.
      */    
     FeatureIterator features();    
-    
-    /**
-     * Returns an iterator over the contents of this collection.
-     * <p>
-     * Collection is not guarneteed to be ordered in any manner.
-     * </p>
-     * <p>
-     * The implementation of Collection must adhere to the rules of
-     * fail-fast concurrent modification. In addition (to allow for
-     * resource backed collections, the <code>close( Iterator )</code>
-     * method must be called.
-     * <p>
-     * </p>
-     * Example (safe) use:<pre><code>
-     * Iterator iterator = collection.iterator();
-     * try {
-     *     while( iterator.hasNext();){
-     *          Feature feature = (Feature) iterator.hasNext();
-     *          System.out.println( feature.getID() );
-     *     }
-     * }
-     * finally {
-     *     collection.close( iterator );
-     * }
-     * </code></pre>
-     * </p>
-     * <h3>GML Notes</h3>
-     * <p>
-	 * Note XPath: the contents of a GML collection are represented by either
-	 * featureMember or featureMembers. When interpretting an XPath expression,
-	 * you should consider this function to visit both elements for you.
-	 * </p>
-	 * <p>
-	 * XPath Mapping:
-	 * <ul>
-	 * <li>Preferred:<code>featureMember/*</code>
-	 * <li>Legal:<code>featureMembers</code>
-	 * </ul>
-     * @see features()
-     */
-    public Iterator iterator();
     
     /**
      * Clean up any resources assocaited with this iterator in a manner similar to JDO collections.
@@ -340,5 +301,13 @@ public interface FeatureCollection extends Collection, FeatureResults, Feature {
      * @param filter
      * @return FeatureCollection identified as subset.
      */
-    //public FeatureCollection subCollection( Filter filter );    
+    public FeatureCollection subCollection( Filter filter );
+    
+    /**
+     * collection.subCollection( myFilter ).sort( {"foo","bar"} );
+     * collection.subCollection( myFilter ).sort( "bar" ).sort("foo") 
+     * @param order
+     * @return
+     */
+    public FeatureList sort( SortBy order  );
 }

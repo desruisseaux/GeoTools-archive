@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 /*
  * Created on 15-Mar-2005
@@ -24,7 +23,6 @@ package org.geotools.data;
 
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
-import org.geotools.filter.SortBy2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.net.URI;
 import java.util.Arrays;
@@ -165,7 +163,7 @@ class ALLQuery implements Query {
         return null;
     }
 
-	public SortBy2[] getSortyBy() {
-		return SortBy.UNSORTED;
-	}
+    public SortBy[] getSortyBy() {
+        return SortBy.UNSORTED;
+    }
 }

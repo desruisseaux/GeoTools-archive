@@ -16,11 +16,12 @@
  */
 package org.geotools.data;
 
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import java.io.IOException;
-import java.util.NoSuchElementException;
 
 
 /**
@@ -30,34 +31,50 @@ import java.util.NoSuchElementException;
  * <p>
  * Typical use is as follows:
  * <pre><code>
- *   FeatureReader reader;
- *   ...
- *   Feature f = null;
- *   while ( reader.hasNext() ) {
- *      f = reader.next();
- * 
+ *   FeatureReader reader = null;
+ *   try{
+ *      for( reader = data.getFeatureReader( filter ); reader.hasNext(); ){
+ *          f = reader.next();
+ *          ...
+ *      }
  *   }
- * 
- *   reader.close();
+ *   catch (IOException problem){
+ *      ...
+ *   }
+ *   finally {
+ *      if( reader != null ){
+ *          try {
+ *             reader.close();
+ *          }
+ *          catch( IOException eek){
+ *          }
+ *      }
+ *   } 
  * </code></pre>
- * Questions for Ian:
  * 
+ * <h2>Questions and Suggestions</h2>
  * <ul>
- * <li>
- * Should FeatureReader provide access to the AttributeReaders it uses?
+ * <li>Q: Should FeatureReader provide access to the AttributeReaders it uses?
+ * <br>A:
+ *       No, it looks like we will make a lazy Feature in order to cleanly 
+ *       allow for lazy parsing of attribtues.
  * </li>
- * <li>
- * FeatureReader has a close method, but no open method? (This is probably by
- * design allowing FeatureReader to encapsulate its InputStream or Rowset). I
- * am going to assume that FeatureReaders are a single use proposition.
+ * <li>Q:FeatureReader has a close method, but no open method?
+ * <br>A: This is by design allowing FeatureReader to encapsulate its InputStream
+ *     or Rowset). Please assume that FeatureReaders are a single use proposition.
+ * </li>
+ * <li>Q: All that exception handling is a pain!
+ *     A:
+ *        Yes it is, we have constructed semi-normal Java iterators to cut down on the
+ *        pain. But you *do* still have to close 'em - this is IO after all.
+ * </li>
+ * <li>Q: Can we include skip(int) - SeanG
+ *     A:
+ *        The order of the contents is not "known" or predicatable to the end user, so
+ *        skip( int ) would be useless. For random access (a higher order
+ *        of abstraction then FeatureReader) please look at FeatureList.
  * </li>
  * </ul>
- * </p>
- * 
- * <p>
- * I've modified this to be based on the Iterator pattern as discussed in
- * email. The only question remaining is whether to include skip(int) or not.
- * (SeanG)
  * </p>
  *
  * @author Ian Schneider

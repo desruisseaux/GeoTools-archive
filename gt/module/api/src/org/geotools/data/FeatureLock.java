@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data;
 
@@ -26,8 +25,14 @@ package org.geotools.data;
  * <p>
  * A FeatureLock representing the Current Transaction has been provided.
  * </p>
+ * <h2>
+ * 
+ * <p>
+ * Jody - I have a slightly more consistent specification of this idea in
+ * GeoAPI that should be ported back over.
+ * </p>
  *
- * @author jgarnett, Refractions Research, Inc.
+ * @author Jody Garnett, Refractions Research, Inc.
  * @version $Id: FeatureLock.java,v 1.4 2003/11/05 00:51:35 jive Exp $
  *
  * @see <a

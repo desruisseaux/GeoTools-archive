@@ -19,25 +19,32 @@ package org.geotools.data.store;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
-import org.geotools.feature.AbstractFeatureCollection;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.collection.DelegateFeatureIterator;
+import org.geotools.feature.collection.FeatureDelegate;
+import org.geotools.feature.collection.SubFeatureCollection;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.filter.Filter;
+import org.geotools.filter.SortBy;
+import org.geotools.filter.SortBy2;
 import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -66,7 +73,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author jgarnett
  * @since 2.1.RC0
  */
-public abstract class DataFeatureCollection extends AbstractFeatureCollection {
+public abstract class DataFeatureCollection implements FeatureCollection {
     
     /** Internal listener storage list */
     private List listeners = new ArrayList(2);
@@ -166,6 +173,12 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
         listeners.remove(listener);
     }
     
+    //
+    // Content Access
+    //
+    /** Set of open resource iterators & featureIterators */
+    private final Set open = new HashSet();
+
     /**
      * FeatureIterator is entirely based on iterator().
      * <p>
@@ -173,23 +186,37 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
      * out of the box.
      */
     public FeatureIterator features() {
-        return new DelegateFeatureIterator( iterator() );
+    	FeatureIterator iterator = new DelegateFeatureIterator( iterator() );
+        open.add( iterator );
+        return iterator;
     }
    
     /**
      * Iterator may (or may) not support modification.
      */
-    public Iterator iterator() {        
-        FeatureWriter writer = null;
-        try {
-            writer = writer();
-            return new FeatureWriterIterator( writer );
+    final public Iterator iterator() {
+    	Iterator iterator = openIteartor();
+    	open.add( iterator );
+    	return iterator;    	    	
+    }
+    
+    /**
+     * Returns a FeatureWriterIterator, or FeatureReaderIterator over content.
+     * <p>
+     * If you have a way to tell that you are readonly please subclass with
+     * a less hardcore check - this implementations catches a
+     * UnsupportedOpperationsException from wrtier()!
+     * 
+     * @return Iterator, should be closed closeIterator 
+     */
+    protected Iterator openIteartor(){
+    	try {
+            return new FeatureWriterIterator( writer() );
         }
         catch (IOException badWriter) {
             return new NoContentIterator( badWriter );
         }
         catch( UnsupportedOperationException readOnly ){
-            // okay then lets try a reader based iterator
         }
         try {
             return new FeatureReaderIterator( reader() );
@@ -199,11 +226,16 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
     }
 
     public void close( FeatureIterator iterator) {
-        if( iterator != null ) iterator.close();
+    	iterator.close();
+        open.remove( iterator );        
     }
 
-    public void close( Iterator close ) {
-        if( close == null ){
+    final public void close( Iterator close ) {
+    	closeIterator( close );
+        open.remove( close );
+    }   
+    protected void closeIterator( Iterator close ){
+    	if( close == null ){
             // iterator probably failed during consturction !
         }
         else if( close instanceof FeatureReaderIterator ){
@@ -214,8 +246,8 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
             FeatureWriterIterator iterator = (FeatureWriterIterator) close;
             iterator.close(); // only needs package visability
         }
-    }   
-
+    }
+    
     /** Default implementation based on getCount() - this may be expensive */
     public int size() {
         try {
@@ -224,6 +256,28 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
             return 0;
         }
     }
+    public void purge(){    	
+    	for( Iterator i = open.iterator(); i.hasNext(); ){
+    		Object iterator =  i.next();
+    		try {
+    			if( iterator instanceof Iterator ){
+    				closeIterator( (Iterator) iterator );
+    			}
+    			if( iterator instanceof FeatureIterator){
+    				( (FeatureIterator) iterator ).close();
+    			}
+    		}
+    		catch( Throwable e){
+    			// TODO: Log e = ln
+    		}
+    		finally {
+    			i.remove();
+    		}
+    	}
+    }
+    //
+    // Off into implementation land!
+    //
     /**
      * Default implementation based on creating an reader, testing hasNext, and closing.
      * <p>
@@ -311,8 +365,19 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
         return false;
     }
 
-    public boolean addAll( Collection arg0 ) {
-        return false;
+    /**
+     * Optimized implementation of addAll that recognizes the
+     * use of collections obtained with subCollection( filter ).
+     * <p>
+     * This method is constructed by either:
+     * <ul>
+     * <li>Filter OR
+     * <li>Removing an extact match of Filter AND
+     * </ul>
+     * 
+     */
+    public boolean addAll(Collection arg0) {
+    	return false;
     }
 
     public boolean removeAll( Collection arg0 ) {        
@@ -423,7 +488,7 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
     public void setAttribute( int position, Object val ) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
         if(position == 0 && val instanceof Collection){
             Collection list = (Collection)val;
-            if( !isFeatures( list )) return;
+            if( !FeatureDelegate.isFeatures( list )) return;
             
             FeatureWriter writer = null;
             try {
@@ -519,4 +584,62 @@ public abstract class DataFeatureCollection extends AbstractFeatureCollection {
         	close( iterator );
         }
 	}
+    
+    /**
+     * Will return an optimized subCollection based on access
+     * to the origional FeatureSource.
+     * <p>
+     * The subCollection is constructed by using an AND Filter.
+     * For the converse of this opperation please see
+     * collection.addAll( Collection ), it has been optimized
+     * to be aware of these filter based SubCollections.
+     * </p>
+     * <p>
+     * This method is intended in a manner similar to subList,
+     * example use:
+     * <code>
+     * collection.subCollection( myFilter ).clear()
+     * </code>
+     * </p>    
+     * @param filter Filter used to determine sub collection.
+     * @since GeoTools 2.2, Filter 1.1
+     */
+    public FeatureCollection subCollection(Filter filter) {
+    	return new SubFeatureCollection( this, filter );
+    }
+
+    /**
+     * Construct a sorted view of this content.
+     * <p>
+     * Sorts may be combined togther in a stable fashion, in congruence
+     * with the Filter 1.1 specification.
+     * </p>
+     * This method should also be able to handle GeoTools specific
+     * sorting through detecting order as a SortBy2 instance.
+     * @param SortBy Construction of a Sort
+     * @since GeoTools 2.2, Filter 1.1
+     * @param order Filter 1.1 SortBy
+     * @return FeatureList sorted according to provided order
+
+     */
+    public FeatureList sort(SortBy order) {
+    	if( order instanceof SortBy2){
+    		SortBy2 advanced = (SortBy2) order;
+    		return sort( advanced );
+    	}
+    	return null; // new OrderedFeatureList( this, order );
+    }
+    /**
+     * Allows for "Advanced" sort capabilities specific to the
+     * GeoTools platform!
+     * <p>
+     * Advanced in this case really means making use of a generic
+     * Expression, rather then being limited to PropertyName.
+     * </p>
+     * @param order GeoTools SortBy
+     * @return FeatureList sorted according to provided order
+     */
+    public FeatureList sort(SortBy2 order ){
+    	return null;
+    }    
 }
