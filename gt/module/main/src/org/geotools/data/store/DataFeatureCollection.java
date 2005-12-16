@@ -38,7 +38,7 @@ import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.collection.DelegateFeatureIterator;
-import org.geotools.feature.collection.FeatureDelegate;
+import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.SubFeatureCollection;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.visitor.FeatureVisitor;
@@ -488,7 +488,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
     public void setAttribute( int position, Object val ) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
         if(position == 0 && val instanceof Collection){
             Collection list = (Collection)val;
-            if( !FeatureDelegate.isFeatures( list )) return;
+            if( !FeatureState.isFeatures( list )) return;
             
             FeatureWriter writer = null;
             try {

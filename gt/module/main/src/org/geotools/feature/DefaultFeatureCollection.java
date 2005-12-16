@@ -32,7 +32,7 @@ import java.util.TreeMap;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.collection.FeatureDelegate;
+import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.FeatureIteratorImpl;
 import org.geotools.feature.collection.SubFeatureCollection;
 import org.geotools.feature.type.FeatureAttributeType;
@@ -624,7 +624,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
 	public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
 		if(position == 0 && val instanceof List){
             List nw = (List)val;
-			if( !FeatureDelegate.isFeatures( nw )) return;
+			if( !FeatureState.isFeatures( nw )) return;
             
             contents.clear();
             for( Iterator i = nw.iterator(); i.hasNext(); ){

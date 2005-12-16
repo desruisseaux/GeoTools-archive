@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Jody Garnett, Refractions Reserach, Inc.
  * @since GeoTools 2.2
  */
-public class FeatureDelegate {
+public class FeatureState {
 	final ResourceCollection collection;
 	final FeatureType featureType;
 	final FeatureType schema;	
@@ -74,10 +74,10 @@ public class FeatureDelegate {
         return new DefaultFeatureType("AbstractFeatureColletionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);        
 	}
 
-	public FeatureDelegate( ResourceCollection collection, FeatureType schema ){
+	public FeatureState( ResourceCollection collection, FeatureType schema ){
 		this( collection, featureType( schema ), schema );				
 	}
-	public FeatureDelegate( ResourceCollection collection, FeatureType featureType, FeatureType schema ){
+	public FeatureState( ResourceCollection collection, FeatureType featureType, FeatureType schema ){
 		this.collection = collection;
 		this.featureType = featureType;
 		this.schema = schema;
