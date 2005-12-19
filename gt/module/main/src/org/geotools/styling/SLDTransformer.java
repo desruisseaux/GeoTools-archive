@@ -250,9 +250,9 @@ public class SLDTransformer extends TransformerBase {
             AttributesImpl atts = new AttributesImpl();
 
             try {
-                atts.addAttribute(XLINK_NAMESPACE, "type", "type", "", "simple");
-                atts.addAttribute(XLINK_NAMESPACE, "xlink", "xlink", "",
-                    exgr.getLocation().toString());
+            	atts.addAttribute("", "xlink", "xmlns:xlink", "", XLINK_NAMESPACE);
+                atts.addAttribute(XLINK_NAMESPACE, "type", "xlink:type", "", "simple");
+                atts.addAttribute(XLINK_NAMESPACE, "xlink", "xlink:href","", exgr.getLocation().toString());
             } catch (java.net.MalformedURLException murle) {
                 throw new Error("SOMEONE CODED THE X LINK NAMESPACE WRONG!!");
             }
@@ -440,14 +440,39 @@ public class SLDTransformer extends TransformerBase {
         }
 
         public void visit(RemoteOWS remoteOWS) {
-            //TODO: implement this visitor (RemoteOWS needs to be implemented first)
+        	start("RemoteOWS");
+        	element("Service", remoteOWS.getService());
+        	element("OnlineResource", remoteOWS.getOnlineResource());
+        	end("RemoteOWS");
         }
 
         public void visit(FeatureTypeConstraint ftc) {
+        	start("FeatureTypeConstraint");
+        	element("FeatureTypeName", ftc.getFeatureTypeName());
+        	visit(ftc.getFilter());
+
+        	Extent[] extent = ftc.getExtents();
+
+            for (int i = 0; i < extent.length; i++) {
+                visit(extent[i]);
+            }
+
+            end("FeatureTypeConstraint");
             //TODO: implement this visitor (NamedLayer/UserLayer needs to implement FeatureTypeConstraint first)
         }
 
-        public void visit(Style style) {
+        public void visit(Extent extent) {
+        	start("Extent");
+        	element("Name", extent.getName());
+        	element("Value", extent.getValue());
+        	end("Extent");
+		}
+
+		public void visit(Filter filter) {
+			// TODO: implement this visitor
+		}
+
+		public void visit(Style style) {
             start("UserStyle");
             element("Name", style.getName());
             element("Title", style.getTitle());
@@ -543,8 +568,8 @@ public class SLDTransformer extends TransformerBase {
                 contentHandler.startDocument();
 
                 start("StyledLayerDescriptor", NULL_ATTS);
-                start("NamedLayer"); //this is correct?
-
+                start("NamedLayer", NULL_ATTS); //this is correct?
+                
                 for (int i = 0, ii = styles.length; i < ii; i++) {
                     styles[i].accept(this);
                 }
