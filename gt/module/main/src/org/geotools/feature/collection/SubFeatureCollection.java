@@ -54,7 +54,7 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
         if( subfilter != null ){
     		if (collection instanceof SubFeatureCollection) {
     			SubFeatureCollection filtered = (SubFeatureCollection) collection;
-    			collection = filtered.collection;            
+    			this.collection = filtered.collection;            
     			this.filter = filtered.filter().and(subfilter);
     		} else {
     			this.collection = collection;

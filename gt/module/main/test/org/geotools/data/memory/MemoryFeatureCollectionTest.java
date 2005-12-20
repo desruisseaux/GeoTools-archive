@@ -61,7 +61,7 @@ public class MemoryFeatureCollectionTest extends DataTestCase {
         FeatureCollection sub = roads.subCollection( rd12Filter );
         assertEquals( 2, sub.size() );
     }
-    public void XtestSubSubCollection(){
+    public void testSubSubCollection(){
         FeatureCollection sub = roads.subCollection( rd12Filter );        
         FeatureCollection subsub = sub.subCollection( rd1Filter );
         assertEquals( 1, subsub.size() );        
