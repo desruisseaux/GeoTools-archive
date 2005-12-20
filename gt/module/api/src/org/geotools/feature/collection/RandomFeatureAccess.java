@@ -1,0 +1,36 @@
+package org.geotools.feature.collection;
+
+import java.util.NoSuchElementException;
+
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+
+/**
+ * Access Feature content using Feature "Id".
+ * <p>
+ * Many FeatureCollection classes will make use of this
+ * API to avoid unnecessary caching of content. Supporting
+ * this interface will allow SubCollections to occur based
+ * on FeatureIds, with a suitable improvement in memory
+ * consumption.
+ * </p>
+ * <p>
+ * For an addition improvement in memory comsumption SubCollections
+ * may use of a sparse reprsentation where only (beginId,endId] ranges
+ * are kept in memory.
+ * </p>
+ * @author Jody Garnett, Refractions Research Inc.
+ */
+public interface RandomFeatureAccess extends FeatureCollection {
+    /**
+     * Access Feature content by feature id.
+     * 
+     * @param id
+     * @return Feature with the indicated or id
+     * @throws NoSuchElementException if a Feature with the indicated id is not present
+     */
+    public Feature getFeatureMember( String id ) throws NoSuchElementException;
+    
+    /** Optional Method */
+    public Feature removeFeatureMember( String id );
+}

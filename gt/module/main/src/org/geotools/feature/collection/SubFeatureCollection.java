@@ -1,8 +1,10 @@
 package org.geotools.feature.collection;
 
 import java.io.IOException;
-import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
@@ -23,46 +25,65 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * Used as a reasonable default implementation for subCollection.
  * <p>
- * Note: to implementors, this is not optional, please do your own
- * thing - the users will thank you.
+ * Note: to implementors, this is not optimal, please do your own
+ * thing - your users will thank you.
  * </p>
  * 
- * @author jgarnett
+ * @author Jody Garnett, Refractions Research, Inc.
  *
  */
-public class SubFeatureCollection extends AbstractCollection implements FeatureCollection {
-	
+public class SubFeatureCollection extends AbstractResourceCollection implements FeatureCollection {
+	/** Filter */
+    protected Filter filter;
+    
+    /** Origional Collection */
 	protected FeatureCollection collection;
-	protected Filter filter;
-
-	public SubFeatureCollection(FeatureCollection collection, Filter filter) {
-		if (filter.equals(Filter.ALL)) {
+    
+    protected FeatureState state;
+    
+    public SubFeatureCollection(FeatureCollection collection ) {
+        this( collection, null );
+    }
+	public SubFeatureCollection(FeatureCollection collection, Filter subfilter ){
+		if (subfilter.equals(Filter.ALL)) {
 			throw new IllegalArgumentException("A subcollection with Filter.ALL is a null operation");
 		}
-		if (filter.equals(Filter.NONE)) {
+		if (subfilter.equals(Filter.NONE)) {
 			throw new IllegalArgumentException("A subcollection with Filter.NONE should be a FeatureCollectionEmpty");
 		}
-		if (collection instanceof SubFeatureCollection) {
-			SubFeatureCollection filtered = (SubFeatureCollection) collection;
-			collection = filtered.collection;
-			this.filter = filtered.filter.and(filter);
-		} else {
-			this.collection = collection;
-			this.filter = filter;
-		}
+        if( subfilter != null ){
+    		if (collection instanceof SubFeatureCollection) {
+    			SubFeatureCollection filtered = (SubFeatureCollection) collection;
+    			collection = filtered.collection;            
+    			this.filter = filtered.filter().and(subfilter);
+    		} else {
+    			this.collection = collection;
+    			this.filter = subfilter;
+    		}
+        }
+        state = new SubFeatureState( this.collection, this );
 	}
-
+    
+	protected Filter filter(){
+	    if( filter == null ){
+            filter = createFilter();
+        }
+        return filter;
+    }
+    /** Override to implement subsetting */
+    protected Filter createFilter(){
+        return Filter.NONE;
+    }
+    
 	public FeatureType getFeatureType() {
-		return collection.getFeatureType();
+		return state.getFeatureType();
 	}
 	
 	public FeatureIterator features() {
 		return new DelegateFeatureIterator( iterator() );		
-	}
+	}	
 	
-	
-	
-	public void close(Iterator iterator) {
+	public void closeIterator(Iterator iterator) {
 		if( iterator == null ) return;
 		
 		if( iterator instanceof FilteredIterator){
@@ -74,54 +95,66 @@ public class SubFeatureCollection extends AbstractCollection implements FeatureC
 		if( close != null ) close.close();
 	}
 
-	/**
-	 * I am a little bit worried about this one!
-	 * <p>
-	 * Here is why: it a set threory we are defining <b>collection</b>
-	 * as a subset of <b>all possible</b> features in the universe. Since
-	 * this is a <i>subset</i> of collection it is a different (smaller)
-	 * collection and should get a new ID.
-	 * </p>
-	 * <p>
-	 * Since the above is clear cut why is this method returning
-	 * the same ID as collection? Because this collection is really
-	 * be used as a computer science hack to reduce the number
-	 * of methods that are part of the FeatureCollection interface.
-	 * </p>
-	 * <p>
-	 * This distinction brings clarity to this class - it really is
-	 * <i>a view</i> used to allow a way to interact with the
-	 * origional collection and is not really expected to venture out
-	 * into the world on its own steam.
-	 * </p>
-	 */
+    //
+    // Feature methods
+    //
 	public String getID() {
-		return collection.getID();
+		return state.getId();
 	}
 
 	public Envelope getBounds(){
-		Iterator i = null;
-		Envelope bounds = new Envelope();
-		try {
-		    for( i=iterator(); i.hasNext();  ) {
-				Feature feature = (Feature) i.next();
-				bounds.expandToInclude(feature.getBounds());
-		    }
-		}
-		finally {
-			close( i );
-		}
-		return bounds;
+        return state.getBounds();        
 	}
 	
 	public Geometry getDefaultGeometry() {
-		return collection.getDefaultGeometry();
+		return state.getDefaultGeometry();
 	}
 
-	public void setDefaultGeometry(Geometry g) {
-		throw new UnsupportedOperationException();
+	public void setDefaultGeometry(Geometry g) throws IllegalAttributeException {
+		state.setDefaultGeometry( g );
 	}
+    public void addListener(CollectionListener listener) throws NullPointerException {
+        state.addListener( listener );
+    }
 
+    public void removeListener(CollectionListener listener) throws NullPointerException {
+        state.removeListener( listener );
+    }
+    
+    public FeatureCollection getParent() {
+        return state.getParent(); 
+    }
+
+    public void setParent(FeatureCollection collection) {
+        state.setParent( collection );
+    }
+
+    public Object[] getAttributes(Object[] attributes) {
+        return state.getAttributes( attributes );
+    }
+
+    public Object getAttribute(String xPath) {
+        return state.getAttribute( xPath );
+    }
+
+    public Object getAttribute(int index) {
+        return state.getAttribute( index );
+    }
+
+    public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
+        state.setAttribute( position, val  );
+    }
+    public int getNumberOfAttributes() {
+        return state.getNumberOfAttributes();
+    }
+
+    public void setAttribute(String xPath, Object attribute) throws IllegalAttributeException {
+        state.setAttribute( xPath, attribute );
+    }
+    
+    //
+    //
+    //
 	public FeatureCollection subCollection(Filter filter) {
 		if (filter.equals(Filter.NONE)) {
 			return this;
@@ -154,20 +187,13 @@ public class SubFeatureCollection extends AbstractCollection implements FeatureC
 		}
 	}
 	
-	public Iterator iterator() {
-		return new FilteredIterator( collection, filter );
+	public Iterator openIterator() {
+		return new FilteredIterator( collection, filter() );
 	}
 
-	public void addListener(CollectionListener listener) throws NullPointerException {
-		collection.addListener( listener );
-	}
-
-	public void removeListener(CollectionListener listener) throws NullPointerException {
-		collection.removeListener( listener );
-	}
 
 	public FeatureType getSchema() {
-		return collection.getSchema();
+        return collection.getSchema();
 	}
 
 	public void accepts(FeatureVisitor visitor) throws IOException {
@@ -197,37 +223,6 @@ public class SubFeatureCollection extends AbstractCollection implements FeatureC
 
 	public FeatureCollection collection() throws IOException {
 		return this;
-	}
-
-	public FeatureCollection getParent() {
-		return null; 
-	}
-
-	public void setParent(FeatureCollection collection) {
-		collection.setParent( collection );
-	}
-
-	public Object[] getAttributes(Object[] attributes) {
-		return collection.getAttributes( attributes );
-	}
-
-	public Object getAttribute(String xPath) {
-		return collection.getAttribute( xPath );
-	}
-
-	public Object getAttribute(int index) {
-		return collection.getAttribute( index );
-	}
-
-	public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
-		collection.setAttribute( position, val  );
-	}
-	public int getNumberOfAttributes() {
-		return collection.getNumberOfAttributes();
-	}
-
-	public void setAttribute(String xPath, Object attribute) throws IllegalAttributeException {
-		collection.setAttribute( xPath, attribute );
 	}
 
 	public FeatureList sort(SortBy order) {

@@ -36,7 +36,9 @@ import org.geotools.filter.Filter;
  *  
  * @author Jody Garnett, Refractions Research, Inc.
  */
-public interface FeatureList extends List, FeatureCollection {	
+public interface FeatureList extends List, FeatureCollection {
+    
+    
 	/**
 	 * Similar to subCollection, explicitly constructs a ordered List.
 	 * <p>

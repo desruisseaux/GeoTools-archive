@@ -5,22 +5,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.geotools.data.collection.ResourceCollection;
-import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.type.FeatureAttributeType;
-import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -43,45 +38,14 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Jody Garnett, Refractions Reserach, Inc.
  * @since GeoTools 2.2
  */
-public class FeatureState {
-	final ResourceCollection collection;
-	final FeatureType featureType;
-	final FeatureType schema;	
-	
-    /** Internal listener storage list */
-    private List listeners = new ArrayList(2);
+public abstract class FeatureState {
+	    
+    protected Envelope bounds = null;
+    protected ResourceCollection data;
 
-    /** Internal envelope of bounds. */
-    private Envelope bounds = null;
-    
-	/**
- 	 * Construct a fake FeatureType of this FeatureCollection.
-  	 * <p>
-	 * Unless a FeatureType was provided during consturction (or this method is
-	 * overriden) a FeatureType will be generated based on getSchmea according
-	 * to the following assumptions:
-	 * <ul>
-	 * <li>FeatureType is gml:AbstractFeatureCollectionType
-	 * <li>first attribute is getSchema.typeName
-	 * <li>the attribute FeatureType the same as returned by getSchema()
-	 * </ul>
-	 * </p>
-	 * 
-	 */
-	private static FeatureType featureType( FeatureType schema ){
-		List ats = new LinkedList();
-        ats.add(new FeatureAttributeType(schema.getTypeName(), schema,false));
-        return new DefaultFeatureType("AbstractFeatureColletionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);        
-	}
-
-	public FeatureState( ResourceCollection collection, FeatureType schema ){
-		this( collection, featureType( schema ), schema );				
-	}
-	public FeatureState( ResourceCollection collection, FeatureType featureType, FeatureType schema ){
-		this.collection = collection;
-		this.featureType = featureType;
-		this.schema = schema;
-	}
+    protected FeatureState( ResourceCollection collection ){
+        data = collection;
+    }
 	//
 	// FeatureCollection Event Support
 	//
@@ -91,36 +55,21 @@ public class FeatureState {
      *
      * @param listener The listener to add
      */
-    public void addListener(CollectionListener listener) {
-    	if( !(collection instanceof FeatureCollection )) return;    	
-        listeners.add(listener);
-    }
+    abstract public void addListener(CollectionListener listener);
 
     /**
      * Removes a listener for collection events.
      *
      * @param listener The listener to remove
      */
-    public void removeListener(CollectionListener listener) {
-    	if( !(collection instanceof FeatureCollection )) return;    	
-        listeners.remove(listener);
-    }
+    abstract public void removeListener(CollectionListener listener);
+    	
     
     /**
      * To let listeners know that something has changed.
      */
-    protected void fireChange(Feature[] features, int type) {
-    	if( !(collection instanceof FeatureCollection )) return;
-    	
-        bounds = null; // must recalculate bounds
-
-        CollectionEvent cEvent = new CollectionEvent( (FeatureCollection) collection, features, type);
-        
-        for (int i = 0, ii = listeners.size(); i < ii; i++) {
-            ((CollectionListener) listeners.get(i)).collectionChanged(cEvent);
-        }
-    }
-        
+    abstract protected void fireChange(Feature[] features, int type);
+    
     protected void fireChange(Feature feature, int type) {
         fireChange(new Feature[] {feature}, type);
     }
@@ -130,6 +79,7 @@ public class FeatureState {
         features = (Feature[]) coll.toArray(features);
         fireChange(features, type);
     }
+    
 	//
 	// Feature Methods
     //    
@@ -142,7 +92,7 @@ public class FeatureState {
     public Envelope getBounds() {
         if (bounds == null) {
             bounds = new Envelope();
-            Iterator i = collection.iterator();
+            Iterator i = data.iterator();
             try {            	
 	            while(i.hasNext()) {
 	                Envelope geomBounds = ((Feature) i.next()).getBounds();                
@@ -152,16 +102,23 @@ public class FeatureState {
 	            }
             }
             finally {
-            	collection.close( i );
+            	data.close( i );
             }
         }
         return bounds;
     }
 
-    public synchronized FeatureType getFeatureType() {
-        return featureType;
-    }
+    public abstract FeatureType getFeatureType();
+    public abstract FeatureType getChildFeatureType();
     
+    public abstract String getId();
+    
+    public FeatureCollection getParent(){
+        return null;        
+    }
+    public void setParent( FeatureCollection parent ){
+        throw new UnsupportedOperationException();
+    }
     public Object[] getAttributes( Object[] attributes ) {
         List list = (List) getAttribute( 0 );
         return list.toArray( attributes );
@@ -171,7 +128,7 @@ public class FeatureState {
      * Not really interested yet .. 
      */
     public Object getAttribute( String xPath ) {
-        if(xPath.indexOf(featureType.getTypeName())>-1)
+        if(xPath.indexOf(getFeatureType().getTypeName())>-1)
             if(xPath.endsWith("]")){
                 return getAttribute(0);
             } else {
@@ -182,7 +139,7 @@ public class FeatureState {
     
     public Object getAttribute( int index ) {
         if(index == 0){
-        	Iterator i = collection.iterator();
+        	Iterator i = data.iterator();
         	List list = new ArrayList();        	
             try {                
                 while( i.hasNext() ){
@@ -194,7 +151,7 @@ public class FeatureState {
                 return Collections.EMPTY_LIST; // could not find contents
             }
             finally {
-                collection.close( i );
+                data.close( i );
             }
         }
         return null;
@@ -206,30 +163,30 @@ public class FeatureState {
 			if( !isFeatures( newStuff )) {
 				throw new IllegalAttributeException("Content must be features");
 			}            
-            collection.clear(); // clean out previous contents!
+            data.clear(); // clean out previous contents!
             Iterator i = newStuff.iterator();
             try {
 	            while( i.hasNext() ){
 	                Feature feature = (Feature) i.next();                
-	                if( collection instanceof FeatureCollection ){
-	                	feature.setParent( (FeatureCollection) collection );
+	                if( data instanceof FeatureCollection ){
+	                	feature.setParent( (FeatureCollection) data );
 	                }
-	                collection.add( feature );
+	                data.add( feature );
 	            }
             }
             finally {
-                collection.close( i );
+                data.close( i );
             }
 			//fireChange(nw,0);
 		}
 	}
        
 	public int getNumberOfAttributes() {
-		return featureType.getAttributeCount();		
+		return getFeatureType().getAttributeCount();		
 	}
 
     public void setAttribute( String xPath, Object attribute ) throws IllegalAttributeException {
-        if(xPath.indexOf(featureType.getTypeName())>-1){
+        if(xPath.indexOf(getFeatureType().getTypeName())>-1){
             if(xPath.endsWith("]")){
                 // TODO get index and grab it
             } else {

@@ -84,24 +84,32 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         return new FeatureAttributeType(name, type, isNillable,1,1);
     }
     
+    protected Filter length(int fieldLength){
+        LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
+        if( length == null ) {
+            // TODO: Help Richard! ff.createFunctionExpression cannot find Length!
+            return null;
+        }
+        
+        length.setArgs(new Expression[]{null});
+        CompareFilter cf = null;
+        try {
+            cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
+            cf.addLeftValue(length);
+            cf.addRightValue(ff.createLiteralExpression(fieldLength));
+        } catch (IllegalFilterException e) {
+            // TODO something
+        }
+        return cf == null ? Filter.ALL : cf;
+    }
+    
     /**
      * Implementation of AttributeType creation.
      */
     protected AttributeType createAttributeType(String name, Class clazz, 
         boolean isNillable, int fieldLength, Object defaultValue) {
-
-    	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
-    	length.setArgs(new Expression[]{null});
-    	CompareFilter cf = null;
-        try {
-            cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
-        cf.addLeftValue(length);
-        cf.addRightValue(ff.createLiteralExpression(fieldLength));
-        } catch (IllegalFilterException e) {
-            // TODO something
-        }
-        Filter f = cf == null?Filter.ALL:cf;
-    	
+        Filter f = length( fieldLength );
+        
         if (Number.class.isAssignableFrom(clazz)) {
             return new NumericAttributeType(
                 name, clazz, isNillable,1,1,defaultValue,f);
@@ -111,9 +119,8 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
             return new TemporalAttributeType(name,isNillable,1,1,defaultValue,f);
         } else if (Geometry.class.isAssignableFrom( clazz )){
             return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue,null,f);
-        }
-        
-        return new DefaultAttributeType(name, clazz, isNillable,1,1,defaultValue,cf);
+        }        
+        return new DefaultAttributeType(name, clazz, isNillable,1,1,defaultValue, f);
     }
     
     /**

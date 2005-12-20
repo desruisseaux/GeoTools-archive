@@ -355,7 +355,7 @@ public abstract class AbstractResourceCollection implements ResourceCollection {
     //
     //
     /** Set of open resource iterators */
-    private final Set open = new HashSet();
+    protected final Set open = new HashSet();
 
     /**
      * Please implement!
