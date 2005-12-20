@@ -102,7 +102,7 @@ public interface FeatureTypeStyle extends GTComponent {
      * @return An array of strings representing systematic types which
      *         could be styled by this instance.
      **/
-    String[] getSemantecTypeIdentifiers();
+    String[] getSemanticTypeIdentifiers();
     
         /**
      * The SemanticTypeIdentifiers is experimental and is intended to be used
@@ -121,7 +121,7 @@ public interface FeatureTypeStyle extends GTComponent {
      * @param types An array of strings representing systematic types which
      *         could be styled by this instance.
      **/
-    void setSemantecTypeIdentifiers(String[] types);
+    void setSemanticTypeIdentifiers(String[] types);
     
     /**
      * Rules govern the appearance of any given feature to be styled by

@@ -107,7 +107,7 @@ public class StyleCloner {
         clone.setAbstract(toClone.getAbstract());
         clone.setName(toClone.getName());
         clone.setFeatureTypeName(toClone.getFeatureTypeName());
-        clone.setSemantecTypeIdentifiers(toClone.getSemantecTypeIdentifiers());
+        clone.setSemanticTypeIdentifiers(toClone.getSemanticTypeIdentifiers());
         clone.setTitle(toClone.getTitle());
 
         return clone;

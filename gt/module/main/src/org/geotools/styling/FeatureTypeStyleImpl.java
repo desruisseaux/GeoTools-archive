@@ -61,6 +61,7 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
     private String name = "name";
     private String title = "title";
     private String abstractStr = "abstract";
+    private String[] semanticTypeIdentifiers;
 
     /**
      * Creates a new instance of FeatureTypeStyleImpl
@@ -95,12 +96,16 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
         return ruleList;
     }
 
-    public String[] getSemantecTypeIdentifiers() {
-        return new String[] { "generic:geometry" }; //HACK: - generic catch all identifier
+    public String[] getSemanticTypeIdentifiers() {
+    	if (semanticTypeIdentifiers == null) {
+    		return new String[] { "generic:geometry" }; //HACK: - generic catch all identifier	
+    	} else {
+    		return semanticTypeIdentifiers;
+    	}
     }
 
-    public void setSemantecTypeIdentifiers(String[] types) {
-        // since these are defined yet we can ignore it
+    public void setSemanticTypeIdentifiers(String[] types) {
+    	semanticTypeIdentifiers = types;
     }
 
     public void setRules(Rule[] rules) {

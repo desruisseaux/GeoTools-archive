@@ -17,9 +17,9 @@ import org.geotools.filter.LiteralExpression;
 
 /**
  *
- * @author  jfc173
+ * @author James Macgill
  */
-public abstract class ClassificationFunction extends FunctionExpressionImpl implements FunctionExpression{
+public abstract class ClassificationFunction extends FunctionExpressionImpl implements FunctionExpression {
     
     FeatureCollection fc = null;
     int classNum;
@@ -41,12 +41,16 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
         classNum = i;
     }
     
-    public Expression getExpression(){
-        return expr;
+    public FeatureCollection getCollection() {
+    	return fc;
     }
     
     public void setCollection (FeatureCollection fc) {
     	this.fc = fc;
+    }
+    
+    public Expression getExpression(){
+        return expr;
     }
     
     public void setExpression(Expression e){

@@ -54,7 +54,7 @@ public class UniqueVisitor implements FeatureCalc {
                 type.getAttributeType(attrName).getName());
     }
 
-    public UniqueVisitor(Expression expr) throws IllegalFilterException {
+    public UniqueVisitor(Expression expr) {
         this.expr = expr;
     }
 

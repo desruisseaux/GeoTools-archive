@@ -51,14 +51,16 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.Set;
 
-
 /**
- * Generates a style using ColorBrewer
+ * Generates a style/featureTypeStyle using ColorBrewer.
+ * <br>
+ * WARNING: this is unstable and subject to change.
  *
- * @author Cory Horner, Refractions Research
+ * @author Cory Horner, Refractions Research Inc.
  */
 public class StyleGenerator {
     private ColorBrewer colorBrewer;
+    private Color[] colors;
     private String paletteName;
     private int numClasses;
     private Expression expression;
@@ -66,9 +68,20 @@ public class StyleGenerator {
     private FilterFactory ff;
     private StyleFactory sf;
     private StyleBuilder sb;
+    private ClassificationFunction function;
     private double opacity = 0.5;
     private Stroke defaultStroke;
-
+    private String id;
+    
+    /**
+     * @deprecated
+     * 
+     * @param colorBrewer
+     * @param paletteName
+     * @param numClasses
+     * @param expression
+     * @param collection
+     */
     public StyleGenerator(ColorBrewer colorBrewer, String paletteName,
         int numClasses, Expression expression, FeatureCollection collection) {
         this.colorBrewer = colorBrewer;
@@ -76,6 +89,28 @@ public class StyleGenerator {
         this.numClasses = numClasses;
         this.expression = expression;
         this.collection = collection;
+        ff = FilterFactoryFinder.createFilterFactory();
+        sf = StyleFactoryFinder.createStyleFactory();
+        sb = new StyleBuilder(sf, ff);
+        defaultStroke = sb.createStroke();
+    }
+    
+    /**
+     * 
+     * @param colors 
+     * @param paletteName
+     * @param expression
+     * @param collection 
+     * @param function classificationFunction containing our desired breaks
+     * @param id unique string to tag the FTS with
+     */
+    public StyleGenerator(Color[] colors, ClassificationFunction function, String id) {
+        this.colors = colors;
+        this.numClasses = function.getNumberOfClasses();
+        this.expression = function.getExpression();
+        this.collection = function.getCollection();
+        this.function = function;
+        this.id = id;
         ff = FilterFactoryFinder.createFilterFactory();
         sf = StyleFactoryFinder.createStyleFactory();
         sb = new StyleBuilder(sf, ff);
@@ -90,10 +125,12 @@ public class StyleGenerator {
         this.collection = collection;
     }
 
+    /** @deprecated */
     public ColorBrewer getColorBrewer() {
         return colorBrewer;
     }
 
+    /** @deprecated */
     public void setColorBrewer(ColorBrewer colorBrewer) {
         this.colorBrewer = colorBrewer;
     }
@@ -130,14 +167,206 @@ public class StyleGenerator {
         this.defaultStroke = defaultStroke;
     }
 
+    /** @deprecated */
     public String getPaletteName() {
         return paletteName;
     }
 
+    /** @deprecated */
     public void setPaletteName(String paletteName) {
         this.paletteName = paletteName;
     }
 
+    public ClassificationFunction getClassifier() {
+    	return function;
+    }
+    
+    public void setClassifier(ClassificationFunction function) {
+    	this.function = function;
+    }
+    
+    public FeatureTypeStyle createFeatureTypeStyle() throws IllegalFilterException {
+    	//answer goes here
+    	FeatureTypeStyle fts = sf.createFeatureTypeStyle();
+        // update the number of classes
+        numClasses = function.getNumberOfClasses();
+
+        // determine the geometry
+        FeatureIterator it = collection.features();
+        Feature firstFeature = it.next();
+        Geometry geometry = firstFeature.getDefaultGeometry();
+
+        //numeric
+    	if (function instanceof EqualIntervalFunction) {
+    		EqualIntervalFunction eiClassifier = (EqualIntervalFunction) function;
+
+    		Object localMin = null;
+    		Object localMax = null;
+
+            // for each class
+            for (int i = 0; i < numClasses; i++) {
+                // obtain min/max values
+                localMin = eiClassifier.getMin(i);
+                localMax = eiClassifier.getMax(i);
+
+                // 1.0 --> 1
+                // (this makes our styleExpressions more readable. Note that the
+                // filter always converts to double, so it doesn't care what we
+                // do).
+                localMin = chopInteger(localMin);
+                localMax = chopInteger(localMax);
+
+                // generate a title
+                String title = localMin + " to " + localMax;
+
+                // construct filters
+                Filter filter = null;
+
+                if (localMin == localMax) {
+                    // build filter: =
+                    CompareFilter eqFilter = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
+                    eqFilter.addLeftValue(expression);
+                    eqFilter.addRightValue(ff.createLiteralExpression(localMax));
+                    filter = eqFilter;
+                } else {
+                    // build filter: [min <= x] AND [x < max]
+                    LogicFilter andFilter = null;
+                    CompareFilter lowBoundFilter = null; // less than or
+
+                    // equal
+                    CompareFilter hiBoundFilter = null; // less than
+                    lowBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
+                    lowBoundFilter.addLeftValue(ff.createLiteralExpression(
+                            localMin)); // min
+                    lowBoundFilter.addRightValue(expression); // x
+
+                    // if this is the global maximum, include the max value
+                    if (i == (numClasses - 1)) {
+                        hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
+                    } else {
+                        hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
+                    }
+
+                    hiBoundFilter.addLeftValue(expression); // x
+                    hiBoundFilter.addRightValue(ff.createLiteralExpression(
+                            localMax)); // max
+                    andFilter = ff.createLogicFilter(lowBoundFilter,
+                            hiBoundFilter, LogicFilter.LOGIC_AND);
+                    filter = andFilter;
+                }
+
+                // create a symbolizer
+                Symbolizer symb = null;
+                Color color = colors[i];
+                symb = createSymbolizer(sb, geometry, color, opacity, defaultStroke);
+
+                // create a rule
+                Rule rule = sb.createRule(symb);
+                rule.setFilter(filter);
+                rule.setTitle(title);
+                rule.setName(getRuleName(i + 1));
+                fts.addRule(rule);
+            }
+        } else if (function instanceof UniqueIntervalFunction) {
+            UniqueIntervalFunction uniqueClassifier = (UniqueIntervalFunction) function;
+            LogicFilter orFilter = null;
+            CompareFilter filter = null;
+            Rule rule = null;
+
+            // for each class
+            for (int i = 0; i < numClasses; i++) {
+                // obtain the set of values for the current bin
+                Set value = (Set) uniqueClassifier.getValue(i);
+
+                // create a sub filter for each unique value, and merge them
+                // into the logic filter
+                Object[] items = value.toArray();
+                Arrays.sort(items);
+                orFilter = ff.createLogicFilter(FilterType.LOGIC_OR);
+
+                String title = "";
+
+                for (int item = 0; item < items.length; item++) {
+                    // construct a filter
+                    try {
+                        filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
+                        filter.addLeftValue(expression); // the attribute
+
+                        // we're looking at
+                        filter.addRightValue(ff.createLiteralExpression(
+                                items[item]));
+                    } catch (IllegalFilterException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+
+                        return null;
+                    }
+
+                    // add to the title
+                    title += items[item].toString();
+
+                    if ((item + 1) != items.length) {
+                        title += ", ";
+                    }
+
+                    // add the filter to the logicFilter
+                    orFilter.addFilter(filter);
+                }
+
+                // create the symbolizer
+                Symbolizer symb = null;
+                Color color = colors[i];
+                symb = createSymbolizer(sb, geometry, color, opacity,
+                        defaultStroke);
+
+                // create the rule
+                rule = sb.createRule(symb);
+
+                if (items.length > 1) {
+                    rule.setFilter(orFilter);
+                } else {
+                    rule.setFilter(filter);
+                }
+
+                rule.setTitle(title);
+                rule.setName(getRuleName(i + 1));
+                fts.addRule(rule);
+            }
+        }
+
+        // sort the FeatureTypeStyle rules
+        Rule[] rule = fts.getRules();
+
+        for (int i = 0; i < rule.length; i++) {
+            String properRuleName = getRuleName(i + 1);
+
+            if (!rule[i].getName().equals(properRuleName)) {
+                // is in incorrect order, find where the rule for this index
+                // actually is
+                for (int j = i + 1; j < rule.length; j++) {
+                    if (rule[j].getName().equals(properRuleName)) {
+                        // switch the 2 rules
+                        Rule tempRule = rule[i];
+                        rule[i] = rule[j];
+                        rule[j] = tempRule;
+
+                        break;
+                    }
+                }
+            }
+        }
+        
+        //our syntax will be: ColorBrewer:id
+        fts.setSemanticTypeIdentifiers(new String[] {"generic:geometry", "colorbrewer:"+id});
+
+        return fts;
+    }
+    
+    /**
+     * @deprecated
+     * @return
+     * @throws IllegalFilterException
+     */
     public Style createStyle() throws IllegalFilterException {
         // create our classifier
         ClassificationFunction classifier = null;
