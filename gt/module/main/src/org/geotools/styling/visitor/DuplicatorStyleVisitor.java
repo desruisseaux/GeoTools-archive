@@ -248,7 +248,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         copy.setAbstract(fts.getAbstract());
         copy.setFeatureTypeName(fts.getFeatureTypeName());
         copy.setRules(rulesCopy);
-
+        copy.setSemanticTypeIdentifiers((String[]) fts.getSemanticTypeIdentifiers().clone());
+        
         getPages().push(copy);
     }
 
