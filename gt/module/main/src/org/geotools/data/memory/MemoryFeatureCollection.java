@@ -26,7 +26,6 @@ import org.geotools.feature.collection.RandomFeatureAccess;
  */
 public class MemoryFeatureCollection extends AbstractFeatureCollection implements RandomFeatureAccess {
     TreeMap contents = new TreeMap();
-    FeatureState state;
     
     public MemoryFeatureCollection( FeatureType schema ){
         super( schema );

@@ -452,16 +452,19 @@ public abstract class AbstractResourceCollection implements ResourceCollection {
      */
     public void purge(){    	
     	for( Iterator i = open.iterator(); i.hasNext(); ){
-    		Iterator resourceIterator = (Iterator) i.next();
-    		try {
-    			closeIterator( resourceIterator );
-    		}
-    		catch( Throwable e){
-    			// TODO: Log e = ln
-    		}
-    		finally {
-    			i.remove();
-    		}
+            Object resource = i.next();
+            if( resource instanceof Iterator ){
+        		Iterator resourceIterator = (Iterator) resource;
+        		try {
+        			closeIterator( resourceIterator );
+        		}
+        		catch( Throwable e){
+        			// TODO: Log e = ln
+        		}
+        		finally {
+        			i.remove();
+        		}
+            }
     	}
     }
 }

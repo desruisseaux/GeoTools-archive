@@ -88,6 +88,9 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
     public Envelope getBounds() {
         return state.getBounds();
     }
+    public FeatureType getSchema() {
+        return state.getChildFeatureType();
+    }    
     //
     // FeatureCollection - Events
     //
@@ -102,15 +105,36 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
     // FeatureCollection - Feature Access
     // 
     public FeatureIterator features() {
-        // TODO Auto-generated method stub
-        return null;
+        FeatureIterator iter = new DelegateFeatureIterator( openIterator() );
+        open.add( iter );
+        return iter; 
     }
-    public void close( FeatureIterator close ) {
-        // TODO Auto-generated method stub        
+    public void close( FeatureIterator close ) {     
+        closeIterator( close );
+        open.remove( close );
     }
-    public FeatureType getSchema() {
-        // TODO Auto-generated method stub
-        return null;
+    public void closeIterator( FeatureIterator close ) {
+        DelegateFeatureIterator iter = (DelegateFeatureIterator) close;
+        closeIterator( iter.delegate );
+        iter.close(); 
+    }
+    public void purge() {
+        for( Iterator i = open.iterator(); i.hasNext(); ){
+            Object resource = i.next();
+            if( resource instanceof FeatureIterator ){
+                FeatureIterator resourceIterator = (FeatureIterator) resource;
+                try {
+                    closeIterator( resourceIterator );
+                }
+                catch( Throwable e){
+                    // TODO: Log e = ln
+                }
+                finally {
+                    i.remove();
+                }
+            }
+        }        
+        super.purge();
     }
     /**
      * Accepts a visitor, which then visits each feature in the collection.
