@@ -5,7 +5,9 @@ import java.util.Iterator;
 
 import org.geotools.data.DataTestCase;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureList;
 import org.geotools.feature.collection.AbstractResourceCollection;
+import org.geotools.filter.SortBy;
 
 public class MemoryFeatureCollectionTest extends DataTestCase {
     private MemoryFeatureCollection roads;
@@ -65,5 +67,11 @@ public class MemoryFeatureCollectionTest extends DataTestCase {
         FeatureCollection sub = roads.subCollection( rd12Filter );        
         FeatureCollection subsub = sub.subCollection( rd1Filter );
         assertEquals( 1, subsub.size() );        
+    }
+    public void XtestSort(){
+        FeatureList fList = roads.sort(SortBy.NATRUAL_ORDER);
+        for (Object obj : fList) {
+            System.out.println(obj);
+        }
     }
 }

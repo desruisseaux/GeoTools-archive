@@ -46,22 +46,20 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
         this( collection, null );
     }
 	public SubFeatureCollection(FeatureCollection collection, Filter subfilter ){
-		if (subfilter.equals(Filter.ALL)) {
+		if (subfilter != null && subfilter.equals(Filter.ALL)) {
 			throw new IllegalArgumentException("A subcollection with Filter.ALL is a null operation");
 		}
-		if (subfilter.equals(Filter.NONE)) {
+		if (subfilter != null && subfilter.equals(Filter.NONE)) {
 			throw new IllegalArgumentException("A subcollection with Filter.NONE should be a FeatureCollectionEmpty");
 		}
-        if( subfilter != null ){
-    		if (collection instanceof SubFeatureCollection) {
-    			SubFeatureCollection filtered = (SubFeatureCollection) collection;
-    			this.collection = filtered.collection;            
-    			this.filter = filtered.filter().and(subfilter);
-    		} else {
-    			this.collection = collection;
-    			this.filter = subfilter;
-    		}
-        }
+        if( subfilter != null && (collection instanceof SubFeatureCollection)){
+			SubFeatureCollection filtered = (SubFeatureCollection) collection;
+			this.collection = filtered.collection;            
+			this.filter = filtered.filter().and(subfilter);
+		} else {
+			this.collection = collection;
+			this.filter = subfilter;
+		}
         state = new SubFeatureState( this.collection, this );
 	}
     

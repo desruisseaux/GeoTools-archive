@@ -22,7 +22,7 @@ import org.geotools.filter.SortBy;
 import org.geotools.filter.SortOrder;
 
 public class SubFeatureList extends SubFeatureCollection implements FeatureList, RandomFeatureAccess {
-    List sort;
+    List sort; 
     List index;
     
     public SubFeatureList(FeatureCollection list, Filter filter){
@@ -40,18 +40,15 @@ public class SubFeatureList extends SubFeatureCollection implements FeatureList,
 	public SubFeatureList(FeatureCollection list, Filter filter, SortBy subSort) {
 		super( list,  filter );
         state = new SubFeatureState( list, this );
-        if( sort != null ){
-            if( subSort == null ){
-                sort = Collections.EMPTY_LIST;
+        if( subSort == null ){
+            sort = Collections.EMPTY_LIST;
+        } else {
+            sort = new ArrayList();                
+            if (collection instanceof SubFeatureList) {
+                SubFeatureList sorted = (SubFeatureList) collection;                    
+                sort.addAll( sorted.sort );
             }
-            else {
-                sort = new ArrayList();                
-                if (collection instanceof SubFeatureList) {
-                    SubFeatureList sorted = (SubFeatureList) collection;                    
-                    sort.addAll( sorted.sort );
-                }
-                sort.add( subSort );
-            }
+            sort.add( subSort );
         }
         index = null;                
 	}
