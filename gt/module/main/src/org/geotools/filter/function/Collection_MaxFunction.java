@@ -81,7 +81,7 @@ public class Collection_MaxFunction extends FunctionExpressionImpl
     public static CalcResult calculateMax(FeatureCollection collection,
         Expression expression) throws IllegalFilterException, IOException {
         MaxVisitor maxVisitor = new MaxVisitor(expression);
-        collection.accepts(maxVisitor);
+        collection.accepts(maxVisitor, null);
 
         return maxVisitor.getResult();
     }

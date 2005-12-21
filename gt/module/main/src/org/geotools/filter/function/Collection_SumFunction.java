@@ -81,7 +81,7 @@ public class Collection_SumFunction extends FunctionExpressionImpl
     public static CalcResult calculateSum(FeatureCollection collection,
         Expression expression) throws IllegalFilterException, IOException {
         SumVisitor sumVisitor = new SumVisitor(expression);
-        collection.accepts(sumVisitor);
+        collection.accepts(sumVisitor, null);
 
         return sumVisitor.getResult();
     }

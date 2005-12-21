@@ -80,7 +80,7 @@ public class Collection_BoundsFunction extends FunctionExpressionImpl
      */
     public static CalcResult calculateBounds(FeatureCollection collection) throws IllegalFilterException, IOException {
         BoundsVisitor boundsVisitor = new BoundsVisitor();
-        collection.accepts(boundsVisitor);
+        collection.accepts(boundsVisitor, null);
 
         return boundsVisitor.getResult();
     }

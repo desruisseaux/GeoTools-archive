@@ -81,7 +81,7 @@ public class Collection_UniqueFunction extends FunctionExpressionImpl
     public static CalcResult calculateUnique(FeatureCollection collection,
         Expression expression) throws IllegalFilterException, IOException {
         UniqueVisitor uniqueVisitor = new UniqueVisitor(expression);
-        collection.accepts(uniqueVisitor);
+        collection.accepts(uniqueVisitor, null);
 
         return uniqueVisitor.getResult();
     }

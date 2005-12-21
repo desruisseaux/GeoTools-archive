@@ -56,17 +56,17 @@ public class EqualIntervalFunction extends ClassificationFunction {
         MinVisitor minVisit;
 		try {
 			minVisit = new MinVisitor(expr);
-			fc.accepts(minVisit);
+			fc.accepts(minVisit, null);
 			globalMin = (Comparable) minVisit.getResult().getValue();
 
 			MaxVisitor maxVisit = new MaxVisitor(expr);
-			fc.accepts(maxVisit);
+			fc.accepts(maxVisit, null);
 			globalMax = (Comparable) maxVisit.getResult().getValue();
 			
 			if (!((globalMin instanceof Number) && (globalMax instanceof Number))) {
 				//obtain of list of unique values, so we can enumerate
 				UniqueVisitor uniqueVisit = new UniqueVisitor(expr);
-				fc.accepts(uniqueVisit);
+				fc.accepts(uniqueVisit, null);
 		        List result = uniqueVisit.getResult().toList();
 		        //sort the results and put them in an array
 		        Collections.sort(result);

@@ -81,7 +81,7 @@ public class Collection_MedianFunction extends FunctionExpressionImpl
     public static CalcResult calculateMedian(FeatureCollection collection,
         Expression expression) throws IllegalFilterException, IOException {
         MedianVisitor medianVisitor = new MedianVisitor(expression);
-        collection.accepts(medianVisitor);
+        collection.accepts(medianVisitor, null);
 
         return medianVisitor.getResult();
     }

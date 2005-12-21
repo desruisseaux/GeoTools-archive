@@ -85,7 +85,7 @@ public class Collection_CountFunction extends FunctionExpressionImpl implements
 	public static CalcResult calculateCount(FeatureCollection collection)
 			throws IllegalFilterException, IOException {
 		CountVisitor countVisitor = new CountVisitor();
-		collection.accepts(countVisitor);
+		collection.accepts(countVisitor, null);
 		return countVisitor.getResult();
 	}
 

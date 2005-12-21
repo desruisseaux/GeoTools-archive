@@ -40,6 +40,7 @@ import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
 import org.geotools.filter.SortBy2;
+import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
 import org.geotools.xml.gml.GMLSchema;
 
@@ -739,7 +740,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
      */
     public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
         Iterator iterator = null;
-        // if( progress == null ) progress = new NullProgressListener();
+        if (progress == null) progress = new NullProgressListener();
         try{
             float size = size();
             float position = 0;            

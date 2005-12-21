@@ -51,7 +51,7 @@ public class UniqueIntervalFunction extends ClassificationFunction {
         throws IllegalFilterException, IOException {
     	//use a visitor to grab the unique values
         UniqueVisitor uniqueVisit = new UniqueVisitor(expr);
-        fc.accepts(uniqueVisit);
+        fc.accepts(uniqueVisit, null);
         CalcResult calcResult = uniqueVisit.getResult();
         if (calcResult == null) return;
         List result = calcResult.toList();

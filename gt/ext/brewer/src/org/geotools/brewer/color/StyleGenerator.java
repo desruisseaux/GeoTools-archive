@@ -125,6 +125,14 @@ public class StyleGenerator {
         this.collection = collection;
     }
 
+    public Color[] getColors() {
+    	return colors;
+    }
+    
+    public void setColors(Color[] colors) {
+    	this.colors = colors;
+    }
+    
     /** @deprecated */
     public ColorBrewer getColorBrewer() {
         return colorBrewer;

@@ -59,9 +59,9 @@ public class VisitorCalculationTest extends DataTestCase {
     public void testMin() throws IllegalFilterException, IOException {
         //index 0 is the id field, so the data isn't terribly exciting (1,2,3).
     	MinVisitor minVisitor = new MinVisitor(0, ft);
-        fc.accepts(minVisitor);
+        fc.accepts(minVisitor, null);
     	MinVisitor minVisitor2 = new MinVisitor(0, ft2);
-        fc2.accepts(minVisitor2);
+        fc2.accepts(minVisitor2, null);
         //1 is min
         Object result = minVisitor.getResult().getValue();
         int value = ((Integer) result).intValue();
@@ -99,9 +99,9 @@ public class VisitorCalculationTest extends DataTestCase {
     public void testMax() throws IllegalFilterException, IOException {
         //index 0 is the id field, so the data isn't terribly exciting
         MaxVisitor maxVisitor = new MaxVisitor(0, ft);
-        fc.accepts(maxVisitor); //1,2,3
+        fc.accepts(maxVisitor, null); //1,2,3
         MaxVisitor maxVisitor2 = new MaxVisitor(3, ft2);
-        fc2.accepts(maxVisitor2); //3,4.5
+        fc2.accepts(maxVisitor2, null); //3,4.5
         //3 is max
         int value1 = maxVisitor.getResult().toInt();
         assertEquals(3, value1);
@@ -138,9 +138,9 @@ public class VisitorCalculationTest extends DataTestCase {
 
     public void testMedian() throws IllegalFilterException, IOException {
         MedianVisitor medianVisitor1 = new MedianVisitor(0, ft);
-        fc.accepts(medianVisitor1); //1,2,3
+        fc.accepts(medianVisitor1, null); //1,2,3
         MedianVisitor medianVisitor2 = new MedianVisitor(0, ft2);
-        fc2.accepts(medianVisitor2); //3,4.5
+        fc2.accepts(medianVisitor2, null); //3,4.5
         //1,2,3 --> 2, 1,2 --> 1.5
         CalcResult medianResult1 = medianVisitor1.getResult();
         CalcResult medianResult2 = medianVisitor2.getResult();
@@ -169,9 +169,9 @@ public class VisitorCalculationTest extends DataTestCase {
 
     public void testSum() throws IllegalFilterException, IOException {
         SumVisitor sumVisitor = new SumVisitor(0, ft);
-        fc.accepts(sumVisitor); //1,2,3
+        fc.accepts(sumVisitor, null); //1,2,3
         SumVisitor sumVisitor2 = new SumVisitor(3, ft2);
-        fc2.accepts(sumVisitor2); //3,4.5
+        fc2.accepts(sumVisitor2, null); //3,4.5
         //6 is sum
         int value1 = sumVisitor.getResult().toInt();
         assertEquals(6, value1);
@@ -195,9 +195,9 @@ public class VisitorCalculationTest extends DataTestCase {
     
     public void testCount() throws IllegalFilterException, IOException {
     	CountVisitor countVisitor = new CountVisitor();
-        fc.accepts(countVisitor);
+        fc.accepts(countVisitor, null);
         CountVisitor countVisitor2 = new CountVisitor();
-        fc2.accepts(countVisitor2);
+        fc2.accepts(countVisitor2, null);
         //3 features
         int value1 = countVisitor.getResult().toInt();
         assertEquals(3, value1);
@@ -222,9 +222,9 @@ public class VisitorCalculationTest extends DataTestCase {
 
     public void testAverage() throws IllegalFilterException, IOException {
         AverageVisitor averageVisitor = new AverageVisitor(0, ft);
-        fc.accepts(averageVisitor);  //1,2,3
+        fc.accepts(averageVisitor, null);  //1,2,3
         AverageVisitor averageVisitor2 = new AverageVisitor(3, ft2);
-        fc2.accepts(averageVisitor2); //3,4.5
+        fc2.accepts(averageVisitor2, null); //3,4.5
         //2 is average
         int value1 = averageVisitor.getResult().toInt();
         assertEquals(2, value1);
@@ -264,9 +264,9 @@ public class VisitorCalculationTest extends DataTestCase {
     
     public void testUnique() throws IllegalFilterException, IOException {
         UniqueVisitor uniqueVisitor = new UniqueVisitor(0, ft);
-        fc.accepts(uniqueVisitor);
+        fc.accepts(uniqueVisitor, null);
         UniqueVisitor uniqueVisitor2 = new UniqueVisitor(3, ft2);
-        fc2.accepts(uniqueVisitor2);
+        fc2.accepts(uniqueVisitor2, null);
         //1, 2, 3
         Set value1 = uniqueVisitor.getResult().toSet();
         assertEquals(3, value1.size()); //3 items in the set
@@ -302,9 +302,9 @@ public class VisitorCalculationTest extends DataTestCase {
 
     public void testBounds() throws IOException {
         BoundsVisitor boundsVisitor1 = new BoundsVisitor();
-        fc.accepts(boundsVisitor1);
+        fc.accepts(boundsVisitor1, null);
         BoundsVisitor boundsVisitor2 = new BoundsVisitor();
-        fc2.accepts(boundsVisitor2);
+        fc2.accepts(boundsVisitor2, null);
         Envelope env1 = new Envelope(1,5,0,4);
         CalcResult boundsResult1 = boundsVisitor1.getResult();
         assertEquals(env1, boundsResult1.toEnvelope());
@@ -319,9 +319,9 @@ public class VisitorCalculationTest extends DataTestCase {
     //try merging a count and sum to get an average, both count+sum and sum+count 
     public void testCountSumMerge() throws IllegalFilterException, IOException {
         CountVisitor countVisitor = new CountVisitor();
-        fc2.accepts(countVisitor); //count = 2
+        fc2.accepts(countVisitor, null); //count = 2
         SumVisitor sumVisitor = new SumVisitor(3, ft2);
-        fc2.accepts(sumVisitor); //sum = 7.5
+        fc2.accepts(sumVisitor, null); //sum = 7.5
         CalcResult countResult = countVisitor.getResult();
         CalcResult sumResult = sumVisitor.getResult();
         CalcResult averageResult1 = countResult.merge(sumResult);
