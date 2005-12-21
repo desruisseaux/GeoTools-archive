@@ -14,6 +14,7 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.LiteralExpression;
+import org.geotools.util.ProgressListener;
 
 /**
  *
@@ -24,6 +25,7 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
     FeatureCollection fc = null;
     int classNum;
     Expression expr; 
+    ProgressListener progress;
     
     /** Creates a new instance of ClassificationFunction */
     public ClassificationFunction() {
@@ -55,6 +57,14 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
     
     public void setExpression(Expression e){
         expr = e;
+    }
+    
+    public ProgressListener getProgressListener() {
+    	return progress;
+    }
+    
+    public void setProgressListener(ProgressListener progress) {
+    	this.progress = progress;
     }
     
     public Expression[] getArgs(){

@@ -60,7 +60,8 @@ public class EqualIntervalFunction extends ClassificationFunction {
 			globalMin = (Comparable) minVisit.getResult().getValue();
 
 			MaxVisitor maxVisit = new MaxVisitor(expr);
-			fc.accepts(maxVisit, null);
+			fc.accepts(maxVisit, progress);
+			if (progress.isCanceled()) return;
 			globalMax = (Comparable) maxVisit.getResult().getValue();
 			
 			if (!((globalMin instanceof Number) && (globalMax instanceof Number))) {
