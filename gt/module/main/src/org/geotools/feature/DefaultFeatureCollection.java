@@ -798,7 +798,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
 
      */
     public FeatureList sort(SortBy order) {
-    	if( order == SortBy.NATRUAL_ORDER ){
+    	if( order == SortBy.NATURAL_ORDER ){
     		// return new FeatureListImpl( this );
     	}
     	if( order instanceof SortBy2){
@@ -819,7 +819,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
      */
     public FeatureList sort(SortBy2 order ){
     	Comparator compare;    	
-    	if( order == SortBy.NATRUAL_ORDER ){
+    	if( order == SortBy.NATURAL_ORDER ){
     		// forward
     	}
     	else if ( order == SortBy.REVERSE_ORDER ){

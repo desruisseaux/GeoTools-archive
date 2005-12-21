@@ -71,7 +71,7 @@ public interface SortBy {
 	 * This is a "NullObject".
 	 * </p> 
 	 */
-	public static final SortBy2 NATRUAL_ORDER= new SortBy2(){
+	public static final SortBy2 NATURAL_ORDER = new SortBy2(){
 		public Expression getExpression() {
 			return null;
 		}
@@ -99,7 +99,7 @@ public interface SortBy {
 	 * This is a "NullObject".
 	 * </p> 
 	 */
-	public static final SortBy2 REVERSE_ORDER= new SortBy2(){
+	public static final SortBy2 REVERSE_ORDER = new SortBy2(){
 		public Expression getExpression() {
 			return null;
 		}

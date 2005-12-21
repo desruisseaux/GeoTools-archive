@@ -69,9 +69,9 @@ public class MemoryFeatureCollectionTest extends DataTestCase {
         assertEquals( 1, subsub.size() );        
     }
     public void XtestSort(){
-        FeatureList fList = roads.sort(SortBy.NATRUAL_ORDER);
-        for (Object obj : fList) {
-            System.out.println(obj);
-        }
+        FeatureList fList = roads.sort(SortBy.NATURAL_ORDER);
+//        for (Object obj : fList) {
+//            System.out.println(obj);
+//        }
     }
 }
