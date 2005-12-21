@@ -40,6 +40,7 @@ import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
 import org.geotools.filter.SortBy2;
+import org.geotools.util.ProgressListener;
 import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -734,19 +735,30 @@ public class DefaultFeatureCollection implements FeatureCollection {
 
     /**
      * Accepts a visitor, which then visits each feature in the collection.
+     * @throws IOException 
      */
-    public void accepts(FeatureVisitor visitor) {
+    public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
         Iterator iterator = null;
+        // if( progress == null ) progress = new NullProgressListener();
         try{
-        	for( iterator = iterator(); iterator.hasNext(); ){
-	            Feature feature = (Feature) iterator.next();
-	            visitor.visit(feature);
-	        }
+            float size = size();
+            float position = 0;            
+            progress.started();
+            for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext(); progress.progress( position++/size )){
+                try {
+                    Feature feature = (Feature) iterator.next();
+                    visitor.visit(feature);
+                }
+                catch( Exception erp ){
+                    progress.exceptionOccurred( erp );
+                }
+            }            
         }
         finally {
-        	close( iterator );
+            progress.complete();            
+            close( iterator );
         }
-	}
+    }
 
     /**
      * Will return an optimized subCollection based on access

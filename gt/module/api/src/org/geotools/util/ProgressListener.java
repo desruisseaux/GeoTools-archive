@@ -20,6 +20,12 @@
  */
 package org.geotools.util;
 
+import java.io.IOException;
+import java.util.Iterator;
+
+import org.geotools.feature.Feature;
+import org.geotools.feature.visitor.FeatureVisitor;
+
 
 /**
  * Monitor the progress of some lengthly operation. This interface makes no
@@ -51,6 +57,32 @@ package org.geotools.util;
  * is used for reducing the amount of calls to {@link #progress} (only once every 256 steps).
  * This is not mandatory, but may speed up the process.
  *
+ * <p>
+ * Here is another example showing how to cancel:
+ * <pre><code>
+ *      Iterator iterator = null;
+ *      try{
+ *          float size = size();
+ *          float position = 0;
+ *          progress.started();
+ *          for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext(); progress.progress( (position++)/size )){
+ *              try {
+ *                  Feature feature = (Feature) iterator.next();
+ *                  visitor.visit(feature);
+ *              }
+ *              catch( Exception erp ){
+ *                  progress.exceptionOccurred( erp );
+ *              }
+ *          }
+ *          progress.complete();
+ *      
+ *      }
+ *      finally {
+ *          close( iterator );
+ *      }
+ * </pcode></pre>
+ * Note the use of try and catch to report exceptions.
+ * 
  * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
@@ -100,6 +132,12 @@ public interface ProgressListener {
      */
     public abstract void dispose();
 
+    /** Is this job canceled? */
+    public abstract boolean isCanceled();
+    
+    /** Indicate that progress should is cancled */
+    public abstract void setCanceled( boolean cancel);    
+    
     /**
      * Reports a warning. This warning may be printed to the {@linkplain System#err standard error
      * stream}, appears in a windows or be ignored, at implementor choice.
@@ -115,6 +153,7 @@ public interface ProgressListener {
     /**
      * Reports an exception. This method may prints the stack trace to the {@linkplain System#err
      * standard error stream} or display it in a dialog box, at implementor choice.
+     * 
      */
     public abstract void exceptionOccurred(final Throwable exception);
 }

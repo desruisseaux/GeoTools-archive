@@ -24,6 +24,7 @@ import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
+import org.geotools.util.ProgressListener;
 
 /**
  * Represents a collection of features.
@@ -269,7 +270,7 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * @param visitor
      * @throws IOException 
      */
-    void accepts( FeatureVisitor visitor ) throws IOException;
+    void accepts( FeatureVisitor visitor, ProgressListener progress ) throws IOException;
     
     /**
      * FeatureCollection "view" indicated by provided filter.

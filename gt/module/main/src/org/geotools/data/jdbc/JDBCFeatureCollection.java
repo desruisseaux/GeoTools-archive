@@ -194,7 +194,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
         }
         //optimization was not available, or it failed
         isOptimized = false;
-        super.accepts(visitor);
+        super.accepts(visitor, null);
     }
 
     Connection getConnection() throws IOException {

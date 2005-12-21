@@ -1,10 +1,12 @@
 package org.geotools.feature.collection;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.CollectionListener;
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureList;
@@ -13,6 +15,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
+import org.geotools.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -109,8 +112,31 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
         // TODO Auto-generated method stub
         return null;
     }
-    public void accepts( FeatureVisitor visitor ) throws IOException {
-        // TODO Auto-generated method stub        
+    /**
+     * Accepts a visitor, which then visits each feature in the collection.
+     * @throws IOException 
+     */
+    public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
+        Iterator iterator = null;
+        // if( progress == null ) progress = new NullProgressListener();
+        try{
+            float size = size();
+            float position = 0;            
+            progress.started();
+            for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext(); progress.progress( position++/size )){
+                try {
+                    Feature feature = (Feature) iterator.next();
+                    visitor.visit(feature);
+                }
+                catch( Exception erp ){
+                    progress.exceptionOccurred( erp );
+                }
+            }            
+        }
+        finally {
+            progress.complete();            
+            close( iterator );
+        }
     }
         
     //

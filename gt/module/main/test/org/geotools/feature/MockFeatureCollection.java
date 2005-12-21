@@ -13,6 +13,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
+import org.geotools.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -218,21 +219,8 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
     public void close( FeatureIterator iterator ) {
     }
     
-    /**
-     * Accepts a visitor, which then visits each feature in the collection.
-     */
-    public void accepts(FeatureVisitor visitor) {
-        Iterator iterator = null;
-        try{
-        	for( iterator = iterator(); iterator.hasNext(); ){
-	            Feature feature = (Feature) iterator.next();
-	            visitor.visit(feature);
-	        }
-        }
-        finally {
-        	close( iterator );
-        }
-	}
+    public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {        
+    }
 
 	public FeatureCollection subCollection(Filter filter) {
 		// TODO Auto-generated method stub

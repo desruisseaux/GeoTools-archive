@@ -18,6 +18,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
+import org.geotools.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -196,22 +197,32 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
         return collection.getSchema();
 	}
 
-	public void accepts(FeatureVisitor visitor) throws IOException {
-		Iterator iterator = null;
-		try {
-			for( iterator = iterator(); iterator.hasNext(); ){
-				try {
-					visitor.visit( (Feature) iterator.next() );
-				}
-				catch( Throwable t ){
-					// WARNING!
-				}
-			}
-		}
-		finally {
-			close( iterator );
-		}
-	}
+    /**
+     * Accepts a visitor, which then visits each feature in the collection.
+     * @throws IOException 
+     */
+    public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
+        Iterator iterator = null;
+        // if( progress == null ) progress = new NullProgressListener();
+        try{
+            float size = size();
+            float position = 0;            
+            progress.started();
+            for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext(); progress.progress( position++/size )){
+                try {
+                    Feature feature = (Feature) iterator.next();
+                    visitor.visit(feature);
+                }
+                catch( Exception erp ){
+                    progress.exceptionOccurred( erp );
+                }
+            }            
+        }
+        finally {
+            progress.complete();            
+            close( iterator );
+        }
+    }
 
 	public FeatureReader reader() throws IOException {
 		return new DelegateFeatureReader( getSchema(), features() );
