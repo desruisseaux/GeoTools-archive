@@ -21,35 +21,37 @@
 package org.geotools.gui.swing;
 
 // J2SE dependencies
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Toolkit;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.BorderLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JDialog;
-import javax.swing.JTextArea;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
-import javax.swing.JLayeredPane;
-import javax.swing.JDesktopPane;
-import javax.swing.BorderFactory;
-import javax.swing.JInternalFrame;
-import javax.swing.BoundedRangeModel;
-import java.lang.reflect.InvocationTargetException;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-// Geotools dependencies
-import org.geotools.util.ProgressListener;
-import org.geotools.resources.Utilities;
+import javax.swing.BorderFactory;
+import javax.swing.BoundedRangeModel;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JDialog;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import org.geotools.resources.SwingUtilities;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.util.ProgressListener;
 
 
 /**
@@ -126,6 +128,12 @@ public class ProgressWindow implements ProgressListener {
     private final JLabel description;
 
     /**
+     * Description de l'opération en cours. Des exemples de descriptions
+     * seraient "Lecture de l'en-tête" ou "Lecture des données".
+     */
+    private final JButton cancel;
+    
+    /**
      * Région dans laquelle afficher les messages d'avertissements.
      * Cet objet doit être de la classe {@link JTextArea}. il ne sera
      * toutefois construit que si des erreurs surviennent effectivement.
@@ -191,6 +199,14 @@ public class ProgressWindow implements ProgressListener {
         progressBar.setBorder(BorderFactory.createCompoundBorder(
                               BorderFactory.createEmptyBorder(6,9,6,9),
                               progressBar.getBorder()));
+        
+        cancel = new JButton("Cancel");
+        cancel.addActionListener( new ActionListener(){
+            public void actionPerformed( ActionEvent e ) {
+                setCanceled( true );
+            }            
+        });
+        
         /*
          * Dispose les éléments à l'intérieur de la fenêtre.
          * On leur donnera une bordure vide pour laisser un
@@ -536,5 +552,13 @@ public class ProgressWindow implements ProgressListener {
                 warningArea.append(text);
             }
         }
+    }
+
+    public boolean isCanceled() {
+        return cancel.isSelected();
+    }
+
+    public void setCanceled( boolean stop ) {
+        cancel.setSelected( stop );        
     }
 }

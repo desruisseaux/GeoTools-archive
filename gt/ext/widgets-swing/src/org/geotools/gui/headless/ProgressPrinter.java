@@ -21,24 +21,15 @@
 package org.geotools.gui.headless;
 
 // J2SE Input/output
-import java.lang.System;
-import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.UnsupportedCharsetException;
-
-// Text
-import java.text.NumberFormat;
 import java.text.BreakIterator;
+import java.text.NumberFormat;
 
-// Geotools dependencies
-import org.geotools.util.ProgressListener;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.util.ProgressListener;
 
 
 /**
@@ -120,6 +111,8 @@ public class ProgressPrinter implements ProgressListener {
      * autres messages d'avertissements.
      */
     private String lastSource;
+
+    private boolean canceled;
 
     /**
      * Constructs a new object sending progress reports to the
@@ -412,5 +405,13 @@ public class ProgressPrinter implements ProgressListener {
                         break;
             }
         }
+    }
+
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled( boolean canceled ) {
+        this.canceled = canceled;
     }
 }

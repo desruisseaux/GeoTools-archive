@@ -1,12 +1,14 @@
 package org.geotools.data.memory;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.collection.AbstractFeatureCollection;
 import org.geotools.feature.collection.FeatureState;
+import org.geotools.feature.collection.RandomFeatureAccess;
 
 /**
  * Implement a FeatureCollection by burning memory!
@@ -22,7 +24,7 @@ import org.geotools.feature.collection.FeatureState;
  *   
  * @author Jody Garnett, Refractions Research
  */
-public class MemoryFeatureCollection extends AbstractFeatureCollection {
+public class MemoryFeatureCollection extends AbstractFeatureCollection implements RandomFeatureAccess {
     TreeMap contents = new TreeMap();
     FeatureState state;
     
@@ -74,5 +76,24 @@ public class MemoryFeatureCollection extends AbstractFeatureCollection {
         public void remove() {
             it.remove();
         }        
+    }
+
+    //
+    // RandomFeatureAccess 
+    //
+    public Feature getFeatureMember( String id ) throws NoSuchElementException {
+        if( contents.containsKey( id ) ){
+            return (Feature) contents.get( id );
+        }
+        throw new NoSuchElementException( id );
+    }
+
+    public Feature removeFeatureMember( String id ) {
+        if( contents.containsKey( id ) ){
+            Feature old = (Feature) contents.get( id );
+            contents.remove( id );
+            return old;
+        }
+        return null;
     };
 }
