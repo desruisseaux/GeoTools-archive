@@ -28,6 +28,7 @@ import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.UniqueVisitor;
 import org.geotools.filter.Expression;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.util.NullProgressListener;
 
 
 /**
@@ -51,6 +52,7 @@ public class UniqueIntervalFunction extends ClassificationFunction {
         throws IllegalFilterException, IOException {
     	//use a visitor to grab the unique values
         UniqueVisitor uniqueVisit = new UniqueVisitor(expr);
+		if (progress == null) progress = new NullProgressListener();
         fc.accepts(uniqueVisit, progress);
 		if (progress.isCanceled()) return;
 

@@ -27,6 +27,7 @@ import org.geotools.feature.visitor.MinVisitor;
 import org.geotools.feature.visitor.UniqueVisitor;
 import org.geotools.filter.Expression;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.util.NullProgressListener;
 
 
 /**
@@ -60,6 +61,7 @@ public class EqualIntervalFunction extends ClassificationFunction {
 			globalMin = (Comparable) minVisit.getResult().getValue();
 
 			MaxVisitor maxVisit = new MaxVisitor(expr);
+			if (progress == null) progress = new NullProgressListener();
 			fc.accepts(maxVisit, progress);
 			if (progress.isCanceled()) return;
 			globalMax = (Comparable) maxVisit.getResult().getValue();
