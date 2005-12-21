@@ -45,6 +45,7 @@ import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
 import org.geotools.filter.SortBy2;
+import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
 import org.geotools.xml.gml.GMLSchema;
 
@@ -421,7 +422,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
         if( featureType == null ){
             List ats = new LinkedList();
             ats.add(new FeatureAttributeType( getSchema().getTypeName(), getSchema(),false));
-            featureType = new DefaultFeatureType("AbstractFeatureColletionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);        
+            featureType = new DefaultFeatureType("AbstractFeatureCollectionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);        
         }
         return featureType;
     }
@@ -575,7 +576,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
      */
     public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
         Iterator iterator = null;
-        // if( progress == null ) progress = new NullProgressListener();
+        if (progress == null) progress = new NullProgressListener();
         try{
             float size = size();
             float position = 0;            
