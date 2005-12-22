@@ -103,8 +103,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory {
      */
     protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
         try {
-            URL url;
-            url = FactoryUsingWKT.class.getResource(FILENAME);
+            URL url = FactoryUsingWKT.class.getResource(FILENAME);
             if (url == null) {
                 throw new FileNotFoundException(FILENAME);
             }

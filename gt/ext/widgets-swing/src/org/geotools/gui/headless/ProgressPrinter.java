@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.text.BreakIterator;
 import java.text.NumberFormat;
 
+// Geotools dependencies
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
@@ -112,7 +113,10 @@ public class ProgressPrinter implements ProgressListener {
      */
     private String lastSource;
 
-    private boolean canceled;
+    /**
+     * {@code true} if the action has been canceled.
+     */
+    private volatile boolean canceled;
 
     /**
      * Constructs a new object sending progress reports to the
@@ -282,6 +286,20 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setCanceled(final boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    /**
      * Prints a warning. The first time this method is invoked, the localized word "WARNING" will
      * be printed in the middle of a box. If a source is specified, it will be printed only if it
      * is not the same one than the source of the last warning. If a marging is specified, it will
@@ -405,13 +423,5 @@ public class ProgressPrinter implements ProgressListener {
                         break;
             }
         }
-    }
-
-    public boolean isCanceled() {
-        return canceled;
-    }
-
-    public void setCanceled( boolean canceled ) {
-        this.canceled = canceled;
     }
 }

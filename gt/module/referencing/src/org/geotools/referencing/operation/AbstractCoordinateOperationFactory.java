@@ -78,7 +78,6 @@ import org.geotools.util.WeakHashSet;
  *
  * @since 2.1
  * @version $Id$
- * @author <A HREF="http://www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  */
 public abstract class AbstractCoordinateOperationFactory extends AbstractFactory

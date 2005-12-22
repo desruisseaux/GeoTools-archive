@@ -34,6 +34,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
@@ -47,6 +48,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+// Geotools dependencies
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
@@ -70,83 +72,81 @@ import org.geotools.util.ProgressListener;
  */
 public class ProgressWindow implements ProgressListener {
     /**
-     * Largeur initiale de la fenêtre des progrès, en pixels.
+     * Initial with for the progress window, in pixels.
      */
     private static final int WIDTH = 360;
 
     /**
-     * Hauteur initiale de la fenêtre des progrès, en pixels.
+     * Initial height for the progress window, in pixels.
+     * Increase this value is some component (e.g. the "Cancel" button) seems truncated.
+     * The current value has been tested for Metal look and feel.
      */
-    private static final int HEIGHT = 120;
+    private static final int HEIGHT = 140;
 
     /**
-     * Hauteur de la zone de texte qui contiendra des messages d'avertissements.
+     * The height of the text area containing the warning messages (if any).
      */
     private static final int WARNING_HEIGHT = 120;
 
     /**
-     * Largeur de la marge horizontale, en pixels.
+     * Horizontal margin width, in pixels.
      */
     private static final int HMARGIN = 12;
 
     /**
-     * Largeur de la marge verticale, en pixels.
+     * Vertical margin height, in pixels.
      */
     private static final int VMARGIN = 9;
 
     /**
-     * Nombre d'espaces à placer dans la marge de
-     * la fenêtre contenant les messages d'erreurs.
+     * Amount of spaces to put in the margin of the warning messages window.
      */
     private static final int WARNING_MARGIN = 8;
 
     /**
-     * Fenêtre affichant les progrès de la longue opération.
-     * Il peut s'agir notamment d'un objet {@link JDialog} ou
-     * d'un objet {@link JInternalFrame}, dépendamment de la
-     * composante parente.
+     * The progress window as a {@link JDialog} or a {@link JInternalFrame},
+     * depending of the parent component.
      */
     private final Component window;
 
     /**
-     * Conteneur dans lequel insérer les éléments tels que
-     * la barre des progrès. Ca peut être le même objet que
-     * {@link #window}, mais pas nécessairement.
+     * The container where to add components like the progress bar.
      */
     private final JComponent content;
 
     /**
-     * Barre des progrès. La plage de cette barre doit
-     * obligatoirement aller au moins de 0 à 100.
+     * The progress bar. Values ranges from 0 to 100.
      */
     private final JProgressBar progressBar;
 
     /**
-     * Description de l'opération en cours. Des exemples de descriptions
-     * seraient "Lecture de l'en-tête" ou "Lecture des données".
+     * A description of the undergoing operation. Examples: "Reading header",
+     * "Reading data", <cite>etc.</cite>
      */
     private final JLabel description;
 
     /**
-     * Description de l'opération en cours. Des exemples de descriptions
-     * seraient "Lecture de l'en-tête" ou "Lecture des données".
+     * The cancel button.
      */
     private final JButton cancel;
     
     /**
-     * Région dans laquelle afficher les messages d'avertissements.
-     * Cet objet doit être de la classe {@link JTextArea}. il ne sera
-     * toutefois construit que si des erreurs surviennent effectivement.
+     * Component where to display warnings. The actual component class is {@link JTextArea}.
+     * But we declare {@link JComponent} here in order to avoid class loading before needed.
      */
     private JComponent warningArea;
 
     /**
-     * Source du dernier message d'avertissement. Cette information est
-     * conservée afin d'éviter de répéter la source lors d'éventuels
-     * autres messages d'avertissements.
+     * The source of the last warning message. Used in order to avoid to repeat the source
+     * for all subsequent warning messages, if the source didn't changed.
      */
     private String lastSource;
-    
+
+    /**
+     * {@code true} if the action has been canceled.
+     */
+    private volatile boolean canceled;
+
     /**
      * Creates a window for reporting progress. The window will not appears immediately.
      * It will appears only when the {@link #started} method will be invoked.
@@ -155,69 +155,77 @@ public class ProgressWindow implements ProgressListener {
      */
     public ProgressWindow(final Component parent) {
         /*
-         * Création de la fenêtre qui contiendra
-         * les composantes affichant le progrès.
+         * Creates the window containing the components.
          */
         Dimension        parentSize;
         final Vocabulary  resources = Vocabulary.getResources(parent!=null ? parent.getLocale() : null);
         final String          title = resources.getString(VocabularyKeys.PROGRESSION);
         final JDesktopPane  desktop = JOptionPane.getDesktopPaneForComponent(parent);
         if (desktop != null) {
-            final JInternalFrame frame = new JInternalFrame(title);
-            window                     = frame;
-            content                    = new JPanel();
-            parentSize                 = desktop.getSize();
-            frame.setContentPane(content); // Pour avoir un fond opaque
+            final JInternalFrame frame;
+            frame      = new JInternalFrame(title);
+            window     = frame;
+            content    = new JPanel(); // Pour avoir un fond opaque
+            parentSize = desktop.getSize();
+            frame.setContentPane(content);
             frame.setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
             desktop.add(frame, JLayeredPane.PALETTE_LAYER);
         } else {
-            final Frame frame    = JOptionPane.getFrameForComponent(parent);
-            final JDialog dialog = new JDialog(frame, title);
-            window               = dialog;
-            content              = (JComponent) dialog.getContentPane();
-            parentSize           = frame.getSize();
+            final Frame frame;
+            final JDialog dialog;
+            frame      = JOptionPane.getFrameForComponent(parent);
+            dialog     = new JDialog(frame, title);
+            window     = dialog;
+            content    = (JComponent) dialog.getContentPane();
+            parentSize = frame.getSize();
             if (parentSize.width==0 || parentSize.height==0) {
-                parentSize=Toolkit.getDefaultToolkit().getScreenSize();
+                parentSize = Toolkit.getDefaultToolkit().getScreenSize();
             }
-            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
             dialog.setResizable(false);
         }
         window.setBounds((parentSize.width-WIDTH)/2, (parentSize.height-HEIGHT)/2, WIDTH, HEIGHT);
         /*
-         * Création de l'étiquette qui décrira l'opération
-         * en cours. Au départ, aucun texte ne sera placé
-         * dans cette étiquette.
+         * Creates the label that is going to display the undergoing operation.
+         * This label is initially empty.
          */
         description = new JLabel();
         description.setHorizontalAlignment(JLabel.CENTER);
         /*
-         * Procède à la création de la barre des progrès.
-         * Le modèle de cette barre sera retenu pour être
+         * Creates the progress bar.
          */
         progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
         progressBar.setBorder(BorderFactory.createCompoundBorder(
                               BorderFactory.createEmptyBorder(6,9,6,9),
                               progressBar.getBorder()));
-        
-        cancel = new JButton("Cancel");
+        /*
+         * Creates the cancel button.
+         */
+        cancel = new JButton(resources.getString(VocabularyKeys.CANCEL));
         cancel.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
                 setCanceled( true );
             }            
         });
-        
+        final Box cancelBox = Box.createHorizontalBox();
+        cancelBox.add(Box.createGlue());
+        cancelBox.add(cancel);
+        cancelBox.add(Box.createGlue());
+        cancelBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
         /*
-         * Dispose les éléments à l'intérieur de la fenêtre.
-         * On leur donnera une bordure vide pour laisser un
-         * peu d'espace entre eux et les bords de la fenêtre.
+         * Layout the elements inside the window. An empty border is created in
+         * order to put some space between the window content and the window border.
          */
-        content.setLayout(new GridLayout(2,1));
-        content.setBorder(BorderFactory.createCompoundBorder(
-                          BorderFactory.createEmptyBorder(VMARGIN,HMARGIN,VMARGIN,HMARGIN),
-                          BorderFactory.createEtchedBorder()));
-        content.add(description);
-        content.add(progressBar);
+        final JPanel panel = new JPanel(new GridLayout(2,1));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createEmptyBorder(VMARGIN, HMARGIN, VMARGIN, HMARGIN),
+                        BorderFactory.createEtchedBorder()));
+        panel.add(description);
+        panel.add(progressBar);
+        content.setLayout(new BorderLayout());
+        content.add(panel,     BorderLayout.NORTH);
+        content.add(cancelBox, BorderLayout.SOUTH);
     }
 
     /**
@@ -231,21 +239,24 @@ public class ProgressWindow implements ProgressListener {
      * Returns the window title. The default title is "Progress" localized in current locale.
      */
     public String getTitle() {
-        return get(Caller.TITLE);
+        return (String) get(Caller.TITLE);
     }
 
     /**
      * Set the window title. A {@code null} value reset the default title.
      */
-    public void setTitle(final String name) {
-        set(Caller.TITLE, (name!=null) ? name : getString(VocabularyKeys.PROGRESSION));
+    public void setTitle(String name) {
+        if (name == null) {
+            name = getString(VocabularyKeys.PROGRESSION);
+        }
+        set(Caller.TITLE, name);
     }
 
     /**
      * {@inheritDoc}
      */
     public String getDescription() {
-        return get(Caller.LABEL);
+        return (String) get(Caller.LABEL);
     }
 
     /**
@@ -270,7 +281,7 @@ public class ProgressWindow implements ProgressListener {
         int p=(int) percent; // round toward 0
         if (p<  0) p=  0;
         if (p>100) p=100;
-        set(Caller.PROGRESS, p);
+        set(Caller.PROGRESS, new Integer(p));
     }
 
     /**
@@ -289,7 +300,21 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Display a warning message under the progres bar. The text area for warning messages
+     * {@inheritDoc}
+     */
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setCanceled(final boolean stop) {
+        canceled = stop;
+    }
+
+    /**
+     * Display a warning message under the progress bar. The text area for warning messages
      * will appears only the first time this method is invoked.
      */
     public synchronized void warningOccurred(final String source, String margin,
@@ -332,9 +357,7 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Retourne la chaîne {@code margin} sans les
-     * éventuelles parenthèses qu'elle pourrait avoir
-     * de part et d'autre.
+     * Returns the string {@code margin} without the parenthesis (if any).
      */
     private static String trim(String margin) {
         margin = margin.trim();
@@ -346,177 +369,181 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Interroge une des composantes de la boîte des progrès.
-     * L'interrogation sera faite dans le thread de <i>Swing</i>.
+     * Queries one of the components in the progress window. This method
+     * doesn't need to be invoked from the <cite>Swing</cite> thread.
      *
-     * @param  task Information désirée. Ce code doit être une
-     *         des constantes telles que {@link Caller#TITLE}
-     *         ou {@link Caller#LABEL}.
-     * @return L'information demandée.
+     * @param  task The desired value as one of the {@link Caller#TITLE}
+     *              or {@link Caller#LABEL} constants.
+     * @return The value.
      */
-    private String get(final int task) {
+    private Object get(final int task) {
         final Caller caller = new Caller(-task);
         SwingUtilities.invokeAndWait(caller);
-        return caller.text;
+        return caller.value;
     }
 
     /**
-     * Modifie l'état d'une des composantes de la boîte des progrès.
-     * La modification sera faite dans le thread de <i>Swing</i>.
+     * Sets the state of one of the components in the progress window.
+     * This method doesn't need to be invoked from the <cite>Swing</cite> thread.
      *
-     * @param  task Information à modifier. Ce code doit être une
-     *         des constantes telles que {@link Caller#TITLE}
-     *         ou {@link Caller#LABEL}.
-     * @param  text Le nouveau texte.
+     * @param  task  The value to change as one of the {@link Caller#TITLE}
+     *               or {@link Caller#LABEL} constants.
+     * @param  value The new value.
      */
-    private void set(final int task, final String text) {
-        final Caller caller = new Caller(task);
-        caller.text = text;
-        EventQueue.invokeLater(caller);
-    }
-
-    /**
-     * Modifie l'état d'une des composantes de la boîte des progrès.
-     * La modification sera faite dans le thread de <i>Swing</i>.
-     *
-     * @param  task Information à modifier. Ce code doit être une
-     *         des constantes telles que {@link Caller#PROGRESS}.
-     * @param  value Nouvelle valeur à affecter à la composante.
-     */
-    private void set(final int task, final int value) {
+    private void set(final int task, final Object value) {
         final Caller caller = new Caller(task);
         caller.value = value;
         EventQueue.invokeLater(caller);
     }
 
     /**
-     * Appelle une méthode <i>Swing</i> sans argument.
-     * @param  task Méthode à appeler. Ce code doit être une
-     *         des constantes telles que {@link Caller#STARTED}
-     *         ou {@link Caller#DISPOSE}.
+     * Invokes a <cite>Swing</cite> method without arguments.
+     *
+     * @param task The method to invoke: {@link Caller#STARTED} or {@link Caller#DISPOSE}.
      */
     private void call(final int task) {
         EventQueue.invokeLater(new Caller(task));
     }
 
     /**
-     * Tâche à exécuter dans le thread de <i>Swing</i> pour interroger
-     * ou modifier l'état d'une composante. Cette tache est destinée à être appelée par
-     * les méthodes {@link EventQueue#invokeLater} et {@link EventQueue#invokeAndWait}.
-     * Les tâches possibles sont désignées par des constantes telles que {@link #TITLE}
-     * et {@link #LABEL}. Une valeur positive signifie que l'on modifie l'état de cette
-     * composante (dans ce cas, il faut d'abord avoir affecté une valeur à {@link #text}),
-     * tandis qu'une valeur négative signifie que l'on interroge l'état de la comosante
-     * (dans ce cas, il faudra extrait l'état du champ {@link #text}).
+     * Task to run in the <cite>Swing</cite> thread. Tasks are identified by a numeric
+     * constant. The {@code get} operations have negative identifiers and are executed
+     * by the {@link EventQueue#invokeAndWait} method. The {@code set} operations have
+     * positive identifiers and are executed by the {@link EventQueue#invokeLater} method.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private class Caller implements Runnable {
-        /**
-         * Constante indiquant que l'on souhaite interroger
-         * ou modifier le titre de la boîte des progrès.
-         */
-        public static final int TITLE=1;
+        /** For getting or setting the window title. */
+        public static final int TITLE = 1;
+
+        /** For getting or setting the progress label. */
+        public static final int LABEL = 2;
+
+        /** For getting or setting the progress bar value. */
+        public static final int PROGRESS = 3;
+
+        /** For adding a warning message. */
+        public static final int WARNING = 4;
+
+        /** Notify that an action started. */
+        public static final int STARTED = 5;
+
+        /** Notify that an action is completed. */
+        public static final int COMPLETE = 6;
+
+        /** Notify that the window can be disposed. */
+        public static final int DISPOSE = 7;
 
         /**
-         * Constante indiquant que l'on souhaite interroger
-         * ou modifier la description des progrès.
-         */
-        public static final int LABEL=2;
-
-        /**
-         * Constante indiquant que l'on souhaite modifier
-         * la valeur de la barre des progrès.
-         */
-        public static final int PROGRESS=3;
-
-        /**
-         * Constante indiquant que l'on souhaite
-         * faire apparaître un avertissement.
-         */
-        public static final int WARNING=4;
-
-        /**
-         * Constante indiquant que l'on souhaite
-         * faire apparaître la boîte des progrès.
-         */
-        public static final int STARTED=5;
-
-        /**
-         * Constante indiquant que l'on souhaite
-         * faire disparaître la boîte des progrès.
-         */
-        public static final int COMPLETE=6;
-
-        /**
-         * Constante indiquant que l'on souhaite
-         * faire disparaître la boîte des progrès.
-         */
-        public static final int DISPOSE=7;
-
-        /**
-         * Constante indiquant la tâche que l'on souhaite effectuer. Il doit s'agir
-         * d'une valeur telle que {@link #TITLE} et {@link #LABEL}, ainsi que leurs
-         * valeurs négatives.
+         * The task to execute, as one of the {@link #TITLE}, {@link #LABEL}, <cite>etc.</cite>
+         * constants or their negative counterpart.
          */
         private final int task;
 
         /**
-         * Valeur à affecter ou valeur retournée. Pour des valeurs positives de {@link #task},
-         * il s'agit de la valeur à affecter à une composante. Pour des valeurs négatives de
-         * {@link #task}, il s'agit de la valeur retournée par une composante.
+         * The value to get (negative value {@link #task}) or set (positive value {@link #task}).
          */
-        public String text;
+        public Object value;
 
         /**
-         * Valeur à affecter à la barre des progrès.
-         */
-        public int value;
-
-        /**
-         * Construit un objet qui effectura la tâche identifiée par la constante {@code task}.
-         * Cette constantes doit être une valeur telle que {@link #TITLE} et {@link #LABEL}, ou une
-         * de leurs valeurs négatives.
+         * Creates an action. {@code task} must be one of {@link #TITLE}, {@link #LABEL}
+         * <cite>etc.</cite> constants or their negative counterpart.
          */
         public Caller(final int task) {
             this.task = task;
         }
 
         /**
-         * Exécute la tâche identifiée par la constante {@link #task}.
+         * Run the task.
          */
         public void run() {
             final BoundedRangeModel model = progressBar.getModel();
             switch (task) {
-                case   +LABEL: description.setText(text);  return;
-                case   -LABEL: text=description.getText(); return;
-                case PROGRESS: model.setValue(value); progressBar.setIndeterminate(false); return;
-                case  STARTED: model.setRangeProperties(  0,1,0,100,false); window.setVisible(true); break;
-                case COMPLETE: model.setRangeProperties(100,1,0,100,false); window.setVisible(warningArea!=null); break;
+                case -LABEL: {
+                    value = description.getText();
+                    return;
+                }
+                case +LABEL: {
+                    description.setText((String) value);
+                    return;
+                }
+                case PROGRESS: {
+                    model.setValue(((Integer) value).intValue());
+                    progressBar.setIndeterminate(false);
+                    return;
+                }
+                case STARTED: {
+                    model.setRangeProperties(0, 1, 0, 100, false);
+                    window.setVisible(true);
+                    break; // Need further action below.
+                }
+                case COMPLETE: {
+                    model.setRangeProperties(100, 1, 0, 100, false);
+                    window.setVisible(warningArea != null);
+                    cancel.setEnabled(false);
+                    break; // Need further action below.
+                }
             }
+            /*
+             * Some of the tasks above requires an action on the window, which may be a JDialog or
+             * a JInternalFrame. We need to determine the window type before to apply the action.
+             */
             synchronized (ProgressWindow.this) {
                 if (window instanceof JDialog) {
                     final JDialog window = (JDialog) ProgressWindow.this.window;
                     switch (task) {
-                        case   +TITLE: window.setTitle(text);  return;
-                        case   -TITLE: text=window.getTitle(); return;
-                        case  STARTED: window.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); return;
-                        case COMPLETE: window.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);       return;
-                        case  DISPOSE: window.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-                                       if (warningArea==null || !window.isVisible()) window.dispose();
-                                       return;
+                        case -TITLE: {
+                            value = window.getTitle();
+                            return;
+                        }
+                        case +TITLE: {
+                            window.setTitle((String) value);
+                            return;
+                        }
+                        case STARTED: {
+                            window.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+                            return;
+                        }
+                        case COMPLETE: {
+                            window.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+                            return;
+                        }
+                        case DISPOSE: {
+                            window.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                            if (warningArea==null || !window.isVisible()) {
+                                window.dispose();
+                            }
+                            return;
+                        }
                     }
                 } else {
                     final JInternalFrame window = (JInternalFrame) ProgressWindow.this.window;
                     switch (task) {
-                        case   +TITLE: window.setTitle(text);     return;
-                        case   -TITLE: text=window.getTitle();    return;
-                        case  STARTED: window.setClosable(false); return;
-                        case COMPLETE: window.setClosable(true);  return;
-                        case  DISPOSE: window.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-                                       if (warningArea==null || !window.isVisible()) window.dispose();
-                                       return;
+                        case -TITLE: {
+                            value = window.getTitle();
+                            return;
+                        }
+                        case +TITLE: {
+                            window.setTitle((String) value);
+                            return;
+                        }
+                        case STARTED: {
+                            window.setClosable(false);
+                            return;
+                        }
+                        case COMPLETE: {
+                            window.setClosable(true);
+                            return;
+                        }
+                        case DISPOSE: {
+                            window.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+                            if (warningArea==null || !window.isVisible()) {
+                                window.dispose();
+                            }
+                            return;
+                        }
                     }
                 }
                 /*
@@ -526,39 +553,27 @@ public class ProgressWindow implements ProgressListener {
                 if (warningArea == null) {
                     final JTextArea     warningArea = new JTextArea();
                     final JScrollPane        scroll = new JScrollPane(warningArea);
-                    final JPanel              panel = new JPanel(new BorderLayout());
-                    final JPanel              title = new JPanel(new BorderLayout());
+                    final JPanel          namedArea = new JPanel(new BorderLayout());
                     ProgressWindow.this.warningArea = warningArea;
                     warningArea.setFont(Font.getFont("Monospaced"));
                     warningArea.setEditable(false);
-                    title.setBorder(BorderFactory.createEmptyBorder(0,HMARGIN,VMARGIN,HMARGIN));
-                    panel.add(content,                                       BorderLayout.NORTH);
-                    title.add(new JLabel(getString(VocabularyKeys.WARNING)), BorderLayout.NORTH);
-                    title.add(scroll,                                        BorderLayout.CENTER);
-                    panel.add(title,                                         BorderLayout.CENTER);
+                    namedArea.setBorder(BorderFactory.createEmptyBorder(0, HMARGIN, VMARGIN, HMARGIN));
+                    namedArea.add(new JLabel(getString(VocabularyKeys.WARNING)), BorderLayout.NORTH);
+                    namedArea.add(scroll,                                        BorderLayout.CENTER);
+                    content.add(namedArea,                                       BorderLayout.CENTER);
                     if (window instanceof JDialog) {
                         final JDialog window = (JDialog) ProgressWindow.this.window;
-                        window.setContentPane(panel);
                         window.setResizable(true);
                     } else {
                         final JInternalFrame window = (JInternalFrame) ProgressWindow.this.window;
-                        window.setContentPane(panel);
                         window.setResizable(true);
                     }
                     window.setSize(WIDTH, HEIGHT+WARNING_HEIGHT);
                     window.setVisible(true); // Seems required in order to force relayout.
                 }
-                final JTextArea warningArea=(JTextArea) ProgressWindow.this.warningArea;
-                warningArea.append(text);
+                final JTextArea warningArea = (JTextArea) ProgressWindow.this.warningArea;
+                warningArea.append((String) value);
             }
         }
-    }
-
-    public boolean isCanceled() {
-        return cancel.isSelected();
-    }
-
-    public void setCanceled( boolean stop ) {
-        cancel.setSelected( stop );        
     }
 }

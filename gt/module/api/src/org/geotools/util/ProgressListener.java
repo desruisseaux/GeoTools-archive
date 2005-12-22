@@ -75,12 +75,11 @@ import org.geotools.feature.visitor.FeatureVisitor;
  *              }
  *          }
  *          progress.complete();
- *      
  *      }
  *      finally {
  *          close( iterator );
  *      }
- * </pcode></pre>
+ * </code></pre>
  * Note the use of try and catch to report exceptions.
  * 
  * @since 2.0
@@ -96,7 +95,7 @@ public interface ProgressListener {
     /**
      * Returns the description for the lengthly operation to be reported, or {@code null} if none.
      */
-    public abstract String getDescription();
+    String getDescription();
 
     /**
      * Set the description for the lenghtly operation to be reported. This method is usually
@@ -106,37 +105,41 @@ public interface ProgressListener {
      *
      * @param description The new description, or {@code null} if none.
      */
-    public abstract void setDescription(final String description);
+    void setDescription(String description);
 
     /**
      * Notifies this listener that the operation begins.
      */
-    public abstract void started();
+    void started();
 
     /**
      * Notifies this listener of progress in the lengthly operation. Progress are reported
      * as a value between 0 and 100 inclusive. Values out of bounds will be clamped.
      */
-    public abstract void progress(final float percent);
+    void progress(float percent);
 
     /**
      * Notifies this listener that the operation has finished. The progress indicator will
      * shows 100% or disaspears, at implementor choice. If warning messages were pending,
      * they will be displayed now.
      */
-    public abstract void complete();
+    void complete();
 
     /**
      * Release any resources used by this listener. If the progress were reported in a window,
      * this window may be disposed.
      */
-    public abstract void dispose();
+    void dispose();
 
-    /** Is this job canceled? */
-    public abstract boolean isCanceled();
+    /**
+     * Is this job canceled?
+     */
+    boolean isCanceled();
     
-    /** Indicate that progress should is cancled */
-    public abstract void setCanceled( boolean cancel);    
+    /**
+     * Indicate that progress should is canceled.
+     */
+    void setCanceled(boolean cancel);    
     
     /**
      * Reports a warning. This warning may be printed to the {@linkplain System#err standard error
@@ -148,12 +151,11 @@ public interface ProgressListener {
      *        This is typically the line number where the error occured in the {@code source} file.
      * @param warning The warning message.
      */
-    public abstract void warningOccurred(String source, String margin, String warning);
+    void warningOccurred(String source, String margin, String warning);
 
     /**
      * Reports an exception. This method may prints the stack trace to the {@linkplain System#err
      * standard error stream} or display it in a dialog box, at implementor choice.
-     * 
      */
-    public abstract void exceptionOccurred(final Throwable exception);
+    void exceptionOccurred(Throwable exception);
 }

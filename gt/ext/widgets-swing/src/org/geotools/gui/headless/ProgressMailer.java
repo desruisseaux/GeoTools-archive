@@ -90,7 +90,10 @@ public class ProgressMailer implements ProgressListener {
      */
     private long nextTime;
 
-    private boolean cancel = false;
+    /**
+     * {@code true} if the action has been canceled.
+     */
+    private volatile boolean canceled;
 
     /**
      * Creates an objects reporting progress to the specified email address.
@@ -247,6 +250,20 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setCanceled(final boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    /**
      * Send a warning by email.
      */
     public synchronized void warningOccurred(final String source,
@@ -277,13 +294,5 @@ public class ProgressMailer implements ProgressListener {
         final CharArrayWriter buffer = new CharArrayWriter();
         exception.printStackTrace(new PrintWriter(buffer));
         send("exceptionOccurred", VocabularyKeys.EXCEPTION, buffer.toString());
-    }
-
-    public boolean isCanceled() {
-        return cancel;
-    }
-
-    public void setCanceled( boolean canceled ) {
-        this.cancel = canceled;
     }
 }
