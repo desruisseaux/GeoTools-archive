@@ -60,6 +60,10 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
             "postgis database");
 
     /** Param, package visibiity for JUnit tests */
+    static final Param SCHEMA = new Param("schema", String.class,
+    		"postgis schema", false, "public");
+    
+    /** Param, package visibiity for JUnit tests */
     static final Param USER = new Param("user", String.class,
             "user name to login as");
 
@@ -163,6 +167,7 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
         Integer port = (Integer) PORT.lookUp(params);
+        String schema = (String) SCHEMA.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
         Boolean wkb_enabled = (Boolean) WKBENABLED.lookUp(params);
         Boolean is_loose_bbox = (Boolean) LOOSEBBOX.lookUp(params);
@@ -187,13 +192,7 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
             throw new DataSourceException("Could not create connection", e);
         }
 
-        PostgisDataStore dataStore;
-
-        if (namespace != null) {
-        	dataStore = createDataStoreInternal(pool,namespace);
-        } else {
-        	dataStore = createDataStoreInternal(pool);
-        }
+        PostgisDataStore dataStore = createDataStoreInternal(pool,namespace,schema);
 
         if (wkb_enabled != null) {
             dataStore.setWKBEnabled(wkb_enabled.booleanValue());
@@ -206,17 +205,41 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         return dataStore;
     }
     
+    protected PostgisDataStore createDataStoreInternal(
+		ConnectionPool pool, String namespace, String schema
+    ) throws IOException {
+    	
+    	if (schema == null && namespace == null)
+    		return new PostgisDataStore(pool); 
+    	
+    	if (schema == null && namespace != null) {
+    		return new PostgisDataStore(pool,namespace);
+    	}
+    	
+    	return new PostgisDataStore(pool,schema,namespace);
+    }
+    
+    /**
+     * @deprecated this method is only here for backwards compatibility for 
+     * subclasses, use {@link #createDataStoreInternal(ConnectionPool, String, String)}
+     * instead.
+     */
     protected PostgisDataStore createDataStoreInternal(ConnectionPool pool)
     	throws IOException {
     	
-    	return new PostgisDataStore(pool);
+    	return createDataStoreInternal(pool,null,null);
     }
     
+    /**
+     * @deprecated this method is only here for backwards compatibility for 
+     * subclasses, use {@link #createDataStoreInternal(ConnectionPool, String, String)}
+     * instead.
+     */
     protected PostgisDataStore createDataStoreInternal(
 		ConnectionPool pool, String namespace
 	) throws IOException {
     	
-    	return new PostgisDataStore(pool, namespace);
+    	return createDataStoreInternal(pool,namespace,null);
     }
 
     /**
@@ -247,16 +270,6 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         return "PostGIS spatial database";
     }
 
-//      /**
-//       * TODO: Probabaly need some metadata for loose bbox and wkbenabled?
-//       */
-//	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-//	    String host = (String) HOST.lookUp(params);
-//        String user = (String) USER.lookUp(params);
-//        Integer port = (Integer) PORT.lookUp(params);
-//        String database = (String) DATABASE.lookUp(params);
-//        return new DataSourceMetadataEnity( host+":"+port, database, "Connection to "+getDisplayName()+" on "+host+" as "+user );
-//	}
     /**
      * Determines if the appropriate libraries are present for this datastore
      * factory to successfully produce postgis datastores.  
@@ -281,7 +294,7 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, WKBENABLED, LOOSEBBOX, NAMESPACE
+            DBTYPE, HOST, PORT, SCHEMA, DATABASE, USER, PASSWD, WKBENABLED, LOOSEBBOX, NAMESPACE 
         };
     }
 }

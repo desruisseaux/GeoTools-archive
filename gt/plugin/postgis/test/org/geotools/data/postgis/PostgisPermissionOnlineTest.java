@@ -27,6 +27,7 @@ public class PostgisPermissionOnlineTest extends TestCase {
 		params.put(PostgisDataStoreFactory.DATABASE.key, f.database);
 		params.put(PostgisDataStoreFactory.USER.key, f.user);
 		params.put(PostgisDataStoreFactory.PASSWD.key, f.password);
+		params.put(PostgisDataStoreFactory.SCHEMA.key,f.schema);
 		
 		dataStore = new PostgisDataStoreFactory().createDataStore(params);
 	}

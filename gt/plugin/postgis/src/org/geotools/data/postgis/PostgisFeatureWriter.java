@@ -19,6 +19,7 @@ package org.geotools.data.postgis;
 import java.io.IOException;
 
 import org.geotools.data.FeatureReader;
+import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.postgis.attributeio.WKBEncoder;
@@ -30,8 +31,11 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
 
     /** Well Known Text writer (from JTS). */
     protected static WKTWriter geometryWriter = new WKTWriter();
+    
     private boolean WKBEnabled;
     private boolean byteaWKB;
+    
+    private PostgisSQLBuilder sqlBuilder;
 
     /**
      * 
@@ -41,10 +45,14 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
      * @param byteaWKB   -- true if you're using postgis 1.0+.  they changed how to do wkb writing.
      * @throws IOException
      */
-    public PostgisFeatureWriter(FeatureReader fReader, QueryData queryData, boolean WKBEnabled,boolean byteaWKB) throws IOException {
+    public PostgisFeatureWriter(
+		FeatureReader fReader, QueryData queryData, boolean WKBEnabled,boolean byteaWKB, PostgisSQLBuilder sqlBuilder
+	) throws IOException {
+    	
         super(fReader, queryData);
         this.WKBEnabled = WKBEnabled;
         this.byteaWKB = byteaWKB;
+        this.sqlBuilder = sqlBuilder;
     }
 
     protected String getGeometryInsertText(Geometry geom, int srid) throws IOException {
@@ -86,7 +94,10 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
      * override and put double quotes around the tablename.
      */
     protected String encodeName(String tableName) {
-	return "\""+tableName+"\"";
+    	return sqlBuilder.encodeTableName(tableName);
     }
     
+    protected String encodeColumnName(String colName) {
+    	return sqlBuilder.encodeColumnName(colName);
+    }
 }

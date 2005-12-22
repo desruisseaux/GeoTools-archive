@@ -1091,7 +1091,8 @@ public abstract class JDBC1DataStore implements DataStore {
 			DatabaseMetaData dbMetaData = conn.getMetaData();
 
 			List attributeTypes = new ArrayList();
-			tableInfo = dbMetaData.getColumns(null, null, typeName, "%");
+
+			tableInfo = dbMetaData.getColumns(null, config.getDatabaseSchemaName(), typeName, "%");
 
 			boolean tableInfoFound = false;
 

@@ -103,7 +103,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
     protected static final String CONN_ERROR = "Some sort of database connection error: ";
 
     /** To create the sql where statement */
-    protected SQLBuilder sqlBuilder;
+    protected PostgisSQLBuilder sqlBuilder;
     protected SQLEncoderPostgis encoder;
     protected String tableName;
 
@@ -115,7 +115,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         super(postgisDataStore, featureType);
         tableName = featureType.getTypeName();
         fidMapper = postgisDataStore.getFIDMapper(tableName);
-        sqlBuilder = postgisDataStore.getSqlBuilder(tableName);
+        sqlBuilder = (PostgisSQLBuilder) postgisDataStore.getSqlBuilder(tableName);
 
         AttributeType geomType = featureType.getDefaultGeometry();
         encoder = new SQLEncoderPostgis();
@@ -384,7 +384,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
             if (encodableFilter != null) {
                 whereStmt = encoder.encode((AbstractFilter) encodableFilter);
-                sql = "DELETE from \"" + tableName + "\" " + whereStmt + ";";
+                sql = "DELETE from " + sqlBuilder.encodeTableName(tableName) + whereStmt + ";";
 
                 //do actual delete
                 LOGGER.fine("sql statment is " + sql);
@@ -568,7 +568,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
         if (arrLength == values.length) {
             StringBuffer sqlStatement = new StringBuffer("UPDATE ");
-            sqlStatement.append("\"" + tableName + "\" SET ");
+            sqlStatement.append(sqlBuilder.encodeTableName(tableName) + " SET ");
 
             for (int i = 0; i < arrLength; i++) {
                 AttributeType curType = types[i];
@@ -586,7 +586,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                     newValue = addQuotes(curValue);
                 }
 
-                sqlStatement.append("\"" + curType.getName() + "\" = " + newValue);
+                sqlStatement.append(sqlBuilder.encodeColumnName(curType.getName()) + " = " + newValue);
 
                 //sqlStatement.append(curType.getName() + " = " + newValue);
                 sqlStatement.append((i < (arrLength - 1)) ? ", " : " ");

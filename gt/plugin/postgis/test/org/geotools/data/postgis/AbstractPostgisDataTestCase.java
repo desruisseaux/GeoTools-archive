@@ -52,7 +52,8 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             CHECK_TYPE = false; // just once
         }
 
-        data = new PostgisDataStore(pool, "public", getName(),
+        	
+        data = new PostgisDataStore(pool, f.schema, getName(),
                 PostgisDataStore.OPTIMIZE_SAFE);
         data.setWKBEnabled(WKB_ENABLED);
         data.setFIDMapper("road",
@@ -135,13 +136,13 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("SELECT dropgeometrycolumn( '" + f.database
+            s.execute("SELECT dropgeometrycolumn( '" + f.schema
                 + "','road','geom')");
         } catch (Exception ignore) {}
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE road");
+            s.execute("DROP TABLE " + f.schema + ".road");
         } catch (Exception ignore) {
         }
 
@@ -149,21 +150,21 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             Statement s = conn.createStatement();
 
             //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
-            s.execute("CREATE TABLE road (fid varchar PRIMARY KEY, id int )");
-            s.execute("SELECT AddGeometryColumn('" + f.database
+            s.execute("CREATE TABLE " + f.schema + ".road (fid varchar PRIMARY KEY, id int )");
+            s.execute("SELECT AddGeometryColumn('" + f.schema
                 + "', 'road', 'geom', 0, 'LINESTRING', 2);");
-            s.execute("ALTER TABLE road add name varchar;");
+            s.execute("ALTER TABLE " + f.schema + ".road add name varchar;");
 
             for (int i = 0; i < roadFeatures.length; i++) {
-                Feature f = roadFeatures[i];
+                Feature feature = roadFeatures[i];
 
                 //strip out the road. 
-                String fid = f.getID().substring("road.".length());
-                String ql = "INSERT INTO road (fid,id,geom,name) VALUES ("
-                    + "'" + fid + "'," + f.getAttribute("id") + ","
+                String fid = feature.getID().substring("road.".length());
+                String ql = "INSERT INTO " + f.schema + ".road (fid,id,geom,name) VALUES ("
+                    + "'" + fid + "'," + feature.getAttribute("id") + ","
                     + "GeometryFromText('"
-                    + ((Geometry) f.getAttribute("geom")).toText() + "', 0 ),"
-                    + "'" + f.getAttribute("name") + "')";
+                    + ((Geometry) feature.getAttribute("geom")).toText() + "', 0 ),"
+                    + "'" + feature.getAttribute("name") + "')";
 
                 s.execute(ql);
             }
@@ -178,13 +179,13 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("SELECT dropgeometrycolumn( '" + f.database
+            s.execute("SELECT dropgeometrycolumn( '" + f.schema
                 + "','lake','geom')");
         } catch (Exception ignore) {}
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE lake");
+            s.execute("DROP TABLE " + f.schema + ".lake");
         } catch (Exception ignore) {
         }
 
@@ -192,20 +193,21 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             Statement s = conn.createStatement();
 
             //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
-            s.execute("CREATE TABLE lake ( id int )");
-            s.execute("SELECT AddGeometryColumn('" + f.database
+            s.execute("CREATE TABLE " + f.schema + ".lake ( id int )");
+            s.execute("SELECT AddGeometryColumn('" + f.schema
                 + "', 'lake', 'geom', 0, 'POLYGON', 2);");
-            s.execute("ALTER TABLE lake add name varchar;");
+            s.execute("ALTER TABLE " + f.schema + ".lake add name varchar;");
+            		
 
             for (int i = 0; i < lakeFeatures.length; i++) {
-                Feature f = lakeFeatures[i];
+                Feature feature = lakeFeatures[i];
 
                 //strip out the road. 
-                String fid = f.getID().substring("lake.".length());
-                String ql = "INSERT INTO lake (id,geom,name) VALUES ("
-                    + f.getAttribute("id") + "," + "GeometryFromText('"
-                    + ((Geometry) f.getAttribute("geom")).toText() + "', 0 ),"
-                    + "'" + f.getAttribute("name") + "')";
+                String fid = feature.getID().substring("lake.".length());
+                String ql = "INSERT INTO " + f.schema + ".lake (id,geom,name) VALUES ("
+                    + feature.getAttribute("id") + "," + "GeometryFromText('"
+                    + ((Geometry) feature.getAttribute("geom")).toText() + "', 0 ),"
+                    + "'" + feature.getAttribute("name") + "')";
 
                 s.execute(ql);
             }
@@ -218,20 +220,37 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
         Connection conn = pool.getConnection();
 
         try {
-            Statement s = conn.createStatement();
-            s.execute("SELECT dropgeometrycolumn( '" + f.database
-                + "','road','geom')");
-            s.execute("SELECT dropgeometrycolumn( '" + f.database
-                + "','river','geom')");
-        } catch (Exception ignore) {
+	        Statement s = conn.createStatement();
+	        
+	        try {
+	            s.execute("SELECT dropgeometrycolumn( '" + f.schema
+	                + "','road','geom')");
+	        } catch (Exception ignore) {}
+	        
+	        try {
+	            s.execute("SELECT dropgeometrycolumn( '" + f.schema
+	                + "','river','geom')");
+	        } catch (Exception ignore) {}
+	
+	        try {
+	            s.execute("SELECT dropgeometrycolumn( '" + f.schema
+	                + "','lake','geom')");
+	        } catch (Exception ignore) {}
+	        
+	        try {
+	        	s.execute("DROP TABLE " + f.schema + ".road");
+	        } catch (Exception ignore) {}
+	        
+	        try {    
+	            s.execute("DROP TABLE " + f.schema + ".river");
+	        } catch (Exception ignore) {}
+	        
+	        try {    
+	            s.execute("DROP TABLE " + f.schema + ".lake");
+	        } catch (Exception ignore) {}
+        
         }
-
-        try {
-            Statement s = conn.createStatement();
-            s.execute("DROP TABLE road");
-            s.execute("DROP TABLE river");
-        } catch (Exception ignore) {
-        } finally {
+	    finally {
             conn.close();
         }
     }
@@ -241,14 +260,14 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("SELECT dropgeometrycolumn( '" + f.database
+            s.execute("SELECT dropgeometrycolumn( '" + f.schema
                 + "','river','geom')");
         } catch (Exception ignore) {
         }
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE river");
+            s.execute("DROP TABLE " + f.schema + ".river");
         } catch (Exception ignore) {
         }
 
@@ -256,21 +275,21 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             Statement s = conn.createStatement();
 
             //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
-            s.execute("CREATE TABLE river(fid varchar PRIMARY KEY, id int)");
-            s.execute("SELECT AddGeometryColumn('" + f.database
+            s.execute("CREATE TABLE " + f.schema + ".river(fid varchar PRIMARY KEY, id int)");
+            s.execute("SELECT AddGeometryColumn('" + f.schema
                 + "', 'river', 'geom', 0, 'MULTILINESTRING', 2);");
-            s.execute("ALTER TABLE river add river varchar");
-            s.execute("ALTER TABLE river add flow float8");
+            s.execute("ALTER TABLE " + f.schema + ".river add river varchar");
+            s.execute("ALTER TABLE " + f.schema + ".river add flow float8");
 
             for (int i = 0; i < riverFeatures.length; i++) {
-                Feature f = riverFeatures[i];
-                String fid = f.getID().substring("river.".length());
+                Feature feature = riverFeatures[i];
+                String fid = feature.getID().substring("river.".length());
                 s.execute(
-                    "INSERT INTO river (fid, id, geom, river, flow) VALUES ("
-                    + "'" + fid + "'," + f.getAttribute("id") + ","
-                    + "GeometryFromText('" + f.getAttribute("geom").toString()
-                    + "', 0 )," + "'" + f.getAttribute("river") + "',"
-                    + f.getAttribute("flow") + ")");
+                    "INSERT INTO " + f.schema + ".river (fid, id, geom, river, flow) VALUES ("
+                    + "'" + fid + "'," + feature.getAttribute("id") + ","
+                    + "GeometryFromText('" + feature.getAttribute("geom").toString()
+                    + "', 0 )," + "'" + feature.getAttribute("river") + "',"
+                    + feature.getAttribute("flow") + ")");
             }
         } finally {
             conn.close();

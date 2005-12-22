@@ -162,7 +162,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     }
 
     private static Map GEOM_CLASS_MAPPINGS = new HashMap();
-
+    
     //why don't we just stick this in with the non-geom class mappings?
     static {
         // init the inverse map
@@ -184,8 +184,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     //private static PostgisAuthorityFactory paf = null;
     private PostgisAuthorityFactory paf = null;
 
-    /** The lock manager */
-    //private LockingManager lockingManager = createLockingManager();
+    
 
     /** Enables the use of geos operators */
     protected boolean useGeos;
@@ -223,23 +222,33 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
     protected PostgisDataStore(ConnectionPool connPool, String namespace)
         throws IOException {
-        this(connPool, null, namespace);
+        this(connPool, schema(null), namespace);
     }
 
     protected PostgisDataStore(ConnectionPool connPool, String schema,
         String namespace) throws IOException {
         this(connPool,
-            new JDBCDataStoreConfig(namespace, schema, new HashMap(),
+            new JDBCDataStoreConfig(namespace, schema(schema), new HashMap(),
                 new HashMap()), OPTIMIZE_SQL);
     }
 
     protected PostgisDataStore(ConnectionPool connPool, String schema,
         String namespace, int optimizeMode) throws IOException {
         this(connPool,
-            new JDBCDataStoreConfig(namespace, schema, new HashMap(),
+            new JDBCDataStoreConfig(namespace, schema(schema), new HashMap(),
                 new HashMap()), OPTIMIZE_SQL); // DB: should this be optimizeMode instead of optimize_sql?
     }
 
+    /** 
+     * Simple helper method to ensure that a schema is always set.
+     */
+    protected static String schema(String schema) {
+    	if (schema != null && !"".equals(schema))
+    		return schema;
+    	
+    	return (String) PostgisDataStoreFactory.SCHEMA.sample;
+    }
+    	
     public PostgisDataStore(ConnectionPool connectionPool,
         JDBCDataStoreConfig config, int optimizeMode) throws IOException {
         super(connectionPool, config);
@@ -346,8 +355,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     config.getDatabaseSchemaName(), "%", tableType);
 
             while (tables.next()) {
-                String tableName = tables.getString(TABLE_NAME_COL);
-
+            	String tableName = tables.getString(TABLE_NAME_COL);
+            	            	
                 if (allowTable(tableName)) {
                     list.add(tableName);
                 }
@@ -572,7 +581,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 				throw new DataSourceException(msg,t);
 			}
 			try {
-				st.execute("SELECT * FROM \"" + typeName + "\" LIMIT 0;");
+				st.execute("SELECT * FROM \"" + config.getDatabaseSchemaName() +
+						"\".\"" +  typeName + "\" LIMIT 0;");
 			} 
 			catch (Throwable t) {
 				String msg = "Error querying relation:" + typeName + "."  +  
@@ -736,7 +746,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         encoder.setSRID(srid);
         encoder.setLooseBbox(looseBbox);
 
-        PostgisSQLBuilder builder = new PostgisSQLBuilder(encoder);
+        PostgisSQLBuilder builder = new PostgisSQLBuilder(encoder,config);
         builder.setWKBEnabled(WKBEnabled);
         builder.setByteaEnabled(byteaEnabled);
 
@@ -1465,7 +1475,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     protected JDBCFeatureWriter createFeatureWriter(FeatureReader fReader,
         QueryData queryData) throws IOException {
-        return new PostgisFeatureWriter(fReader, queryData, WKBEnabled,byteaWKB);
+    	PostgisSQLBuilder sqlBuilder = 
+    		(PostgisSQLBuilder) getSqlBuilder(fReader.getFeatureType().getTypeName());
+        return new PostgisFeatureWriter(fReader, queryData, WKBEnabled,byteaWKB,sqlBuilder);
     }
 
     /**

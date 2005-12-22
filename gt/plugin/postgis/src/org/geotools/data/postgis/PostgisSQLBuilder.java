@@ -17,6 +17,7 @@
 package org.geotools.data.postgis;
 
 import org.geotools.data.jdbc.DefaultSQLBuilder;
+import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.GeometryAttributeType;
@@ -38,11 +39,14 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
     /** If true, ByteA function is used to transfer WKB data*/
     protected boolean byteaEnabled = false;
 
+    /** the datastore **/
+    protected JDBCDataStoreConfig config;
+    
     /**
      *
      */
-    public PostgisSQLBuilder(int srid) {
-        this((SQLEncoder) new SQLEncoderPostgis(srid));
+    public PostgisSQLBuilder(int srid, JDBCDataStoreConfig config) {
+        this((SQLEncoder) new SQLEncoderPostgis(srid),config);
     }
 
     /**
@@ -50,8 +54,9 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
      *
      * @param encoder
      */
-    public PostgisSQLBuilder(SQLEncoder encoder) {
+    public PostgisSQLBuilder(SQLEncoder encoder, JDBCDataStoreConfig config) {
         super(encoder);
+        this.config = config;
     }
 
     /**
@@ -120,7 +125,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
      */
     public void sqlFrom(StringBuffer sql, String typeName) {
         sql.append(" FROM ");
-        sql.append("\"" + typeName + "\"");
+        sql.append(encodeTableName(typeName));
     }
 
     /**
@@ -176,5 +181,13 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
      */
     public void setByteaEnabled(boolean byteaEnable) {
         byteaEnabled = byteaEnable;
+    }
+    
+    public String encodeTableName(String tableName) {
+    	return "\"" + config.getDatabaseSchemaName() + "\".\"" + tableName + "\"";
+    }
+    
+    public String encodeColumnName(String columnName) {
+    	return "\"" + columnName + "\""; 
     }
 }

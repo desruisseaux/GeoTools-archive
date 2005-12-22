@@ -169,8 +169,8 @@ public interface FeatureWriter {
     /**
      * Release the underlying resources.
      *
-     * @throws IOException if close has already been called or if there there
-     *         are problems releasing underlying resources.
+     * @throws IOException if there there are problems releasing underlying resources, or 
+     * possibly if close has been called (up to the implementation).
      */
     void close() throws IOException;
 }

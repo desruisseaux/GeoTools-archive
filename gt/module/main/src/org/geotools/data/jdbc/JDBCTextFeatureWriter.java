@@ -150,7 +150,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         }
 
         for (int i = 0; i < attributeTypes.length; i++) {
-	    String colName = encodeName(attributeTypes[i].getName());
+        	String colName = encodeColumnName(attributeTypes[i].getName());
             statementSQL.append(colName).append(",");
         }
 
@@ -224,7 +224,14 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      * override and put double quotes around the tablename.
      */
     protected String encodeName(String tableName) {
-	return tableName;
+    	return tableName;
+    }
+    
+    /**
+     * Encodes the colName, default just calls {@link #encodeName(String)}.
+     */
+    protected String encodeColumnName(String colName) {
+    	return encodeName(colName);
     }
 
     /**
@@ -371,16 +378,18 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 if (LOGGER.isLoggable(Level.INFO)) {
                     LOGGER.fine("modifying att# " + i + " to " + currAtt);
                 }
-		String attrValue = null;
-		if (attributes[i] instanceof GeometryAttributeType) {
-		    String geomName = attributes[i].getName();
-		    int srid = ftInfo.getSRID(geomName);
-		    attrValue = getGeometryInsertText((Geometry) currAtt, srid);
-		} else {
-		    attrValue = addQuotes(currAtt);
-		}
 
-		String colName = encodeName(attributes[i].getName());
+				String attrValue = null;
+				if (attributes[i] instanceof GeometryAttributeType) {
+				    String geomName = attributes[i].getName();
+				    int srid = ftInfo.getSRID(geomName);
+				    attrValue = getGeometryInsertText((Geometry) currAtt, srid);
+				} else {
+				    attrValue = addQuotes(currAtt);
+				}
+
+
+				String colName = encodeColumnName(attributes[i].getName());
                 statementSQL.append(colName).append(" = ")
                             .append(attrValue).append(", ");
             }

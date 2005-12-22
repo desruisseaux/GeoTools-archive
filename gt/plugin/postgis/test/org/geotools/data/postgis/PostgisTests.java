@@ -25,7 +25,10 @@ public class PostgisTests {
         f.database = resource.getString("database");
         f.user = resource.getString("user");
         f.password = resource.getString("password");	
+        f.schema = resource.getString("schema");
         
+        if (f.schema == null || "".equals(f.schema.trim()))
+        	f.schema = "public";
         return f;
 	}
 	
@@ -40,6 +43,7 @@ public class PostgisTests {
 		public Integer port;
 		public String user;
 		public String password;
+		public String schema;
 		
 	}
 }
