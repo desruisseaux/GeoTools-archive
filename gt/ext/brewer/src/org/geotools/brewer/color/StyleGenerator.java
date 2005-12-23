@@ -35,6 +35,7 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.function.ClassificationFunction;
 import org.geotools.filter.function.EqualIntervalFunction;
+import org.geotools.filter.function.QuantileFunction;
 import org.geotools.filter.function.UniqueIntervalFunction;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -48,7 +49,9 @@ import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -340,6 +343,76 @@ public class StyleGenerator {
                 rule.setName(getRuleName(i + 1));
                 fts.addRule(rule);
             }
+        } else if (function instanceof QuantileFunction) {
+        	QuantileFunction quantile = (QuantileFunction) function;
+
+            // for each class
+            for (int i = 0; i < numClasses; i++) {
+                // obtain values
+            	Object localMin = quantile.getMin(i);
+                Object localMax = quantile.getMax(i);
+
+                if (localMin instanceof Number && localMax instanceof Number) {
+	                // 1.0 --> 1
+	                // (this makes our styleExpressions more readable. Note that the
+	                // filter always converts to double, so it doesn't care what we
+	                // do).
+	                localMin = chopInteger(localMin);
+	                localMax = chopInteger(localMax);
+                }
+                
+                // generate a title
+                String title = localMin + " to " + localMax;
+
+                // construct filters
+                Filter filter = null;
+
+                if (localMin == localMax) {
+                    // build filter: =
+                    CompareFilter eqFilter = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
+                    eqFilter.addLeftValue(expression);
+                    eqFilter.addRightValue(ff.createLiteralExpression(localMax));
+                    filter = eqFilter;
+                } else {
+                    // build filter: [min <= x] AND [x < max]
+                    LogicFilter andFilter = null;
+                    CompareFilter lowBoundFilter = null; // less than or
+
+                    // equal
+                    CompareFilter hiBoundFilter = null; // less than
+                    lowBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
+                    lowBoundFilter.addLeftValue(ff.createLiteralExpression(
+                            localMin)); // min
+                    lowBoundFilter.addRightValue(expression); // x
+
+                    // if this is the global maximum, include the max value
+                    if (i == (numClasses - 1)) {
+                        hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
+                    } else {
+                        hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
+                    }
+
+                    hiBoundFilter.addLeftValue(expression); // x
+                    hiBoundFilter.addRightValue(ff.createLiteralExpression(
+                            localMax)); // max
+                    andFilter = ff.createLogicFilter(lowBoundFilter,
+                            hiBoundFilter, LogicFilter.LOGIC_AND);
+                    filter = andFilter;
+                }
+
+                // create a symbolizer
+                Symbolizer symb = null;
+                Color color = colors[i];
+                symb = createSymbolizer(sb, geometry, color, opacity, defaultStroke);
+
+                // create a rule
+                Rule rule = sb.createRule(symb);
+                rule.setFilter(filter);
+                rule.setTitle(title);
+                rule.setName(getRuleName(i + 1));
+                fts.addRule(rule);
+            }
+
         }
 
         // sort the FeatureTypeStyle rules

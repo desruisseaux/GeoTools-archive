@@ -57,11 +57,12 @@ public class EqualIntervalFunction extends ClassificationFunction {
         MinVisitor minVisit;
 		try {
 			minVisit = new MinVisitor(expr);
-			fc.accepts(minVisit, null);
+			if (progress == null) progress = new NullProgressListener();
+			fc.accepts(minVisit, progress);
+			if (progress.isCanceled()) return;
 			globalMin = (Comparable) minVisit.getResult().getValue();
 
 			MaxVisitor maxVisit = new MaxVisitor(expr);
-			if (progress == null) progress = new NullProgressListener();
 			fc.accepts(maxVisit, progress);
 			if (progress.isCanceled()) return;
 			globalMax = (Comparable) maxVisit.getResult().getValue();
@@ -104,6 +105,16 @@ public class EqualIntervalFunction extends ClassificationFunction {
         			localMin[i] = new Double(round(((Number) localMin[i]).doubleValue(), decPlaces));
         			localMax[i] = new Double(round(((Number) localMax[i]).doubleValue(), decPlaces));
         		}
+        		
+        		if (i == 0) {
+    				//ensure first min is less than or equal to globalMin
+        			if (localMin[i].compareTo(new Double(((Number) globalMin).doubleValue())) < 0)
+        				localMin[i] = new Double(fixRound(((Number) localMin[i]).doubleValue(), decPlaces, false));
+        		} else if (i == classNum - 1) { 
+        			//ensure last max is greater than or equal to globalMax
+        			if (localMax[i].compareTo(new Double(((Number) globalMax).doubleValue())) > 0)
+        				localMax[i] = new Double(fixRound(((Number) localMax[i]).doubleValue(), decPlaces, true));
+        		}
         		//synchronize min with previous max
         		if ((i != 0) && (!localMin[i].equals(localMax[i-1]))) {
         			localMin[i] = localMax[i-1];
@@ -141,35 +152,43 @@ public class EqualIntervalFunction extends ClassificationFunction {
         isValid = true;
     }
 
-    /**
-	 * Determines the number of decimal places to truncate the interval at
-	 * (public for testing purposes only).
-	 * 
-	 * @param slotWidth
-	 * @return
-	 */
-    public int decimalPlaces(double slotWidth) {
-    	int val = (new Double(Math.log(1.0/slotWidth)/2.0)).intValue();
-    	if (val < 0) return 0;
-    	else return val+1;
-    }
-    
-    /**
-	 * Truncates a double to a certain number of decimals places (public for
-	 * testing purposes only). Note: truncation at zero decimal places will
-	 * still show up as x.0, since we're using the double type.
-	 * 
-	 * @param value
-	 * @param decimalPlaces
-	 * @return
-	 */
-    public double round(double value, int decimalPlaces) {
-    	double divisor = Math.pow(10, decimalPlaces);
-    	double newVal = value * divisor;
-    	//newVal = (new Double(newVal).intValue())/divisor; 
-    	newVal =  (new Long(Math.round(newVal)).intValue())/divisor; 
-    	return newVal;
-    }
+//    /**
+//	 * Determines the number of decimal places to truncate the interval at
+//	 * (public for testing purposes only).
+//	 * 
+//	 * @param slotWidth
+//	 * @return
+//	 */
+//    public int decimalPlaces(double slotWidth) {
+//    	int val = (new Double(Math.log(1.0/slotWidth)/2.0)).intValue();
+//    	if (val < 0) return 0;
+//    	else return val+1;
+//    }
+//    
+//    /**
+//	 * Truncates a double to a certain number of decimals places (public for
+//	 * testing purposes only). Note: truncation at zero decimal places will
+//	 * still show up as x.0, since we're using the double type.
+//	 * 
+//	 * @param value
+//	 * @param decimalPlaces
+//	 * @return
+//	 */
+//    public double round(double value, int decimalPlaces) {
+//    	double divisor = Math.pow(10, decimalPlaces);
+//    	double newVal = value * divisor;
+//    	newVal =  (new Long(Math.round(newVal)).intValue())/divisor; 
+//    	return newVal;
+//    }
+//    
+//    public double fixRound(double value, int decimalPlaces, boolean up) {
+//    	double divisor = Math.pow(10, decimalPlaces);
+//    	double newVal = value * divisor;
+//    	if (up) newVal++; //+0.001 (for 3 dec places)
+//    	else newVal--; //-0.001
+//    	newVal =  newVal/divisor; 
+//    	return newVal;
+//    }
     
     private double calculateSlotWidth() {
     	//this method assumes isNumber and isValid are asserted

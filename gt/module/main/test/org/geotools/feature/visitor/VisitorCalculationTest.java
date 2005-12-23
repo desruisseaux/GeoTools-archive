@@ -30,6 +30,9 @@ import org.geotools.feature.visitor.MaxVisitor.MaxResult;
 import org.geotools.feature.visitor.MedianVisitor.MedianResult;
 import org.geotools.feature.visitor.MinVisitor.MinResult;
 import org.geotools.feature.visitor.UniqueVisitor.UniqueResult;
+import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -314,6 +317,19 @@ public class VisitorCalculationTest extends DataTestCase {
         CalcResult boundsResult3 = boundsResult2.merge(boundsResult1);
         Envelope env3 = new Envelope(1,13,0,10);
         assertEquals(env3, boundsResult3.toEnvelope());
+    }
+    
+    
+    public void testQuantileList() throws Exception {
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        Expression expr = factory.createAttributeExpression(ft,
+                ft.getAttributeType(0).getName());
+        QuantileListVisitor visitor = new QuantileListVisitor(expr, 2);
+        fc.accepts(visitor, null);
+        List[] qResult = (List[]) visitor.getResult().getValue();
+        assertEquals(2, qResult.length);
+        assertEquals(2, qResult[0].size());
+        assertEquals(1, qResult[1].size());
     }
     
     //try merging a count and sum to get an average, both count+sum and sum+count 

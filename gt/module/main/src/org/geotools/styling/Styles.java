@@ -468,13 +468,13 @@ public class Styles {
 		} else {
 			throw new IllegalArgumentException("Unsupported FilterType");
 		}
-		//look for attribute Expressions
-		if ((max1 instanceof AttributeExpression) && (min2 instanceof AttributeExpression)) {
+		//look for 2 equal expressions
+		if (max1.equals(min2)) {
 			return min1.toString()+".."+max2.toString();
-		} else if ((max2 instanceof AttributeExpression) && (min1 instanceof AttributeExpression)) {
+		} else if (max2.equals(min1)) {
 			return min2.toString()+".."+max1.toString();
 		} else {
-			throw new IllegalArgumentException("Couldn't find the correct arrangement of AttributeExpressions");
+			throw new IllegalArgumentException("Couldn't find the expected arrangement of Expressions");
 		}
 	}
 
