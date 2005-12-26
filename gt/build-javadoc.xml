@@ -8,11 +8,21 @@
      file. This script exists because creating a cross-module javadoc
      throws an OutOfMemoryError with Maven 1, and is not yet supported
      in Maven 2.
-     
+
      It is recommanded (but not essential) to do a Maven 2 build before
      to run this script, using the "mvn install" command line in the same
      directory. It will avoid many javadoc warnings, because most classes
      information will be available to javadoc in the 'target' directory.
+
+
+     ==================
+     RUNNING THE SCRIPT
+     ==================
+     Just type the following on the command line
+     (the first line is optional; see above paragraph):
+
+         mvn install
+         ant -f build-javadoc.xml
 
      By default, this script put the generated HTML pages in the
      'target/javadoc' directory. To select a different directory,
