@@ -24,8 +24,12 @@ import org.geotools.resources.geometry.XAffineTransform;
  * @see org.geotools.gui.swing.Plot2D
  *
  * @deprecated Replaced by {@link org.geotools.geometry.array.ShapeAdapter}
- *             as part of the port of J2D-renderer to the new API. See
- *             <A HREF="http://jira.codehaus.org/browse/GEOT-776">GEOT-776</A> work.
+ *             as part of the port of J2D-renderer to the new GO-1 based API. Note that it is not
+ *             possible to mix J2D-renderer classes with GO-1 rendering engine. Migration from
+ *             J2D-renderer to the GO-1 API will requires the replacement of all deprecated classes
+ *             together. Because the new GO-1 rendering engine is a work in progress, see
+ *             <A HREF="http://jira.codehaus.org/browse/GEOT-776">GEOT-776</A> in order to determine
+ *             if enough functionalites have been ported for yours need.
  */
 final class ShapeAdapter implements Shape, Serializable {
     /**
