@@ -1,8 +1,9 @@
 #
-# Connection parameters to the EPSG database with HSQL. Developpers should
-# copy this file in their home directory and change the path name to their
-# database installation directory. Note: the trailing "EPSG" is the database
-# name, not a directory name.
+# Connection parameters to the EPSG database with HSQL.  Developpers should
+# copy this file in their home directory. The URL below searchs for an EPSG
+# database  (or creates a new one if no existing database is found)  in the
+# current directory. An absolute URL may be specified instead if wanted.
+# Example: jdbc:hsqldb:file:/tmp/Geotools/Cached databases/EPSG
 #
 # This file doesn't need to be distributed in the JAR file. It is
 # included here only for maintenance of the EPSG database for HSQL.
@@ -12,11 +13,11 @@
 #
 
 urlid EPSG
-url jdbc:hsqldb:file:/tmp/Geotools/Cached databases/EPSG
+url jdbc:hsqldb:file:EPSG
 username Geotools
 password Geotools
 
 urlid EPSG-admin
-url jdbc:hsqldb:file:/tmp/Geotools/Cached databases/EPSG
+url jdbc:hsqldb:file:EPSG
 username sa
 password
