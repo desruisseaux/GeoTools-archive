@@ -24,7 +24,11 @@
   <packaging>pom</packaging>
   <version>2.2-SNAPSHOT</version>
   <name>Geotools plugins</name>
-  <url>http://modules.geotools.org/plugin</url>
+  <url>http://modules.geotools.org/plugin/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/</url>
+  </scm>
   <description>
     Geotools plugins.
   </description>

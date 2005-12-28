@@ -23,7 +23,11 @@
   <artifactId>gt2-legacy</artifactId>
   <packaging>jar</packaging>
   <name>Legacy module</name>
-  <url>http://modules.geotools.org/legacy</url>
+  <url>http://modules.geotools.org/legacy/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/legacy/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/module/legacy/</url>
+  </scm>
   <description>
     This module contains code which has been deprecated.  It exists to help users whilst
     updating their code and to support the 'migrate' module which contains core geotools

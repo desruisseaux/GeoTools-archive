@@ -23,7 +23,11 @@
   <artifactId>gt2-vpf</artifactId>
   <packaging>jar</packaging>
   <name>VPF Plugin</name>
-  <url>http://modules.geotools.org/vpf</url>
+  <url>http://modules.geotools.org/vpf/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/vpf/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/vpf/</url>
+  </scm>
   <description>
     (todo)
   </description>

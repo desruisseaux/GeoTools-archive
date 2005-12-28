@@ -23,7 +23,11 @@
   <artifactId>gt2-graph</artifactId>
   <packaging>jar</packaging>
   <name>Feature Based Graphs and Networks</name>
-  <url>http://modules.geotools.org/graph</url>
+  <url>http://modules.geotools.org/graph/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/graph/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/ext/graph/</url>
+  </scm>
   <description>
     Graph classes that builds and walk networks based on Feature relationships.
     The original graph package has been developed using the JUMP Feature API.

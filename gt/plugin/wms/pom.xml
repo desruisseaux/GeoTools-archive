@@ -23,7 +23,11 @@
   <artifactId>gt2-wms</artifactId>
   <packaging>jar</packaging>
   <name>Web Map Server client</name>
-  <url>http://modules.geotools.org/wms</url>
+  <url>http://modules.geotools.org/wms/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/wms/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/wms/</url>
+  </scm>
   <description>
     An OGC Web Map Server client implementation that can be used directly or as 
     through the GridCoverageExchange API. Direct usage is recommended, as the

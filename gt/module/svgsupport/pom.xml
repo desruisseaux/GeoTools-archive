@@ -23,7 +23,11 @@
   <artifactId>gt2-svgsupport</artifactId>
   <packaging>jar</packaging>
   <name>SVG support</name>
-  <url>http://modules.geotools.org/svgsupport</url>
+  <url>http://modules.geotools.org/svgsupport/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/svgsupport/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/module/svgsupport/</url>
+  </scm>
   <description>
     (todo)
   </description>

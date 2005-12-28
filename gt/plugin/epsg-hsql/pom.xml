@@ -23,7 +23,11 @@
   <artifactId>gt2-epsg-hsql</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using HSQL database</name>
-  <url>http://modules.geotools.org/epsg-hsql</url>
+  <url>http://modules.geotools.org/epsg-hsql/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-hsql/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-hsql/</url>
+  </scm>
   <description>
     Connection to an embedded EPSG database in HSQL format.
     This database is built from the SQL scripts delivered by EPSG.

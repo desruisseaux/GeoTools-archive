@@ -23,7 +23,11 @@
   <artifactId>gt2-mif</artifactId>
   <packaging>jar</packaging>
   <name>MapInfo MIF format module</name>
-  <url>http://modules.geotools.org/mif</url>
+  <url>http://modules.geotools.org/mif/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/mif/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/mif/</url>
+  </scm>
   <description>
     (todo)
   </description>

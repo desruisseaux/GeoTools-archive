@@ -23,7 +23,11 @@
   <artifactId>gt2-referencing</artifactId>
   <packaging>jar</packaging>
   <name>Referencing services</name>
-  <url>http://modules.geotools.org/referencing</url>
+  <url>http://modules.geotools.org/referencing/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/referencing/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/module/referencing/</url>
+  </scm>
   <description>
     Contains implementations of Coordinate Reference Systems (CRS), Coordinate
     Transformation Services (CTS) metadata and some core utilities classes.

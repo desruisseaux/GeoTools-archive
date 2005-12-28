@@ -24,7 +24,11 @@
   <packaging>pom</packaging>
   <version>2.2-SNAPSHOT</version>
   <name>Geotools modules</name>
-  <url>http://modules.geotools.org/module</url>
+  <url>http://modules.geotools.org/module/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/module/</url>
+  </scm>
   <description>
     Geotools core modules.
   </description>

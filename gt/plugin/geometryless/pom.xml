@@ -23,7 +23,11 @@
   <artifactId>gt2-geometryless</artifactId>
   <packaging>jar</packaging>
   <name>Generic (geometryless) DataStore implementation</name>
-  <url>http://modules.geotools.org/geometryless</url>
+  <url>http://modules.geotools.org/geometryless/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/geometryless/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/geometryless/</url>
+  </scm>
   <description>
     The JDBC module contains an implementation of the DataStore interface (found in data),
     as well as the older DataSource interface (found in core), for use with any JDBC data

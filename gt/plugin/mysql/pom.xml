@@ -23,7 +23,11 @@
   <artifactId>gt2-mysql</artifactId>
   <packaging>jar</packaging>
   <name>MySQL DataStore Implementation</name>
-  <url>http://modules.geotools.org/mysql</url>
+  <url>http://modules.geotools.org/mysql/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/mysql/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/mysql/</url>
+  </scm>
   <description>
     The MySQL module contains an implementation of the DataStore interface
     (found in data), as well as the older DataSource interface (found in core),

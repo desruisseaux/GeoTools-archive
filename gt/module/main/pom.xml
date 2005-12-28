@@ -23,7 +23,11 @@
   <artifactId>gt2-main</artifactId>
   <packaging>jar</packaging>
   <name>Main module</name>
-  <url>http://modules.geotools.org/main</url>
+  <url>http://modules.geotools.org/main/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/main/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/module/main/</url>
+  </scm>
   <description>
     The main module contains the key interfaces and default
     implementations that are used by other GeoTools modules.

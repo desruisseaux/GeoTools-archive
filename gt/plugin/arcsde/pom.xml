@@ -23,7 +23,11 @@
   <artifactId>gt2-arcsde</artifactId>
   <packaging>jar</packaging>
   <name>ArcSDE datasource module</name>
-  <url>http://modules.geotools.org/arcsde</url>
+  <url>http://modules.geotools.org/arcsde/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/arcsde/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/arcsde/</url>
+  </scm>
   <description>
     ArcSDE datasource module.
   </description>

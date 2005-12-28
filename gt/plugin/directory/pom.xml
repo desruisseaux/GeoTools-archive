@@ -23,7 +23,11 @@
   <artifactId>gt2-directory</artifactId>
   <packaging>jar</packaging>
   <name>Directory module</name>
-  <url>http://modules.geotools.org/directory</url>
+  <url>http://modules.geotools.org/directory/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/directory/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/directory/</url>
+  </scm>
   <description>
     Used to represent a directory and propagates to the 
     appropriate datastore based on file type.

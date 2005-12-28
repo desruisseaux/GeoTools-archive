@@ -23,7 +23,11 @@
   <artifactId>gt2-arcgrid</artifactId>
   <packaging>jar</packaging>
   <name>ArcGrid datasource module</name>
-  <url>http://modules.geotools.org/arcgrid</url>
+  <url>http://modules.geotools.org/arcgrid/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/arcgrid/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/arcgrid/</url>
+  </scm>
   <description>
     Datasource created to read ArcGrid raster format. Currently Serving
     as a prototype for the GridCoverageExchange API.

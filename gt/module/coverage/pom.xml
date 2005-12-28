@@ -23,7 +23,11 @@
   <artifactId>gt2-coverage</artifactId>
   <packaging>jar</packaging>
   <name>Grid Coverage module</name>
-  <url>http://modules.geotools.org/coverage</url>
+  <url>http://modules.geotools.org/coverage/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/coverage/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/module/coverage/</url>
+  </scm>
   <description>
     Implementation of Grid Coverage specification. Provides support
     for rasters and some image processing like reprojection.

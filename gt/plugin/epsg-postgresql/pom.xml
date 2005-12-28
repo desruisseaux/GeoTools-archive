@@ -23,7 +23,11 @@
   <artifactId>gt2-epsg-postgresql</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using PostgreSQL database</name>
-  <url>http://modules.geotools.org/epsg-postgresql</url>
+  <url>http://modules.geotools.org/epsg-postgresql/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-postgresql/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-postgresql/</url>
+  </scm>
   <description>
     Connection to an EPSG postgreSQL database.
     This database is built from the SQL scripts delivered by EPSG.

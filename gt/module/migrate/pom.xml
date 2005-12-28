@@ -23,7 +23,11 @@
   <artifactId>gt2-migrate</artifactId>
   <packaging>jar</packaging>
   <name>Migrate module</name>
-  <url>http://modules.geotools.org/migrate</url>
+  <url>http://modules.geotools.org/migrate/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/migrate/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/module/migrate/</url>
+  </scm>
   <description>
     This module contains code which depends on legacy methods or classes.
     It is code which should find its way back into the main module once the

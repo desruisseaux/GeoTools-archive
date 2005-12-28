@@ -23,7 +23,11 @@
   <artifactId>gt2-hsql</artifactId>
   <packaging>jar</packaging>
   <name>HSQL datasource module</name>
-  <url>http://modules.geotools.org/hsql</url>
+  <url>http://modules.geotools.org/hsql/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/hsql/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/hsql/</url>
+  </scm>
   <description>
     HSQL is a lightweight (~600k) JAVA database that
     is usefull for saving data locally. This module also uses

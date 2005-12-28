@@ -23,7 +23,11 @@
   <artifactId>gt2-postgis</artifactId>
   <packaging>jar</packaging>
   <name>PostGIS module</name>
-  <url>http://modules.geotools.org/postgis</url>
+  <url>http://modules.geotools.org/postgis/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/postgis/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/postgis/</url>
+  </scm>
   <description>
     Used to extract and edit features from a PostGIS database.  PostGIS was
     developed by Refractions Research. It is an extension to the excellent

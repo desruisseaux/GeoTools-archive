@@ -23,7 +23,11 @@
   <artifactId>gt2-sample-data</artifactId>
   <packaging>jar</packaging>
   <name>Sample data module</name>
-  <url>http://modules.geotools.org/sample-data</url>
+  <url>http://modules.geotools.org/sample-data/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/sample-data/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/module/sample-data/</url>
+  </scm>
   <description>
     Contains sample data for testing purpose.
   </description>

@@ -23,7 +23,11 @@
   <artifactId>gt2-pickle</artifactId>
   <packaging>jar</packaging>
   <name>Pickle module</name>
-  <url>http://modules.geotools.org/pickle</url>
+  <url>http://modules.geotools.org/pickle/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/pickle/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/ext/pickle/</url>
+  </scm>
   <description>
     (todo)
   </description>
