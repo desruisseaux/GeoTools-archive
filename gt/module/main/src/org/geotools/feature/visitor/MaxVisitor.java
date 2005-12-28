@@ -25,9 +25,9 @@ import org.geotools.filter.IllegalFilterException;
 
 
 /**
- * Calculates the minimum value of an attribute.
+ * Calculates the maximum value of an attribute.
  *
- * @author Cory Horner, Refractions
+ * @author Cory Horner, Refractions Research Inc.
  *
  * @since 2.2.M2
  */
@@ -36,7 +36,9 @@ public class MaxVisitor implements FeatureCalc {
     Comparable maxvalue;
     Comparable curvalue;
     boolean visited = false;
-
+    int countNull = 0;
+    int countNaN = 0;
+    
     public MaxVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
@@ -64,11 +66,15 @@ public class MaxVisitor implements FeatureCalc {
         Object attribValue = expr.getValue(feature);
 
         if (attribValue == null) {
-            System.out.println("no one is home");
-
-            return;
+        	countNull++; //increment the null count, but don't store its value            
+        	return;
         }
 
+        if ((attribValue instanceof Double) && ((Number) attribValue).doubleValue() == Double.NaN) {
+        	countNaN++; //increment the NaN count, but don't store NaN as the max
+        	return;
+        }
+        
         curvalue = (Comparable) attribValue;
 
         if ((!visited) || (curvalue.compareTo(maxvalue) > 0)) {
@@ -94,6 +100,20 @@ public class MaxVisitor implements FeatureCalc {
 
         return maxvalue;
     }
+    
+    /**
+     * @return the number of features which returned a NaN
+     */
+    public int getNaNCount() {
+    	return countNaN;
+    }
+    
+    /**
+     * @return the number of features which returned a null
+     */
+    public int getNullCount() {
+    	return countNull;
+    }
 
     public void reset() {
         /**
@@ -101,6 +121,8 @@ public class MaxVisitor implements FeatureCalc {
          */
         this.visited = false;
         this.maxvalue = new Integer(Integer.MIN_VALUE);
+        this.countNaN = 0;
+        this.countNull = 0;
     }
 
     public Expression getExpression() {
@@ -182,28 +204,4 @@ public class MaxVisitor implements FeatureCalc {
             }
         }
     }
-
-    //    private Comparable bumpType(Comparable var1, Comparable var2) {
-    //    	Class class1 = var1.getClass();
-    //		Class class2 = var2.getClass();
-    //		if (class1 != class2) {
-    //    		//find bigger class
-    //    		if (class2 == Double.class) {
-    //    			var1 = (Comparable) new Double(var1.toString());
-    //    		} else if (class1 == Float.class) {
-    //    			var2 = (Comparable) new Float(var2.toString());
-    //    		} else if (class2 == Float.class) {
-    //    			var1 = (Comparable) new Float(var1.toString());
-    //    		} else if (class1 == Long.class) {
-    //    			var2 = (Comparable) new Long(var2.toString());
-    //    		} else if (class2 == Long.class) {
-    //    			var1 = (Comparable) new Long(var1.toString());
-    //    		} else if (class1 == Integer.class) {
-    //    			var2 = (Comparable) new Integer(var2.toString());
-    //    		} else if (class2 == Integer.class) {
-    //    			var1 = (Comparable) new Integer(var1.toString());
-    //    		}
-    //    	}
-    //		return var1;
-    //    }
 }

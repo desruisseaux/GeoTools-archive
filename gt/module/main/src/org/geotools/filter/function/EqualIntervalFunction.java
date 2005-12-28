@@ -35,7 +35,7 @@ import org.geotools.util.NullProgressListener;
  * of "equal" size.
  * 
  * @author James Macgill
- * @author Cory Horner, Refractions Research
+ * @author Cory Horner, Refractions Research Inc.
  */
 public class EqualIntervalFunction extends ClassificationFunction {
 	Comparable globalMin = null;
@@ -152,44 +152,6 @@ public class EqualIntervalFunction extends ClassificationFunction {
         isValid = true;
     }
 
-//    /**
-//	 * Determines the number of decimal places to truncate the interval at
-//	 * (public for testing purposes only).
-//	 * 
-//	 * @param slotWidth
-//	 * @return
-//	 */
-//    public int decimalPlaces(double slotWidth) {
-//    	int val = (new Double(Math.log(1.0/slotWidth)/2.0)).intValue();
-//    	if (val < 0) return 0;
-//    	else return val+1;
-//    }
-//    
-//    /**
-//	 * Truncates a double to a certain number of decimals places (public for
-//	 * testing purposes only). Note: truncation at zero decimal places will
-//	 * still show up as x.0, since we're using the double type.
-//	 * 
-//	 * @param value
-//	 * @param decimalPlaces
-//	 * @return
-//	 */
-//    public double round(double value, int decimalPlaces) {
-//    	double divisor = Math.pow(10, decimalPlaces);
-//    	double newVal = value * divisor;
-//    	newVal =  (new Long(Math.round(newVal)).intValue())/divisor; 
-//    	return newVal;
-//    }
-//    
-//    public double fixRound(double value, int decimalPlaces, boolean up) {
-//    	double divisor = Math.pow(10, decimalPlaces);
-//    	double newVal = value * divisor;
-//    	if (up) newVal++; //+0.001 (for 3 dec places)
-//    	else newVal--; //-0.001
-//    	newVal =  newVal/divisor; 
-//    	return newVal;
-//    }
-    
     private double calculateSlotWidth() {
     	//this method assumes isNumber and isValid are asserted
     	return (((Number) globalMax).doubleValue() - ((Number) globalMin).doubleValue()) / classNum;

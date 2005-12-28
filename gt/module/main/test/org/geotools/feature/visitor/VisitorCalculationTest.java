@@ -319,18 +319,17 @@ public class VisitorCalculationTest extends DataTestCase {
         assertEquals(env3, boundsResult3.toEnvelope());
     }
     
-    
-//    public void testQuantileList() throws Exception {
-//        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-//        Expression expr = factory.createAttributeExpression(ft,
-//                ft.getAttributeType(0).getName());
-//        QuantileListVisitor visitor = new QuantileListVisitor(expr, 2);
-//        fc.accepts(visitor, null);
-//        List[] qResult = (List[]) visitor.getResult().getValue();
-//        assertEquals(2, qResult.length);
-//        assertEquals(2, qResult[0].size());
-//        assertEquals(1, qResult[1].size());
-//    }
+    public void testQuantileList() throws Exception {
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        Expression expr = factory.createAttributeExpression(ft,
+                ft.getAttributeType(0).getName());
+        QuantileListVisitor visitor = new QuantileListVisitor(expr, 2);
+        fc.accepts(visitor, null);
+        List[] qResult = (List[]) visitor.getResult().getValue();
+        assertEquals(2, qResult.length);
+        assertEquals(2, qResult[0].size());
+        assertEquals(1, qResult[1].size());
+    }
     
     //try merging a count and sum to get an average, both count+sum and sum+count 
     public void testCountSumMerge() throws IllegalFilterException, IOException {
