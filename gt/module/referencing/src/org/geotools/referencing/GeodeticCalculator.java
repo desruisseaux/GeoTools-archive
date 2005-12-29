@@ -23,6 +23,8 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.io.IOException;
+import java.text.Format;
 import java.util.Iterator;
 import java.util.List;
 import javax.units.NonSI;
@@ -44,21 +46,25 @@ import org.opengis.spatialschema.geometry.geometry.Position;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.measure.CoordinateFormat;
+import org.geotools.measure.Angle;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.geometry.ShapeUtilities;
+import org.geotools.measure.CoordinateFormat;
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.operation.transform.IdentityTransform;
-import org.geotools.geometry.DirectPosition2D;
+import org.geotools.resources.geometry.ShapeUtilities;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.io.TableWriter;
 
 
 /**
@@ -88,6 +94,11 @@ public class GeodeticCalculator {
                                 TOLERANCE_1 = 5.0e-14,  // tol1
                                 TOLERANCE_2 = 5.0e-13,  // tt
                                 TOLERANCE_3 = 7.0e-3;   // tol2
+    
+    /**
+     * Tolerance factor for assertions. It has no impact on computed values.
+     */
+    private static final double TOLERANCE_CHECK = 1E-8;
     
     /**
      * The transform from user coordinates to geodetic coordinates used for computation.
@@ -437,10 +448,17 @@ public class GeodeticCalculator {
      * includes informations about anchor and destination points.
      */
     private String getNoConvergenceErrorMessage() {
-        final CoordinateFormat format = new CoordinateFormat();
+        final CoordinateFormat cf = new CoordinateFormat();
         return Errors.format(ErrorKeys.NO_CONVERGENCE_$2,
-               format.format(new GeneralDirectPosition(Math.toDegrees(long1), Math.toDegrees(lat1))),
-               format.format(new GeneralDirectPosition(Math.toDegrees(long2), Math.toDegrees(lat2))));
+                             format(cf, long1, lat1), format(cf, long2, lat2));
+    }
+
+    /**
+     * Format the specified coordinates using the specified formatter, which should be an instance
+     * of {@link CoordinateFormat}.
+     */
+    private static String format(final Format cf, final double longitude, final double latitude) {
+        return cf.format(new GeneralDirectPosition(Math.toDegrees(longitude), Math.toDegrees(latitude)));
     }
 
 
@@ -712,7 +730,7 @@ public class GeodeticCalculator {
     public double getOrthodromicDistance() throws IllegalStateException {
         if (!directionValid) {
             computeDirection();
-            assert checkOrthodromicDistance();
+            assert checkOrthodromicDistance() : this;
         }
         return distance;
     }
@@ -729,7 +747,7 @@ public class GeodeticCalculator {
             check = ellipsoid.orthodromicDistance(Math.toDegrees(long1), Math.toDegrees(lat1),
                                                   Math.toDegrees(long2), Math.toDegrees(lat2));
             check = Math.abs(distance - check);
-            return check <= semiMajorAxis*TOLERANCE_2;
+            return check <= (distance+1) * TOLERANCE_CHECK;
         }
         return true;
     }
@@ -1139,7 +1157,7 @@ public class GeodeticCalculator {
                                 (x2<x1) ? Boolean.valueOf(azimuth <= 0) : null;
         final Boolean yDirect = (y2>y1) ? Boolean.valueOf(azimuth >= -90 && azimuth <= +90) :
                                 (y2<y1) ? Boolean.valueOf(azimuth <= -90 || azimuth >= +90) : null;
-        assert xDirect==null || yDirect==null || xDirect.equals(yDirect) : azimuth;
+        assert xDirect==null || yDirect==null || xDirect.equals(yDirect) : this;
         if (!Boolean.FALSE.equals(xDirect) && !Boolean.FALSE.equals(yDirect)) {
             return new Line2D.Double(x1, y1, x2, y2);
         }
@@ -1240,5 +1258,56 @@ public class GeodeticCalculator {
             // Not a good practice, but we are going to remove this method anyway.
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Returns a string representation of the current state of this calculator.
+     */
+    public String toString() {
+        final Vocabulary resources = Vocabulary.getResources(null);
+        final TableWriter buffer = new TableWriter(null, " ");
+        if (coordinateReferenceSystem != null) {
+            buffer.write(resources.getLabel(VocabularyKeys.COORDINATE_REFERENCE_SYSTEM));
+            buffer.nextColumn();
+            buffer.write(coordinateReferenceSystem.getName().getCode());
+            buffer.nextLine();
+        }
+        if (ellipsoid != null) {
+            buffer.write(resources.getLabel(VocabularyKeys.ELLIPSOID));
+            buffer.nextColumn();
+            buffer.write(ellipsoid.getName().getCode());
+            buffer.nextLine();
+        }
+        final CoordinateFormat cf = new CoordinateFormat();
+        final Format           nf = cf.getFormat(0);
+        if (true) {
+            buffer.write(resources.getLabel(VocabularyKeys.SOURCE_POINT));
+            buffer.nextColumn();
+            buffer.write(format(cf, long1, lat1));
+            buffer.nextLine();
+        }
+        if (destinationValid) {
+            buffer.write(resources.getLabel(VocabularyKeys.TARGET_POINT));
+            buffer.nextColumn();
+            buffer.write(format(cf, long2, lat2));
+            buffer.nextLine();
+        }
+        if (directionValid) {
+            buffer.write(resources.getLabel(VocabularyKeys.AZIMUTH));
+            buffer.nextColumn();
+            buffer.write(nf.format(new Angle(Math.toDegrees(azimuth))));
+            buffer.nextLine();
+        }
+        if (directionValid) {
+            buffer.write(resources.getLabel(VocabularyKeys.ORTHODROMIC_DISTANCE));
+            buffer.nextColumn();
+            buffer.write(nf.format(new Double(distance)));
+            if (ellipsoid != null) {
+                buffer.write(' ');
+                buffer.write(ellipsoid.getAxisUnit().toString());
+            }
+            buffer.nextLine();
+        }
+        return buffer.toString();
     }
 }

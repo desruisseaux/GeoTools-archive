@@ -31,6 +31,7 @@ public final class VocabularyKeys {
     public static final int ALTITUDE                           =     5;
     public static final int AUTHORITY                          =   223;
     public static final int AXIS_CHANGES                       =   204;
+    public static final int AZIMUTH                            =   224;
     public static final int BAND                               =   193;
     public static final int BAROMETRIC_ALTITUDE                =     6;
     public static final int BLACK                              =     7;
@@ -52,6 +53,7 @@ public final class VocabularyKeys {
     public static final int CONVERSION_AND_TRANSFORMATION      =    21;
     public static final int COORDINATES_SELECTION              =    22;
     public static final int COORDINATE_FORMAT                  =    23;
+    public static final int COORDINATE_REFERENCE_SYSTEM        =   225;
     public static final int CYAN                               =    24;
     public static final int CYLINDRICAL_MERCATOR_PROJECTION    =    25;
     public static final int DATA_BASE_$3                       =   201;
@@ -69,6 +71,7 @@ public final class VocabularyKeys {
     public static final int DOWN                               =    33;
     public static final int EAST                               =    34;
     public static final int EASTING                            =    35;
+    public static final int ELLIPSOID                          =   226;
     public static final int ELLIPSOIDAL                        =    36;
     public static final int ELLIPSOIDAL_HEIGHT                 =    37;
     public static final int ELLIPSOID_SHIFT                    =   206;
@@ -165,6 +168,7 @@ public final class VocabularyKeys {
     public static final int OK                                 =   116;
     public static final int OPERATIONS                         =   117;
     public static final int OPERATION_$1                       =   118;
+    public static final int ORTHODROMIC_DISTANCE               =   227;
     public static final int ORTHOGRAPHIC_PROJECTION            =   119;
     public static final int ORTHOMETRIC                        =   120;
     public static final int OS_NAME_$1                         =   121;

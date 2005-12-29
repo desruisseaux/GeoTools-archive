@@ -57,14 +57,13 @@ public class EPSGTest extends TestCase {
         
         assertNotNull( authority );
         assertEquals( "European Petroleum Survey Group", authority.getTitle().toString() );
-        assert( authority.getIdentifiers().contains( "EPSG" ) );                        
+        assertTrue( authority.getIdentifiers().contains( "EPSG" ) );
     }
     
     public void testVendor(){
         Citation vendor = factory.getVendor();        
         assertNotNull( vendor );
         assertEquals( "Geotools", vendor.getTitle().toString() );
-        assert( vendor.getIdentifiers().contains( "EPSG" ) );                        
     }
     
     public void testCodes() throws Exception {

@@ -500,9 +500,10 @@ public abstract class MapProjection extends AbstractMathTransform
             }
             if (distance > getToleranceForAssertions(longitude, latitude)) {
                 // Do not fail for NaN values.
-                throw new AssertionError("\u03B5=" + distance +
-                                         " (\u0394\u03BB=" + (longitude-Math.toDegrees(centralMeridian)) + "\u00B0" +
-                                         ", \u0394\u03C6=" + (latitude-Math.toDegrees(latitudeOfOrigin)) + "\u00B0)");
+                throw new AssertionError(Errors.format(ErrorKeys.PROJECTION_CHECK_FAILED_$3,
+                          new Double   (distance),
+                          new Longitude(longitude - Math.toDegrees(centralMeridian )),
+                          new Latitude (latitude  - Math.toDegrees(latitudeOfOrigin))));
             }
         } catch (TransformException exception) {
             final AssertionError error = new AssertionError(exception.getLocalizedMessage());
