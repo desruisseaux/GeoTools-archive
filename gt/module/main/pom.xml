@@ -238,8 +238,9 @@
         </executions>
       </plugin>
 
-      <!-- TEMPORARY HACK: Disables JUnit tests for now, until the following get fixed:
-           http://jira.codehaus.org/browse/MNG-441   (targeted to Maven 2.0-beta 4) -->
+      <!-- TEMPORARY HACK: Disables JUnit tests for now. For a mysterious reason,
+           many implementation class like SimpleFeature are replaced by generated
+           implementations like $Proxy2, leading to numerous ClassCastException. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

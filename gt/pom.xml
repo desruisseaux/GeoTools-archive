@@ -588,7 +588,7 @@
             <exclude>**/*OnlineTest.java</exclude>
           </excludes>
           <forkMode>once</forkMode>
-          <argLine>-enableassertions</argLine>
+          <argLine>-Xmx512M -enableassertions</argLine>
           <printSummary>false</printSummary>   <!-- Make the build less verbose -->
         </configuration>
       </plugin>

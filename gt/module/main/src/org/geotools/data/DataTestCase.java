@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  * <p>
  * This code has been made part of the public geotools.jar to provide
- * a starting point for test cases involcing Data constructs.
+ * a starting point for test cases involving Data constructs.
  * </p>
  * @author Jody Garnett, Refractions Research
  */
