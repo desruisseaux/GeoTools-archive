@@ -56,7 +56,6 @@ public class WorldImageReaderTest extends TestCase {
     }
 
     public void testRead() throws IOException {
-        TestData testData = new TestData();
         URL url = null;
         File file = null;
         InputStream in = null;
@@ -67,7 +66,7 @@ public class WorldImageReaderTest extends TestCase {
 
         for (int i = 0; i < fileList.length; i++) {
             //url
-            url = TestData.getResource(this, fileList[i]);
+            url = TestData.url(this, fileList[i]);
             this.read(url);
 
             //file

@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 /**
  * 
+ * @version $Id$
  * @author jones
  */
 public class LockTest extends TestCase {

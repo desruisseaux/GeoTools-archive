@@ -41,19 +41,22 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * A set of constructs and utility methods used to test the data module.
  * <p>
- * By isolating a commong set of Features,FeatureTypes and Filters
- * we are able to reduce the amount of overhead in setting up new
- * tests.
+ * By isolating a commong set of {@link Feature}s, {@link FeatureType}s and {@link Filter}s
+ * we are able to reduce the amount of overhead in setting up new tests.
  * </p>
  * <p>
- * We have also special cased assert( Geometry, Geometry ) to work around
- * Geometry.equals( Object ) not working as expected.
+ * We have also special cased {@link #assertEquals(Geometry, Geometry)} to work around
+ * {@code Geometry.equals( Object )} not working as expected.
  * </p>
  * <p>
- * This code has been made part of the public geotools.jar to provide
+ * This code has been made part of the public {@code geotools.jar} to provide
  * a starting point for test cases involving Data constructs.
  * </p>
+ *
+ * @version $Id$
  * @author Jody Garnett, Refractions Research
+ *
+ * @todo It should be possible to move this class in the {@code sample-data} module.
  */
 public class DataTestCase extends TestCase {
     protected GeometryFactory gf;
@@ -80,26 +83,29 @@ public class DataTestCase extends TestCase {
     
     
     /**
-     * Constructor for DataUtilitiesTest.
-     *
-     * @param arg0
+     * Creates a default test case with the given name.
      */
-    public DataTestCase(String arg0) {
-        super(arg0);        
+    public DataTestCase(final String name) {
+        super(name);
     }
 
+    /**
+     * Invoked before a test is run. The default implementation invokes {@link #dataSetUp}.
+     */
     protected void setUp() throws Exception {
         dataSetUp();
     }
     
-    /*
-     * @see TestCase#setUp()
+    /**
+     * Loads the data.
+     *
+     * @see #setUp()
      */
     protected void dataSetUp() throws Exception {
         String namespace = getName();
-        roadType = DataUtilities.createType(namespace+".road",
+        roadType = DataUtilities.createType(namespace + ".road",
                 "id:0,geom:LineString,name:String");
-        subRoadType = DataUtilities.createType(namespace+"road",
+        subRoadType = DataUtilities.createType(namespace + "road",
                 "id:0,geom:LineString");
         gf = new GeometryFactory();
 
@@ -236,8 +242,9 @@ public class DataTestCase extends TestCase {
         lakeBounds.expandToInclude(lakeFeatures[0].getBounds());                 
     }
 
-    /*
-     * @see TestCase#tearDown()
+    /**
+     * Set all data references to {@code null}, allowing garbage collection.
+     * This method is automatically invoked after each test.
      */
     protected void tearDown() throws Exception {
         gf = null;
@@ -255,7 +262,11 @@ public class DataTestCase extends TestCase {
         rv1Filter = null;
         newRiver = null;                    
     }
-    
+
+    /**
+     * Creates a line from the specified (<var>x</var>,<var>y</var>) coordinates.
+     * The coordinates are stored in a flat array.
+     */
     public LineString line(int[] xy) {
         Coordinate[] coords = new Coordinate[xy.length / 2];
 
@@ -266,6 +277,9 @@ public class DataTestCase extends TestCase {
         return gf.createLineString(coords);
     }
 
+    /**
+     * Creates a multiline from the specified (<var>x</var>,<var>y</var>) coordinates.
+     */
     public MultiLineString lines(int[][] xy) {
         LineString[] lines = new LineString[xy.length];
 
@@ -275,13 +289,21 @@ public class DataTestCase extends TestCase {
 
         return gf.createMultiLineString(lines);
     }
-    
+
+    /**
+     * Creates a polygon from the specified (<var>x</var>,<var>y</var>) coordinates.
+     * The coordinates are stored in a flat array.
+     */
     public Polygon polygon( int[] xy ){
-        LinearRing shell = ring( xy );        
-        return gf.createPolygon( shell, null );        
+        LinearRing shell = ring( xy );
+        return gf.createPolygon( shell, null );
     }
 
-    public Polygon polygon( int[] xy, int []holes[] ){
+    /**
+     * Creates a line from the specified (<var>x</var>,<var>y</var>) coordinates and
+     * an arbitrary amount of holes.
+     */
+    public Polygon polygon( int[] xy, int[][] holes ){
         if( holes == null || holes.length == 0){
            return polygon( xy );
         }
@@ -294,7 +316,11 @@ public class DataTestCase extends TestCase {
         }        
         return gf.createPolygon( shell, rings );        
     }
-        
+
+    /**
+     * Creates a ring from the specified (<var>x</var>,<var>y</var>) coordinates.
+     * The coordinates are stored in a flat array.
+     */
     public LinearRing ring( int[] xy ){
         Coordinate[] coords = new Coordinate[xy.length / 2];
 
@@ -304,7 +330,10 @@ public class DataTestCase extends TestCase {
 
         return gf.createLinearRing(coords);        
     }
-    //  need to special case Geometry
+
+    /**
+     * Compares two geometries for equality.
+     */
     protected void assertEquals(Geometry expected, Geometry actual) {
         if (expected == actual) {
             return;
@@ -313,6 +342,10 @@ public class DataTestCase extends TestCase {
         assertNotNull(actual);
         assertTrue(expected.equals(actual));
     }
+
+    /**
+     * Compares two geometries for equality.
+     */
     protected void assertEquals(String message, Geometry expected, Geometry actual) {
         if (expected == actual) {
             return;
@@ -321,16 +354,17 @@ public class DataTestCase extends TestCase {
         assertNotNull(message, actual);
         assertTrue(message, expected.equals(actual));
     }
+
     /**
-     * Counts the number of Features returned by reader.
+     * Counts the number of Features returned by the specified reader.
      * <p>
-     * This method will close reader
+     * This method will close the reader.
      * </p>
      */
     protected int count( FeatureReader reader ) throws IOException {
         if( reader == null) {
             return -1;
-        }             
+        }
         int count = 0;
         try {
             while( reader.hasNext() ){
@@ -342,12 +376,17 @@ public class DataTestCase extends TestCase {
             throw new DataSourceException("hasNext() lied to me at:"+count, e );
         } catch (IllegalAttributeException e) {
             throw new DataSourceException("next() could not understand feature at:"+count, e );
-        }        
+        }
         finally {
             reader.close();
         }
         return count;
     }
+
+    /**
+     * Counts the number of Features in the specified writer.
+     * This method will close the writer.
+     */
     protected int count(FeatureWriter writer)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;

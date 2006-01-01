@@ -12,13 +12,14 @@ import org.geotools.resources.TestData;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class ShpXmlFileReaderTest extends TestCase {
-     ShpXmlFileReader reader;
+    ShpXmlFileReader reader;
      
-     protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
-        URL example = TestData.getResource( this, "example.shp.xml" );
+        URL example = TestData.url( this, "example.shp.xml" );
         reader = new ShpXmlFileReader( example );
     }
+    
     public void testBBox() {
          Metadata meta = reader.parse();
          assertNotNull( "meta", meta );

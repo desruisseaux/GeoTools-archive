@@ -1,13 +1,27 @@
 /*
- * ShapefileTest.java
- * JUnit based test
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2002, Geotools Project Managment Committee (PMC)
  *
- * Created on 12 February 2002, 21:27
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package org.geotools.data.shapefile;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 
 import org.geotools.data.DataStore;
@@ -21,11 +35,15 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.resources.TestData;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
+
 /**
+ *
+ * @version $Id$
  * @author Ian Schneider
  * @author James Macgill
  */
@@ -39,11 +57,12 @@ public class ShapefileTest extends TestCaseSupport {
   final String EXTRAATEND = "extraAtEnd.shp";
   
   
-  public ShapefileTest(String testName) {
+  public ShapefileTest(String testName) throws IOException {
     super(testName);
   }
   
   public static void main(java.lang.String[] args) {
+    verbose = true;
     junit.textui.TestRunner.run(suite(ShapefileTest.class));
   }
   
@@ -79,6 +98,7 @@ public class ShapefileTest extends TestCaseSupport {
     loadShapes(HOLETOUCHEDGE, 1);
     loadMemoryMapped(HOLETOUCHEDGE,1);
   }
+  
   /**
    * It is posible for a shapefile to have extra information past the end
    * of the normal feature area, this tests checks that this situation is
@@ -90,9 +110,12 @@ public class ShapefileTest extends TestCaseSupport {
   }
   
   public void testIndexFile() throws Exception {
-    ShapefileReader reader1 = new ShapefileReader(getTestResourceChannel(STATEPOP), new Lock());
-    ShapefileReader reader2 = new ShapefileReader(getReadableFileChannel(STATEPOP), new Lock());
-    IndexFile index = new IndexFile(getTestResourceChannel(STATEPOP_IDX));
+    final ReadableByteChannel channel1 = Channels.newChannel(TestData.openStream(this, STATEPOP));
+    final ReadableByteChannel channel2 = TestData.openChannel(this, STATEPOP);
+    final ReadableByteChannel channel3 = TestData.openChannel(this, STATEPOP_IDX);
+    final ShapefileReader     reader1  = new ShapefileReader(channel1, new Lock());
+    final ShapefileReader     reader2  = new ShapefileReader(channel2, new Lock());
+    final IndexFile           index    = new IndexFile(channel3);
     for (int i = 0; i < index.getRecordCount(); i++) {
       if (reader1.hasNext()) {
 
@@ -105,13 +128,16 @@ public class ShapefileTest extends TestCaseSupport {
       }
       //assertEquals(reader1.nextRecord().offset(),index.getOffset(i));
     }
+    channel3.close();
+    channel2.close();
+    channel1.close();
   }
   
   public void testHolyPolygons() throws Exception {
     Geometry g = readGeometry("holyPoly");
     
     FeatureTypeFactory factory = FeatureTypeFactory.newInstance("junk");
-    factory.addType(AttributeTypeFactory.newAttributeType("a",Geometry.class));
+    factory.addType(AttributeTypeFactory.newAttributeType("a", Geometry.class));
     FeatureType type = factory.getFeatureType();
     FeatureCollection features = FeatureCollections.newCollection();
     features.add(type.create(new Object[] {g}));
@@ -137,17 +163,20 @@ public class ShapefileTest extends TestCaseSupport {
   }
   
   public void testSkippingRecords() throws Exception {
-    ShapefileReader r = new ShapefileReader(getTestResourceChannel(STATEPOP), new Lock());
+    final ReadableByteChannel c = TestData.openChannel(this, STATEPOP);
+    final ShapefileReader r = new ShapefileReader(c, new Lock());
     int idx = 0;
     while (r.hasNext()) {
         idx++;
         r.nextRecord();
     }
     assertEquals(49,idx);
+    c.close();
   }
   
   public void testShapefileReaderRecord() throws Exception {
-    ShapefileReader reader = new ShapefileReader(getTestResourceChannel(STATEPOP), new Lock());
+    final ReadableByteChannel c1 = Channels.newChannel(TestData.openStream(this, STATEPOP));
+    ShapefileReader reader = new ShapefileReader(c1, new Lock());
     ArrayList offsets = new ArrayList();
     while (reader.hasNext()) {
       ShapefileReader.Record record = reader.nextRecord();
@@ -156,30 +185,36 @@ public class ShapefileTest extends TestCaseSupport {
       assertEquals(new Envelope(record.minX,record.maxX,record.minY,record.maxY), geom.getEnvelopeInternal());
       record.toString();
     }
-    reader = new ShapefileReader(getReadableFileChannel(STATEPOP), new Lock());
+    final ReadableByteChannel c2 = TestData.openChannel(this, STATEPOP);
+    reader = new ShapefileReader(c2, new Lock());
     for (int i = 0, ii = offsets.size(); i < ii; i++) {
       reader.shapeAt( ((Integer)offsets.get(i)).intValue() ); 
     }
+    c2.close();
+    c1.close();
   }
   
-  private void loadShapes(String resource,int expected) throws Exception {
-    ShapefileReader reader = new ShapefileReader(getTestResourceChannel(resource), new Lock());
+  private void loadShapes(String resource, int expected) throws Exception {
+    final ReadableByteChannel c = Channels.newChannel(TestData.openStream(this, resource));
+    ShapefileReader reader = new ShapefileReader(c, new Lock());
     int cnt = 0;
     while (reader.hasNext()) {
       reader.nextRecord().shape();
       cnt++;
     }
     assertEquals("Number of Geometries loaded incorect for : " + resource,expected,cnt);
+    c.close();
   }
   
-  private void loadMemoryMapped(String resource,int expected) throws Exception {
-    ShapefileReader reader = new ShapefileReader(getReadableFileChannel(resource), new Lock());
+  private void loadMemoryMapped(String resource, int expected) throws Exception {
+    final ReadableByteChannel c = TestData.openChannel(this, resource);
+    ShapefileReader reader = new ShapefileReader(c, new Lock());
     int cnt = 0;
     while (reader.hasNext()) {
       reader.nextRecord().shape();
       cnt++;
     }
     assertEquals("Number of Geometries loaded incorect for : " + resource,expected,cnt);
+    c.close();
   }
-
 }

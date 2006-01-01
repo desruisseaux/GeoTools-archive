@@ -127,30 +127,4 @@
     </dependency>
   </dependencies>
 
-
-
-  <!-- ==================================================== -->
-  <!--     Configuration (including resources)              -->
-  <!-- ==================================================== -->
-  <build>
-    <testResources>
-      <testResource>
-        <directory>test</directory>
-        <includes>
-          <include>testData/*</include> <!-- todo: should live in test-data directory -->
-        </includes>
-      </testResource>
-    </testResources>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

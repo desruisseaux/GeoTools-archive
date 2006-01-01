@@ -81,11 +81,7 @@ public class ScriptTest extends TestCase {
      * @throws Exception If a test failed.
      */
     private void runScript(final String filename) throws Exception {
-        final URL url = TestData.getResource(this, filename);
-        if (url == null) {
-            throw new FileNotFoundException(filename);
-        }
-        final LineNumberReader in = new LineNumberReader(new InputStreamReader(url.openStream()));
+        final LineNumberReader in = TestData.openReader(this, filename);
         final TestScript test = new TestScript(in);
         test.executeAll();
         in.close();

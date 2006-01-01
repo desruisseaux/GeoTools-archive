@@ -29,6 +29,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;

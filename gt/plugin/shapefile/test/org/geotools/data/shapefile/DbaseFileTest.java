@@ -1,22 +1,38 @@
 /*
- * ShapefileTest.java
- * JUnit based test
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2002, Geotools Project Managment Committee (PMC)
  *
- * Created on 12 February 2002, 21:27
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package org.geotools.data.shapefile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.ReadableByteChannel;
 
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.dbf.DbaseFileWriter;
+import org.geotools.resources.TestData;
 
 
 /**
+ *
+ * @version $Id$
  * @author Ian Schneider
  * @author James Macgill
  */
@@ -26,16 +42,18 @@ public class DbaseFileTest extends TestCaseSupport {
   
   private DbaseFileReader dbf = null;
   
-  public DbaseFileTest(java.lang.String testName) {
+  public DbaseFileTest(String testName) throws IOException {
     super(testName);
   }
   
-  public static void main(java.lang.String[] args) {
+  public static void main(String[] args) {
+    verbose = true;
     junit.textui.TestRunner.run(suite(DbaseFileTest.class));
   }
 
   protected void setUp() throws Exception {
-    dbf = new DbaseFileReader(getTestResourceChannel(TEST_FILE));
+    super.setUp();
+    dbf = new DbaseFileReader(TestData.openChannel(this, TEST_FILE));
   }
   
   public void testNumberofColsLoaded(){
@@ -55,7 +73,8 @@ public class DbaseFileTest extends TestCaseSupport {
   
   public void testRowVsEntry() throws Exception {
     Object[] attrs = new Object[dbf.getHeader().getNumFields()];
-    DbaseFileReader dbf2 = new DbaseFileReader(getTestResourceChannel(TEST_FILE));
+    ReadableByteChannel ch2 = TestData.openChannel(this, TEST_FILE);
+    DbaseFileReader dbf2 = new DbaseFileReader(ch2);
     while (dbf.hasNext()) {
       dbf.readEntry(attrs);
       DbaseFileReader.Row r = dbf2.readRow();
@@ -65,6 +84,7 @@ public class DbaseFileTest extends TestCaseSupport {
         assertEquals(attrs[i], r.read(i));
       }
     }
+    ch2.close();
   }
   
   public void testHeader() throws Exception {
@@ -117,9 +137,9 @@ public class DbaseFileTest extends TestCaseSupport {
       DbaseFileWriter.FieldFormatter formatter=new DbaseFileWriter.FieldFormatter();
       
       String stringWithInternationChars="hello "+'\u20ac';
-      
-      System.out.println(stringWithInternationChars);
-      
+      if (verbose) {
+        System.out.println(stringWithInternationChars);
+      }
       String formattedString=formatter.getFieldString(10, stringWithInternationChars);
       
       assertEquals("          ".getBytes().length, formattedString.getBytes().length);

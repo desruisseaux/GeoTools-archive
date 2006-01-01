@@ -32,6 +32,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -44,7 +45,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
@@ -67,6 +70,7 @@ import com.sun.media.imageio.stream.FileChannelImageInputStream;
  * methods return null. In the early future we will start (hopefully
  * supporting them).
  *
+ * @version $Id$
  * @author simone giannecchini
  * @author alessio fabiani
  * @author rgould
@@ -114,8 +118,18 @@ public class WorldImageReader implements GridCoverageReader {
             return; //do nothing if it is a file
         } else if (source instanceof URL) { //URL that point to a file
 
-            if (((URL) source).getProtocol().compareToIgnoreCase("file") == 0) {
-                this.source = new File(((URL) source).getPath());
+            if (((URL) source).getProtocol().equalsIgnoreCase("file")) {
+                String path = ((URL) source).getPath();
+                File file = new File(path);
+                if (!file.exists()) try {
+                    // Try to decode as UTF-8.
+                    path = URLDecoder.decode(path, "UTF-8");
+                    file = new File(path);
+                } catch (UnsupportedEncodingException e) {
+                    // Ignore. We will keep the undecoded path, which is
+                    // likely to throws a FileNotFoundException later.
+                }
+                this.source = file;
             }
         }
     }

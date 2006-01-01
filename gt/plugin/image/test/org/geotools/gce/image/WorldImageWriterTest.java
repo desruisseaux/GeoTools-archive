@@ -93,7 +93,7 @@ public class WorldImageWriterTest extends TestCase {
 
         for (int i = 0; i < fileList.length; i++) {
             //url
-            url = TestData.getResource(this, fileList[i]);
+            url = TestData.url(this, fileList[i]);
             assertTrue(url != null);
             this.write(url);
 

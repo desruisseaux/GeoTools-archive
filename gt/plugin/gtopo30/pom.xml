@@ -71,23 +71,4 @@
     </dependency>
   </dependencies>
 
-
-
-  <!-- ==================================================== -->
-  <!--     Plugins configuration                            -->
-  <!-- ==================================================== -->
-  <build>
-    <plugins>
-      <plugin>
-      <!-- TEMPORARY HACK: Disables JUnit tests for now. We have a NullPointerException
-           in TestCaseSupport.getFile. Need to be replaced by the convenience class in main. -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

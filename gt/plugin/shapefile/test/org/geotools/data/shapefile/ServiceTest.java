@@ -1,31 +1,48 @@
+/*
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 package org.geotools.data.shapefile;
 
-/*
- * GmlSuite.java
- * JUnit based test
- *
- * Created on 04 March 2002, 16:09
- */
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFinder;
+import org.geotools.resources.TestData;
+
 
 /**
  *
+ * @version $Id$
  * @author ian
  */
 public class ServiceTest extends TestCaseSupport {
   
   final String TEST_FILE = "statepop.shp";
   
-  public ServiceTest(java.lang.String testName) {
+  public ServiceTest(String testName) throws IOException {
     super(testName);
   }
   
-  public static void main(java.lang.String[] args) {
+  public static void main(String[] args) {
+    verbose = true;
     junit.textui.TestRunner.run(suite(ServiceTest.class));
   }
   
@@ -49,12 +66,12 @@ public class ServiceTest extends TestCaseSupport {
   /**
    * Ensure that we can create a DataStore using url OR string url.
    */ 
-  public void testShapefileDataStore() throws Exception{
+  public void testShapefileDataStore() throws Exception {
     HashMap params = new HashMap();
-    params.put("url", getTestResource(TEST_FILE));
+    params.put("url", TestData.url(this, TEST_FILE));
     DataStore ds = DataStoreFinder.getDataStore(params);
     assertNotNull(ds);
-    params.put("url", getTestResource(TEST_FILE).toString());
+    params.put("url", TestData.url(this, TEST_FILE).toString());
     assertNotNull(ds);
   }
   

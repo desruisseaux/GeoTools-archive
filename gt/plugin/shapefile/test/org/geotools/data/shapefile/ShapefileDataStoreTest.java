@@ -1,13 +1,26 @@
 /*
- * ShapefileDataStoreTest.java
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2002, Geotools Project Managment Committee (PMC)
  *
- * Created on November 5, 2003, 2:20 PM
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package org.geotools.data.shapefile;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -37,6 +50,7 @@ import org.geotools.feature.SimpleFeature;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.Filter;
 import org.geotools.xml.gml.GMLSchema;
+import org.geotools.resources.TestData;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -45,8 +59,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+
 /**
  *
+ * @version $Id$
  * @author  Ian Schneider
  */
 public class ShapefileDataStoreTest extends TestCaseSupport {
@@ -54,13 +70,13 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     final static String STATE_POP = "statepop.shp";
     final static String STREAM = "stream.shp";
     
-    public ShapefileDataStoreTest(java.lang.String testName) {
+    public ShapefileDataStoreTest(String testName) throws IOException {
         super(testName);
     }
     
     protected FeatureCollection loadFeatures(String resource,Query q) throws Exception {
         if (q == null) q = new DefaultQuery();
-        URL url = getTestResource(resource);
+        URL url = TestData.url(this, resource);
         ShapefileDataStore s = new ShapefileDataStore(url);
         FeatureSource fs = s.getFeatureSource(s.getTypeNames()[0]);
         return fs.getFeatures(q).collection();
@@ -79,13 +95,13 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 		Map map=new HashMap();
 		URI namespace = new URI("http://jesse.com");
 		map.put(ShapefileDataStoreFactory.NAMESPACEP.key, namespace);
-		map.put(ShapefileDataStoreFactory.URLP.key, getTestResource(STATE_POP));
+		map.put(ShapefileDataStoreFactory.URLP.key, TestData.url(this, STATE_POP));
 		DataStore store = factory.createDataStore(map);
 		assertEquals(namespace, store.getSchema(STATE_POP.substring(0, STATE_POP.lastIndexOf('.'))).getNamespace());
 	}
     
     public void testSchema() throws Exception {
-        URL url = getTestResource(STATE_POP);
+        URL url = TestData.url(this, STATE_POP);
         ShapefileDataStore s = new ShapefileDataStore(url);
         FeatureType schema = s.getSchema(s.getTypeNames()[0]);
         AttributeType[] types = schema.getAttributeTypes();
@@ -93,7 +109,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     }
     
     public void testSpacesInPath() throws Exception {
-        URL u = getTestResource("legacy folder/pointtest.shp");
+        URL u = TestData.url(this, "legacy folder/pointtest.shp");
         File f = new File(URLDecoder.decode(u.getFile(),"UTF-8"));
         assertTrue(f.exists());
         ShapefileDataStore s = new ShapefileDataStore(u);
@@ -105,7 +121,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      */
     public void testEnvelope() throws Exception {
         FeatureCollection features = loadFeatures(STATE_POP, null);
-        ShapefileDataStore s = new ShapefileDataStore(getTestResource(STATE_POP));
+        ShapefileDataStore s = new ShapefileDataStore(TestData.url(this, STATE_POP));
         String typeName = s.getTypeNames()[0];
         FeatureResults all = s.getFeatureSource( typeName ).getFeatures();
         
@@ -189,7 +205,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             }
         }
         catch (Throwable t ){
-            if( System.getProperty("os.name").startsWith("Windows")){
+            if( System.getProperty("os.name").startsWith("Windows")) {
                 System.out.println("Ignore "+t+" because you are on windows");
                 return;
             }        
@@ -197,7 +213,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                 throw t;
             }
         }
-        
     }
     
     /**
@@ -444,7 +459,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     }
     
     public void testGetCount() throws Exception{
-        ShapefileDataStore store=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(getTestResource(STREAM));
+        ShapefileDataStore store=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(TestData.url(this, STREAM));
         int count=0;
         FeatureReader reader=store.getFeatureReader();
         try{
@@ -464,6 +479,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     }
     
     public static void main(java.lang.String[] args) throws Exception {
+        verbose = true;
         junit.textui.TestRunner.run(suite(ShapefileDataStoreTest.class));
     }
     
