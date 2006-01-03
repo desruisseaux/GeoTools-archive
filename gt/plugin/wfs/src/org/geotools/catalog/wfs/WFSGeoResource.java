@@ -30,7 +30,7 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.feature.FeatureType;
-import org.geotools.geometry.JTS.ReferencedEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.ProgressListener;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -93,7 +93,6 @@ public class WFSGeoResource extends AbstractGeoResource {
      * <li>IGeoResourceInfo.class
      * <li>IService.class
      * </ul>
-     * @see net.refractions.udig.catalog.IResolve#resolve(java.lang.Class, org.eclipse.core.runtime.IProgressMonitor)
      */
     public Object resolve(Class adaptee, ProgressListener monitor)
         throws IOException {

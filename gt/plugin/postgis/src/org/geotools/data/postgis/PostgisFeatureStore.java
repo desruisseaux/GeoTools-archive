@@ -54,7 +54,7 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLUnpacker;
-import org.geotools.geometry.JTS.ReferencedEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;

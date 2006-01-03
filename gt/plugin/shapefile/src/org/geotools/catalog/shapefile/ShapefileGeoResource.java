@@ -27,7 +27,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.geometry.JTS.ReferencedEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;

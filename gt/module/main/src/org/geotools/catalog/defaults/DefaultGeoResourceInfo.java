@@ -17,7 +17,7 @@ package org.geotools.catalog.defaults;
 
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.catalog.GeoResourceInfo;
-import org.geotools.geometry.JTS.ReferencedEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.net.URI;
 import javax.swing.Icon;
@@ -109,6 +109,6 @@ public class DefaultGeoResourceInfo implements GeoResourceInfo {
      */
     public CoordinateReferenceSystem getCRS() { // part of Coverage
 
-        return bounds.getCRS();
+        return bounds.getCoordinateReferenceSystem();
     }
 }
