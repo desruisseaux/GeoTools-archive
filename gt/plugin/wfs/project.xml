@@ -46,11 +46,11 @@
         <release.bundle>true</release.bundle>
       </properties>
     </dependency>
-    <dependency>
+    <!--dependency>
       <id>wms</id>
       <version>2.2.x</version>
       <groupId>gt2</groupId>
-    </dependency>
+    </dependency-->
     <dependency>
       <id>epsg-wkt</id>
       <version>2.2.x</version>
@@ -71,13 +71,13 @@
       <version>0.2</version>
       <url>http://www.opengis.org</url>
     </dependency>
-    <dependency>
+    <!--dependency>
       <id>XDO</id>
       <version>beta</version>
       <properties>
         <release.bundle>true</release.bundle>
        </properties>
-    </dependency>
+    </dependency-->
     
   </dependencies>
   <build>
