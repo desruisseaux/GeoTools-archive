@@ -41,11 +41,11 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class WFSFeatureSource extends AbstractFeatureSource {
     protected WFSDataStore ds;
-    protected FeatureType ft;
+    protected String fname;
 
-    protected WFSFeatureSource(WFSDataStore ds, FeatureType ft) {
+    protected WFSFeatureSource(WFSDataStore ds, String fname) {
         this.ds = ds;
-        this.ft = ft;
+        this.fname = fname;
     }
 
     /**
@@ -77,7 +77,11 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * @see org.geotools.data.FeatureSource#getSchema()
      */
     public FeatureType getSchema() {
-        return ft;
+    	try {
+			return ds.getSchema(fname);
+		} catch (IOException e) {
+			return null;
+		}
     }
 
     /**
@@ -85,8 +89,8 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * @see org.geotools.data.FeatureSource#getBounds()
      */
     public Envelope getBounds() throws IOException {
-        return getBounds((ft == null) ? Query.ALL
-                                      : new DefaultQuery(ft.getTypeName()));
+        return getBounds((fname == null) ? Query.ALL
+                                      : new DefaultQuery(fname));
     }
 
     /**
@@ -102,7 +106,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * @see org.geotools.data.FeatureSource#getFeatures()
      */
     public FeatureCollection getFeatures(){
-        return getFeatures(new DefaultQuery(ft.getTypeName(), Filter.NONE));
+        return getFeatures(new DefaultQuery(getSchema().getTypeName(), Filter.NONE));
     }
 
     /**
@@ -110,7 +114,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.filter.Filter)
      */
     public FeatureCollection getFeatures(Filter filter){
-        return getFeatures(new DefaultQuery(ft.getTypeName(), filter));
+        return getFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
     }
 
     /**
@@ -153,7 +157,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          * @see org.geotools.data.FeatureResults#getSchema()
          */
         public FeatureType getSchema(){
-            return fs.ft;
+            return fs.getSchema();
         }
 
         /**

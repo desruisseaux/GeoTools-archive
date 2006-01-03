@@ -53,6 +53,7 @@ import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.wfs.WFSFilterVisitor.WFSBBoxFilterVisitor;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
@@ -329,7 +330,7 @@ public class WFSDataStore extends AbstractDataStore {
         
         if(ftName!=null){
             try {
-                t = FeatureTypeFactory.newFeatureType(t.getAttributeTypes(),ftName==null?typeName:ftName,t.getNamespace(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
+            	t = FeatureTypeBuilder.newFeatureType(t.getAttributeTypes(),ftName==null?typeName:ftName,t.getNamespace(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
             } catch (FactoryConfigurationError e1) {
                 WFSDataStoreFactory.logger.warning(e1.getMessage());
             } catch (SchemaException e1) {
@@ -908,10 +909,10 @@ public class WFSDataStore extends AbstractDataStore {
             //			if(capabilities.getLockFeature()!=null){
             //				return new WFSFeatureLocking(this,getSchema(typeName));
             //			}
-            return new WFSFeatureStore(this, getSchema(typeName));
+            return new WFSFeatureStore(this, typeName);
         }
 
-        return new WFSFeatureSource(this, getSchema(typeName));
+        return new WFSFeatureSource(this, typeName);
     }
 
     private static class WFSAuthenticator extends Authenticator {

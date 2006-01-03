@@ -54,8 +54,8 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
      * @param ds
      * @param ft
      */
-    public WFSFeatureStore(WFSDataStore ds, FeatureType ft) {
-        super(ds, ft);
+    public WFSFeatureStore(WFSDataStore ds, String typeName) {
+        super(ds, typeName);
     }
 
     /**
@@ -82,12 +82,13 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         }
 
         HashSet r = new HashSet();
+        
+    	AttributeType[] atrs = getSchema().getAttributeTypes();
 
         while (reader.hasNext()){
             try {
                 Feature f = reader.next();
                 r.add(f.getID());
-            	AttributeType[] atrs = f.getFeatureType().getAttributeTypes();
             	for(int i=0;i<atrs.length;i++){
             		if(atrs[i] instanceof GeometryAttributeType){
             			Geometry g = (Geometry)f.getAttribute(i);
@@ -130,7 +131,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             ts = (WFSTransactionState) trans.getState(ds);
         }
 
-        ts.addAction(new DeleteAction(ft.getTypeName(), filter));
+        ts.addAction(new DeleteAction(getSchema().getTypeName(), filter));
 
         if (trans == Transaction.AUTO_COMMIT) {
             ts.commit();
@@ -162,7 +163,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             props.put(type[i].getName(), value[i]);
         }
 
-        ts.addAction(new UpdateAction(ft.getTypeName(), filter, props));
+        ts.addAction(new UpdateAction(getSchema().getTypeName(), filter, props));
 
         if (trans == Transaction.AUTO_COMMIT) {
             ts.commit();
@@ -192,7 +193,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             ts = (WFSTransactionState) trans.getState(ds);
         }
 
-        ts.addAction(new DeleteAction(ft.getTypeName(), Filter.NONE));
+        ts.addAction(new DeleteAction(getSchema().getTypeName(), Filter.NONE));
 
         while (reader.hasNext())
 

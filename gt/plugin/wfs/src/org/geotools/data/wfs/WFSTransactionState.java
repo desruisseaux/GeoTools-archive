@@ -109,11 +109,9 @@ public class WFSTransactionState implements State {
             try {
                 tr = commitPost();
             } catch (OperationNotSupportedException e) {
-e.printStackTrace();
                 WFSDataStoreFactory.logger.warning(e.toString());
                 tr = null;
             } catch (SAXException e) {
-e.printStackTrace();
                 WFSDataStoreFactory.logger.warning(e.toString());
                 tr = null;
             }
