@@ -217,7 +217,7 @@ public class GridCoverageFactory extends AbstractFactory {
      * A default color palette is built from the minimal and maximal values found in the matrix.
      *
      * @param name     The grid coverage name.
-     * @param raster   The matrix data in a {@code [row][column]} layout.
+     * @param matrix   The matrix data in a {@code [row][column]} layout.
      *                 {@linkplain Float#NaN NaN} values are mapped to a transparent color.
      * @param envelope The envelope.
      *

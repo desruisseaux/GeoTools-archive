@@ -46,6 +46,7 @@ public final class ErrorKeys {
     public static final int CANT_CONCATENATE_TRANSFORMS_$2         =    20;
     public static final int CANT_CONNECT_DATABASE_$1               =   154;
     public static final int CANT_CONVERT_FROM_TYPE_$1              =    21;
+    public static final int CANT_CREATE_FACTORY_$1                 =   184;
     public static final int CANT_CREATE_FROM_TEXT_$1               =    22;
     public static final int CANT_EVALUATE_$1                       =    23;
     public static final int CANT_GET_DATASOURCE_$1                 =   155;
@@ -68,6 +69,7 @@ public final class ErrorKeys {
     public static final int EMPTY_ARRAY                            =    33;
     public static final int EMPTY_ENVELOPE                         =    34;
     public static final int END_OF_DATA_FILE                       =    35;
+    public static final int FACTORY_NOT_FOUND_$1                   =   185;
     public static final int FILE_DOES_NOT_EXIST_$1                 =    36;
     public static final int FILE_HAS_TOO_FEW_DATA                  =    37;
     public static final int GEOTOOLS_EXTENSION_REQUIRED_$1         =   166;
@@ -87,6 +89,7 @@ public final class ErrorKeys {
     public static final int ILLEGAL_ENVELOPE_ORDINATE_$1           =    49;
     public static final int ILLEGAL_IDENTIFIER_$1                  =   169;
     public static final int ILLEGAL_INSTRUCTION_$1                 =   170;
+    public static final int ILLEGAL_KEY_$1                         =   186;
     public static final int ILLEGAL_OCCURS_FOR_PARAMETER_$4        =    50;
     public static final int ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1   =    51;
     public static final int INCOMPATIBLE_COORDINATE_SYSTEM_TYPE    =   149;
@@ -111,6 +114,7 @@ public final class ErrorKeys {
     public static final int MISMATCHED_ARRAY_LENGTH                =    67;
     public static final int MISMATCHED_DIMENSION_$2                =    68;
     public static final int MISMATCHED_DIMENSION_$3                =    69;
+    public static final int MISSING_AUTHORITY_$1                   =   182;
     public static final int MISSING_CHARACTER_$1                   =    70;
     public static final int MISSING_PARAMETER_$1                   =    71;
     public static final int MISSING_PARAMETER_VALUE_$1             =    72;
@@ -184,6 +188,7 @@ public final class ErrorKeys {
     public static final int UNEXPECTED_ROW_LENGTH_$3               =   130;
     public static final int UNEXPECTED_TRANSFORM_RESULT            =   175;
     public static final int UNITLESS_PARAMETER_$1                  =   131;
+    public static final int UNKNOW_AUTHORITY_$1                    =   183;
     public static final int UNKNOW_AXIS_DIRECTION_$1               =   152;
     public static final int UNKNOW_INTERPOLATION_$1                =   132;
     public static final int UNKNOW_PARAMETER_$1                    =   133;

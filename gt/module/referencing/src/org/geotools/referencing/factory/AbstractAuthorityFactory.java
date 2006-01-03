@@ -31,55 +31,18 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.referencing.*;
+import org.opengis.referencing.cs.*;
+import org.opengis.referencing.crs.*;
+import org.opengis.referencing.datum.*;
+import org.opengis.referencing.operation.*;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.referencing.Factory;
-import org.opengis.referencing.AuthorityFactory;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.ObjectFactory;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CompoundCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.DerivedCRS;
-import org.opengis.referencing.crs.EngineeringCRS;
-import org.opengis.referencing.crs.GeocentricCRS;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.ImageCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.crs.TemporalCRS;
-import org.opengis.referencing.crs.VerticalCRS;
-import org.opengis.referencing.cs.CartesianCS;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.cs.CSAuthorityFactory;
-import org.opengis.referencing.cs.CylindricalCS;
-import org.opengis.referencing.cs.EllipsoidalCS;
-import org.opengis.referencing.cs.PolarCS;
-import org.opengis.referencing.cs.SphericalCS;
-import org.opengis.referencing.cs.VerticalCS;
-import org.opengis.referencing.cs.TimeCS;
-import org.opengis.referencing.datum.Datum;
-import org.opengis.referencing.datum.DatumAuthorityFactory;
-import org.opengis.referencing.datum.Ellipsoid;
-import org.opengis.referencing.datum.EngineeringDatum;
-import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.datum.ImageDatum;
-import org.opengis.referencing.datum.PrimeMeridian;
-import org.opengis.referencing.datum.TemporalDatum;
-import org.opengis.referencing.datum.VerticalDatum;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.referencing.FactoryFinder;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -633,7 +596,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
-     * @see org.opengis.referencing.datum.DatumAuthorityFactory#createGeodeticDatum
+     * @see #createGeodeticDatum
      */
     public GeographicCRS createGeographicCRS(final String code) throws FactoryException {
         final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
@@ -650,7 +613,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * @param code Value allocated by authority.
      * @throws FactoryException if the object creation failed.
      *
-     * @see org.opengis.referencing.datum.DatumAuthorityFactory#createGeodeticDatum
+     * @see #createGeodeticDatum
      */
     public GeocentricCRS createGeocentricCRS(final String code) throws FactoryException {
         final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
@@ -684,7 +647,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
-     * @see org.opengis.referencing.datum.DatumAuthorityFactory#createGeodeticDatum
+     * @see #createGeodeticDatum
      */
     public ProjectedCRS createProjectedCRS(final String code) throws FactoryException {
         final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
@@ -702,7 +665,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
-     * @see org.opengis.referencing.datum.DatumAuthorityFactory#createTemporalDatum
+     * @see #createTemporalDatum
      */
     public TemporalCRS createTemporalCRS(final String code) throws FactoryException {
         final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
@@ -720,7 +683,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
-     * @see org.opengis.referencing.datum.DatumAuthorityFactory#createVerticalDatum
+     * @see #createVerticalDatum
      */
     public VerticalCRS createVerticalCRS(final String code) throws FactoryException {
         final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);

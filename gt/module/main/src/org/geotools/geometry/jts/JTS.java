@@ -315,12 +315,13 @@ public final class JTS {
      *            CRS to a {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
      */
     public static synchronized double orthodromicDistance(final Coordinate p1, final Coordinate p2,
-                                                          CoordinateReferenceSystem crs)
+                                                          final CoordinateReferenceSystem crs)
             throws TransformException
     {
         /*
-         * Needs to synchronize because we use shared instances of GeodeticCalculator and
-         * GeneralDirectPosition, and none of them are thread-safe.
+         * Need to synchronize because we use a single instance of a Map (CALCULATORS) as well as
+         * shared instances of GeodeticCalculator and GeneralDirectPosition (POSITIONS). None of
+         * them are thread-safe.
          */
         GeodeticCalculator gc = (GeodeticCalculator) CALCULATORS.get(crs);
         if (gc == null) {

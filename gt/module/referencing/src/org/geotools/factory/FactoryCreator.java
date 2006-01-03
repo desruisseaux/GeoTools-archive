@@ -19,6 +19,7 @@
 package org.geotools.factory;
 
 // J2SE dependencies
+import java.util.Map;
 import java.util.Iterator;
 import java.util.Collection;
 import java.lang.reflect.Modifier;
@@ -27,6 +28,8 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -122,14 +125,29 @@ public class FactoryCreator extends FactoryRegistry {
          * accepting a Hints argument. No-args constructor will be ignored.
          */
         for (final Iterator it=getServiceProviders(category); it.hasNext();) {
-            final Class implementation = it.next().getClass();
+            final Object factory = it.next();
+            if (hints!=null && factory instanceof Factory) {
+                final Map impl = ((Factory) factory).getImplementationHints();
+                if (impl!=null && impl.entrySet().containsAll(hints.entrySet())) {
+                    /*
+                     * This factory has already been considered by the super-class, and rejected
+                     * for some reason. Probably it didn't pass the ServiceRegistry.Filter test.
+                     * Avoid the potentially costly object creation below.
+                     */
+                    continue;
+                }
+            }
+            final Class implementation = factory.getClass();
             try {
                 implementation.getConstructor(HINTS_ARGUMENT);
             } catch (NoSuchMethodException exception) {
                 // No public constructor with the expected argument.
                 continue;
             }
-            return createServiceProvider(category, implementation, hints);
+            final Object candidate = createServiceProvider(category, implementation, hints);
+            if (filter==null || filter.filter(candidate)) {
+                return candidate;
+            }
         }
         throw notFound;
     }
@@ -173,8 +191,7 @@ public class FactoryCreator extends FactoryRegistry {
         } catch (InvocationTargetException exception) {
             cause = exception.getCause(); // Exception in constructor
         }
-        // TODO: localize
-        throw new FactoryRegistryException("Can't creates \"" +
-                Utilities.getShortName(implementation) + "\" factory.", cause);
+        throw new FactoryRegistryException(Errors.format(ErrorKeys.CANT_CREATE_FACTORY_$1,
+                                           Utilities.getShortName(implementation)), cause);
     }
 }

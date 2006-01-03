@@ -232,6 +232,8 @@ public class DefaultDataSourceTest extends TestCase {
      * be run after {@link #testCreation} and before any call to {@code getAuthorityCodes()}.
      */
     public void testTimeout() throws FactoryException {
+        System.gc();              // If there is any object holding a connection to the EPSG
+        System.runFinalization(); // database, running finalizers may help to close them.
         factory.setTimeout(200);
         try {
             assertTrue(factory.isConnected());

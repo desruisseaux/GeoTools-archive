@@ -375,7 +375,7 @@ public abstract class PointArray2D implements PointArray, Serializable {
      * If {@code resolutionSquared} is greater than 0, then points that are closer than
      * {@code sqrt(resolutionSquared)} from previous one will be skiped.
      *
-     * @param  The destination array.
+     * @param  dest The destination array.
      * @param  resolutionSquared The minimum squared distance desired between points.
      *
      * @todo Current implementations compute distance using Pythagoras formulas, which

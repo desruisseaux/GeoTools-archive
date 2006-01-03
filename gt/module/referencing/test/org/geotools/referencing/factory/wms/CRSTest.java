@@ -71,6 +71,13 @@ public class CRSTest extends TestCase {
     }
 
     /**
+     * Creates a suite of the given name.
+     */
+    public CRSTest(final String name) {
+        super(name);
+    }
+
+    /**
      * Initializes the factory to test.
      */
     protected void setUp() throws Exception {

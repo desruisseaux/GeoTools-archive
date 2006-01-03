@@ -94,7 +94,8 @@ public class Mercator1SP extends Mercator {
 
 
     /**
-     * The {@link MathTransformProvider} for a {@linkplain Mercator1SP Mercator 1SP} projection.
+     * The {@link org.geotools.referencing.operation.MathTransformProvider} for a
+     * {@linkplain Mercator1SP Mercator 1SP} projection.
      *
      * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on Remote Sensing</A>
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory

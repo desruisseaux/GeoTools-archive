@@ -25,9 +25,9 @@ import java.io.Writer;
 import java.util.Set;
 import java.util.Locale;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import javax.imageio.spi.ServiceRegistry;
 import javax.imageio.spi.RegisterableService;
 
@@ -158,7 +158,7 @@ public final class FactoryFinder {
      */
     public static synchronized Set/*<String>*/ getAuthorityNames() {
         if (authorityNames == null) {
-            authorityNames = new HashSet();
+            authorityNames = new LinkedHashSet();
 loop:       for (int i=0; ; i++) {
                 final Set/*<AuthorityFactory>*/ factories;
                 switch (i) {

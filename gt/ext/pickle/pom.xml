@@ -69,10 +69,10 @@
   <!-- ==================================================== -->
   <build>
     <plugins>
-      <!-- TEMPORARY HACK: Disables JUnit tests for now. For a mysterious reason,
-           values are different with Maven 2 compared to Maven 1. For example in
-           org.geotools.data.pickle.PickleTest.checkFeature, Maven 2 produces
-           Color[r=255,g=200,b=0] while Maven 1 produces Color[r=255,g=0,b=0] -->
+      <!-- TEMPORARY HACK: Disables JUnit tests for now. This module is excluded in
+           the Maven 1 build (it doesn't compile anymore). We managed to compile it
+           with Maven 2, but the test seems broken (is this module maintained?). For
+           example we get Color[r=255,g=200,b=0] but expected Color[r=255,g=0,b=0]. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

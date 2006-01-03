@@ -85,6 +85,7 @@ parse:  for (int i=0; /*stop condition in the 'switch' statement below*/; i++) {
             if (endField < 0) {
                 if (i == 0) {
                     // The "AUTO" prefix is optional. Continue the search for next fields.
+                    startField = -1;
                     continue;
                 }
                 endField = text.length();

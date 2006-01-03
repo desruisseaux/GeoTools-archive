@@ -70,6 +70,13 @@ public class AUTOTest extends TestCase {
     }
 
     /**
+     * Creates a suite of the given name.
+     */
+    public AUTOTest(final String name) {
+        super(name);
+    }
+
+    /**
      * Initializes the factory to test.
      */
     protected void setUp() throws Exception {
@@ -108,6 +115,7 @@ public class AUTOTest extends TestCase {
         assertNotNull("auto-utm", utm);
         assertSame   (utm, factory.createObject("AUTO :42001, 0,0"));
         assertSame   (utm, factory.createObject("AUTO2:42001, 0,0"));
+        assertSame   (utm, factory.createObject(      "42001, 0,0"));
         assertNotSame(utm, factory.createObject("AUTO :42001,30,0"));
         assertEquals ("Transverse_Mercator", utm.getConversionFromBase().getMethod().getName().getCode());
     }

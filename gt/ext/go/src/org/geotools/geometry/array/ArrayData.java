@@ -32,7 +32,7 @@ import org.geotools.resources.XArray;
 /**
  * An object holding an uncompressed copy of points from a {@link PointArray2D}.
  * Because the data are copied, they can be directly transformed by a
- * {@link org.geotools.referencing.operation.MathTransform} without any side effect
+ * {@link org.opengis.referencing.operation.MathTransform} without any side effect
  * on the original {@code PointArray2D}.
  *
  * @since 2.2

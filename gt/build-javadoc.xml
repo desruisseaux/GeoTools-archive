@@ -161,14 +161,14 @@
       <tag name="todo" scope="types,fields,methods,constructors" description="TODO:"/>
       <tag name="task" scope="types,fields,methods,constructors" description="TASK:"/>
 
-      <group title="Data stores"                        packages="org.geotools.data*"/>
-      <group title="XML and derivatives (GML, SVG)"     packages="org.geotools.xml*:org.geotools.gml*:org.geotools.svg*"/>
       <group title="Features, Filters and Styling"      packages="org.geotools.feature*:org.geotools.filter*:org.geotools.styling*"/>
       <group title="Geometries"                         packages="org.geotools.geometry*:org.geotools.topology*:org.geotools.measure*"/>
       <group title="Images and Grid Coverage"           packages="org.geotools.coverage*:org.geotools.gce*:org.geotools.image*"/>
       <group title="Spatial Referencing by Coordinates" packages="org.geotools.referencing*:org.geotools.parameter*:org.geotools.axis*"/>
       <group title="Meta Data"                          packages="org.geotools.metadata*"/>
       <group title="Catalog Services"                   packages="org.geotools.catalog*"/>
+      <group title="Data stores"                        packages="org.geotools.data*"/>
+      <group title="XML and derivatives (GML, SVG)"     packages="org.geotools.xml*:org.geotools.gml*:org.geotools.svg*"/>
       <group title="Graphs"                             packages="org.geotools.graph*"/>
       <group title="Renderer and Display Objects"       packages="org.geotools.display*:org.geotools.renderer.lite*:org.geotools.renderer.shape*:org.geotools.map*"/>
       <group title="Graphic User Interfaces"            packages="org.geotools.gui*"/>

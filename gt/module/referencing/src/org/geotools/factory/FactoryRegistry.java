@@ -35,6 +35,8 @@ import javax.imageio.spi.ServiceRegistry;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 
@@ -163,8 +165,7 @@ public class FactoryRegistry extends ServiceRegistry {
              * Sanity check: make sure that the key class is appropriate for the category.
              */
             if (!category.isAssignableFrom(key.getValueClass())) {
-                // TODO: localize this error message.
-                throw new IllegalArgumentException("Illegal hint key: "+key);
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_KEY_$1, key));
             }
             if (hints!=null && !hints.isEmpty()) {
                 final Object hint = hints.get(key);
@@ -201,15 +202,8 @@ public class FactoryRegistry extends ServiceRegistry {
         if (candidate != null) {
             return candidate;
         }
-        // TODO: provides localized messages.
-        final String message;
-        if (implementation == null) {
-            message = "No factory found for category \"" + Utilities.getShortName(category) + "\".";
-        } else {
-            message = "No factory found for implementation \"" +
-                      Utilities.getShortName(implementation) +"\".";
-        }
-        throw new FactoryNotFoundException(message);
+        throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
+                  Utilities.getShortName(implementation!=null ? implementation : category)));
     }
 
     /**
@@ -412,16 +406,13 @@ public class FactoryRegistry extends ServiceRegistry {
      *
      * @param loader The class loader to use.
      * @param category The category to scan for plug-ins.
-     *
-     * @todo localize log and error messages.
      */
     private void scanForPlugins(final ClassLoader loader, final Class category) {
         final Iterator   factories = ServiceRegistry.lookupProviders(category, loader);
         final String lineSeparator = System.getProperty("line.separator", "\n");
         final StringBuffer message = new StringBuffer();
-        message.append("Scan for '");
-        message.append(Utilities.getShortName(category));
-        message.append("' implementations:");
+        message.append(Logging.getResources(null).getString(LoggingKeys.FACTORY_IMPLEMENTATIONS_$1,
+                                                            Utilities.getShortName(category)));
         boolean newServices = false;
         while (factories.hasNext()) {
             Object factory;
@@ -469,7 +460,7 @@ public class FactoryRegistry extends ServiceRegistry {
                  * MathTransformProviders) may be quite extensive.
                  */
                 message.append(lineSeparator);
-                message.append("  Register ");
+                message.append("  ");
                 message.append(factoryClass.getName());
                 newServices = true;
             }
@@ -488,19 +479,16 @@ public class FactoryRegistry extends ServiceRegistry {
                     factory = factoryClass.newInstance();
                     if (registerServiceProvider(factory, category)) {
                         message.append(lineSeparator);
-                        message.append("  Register ");
+                        message.append("  ");
                         message.append(factoryClass.getName());
-                        message.append(" from system property");
                         newServices = true;
                     }
                 } catch (IllegalAccessException exception) {
-                    // TODO: localize
-                    throw new FactoryRegistryException("Can't create factory for the \"" +
-                                classname + "\" system property.", exception);
+                    throw new FactoryRegistryException(Errors.format(ErrorKeys.CANT_CREATE_FACTORY_$1,
+                                                                     classname), exception);
                 } catch (InstantiationException exception) {
-                    // TODO: localize
-                    throw new FactoryRegistryException("Can't create factory for the \"" +
-                                classname + "\" system property.", exception);
+                    throw new FactoryRegistryException(Errors.format(ErrorKeys.CANT_CREATE_FACTORY_$1,
+                                                                     classname), exception);
                 }
                 /*
                  * Put this factory in front of every other factories (including the ones loaded

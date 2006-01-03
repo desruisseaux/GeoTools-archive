@@ -21,7 +21,6 @@ package org.geotools.factory;
 // J2SE dependencies
 import java.util.Map;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Collections;
 import javax.imageio.spi.RegisterableService;
 import javax.imageio.spi.ServiceRegistry;
@@ -157,14 +156,14 @@ public class AbstractFactory implements Factory, RegisterableService {
      * <p>Once the hints are accessibles to the user (this usually means when the subclass
      * construction is finished), this map should not change anymore.</p>
      */
-    protected final Map/*<RenderingHints.Key,Object>*/ hints = new LinkedHashMap();
+    protected final Hints hints = new Hints(null);
 
     /**
      * An unmodifiable view of {@link #hints}. This is the actual map to be returned
      * by {@link #getImplementationHints}. Its content reflects the {@link #hints}
      * map even if the later is modified.
      */
-    private final Map unmodifiableHints = Collections.unmodifiableMap(hints);
+    private final Map/*<RenderingHints.Key,Object>*/ unmodifiableHints = Collections.unmodifiableMap(hints);
     
     /**
      * Creates a new factory with the {@linkplain #NORMAL_PRIORITY default priority}.

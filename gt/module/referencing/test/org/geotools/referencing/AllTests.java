@@ -70,7 +70,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing.operation.transform .PassthroughTransformTest .suite());
         suite.addTest(org.geotools.referencing.operation.transform .LocalizationGridTest     .suite());
         suite.addTest(org.geotools.referencing.operation.transform .WarpTransformTest        .suite());
-        suite.addTest(org.geotools.referencing.operation.projection.NewZealandMapGridTest   .suite());
+        suite.addTest(org.geotools.referencing.operation.projection.NewZealandMapGridTest    .suite());
         suite.addTest(org.geotools.referencing                     .ScriptTest               .suite());
         suite.addTest(org.geotools.referencing.factory.wms         .AUTOTest                 .suite());
         suite.addTest(org.geotools.referencing.factory.wms         .CRSTest                  .suite());
@@ -90,6 +90,14 @@ public class AllTests extends TestCase {
              * was just a convenience. All tests will be run at Maven build anyway.
              */
         }
+        /*
+         * The following must be tested after the EPSG factory tests, because it may involves more
+         * interactions with the EPSG factory.  No work on the database-backed EPSG factory should
+         * be performed before the tests from the EPSG module (the 'try {...} catch' block above),
+         * otherwise the org.geotools.referencing.factory.epsg.DefaultDataSourceTest.testTimeout()
+         * test may fails.
+         */
+        suite.addTest(org.geotools.referencing.factory.AllAuthoritiesFactoryTest.suite());
         return suite;
     }
 }

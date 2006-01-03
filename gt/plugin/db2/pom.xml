@@ -61,11 +61,31 @@
       <artifactId>gt2-main</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
+
+    <!-- Use this for building when real DB2 JDBC drivers are not available. -->
     <dependency>
       <groupId>com.ibm</groupId>
       <artifactId>db2jcc_dummy</artifactId>
       <version>8.2.1</version>
     </dependency>
+
+    <!-- The following should be uncommented and comment out the above when DB2 JDBC drivers
+         are available. Files 'db2jcc.jar' and 'db2jcc_license_cu.jar' should be copied into
+         the <home>/.m2/repository/com/ibm directory. -->
+<!--
+    <dependency>
+      <groupId>com.ibm</groupId>
+      <artifactId>db2jcc</artifactId>
+      <version>8.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm</groupId>
+      <artifactId>db2jcc_license_cu</artifactId>
+      <version>8.2</version>
+      <scope>provided</scope>
+    </dependency>
+ -->
   </dependencies>
 
 
@@ -75,14 +95,14 @@
   <!-- ==================================================== -->
   <build>
     <plugins>
-      <!-- TEMPORARY HACK: Disables JUnit tests for now. We get a ClassCastException
-           (found com.ibm.db2.jcc.DB2ConnectionPoolDataSource) at line 140 in file
-           org.geotools.data.db2.DB2ConnectionFactory.getConnectionPool. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <!-- Comment out the following exclusion to run tests against live database. -->
+          <excludes>
+            <exclude>**/DB2*.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

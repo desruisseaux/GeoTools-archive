@@ -159,7 +159,7 @@ public interface XReferencing extends XInterface {
      *
      * @param xOptions Provided by OpenOffice.
      * @param sourceCRS The authority code for the source coordinate reference system.
-     * @param sourceCRS The authority code for the target coordinate reference system.
+     * @param targetCRS The authority code for the target coordinate reference system.
      * @param authority The authority name for choice of parameter names. Usually "OGC".
      */
     String getTransformWKT(XPropertySet xOptions, String sourceCRS, String targetCRS, Object authority);
@@ -169,7 +169,7 @@ public interface XReferencing extends XInterface {
      *
      * @param xOptions Provided by OpenOffice.
      * @param sourceCRS The authority code for the source coordinate reference system.
-     * @param sourceCRS The authority code for the target coordinate reference system.
+     * @param targetCRS The authority code for the target coordinate reference system.
      */
     double getAccuracy(XPropertySet xOptions, String sourceCRS, String targetCRS);
 
@@ -179,7 +179,7 @@ public interface XReferencing extends XInterface {
      * @param xOptions Provided by OpenOffice.
      * @param coordinates The coordinates to transform.
      * @param sourceCRS The authority code for the source coordinate reference system.
-     * @param sourceCRS The authority code for the target coordinate reference system.
+     * @param targetCRS The authority code for the target coordinate reference system.
      */
     double[][] getTransformedCoordinates(XPropertySet xOptions, double[][] coordinates,
                                          String sourceCRS, String targetCRS);
