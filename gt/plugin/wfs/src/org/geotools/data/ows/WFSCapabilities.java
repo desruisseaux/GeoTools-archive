@@ -60,8 +60,14 @@ public class WFSCapabilities {
         while (i.hasNext() && crsName==null) {
                 FeatureSetDescription fsd = (FeatureSetDescription) i.next();
                 String name = fsd.getName();
-                if (typename.equals( name ) || (name !=null && typename.equals(name.substring(name.indexOf(':')+1)))) {
+                if (typename.equals( name )) {
                     return fsd;
+                }
+                if(name !=null){
+                	int index = name.indexOf(':'); 
+                	if(index!=-1 && typename.equals(name.substring(index+1))){
+                	
+                	}
                 }
         }
         return null;
