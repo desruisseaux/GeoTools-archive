@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-api</name>
-  <id>api</id>
+  <id>render</id>
   <currentVersion>2.2.x</currentVersion>
   <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10270</issueTrackingUrl>
   <shortDescription>Geotools</shortDescription>
