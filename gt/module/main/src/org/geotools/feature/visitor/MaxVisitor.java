@@ -70,11 +70,14 @@ public class MaxVisitor implements FeatureCalc {
         	return;
         }
 
-        if ((attribValue instanceof Double) && ((Number) attribValue).doubleValue() == Double.NaN) {
-        	countNaN++; //increment the NaN count, but don't store NaN as the max
-        	return;
+        if (attribValue instanceof Double) {
+        	double doubleVal = ((Double) attribValue).doubleValue();
+        	if (Double.isNaN(doubleVal) || Double.isInfinite(doubleVal)) {
+        		countNaN++; //increment the NaN count, but don't store NaN as the max
+        		return;
+        	}
         }
-        
+
         curvalue = (Comparable) attribValue;
 
         if ((!visited) || (curvalue.compareTo(maxvalue) > 0)) {

@@ -7,6 +7,14 @@ import java.util.List;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
 
+/**
+ * Obtains the data needed for a Quantile operation (classification of features into classes of equal size). 
+ * 
+ * The result contains an array of lists with the expression values in each.
+ * 
+ * @author Cory Horner, Refractions Research Inc.
+ *
+ */
 public class QuantileListVisitor implements FeatureCalc {
 	private Expression expr;
 	private int count = 0;
@@ -28,20 +36,24 @@ public class QuantileListVisitor implements FeatureCalc {
 		// sort the list
 		Collections.sort(items);
 
+		if (bins > count) { //resize
+			bins = count;
+			this.bin = new ArrayList[bins];
+		}
+		
 		// calculate number of items to put into each of the larger bins
 		int binPop = new Double(Math.ceil((double) count / bins)).intValue();
 		// determine index of bin where the next bin has one less item
-		int lastBigBin = bins - (count % binPop) - 1;
+		int lastBigBin = count % bins;
+		if (lastBigBin == 0) lastBigBin = bins;
+		else lastBigBin--;
 
 		// put the items into their respective bins
 		int item = 0;
 		for (int binIndex = 0; binIndex < bins; binIndex++) {
 			bin[binIndex] = new ArrayList();
 			for (int binMember = 0; binMember < binPop; binMember++) {
-				if (item < items.size())
-					bin[binIndex].add(items.get(item++));
-				else
-					System.out.println("exceeded list bounds:"+item+"/"+items.size());
+				bin[binIndex].add(items.get(item++));
 			}
 			if (lastBigBin == binIndex)
 				binPop--; // decrease the number of items in a bin for the next item
@@ -57,17 +69,17 @@ public class QuantileListVisitor implements FeatureCalc {
         Object value = expr.getValue(feature);
 
         if (value == null) {
-        	countNull++; //increment the null count, but don't store its value            
-        	return;
-        }
+			countNull++; // increment the null count
+			return; // don't store this value
+		}
 
-        if (value instanceof Double) {
-        	double doubleVal = ((Number) value).doubleValue();
-        	if ((doubleVal == Double.NaN) || Double.isInfinite(doubleVal)) {
-        		countNaN++; //increment the NaN count, but don't store NaN as the max
-        		return;
-        	}
-        }
+		if (value instanceof Double) {
+			double doubleVal = ((Double) value).doubleValue();
+			if (Double.isNaN(doubleVal) || Double.isInfinite(doubleVal)) {
+				countNaN++; // increment the NaN count
+				return; // don't store NaN value
+			}
+		}
 		
 		count++;
 		items.add(value);

@@ -6,6 +6,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FilterFactoryFinder;
@@ -34,27 +35,17 @@ public class QuantileFunctionTest extends FunctionTestSupport {
         return suite;
     }
     
-    /**
-     * Test of getName method, of class org.geotools.filter.functions.EqualIntervalFunction.
-     */
     public void testInstance() {
         FunctionExpression equInt = FilterFactoryFinder.createFilterFactory().createFunctionExpression("Quantile");
         assertNotNull(equInt);
     }
     
-    
-    /**
-     * Test of getName method, of class org.geotools.filter.functions.EqualIntervalFunction.
-     */
     public void testGetName() {
         FunctionExpression qInt = FilterFactoryFinder.createFilterFactory().createFunctionExpression("Quantile");
         System.out.println("testGetName");
         assertEquals("Quantile",qInt.getName());
     }
     
-    /**
-     * Test of setNumberOfClasses method, of class org.geotools.filter.functions.EqualIntervalFunction.
-     */
     public void testSetNumberOfClasses() throws Exception{
         System.out.println("testSetNumberOfClasses");
         
@@ -68,9 +59,6 @@ public class QuantileFunctionTest extends FunctionTestSupport {
         assertEquals(12,func.getNumberOfClasses());
     }
     
-    /**
-     * Test of calculateSlot method, of class org.geotools.filter.functions.EqualIntervalFunction.
-     */
     public void testCalculateSlot() throws ParseException {
         System.out.println("testCalculateSlot");
         Expression classes = (Expression)builder.parse(dataType, "3");
@@ -87,9 +75,6 @@ public class QuantileFunctionTest extends FunctionTestSupport {
         
     }
     
-    /**
-     * Test of getValue method, of class org.geotools.filter.functions.EqualIntervalFunction.
-     */
     public void testGetValue() throws Exception{
         System.out.println("testGetValue");
         Expression classes = (Expression)builder.parse(dataType, "2");
@@ -103,28 +88,8 @@ public class QuantileFunctionTest extends FunctionTestSupport {
             int slot = ((Number)func.getValue(f)).intValue();
             int value = ((Number)f.getAttribute("foo")).intValue();
             System.out.println(slot+"("+value+")");
-//            if(value < 46){
-//                assertEquals(0,slot);
-//            } else{
-//                assertEquals(1,slot);
-//            }
             //TODO: test the values are put in the correct slots
         }
-    }
-    
-    public void testRound() throws Exception{
-    	System.out.println("testRound");
-    	FunctionExpression func = fac.createFunctionExpression("Quantile");
-    	QuantileFunction qf = (QuantileFunction) func;
-        double val = qf.round(100.0, 0);
-        System.out.println("round 0 digits, 100.0 --> "+val);
-        assertEquals(100.0, val, 0);
-        val = qf.round(1.12, 1);
-        System.out.println("round 1 digit, 1.12 --> "+val);
-        assertEquals(1.1, val, 0);
-        val = qf.round(0.34523, 2);
-        System.out.println("round 2 digits, 0.34523 --> "+val);
-        assertEquals(0.35, val, 0);
     }
     
     public void testNullNaNHandling() throws Exception {
@@ -136,23 +101,36 @@ public class QuantileFunctionTest extends FunctionTestSupport {
     	//create a feature collection
     	FeatureType ft = DataUtilities.createType("classification.nullnan",
         "id:0,foo:int,bar:double");
-    	int iVal[] = new int[]{1,2,3,4,5};
-    	double dVal[] = new double[]{0.0, 0.1, 1.0, 10.0, 100.0};
+    	Integer iVal[] = new Integer[] {
+    			new Integer(0),
+    			new Integer(0),
+    			new Integer(0),
+    			new Integer(13),
+    			new Integer(13),
+    			new Integer(13),
+    			null,
+    			null,
+    			null};
+    	Double dVal[] = new Double[] {
+    			new Double(0.0),
+    			new Double(50.01),
+    			null,
+    			new Double(0.0),
+    			new Double(50.01),
+    			null,
+    			new Double(0.0),
+    			new Double(50.01),
+    			null};
 
-    	Feature[] testFeatures = new Feature[iVal.length+1];
+    	Feature[] testFeatures = new Feature[iVal.length];
 
     	for(int i=0; i< iVal.length; i++){
     		testFeatures[i] = ft.create(new Object[] {
     				new Integer(i+1),
-    				new Integer(iVal[i]),
-    				new Double(dVal[i]),
-    		},"classification.t"+(i+1));
+    				iVal[i],
+    				dVal[i],
+    		},"nantest.t"+(i+1));
     	}
-        //add one more null feature
-    	int i = iVal.length;
-    	testFeatures[i] = ft.create(new Object[] {
-    			new Integer(i+1), null, new Double(1000.0)
-    	},"classification.t"+(i+1));
     	MemoryDataStore store = new MemoryDataStore();
     	store.createSchema(ft);
     	store.addFeatures(testFeatures);
@@ -167,10 +145,15 @@ public class QuantileFunctionTest extends FunctionTestSupport {
     	qf.setCollection(thisFC);
     	qf.setExpression(divide);
     	
-    	
-    	for (int j = 0; j < 3; j++) {
+    	for (int j = 0; j < qf.classNum; j++) {
     		System.out.println(qf.getMin(j)+".."+qf.getMax(j));
     	}
-    	
+
+    	thisFC.accepts(new FeatureVisitor() {
+
+			public void visit(Feature arg0) {
+				System.out.println(arg0.toString());
+			}
+    	}, null);
     }
 }

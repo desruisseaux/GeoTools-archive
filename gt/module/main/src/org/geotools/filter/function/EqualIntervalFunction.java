@@ -131,7 +131,10 @@ public class EqualIntervalFunction extends ClassificationFunction {
         	//calculate number of items to put in each of the larger bins
         	int binPop = new Double(Math.ceil((double) values.length / classNum)).intValue();
         	//determine index of bin where the next bin has one less item
-        	int lastBigBin = classNum - (values.length % binPop) - 1;
+    		int lastBigBin = values.length % classNum;
+    		if (lastBigBin == 0) lastBigBin = classNum;
+    		else lastBigBin--;
+
         	int itemIndex = 0;
         	//for each bin
         	for (int binIndex = 0; binIndex < classNum; binIndex++) {

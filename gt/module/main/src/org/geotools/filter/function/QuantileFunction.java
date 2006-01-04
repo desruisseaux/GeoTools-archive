@@ -28,7 +28,7 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.util.NullProgressListener;
 
 /**
- * Breaks data into bins with an equal number of items in each.
+ * Breaks a FeatureCollection into classes with an equal number of items in each.
  * 
  * @author Cory Horner, Refractions Research Inc.
  */
@@ -59,15 +59,18 @@ public class QuantileFunction extends ClassificationFunction {
 		if (calcResult == null) return;
 		Object result = calcResult.getValue();
 		bin = (List[]) result;
-		
-		//we could sort each bin, but we'll assume they are in the correct order
-		//Collections.sort(bin[index]);
+		if (bin.length != classNum) {
+			classNum = bin.length; //number of bins was reduced, therefore resize.
+		}
 		
 		//generate the min and max values, and round off if applicable/necessary
 		globalMin = (Comparable) bin[0].toArray()[0];
 		Object lastBin[] = bin[bin.length-1].toArray(); 
-		globalMax = (Comparable) lastBin[lastBin.length-1];
-		
+		if (lastBin.length > 0)
+			globalMax = (Comparable) lastBin[lastBin.length-1];
+		else
+			globalMax = null;
+	
 		if ((globalMin instanceof Number) && (globalMax instanceof Number)) {
 			isNumber = true;
 		} else {
@@ -89,6 +92,9 @@ public class QuantileFunction extends ClassificationFunction {
         		localMax[i] = (Comparable) thisBin.get(thisBin.size()-1);
         		//locally accurate
         		double slotWidth = (((Number) localMax[i]).doubleValue() - ((Number) localMin[i]).doubleValue()) / classNum;
+        		if (slotWidth == 0.0) { //use global value, as there is only 1 value in this set
+        			slotWidth = (((Number) globalMax).doubleValue() - ((Number) globalMin).doubleValue()) / classNum;
+        		}
         		//determine number of decimal places to allow
         		int decPlaces = decimalPlaces(slotWidth);
         		//clean up truncation error
@@ -99,16 +105,17 @@ public class QuantileFunction extends ClassificationFunction {
         		
         		if (i == 0) {
     				//ensure first min is less than or equal to globalMin
-        			if (localMin[i].compareTo(new Double(((Number) globalMin).doubleValue())) < 0)
+        			if (localMin[i].compareTo(new Double(((Number) globalMin).doubleValue())) > 0)
         				localMin[i] = new Double(fixRound(((Number) localMin[i]).doubleValue(), decPlaces, false));
         		} else if (i == classNum - 1) { 
         			//ensure last max is greater than or equal to globalMax
-        			if (localMax[i].compareTo(new Double(((Number) globalMax).doubleValue())) > 0)
+        			if (localMax[i].compareTo(new Double(((Number) globalMax).doubleValue())) < 0)
         				localMax[i] = new Double(fixRound(((Number) localMax[i]).doubleValue(), decPlaces, true));
         		}
         		//synchronize min with previous max
         		if ((i != 0) && (!localMin[i].equals(localMax[i-1]))) {
-        			localMin[i] = localMax[i-1];
+        			if (!localMin[i].equals(localMax[i])) //only if the range contains more than 1 value
+        				localMin[i] = localMax[i-1];
         		}
         	}
         } else {

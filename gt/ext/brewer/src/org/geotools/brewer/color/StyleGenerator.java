@@ -64,6 +64,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class StyleGenerator {
     private ColorBrewer colorBrewer;
     private Color[] colors;
+    /** @deprecated */
     private String paletteName;
     private int numClasses;
     private Expression expression;
@@ -75,6 +76,13 @@ public class StyleGenerator {
     private double opacity = 0.5;
     private Stroke defaultStroke;
     private String id;
+    private String titleSpacer = " to ";
+    private int elseMode = ELSEMODE_IGNORE;
+    
+    public final static int ELSEMODE_IGNORE = 0;
+    public final static int ELSEMODE_INCLUDEASMIN = 1;
+    public final static int ELSEMODE_INCLUDEASMAX = 2;
+    
     
     /**
      * @deprecated
@@ -196,11 +204,47 @@ public class StyleGenerator {
     	this.function = function;
     }
     
+    /**
+     * Sets the text displayed between ranged values (by default " to ").
+     * @param titleSpacer
+     */
+    public void setTitleSpacer(String titleSpacer) {
+    	this.titleSpacer = titleSpacer;
+    }
+    
+    public void setElseMode(int elseMode) {
+    	this.elseMode = elseMode;
+    }
+    
+    /**
+	 * Obtains the colour for the indexed rule. If an else rule is also to be
+	 * created from the colour palette, the appropriate offset is applied.
+	 * 
+	 * @param index
+	 * @return
+	 */
+    private Color getColor(int index) {
+    	if (elseMode == ELSEMODE_IGNORE) return colors[index];
+    	else if (elseMode == ELSEMODE_INCLUDEASMIN) return colors[index+1];
+    	else if (elseMode == ELSEMODE_INCLUDEASMAX) return colors[index];
+    	else return null;
+    }
+    
+    private Color getElseColor() {
+    	if (elseMode == ELSEMODE_INCLUDEASMIN) return colors[0];
+    	else if (elseMode == ELSEMODE_INCLUDEASMAX) return colors[colors.length-1];
+    	else return null;
+    }
+    
     public FeatureTypeStyle createFeatureTypeStyle() throws IllegalFilterException {
     	//answer goes here
     	FeatureTypeStyle fts = sf.createFeatureTypeStyle();
         // update the number of classes
-        numClasses = function.getNumberOfClasses();
+        if (elseMode == ELSEMODE_IGNORE) {
+        	numClasses = function.getNumberOfClasses();
+        } else {
+        	numClasses = function.getNumberOfClasses() + 1;
+        }
 
         // determine the geometry
         FeatureIterator it = collection.features();
@@ -215,7 +259,7 @@ public class StyleGenerator {
     		Object localMax = null;
 
             // for each class
-            for (int i = 0; i < numClasses; i++) {
+            for (int i = 0; i < function.getNumberOfClasses(); i++) {
                 // obtain min/max values
                 localMin = eiClassifier.getMin(i);
                 localMax = eiClassifier.getMax(i);
@@ -228,7 +272,7 @@ public class StyleGenerator {
                 localMax = chopInteger(localMax);
 
                 // generate a title
-                String title = localMin + " to " + localMax;
+                String title = localMin + titleSpacer + localMax;
 
                 // construct filters
                 Filter filter = null;
@@ -252,7 +296,7 @@ public class StyleGenerator {
                     lowBoundFilter.addRightValue(expression); // x
 
                     // if this is the global maximum, include the max value
-                    if (i == (numClasses - 1)) {
+                    if (i == (function.getNumberOfClasses() - 1)) {
                         hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
                     } else {
                         hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
@@ -267,9 +311,7 @@ public class StyleGenerator {
                 }
 
                 // create a symbolizer
-                Symbolizer symb = null;
-                Color color = colors[i];
-                symb = createSymbolizer(sb, geometry, color, opacity, defaultStroke);
+                Symbolizer symb = createSymbolizer(sb, geometry, getColor(i), opacity, defaultStroke);
 
                 // create a rule
                 Rule rule = sb.createRule(symb);
@@ -285,7 +327,7 @@ public class StyleGenerator {
             Rule rule = null;
 
             // for each class
-            for (int i = 0; i < numClasses; i++) {
+            for (int i = 0; i < function.getNumberOfClasses(); i++) {
                 // obtain the set of values for the current bin
                 Set value = (Set) uniqueClassifier.getValue(i);
 
@@ -325,10 +367,7 @@ public class StyleGenerator {
                 }
 
                 // create the symbolizer
-                Symbolizer symb = null;
-                Color color = colors[i];
-                symb = createSymbolizer(sb, geometry, color, opacity,
-                        defaultStroke);
+                Symbolizer symb = createSymbolizer(sb, geometry, getColor(i), opacity, defaultStroke);
 
                 // create the rule
                 rule = sb.createRule(symb);
@@ -347,7 +386,7 @@ public class StyleGenerator {
         	QuantileFunction quantile = (QuantileFunction) function;
 
             // for each class
-            for (int i = 0; i < numClasses; i++) {
+            for (int i = 0; i < function.getNumberOfClasses(); i++) {
                 // obtain values
             	Object localMin = quantile.getMin(i);
                 Object localMax = quantile.getMax(i);
@@ -362,7 +401,7 @@ public class StyleGenerator {
                 }
                 
                 // generate a title
-                String title = localMin + " to " + localMax;
+                String title = localMin + titleSpacer + localMax;
 
                 // construct filters
                 Filter filter = null;
@@ -386,7 +425,7 @@ public class StyleGenerator {
                     lowBoundFilter.addRightValue(expression); // x
 
                     // if this is the global maximum, include the max value
-                    if (i == (numClasses - 1)) {
+                    if (i == (function.getNumberOfClasses() - 1)) {
                         hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
                     } else {
                         hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
@@ -401,9 +440,7 @@ public class StyleGenerator {
                 }
 
                 // create a symbolizer
-                Symbolizer symb = null;
-                Color color = colors[i];
-                symb = createSymbolizer(sb, geometry, color, opacity, defaultStroke);
+                Symbolizer symb = createSymbolizer(sb, geometry, getColor(i), opacity, defaultStroke);
 
                 // create a rule
                 Rule rule = sb.createRule(symb);
@@ -415,27 +452,46 @@ public class StyleGenerator {
 
         }
 
+    	// add an else rule to capture any missing features?
+    	if (elseMode != ELSEMODE_IGNORE) {
+    		Symbolizer symb = createSymbolizer(sb, geometry, getElseColor(), opacity, defaultStroke); 
+	    	Rule elseRule = sb.createRule(symb);
+	    	elseRule.setIsElseFilter(true);
+	    	elseRule.setTitle("Else");
+	    	elseRule.setName("else");
+	    	fts.addRule(elseRule);
+    	}
+    	
         // sort the FeatureTypeStyle rules
         Rule[] rule = fts.getRules();
-
-        for (int i = 0; i < rule.length; i++) {
-            String properRuleName = getRuleName(i + 1);
-
-            if (!rule[i].getName().equals(properRuleName)) {
-                // is in incorrect order, find where the rule for this index
-                // actually is
-                for (int j = i + 1; j < rule.length; j++) {
-                    if (rule[j].getName().equals(properRuleName)) {
-                        // switch the 2 rules
-                        Rule tempRule = rule[i];
-                        rule[i] = rule[j];
-                        rule[j] = tempRule;
-
-                        break;
-                    }
-                }
-            }
+        
+        if (elseMode == ELSEMODE_INCLUDEASMIN) {
+        	//move last rule to the front
+        	for (int i = rule.length-1; i > 0; i--) {
+        		Rule tempRule = rule[i];
+                rule[i] = rule[i-1];
+                rule[i-1] = tempRule;
+        	}
         }
+        
+//        for (int i = 0; i < rule.length; i++) {
+//            String properRuleName = getRuleName(i + 1);
+//            
+//            if (!rule[i].getName().equals(properRuleName)) {
+//                // is in incorrect order, find where the rule for this index
+//                // actually is
+//                for (int j = i + 1; j < rule.length; j++) {
+//                    if (rule[j].getName().equals(properRuleName)) {
+//                        // switch the 2 rules
+//                        Rule tempRule = rule[i];
+//                        rule[i] = rule[j];
+//                        rule[j] = tempRule;
+//
+//                        break;
+//                    }
+//                }
+//            }
+//        }
         
         //our syntax will be: ColorBrewer:id
         fts.setSemanticTypeIdentifiers(new String[] {"generic:geometry", "colorbrewer:"+id});
@@ -507,7 +563,7 @@ public class StyleGenerator {
                 localMax = chopInteger(localMax);
 
                 // generate a title
-                String title = localMin + " to " + localMax;
+                String title = localMin + titleSpacer + localMax;
 
                 // construct filters
                 Filter filter = null;
