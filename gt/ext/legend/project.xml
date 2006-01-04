@@ -57,6 +57,12 @@
       <url>http://www.geotools.org</url>
     </dependency>
     <dependency>
+      <artifactId>render</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+      <url>http://www.geotools.org</url>
+    </dependency>
+    <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
       <version>2.2.x</version>

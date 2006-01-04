@@ -37,7 +37,7 @@ import org.geotools.catalog.ResolveChangeListener;
 import org.geotools.catalog.ResolveDelta;
 import org.geotools.catalog.Service;
 import org.geotools.catalog.ServiceInfo;
-import org.geotools.renderer.lite.ListenerList;
+import org.geotools.util.ListenerList;
 import org.geotools.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Envelope;
