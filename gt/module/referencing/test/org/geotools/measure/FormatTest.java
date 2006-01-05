@@ -44,6 +44,8 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultVerticalCRS;
 import org.geotools.referencing.cs.DefaultTimeCS;
 import org.geotools.referencing.datum.DefaultTemporalDatum;
+import org.geotools.util.MonolineFormatter;
+import org.geotools.resources.Arguments;
 
 
 /**
@@ -56,8 +58,11 @@ public class FormatTest extends TestCase {
     /**
      * Run the suite from the command line.
      */
-    public static void main(final String[] args) {
-        org.geotools.util.MonolineFormatter.initGeotools();
+    public static void main(String[] args) {
+        MonolineFormatter.initGeotools();
+        final Arguments arguments = new Arguments(args);
+        args = arguments.getRemainingArguments(0);
+        Locale.setDefault(arguments.locale);
         TestRunner.run(suite());
     }
 
@@ -151,6 +156,7 @@ public class FormatTest extends TestCase {
          * Try again the original CRS, but different separator.
          */
         format.setCoordinateReferenceSystem(crs);
+        format.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
         format.setSeparator("; ");
         assertEquals("23°46,8'E; 12°44,4'S; 127,9\u00A0m; 4 janv. 2003", format.format(position));
      }
