@@ -60,7 +60,6 @@
       <name>Mike Gelbin</name>
       <id>mgelbin</id>
       <email>schmeldog@gelbin.org</email>
-      <organization>Unknown</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -94,19 +93,6 @@
       <artifactId>beam</artifactId>
       <version>1.0</version>
     </dependency>
-
-<!-- The following is disabled for now because attempt to download from
-     www.ibiblio.org fails. Furthermore, the ImageRead and ImageWrite
-     operation may be provided in a future JAI release, which would avoid
-     the need for this dependency.
-
-    <dependency>
-      <groupId>com.sun</groupId>
-      <artifactId>jai_imageio</artifactId>
-      <version>1.0</version>
-      <scope>provided</scope>    <!- Should be part of a JAI installation ->
-    </dependency>
--->
   </dependencies>
 
 </project>
