@@ -58,7 +58,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>gt2-render</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
     <dependency>

@@ -37,6 +37,7 @@ import javax.units.Converter;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
+import javax.units.UnitFormat;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -80,12 +81,17 @@ public class CoordinateFormat extends Format {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -1334894996513164253L;
-    
+    private static final long serialVersionUID = 8235685097881260737L;
+
     /**
-     * The output coordinate reference system.
+     * The output coordinate reference system. May be {@code null}.
      */
     private CoordinateReferenceSystem crs;
+
+    /**
+     * The separator between each coordinate values to be formatted.
+     */
+    private String separator;
 
     /**
      * The formats to use for formatting. This array's length must be equals
@@ -93,6 +99,11 @@ public class CoordinateFormat extends Format {
      * dimension. This array is never {@code null}.
      */
     private Format[] formats;
+
+    /**
+     * Formatter for units. Will be created only when first needed.
+     */
+    private transient UnitFormat unitFormat;
 
     /**
      * The type for each value in the {@code formats} array.
@@ -128,7 +139,7 @@ public class CoordinateFormat extends Format {
     private final Locale locale;
 
     /**
-     * Construct a new coordinate format with default locale and a two-dimensional
+     * Constructs a new coordinate format with default locale and a two-dimensional
      * {@linkplain DefaultGeographicCRS#WGS84 geographic (WGS 1984)} coordinate reference system.
      */
     public CoordinateFormat() {
@@ -146,13 +157,14 @@ public class CoordinateFormat extends Format {
     }
 
     /**
-     * Construct a new coordinate format for the specified locale and coordinate system.
+     * Constructs a new coordinate format for the specified locale and coordinate reference system.
      *
      * @param locale The locale for formatting coordinates and numbers.
      * @param crs    The output coordinate reference system.
      */
     public CoordinateFormat(final Locale locale, final CoordinateReferenceSystem crs) {
         this.locale = locale;
+        this.separator = " ";
         setCoordinateReferenceSystem(crs);
     }
 
@@ -172,90 +184,120 @@ public class CoordinateFormat extends Format {
      * @param crs The new coordinate system.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
-        if (!CRSUtilities.equalsIgnoreMetadata(this.crs, crs)) {
-            final CoordinateSystem cs = crs.getCoordinateSystem();
-            Format numberFormat = null;
-            Format  angleFormat = null;
-            Format   dateFormat = null;
-            /*
-             * Reuse existing formats. It is necessary in order to avoid
-             * overwritting any setting done with 'setNumberPattern(...)'
-             * or 'setAnglePattern(...)'
-             */
-            if (formats != null) {
-                for (int i=formats.length; --i>=0;) {
-                    final Format format = formats[i];
-                    if (format instanceof NumberFormat) {
-                        numberFormat = format;
-                    } else if (format instanceof AngleFormat) {
-                        angleFormat = format;
-                    } else if (format instanceof DateFormat) {
-                        dateFormat = format;
-                    }
+        if (CRSUtilities.equalsIgnoreMetadata(this.crs, (this.crs = crs))) {
+            return;
+        }
+        Format numberFormat = null;
+        Format  angleFormat = null;
+        Format   dateFormat = null;
+        /*
+         * Reuses existing formats. It is necessary in order to avoid
+         * overwritting any setting done with 'setNumberPattern(...)'
+         * or 'setAnglePattern(...)'
+         */
+        if (formats != null) {
+            for (int i=formats.length; --i>=0;) {
+                final Format format = formats[i];
+                if (format instanceof NumberFormat) {
+                    numberFormat = format;
+                } else if (format instanceof AngleFormat) {
+                    angleFormat = format;
+                } else if (format instanceof DateFormat) {
+                    dateFormat = format;
                 }
-            }
-            /*
-             * Create a new array of 'Format' objects, one for each dimension.
-             * The format subclasses are infered from coordinate system axis.
-             */
-            epochs   = null;
-            toMillis = null;
-            formats  = new Format[cs.getDimension()];
-            types    = new byte[formats.length];
-            for (int i=0; i<formats.length; i++) {
-                final Unit unit = cs.getAxis(i).getUnit();
-                /////////////////
-                ////  Angle  ////
-                /////////////////
-                if (NonSI.DEGREE_ANGLE.equals(unit)) {
-                    if (angleFormat == null) {
-                        angleFormat = new AngleFormat("DD°MM.m'", locale);
-                    }
-                    formats[i] = angleFormat;
-                    final AxisDirection axis = cs.getAxis(i).getDirection().absolute();
-                    if (AxisDirection.EAST.equals(axis)) {
-                        types[i] = LONGITUDE;
-                    } else if (AxisDirection.NORTH.equals(axis)) {
-                        types[i] = LATITUDE;
-                    } else {
-                        types[i] = ANGLE;
-                    }
-                    continue;
-                }
-                ////////////////
-                ////  Date  ////
-                ////////////////
-                if (SI.SECOND.isCompatible(unit)) {
-                    final Datum datum = CRSUtilities.getDatum(CRSUtilities.getSubCRS(crs, i, i+1));
-                    if (datum instanceof TemporalDatum) {
-                        if (toMillis == null) {
-                            toMillis = new Converter[formats.length];
-                            epochs   = new long     [formats.length];
-                        }
-                        toMillis[i] = unit.getConverterTo(DefaultTemporalCRS.MILLISECOND);
-                        epochs  [i] = ((TemporalDatum) datum).getOrigin().getTime();
-                        if (dateFormat == null) {
-                            dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
-                        }
-                        formats[i] = dateFormat;
-                        types  [i] = DATE;
-                        continue;
-                    }
-                    types[i] = TIME;
-                    // Fallthrough: formatted as number for now.
-                    // TODO: Provide ellapsed time formatting later.
-                }
-                //////////////////
-                ////  Number  ////
-                //////////////////
-                if (numberFormat == null) {
-                    numberFormat = NumberFormat.getNumberInstance(locale);
-                }
-                formats[i] = numberFormat;
-                // types[i] default to 0.
             }
         }
-        this.crs = crs;
+        /*
+         * If no CRS were specified, formats everything as numbers. Working with null CRS is
+         * sometime useful because null CRS are allowed in DirectPosition according ISO 19107.
+         */
+        if (crs == null) {
+            if (numberFormat == null) {
+                numberFormat = NumberFormat.getNumberInstance(locale);
+            }
+            types   = new byte[1];
+            formats = new Format[] {numberFormat};
+            return;
+        }
+        /*
+         * Creates a new array of 'Format' objects, one for each dimension.
+         * The format subclasses are infered from coordinate system axis.
+         */
+        final CoordinateSystem cs = crs.getCoordinateSystem();
+        epochs   = null;
+        toMillis = null;
+        formats  = new Format[cs.getDimension()];
+        types    = new byte[formats.length];
+        for (int i=0; i<formats.length; i++) {
+            final Unit unit = cs.getAxis(i).getUnit();
+            /////////////////
+            ////  Angle  ////
+            /////////////////
+            if (NonSI.DEGREE_ANGLE.equals(unit)) {
+                if (angleFormat == null) {
+                    angleFormat = new AngleFormat("DD°MM.m'", locale);
+                }
+                formats[i] = angleFormat;
+                final AxisDirection axis = cs.getAxis(i).getDirection().absolute();
+                if (AxisDirection.EAST.equals(axis)) {
+                    types[i] = LONGITUDE;
+                } else if (AxisDirection.NORTH.equals(axis)) {
+                    types[i] = LATITUDE;
+                } else {
+                    types[i] = ANGLE;
+                }
+                continue;
+            }
+            ////////////////
+            ////  Date  ////
+            ////////////////
+            if (SI.SECOND.isCompatible(unit)) {
+                final Datum datum = CRSUtilities.getDatum(CRSUtilities.getSubCRS(crs, i, i+1));
+                if (datum instanceof TemporalDatum) {
+                    if (toMillis == null) {
+                        toMillis = new Converter[formats.length];
+                        epochs   = new long     [formats.length];
+                    }
+                    toMillis[i] = unit.getConverterTo(DefaultTemporalCRS.MILLISECOND);
+                    epochs  [i] = ((TemporalDatum) datum).getOrigin().getTime();
+                    if (dateFormat == null) {
+                        dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+                    }
+                    formats[i] = dateFormat;
+                    types  [i] = DATE;
+                    continue;
+                }
+                types[i] = TIME;
+                // Fallthrough: formatted as number for now.
+                // TODO: Provide ellapsed time formatting later.
+            }
+            //////////////////
+            ////  Number  ////
+            //////////////////
+            if (numberFormat == null) {
+                numberFormat = NumberFormat.getNumberInstance(locale);
+            }
+            formats[i] = numberFormat;
+            // types[i] default to 0.
+        }
+    }
+
+    /**
+     * Returns the separator between each coordinate (number, angle or date).
+     *
+     * @since 2.2
+     */
+    public String getSeparator() {
+        return separator;
+    }
+
+    /**
+     * Set the separator between each coordinate.
+     *
+     * @since 2.2
+     */
+    public void setSeparator(final String separator) {
+        this.separator = separator;
     }
 
     /**
@@ -379,33 +421,57 @@ public class CoordinateFormat extends Format {
             throws IllegalArgumentException
     {
         final int dimension = point.getDimension();
-        if (dimension != formats.length) {
-            throw new MismatchedDimensionException(Errors.format(
-                        ErrorKeys.MISMATCHED_DIMENSION_$3, "point",
-                        new Integer(dimension), new Integer(formats.length)));
+        final CoordinateSystem cs;
+        if (crs != null) {
+            if (dimension != formats.length) {
+                throw new MismatchedDimensionException(Errors.format(
+                            ErrorKeys.MISMATCHED_DIMENSION_$3, "point",
+                            new Integer(dimension), new Integer(formats.length)));
+            }
+            cs = crs.getCoordinateSystem();
+        } else {
+            cs = null;
         }
-        for (int i=0; i<formats.length; i++) {
+        for (int i=0; i<dimension; i++) {
             final double value = point.getOrdinate(i);
+            final int fi = Math.min(i, formats.length-1);
             final Object object;
-            switch (types[i]) {
+            final byte type = types[fi];
+            switch (type) {
                 default:        object=new Double   (value); break;
                 case LONGITUDE: object=new Longitude(value); break;
                 case LATITUDE:  object=new Latitude (value); break;
                 case ANGLE:     object=new Angle    (value); break;
                 case DATE: {
-                    final CoordinateSystemAxis axis = crs.getCoordinateSystem().getAxis(i);
-                    long offset = Math.round(toMillis[i].convert(value));
+                    final CoordinateSystemAxis axis = cs.getAxis(i);
+                    long offset = Math.round(toMillis[fi].convert(value));
                     if (AxisDirection.PAST.equals(axis.getDirection())) {
                         offset = -offset;
                     }
-                    object = new Date(epochs[i] + offset);
+                    object = new Date(epochs[fi] + offset);
                     break;
                 }
             }
             if (i != 0) {
-                toAppendTo.append(' ');
+                toAppendTo.append(separator);
             }
-            formats[i].format(object, toAppendTo, dummy);
+            formats[fi].format(object, toAppendTo, dummy);
+            /*
+             * If the formatted value is a number, append the units.
+             */
+            if (type==0 && cs!=null) {
+                final Unit unit = cs.getAxis(i).getUnit();
+                if (unit != null) {
+                    if (unitFormat == null) {
+                        unitFormat = UnitFormat.getInstance();
+                    }
+                    final String asText = unitFormat.format(unit);
+                    if (asText.length() != 0) {
+                        toAppendTo.append('\u00A0'); // No break space
+                        toAppendTo.append(unit);
+                    }
+                }
+            }
         }
         return toAppendTo;
     }

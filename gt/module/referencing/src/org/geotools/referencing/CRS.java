@@ -32,6 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;        // For javadoc
 import org.opengis.referencing.operation.CoordinateOperationFactory; // For javadoc
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -67,7 +68,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
  */
-public class CRS {
+public final class CRS {
     /**
      * A set of hints used in order to fetch lenient coordinate operation factory.
      */
@@ -102,6 +103,27 @@ public class CRS {
         public Object  factory( CoordinateOperationFactory factory ) throws FactoryException;
     }
 
+    /**
+     * Do not allow instantiation of this class.
+     */
+    private CRS() {
+    }
+
+    /**
+     * Compares the specified objects for equality. If both objects are Geotools
+     * implementations of class {@link AbstractIdentifiedObject}, then this method
+     * will ignore the metadata during the comparaison.
+     *
+     * @param  object1 The first object to compare (may be null).
+     * @param  object2 The second object to compare (may be null).
+     * @return {@code true} if both objects are equals.
+     *
+     * @since 2.2
+     */
+    public static boolean equalsIgnoreMetadata(final Object object1, final Object object2) {
+        // TODO: Copy the implementation from CRSUtilities there.
+        return org.geotools.resources.CRSUtilities.equalsIgnoreMetadata(object1, object2);
+    }
 
     /**
      * Grab a transform between two Coordinate Reference Systems. This convenience method is a
@@ -144,7 +166,7 @@ public class CRS {
      * @param  sourceCRS The source CRS.
      * @param  targetCRS The target CRS.
      * @param  lenient {@code true} if the math transform should be created even when there is
-     *         no information available for a datum shift.
+     *         no information available for a datum shift. The default value is {@code false}.
      * @return The math transform from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If no math transform can be created for the specified source and
      *         target CRS.
@@ -348,7 +370,22 @@ public class CRS {
     public static CoordinateReferenceSystem parseWKT(final String wkt) throws FactoryException {
     	return FactoryFinder.getCRSFactory(null).createFromWKT(wkt);
     }
-    
+
+    /**
+     * Returns the valid area bounding box for the specified coordinate reference system, or
+     * {@code null} if unknown. This method search in the metadata informations associated with
+     * the given CRS.
+     *
+     * @param  crs The coordinate reference system, or {@code null}.
+     * @return The envelope, or {@code null} if none.
+     *
+     * @since 2.2
+     */
+    public static Envelope getEnvelope(final CoordinateReferenceSystem crs) {
+        // TODO: Copy the implementation from CRSUtilities there.
+        return org.geotools.resources.CRSUtilities.getEnvelope(crs);
+    }
+
     /**
      * ESTIMATE the distance between the two points.
      *    1. transforms both points to lat/lon

@@ -33,17 +33,39 @@ import junit.framework.TestSuite;
 import org.opengis.coverage.grid.GridCoverage;
 
 // Geotools dependencies
+import org.geotools.resources.Arguments;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.Operations;
 
 
 /**
  * Tests JAI operation wrapped as {@link OperatorJAI}.
+ * <p>
+ * <strong>NOTE:</strong>
+ * This test may fails when executed on a machine without the <cite>mediaLib</cite> accelerator.
+ * On Windows, the {@code mlib_jai.dll} and {@code mlib_jai_mmx.dll} files should exist in the
+ * {@code jre/bin} directory, as well as {@code mlibwrapper_jai.jar} in {@code jre/lib/ext}.
+ * Those {@code .dll} files should be there if JAI has been installed with the Sun standard
+ * installation program ({@code jai-1_1_2_01-lib-windows-i586-jdk.exe}). With such installation,
+ * everything should run fine. The {@code .dll} files are probably missing if JAI has been put in
+ * the classpath by Maven, like our past attempt on the 2.1 branch.
+ * <p>
+ * This behavior looks like a JAI bug to me. In theory, the pure Java mode is supposed to produce
+ * exactly the same result than the <cite>mediaLib</cite> native mode; just slower. This test
+ * failure suggests that it is not always the case. The <cite>mediaLib</cite> native code seems
+ * right in this case (the bug would be in the pure Java code).
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class OperationsTest extends GridCoverageTest {
+    /**
+     * Sets to {@code true} in order to display the coverage. This is used for manual inspection
+     * only. This field is set to {@code true} if this test suite is executed from the command line
+     * with the {@code -show} option.
+     */
+    private static boolean show;
+
     /**
      * Sample image. This field is static in order to avoid reloading it for every test cases
      * in this class.
@@ -59,6 +81,9 @@ public final class OperationsTest extends GridCoverageTest {
      * Run the suite from the command line.
      */
     public static void main(final String[] args) {
+        final Arguments arguments = new Arguments(args);
+        show = arguments.getFlag("-show");
+        arguments.getRemainingArguments(0);
         junit.textui.TestRunner.run(suite());
     }
 
@@ -88,7 +113,7 @@ public final class OperationsTest extends GridCoverageTest {
 
     /**
      * Applies an operation on the specified coverage. All tests in the parent classes will
-     * be executed with on this transformed coverage.
+     * be executed on this transformed coverage.
      *
      * @todo Applies some operation.
      */
@@ -154,7 +179,7 @@ public final class OperationsTest extends GridCoverageTest {
                 }
             }
         }
-        if (false) {
+        if (show) {
             show(targetCoverage);
         }
     }
@@ -196,7 +221,7 @@ public final class OperationsTest extends GridCoverageTest {
                 }
             }
         }
-        if (false) {
+        if (show) {
             show(targetCoverage);
         }
     }
@@ -230,7 +255,7 @@ public final class OperationsTest extends GridCoverageTest {
         assertEquals(3.95f, targetRaster.getSampleFloat(304, 310, 0), 1E-2f);
         assertEquals(1.88f, targetRaster.getSampleFloat(262, 357, 0), 1E-2f);
 
-        if (false) {
+        if (show) {
             show(targetCoverage);
         }
     }

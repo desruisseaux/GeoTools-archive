@@ -32,6 +32,9 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+// OpenGIS dependencies
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
 // Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
@@ -125,6 +128,30 @@ public class FormatTest extends TestCase {
         final GeneralDirectPosition position = new GeneralDirectPosition(new double[] {
             23.78, -12.74, 127.9, 3.2
         });
-        assertEquals("23°46,8'E 12°44,4'S 127,9 4 janv. 2003", format.format(position));
+        assertEquals("23°46,8'E 12°44,4'S 127,9\u00A0m 4 janv. 2003", format.format(position));
+        /*
+         * Try a point with wrong dimension.
+         */
+        final GeneralDirectPosition wrong = new GeneralDirectPosition(new double[] {
+            23.78, -12.74, 127.9, 3.2, 8.5
+        });
+        try {
+            assertNotNull(format.format(wrong));
+            fail("Excepted a mismatched dimension exception.");
+        } catch (MismatchedDimensionException e) {
+            // This is the expected dimension.
+        }
+        /*
+         * Try a null CRS. Should formats everything as numbers.
+         */
+        format.setCoordinateReferenceSystem(null);
+        assertEquals("23,78 -12,74 127,9 3,2",     format.format(position));
+        assertEquals("23,78 -12,74 127,9 3,2 8,5", format.format(wrong));
+        /*
+         * Try again the original CRS, but different separator.
+         */
+        format.setCoordinateReferenceSystem(crs);
+        format.setSeparator("; ");
+        assertEquals("23°46,8'E; 12°44,4'S; 127,9\u00A0m; 4 janv. 2003", format.format(position));
      }
 }

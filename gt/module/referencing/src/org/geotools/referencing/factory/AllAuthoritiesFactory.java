@@ -23,6 +23,7 @@ package org.geotools.referencing.factory;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Collection;
 import java.util.Iterator;
 import javax.units.Unit;
 
@@ -39,6 +40,7 @@ import org.opengis.metadata.citation.Citation;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.util.GenericName;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -79,15 +81,21 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
             new CitationImpl(Vocabulary.format(VocabularyKeys.ALL)).unmodifiable();
 
     /**
-     * The separator between the authority name and the code. The default value is {@code ':'}.
-     */
-    private final char separator;
-
-    /**
      * An instance of {@code AllAuthoritiesFactory} with the
      * {@linkplain GenericName#DEFAULT_SEPARATOR default name separator} and no hints.
      */
     public static AllAuthoritiesFactory DEFAULT = new AllAuthoritiesFactory(null);
+
+    /**
+     * A set of user-specified factories to try before to delegate to {@link FactoryFinder},
+     * or {@code null} if none.
+     */
+    private final Set/*<AuthorityFactory>*/ factories;
+
+    /**
+     * The separator between the authority name and the code. The default value is {@code ':'}.
+     */
+    private final char separator;
 
     /**
      * Creates a new factory using the specified hints and the
@@ -96,20 +104,46 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
      * @param hints An optional set of hints, or {@code null} if none.
      */
     public AllAuthoritiesFactory(final Hints hints) {
-        this(hints, GenericName.DEFAULT_SEPARATOR);
+        this(hints, null, GenericName.DEFAULT_SEPARATOR);
     }
 
     /**
-     * Creates a new factory using the specified hints and name separator.
+     * Creates a new factory using the specified hints and a set of user factories.
+     * If {@code factories} is not null, then any call to a {@code createFoo(code)} method will
+     * first scan the supplied factories in their iteration order. The first factory implementing
+     * the appropriate interface and having the expected {@linkplain AuthorityFactory#getAuthority
+     * authority name} will be used. Only if no suitable factory is found, then this class delegates
+     * to {@link FactoryFinder}.
      *
      * @param hints An optional set of hints, or {@code null} if none.
+     * @paral factories A set of user-specified factories to try before to delegate
+     *        to {@link FactoryFinder}, or {@code null} if none.
+     */
+    public AllAuthoritiesFactory(final Hints hints, final Collection/*<AuthorityFactory>*/ factories) {
+        this(hints, factories, GenericName.DEFAULT_SEPARATOR);
+    }
+
+    /**
+     * Creates a new factory using the specified hints, user factories and name separator.
+     *
+     * @param hints An optional set of hints, or {@code null} if none.
+     * @paral factories A set of user-specified factories to try before to delegate
+     *        to {@link FactoryFinder}, or {@code null} if none.
      * @param separator The separator between the authority name and the code.
      */
-    public AllAuthoritiesFactory(final Hints hints, final char separator) {
+    public AllAuthoritiesFactory(final Hints hints,
+                                 final Collection/*<AuthorityFactory>*/ factories,
+                                 final char separator)
+    {
         super(hints, NORMAL_PRIORITY);
         this.separator = separator;
         if (hints != null) {
             this.hints.putAll(hints);
+        }
+        if (factories!=null && !factories.isEmpty()) {
+            this.factories = new LinkedHashSet(factories);
+        } else {
+            this.factories = null;
         }
     }
 
@@ -161,6 +195,27 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
     }
 
     /**
+     * Searchs for a user-supplied factory of the given type.
+     *
+     * @param  type      The interface to be implemented.
+     * @param  authority The authority name.
+     * @return The user factory, or {@code null} if none.
+     */
+    private AuthorityFactory getAuthorityFactory(final Class type, final String authority) {
+        if (factories != null) {
+            for (final Iterator it=factories.iterator(); it.hasNext();) {
+                final AuthorityFactory factory = (AuthorityFactory) it.next();
+                if (type.isAssignableFrom(factory.getClass())) {
+                    if (Citations.identifierMatches(factory.getAuthority(), authority)) {
+                        return factory;
+                    }
+                }
+            }    
+        }
+        return null;
+    }
+
+    /**
      * Returns the datum authority factory for the specified {@code "AUTHORITY:NUMBER"} code.
      *
      * @param  code The code to parse.
@@ -170,11 +225,15 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
     private DatumAuthorityFactory getDatumAuthorityFactory(final String code)
             throws NoSuchAuthorityCodeException
     {
-        try {
-            return FactoryFinder.getDatumAuthorityFactory(getAuthority(code), hints);
+        final String authority = getAuthority(code);
+        DatumAuthorityFactory factory = (DatumAuthorityFactory) // TODO: remove cast with J2SE 1.5.
+                getAuthorityFactory(DatumAuthorityFactory.class, authority);
+        if (factory == null) try {
+            factory = FactoryFinder.getDatumAuthorityFactory(authority, hints);
         } catch (FactoryRegistryException cause) {
             throw noSuchAuthority(code, cause);
         }
+        return factory;
     }
 
     /**
@@ -187,11 +246,15 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
     private CSAuthorityFactory getCSAuthorityFactory(final String code)
             throws NoSuchAuthorityCodeException
     {
-        try {
-            return FactoryFinder.getCSAuthorityFactory(getAuthority(code), hints);
+        final String authority = getAuthority(code);
+        CSAuthorityFactory factory = (CSAuthorityFactory) // TODO: remove cast with J2SE 1.5.
+                getAuthorityFactory(CSAuthorityFactory.class, authority);
+        if (factory == null) try {
+            factory = FactoryFinder.getCSAuthorityFactory(authority, hints);
         } catch (FactoryRegistryException cause) {
             throw noSuchAuthority(code, cause);
         }
+        return factory;
     }
 
     /**
@@ -204,11 +267,15 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
     private CRSAuthorityFactory getCRSAuthorityFactory(final String code)
             throws NoSuchAuthorityCodeException
     {
-        try {
-            return FactoryFinder.getCRSAuthorityFactory(getAuthority(code), hints);
+        final String authority = getAuthority(code);
+        CRSAuthorityFactory factory = (CRSAuthorityFactory) // TODO: remove cast with J2SE 1.5.
+                getAuthorityFactory(CRSAuthorityFactory.class, authority);
+        if (factory == null) try {
+            factory = FactoryFinder.getCRSAuthorityFactory(authority, hints);
         } catch (FactoryRegistryException cause) {
             throw noSuchAuthority(code, cause);
         }
+        return factory;
     }
 
     /**
@@ -221,11 +288,15 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
     private CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory(final String code)
             throws NoSuchAuthorityCodeException
     {
-        try {
-            return FactoryFinder.getCoordinateOperationAuthorityFactory(getAuthority(code), hints);
+        final String authority = getAuthority(code);
+        CoordinateOperationAuthorityFactory factory = (CoordinateOperationAuthorityFactory) // TODO: remove cast with J2SE 1.5.
+                getAuthorityFactory(CoordinateOperationAuthorityFactory.class, authority);
+        if (factory == null) try {
+            factory = FactoryFinder.getCoordinateOperationAuthorityFactory(authority, hints);
         } catch (FactoryRegistryException cause) {
             throw noSuchAuthority(code, cause);
         }
+        return factory;
     }
 
     /**

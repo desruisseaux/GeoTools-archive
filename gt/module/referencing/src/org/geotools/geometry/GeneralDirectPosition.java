@@ -33,6 +33,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.measure.CoordinateFormat;
 
 
 /**
@@ -49,6 +50,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * uses an {@linkplain #ordinates array of ordinates} of an arbitrary length. If the direct
  * position is know to be always two-dimensional, then {@link DirectPosition2D} may provides
  * a more efficient implementation.
+ * <p>
+ * Most methods in this implementation are final for performance reason.
  * 
  * @since 2.0
  * @version $Id$
@@ -56,11 +59,16 @@ import org.geotools.resources.i18n.ErrorKeys;
  *
  * @see java.awt.geom.Point2D
  */
-public final class GeneralDirectPosition implements DirectPosition, Serializable {
+public class GeneralDirectPosition implements DirectPosition, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 9071833698385715524L;
+
+    /**
+     * The format for {@link #toString}. Will be created only when first needed.
+     */
+    private static CoordinateFormat format;
 
     /**
      * The ordinates of the direct position.
@@ -130,10 +138,12 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
 
     /**
      * Constructs a position initialized to the same values than the specified point.
+     *
+     * @since 2.2
      */
-    public GeneralDirectPosition(final GeneralDirectPosition point) {
-        ordinates = (double[]) point.ordinates.clone();
-        crs = point.crs;
+    public GeneralDirectPosition(final DirectPosition point) {
+        ordinates = (double[]) point.getCoordinates(); // Should already be cloned.
+        crs = point.getCoordinateReferenceSystem();
     }
 
     /**
@@ -189,7 +199,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
             }
         }
     }
-    
+
     /**
      * Convenience method for checking object dimension validity.
      * This method is usually invoked for argument checking.
@@ -225,9 +235,9 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      * Returns a sequence of numbers that hold the coordinate of this position in its
      * reference system.
      *
-     * @return The coordinates
+     * @return A copy of the {@linkplain #ordinates coordinates}.
      */
-    public double[] getCoordinates() {
+    public final double[] getCoordinates() {
         return (double[]) ordinates.clone();
     }
 
@@ -260,10 +270,28 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      *
      * @param  position The new position for this point.
      * @throws MismatchedDimensionException if this point doesn't have the expected dimension.
+     *
+     * @since 2.2
      */
-    public void setLocation(final GeneralDirectPosition position) throws MismatchedDimensionException {
-        ensureDimensionMatch("position", position.ordinates.length, getDimension());
+    public final void setLocation(final DirectPosition position) throws MismatchedDimensionException {
+        ensureDimensionMatch("position", position.getDimension(), ordinates.length);
         setCoordinateReferenceSystem(position.getCoordinateReferenceSystem());
+        for (int i=0; i<ordinates.length; i++) {
+            ordinates[i] = position.getOrdinate(i);
+        }
+    }
+
+    /**
+     * Set this coordinate to the specified direct position. This method is identical to
+     * {@link #setLocation(DirectPosition)}, but is slightly faster in the special case
+     * of an {@code GeneralDirectPosition} implementation.
+     *
+     * @param  position The new position for this point.
+     * @throws MismatchedDimensionException if this point doesn't have the expected dimension.
+     */
+    public final void setLocation(final GeneralDirectPosition position) throws MismatchedDimensionException {
+        ensureDimensionMatch("position", position.ordinates.length, ordinates.length);
+        setCoordinateReferenceSystem(position.crs);
         System.arraycopy(position.ordinates, 0, ordinates, 0, ordinates.length);
     }
 
@@ -273,10 +301,8 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
      *
      * @param  point The new coordinate for this point.
      * @throws MismatchedDimensionException if this coordinate point is not two-dimensional.
-     *
-     * @todo Check axis order.
      */
-    public void setLocation(final Point2D point) throws MismatchedDimensionException {
+    public final void setLocation(final Point2D point) throws MismatchedDimensionException {
         if (ordinates.length != 2) {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
                                                    new Integer(ordinates.length)));
@@ -284,14 +310,12 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
         ordinates[0] = point.getX();
         ordinates[1] = point.getY();
     }
-    
+
     /**
      * Returns a {@link Point2D} with the same coordinate as this direct position.
      * This is a convenience method for interoperability with Java2D.
      *
      * @throws IllegalStateException if this coordinate point is not two-dimensional.
-     *
-     * @todo Check axis order.
      */
     public Point2D toPoint2D() throws IllegalStateException {
         if (ordinates.length != 2) {
@@ -300,30 +324,33 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
         }
         return new Point2D.Double(ordinates[0], ordinates[1]);
     }
-    
+
     /**
-     * Returns a string representation of this coordinate. The returned string is
-     * implementation dependent. It is usually provided for debugging purposes.
+     * Returns a string representation of this coordinate. The default implementation formats
+     * this coordinate using a shared instance of {@link org.geotools.measure.CoordinateFormat}.
+     * This is okay for occasional formatting (for example for debugging purpose). But if there
+     * is a lot of positions to format, users will get better performance and more control by
+     * using their own instance of {@link org.geotools.measure.CoordinateFormat}.
      */
     public String toString() {
-        return toString(this, ordinates);
+        return toString(this);
     }
-    
+
     /**
-     * Returns a string representation of an object. The returned string is implementation
-     * dependent. It is usually provided for debugging purposes.
+     * Format the specified position.
+     * <strong>NOTE:</strong> This convenience method uses a shared instance of
+     * {@link CoordinateFormat}. This is okay for occasional formatting. But if
+     * a lot of position needs to be formatted, it is more efficient to use an
+     * other instance of {@link CoordinateFormat}.
      */
-    static String toString(final Object owner, final double[] ordinates) {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(owner));
-        buffer.append('[');
-        for (int i=0; i<ordinates.length; i++) {
-            if (i!=0) buffer.append(", ");
-            buffer.append(ordinates[i]);
+    static synchronized String toString(final DirectPosition position) {
+        if (format == null) {
+            format = new CoordinateFormat();
         }
-        buffer.append(']');
-        return buffer.toString();
+        format.setCoordinateReferenceSystem(position.getCoordinateReferenceSystem());
+        return format.format(position);
     }
-    
+
     /**
      * Returns a hash value for this coordinate. This value need not remain consistent between
      * different implementations of the same class.
@@ -350,7 +377,7 @@ public final class GeneralDirectPosition implements DirectPosition, Serializable
         }
         return (int)(code >>> 32) ^ (int)code;
     }
-    
+
     /**
      * Returns a deep copy of this position.
      */

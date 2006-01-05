@@ -98,6 +98,7 @@ public final class CRSUtilities {
      * @return {@code true} if both objects are equals.
      *
      * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     *       The method signature is already there.
      */
     public static boolean equalsIgnoreMetadata(final Object object1, final Object object2) {
         if (object1 == object2) {
@@ -444,6 +445,7 @@ public final class CRSUtilities {
      * @return The envelope, or {@code null} if none.
      *
      * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     *       The method signature is already there.
      */
     public static Envelope getEnvelope(final CoordinateReferenceSystem crs) {
         GeneralEnvelope envelope = null;

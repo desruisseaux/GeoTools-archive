@@ -33,6 +33,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.geometry.XRectangle2D;
@@ -163,8 +164,20 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             throws MismatchedDimensionException
     {
         this(minCP.ordinates, maxCP.ordinates);
+        final CoordinateReferenceSystem crs1 = minCP.getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem crs2 = maxCP.getCoordinateReferenceSystem();
+        if (crs1 == null) {
+            crs = crs2;
+        } else {
+            crs = crs1;
+            if (crs2!=null && !CRSUtilities.equalsIgnoreMetadata(crs1, crs2)) {
+                throw new IllegalArgumentException(
+                          Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
+            }
+        }
+        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, ordinates.length/2);
     }
-    
+
     /**
      * Constructs two-dimensional envelope defined by a {@link Rectangle2D}.
      */
@@ -315,6 +328,36 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
+     * Sets the lower corner to {@linkplain Double#NEGATIVE_INFINITY negative infinity}
+     * and the upper corner to {@linkplain Double#POSITIVE_INFINITY positive infinity}.
+     * The {@linkplain #getCoordinateReferenceSystem coordinate reference system} (if any)
+     * stay unchanged.
+     *
+     * @since 2.2
+     */
+    public void setToInfinite() {
+        final int mid = ordinates.length/2;
+        Arrays.fill(ordinates, 0,   mid,              Double.NEGATIVE_INFINITY);
+        Arrays.fill(ordinates, mid, ordinates.length, Double.POSITIVE_INFINITY);
+        assert isInfinite() : this;
+    }
+
+    /**
+     * Returns {@code true} if at least one ordinate has an
+     * {@linkplain Double#isInfinite infinite} value.
+     *
+     * @since 2.2
+     */
+    public boolean isInfinite() {
+        for (int i=0; i<ordinates.length; i++) {
+            if (Double.isInfinite(ordinates[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Sets all ordinate values to {@linkplain Double#NaN NaN}. The
      * {@linkplain #getCoordinateReferenceSystem coordinate reference system} (if any) stay
      * unchanged.
@@ -372,11 +415,25 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
+     * Returns {@code true} if at least one of the specified CRS is null, or both CRS are equals.
+     * This special processing for {@code null} values is different from the usual contract of an
+     * {@code equals} method, but allow to handle the case where the CRS is unknown.
+     */
+    private static boolean equalsIgnoreMetadata(final CoordinateReferenceSystem crs1,
+                                                final CoordinateReferenceSystem crs2)
+    {
+        return crs1==null || crs2==null || CRSUtilities.equalsIgnoreMetadata(crs1, crs2);
+    }
+
+    /**
      * Adds a point to this envelope. The resulting envelope is the smallest envelope that
      * contains both the original envelope and the specified point. After adding a point,
      * a call to {@link #contains} with the added point as an argument will return {@code true},
      * except if one of the point's ordinates was {@link Double#NaN} (in which case the
      * corresponding ordinate have been ignored).
+     * <p>
+     * This method assumes that the specified point uses the same CRS than this envelope.
+     * For performance reason, it will no be verified unless J2SE assertions are enabled.
      *
      * @param  position The point to add.
      * @throws MismatchedDimensionException if the specified point doesn't have
@@ -385,6 +442,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public void add(final GeneralDirectPosition position) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
         GeneralDirectPosition.ensureDimensionMatch("position", position.getDimension(), dim);
+        assert equalsIgnoreMetadata(crs, position.getCoordinateReferenceSystem()) : position;
         for (int i=0; i<dim; i++) {
             final double value = position.getOrdinate(i);
             if (value < ordinates[i    ]) ordinates[i    ]=value;
@@ -395,6 +453,9 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     /**
      * Adds an envelope object to this envelope. The resulting envelope is the union of the
      * two {@code Envelope} objects.
+     * <p>
+     * This method assumes that the specified envelope uses the same CRS than this envelope.
+     * For performance reason, it will no be verified unless J2SE assertions are enabled.
      *
      * @param  envelope the {@code Envelope} to add to this envelope.
      * @throws MismatchedDimensionException if the specified envelope doesn't
@@ -403,6 +464,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public void add(final GeneralEnvelope envelope) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
         GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
+        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
             final double min = envelope.ordinates[i    ];
             final double max = envelope.ordinates[i+dim];
@@ -413,6 +475,9 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
 
     /**
      * Tests if a specified coordinate is inside the boundary of this envelope.
+     * <p>
+     * This method assumes that the specified point uses the same CRS than this envelope.
+     * For performance reason, it will no be verified unless J2SE assertions are enabled.
      *
      * @param  position The point to text.
      * @return {@code true} if the specified coordinates are inside the boundary
@@ -423,6 +488,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public boolean contains(final GeneralDirectPosition position) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
         GeneralDirectPosition.ensureDimensionMatch("point", position.getDimension(), dim);
+        assert equalsIgnoreMetadata(crs, position.getCoordinateReferenceSystem()) : position;
         for (int i=0; i<dim; i++) {
             final double value = position.getOrdinate(i);
             if (!(value >= ordinates[i    ])) return false;
@@ -434,6 +500,9 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
 
     /**
      * Sets this envelope to the intersection if this envelope with the specified one.
+     * <p>
+     * This method assumes that the specified envelope uses the same CRS than this envelope.
+     * For performance reason, it will no be verified unless J2SE assertions are enabled.
      *
      * @param  envelope the {@code Envelope} to intersect to this envelope.
      * @throws MismatchedDimensionException if the specified envelope doesn't
@@ -442,6 +511,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public void intersect(final GeneralEnvelope envelope) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
         GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
+        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
             double min = Math.max(ordinates[i    ], envelope.ordinates[i    ]);
             double max = Math.min(ordinates[i+dim], envelope.ordinates[i+dim]);
@@ -530,11 +600,21 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
-     * Returns a string representation of this envelope. The returned string
-     * is implementation dependent. It is usually provided for debugging purposes.
+     * Returns a string representation of this envelope. The default implementation formats the
+     * {@linkplain #getLowerCorder lower} and {@linkplain #getUpperCorder upper} corners using a
+     * shared instance of {@link org.geotools.measure.CoordinateFormat}. This is okay for occasional
+     * formatting (for example for debugging purpose). But if there is a lot of positions to format,
+     * users will get better performance and more control by using their own instance of
+     * {@link org.geotools.measure.CoordinateFormat}.
      */
     public String toString() {
-        return GeneralDirectPosition.toString(this, ordinates);
+        final StringBuffer buffer = new StringBuffer();
+        buffer.append('[');
+        buffer.append(GeneralDirectPosition.toString(getLowerCorner()));
+        buffer.append(" , ");
+        buffer.append(GeneralDirectPosition.toString(getUpperCorner()));
+        buffer.append(']');
+        return buffer.toString();
     }
 
     /**

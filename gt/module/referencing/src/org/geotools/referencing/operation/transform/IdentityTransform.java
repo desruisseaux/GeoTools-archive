@@ -26,11 +26,13 @@ import java.io.Serializable;
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 
@@ -144,6 +146,32 @@ public class IdentityTransform extends AbstractMathTransform
      */
     public Matrix derivative(final DirectPosition point) {
         return MatrixFactory.create(dimension);
+    }
+    
+    /**
+     * Copies the values from {@code ptSrc} to {@code ptDst}.
+     * Overrides the super-class method for performance reason.
+     *
+     * @since 2.2
+     */
+    public DirectPosition transform(final DirectPosition ptSrc, final DirectPosition ptDst) {
+        if (ptSrc.getDimension() == dimension) {
+            if (ptDst == null) {
+                return new GeneralDirectPosition(ptSrc);
+            }
+            if (ptDst.getDimension() == dimension) {
+                for (int i=0; i<dimension; i++) {
+                    ptDst.setOrdinate(i, ptSrc.getOrdinate(i));
+                }
+                return ptDst;
+            }
+        }
+        try {
+            // The super class will take care of throwing the MismatchedDimensionException.
+            return super.transform(ptSrc, ptDst);
+        } catch (TransformException e) {
+            throw new AssertionError(e); // Should never happen.
+        }
     }
     
     /**

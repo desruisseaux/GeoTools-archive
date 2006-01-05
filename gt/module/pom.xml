@@ -45,6 +45,7 @@
     <module>main</module>
     <module>migrate</module>
     <module>referencing</module>
+    <module>render</module>
     <module>sample-data</module>
     <module>svgsupport</module>
   </modules>

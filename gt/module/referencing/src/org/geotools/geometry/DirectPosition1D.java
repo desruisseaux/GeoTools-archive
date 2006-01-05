@@ -178,11 +178,14 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
     }
     
     /**
-     * Returns a string representation of this coordinate. The returned string is
-     * implementation dependent. It is usually provided for debugging purposes.
+     * Returns a string representation of this coordinate. The default implementation formats
+     * this coordinate using a shared instance of {@link org.geotools.measure.CoordinateFormat}.
+     * This is okay for occasional formatting (for example for debugging purpose). But if there
+     * is a lot of positions to format, users will get better performance and more control by
+     * using their own instance of {@link org.geotools.measure.CoordinateFormat}.
      */
     public String toString() {
-        return GeneralDirectPosition.toString(this, getCoordinates());
+        return GeneralDirectPosition.toString(this);
     }
     
     /**
