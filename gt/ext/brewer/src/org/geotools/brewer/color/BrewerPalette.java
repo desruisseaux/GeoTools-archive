@@ -26,9 +26,8 @@ import java.awt.Color;
  * @author Cory Horner, Refractions Research Inc.
  */
 public class BrewerPalette extends ColorPalette {
-    public PaletteSuitability suitability;
-    public SampleScheme sampler;
-
+    private PaletteSuitability suitability;
+    private SampleScheme sampler;
     private PaletteType type;
     
     /**
@@ -103,4 +102,20 @@ public class BrewerPalette extends ColorPalette {
 
         return result;
     }
+
+	public PaletteSuitability getPaletteSuitability() {
+		return suitability;
+	}
+
+	public void setPaletteSuitability(PaletteSuitability suitability) {
+		this.suitability = suitability;
+	}
+	
+	public SampleScheme getColorScheme() {
+		return sampler;
+	}
+	
+	public void setColorScheme(SampleScheme scheme) {
+		this.sampler = scheme;
+	}
 }

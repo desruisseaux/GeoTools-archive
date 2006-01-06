@@ -36,7 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 
 /**
- * Contains 
+ * Contains ColorBrewer palettes and suitability data.
  *
  * @author James Macgill
  * @author Cory Horner, Refractions Research Inc.
@@ -104,6 +104,37 @@ public class ColorBrewer {
             }
             if (!pal.getType().isMatch(type)) match = false;
             if (match) {
+            	palettes.add(pal);
+            }
+        }
+        return (BrewerPalette[]) palettes.toArray(new BrewerPalette[palettes.size()]);
+    }
+    
+    public BrewerPalette[] getPalettes(PaletteType type, int numClasses, int requiredViewers) {
+    	List palettes = new ArrayList();
+    	Object[] entry = this.palettes.keySet().toArray();
+        for (int i = 0; i < entry.length; i++) {
+            BrewerPalette pal = (BrewerPalette) getPalette(entry[i].toString());
+            boolean match = true;
+            //filter by number of classes
+            if (numClasses > -1) {
+            	if (pal.getMaxColors() < numClasses) match = false;	
+            }
+            if (!pal.getType().isMatch(type)) match = false;
+            int[] suitability = pal.getPaletteSuitability().getSuitability(numClasses);
+            if (isSet(PaletteSuitability.VIEWER_COLORBLIND, requiredViewers) && (suitability[PaletteSuitability.VIEWER_COLORBLIND] != PaletteSuitability.QUALITY_GOOD ))
+            	match = false;
+            else if (isSet(PaletteSuitability.VIEWER_CRT, requiredViewers) && (suitability[PaletteSuitability.VIEWER_CRT] != PaletteSuitability.QUALITY_GOOD ))
+            	match = false;
+            else if (isSet(PaletteSuitability.VIEWER_LCD, requiredViewers) && (suitability[PaletteSuitability.VIEWER_LCD] != PaletteSuitability.QUALITY_GOOD ))
+            	match = false;
+            else if (isSet(PaletteSuitability.VIEWER_PHOTOCOPY, requiredViewers) && (suitability[PaletteSuitability.VIEWER_PHOTOCOPY] != PaletteSuitability.QUALITY_GOOD ))
+            	match = false;
+            else if (isSet(PaletteSuitability.VIEWER_PRINT, requiredViewers) && (suitability[PaletteSuitability.VIEWER_PRINT] != PaletteSuitability.QUALITY_GOOD ))
+            	match = false;
+            else if (isSet(PaletteSuitability.VIEWER_PROJECTOR, requiredViewers) && (suitability[PaletteSuitability.VIEWER_PROJECTOR] != PaletteSuitability.QUALITY_GOOD ))
+            	match = false;
+        	if (match) {
             	palettes.add(pal);
             }
         }
@@ -264,10 +295,7 @@ public class ColorBrewer {
 						int numColors = 0;
 						Color[] colors = new Color[15];
 
-						for (int k = 0; k < 15; k++) { // alternate condition:
-														// "oTok.countTokens() >
-														// 0"
-
+						for (int k = 0; k < 15; k++) { 
 							if (!oTok.hasMoreTokens()) {
 								break;
 							}
@@ -317,8 +345,8 @@ public class ColorBrewer {
 				}
 
 				pal.setType(type);
-				pal.sampler = scheme;
-				pal.suitability = suitability;
+				pal.setColorScheme(scheme);
+				pal.setPaletteSuitability(suitability);
 				registerPalette(pal); // add the palette
 			}
 		} catch (SAXException sxe) {
@@ -454,8 +482,8 @@ public class ColorBrewer {
                 }
 
                 //pal.setType(legendType);
-                pal.sampler = scheme;
-                pal.suitability = suitability;
+                pal.setColorScheme(scheme);
+                pal.setPaletteSuitability(suitability);
                 registerPalette(pal); //add the palette
             }
         } catch (SAXException sxe) {
@@ -497,6 +525,10 @@ public class ColorBrewer {
         return input;
     }
 
+    public String getName() {
+    	return name;
+    }
+    
     public String getDescription() {
         return description;
     }
@@ -506,5 +538,9 @@ public class ColorBrewer {
         name = null;
         description = null;
         palettes = new Hashtable();
+    }
+    
+    public boolean isSet(int singleValue, int multipleValue) {
+    	return ((singleValue & multipleValue) != 0);
     }
 }

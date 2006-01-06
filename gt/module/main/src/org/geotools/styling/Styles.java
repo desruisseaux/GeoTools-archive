@@ -147,28 +147,6 @@ public class Styles {
 	}
 	
 	/**
-	 * Event-friendly replacement of a style.
-	 * @deprecated
-	 * @param oldStyle
-	 * @param newStyle
-	 */
-	public static void replaceStyle(Style oldStyle, Style newStyle) {
-//		if (oldStyle instanceof StyleImpl && newStyle instanceof StyleImpl) {
-//			GTComponent parent = ((StyleImpl) oldStyle).parent;
-//			oldStyle = newStyle;
-//			((GTComponent) oldStyle).parent = parent; //maintain the parent
-//			parent.fireChildChanged(oldStyle);
-//		}
-		GTComponent parent = oldStyle.getParent();
-		oldStyle = newStyle;
-		oldStyle.getNote().setParent(parent);
-		//TODO: fire event
-//		parent.changed(new GTDeltaImpl(?, ?) {
-//			//fireChildChanged(oldStyle)
-//		});
-	}
-	
-	/**
 	 * <p>
 	 * Creates a filter with each value explicitly defined.
 	 * </p>
