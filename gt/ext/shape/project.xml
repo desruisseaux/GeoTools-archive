@@ -1,131 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-	<pomVersion>3</pomVersion>
-	<extend>${basedir}/../../project.xml</extend>
-	<name>indexed-shapefile</name>
-	<id>indexed-shapefile</id>
-	<currentVersion>2.2.x</currentVersion>
-	<package>org.geotools</package>
-	<shortDescription>indexed shapefile module</shortDescription>
-	<gumpRepositoryId>geotools</gumpRepositoryId>
-	<description>indexed shapefile module</description>
-	<mailingLists/>
-	<developers>
-		<developer>
-      <name>Tommaso Nolli</name>
-      <id>tnolli</id>
-      <email>tommaso.nolli@asimantova.it</email>
-      <organization>Azienda Servizi Informativi S.p.a</organization>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Jesse Eichar</name>
-      <id>jeichar</id>
-      <email>jeichar@refractions.net</email>
-      <organization>Refraction Research Inc.</organization>
-      <roles>
-	  <role>Module Maintainer</role>
-	  <role>Java Developer</role>
-      </roles>
-    </developer>
-	</developers>
-	<dependencies>
-    <dependency>
-      <artifactId>api</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.2.x</version>
-    </dependency>	
-		<dependency>
-			<artifactId>main</artifactId>
-			<groupId>gt2</groupId>
-			<version>2.2.x</version>
-		</dependency>
-		<dependency>
-			<artifactId>referencing</artifactId>
-			<groupId>gt2</groupId>
-			<version>2.2.x</version>
-		</dependency>
-		<dependency>
-			<artifactId>shapefile</artifactId>
-			<groupId>gt2</groupId>
-			<version>2.2.x</version>
-		</dependency>
-		<dependency>
-		      <id>jdom</id>
-		      <version>1.0b10</version>
-		      <url>http://www.jdom.org/</url>
-		</dependency>
-		<dependency>
-			<artifactId>units</artifactId>
-			<groupId>units</groupId>
-			<version>0.01</version>
-		</dependency>
-		<dependency>
-			<id>JTS</id>
-			<version>1.6</version>
-			<url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
-			<properties>
-				<release.bundle>true</release.bundle>
-			</properties>
-		</dependency>
-		<dependency>
-			<id>opengis+legacy</id>
-			<version>0.2</version>
-			<url>http://www.opengis.org</url>
-		</dependency>
-		<dependency>
-			<id>vecmath</id>
-			<version>1.3</version>
-			<properties>
-				<release.bundle>true</release.bundle>
-			</properties>
-			<url>http://java.sun.com/products/java-media/3D/</url>
-		</dependency>
-	</dependencies>
-	<contributors>
-		<contributor>
-			<name>Dave Blasby</name>
-			<organization>Refractions Research</organization>
-			<roles>
-				<role>Bug Fixer</role>
-			</roles>
-		</contributor>
-		<contributor>
-			<name>William Stockhausen</name>
-			<organization>Virginia Institute of Marine
-      Science</organization>
-			<roles>
-				<role>Bug Fixer</role>
-			</roles>
-		</contributor>
-		<contributor>
-			<name>Ithaqua</name>
-			<organization>Virginia Institute of Marine
-      Science</organization>
-			<roles>
-				<role>External Project Developer</role>
-			</roles>
-		</contributor>
-	</contributors>
-	<build>
-		<unitTest>
-			<includes>
-				<include>**/*Test.java</include>
-			</includes>
-			<resources>
-				<resource>
-					<directory>${basedir}/test</directory>
-					<includes>
-						<include>META-INF/</include>
-						<include>**/test-data/</include>
-						<include>**/data.zip</include>
-						<include>**/*.wkt</include>
-						<include>**/*.prj</include>
-					</includes>
-				</resource>
-			</resources>
-		</unitTest>
-	</build>
+    <pomVersion>3</pomVersion>
+    <extend>${basedir}/../../project.xml</extend>
+    <name>indexed-shapefile</name>
+    <id>indexed-shapefile</id>
+    <currentVersion>2.2.x</currentVersion>
+    <package>org.geotools</package>
+    <shortDescription>indexed shapefile module</shortDescription>
+    <gumpRepositoryId>geotools</gumpRepositoryId>
+    <description>indexed shapefile module</description>
+    <mailingLists/>
+    <developers>
+        <developer>
+            <name>Tommaso Nolli</name>
+            <id>tnolli</id>
+            <email>tommaso.nolli@asimantova.it</email>
+            <organization>Azienda Servizi Informativi S.p.a</organization>
+            <roles>
+                <role>Java Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Jesse Eichar</name>
+            <id>jeichar</id>
+            <email>jeichar@refractions.net</email>
+            <organization>Refraction Research Inc.</organization>
+            <roles>
+                <role>Module Maintainer</role>
+                <role>Java Developer</role>
+            </roles>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <artifactId>api</artifactId>
+            <groupId>gt2</groupId>
+            <version>2.2.x</version>
+        </dependency>	
+        <dependency>
+            <artifactId>main</artifactId>
+            <groupId>gt2</groupId>
+            <version>2.2.x</version>
+        </dependency>
+        <dependency>
+            <artifactId>referencing</artifactId>
+            <groupId>gt2</groupId>
+            <version>2.2.x</version>
+        </dependency>
+        <dependency>
+            <artifactId>shapefile</artifactId>
+            <groupId>gt2</groupId>
+            <version>2.2.x</version>
+        </dependency>
+        <dependency>
+            <artifactId>sample-data</artifactId>
+            <groupId>gt2</groupId>
+            <version>2.2.x</version>
+            <type>test</type>
+        </dependency>
+        <dependency>
+            <id>jdom</id>
+            <version>1.0b10</version>
+            <url>http://www.jdom.org/</url>
+        </dependency>
+        <dependency>
+            <artifactId>units</artifactId>
+            <groupId>units</groupId>
+            <version>0.01</version>
+        </dependency>
+        <dependency>
+            <id>JTS</id>
+            <version>1.6</version>
+            <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+            <properties>
+                <release.bundle>true</release.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>opengis+legacy</id>
+            <version>0.2</version>
+            <url>http://www.opengis.org</url>
+        </dependency>
+        <dependency>
+            <id>vecmath</id>
+            <version>1.3</version>
+            <properties>
+                <release.bundle>true</release.bundle>
+            </properties>
+            <url>http://java.sun.com/products/java-media/3D/</url>
+        </dependency>
+    </dependencies>
+    <contributors>
+        <contributor>
+            <name>Dave Blasby</name>
+            <organization>Refractions Research</organization>
+            <roles>
+                <role>Bug Fixer</role>
+            </roles>
+        </contributor>
+        <contributor>
+            <name>William Stockhausen</name>
+            <organization>Virginia Institute of Marine
+            Science</organization>
+            <roles>
+                <role>Bug Fixer</role>
+            </roles>
+        </contributor>
+        <contributor>
+            <name>Ithaqua</name>
+            <organization>Virginia Institute of Marine
+            Science</organization>
+            <roles>
+                <role>External Project Developer</role>
+            </roles>
+        </contributor>
+    </contributors>
+    <build>
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+            <resources>
+                <resource>
+                    <directory>${basedir}/test</directory>
+                    <includes>
+                        <include>META-INF/</include>
+                        <include>**/test-data/</include>
+                        <include>**/data.zip</include>
+                        <include>**/*.wkt</include>
+                        <include>**/*.prj</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+    </build>
 </project>

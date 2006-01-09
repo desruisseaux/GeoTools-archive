@@ -60,13 +60,25 @@
       <resource>
         <directory>src</directory>
         <includes>
-          <include>**/*.shp</include>
-          <include>**/*.shx</include>
-          <include>**/*.dbf</include>
-          <include>**/spearfish_dem.asc.gz</include>
+          <include>org/geotools/test-data/**</include>
         </includes>
       </resource>
     </resources>
   </build>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Dependencies                                     -->
+  <!-- ==================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+      <version>2.2-SNAPSHOT</version>
+      <!-- We don't really need the referencing module, but we use
+           org.geotools.resources.TestData which is defined there. -->
+    </dependency>
+  </dependencies>
 
 </project>

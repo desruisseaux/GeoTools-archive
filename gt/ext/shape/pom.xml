@@ -91,13 +91,24 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+      <version>2.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
       <artifactId>gt2-shapefile</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
     <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-sample-data</artifactId>
+      <version>2.2-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>velocity</groupId>
       <artifactId>velocity</artifactId>
-      <version>1.4</version>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>
 
@@ -108,18 +119,13 @@
   <!-- ==================================================== -->
   <build>
     <plugins>
-      <!-- TEMPORARY HACK: Disables JUnit tests for now. The TestCaseSupport method
-           in the org.geotools.data.shapefile.indexed package fails to find resources,
-           apparently because SureFire disallows fetching resources from the root package.
-           We need to apply the same changes than the one applied to plugin/shapefile in
-           revision 17435 (move '/testData' to '.../test-data', replace most methods in
-           TestCaseSupport by calls to TestData, etc.). Actually, since the test data
-           seems to be the same, they should be shared in the sample-data module. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <!-- TODO: Disables assertions for now until the following is fixed: -->
+          <!--       http://jira.codehaus.org/browse/GEOT-792                  -->
+          <argLine>-Xmx512M -disableassertions</argLine>
         </configuration>
       </plugin>
     </plugins>

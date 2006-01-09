@@ -12,13 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- */
-/*
- * ProjectionTestSuite.java
- * JUnit based test
- *
- * Created on February 22, 2002, 3:58 PM
  */
 package org.geotools.data.shapefile.indexed;
 
@@ -28,8 +21,8 @@ import junit.framework.TestSuite;
 
 
 /**
- * DOCUMENT ME!
  *
+ * @version $Id$
  * @author jamesm
  */
 public class ShapefileSuite extends TestCase {
@@ -43,9 +36,6 @@ public class ShapefileSuite extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite("All ShapefileDataSource Tests");
-
-        // this test must go first!!!
-        suite.addTestSuite(TestCaseSupportTest.class);
 
         suite.addTestSuite(DbaseFileTest.class);
         suite.addTestSuite(ShapefileTest.class);

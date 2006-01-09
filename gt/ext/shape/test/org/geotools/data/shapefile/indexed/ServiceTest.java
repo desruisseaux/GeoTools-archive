@@ -12,37 +12,32 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.shapefile.indexed;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFinder;
-
-/*
- * GmlSuite.java
- * JUnit based test
- *
- * Created on 04 March 2002, 16:09
- */
-import java.util.HashMap;
-import java.util.Iterator;
+import org.geotools.TestData;
 
 
 /**
- * DOCUMENT ME!
  *
+ * @version $Id$
  * @author ian
  */
 public class ServiceTest extends TestCaseSupport {
-    final String TEST_FILE = "statepop.shp";
+    final String TEST_FILE = "shapes/statepop.shp";
 
-    public ServiceTest(java.lang.String testName) {
+    public ServiceTest(String testName) throws IOException {
         super(testName);
     }
 
     public static void main(java.lang.String[] args) {
+        verbose = true;
         junit.textui.TestRunner.run(suite(ServiceTest.class));
     }
 
@@ -69,16 +64,14 @@ public class ServiceTest extends TestCaseSupport {
 
     /**
      * Ensure that we can create a DataStore using url OR string url.
-     *
-     * @throws Exception DOCUMENT ME!
      */
     public void testShapefileDataStore() throws Exception {
         HashMap params = new HashMap();
-        params.put("url", getTestResource(TEST_FILE));
+        params.put("url", TestData.url(TEST_FILE));
 
         DataStore ds = DataStoreFinder.getDataStore(params);
         assertNotNull(ds);
-        params.put("url", getTestResource(TEST_FILE).toString());
+        params.put("url", TestData.url(TEST_FILE).toString());
         assertNotNull(ds);
     }
 

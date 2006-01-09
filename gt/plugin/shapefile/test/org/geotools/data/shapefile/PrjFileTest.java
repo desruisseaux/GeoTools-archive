@@ -20,7 +20,7 @@ package org.geotools.data.shapefile;
 
 import java.io.IOException;
 import org.geotools.data.shapefile.prj.PrjFileReader;
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 
 
 /**
@@ -31,7 +31,7 @@ import org.geotools.resources.TestData;
  */
 public class PrjFileTest extends TestCaseSupport {
   
-  static final String TEST_FILE = "cntbnd01.prj";
+  static final String TEST_FILE = "wkt/cntbnd01.prj";
   
   private PrjFileReader prj = null;
   
@@ -45,7 +45,7 @@ public class PrjFileTest extends TestCaseSupport {
   }
 
   protected void setUp() throws Exception {
-    prj = new PrjFileReader(TestData.openChannel(this, TEST_FILE));
+    prj = new PrjFileReader(TestData.openChannel(TEST_FILE));
   }
 
   public void testGeneral() {

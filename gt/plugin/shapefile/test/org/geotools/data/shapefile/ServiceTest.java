@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 
 
 /**
@@ -35,7 +35,7 @@ import org.geotools.resources.TestData;
  */
 public class ServiceTest extends TestCaseSupport {
   
-  final String TEST_FILE = "statepop.shp";
+  final String TEST_FILE = "shapes/statepop.shp";
   
   public ServiceTest(String testName) throws IOException {
     super(testName);
@@ -68,10 +68,10 @@ public class ServiceTest extends TestCaseSupport {
    */ 
   public void testShapefileDataStore() throws Exception {
     HashMap params = new HashMap();
-    params.put("url", TestData.url(this, TEST_FILE));
+    params.put("url", TestData.url(TEST_FILE));
     DataStore ds = DataStoreFinder.getDataStore(params);
     assertNotNull(ds);
-    params.put("url", TestData.url(this, TEST_FILE).toString());
+    params.put("url", TestData.url(TEST_FILE).toString());
     assertNotNull(ds);
   }
   

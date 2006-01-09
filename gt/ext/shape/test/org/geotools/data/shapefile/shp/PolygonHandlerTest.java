@@ -14,33 +14,30 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * PolygonHandlerTest.java
- *
- * Created on July 24, 2003, 12:38 PM
- */
 package org.geotools.data.shapefile.shp;
 
+import java.awt.Dimension;
+import java.io.IOException;
+import java.util.ArrayList;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import org.geotools.data.shapefile.indexed.TestCaseSupport;
-import java.util.ArrayList;
 
 
 /**
- * DOCUMENT ME!
- *
+ * @version $Id$
  * @author Ian Schneider
  */
 public class PolygonHandlerTest extends TestCaseSupport {
-    public PolygonHandlerTest(String testName) {
+    public PolygonHandlerTest(String testName) throws IOException {
         super(testName);
     }
 
-    public static void main(java.lang.String[] args) {
+    public static void main(String[] args) {
+        verbose = true;
         junit.textui.TestRunner.run(suite(PolygonHandlerTest.class));
     }
 
@@ -59,7 +56,7 @@ public class PolygonHandlerTest extends TestCaseSupport {
     }
 
     public void testHoleAssignment() {
-        java.awt.Dimension ps = new java.awt.Dimension(500, 500);
+        Dimension ps = new Dimension(500, 500);
         PrecisionModel precision = new PrecisionModel();
 
         ArrayList shells = new ArrayList();

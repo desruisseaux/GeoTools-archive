@@ -168,42 +168,14 @@
       <version>2.2-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
-      <version>2.2-SNAPSHOT</version>
-    </dependency>
-    <dependency>
       <groupId>com.vividsolutions</groupId>
       <artifactId>jts</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-transcoder</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-    <dependency>
-      <groupId>oro</groupId>
-      <artifactId>oro</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.opengis</groupId>
       <artifactId>geoapi-legacy</artifactId>
       <!-- The version number is specified in the parent POM. -->
-    </dependency>
-    <dependency>
-      <groupId>com.mockrunner</groupId>
-      <artifactId>mockrunner</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

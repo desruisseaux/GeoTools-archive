@@ -35,7 +35,7 @@ import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.PointHandler;
 import org.geotools.renderer.shape.SimpleGeometry;
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
@@ -50,7 +50,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class PointHandlerTest extends TestCase {
 
 	public void testRead() throws Exception{
-		URL url=TestData.getResource(LabelingTest.class, "pointtest.shp");
+		URL url = TestData.url("shapes/pointtest.shp");
 		ShapefileDataStore ds=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(url);
 		
 		Envelope env=ds.getFeatureSource().getBounds();

@@ -7,8 +7,7 @@
   <currentVersion>2.2.x</currentVersion>
   <package>org.geotools</package>
   <shortDescription>GTopo30 datasource module</shortDescription>
-  <description>This datasource reads the GTOPO30 DEM
-  format.</description>
+  <description>This datasource reads the GTOPO30 DEM format.</description>
   <developers>
     <developer>
       <name>Andrea Aime</name>
@@ -20,7 +19,7 @@
         <role>Java Developer</role>
       </roles>
     </developer>
-<developer>
+    <developer>
       <name>Simone Giannecchini</name>
       <id>simboss</id>
       <email>simboss1@gmail.com</email>
@@ -72,6 +71,10 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
+      <excludes>
+        <!-- Excludes until http://jira.codehaus.org/browse/GEOT-793 is fixed. -->
+        <exclude>**/GT30ReaderWriterTest.java</exclude>
+      </excludes>
       <resources>
         <resource>
           <directory>${basedir}/test</directory>

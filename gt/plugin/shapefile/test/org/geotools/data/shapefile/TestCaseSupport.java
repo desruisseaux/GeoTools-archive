@@ -21,8 +21,10 @@ package org.geotools.data.shapefile;
 import java.io.File;
 import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -30,7 +32,7 @@ import junit.framework.TestSuite;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
@@ -41,6 +43,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * Base class for test suite. This class is not abstract for the purpose of
  * {@link TestCaseSupportTest}, but should not be instantiated otherwise.
  * It should be extented (which is why the constructor is protected).
+ * <p>
+ * Note: a nearly identical copy of this file exists in the {@code ext/shape} module.
  *
  * @version $Id$
  * @author  Ian Schneider
@@ -54,24 +58,15 @@ public class TestCaseSupport extends TestCase {
     protected static boolean verbose = false;
 
     /**
-     * Make sure unzipping of data only occurs once per suite.
-     */
-    static boolean prepared = false;
-
-    /**
      * Stores all temporary files here - delete on tear down.
      */
-    private final ArrayList tmpFiles = new ArrayList();
+    private final List tmpFiles = new ArrayList();
 
     /**
      * Creates a new instance of {@code TestCaseSupport} with the given name.
      */
     protected TestCaseSupport(final String name) throws IOException {
         super(name);
-        if (!prepared) {
-            prepared = true;
-            TestData.unzipFile(TestCaseSupport.class, "data.zip");
-        }
     }
 
     /**
@@ -97,9 +92,18 @@ public class TestCaseSupport extends TestCase {
      * Helper method for {@link #tearDown}.
      */
     private static File sibling(final File f, final String ext) {
-        String name = f.getName();
-        name = name.substring(0, name.indexOf('.') + 1);
-        return new File(f.getParent(), name + ext);
+        return new File(sibling(f.getName(), ext));
+    }
+
+    /**
+     * Helper method for {@link #copyShapefiles}.
+     */
+    private static String sibling(String name, final String ext) {
+        final int s = name.lastIndexOf('.');
+        if (s >= 0) {
+            name = name.substring(0, s);
+        }
+        return name + '.' + ext;
     }
 
     /**
@@ -110,7 +114,7 @@ public class TestCaseSupport extends TestCase {
      * @throws IOException if reading failed.
      */
     protected Geometry readGeometry(final String wktResource) throws IOException {
-        final BufferedReader stream = TestData.openReader(TestCaseSupport.class, wktResource + ".wkt");
+        final BufferedReader stream = TestData.openReader("wkt/" + wktResource + ".wkt");
         final WKTReader reader = new WKTReader();
         final Geometry geom;
         try {
@@ -136,14 +140,31 @@ public class TestCaseSupport extends TestCase {
      */
     protected File getTempFile() throws IOException {
         File tmpFile = File.createTempFile("test-shp", ".shp");
+        assertTrue(tmpFile.isFile());
         // keep track of all temp files so we can delete them
         tmpFiles.add(tmpFile);
-        tmpFile.createNewFile();
-        if (!tmpFile.exists()) {
-            throw new IOException("Couldn't setup temp file");
-        }
         tmpFile.deleteOnExit();
         return tmpFile;
+    }
+
+    /**
+     * Copies the specified shape file into the {@code test-data} directory, together with its
+     * sibling ({@code .dbf}, {@code .shp}, {@code .shx} and {@code .prj} files).
+     */
+    protected File copyShapefiles(final String name) throws IOException {
+        assertTrue(TestData.copy(this, sibling(name, "dbf")).canRead());
+        assertTrue(TestData.copy(this, sibling(name, "shp")).canRead());
+        try {
+            assertTrue(TestData.copy(this, sibling(name, "shx")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        try {
+            assertTrue(TestData.copy(this, sibling(name, "prj")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        return TestData.copy(this, name);
     }
 
     /**

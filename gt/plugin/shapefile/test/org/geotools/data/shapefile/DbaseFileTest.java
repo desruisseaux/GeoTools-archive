@@ -27,7 +27,7 @@ import java.nio.channels.ReadableByteChannel;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.dbf.DbaseFileWriter;
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 
 
 /**
@@ -38,7 +38,7 @@ import org.geotools.resources.TestData;
  */
 public class DbaseFileTest extends TestCaseSupport {
   
-  static final String TEST_FILE = "statepop.dbf";
+  static final String TEST_FILE = "shapes/statepop.dbf";
   
   private DbaseFileReader dbf = null;
   
@@ -53,27 +53,27 @@ public class DbaseFileTest extends TestCaseSupport {
 
   protected void setUp() throws Exception {
     super.setUp();
-    dbf = new DbaseFileReader(TestData.openChannel(this, TEST_FILE));
+    dbf = new DbaseFileReader(TestData.openChannel(TEST_FILE));
   }
   
   public void testNumberofColsLoaded(){
-    assertEquals("Number of attributes found incorect",252,dbf.getHeader().getNumFields());
+    assertEquals("Number of attributes found incorect", 252, dbf.getHeader().getNumFields());
   }
   
   public void testNumberofRowsLoaded(){
-    assertEquals("Number of rows",49,dbf.getHeader().getNumRecords());
+    assertEquals("Number of rows", 49, dbf.getHeader().getNumRecords());
   }
   
   public void testDataLoaded() throws Exception{
     Object[] attrs = new Object[dbf.getHeader().getNumFields()];
     dbf.readEntry(attrs);
-    assertEquals("Value of Column 0 is wrong",attrs[0],new String("Illinois"));
-    assertEquals("Value of Column 4 is wrong",((Double)attrs[4]).doubleValue(),143986.61,0.001);
+    assertEquals("Value of Column 0 is wrong", "Illinois", attrs[0]);
+    assertEquals("Value of Column 4 is wrong", 143986.61, ((Double)attrs[4]).doubleValue(), 0.001);
   }
   
   public void testRowVsEntry() throws Exception {
     Object[] attrs = new Object[dbf.getHeader().getNumFields()];
-    ReadableByteChannel ch2 = TestData.openChannel(this, TEST_FILE);
+    ReadableByteChannel ch2 = TestData.openChannel(TEST_FILE);
     DbaseFileReader dbf2 = new DbaseFileReader(ch2);
     while (dbf.hasNext()) {
       dbf.readEntry(attrs);

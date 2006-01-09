@@ -38,7 +38,7 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.RenderListener;
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.LineSymbolizer;
@@ -72,7 +72,7 @@ public class TestUtilites {
 
     public static ShapefileDataStore getDataStore(String filename)
         throws IOException {
-        URL url = TestData.getResource(Rendering2DTest.class, filename);
+        URL url = TestData.url(Rendering2DTest.class, filename);
         ShapefileDataStoreFactory factory = new ShapefileDataStoreFactory();
 
         return (ShapefileDataStore) factory.createDataStore(url);
@@ -83,7 +83,7 @@ public class TestUtilites {
     }
 
     public static ShapefileDataStore getPoints() throws IOException {
-        URL url = TestData.getResource(Rendering2DTest.class, "pointtest.shp");
+        URL url = TestData.url("shapes/pointtest.shp");
         ShapefileDataStoreFactory factory = new ShapefileDataStoreFactory();
 
         return (ShapefileDataStore) factory.createDataStore(url);

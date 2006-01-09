@@ -12,20 +12,24 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- */
-/*
- * ShapefileDataStoreTest.java
- *
- * Created on November 5, 2003, 2:20 PM
  */
 package org.geotools.data.shapefile.indexed;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
+
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
@@ -42,26 +46,19 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
+import org.geotools.TestData;
 
 
 /**
- * DOCUMENT ME!
  *
+ * @version $Id$
  * @author Ian Schneider
  */
 public class ShapefileDataStoreTest extends TestCaseSupport {
-    final static String STATE_POP = "statepop.shp";
-    final static String STREAM = "stream.shp";
+    final static String STATE_POP = "shapes/statepop.shp";
+    final static String STREAM    = "shapes/stream.shp";
 
-    public ShapefileDataStoreTest(java.lang.String testName) {
+    public ShapefileDataStoreTest(String testName) throws IOException {
         super(testName);
     }
 
@@ -71,7 +68,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             q = new DefaultQuery();
         }
 
-        URL url = getTestResource(resource);
+        URL url = TestData.url(resource);
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(url);
         FeatureSource fs = s.getFeatureSource(s.getTypeNames()[0]);
 
@@ -88,7 +85,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     }
 
     public void testSchema() throws Exception {
-        URL url = getTestResource(STATE_POP);
+        URL url = TestData.url(STATE_POP);
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(url);
         FeatureType schema = s.getSchema(s.getTypeNames()[0]);
         AttributeType[] types = schema.getAttributeTypes();
@@ -97,7 +94,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     }
 
     public void testSpacesInPath() throws Exception {
-        URL u = getTestResource("legacy folder/pointtest.shp");
+        URL u = TestData.url(this, "folder with spaces/pointtest.shp");
         File f = new File(URLDecoder.decode(u.getFile(), "UTF-8"));
         assertTrue(f.exists());
 
@@ -107,8 +104,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     /**
      * Test envelope versus old DataSource
-     *
-     * @throws Exception DOCUMENT ME!
      */
     public void testEnvelope() throws Exception {
         FeatureCollection features = loadFeatures(STATE_POP, null);
@@ -119,8 +114,8 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     private void testEnvelope(FeatureCollection features, byte treeType)
         throws MalformedURLException, IOException {
-        IndexedShapefileDataStore s = new IndexedShapefileDataStore(getTestResource(
-                    STATE_POP), null, true, true, treeType);
+        IndexedShapefileDataStore s = new IndexedShapefileDataStore(TestData.url(STATE_POP),
+                    null, true, true, treeType);
         String typeName = s.getTypeNames()[0];
         FeatureResults all = s.getFeatureSource(typeName).getFeatures();
 
@@ -128,7 +123,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     }
 
     public void testCreateAndReadQIX() throws Exception {
-        URL url = getTestResource(STATE_POP);
+        URL url = TestData.url(STATE_POP);
         String filename = url.getFile();
         filename = filename.substring(0, filename.lastIndexOf("."));
 
@@ -151,7 +146,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     }
 
     public void testCreateAndReadGRX() throws Exception {
-        URL url = getTestResource(STATE_POP);
+        URL url = TestData.url(STATE_POP);
         String filename = url.getFile();
         filename = filename.substring(0, filename.lastIndexOf("."));
 
@@ -208,8 +203,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     /**
      * Create a set of features, then remove every other one, updating the
      * remaining. Test for removal and proper update after reloading...
-     *
-     * @throws Throwable DOCUMENT ME!
      */
     public void testUpdating() throws Throwable {
         try {
@@ -260,8 +253,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     /**
      * Create a test file, then continue removing the first entry until there
      * are no features left.
-     *
-     * @throws Throwable DOCUMENT ME!
      */
     public void testRemoveFromFrontAndClose() throws Throwable {
         try {
@@ -301,8 +292,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     /**
      * Create a test file, then continue removing the last entry until there
      * are no features left.
-     *
-     * @throws Throwable DOCUMENT ME!
      */
     public void testRemoveFromBackAndClose() throws Throwable {
         try {

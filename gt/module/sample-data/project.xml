@@ -22,7 +22,13 @@
     </developer>
   </developers>
   <dependencies>
-   
+    <dependency>
+      <artifactId>referencing</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+      <!-- We don't really need the referencing module, but we use
+           org.geotools.resources.TestData which is defined there. -->
+    </dependency>
   </dependencies>
   <contributors></contributors>
   <build>
@@ -30,10 +36,7 @@
         <resource>
           <directory>${basedir}/src/</directory>
           <includes>
-            <include>**/*.shp</include>
-            <include>**/*.shx</include>
-            <include>**/*.dbf</include>
-            <include>**/spearfish_dem.asc.gz</include>
+            <include>org/geotools/test-data/**</include>
           </includes>
         </resource>
     </resources>

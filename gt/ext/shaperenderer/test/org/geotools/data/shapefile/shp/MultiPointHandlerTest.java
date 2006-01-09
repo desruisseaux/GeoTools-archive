@@ -28,7 +28,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.MultiPointHandler;
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 
@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class MultiPointHandlerTest extends TestCase {
 
 	public void testRead() throws Exception{
-		URL url=TestData.getResource(LabelingTest.class, "pointtest.shp");
+		URL url = TestData.url("shapes/pointtest.shp");
 		ShapefileDataStore ds=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(url);
 		
 //		Envelope env=ds.getFeatureSource().getBounds();

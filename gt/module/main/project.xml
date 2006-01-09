@@ -197,6 +197,12 @@
       <type>test</type>
       <url>http://mockrunner.sourceforge.net/</url>
     </dependency>
+    <dependency>
+      <artifactId>sample-data</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+      <type>test</type>
+    </dependency>
 
   </dependencies>
 

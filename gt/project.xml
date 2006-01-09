@@ -305,12 +305,12 @@
       <version>2.0</version>
       <url>http://geoapi.sourceforge.net</url>
     </dependency>
-		<dependency>
-				<groupId>maven</groupId>
+    <dependency>
+      <groupId>maven</groupId>
         <artifactId>maven-test-plugin</artifactId>
         <version>1.7</version>
         <type>plugin</type>
-		</dependency>
+    </dependency>
   </dependencies>
 
   <build>
@@ -320,10 +320,10 @@
     <aspectSourceDirectories/>
     <integrationUnitTestPatterns/>
     <sourceDirectory>src</sourceDirectory>
-		<unitTest>
-        <excludes>
-          <exclude>**/*Geot553Test.*</exclude>
-        </excludes>
+    <unitTest>
+      <excludes>
+        <exclude>**/*Geot553Test.*</exclude>
+      </excludes>
     </unitTest>
     <resources>
       <resource>

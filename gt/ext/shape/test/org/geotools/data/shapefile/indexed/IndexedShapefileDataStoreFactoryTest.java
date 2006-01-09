@@ -12,24 +12,25 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.shapefile.indexed;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.geotools.TestData;
+import org.geotools.data.DataStore;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 
 
 public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
     private IndexedShapefileDataStoreFactory factory;
 
-    public IndexedShapefileDataStoreFactoryTest() {
+    public IndexedShapefileDataStoreFactoryTest() throws IOException {
         super("IndexedShapefileDataStoreFactoryTest");
     }
 
@@ -43,7 +44,7 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
     public void testCanProcessMap() throws Exception {
         Map map = new HashMap();
         map.put(IndexedShapefileDataStoreFactory.URLP.key,
-            getTestResource(ShapefileDataStoreTest.STATE_POP));
+            TestData.url(ShapefileDataStoreTest.STATE_POP));
         map.put(IndexedShapefileDataStoreFactory.SPATIAL_INDEX_TYPE.key,
             IndexedShapefileDataStoreFactory.TREE_NONE);
         assertTrue(factory.canProcess(map));
@@ -109,11 +110,12 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
         URI namespace = new URI("http://jesse.com");
         map.put(ShapefileDataStoreFactory.NAMESPACEP.key, namespace);
         map.put(ShapefileDataStoreFactory.URLP.key,
-            getTestResource(ShapefileDataStoreTest.STATE_POP));
+            TestData.url(ShapefileDataStoreTest.STATE_POP));
 
         DataStore store = factory.createDataStore(map);
         assertEquals(namespace,
-            store.getSchema(ShapefileDataStoreTest.STATE_POP.substring(0,
+            store.getSchema(ShapefileDataStoreTest.STATE_POP.substring(
+                    ShapefileDataStoreTest.STATE_POP.indexOf('/')+1,
                     ShapefileDataStoreTest.STATE_POP.lastIndexOf('.')))
                  .getNamespace());
     }
@@ -121,9 +123,10 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
     private IndexedShapefileDataStore testCreateDataStore(boolean newDS,
         Byte treeType, boolean memorymapped, boolean createIndex)
         throws Exception {
+        copyShapefiles(ShapefileDataStoreTest.STATE_POP);
         Map map = new HashMap();
         map.put(IndexedShapefileDataStoreFactory.URLP.key,
-            getTestResource(ShapefileDataStoreTest.STATE_POP));
+            TestData.url(this, ShapefileDataStoreTest.STATE_POP));
         map.put(IndexedShapefileDataStoreFactory.SPATIAL_INDEX_TYPE.key,
             treeType);
         map.put(IndexedShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key,
@@ -200,16 +203,17 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
     /*
      * Test method for 'org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory.canProcess(URL)'
      */
-    public void testCanProcessURL() {
-        factory.canProcess(getTestResource(ShapefileDataStoreTest.STATE_POP));
+    public void testCanProcessURL() throws FileNotFoundException {
+        factory.canProcess(TestData.url(ShapefileDataStoreTest.STATE_POP));
     }
 
     /*
      * Test method for 'org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory.createDataStore(URL)'
      */
     public void testCreateDataStoreURL() throws IOException {
-        DataStore ds = factory.createDataStore(getTestResource(
-                    ShapefileDataStoreTest.STATE_POP));
+        copyShapefiles(ShapefileDataStoreTest.STATE_POP);
+        DataStore ds = factory.createDataStore(TestData.url(
+                    this, ShapefileDataStoreTest.STATE_POP));
         testDataStore(IndexedShapefileDataStoreFactory.TREE_GRX, true, true,
             (IndexedShapefileDataStore) ds);
     }
@@ -218,6 +222,6 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
      * Test method for 'org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory.getTypeName(URL)'
      */
     public void testGetTypeName() throws IOException {
-        factory.getTypeName(getTestResource(ShapefileDataStoreTest.STATE_POP));
+        factory.getTypeName(TestData.url(ShapefileDataStoreTest.STATE_POP));
     }
 }

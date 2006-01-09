@@ -57,47 +57,38 @@ import org.opengis.referencing.operation.TransformException;
 
 
 /**
- * DOCUMENT ME!
  *
- * @author giannecchini TODO To change the template for this generated type
- *         comment go to Window - Preferences - Java - Code Style - Code
- *         Templates
+ * @author giannecchini
  */
 public class GeoTiffReaderWriterTest extends TestCase {
 
     /**
      * Constructor for GeoTiffReaderTest.
-     *
-     * @param arg0
      */
     public GeoTiffReaderWriterTest() {
-        super("Reader-Writer Test!");
+        super("GeoTIFF Reader-Writer Test");
     }
 
-		public GeoTiffReaderWriterTest(String arg0) {
-        super(arg0);
+    public GeoTiffReaderWriterTest(String name) {
+        super(name);
     }
 
-    /*
-     * @see TestCase#setUp()
-     */
     protected void setUp() throws Exception {
         super.setUp();
     }
     
-    /**
-     * testReader
-     *
-     * @throws IllegalArgumentException
-     * @throws IOException
-     * @throws FactoryException 
-     * @throws OperationNotFoundException 
-     * @throws TransformException 
-     */
     public void testReader()
         throws IllegalArgumentException, IOException, OperationNotFoundException, FactoryException, TransformException {
-
-				File file = TestData.file(GeoTiffReaderWriterTest.class, "002025_0100_010722_l7_01_utm21.tif");
+        if (true) {
+            /*
+             * TODO: Test disabled because the 002025_0100_010722_l7_01_utm21.tif file has been
+             *       deleted. This file was too big (~55 Mb) for inclusion in the SVN head.
+             *
+             *       See http://jira.codehaus.org/browse/GEOT-794
+             */
+            return;
+        }
+        File file = TestData.file(GeoTiffReaderWriterTest.class, "002025_0100_010722_l7_01_utm21.tif");
 
         //getting a reader
         AbstractGridFormat format = new GeoTiffFormat();
@@ -281,5 +272,4 @@ public class GeoTiffReaderWriterTest extends TestCase {
 //                //
 //            }
         }
-   
 }

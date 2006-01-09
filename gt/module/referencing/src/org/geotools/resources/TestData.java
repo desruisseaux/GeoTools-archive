@@ -75,10 +75,8 @@ import java.util.zip.ZipFile;
  * @author James McGill
  * @author Simone Giannecchiin (simboss)
  * @author Martin Desruisseaux
- *
- * @todo It should be possible to move this class in the {@code sample-data} module.
  */
-public final class TestData implements Runnable {
+public class TestData implements Runnable {
     /**
      * The test data directory.
      */
@@ -93,7 +91,7 @@ public final class TestData implements Runnable {
      * The file to deletes at shutdown time. {@link File#deleteOnExit} alone doesn't seem
      * suffisient since it will preserve any overwritten files.
      */
-    private static final List toDelete = new LinkedList();
+    private static final LinkedList toDelete = new LinkedList();
 
     /**
      * Register the thread to be automatically executed at shutdown time.
@@ -104,9 +102,9 @@ public final class TestData implements Runnable {
     }
 
     /**
-     * Do not allow instantiation of this class.
+     * Do not allow instantiation of this class, except for extending it.
      */
-    private TestData() {
+    protected TestData() {
     }
 
     /**
@@ -334,12 +332,17 @@ public final class TestData implements Runnable {
     }
 
     /**
-     * Adds a file to delete on exit.
+     * Requests that the file or directory denoted by the specified
+     * pathname be deleted when the virtual machine terminates.
      */
-    private static void deleteOnExit(final File file) {
+    protected static void deleteOnExit(final File file) {
         file.deleteOnExit();
         synchronized (toDelete) {
-            toDelete.add(file);
+            if (file.isFile()) {
+                toDelete.addFirst(file);
+            } else {
+                toDelete.addLast(file);
+            }
         }
     }
 

@@ -12,49 +12,47 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- */
-/*
- * ShapefileTest.java
- * JUnit based test
- *
- * Created on 12 February 2002, 21:27
  */
 package org.geotools.data.shapefile.indexed;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.ReadableByteChannel;
 
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileWriter;
 import org.geotools.data.shapefile.dbf.IndexedDbaseFileReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import org.geotools.TestData;
 
 
 /**
- * DOCUMENT ME!
- *
+ * @version $Id$
  * @author Ian Schneider
  * @author James Macgill
  */
 public class DbaseFileTest extends TestCaseSupport {
-    static final String TEST_FILE = "statepop.dbf";
+    static final String TEST_FILE = "shapes/statepop.dbf";
+
     private IndexedDbaseFileReader dbf = null;
 
-    public DbaseFileTest(java.lang.String testName) {
+    public DbaseFileTest(String testName) throws IOException {
         super(testName);
     }
 
     public static void main(java.lang.String[] args) {
+        verbose = true;
         junit.textui.TestRunner.run(suite(DbaseFileTest.class));
     }
 
     protected void setUp() throws Exception {
-        dbf = new IndexedDbaseFileReader(getTestResourceChannel(TEST_FILE));
+        super.setUp();
+        dbf = new IndexedDbaseFileReader(TestData.openChannel(TEST_FILE));
     }
 
     public void testNumberofColsLoaded() {
-        assertEquals("Number of attributes found incorect", 252,
-            dbf.getHeader().getNumFields());
+        assertEquals("Number of attributes found incorect", 252, dbf.getHeader().getNumFields());
     }
 
     public void testNumberofRowsLoaded() {
@@ -64,16 +62,15 @@ public class DbaseFileTest extends TestCaseSupport {
     public void testDataLoaded() throws Exception {
         Object[] attrs = new Object[dbf.getHeader().getNumFields()];
         dbf.readEntry(attrs);
-        assertEquals("Value of Column 0 is wrong", attrs[0],
-            new String("Illinois"));
-        assertEquals("Value of Column 4 is wrong",
-            ((Double) attrs[4]).doubleValue(), 143986.61, 0.001);
+        assertEquals("Value of Column 0 is wrong", "Illinois", attrs[0]);
+        assertEquals("Value of Column 4 is wrong", 143986.61,
+            ((Double) attrs[4]).doubleValue(), 0.001);
     }
 
     public void testRowVsEntry() throws Exception {
         Object[] attrs = new Object[dbf.getHeader().getNumFields()];
-        IndexedDbaseFileReader dbf2 = new IndexedDbaseFileReader(getTestResourceChannel(
-                    TEST_FILE));
+        ReadableByteChannel ch2 = TestData.openChannel(TEST_FILE);
+        IndexedDbaseFileReader dbf2 = new IndexedDbaseFileReader(ch2);
 
         while (dbf.hasNext()) {
             dbf.readEntry(attrs);
@@ -86,6 +83,7 @@ public class DbaseFileTest extends TestCaseSupport {
                 assertEquals(attrs[i], r.read(i));
             }
         }
+        ch2.close();
     }
 
     public void testHeader() throws Exception {

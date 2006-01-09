@@ -34,7 +34,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -45,20 +45,17 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Ian Schneider
  */
 public class ShapefileReadWriteTest extends TestCaseSupport {
-    final String[] files = new String[] { "statepop.shp", "polygontest.shp",
-            "pointtest.shp", "holeTouchEdge.shp", "stream.shp" };
+    final String[] files = {
+        "shapes/statepop.shp",
+        "shapes/polygontest.shp",
+        "shapes/pointtest.shp",
+        "shapes/holeTouchEdge.shp",
+        "shapes/stream.shp"
+    };
 
     /** Creates a new instance of ShapefileReadWriteTest */
     public ShapefileReadWriteTest(String name) throws IOException {
         super(name);
-    }
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        File data = TestData.file(this, null);
-        if (!data.isDirectory()) {
-            throw new IOException("Couldn't setup temp file");
-        }
     }
 
     public void testAll() {
@@ -83,6 +80,8 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
     Exception exception = null;
 
     public void testConcurrentReadWrite() throws Exception {
+        System.gc();
+        System.runFinalization(); // If some streams are still open, it may help to close them.
         final File file = getTempFile();
         final Boolean bool;
         Runnable reader = new Runnable() {
@@ -125,8 +124,9 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         Thread readThread = new Thread(reader);
         readThread.start();
         while (!readStarted) {
-            if (exception != null)
+            if (exception != null) {
                 throw exception;
+            }
             Thread.yield();
         }
         test(files[0]);
@@ -139,6 +139,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
     }
 
     private void test(String f) throws Exception {
+        copyShapefiles(f); // Work on File rather than URL from JAR.
         ShapefileDataStore s = new ShapefileDataStore(TestData.url(this, f));
         String typeName = s.getTypeNames()[0];
         FeatureSource source = s.getFeatureSource(typeName);

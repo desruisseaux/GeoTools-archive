@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 
 import com.vividsolutions.jts.geom.Envelope;
 

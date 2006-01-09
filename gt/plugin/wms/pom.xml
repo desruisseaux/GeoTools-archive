@@ -67,6 +67,11 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
+      <artifactId>gt2-coverage</artifactId>
+      <version>2.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
       <artifactId>gt2-referencing</artifactId>
       <version>2.2-SNAPSHOT</version>
     </dependency>
@@ -79,7 +84,7 @@
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
-      <version>2.1</version>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>
 
