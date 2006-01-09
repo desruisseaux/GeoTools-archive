@@ -80,6 +80,10 @@ public class NullZeroValidation extends DefaultFeatureValidation {
     public boolean validate(Feature feature, FeatureType type,
         ValidationResults results) { // throws Exception {
 
+    	//if attribute not set, just pass
+    	if (attribute == null)
+    		return true;
+    	
         Object obj = feature.getAttribute(attribute);
 
         if (obj == null) {
