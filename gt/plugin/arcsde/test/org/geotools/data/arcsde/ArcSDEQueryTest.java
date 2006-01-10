@@ -66,9 +66,8 @@ public class ArcSDEQueryTest extends TestCase {
     }
 
     /**
-     * loads /testData/testparams.properties into a Properties object, wich is
-     * used to obtain test tables names and is used as parameter to find the
-     * DataStore
+     * loads {@code test-data/testparams.properties} into a Properties object, wich is
+     * used to obtain test tables names and is used as parameter to find the DataStore
      *
      * @throws Exception DOCUMENT ME!
      */

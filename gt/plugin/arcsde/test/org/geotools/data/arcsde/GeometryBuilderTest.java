@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
@@ -285,15 +286,15 @@ public class GeometryBuilderTest extends TestCase {
      */
     private static void testConstructShape(Geometry geometry)
         throws Exception {
-        LOGGER.fine("testConstructShape: testing " + geometry);
+        LOGGER.finer("testConstructShape: testing " + geometry);
 
         Class geometryClass = geometry.getClass();
         GeometryBuilder builder = GeometryBuilder.builderFor(geometryClass);
 
         SeCoordinateReference cr = TestData.getGenericCoordRef();
-
-        System.err.println("\n\n******************\n" + cr.getXYEnvelope());
-
+        if (LOGGER.isLoggable(Level.FINE)) {
+            System.err.println("\n\n******************\n" + cr.getXYEnvelope());
+        }
         Geometry equivalentGeometry = null;
 
         SeShape equivalentShape = builder.constructShape(geometry, cr);
@@ -301,27 +302,27 @@ public class GeometryBuilderTest extends TestCase {
 
         assertEquals(geometry + " - " + equivalentShape, expectedNumOfPoints,
             equivalentShape.getNumOfPoints());
-        LOGGER.info("geometry and SeShape contains the same number of points: "
+        LOGGER.fine("geometry and SeShape contains the same number of points: "
             + equivalentShape.getNumOfPoints());
 
-        LOGGER.fine("generating an SeShape's equivalent Geometry");
+        LOGGER.finer("generating an SeShape's equivalent Geometry");
         equivalentGeometry = builder.construct(equivalentShape);
 
-        LOGGER.info("now testing both geometries for equivalence: " + geometry
+        LOGGER.fine("now testing both geometries for equivalence: " + geometry
             + " -- " + equivalentGeometry);
 
         assertEquals(geometry.getDimension(), equivalentGeometry.getDimension());
-        LOGGER.info("dimension test passed");
+        LOGGER.fine("dimension test passed");
 
         assertEquals(geometry.getGeometryType(),
             equivalentGeometry.getGeometryType());
-        LOGGER.info("geometry type test passed");
+        LOGGER.fine("geometry type test passed");
 
         assertEquals(geometry + " - " + equivalentGeometry,
             geometry.getNumPoints(), equivalentGeometry.getNumPoints());
-        LOGGER.info("numPoints test passed");
+        LOGGER.fine("numPoints test passed");
 
-        LOGGER.info(geometry.getEnvelopeInternal() + " == "
+        LOGGER.fine(geometry.getEnvelopeInternal() + " == "
             + equivalentGeometry.getEnvelopeInternal());
 
         /*
@@ -329,7 +330,7 @@ public class GeometryBuilderTest extends TestCase {
                equivalentGeometry.getEnvelopeInternal());
          */
         assertEquals(geometry.getArea(), equivalentGeometry.getArea(), 0.1);
-        LOGGER.info("area test passed");
+        LOGGER.fine("area test passed");
     }
 
     /**
@@ -339,25 +340,25 @@ public class GeometryBuilderTest extends TestCase {
      * 
      * <p>
      * To do so, first parses the WKT geometries from the properties file
-     * pointed by <code>"testData/" + testDataSource</code>, then creates
+     * pointed by <code>"test-data/" + testDataSource</code>, then creates
      * their corresponding <code>SeShape</code> objects and finally used
      * GeometryBuilder to build the JTS geometries back, which are tested for
      * equality against the original ones.
      * </p>
      *
      * @param geometryClass a JTS geometry class
-     * @param testDataResource the resource name under "testData/" which
+     * @param testDataResource the resource name under "test-data/" which
      *        contains the geometries to load in WKT.
      *
      * @throws Exception for any problem that could arise
      */
     private void testBuildJTSGeometries(final Class geometryClass,
         final String testDataResource) throws Exception {
-        LOGGER.info("---- testBuildGeometries: testing " + testDataResource
+        LOGGER.fine("---- testBuildGeometries: testing " + testDataResource
             + " ----");
 
         this.geometryBuilder = GeometryBuilder.builderFor(geometryClass);
-        LOGGER.info("created " + this.geometryBuilder.getClass().getName());
+        LOGGER.fine("created " + this.geometryBuilder.getClass().getName());
 
         Geometry[] expectedGeometries = loadTestData(testDataResource);
         Geometry createdGeometry;
@@ -487,10 +488,9 @@ public class GeometryBuilderTest extends TestCase {
         String line = null;
 
         try {
-            LOGGER.info("loading test data /testData/" + resource);
+            LOGGER.fine("loading test data test-data/" + resource);
 
-            InputStream in = getClass().getResourceAsStream("/testData/"
-                    + resource);
+            InputStream in = org.geotools.resources.TestData.openStream(this, resource);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
             while ((line = reader.readLine()) != null) {
@@ -501,7 +501,7 @@ public class GeometryBuilderTest extends TestCase {
                 }
 
                 g = this.wktReader.read(line);
-                LOGGER.info("loaded test geometry: " + g.toText());
+                LOGGER.fine("loaded test geometry: " + g.toText());
                 testGeoms.add(g);
             }
         } catch (ParseException ex) {

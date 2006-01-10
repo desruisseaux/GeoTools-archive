@@ -688,8 +688,11 @@
 -->
           <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in doc comments. -->
           <tags>
+            <tag>tutorial:t:Tutorial</tag>
             <tag>todo:tfmc:TODO</tag>
+            <tag>task:tfmc:TODO</tag>
             <tag>revisit:tfmc:TODO</tag>
+            <tag>source:t:Source</tag>
           </tags>
 
           <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->

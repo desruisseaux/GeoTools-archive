@@ -17,6 +17,7 @@
 package org.geotools.data.arcsde;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
@@ -77,9 +78,8 @@ public class ArcSDEJavaApiTest extends TestCase {
 	}
 
 	/**
-	 * loads /testData/testparams.properties into a Properties object, wich is
-	 * used to obtain test tables names and is used as parameter to find the
-	 * DataStore
+	 * loads {@code test-data/testparams.properties} into a Properties object, wich is
+	 * used to obtain test tables names and is used as parameter to find the DataStore
 	 * 
 	 * @throws Exception
 	 *             DOCUMENT ME!
@@ -117,7 +117,7 @@ public class ArcSDEJavaApiTest extends TestCase {
 			rowQuery.execute();
 			fail("A null SeSqlConstruct should have thrown an exception!");
 		} catch (SeException e) {
-			LOGGER.info("Null SqlConstruct throwed exception, it's OK");
+			LOGGER.fine("Null SqlConstruct throwed exception, it's OK");
 		}
 	}
 
@@ -170,7 +170,7 @@ public class ArcSDEJavaApiTest extends TestCase {
 			SeConnection conn = pool.getConnection();
 
 			for (int i = 0; i < 26; i++) {
-				LOGGER.info("Running iteration #" + i);
+				LOGGER.fine("Running iteration #" + i);
 
 				SeQuery rowQuery = new SeQuery(conn, columns, sql);
 				rowQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true,
@@ -203,7 +203,7 @@ public class ArcSDEJavaApiTest extends TestCase {
 				rowQuery.close();
 				countQuery.close();
 			}
-			LOGGER.info("TEST PASSED");
+			LOGGER.fine("TEST PASSED");
 		} catch (SeException e) {
 			LOGGER.warning(e.getSeError().getErrDesc());
 			e.printStackTrace();
@@ -278,7 +278,7 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 */
 	public void testGenericSeCoordinateReferenceLimits() throws SeException {
 		SeCoordinateReference crs = this.testData.getGenericCoordRef();
-		LOGGER.info("CRS constraints: " + crs.getXYEnvelope() + ", presision: "
+		LOGGER.fine("CRS constraints: " + crs.getXYEnvelope() + ", presision: "
 				+ crs.getXYUnits());
 
 		SDEPoint[] ptArray = new SDEPoint[2];
@@ -296,7 +296,7 @@ public class ArcSDEJavaApiTest extends TestCase {
 				shift /= 10;
 			}
 		} catch (SeException e) {
-			LOGGER.info("Lower limit: " + String.valueOf(10 * shift));
+			LOGGER.fine("Lower limit: " + String.valueOf(10 * shift));
 		}
 
 		int numPts = 5;
@@ -647,11 +647,13 @@ public class ArcSDEJavaApiTest extends TestCase {
 			 * Create the table using the DBMS default configuration keyword.
 			 * Valid keywords are defined in the dbtune table.
 			 */
-			System.out
-					.println("\n--> Creating a table using DBMS Default Keyword");
+            if (LOGGER.isLoggable(Level.FINE)) {
+        		System.out.println("\n--> Creating a table using DBMS Default Keyword");
+            }                
 			table.create(colDefs, "DEFAULTS");
-			System.out.println(" - Done.");
-
+            if (LOGGER.isLoggable(Level.FINE)) {
+    			System.out.println(" - Done.");
+            }
 			/*
 			 * Define the attributes of the spatial column
 			 */
@@ -684,9 +686,13 @@ public class ArcSDEJavaApiTest extends TestCase {
 			/*
 			 * Spatially enable the new table...
 			 */
-			System.out.println("\n--> Adding spatial column \"SHAPE\"...");
+            if (LOGGER.isLoggable(Level.FINE)) {
+        		System.out.println("\n--> Adding spatial column \"SHAPE\"...");
+            }
 			layer.create(3, 4);
-			System.out.println(" - Done.");
+            if (LOGGER.isLoggable(Level.FINE)) {
+        		System.out.println(" - Done.");
+            }
 		} catch (SeException e) {
 			System.out.println(e.getSeError().getErrDesc());
 			e.printStackTrace();
@@ -741,14 +747,15 @@ public class ArcSDEJavaApiTest extends TestCase {
 			 * Create the table using the DBMS default configuration keyword.
 			 * Valid keywords are defined in the dbtune table.
 			 */
-			System.out
-					.println("\n--> Creating a table using DBMS Default Keyword");
-
+            if (LOGGER.isLoggable(Level.FINE)) {
+        		System.out.println("\n--> Creating a table using DBMS Default Keyword");
+            }
 			SeColumnDefinition[] tmpCols = new SeColumnDefinition[] { new SeColumnDefinition(
 					"tmp", SeColumnDefinition.TYPE_STRING, 5, 0, true) };
 			table.create(tmpCols, "DEFAULTS");
-			System.out.println(" - Done.");
-
+            if (LOGGER.isLoggable(Level.FINE)) {
+        		System.out.println(" - Done.");
+            }
 			SeColumnDefinition[] colDefs = new SeColumnDefinition[7];
 
 			/*
@@ -811,9 +818,13 @@ public class ArcSDEJavaApiTest extends TestCase {
 			/*
 			 * Spatially enable the new table...
 			 */
-			System.out.println("\n--> Adding spatial column \"SHAPE\"...");
+            if (LOGGER.isLoggable(Level.FINE)) {
+        		System.out.println("\n--> Adding spatial column \"SHAPE\"...");
+            }
 			layer.create(3, 4);
-			System.out.println(" - Done.");
+            if (LOGGER.isLoggable(Level.FINE)) {
+        		System.out.println(" - Done.");
+            }
 
 			table.addColumn(colDefs[4]);
 			table.addColumn(colDefs[5]);

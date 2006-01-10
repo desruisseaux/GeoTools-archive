@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * This test case does not still use the ArcSDEDataStore testing data supplied
- * with in test/testData/import, so it is excluded in project.xml.
+ * with in {@code test-data/import}, so it is excluded in project.xml.
  *
  * @author cdillard
  * @version $Id$

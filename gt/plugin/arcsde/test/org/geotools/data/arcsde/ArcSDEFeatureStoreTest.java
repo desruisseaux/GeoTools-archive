@@ -73,9 +73,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     private TestData testData;
 
     /**
-     * loads /testData/testparams.properties into a Properties object, wich is
-     * used to obtain test tables names and is used as parameter to find the
-     * DataStore
+     * loads {@code test-data/testparams.properties} into a Properties object, wich is
+     * used to obtain test tables names and is used as parameter to find the DataStore
      *
      * @throws Exception DOCUMENT ME!
      */
@@ -215,7 +214,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         AttributeType[] atts = new AttributeType[4];
         String typeName = this.testData.getTemp_table();
         if(typeName.indexOf('.') != -1){
-        	LOGGER.info("Unqualifying type name to create schema.");
+        	LOGGER.fine("Unqualifying type name to create schema.");
         	typeName = typeName.substring(typeName.lastIndexOf('.') + 1);
         }
 

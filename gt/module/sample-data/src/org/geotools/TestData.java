@@ -43,6 +43,8 @@ import java.nio.channels.ReadableByteChannel;
  * @since 2.2
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @tutorial http://www.geotools.org/display/GEOTOOLS/Test+Data
  */
 public final class TestData extends org.geotools.resources.TestData {
     /**

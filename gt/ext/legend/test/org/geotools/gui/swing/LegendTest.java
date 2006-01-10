@@ -14,21 +14,16 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * SLDStyleSuite.java
- * JUnit based test
- *
- * $Id: LegendTest.java,v 1.3 2004/05/01 21:18:37 jmacgill Exp $
- */
 package org.geotools.gui.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.HashMap;
 
 import javax.swing.JFrame;
@@ -57,158 +52,154 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.units.Unit;
+import org.geotools.resources.TestData;
 
 
 /**
- * DOCUMENT ME!
  *
+ * @version $Id$
  * @author iant
  */
 public class LegendTest extends TestCase {
     /**
-     * The context which contains this maps data
-     *
-     * @param testName DOCUMENT ME!
+     * {@code true} for enabling {@code println} statements. By default {@code true}
+     * when running from the command line, and {@code false} when running by Maven.
      */
-    public LegendTest(java.lang.String testName) {
+    private static boolean verbose;
+
+    /**
+     * The context which contains this maps data
+     */
+    public LegendTest(String testName) {
         super(testName);
     }
 
-    public void testLegend() throws java.io.UnsupportedEncodingException{
+    public void testLegend() throws Exception {
         MapLayer[] layers;
         MapContext context;
 
-        URL shpData0 = null;
-        URL shpData1 = null;
-        URL shpData2 = null;
-
-        URL base = getClass().getResource("testdata/");
-
-        System.out.println("base: " + base.toString());
-
-        try {
-	        shpData2 = new File(base.getPath() + "/testPoint.shp").toURL();
-            shpData1 = new File(base.getPath() + "/testLine.shp").toURL();
-            shpData0 = new File(base.getPath() + "/testPolygon.shp").toURL();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        URL shpData2 = TestData.url(this, "testPoint.shp");
+        URL shpData1 = TestData.url(this, "testLine.shp");
+        URL shpData0 = TestData.url(this, "testPolygon.shp");
 
         URL[] data = new URL[] { shpData0, shpData1, shpData2 };
 
-        File sldFile = new File(URLDecoder.decode(base.getPath(),"UTF-8") + "/color.sld");
+        File sldFile = TestData.file(this, "color.sld");
         SLDParser sld = null;
         
         SLDEditor.propertyEditorFactory.setInExpertMode(true);
 
-        try {
-            sld = new SLDParser(StyleFactoryFinder.createStyleFactory(), sldFile);
-        } catch (java.io.FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        sld = new SLDParser(StyleFactoryFinder.createStyleFactory(), sldFile);
 
         Style[] styles = sld.readXML();
-        System.out.println("user style num: " + styles.length);
-
-        try {
-            context = new DefaultMapContext();
-
-            ShapefileDataStore[] dataStores = new ShapefileDataStore[data.length];
-            layers = new MapLayer[data.length];
-
-            for (int i = 0; i < data.length; i++) {
-                HashMap params = new HashMap();
-                params.put("url", data[i].toString());
-                dataStores[i] = new ShapefileDataStore(data[i]);
-            }
-
-            StyleFactory styleFactory = StyleFactoryFinder.createStyleFactory();
-            BasicPolygonStyle style = new BasicPolygonStyle(styleFactory.getDefaultFill(),
-                    styleFactory.getDefaultStroke());
-            style.setTitle("Leeds ED Poly");
-
-            BasicLineStyle lineStyle = new BasicLineStyle(styleFactory.getDefaultStroke());
-            lineStyle.setTitle("UK Motorway Basic");
-            lineStyle.getFeatureTypeStyles()[0].getRules()[0].setTitle("Motorway");
-
-            System.out.println("Loading Data");
-
-            layers[0] = new DefaultMapLayer(dataStores[0].getFeatureSource(dataStores[0].getTypeNames()[0]), styles[0], "Leeds Ward Layer");
-            layers[1] = new DefaultMapLayer(dataStores[1].getFeatureSource(dataStores[1].getTypeNames()[0]), lineStyle, "Leeds ED Layer");
-            layers[2] = new DefaultMapLayer(dataStores[2].getFeatureSource(dataStores[2].getTypeNames()[0]), styles[1], "UK MotorWays Basic");
-
-            System.out.println("create Coodinate System....1");
-
-            Ellipsoid airy1830 = Ellipsoid.createEllipsoid("Airy1830", 6377563.396, 6356256.910,
-                    Unit.METRE);
-            System.out.println("create Coodinate System....2" + airy1830.toString());
-
-            GeographicCoordinateSystem geogCS = CoordinateSystemFactory.getDefault()
-                                                                       .createGeographicCoordinateSystem("Airy1830",
-                    new HorizontalDatum("Airy1830", airy1830));
-            System.out.println("create Coodinate System....3" + geogCS.toString());
-
-            Projection p = new Projection("Great_Britian_National_Grid", "Transverse_Mercator",
-                    airy1830, new Point2D.Double(49, -2), new Point2D.Double(400000, -100000));
-
-            System.out.println("create Coodinate System....4" + p.toString());
-
-            CoordinateSystem projectCS = CoordinateSystemFactory.getDefault()
-                                                                .createProjectedCoordinateSystem("Great_Britian_National_Grid",
-                    geogCS, p);
-
-            System.out.println("create Context");
-
-            context.addLayers(layers);
-
-            System.out.println("creating Map Pane");
-
-            // Create MapPane
-            StyledMapPane mapPane = new StyledMapPane();
-            mapPane.setMapContext(context);
-            System.out.println("Creating Map Pane Done");
-            mapPane.setBackground(Color.WHITE);
-            mapPane.setPreferredSize(new Dimension(800, 800));
-
-            // Create Menu for tools
-            JMenuBar menuBar = new javax.swing.JMenuBar();
-            System.out.println("creating MenuBar for Map Pane...");
-
-            // Create frame
-            JFrame frame = new JFrame();
-            frame.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent evt) {
-                        System.exit(0);
-                    }
-                });
-
-            frame.getContentPane().setLayout(new BorderLayout());
-            System.out.println("Add Map Pane into Frame");
-            
-            JSplitPane splitPane = new JSplitPane();
-            splitPane.add(new Legend(context, "LegendTest"), JSplitPane.LEFT);
-            splitPane.add(mapPane, JSplitPane.RIGHT);
-            splitPane.setDividerLocation(200);
-            frame.setContentPane(splitPane);            
-
-            frame.setTitle("Map Viewer");
-            frame.setSize(600, 400);
-            frame.show();
-
-            frame.dispose();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (verbose) {
+            System.out.println("user style num: " + styles.length);
         }
+
+        context = new DefaultMapContext();
+
+        ShapefileDataStore[] dataStores = new ShapefileDataStore[data.length];
+        layers = new MapLayer[data.length];
+
+        for (int i = 0; i < data.length; i++) {
+            HashMap params = new HashMap();
+            params.put("url", data[i].toString());
+            dataStores[i] = new ShapefileDataStore(data[i]);
+        }
+
+        StyleFactory styleFactory = StyleFactoryFinder.createStyleFactory();
+        BasicPolygonStyle style = new BasicPolygonStyle(styleFactory.getDefaultFill(),
+                styleFactory.getDefaultStroke());
+        style.setTitle("Leeds ED Poly");
+
+        BasicLineStyle lineStyle = new BasicLineStyle(styleFactory.getDefaultStroke());
+        lineStyle.setTitle("UK Motorway Basic");
+        lineStyle.getFeatureTypeStyles()[0].getRules()[0].setTitle("Motorway");
+
+        if (verbose) {
+            System.out.println("Loading Data");
+        }
+        layers[0] = new DefaultMapLayer(dataStores[0].getFeatureSource(dataStores[0].getTypeNames()[0]), styles[0], "Leeds Ward Layer");
+        layers[1] = new DefaultMapLayer(dataStores[1].getFeatureSource(dataStores[1].getTypeNames()[0]), lineStyle, "Leeds ED Layer");
+        layers[2] = new DefaultMapLayer(dataStores[2].getFeatureSource(dataStores[2].getTypeNames()[0]), styles[1], "UK MotorWays Basic");
+
+        if (verbose) {
+            System.out.println("create Coodinate System....1");
+        }
+        Ellipsoid airy1830 = Ellipsoid.createEllipsoid("Airy1830", 6377563.396, 6356256.910,
+                Unit.METRE);
+        if (verbose) {
+            System.out.println("create Coodinate System....2" + airy1830.toString());
+        }
+        GeographicCoordinateSystem geogCS = CoordinateSystemFactory.getDefault()
+                                                                   .createGeographicCoordinateSystem("Airy1830",
+                new HorizontalDatum("Airy1830", airy1830));
+        if (verbose) {
+            System.out.println("create Coodinate System....3" + geogCS.toString());
+        }
+        Projection p = new Projection("Great_Britian_National_Grid", "Transverse_Mercator",
+                airy1830, new Point2D.Double(49, -2), new Point2D.Double(400000, -100000));
+
+        if (verbose) {
+            System.out.println("create Coodinate System....4" + p.toString());
+        }
+        CoordinateSystem projectCS = CoordinateSystemFactory.getDefault()
+                                                            .createProjectedCoordinateSystem("Great_Britian_National_Grid",
+                geogCS, p);
+
+        if (verbose) {
+            System.out.println("create Context");
+        }
+        context.addLayers(layers);
+
+        if (verbose) {
+            System.out.println("creating Map Pane");
+        }
+        // Create MapPane
+        StyledMapPane mapPane = new StyledMapPane();
+        mapPane.setMapContext(context);
+        if (verbose) {
+            System.out.println("Creating Map Pane Done");
+        }
+        mapPane.setBackground(Color.WHITE);
+        mapPane.setPreferredSize(new Dimension(800, 800));
+
+        // Create Menu for tools
+        JMenuBar menuBar = new javax.swing.JMenuBar();
+        if (verbose) {
+            System.out.println("creating MenuBar for Map Pane...");
+        }
+        // Create frame
+        JFrame frame = new JFrame();
+        frame.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent evt) {
+                    System.exit(0);
+                }
+            });
+
+        frame.getContentPane().setLayout(new BorderLayout());
+        if (verbose) {
+            System.out.println("Add Map Pane into Frame");
+        }
+        JSplitPane splitPane = new JSplitPane();
+        splitPane.add(new Legend(context, "LegendTest"), JSplitPane.LEFT);
+        splitPane.add(mapPane, JSplitPane.RIGHT);
+        splitPane.setDividerLocation(200);
+        frame.setContentPane(splitPane);            
+
+        frame.setTitle("Map Viewer");
+        frame.setSize(600, 400);
+        frame.setVisible(true);
+        Thread.currentThread().sleep(500);
+        frame.dispose();
     }
 
     public static void main(java.lang.String[] args) {
+        verbose = true;
         junit.textui.TestRunner.run(suite());
     }
 
     public static Test suite() {
         return new junit.framework.TestSuite(LegendTest.class);
     }
-   
-    
-    
 }

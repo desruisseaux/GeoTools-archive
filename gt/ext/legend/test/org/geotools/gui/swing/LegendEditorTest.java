@@ -14,12 +14,11 @@
  *    Lesser General Public License for more details.
  *
  */
-
 package org.geotools.gui.swing;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
-import java.net.URL;
-import java.net.URLDecoder;
 
 import javax.swing.JFrame;
 
@@ -30,63 +29,61 @@ import org.geotools.gui.swing.sldeditor.style.StyleEditorChooser;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactoryFinder;
+import org.geotools.resources.TestData;
 
 
 /**
- * DOCUMENT ME!
  *
+ * @version $Id$
  * @author wolf
  */
 public class LegendEditorTest extends TestCase {
     /**
-     * The context which contains this maps data
-     *
-     * @param testName DOCUMENT ME!
+     * {@code true} for enabling {@code println} statements. By default {@code true}
+     * when running from the command line, and {@code false} when running by Maven.
      */
-    public LegendEditorTest(java.lang.String testName) {
+    private static boolean verbose;
+
+    /**
+     * The context which contains this maps data
+     */
+    public LegendEditorTest(String testName) {
         super(testName);
     }
     
-    public void testLegend() {
-        URL base = getClass().getResource("testdata/");
-        
-        
+    public void testLegend() throws Exception {
         SLDParser sld = null;
         
-        try {
-            File sldFile = new File(URLDecoder.decode(base.getPath(),"UTF-8") + "/color.sld");
-            sld = new SLDParser(StyleFactoryFinder.createStyleFactory(), sldFile);
-        } catch (java.io.FileNotFoundException e) {
-            e.printStackTrace();
-        }
-         catch (java.io.UnsupportedEncodingException e) {
-            e.printStackTrace();
-            fail();
-        }
+        File sldFile = TestData.file(this, "color.sld");
+        sld = new SLDParser(StyleFactoryFinder.createStyleFactory(), sldFile);
         
         Style[] styles = sld.readXML();
-        System.out.println("Style loaded");
-        
+        if (verbose) {
+            System.out.println("Style loaded");
+        }
         long start = System.currentTimeMillis();
         StyleEditorChooser sec = new StyleEditorChooser(null, styles[0]);
         
-        System.out.println("Style editor created in " + (System.currentTimeMillis() - start));
-        
+        if (verbose) {
+            System.out.println("Style editor created in " + (System.currentTimeMillis() - start));
+        }    
         // Create frame
         JFrame frame = new JFrame();
-        frame.addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent evt) {
                 System.exit(0);
             }
         });
         frame.setContentPane(sec);
-        
+
         frame.pack();
-        frame.show();
+        frame.setVisible(true);
+        Thread.currentThread().sleep(500);
         frame.dispose();
     }
     
     public static void main(java.lang.String[] args) {
+        verbose = true;
         junit.textui.TestRunner.run(suite());
     }
     

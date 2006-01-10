@@ -159,8 +159,9 @@
       <link href="http://geoapi.sourceforge.net/legacy/javadoc"/>
       <link href="http://www.jump-project.org/docs/jts/1.6/api"/>
 
-      <tag name="todo" scope="types,fields,methods,constructors" description="TODO:"/>
-      <tag name="task" scope="types,fields,methods,constructors" description="TASK:"/>
+      <tag name="tutorial" scope="types"                             description="Tutorial:"/>
+      <tag name="todo"     scope="types,fields,methods,constructors" description="TODO:"/>
+      <tag name="task"     scope="types,fields,methods,constructors" description="TASK:"/>
 
       <group title="Features, Filters and Styling"      packages="org.geotools.feature*:org.geotools.filter*:org.geotools.styling*"/>
       <group title="Geometries"                         packages="org.geotools.geometry*:org.geotools.topology*:org.geotools.measure*"/>

@@ -47,34 +47,37 @@ import java.util.zip.ZipFile;
  * <p>
  * We have chosen "{@code test-data}" to follow the javadoc "{@code doc-files}" convention
  * of ensuring that data directories don't look anything like normal java packages.
- * </p>
  * <p>
  * Example:
  * <pre>
  * class MyClass {
  *     public void example() {
- *         Image testImage = new ImageIcon(TestData.getResource(this, "test.png")).getImage();
- *         Reader reader = TestData.getReader(this, "script.xml");
+ *         Image testImage = new ImageIcon(TestData.url(this, "test.png")).getImage();
+ *         Reader reader = TestData.openReader(this, "script.xml");
+ *         // ... do some process
+ *         reader.close();
  *     }
  * }
  * </pre>
- * Where:
+ * Where the directory structure goes as bellow:
  * <ul>
  *   <li>{@code MyClass.java}<li>
  *   <li>{@code test-data/test.png}</li>
  *   <li>{@code test-data/script.xml}</li>
  * </ul>
- * </p>
  * <p>
  * By convention you should try and locate {@code test-data} near the JUnit test
- * cases that uses it.
- * </p>
+ * cases that uses it. If you need an access to shared test data, import the
+ * {@link org.geotools.TestData} class from the {@code sample-module} instead
+ * of this one.
  *
  * @since 2.0
  * @version $Id$
  * @author James McGill
  * @author Simone Giannecchiin (simboss)
  * @author Martin Desruisseaux
+ *
+ * @tutorial http://www.geotools.org/display/GEOTOOLS/Test+Data
  */
 public class TestData implements Runnable {
     /**
@@ -188,8 +191,8 @@ public class TestData implements Runnable {
     public static File temp(final Object caller, final String name) throws IOException {
         final File testData = file(caller, null);
         final int split = name.lastIndexOf('.');
-        final String prefix = (split < 0) ? name : name.substring(0,split);
-        final String suffix = (split < 0) ? null : name.substring(split+1);
+        final String prefix = (split < 0) ? name  : name.substring(0,split);
+        final String suffix = (split < 0) ? "tmp" : name.substring(split+1);
         final File tmp = File.createTempFile(prefix, '.'+suffix, testData);
         deleteOnExit(tmp);
         return tmp;

@@ -133,20 +133,6 @@
 
 
   <!-- ==================================================== -->
-  <!--     Reports configuration for the web site           -->
-  <!-- ==================================================== -->
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-plugin-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </reporting>
-
-
-
-  <!-- ==================================================== -->
   <!--     Deployment to Geotools servers                   -->
   <!-- ==================================================== -->
   <distributionManagement>
@@ -157,16 +143,6 @@
       <name>Geotools release repository</name>
       <url>scp://eaunet2.espace.ird.nc/home/latical/maven</url>
     </repository>
-    <snapshotRepository>
-      <id>espace</id>
-      <name>Geotools snapshot repository</name>
-      <url>scp://eaunet2.espace.ird.nc/home/latical/maven</url>
-    </snapshotRepository>
-    <site>
-      <id>sicade</id>
-      <name>Geotools web site</name>
-      <url>scp://eaunet.espace.ird.nc/var/www/html/sicade/geotools/</url>
-    </site>
   </distributionManagement>
 
 
@@ -175,11 +151,12 @@
   <!--     All Geotools 2 plugins included in the build     -->
   <!-- ==================================================== -->
   <modules>
+    <!-- Do not include 'doclets', because it requires J2SE 1.5. -->
+    <module>jar-collector</module>
+    <module>javamaker</module>
     <module>jjtree-javacc</module>
     <module>rmic</module>
-    <module>javamaker</module>
     <module>unopkg</module>
-    <module>jar-collector</module>
   </modules>
 
 </project>

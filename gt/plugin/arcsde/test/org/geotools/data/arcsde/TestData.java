@@ -16,6 +16,7 @@
  */
 package org.geotools.data.arcsde;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -72,10 +73,7 @@ public class TestData {
         + "UNIT[\"degree\", 0.017453292519943295]," + "AXIS[\"Lon\", EAST],"
         + "AXIS[\"Lat\", NORTH]," + "AUTHORITY[\"EPSG\",\"4326\"]]";
 
-    /** folder used to load test filters */
-    private String dataFolder = "/testData/";
-
-    /** the set of test parameters loaded from /testData/testparams.properties */
+    /** the set of test parameters loaded from {@code test-data/testparams.properties} */
     private Properties conProps = null;
 
     /** the name of the table holding the point test features */
@@ -111,18 +109,16 @@ public class TestData {
      * @throws IOException DOCUMENT ME!
      */
     public void setUp() throws IOException {
-        URL folderUrl = getClass().getResource("/testData");
-        this.dataFolder = folderUrl.toExternalForm() + "/";
         this.conProps = new Properties();
 
-        String propsFile = "/testData/testparams.properties";
-        InputStream in = getClass().getResourceAsStream(propsFile);
-
-        if (in == null) {
-            throw new IOException("cannot find test params: " + propsFile);
-        }
+        String propsFile = "testparams.properties";
+        InputStream in = org.geotools.resources.TestData.openStream(this, propsFile);
+        // The line above should never returns null. It should thow a
+        // FileNotFoundException instead if the resource is not available.
 
         this.conProps.load(in);
+        in.close();
+
         this.point_table = this.conProps.getProperty("point_table");
         this.line_table = this.conProps.getProperty("line_table");
         this.polygon_table = this.conProps.getProperty("polygon_table");
@@ -160,7 +156,7 @@ public class TestData {
     }
 
     /**
-     * creates an ArcSDEDataStore using /testData/testparams.properties as
+     * creates an ArcSDEDataStore using {@code test-data/testparams.properties} as
      * holder of datastore parameters
      *
      * @return DOCUMENT ME!
@@ -194,24 +190,6 @@ public class TestData {
      */
     public void setConProps(Properties conProps) {
         this.conProps = conProps;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return Returns the dataFolder.
-     */
-    public String getDataFolder() {
-        return this.dataFolder;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param dataFolder The dataFolder to set.
-     */
-    public void setDataFolder(String dataFolder) {
-        this.dataFolder = dataFolder;
     }
 
     /**
@@ -473,7 +451,7 @@ public class TestData {
             SeRow row = insert.getRowToSet();
 
             SeCoordinateReference coordref = layer.getCoordRef();
-            LOGGER.info("CRS constraints: " + coordref.getXYEnvelope()
+            LOGGER.fine("CRS constraints: " + coordref.getXYEnvelope()
                 + ", presision: " + coordref.getXYUnits());
 
             SeShape shape = new SeShape(coordref);
@@ -986,7 +964,7 @@ public class TestData {
         int shift = 100000;
         SeExtent validRange = new SeExtent(-shift, -shift, shift, shift);
         seCRS.setXYByEnvelope(validRange);
-        GeometryBuilderTest.LOGGER.info("CRS: " + seCRS.getXYEnvelope());
+        GeometryBuilderTest.LOGGER.fine("CRS: " + seCRS.getXYEnvelope());
 
         return seCRS;
     }

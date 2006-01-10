@@ -61,9 +61,9 @@ public class ArcSDEConnectionPoolTest extends TestCase {
     }
 
     /**
-     * loads /testData/testparams.properties to get connection parameters and
-     * sets up a ConnectionConfig with them for tests to set up
-     * ArcSDEConnectionPool's as requiered
+     * loads {@code test-data/testparams.properties} to get connection parameters and
+     * sets up a ConnectionConfig with them for tests to set up ArcSDEConnectionPool's
+     * as requiered
      *
      * @throws Exception DOCUMENT ME!
      * @throws IllegalStateException DOCUMENT ME!
@@ -72,9 +72,9 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         super.setUp();
 
         Properties conProps = new Properties();
-        String propsFile = "/testData/testparams.properties";
-        URL conParamsSource = getClass().getResource(propsFile);
-        LOGGER.info("loading connection parameters from "
+        String propsFile = "testparams.properties";
+        URL conParamsSource = org.geotools.resources.TestData.url(this, propsFile);
+        LOGGER.fine("loading connection parameters from "
             + conParamsSource.toExternalForm());
 
         InputStream in = conParamsSource.openStream();
@@ -85,6 +85,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         }
 
         conProps.load(in);
+        in.close();
         connectionParameters = conProps;
 
         //test that mandatory connection parameters are set
@@ -134,16 +135,16 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         throws IllegalArgumentException, NullPointerException, 
             DataSourceException {
         this.connectionConfig = new ConnectionConfig(connParams);
-        LOGGER.info("creating a new ArcSDEConnectionPool with "
+        LOGGER.fine("creating a new ArcSDEConnectionPool with "
             + connectionConfig);
 
         if (this.pool != null) {
-            LOGGER.info("pool already created, closing it");
+            LOGGER.fine("pool already created, closing it");
             this.pool.close();
         }
 
         this.pool = new ArcSDEConnectionPool(connectionConfig);
-        LOGGER.info("pool created");
+        LOGGER.fine("pool created");
 
         return this.pool;
     }
@@ -156,7 +157,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
      * @throws IOException DOCUMENT ME!
      */
     public void testConnect() throws IOException {
-        LOGGER.info("testing connection to the sde database");
+        LOGGER.fine("testing connection to the sde database");
 
         ConnectionPoolFactory pf = ConnectionPoolFactory.getInstance();
         ConnectionConfig congfig = null;
@@ -165,7 +166,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
 
         try {
             ArcSDEConnectionPool pool = pf.createPool(congfig);
-            LOGGER.info("connection succeed " + pool.getPoolSize()
+            LOGGER.fine("connection succeed " + pool.getPoolSize()
                 + " connections ready");
         } catch (DataSourceException ex) {
             throw ex;
@@ -223,14 +224,14 @@ public class ArcSDEConnectionPoolTest extends TestCase {
 
         //this MUST fail, since maxConnections is lower than minConnections
         try {
-            LOGGER.info(
+            LOGGER.fine(
                 "testing parameters' sanity check at pool creation time");
             createPool(params);
             fail(
                 "the connection pool creation must have failed since a wrong set of arguments was passed");
         } catch (IllegalArgumentException ex) {
             //it's ok, it is what's expected
-            LOGGER.info("pramams assertion passed");
+            LOGGER.fine("pramams assertion passed");
         }
     }
 
@@ -297,7 +298,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
             fail(
                 "createPool should have thrown an exception, since increment is greater than max");
         } catch (IllegalArgumentException iae) {
-            LOGGER.info("It is intentional: " + iae.getMessage());
+            LOGGER.fine("It is intentional: " + iae.getMessage());
         }
     }
 
@@ -370,7 +371,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
             fail(
                 "since the max number of connections was reached, the pool should have throwed an UnavailableConnectionException");
         } catch (UnavailableConnectionException ex) {
-            LOGGER.info(
+            LOGGER.fine(
                 "maximun number of connections reached, got an UnavailableConnectionException, it's OK");
         }
 

@@ -98,9 +98,8 @@ public class ArcSDEDataStoreTest extends TestCase {
     }
 
     /**
-     * loads /testData/testparams.properties into a Properties object, wich is
-     * used to obtain test tables names and is used as parameter to find the
-     * DataStore
+     * loads {@code testData/testparams.properties} into a Properties object, wich is
+     * used to obtain test tables names and is used as parameter to find the DataStore
      *
      * @throws Exception DOCUMENT ME!
      */
@@ -134,7 +133,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         String failMsg = sdeDs + " is not an ArcSDEDataStore";
         assertTrue(failMsg, (sdeDs instanceof ArcSDEDataStore));
-        LOGGER.info("testFinder OK :" + sdeDs.getClass().getName());
+        LOGGER.fine("testFinder OK :" + sdeDs.getClass().getName());
     }
 
     /**
@@ -184,7 +183,7 @@ public class ArcSDEDataStoreTest extends TestCase {
             bbox.addRightGeometry(ff.createBBoxExpression(bounds));
 
             for(int i = 0; i < 20; i++){
-            	LOGGER.info("Running iteration #" + i);
+            	LOGGER.fine("Running iteration #" + i);
             	
             	FeatureResults res = source.getFeatures(bbox);
             	FeatureReader reader = res.reader();
@@ -223,9 +222,10 @@ public class ArcSDEDataStoreTest extends TestCase {
         String[] featureTypes = store.getTypeNames();
         assertNotNull(featureTypes);
 
-        for (int i = 0; i < featureTypes.length; i++)
-            System.out.println(featureTypes[i]);
-
+        if (LOGGER.isLoggable(Level.FINE)) {
+            for (int i = 0; i < featureTypes.length; i++)
+                System.out.println(featureTypes[i]);
+        }
         testTypeExists(featureTypes, this.testData.getPoint_table());
         testTypeExists(featureTypes, this.testData.getLine_table());
         testTypeExists(featureTypes, this.testData.getPolygon_table());
@@ -248,7 +248,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         schema = store.getSchema(this.testData.getPolygon_table());
         assertNotNull(schema);
         assertTrue(schema.getAttributeCount() > 0);
-        LOGGER.info("testGetSchema OK: " + schema);
+        LOGGER.fine("testGetSchema OK: " + schema);
     }
 
     /**
@@ -321,7 +321,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         for (int i = 0; i < NUM_READERS; i++)
             scounts += (counts[i] + ", ");
 
-        LOGGER.info("testGetFeatureReader: traversed " + scounts
+        LOGGER.fine("testGetFeatureReader: traversed " + scounts
             + " features simultaneously from " + NUM_READERS
             + " different FeatureReaders in " + t + "ms");
     }
@@ -471,14 +471,14 @@ public class ArcSDEDataStoreTest extends TestCase {
         Filter bboxFilter = getBBoxfilter(fs);
         String sqlFilterUri = getFilterUri("filters.sql.polygons.filter");
         Filter sqlFilter = parseDocument(sqlFilterUri);
-        LOGGER.info("Geometry filter: " + bboxFilter);
-        LOGGER.info("SQL filter: " + sqlFilter);
+        LOGGER.fine("Geometry filter: " + bboxFilter);
+        LOGGER.fine("SQL filter: " + sqlFilter);
 
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         LogicFilter mixedFilter = ff.createLogicFilter(sqlFilter,
                 FilterType.LOGIC_AND);
         mixedFilter.addFilter(bboxFilter);
-        LOGGER.info("Mixed filter: " + mixedFilter);
+        LOGGER.fine("Mixed filter: " + mixedFilter);
 
         //verify both filter constraints are met
         testFilter(mixedFilter, fs, EXPECTED_RESULT_COUNT);
@@ -486,14 +486,14 @@ public class ArcSDEDataStoreTest extends TestCase {
         final int LOOP_COUNT = 6;
 
         for (int i = 0; i < LOOP_COUNT; i++) {
-            LOGGER.info("Running #" + i + " iteration for mixed query test");
+            LOGGER.fine("Running #" + i + " iteration for mixed query test");
 
             //check that getBounds and getCount do function
             try {
                 FeatureResults results = fs.getFeatures(mixedFilter);
                 Envelope bounds = results.getBounds();
                 assertNotNull(bounds);
-                LOGGER.info("results bounds: " + bounds);
+                LOGGER.fine("results bounds: " + bounds);
 
                 FeatureReader reader = results.reader();
 
@@ -503,11 +503,11 @@ public class ArcSDEDataStoreTest extends TestCase {
                 reader.next();
                 bounds = results.getBounds();
                 assertNotNull(bounds);
-                LOGGER.info("results bounds when reading: " + bounds);
+                LOGGER.fine("results bounds when reading: " + bounds);
 
                 int count = results.getCount();
                 assertEquals(EXPECTED_RESULT_COUNT, count);
-                LOGGER.info("wooohoooo...");
+                LOGGER.fine("wooohoooo...");
                 reader.close();
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "At iteration " + i, e);
@@ -780,7 +780,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         FeatureResults results = fsource.getFeatures();
         int count = results.getCount();
         assertTrue("getCount returns " + count, count > 0);
-        LOGGER.info("feature count: " + count);
+        LOGGER.fine("feature count: " + count);
 
         Envelope env1;
         Envelope env2;
@@ -817,7 +817,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      *
      * @return DOCUMENT ME!
      */
-    private String getFilterUri(String filterKey) {
+    private String getFilterUri(String filterKey) throws IOException {
         String filterFileName = this.testData.getConProps().getProperty(filterKey);
 
         if (filterFileName == null) {
@@ -825,7 +825,7 @@ public class ArcSDEDataStoreTest extends TestCase {
                 + " param not found in tests configurarion properties file");
         }
 
-        String uri = this.testData.getDataFolder() + filterFileName;
+        String uri = org.geotools.resources.TestData.url(this, filterFileName).toString();
 
         return uri;
     }
@@ -879,11 +879,11 @@ public class ArcSDEDataStoreTest extends TestCase {
         FeatureCollection fc = results.collection();
         int resCount = results.getCount();
         int fCount = fc.size();
-        LOGGER.info("results count: " + resCount + " collection size: "
+        LOGGER.fine("results count: " + resCount + " collection size: "
             + fCount);
 
         Feature f = fc.features().next();
-        LOGGER.info("first feature is: " + f);
+        LOGGER.fine("first feature is: " + f);
 
         String failMsg = "Expected and returned result count does not match";
         assertEquals(failMsg, expected, fCount);
@@ -937,7 +937,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     private void testTypeExists(String[] featureTypes, String table) {
         for (int i = 0; i < featureTypes.length; i++) {
             if (featureTypes[i].equalsIgnoreCase(table.toUpperCase())) {
-                LOGGER.info("testTypeExists OK: " + table);
+                LOGGER.fine("testTypeExists OK: " + table);
 
                 return;
             }
@@ -956,7 +956,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     private void testGetFeatures(String wich, String table)
         throws IOException {
-        LOGGER.info("getting all features from " + table);
+        LOGGER.fine("getting all features from " + table);
 
         FeatureSource source = store.getFeatureSource(table);
         int expectedCount = getExpectedCount("getfeatures." + wich
@@ -969,7 +969,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         FeatureCollection features = fresults.collection();
         failMsg = "FeatureResults.getCount and .collection().size thoes not match";
         assertEquals(failMsg, fCount, features.size());
-        LOGGER.info("fetched " + fCount + " features for " + wich
+        LOGGER.fine("fetched " + fCount + " features for " + wich
             + " layer, OK");
     }
 
@@ -995,7 +995,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         SAXParser parser = fac.newSAXParser();
         ParserAdapter p = new ParserAdapter(parser.getParser());
         p.setContentHandler(documentFilter);
-        LOGGER.fine("just made parser, " + uri);
+        LOGGER.finer("just made parser, " + uri);
         p.parse(uri);
         LOGGER.finest("just parsed: " + uri);
 
