@@ -291,6 +291,7 @@ public class SLDParser {
 	public StyledLayerDescriptor parseSLD() {
 		javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory
 				.newInstance();
+		dbf.setNamespaceAware(true);
 
 		try {
 			javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();

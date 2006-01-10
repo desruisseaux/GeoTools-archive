@@ -30,6 +30,7 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LogicFilter;
 import org.geotools.resources.TestData;
 import java.io.IOException;
+import java.net.URL;
 
 
 /**
@@ -57,32 +58,6 @@ public class SLDStyleTest extends TestCase {
 
         return suite;
     }
-
-    //
-    //    /** Test of setInput method, of class org.geotools.styling.SLDStyle. */
-    //    public void testSetInput() {
-    //        System.out.println("testSetInput");
-    //
-    //        // Add your test code below by replacing the default call to fail.
-    //        fail("The test case is empty.");
-    //    }
-    //
-    //    /** Test of readXML method, of class org.geotools.styling.SLDStyle. */
-    //    public void testReadXML() {
-    //        System.out.println("testReadXML");
-    //
-    //        // Add your test code below by replacing the default call to fail.
-    //        fail("The test case is empty.");
-    //    }
-    //
-    //    /** Test of readDOM method, of class org.geotools.styling.SLDStyle. */
-    //    public void testReadDOM() {
-    //        System.out.println("testReadDOM");
-    //
-    //        // Add your test code below by replacing the default call to fail.
-    //        fail("The test case is empty.");
-    //    }
-    //
 
     /**
      * Test of parseStyle method, of class org.geotools.styling.SLDStyle.
@@ -132,9 +107,20 @@ public class SLDStyleTest extends TestCase {
         String xml = aTransformer.transform(sld);
 
         //System.out.println(xml);
+        assertNotNull(xml);
         //we're content if this didn't throw an exception...
+        //TODO: add a real test case
     }
 
+    public void testParseSLD_NameSpaceAware() throws Exception {
+        URL surl = TestData.getResource(this, "test-ns.sld");
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
+        SLDParser stylereader = new SLDParser(factory, surl);
+        StyledLayerDescriptor sld = stylereader.parseSLD();
+        
+        assertEquals(1, sld.getStyledLayers().length);
+    }
+    
     /**
      * Test of parseSLD method to ensure NamedLayer/Name and
      * NamedLayer/NamedStyle are parsed correctly
