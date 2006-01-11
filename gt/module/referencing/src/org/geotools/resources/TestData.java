@@ -77,7 +77,7 @@ import java.util.zip.ZipFile;
  * @author Simone Giannecchiin (simboss)
  * @author Martin Desruisseaux
  *
- * @tutorial http://www.geotools.org/display/GEOTOOLS/Test+Data
+ * @tutorial http://www.geotools.org/display/GEOT/5.8+Test+Data
  */
 public class TestData implements Runnable {
     /**

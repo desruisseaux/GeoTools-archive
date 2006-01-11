@@ -77,6 +77,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @since 2.0
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Parameters
  */
 public abstract class AbstractMathTransform extends Formattable implements MathTransform {
     /**

@@ -103,6 +103,8 @@ import org.geotools.util.WeakHashSet;
  * @since 2.1
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Parameters
  */
 public class DefaultMathTransformFactory implements MathTransformFactory {
     /**

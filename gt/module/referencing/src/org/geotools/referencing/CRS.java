@@ -67,6 +67,8 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @version $Id$
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
+ *
+ * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Services+for+Geotools+2.1
  */
 public final class CRS {
     /**

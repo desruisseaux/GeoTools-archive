@@ -78,6 +78,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  *
  * @see <A HREF="http://mathworld.wolfram.com/MapProjection.html">Map projections on MathWorld</A>
  * @see <A HREF="http://atlas.gc.ca/site/english/learningresources/carto_corner/map_projections.html">Map projections on the atlas of Canada</A>
+ *
+ * @tutorial http://www.geotools.org/display/GEOTOOLS/How+to+add+new+projections
  */
 public abstract class MapProjection extends AbstractMathTransform
                 implements MathTransform2D, Serializable
