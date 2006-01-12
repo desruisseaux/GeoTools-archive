@@ -224,6 +224,7 @@ public interface FilterFactory extends Factory {
      * @param schema the schema to create with.
      *
      * @return The new Attribute Expression.
+     * @deprecated use {@link #createAttributeExpression(String)} instead.
      */
     public AttributeExpression createAttributeExpression(FeatureType schema);
 
