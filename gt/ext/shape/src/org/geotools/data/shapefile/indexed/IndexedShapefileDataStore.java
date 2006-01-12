@@ -87,21 +87,10 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BetweenFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
-import org.geotools.filter.FilterVisitor;
-import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.LogicFilter;
-import org.geotools.filter.MathExpression;
-import org.geotools.filter.NullFilter;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.LockTimeoutException;
@@ -143,6 +132,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     byte treeType;
     final boolean createIndex;
     final boolean useIndex;
+	private QuadTree quadTree;
+	private RTree rtree;
 
     /**
      * Creates a new instance of ShapefileDataStore.
@@ -283,6 +274,21 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         }
     }
 
+    protected void finalize() throws Throwable {
+    	if( rtree!=null )
+    		try {
+				rtree.close();
+			} catch (Exception e) {
+				LOGGER.severe("IndexedShapeFileDataStore:finalize(): Error closing rtree. "+e.getLocalizedMessage());
+			}
+    	if( quadTree!=null )
+    		try {
+				quadTree.close();
+			} catch (Exception e) {
+				LOGGER.severe("IndexedShapeFileDataStore:finalize(): Error closing quadTree. "+e.getLocalizedMessage());
+			}
+    }
+    
     /**
      * Determine if the location of this shape is local or remote.
      *
@@ -528,7 +534,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             throw new DataSourceException("Error querying QuadTree", le);
         } finally {
             try {
-                tree.close();
+//                tree.close();
             } catch (Exception ee) {
             }
 
@@ -632,35 +638,35 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      * @throws IOException If an error occurs during creation.
      * @throws DataSourceException DOCUMENT ME!
      */
-    protected RTree openRTree() throws IOException {
-        if (!this.isLocal()) {
-            return null;
-        }
+    protected synchronized RTree openRTree() throws IOException {
+    	if( rtree == null){
+	        if (!this.isLocal()) {
+	            return null;
+	        }
+	
+	        File file = new File(treeURL.getPath());
+	
+	        if (!file.exists() || (file.length() == 0)) {
+	            if (this.createIndex) {
+	                try {
+	                    this.buildRTree();
+	                } catch (TreeException e) {
+	                    return null;
+	                }
+	            } else {
+	                return null;
+	            }
+	        }
+	
+	        try {
+	            FileSystemPageStore fps = new FileSystemPageStore(file);
+	            rtree = new RTree(fps);
+	        } catch (TreeException re) {
+	            throw new DataSourceException("Error opening RTree", re);
+	        }
+    	}
 
-        File file = new File(treeURL.getPath());
-
-        if (!file.exists() || (file.length() == 0)) {
-            if (this.createIndex) {
-                try {
-                    this.buildRTree();
-                } catch (TreeException e) {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        }
-
-        RTree ret = null;
-
-        try {
-            FileSystemPageStore fps = new FileSystemPageStore(file);
-            ret = new RTree(fps);
-        } catch (TreeException re) {
-            throw new DataSourceException("Error opening RTree", re);
-        }
-
-        return ret;
+        return rtree;
     }
 
     /**
@@ -670,24 +676,27 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      *
      * @throws StoreException
      */
-    protected QuadTree openQuadTree() throws StoreException {
-        File file = new File(treeURL.getPath());
+    protected synchronized QuadTree openQuadTree() throws StoreException {
+    	if( quadTree==null ){
+	        File file = new File(treeURL.getPath());
+	
+	        if (!file.exists() || (file.length() == 0)) {
+	            if (this.createIndex) {
+	                try {
+	                    this.buildQuadTree();
+	                } catch (TreeException e) {
+	                    return null;
+	                }
+	            } else {
+	                return null;
+	            }
+	        }
+	
+	        FileSystemIndexStore store = new FileSystemIndexStore(file);
+	        quadTree=store.load();
+    	}
 
-        if (!file.exists() || (file.length() == 0)) {
-            if (this.createIndex) {
-                try {
-                    this.buildQuadTree();
-                } catch (TreeException e) {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        }
-
-        FileSystemIndexStore store = new FileSystemIndexStore(file);
-
-        return store.load();
+        return quadTree;
     }
 
     /**
@@ -1062,6 +1071,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         if (isLocal()) {
             LOGGER.info("Creating spatial index for " + shpURL.getPath());
 
+            synchronized (this) {
+            	rtree=null;
+			}
             ShapeFileIndexer indexer = new ShapeFileIndexer();
             indexer.setIdxType(ShapeFileIndexer.RTREE);
             indexer.setShapeFileName(shpURL.getPath());
@@ -1096,7 +1108,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     private void buildQuadTree() throws TreeException {
         if (isLocal()) {
             LOGGER.info("Creating spatial index for " + shpURL.getPath());
-
+            synchronized (this) {
+            	quadTree=null;
+			}
             ShapeFileIndexer indexer = new ShapeFileIndexer();
             indexer.setIdxType(ShapeFileIndexer.QUADTREE);
             indexer.setShapeFileName(shpURL.getPath());
