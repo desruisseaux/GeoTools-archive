@@ -54,7 +54,10 @@ import org.geotools.index.rtree.RTree;
 import org.geotools.index.rtree.cachefs.FileSystemPageStore;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.nio.channels.FileChannel;
 import java.util.Hashtable;
@@ -281,16 +284,23 @@ public class ShapeFileIndexer {
 
             // Final index file
             File finalFile = new File(rtreeName);
-
+            boolean copied=false;
+            
             // Delete file if exists
             if (finalFile.exists()) {
                 if (!finalFile.delete()) {
-                    throw new TreeException("Unable to delete " + treeFile
-                        + " cannot commit the new index!");
+                	try{
+                		copyFile(treeFile, finalFile);
+                		copied=true;
+                	}catch (IOException ie){
+                        throw new TreeException("Unable to delete " + treeFile
+                                + " cannot commit the new index!");
+
+                	}
                 }
             }
 
-            if (!treeFile.renameTo(finalFile)) {
+            if (!copied && !treeFile.renameTo(finalFile)) {
                 throw new TreeException("Unable to rename " + treeFile + " to "
                     + finalFile + " cannot commit the new index!");
             }
@@ -306,7 +316,40 @@ public class ShapeFileIndexer {
         return cnt;
     }
 
-    /**
+    /** 
+     * Copy data from source file to destination file.
+     * 
+     * @param source source file
+     * @param dest destination file
+     */
+    private static void copyFile(File source, File dest) throws IOException {
+    	 if(!dest.exists()) {
+    	  dest.createNewFile();
+    	 }
+    	 InputStream in = null;
+    	 OutputStream out = null;
+    	 try {
+    	  in = new FileInputStream(source);
+    	  out = new FileOutputStream(dest);
+    	    
+    	  // Transfer bytes from in to out
+    	  byte[] buf = new byte[1024];
+    	  int len;
+    	  while ((len = in.read(buf)) > 0) {
+    	   out.write(buf, 0, len);
+    	  }
+    	 }
+    	 finally {
+    	  if(in != null) {
+    	   in.close();
+    	  }
+    	  if(out != null) {
+    	   out.close();
+    	  }
+    	 }
+    	}
+
+	/**
      * DOCUMENT ME!
      *
      * @param reader

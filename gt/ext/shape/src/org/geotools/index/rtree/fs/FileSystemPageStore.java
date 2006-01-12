@@ -324,13 +324,6 @@ public class FileSystemPageStore extends PageStore {
     }
 
     /**
-     * @see java.lang.Object#finalize()
-     */
-    protected void finalize() throws Throwable {
-        this.close();
-    }
-
-    /**
      * @see org.geotools.index.rtree.PageStore#getRoot()
      */
     public Node getRoot() {
@@ -429,6 +422,7 @@ public class FileSystemPageStore extends PageStore {
 
             this.raFile.close();
         } catch (IOException e) {
+        	e.printStackTrace();
             throw new TreeException(e);
         }
     }

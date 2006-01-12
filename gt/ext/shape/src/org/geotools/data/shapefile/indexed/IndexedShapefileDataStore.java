@@ -14,40 +14,16 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- *    Geotools - OpenSource mapping toolkit
- *    (C) 2002, Centre for Computational Geography
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- */
 package org.geotools.data.shapefile.indexed;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.data.AbstractAttributeIO;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
@@ -105,15 +81,18 @@ import org.geotools.index.rtree.fs.FileSystemPageStore;
 import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.xml.gml.GMLSchema;
 import org.opengis.referencing.FactoryException;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
 
 
 /**
@@ -132,16 +111,13 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     byte treeType;
     final boolean createIndex;
     final boolean useIndex;
-	private QuadTree quadTree;
-	private RTree rtree;
+    private QuadTree quadTree;
+    private RTree rtree;
 
     /**
      * Creates a new instance of ShapefileDataStore.
      *
      * @param url The URL of the shp file to use for this DataSource.
-     *
-     * @throws java.net.MalformedURLException If computation of related URLs
-     *         (dbf,shx) fails.
      */
     public IndexedShapefileDataStore(URL url)
         throws java.net.MalformedURLException {
@@ -153,9 +129,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      *
      * @param url The URL of the shp file to use for this DataSource.
      * @param namespace DOCUMENT ME!
-     *
-     * @throws java.net.MalformedURLException If computation of related URLs
-     *         (dbf,shx) fails.
      */
     public IndexedShapefileDataStore(URL url, URI namespace)
         throws java.net.MalformedURLException {
@@ -168,8 +141,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      * @param url The URL of the shp file to use for this DataSource.
      * @param namespace DOCUMENT ME!
      * @param useMemoryMappedBuffer enable/disable memory mapping of files
-     *
-     * @throws java.net.MalformedURLException
      */
     public IndexedShapefileDataStore(URL url, URI namespace,
         boolean useMemoryMappedBuffer) throws java.net.MalformedURLException {
@@ -181,8 +152,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      *
      * @param url The URL of the shp file to use for this DataSource.
      * @param useMemoryMappedBuffer enable/disable memory mapping of files
-     *
-     * @throws java.net.MalformedURLException
      */
     public IndexedShapefileDataStore(URL url, boolean useMemoryMappedBuffer)
         throws java.net.MalformedURLException {
@@ -195,8 +164,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      * @param url The URL of the shp file to use for this DataSource.
      * @param useMemoryMappedBuffer enable/disable memory mapping of files
      * @param createIndex enable/disable automatic index creation if needed
-     *
-     * @throws java.net.MalformedURLException
      */
     public IndexedShapefileDataStore(URL url, boolean useMemoryMappedBuffer,
         boolean createIndex) throws java.net.MalformedURLException {
@@ -207,12 +174,13 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      * Creates a new instance of ShapefileDataStore.
      *
      * @param url The URL of the shp file to use for this DataSource.
-     * @param createIndex enable/disable automatic index creation if needed
+     * @param namespace DOCUMENT ME!
      * @param useMemoryMappedBuffer enable/disable memory mapping of files
+     * @param createIndex enable/disable automatic index creation if needed
      * @param treeType DOCUMENT ME!
      *
-     * @throws java.net.MalformedURLException
      * @throws NullPointerException DOCUMENT ME!
+     * @throws .
      */
     public IndexedShapefileDataStore(URL url, URI namespace,
         boolean useMemoryMappedBuffer, boolean createIndex, byte treeType)
@@ -275,20 +243,29 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     }
 
     protected void finalize() throws Throwable {
-    	if( rtree!=null )
-    		try {
-				rtree.close();
-			} catch (Exception e) {
-				LOGGER.severe("IndexedShapeFileDataStore:finalize(): Error closing rtree. "+e.getLocalizedMessage());
-			}
-    	if( quadTree!=null )
-    		try {
-				quadTree.close();
-			} catch (Exception e) {
-				LOGGER.severe("IndexedShapeFileDataStore:finalize(): Error closing quadTree. "+e.getLocalizedMessage());
-			}
+        if (rtree != null) {
+            try {
+                rtree.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                LOGGER.severe(
+                    "org.geotools.data.shapefile.indexed.IndexedShapeFileDataStore#finalize(): Error closing rtree. "
+                    + e.getLocalizedMessage());
+            }
+        }
+
+        if (quadTree != null) {
+            try {
+                quadTree.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                LOGGER.severe(
+                    "org.geotools.data.shapefile.indexed.IndexedShapeFileDataStore#finalize(): Error closing quadTree. "
+                    + e.getLocalizedMessage());
+            }
+        }
     }
-    
+
     /**
      * Determine if the location of this shape is local or remote.
      *
@@ -299,26 +276,29 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     }
 
     protected Filter getUnsupportedFilter(String typeName, Filter filter) {
-    	if( !(filter instanceof GeometryFilter) ){
-    		return filter;
-    	}
-		GeometryFilter geomF=(GeometryFilter) filter;
-		if( geomF.getFilterType() != FilterType.GEOMETRY_BBOX ){
-			return filter;
-		}
-		
-		if( !(geomF.getRightGeometry() instanceof LiteralExpression) )
-			return filter;
-		
-		LiteralExpression exp=(LiteralExpression) geomF.getRightGeometry();
-		
-		if( !(exp.getLiteral() instanceof Geometry) ){
-			return filter;
-		}
-		
-		return Filter.NONE;
-		
+        if (!(filter instanceof GeometryFilter)) {
+            return filter;
+        }
+
+        GeometryFilter geomF = (GeometryFilter) filter;
+
+        if (geomF.getFilterType() != FilterType.GEOMETRY_BBOX) {
+            return filter;
+        }
+
+        if (!(geomF.getRightGeometry() instanceof LiteralExpression)) {
+            return filter;
+        }
+
+        LiteralExpression exp = (LiteralExpression) geomF.getRightGeometry();
+
+        if (!(exp.getLiteral() instanceof Geometry)) {
+            return filter;
+        }
+
+        return Filter.NONE;
     }
+
     /**
      * Use the spatial index if available and adds a small optimization: if no
      * attributes are going to be read, don't uselessly open and read the dbf
@@ -335,21 +315,21 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         FeatureType newSchema = schema;
         boolean readDbf = true;
         boolean readGeometry = true;
+
         try {
-            if ( ((propertyNames != null) && (propertyNames.length == 1)
-                    && propertyNames[0].equals(defaultGeomName) ) ) {
+            if (((propertyNames != null) && (propertyNames.length == 1)
+                    && propertyNames[0].equals(defaultGeomName))) {
                 readDbf = false;
                 newSchema = DataUtilities.createSubType(schema, propertyNames);
-            }else if( propertyNames !=null && propertyNames.length==0 ){
+            } else if ((propertyNames != null) && (propertyNames.length == 0)) {
                 readDbf = false;
-                readGeometry=false;
+                readGeometry = false;
                 newSchema = DataUtilities.createSubType(schema, propertyNames);
-            	
             }
-            
 
             return createFeatureReader(typeName,
-                getAttributesReader(readDbf, readGeometry, query.getFilter()), newSchema);
+                getAttributesReader(readDbf, readGeometry, query.getFilter()),
+                newSchema);
         } catch (SchemaException se) {
             throw new DataSourceException("Error creating schema", se);
         }
@@ -378,14 +358,15 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      * combined dbf/shp reader.
      *
      * @param readDbf - if true, the dbf fill will be opened and read
+     * @param readGeometry DOCUMENT ME!
      * @param filter - a Filter to use
      *
      * @return
      *
      * @throws IOException
      */
-    protected Reader getAttributesReader(boolean readDbf, boolean readGeometry, Filter filter)
-        throws IOException {
+    protected Reader getAttributesReader(boolean readDbf, boolean readGeometry,
+        Filter filter) throws IOException {
         Envelope bbox = null;
 
         if (filter != null) {
@@ -413,14 +394,14 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             LOGGER.fine("The DBF file won't be opened since no attributes "
                 + "will be read from it");
             atts = new AttributeType[] { schema.getDefaultGeometry() };
-            if( !readGeometry){
-            	atts = new AttributeType[0];
+
+            if (!readGeometry) {
+                atts = new AttributeType[0];
             }
         } else {
             dbfR = (IndexedDbaseFileReader) openDbfReader();
         }
 
-        
         return new Reader(atts, openShapeReader(), dbfR, goodRecs);
     }
 
@@ -471,11 +452,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             throw new DataSourceException("Error querying RTree", le);
         } catch (TreeException re) {
             throw new DataSourceException("Error querying RTree", re);
-        } finally {
-            try {
-                rtree.close();
-            } catch (Exception ee) {
-            }
         }
 
         return goodRecs;
@@ -508,9 +484,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                 if (tmp.size() > 0) {
                     // WARNING: QuadTree records number begins from 0
                     shx = this.openIndexFile();
-                    
+
                     goodRecs = new ArrayList();
-                    
+
                     Collections.sort(tmp);
 
                     DataDefinition def = new DataDefinition("US-ASCII");
@@ -533,11 +509,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         } catch (StoreException le) {
             throw new DataSourceException("Error querying QuadTree", le);
         } finally {
-            try {
-//                tree.close();
-            } catch (Exception ee) {
-            }
-
             try {
                 shx.close();
             } catch (Exception ee) {
@@ -566,29 +537,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     }
 
     /**
-     * Convenience method for opening a ShapefileReader.
-     *
-     * @return A new ShapefileReader.
-     *
-     * @throws IOException If an error occurs during creation.
-     * @throws DataSourceException DOCUMENT ME!
-     */
-    protected ShapefileReader openShapeReader() throws IOException {
-        ReadableByteChannel rbc = getReadChannel(shpURL);
-
-        if (rbc == null) {
-            return null;
-        }
-
-        try {
-            return new ShapefileReader(rbc, true, useMemoryMappedBuffer,
-                readWriteLock);
-        } catch (ShapefileException se) {
-            throw new DataSourceException("Error creating ShapefileReader", se);
-        }
-    }
-
-    /**
      * Convenience method for opening a DbaseFileReader.
      *
      * @return A new DbaseFileReader
@@ -606,31 +554,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     }
 
     /**
-     * Convenience method for opening a DbaseFileReader.
-     *
-     * @return A new DbaseFileReader
-     *
-     * @throws IOException If an error occurs during creation.
-     * @throws FactoryException DOCUMENT ME!
-     */
-    protected PrjFileReader openPrjReader()
-        throws IOException, FactoryException {
-        ReadableByteChannel rbc = null;
-
-        try {
-            rbc = getReadChannel(prjURL);
-        } catch (IOException e) {
-            LOGGER.warning("projection (.prj) for shapefile not available");
-        }
-
-        if (rbc == null) {
-            return null;
-        }
-
-        return new PrjFileReader(rbc);
-    }
-
-    /**
      * Convenience method for opening an RTree index.
      *
      * @return A new RTree.
@@ -639,32 +562,32 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      * @throws DataSourceException DOCUMENT ME!
      */
     protected synchronized RTree openRTree() throws IOException {
-    	if( rtree == null){
-	        if (!this.isLocal()) {
-	            return null;
-	        }
-	
-	        File file = new File(treeURL.getPath());
-	
-	        if (!file.exists() || (file.length() == 0)) {
-	            if (this.createIndex) {
-	                try {
-	                    this.buildRTree();
-	                } catch (TreeException e) {
-	                    return null;
-	                }
-	            } else {
-	                return null;
-	            }
-	        }
-	
-	        try {
-	            FileSystemPageStore fps = new FileSystemPageStore(file);
-	            rtree = new RTree(fps);
-	        } catch (TreeException re) {
-	            throw new DataSourceException("Error opening RTree", re);
-	        }
-    	}
+        if (rtree == null) {
+            if (!this.isLocal()) {
+                return null;
+            }
+
+            File file = new File(treeURL.getPath());
+
+            if (!file.exists() || (file.length() == 0)) {
+                if (this.createIndex) {
+                    try {
+                        this.buildRTree();
+                    } catch (TreeException e) {
+                        return null;
+                    }
+                } else {
+                    return null;
+                }
+            }
+
+            try {
+                FileSystemPageStore fps = new FileSystemPageStore(file);
+                rtree = new RTree(fps);
+            } catch (TreeException re) {
+                throw new DataSourceException("Error opening RTree", re);
+            }
+        }
 
         return rtree;
     }
@@ -677,24 +600,24 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      * @throws StoreException
      */
     protected synchronized QuadTree openQuadTree() throws StoreException {
-    	if( quadTree==null ){
-	        File file = new File(treeURL.getPath());
-	
-	        if (!file.exists() || (file.length() == 0)) {
-	            if (this.createIndex) {
-	                try {
-	                    this.buildQuadTree();
-	                } catch (TreeException e) {
-	                    return null;
-	                }
-	            } else {
-	                return null;
-	            }
-	        }
-	
-	        FileSystemIndexStore store = new FileSystemIndexStore(file);
-	        quadTree=store.load();
-    	}
+        if (quadTree == null) {
+            File file = new File(treeURL.getPath());
+
+            if (!file.exists() || (file.length() == 0)) {
+                if (this.createIndex) {
+                    try {
+                        this.buildQuadTree();
+                    } catch (TreeException e) {
+                        return null;
+                    }
+                } else {
+                    return null;
+                }
+            }
+
+            FileSystemIndexStore store = new FileSystemIndexStore(file);
+            quadTree = store.load();
+        }
 
         return quadTree;
     }
@@ -881,7 +804,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             }
         }
     }
-
 
     /**
      * Gets the bounding box of the file represented by this data store as a
@@ -1072,8 +994,13 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             LOGGER.info("Creating spatial index for " + shpURL.getPath());
 
             synchronized (this) {
-            	rtree=null;
-			}
+                if (rtree != null) {
+                    rtree.close();
+                }
+
+                rtree = null;
+            }
+
             ShapeFileIndexer indexer = new ShapeFileIndexer();
             indexer.setIdxType(ShapeFileIndexer.RTREE);
             indexer.setShapeFileName(shpURL.getPath());
@@ -1108,9 +1035,19 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     private void buildQuadTree() throws TreeException {
         if (isLocal()) {
             LOGGER.info("Creating spatial index for " + shpURL.getPath());
+
             synchronized (this) {
-            	quadTree=null;
-			}
+                if (quadTree != null) {
+                    try {
+                        quadTree.close();
+                    } catch (StoreException e) {
+                        throw new TreeException(e);
+                    }
+                }
+
+                quadTree = null;
+            }
+
             ShapeFileIndexer indexer = new ShapeFileIndexer();
             indexer.setIdxType(ShapeFileIndexer.QUADTREE);
             indexer.setShapeFileName(shpURL.getPath());
@@ -1359,10 +1296,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                     (FileChannel) getWriteChannel(getStorageURL(shxURL, temp)),
                     readWriteLock);
 
-            dbfChannel = (FileChannel) getWriteChannel(getStorageURL(dbfURL, temp));
+            dbfChannel = (FileChannel) getWriteChannel(getStorageURL(dbfURL,
+                        temp));
             dbfHeader = createDbaseHeader();
             dbfWriter = new DbaseFileWriter(dbfHeader, dbfChannel);
-
         }
 
         /**
@@ -1473,7 +1410,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             copyAndDelete(dbfURL, temp);
         }
 
-
         /**
          * Release resources and flush the header information.
          *
@@ -1483,7 +1419,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             if (featureReader == null) {
                 throw new IOException("Writer closed");
             }
-            
 
             // make sure to write the last feature...
             if (currentFeature != null) {
@@ -1543,7 +1478,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                  * during shp record writes
                  */
                 try {
-                    String filename = shpURL.getFile().substring(0,
+                    String filename = shpURL.getFile()
+                                            .substring(0,
                             shpURL.getFile().length() - 4);
                     File file = new File(filename + ".qix");
 
@@ -1560,21 +1496,25 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                     if (createIndex) {
                         if (treeType == TREE_GRX) {
                             buildRTree();
-                            filename = shpURL.getFile().substring(0,
+                            filename = shpURL.getFile()
+                                             .substring(0,
                                     shpURL.getFile().length() - 4);
-                            File toDelete= new File(filename + ".qix");
+
+                            File toDelete = new File(filename + ".qix");
 
                             if (toDelete.exists()) {
-                            	toDelete.delete();
+                                toDelete.delete();
                             }
                         } else if (treeType == TREE_QIX) {
                             buildQuadTree();
-                            filename = shpURL.getFile().substring(0,
+                            filename = shpURL.getFile()
+                                             .substring(0,
                                     shpURL.getFile().length() - 4);
-                            File otherIndex= new File(filename + ".grx");
+
+                            File otherIndex = new File(filename + ".grx");
 
                             if (otherIndex.exists()) {
-                            	otherIndex.delete();
+                                otherIndex.delete();
                             }
                         }
                     }
