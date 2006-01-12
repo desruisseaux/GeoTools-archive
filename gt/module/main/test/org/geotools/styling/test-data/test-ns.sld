@@ -10,7 +10,7 @@
 <sld:Title>title</sld:Title>
 <sld:Abstract>abstract</sld:Abstract>
 <sld:FeatureTypeName>Feature</sld:FeatureTypeName>
-<sld:SemanticTypeIndentifier>generic:geometry</sld:SemanticTypeIndentifier>
+<sld:SemanticTypeIdentifier>generic:geometry</sld:SemanticTypeIdentifier>
 <sld:Rule>
 <sld:Name>name</sld:Name>
 <sld:Abstract>Abstract</sld:Abstract>
@@ -23,7 +23,8 @@
 <sld:Title>title</sld:Title>
 <sld:Abstract>abstract</sld:Abstract>
 <sld:FeatureTypeName>Feature</sld:FeatureTypeName>
-<sld:SemanticTypeIndentifier>generic:geometry</sld:SemanticTypeIndentifier>
+<sld:SemanticTypeIdentifier>generic:geometry</sld:SemanticTypeIdentifier>
+<sld:SemanticTypeIdentifier>colorbrewer:default</sld:SemanticTypeIdentifier>
 <sld:Rule>
 <sld:Name>rule01</sld:Name>
 <sld:Abstract>Abstract</sld:Abstract>

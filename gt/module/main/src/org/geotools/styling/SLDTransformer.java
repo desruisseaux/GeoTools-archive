@@ -510,7 +510,7 @@ public class SLDTransformer extends TransformerBase {
             String[] sti = fts.getSemanticTypeIdentifiers();
 
             for (int i = 0; i < sti.length; i++) {
-                element("SemanticTypeIndentifier", sti[i]);
+                element("SemanticTypeIdentifier", sti[i]);
             }
 
             Rule[] rules = fts.getRules();

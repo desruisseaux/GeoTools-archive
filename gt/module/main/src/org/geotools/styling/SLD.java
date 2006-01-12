@@ -19,6 +19,8 @@ package org.geotools.styling;
 import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
@@ -1555,4 +1557,48 @@ SYMBOLIZER:
     public static String colorToHex(Color c) {
     	return "#" + Integer.toHexString(c.getRGB() & 0x00ffffff);
     }
+    
+    public static Style[] getStyles(StyledLayerDescriptor sld) {
+        StyledLayer[] layers = sld.getStyledLayers();
+        List styles = new ArrayList();
+        for (int i = 0; i < layers.length; i++) {
+            if (layers[i] instanceof UserLayer) {
+                UserLayer layer = (UserLayer) layers[i];
+                styles.addAll(toList(layer.getUserStyles()));
+            } else if (layers[i] instanceof NamedLayer) {
+                NamedLayer layer = (NamedLayer) layers[i];
+                styles.addAll(toList(layer.getStyles()));
+            }
+        }
+        return (Style[]) styles.toArray(new Style[styles.size()]);
+    }
+    
+    public static FeatureTypeStyle[] getFeatureTypeStyles(StyledLayerDescriptor sld) {
+        Style[] styles = getStyles(sld);
+        List fts = new ArrayList();
+        for (int i = 0; i < styles.length; i++) {
+            fts.addAll(toList(styles[i].getFeatureTypeStyles()));
+        }
+        return (FeatureTypeStyle[]) fts.toArray(new FeatureTypeStyle[fts.size()]);
+    }
+    
+    private static List toList(Object[] array) {
+        List list = new ArrayList();
+        for (int i = 0; i < array.length; i++) {
+            list.add(array[i]);
+        }
+        return list;
+    }
+    
+    public static Style getDefaultStyle(StyledLayerDescriptor sld) {
+        Style[] styles = getStyles(sld);
+        for (int i = 0; i < styles.length; i++) {
+            if (styles[i].isDefault()) {
+                return styles[i];
+            }
+        }
+        //no default, so just grab the first one
+        return styles[0];
+    }
+
 }

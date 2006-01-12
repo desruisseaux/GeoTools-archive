@@ -689,7 +689,7 @@ public class SLDParser {
 			if (childName.equalsIgnoreCase("FeatureTypeName")) {
 				ft.setFeatureTypeName(child.getFirstChild().getNodeValue());
 			}
-			
+
 			if (childName.equalsIgnoreCase("SemanticTypeIdentifier")) {
 				sti.add(child.getFirstChild().getNodeValue());
 			}

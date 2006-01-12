@@ -119,6 +119,11 @@ public class SLDStyleTest extends TestCase {
         StyledLayerDescriptor sld = stylereader.parseSLD();
         
         assertEquals(1, sld.getStyledLayers().length);
+        FeatureTypeStyle[] fts = SLD.getFeatureTypeStyles(sld);
+        assertEquals(2, fts.length);
+        assertEquals(1, fts[0].getSemanticTypeIdentifiers().length);
+        assertEquals(2, fts[1].getSemanticTypeIdentifiers().length);
+        assertEquals("colorbrewer:default", fts[1].getSemanticTypeIdentifiers()[1]);
     }
     
     /**
