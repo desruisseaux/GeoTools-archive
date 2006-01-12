@@ -43,6 +43,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -86,7 +87,21 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.BetweenFilter;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.LikeFilter;
+import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.LogicFilter;
+import org.geotools.filter.MathExpression;
+import org.geotools.filter.NullFilter;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.LockTimeoutException;
@@ -292,16 +307,22 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
         FeatureType newSchema = schema;
         boolean readDbf = true;
-
+        boolean readGeometry = true;
         try {
-            if ((propertyNames != null) && (propertyNames.length == 1)
-                    && propertyNames[0].equals(defaultGeomName)) {
+            if ( ((propertyNames != null) && (propertyNames.length == 1)
+                    && propertyNames[0].equals(defaultGeomName) ) ) {
                 readDbf = false;
                 newSchema = DataUtilities.createSubType(schema, propertyNames);
+            }else if( propertyNames !=null && propertyNames.length==0 ){
+                readDbf = false;
+                readGeometry=false;
+                newSchema = DataUtilities.createSubType(schema, propertyNames);
+            	
             }
+            
 
             return createFeatureReader(typeName,
-                getAttributesReader(readDbf, query.getFilter()), newSchema);
+                getAttributesReader(readDbf, readGeometry, query.getFilter()), newSchema);
         } catch (SchemaException se) {
             throw new DataSourceException("Error creating schema", se);
         }
@@ -336,7 +357,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
      *
      * @throws IOException
      */
-    protected Reader getAttributesReader(boolean readDbf, Filter filter)
+    protected Reader getAttributesReader(boolean readDbf, boolean readGeometry, Filter filter)
         throws IOException {
         Envelope bbox = null;
 
@@ -365,10 +386,14 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             LOGGER.fine("The DBF file won't be opened since no attributes "
                 + "will be read from it");
             atts = new AttributeType[] { schema.getDefaultGeometry() };
+            if( !readGeometry){
+            	atts = new AttributeType[0];
+            }
         } else {
             dbfR = (IndexedDbaseFileReader) openDbfReader();
         }
 
+        
         return new Reader(atts, openShapeReader(), dbfR, goodRecs);
     }
 
@@ -456,7 +481,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                 if (tmp.size() > 0) {
                     // WARNING: QuadTree records number begins from 0
                     shx = this.openIndexFile();
-
+                    
+                    goodRecs = new ArrayList();
+                    
                     Collections.sort(tmp);
 
                     DataDefinition def = new DataDefinition("US-ASCII");
@@ -472,6 +499,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                         data.addValue(new Integer(recno.intValue() + 1));
                         data.addValue(new Long(shx.getOffsetInBytes(
                                     recno.intValue())));
+                        goodRecs.add(data);
                     }
                 }
             }
@@ -1255,7 +1283,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         public Writer(String typeName) throws IOException {
             // set up reader
             try {
-                attReader = getAttributesReader(true, null);
+                attReader = getAttributesReader(true, true, null);
                 featureReader = createFeatureReader(typeName, attReader, schema);
                 temp = System.currentTimeMillis();
             } catch (Exception e) {
