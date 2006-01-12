@@ -1401,35 +1401,35 @@ public class StyleBuilder {
     /**
      * create a Feature type styler
      *
-     * @param featureTypeStyleName - name for the feature type styler
+     * @param featureTypeName - name of the feature type
      * @param symbolizer - the symbolizer to use
      *
      * @return the new feature type styler
      */
     public FeatureTypeStyle createFeatureTypeStyle(
-        String featureTypeStyleName,
+        String featureTypeName,
         Symbolizer symbolizer) {
-        return createFeatureTypeStyle(featureTypeStyleName, symbolizer, Double.NaN, Double.NaN);
+        return createFeatureTypeStyle(featureTypeName, symbolizer, Double.NaN, Double.NaN);
     }
 
     /**
      * create a Feature type styler
      *
-     * @param featureTypeStyleName - name for the feature type styler
+     * @param featureTypeName - name of the feature type
      * @param symbolizers - an array of symbolizers to use
      *
      * @return the new feature type styler
      */
     public FeatureTypeStyle createFeatureTypeStyle(
-        String featureTypeStyleName,
+        String featureTypeName,
         Symbolizer[] symbolizers) {
-        return createFeatureTypeStyle(featureTypeStyleName, symbolizers, Double.NaN, Double.NaN);
+        return createFeatureTypeStyle(featureTypeName, symbolizers, Double.NaN, Double.NaN);
     }
 
     /**
      * create a Feature type styler see the SLD Spec for more details of scaleDenominators
      *
-     * @param featureTypeStyleName - name for the feature type styler
+     * @param featureTypeName - name of the feature type
      * @param symbolizer - the symbolizer to use
      * @param minScaleDenominator - the minimim scale to draw the feature at
      * @param maxScaleDenominator - the maximum scale to draw the feature at
@@ -1437,12 +1437,12 @@ public class StyleBuilder {
      * @return the new feature type styler
      */
     public FeatureTypeStyle createFeatureTypeStyle(
-        String featureTypeStyleName,
+        String featureTypeName,
         Symbolizer symbolizer,
         double minScaleDenominator,
         double maxScaleDenominator) {
         return createFeatureTypeStyle(
-            featureTypeStyleName,
+        		featureTypeName,
             new Symbolizer[] { symbolizer },
             minScaleDenominator,
             maxScaleDenominator);
@@ -1451,7 +1451,7 @@ public class StyleBuilder {
     /**
      * create a Feature type styler see the SLD Spec for more details of scaleDenominators
      *
-     * @param featureTypeStyleName - name for the feature type styler
+     * @param featureTypeName - name of the feature type
      * @param symbolizers - an array of symbolizers to use
      * @param minScaleDenominator - the minimim scale to draw the feature at
      * @param maxScaleDenominator - the maximum scale to draw the feature at
@@ -1459,7 +1459,7 @@ public class StyleBuilder {
      * @return the new feature type styler
      */
     public FeatureTypeStyle createFeatureTypeStyle(
-        String featureTypeStyleName,
+        String featureTypeName,
         Symbolizer[] symbolizers,
         double minScaleDenominator,
         double maxScaleDenominator) {
@@ -1469,8 +1469,8 @@ public class StyleBuilder {
         FeatureTypeStyle fts = sf.createFeatureTypeStyle();
         fts.setRules(new Rule[] { r });
 
-        if (featureTypeStyleName != null) {
-            fts.setFeatureTypeName(featureTypeStyleName);
+        if (featureTypeName != null) {
+            fts.setFeatureTypeName(featureTypeName);
         }
 
         return fts;
@@ -1479,18 +1479,18 @@ public class StyleBuilder {
     /**
      * create a Feature type styler
      *
-     * @param featureTypeStyleName - name for the feature type styler
+     * @param featureTypeName - name of the feature type
      * @param r - the rule that driver this feature typ style
      *
      * @return the new feature type styler
      */
-    public FeatureTypeStyle createFeatureTypeStyle(String featureTypeStyleName, Rule r) {
+    public FeatureTypeStyle createFeatureTypeStyle(String featureTypeName, Rule r) {
         // setup the feature type style
         FeatureTypeStyle fts = sf.createFeatureTypeStyle();
         fts.setRules(new Rule[] { r });
 
-        if (featureTypeStyleName != null) {
-            fts.setFeatureTypeName(featureTypeStyleName);
+        if (featureTypeName != null) {
+            fts.setFeatureTypeName(featureTypeName);
         }
 
         return fts;
@@ -1499,17 +1499,17 @@ public class StyleBuilder {
     /**
      * create a Feature type styler see the SLD Spec for more details of scaleDenominators
      *
-     * @param featureTypeStyleName - name for the feature type styler
+     * @param featureTypeName - name of the feature type
      * @param rules - the rules that make up the FeatureTypeStyle
      *
      * @return the new feature type styler
      */
-    public FeatureTypeStyle createFeatureTypeStyle(String featureTypeStyleName, Rule[] rules) {
+    public FeatureTypeStyle createFeatureTypeStyle(String featureTypeName, Rule[] rules) {
         FeatureTypeStyle fts = sf.createFeatureTypeStyle();
         fts.setRules(rules);
 
-        if (featureTypeStyleName != null) {
-            fts.setFeatureTypeName(featureTypeStyleName);
+        if (featureTypeName != null) {
+            fts.setFeatureTypeName(featureTypeName);
         }
 
         return fts;
