@@ -164,7 +164,7 @@ public class ShapefileTest extends TestCaseSupport {
         FeatureSource source = s.getFeatureSource(typeName);
         FeatureCollection fc = source.getFeatures().collection();
 
-        ShapefileReadWriteTest.compare(features, fc);
+        ShapefileRTreeReadWriteTest.compare(features, fc);
     }
 
     public void testSkippingRecords() throws Exception {

@@ -39,7 +39,7 @@ public class ShapefileSuite extends TestCase {
 
         suite.addTestSuite(DbaseFileTest.class);
         suite.addTestSuite(ShapefileTest.class);
-        suite.addTestSuite(ShapefileReadWriteTest.class);
+        suite.addTestSuite(ShapefileRTreeReadWriteTest.class);
         suite.addTestSuite(ShapefileDataStoreTest.class);
 
         return suite;
