@@ -50,14 +50,16 @@ public class DuplicatorStyleVisitorTest extends TestCase {
     public void testStyleDuplication() throws IllegalFilterException {
     	//create a style
     	Style oldStyle = sb.createStyle("FTSName", sf.createPolygonSymbolizer());
-    	
+    	oldStyle.getFeatureTypeStyles()[0].setSemanticTypeIdentifiers(new String[] {"simple", "generic:geometry"});
     	//duplicate it
     	DuplicatorStyleVisitor visitor = new DuplicatorStyleVisitor(sf, ff);
     	oldStyle.accept(visitor);
     	Style newStyle = (Style) visitor.getCopy();
-
+    	
     	//compare it
     	assertNotNull(newStyle);
+    	assertEquals(2, newStyle.getFeatureTypeStyles()[0].getSemanticTypeIdentifiers().length);
     	//TODO: actually compare it
     }
+    
 }

@@ -981,11 +981,22 @@ public class SLD {
     }
 
     /**
-     * Retrieve the first PolygonSymbolizer from the provided Style.
+     * Retrieve the first TextSymbolizer from the provided Style.
+     *
+     * @param fts SLD featureTypeStyle information.
+     *
+     * @return TextSymbolizer, or null if not found.
+     */
+    public static TextSymbolizer textSymbolizer(FeatureTypeStyle fts) {
+        return (TextSymbolizer) symbolizer(fts, TextSymbolizer.class);
+    }
+
+    /**
+     * Retrieve the first TextSymbolizer from the provided Style.
      *
      * @param style SLD style information.
      *
-     * @return PolygonSymbolizer, or null if not found.
+     * @return TextSymbolizer, or null if not found.
      */
     public static TextSymbolizer textSymbolizer(Style style) {
         return (TextSymbolizer) symbolizer(style, TextSymbolizer.class);
@@ -1287,12 +1298,34 @@ public class SLD {
     /**
      * Retrieve the first RasterSymbolizer from the provided Style.
      *
+     * @param fts SLD featureTypeStyle information.
+     *
+     * @return RasterSymbolizer, or null if not found.
+     */
+    public static RasterSymbolizer rasterSymbolizer(FeatureTypeStyle fts) {
+        return (RasterSymbolizer) symbolizer(fts, RasterSymbolizer.class);
+    }
+
+    /**
+     * Retrieve the first RasterSymbolizer from the provided Style.
+     *
      * @param style SLD style information.
      *
-     * @return LineSymbolizer, or null if not found.
+     * @return RasterSymbolizer, or null if not found.
      */
     public static RasterSymbolizer rasterSymbolizer(Style style) {
         return (RasterSymbolizer) symbolizer(style, RasterSymbolizer.class);
+    }
+
+    /**
+     * Retrieve the first LineSymbolizer from the provided Style.
+     *
+     * @param fts SLD featureTypeStyle information.
+     *
+     * @return LineSymbolizer, or null if not found.
+     */
+    public static LineSymbolizer lineSymbolizer(FeatureTypeStyle fts) {
+        return (LineSymbolizer) symbolizer(fts, LineSymbolizer.class);
     }
 
     /**
@@ -1343,6 +1376,17 @@ public class SLD {
     }
 
     /**
+     * Retrieve the first PointSymbolizer from the provided FeatureTypeStyle.
+     *
+     * @param fts SLD featureTypeStyle information.
+     *
+     * @return PointSymbolizer, or null if not found.
+     */
+    public static PointSymbolizer pointSymbolizer(FeatureTypeStyle fts) {
+        return (PointSymbolizer) symbolizer(fts, PointSymbolizer.class);
+    }
+
+    /**
      * Retrieve the first PointSymbolizer from the provided Style.
      *
      * @param style SLD style information.
@@ -1351,6 +1395,17 @@ public class SLD {
      */
     public static PointSymbolizer pointSymbolizer(Style style) {
         return (PointSymbolizer) symbolizer(style, PointSymbolizer.class);
+    }
+
+    /**
+     * Retrieve the first PolygonSymbolizer from the provided Style.
+     *
+     * @param fts SLD featureTypeStyle information.
+     *
+     * @return PolygonSymbolizer, or null if not found.
+     */
+    public static PolygonSymbolizer polySymbolizer(FeatureTypeStyle fts) {
+        return (PolygonSymbolizer) symbolizer(fts, PolygonSymbolizer.class);
     }
 
     /**
@@ -1429,18 +1484,13 @@ public class SLD {
      * Retrieve the first SYMBOLIZER from the provided Style.
      *
      * @param style SLD style information.
-     * @param SYMBOLIZER DOCUMENT ME!
+     * @param SYMBOLIZER LineSymbolizer.class, PointSymbolizer.class, 
+     *        PolygonSymbolizer.class, RasterSymbolizer.class, or TextSymbolizer.class
      *
      * @return symbolizer instance from style, or null if not found.
      */
     protected static Symbolizer symbolizer(Style style, final Class SYMBOLIZER) {
         if (style == null) {
-            return null;
-        }
-
-        FeatureTypeStyle[] styles = style.getFeatureTypeStyles();
-
-        if (styles == null) {
             return null;
         }
 
@@ -1450,39 +1500,55 @@ public class SLD {
             return null;
         }
 
-FEATURETYPE: 
         for (int i = 0; i < ftStyleList.length; i++) {
             FeatureTypeStyle ftStyle = ftStyleList[i];
-            Rule[] ruleList = ftStyle.getRules();
+            Symbolizer result = symbolizer(ftStyle, SYMBOLIZER);
+            if (result != null) return result;
+        }
+        return null;
+    }
 
-            if (ruleList == null) {
-                continue FEATURETYPE;
-            }
+    /**
+     * Retrieve the first SYMBOLIZER from the provided FeatureTypeStyle.
+     *
+     * @param style SLD style information.
+     * @param SYMBOLIZER LineSymbolizer.class, PointSymbolizer.class, 
+     *        PolygonSymbolizer.class, RasterSymbolizer.class, or TextSymbolizer.class
+     *        
+     * @return symbolizer instance from fts, or null if not found.
+     */
+    protected static Symbolizer symbolizer(FeatureTypeStyle fts, final Class SYMBOLIZER) {
+        if (fts == null) {
+            return null;
+        }
+
+        Rule[] ruleList = fts.getRules();
+        if (ruleList == null) {
+            return null;
+        }
 
 RULE: 
-            for (int j = 0; j < ruleList.length; j++) {
-                Rule rule = ruleList[j];
-                Symbolizer[] symbolizerList = rule.getSymbolizers();
+        for (int j = 0; j < ruleList.length; j++) {
+            Rule rule = ruleList[j];
+            Symbolizer[] symbolizerList = rule.getSymbolizers();
 
-                if (symbolizerList == null) {
-                    continue RULE;
-                }
+            if (symbolizerList == null) {
+                continue RULE;
+            }
 
 SYMBOLIZER: 
-                for (int k = 0; k < symbolizerList.length; k++) {
-                    Symbolizer symbolizer = symbolizerList[k];
+            for (int k = 0; k < symbolizerList.length; k++) {
+                Symbolizer symbolizer = symbolizerList[k];
 
-                    if (symbolizer == null) {
-                        continue SYMBOLIZER;
-                    }
+                if (symbolizer == null) {
+                    continue SYMBOLIZER;
+                }
 
-                    if (SYMBOLIZER.isInstance(symbolizer)) {
-                        return symbolizer;
-                    }
+                if (SYMBOLIZER.isInstance(symbolizer)) {
+                    return symbolizer;
                 }
             }
         }
-
         return null;
     }
     

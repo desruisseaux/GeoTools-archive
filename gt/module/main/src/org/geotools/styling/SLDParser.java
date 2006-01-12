@@ -657,6 +657,7 @@ public class SLDParser {
 		FeatureTypeStyle ft = factory.createFeatureTypeStyle();
 
 		ArrayList rules = new ArrayList();
+		ArrayList sti = new ArrayList();
 		NodeList children = style.getChildNodes();
 
 		for (int i = 0; i < children.getLength(); i++) {
@@ -688,12 +689,19 @@ public class SLDParser {
 			if (childName.equalsIgnoreCase("FeatureTypeName")) {
 				ft.setFeatureTypeName(child.getFirstChild().getNodeValue());
 			}
+			
+			if (childName.equalsIgnoreCase("SemanticTypeIdentifier")) {
+				sti.add(child.getFirstChild().getNodeValue());
+			}
 
 			if (childName.equalsIgnoreCase("Rule")) {
 				rules.add(parseRule(child));
 			}
 		}
-
+		
+		if (sti.size() > 0) {
+			ft.setSemanticTypeIdentifiers((String[]) sti.toArray(new String[0]));
+		}
 		ft.setRules((Rule[]) rules.toArray(new Rule[0]));
 
 		return ft;
