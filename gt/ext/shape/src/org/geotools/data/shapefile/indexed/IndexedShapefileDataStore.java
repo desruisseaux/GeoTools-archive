@@ -292,6 +292,27 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         return shpURL.getProtocol().equals("file");
     }
 
+    protected Filter getUnsupportedFilter(String typeName, Filter filter) {
+    	if( !(filter instanceof GeometryFilter) ){
+    		return filter;
+    	}
+		GeometryFilter geomF=(GeometryFilter) filter;
+		if( geomF.getFilterType() != FilterType.GEOMETRY_BBOX ){
+			return filter;
+		}
+		
+		if( !(geomF.getRightGeometry() instanceof LiteralExpression) )
+			return filter;
+		
+		LiteralExpression exp=(LiteralExpression) geomF.getRightGeometry();
+		
+		if( !(exp.getLiteral() instanceof Geometry) ){
+			return filter;
+		}
+		
+		return Filter.NONE;
+		
+    }
     /**
      * Use the spatial index if available and adds a small optimization: if no
      * attributes are going to be read, don't uselessly open and read the dbf
