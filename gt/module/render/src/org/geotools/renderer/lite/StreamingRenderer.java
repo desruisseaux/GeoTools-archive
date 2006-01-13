@@ -58,7 +58,6 @@ import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
@@ -73,7 +72,6 @@ import org.geotools.geometry.JTS;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.style.SLDStyleFactory;
@@ -85,7 +83,6 @@ import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Rule;
-import org.geotools.styling.Style;
 import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
@@ -622,6 +619,7 @@ public class StreamingRenderer implements GTRenderer {
                 DefaultQuery q = new DefaultQuery(schema.getTypeName());
                 q.setFilter(filter);
                 q.setPropertyNames(attributes);
+                processRuleForQuery(styles, q);
                 query = q;
             } catch (Exception e) {
                 fireErrorEvent(new Exception("Error transforming bbox",e));
@@ -640,9 +638,13 @@ public class StreamingRenderer implements GTRenderer {
                             + "envelope, falling back on full data loading (no bbox query)");
                     q.setFilter( Filter.NONE );
                 }
+                processRuleForQuery(styles, q);
+
                 query = q;
             }
         }
+        
+        
         
         // now, if a definition query has been established for this layer, be
         // sure to respect it by combining it with the bounding box one.
@@ -676,6 +678,18 @@ public class StreamingRenderer implements GTRenderer {
         
         return results;
     }
+
+
+	private void processRuleForQuery(LiteFeatureTypeStyle[] styles, DefaultQuery q) {
+		// JE: If there is a single rule "and" its filter together with the query's filter and send it off to datastore.  This will
+		// allow as more processing to be done on the back end... Very useful if DataStore is a database.  Problem is that worst case each filter
+		// is ran twice.  
+		// Next we will modify it to find a "Common" filter between all rules and send that to the datastore.
+		if( styles!=null && styles.length==1 && styles[0].ruleList.length==1 && styles[0].elseRules.length==0){
+			if(styles[0].ruleList[0].getFilter()!=null)
+			q.setFilter(q.getFilter().and(styles[0].ruleList[0].getFilter()));
+		}
+	}
     
     /**
      * @return

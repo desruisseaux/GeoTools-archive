@@ -15,6 +15,7 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -37,10 +38,12 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.AbstractFilterImpl;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FilterVisitor;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.JTS;
@@ -63,6 +66,7 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
+import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.StyledLayerDescriptor;
@@ -703,9 +707,57 @@ public class Rendering2DTest extends TestCase {
             }
         }
         assertTrue("image is blank and should not be", hasData);
-
-
     }
+    
+    public void testDefinitionQuerySLDProcessing() throws Exception {
+    	final FeatureCollection ft = createTestDefQueryFeatureCollection();
+        final Style style = createDefQueryTestStyle();
+        FeatureResults results;
+        Envelope envelope = ft.getBounds();
+
+        // we'll use this as the definition query for the layer
+        Query layerQuery;
+
+        MapLayer layer = new DefaultMapLayer(ft, style);
+        MapContext map = new DefaultMapContext(new MapLayer[]{layer});
+        map.setAreaOfInterest(envelope);
+        StreamingRenderer renderer = new StreamingRenderer();
+        renderer.setContext(map);
+        renderer.setRendererHints(rendererHints);
+
+
+        // this is the reader that StreamingRenderer obtains after applying
+        // the mixed filter to a given layer.
+        FeatureReader reader;
+        Filter filter = Filter.NONE;
+        FilterFactory ffac = FilterFactoryFinder.createFilterFactory();
+
+        // test maxFeatures, render just the first 2 features
+        layerQuery = new DefaultQuery("querytest", filter);
+        layer.setQuery(layerQuery);
+        
+        ArrayList rules=new ArrayList();
+        ArrayList elseRules=new ArrayList();
+        StyleBuilder builder=new StyleBuilder();
+        Rule rule = builder.createRule(builder.createLineSymbolizer());
+        rules.add(rule);
+        rule.setFilter(new AbstractFilterImpl(){
+        	int i=0;
+			public boolean contains(Feature feature) {
+				i++;
+				return i<3;
+			}
+
+			public void accept(FilterVisitor visitor) {
+				visitor.visit(this);
+			}
+        	
+        });
+        LiteFeatureTypeStyle fts=new LiteFeatureTypeStyle(null, rules, elseRules);
+        
+        results = renderer.queryLayer(layer, new LiteFeatureTypeStyle[]{fts},envelope, DefaultGeographicCRS.WGS84);
+        assertEquals(2, results.getCount());
+	}
 
     /**
      * responsible for actually rendering.
