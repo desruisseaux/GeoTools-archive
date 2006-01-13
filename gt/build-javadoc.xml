@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ======================================================================
+<!-- =======================================================================
 
      ANT BUILD FILE (Ref. http://jakarta.apache.org/ant )
 
@@ -34,7 +34,7 @@
 
      Author:  Martin Desruisseaux
      Version: $Id$
-     ====================================================================== -->
+     ======================================================================= -->
 
 <project name="Geotools Javadoc" default="javadoc">
   <description>
@@ -159,9 +159,10 @@
       <link href="http://geoapi.sourceforge.net/legacy/javadoc"/>
       <link href="http://www.jump-project.org/docs/jts/1.6/api"/>
 
-      <tag name="tutorial" scope="types"                             description="Tutorial:"/>
-      <tag name="todo"     scope="types,fields,methods,constructors" description="TODO:"/>
-      <tag name="task"     scope="types,fields,methods,constructors" description="TASK:"/>
+      <tag name="todo" scope="types,fields,methods,constructors" description="TODO:"/>
+      <tag name="task" scope="types,fields,methods,constructors" description="TASK:"/>
+      <taglet name="org.geotools.taglet.Tutorial"/>
+      <taglet name="org.geotools.taglet.Source"  />
 
       <group title="Features, Filters and Styling"      packages="org.geotools.feature*:org.geotools.filter*:org.geotools.styling*"/>
       <group title="Geometries"                         packages="org.geotools.geometry*:org.geotools.topology*:org.geotools.measure*"/>

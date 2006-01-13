@@ -601,7 +601,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
 
     /**
      * Returns a string representation of this envelope. The default implementation formats the
-     * {@linkplain #getLowerCorder lower} and {@linkplain #getUpperCorder upper} corners using a
+     * {@linkplain #getLowerCorner lower} and {@linkplain #getUpperCorner upper} corners using a
      * shared instance of {@link org.geotools.measure.CoordinateFormat}. This is okay for occasional
      * formatting (for example for debugging purpose). But if there is a lot of positions to format,
      * users will get better performance and more control by using their own instance of

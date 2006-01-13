@@ -88,4 +88,22 @@
     </dependency>
   </dependencies>
 
+
+
+  <!-- ==================================================== -->
+  <!--     Plugins configuration                            -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <!-- Surefile 2.1.2 fails for a mysterious reason before to run any test! -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

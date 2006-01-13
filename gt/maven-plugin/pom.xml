@@ -1,90 +1,39 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ====================================================
+<!-- =======================================================================
          Maven 2 project configuration file
          http://maven.apache.org/maven2/
 
-         Configuration file for Maven plugins specific to the the Geotools 2 project
+         Maven plugins specific to the the Geotools 2 project
          http://www.geotools.org
 
          Version: $Id$
-     ==================================================== -->
+     ======================================================================= -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
-  <!-- Must NOT extends the parent gt2 POM. -->
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt2</artifactId>
+    <version>2.2-SNAPSHOT</version>
+  </parent>
 
 
   <!-- ==================================================== -->
-  <!--     Project description (including license)          -->
+  <!--     Project description                              -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-maven-plugin</artifactId>
   <packaging>pom</packaging>
   <version>2.2-SNAPSHOT</version>
   <name>Maven plugins for Geotools 2</name>
-
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  <inceptionYear>1996</inceptionYear>
-
-  <licenses>
-    <license>
-      <name>Lesser General Public License (LGPL)</name>
-      <url>http://www.gnu.org/copyleft/lesser.html</url>
-      <distribution>manual</distribution>
-    </license>
-  </licenses>
-
-  <issueManagement>
-    <system>JIRA</system>
-    <url>http://jira.codehaus.org/browse/GEOT</url>
-  </issueManagement>
-
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven-plugin</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/maven-plugin</url>
   </scm>
-
-  <mailingLists>
-    <mailingList>
-      <name>geotools-devel</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-devel</subscribe>
-      <post>geotools-devel@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-devel</archive>
-    </mailingList>
-  </mailingLists>
-
-
-
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
-  <developers>
-    <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
-      <organization>PennState</organization>
-      <roles>
-        <role>Java Developer</role>
-        <role>Project Management Committee (PMC) Member</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Martin Desruisseaux</name>
-      <id>desruisseaux</id>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
-      <roles>
-        <role>Java Developer</role>
-        <role>Project Management Committee (PMC) Member</role>
-      </roles>
-    </developer>
-  </developers>
+  <description>
+    Maven plugins specific to the the Geotools 2 project.
+  </description>
 
 
 
@@ -95,55 +44,19 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>2.0</version>
+      <version>2.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-project</artifactId>
-      <version>2.0</version>
+      <version>2.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.0.4</version>
+      <version>1.1</version>
     </dependency>
   </dependencies>
-
-
-
-  <!-- ==================================================== -->
-  <!--     Compilation (including resources)                -->
-  <!-- ==================================================== -->
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.4</source>              <!-- The -source argument for the Java compiler.   -->
-          <target>1.4</target>              <!-- The -target argument for the Java compiler.   -->
-          <encoding>ISO-8859-1</encoding>   <!-- The -encoding argument for the Java compiler. -->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
-
-
-  <!-- ==================================================== -->
-  <!--     Deployment to Geotools servers                   -->
-  <!-- ==================================================== -->
-  <distributionManagement>
-    <!-- The 'sicade' repository below are for testing purpose.  -->
-    <!-- They will need to be replaced by Geotools repositories. -->
-    <repository>
-      <id>espace</id>
-      <name>Geotools release repository</name>
-      <url>scp://eaunet2.espace.ird.nc/home/latical/maven</url>
-    </repository>
-  </distributionManagement>
 
 
 
@@ -151,8 +64,8 @@
   <!--     All Geotools 2 plugins included in the build     -->
   <!-- ==================================================== -->
   <modules>
-    <!-- Do not include 'doclets', because it requires J2SE 1.5. -->
     <module>jar-collector</module>
+<!--    <module>javadoc</module> Disabled for now because maven-plugin-tools-ant crash. -->
     <module>javamaker</module>
     <module>jjtree-javacc</module>
     <module>rmic</module>

@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ===========================================================================
-         Project configuration file for the Geotools 2 project
-         http://www.geotools.org/
-
-         NOTE: Some tests require a lot of memory. For a successfull build,
-               make sure that the MAVEN_OPTS environmental variable is set
-               to -Xmx384M or some higher value.
-
+         Maven 2 Project configuration file for the Geotools project.
          Version: $Id$
      =========================================================================== -->
 
@@ -16,9 +10,9 @@
 
 
 
-  <!-- ==================================================== -->
-  <!--     Project description (including license)          -->
-  <!-- ==================================================== -->
+  <!-- ===================================================================== -->
+  <!--     Project description (including license).                          -->
+  <!-- ===================================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2</artifactId>
   <packaging>pom</packaging>
@@ -51,9 +45,9 @@
 
 
 
-  <!-- ==================================================== -->
-  <!--     Issue managements and mailing lists              -->
-  <!-- ==================================================== -->
+  <!-- ===================================================================== -->
+  <!--     Issue managements and mailing lists.                              -->
+  <!-- ===================================================================== -->
   <issueManagement>
     <system>JIRA</system>
     <url>http://jira.codehaus.org/browse/GEOT</url>
@@ -88,9 +82,9 @@
 
 
 
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
+  <!-- ===================================================================== -->
+  <!--     Developers and contributors.                                      -->
+  <!-- ===================================================================== -->
   <developers>
     <developer>
       <name>Ian Turton</name>
@@ -345,39 +339,26 @@
 
 
 
-  <!-- ==================================================== -->
-  <!--     External dependencies                            -->
-  <!--     POM in subdirectories will inherit them.         -->
-  <!-- ==================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>geoapi</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.units</groupId>
-      <artifactId>jsr108</artifactId>
-      <version>0.01</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <!-- Version number provided below. -->
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
-
-
-  <!-- ==================================================== -->
-  <!--     Dependencies management                          -->
-  <!--     If a POM declares one of those dependencies,     -->
-  <!--     then it will use the version specified here.     -->
-  <!--     Otherwise, those dependencies are ignored.       -->
-  <!-- ==================================================== -->
+  <!-- ===================================================================== -->
+  <!--     Dependencies management.                                          -->
+  <!--     If a POM declares one of those dependencies, then it will use     -->
+  <!--     the version specified here. Otherwise, those dependencies are     -->
+  <!--     ignored.                                                          -->
+  <!-- ===================================================================== -->
   <dependencyManagement>
     <dependencies>
+
+      <!-- GeoAPI and its dependencies -->
+      <dependency>
+        <groupId>org.opengis</groupId>
+        <artifactId>geoapi</artifactId>
+        <version>2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.units</groupId>
+        <artifactId>jsr108</artifactId>
+        <version>0.01</version>
+      </dependency>
 
       <!-- Mathematic, geometries, SVG... -->
       <dependency>
@@ -490,41 +471,9 @@
 
 
 
-  <!-- ==================================================== -->
-  <!--     Repositories (ibiblio, refractions...)           -->
-  <!-- ==================================================== -->
-  <repositories>
-    <repository>
-      <id>ibiblio</id>
-      <name>Ibiblio - the public's library and digital archive</name>
-      <url>http://www.ibiblio.org/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>planetmirror</id>
-      <name>PlanetMirror - mirror of Ibiblio</name>
-      <url>http://public.planetmirror.com/pub/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>geotools</id>
-      <name>Geotools repository</name>
-      <url>http://maven.geotools.org/gt2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
-
-
-  <!-- ==================================================== -->
-  <!--     Build configuration (resources, ...)             -->
-  <!-- ==================================================== -->
+  <!-- ===================================================================== -->
+  <!--     Build configuration (resources, ...).                             -->
+  <!-- ===================================================================== -->
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
@@ -574,9 +523,102 @@
 
 
 
-    <!-- ==================================================== -->
-    <!--     Compilation                                      -->
-    <!-- ==================================================== -->
+    <!-- =================================================================== -->
+    <!--   Maven plugins dependencies management.                            -->
+    <!--   It should not be needed since Maven select by default the latest  -->
+    <!--   plugins. Unfortunatly, experience shows that new plugin releases  -->
+    <!--   sometime introduce new bugs that break our build. So it is safer  -->
+    <!--   to specify plugin versions that are known to work.  This list is  -->
+    <!--   in alphabetical order for easier comparaison with latest plugins  -->
+    <!--   at http://www.ibiblio.org/maven2/org/apache/maven/plugins/.       -->
+    <!-- =================================================================== -->
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.0-beta-3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>2.0-alpha-2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>2.0-beta-3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>2.0-beta-4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.1.2</version>
+        </plugin>
+
+        <!-- http://www.ibiblio.org/maven2/org/codehaus/mojo/ -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>changelog-maven-plugin</artifactId>
+          <version>2.0-beta-1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>changes-maven-plugin</artifactId>
+          <version>2.0-beta-1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>jxr-maven-plugin</artifactId>
+          <version>2.0-beta-1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>surefire-report-maven-plugin</artifactId>
+          <version>2.0-beta-1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>taglist-maven-plugin</artifactId>
+          <version>2.0-beta-1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+
+
+    <!-- =================================================================== -->
+    <!--     Compilation.                                                    -->
+    <!-- =================================================================== -->
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -591,9 +633,9 @@
 
 
 
-      <!-- ==================================================== -->
-      <!--     Tests                                            -->
-      <!-- ==================================================== -->
+      <!-- ================================================================= -->
+      <!--     Tests.                                                        -->
+      <!-- ================================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -606,15 +648,15 @@
           </excludes>
           <forkMode>once</forkMode>
           <argLine>-Xmx512M -enableassertions</argLine>
-          <printSummary>false</printSummary>   <!-- Make the build less verbose -->
+          <printSummary>false</printSummary>  <!-- Make the build less verbose -->
         </configuration>
       </plugin>
 
 
 
-      <!-- ==================================================== -->
-      <!--     JAR packaging                                    -->
-      <!-- ==================================================== -->
+      <!-- ================================================================= -->
+      <!--     JAR packaging.                                                -->
+      <!-- ================================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -626,24 +668,6 @@
           </archive>
         </configuration>
       </plugin>
-
-
-
-      <!-- ==================================================== -->
-      <!--     Copies all JARs in a single directory            -->
-      <!-- ==================================================== -->
-      <plugin>
-        <groupId>org.geotools</groupId>
-        <artifactId>gt2-jar-collector</artifactId>
-        <version>2.2-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>collect</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
@@ -651,9 +675,9 @@
 
   <reporting>
     <plugins>
-      <!-- ==================================================== -->
-      <!--     Javadoc generation                               -->
-      <!-- ==================================================== -->
+      <!-- ================================================================= -->
+      <!--     Javadoc generation for a single module.                       -->
+      <!-- ================================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -709,9 +733,9 @@
 
 
 
-      <!-- ==================================================== -->
-      <!--     Web site generation                              -->
-      <!-- ==================================================== -->
+      <!-- ================================================================= -->
+      <!--     Web site generation.                                          -->
+      <!-- ================================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
@@ -725,9 +749,9 @@
 
 
 
-      <!-- ==================================================== -->
-      <!--     Reports configuration for the web site           -->
-      <!-- ==================================================== -->
+      <!-- ================================================================= -->
+      <!--     Reports configuration for the web site.                       -->
+      <!-- ================================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -780,9 +804,9 @@
 
 
 
-  <!-- ==================================================== -->
-  <!--     Deployment to Geotools servers                   -->
-  <!-- ==================================================== -->
+  <!-- ===================================================================== -->
+  <!--     Deployment to Geotools servers.                                   -->
+  <!-- ===================================================================== -->
   <distributionManagement>
     <!-- The 'sicade' repository below are for testing purpose.  -->
     <!-- They will need to be replaced by Geotools repositories. -->
@@ -805,9 +829,42 @@
 
 
 
-  <!-- ==================================================== -->
-  <!--     All Geotools 2 groups included in the build      -->
-  <!-- ==================================================== -->
+  <!-- ===================================================================== -->
+  <!--     Repositories (ibiblio, refractions...).                           -->
+  <!--     This is where Maven looks for dependencies.                       -->
+  <!-- ===================================================================== -->
+  <repositories>
+    <repository>
+      <id>ibiblio</id>
+      <name>Ibiblio - the public's library and digital archive</name>
+      <url>http://www.ibiblio.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>planetmirror</id>
+      <name>PlanetMirror - mirror of Ibiblio</name>
+      <url>http://public.planetmirror.com/pub/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>geotools</id>
+      <name>Geotools repository</name>
+      <url>http://maven.geotools.org/gt2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+
+
+  <!-- ===================================================================== -->
+  <!--     All Geotools 2 groups included in the build.                      -->
+  <!-- ===================================================================== -->
   <modules>
     <module>maven-plugin</module>
     <module>module</module>
