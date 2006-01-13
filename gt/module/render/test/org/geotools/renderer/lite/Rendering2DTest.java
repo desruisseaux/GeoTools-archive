@@ -757,6 +757,13 @@ public class Rendering2DTest extends TestCase {
         
         results = renderer.queryLayer(layer, new LiteFeatureTypeStyle[]{fts},envelope, DefaultGeographicCRS.WGS84);
         assertEquals(2, results.getCount());
+        
+        elseRules.add(rule);
+
+        fts=new LiteFeatureTypeStyle(null, rules, elseRules);
+        results = renderer.queryLayer(layer, new LiteFeatureTypeStyle[]{fts},envelope, DefaultGeographicCRS.WGS84);
+        assertEquals(3, results.getCount());
+        
 	}
 
     /**
