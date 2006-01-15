@@ -36,6 +36,8 @@ import javax.swing.*;
  * @author rgould
  */
 public class WorldImageReaderTest extends TestCase {
+    private static boolean verbose = false;
+
     WorldImageReader wiReader;
     ParameterValueGroup paramsRead = null;
 
@@ -106,9 +108,12 @@ public class WorldImageReaderTest extends TestCase {
         assertNotNull(((GridCoverage2D) coverage).getRenderedImage());
         assertNotNull(coverage.getEnvelope());
 
-        System.out.println(((GridCoverage2D) coverage).getCoordinateReferenceSystem()
-                            .toWKT());
-
+        if (verbose) {
+            System.out.println(((GridCoverage2D) coverage).getCoordinateReferenceSystem().toWKT());
+        }
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
         JFrame frame = new JFrame();
         JLabel label = new JLabel(new ImageIcon(
                     ((PlanarImage) coverage.getRenderedImage())

@@ -17,6 +17,7 @@
 package org.geotools.gce.image;
 
 import java.awt.BorderLayout;
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -136,44 +137,47 @@ public class WorldImageWriterTest extends TestCase {
         coverage = (GridCoverage2D) wiReader.read(null);
 //        reprojectAndShow(coverage);
 
-                assertNotNull(coverage);
-                assertNotNull( coverage.getRenderedImage());
-                assertNotNull(coverage.getEnvelope());
-        
-                //writing png
-                File tempFile = null;
-        
-                //remember to provide a valid name, it wil be mde unique by the helper function
-                //temp
-                tempFile = File.createTempFile("temp", ".gif");
-                tempFile.deleteOnExit();
-                assertTrue(tempFile.exists());
-        
-                //writer
-                wiWriter = new WorldImageWriter(tempFile);
-        
-                //writing parameters for png
-                Format writerParams = wiWriter.getFormat();
-                writerParams.getWriteParameters().parameter("Format").setValue("gif");
-        
-                //writing
-                wiWriter.write(coverage, null);
-        
-                //reading again
-                assertTrue(tempFile.exists());
-                wiReader = new WorldImageReader(tempFile);
-        
-                coverage = (GridCoverage2D) wiReader.read(null);
-        
-                //displaying
-                JFrame frame = new JFrame();
-                JLabel label = new JLabel(new ImageIcon(
-                            ((PlanarImage) coverage.getRenderedImage())
-                            .getAsBufferedImage()));
-                frame.getContentPane().add(label, BorderLayout.CENTER);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.pack();
-                frame.show();
+        assertNotNull(coverage);
+        assertNotNull( coverage.getRenderedImage());
+        assertNotNull(coverage.getEnvelope());
+
+        //writing png
+        File tempFile = null;
+
+        //remember to provide a valid name, it wil be mde unique by the helper function
+        //temp
+        tempFile = File.createTempFile("temp", ".gif");
+        tempFile.deleteOnExit();
+        assertTrue(tempFile.exists());
+
+        //writer
+        wiWriter = new WorldImageWriter(tempFile);
+
+        //writing parameters for png
+        Format writerParams = wiWriter.getFormat();
+        writerParams.getWriteParameters().parameter("Format").setValue("gif");
+
+        //writing
+        wiWriter.write(coverage, null);
+
+        //reading again
+        assertTrue(tempFile.exists());
+        wiReader = new WorldImageReader(tempFile);
+
+        coverage = (GridCoverage2D) wiReader.read(null);
+
+        //displaying
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
+        JFrame frame = new JFrame();
+        JLabel label = new JLabel(new ImageIcon(
+                    ((PlanarImage) coverage.getRenderedImage())
+                    .getAsBufferedImage()));
+        frame.getContentPane().add(label, BorderLayout.CENTER);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.show();
     }
 //
 //    private void reprojectAndShow(GridCoverage2D coverage)
