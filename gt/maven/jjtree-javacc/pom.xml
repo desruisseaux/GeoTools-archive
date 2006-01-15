@@ -14,7 +14,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-maven-plugin</artifactId>
+    <artifactId>gt2-maven</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
 
@@ -24,11 +24,15 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-rmic</artifactId>
+  <artifactId>gt2-jjtree-javacc</artifactId>
   <packaging>maven-plugin</packaging>
-  <name>RMI compiler (rmic)</name>
+  <name>JJTree and JavaCC compilers plugin</name>
   <description>
-    Invokes the RMI compiler 'rmic'.
+    This Maven plugin run 'jjtree' on a set of .jjt files found in the source
+    directory, which generates a set of .jj files. Next, this plugin executes
+    'javacc' on those .jj files in order to generate the .java files. All
+    generated files are stored in a 'target/generated-sources' directory and
+    are part of the compilation phase.
   </description>
 
 
@@ -51,16 +55,20 @@
 
 
 
-
   <!-- ==================================================== -->
   <!--     External dependencies                            -->
   <!-- ==================================================== -->
   <dependencies>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-compiler-api</artifactId>
+      <version>1.5.1</version>
+    </dependency>
+    <dependency>
+      <groupId>javacc</groupId>
+      <artifactId>javacc</artifactId>
+      <version>3.2</version>
     </dependency>
   </dependencies>
-
+  
 </project>

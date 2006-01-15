@@ -7,7 +7,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
+<!-- TODO: Uncomment when Maven 2.0.2 will be released
+  <prerequisite>
+    <maven>2.0.2</maven>
+  </prerequisite> -->
 
 
   <!-- ===================================================================== -->
@@ -853,7 +856,7 @@
     <repository>
       <id>geotools</id>
       <name>Geotools repository</name>
-      <url>http://maven.geotools.org/gt2</url>
+      <url>http://maven.geotools.fr/repository</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -866,7 +869,7 @@
   <!--     All Geotools 2 groups included in the build.                      -->
   <!-- ===================================================================== -->
   <modules>
-    <module>maven-plugin</module>
+    <module>maven</module>
     <module>module</module>
     <module>plugin</module>
     <module>ext</module>
