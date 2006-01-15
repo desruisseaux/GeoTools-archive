@@ -19,6 +19,7 @@ package org.geotools.gui.swing;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
@@ -126,14 +127,12 @@ public class LegendTest extends TestCase {
         if (verbose) {
             System.out.println("create Coodinate System....1");
         }
-        Ellipsoid airy1830 = Ellipsoid.createEllipsoid("Airy1830", 6377563.396, 6356256.910,
-                Unit.METRE);
+        Ellipsoid airy1830 = Ellipsoid.createEllipsoid("Airy1830", 6377563.396, 6356256.910, Unit.METRE);
         if (verbose) {
             System.out.println("create Coodinate System....2" + airy1830.toString());
         }
         GeographicCoordinateSystem geogCS = CoordinateSystemFactory.getDefault()
-                                                                   .createGeographicCoordinateSystem("Airy1830",
-                new HorizontalDatum("Airy1830", airy1830));
+                .createGeographicCoordinateSystem("Airy1830", new HorizontalDatum("Airy1830", airy1830));
         if (verbose) {
             System.out.println("create Coodinate System....3" + geogCS.toString());
         }
@@ -144,14 +143,15 @@ public class LegendTest extends TestCase {
             System.out.println("create Coodinate System....4" + p.toString());
         }
         CoordinateSystem projectCS = CoordinateSystemFactory.getDefault()
-                                                            .createProjectedCoordinateSystem("Great_Britian_National_Grid",
-                geogCS, p);
+                .createProjectedCoordinateSystem("Great_Britian_National_Grid", geogCS, p);
 
         if (verbose) {
             System.out.println("create Context");
         }
         context.addLayers(layers);
-
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
         if (verbose) {
             System.out.println("creating Map Pane");
         }

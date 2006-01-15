@@ -18,6 +18,7 @@ package org.geotools.gui.swing;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 
 import javax.swing.JFrame;
@@ -68,6 +69,9 @@ public class LegendEditorTest extends TestCase {
             System.out.println("Style editor created in " + (System.currentTimeMillis() - start));
         }    
         // Create frame
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
         JFrame frame = new JFrame();
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent evt) {
