@@ -199,6 +199,8 @@ public abstract class PointArray2D implements PointArray, Serializable {
      * @param  dest An optionnaly pre-allocated direct position.
      * @return The {@code dest} argument, or a new object if {@code dest} was null.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
+     *
+     * @todo Ensures CRS are compatibles.
      */
     public DirectPosition get(final int index, DirectPosition dest)
             throws IndexOutOfBoundsException
