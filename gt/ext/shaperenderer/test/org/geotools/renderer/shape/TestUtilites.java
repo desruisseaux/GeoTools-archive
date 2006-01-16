@@ -25,6 +25,7 @@ import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.net.URL;
 
@@ -208,9 +209,7 @@ public class TestUtilites {
         TestUtilites.render(renderer, g, new Rectangle(w, h), bounds);
 
         g.dispose();
-        if (((System.getProperty("java.awt.headless") == null)
-                || !System.getProperty("java.awt.headless").equals("true"))
-                && TestUtilites.INTERACTIVE) {
+        if (!GraphicsEnvironment.isHeadless() && TestUtilites.INTERACTIVE) {
             Frame frame = new Frame(testName);
             frame.addWindowListener(new WindowAdapter() {
                     public void windowClosing(WindowEvent e) {
@@ -266,7 +265,7 @@ public class TestUtilites {
      *
      * @throws IOException
      */
-    static void render(Object obj, Graphics g, Rectangle rect, Envelope bounds)
+    private static void render(Object obj, Graphics g, Rectangle rect, Envelope bounds)
         throws IOException {
         if (obj instanceof GTRenderer) {
             GTRenderer renderer = (GTRenderer) obj;
