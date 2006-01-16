@@ -26,6 +26,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Panel;
 import java.awt.Shape;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.GeneralPath;
@@ -189,6 +190,9 @@ public class PolygonShapeTest extends TestCase {
     }
 
     public void testPolygonPoint() throws InterruptedException {
+        if (!DISPLAY) {
+            return;
+        }
         final GeneralPath shape = new GeneralPath();
 
         shape.moveTo(10.1f, 10.1f);
@@ -226,6 +230,9 @@ public class PolygonShapeTest extends TestCase {
 
     public static Frame display(String testName, final Shape shape, int w, int h)
         throws Exception {
+        if (GraphicsEnvironment.isHeadless()) {
+            return null;
+        }
         Frame frame = new Frame(testName);
         frame.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {
