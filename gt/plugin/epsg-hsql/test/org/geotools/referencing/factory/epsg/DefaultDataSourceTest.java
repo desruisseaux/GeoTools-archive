@@ -84,8 +84,15 @@ import org.geotools.resources.Arguments;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Vadim Semenov
+ *
+ * @todo This test suite need to be profiled in order to determine where this test spent its time.
  */
 public class DefaultDataSourceTest extends TestCase {
+    /**
+     * Set to {@code true} for verbose and more extensive tests.
+     */
+    private static boolean verbose = false;
+
     /**
      * Small value for parameter value comparaisons.
      */
@@ -97,16 +104,29 @@ public class DefaultDataSourceTest extends TestCase {
     private DefaultFactory factory;
 
     /**
-     * Run the suite from the command line. If {@code "-log"} flag is specified on the
-     * command-line, then the logger will be set to {@link Level#CONFIG}. This is usefull
-     * for tracking down which data source is actually used.
+     * Run the suite from the command line. Optional command-line arguments:
+     * <ul>
+     *   <li>{@code -log}: set the logger lever to {@link Level#CONFIG}.
+     *       This is usefull for tracking down which data source is actually used.</li>
+     *   <li>{@code -verbose}: Prints some messages to the standard output stream.</li>
+     *   <li>{@code -gui}: Run the graphical test runner instead of the text one.</li>
+     * </ul>
      */
     public static void main(final String[] args) {
         final Arguments arguments = new Arguments(args);
+        final boolean gui = arguments.getFlag("-gui");
         final boolean log = arguments.getFlag("-log");
+        verbose = arguments.getFlag("-verbose");
         arguments.getRemainingArguments(0);
         MonolineFormatter.initGeotools(log ? Level.CONFIG : null);
-        junit.textui.TestRunner.run(suite());
+        if (gui) {
+            junit.swingui.TestRunner.main(new String[] {
+                "-noloading",
+                DefaultDataSourceTest.class.getName()
+            });
+        } else {
+            junit.textui.TestRunner.run(suite());
+        }
     }
 
     /**
@@ -575,11 +595,12 @@ public class DefaultDataSourceTest extends TestCase {
      */
     public void testAccuracy() throws FactoryException {
         final Set identifiers = factory.getAuthorityCodes(CoordinateOperation.class);
-        double min   = Double.POSITIVE_INFINITY;
-        double max   = Double.NEGATIVE_INFINITY;
-        double sum   = 0;
-        int    count = 0; // Number of coordinate operations recognized by the factory.
-        int    valid = 0; // Number of non-NaN accuracies.
+        double min     = Double.POSITIVE_INFINITY;
+        double max     = Double.NEGATIVE_INFINITY;
+        double sum     = 0;
+        int    count   = 0; // Number of coordinate operations (minus the skipped ones).
+        int    created = 0; // Number of coordinate operations recognized by the factory.
+        int    valid   = 0; // Number of non-NaN accuracies.
         for (final Iterator it=identifiers.iterator(); it.hasNext();) {
             final CoordinateOperation operation;
             final String code = (String) it.next();
@@ -588,13 +609,14 @@ public class DefaultDataSourceTest extends TestCase {
                 // Valid, but log a warning. Will avoid just in order to keep the output clean.
                 continue;
             }
+            ++count;
             try {
                 operation = factory.createCoordinateOperation(code);
             } catch (FactoryException exception) {
                 // Skip unsupported coordinate operations.
                 continue;
             }
-            count++;
+            created++;
             assertNotNull(operation);
             final double accuracy = AbstractCoordinateOperation.getAccuracy(operation);
             assertFalse(accuracy < 0);
@@ -605,9 +627,10 @@ public class DefaultDataSourceTest extends TestCase {
                 valid++;
             }
         }
-        if (false) {
+        if (verbose) {
             System.out.print("Number of coordinate operations:    "); System.out.println(identifiers.size());
-            System.out.print("Number of recognized operations:    "); System.out.println(count);
+            System.out.print("Number of tested operations:        "); System.out.println(count);
+            System.out.print("Number of recognized operations:    "); System.out.println(created);
             System.out.print("Number of operations with accuracy: "); System.out.println(valid);
             System.out.print("Minimal accuracy value (meters):    "); System.out.println(min);
             System.out.print("Maximal accuracy value (meters):    "); System.out.println(max);
