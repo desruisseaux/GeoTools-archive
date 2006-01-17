@@ -14,6 +14,45 @@
 
 
   <!-- ===================================================================== -->
+  <!--     Profiles: modify the build process in certain conditions.         -->
+  <!--     The conditions are trigged by command-line properties.            -->
+  <!--     Available properties are:                                         -->
+  <!--                                                                       -->
+  <!--     site.build     -  The main purpose of this build is to create     -->
+  <!--                       reports. Consequently, a JUnit test failure     -->
+  <!--                       will not stop the build. The failure should     -->
+  <!--                       be reported by the surefire report plugin.      -->
+  <!--                                                                       -->
+  <!--     Example:          mvn -Dsite.build=true site                      -->
+  <!--                                                                       -->
+  <!--     Note that properties like "site.build" are not mandatory for      -->
+  <!--     using the "site" goal. Such properties just modify the build      -->
+  <!--     process prior the "site" goal execution in a manner relevant      -->
+  <!--     to the purpose of the "site" goal.                                -->
+  <!-- ===================================================================== -->
+  <properties>
+    <allow.test.skip>true</allow.test.skip>
+    <allow.test.failure.ignore>false</allow.test.failure.ignore>
+  </properties>
+
+  <!-- Overwrite the above default properties according command-line parameters. -->
+  <profiles>
+    <profile>
+      <activation>
+        <property>
+          <name>site.build</name>
+        </property>
+      </activation>
+      <properties>
+        <allow.test.skip>false</allow.test.skip>
+        <allow.test.failure.ignore>true</allow.test.failure.ignore>
+      </properties>
+    </profile>
+  </profiles>
+
+
+
+  <!-- ===================================================================== -->
   <!--     Project description (including license).                          -->
   <!-- ===================================================================== -->
   <groupId>org.geotools</groupId>
@@ -652,6 +691,9 @@
           <forkMode>once</forkMode>
           <argLine>-Xmx512M -enableassertions</argLine>
           <printSummary>false</printSummary>  <!-- Make the build less verbose -->
+          <!-- Ignores test failure only if we are generating a report for publication on
+               the web site. See the profiles section at the begining of this pom.xml file. -->
+          <testFailureIgnore>${allow.test.failure.ignore}</testFailureIgnore>
         </configuration>
       </plugin>
 
@@ -813,12 +855,12 @@
     <site>
       <id>reports</id>
       <name>Web site for Maven reports</name>
-      <url>scp://maven.geotools.fr/var/www/geotools.fr/maven/reports</url>
+      <url>scp://maven.geotools.fr/var/www/geotools.fr/maven/reports/</url>
     </site>
     <repository>
       <id>repository</id>
       <name>Geotools release repository</name>
-      <url>scp://maven.geotools.fr/var/www/geotools.fr/maven/repository</url>
+      <url>scp://maven.geotools.fr/var/www/geotools.fr/maven/repository/</url>
     </repository>
   </distributionManagement>
 

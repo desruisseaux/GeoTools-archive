@@ -117,7 +117,7 @@
             <exclude>**/PostgisDataStoreTest.java</exclude>
           </excludes>
           <!-- End exclude tests -->
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <skip>${allow.test.skip}</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
           <!-- We bypass for now because PostGIS tests are very long (20 minutes!)  -->
         </configuration>
       </plugin>

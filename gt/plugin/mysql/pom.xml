@@ -100,7 +100,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <skip>${allow.test.skip}</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
         </configuration>
       </plugin>
     </plugins>

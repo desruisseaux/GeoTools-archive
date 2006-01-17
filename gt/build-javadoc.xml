@@ -161,8 +161,8 @@
 
       <tag name="todo" scope="types,fields,methods,constructors" description="TODO:"/>
       <tag name="task" scope="types,fields,methods,constructors" description="TASK:"/>
-      <taglet name="org.geotools.taglet.Tutorial"/>
-      <taglet name="org.geotools.taglet.Source"  />
+      <taglet name="org.geotools.maven.taglet.Tutorial"/>
+      <taglet name="org.geotools.maven.taglet.Source"  />
 
       <group title="Features, Filters and Styling"      packages="org.geotools.feature*:org.geotools.filter*:org.geotools.styling*"/>
       <group title="Geometries"                         packages="org.geotools.geometry*:org.geotools.topology*:org.geotools.measure*"/>

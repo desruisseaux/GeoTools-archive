@@ -1,3 +1,7 @@
+--------------------------------------------------------------------------------
+ README file for Geotools developpers - Do NOT copy this file to the web server
+--------------------------------------------------------------------------------
+
 The HTML pages in this directory provide the content for the following site:
 
     http://maven.geotools.org/  (TODO: not yet enabled)
