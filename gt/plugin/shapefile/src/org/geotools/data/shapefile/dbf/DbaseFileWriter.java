@@ -250,8 +250,7 @@ public class DbaseFileWriter  {
       }
       
       buffer.setLength(maxSize);
-
-      System.out.println(buffer.toString().getBytes().length);
+      
       return buffer.toString();
     }
     
