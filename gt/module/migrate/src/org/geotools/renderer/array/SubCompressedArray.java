@@ -28,7 +28,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 /**
  * Classe enveloppant une portion seulement d'un tableau {@link CompressedArray}.
  *
- * @version $Id: SubCompressedArray.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class SubCompressedArray extends CompressedArray {

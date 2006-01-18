@@ -39,7 +39,7 @@ import org.geotools.util.ProgressListener;
  * notifications without stoping the lenghtly task.
  *
  * @since 2.0
- * @version $Id: ProgressPrinter.java,v 1.2 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ProgressPrinter implements ProgressListener {

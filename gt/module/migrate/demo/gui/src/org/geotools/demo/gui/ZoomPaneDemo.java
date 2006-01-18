@@ -53,7 +53,7 @@ import org.geotools.gui.swing.event.ZoomChangeListener;
  * (it doesn't have to be in pixel unit) and <CODE>paintComponent(Graphics2D)</CODE>
  * which performs the actual painting.
  *
- * @version $Id: ZoomPaneDemo.java,v 1.1 2004/02/05 15:08:21 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ZoomPaneDemo extends ZoomPane implements ZoomChangeListener {

@@ -59,7 +59,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * A map pane which support styling.
  *
  * @author Martin Desruisseaux
- * @version $Id: StyledMapPane.java,v 1.5 2004/03/26 19:06:50 aaime Exp $
+ * @version $Id$
  */
 public class StyledMapPane extends MapPane {
     /** The model which stores a list of layers and bounding box. */

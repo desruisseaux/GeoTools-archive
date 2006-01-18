@@ -39,7 +39,7 @@ import org.opengis.referencing.operation.TransformException;
  * that area.
  *
  * @author Cameron Shorter
- * @version $Id: ZoomToolImpl.java,v 1.13 2003/12/23 17:21:02 aaime Exp $
+ * @version $Id$
  */
 public class ZoomToolImpl extends PanToolImpl implements ZoomTool {
     private static final Logger LOGGER = Logger.getLogger(

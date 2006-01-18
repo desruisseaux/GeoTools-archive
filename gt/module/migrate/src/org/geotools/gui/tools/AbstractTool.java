@@ -17,7 +17,7 @@ import org.geotools.map.MapContext;
  * Base class for all the geotools Tools, like PanTool, ZoomTool, etc.
  * Tools process mouse events on behalf of widgets like MapPane and change
  * data in the Context (like the AreaOfInterest).
- * @version $Id: AbstractTool.java,v 1.4 2003/12/23 17:21:02 aaime Exp $
+ * @version $Id$
  * @author Cameron Shorter
  */
 public abstract class AbstractTool

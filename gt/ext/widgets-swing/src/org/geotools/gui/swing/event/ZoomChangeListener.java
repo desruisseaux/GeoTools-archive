@@ -28,7 +28,7 @@ import java.util.EventListener;
  * are indicated by an {@link java.awt.geom.AffineTransform}.
  *
  * @since 2.0
- * @version $Id: ZoomChangeListener.java,v 1.4 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface ZoomChangeListener extends EventListener {

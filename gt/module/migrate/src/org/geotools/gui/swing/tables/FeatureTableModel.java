@@ -25,7 +25,7 @@ import org.geotools.feature.*;
  * displayed.
  *
  * @author James Macgill, CCG
- * @version $Id: FeatureTableModel.java,v 1.4 2004/02/27 14:02:00 aaime Exp $
+ * @version $Id$
  *
  * @task TODO: It would be excellent if there were custom cell renderers
  *       available for Geometry types.

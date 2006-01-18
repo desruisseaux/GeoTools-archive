@@ -26,7 +26,7 @@ package org.geotools.gui.swing.tree;
  * Swing's interface, which seems to have been forgotten in J2SE.
  *
  * @since 2.0
- * @version $Id: TreeNode.java,v 1.2 2004/04/30 19:40:16 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface TreeNode extends javax.swing.tree.TreeNode {

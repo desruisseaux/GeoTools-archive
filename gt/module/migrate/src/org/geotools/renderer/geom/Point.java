@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * Geometry hierarchy.
  *
  * @author Andrea Aime
- * @version $Id: Point.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  */
 public class Point extends Geometry {
     /**

@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * coordinate system.
  *
  * @author James Macgill, CCG
- * @version $Id: Map.java,v 1.13 2003/08/07 22:11:58 cholmesny Exp $
+ * @version $Id$
  *
  * @deprecated Use Context instead.
  */

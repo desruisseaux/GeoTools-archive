@@ -30,7 +30,7 @@ import org.geotools.map.MapContext;
  * map and then zoom in/out by the zoomFactor.
  *
  * @author Cameron Shorter
- * @version $Id: ClickPanToolImpl.java,v 1.5 2003/12/23 17:21:02 aaime Exp $
+ * @version $Id$
  */
 public class ClickPanToolImpl extends PanToolImpl implements ClickPanTool {
     private static final Logger LOGGER =

@@ -76,7 +76,7 @@ import org.opengis.referencing.operation.TransformException;
  * <code>GeometryCollection</code> is convenient for sorting collections in alphabetical order
  * or isobaths in increasing order of altitude.
  *
- * @version $Id: GeometryCollection.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @task TODO: Add a 'getTree(boolean)' method returning a TreeNode. Would be usefull for debugging.
@@ -1393,7 +1393,7 @@ public class GeometryCollection extends Geometry implements Comparable {
      * The collection of geometries meeting a condition.
      * The check for inclusion or intersection will be performed only when first needed.
      *
-     * @version $Id: GeometryCollection.java 10796 2005-01-28 19:09:18Z dzwiers $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static abstract class Filtered extends AbstractCollection {

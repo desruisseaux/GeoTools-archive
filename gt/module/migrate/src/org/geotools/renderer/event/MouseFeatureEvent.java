@@ -28,7 +28,7 @@ import org.geotools.feature.Feature;
  * {@link MouseFeatureListener} objects that have been registered with the
  * {@link HighlightManager}.
  *
- * @version $Id: MouseFeatureEvent.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Julian Elliott
  */
 public interface MouseFeatureEvent {

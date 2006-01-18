@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * A geometry collection backed by one or many JTS
  * {@link com.vividsolutions.jts.geom.Geometry} objects.
  *
- * @version $Id: JTSGeometries.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class JTSGeometries extends org.geotools.renderer.geom.GeometryCollection {

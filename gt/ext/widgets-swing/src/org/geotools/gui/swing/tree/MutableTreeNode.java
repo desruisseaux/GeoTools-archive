@@ -29,7 +29,7 @@ package org.geotools.gui.swing.tree;
  * define or inherit any {@code getUserObject()}.
  *
  * @since 2.0
- * @version $Id: MutableTreeNode.java,v 1.2 2004/04/30 19:40:16 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface MutableTreeNode extends javax.swing.tree.MutableTreeNode, TreeNode {

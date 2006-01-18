@@ -25,7 +25,7 @@ import org.geotools.feature.Feature;
  * The listener interface for receiving "interesting" mouse events (click, enter, and exit)
  * on a {@linkplain Feature feature}.
  *
- * @version $Id: MouseFeatureListener.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Julian Elliott
  */
 public interface MouseFeatureListener extends EventListener {

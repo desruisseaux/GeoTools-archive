@@ -42,7 +42,7 @@ import org.geotools.resources.i18n.Errors;
  * when a raster is being read but the file doesn't contains enough information for
  * constructing the raster's coordinate system.
  *
- * @version $Id: MissingPropertyException.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Replaced by {@link org.geotools.coverage.io.MissingMetadataException}.

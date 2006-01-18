@@ -42,7 +42,7 @@ import java.awt.image.RenderedImage;
  * {@link org.geotools.renderer.style.MarkStyle2D} and
  * {@link org.geotools.renderer.style.GraphicStyle2D}.
  *
- * @version $Id: FeatureModifier.java 5670 2004-05-16 17:35:30Z desruisseaux $
+ * @version $Id$
  * @author Julian Elliott
  */
 public interface FeatureModifier {
@@ -113,7 +113,7 @@ public interface FeatureModifier {
      * A base (identity) implementation of the {@link FeatureModifier} interface.
      * Users should typically extend this to obtain the behaviour they want.
      *
-     * @version $Id: FeatureModifier.java 5670 2004-05-16 17:35:30Z desruisseaux $
+     * @version $Id$
      * @author Julian Elliott
      */
     public static class Adapter implements FeatureModifier {

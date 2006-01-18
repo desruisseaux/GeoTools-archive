@@ -48,7 +48,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * If this exception is thrown, the workaround is to {@linkplain Geometry#clone clone}
  * the geometry before to invokes one of the above methods.
  *
- * @version $Id: UnmodifiableGeometryException.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class UnmodifiableGeometryException extends IllegalStateException {

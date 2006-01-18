@@ -28,7 +28,7 @@ import java.awt.geom.Point2D;
  * (generally constant time) random access. Most default (flat) arrays implement this interface,
  * while compressed arrays generally do not implement it.
  *
- * @version $Id: RandomAccess.java 6410 2004-06-12 19:59:51Z jgarnett $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated No replacement. See <A HREF="http://jira.codehaus.org/browse/GEOT-776">GEOT-776</A>.

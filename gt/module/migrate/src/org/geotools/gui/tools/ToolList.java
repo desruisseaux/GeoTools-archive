@@ -30,7 +30,7 @@ import org.geotools.gui.tools.event.SelectedToolListener;
  * that.
  *
  * @author Cameron Shorter
- * @version $Id: ToolList.java,v 1.3 2003/08/20 21:32:13 cholmesny Exp $
+ * @version $Id$
  */
 public interface ToolList extends List {
     /**

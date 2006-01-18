@@ -51,7 +51,7 @@ import org.geotools.resources.Arguments;
 /**
  * Test formatting done by the {@link CoordinateFormat} class.
  *
- * @version $Id: CoordinateFormatTest.java,v 1.2 2003/05/13 10:58:50 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class FormatTest extends TestCase {

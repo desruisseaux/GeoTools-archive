@@ -77,7 +77,7 @@ import org.opengis.referencing.operation.TransformException;
  * Par convention, toutes les méthodes statiques de cette classe peuvent agir
  * sur une chaîne d'objets {@link LineString} plutôt que sur une seule instance.
  *
- * @version $Id: LineString.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class LineString implements Serializable {
@@ -1418,7 +1418,7 @@ final class LineString implements Serializable {
      * A set of points ({@link Point2D}) from a polyline or a polygon.
      * This set of points is returned by {@link Polyline#getPoints}.
      *
-     * @version $Id: LineString.java 10796 2005-01-28 19:09:18Z dzwiers $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     static final class Collection extends AbstractCollection {
@@ -1461,7 +1461,7 @@ final class LineString implements Serializable {
     /**
      * Iterateur balayant les coordonnées d'un polyligne ou d'un polygone.
      *
-     * @version $Id: LineString.java 10796 2005-01-28 19:09:18Z dzwiers $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     static final class Iterator implements java.util.Iterator {

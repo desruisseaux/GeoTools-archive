@@ -24,7 +24,7 @@ import java.util.EventObject;
  * Methods to handle a change of a MapPane's selected tool.
  *
  * @author Cameron Shorter
- * @version $Id: SelectedToolListener.java,v 1.2 2003/08/20 21:32:14 cholmesny Exp $
+ * @version $Id$
  */
 public interface SelectedToolListener extends EventListener {
     /**

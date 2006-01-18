@@ -56,7 +56,7 @@ import org.geotools.resources.Utilities;
  * coverages} or {@linkplain Geometry geometry} objects in a Swing widget.
  *
  * @author Martin Desruisseaux
- * @version $Id: FrameFactory.java,v 1.6 2003/11/18 14:26:49 desruisseaux Exp $
+ * @version $Id$
  */
 public final class FrameFactory {
     /**

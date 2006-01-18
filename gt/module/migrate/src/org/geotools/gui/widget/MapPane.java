@@ -27,7 +27,7 @@ import org.geotools.map.event.MapLayerListListener;
  * required if any of the parameters in the associated Context changes.
  *
  * @author Cameron Shorter
- * @version $Id: MapPane.java,v 1.9 2004/03/14 18:44:26 aaime Exp $
+ * @version $Id$
  *
  * @task TODO Should extend LayerListener as well.  Ie, if features inside a \
  *       layer change, then a redraw is required.

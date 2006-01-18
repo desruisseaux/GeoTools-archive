@@ -43,7 +43,7 @@ import java.awt.geom.Point2D;
  * L'implémentation par défaut de cette classe est imutable. Toutefois, certaines
  * classes dérivées (notamment {@link DynamicArray}) ne le seront pas forcément.
  *
- * @version $Id: SubArray.java 6410 2004-06-12 19:59:51Z jgarnett $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 class SubArray extends DefaultArray {

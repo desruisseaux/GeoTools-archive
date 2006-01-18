@@ -22,7 +22,7 @@ package org.geotools.renderer.event;
 /**
  * Informations relatives to a rendering in progress.
  *
- * @version $Id: RenderingContext.java 5670 2004-05-16 17:35:30Z desruisseaux $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface RenderingContext {

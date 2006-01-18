@@ -27,7 +27,7 @@ package org.geotools.gui.swing.tree;
  * implementation but seems to have been forgotten in all Swing interfaces.
  *
  * @since 2.0
- * @version $Id: DefaultMutableTreeNode.java,v 1.2 2004/04/30 19:40:16 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class DefaultMutableTreeNode extends javax.swing.tree.DefaultMutableTreeNode

@@ -23,7 +23,7 @@ import java.awt.event.WindowListener;
  * A frame which can contain other widgets.
  *
  * @author Cameron Shorter
- * @version $Id: FrameWidget.java,v 1.4 2003/08/20 21:37:58 cholmesny Exp $
+ * @version $Id$
  */
 public interface FrameWidget extends Widget {
     /**

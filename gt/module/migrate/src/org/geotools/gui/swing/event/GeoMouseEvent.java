@@ -44,7 +44,7 @@ import org.geotools.pt.CoordinatePoint;
  * &nbsp;}
  * </pre></blockquote>
  *
- * @version $Id: GeoMouseEvent.java,v 1.5 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Cameron Shorter
  */
 public final class GeoMouseEvent extends MouseEvent {

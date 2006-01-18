@@ -80,7 +80,7 @@ import org.geotools.resources.i18n.Errors;
  * However, other methods may be overriden too in order to get finner control
  * on the result.
  *
- * @version $Id: GridCoverageReader.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Replaced by {@link org.geotools.coverage.io.AbstractGridCoverageReader}.

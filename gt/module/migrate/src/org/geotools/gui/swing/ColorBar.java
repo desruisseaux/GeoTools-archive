@@ -82,7 +82,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * is usually painted together with a remote sensing image, for example in a
  * {@link org.geotools.gui.swing.MapPane} object.
  *
- * @version $Id: ColorBar.java,v 1.9 2004/02/13 14:29:37 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Use {@link ColorRamp} instead.
@@ -759,7 +759,7 @@ public class ColorBar extends JComponent {
      * de calculer l'espace qu'elle occupe. Cette classe peut aussi réagir
      * à certains événements.
      *
-     * @version $Id: ColorBar.java,v 1.9 2004/02/13 14:29:37 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class UI extends ComponentUI implements PropertyChangeListener {

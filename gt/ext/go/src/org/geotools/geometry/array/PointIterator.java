@@ -36,7 +36,7 @@ import org.opengis.util.Cloneable;
  * behavior is undertermined if those methods are not invoked in this order.
  *
  * @since 2.2
- * @version $Id: PointIterator.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @todo Once J2SE 1.5 will be available, this class should implements {@code Iterator<Point2D>}

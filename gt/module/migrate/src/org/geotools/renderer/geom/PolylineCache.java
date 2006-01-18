@@ -42,7 +42,7 @@ import org.geotools.util.WeakHashSet;
  * There is at most one instance of this class for each instance of {@link Polyline}. This
  * class is strictly for internal use by {@link PolygonPathIterator}.
  *
- * @version $Id: PolylineCache.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class PolylineCache {

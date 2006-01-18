@@ -31,7 +31,7 @@ import org.geotools.feature.Feature;
  * In addition, {@link MouseFeatureListener} objects can be
  * registered with the <code>HighlightManager</code>
  *
- * @version $Id: HighlightManager.java 5670 2004-05-16 17:35:30Z desruisseaux $
+ * @version $Id$
  * @author Julian Elliott
  */
 public interface HighlightManager {

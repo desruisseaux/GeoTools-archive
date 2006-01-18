@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.LineString;
  * class wrap directly this {@link LineString} internal array,  in order to avoid object creation
  * and copies.
  *
- * @version $Id: JTSArray.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see DefaultArray

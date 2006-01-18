@@ -103,7 +103,7 @@ import javax.swing.JToolBar;
  * </blockquote>
  *
  * @author Martin Desruisseaux
- * @version $Id: MapLegendViewer.java,v 1.4 2004/04/10 14:25:41 aaime Exp $
+ * @version $Id$
  */
 public class MapLegendViewer extends JFrame {
     private MapContext context;

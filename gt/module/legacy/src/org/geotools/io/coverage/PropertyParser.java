@@ -134,7 +134,7 @@ import org.opengis.referencing.operation.TransformException;
  * For example, the {@link #getCoordinateSystem} method constructs a
  * {@link org.geotools.cs.CoordinateSystem} object using available informations.
  *
- * @version $Id: MetadataBuilder.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Replaced by {@link org.geotools.coverage.io.PropertyParser}.
@@ -2079,7 +2079,7 @@ loop:       for (int i=str.length(); --i>=0;) {
      * <code>'_'</code> character. For example, the key <code>"false&nbsp;&nbsp;easting"</code>
      * is considered equals to <code>"false_easting"</code>.
      *
-     * @version $Id: PropertyParser.java 10796 2005-01-28 19:09:18Z dzwiers $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     public static class Key implements Serializable {
@@ -2151,7 +2151,7 @@ loop:       for (int i=str.length(); --i>=0;) {
     /**
      * A key for properties derived from {@link Envelope} and/or {@link GridRange}.
      *
-     * @version $Id: PropertyParser.java 10796 2005-01-28 19:09:18Z dzwiers $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class EnvelopeKey extends Key {
@@ -2261,7 +2261,7 @@ loop:       for (int i=str.length(); --i>=0;) {
      * A key for properties derived from {@link Projection}.
      * The key name must be the projection parameter name.
      *
-     * @version $Id: PropertyParser.java 10796 2005-01-28 19:09:18Z dzwiers $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class ProjectionKey extends Key {
@@ -2298,7 +2298,7 @@ loop:       for (int i=str.length(); --i>=0;) {
      * <code>AliasKey</code> with ordinary <code>Key</code>s. This kind of key is
      * for internal use only.
      *
-     * @version $Id: PropertyParser.java 10796 2005-01-28 19:09:18Z dzwiers $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class AliasKey extends Key {

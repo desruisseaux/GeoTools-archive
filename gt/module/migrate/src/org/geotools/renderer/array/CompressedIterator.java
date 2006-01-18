@@ -37,7 +37,7 @@ package org.geotools.renderer.array;
 /**
  * Itérateur balayant les données d'un tableau {@link CompressedArray}.
  *
- * @version $Id: CompressedIterator.java 6410 2004-06-12 19:59:51Z jgarnett $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class CompressedIterator extends PointIterator {

@@ -78,7 +78,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  *   </li>
  * </ul>
  *
- * @version $Id: CompressionLevel.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see Geometry#compress

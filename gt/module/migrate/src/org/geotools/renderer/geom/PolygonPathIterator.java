@@ -47,7 +47,7 @@ import org.geotools.renderer.array.ArrayData;
  * This iterator is typically used for drawing a single {@link Polygon}, which
  * may be made of many {@link Polylines}.
  *
- * @version $Id: PolygonPathIterator.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class PolygonPathIterator extends ArrayData implements PathIterator {

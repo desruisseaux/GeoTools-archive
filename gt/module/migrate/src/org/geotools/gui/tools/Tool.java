@@ -29,7 +29,7 @@ import org.geotools.map.MapContext;
  * the Context (like the AreaOfInterest).
  *
  * @author Cameron Shorter
- * @version $Id: Tool.java,v 1.6 2003/12/23 17:21:02 aaime Exp $
+ * @version $Id$
  */
 public abstract interface Tool {
     /**

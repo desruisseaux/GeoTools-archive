@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.Coordinate;  // For javadoc only
  * value and some precision due to the conversion of {@code double} to {@code float} values.
  *
  * @since 2.2
- * @version $Id: CompressionLevel.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class CompressionLevel extends CodeList {

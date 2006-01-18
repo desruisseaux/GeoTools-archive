@@ -59,7 +59,7 @@ import java.awt.geom.Point2D;
  * component changes size.
  *
  * @author Cameron Shorter
- * @version $Id: MapPaneImpl.java,v 1.35 2003/12/23 17:21:02 aaime Exp $
+ * @version $Id$
  *
  * @task REVISIT: We need to add a PixcelAspectRatio varible which defaults to
  *       1, ie width/heigh=1.  Currently, this is assumed to be 1.

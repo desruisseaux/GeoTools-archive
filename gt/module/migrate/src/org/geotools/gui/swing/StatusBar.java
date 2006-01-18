@@ -91,7 +91,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * {@link #getCoordinateFormat}.setCoordinateSystem(mapPane.getCoordinateSystem());
  * </pre></blockquote>
  *
- * @version $Id: StatusBar.java,v 1.7 2003/11/12 14:14:25 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class StatusBar extends JComponent implements MouseMotionListener {
@@ -401,7 +401,7 @@ public class StatusBar extends JComponent implements MouseMotionListener {
     /**
      * Classe chargée de réagir au progrès de la lecture.
      *
-     * @version $Id: StatusBar.java,v 1.7 2003/11/12 14:14:25 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class ProgressListener implements IIOReadProgressListener, Runnable {

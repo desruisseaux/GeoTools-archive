@@ -43,7 +43,7 @@ import org.opengis.referencing.operation.TransformException;
  * @task TODO: This class is not yet used. It should be part of <code>PolygonAssembler</code>,
  *             work, but is not yet finished neither tested.
  *
- * @version $Id: PolygonInclusion.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class PolygonInclusion {

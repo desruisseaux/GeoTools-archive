@@ -78,7 +78,7 @@ import java.util.logging.Logger;
  *             description.
  *
  * @author Ian Schneider
- * @version $Id: FactoryFinder.java,v 1.4 2003/08/05 20:59:23 cholmesny Exp $
+ * @version $Id$
  */
 public final class FactoryFinder {
     /**

@@ -37,7 +37,7 @@ import org.geotools.resources.XArray;
  * This class (like the whole <code>org.geotools.renderer.array</code> package)
  * is for internal use by {@link org.geotools.renderer.geom.Polyline} only.
  *
- * @version $Id: ArrayData.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Replaced by {@link org.geotools.geometry.array.ArrayData}

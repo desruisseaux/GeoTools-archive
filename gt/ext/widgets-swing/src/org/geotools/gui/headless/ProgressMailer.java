@@ -55,7 +55,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Reports progress by sending email to the specified address at regular interval.
  *
  * @since 2.0
- * @version $Id: ProgressMailer.java,v 1.2 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ProgressMailer implements ProgressListener {

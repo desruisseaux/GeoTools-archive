@@ -35,7 +35,7 @@ import org.geotools.resources.XArray;
  * Convenience static methods for trees operations.
  *
  * @since 2.0
- * @version $Id: Trees.java,v 1.1 2003/05/29 16:04:31 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class Trees {

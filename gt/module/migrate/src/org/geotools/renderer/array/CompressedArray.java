@@ -44,7 +44,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  *             work providing that each points are approximatively equidistant. The current
  *             {@link org.geotools.renderer.geom.Polyline#setResolution} method ensure exactly that.
  *
- * @version $Id: CompressedArray.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 class CompressedArray extends PointArray {

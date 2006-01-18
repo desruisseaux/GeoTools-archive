@@ -21,7 +21,7 @@ package org.geotools.gui.tools;
  * map.
  *
  * @author Cameron Shorter
- * @version $Id: ClickPanTool.java,v 1.2 2003/08/20 21:32:13 cholmesny Exp $
+ * @version $Id$
  */
 public interface ClickPanTool extends Tool {
 }

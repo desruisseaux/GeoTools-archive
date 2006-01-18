@@ -36,7 +36,7 @@ import org.geotools.resources.XArray;
  * on the original {@code PointArray2D}.
  *
  * @since 2.2
- * @version $Id: ArrayData.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see PointArray2D#toFloatArray(ArrayData,float)

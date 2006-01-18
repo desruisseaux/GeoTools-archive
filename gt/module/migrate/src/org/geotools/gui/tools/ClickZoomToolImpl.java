@@ -19,7 +19,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Pan the map so that the new extent has the click point in the middle of the
  * map and then zoom in/out by the zoomFactor.
  * 
- * @version $Id: ClickZoomToolImpl.java,v 1.5 2003/12/23 17:21:02 aaime Exp $
+ * @version $Id$
  * @author Cameron Shorter
  */
 public class ClickZoomToolImpl extends AbstractTool implements ClickZoomTool {

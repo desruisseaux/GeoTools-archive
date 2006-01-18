@@ -42,7 +42,7 @@ import org.geotools.resources.i18n.Errors;
  * thrown when a property is defined twice with different values.  It may also be thrown
  * if a property can be computed from other properties, but their values are inconsistent.
  *
- * @version $Id: AmbiguousPropertyException.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Replaced by {@link org.geotools.coverage.io.AmbiguousMetadataException}.

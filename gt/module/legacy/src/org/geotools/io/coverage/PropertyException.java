@@ -40,7 +40,7 @@ import javax.imageio.IIOException;
  * The base class for error related to grid coverage's properties.
  * This exception is thrown by the helper class {@link PropertyParser}.
  *
- * @version $Id: PropertyException.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Replaced by {@link org.geotools.coverage.io.MetadataException}.

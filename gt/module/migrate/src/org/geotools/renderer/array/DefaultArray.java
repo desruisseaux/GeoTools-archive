@@ -37,7 +37,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * doesn't use any compression technic. However, subclasses may be mutable (i.e. support the
  * {@link #insertAt insertAt(...)} method) or compress data.
  *
- * @version $Id: DefaultArray.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see #getInstance

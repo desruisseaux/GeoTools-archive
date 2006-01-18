@@ -37,7 +37,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * Exposes a {@link PointArray2D} as a Java2D shape. This shape is not designed for map rendering.
  * It is rather used for debugging purpose, as well as rendering lines in some simplier context.
  *
- * @version $Id: ShapeAdapter.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see PointArray2D#toShape
@@ -182,7 +182,7 @@ final class ShapeAdapter implements Shape, Serializable {
     /**
      * The path iterator for the data to plot.
      *
-     * @version $Id: ShapeAdapter.java 10796 2005-01-28 19:09:18Z dzwiers $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     static final class Iterator extends Point2D.Double implements PathIterator {

@@ -52,7 +52,7 @@ import org.geotools.geometry.DirectPosition2D;
  * the ones that compress their data.
  *
  * @since 2.2
- * @version $Id: PointArray.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class PointArray2D implements PointArray, Serializable {

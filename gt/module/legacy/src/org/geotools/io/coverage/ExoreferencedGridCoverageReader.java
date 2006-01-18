@@ -57,7 +57,7 @@ import org.geotools.cs.CoordinateSystem;
  * text file. The text file is parsed by a {@link PropertyParser} object, while the pixel
  * values are read by a {@link ImageReader} object.
  *
- * @version $Id: ExoreferencedGridCoverageReader.java 10849 2005-01-29 00:56:48Z jeichar $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @deprecated Replaced by {@link org.geotools.coverage.io.ExoreferencedGridCoverageReader}.

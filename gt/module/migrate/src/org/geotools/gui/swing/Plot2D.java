@@ -82,7 +82,7 @@ import org.geotools.resources.XMath;
  * <p align="center"><img src="doc-files/Plot2D.png"></p>
  * <p>&nbsp;</p>
  *
- * @version $Id: Plot2D.java,v 1.6 2003/07/23 14:17:11 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see <A HREF="http://jgraph.sourceforge.net/">JGraph</A>
@@ -735,7 +735,7 @@ public class Plot2D extends ZoomPane {
      * data to draw as a {@link Shape}. It also contains the {@link Paint} and {@link Stroke}
      * attributes.
      *
-     * @version $Id: Plot2D.java,v 1.6 2003/07/23 14:17:11 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     public static interface Series {
@@ -780,7 +780,7 @@ public class Plot2D extends ZoomPane {
     /**
      * Default implementation of {@link Plot2D.Series}.
      *
-     * @version $Id: Plot2D.java,v 1.6 2003/07/23 14:17:11 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class DefaultSeries extends GenericArray implements Series {

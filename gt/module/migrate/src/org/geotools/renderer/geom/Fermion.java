@@ -43,7 +43,7 @@ package org.geotools.renderer.geom;
  *
  * @see FermionPair
  *
- * @version $Id: Fermion.java 6410 2004-06-12 19:59:51Z jgarnett $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class Fermion {

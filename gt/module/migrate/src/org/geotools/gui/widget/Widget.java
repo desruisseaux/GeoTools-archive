@@ -21,7 +21,7 @@ package org.geotools.gui.widget;
  * include MapPane, Legend, PanButton, etc.
  *
  * @author Cameron Shorter
- * @version $Id: Widget.java,v 1.3 2003/08/20 21:37:58 cholmesny Exp $
+ * @version $Id$
  *
  * @deprecated
  */

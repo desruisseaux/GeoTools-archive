@@ -49,7 +49,7 @@ import org.geotools.resources.XArray;
 /**
  * Test the <code>org.geotools.renderer.array</code> package.
  *
- * @version $Id: PointArrayTest.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class PointArrayTest extends TestCase {

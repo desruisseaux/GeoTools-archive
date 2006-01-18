@@ -58,7 +58,7 @@ import org.geotools.renderer.j2d.GeoMouseEvent;
  * to zoom, translate and rotate around the map (Remind: <code>MapPanel</code> has
  * no scrollbar. To display scrollbars, use {@link #createScrollPane}).
  *
- * @version $Id: MapPane.java,v 1.23 2003/08/22 12:43:04 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class MapPane extends ZoomPane {

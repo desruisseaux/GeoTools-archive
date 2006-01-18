@@ -35,7 +35,7 @@ import org.opengis.util.Cloneable;
  * cet ordre: {@link #nextX} d'abord, suivit de {@link #nextY}. Tout manquement à cette règle (par
  * exemple appeller {@link #nextX} deux fois de suite) peut produire des résultats erronées.
  *
- * @version $Id: PointIterator.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @task TODO: Once J2SE 1.5 will be available, this class should implements

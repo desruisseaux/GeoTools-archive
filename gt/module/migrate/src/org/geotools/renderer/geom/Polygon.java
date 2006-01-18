@@ -45,7 +45,7 @@ import org.opengis.referencing.operation.TransformException;
  * A polygon bounded by one exterior ring (the "shell") and zero or more interior rings
  * (the "holes"). Shell and holes are stored as {@link Polyline} objects.
  *
- * @version $Id: Polygon.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Polygon extends Polyline {

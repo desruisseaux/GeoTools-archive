@@ -44,7 +44,7 @@ import org.opengis.referencing.operation.TransformException;
  * points of <code>line</code>. This scalar product can be viewed as a sort of measure of the distance
  * between the start of <code>line</code> and the intersection point.
  *
- * @version $Id: IntersectionPoint.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class IntersectionPoint extends Point2D.Double implements Comparable {

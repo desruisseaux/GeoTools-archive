@@ -29,7 +29,7 @@ import java.awt.geom.AffineTransform;
  * This event is usually fired by {@link org.geotools.gui.swing.ZoomPane}.
  *
  * @since 2.0
- * @version $Id: ZoomChangeEvent.java,v 1.5 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ZoomChangeEvent extends EventObject {
