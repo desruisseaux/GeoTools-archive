@@ -42,6 +42,7 @@ import com.vividsolutions.jts.geom.Coordinate;  // For javadoc only
  * value and some precision due to the conversion of {@code double} to {@code float} values.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

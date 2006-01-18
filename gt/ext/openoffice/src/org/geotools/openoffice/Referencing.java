@@ -87,6 +87,7 @@ import org.geotools.resources.i18n.Errors;
  * <A HREF="http://www.openoffice.org">OpenOffice</A> add-ins.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Richard Deplanque

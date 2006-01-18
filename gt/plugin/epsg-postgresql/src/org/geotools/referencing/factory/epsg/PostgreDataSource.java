@@ -105,6 +105,7 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  * database.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Didier Richard
  * @author Martin Desruisseaux

@@ -78,6 +78,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * to the usual high standards of the rest of this package. Please aid in
  * improving this class with bug reports etc...
  * </p> 
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  * @author Rueben Schulz

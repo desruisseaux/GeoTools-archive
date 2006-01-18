@@ -52,6 +52,7 @@ import org.geotools.geometry.DirectPosition2D;
  * the ones that compress their data.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

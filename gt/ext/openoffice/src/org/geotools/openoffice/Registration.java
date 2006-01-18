@@ -28,6 +28,7 @@ import com.sun.star.registry.XRegistryKey;
  * The registration of all formulas provided in this package.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

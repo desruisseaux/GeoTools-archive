@@ -41,6 +41,7 @@ import junit.framework.TestCase;
  * 
  * @author Jody Garnett
  * @since 2.1.M3
+ * @source $URL$
  * @version 2.1.M3
  */
 public class EPSGTest extends TestCase {

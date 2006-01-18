@@ -25,6 +25,7 @@ package org.geotools.openoffice;
  * add-in.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

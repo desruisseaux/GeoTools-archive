@@ -36,6 +36,7 @@ import org.geotools.resources.XArray;
  * on the original {@code PointArray2D}.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

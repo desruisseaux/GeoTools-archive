@@ -44,6 +44,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * database (for example a PostgreSQL database reachable on internet).
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

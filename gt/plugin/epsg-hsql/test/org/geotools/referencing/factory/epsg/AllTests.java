@@ -32,6 +32,7 @@ import org.geotools.referencing.factory.OrderedAxisAuthorityFactoryTest;
 /**
  * Performs all tests for the <code>org.geotools.referencing.factory.epsg</code> packages.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

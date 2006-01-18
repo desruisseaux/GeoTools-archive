@@ -49,6 +49,7 @@ import org.geotools.resources.Utilities;
  * <A HREF="http://www.openoffice.org">OpenOffice</A> spread sheet.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

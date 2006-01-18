@@ -36,6 +36,7 @@ import org.opengis.util.Cloneable;
  * behavior is undertermined if those methods are not invoked in this order.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *
