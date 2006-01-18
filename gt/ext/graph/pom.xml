@@ -23,7 +23,7 @@
   <artifactId>gt2-graph</artifactId>
   <packaging>jar</packaging>
   <name>Feature Based Graphs and Networks</name>
-  <url>http://modules.geotools.org/graph/</url>
+  <url>http://maven.geotools.fr/reports/graph/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/graph/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/ext/graph/</url>

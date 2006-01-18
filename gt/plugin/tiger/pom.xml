@@ -23,7 +23,7 @@
   <artifactId>gt2-tiger</artifactId>
   <packaging>jar</packaging>
   <name>TIGER/Line 2000 datastore implementation</name>
-  <url>http://modules.geotools.org/tiger/</url>
+  <url>http://maven.geotools.fr/reports/tiger/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/tiger/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/tiger/</url>

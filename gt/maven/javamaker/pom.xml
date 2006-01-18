@@ -27,6 +27,11 @@
   <artifactId>gt2-javamaker</artifactId>
   <packaging>maven-plugin</packaging>
   <name>OpenOffice IDL to Java</name>
+  <url>http://maven.geotools.fr/reports/javamaker/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/javamaker/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/maven/javamaker/</url>
+  </scm>
   <description>
     Compiles Java interfaces from OpenOffice IDL files. In an ideal world,
     this plugin should executes 'idlc' on the *.idl files, then 'regmerge'

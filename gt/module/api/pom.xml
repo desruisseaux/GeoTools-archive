@@ -23,7 +23,7 @@
   <artifactId>gt2-api</artifactId>
   <packaging>jar</packaging>
   <name>API interfaces</name>
-  <url>http://modules.geotools.org/api/</url>
+  <url>http://maven.geotools.fr/reports/api/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/api/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/module/api/</url>

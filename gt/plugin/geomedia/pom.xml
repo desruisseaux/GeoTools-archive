@@ -23,7 +23,7 @@
   <artifactId>gt2-geomedia</artifactId>
   <packaging>jar</packaging>
   <name>GeoMedia datastore implementation</name>
-  <url>http://modules.geotools.org/geomedia/</url>
+  <url>http://maven.geotools.fr/reports/geomedia/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/geomedia/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/geomedia/</url>

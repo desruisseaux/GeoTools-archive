@@ -23,7 +23,7 @@
   <artifactId>gt2-brewer</artifactId>
   <packaging>jar</packaging>
   <name>Brewer module</name>
-  <url>http://modules.geotools.org/brewer/</url>
+  <url>http://maven.geotools.fr/reports/brewer/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/brewer/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/ext/brewer/</url>

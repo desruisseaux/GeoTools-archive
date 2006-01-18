@@ -23,7 +23,7 @@
   <artifactId>gt2-gml</artifactId>
   <packaging>jar</packaging>
   <name>GML module</name>
-  <url>http://modules.geotools.org/gml/</url>
+  <url>http://maven.geotools.fr/reports/gml/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/gml/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/gml/</url>

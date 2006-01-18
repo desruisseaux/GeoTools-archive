@@ -23,7 +23,7 @@
   <artifactId>gt2-coverage</artifactId>
   <packaging>jar</packaging>
   <name>Grid Coverage module</name>
-  <url>http://modules.geotools.org/coverage/</url>
+  <url>http://maven.geotools.fr/reports/coverage/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/coverage/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/module/coverage/</url>

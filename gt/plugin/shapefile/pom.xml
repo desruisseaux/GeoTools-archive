@@ -23,7 +23,7 @@
   <artifactId>gt2-shapefile</artifactId>
   <packaging>jar</packaging>
   <name>Shapefile module</name>
-  <url>http://modules.geotools.org/shapefile/</url>
+  <url>http://maven.geotools.fr/reports/shapefile/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/shapefile/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/shapefile/</url>

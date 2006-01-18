@@ -21,12 +21,17 @@ package org.geotools.maven.tools;
 // J2SE dependencies
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,23 +55,23 @@ import java.util.logging.Logger;
  * (after running {@code mvn install} at least once):
  *
  * <blockquote><code>
- * java -classpath ~/svnroot/geotools/maven/target/classes org.geotools.maven.tools.ReportPublisher
- * ~/svnroot/geotools ~/maven/reports
+ * java -classpath ~/svnroot/geotools/maven/javadoc/target/classes
+ * org.geotools.maven.tools.ReportPublisher ~/svnroot/geotools ~/maven/reports
  * </code></blockquote>
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ReportPublisher implements Runnable {
+public class ReportPublisher implements Runnable, FilenameFilter {
     /**
      * The source directory.
      */
-    private final File source;
+    private final File sourceBase;
 
     /**
      * The target directory.
      */
-    private final File target;
+    private final File targetBase;
 
     /**
      * The subdirectory to search for.
@@ -83,7 +88,7 @@ public class ReportPublisher implements Runnable {
     /**
      * The list of modules processed.
      */
-    private final Collection modules = new HashSet();
+    private final Collection modules = new TreeSet();
 
     /**
      * The stream where to write the {@code index.html} file. Used by {@link #writeIndex} only.
@@ -120,15 +125,22 @@ public class ReportPublisher implements Runnable {
      * @param target The target directory.
      */
     public ReportPublisher(final String source, final String target) {
-        this.source = new File(source);
-        this.target = new File(target);
+        sourceBase = new File(source);
+        targetBase = new File(target);
+    }
+
+    /**
+     * Returns {@code true} if the specified name is not a SVN directory.
+     */
+    public boolean accept(final File directory, final String name) {
+        return !name.equalsIgnoreCase(".svn") && !name.equalsIgnoreCase("_svn");
     }
 
     /**
      * Process all files.
      */
     public void run() {
-        process(source, 0);
+        process(sourceBase, 0);
         try {
             writeIndex();
         } catch (IOException e) {
@@ -137,28 +149,39 @@ public class ReportPublisher implements Runnable {
     }
 
     /**
+     * Gets the module relative path for the specifed source directory and depth.
+     */
+    private static String getModulePath(File source, int depth) {
+        final StringBuffer buffer = new StringBuffer();
+        while (--depth >= 0) {
+            buffer.insert(0, '/');
+            buffer.insert(0, source.getName());
+            source = source.getParentFile();
+        }
+        return buffer.toString();
+    }
+
+    /**
      * Process all files in the specified directory.
      *
-     * @param directory The directory to process.
-     * @param depth The directory depth, from 0 to {@link #maxDepth} inclusive.
+     * @param source The directory to process.
+     * @param depth  The directory depth, from 0 to {@link #maxDepth} inclusive.
      */
-    private void process(final File directory, int depth) {
-        final File candidate = new File(directory, searchFor);
+    private void process(final File source, int depth) {
+        final String modulePath = getModulePath(source, depth);
+        final String moduleName = new File(modulePath).getName();
+        final File   candidate  = new File(source, searchFor);
         if (candidate.isDirectory()) {
-            final String module = directory.getName();
-            move(candidate, new File(target, module));
-            modules.add(module);
+            move(candidate, new File(targetBase, moduleName));
+            modules.add(modulePath);
         }
         // Now scan subdirectories.
         if (++depth <= maxDepth) {
-            final File[] content = directory.listFiles();
+            final File[] content = source.listFiles(this);
             for (int i=0; i<content.length; i++) {
                 final File c = content[i];
                 if (c.isDirectory() && !c.isHidden()) {
-                    final String name = c.getName();
-                    if (!name.equalsIgnoreCase(".svn") && !name.equalsIgnoreCase("_svn")) {
-                        process(c, depth);
-                    }
+                    process(c, depth);
                 }
             }
         }
@@ -172,7 +195,7 @@ public class ReportPublisher implements Runnable {
      * @param source The source directory.
      * @param target The target directory.
      */
-    private static void move(final File source, final File target) {
+    private void move(final File source, final File target) {
         if (target.isFile()) {
             if (!target.delete()) {
                 warning(target, "delete");
@@ -183,7 +206,7 @@ public class ReportPublisher implements Runnable {
                 warning(target, "mkdir");
             }
         }
-        final File[] content = source.listFiles();
+        final File[] content = source.listFiles(this);
         for (int i=0; i<content.length; i++) {
             final File s = content[i];
             final File t = new File(target, s.getName());
@@ -194,7 +217,15 @@ public class ReportPublisher implements Runnable {
                     }
                 }
                 if (!s.renameTo(t)) {
-                    warning(s, "move");
+                    // Unable to use 'renameTo'. Copy and delete.
+                    try {
+                        copy(s, t);
+                        if (!s.delete()) {
+                            warning(s, "delete");
+                        }
+                    } catch (IOException e) {
+                        warning(s, "move");
+                    }
                 }
                 continue;
             }
@@ -209,6 +240,22 @@ public class ReportPublisher implements Runnable {
     }
 
     /**
+     * Copies {@code source} to {@code target}. Note: no need for a buffered input/output
+     * streams, since we are already using a buffer of type {@code byte[4096]}.
+     */
+    private static void copy(final File source, final File target) throws IOException {
+        final InputStream  in  = new FileInputStream (source);
+        final OutputStream out = new FileOutputStream(target);
+        final byte[]    buffer = new byte[4096];
+        int len;
+        while ((len = in.read(buffer)) >= 0) {
+            out.write(buffer, 0, len);
+        }
+        out.close();
+        in.close();
+    }
+
+    /**
      * Prints a warning when an operation failed.
      */
     private static void warning(final File file, final String operation) {
@@ -216,12 +263,13 @@ public class ReportPublisher implements Runnable {
     }
 
     /**
-     * Write an index with the list of all modules processed.
+     * Writes an index with the list of all modules processed.
      */
     private void writeIndex() throws IOException {
-        final String modules[] = (String[]) this.modules.toArray(new String[this.modules.size()]);
-        Arrays.sort(modules);
-        index = new BufferedWriter(new FileWriter(new File(target, "index.html")));
+        final String[] prefix = {"module/", "plugin/", "ext/",       "maven/"       };
+        final String[] titles = {"Modules", "Plugins", "Extensions", "Maven plugins"};
+        final int width = 100 / prefix.length;
+        index = new BufferedWriter(new FileWriter(new File(targetBase, "index.html")));
         writeLine(0, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
         writeLine(0, "<html>");
         writeLine(1, "<head>");
@@ -229,13 +277,27 @@ public class ReportPublisher implements Runnable {
         writeLine(1, "</head>");
         writeLine(1, "<body>");
         writeLine(2, "<h1>Maven reports for the Geotools project</h1>");
-        writeLine(2, "<h2>All modules, plugins and extensions</h2>");
-        writeLine(2, "<p><ul>");
-        for (int i=0; i<modules.length; i++) {
-            final String module = modules[i];
-            writeLine(3, "<li><a href=\"" + module + "/index.html\">" + module + "</a></li>");
+        writeLine(2, "<p><table cellpadding=\"6\" border=\"1\">");
+        writeLine(3, "<tr>");
+        for (int i=0; i<titles.length; i++) {
+            writeLine(4, "<th bgcolor=\"palegreen\" width=\"" + width + "%\">" + titles[i] + "</th>");
         }
-        writeLine(2, "</ul></p>");
+        writeLine(3, "</tr><tr>");
+        for (int column=0; column<prefix.length; column++) {
+            final String p = prefix[column];
+            writeLine(4, "<td nowrap witdh=\"" + width + "%\"><ul>");
+            for (final Iterator it=modules.iterator(); it.hasNext();) {
+                final String module = (String) it.next();
+                if (module.startsWith(p)) {
+                    final String name = new File(module).getName();
+                    writeLine(5, "<li><a href=\"" + name + "/index.html\">" + name + "</a></li>");
+                    it.remove();
+                }
+            }
+            writeLine(4, "</ul></td>");
+        }
+        writeLine(3, "</tr>");
+        writeLine(2, "</table>");
         writeLine(1, "</body>");
         writeLine(0, "</html>");
         index.close();

@@ -27,6 +27,11 @@
   <artifactId>gt2-jjtree-javacc</artifactId>
   <packaging>maven-plugin</packaging>
   <name>JJTree and JavaCC compilers plugin</name>
+  <url>http://maven.geotools.fr/reports/jjtree-javacc/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/jjtree-javacc/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/maven/jjtree-javacc/</url>
+  </scm>
   <description>
     This Maven plugin run 'jjtree' on a set of .jjt files found in the source
     directory, which generates a set of .jj files. Next, this plugin executes

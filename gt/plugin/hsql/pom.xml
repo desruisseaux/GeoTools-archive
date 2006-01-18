@@ -23,7 +23,7 @@
   <artifactId>gt2-hsql</artifactId>
   <packaging>jar</packaging>
   <name>HSQL datasource module</name>
-  <url>http://modules.geotools.org/hsql/</url>
+  <url>http://maven.geotools.fr/reports/hsql/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/hsql/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/hsql/</url>

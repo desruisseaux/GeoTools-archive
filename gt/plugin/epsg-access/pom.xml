@@ -23,7 +23,7 @@
   <artifactId>gt2-epsg-access</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using MS-Access database</name>
-  <url>http://modules.geotools.org/epsg-access/</url>
+  <url>http://maven.geotools.fr/reports/epsg-access/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-access/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-access/</url>

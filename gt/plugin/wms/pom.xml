@@ -23,7 +23,7 @@
   <artifactId>gt2-wms</artifactId>
   <packaging>jar</packaging>
   <name>Web Map Server client</name>
-  <url>http://modules.geotools.org/wms/</url>
+  <url>http://maven.geotools.fr/reports/wms/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/wms/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/wms/</url>

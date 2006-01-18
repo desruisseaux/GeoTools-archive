@@ -4,31 +4,27 @@
   <!--     Logo to appears in the banner on top of each pages    -->
   <!-- ========================================================= -->
   <bannerLeft>
-    <name>Geotools 2</name>
-<!-- TODO: The icon needs to move somewhere else. In current location,
-           it is downloaded again and again for all pages. -->
-<!--    <src>http://www.geotools.org/download/userResources/GEOTOOLS/logo</src> -->
+    <name>Referencing services</name>
     <href>http://www.geotools.org/</href>
   </bannerLeft>
-  <bannerRight>
-    <!-- TODO: provid a small icon here -->
-    <!-- <src>http://maven.apache.org/images/maven-small.gif</src> -->
-  </bannerRight>
 
   <body>
     <!-- ==================================================== -->
     <!--     Links to appears just below the right banner     -->
     <!-- ==================================================== -->
     <links>
-      <item name="Geotools 2" href="http://www.geotools.org/" />
+      <item name="Geotools" href="http://www.geotools.org/"             />
+      <item name="GeoAPI"   href="http://geoapi.sourceforge.net/"       />
+      <item name="Javadoc"  href="http://javadoc.geotools.fr/snapshot/" />
     </links>
 
     <!-- ==================================================== -->
     <!--     Menus to appears on the left side of each page   -->
     <!-- ==================================================== -->
     <menu name="Geotools">
-      <item name="Download" href="http://www.geotools.org/display/GEOTOOLS/Downloads"                    />
-      <item name="News"     href="http://www.geotools.org/pages/viewrecentblogposts.action?key=GEOTOOLS" />
+      <item name="Download"     href="http://www.geotools.org/display/GEOTOOLS/Downloads" />
+      <item name="Full Javadoc" href="http://javadoc.geotools.fr/snapshot/"               />
+      <item name="All Reports"  href="http://maven.geotools.fr/reports/"                  />
     </menu>
 
     ${reports}  <!-- Replaced by menus for any configured reports (mailing lists, etc.) -->

@@ -23,7 +23,7 @@
   <artifactId>gt2-arcgrid</artifactId>
   <packaging>jar</packaging>
   <name>ArcGrid datasource module</name>
-  <url>http://modules.geotools.org/arcgrid/</url>
+  <url>http://maven.geotools.fr/reports/arcgrid/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/arcgrid/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/arcgrid/</url>

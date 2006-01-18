@@ -23,7 +23,7 @@
   <artifactId>gt2-go</artifactId>
   <packaging>jar</packaging>
   <name>GO-1 implementation</name>
-  <url>http://modules.geotools.org/go/</url>
+  <url>http://maven.geotools.fr/reports/go/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/go/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/ext/go/</url>

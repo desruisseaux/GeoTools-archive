@@ -23,7 +23,7 @@
   <artifactId>gt2-postgis</artifactId>
   <packaging>jar</packaging>
   <name>PostGIS module</name>
-  <url>http://modules.geotools.org/postgis/</url>
+  <url>http://maven.geotools.fr/reports/postgis/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/postgis/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/postgis/</url>

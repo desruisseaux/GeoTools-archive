@@ -23,7 +23,7 @@
   <artifactId>gt2-indexed-shapefile</artifactId>
   <packaging>jar</packaging>
   <name>Indexed shapefile module</name>
-  <url>http://modules.geotools.org/indexed-shapefile/</url>
+  <url>http://maven.geotools.fr/reports/indexed-shapefile/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/shape/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/ext/shape/</url>

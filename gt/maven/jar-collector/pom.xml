@@ -27,6 +27,11 @@
   <artifactId>gt2-jar-collector</artifactId>
   <packaging>maven-plugin</packaging>
   <name>JAR files collector</name>
+  <url>http://maven.geotools.fr/reports/jar-collector/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/jar-collector/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/maven/jar-collector/</url>
+  </scm>
   <description>
     Copy all JAR files (including dependencies) in the target directory
     of the parent project descriptor.

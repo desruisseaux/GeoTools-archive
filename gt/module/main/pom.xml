@@ -23,7 +23,7 @@
   <artifactId>gt2-main</artifactId>
   <packaging>jar</packaging>
   <name>Main module</name>
-  <url>http://modules.geotools.org/main/</url>
+  <url>http://maven.geotools.fr/reports/main/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/main/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/module/main/</url>

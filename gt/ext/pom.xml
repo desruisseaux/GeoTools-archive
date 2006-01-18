@@ -24,7 +24,7 @@
   <packaging>pom</packaging>
   <version>2.2-SNAPSHOT</version>
   <name>Geotools extensions</name>
-  <url>http://modules.geotools.org/ext/</url>
+  <url>http://maven.geotools.fr/reports/ext/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/ext/</url>

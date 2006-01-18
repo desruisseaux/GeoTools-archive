@@ -23,7 +23,7 @@
   <artifactId>gt2-epsg-wkt</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using WKT file</name>
-  <url>http://modules.geotools.org/epsg-wkt/</url>
+  <url>http://maven.geotools.fr/reports/epsg-wkt/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-wkt/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-wkt/</url>

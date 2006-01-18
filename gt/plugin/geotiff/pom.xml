@@ -23,7 +23,7 @@
   <artifactId>gt2-geotiff</artifactId>
   <packaging>jar</packaging>
   <name>GeoTIFF grid coverage exchange module</name>
-  <url>http://modules.geotools.org/geotiff/</url>
+  <url>http://maven.geotools.fr/reports/geotiff/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/</url>

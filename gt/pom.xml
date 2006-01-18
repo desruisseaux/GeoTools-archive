@@ -60,7 +60,7 @@
   <packaging>pom</packaging>
   <version>2.2-SNAPSHOT</version>
   <name>Geotools 2</name>
-  <url>http://modules.geotools.org</url>
+  <url>http://maven.geotools.fr/reports/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/</url>

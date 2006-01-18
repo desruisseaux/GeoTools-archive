@@ -1,6 +1,6 @@
---------------------------------------------------------------------------------
- README file for Geotools developpers - Do NOT copy this file to the web server
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+ README file for Geotools developers - Do NOT copy this file to the web server
+-------------------------------------------------------------------------------
 
 The HTML pages in this directory provide the content for the following site:
 
@@ -21,3 +21,6 @@ as below:
 
     cd /var/www/geotools.org/maven/repository
     ln -s /home/localsvn/geotools/trunk/gt/maven/www/repository/HEADER.html HEADER.html
+
+    cd /var/www/geotools.org/maven/resources
+    ln -s /home/localsvn/geotools/trunk/gt/maven/www/resources/banner.gif banner.gif

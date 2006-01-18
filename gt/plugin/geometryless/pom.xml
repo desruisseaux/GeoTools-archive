@@ -23,7 +23,7 @@
   <artifactId>gt2-geometryless</artifactId>
   <packaging>jar</packaging>
   <name>Generic (geometryless) DataStore implementation</name>
-  <url>http://modules.geotools.org/geometryless/</url>
+  <url>http://maven.geotools.fr/reports/geometryless/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/geometryless/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/geometryless/</url>

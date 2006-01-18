@@ -23,7 +23,7 @@
   <artifactId>gt2-migrate</artifactId>
   <packaging>jar</packaging>
   <name>Migrate module</name>
-  <url>http://modules.geotools.org/migrate/</url>
+  <url>http://maven.geotools.fr/reports/migrate/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/migrate/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/module/migrate/</url>
