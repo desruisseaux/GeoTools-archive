@@ -143,10 +143,8 @@
       <arg line="-quiet"/>
       <arg line="-keywords"/>
       <arg line="-linksource"/>
-      <arg line="-docfilessubdirs"/>
 
       <package name="org.geotools.*"/>
-
       <excludepackage name="org.geotools.resources.*"/>
 
       <link href="http://java.sun.com/j2se/1.5/docs/api"/>

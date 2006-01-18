@@ -285,7 +285,7 @@ public class ReportPublisher implements Runnable, FilenameFilter {
         writeLine(3, "</tr><tr>");
         for (int column=0; column<prefix.length; column++) {
             final String p = prefix[column];
-            writeLine(4, "<td nowrap witdh=\"" + width + "%\"><ul>");
+            writeLine(4, "<td nowrap witdh=\"" + width + "%\" valign=\"top\"><ul>");
             for (final Iterator it=modules.iterator(); it.hasNext();) {
                 final String module = (String) it.next();
                 if (module.startsWith(p)) {

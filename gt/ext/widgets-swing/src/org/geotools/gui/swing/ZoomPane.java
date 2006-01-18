@@ -182,17 +182,17 @@ import org.geotools.resources.i18n.VocabularyKeys;
  *
  * <P><TABLE ALIGN="CENTER" BORDER="2">
  * <TR BGCOLOR="#CCCCFF"><TH>Key</TH>                      <TH>Purpose</TH>     <TH>{@link Action} name</TH></TR>
- * <TR><TD><IMG SRC="doc-files/keyboard/up.png"></TD>      <TD>Scroll up</TD>   <TD><code>"Up"</code></TD></TR>
- * <TR><TD><IMG SRC="doc-files/keyboard/down.png"></TD>    <TD>Scroll down</TD> <TD><code>"Down"</code></TD></TR>
- * <TR><TD><IMG SRC="doc-files/keyboard/left.png"></TD>    <TD>Scroll left</TD> <TD><code>"Left"</code></TD></TR>
- * <TR><TD><IMG SRC="doc-files/keyboard/right.png"></TD>   <TD>Scroll right</TD><TD><code>"Right"</code></TD></TR>
- * <TR><TD><IMG SRC="doc-files/keyboard/pageDown.png"></TD><TD>Zoom in</TD>     <TD><code>"ZoomIn"</code></TD></TR>
- * <TR><TD><IMG SRC="doc-files/keyboard/pageUp.png"></TD>  <TD>Zoom out</TD>    <TD><code>"ZoomOut"</code></TD></TR>
- * <TR><TD><IMG SRC="doc-files/keyboard/end.png"></TD>     <TD>Zoom</TD>        <TD><code>"Zoom"</code></TD></TR>
- * <TR><TD><IMG SRC="doc-files/keyboard/home.png"></TD>    <TD>Default zoom</TD><TD><code>"Reset"</code></TD></TR>
+ * <TR><TD><IMG SRC="doc-files/key-up.png"></TD>      <TD>Scroll up</TD>   <TD><code>"Up"</code></TD></TR>
+ * <TR><TD><IMG SRC="doc-files/key-down.png"></TD>    <TD>Scroll down</TD> <TD><code>"Down"</code></TD></TR>
+ * <TR><TD><IMG SRC="doc-files/key-left.png"></TD>    <TD>Scroll left</TD> <TD><code>"Left"</code></TD></TR>
+ * <TR><TD><IMG SRC="doc-files/key-right.png"></TD>   <TD>Scroll right</TD><TD><code>"Right"</code></TD></TR>
+ * <TR><TD><IMG SRC="doc-files/key-pageDown.png"></TD><TD>Zoom in</TD>     <TD><code>"ZoomIn"</code></TD></TR>
+ * <TR><TD><IMG SRC="doc-files/key-pageUp.png"></TD>  <TD>Zoom out</TD>    <TD><code>"ZoomOut"</code></TD></TR>
+ * <TR><TD><IMG SRC="doc-files/key-end.png"></TD>     <TD>Zoom</TD>        <TD><code>"Zoom"</code></TD></TR>
+ * <TR><TD><IMG SRC="doc-files/key-home.png"></TD>    <TD>Default zoom</TD><TD><code>"Reset"</code></TD></TR>
  *
- * <TR><TD>Ctrl+<IMG SRC="doc-files/keyboard/left.png"></TD> <TD>Anti-clockwise rotation</TD><TD><code>"RotateLeft"</code></TD></TR>
- * <TR><TD>Ctrl+<IMG SRC="doc-files/keyboard/right.png"></TD><TD>Clockwise rotation</TD>     <TD><code>"RotateRight"</code></TD></TR>
+ * <TR><TD>Ctrl+<IMG SRC="doc-files/key-left.png"></TD> <TD>Anti-clockwise rotation</TD><TD><code>"RotateLeft"</code></TD></TR>
+ * <TR><TD>Ctrl+<IMG SRC="doc-files/key-right.png"></TD><TD>Clockwise rotation</TD>     <TD><code>"RotateRight"</code></TD></TR>
  * </TABLE></P>
  *
  * In this table, the last column gives the Strings by which the different actions
