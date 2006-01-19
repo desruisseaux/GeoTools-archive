@@ -188,7 +188,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
      * out of the box.
      */
     public FeatureIterator features() {
-    	FeatureIterator iterator = new DelegateFeatureIterator( iterator() );
+    	FeatureIterator iterator = new DelegateFeatureIterator( this, iterator() );
         open.add( iterator );
         return iterator;
     }

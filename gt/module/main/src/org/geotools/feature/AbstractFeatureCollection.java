@@ -18,7 +18,7 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
      
     /** Default implementation based on DelegateFeatureIterator */
     public FeatureIterator features() {
-        return new DelegateFeatureIterator( iterator() );
+        return new DelegateFeatureIterator(this, iterator() );
     }
     /** will close() the provided FeatureIterator */
     public void close( FeatureIterator close ) {

@@ -1,10 +1,7 @@
 package org.geotools.feature.collection;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
@@ -79,7 +76,7 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
 	}
 	
 	public FeatureIterator features() {
-		return new DelegateFeatureIterator( iterator() );		
+		return new DelegateFeatureIterator( this, iterator() );		
 	}	
 	
 	public void closeIterator(Iterator iterator) {

@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 
 /**
@@ -24,7 +25,7 @@ public class DelegateFeatureIterator implements FeatureIterator {
 	 * 
 	 * @param iterator Iterator to be used as a delegate.
 	 */
-	public DelegateFeatureIterator( Iterator iterator ){
+	public DelegateFeatureIterator( FeatureCollection collection, Iterator iterator ){
 		delegate = iterator;
 	}
 	public boolean hasNext() {
@@ -36,5 +37,6 @@ public class DelegateFeatureIterator implements FeatureIterator {
 	}
 	public void close() {
 		delegate = null;
+		
 	}
 }

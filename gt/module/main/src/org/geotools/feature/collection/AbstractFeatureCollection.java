@@ -105,7 +105,7 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
     // FeatureCollection - Feature Access
     // 
     public FeatureIterator features() {
-        FeatureIterator iter = new DelegateFeatureIterator( openIterator() );
+        FeatureIterator iter = new DelegateFeatureIterator( this, openIterator() );
         open.add( iter );
         return iter; 
     }
