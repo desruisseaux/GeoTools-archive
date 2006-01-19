@@ -42,6 +42,7 @@ import org.opengis.util.Cloneable;
  * Those coefficients can be set directly, or computed by a linear regression of this plane
  * through a set of three-dimensional points.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Howard Freeland

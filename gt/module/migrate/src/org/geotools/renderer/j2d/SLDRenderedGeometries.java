@@ -34,6 +34,7 @@ import org.opengis.referencing.operation.TransformException;
  * coordinates for  style rendering)
  *
  * @author aaime
+ * @source $URL$
  */
 public class SLDRenderedGeometries extends RenderedGeometries {
     

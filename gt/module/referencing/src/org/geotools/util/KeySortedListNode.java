@@ -3,6 +3,7 @@ package org.geotools.util;
 /**
  * @deprecated Was for inner use by {@link KeySortedLinkedList}, which is replaced by
  *             {@link KeySortedList}.
+ * @source $URL$
  */
 class KeySortedListNode implements Comparable {
     Object element;

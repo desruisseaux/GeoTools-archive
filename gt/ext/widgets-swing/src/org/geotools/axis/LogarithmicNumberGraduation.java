@@ -29,6 +29,7 @@ import javax.units.Unit;
  * A graduation using numbers on a logarithmic axis.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

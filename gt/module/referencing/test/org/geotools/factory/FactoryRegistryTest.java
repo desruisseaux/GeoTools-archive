@@ -33,6 +33,7 @@ import org.geotools.resources.LazySet;
 /**
  * Tests {@link FactoryRegistry} implementation.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

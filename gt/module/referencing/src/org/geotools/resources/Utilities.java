@@ -30,6 +30,7 @@ import java.util.logging.Logger;
  * A set of miscellaneous methods.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -30,6 +30,7 @@ import org.geotools.pt.Matrix;
  * the {@linkplain Matrix#getNumRow number of rows} is equals to the number of
  * {@linkplain #getDimTarget target dimension} plus 1.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

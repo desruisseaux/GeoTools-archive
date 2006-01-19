@@ -3,6 +3,7 @@ package org.geotools.util;
 /**
  * List of elements sorted by a key which is not the element itself.
  *
+ * @source $URL$
  * @version $Id$
  * @author Simone Giannecchini
  *

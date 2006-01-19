@@ -43,6 +43,7 @@ import org.opengis.referencing.operation.TransformException;
  * to the wrapped geometry. Consequently, <strong>changes in this geometry will impact
  * on the wrapped geometry</strong>, and conversely.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

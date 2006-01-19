@@ -89,6 +89,7 @@ import org.geotools.resources.Utilities;
  * </pre></blockquote>
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

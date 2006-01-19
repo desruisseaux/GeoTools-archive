@@ -72,6 +72,7 @@ import org.geotools.resources.i18n.Errors;
  * The USGS oblique/equatorial case of the {@linkplain Stereographic stereographic} 
  * projection. This is similar but <strong>NOT</strong> equal to EPSG code 9809.
  *
+ * @source $URL$
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux

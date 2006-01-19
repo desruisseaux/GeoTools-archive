@@ -94,6 +94,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * they are in use somewhere else in the Java virtual machine, but will be discarted
  * (and recreated on the fly if needed) otherwise.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

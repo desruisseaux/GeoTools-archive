@@ -55,6 +55,7 @@ import org.opengis.ct.CT_DomainFlags;
  * means that some parts of the convex hull are inside the domain,
  * and some parts of the convex hull are outside the domain.
  *
+ * @source $URL$
  * @version 1.00
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

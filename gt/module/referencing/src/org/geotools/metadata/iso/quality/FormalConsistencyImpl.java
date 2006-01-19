@@ -30,6 +30,7 @@ import org.opengis.metadata.quality.FormalConsistency;
  * Degree to which data is stored in accordance with the physical structure of
  * the dataset, as described by the scope.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

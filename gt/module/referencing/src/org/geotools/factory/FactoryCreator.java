@@ -48,6 +48,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * application is expected to ask for. It is preferable that such custom implementation
  * {@linkplain ServiceRegistry#setOrdering order} itself after the default implementations.
  * </p>
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett

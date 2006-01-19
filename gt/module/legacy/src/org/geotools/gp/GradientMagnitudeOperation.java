@@ -46,6 +46,7 @@ import org.geotools.util.NumberRange;
  * to "geophysics" measurements. The normalization include dividing
  * by the distance between pixels.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

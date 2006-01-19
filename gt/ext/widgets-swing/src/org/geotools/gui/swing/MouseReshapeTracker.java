@@ -120,6 +120,7 @@ import org.geotools.resources.Utilities;
  * }
  * </pre></blockquote>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

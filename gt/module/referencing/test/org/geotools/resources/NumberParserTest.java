@@ -27,6 +27,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link NumberParser} class.
  *
+ * @source $URL$
  * @version $Id$
  * @author Ian Schneider
  */

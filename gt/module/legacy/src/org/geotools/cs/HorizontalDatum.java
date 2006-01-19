@@ -34,6 +34,7 @@ import org.opengis.cs.CS_WGS84ConversionInfo;
 /**
  * Procedure used to measure positions on the surface of the Earth.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

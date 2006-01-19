@@ -42,6 +42,7 @@ import org.opengis.cs.CS_DatumType;
  * for local types. This will allow the OpenGIS Consortium to coordinate the
  * addition of new interoperable codes.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

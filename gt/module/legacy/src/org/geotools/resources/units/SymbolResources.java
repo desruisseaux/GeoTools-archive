@@ -37,6 +37,7 @@ import java.util.NoSuchElementException;
  * s'apparente à la classe {@link java.util.ListResourceBundle} standard du
  * Java, excepté qu'elle est légèrement plus économe en mémoire.
  *
+ * @source $URL$
  * @version 1.0
  * @author Martin Desruisseaux
  */

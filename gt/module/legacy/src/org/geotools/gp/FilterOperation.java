@@ -52,6 +52,7 @@ import org.geotools.cv.SampleDimension;
  * duplicated to fill a complete kernel.
  * </blockquote>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

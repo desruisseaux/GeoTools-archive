@@ -37,6 +37,7 @@ import org.opengis.referencing.operation.TransformException;
  * This class is really a special case of {@link MatrixTransform} using a 2&times;2 affine
  * transform. However, this specialized <code>LinearTransform1D</code> class is faster.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

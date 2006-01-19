@@ -29,6 +29,7 @@ import org.geotools.gui.tools.event.SelectedToolListener;
  * ToolListImplTest.java JUnit based test
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  */
 public class ToolListImplTest extends TestCase implements SelectedToolListener {

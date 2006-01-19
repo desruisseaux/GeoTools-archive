@@ -77,6 +77,7 @@ import org.geotools.resources.Utilities;
  * <h3>Thread safety</h3>
  * This class is not thread-safe.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

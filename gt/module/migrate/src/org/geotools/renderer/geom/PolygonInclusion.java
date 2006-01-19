@@ -43,6 +43,7 @@ import org.opengis.referencing.operation.TransformException;
  * @task TODO: This class is not yet used. It should be part of <code>PolygonAssembler</code>,
  *             work, but is not yet finished neither tested.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

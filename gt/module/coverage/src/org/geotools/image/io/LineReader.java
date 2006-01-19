@@ -33,6 +33,7 @@ import java.nio.charset.Charset;
  * and stream position. This class can't be public for now, because I
  * can't figure out how to implement reliably {@link #readLine}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

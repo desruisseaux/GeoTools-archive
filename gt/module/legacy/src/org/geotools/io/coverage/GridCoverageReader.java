@@ -80,6 +80,7 @@ import org.geotools.resources.i18n.Errors;
  * However, other methods may be overriden too in order to get finner control
  * on the result.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

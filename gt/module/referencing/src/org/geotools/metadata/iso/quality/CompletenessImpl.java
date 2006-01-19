@@ -28,6 +28,7 @@ import org.opengis.metadata.quality.Completeness;
 /**
  * Presence and absence of features, their attributes and their relationships.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

@@ -50,6 +50,7 @@ import org.geotools.metadata.iso.citation.Citations;
 /**
  * Tests the wrapper for JAI's parameters.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

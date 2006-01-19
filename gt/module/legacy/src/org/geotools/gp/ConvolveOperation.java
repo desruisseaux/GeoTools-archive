@@ -37,6 +37,7 @@ import org.geotools.util.NumberRange;
  * "Convolve". It includes the OpenGIS "LaplaceType1Filter" and "LaplaceType2Filter"
  * operations.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

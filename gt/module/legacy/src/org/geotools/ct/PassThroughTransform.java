@@ -39,6 +39,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * coordinates, then you may wish to convert the height values from feet to
  * meters without affecting the latitude and longitude values.
  *
+ * @source $URL$
  * @version 1.00
  * @author Martin Desruisseaux
  *

@@ -70,6 +70,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * their own instance.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

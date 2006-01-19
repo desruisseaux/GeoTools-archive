@@ -41,6 +41,7 @@ import junit.framework.TestSuite;
  * rely on {@link CategoryList} for many of its work, many {@code GridSampleDimension}
  * tests are actually {@code CategoryList} tests.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

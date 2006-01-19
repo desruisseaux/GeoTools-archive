@@ -36,6 +36,7 @@ import org.geotools.util.DerivedMap;
  * key: if it doesn't exists, then the plain {@code name} key is used. In other words,
  * this map inherits the <code>"name"</code> property from the {@linkplain #base} map.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

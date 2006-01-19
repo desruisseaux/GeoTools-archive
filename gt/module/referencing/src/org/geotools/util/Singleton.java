@@ -29,6 +29,7 @@ import java.util.NoSuchElementException;
  * A mutable set containing only one element. This set can't contains null element.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

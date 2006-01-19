@@ -32,6 +32,7 @@ import org.geotools.resources.Utilities;
  * Writes characters to a stream while expanding
  * tabs (<code>'\t'</code>) into spaces.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

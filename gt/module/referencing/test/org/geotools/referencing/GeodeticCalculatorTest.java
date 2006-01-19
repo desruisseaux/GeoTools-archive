@@ -48,6 +48,7 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
 /**
  * Tests the geodetic calculator.
  *
+ * @source $URL$
  * @version $Id$
  */
 public class GeodeticCalculatorTest extends TestCase {

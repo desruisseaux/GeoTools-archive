@@ -139,6 +139,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * The later may be better understood as the number of bands for 2D grid coverage.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -35,6 +35,7 @@ import org.geotools.resources.Utilities;
 /**
  * Description of the data specified by the scope.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

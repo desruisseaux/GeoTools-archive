@@ -110,6 +110,7 @@ import org.geotools.renderer.Renderer2D;
  * a remote sensing image ({@link RenderedGridCoverage}), a set of arbitrary marks
  * ({@link RenderedMarks}), a map scale ({@link RenderedMapScale}), etc.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

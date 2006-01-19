@@ -101,6 +101,7 @@ import org.geotools.util.WeakHashSet;
  * transform object to keep information on its source and target coordinate systems.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

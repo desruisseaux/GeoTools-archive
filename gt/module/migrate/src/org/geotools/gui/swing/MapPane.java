@@ -58,6 +58,7 @@ import org.geotools.renderer.j2d.GeoMouseEvent;
  * to zoom, translate and rotate around the map (Remind: <code>MapPanel</code> has
  * no scrollbar. To display scrollbars, use {@link #createScrollPane}).
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -3,6 +3,7 @@ package org.geotools.util;
 /**
  * Iterator for {@link KeySortedLinkedList}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Simone Giannecchini
  *

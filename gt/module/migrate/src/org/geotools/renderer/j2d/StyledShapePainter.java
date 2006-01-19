@@ -45,6 +45,7 @@ import java.util.logging.Logger;
  * out since both renderers do use the same painting logic.
  *
  * @author Andrea Aime
+ * @source $URL$
  */
 public class StyledShapePainter {
     private static AffineTransform IDENTITY_TRANSFORM = new AffineTransform();

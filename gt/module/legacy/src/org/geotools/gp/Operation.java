@@ -60,6 +60,7 @@ import org.opengis.gp.GP_Operation;
  * name of the operation, operation description, and number of source grid
  * coverages required for the operation.
  *
+ * @source $URL$
  * @version $Id$
  * @author <a href="www.opengis.org">OpenGIS</a>
  * @author Martin Desruisseaux

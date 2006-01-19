@@ -57,6 +57,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * and scroll bars for the table.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

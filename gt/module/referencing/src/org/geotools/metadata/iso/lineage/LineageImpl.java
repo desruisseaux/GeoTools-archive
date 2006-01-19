@@ -45,6 +45,7 @@ import org.geotools.resources.Utilities;
  * Only one of {@linkplain #getStatement statement}, {@linkplain #getProcessSteps process steps}
  * and {@link #getSources sources} should be provided.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

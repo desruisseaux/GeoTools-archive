@@ -55,6 +55,7 @@ import org.geotools.util.WeakHashSet;
  * <strong>IMPORTANT: future version will NOT be compatible
  * will this one. Remind, this is a temporary class!</strong>
  *
+ * @source $URL$
  * @version $Id$
  * @author Steven R. Emmerson
  * @author Bill Hibbard

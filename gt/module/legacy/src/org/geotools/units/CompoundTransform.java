@@ -36,6 +36,7 @@ package org.geotools.units;
  * Une transformation d'unités qui représente la
  * combinaison de deux autres transformations.
  *
+ * @source $URL$
  * @version 1.0
  * @author Martin Desruisseaux
  *

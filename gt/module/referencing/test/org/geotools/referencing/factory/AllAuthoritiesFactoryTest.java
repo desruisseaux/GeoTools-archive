@@ -44,6 +44,7 @@ import org.geotools.referencing.FactoryFinder;
  * Tests the {@link AllAuthoritiesFactory} implementation.
  *
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  */
 public class AllAuthoritiesFactoryTest extends TestCase {

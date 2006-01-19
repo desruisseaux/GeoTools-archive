@@ -46,6 +46,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * description, and number of source grid coverages required for the operation.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

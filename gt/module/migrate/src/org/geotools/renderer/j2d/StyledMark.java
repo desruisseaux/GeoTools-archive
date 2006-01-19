@@ -40,6 +40,7 @@ import org.geotools.renderer.j2d.MarkIterator;
 /**
  *
  * @author  jamesm
+ * @source $URL$
  */
 public class StyledMark extends RenderedMarks {
     Feature f;

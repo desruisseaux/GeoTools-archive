@@ -93,6 +93,7 @@ import org.geotools.resources.XArray;
  * factory} or any {@linkplain org.geotools.referencing.wkt.Parser WKT parser} using this
  * factory will takes advantage of the aliases table.
  *
+ * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
  * @author Martin Desruisseaux

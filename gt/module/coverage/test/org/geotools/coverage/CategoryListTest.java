@@ -39,6 +39,7 @@ import org.geotools.resources.XArray;
 /**
  * Test the {@link CategoryList} implementation.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

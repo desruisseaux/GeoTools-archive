@@ -61,6 +61,7 @@ import org.geotools.util.WeakValueHashMap;
  * Processor for {@link GridCoverage2D} objects.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

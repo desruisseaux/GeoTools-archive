@@ -43,6 +43,7 @@ package org.geotools.renderer.geom;
  *
  * @see FermionPair
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

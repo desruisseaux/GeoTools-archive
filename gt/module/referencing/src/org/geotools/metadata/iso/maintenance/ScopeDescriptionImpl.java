@@ -36,6 +36,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 /**
  * Description of the class of information covered by the information.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

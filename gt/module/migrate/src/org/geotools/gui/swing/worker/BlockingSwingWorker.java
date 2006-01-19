@@ -29,6 +29,7 @@ import javax.swing.*;
  *
  * @author Yexin Chen
  * @author Andrea Aime
+ * @source $URL$
  */
 public abstract class BlockingSwingWorker {
     private Thread thread;

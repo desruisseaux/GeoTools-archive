@@ -25,6 +25,7 @@ package org.geotools.factory;
  * error will grind the application to a halt, as it should.
  *
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  *
  * @see java.lang.Error

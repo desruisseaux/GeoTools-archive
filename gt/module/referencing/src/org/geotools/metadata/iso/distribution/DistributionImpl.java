@@ -39,6 +39,7 @@ import org.geotools.resources.Utilities;
 /**
  * Information about the distributor of and options for obtaining the resource.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

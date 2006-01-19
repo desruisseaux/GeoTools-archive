@@ -61,6 +61,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * a single, full-featured constructor}. All other constructors are just shortcuts.
  *  
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

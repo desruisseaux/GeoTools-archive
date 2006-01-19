@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
 /**
  * Restrictions and legal prerequisites for accessing and using the resource.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

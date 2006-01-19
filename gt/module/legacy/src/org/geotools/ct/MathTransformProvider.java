@@ -49,6 +49,7 @@ import org.opengis.referencing.FactoryException;
  * <strong>Note: this class is not part of OpenGIS specification and
  * may change in a future version. Do not rely strongly on it.</strong>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

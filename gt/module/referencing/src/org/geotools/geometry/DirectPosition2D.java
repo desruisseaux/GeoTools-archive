@@ -49,6 +49,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * to do with {@linkplain AxisDirection#NORTH_EAST North-East} direction?).
  * 
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

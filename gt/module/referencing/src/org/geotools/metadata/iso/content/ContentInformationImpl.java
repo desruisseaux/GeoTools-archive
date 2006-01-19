@@ -32,6 +32,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 /**
  * Description of the content of a dataset.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

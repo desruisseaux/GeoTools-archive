@@ -48,6 +48,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * values are read by a {@link ImageReader} object.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

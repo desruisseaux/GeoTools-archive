@@ -123,6 +123,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * the two usual ones (horizontal extends along <var>x</var> and <var>y</var>),
  * and a third one for start time and end time (time extends along <var>t</var>).
  *
+ * @source $URL$
  * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux

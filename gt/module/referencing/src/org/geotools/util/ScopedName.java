@@ -44,6 +44,7 @@ import org.geotools.resources.Utilities;
  * as {@linkplain #getScope tail}.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

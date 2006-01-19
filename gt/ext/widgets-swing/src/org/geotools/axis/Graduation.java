@@ -39,6 +39,7 @@ import javax.units.Unit;
  * graduation for numbers.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

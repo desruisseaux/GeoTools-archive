@@ -53,6 +53,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * {@code DataSource} is a second level of plugins used internally by {@link DefaultFactory}.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

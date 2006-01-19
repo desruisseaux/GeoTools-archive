@@ -85,6 +85,7 @@ import org.geotools.resources.i18n.Errors;
  * 
  * @since 2.2
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  */
 public class TransformedDirectPosition extends GeneralDirectPosition {

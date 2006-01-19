@@ -31,6 +31,7 @@ import org.geotools.resources.Utilities;
 /**
  * Value uniquely identifying an object within a namespace.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

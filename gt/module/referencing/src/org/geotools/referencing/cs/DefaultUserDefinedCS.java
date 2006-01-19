@@ -40,6 +40,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * {@linkplain #getAxis axis}.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

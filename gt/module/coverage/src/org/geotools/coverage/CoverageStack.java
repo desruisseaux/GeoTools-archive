@@ -105,6 +105,7 @@ import org.geotools.util.NumberRange;
  * <strong>Note:</strong> This implementation is thread-safe.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

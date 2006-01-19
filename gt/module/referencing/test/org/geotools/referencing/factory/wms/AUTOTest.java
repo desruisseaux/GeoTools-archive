@@ -41,6 +41,7 @@ import org.geotools.referencing.FactoryFinder;
 /**
  * Tests {@link AutoCRSFactory}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  * @author Martin Desruisseaux

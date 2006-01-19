@@ -40,6 +40,7 @@ import org.opengis.referencing.operation.TransformException;
  * Base class for concatenated transform. Concatenated transforms are
  * serializable if all their step transforms are serializables.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

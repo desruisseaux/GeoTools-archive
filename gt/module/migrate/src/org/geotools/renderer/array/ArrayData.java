@@ -37,6 +37,7 @@ import org.geotools.resources.XArray;
  * This class (like the whole <code>org.geotools.renderer.array</code> package)
  * is for internal use by {@link org.geotools.renderer.geom.Polyline} only.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

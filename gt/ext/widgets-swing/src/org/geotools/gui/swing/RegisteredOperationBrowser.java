@@ -98,6 +98,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * </ul>
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

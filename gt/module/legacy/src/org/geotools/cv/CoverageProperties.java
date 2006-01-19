@@ -53,6 +53,7 @@ import org.opengis.cv.CV_Coverage;
  * If a checked {@link RemoteException} is thrown, it is wrapped in an unchecked
  * {@link CannotEvaluateException}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

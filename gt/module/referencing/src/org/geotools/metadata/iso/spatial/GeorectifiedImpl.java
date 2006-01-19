@@ -44,6 +44,7 @@ import org.geotools.util.CheckedArrayList;
  * in the grid can be geolocated given its grid coordinate and the grid origin, cell spacing,
  * and orientation indication of whether or not geographic.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

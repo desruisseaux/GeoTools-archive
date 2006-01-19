@@ -50,6 +50,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * Transforms two-dimensional coordinate points using an {@link AffineTransform}.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

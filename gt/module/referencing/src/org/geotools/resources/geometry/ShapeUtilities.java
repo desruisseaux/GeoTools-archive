@@ -40,6 +40,7 @@ import org.geotools.resources.XMath;
  * shapes from the {@code java.awt.geom} package.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

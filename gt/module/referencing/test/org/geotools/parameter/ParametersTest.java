@@ -64,6 +64,7 @@ import org.geotools.referencing.wkt.Formatter;
 /**
  * Tests the <code>org.geotools.parameter</code> package.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

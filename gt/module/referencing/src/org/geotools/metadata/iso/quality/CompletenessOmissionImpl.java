@@ -29,6 +29,7 @@ import org.opengis.metadata.quality.CompletenessOmission;
 /**
  * Data absent from the dataset, as described by the scope.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

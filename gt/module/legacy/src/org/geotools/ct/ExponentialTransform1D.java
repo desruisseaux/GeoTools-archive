@@ -39,6 +39,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <p align="center"><code>{@link #base}<sup>a&nbsp;+&nbsp;b*x</sup> =
  * {@link #base}<sup>a</sup>*({@link #base}<sup>b</sup>)<sup>x</sup></code></p>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

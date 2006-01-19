@@ -39,6 +39,7 @@ import org.geotools.referencing.operation.TransformPathNotFoundException;
  * instances are sets of direct positions in a particular coordinate reference system.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

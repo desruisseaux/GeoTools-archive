@@ -49,6 +49,7 @@ import org.geotools.resources.Utilities;
  * do not preserve any connection to the database.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

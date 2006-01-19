@@ -53,6 +53,7 @@ import org.geotools.styling.Style;
  * RenderedLayer#repaint} automatically on changes.
  *
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  */
 public class StyledMapRenderer extends Renderer {

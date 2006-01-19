@@ -37,6 +37,7 @@ package org.geotools.renderer.array;
 /**
  * Itérateur balayant les données d'un tableau {@link CompressedArray}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

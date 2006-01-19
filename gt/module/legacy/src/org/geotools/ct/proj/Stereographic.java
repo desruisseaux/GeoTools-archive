@@ -128,6 +128,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/stereographic.html">Stereographic</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/random_issues.html#stereographic">Some Random Stereographic Issues</A>
  *
+ * @source $URL$
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux

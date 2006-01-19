@@ -33,6 +33,7 @@ import javax.imageio.spi.ImageWriterSpi;
  *
  * TODO: NOT YET IMPLEMENTED
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

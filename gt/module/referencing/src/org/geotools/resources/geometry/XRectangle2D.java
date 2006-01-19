@@ -44,6 +44,7 @@ import org.geotools.resources.Utilities;
  * {@linkplain Double#NaN NaN} values.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

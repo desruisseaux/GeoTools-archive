@@ -50,6 +50,7 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
  * undetermined if the {@code isReady()} state changes with time.
  *
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  */
 public interface OptionalFactory extends Factory {

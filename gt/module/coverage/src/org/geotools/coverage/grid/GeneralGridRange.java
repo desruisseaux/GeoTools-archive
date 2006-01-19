@@ -46,6 +46,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Defines a range of grid coverage coordinates.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

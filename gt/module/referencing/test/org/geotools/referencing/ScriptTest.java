@@ -47,6 +47,7 @@ import org.geotools.resources.TestData;
  *
  * This is probably the most important test case for the whole CRS module.
  *
+ * @source $URL$
  * @version $Id$
  * @author Yann Cézard
  * @author Remi Eve

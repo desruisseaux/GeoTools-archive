@@ -28,6 +28,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 /**
  * Classe enveloppant une portion seulement d'un tableau {@link CompressedArray}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

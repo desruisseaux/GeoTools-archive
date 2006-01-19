@@ -36,6 +36,7 @@ import org.geotools.resources.Utilities;
 /**
  * Spatial attributes in the application schema for the feature types.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

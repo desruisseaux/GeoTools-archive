@@ -27,6 +27,7 @@ import junit.framework.TestSuite;
 /**
  * Tests the {@link XMath} static methods.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -32,6 +32,7 @@ import javax.swing.JMenuItem;
  * itself from the ToolList parameters.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  */
 public class ToolMenu extends JMenu {

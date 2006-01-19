@@ -54,6 +54,7 @@ import org.geotools.resources.Arguments;
 /**
  * Test the {@link OperationJAI} implementation.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

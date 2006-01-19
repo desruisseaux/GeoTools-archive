@@ -48,6 +48,7 @@ import org.opengis.cs.CS_WGS84ConversionInfo;
  * which this is by examining the axes. You should also check the angular
  * units, since not all geographic coordinate systems use degrees.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

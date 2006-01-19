@@ -62,6 +62,7 @@ import org.geotools.resources.image.DualRectIter;
  * {@link java.awt.image.renderable.ContextualRenderedImageFactory}. The image
  * operation name is "org.geotools.SampleTranscode".
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

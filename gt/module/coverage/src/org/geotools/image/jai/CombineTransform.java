@@ -32,6 +32,7 @@ package org.geotools.image.jai;
  * values by their logarithm.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

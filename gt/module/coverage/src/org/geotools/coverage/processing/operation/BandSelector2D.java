@@ -49,6 +49,7 @@ import org.geotools.resources.image.ColorUtilities;
  * operation name still appropriate in this context.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

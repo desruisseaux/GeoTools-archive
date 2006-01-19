@@ -42,6 +42,7 @@ import org.geotools.geometry.GeneralDirectPosition;
 /**
  * Tests the {@link GeocentricTranslation} class.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

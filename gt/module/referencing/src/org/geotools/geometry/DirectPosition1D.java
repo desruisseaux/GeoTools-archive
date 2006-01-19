@@ -32,6 +32,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * Holds the coordinates for a one-dimensional position within some coordinate reference system.
  * 
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

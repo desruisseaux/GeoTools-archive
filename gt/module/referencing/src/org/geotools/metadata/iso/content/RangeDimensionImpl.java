@@ -35,6 +35,7 @@ import org.geotools.resources.Utilities;
 /**
  * Information on the range of each dimension of a cell measurement value.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

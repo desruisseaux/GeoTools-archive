@@ -34,6 +34,7 @@ import junit.framework.TestSuite;
  * Test the {@link WeakHashSet}. A standard {@link HashSet} object
  * is used for comparaison purpose.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

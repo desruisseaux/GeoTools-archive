@@ -37,6 +37,7 @@ import org.opengis.cs.CS_VerticalDatum;
 /**
  * A one-dimensional coordinate system suitable for vertical measurements.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

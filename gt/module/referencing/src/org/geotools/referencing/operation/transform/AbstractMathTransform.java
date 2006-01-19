@@ -75,6 +75,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * themself if they know to maps two-dimensional coordinate systems.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

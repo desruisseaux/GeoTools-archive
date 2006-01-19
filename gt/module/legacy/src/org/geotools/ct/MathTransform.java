@@ -54,6 +54,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * from observations, the transformation is accurate to within the
  * limitations of those observations.
  *
+ * @source $URL$
  * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux

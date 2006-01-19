@@ -45,6 +45,7 @@ import org.geotools.resources.Utilities;
  *       automatically soft reference into weak ones once some amount of memory usage is
  *       reached. Do not rely on this API; it may change again.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

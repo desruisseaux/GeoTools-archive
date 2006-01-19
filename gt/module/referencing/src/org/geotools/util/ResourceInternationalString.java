@@ -40,6 +40,7 @@ import org.geotools.resources.Utilities;
  * {@link ResourceBundle#getBundle(String,Locale,ClassLoader) getBundle} static method.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

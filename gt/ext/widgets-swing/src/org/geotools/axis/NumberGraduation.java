@@ -36,6 +36,7 @@ import javax.units.ConversionException;
  * A graduation using numbers on a linear axis.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

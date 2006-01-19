@@ -60,6 +60,7 @@ import org.geotools.resources.geometry.XRectangle2D;
  * Note: this implementation is not the fastest one. For maximal performance, consider using
  * {@link DefaultArray} instead.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

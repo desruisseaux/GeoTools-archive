@@ -40,6 +40,7 @@ import org.geotools.resources.Utilities;
 /**
  * Description of the event, including related parameters or tolerances.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

@@ -39,6 +39,7 @@ import org.opengis.referencing.operation.TransformException;
  * that area.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  */
 public class ZoomToolImpl extends PanToolImpl implements ZoomTool {

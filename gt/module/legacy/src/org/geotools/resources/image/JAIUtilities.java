@@ -32,6 +32,7 @@ import org.geotools.resources.XArray;
  * as temporary. They will be removed if Sun extends their class with the fonctionality
  * provided here.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

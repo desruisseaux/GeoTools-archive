@@ -41,6 +41,7 @@ import javax.media.jai.JAI;
  * previews, but should not be used as a "real" renderer for full precision images.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

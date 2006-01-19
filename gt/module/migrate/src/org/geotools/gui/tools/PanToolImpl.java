@@ -39,6 +39,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * CordinateTransform for the map's Context.
  *
  * @author $author$
+ * @source $URL$
  * @version $Revision: 1.20 $
  */
 public class PanToolImpl extends AbstractTool implements PanTool {

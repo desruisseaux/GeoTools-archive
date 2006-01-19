@@ -38,6 +38,7 @@ import org.geotools.resources.Utilities;
  * Common ways in which the resource may be obtained or received, and related instructions
  * and fee information.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett

@@ -65,6 +65,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * {@link DecimalFormat}, {@link SimpleDateFormat} or {@link AngleFormat}.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

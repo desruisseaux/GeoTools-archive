@@ -35,6 +35,7 @@ import org.opengis.referencing.operation.TransformException;
  * one being the possibility to avoid the use of an
  * intermediate buffer.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

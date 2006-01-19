@@ -52,6 +52,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see SpinnerNumberModel
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Adapted from Hans Muller
  * @author Martin Desruisseaux

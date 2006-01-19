@@ -33,6 +33,7 @@ import java.util.Locale;
  * functionally equivalent to C/C++'s {@code realloc}.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -34,6 +34,7 @@ import java.util.Locale;
  * etc.). This is a relatively light object compared to their subclasses and can be used when
  * parsing are not needed.
  *
+ * @source $URL$
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux

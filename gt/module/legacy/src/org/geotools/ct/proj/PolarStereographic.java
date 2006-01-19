@@ -70,6 +70,7 @@ import org.geotools.resources.i18n.Errors;
  * This default implementation uses USGS equation (i.e. iteration) for computing
  * the {@linkplain #inverseTransformNormalized inverse transform}.
  *
+ * @source $URL$
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux

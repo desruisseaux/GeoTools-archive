@@ -52,6 +52,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * computed when needed. The interval computation should be accurate even if there is
  * missing and/or duplicated records.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

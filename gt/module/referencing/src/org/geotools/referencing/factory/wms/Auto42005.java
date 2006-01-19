@@ -46,6 +46,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * ${central_meridian} = ${lon0}
  * </pre>
  *
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  * @author Rueben Schulz

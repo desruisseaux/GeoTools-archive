@@ -69,6 +69,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * for synchronisation. This is usually done in an utility class wrapping this
  * service registry (e.g. {@link org.geotools.referencing.FactoryFinder}).
  * </p>
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Richard Gould

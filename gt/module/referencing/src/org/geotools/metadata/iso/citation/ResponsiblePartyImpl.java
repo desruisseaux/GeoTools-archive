@@ -48,6 +48,7 @@ import org.geotools.util.SimpleInternationalString;
  * organizations associated with the dataset.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

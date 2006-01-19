@@ -16,6 +16,7 @@ import junit.framework.TestSuite;
 /**
  *
  * @author iant
+ * @source $URL$
  */
 public class XMLEncoderTest extends TestCase {
     private static final boolean VERBOSE = false;

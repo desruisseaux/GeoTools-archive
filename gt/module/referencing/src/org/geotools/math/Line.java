@@ -41,6 +41,7 @@ import org.opengis.util.Cloneable;
  * can be computed for a given <var>x</var> value using the {@link #y} method. Method
  * {@link #x} compute the converse and should work even if the line is vertical.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

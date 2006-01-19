@@ -43,6 +43,7 @@ import org.geotools.referencing.operation.AbstractCoordinateOperation;
  * {@link IdentifiedObject} method.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

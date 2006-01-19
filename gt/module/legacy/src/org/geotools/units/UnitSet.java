@@ -45,6 +45,7 @@ import org.geotools.resources.Utilities;
  * en binaire dans le fichier {@link #PATHNAME}. Cette banque d'unités pourra être
  * relue par {@link Unit} lorsque des unités sont demandées.
  *
+ * @source $URL$
  * @version 1.0
  * @author Martin Desruisseaux
  *

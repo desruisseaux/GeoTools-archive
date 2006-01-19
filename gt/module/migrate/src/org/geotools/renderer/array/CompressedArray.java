@@ -44,6 +44,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  *             work providing that each points are approximatively equidistant. The current
  *             {@link org.geotools.renderer.geom.Polyline#setResolution} method ensure exactly that.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

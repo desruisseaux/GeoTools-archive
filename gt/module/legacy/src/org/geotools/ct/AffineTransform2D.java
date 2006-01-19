@@ -38,6 +38,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 /**
  * Transforms two-dimensional coordinate points using an {@link AffineTransform}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

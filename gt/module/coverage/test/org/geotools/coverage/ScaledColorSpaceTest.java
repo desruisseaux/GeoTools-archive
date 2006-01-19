@@ -43,6 +43,7 @@ import org.geotools.resources.XMath;
  * Tests the {@link ScaledColorSpace} implementation.
  * This is a visual test when run on the command line.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

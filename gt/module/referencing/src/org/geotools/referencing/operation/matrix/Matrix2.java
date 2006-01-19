@@ -31,6 +31,7 @@ import org.opengis.referencing.operation.Matrix;
  * A matrix of fixed {@value #SIZE}&times;{@value #SIZE} size.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

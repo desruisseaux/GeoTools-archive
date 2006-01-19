@@ -25,6 +25,7 @@ import org.geotools.feature.*;
  * displayed.
  *
  * @author James Macgill, CCG
+ * @source $URL$
  * @version $Id$
  *
  * @task TODO: It would be excellent if there were custom cell renderers

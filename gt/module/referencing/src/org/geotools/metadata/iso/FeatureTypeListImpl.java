@@ -32,6 +32,7 @@ import org.geotools.resources.Utilities;
 /**
  * List of names of feature types with the same spatial representation (same as spatial attributes).
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

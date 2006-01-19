@@ -56,6 +56,7 @@ import org.opengis.referencing.cs.AxisDirection;
  * See {@link java.lang.Comparable}, {@link java.util.SortedMap} or
  * {@link java.util.SortedSet} for more information.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

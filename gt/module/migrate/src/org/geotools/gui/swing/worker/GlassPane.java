@@ -36,6 +36,7 @@ import javax.swing.SwingUtilities;
  *
  * @author Yexin Chen
  * @author Andrea Aime
+ * @source $URL$
  */
 public class GlassPane extends JComponent implements AWTEventListener {
     private Window theWindow;

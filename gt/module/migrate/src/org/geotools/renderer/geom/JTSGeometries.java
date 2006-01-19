@@ -38,6 +38,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * A geometry collection backed by one or many JTS
  * {@link com.vividsolutions.jts.geom.Geometry} objects.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

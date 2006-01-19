@@ -51,6 +51,7 @@ import org.geotools.gc.GridCoverage;
  * The implementation of JAI's {@link MinFilterDescriptor MinFilter},
  * {@link MaxFilterDescriptor MaxFilter} and {@link MedianFilterDescriptor MedianFilter}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

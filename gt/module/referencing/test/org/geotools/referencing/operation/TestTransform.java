@@ -45,6 +45,7 @@ import org.geotools.geometry.GeneralDirectPosition;
  * Base class for transform test cases. This class is not a test in itself;
  * only subclasses will be.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

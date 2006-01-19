@@ -70,6 +70,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * coordinates are extrapolated.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux

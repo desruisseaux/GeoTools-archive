@@ -42,6 +42,7 @@ import org.geotools.resources.i18n.Errors;
  * thrown when a property is defined twice with different values.  It may also be thrown
  * if a property can be computed from other properties, but their values are inconsistent.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

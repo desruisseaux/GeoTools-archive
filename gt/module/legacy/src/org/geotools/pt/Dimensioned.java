@@ -28,6 +28,7 @@ package org.geotools.pt;
  * a height), two-dimensional (e.g. a geographic coordinate), three-dimensional,
  * etc. The actual number of dimension can be queried by {@link #getDimension}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

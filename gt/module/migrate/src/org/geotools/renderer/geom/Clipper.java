@@ -41,6 +41,7 @@ import org.opengis.referencing.operation.TransformException;
  * The clipping area to apply on a {@link Geometry} object. A <code>Clipper</code> object
  * contains the clip as a {@link Rectangle2D} and its {@link CoordinateSystem}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

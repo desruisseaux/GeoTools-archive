@@ -17,6 +17,7 @@ import org.geotools.map.MapContext;
  * Base class for all the geotools Tools, like PanTool, ZoomTool, etc.
  * Tools process mouse events on behalf of widgets like MapPane and change
  * data in the Context (like the AreaOfInterest).
+ * @source $URL$
  * @version $Id$
  * @author Cameron Shorter
  */

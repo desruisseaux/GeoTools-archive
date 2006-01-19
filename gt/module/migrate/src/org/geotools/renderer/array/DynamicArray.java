@@ -40,6 +40,7 @@ import org.geotools.renderer.geom.CompressionLevel;
 /**
  * Enveloppe un tableau <code>float[]</code> dans lequel des données pourront être ajoutées.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

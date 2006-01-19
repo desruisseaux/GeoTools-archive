@@ -29,6 +29,7 @@ import org.opengis.metadata.quality.DomainConsistency;
 /**
  * Adherence of values to the value domains.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

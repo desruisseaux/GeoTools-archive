@@ -50,6 +50,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * serializable if all their step transforms are serializables.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

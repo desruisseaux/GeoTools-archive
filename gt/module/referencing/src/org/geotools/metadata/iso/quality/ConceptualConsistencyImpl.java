@@ -29,6 +29,7 @@ import org.opengis.metadata.quality.ConceptualConsistency;
 /**
  * Adherence to rules of the conceptual schema.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

@@ -59,6 +59,7 @@ import org.geotools.util.WeakValueHashMap;
  * should not affect the number of sample dimensions currently being
  * accessed or value sequence.
  *
+ * @source $URL$
  * @version $Id$
  * @author <a href="www.opengis.org">OpenGIS</a>
  * @author Martin Desruisseaux

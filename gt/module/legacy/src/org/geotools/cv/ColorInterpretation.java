@@ -44,6 +44,7 @@ import org.opengis.cv.CV_ColorInterpretation;
  * Enumeration class specifing the
  * mapping of a band to a color model component.
  *
+ * @source $URL$
  * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux

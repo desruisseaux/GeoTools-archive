@@ -50,6 +50,7 @@ import org.opengis.util.Cloneable;
  * This class is not thread-safe.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Andrea Aime

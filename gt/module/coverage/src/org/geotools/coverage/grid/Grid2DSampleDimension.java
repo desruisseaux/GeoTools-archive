@@ -56,6 +56,7 @@ import org.geotools.util.SimpleInternationalString;
  * Describes the band values for a grid coverage.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

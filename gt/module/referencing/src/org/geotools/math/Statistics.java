@@ -54,6 +54,7 @@ import org.opengis.util.Cloneable;
  * System.out.println(stats);
  * </pre></blockquote>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

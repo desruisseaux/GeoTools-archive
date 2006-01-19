@@ -45,6 +45,7 @@ import org.opengis.cs.CS_PrimeMeridian;
  * will point East (e.g. a right handed system), but you should
  * check the axes for non-default values.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

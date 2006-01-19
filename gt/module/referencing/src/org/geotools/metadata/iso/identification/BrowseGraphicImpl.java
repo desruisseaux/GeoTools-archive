@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
 /**
  * Graphic that provides an illustration of the dataset (should include a legend for the graphic).
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

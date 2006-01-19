@@ -36,6 +36,7 @@ import org.geotools.resources.Utilities;
 /**
  * Information identifying the portrayal catalogue used.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

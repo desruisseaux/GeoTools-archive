@@ -31,6 +31,7 @@ import junit.textui.TestRunner;
  * also includes tests in some dependencies, like <code>org.geotools.measure</code>
  * and <code>org.geotools.parameter</code> packages.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -75,6 +75,7 @@ import com.vividsolutions.jts.geom.Point;
  *
  * @author Andrea Aime
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  */
 public class RenderedLayerFactory {

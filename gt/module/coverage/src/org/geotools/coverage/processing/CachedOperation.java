@@ -46,6 +46,7 @@ import org.geotools.parameter.Parameters;
  *       image. The OpenGIS specification allows to change sample values. What
  *       should be the semantic for operation using those images as sources?
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

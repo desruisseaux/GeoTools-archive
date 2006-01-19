@@ -44,6 +44,7 @@ import org.geotools.resources.Utilities;
 /**
  * Information required to identify a dataset.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

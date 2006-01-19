@@ -45,6 +45,7 @@ import org.geotools.resources.Utilities;
  *    separator between name elements.</P>
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

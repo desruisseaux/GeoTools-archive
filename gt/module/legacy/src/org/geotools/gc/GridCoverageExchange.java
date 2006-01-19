@@ -53,6 +53,7 @@ import org.opengis.gc.GC_GridCoverageExchange;
  * Support for creation of grid coverages from persistent formats as well
  * as exporting a grid coverage to a persistent formats.
  *
+ * @source $URL$
  * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux

@@ -40,6 +40,7 @@ import org.opengis.cs.CS_LocalDatum;
  * between two different local coordinate systems, as long as they are based
  * on the same local datum.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

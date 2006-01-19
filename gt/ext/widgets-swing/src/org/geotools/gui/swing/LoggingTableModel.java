@@ -56,6 +56,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * This model is used by {@link LoggingPanel} for displaying logging messages in
  * a {@link javax.swing.JTable}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

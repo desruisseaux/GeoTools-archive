@@ -45,6 +45,7 @@ import org.geotools.resources.XMath;
  * {@link Category#getSampleToGeophysics} transform is thread-safe too.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

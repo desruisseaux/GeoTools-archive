@@ -36,6 +36,7 @@ import org.geotools.gc.GridCoverage;
 /**
  * A JAI operation which accepts an arbitrary number of sources.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

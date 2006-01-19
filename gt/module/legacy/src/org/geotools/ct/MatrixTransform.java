@@ -45,6 +45,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 /**
  * Transforms multi-dimensional coordinate points using a {@link Matrix}.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

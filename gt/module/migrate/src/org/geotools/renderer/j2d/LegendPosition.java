@@ -54,6 +54,7 @@ import javax.media.jai.EnumeratedParameter;
  * <tr><td>{@link #SOUTH_WEST}</td>  <td>{@link  #SOUTH}</td>  <td>{@link #SOUTH_EAST}</td></tr>
  * </table>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

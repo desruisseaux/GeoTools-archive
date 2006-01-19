@@ -49,6 +49,7 @@ import org.geotools.resources.geometry.XRectangle2D;
  * uses coordinates of an arbitrary dimension.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

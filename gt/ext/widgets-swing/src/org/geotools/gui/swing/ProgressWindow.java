@@ -67,6 +67,7 @@ import org.geotools.util.ProgressListener;
  * <p>&nbsp;</p>
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

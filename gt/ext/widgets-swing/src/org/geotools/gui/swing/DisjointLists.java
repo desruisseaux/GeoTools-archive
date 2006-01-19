@@ -61,6 +61,7 @@ import org.geotools.resources.SwingUtilities;
  * selected. User can move items from one list to the other using buttons in the middle.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

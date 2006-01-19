@@ -42,6 +42,7 @@ import java.awt.image.RenderedImage;
  * {@link org.geotools.renderer.style.MarkStyle2D} and
  * {@link org.geotools.renderer.style.GraphicStyle2D}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Julian Elliott
  */

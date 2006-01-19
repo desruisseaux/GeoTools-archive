@@ -49,6 +49,7 @@ import com.vividsolutions.jts.geom.LineString;
  * class wrap directly this {@link LineString} internal array,  in order to avoid object creation
  * and copies.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

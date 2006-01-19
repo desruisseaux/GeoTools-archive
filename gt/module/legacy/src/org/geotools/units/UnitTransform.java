@@ -42,6 +42,7 @@ import org.geotools.util.WeakHashSet;
  * les objets <code>UnitTransform</code> sont toujours imutables. Il est
  * donc sécuritaire de partager plusieurs références vers le même objet.
  *
+ * @source $URL$
  * @version 1.0
  * @author Martin Desruisseaux
  *

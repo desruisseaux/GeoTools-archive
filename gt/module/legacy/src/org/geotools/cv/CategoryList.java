@@ -62,6 +62,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  *
  * Instances of {@link CategoryList} are immutable and thread-safe.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

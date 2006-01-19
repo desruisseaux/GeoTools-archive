@@ -96,6 +96,7 @@ import org.geotools.resources.i18n.Errors;
  * <p>&nbsp;</p>
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Lionel Flahaut 

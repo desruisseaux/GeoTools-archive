@@ -58,6 +58,7 @@ import org.geotools.resources.image.ColorUtilities;
  * color model is to select a different visible band. Consequently, the "SelectSampleDimension"
  * name still appropriate in this context.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

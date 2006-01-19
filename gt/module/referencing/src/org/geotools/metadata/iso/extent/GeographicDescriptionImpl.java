@@ -33,6 +33,7 @@ import org.geotools.resources.Utilities;
 /**
  * Description of the geographic area using identifiers.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

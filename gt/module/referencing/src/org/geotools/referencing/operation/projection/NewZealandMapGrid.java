@@ -41,6 +41,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * The algorithm is documented <a href="http://www.linz.govt.nz/rcs/linz/6137/">here</a>.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Justin Deoliveira
  * @author Martin Desruisseaux

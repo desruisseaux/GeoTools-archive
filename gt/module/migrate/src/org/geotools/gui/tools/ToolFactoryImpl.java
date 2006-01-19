@@ -25,6 +25,7 @@ import org.geotools.gui.tools.ZoomTool;
  * An implementation of ToolFactory to be used to construct tools.  This class
  * should not be called directly.  Instead it should be created from
  * ToolFactory, and ToolFactory methods should be called instead.
+ * @source $URL$
  */
 public class ToolFactoryImpl extends ToolFactory {
     /**

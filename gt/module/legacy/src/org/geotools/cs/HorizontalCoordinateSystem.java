@@ -36,6 +36,7 @@ import org.opengis.cs.CS_HorizontalDatum;
 /**
  * A 2D coordinate system suitable for positions on the Earth's surface.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

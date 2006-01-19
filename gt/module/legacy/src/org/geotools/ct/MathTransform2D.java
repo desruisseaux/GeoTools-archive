@@ -46,6 +46,7 @@ import org.opengis.referencing.operation.TransformException;
  * If the transformation is affine, then <code>MathTransform</code> shall be an
  * immutable instance of {@link AffineTransform}.
  *
+ * @source $URL$
  * @version 1.00
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

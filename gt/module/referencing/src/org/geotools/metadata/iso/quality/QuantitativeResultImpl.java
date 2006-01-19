@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
 /**
  * Information about the value (or set of values) obtained from applying a data quality measure.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

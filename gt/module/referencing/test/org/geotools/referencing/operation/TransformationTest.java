@@ -64,6 +64,7 @@ import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
  * the IDE however, in which case the tests are disabled in order to allows normal
  * execution of other tests.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

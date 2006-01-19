@@ -38,6 +38,7 @@ import org.geotools.resources.Utilities;
 /**
  * Information identifying the feature catalogue.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

@@ -27,6 +27,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link RangeSet} implementation.
  *
+ * @source $URL$
  * @version $Id$
  * @author Andrea Aime
  */

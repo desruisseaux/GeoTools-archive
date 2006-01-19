@@ -66,6 +66,7 @@ import org.geotools.resources.i18n.Errors;
  * The oblique case of the {@link Orthographic} projection. Only the spherical
  * form is given here.
  *
+ * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
  *

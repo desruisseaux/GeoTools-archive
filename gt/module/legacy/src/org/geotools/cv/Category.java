@@ -84,6 +84,7 @@ import org.opengis.referencing.operation.TransformException;
  * <br><br>
  * All <code>Category</code> objects are immutable and thread-safe.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

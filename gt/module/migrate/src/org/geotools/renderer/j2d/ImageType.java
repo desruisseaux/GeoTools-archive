@@ -45,6 +45,7 @@ import javax.media.jai.EnumeratedParameter;
  * {@link VolatileImage} for fast rendering, or by a {@link BufferedImage} for
  * longer persistence.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

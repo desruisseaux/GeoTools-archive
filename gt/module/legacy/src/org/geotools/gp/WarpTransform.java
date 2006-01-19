@@ -41,6 +41,7 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * An image warp using {@link MathTransform2D}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

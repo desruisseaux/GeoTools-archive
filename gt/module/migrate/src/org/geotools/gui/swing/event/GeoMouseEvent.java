@@ -44,6 +44,7 @@ import org.geotools.pt.CoordinatePoint;
  * &nbsp;}
  * </pre></blockquote>
  *
+ * @source $URL$
  * @version $Id$
  * @author Cameron Shorter
  */

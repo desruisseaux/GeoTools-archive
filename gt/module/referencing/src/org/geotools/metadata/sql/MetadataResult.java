@@ -34,6 +34,7 @@ import java.util.logging.Logger;
  * table is fetched, the {@link ResultSet} is automatically constructed. If many attributes
  * are fetched consecutivly for the same record, then the same {@link ResultSet} is reused.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -33,6 +33,7 @@ import org.opengis.cs.CS_VerticalDatum;
 /**
  * Procedure used to measure vertical distances.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

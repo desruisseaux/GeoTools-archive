@@ -119,6 +119,7 @@ import org.geotools.resources.i18n.Errors;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">"Transverse_Mercator" on Remote Sensing</A>
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux

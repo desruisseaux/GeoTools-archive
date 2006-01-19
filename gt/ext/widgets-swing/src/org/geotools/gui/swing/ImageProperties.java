@@ -70,6 +70,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * sample model}, image size, tile size, etc.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

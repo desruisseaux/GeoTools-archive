@@ -33,6 +33,7 @@ import org.geotools.resources.XMath;
  * Cet itérateur retourne les positions des graduations à partir de la
  * valeur minimale jusqu'à la valeur maximale.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

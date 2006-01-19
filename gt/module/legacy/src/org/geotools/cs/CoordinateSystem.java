@@ -65,6 +65,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * come from specification 2.0 and appears in the <code>implements</code> clause only as a patch
  * for anticipating a future transition to OGC spec. 2.0.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

@@ -38,6 +38,7 @@ import org.geotools.resources.Utilities;
  * Information required to enable contact with the responsible person and/or organization.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

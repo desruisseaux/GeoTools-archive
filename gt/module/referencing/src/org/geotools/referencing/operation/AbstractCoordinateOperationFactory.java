@@ -77,6 +77,7 @@ import org.geotools.util.WeakHashSet;
  * more "intelligent" job is left to subclasses.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

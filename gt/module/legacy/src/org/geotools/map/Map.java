@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * coordinate system.
  *
  * @author James Macgill, CCG
+ * @source $URL$
  * @version $Id$
  *
  * @deprecated Use Context instead.

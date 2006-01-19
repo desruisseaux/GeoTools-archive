@@ -27,6 +27,7 @@ import java.sql.SQLException;
  * Throws when a metadata method failed. The cause for this exception
  * is typically a {@link SQLException}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Touraïvane
  * @author Martin Desruisseaux

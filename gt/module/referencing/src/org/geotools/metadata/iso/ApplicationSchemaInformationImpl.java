@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
 /**
  * Information about the application schema used to build the dataset.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

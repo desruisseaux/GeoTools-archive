@@ -42,6 +42,7 @@ import org.opengis.util.Cloneable;
  * system, but their implicit coordinate system is defined by their
  * context.)
  *
+ * @source $URL$
  * @version 1.00
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

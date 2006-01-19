@@ -35,6 +35,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * This subclass of {@code PointOutsideCoverage} exception is used when the dimension of the
  * out-of-bounds ordinate is known.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

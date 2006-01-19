@@ -46,6 +46,7 @@ import org.geotools.ct.MissingParameterException;
  * <p>&nbsp;</p>
  * <p align="center"><img src="../doc-files/CylindricalProjection.png"></p>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

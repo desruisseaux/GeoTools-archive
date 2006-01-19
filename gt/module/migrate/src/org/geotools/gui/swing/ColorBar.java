@@ -82,6 +82,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * is usually painted together with a remote sensing image, for example in a
  * {@link org.geotools.gui.swing.MapPane} object.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

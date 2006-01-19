@@ -30,6 +30,7 @@ import java.util.Arrays;
  * specialized {@code ConstantTransform1D} class is faster.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -48,6 +48,7 @@ import org.geotools.util.WeakValueHashMap;
  * This factory provides only one public static method: {@link #getColorModel}.  Instances
  * of {@link ColorModel} are shared among all callers in the running virtual machine.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

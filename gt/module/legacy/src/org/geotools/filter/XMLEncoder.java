@@ -50,6 +50,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *       could also be nice to refactor common code from gml producer, as
  *       there is basically a GeometryProducer there.
  * @task REVISIT: make namespace aware.
+ * @source $URL$
  */
 public class XMLEncoder implements org.geotools.filter.FilterVisitor {
     /** The logger for the filter module. */

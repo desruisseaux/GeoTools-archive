@@ -37,6 +37,7 @@ import java.util.TimeZone;
  * la plus récente. Il choisit les intervalles de graduation en supposant qu'on utilise un
  * calendrier grégorien.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

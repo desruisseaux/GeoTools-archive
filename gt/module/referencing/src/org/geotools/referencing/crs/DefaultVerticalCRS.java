@@ -56,6 +56,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * </TD></TR></TABLE>
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

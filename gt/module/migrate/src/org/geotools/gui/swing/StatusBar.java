@@ -91,6 +91,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * {@link #getCoordinateFormat}.setCoordinateSystem(mapPane.getCoordinateSystem());
  * </pre></blockquote>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -18,6 +18,7 @@ package org.geotools.resources.i18n;
  *
  * @see org.geotools.resources.ResourceBundle
  * @see org.geotools.resources.ResourceCompiler
+ * @source $URL$
  */
 public final class DescriptionKeys {
     private DescriptionKeys() {

@@ -77,6 +77,7 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
  * @author Ian Schneider
  * @author Martin Desruisseaux
  * @author Jody Garnett
+ * @source $URL$
  * @version $Id$
  *
  * @see Hints

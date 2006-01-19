@@ -36,6 +36,7 @@ import org.geotools.coverage.GridSampleDimension;
  * {@link BinarizeDescriptor Binarize}.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

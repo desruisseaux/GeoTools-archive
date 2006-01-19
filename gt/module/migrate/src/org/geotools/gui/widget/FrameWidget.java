@@ -23,6 +23,7 @@ import java.awt.event.WindowListener;
  * A frame which can contain other widgets.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  */
 public interface FrameWidget extends Widget {

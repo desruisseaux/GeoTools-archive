@@ -29,6 +29,7 @@ package org.geotools.gui.swing.tree;
  * define or inherit any {@code getUserObject()}.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

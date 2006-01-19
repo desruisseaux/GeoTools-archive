@@ -24,6 +24,7 @@ package org.geotools.resources;
  * A set of utilities for characters handling.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

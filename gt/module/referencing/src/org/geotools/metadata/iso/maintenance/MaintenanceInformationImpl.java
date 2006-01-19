@@ -40,6 +40,7 @@ import org.geotools.resources.Utilities;
 /**
  * Information about the scope and frequency of updating.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

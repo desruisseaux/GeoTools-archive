@@ -68,6 +68,7 @@ import org.geotools.util.NumberRange;
  *  <li>{@link #getExample}</li>
  * </ul>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

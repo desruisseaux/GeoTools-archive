@@ -39,6 +39,7 @@ import org.geotools.resources.Utilities;
 /**
  * New metadata element, not found in ISO 19115, which is required to describe geographic data.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

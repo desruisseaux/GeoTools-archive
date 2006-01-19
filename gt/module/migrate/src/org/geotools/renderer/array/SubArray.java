@@ -43,6 +43,7 @@ import java.awt.geom.Point2D;
  * L'implémentation par défaut de cette classe est imutable. Toutefois, certaines
  * classes dérivées (notamment {@link DynamicArray}) ne le seront pas forcément.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -31,6 +31,7 @@ import junit.framework.Assert;
  * It doesn't matter if this factory is registered or not. We
  * just need a {@code InternalFactory.class} value different
  * than {@code DummyFactory.class}.
+ * @source $URL$
  */
 interface InternalFactory extends Factory {
 }

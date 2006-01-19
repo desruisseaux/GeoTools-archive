@@ -123,6 +123,7 @@ import org.geotools.util.WeakHashSet;
  * in the {@link ObjectFactory} interface.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

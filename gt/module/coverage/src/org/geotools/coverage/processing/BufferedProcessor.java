@@ -44,6 +44,7 @@ import org.geotools.util.WeakValueHashMap;
  * {@linkplain java.lang.ref.WeakReference weak references}.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

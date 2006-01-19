@@ -31,6 +31,7 @@ import java.io.Serializable;
  *
  * This transform is the inverse of {@link ExponentialTransform1D}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

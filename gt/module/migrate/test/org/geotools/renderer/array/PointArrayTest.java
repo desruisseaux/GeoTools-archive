@@ -49,6 +49,7 @@ import org.geotools.resources.XArray;
 /**
  * Test the <code>org.geotools.renderer.array</code> package.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

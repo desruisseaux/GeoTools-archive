@@ -32,6 +32,7 @@ import org.geotools.geometry.GeneralDirectPosition;
 /**
  * Format a {@link CoordinatePoint} in an arbitrary {@link CoordinateSystem}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

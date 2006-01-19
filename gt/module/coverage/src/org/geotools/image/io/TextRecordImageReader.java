@@ -92,6 +92,7 @@ import org.geotools.resources.i18n.DescriptionKeys;
  * the default setting is to create a {@link Spi} subclass. There is no need to subclass
  * {@code TextRecordImageReader}, unless you want more control on the decoding process.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

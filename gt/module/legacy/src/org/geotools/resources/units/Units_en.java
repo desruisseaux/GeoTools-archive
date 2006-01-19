@@ -32,6 +32,7 @@ package org.geotools.resources.units;
  * Noms d'unités en langue anglaise. Les unités qui n'apparaissent
  * pas dans cette ressources ne seront pas localisées.
  *
+ * @source $URL$
  * @version 1.0
  * @author Martin Desruisseaux
  */

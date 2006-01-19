@@ -46,6 +46,7 @@ package org.geotools.renderer.geom;
  * avec le même spin, on ne doit pas avoir nulle part dans la liste deux pointeurs
  * <code>[i/j].path</code> identiques associés à la même valeur booléenne <code>[i/j].mergeEnd</code>.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

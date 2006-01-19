@@ -70,6 +70,7 @@ import org.geotools.resources.i18n.Errors;
  * This is a special case of oblique stereographic projection for 
  * {@link #latitudeOfOrigin} == 0.0.
  *
+ * @source $URL$
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux

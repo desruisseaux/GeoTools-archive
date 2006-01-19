@@ -75,6 +75,7 @@ import org.geotools.util.SimpleInternationalString;
  * @author Martin Desruisseaux
  *
  * @since 2.1
+ * @source $URL$
  */
 public class MetadataSource {
     /**

@@ -68,6 +68,7 @@ import org.geotools.cv.SampleDimension;
  *     08    0000FF        0000FF
  * </pre></blockquote>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

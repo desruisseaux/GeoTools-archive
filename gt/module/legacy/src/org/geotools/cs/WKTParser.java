@@ -43,6 +43,7 @@ import org.opengis.referencing.FactoryException;
  * Parser for <cite>Well Know Text</cite> (WKT).
  * Instances of this class are thread-safe.
  *
+ * @source $URL$
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux

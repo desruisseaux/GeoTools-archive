@@ -57,6 +57,7 @@ import org.geotools.cs.CoordinateSystem;
  * text file. The text file is parsed by a {@link PropertyParser} object, while the pixel
  * values are read by a {@link ImageReader} object.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

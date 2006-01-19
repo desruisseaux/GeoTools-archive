@@ -157,6 +157,7 @@ import org.geotools.geometry.GeneralEnvelope;
  * {@link #getCoordinateReferenceSystem} method constructs a {@link CoordinateReferenceSystem}
  * object using available informations.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

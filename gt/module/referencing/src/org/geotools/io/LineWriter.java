@@ -36,6 +36,7 @@ import org.geotools.resources.XArray;
  * explicitly set at construction time. This writer also remove trailing blanks
  * before end of lines.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

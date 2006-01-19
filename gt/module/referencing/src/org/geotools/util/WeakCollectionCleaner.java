@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
  * is invoked.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

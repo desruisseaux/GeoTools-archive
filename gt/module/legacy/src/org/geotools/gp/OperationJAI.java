@@ -90,6 +90,7 @@ import org.opengis.referencing.FactoryException;
  *   <li>{@link #createRenderedImage} (the actual call to {@link JAI#createNS JAI.createNS})</li>
  * </ol>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

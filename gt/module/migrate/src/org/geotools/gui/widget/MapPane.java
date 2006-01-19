@@ -27,6 +27,7 @@ import org.geotools.map.event.MapLayerListListener;
  * required if any of the parameters in the associated Context changes.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  *
  * @task TODO Should extend LayerListener as well.  Ie, if features inside a \

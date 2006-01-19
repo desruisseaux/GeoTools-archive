@@ -33,6 +33,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 /**
  * A two dimensional array of numbers. Row and column numbering begins with zero.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

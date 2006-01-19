@@ -44,6 +44,7 @@ import org.geotools.ct.MissingParameterException;
  * <p>&nbsp;</p>
  * <p align="center"><img src="../doc-files/PlanarProjection.png"></p>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

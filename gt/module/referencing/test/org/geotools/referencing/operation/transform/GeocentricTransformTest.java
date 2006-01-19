@@ -50,6 +50,7 @@ import org.geotools.resources.XMath;
  *   <li>{@link DefaultEllipsoid}</li>
  * </ul>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

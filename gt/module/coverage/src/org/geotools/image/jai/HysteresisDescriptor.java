@@ -28,6 +28,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
  * The descriptor for the {@link Hysteresis} operation.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Lionel Flahaut
  */

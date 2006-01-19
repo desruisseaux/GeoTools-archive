@@ -25,6 +25,7 @@ package org.geotools.referencing.operation.projection;
  * outside the envelope of validity. Bounds are usually 90°S to 90°N and 180°W to 180°E.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

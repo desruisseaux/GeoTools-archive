@@ -48,6 +48,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * If this exception is thrown, the workaround is to {@linkplain Geometry#clone clone}
  * the geometry before to invokes one of the above methods.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

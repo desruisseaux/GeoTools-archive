@@ -47,6 +47,7 @@ import org.geotools.resources.i18n.Errors;
  * This implementation supports {@link #add} and {@link #remove} operations.
  *  
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

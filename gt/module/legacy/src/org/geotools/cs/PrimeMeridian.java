@@ -35,6 +35,7 @@ import org.opengis.cs.CS_PrimeMeridian;
 /**
  * A meridian used to take longitude measurements from.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

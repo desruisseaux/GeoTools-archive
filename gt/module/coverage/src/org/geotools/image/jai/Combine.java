@@ -82,6 +82,7 @@ import org.geotools.resources.image.ImageUtilities;
  * "{@link BandCombineDescriptor BandCombine}" operation.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Remi Eve

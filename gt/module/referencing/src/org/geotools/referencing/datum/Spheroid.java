@@ -31,6 +31,7 @@ import javax.units.Unit;
  * A ellipsoid which is spherical. This ellipsoid implements a faster
  * {@link #orthodromicDistance} method.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

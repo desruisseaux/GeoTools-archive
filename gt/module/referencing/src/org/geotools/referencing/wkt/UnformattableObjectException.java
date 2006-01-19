@@ -28,6 +28,7 @@ package org.geotools.referencing.wkt;
  * implementations can be formatted as WKT.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

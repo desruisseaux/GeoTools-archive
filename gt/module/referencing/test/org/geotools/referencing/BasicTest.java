@@ -67,6 +67,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * Tests the creation of {@link IdentifiedObject} and its subclasses. Some basic features and
  * simple <cite>Well Know Text</cite> (WKT) formatting are also tested.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

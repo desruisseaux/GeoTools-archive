@@ -34,6 +34,7 @@ import javax.units.ConversionException;
  * Unfortunatly, this pseudo-unit is extensively used in the EPSG database.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -59,6 +59,7 @@ import org.geotools.measure.Units;
  * Others getters and setters are parameter-type dependents.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett (Refractions Research)

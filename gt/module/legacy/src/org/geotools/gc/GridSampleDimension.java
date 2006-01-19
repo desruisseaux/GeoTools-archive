@@ -52,6 +52,7 @@ import org.geotools.util.NumberRange;
 /**
  * Describes the band values for a grid coverage.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

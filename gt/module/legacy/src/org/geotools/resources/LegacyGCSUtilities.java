@@ -36,6 +36,7 @@ import org.geotools.pt.Envelope;
  * A set of utilities methods for the Grid Coverage package. Those methods are not really
  * rigorous; must of them should be seen as temporary implementations.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -64,6 +64,7 @@ import org.geotools.resources.i18n.Errors;
  *        EPSG Guidence Note Number 7, Version 19.</li>
  * </ul>
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

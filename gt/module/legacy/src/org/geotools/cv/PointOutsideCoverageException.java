@@ -38,6 +38,7 @@ import org.opengis.coverage.CannotEvaluateException;
  * Throws when a <code>Coverage.evaluate</code>
  * method is invoked with a point outside coverage.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

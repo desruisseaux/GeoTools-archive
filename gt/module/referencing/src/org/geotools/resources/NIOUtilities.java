@@ -31,6 +31,7 @@ import java.util.logging.Logger;
  * Utility class for managing memory mapped buffers. 
  * 
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Andres Aimes
  */

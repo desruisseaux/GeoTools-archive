@@ -31,6 +31,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * to avoid the use of an intermediate buffer.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

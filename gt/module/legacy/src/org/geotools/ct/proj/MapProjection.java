@@ -59,6 +59,7 @@ import org.opengis.referencing.operation.TransformException;
  * or RMI use, but will probably not be compatible with future version. For long term storage,
  * WKT (Well Know Text) or XML (not yet implemented) are more appropriate.
  *
+ * @source $URL$
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux

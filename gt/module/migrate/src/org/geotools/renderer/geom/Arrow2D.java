@@ -51,6 +51,7 @@ import java.util.NoSuchElementException;
  * <p align="center">The <code>Arrow2D</code> shape</p>
  * <p>&nbsp;</p>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

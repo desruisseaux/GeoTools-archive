@@ -36,6 +36,7 @@ import java.io.Serializable;
  * List of elements sorted by a key which is not the element itself.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Simone Giannecchini
  * @author Martin Desruisseaux

@@ -42,6 +42,7 @@ import org.geotools.units.Unit;
  * {@link org.geotools.cs.Projection} using this class for binding classification
  * name to parameter list descriptors.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

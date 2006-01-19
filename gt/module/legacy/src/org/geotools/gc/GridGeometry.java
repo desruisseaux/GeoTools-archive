@@ -62,6 +62,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * Describes the valid range of grid coordinates and the math
  * transform to transform grid coordinates to real world coordinates.
  *
+ * @source $URL$
  * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux

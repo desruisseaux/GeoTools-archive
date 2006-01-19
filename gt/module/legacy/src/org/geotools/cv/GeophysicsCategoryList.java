@@ -43,6 +43,7 @@ import org.geotools.units.Unit;
  * the list of {@link Category}. This transform is thread safe if each
  * {@link Category#getSampleToGeophysics} transform is thread-safe too.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

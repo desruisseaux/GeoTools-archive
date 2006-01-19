@@ -73,6 +73,7 @@ import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
  * parameters framework.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

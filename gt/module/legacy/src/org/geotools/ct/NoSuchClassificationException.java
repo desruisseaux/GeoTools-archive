@@ -50,6 +50,7 @@ import org.opengis.referencing.FactoryException;
  * exception may be thrown when the projection is given to
  * {@link MathTransformFactory#createParameterizedTransform(Projection)}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

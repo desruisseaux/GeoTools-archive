@@ -39,6 +39,7 @@ import org.geotools.coverage.processing.operation.Interpolate;
  * interpolation however.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -31,6 +31,7 @@ import org.opengis.util.Cloneable;
  * This class is final for performance reason.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Justin Deoliveira
  * @author Martin Desruisseaux

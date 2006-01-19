@@ -169,6 +169,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/oblique_mercator.html">oblique_mercator on Remote Sensing</A>
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author  Rueben Schulz
  */

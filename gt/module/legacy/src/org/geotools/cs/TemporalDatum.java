@@ -30,6 +30,7 @@ import org.geotools.units.Unit;
 /**
  * Procedure used to measure time.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

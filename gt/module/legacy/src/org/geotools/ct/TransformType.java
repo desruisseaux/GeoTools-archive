@@ -50,6 +50,7 @@ import org.opengis.ct.CT_TransformType;
 /**
  * Semantic type of transform used in coordinate transformation.
  *
+ * @source $URL$
  * @version 1.00
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

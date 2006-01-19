@@ -84,6 +84,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * {@link #setVisible setVisible}(true);
  * </pre></blockquote>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

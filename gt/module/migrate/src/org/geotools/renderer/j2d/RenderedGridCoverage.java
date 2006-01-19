@@ -89,6 +89,7 @@ import org.geotools.resources.image.DeferredPlanarImage;
  * in order to display an image in many {@link org.geotools.gui.swing.MapPane} with
  * different zoom.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

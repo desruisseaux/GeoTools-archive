@@ -22,6 +22,7 @@ package org.geotools.renderer.event;
 /**
  * Informations relatives to a rendering in progress.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

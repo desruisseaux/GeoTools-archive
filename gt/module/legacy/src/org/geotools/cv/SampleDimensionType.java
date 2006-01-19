@@ -46,6 +46,7 @@ import org.opengis.cv.CV_SampleDimensionType;
  * This interface is applicable to any coverage type.
  * For grid coverages, the sample dimension refers to an individual band.
  *
+ * @source $URL$
  * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux

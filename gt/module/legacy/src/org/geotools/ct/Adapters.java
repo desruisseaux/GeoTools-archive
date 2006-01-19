@@ -46,6 +46,7 @@ import org.opengis.referencing.FactoryException;
  * Provide methods for interoperability with OpenGIS CT package.
  * All methods accept null argument. All OpenGIS objects are suitable for RMI use.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

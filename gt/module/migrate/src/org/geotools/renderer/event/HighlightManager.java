@@ -31,6 +31,7 @@ import org.geotools.feature.Feature;
  * In addition, {@link MouseFeatureListener} objects can be
  * registered with the <code>HighlightManager</code>
  *
+ * @source $URL$
  * @version $Id$
  * @author Julian Elliott
  */

@@ -54,6 +54,7 @@ import org.geotools.measure.CoordinateFormat;
  * Most methods in this implementation are final for performance reason.
  * 
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

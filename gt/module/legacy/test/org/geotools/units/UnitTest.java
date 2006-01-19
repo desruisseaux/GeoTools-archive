@@ -41,6 +41,7 @@ import junit.framework.TestSuite;
 /**
  * Test the Unit class.
  *
+ * @source $URL$
  * @version $Id$
  * @author Philip Crotwell
  */

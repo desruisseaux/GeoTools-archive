@@ -41,6 +41,7 @@ import org.geotools.coverage.grid.Interpolator2D;
  * {@link GridCoverageTest}. Because we override {@link #transform}, tests will be performed
  * on {@link Interpolator2D} objects instead of default {@link GridCoverage2D}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

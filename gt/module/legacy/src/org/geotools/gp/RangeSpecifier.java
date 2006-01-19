@@ -51,6 +51,7 @@ import org.opengis.util.Cloneable;
  *
  * operation.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

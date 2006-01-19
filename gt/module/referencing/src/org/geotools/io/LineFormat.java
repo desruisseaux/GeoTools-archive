@@ -76,6 +76,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @todo This class is intented to be a subclass of {@link Format}.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

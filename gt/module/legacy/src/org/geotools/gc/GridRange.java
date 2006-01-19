@@ -42,6 +42,7 @@ import org.opengis.gc.GC_GridRange;
 /**
  * Defines a range of grid coverage coordinates.
  *
+ * @source $URL$
  * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux

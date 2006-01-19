@@ -26,6 +26,7 @@ package org.geotools.coverage.grid;
  * invoked while the grid geometry were built with a null
  * {@link org.opengis.coverage.grid.GridRange}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

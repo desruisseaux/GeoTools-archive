@@ -39,6 +39,7 @@ import org.geotools.resources.Utilities;
 /**
  * Brief description of ways in which the resource(s) is/are currently used.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

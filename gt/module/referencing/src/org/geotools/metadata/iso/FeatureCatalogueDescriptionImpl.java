@@ -39,6 +39,7 @@ import org.geotools.resources.Utilities;
 /**
  * Location of the responsible individual or organization.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

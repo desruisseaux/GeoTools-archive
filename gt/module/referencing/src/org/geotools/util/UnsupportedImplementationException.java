@@ -30,6 +30,7 @@ import org.geotools.resources.Utilities;
  * <A HREF="http://geoapi.sourceforge.net">GeoAPI</A> interface.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

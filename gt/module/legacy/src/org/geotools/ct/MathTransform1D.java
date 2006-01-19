@@ -34,6 +34,7 @@ import org.opengis.referencing.operation.TransformException;
  * <code>MathTransform1D</code> extends {@link MathTransform} by adding a simple method
  * transforming a value without the overhead of creating data array.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

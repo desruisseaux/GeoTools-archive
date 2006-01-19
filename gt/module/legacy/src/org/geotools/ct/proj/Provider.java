@@ -35,6 +35,7 @@ import org.geotools.resources.i18n.Vocabulary;
 /**
  * Base class for {@link MapProjection} provider.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -36,6 +36,7 @@ import org.geotools.resources.image.ImageUtilities;
 /**
  * Format grid coverage operation parameters in a tabular format.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -48,6 +48,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Base class for <cite>Well Know Text</cite> (WKT) parser.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux

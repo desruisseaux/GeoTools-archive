@@ -91,6 +91,7 @@ import org.opengis.referencing.operation.TransformException;
  * grid geometry which as the same geoferencing and a region. Grid range in the grid geometry
  * defines the region to subset in the grid coverage.<br>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

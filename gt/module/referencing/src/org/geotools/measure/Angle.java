@@ -37,6 +37,7 @@ import org.geotools.resources.ClassChanger;
  * into coincidence with another, generally measured in degrees, sexagesimal degrees or grads.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -47,6 +47,7 @@ import org.geotools.renderer.array.ArrayData;
  * This iterator is typically used for drawing a single {@link Polygon}, which
  * may be made of many {@link Polylines}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

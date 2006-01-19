@@ -39,6 +39,7 @@ import org.geotools.resources.Utilities;
 /**
  * Technical means and media by which a resource is obtained from the distributor.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

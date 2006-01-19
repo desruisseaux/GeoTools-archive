@@ -25,6 +25,7 @@ import org.geotools.feature.Feature;
  * The listener interface for receiving "interesting" mouse events (click, enter, and exit)
  * on a {@linkplain Feature feature}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Julian Elliott
  */

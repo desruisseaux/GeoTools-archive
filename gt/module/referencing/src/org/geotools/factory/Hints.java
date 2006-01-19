@@ -52,6 +52,7 @@ import org.geotools.resources.Utilities;
  * use of other services.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

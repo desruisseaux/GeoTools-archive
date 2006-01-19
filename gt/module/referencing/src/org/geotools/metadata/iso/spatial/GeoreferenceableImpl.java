@@ -41,6 +41,7 @@ import org.geotools.resources.Utilities;
  * system, whose individual cells can be geolocated using geolocation information
  * supplied with the data but cannot be geolocated from the grid properties alone.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

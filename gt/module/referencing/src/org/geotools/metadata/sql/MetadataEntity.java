@@ -37,6 +37,7 @@ import java.sql.SQLException;
  * a table name, and the method name is translated into a column name.
  * Then the information is fetch in the underlying metadata database.
  *
+ * @source $URL$
  * @version $Id$
  * @author Touraïvane
  * @author Martin Desruisseaux

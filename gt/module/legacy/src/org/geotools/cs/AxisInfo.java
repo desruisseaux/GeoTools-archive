@@ -43,6 +43,7 @@ import org.geotools.units.Unit;
  * Details of axis. This is used to label axes,
  * and indicate the orientation.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

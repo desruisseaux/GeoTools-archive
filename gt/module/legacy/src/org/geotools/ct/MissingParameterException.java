@@ -47,6 +47,7 @@ import org.opengis.referencing.FactoryException;
  * For example, this exception may be thrown when a map projection
  * was requested but the "semi_major" parameter was not specified.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

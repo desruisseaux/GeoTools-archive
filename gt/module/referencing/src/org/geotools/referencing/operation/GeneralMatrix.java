@@ -33,6 +33,7 @@ import org.opengis.spatialschema.geometry.Envelope;
  * A two dimensional array of numbers. Row and column numbering begins with zero.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

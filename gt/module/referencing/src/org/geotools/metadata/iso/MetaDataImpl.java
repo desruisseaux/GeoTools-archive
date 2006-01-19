@@ -51,6 +51,7 @@ import org.geotools.resources.Utilities;
 /**
  * Root entity which defines metadata about a resource or resources.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

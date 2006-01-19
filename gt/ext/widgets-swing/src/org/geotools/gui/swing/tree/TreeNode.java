@@ -26,6 +26,7 @@ package org.geotools.gui.swing.tree;
  * Swing's interface, which seems to have been forgotten in J2SE.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

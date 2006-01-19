@@ -30,6 +30,7 @@ import javax.imageio.event.IIOReadProgressListener;
  * convenience for creating listener objects.
  *
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  *
  * @since 2.1

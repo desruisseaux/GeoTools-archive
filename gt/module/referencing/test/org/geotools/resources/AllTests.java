@@ -27,6 +27,7 @@ import junit.textui.TestRunner;
 /**
  * Performs all tests for the <code>org.geotools.resources</code> packages.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -41,6 +41,7 @@ import org.opengis.referencing.operation.TransformException;
  * values.   By definition, the {@link #getSampleToGeophysics} method for this class returns
  * the identity transform, or <code>null</code> if this category is a qualitative one.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

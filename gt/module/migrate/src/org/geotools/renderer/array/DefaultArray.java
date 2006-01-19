@@ -37,6 +37,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * doesn't use any compression technic. However, subclasses may be mutable (i.e. support the
  * {@link #insertAt insertAt(...)} method) or compress data.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

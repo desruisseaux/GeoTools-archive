@@ -156,6 +156,7 @@ import org.geotools.util.ScopedName;
  * should override the {@link #adaptSQL} method.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Yann Cézard
  * @author Martin Desruisseaux

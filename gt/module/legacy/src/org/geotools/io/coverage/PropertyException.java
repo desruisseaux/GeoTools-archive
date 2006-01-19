@@ -40,6 +40,7 @@ import javax.imageio.IIOException;
  * The base class for error related to grid coverage's properties.
  * This exception is thrown by the helper class {@link PropertyParser}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

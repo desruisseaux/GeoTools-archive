@@ -33,6 +33,7 @@ import java.awt.geom.Point2D;
  * for corrections of apparent pixel position in order to get the position we would
  * have if no deformations existed.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

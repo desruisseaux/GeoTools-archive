@@ -32,6 +32,7 @@ import org.geotools.pt.Matrix;
  * For 2D identity transform, {@link java.awt.geom.AffineTransform} is already
  * optimized. For 1D transform, {@link IdentityTransform1D} is the class to use.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

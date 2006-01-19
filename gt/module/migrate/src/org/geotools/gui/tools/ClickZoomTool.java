@@ -21,6 +21,7 @@ package org.geotools.gui.tools;
  * map and then zoom in/out by the zoomFactor.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  */
 public interface ClickZoomTool extends Tool {

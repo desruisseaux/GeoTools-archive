@@ -31,6 +31,7 @@ import javax.naming.NamingException;
  * find connection parameters to an EPSG database. Using JNDI, such connection parameters can
  * be set in a J2EE environment.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

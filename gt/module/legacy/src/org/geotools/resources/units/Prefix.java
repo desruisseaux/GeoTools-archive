@@ -37,6 +37,7 @@ package org.geotools.resources.units;
  * de cette classe, et les divers resources seront mises à la disposition
  * du développeur via les méthodes statiques.
  *
+ * @source $URL$
  * @version 1.0
  * @author Martin Desruisseaux
  */

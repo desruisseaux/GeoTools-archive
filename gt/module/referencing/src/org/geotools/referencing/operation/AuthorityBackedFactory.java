@@ -61,6 +61,7 @@ import org.geotools.resources.CRSUtilities;
  * {@linkplain CoordinateOperation#getPositionalAccuracy positional accuracy}.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -40,6 +40,7 @@ import org.geotools.resources.Utilities;
 /**
  * Information about the media on which the resource can be distributed.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

@@ -89,6 +89,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * <p>&nbsp;</p>
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

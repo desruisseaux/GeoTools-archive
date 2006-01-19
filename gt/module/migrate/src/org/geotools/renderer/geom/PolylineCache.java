@@ -42,6 +42,7 @@ import org.geotools.util.WeakHashSet;
  * There is at most one instance of this class for each instance of {@link Polyline}. This
  * class is strictly for internal use by {@link PolygonPathIterator}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

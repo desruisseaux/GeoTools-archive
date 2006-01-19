@@ -44,6 +44,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * A graduation using dates on a linear axis.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

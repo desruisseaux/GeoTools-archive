@@ -82,6 +82,7 @@ import org.geotools.util.MonolineFormatter;
  * <code>{@linkplain FactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

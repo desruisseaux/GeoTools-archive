@@ -24,6 +24,7 @@ package org.geotools.gp;
  * Thrown by {@link GridCoverageProcessor} when an operation is queried
  * but has not been found.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

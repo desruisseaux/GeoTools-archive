@@ -53,6 +53,7 @@ import org.opengis.referencing.operation.TransformException;
  * interpolation (use the standard {@link GridCoverage} class for that).
  * It should work for other kinds of interpolation however.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -35,6 +35,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link Line} and {@link Plane} classes.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -55,6 +55,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Reports progress by sending email to the specified address at regular interval.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

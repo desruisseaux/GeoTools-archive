@@ -34,6 +34,7 @@ import javax.media.jai.CRIFImpl;
  * The image factory for the {@link Combine} operation.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux

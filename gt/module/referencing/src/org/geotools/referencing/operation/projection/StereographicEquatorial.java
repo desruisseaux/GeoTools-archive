@@ -64,6 +64,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * {@link #latitudeOfOrigin} == 0.0.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux

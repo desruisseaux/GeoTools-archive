@@ -41,6 +41,7 @@ import org.geotools.resources.i18n.Errors;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/equirectangular.html">"Equirectangular" on Remote Sensing</A>
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author John Grange
  * @author Martin Desruisseaux

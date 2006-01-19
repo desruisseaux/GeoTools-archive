@@ -30,6 +30,7 @@ import org.geotools.resources.Utilities;
  * A scalar with an unit.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

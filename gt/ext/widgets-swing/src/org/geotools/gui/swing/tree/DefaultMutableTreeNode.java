@@ -27,6 +27,7 @@ package org.geotools.gui.swing.tree;
  * implementation but seems to have been forgotten in all Swing interfaces.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

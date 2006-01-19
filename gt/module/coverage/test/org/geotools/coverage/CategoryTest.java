@@ -35,6 +35,7 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * Tests the {@link Category} implementation.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

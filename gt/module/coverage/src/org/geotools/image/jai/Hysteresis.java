@@ -47,6 +47,7 @@ import javax.media.jai.iterator.RandomIterFactory;
  * jusqu'à ce que le point indéterminé n'est plus de voisins satisfaisants.
  * 
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Lionel Flahaut
  * @author Martin Desruisseaux

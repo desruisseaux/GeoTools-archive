@@ -87,6 +87,7 @@ import org.geotools.util.NumberRange;
  * All {@code Category} objects are immutable and thread-safe.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

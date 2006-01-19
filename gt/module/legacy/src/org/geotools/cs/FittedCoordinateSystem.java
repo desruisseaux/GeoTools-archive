@@ -42,6 +42,7 @@ import org.geotools.resources.i18n.Errors;
  * any other math transform to inject itself into the base coordinate
  * system.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

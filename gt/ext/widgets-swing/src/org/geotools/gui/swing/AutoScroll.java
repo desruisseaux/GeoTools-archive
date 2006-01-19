@@ -47,6 +47,7 @@ import javax.swing.table.DefaultTableModel; // For JavaDoc only
  * </pre></blockquote>
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

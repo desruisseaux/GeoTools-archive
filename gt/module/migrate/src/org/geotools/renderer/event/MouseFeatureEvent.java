@@ -28,6 +28,7 @@ import org.geotools.feature.Feature;
  * {@link MouseFeatureListener} objects that have been registered with the
  * {@link HighlightManager}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Julian Elliott
  */

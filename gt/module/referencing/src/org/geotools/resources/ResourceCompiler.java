@@ -58,6 +58,7 @@ import java.util.StringTokenizer;
  * JAR file. They are used at compile time only and no other classes should keep reference to them.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

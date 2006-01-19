@@ -38,6 +38,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * ESRI includes a {@code scale_factor} parameter. 
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
  * @author Martin Desruisseaux

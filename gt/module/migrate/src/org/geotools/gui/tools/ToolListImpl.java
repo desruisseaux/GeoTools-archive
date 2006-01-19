@@ -32,6 +32,7 @@ import javax.swing.event.EventListenerList;
  * that.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  */
 public class ToolListImpl extends ArrayList implements ToolList {

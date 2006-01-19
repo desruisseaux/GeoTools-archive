@@ -35,6 +35,7 @@ package org.geotools.units;
  * sur une certaine unité. Cette exception peut être lancée lorsqu'une conversion est impossible,
  * ou qu'on ne peut pas multiplier une unité par une autre.
  *
+ * @source $URL$
  * @version 1.0
  * @author Steven R. Emmerson
  * @author Bill Hibbard

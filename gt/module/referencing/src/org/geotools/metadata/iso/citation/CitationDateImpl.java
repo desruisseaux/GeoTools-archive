@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
 /**
  * Reference date and event used to describe it.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

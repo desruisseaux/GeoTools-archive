@@ -52,6 +52,7 @@ import org.geotools.util.WeakHashSet;
  * que tout objet produit par {@link #format(Object)} soit lissible par {@link #parse(String)} <u>n'est
  * pas garanti</u> dans la version actuelle.
  *
+ * @source $URL$
  * @version 1.0
  * @author Martin Desruisseaux
  *

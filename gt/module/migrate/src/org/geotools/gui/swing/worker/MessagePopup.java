@@ -26,6 +26,7 @@ import javax.swing.UIManager;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class MessagePopup extends javax.swing.JDialog {
     // Variables declaration - do not modify

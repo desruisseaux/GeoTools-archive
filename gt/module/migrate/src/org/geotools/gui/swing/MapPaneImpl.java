@@ -59,6 +59,7 @@ import java.awt.geom.Point2D;
  * component changes size.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  *
  * @task REVISIT: We need to add a PixcelAspectRatio varible which defaults to

@@ -95,6 +95,7 @@ import org.geotools.resources.JDBC;
  * </TABLE>
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

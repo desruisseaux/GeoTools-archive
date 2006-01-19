@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
  * Base class for test on widgets. Widgets will be displayed only if the test is run
  * from the main method. Otherwise (i.e. if run from Maven), widgets are invisibles.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

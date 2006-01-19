@@ -38,6 +38,7 @@ import org.geotools.util.CheckedArrayList;
 /**
  * Basic information required to uniquely identify a resource or resources.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

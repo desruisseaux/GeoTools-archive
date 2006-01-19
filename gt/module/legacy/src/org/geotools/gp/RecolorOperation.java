@@ -54,6 +54,7 @@ import org.geotools.resources.image.ColorUtilities;
  * are category names as {@link String}. Values are colors as <code>Color[]</code>. The
  * <code>null</code> key is a special value meaning "any quantitative category".
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

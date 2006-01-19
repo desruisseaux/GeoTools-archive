@@ -51,6 +51,7 @@ import org.geotools.resources.i18n.DescriptionKeys;
 /**
  * An image decoder for matrix of floating-point numbers.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

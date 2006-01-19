@@ -28,6 +28,7 @@ import javax.imageio.stream.ImageInputStream;
 /**
  * Wraps an {@link ImageInputStream} into a standard {@link java.io.InputStream}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

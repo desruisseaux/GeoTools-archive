@@ -40,6 +40,7 @@ import org.geotools.factory.Hints;
  * Resample a grid coverage using a different grid geometry.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

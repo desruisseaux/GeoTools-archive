@@ -65,6 +65,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * projection. This is similar but <strong>NOT</strong> equal to EPSG code 9809.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux

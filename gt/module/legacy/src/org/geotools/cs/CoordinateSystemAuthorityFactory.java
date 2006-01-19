@@ -65,6 +65,7 @@ import org.opengis.referencing.FactoryException;
  * A commonly used authority is EPSG, which is also
  * used in the GeoTIFF standard.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

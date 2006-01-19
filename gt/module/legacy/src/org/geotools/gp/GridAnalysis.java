@@ -43,6 +43,7 @@ import org.geotools.gc.GridCoverage;
  * Performs various analysis operations on a grid coverage.
  * Note: this class is not yet implemented.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -58,6 +58,7 @@ import org.opengis.gc.GC_ParameterInfo;
  * OpenGIS specification and its API is significantly different from Java
  * Advanced Imaging.
  *
+ * @source $URL$
  * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux

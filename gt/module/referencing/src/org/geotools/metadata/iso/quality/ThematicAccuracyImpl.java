@@ -30,6 +30,7 @@ import org.opengis.metadata.quality.ThematicAccuracy;
  * Accuracy of quantitative attributes and the correctness of non-quantitative attributes
  * and of the classifications of features and their relationships.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

@@ -49,6 +49,7 @@ import org.geotools.resources.Utilities;
  *  {@linkplain #getDescription description}.
  *  At least one of the four shall be used.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

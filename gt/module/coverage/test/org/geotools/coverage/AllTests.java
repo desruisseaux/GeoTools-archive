@@ -29,6 +29,7 @@ import junit.textui.TestRunner;
 /**
  * Performs all tests for the <code>org.geotools.coverage</code> packages and its dependencies.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

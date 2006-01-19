@@ -29,6 +29,7 @@ import org.opengis.metadata.quality.AccuracyOfATimeMeasurement;
 /**
  * Correctness of the temporal references of an item (reporting of error in time measurement).
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

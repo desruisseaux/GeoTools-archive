@@ -54,6 +54,7 @@ import org.geotools.resources.i18n.Errors;
  * {@link CoordinateReferenceSystem}.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

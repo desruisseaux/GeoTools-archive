@@ -46,6 +46,7 @@ import org.geotools.resources.Arguments;
  * spherical tests here tests real spheres (tests in <code>"Simple"</code> test scripts
  * are not exactly spherical).
  *
+ * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
  */

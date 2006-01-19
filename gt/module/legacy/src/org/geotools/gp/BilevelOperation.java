@@ -32,6 +32,7 @@ import org.geotools.cv.SampleDimension;
  * Wraps any JAI operation producing a bilevel image. An example of such operation is
  * {@link BinarizeDescriptor Binarize}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

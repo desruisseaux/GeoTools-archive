@@ -71,6 +71,7 @@ import org.geotools.resources.i18n.Errors;
  * @task REVISIT: this code is identical to the oblique except for 6 lines.
  *                It could be moved to the oblique with an isEquatorial flag.
  *
+ * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
  *

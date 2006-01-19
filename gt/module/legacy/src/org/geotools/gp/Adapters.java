@@ -34,6 +34,7 @@ import org.opengis.gc.GC_GridCoverage;
  * Provide methods for interoperability with OpenGIS GC package.
  * All methods accept null argument.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -17,6 +17,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * It is rather used for debugging purpose, as well as rendering lines in some simplier
  * context (e.g. {@link org.geotools.gui.swing.Plot2D}).
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

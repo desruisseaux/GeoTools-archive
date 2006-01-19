@@ -82,6 +82,7 @@ import org.geotools.resources.XMath;
  * <p align="center"><img src="doc-files/Plot2D.png"></p>
  * <p>&nbsp;</p>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

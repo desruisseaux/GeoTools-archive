@@ -45,6 +45,7 @@ import org.geotools.util.LocalName;
  * ship or satellite).
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

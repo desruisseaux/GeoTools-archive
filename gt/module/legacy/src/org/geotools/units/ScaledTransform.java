@@ -38,6 +38,7 @@ import org.geotools.resources.i18n.Errors;
  * Représente une transformation entre deux unités
  * qui diffèrent seulement par un facteur d'échelle.
  *
+ * @source $URL$
  * @version 1.0
  * @author Martin Desruisseaux
  *

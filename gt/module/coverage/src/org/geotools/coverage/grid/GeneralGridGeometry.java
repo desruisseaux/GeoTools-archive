@@ -72,6 +72,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * use {@link #isDefined}.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Alessio Fabiani

@@ -38,6 +38,7 @@ package org.geotools.units;
  * ce type, et nous en avons parfois besoin pour interagir avec des
  * logiciels existants...
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

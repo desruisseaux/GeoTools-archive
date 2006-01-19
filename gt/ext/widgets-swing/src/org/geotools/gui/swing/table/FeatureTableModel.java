@@ -29,6 +29,7 @@ import org.geotools.feature.FeatureType;
  * An implementation of Swing's table model which allows feature tables to be displayed.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author James Macgill, CCG
  *

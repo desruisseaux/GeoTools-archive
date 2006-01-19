@@ -44,6 +44,7 @@ import org.opengis.referencing.operation.TransformException;
  * points of <code>line</code>. This scalar product can be viewed as a sort of measure of the distance
  * between the start of <code>line</code> and the intersection point.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

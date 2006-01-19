@@ -77,6 +77,7 @@ import org.opengis.referencing.operation.TransformException;
  *   <li>The loop is reexecuted from step 1 until no more polylines have been merged.</li>
  * </ol>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

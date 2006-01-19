@@ -44,6 +44,7 @@ import org.geotools.coverage.grid.GridCoverageTest;
 /**
  * Tests the {@link MetadataBuilder} implementation.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

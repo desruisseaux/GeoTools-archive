@@ -53,6 +53,7 @@ import org.geotools.resources.Utilities;
  * capability, no user interaction and ignores the coordinate system. It is just
  * for quick test of grid coverage.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -35,6 +35,7 @@ import org.geotools.util.ProgressListener;
  * Test {@link ProgressWindow}. The window will be displayed only if this test
  * is executed through its {@link #main main} method.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

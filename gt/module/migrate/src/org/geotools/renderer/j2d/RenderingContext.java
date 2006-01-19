@@ -74,6 +74,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * &nbsp;&nbsp;&nbsp;{@link #deviceCS}
  * </p>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

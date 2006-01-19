@@ -88,6 +88,7 @@ import org.geotools.util.NumberRange;
  * in the class name.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

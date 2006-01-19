@@ -99,6 +99,7 @@ import org.geotools.resources.i18n.Errors;
  * @see <A HREF="http://srmwww.gov.bc.ca/gis/bceprojection.html">British Columbia Albers Standard Projection</A>
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
  */

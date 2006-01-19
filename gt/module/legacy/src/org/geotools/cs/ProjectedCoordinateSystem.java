@@ -49,6 +49,7 @@ import org.opengis.cs.CS_Projection;
  * Conversions to, and conversions between, projected spatial coordinate
  * systems often do not preserve distances, areas and angles.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

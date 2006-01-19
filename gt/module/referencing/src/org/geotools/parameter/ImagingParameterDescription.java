@@ -38,6 +38,7 @@ import org.geotools.util.AbstractInternationalString;
  * This is used by {@link ImagingParameterDescriptors}.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

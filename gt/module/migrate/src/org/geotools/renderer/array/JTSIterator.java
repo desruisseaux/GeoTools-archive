@@ -41,6 +41,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 /**
  * Itérateur balayant les données d'un tableau {@link JTSArray}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

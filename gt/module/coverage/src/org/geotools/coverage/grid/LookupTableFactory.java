@@ -39,6 +39,7 @@ import org.geotools.util.WeakValueHashMap;
  * A factory for {@link LookupTableJAI} objects built from an array of {@link MathTransform1D}.
  * This factory is used internally by {@link GridCoverage#createGeophysics}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

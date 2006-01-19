@@ -19,6 +19,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Pan the map so that the new extent has the click point in the middle of the
  * map and then zoom in/out by the zoomFactor.
  * 
+ * @source $URL$
  * @version $Id$
  * @author Cameron Shorter
  */

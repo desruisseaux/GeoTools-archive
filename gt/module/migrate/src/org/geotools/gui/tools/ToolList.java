@@ -30,6 +30,7 @@ import org.geotools.gui.tools.event.SelectedToolListener;
  * that.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  */
 public interface ToolList extends List {

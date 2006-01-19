@@ -32,6 +32,7 @@ import org.geotools.resources.Arguments;
 /**
  * Test the {@link MonolineFormatter} class.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

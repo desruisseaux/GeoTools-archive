@@ -33,6 +33,7 @@ import org.geotools.units.Unit;
 /**
  * A one-dimensional coordinate system suitable for time measurements.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

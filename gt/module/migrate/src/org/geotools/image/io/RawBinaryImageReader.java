@@ -91,6 +91,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  *       subclass setting the <code>padValue</code> field.</li>
  * </ul>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

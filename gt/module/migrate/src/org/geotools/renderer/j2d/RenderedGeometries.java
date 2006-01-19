@@ -75,6 +75,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * used for isobaths. Each isobath (e.g. sea-level, 50 meters, 100 meters...) may be rendererd
  * with an instance of <code>RenderedGeometries</code>.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

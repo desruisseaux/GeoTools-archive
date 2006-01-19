@@ -42,6 +42,7 @@ import org.geotools.resources.Utilities;
 /**
  * Type of test applied to the data specified by a data quality scope.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

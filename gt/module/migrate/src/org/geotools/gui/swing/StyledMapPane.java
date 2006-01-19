@@ -59,6 +59,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * A map pane which support styling.
  *
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  */
 public class StyledMapPane extends MapPane {

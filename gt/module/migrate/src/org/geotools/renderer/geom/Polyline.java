@@ -83,6 +83,7 @@ import org.opengis.referencing.operation.TransformException;
  *
  * <p align="center"><img src="doc-files/borders.png"></p>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

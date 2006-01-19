@@ -74,6 +74,7 @@ import org.opengis.referencing.FactoryException;
  * A default instance of the <code>Adapters</code> classes is provided in the
  * {@link org.geotools.ct.Adapters#getDefault() org.geotools.ct} package.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

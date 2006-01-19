@@ -48,6 +48,7 @@ import org.geotools.referencing.operation.transform.AffineTransform2D;
 /**
  * Tests the {@link WarpTransform2D} and {@link WarpAdapter} classes.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

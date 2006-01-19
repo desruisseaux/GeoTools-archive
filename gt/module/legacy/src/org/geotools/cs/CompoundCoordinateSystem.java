@@ -41,6 +41,7 @@ import org.opengis.cs.CS_CoordinateSystem;
  * geographic or a projected coordinate system with a horizontal datum.
  * The other is a one-dimensional coordinate system with a vertical datum.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

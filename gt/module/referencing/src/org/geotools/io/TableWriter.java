@@ -66,6 +66,7 @@ import org.geotools.resources.XArray;
  *      Yvan        Dubois
  * </pre></blockquote>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

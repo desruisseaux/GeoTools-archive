@@ -77,6 +77,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Image Manipulation</A> in the <cite>Programming in Java Advanced Imaging</cite> guide.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Alessio Fabiani

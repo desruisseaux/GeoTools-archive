@@ -63,6 +63,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * <a href="http://java.sun.com/products/java-media/jai/">Java Advanced Imaging</a>
  * operators after reading.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -38,6 +38,7 @@ import org.geotools.resources.geometry.XRectangle2D;
 /**
  * Immutable version of a serializable, high-performance double-precision rectangle.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

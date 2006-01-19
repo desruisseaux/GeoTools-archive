@@ -86,6 +86,7 @@ import org.geotools.resources.LazySet;
  * wrapper around a {@code FactoryRegistry} instance.</P>
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

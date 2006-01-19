@@ -80,6 +80,7 @@ import org.geotools.util.NumberRange;
  * way to check if a grid coverages is a result of a resample operation.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

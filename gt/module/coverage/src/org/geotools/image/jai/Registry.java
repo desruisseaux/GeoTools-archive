@@ -43,6 +43,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * A set of static methods for managing JAI's {@linkplain OperationRegistry operation registry}.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

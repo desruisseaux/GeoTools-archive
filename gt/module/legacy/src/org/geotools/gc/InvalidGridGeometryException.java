@@ -26,6 +26,7 @@ package org.geotools.gc;
  * this exception is thrown when {@link GridGeometry#getGridRange() getGridRange()} is
  * invoked while the grid geometry were built with a null {@link GridRange}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

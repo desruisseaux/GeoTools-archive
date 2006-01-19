@@ -78,6 +78,7 @@ import org.geotools.referencing.AbstractIdentifiedObject;
  * parameter), the parameter name is a suffisient key.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux

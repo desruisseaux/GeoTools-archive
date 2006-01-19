@@ -39,6 +39,7 @@ import org.geotools.resources.i18n.Errors;
  * implementation in that it is "extensible", i.e. the number of parameters depends of the
  * number of row and column in the matrix. 
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -59,6 +59,7 @@ import org.geotools.util.SimpleInternationalString;
  * {@link org.geotools.referencing.FactoryFinder} will uses it only if it has been unable
  * to get a connection to a more suitable database like EPSG.
  *
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  * @author Rueben Schulz

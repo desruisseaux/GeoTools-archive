@@ -49,6 +49,7 @@ import org.geotools.util.CheckedHashSet;
  * However, subclasses are required to overrides the {@link #freeze} method.</P>
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  * @author Martin Desruisseaux

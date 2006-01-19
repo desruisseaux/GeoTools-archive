@@ -39,6 +39,7 @@ import org.geotools.resources.XMath;
  * The static method {@link #roots(double[])} can be used for computing the root of a polynomial
  * equation without creating a {@code Polygon} object.
  *
+ * @source $URL$
  * @version $Id$
  * @author Ken Turkiwski
  * @author Martin Desruisseaux

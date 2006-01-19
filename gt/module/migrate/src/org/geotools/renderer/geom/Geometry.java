@@ -80,6 +80,7 @@ import org.geotools.math.Statistics;
  * <code>Geometry</code>s can {@linkplain #compress compress} and share their internal data in
  * order to reduce memory footprint.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

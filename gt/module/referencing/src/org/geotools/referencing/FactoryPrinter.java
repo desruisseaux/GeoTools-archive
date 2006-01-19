@@ -46,6 +46,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Prints a list of factory. This is used for {@link FactoryFinder#listProviders}
  * implementation only.
  *
+ * @source $URL$
  * @version $Id$
  * @author Desruisseaux
  */

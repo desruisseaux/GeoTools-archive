@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
  * A factory for {@link GenericName} objects.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author  Martin Desruisseaux
  */

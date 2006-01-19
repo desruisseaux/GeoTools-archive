@@ -53,6 +53,7 @@ import org.geotools.resources.XArray;
  * {@linkplain ParameterDescriptorGroup operation parameter group}.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

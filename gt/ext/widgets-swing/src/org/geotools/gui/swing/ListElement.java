@@ -35,6 +35,7 @@ import org.geotools.resources.Utilities;
  * element's default {@link Object#toString} method. This is specially usefull for
  * localizable elements.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

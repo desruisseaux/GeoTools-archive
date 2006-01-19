@@ -80,6 +80,7 @@ import org.opengis.referencing.FactoryException;
  * that use feet units.  This factory lets an application create such a hybrid
  * coordinate system.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

@@ -29,6 +29,7 @@ import org.opengis.metadata.quality.NonQuantitativeAttributeCorrectness;
 /**
  * Correctness of non-quantitative attributes.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

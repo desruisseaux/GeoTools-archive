@@ -34,6 +34,7 @@ import javax.swing.event.InternalFrameListener;
  * {@link Frame} and {@link JInternalFrame}.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

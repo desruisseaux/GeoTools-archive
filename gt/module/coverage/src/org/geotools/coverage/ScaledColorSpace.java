@@ -35,6 +35,7 @@ import org.geotools.resources.Utilities;
  *       computing grayscales).
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

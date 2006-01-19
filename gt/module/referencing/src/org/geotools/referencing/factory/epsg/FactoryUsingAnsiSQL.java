@@ -53,6 +53,7 @@ import org.geotools.referencing.factory.FactoryGroup;
  *   </li>
  * </ul>
  *
+ * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
  * @author Martin Desruisseaux

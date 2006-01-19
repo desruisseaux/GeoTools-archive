@@ -35,6 +35,7 @@ import org.opengis.util.Cloneable;
  * cet ordre: {@link #nextX} d'abord, suivit de {@link #nextY}. Tout manquement à cette règle (par
  * exemple appeller {@link #nextX} deux fois de suite) peut produire des résultats erronées.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

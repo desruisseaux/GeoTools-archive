@@ -68,6 +68,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * @see <A HREF="http://mathworld.wolfram.com/OrthographicProjection.html">Orthographic projection on mathworld.wolfram.com</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/orthographic.html">"Orthographic" on www.remotesensing.org</A>
  *
+ * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
  *

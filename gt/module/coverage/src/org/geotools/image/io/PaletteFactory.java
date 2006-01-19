@@ -71,6 +71,7 @@ import org.geotools.resources.image.ColorUtilities;
  * map size. RGB codes will be automatically interpolated RGB values when needed.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

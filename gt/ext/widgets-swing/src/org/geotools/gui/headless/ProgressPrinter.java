@@ -39,6 +39,7 @@ import org.geotools.util.ProgressListener;
  * notifications without stoping the lenghtly task.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

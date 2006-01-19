@@ -50,6 +50,7 @@ import org.geotools.ct.CoordinateTransformationFactory; // For Javadoc
  * GridCoverageProcessor processor = new GridCoverageProcessor(hints);
  * </pre></blockquote>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

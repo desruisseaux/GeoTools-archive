@@ -65,6 +65,7 @@ import org.geotools.util.NameFactory;
  * However, other methods may be overriden as well for better performances.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

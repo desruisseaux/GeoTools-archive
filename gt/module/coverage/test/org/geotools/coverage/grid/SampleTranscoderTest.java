@@ -54,6 +54,7 @@ import org.geotools.referencing.operation.transform.IdentityTransform;
  * Test the {@link SampleTranscoder} implementation. Image adapter depends
  * heavily on {@link CategoryList}, so this one should be tested first.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

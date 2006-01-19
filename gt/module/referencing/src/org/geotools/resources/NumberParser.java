@@ -16,6 +16,7 @@ package org.geotools.resources;
 
 /**
  * A faster implementation of {@link Double#parseDouble}.
+ * @source $URL$
  */
 public final class NumberParser {
   boolean	isExceptional;

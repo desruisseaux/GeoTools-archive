@@ -23,6 +23,7 @@ import java.util.logging.Logger;
  * Factory for constructing Tool classes.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  */
 public abstract class ToolFactory {

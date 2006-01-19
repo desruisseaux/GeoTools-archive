@@ -48,6 +48,7 @@ import org.opengis.cs.CS_LinearUnit;
  * the measurement of the shape and the size of the Earth to approximate
  * the geoid as close as possible.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

@@ -31,6 +31,7 @@ import java.util.AbstractList;
  * An unmodifiable view of an array.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

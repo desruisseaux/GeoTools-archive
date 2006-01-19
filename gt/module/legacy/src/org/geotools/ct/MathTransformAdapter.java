@@ -43,6 +43,7 @@ import org.opengis.referencing.operation.TransformException;
  * serializable if the underlying {@link CT_MathTransform} is
  * serializable too.
  *
+ * @source $URL$
  * @version 1.0
  * @author Martin Desruisseaux
  *

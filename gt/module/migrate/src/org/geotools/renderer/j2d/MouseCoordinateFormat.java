@@ -43,6 +43,7 @@ import org.geotools.cs.GeographicCoordinateSystem;
  * {@linkplain Renderer#getCoordinateSystem renderer's coordinate system}), but
  * is usually two-dimensional.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

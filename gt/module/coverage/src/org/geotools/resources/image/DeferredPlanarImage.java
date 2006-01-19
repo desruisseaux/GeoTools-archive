@@ -74,6 +74,7 @@ import org.geotools.util.WeakValueHashMap;
  * jour cette tuile.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux

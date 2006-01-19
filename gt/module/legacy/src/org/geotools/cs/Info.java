@@ -70,6 +70,7 @@ import org.opengis.util.InternationalString;
  *       All of the other metadata items should be left empty.</li>
  * </ul>
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

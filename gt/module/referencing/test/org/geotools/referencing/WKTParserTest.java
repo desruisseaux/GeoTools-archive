@@ -46,6 +46,7 @@ import org.geotools.resources.TestData;
 /**
  * Test the WKT {@link Parser} implementation.
  *
+ * @source $URL$
  * @version $Id$
  * @author Yann Cézard
  * @author Remi Eve

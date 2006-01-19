@@ -32,6 +32,7 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * Concatenated transform in which the resulting transform is one-dimensional.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

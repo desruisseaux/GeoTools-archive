@@ -39,6 +39,7 @@ import org.geotools.resources.Utilities;
 /**
  * Keywords, their type and reference source.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

@@ -35,6 +35,7 @@ import org.geotools.resources.Utilities;
 /**
  * Range of wavelengths in the electromagnetic spectrum.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

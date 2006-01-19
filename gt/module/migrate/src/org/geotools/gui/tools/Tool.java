@@ -29,6 +29,7 @@ import org.geotools.map.MapContext;
  * the Context (like the AreaOfInterest).
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  */
 public abstract interface Tool {

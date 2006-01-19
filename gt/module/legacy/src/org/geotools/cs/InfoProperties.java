@@ -39,6 +39,7 @@ import org.opengis.cs.CS_Info;
  * this map is used only internally by {@link Info} objects,   users don't need to
  * know those short-comming.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

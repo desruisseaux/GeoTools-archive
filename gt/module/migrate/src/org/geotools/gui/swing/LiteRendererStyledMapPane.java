@@ -49,6 +49,7 @@ import com.vividsolutions.jts.geom.Envelope;
 /**
  *  
  * @author jeichar
+ * @source $URL$
  */
 public class LiteRendererStyledMapPane extends ZoomPane{
 

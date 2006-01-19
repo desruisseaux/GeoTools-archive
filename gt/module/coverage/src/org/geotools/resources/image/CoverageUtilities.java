@@ -40,6 +40,7 @@ import org.geotools.coverage.grid.RenderedCoverage;
  * rigorous; must of them should be seen as temporary implementations.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

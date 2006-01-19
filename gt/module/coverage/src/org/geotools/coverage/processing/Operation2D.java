@@ -43,6 +43,7 @@ import org.geotools.referencing.NamedIdentifier;
  * An operation working on {@link GridCoverage2D} sources.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

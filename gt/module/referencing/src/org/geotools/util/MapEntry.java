@@ -35,6 +35,7 @@ import org.geotools.resources.Utilities;
  * key-value pairs. This entry is immutable by default.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

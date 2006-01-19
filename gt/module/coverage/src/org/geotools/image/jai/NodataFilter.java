@@ -45,6 +45,7 @@ import org.geotools.resources.XMath;
  * by the computed average. Otherwise, the {@code NaN} value is left unchanged.
  * 
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Lionel Flahaut
  * @author Martin Desruisseaux

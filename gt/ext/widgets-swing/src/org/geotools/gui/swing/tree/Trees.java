@@ -35,6 +35,7 @@ import org.geotools.resources.XArray;
  * Convenience static methods for trees operations.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

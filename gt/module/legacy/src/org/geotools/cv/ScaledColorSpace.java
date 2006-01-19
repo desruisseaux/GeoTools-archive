@@ -33,6 +33,7 @@ import org.geotools.resources.Utilities;
  *       Future implementation will be differents (interpolate in a color table
  *       instead of computing grayscales).
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

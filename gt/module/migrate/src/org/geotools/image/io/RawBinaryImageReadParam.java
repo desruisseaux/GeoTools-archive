@@ -47,6 +47,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * width and height. The <code>RawBinaryImageReadParam</code> gives a chance
  * to specify those missing informations.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

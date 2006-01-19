@@ -78,6 +78,7 @@ import java.util.logging.Logger;
  *             description.
  *
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  */
 public final class FactoryFinder {

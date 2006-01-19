@@ -123,6 +123,7 @@ import org.opengis.pt.PT_Envelope;
  * OpenGIS's metadata are called "Properties" in <em>Java Advanced Imaging</em>.
  * Use {@link #getProperty} instead.
  *
+ * @source $URL$
  * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux

@@ -44,6 +44,7 @@ import org.geotools.resources.i18n.Errors;
  * The result is a tree, which can be printed with {@link #print}.
  * Elements can be pull in a <cite>first in, first out</cite> order.
  *
+ * @source $URL$
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux

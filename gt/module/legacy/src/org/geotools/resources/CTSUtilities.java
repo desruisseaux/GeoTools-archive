@@ -59,6 +59,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * "official" package, but instead in this private one. <strong>Do not rely on
  * this API!</strong> It may change in incompatible way in any future version.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

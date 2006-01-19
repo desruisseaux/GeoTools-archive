@@ -31,6 +31,7 @@ import org.geotools.resources.i18n.Errors;
  * Thrown when a {@link CoordinateSystemAuthorityFactory}
  * can't find a requested authority code.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

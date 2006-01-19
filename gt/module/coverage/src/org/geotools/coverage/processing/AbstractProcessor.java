@@ -56,6 +56,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Base class for {@linkplain Coverage coverage} processor implementations.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

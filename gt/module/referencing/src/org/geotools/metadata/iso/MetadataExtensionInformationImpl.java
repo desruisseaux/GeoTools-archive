@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
 /**
  * Information describing metadata extensions.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

@@ -44,6 +44,7 @@ import org.geotools.ct.CoordinateTransformationFactory;
  * Rendering hints can be used to control some low-level details, like the expected
  * resolution.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

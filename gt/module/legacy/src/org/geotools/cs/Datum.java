@@ -44,6 +44,7 @@ import org.opengis.cs.CS_DatumType;
  * behavior (such as the rate of change of the orientation of the coordinate
  * axes).
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

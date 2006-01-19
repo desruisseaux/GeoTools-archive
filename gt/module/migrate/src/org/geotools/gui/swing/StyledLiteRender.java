@@ -38,6 +38,7 @@ import org.geotools.renderer.j2d.StyledMapRenderer;
  * </p>
  * @author jeichar
  * @since 0.9.0
+ * @source $URL$
  */
 public class StyledLiteRender extends StyledMapRenderer {
 

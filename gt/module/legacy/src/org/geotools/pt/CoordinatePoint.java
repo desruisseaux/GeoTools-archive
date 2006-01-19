@@ -39,6 +39,7 @@ import org.opengis.util.Cloneable;
  * where <code>numDim</code> is the dimension of the coordinate system
  * the coordinate point belongs in.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -39,6 +39,7 @@ import org.geotools.resources.Utilities;
 /**
  * Quality information for the data specified by a data quality scope.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

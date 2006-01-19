@@ -38,6 +38,7 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 /**
  * A temporal datum defines the origin of a temporal coordinate reference system.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

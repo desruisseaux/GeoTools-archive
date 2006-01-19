@@ -44,6 +44,7 @@ import org.opengis.cs.CS_ProjectionParameter;
 /**
  * A projection from geographic coordinates to projected coordinates.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

@@ -39,6 +39,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * specified. The "0" should be understood as the <em>minimal</em> number of sources required.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux

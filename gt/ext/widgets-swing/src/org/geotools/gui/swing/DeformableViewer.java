@@ -34,6 +34,7 @@ import java.awt.geom.Point2D;
  * have if no deformations existed.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

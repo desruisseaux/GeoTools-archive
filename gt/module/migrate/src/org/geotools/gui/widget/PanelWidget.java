@@ -21,6 +21,7 @@ package org.geotools.gui.widget;
  * A widget which contains the same functionality as a JPanel.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  *
  * @deprecated

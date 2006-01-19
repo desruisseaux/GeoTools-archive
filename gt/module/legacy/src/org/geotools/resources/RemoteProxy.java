@@ -36,6 +36,7 @@ import java.rmi.RemoteException;
  * <br><br>
  * This interface is used internally by Geotools implementations only, for optimization purpose.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

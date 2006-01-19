@@ -29,6 +29,7 @@ import org.geotools.resources.Utilities;
  * Color space for images storing pixels as real numbers.
  *
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  *
  * @since 2.1

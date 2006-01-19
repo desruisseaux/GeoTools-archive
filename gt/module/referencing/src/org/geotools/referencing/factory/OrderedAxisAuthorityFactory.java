@@ -71,6 +71,7 @@ import org.geotools.metadata.iso.citation.CitationImpl;
  * </pre></blockquote>
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

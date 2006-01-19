@@ -28,6 +28,7 @@ import java.util.EventListener;
  * are indicated by an {@link java.awt.geom.AffineTransform}.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

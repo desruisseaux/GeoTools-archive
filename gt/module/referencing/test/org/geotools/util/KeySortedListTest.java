@@ -34,6 +34,7 @@ import junit.framework.TestSuite;
 /**
  * Tests {@link KeySortedList}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

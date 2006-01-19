@@ -46,6 +46,7 @@ import org.geotools.resources.Utilities;
  * {@linkplain CoordinateSystemAxis coordinate system axis} with which it is combined to
  * create a {@linkplain VerticalCRS vertical CRS}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

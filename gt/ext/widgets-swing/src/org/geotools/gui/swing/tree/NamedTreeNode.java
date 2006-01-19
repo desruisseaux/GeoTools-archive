@@ -30,6 +30,7 @@ import javax.swing.JTree;
  * with a custom label.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

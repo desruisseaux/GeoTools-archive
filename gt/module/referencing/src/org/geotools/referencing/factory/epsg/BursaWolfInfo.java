@@ -23,6 +23,7 @@ package org.geotools.referencing.factory.epsg;
 /**
  * Private structure for {@link FactoryUsingSQL#createBursaWolfParameters} usage.
  * 
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -25,6 +25,7 @@ package org.geotools.referencing.factory.epsg;
  * be translated into ANSI SQL later by {@link FactoryUsingSQL#adaptSQL} if needed).
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

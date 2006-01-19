@@ -60,6 +60,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * gain yet more control on character encoding by overriding the {@link #getCharset}
  * method.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

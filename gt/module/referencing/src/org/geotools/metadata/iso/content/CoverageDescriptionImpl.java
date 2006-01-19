@@ -34,6 +34,7 @@ import org.opengis.metadata.content.RangeDimension;
 /**
  * Information about the content of a grid data cell.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

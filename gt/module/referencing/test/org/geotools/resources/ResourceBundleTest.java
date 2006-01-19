@@ -34,6 +34,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
 /**
  * Tests the {@link ResourceBundle} class, especially {@link Vocabulary}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

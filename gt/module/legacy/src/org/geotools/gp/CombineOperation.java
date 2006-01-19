@@ -44,6 +44,7 @@ import org.geotools.image.jai.CombineDescriptor;
  * "{@linkplain BandCombineDescriptor BandCombine}" if the operation has
  * only one source.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

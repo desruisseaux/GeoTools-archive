@@ -24,6 +24,7 @@ package org.geotools.ct;
  * A one dimensional, identity transform. Output values are identical to input values.
  * This class is really a special case of {@link LinearTransform1D} optimized for speed.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

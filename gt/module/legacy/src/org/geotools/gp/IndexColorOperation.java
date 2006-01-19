@@ -46,6 +46,7 @@ import org.geotools.resources.image.ColorUtilities;
  * Operation applied only on image's colors. This operation work
  * only for source image using an {@link IndexColorModel}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

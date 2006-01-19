@@ -48,6 +48,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * space.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  * @author Rueben Schulz

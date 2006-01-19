@@ -43,6 +43,7 @@ import org.opengis.referencing.operation.TransformException;
  * and a {@linkplain #getMargin margin} in dots (or pixels) to keep between the legend and
  * widget's borders.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -33,6 +33,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Acts as a typed {@link java.util.List} while we wait for Java 5.0.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux

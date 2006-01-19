@@ -72,6 +72,7 @@ import org.geotools.util.WeakValueHashMap;
  * "<cite>Digital Chart of the World</cite>").
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

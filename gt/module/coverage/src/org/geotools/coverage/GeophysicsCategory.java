@@ -46,6 +46,7 @@ import org.geotools.util.NumberRange;
  * the identity transform, or {@code null} if this category is a qualitative one.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

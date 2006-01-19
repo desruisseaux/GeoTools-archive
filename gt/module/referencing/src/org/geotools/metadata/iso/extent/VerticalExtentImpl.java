@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
 /**
  * Vertical domain of dataset.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

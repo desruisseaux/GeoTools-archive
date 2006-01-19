@@ -32,6 +32,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link DisjointSet} class.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

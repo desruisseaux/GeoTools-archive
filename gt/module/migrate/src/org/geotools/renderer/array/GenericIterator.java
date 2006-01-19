@@ -41,6 +41,7 @@ import java.awt.geom.Point2D;
 /**
  * Itérateur balayant les données d'un tableau {@link GenericArray}.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

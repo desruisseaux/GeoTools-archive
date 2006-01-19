@@ -63,6 +63,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * Subclasses must declare <code>implements&nbsp;MathTransform2D</code>
  * themself if they know to maps two-dimensional coordinate systems.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

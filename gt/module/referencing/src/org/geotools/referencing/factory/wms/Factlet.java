@@ -36,6 +36,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 /**
  * Mini Plug-In API for {@linkplain ProjectedCRS projected CRS} from the {@code AUTO} authority.
  *
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  * @author Rueben Schulz

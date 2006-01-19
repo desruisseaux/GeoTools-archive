@@ -27,6 +27,7 @@ import org.geotools.cs.CoordinateSystem;
  * Thrown by {@link MapProjection} when a map projection failed because the point is
  * outside the envelope of validity. Bounds are usually 90°S to 90°N and 180°W to 180°E.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

@@ -51,6 +51,7 @@ import org.geotools.gui.swing.table.FeatureTableModel;
  * Tests {@link FeatureTableModel}. The table will be shown only if the test is run from the
  * main method. Otherwise (i.e. if run from Maven), widgets are invisibles.
  *
+ * @source $URL$
  * @version $Id$
  * @author James Macgill, CCG
  */

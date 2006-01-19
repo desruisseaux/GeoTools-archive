@@ -44,6 +44,7 @@ import org.opengis.gc.GC_GridRange;
  * {@link org.geotools.gp.Adapters org.geotools.<strong>gp</strong>.Adapters}
  * implementation cover this case.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

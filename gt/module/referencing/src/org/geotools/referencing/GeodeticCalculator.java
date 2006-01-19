@@ -81,6 +81,7 @@ import org.geotools.io.TableWriter;
  * environment, create one distinct instance of {@code GeodeticCalculator} for each thread.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Daniele Franzoni
  * @author Martin Desruisseaux

@@ -62,6 +62,7 @@ import org.geotools.util.NameFactory;
  * Conversely, these names shall not be used in any other context.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

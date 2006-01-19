@@ -42,6 +42,7 @@ import org.geotools.referencing.operation.matrix.MatrixFactory;
 /**
  * Test the {@link GridGeometry} implementation.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

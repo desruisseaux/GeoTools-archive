@@ -37,6 +37,7 @@ import org.opengis.util.Cloneable;
  * where the X axis points towards the Greenwich Prime Meridian, the Y axis
  * points East, and the Z axis points North.
  *
+ * @source $URL$
  * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux

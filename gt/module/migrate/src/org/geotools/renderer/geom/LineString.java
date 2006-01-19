@@ -77,6 +77,7 @@ import org.opengis.referencing.operation.TransformException;
  * Par convention, toutes les méthodes statiques de cette classe peuvent agir
  * sur une chaîne d'objets {@link LineString} plutôt que sur une seule instance.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

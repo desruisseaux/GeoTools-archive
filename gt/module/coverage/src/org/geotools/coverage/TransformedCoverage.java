@@ -50,6 +50,7 @@ import org.geotools.resources.CRSUtilities;
  * <strong>Note:</strong> This class is not thread safe for performance reasons. If desired,
  * users should create one instance of {@code TransformedCoverage} for each thread.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

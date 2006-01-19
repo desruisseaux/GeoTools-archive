@@ -34,6 +34,7 @@ import org.geotools.resources.Utilities;
 /**
  * Axis properties.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane

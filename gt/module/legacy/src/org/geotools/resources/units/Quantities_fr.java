@@ -32,6 +32,7 @@ package org.geotools.resources.units;
  * Noms de quantités en langue française. Les quantités qui n'apparaissent
  * pas dans cette ressources garderont leur nom neutre.
  *
+ * @source $URL$
  * @version 1.0
  * @author Martin Desruisseaux
  */

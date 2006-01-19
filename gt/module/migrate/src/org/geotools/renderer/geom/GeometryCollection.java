@@ -76,6 +76,7 @@ import org.opengis.referencing.operation.TransformException;
  * <code>GeometryCollection</code> is convenient for sorting collections in alphabetical order
  * or isobaths in increasing order of altitude.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

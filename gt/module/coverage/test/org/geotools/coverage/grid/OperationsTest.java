@@ -55,6 +55,7 @@ import org.geotools.coverage.processing.Operations;
  * failure suggests that it is not always the case. The <cite>mediaLib</cite> native code seems
  * right in this case (the bug would be in the pure Java code).
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -29,6 +29,7 @@ import java.awt.geom.AffineTransform;
  * This event is usually fired by {@link org.geotools.gui.swing.ZoomPane}.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

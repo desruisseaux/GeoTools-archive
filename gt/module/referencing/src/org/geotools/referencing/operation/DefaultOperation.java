@@ -58,6 +58,7 @@ import org.geotools.util.UnsupportedImplementationException;
  * to overrides the {@link #getParameterValues} method.</P>
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

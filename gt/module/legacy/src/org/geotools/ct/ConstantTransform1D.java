@@ -29,6 +29,7 @@ import java.util.Arrays;
  * <code>{@link #scale} = 0</code> and <code>{@link #offset} = constant</code>. However, this
  * specialized <code>ConstantTransform1D</code> class is faster.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

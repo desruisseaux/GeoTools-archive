@@ -237,7 +237,7 @@ scan:   while ((line=in.readLine()) != null) {
                 }
                 word = line.substring(lower, upper);
                 lower = upper; // Will be the lower index for the next iteration.
-            } while (!word.equals("class"));
+            } while (!word.equals("class") && !word.equals("interface"));
             /*
              * We have now found the position where to inserts our javadoc tag. Process to the
              * insertion now, and then just copies all remaining lines without any processing.

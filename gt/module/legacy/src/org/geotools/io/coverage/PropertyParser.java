@@ -134,6 +134,7 @@ import org.opengis.referencing.operation.TransformException;
  * For example, the {@link #getCoordinateSystem} method constructs a
  * {@link org.geotools.cs.CoordinateSystem} object using available informations.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

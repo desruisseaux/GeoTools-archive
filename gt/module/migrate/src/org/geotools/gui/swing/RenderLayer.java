@@ -55,6 +55,7 @@ import org.geotools.renderer.lite.LiteRenderer2;
  * </p>
  * @author jeichar
  * @since 0.9.0
+ * @source $URL$
  */
 public class RenderLayer implements Comparable{
 

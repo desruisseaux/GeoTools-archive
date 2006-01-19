@@ -47,6 +47,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Elements can be pull in a <cite>first in, first out</cite> order.
  *
  * @since 2.0
+ * @source $URL$
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
