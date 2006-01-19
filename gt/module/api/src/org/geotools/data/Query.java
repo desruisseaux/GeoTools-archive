@@ -301,5 +301,5 @@ public interface Query {
      * 
      * @return SortBy array or order of application
      */
-    SortBy[] getSortyBy();
+    SortBy[] getSortBy();
 }

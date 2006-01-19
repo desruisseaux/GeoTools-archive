@@ -167,7 +167,7 @@ class FIDSQuery implements Query {
         return null;
     }
 
-	public SortBy[] getSortyBy() {
+	public SortBy[] getSortBy() {
 		return SortBy.UNSORTED;
 	}
 }

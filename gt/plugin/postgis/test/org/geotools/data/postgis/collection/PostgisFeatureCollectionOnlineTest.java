@@ -32,8 +32,10 @@ import org.geotools.feature.visitor.SumVisitor;
 import org.geotools.feature.visitor.UniqueVisitor;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
+import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.MathExpression;
 import java.util.HashMap;
@@ -95,13 +97,13 @@ public class PostgisFeatureCollectionOnlineTest extends DataTestCase {
 
     public void testSumCount() throws Exception {
         SumVisitor sumVisitor = new SumVisitor(att);
-        fc.accepts(sumVisitor);
+        fc.accepts(sumVisitor, null);
         assertTrue(fc.isOptimized); //the postgis optimization was used
         assertEquals(2209425, sumVisitor.getResult().toInt());
 
         //test count (we need this for the complex expression, so may as well test it here)
         CountVisitor countVisitor = new CountVisitor();
-        fc.accepts(countVisitor);
+        fc.accepts(countVisitor, null);
         assertEquals(7986, countVisitor.getResult().toInt());
 
         //test complex expression
@@ -111,19 +113,19 @@ public class PostgisFeatureCollectionOnlineTest extends DataTestCase {
         addExpr.addRightValue(att);
 
         SumVisitor sumVisitor2 = new SumVisitor(addExpr);
-        fc.accepts(sumVisitor2);
+        fc.accepts(sumVisitor2, null);
         assertTrue(fc.isOptimized);
         assertEquals(2217411, sumVisitor2.getResult().toInt());
     }
 
     public void testMinMax() throws Exception {
         MinVisitor minVisitor = new MinVisitor(att);
-        fc.accepts(minVisitor);
+        fc.accepts(minVisitor, null);
         assertTrue(fc.isOptimized); //the postgis optimization was used
         assertEquals(0, minVisitor.getResult().toInt());
 
         MaxVisitor maxVisitor = new MaxVisitor(att);
-        fc.accepts(maxVisitor);
+        fc.accepts(maxVisitor, null);
         assertTrue(fc.isOptimized); //the postgis optimization was used
         assertEquals(1890, maxVisitor.getResult().toInt());
     }
@@ -139,15 +141,24 @@ public class PostgisFeatureCollectionOnlineTest extends DataTestCase {
     
     public void testAverage() throws Exception {
         AverageVisitor averageVisitor = new AverageVisitor(att);
-        fc.accepts(averageVisitor);
+        fc.accepts(averageVisitor, null);
         assertTrue(fc.isOptimized); //the postgis optimization was used
         assertEquals(276, averageVisitor.getResult().toInt());
     }
 
     public void testUnique() throws Exception {
         UniqueVisitor uniqueVisitor = new UniqueVisitor(att2);
-        fc2.accepts(uniqueVisitor);
+        fc2.accepts(uniqueVisitor, null);
         assertTrue(fc2.isOptimized); //the postgis optimization was used
         assertEquals(6, uniqueVisitor.getResult().toSet().size());
     }
+    
+    public void testSumExpression() throws Exception {
+    	ExpressionBuilder eb = new ExpressionBuilder();
+    	FunctionExpression expr = (FunctionExpression) eb.parser("Collection_Sum(vregist)");
+    	int result = ((Number) expr.getValue(fc)).intValue();
+    	assertTrue(fc.isOptimized);
+    	assertEquals(result, 2209425);
+    }
+    
 }

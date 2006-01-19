@@ -96,9 +96,10 @@ public class ExpressionBuilder {
      * <p>
      * Not schema is provided for reference during construction.
      * </p>
+     * @throws ParseException 
      */
-    public Object parser( String input ){
-    	return parser( input );
+    public Object parser( String input ) throws ParseException{
+    	return parser(null, input);
     }
     
     /**

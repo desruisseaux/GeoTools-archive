@@ -488,7 +488,7 @@ public class DefaultQuery implements Query {
      * you may limit yourself to to SortBy information.
      * </p>
      */
-    public SortBy[] getSortyBy() {
+    public SortBy[] getSortBy() {
 		return (SortBy[]) sorted.toArray( new SortBy[ sorted.size() ] );
 	}   
 }

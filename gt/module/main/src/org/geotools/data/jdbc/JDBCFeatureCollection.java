@@ -43,6 +43,8 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.visitor.AbstractFilterVisitor;
+import org.geotools.util.NullProgressListener;
+import org.geotools.util.ProgressListener;
 
 
 public class JDBCFeatureCollection extends DefaultFeatureResults {
@@ -118,9 +120,12 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public void accepts(FeatureVisitor visitor) throws IOException {
+    public void accepts(FeatureVisitor visitor, ProgressListener progress) throws IOException {
+    	//TODO: review use of progress monitor
+        if (progress == null) progress = new NullProgressListener();
         if (visitor instanceof MinVisitor) {
-            MinVisitor minCalc = (MinVisitor) visitor;
+            progress.started();
+        	MinVisitor minCalc = (MinVisitor) visitor;
             Object min = min(minCalc.getExpression());
 
             if (min != null) {
@@ -128,16 +133,23 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
 				// rather than making him visit everything
                 minCalc.setValue(min);
                 isOptimized = true;
+                progress.complete();
                 return;
+            } else {
+            	progress.warningOccurred("JDBCFeatureCollection.accepts(min,)", null, "Optimization attempt returned null");
             }
         } else if (visitor instanceof MaxVisitor) {
+            progress.started();
             MaxVisitor maxCalc = (MaxVisitor) visitor;
             Object max = max(maxCalc.getExpression());
 
             if (max != null) {
                 maxCalc.setValue(max); // use the optimized result
                 isOptimized = true;
+                progress.complete();
                 return;
+            } else {
+            	progress.warningOccurred("JDBCFeatureCollection.accepts(max,)", null, "Optimization attempt returned null");
             }
 
         } else if (visitor instanceof MedianVisitor) {
@@ -151,26 +163,35 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
         	// return;
         	//}
         } else if (visitor instanceof SumVisitor) {
+            progress.started();
         	SumVisitor sumCalc = (SumVisitor) visitor;
             Object sum = sum(sumCalc.getExpression());
 
             if (sum != null) {
             	sumCalc.setValue(sum); // use the optimized result
                 isOptimized = true;
+                progress.complete();
                 return;
+            } else {
+            	progress.warningOccurred("JDBCFeatureCollection.accepts(sum,)", null, "Optimization attempt returned null");
             }
 
         } else if (visitor instanceof CountVisitor) {
+            progress.started();
         	CountVisitor countCalc = (CountVisitor) visitor;
             Object count = count(null);
 
             if (count != null) {
             	countCalc.setValue(((Number)count).intValue()); // use the optimized result
                 isOptimized = true;
+                progress.complete();
                 return;
+            } else {
+            	progress.warningOccurred("JDBCFeatureCollection.accepts(count,)", null, "Optimization attempt returned null");
             }
 
         } else if (visitor instanceof AverageVisitor) {
+            progress.started();
         	//There is no "AVERAGE" function for SQL (to my knowledge),
         	// so we'll do a SUM / COUNT...
         	AverageVisitor averageCalc = (AverageVisitor) visitor;
@@ -179,22 +200,29 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
         	if (sum != null && count != null) {
         		averageCalc.setValue(((Number) count).intValue(), sum);
             	 isOptimized = true;
+                 progress.complete();
             	 return;
-        	}
+            } else {
+            	progress.warningOccurred("JDBCFeatureCollection.accepts(average,)", null, "Optimization attempt returned null");
+            }
         } else if (visitor instanceof UniqueVisitor) {
+            progress.started();
         	UniqueVisitor uniqueCalc = (UniqueVisitor) visitor;
             Object unique = unique(uniqueCalc.getExpression());
 
             if (unique != null) {
             	uniqueCalc.setValue(unique); // use the optimized result
                 isOptimized = true;
+                progress.complete();
                 return;
+            } else {
+            	progress.warningOccurred("JDBCFeatureCollection.accepts(unique,)", null, "Optimization attempt returned null");
             }
 
         }
         //optimization was not available, or it failed
         isOptimized = false;
-        super.accepts(visitor, null);
+        super.accepts(visitor, progress);
     }
 
     Connection getConnection() throws IOException {
