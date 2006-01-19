@@ -297,9 +297,12 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      *
      * @see #EASTING
      * @see #WESTING
+     * @see #GEOCENTRIC_X
+     * @see #DISPLAY_X
+     * @see #COLUMN
      */
     public static final DefaultCoordinateSystemAxis X = new DefaultCoordinateSystemAxis(
-                        "x", AxisDirection.EAST, SI.METER);
+            "x", AxisDirection.EAST, SI.METER);
     
     /**
      * Default axis info for <var>y</var> values in a
@@ -314,9 +317,12 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      *
      * @see #NORTHING
      * @see #SOUTHING
+     * @see #GEOCENTRIC_y
+     * @see #DISPLAY_Y
+     * @see #ROW
      */
     public static final DefaultCoordinateSystemAxis Y = new DefaultCoordinateSystemAxis(
-                        "y", AxisDirection.NORTH, SI.METER);
+            "y", AxisDirection.NORTH, SI.METER);
     
     /**
      * Default axis info for <var>z</var> values in a
@@ -330,7 +336,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * This axis is usually part of a {@link #X}, {@link #Y}, {@link #Z} set.
      */
     public static final DefaultCoordinateSystemAxis Z = new DefaultCoordinateSystemAxis(
-                        "z", AxisDirection.UP, SI.METER);
+            "z", AxisDirection.UP, SI.METER);
     
     /**
      * Default axis info for <var>x</var> values in a
@@ -493,6 +499,28 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis ROW = new DefaultCoordinateSystemAxis(
             VocabularyKeys.ROW, "j", AxisDirection.ROW_POSITIVE, Unit.ONE);
+
+    /**
+     * A default axis for <var>x</var> values in a display device. Increasing values go toward
+     * {@linkplain AxisDirection#DISPLAY_RIGHT display right}.
+     * 
+     * The abbreviation is lower case "<var>x</var>".
+     *
+     * @since 2.2
+     */
+    public static final DefaultCoordinateSystemAxis DISPLAY_X = new DefaultCoordinateSystemAxis(
+            "x", AxisDirection.DISPLAY_RIGHT, Unit.ONE);
+
+    /**
+     * A default axis for <var>y</var> values in a display device. Increasing values go toward
+     * {@linkplain AxisDirection#DISPLAY_DOWN display down}.
+     * 
+     * The abbreviation is lower case "<var>y</var>".
+     *
+     * @since 2.2
+     */
+    public static final DefaultCoordinateSystemAxis DISPLAY_Y = new DefaultCoordinateSystemAxis(
+            "y", AxisDirection.DISPLAY_DOWN, Unit.ONE);
 
     /**
      * The abbreviation used for this coordinate system axes. This abbreviation is also

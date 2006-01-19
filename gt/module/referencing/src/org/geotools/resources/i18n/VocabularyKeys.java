@@ -68,6 +68,7 @@ public final class VocabularyKeys {
     public static final int DERIVED_FROM_$1                    =   209;
     public static final int DESCRIPTION                        =   210;
     public static final int DISCONTINUOUS                      =    32;
+    public static final int DISPLAY                            =   228;
     public static final int DISTANCE                           =   211;
     public static final int DOWN                               =    33;
     public static final int EAST                               =    34;

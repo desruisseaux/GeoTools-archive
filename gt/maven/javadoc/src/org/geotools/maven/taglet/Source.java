@@ -54,23 +54,24 @@ public final class Source implements Taglet {
     /**
      * The base URL for Maven reports.
      */
-    private static final String MAVEN_REPORTS_BASE_URL = "http://maven.geotools.org/reports/";
+    private static final String MAVEN_REPORTS_BASE_URL = "http://maven.geotools.fr/reports/";
 
     /**
      * The base URL for Maven repository.
      */
-    private static final String MAVEN_REPOSITORY_BASE_URL = "http://maven.geotools.org/repository/";
+    private static final String MAVEN_REPOSITORY_BASE_URL = "http://maven.geotools.fr/repository/";
 
     /**
      * The pattern to use for fetching the URL.
      */
     private final Pattern findURL = Pattern.compile(
-            "\\w*\\" + SVN_KEYWORD_DELIMITER + "URL\\s*\\:\\s*(.+)\\s*\\" + SVN_KEYWORD_DELIMITER + "\\w*");
+            "\\s*\\" + SVN_KEYWORD_DELIMITER + "URL\\s*\\:\\s*(.+)\\s*\\" + SVN_KEYWORD_DELIMITER + "\\s*");
 
     /**
      * The pattern to use for fetching the module name from an URL.
      */
-    private final Pattern findModule = Pattern.compile(".+\\Q/geotools/trunk/gt/\\E\\w+\\/(\\w+)\\/.+");
+    private final Pattern findModule = Pattern.compile(
+            ".+\\Q/geotools/trunk/gt/\\E\\p{Alnum}+\\/([\\p{Alnum}\\-]+)\\/.+");
 
     /**
      * Constructs a default <code>@source</code> taglet.
@@ -170,7 +171,7 @@ public final class Source implements Taglet {
             buffer.append(module);
             buffer.append("</B></CODE> &nbsp; (<A HREF=\"");
             buffer.append(MAVEN_REPOSITORY_BASE_URL);
-            buffer.append("org/geotools/");
+            buffer.append("org/geotools/gt2-");
             buffer.append(module);
             buffer.append("/\"><CODE>gt2-");
             buffer.append(module);

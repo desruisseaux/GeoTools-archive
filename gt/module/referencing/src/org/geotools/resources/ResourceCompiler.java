@@ -388,6 +388,7 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
                   " *\n"                                                                   +
                   " * @see org.geotools.resources.ResourceBundle\n"                        +
                   " * @see org.geotools.resources.ResourceCompiler\n"                      +
+                  " * @source \u0024URL\u0024\n"                                           +
                   " */\n");
         out.write("public final class "); out.write(classname); out.write(" {\n");
         out.write("    private "); out.write(classname); out.write("() {\n");

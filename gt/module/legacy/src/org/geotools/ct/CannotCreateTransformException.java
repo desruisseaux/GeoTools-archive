@@ -52,7 +52,7 @@ import org.opengis.referencing.operation.TransformException;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.opengis.referencing.OperationPathNotFoundException}.
+ * @deprecated Replaced by {@link org.opengis.referencing.operation.OperationNotFoundException}.
  */
 public class CannotCreateTransformException extends TransformException {
     /**

@@ -128,6 +128,19 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
                     DefaultCoordinateSystemAxis.ROW);
 
     /**
+     * A two-dimensional cartesian CS with
+     * <var>{@linkplain DefaultCoordinateSystemAxis#DISPLAY_X display x}</var>,
+     * <var>{@linkplain DefaultCoordinateSystemAxis#DISPLAY_Y display y}</var>
+     * axis.
+     *
+     * @since 2.2
+     */
+    public static DefaultCartesianCS DISPLAY = new DefaultCartesianCS(
+                    name(VocabularyKeys.DISPLAY),
+                    DefaultCoordinateSystemAxis.DISPLAY_X,
+                    DefaultCoordinateSystemAxis.DISPLAY_Y);
+
+    /**
      * Converters from {@linkplain CoordinateSystemAxis#getUnit axis units} to
      * {@linkplain #getDistanceUnit distance unit}. Will be constructed only when
      * first needed.
