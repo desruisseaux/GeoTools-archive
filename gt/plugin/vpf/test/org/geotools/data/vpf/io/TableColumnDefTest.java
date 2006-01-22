@@ -65,6 +65,7 @@ import org.geotools.resources.TestData;
  *     </ol>
  *   </li>
  * </ul>
+ * @source $URL$
  */
 public class TableColumnDefTest extends TestCase
   implements DataTypesDefinition, FileConstants 

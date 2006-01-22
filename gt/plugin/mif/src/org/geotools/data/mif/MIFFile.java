@@ -80,6 +80,7 @@ import java.util.logging.Logger;
  *
  * @author Luca S. Percich, AMA-MI
  * @author Paolo Rizzi, AMA-MI
+ * @source $URL$
  * @version $Id$
  */
 public class MIFFile {

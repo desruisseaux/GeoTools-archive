@@ -47,6 +47,7 @@ import org.geotools.resources.NIOUtilities;
  * @author jamesm
  * @author aaime
  * @author Ian Schneider
+ * @source $URL$
  */
 public class ShapefileReader {
 

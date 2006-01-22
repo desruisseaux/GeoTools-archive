@@ -52,6 +52,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  * @author aaime
  * @author Ian Schneider
  * 
+ * @source $URL$
  */
 public class ShapefileWriter {
   

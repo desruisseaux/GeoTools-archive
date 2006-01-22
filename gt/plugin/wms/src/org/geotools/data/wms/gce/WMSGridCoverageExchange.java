@@ -36,6 +36,7 @@ import org.xml.sax.SAXException;
  * DOCUMENT ME!
  *
  * @author Richard Gould, Refractions Research
+ * @source $URL$
  */
 public class WMSGridCoverageExchange implements GridCoverageExchange {
     /** Available formats for this Web Map Server */

@@ -22,6 +22,7 @@ import javax.media.jai.RenderedOp;
  * @author simone iannecchini
  * @author alessio fabiani
  *
+ * @source $URL$
  */
 public class GeoTiffUtils {
 

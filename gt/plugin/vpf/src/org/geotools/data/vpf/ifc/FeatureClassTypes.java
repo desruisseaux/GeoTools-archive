@@ -23,6 +23,7 @@ package org.geotools.data.vpf.ifc;
  * Created on 21. april 2004, 15:35
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @source $URL$
  */
 public interface FeatureClassTypes {
 

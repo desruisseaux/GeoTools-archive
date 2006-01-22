@@ -31,6 +31,7 @@ import org.geotools.filter.IllegalFilterException;
  * </p>
  * @author dzwiers
  *
+ * @source $URL$
  */
 public class WFSDataStoreWriteOnlineTest extends TestCase {
     public void testEmpty() throws NoSuchElementException, IOException, IllegalAttributeException, FactoryConfigurationError{

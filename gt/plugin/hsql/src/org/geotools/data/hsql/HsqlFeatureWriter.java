@@ -33,6 +33,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  * queries make them work.
  *
  * @author Amr Alam, Refractions Research
+ * @source $URL$
  */
 public class HsqlFeatureWriter extends JDBCTextFeatureWriter {
     private static WKTWriter geometryWriter = new WKTWriter();

@@ -31,6 +31,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  * @author Chris Holmes, TOPP
  * @author Debasish Sahu, debasish.sahu@rmsi.com
  * 
+ * @source $URL$
  */
 public class SQLEncoderMySQL extends SQLEncoder
     implements org.geotools.filter.FilterVisitor {

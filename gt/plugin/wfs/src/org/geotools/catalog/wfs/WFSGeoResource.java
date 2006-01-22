@@ -45,6 +45,7 @@ import java.util.List;
  * Access a feature type in a wfs.
  *
  * @since 0.6
+ * @source $URL$
  */
 public class WFSGeoResource extends AbstractGeoResource {
     WFSService parent;

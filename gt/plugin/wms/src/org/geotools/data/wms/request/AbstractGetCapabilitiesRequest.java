@@ -23,6 +23,7 @@ import java.net.URL;
  * DOCUMENT ME!
  *
  * @author Richard Gould
+ * @source $URL$
  */
 public abstract class AbstractGetCapabilitiesRequest extends AbstractRequest implements GetCapabilitiesRequest{
     /** Represents the SERVICE parameter */

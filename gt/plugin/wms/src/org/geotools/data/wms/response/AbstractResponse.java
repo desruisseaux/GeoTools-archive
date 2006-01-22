@@ -32,6 +32,7 @@ import org.xml.sax.SAXException;
  * DOCUMENT ME!
  *
  * @author Richard Gould, Refractions Research
+ * @source $URL$
  */
 public class AbstractResponse {
     protected InputStream inputStream;

@@ -30,6 +30,7 @@ import javax.sql.ConnectionPoolDataSource;
  * A factory to create a DB2 Connection based on the needed parameters.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2ConnectionFactory {
     private static final Logger LOGGER = Logger.getLogger(

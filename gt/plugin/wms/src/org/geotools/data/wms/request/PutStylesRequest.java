@@ -21,6 +21,7 @@ package org.geotools.data.wms.request;
  * Represents a PutStyles request
  * 
  * @author Richard Gould
+ * @source $URL$
  */
 public interface PutStylesRequest extends Request {
     public static final String MODE = "MODE";

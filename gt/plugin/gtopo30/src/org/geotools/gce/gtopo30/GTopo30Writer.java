@@ -58,6 +58,7 @@ import org.opengis.spatialschema.geometry.Envelope;
  * @author jeichar
  * @author Simone Giannecchini
  * @author mkraemer
+ * @source $URL$
  */
 public class GTopo30Writer implements GridCoverageWriter {
 	/**

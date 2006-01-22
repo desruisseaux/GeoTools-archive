@@ -36,6 +36,7 @@ import org.geotools.data.vpf.exc.VPFDataFormatException;
  * DOCUMENT ME!
  *
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
+ * @source $URL$
  */
 public class TripletId extends Number {
     /**

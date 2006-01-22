@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
  * based upon the shapefile specification.
  * @author aaime
  * @author Ian Schneider
+ * @source $URL$
  * @version
  */
 public interface ShapeHandler {

@@ -50,6 +50,7 @@ import java.util.logging.Logger;
  * provide utility methods.
  *
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 class ArcSDEQuery {

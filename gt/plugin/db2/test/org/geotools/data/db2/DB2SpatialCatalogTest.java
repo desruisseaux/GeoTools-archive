@@ -24,6 +24,7 @@ import java.sql.Connection;
  * Exercise DB2SpatialCatalog.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2SpatialCatalogTest extends DB2TestCase {
     private Connection conn;

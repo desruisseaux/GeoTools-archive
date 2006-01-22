@@ -27,6 +27,7 @@ import java.util.logging.Logger;
  * Override methods from FeatureTypeHandler for DB2-specific handling.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2FeatureTypeHandler extends FeatureTypeHandler {
     private static final Logger LOGGER = Logger.getLogger(

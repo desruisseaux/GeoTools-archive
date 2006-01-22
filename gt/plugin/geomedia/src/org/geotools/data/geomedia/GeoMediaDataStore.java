@@ -48,6 +48,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * to make it compile
  *
  * @author Julian J. Ray
+ * @source $URL$
  * @version 1.0
  */
 public class GeoMediaDataStore extends JDBCDataStore {

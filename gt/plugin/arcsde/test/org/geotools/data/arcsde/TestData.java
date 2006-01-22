@@ -57,6 +57,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Provides access to the ArcSDEDataStore test data configuration.
  *
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 public class TestData {

@@ -49,6 +49,7 @@ import org.geotools.resources.NIOUtilities;
  * You must supply the <CODE>moreRecords</CODE> and <CODE>getMyRecord()</CODE>
  * logic...
  * @author Ian Schneider
+ * @source $URL$
  */
 public class DbaseFileWriter  {
   

@@ -43,6 +43,7 @@ import java.util.HashMap;
  * GCEs will pick it up if it extends AbstractGridFormat.
  *
  * @author Bryce Nordgren, USDA Forest Service
+ * @source $URL$
  */
 public class GeoTiffFormat extends AbstractGridFormat implements Format {
     /** Indicates whether we need to rescale the input */

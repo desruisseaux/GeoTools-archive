@@ -36,6 +36,7 @@ import java.io.IOException;
  * Exercise DB2FeatureSource
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2FeatureSourceTest extends DB2TestCase {
     private DB2DataStore dataStore = null;

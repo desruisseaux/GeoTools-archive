@@ -23,6 +23,7 @@ import org.geotools.data.wms.WMSOperationType;
  * DOCUMENT ME!
  *
  * @author rgould Available WMS Operations are listed in a Request element.
+ * @source $URL$
  */
 public class WMSRequest {
     private WMSOperationType getCapabilities;

@@ -36,6 +36,7 @@ import javax.sql.PooledConnection;
  * Provide common functionality for DB2 plug-in testcases.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2TestCase extends TestCase {
     protected static final String DB2_URL_PREFIX = "jdbc:db2://";

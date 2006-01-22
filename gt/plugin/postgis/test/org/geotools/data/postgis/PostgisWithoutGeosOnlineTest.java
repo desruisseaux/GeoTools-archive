@@ -25,6 +25,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
+ * @source $URL$
  */
 public class PostgisWithoutGeosOnlineTest extends AbstractPostgisDataTestCase {
 

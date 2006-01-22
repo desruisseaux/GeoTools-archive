@@ -49,6 +49,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  *
  * @author Gabriel Rold?n
+ * @source $URL$
  */
 public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
     /** Standard java logger */

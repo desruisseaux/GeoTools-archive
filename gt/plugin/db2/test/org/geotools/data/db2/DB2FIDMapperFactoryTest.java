@@ -29,6 +29,7 @@ import java.sql.SQLException;
  * Exercise DB2FIDMapperFactory.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2FIDMapperFactoryTest extends DB2TestCase {
     public void testMappers() throws Exception {

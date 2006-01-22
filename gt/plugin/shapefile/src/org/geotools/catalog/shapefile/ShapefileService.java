@@ -33,6 +33,7 @@ import java.util.Map;
  * Implementation of a service handle for shapefiles.
  *
  * @see org.geotools.gtcatalog.Service
+ * @source $URL$
  */
 public class ShapefileService extends AbstractService {
     private ServiceInfo info;

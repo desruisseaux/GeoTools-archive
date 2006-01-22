@@ -25,6 +25,7 @@ import java.sql.SQLException;
  * Exercise DB2ConnectionFactory.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2ConnectionFactoryTest extends DB2TestCase {
     // Test connection factory with 3 parameter constructor

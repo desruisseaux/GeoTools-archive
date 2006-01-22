@@ -48,6 +48,7 @@ import java.util.PropertyResourceBundle;
  * JDBCFeatureCollection.
  *
  * @author Cory Horner, Refractions Research
+ * @source $URL$
  */
 public class PostgisFeatureCollectionOnlineTest extends DataTestCase {
     private PostgisDataStore dstore = null;

@@ -41,6 +41,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /** A collection of utility methods for use with JTS and the shapefile package.
  * @author aaime
  * @author Ian Schneider
+ * @source $URL$
  */
 public class JTSUtilities {
     

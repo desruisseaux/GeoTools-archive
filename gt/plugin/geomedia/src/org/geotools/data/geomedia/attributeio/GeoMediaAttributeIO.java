@@ -32,6 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * AttributeIO implementation that read and writes geomedia columns
+ * @source $URL$
  */
 public class GeoMediaAttributeIO implements AttributeIO {
     private static final Logger LOGGER = Logger.getLogger(

@@ -44,6 +44,7 @@ import org.geotools.feature.IllegalAttributeException;
  * </p>
  *
  * @author Julian J. Ray
+ * @source $URL$
  * @version 1.0
  */
 public class TigerFeatureReader implements FeatureReader {

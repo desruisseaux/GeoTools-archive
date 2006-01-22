@@ -54,6 +54,7 @@ import java.io.StringWriter;
  * </p>
  *
  * @author Bryce Nordgren / USDA Forest Service
+ * @source $URL$
  */
 public class GeoTiffException extends IOException {
     private GeoTiffIIOMetadataAdapter metadata = null;

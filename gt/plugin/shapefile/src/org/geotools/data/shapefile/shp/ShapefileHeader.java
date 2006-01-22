@@ -29,6 +29,7 @@ import java.nio.ByteOrder;
  *
  * @author jamesm
  * @author Ian Schneider
+ * @source $URL$
  */
 public class ShapefileHeader {
   

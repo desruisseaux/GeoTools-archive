@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author Richard Gould, Refractions Research
+ * @source $URL$
  */
 public class GetMapResponse extends AbstractResponse {
     public GetMapResponse(String contentType, InputStream response) throws ServiceException, SAXException {

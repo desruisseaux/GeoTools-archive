@@ -26,6 +26,7 @@ import org.geotools.filter.Filter;
  * DOCUMENT ME!
  *
  * @author dzwiers
+ * @source $URL$
  */
 public class LockRequest implements FeatureLock {
     private long duration = 0;

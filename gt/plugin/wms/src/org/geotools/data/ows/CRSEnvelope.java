@@ -25,6 +25,7 @@ import org.opengis.spatialschema.geometry.Envelope;
  * the Earth
  *
  * @author Richard Gould
+ * @source $URL$
  */
 public class CRSEnvelope implements Envelope {
     /** Represents the Coordinate Reference System this bounding box is in */

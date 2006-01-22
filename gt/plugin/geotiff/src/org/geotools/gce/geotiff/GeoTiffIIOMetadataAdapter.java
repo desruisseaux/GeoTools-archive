@@ -57,6 +57,7 @@ import javax.imageio.metadata.IIOMetadataNode;
  * </p>
  *
  * @author Mike Nidel
+ * @source $URL$
  */
 public class GeoTiffIIOMetadataAdapter {
     // The following values are taken from the GeoTIFF specification

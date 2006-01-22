@@ -29,6 +29,7 @@ import java.net.URL;
  * DOCUMENT ME!
  *
  * @author jeichar
+ * @source $URL$
  */
 public class ArcGridReaderTest extends TestCaseSupport {
     GridCoverageReader reader;

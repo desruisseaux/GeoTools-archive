@@ -24,6 +24,7 @@ import java.util.logging.Logger;
  * Overrides NullFIDMapper methods for DB2-specific handling.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2NullFIDMapper extends NullFIDMapper {
     private static final Logger LOGGER = Logger.getLogger(

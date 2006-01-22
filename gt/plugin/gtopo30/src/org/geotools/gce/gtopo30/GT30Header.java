@@ -33,6 +33,7 @@ import org.geotools.data.DataSourceException;
  * 
  * @author aaime
  * @author mkraemer
+ * @source $URL$
  */
 class GT30Header {
     /** Mnemonic constant for line labels in the header file */

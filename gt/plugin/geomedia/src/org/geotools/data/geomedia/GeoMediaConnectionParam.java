@@ -49,6 +49,7 @@ package org.geotools.data.geomedia;
  * </p>
  *
  * @author Julian J. Ray
+ * @source $URL$
  * @version 1.0
  */
 public class GeoMediaConnectionParam {

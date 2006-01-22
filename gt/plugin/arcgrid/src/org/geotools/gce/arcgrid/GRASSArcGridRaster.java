@@ -33,6 +33,7 @@ import javax.media.jai.RasterFactory;
  * @author aaime
  * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini
  *         (simboss)</a>
+ * @source $URL$
  */
 public class GRASSArcGridRaster extends ArcGridRaster {
     /** Column number tag in the header file */

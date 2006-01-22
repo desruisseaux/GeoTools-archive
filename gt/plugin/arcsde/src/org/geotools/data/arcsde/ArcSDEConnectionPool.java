@@ -73,6 +73,7 @@ import com.esri.sde.sdk.client.SeTable;
  * </p>
  * 
  * @author Gabriel Rold?n
+ * @source $URL$
  * @version $Id: ArcSDEConnectionPool.java,v 1.1 2004/06/21 15:00:33 cdillard
  *          Exp $
  */

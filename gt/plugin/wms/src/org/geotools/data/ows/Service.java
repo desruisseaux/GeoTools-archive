@@ -23,6 +23,7 @@ import java.net.URL;
  * This is a data model for the OGC WMS Service metadata. Feel
  *         free to extend it to other OGC services. Name, Title and
  *         OnlineResource are Required. Everything else is optional.
+ * @source $URL$
  */
 public class Service {
     /**

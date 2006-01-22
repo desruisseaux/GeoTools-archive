@@ -21,6 +21,7 @@ import java.util.Properties;
 
 /**
  * This represents a Request to be made against a Web Map Server.
+ * @source $URL$
  */
 public interface Request {
     

@@ -29,6 +29,7 @@ import org.xml.sax.SAXException;
  * @author dzwiers
  * 
  * TODO Check for a cleaner way to do
+ * @source $URL$
  */
 public class GMLDataStore extends AbstractDataStore {
 

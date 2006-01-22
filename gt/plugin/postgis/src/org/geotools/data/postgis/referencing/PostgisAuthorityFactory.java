@@ -25,6 +25,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author jeichar
+ * @source $URL$
  */
 public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
 

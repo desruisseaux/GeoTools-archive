@@ -83,6 +83,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 public abstract class GeometryBuilder {

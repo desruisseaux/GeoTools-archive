@@ -25,6 +25,7 @@ import junit.framework.TestSuite;
  * DOCUMENT ME!
  *
  * @author aaime
+ * @source $URL$
  */
 public class ArcGridSuite extends TestCase {
     public ArcGridSuite(String testName) {

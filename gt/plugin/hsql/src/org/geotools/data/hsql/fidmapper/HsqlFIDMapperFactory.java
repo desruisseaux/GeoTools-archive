@@ -27,6 +27,7 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
  * the HsqlFIDMapper.
  * 
  * @author Amr Alam, Refractions Research
+ * @source $URL$
  */
 public class HsqlFIDMapperFactory extends DefaultFIDMapperFactory {
 

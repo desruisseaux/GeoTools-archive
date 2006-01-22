@@ -40,6 +40,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * </p>
  *
  * @author Richard Gould, Refractions Researach
+ * @source $URL$
  */
 public class WMSFormat implements Format {
     /** Parsed Capabilities Document */

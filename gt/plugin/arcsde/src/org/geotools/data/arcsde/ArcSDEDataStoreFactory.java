@@ -31,6 +31,7 @@ import com.esri.sde.sdk.pe.PeCoordinateSystem;
  * Factory to create DataStores over a live ArcSDE instance.
  *
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id: ArcSDEDataStoreFactory.java,v 1.1 2004/06/21 15:00:33 cdillard
  *          Exp $
  */

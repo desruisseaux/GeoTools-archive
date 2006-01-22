@@ -30,6 +30,7 @@ import org.geotools.feature.SchemaException;
  * Created on 13. april 2004, 14:26
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  * @deprecated
+ * @source $URL$
  */
 public class VPFSchemaCreator {
     private static HashMap featureTypes = new HashMap();

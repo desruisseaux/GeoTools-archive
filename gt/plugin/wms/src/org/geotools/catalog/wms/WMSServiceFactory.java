@@ -35,6 +35,7 @@ import org.geotools.catalog.ServiceFactory;
  * </p>
  *
  * @since 0.6
+ * @source $URL$
  */
 public class WMSServiceFactory implements ServiceFactory {
     /**

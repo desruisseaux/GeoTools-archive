@@ -31,6 +31,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Rob Atkinson , SCO
  * @author Debasish Sahu, debasish.sahu@rmsi.com
  * 
+ * @source $URL$
  */
 public class SQLEncoderBBOX extends SQLEncoder
     implements org.geotools.filter.FilterVisitor {

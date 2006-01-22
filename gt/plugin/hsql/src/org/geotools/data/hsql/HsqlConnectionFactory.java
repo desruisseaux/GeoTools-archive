@@ -30,6 +30,7 @@ import java.util.Properties;
  * to the HsqlDataStore constructor.
  *
  * @author Amr Alam, Refractions Research
+ * @source $URL$
  */
 public class HsqlConnectionFactory {
 

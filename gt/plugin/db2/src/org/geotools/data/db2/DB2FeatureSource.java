@@ -41,6 +41,7 @@ import java.util.logging.Logger;
  * DB2-specific implementation.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2FeatureSource extends JDBCFeatureSource {
     /** The logger for the filter module. */

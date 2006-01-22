@@ -35,6 +35,7 @@ import org.geotools.filter.FilterFactoryFinder;
  * This interface represents pending actions within a transaction.
  *
  * @author dzwiers
+ * @source $URL$
  */
 public interface Action {
 	/**

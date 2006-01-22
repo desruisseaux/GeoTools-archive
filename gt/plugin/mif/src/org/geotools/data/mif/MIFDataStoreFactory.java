@@ -45,6 +45,7 @@ import java.util.Map;
  * </p>
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  * @version $Id$
  *
  * @see MIFDataStore#MIFDataStore(String, HashMap);

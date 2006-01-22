@@ -36,6 +36,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  *
  * @author Rob Hranac, Vision for New York
  * @author Chris Holmes, TOPP
+ * @source $URL$
  * @version $Id$
  *
  * @task REVISIT: connection pooling, implementing java.sql.Datasource.  I

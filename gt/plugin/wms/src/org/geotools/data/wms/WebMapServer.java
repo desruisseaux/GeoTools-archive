@@ -73,6 +73,7 @@ import org.xml.sax.SAXException;
  * </pre></code>
  * 
  * @author Richard Gould, Refractions Research
+ * @source $URL$
  */
 public class WebMapServer {
     private final URL serverURL;

@@ -47,6 +47,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  *
  * @author wolf
  * @author Gary Sheppard garysheppard@psu.edu
+ * @source $URL$
  */
 public class GeometrylessFeatureWriter extends JDBCTextFeatureWriter {
     private static WKTWriter geometryWriter = new WKTWriter();

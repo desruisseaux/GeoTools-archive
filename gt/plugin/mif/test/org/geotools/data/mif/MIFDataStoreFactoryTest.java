@@ -30,6 +30,7 @@ import java.net.URI;
  * TestCase class for MIFDataStoreFactory
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  */
 public class MIFDataStoreFactoryTest extends TestCase {
     private MIFDataStoreFactory dsFactory = null;

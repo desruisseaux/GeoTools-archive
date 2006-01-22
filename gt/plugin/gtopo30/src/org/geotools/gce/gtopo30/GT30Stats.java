@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
  * @author aaime
  * @author simone giannecchini
  * @author mkraemer
+ * @source $URL$
  */
 class GT30Stats {
     /** Minimum value in the data file */

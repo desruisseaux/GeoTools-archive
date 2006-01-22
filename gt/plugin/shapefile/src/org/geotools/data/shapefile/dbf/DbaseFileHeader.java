@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 
 /** Class to represent the header of a Dbase III file.
  * Creation date: (5/15/2001 5:15:30 PM)
+ * @source $URL$
  */
 public class DbaseFileHeader {
   // Constant for the size of a record

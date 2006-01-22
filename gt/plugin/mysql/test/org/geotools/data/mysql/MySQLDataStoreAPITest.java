@@ -96,6 +96,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class MySQLDataStoreAPITest extends DataTestCase {
     private static final int LOCK_DURATION = 3600 * 1000;  // one hour

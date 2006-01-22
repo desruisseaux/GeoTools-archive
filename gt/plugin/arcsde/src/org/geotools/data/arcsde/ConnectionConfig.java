@@ -30,6 +30,7 @@ import java.util.logging.Logger;
  * connection properties
  * 
  * @author Gabriel Rold?n
+ * @source $URL$
  * @version $Id$
  */
 public class ConnectionConfig {

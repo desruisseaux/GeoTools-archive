@@ -40,6 +40,7 @@ import junit.framework.TestCase;
  * DOCUMENT ME!
  *
  * @author $author$
+ * @source $URL$
  * @version $Revision: 1.9 $
  */
 public class ArcSDEQueryTest extends TestCase {

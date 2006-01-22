@@ -46,6 +46,7 @@ import com.vividsolutions.jts.geom.LineString;
  * </p>
  *
  * @author Julian J. Ray
+ * @source $URL$
  * @version 1.0
  */
 public class TigerGeometryAdapter {

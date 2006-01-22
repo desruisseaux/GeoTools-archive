@@ -52,6 +52,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * DOCUMENT ME!
  *
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 public class GeometryBuilderTest extends TestCase {

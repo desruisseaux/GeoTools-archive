@@ -25,6 +25,7 @@ import java.util.Map;
  * Exercise DB2DataStoreFactory.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2DataStoreFactoryTest extends DB2TestCase {
     DB2DataStoreFactory factory = new DB2DataStoreFactory();

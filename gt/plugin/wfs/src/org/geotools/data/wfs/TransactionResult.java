@@ -24,6 +24,7 @@ import org.xml.sax.SAXException;
  * DOCUMENT ME!
  *
  * @author dzwiers
+ * @source $URL$
  */
 public class TransactionResult {
     /**

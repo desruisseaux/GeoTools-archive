@@ -22,6 +22,7 @@ import org.geotools.data.FileDataStoreFactorySpi;
  * @author dzwiers
  * @author adanselm
  * 
+ * @source $URL$
  */
 public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
 

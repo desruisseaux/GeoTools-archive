@@ -26,6 +26,7 @@ import java.sql.SQLException;
  * database transactional classes.
  *
  * @author Amr Alam, Refractions Research
+ * @source $URL$
  */
 public class HsqlConnection implements javax.sql.DataSource {
     //private static Category _log = Category.getInstance(MysqlConnection.class.getName());

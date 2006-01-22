@@ -29,6 +29,7 @@ import org.geotools.filter.SQLEncoder;
  * are specified with x,y columns
  *
  * @author Chris Holmes, TOPP
+ * @source $URL$
  * @version $Id$
  */
 public class BBOXSQLBuilder extends DefaultSQLBuilder {

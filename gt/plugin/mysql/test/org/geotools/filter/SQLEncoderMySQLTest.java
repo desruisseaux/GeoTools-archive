@@ -43,6 +43,7 @@ import com.vividsolutions.jts.geom.LineString;
  * the filter test suite.
  *
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 public class SQLEncoderMySQLTest extends TestCase {
     /** Standard logging instance */

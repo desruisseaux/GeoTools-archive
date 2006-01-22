@@ -38,6 +38,7 @@ import java.net.URL;
  * Test reading and writing arcgrid grid coverages.
  *
  * @author rschulz
+ * @source $URL$
  */
 public class ArcGridReadWriteTest extends TestCaseSupport {
     private Format f = null;

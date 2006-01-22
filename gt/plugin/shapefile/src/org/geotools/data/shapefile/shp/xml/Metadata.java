@@ -13,6 +13,7 @@ package org.geotools.data.shapefile.shp.xml;
  * </p>
  * @author jgarnett
  * @since 0.3
+ * @source $URL$
  */
 public class Metadata {
     

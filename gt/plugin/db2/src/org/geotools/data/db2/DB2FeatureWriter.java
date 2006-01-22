@@ -34,6 +34,7 @@ import java.sql.Types;
  * DOCUMENT ME!
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2FeatureWriter extends JDBCTextFeatureWriter {
     private DB2SQLBuilder sqlBuilder;

@@ -22,6 +22,7 @@ import java.net.URL;
  * 
  * Copied this code from the WMS module to remove the dependency between the two plugins
  * @author rgould
+ * @source $URL$
  */
 public class OperationType {
     protected Object formats;

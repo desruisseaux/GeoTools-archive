@@ -54,6 +54,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author Jody Garnett, Refractions Research
  * @author Amr Alam, Refractions Research
+ * @source $URL$
  */
 public class HsqlTransactionStateDiff extends JDBCTransactionState implements State {
     /**

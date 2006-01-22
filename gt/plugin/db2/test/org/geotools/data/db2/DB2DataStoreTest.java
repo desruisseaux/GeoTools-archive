@@ -24,6 +24,7 @@ import java.io.IOException;
  * Exercise DB2DataStore.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2DataStoreTest extends DB2TestCase {
     /**

@@ -28,6 +28,7 @@ import org.geotools.filter.FilterCapabilitiesMask;
  * </p>
  *
  * @author dzwiers
+ * @source $URL$
  */
 public class WFSCapabilities {
     private Service service; // no contact info provided

@@ -31,6 +31,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * Created on July 4, 2004, 5:35 PM 
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @source $URL$
  */
 public class PointData extends HashMap {
     public Object put(Object key, Object value) {

@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Builds text primities
  *
  * @author John Meagher
+ * @source $URL$
  */
 public class TextGeometryFactory extends VPFGeometryFactory implements FileConstants {
     

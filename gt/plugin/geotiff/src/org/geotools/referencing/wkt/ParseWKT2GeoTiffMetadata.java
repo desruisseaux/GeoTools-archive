@@ -84,6 +84,7 @@ import javax.units.Unit;
  *       analyse the {@link CoordinateReferenceSystem} object produced. It would be more general
  *       (it would work for any source, not just WKT) and avoid duplication (e.g. bug fixes in WKT
  *       parser not ported in this class). See GEOT-690.
+ * @source $URL$
  */
 public class ParseWKT2GeoTiffMetadata extends AbstractParser {
     /**

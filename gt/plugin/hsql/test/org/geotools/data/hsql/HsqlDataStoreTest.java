@@ -39,6 +39,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * DOCUMENT ME!
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class HsqlDataStoreTest extends AbstractDataStoreTest {
 	private HsqlConnectionFactory connFactory;

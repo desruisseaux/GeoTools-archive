@@ -32,6 +32,7 @@ import com.vividsolutions.jts.geom.MultiPoint;
  *
  * @author aaime
  * @author Ian Schneider
+ * @source $URL$
  * @version
  */
 public class MultiPointHandler implements ShapeHandler {

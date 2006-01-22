@@ -47,6 +47,7 @@ import org.geotools.feature.SchemaException;
  * </p>
  *
  * @author Julian J. Ray
+ * @source $URL$
  * @version 1.0
  */
 public class TigerDataStore extends AbstractDataStore {

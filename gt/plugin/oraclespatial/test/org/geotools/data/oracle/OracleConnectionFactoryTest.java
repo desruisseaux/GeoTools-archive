@@ -16,6 +16,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  * 
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
+ * @source $URL$
  * @version $Id$ Last
  *          Modified: $Date: 2003/08/15 00:42:02 $
  */

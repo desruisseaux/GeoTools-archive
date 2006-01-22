@@ -42,6 +42,7 @@ import com.esri.sde.sdk.client.SeLayer;
  * @author Gabriel Rold?n
  *
  * @see org.geotools.data.sde.GeometryEncoderSDE
+ * @source $URL$
  */
 public class SQLEncoderSDE extends SQLEncoder
     implements org.geotools.filter.FilterVisitor {

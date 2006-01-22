@@ -30,6 +30,7 @@ import java.util.TreeSet;
  * to add your own.
  *
  * @author rgould
+ * @source $URL$
  */
 public class Layer implements Comparable {
     /** A machine-readable (typically one word) identifier */

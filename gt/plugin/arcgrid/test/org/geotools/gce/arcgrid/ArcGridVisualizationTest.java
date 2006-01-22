@@ -75,6 +75,7 @@ import java.awt.geom.Rectangle2D;
  *
  * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini
  *         (simboss)</a>
+ * @source $URL$
  * @version 1.0
  */
 public class ArcGridVisualizationTest extends TestCaseSupport {

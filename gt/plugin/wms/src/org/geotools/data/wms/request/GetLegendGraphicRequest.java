@@ -20,6 +20,7 @@ package org.geotools.data.wms.request;
  * A request used to get the legend graphic for a given layer
  * 
  * @author Richard Gould
+ * @source $URL$
  */
 public interface GetLegendGraphicRequest extends Request {
     /* Parameters */

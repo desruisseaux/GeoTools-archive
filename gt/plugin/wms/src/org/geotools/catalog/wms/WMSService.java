@@ -53,6 +53,7 @@ import java.util.Map;
  * Connect to a WMS.
  *
  * @since 0.6
+ * @source $URL$
  */
 public class WMSService extends AbstractService {
     /**

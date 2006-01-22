@@ -54,6 +54,7 @@ import org.geotools.filter.Filter;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc
+ * @source $URL$
  * @version $Id$
  */
 public class PostgisFeatureLocking extends PostgisFeatureStore

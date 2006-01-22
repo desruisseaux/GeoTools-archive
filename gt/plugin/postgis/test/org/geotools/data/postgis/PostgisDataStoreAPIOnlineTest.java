@@ -103,6 +103,7 @@ import com.vividsolutions.jts.geom.LineString;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     

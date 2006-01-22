@@ -101,6 +101,7 @@ import java.util.Map;
  * @author Ian Schneider
  *
  * @todo fix file creation bug
+ * @source $URL$
  */
 public class ShapefileDataStore extends AbstractFileDataStore {
     protected final URL shpURL;

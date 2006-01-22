@@ -36,6 +36,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * An attribute IO implementation that can manage the WKB
  *
  * @author Andrea Aime
+ * @source $URL$
  */
 public class PgWKBAttributeIO implements AttributeIO {
     private boolean useByteArray;

@@ -35,6 +35,7 @@ import org.opengis.parameter.GeneralParameterValue;
  *
  * @author jeichar
  * @author mkraemer
+ * @source $URL$
  */
 public class GTopo30Reader implements GridCoverageReader {
 	/**

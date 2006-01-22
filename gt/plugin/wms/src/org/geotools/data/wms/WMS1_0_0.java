@@ -48,6 +48,7 @@ import org.geotools.data.wms.request.PutStylesRequest;
  * </p>
  * 
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class WMS1_0_0 extends Specification {
     static final Map formatMimeTypes = new HashMap();

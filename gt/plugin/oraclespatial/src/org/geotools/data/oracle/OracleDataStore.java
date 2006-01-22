@@ -46,6 +46,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
+ * @source $URL$
  */
 public class OracleDataStore extends JDBCDataStore {
      private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");

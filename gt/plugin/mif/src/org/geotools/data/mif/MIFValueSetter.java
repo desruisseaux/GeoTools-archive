@@ -22,6 +22,7 @@ package org.geotools.data.mif;
  * text lines and converting them into features.</p>
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  * @version $Id$
 */
 public abstract class MIFValueSetter {

@@ -24,6 +24,7 @@ import java.sql.SQLException;
  * Exercise DB2CoordinateSystem.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2CoordinateSystemTest extends DB2TestCase {
     private Connection conn;

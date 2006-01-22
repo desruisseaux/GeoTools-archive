@@ -38,6 +38,7 @@ import java.io.IOException;
  * Exercise DB2SQLBuilder.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2SQLBuilderTest extends DB2TestCase {
     private DB2SQLBuilder sqlBuilder = null;

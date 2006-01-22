@@ -34,6 +34,7 @@ import javax.swing.*;
  * @author Simone Giannecchini
  * @author Alessio Fabiani
  * @author rgould
+ * @source $URL$
  */
 public class WorldImageReaderTest extends TestCase {
     private static boolean verbose = false;

@@ -41,6 +41,7 @@ import org.geotools.feature.type.AnnotationFeatureType;
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  * @author Chris Holmes, Fulbright.
+ * @source $URL$
  */
 public class VPFFeatureReader
     implements FeatureReader, FCode {

@@ -48,6 +48,7 @@ import java.net.URL;
  *
  * @author jeichar
  * @author simone giannecchini
+ * @source $URL$
  */
 public class ArcGridWriter implements GridCoverageWriter {
     /** Small number for comparaisons. */

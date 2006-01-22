@@ -25,6 +25,7 @@ import junit.framework.TestSuite;
  * geotools2 ArcSDE test suite
  *
  * @author Gabriel Rold?n
+ * @source $URL$
  * @version $Id$
  */
 public class ArcSDETestSuite extends TestCase {

@@ -21,6 +21,7 @@ package org.geotools.data.arcsde;
  * <code>Geometryy</code> from a <code>SeShape</code> or viceversa
  * 
  * @author Gabriel Rold?n
+ * @source $URL$
  * @version $Id: GeometryBuildingException.java,v 1.1 2004/06/21 15:00:33
  *          cdillard Exp $
  */

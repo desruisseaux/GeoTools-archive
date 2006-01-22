@@ -29,6 +29,7 @@ import java.util.Iterator;
  * @author giannecchini TODO To change the template for this generated type
  *         comment go to Window - Preferences - Java - Code Style - Code
  *         Templates
+ * @source $URL$
  */
 class MyFileFilter implements FilenameFilter {
     private HashSet extensions = new HashSet();

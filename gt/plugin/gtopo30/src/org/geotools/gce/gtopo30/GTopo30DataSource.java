@@ -66,6 +66,7 @@ import com.sun.media.imageio.stream.RawImageInputStream;
  * @author aaime
  * @author simone giannecchini
  * @author mkraemer
+ * @source $URL$
  */
 class GTopo30DataSource {
 	private static String dmext = ".dem";

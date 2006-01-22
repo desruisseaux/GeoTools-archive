@@ -22,6 +22,7 @@ import org.geotools.data.ows.Layer;
  * Represents a GetStyles Request
  * 
  * @author Richard Gould
+ * @source $URL$
  */
 public interface GetStylesRequest extends Request {
     public static final String LAYERS = "LAYERS";

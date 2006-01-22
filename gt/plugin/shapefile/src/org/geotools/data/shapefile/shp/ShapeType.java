@@ -22,6 +22,7 @@ package org.geotools.data.shapefile.shp;
 /** Not much but a type safe enumeration of file types as ints and names. The
  * descriptions can easily be tied to a ResourceBundle if someone wants to do that.
  * @author Ian Schneider
+ * @source $URL$
  */
 public final class ShapeType {
   

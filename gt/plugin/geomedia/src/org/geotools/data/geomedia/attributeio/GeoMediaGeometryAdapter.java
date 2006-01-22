@@ -60,6 +60,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * <P></p>
  *
  * @author Julian J. Ray
+ * @source $URL$
  * @version 1.0
  *
  * @todo Add interior polygons to Polygon constructor

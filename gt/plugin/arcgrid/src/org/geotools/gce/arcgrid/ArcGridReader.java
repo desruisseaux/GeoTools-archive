@@ -46,6 +46,7 @@ import javax.units.Unit;
  * @author jeichar
  * @author Simone Giannecchini 
  *  
+ * @source $URL$
  */
 public class ArcGridReader implements GridCoverageReader {
     /** Source object to read from. */

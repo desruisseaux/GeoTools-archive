@@ -70,6 +70,7 @@ import com.sun.media.imageio.stream.FileChannelImageInputStream;
  * methods return null. In the early future we will start (hopefully
  * supporting them).
  *
+ * @source $URL$
  * @version $Id$
  * @author simone giannecchini
  * @author alessio fabiani

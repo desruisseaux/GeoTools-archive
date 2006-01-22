@@ -61,6 +61,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * {@link org.geotools.data.DataStore interface DataStore} for DataStore usage details.
  * 
  * @author Amr Alam, Refractions Research, aalam@refractions.net
+ * @source $URL$
  */
 public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 	/** The logger for the hsql module. */

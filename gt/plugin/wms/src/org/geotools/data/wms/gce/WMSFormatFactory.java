@@ -35,6 +35,7 @@ import org.opengis.coverage.grid.Format;
  * </p>
  *
  * @author Richard Gould, Refractions Research
+ * @source $URL$
  */
 public class WMSFormatFactory implements GridFormatFactorySpi {
     private WMSCapabilities capabilities;

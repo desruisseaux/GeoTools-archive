@@ -92,6 +92,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author dzwiers
+ * @source $URL$
  */
 public class WFSDataStore extends AbstractDataStore {
     

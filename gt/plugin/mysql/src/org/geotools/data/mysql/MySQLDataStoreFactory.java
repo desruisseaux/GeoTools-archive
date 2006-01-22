@@ -38,6 +38,7 @@ import org.geotools.data.jdbc.ConnectionPool;
  * </p>
  *
  * @author Andrea Aime, University of Modena and Reggio Emilia
+ * @source $URL$
  */
 public class MySQLDataStoreFactory
     implements org.geotools.data.DataStoreFactorySpi {

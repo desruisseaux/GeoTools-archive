@@ -42,6 +42,7 @@ import org.geotools.resources.NIOUtilities;
  * * <i>'An ESRI White Paper . May 1997'</i></a>
  *
  * @author Ian Schneider
+ * @source $URL$
  */
 public class IndexFile {
 	private static final Logger LOGGER = 

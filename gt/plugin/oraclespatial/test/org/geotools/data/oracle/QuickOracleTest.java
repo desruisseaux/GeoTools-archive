@@ -55,6 +55,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * keeps everything.
  * </p>
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class QuickOracleTest extends DataTestCase {
     

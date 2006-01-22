@@ -38,6 +38,7 @@ package org.geotools.data.geomedia.attributeio;
  * DOCUMENT ME!
  *
  * @author $author$
+ * @source $URL$
  * @version $Revision: 1.1 $
  */
 public class GeoMediaGeometryTypeNotKnownException extends java.lang.Exception {

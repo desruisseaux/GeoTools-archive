@@ -30,6 +30,7 @@ import java.util.logging.Logger;
  * Extender geometry datatypes.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2SQLBuilder extends DefaultSQLBuilder {
     private static final Logger LOGGER = Logger.getLogger(

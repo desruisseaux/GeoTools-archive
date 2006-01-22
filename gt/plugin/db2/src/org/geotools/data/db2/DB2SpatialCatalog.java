@@ -76,6 +76,7 @@ import java.util.logging.Logger;
  * </p>
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2SpatialCatalog {
     private static final Logger LOGGER = Logger.getLogger(

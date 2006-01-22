@@ -31,6 +31,7 @@ import junit.framework.TestSuite;
  *  DJB added this because there were NO testcases for SQLEncoderGeos!!!
  *    I dont really know what I'm doing for this, but I'm just copying the SQLEncoderPostgis tests and
  *    adding one more.
+ * @source $URL$
  */
 public class SQLEncoderPostgisGeosTest extends TestCase {
 	   /** Standard logging instance */

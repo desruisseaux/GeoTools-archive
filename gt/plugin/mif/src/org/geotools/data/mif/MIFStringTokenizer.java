@@ -23,6 +23,7 @@ import com.vividsolutions.jts.io.ParseException;
  * Simple tokenizer class
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  * @version $Id$
  */
 public class MIFStringTokenizer {

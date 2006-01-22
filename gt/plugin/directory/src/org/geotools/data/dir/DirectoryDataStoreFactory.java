@@ -33,6 +33,7 @@ import org.geotools.data.DataStoreFactorySpi;
  * @author dzwiers
  *
  * @see DataStoreFactorySpi
+ * @source $URL$
  */
 public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
     /** The Directory parameter which should contain some files to read */

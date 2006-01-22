@@ -38,6 +38,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Simple test suite for the WKBEncoder class
  *
  * @author Andrea Aime
+ * @source $URL$
  */
 public class WKBEncoderTest extends TestCase {
     GeometryFactory gf = new GeometryFactory();

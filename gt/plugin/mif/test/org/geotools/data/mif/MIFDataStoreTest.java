@@ -42,6 +42,7 @@ import java.util.HashMap;
  * DOCUMENT ME!
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  */
 public class MIFDataStoreTest extends TestCase {
     private MIFDataStore ds;

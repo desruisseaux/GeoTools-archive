@@ -37,6 +37,7 @@ import java.util.NoSuchElementException;
  * DOCUMENT ME!
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  */
 public class MIFFileTest extends TestCase {
     private MIFFile mif = null;

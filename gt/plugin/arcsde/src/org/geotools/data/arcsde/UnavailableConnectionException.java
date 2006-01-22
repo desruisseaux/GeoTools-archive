@@ -23,6 +23,7 @@ package org.geotools.data.arcsde;
  * 
  * @author Gabriel Rold?n
  * @author Gabriel Rold?n
+ * @source $URL$
  * @version $Id: UnavailableConnectionException.java,v 1.1 2004/06/21 15:00:33
  *          cdillard Exp $
  * 

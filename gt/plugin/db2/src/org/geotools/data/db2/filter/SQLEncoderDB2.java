@@ -78,6 +78,7 @@ import java.util.logging.Logger;
  * </p>
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class SQLEncoderDB2 extends SQLEncoder implements FilterVisitor {
     private static Logger LOGGER = Logger.getLogger("org.geotools.data.db2");

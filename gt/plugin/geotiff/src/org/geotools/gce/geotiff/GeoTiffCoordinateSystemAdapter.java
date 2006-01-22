@@ -90,6 +90,7 @@ import javax.units.Unit;
  * </p>
  *
  * @author Bryce Nordgren / USDA Forest Service
+ * @source $URL$
  */
 public class GeoTiffCoordinateSystemAdapter {
     // common "user defined" value for GeoKeys of type "short"

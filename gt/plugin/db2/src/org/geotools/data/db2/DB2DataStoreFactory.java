@@ -33,6 +33,7 @@ import java.util.logging.Logger;
  * DB2DataStore.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2DataStoreFactory extends AbstractDataStoreFactory
     implements DataStoreFactorySpi {

@@ -34,6 +34,7 @@ import org.geotools.data.DataStoreFactorySpi.Param;
  * @auther Rob Atkinson, Social Change Online
  * @author jgarnett, Refractions Research, Inc.
  * @author $Author: aaime $ (last modification)
+ * @source $URL$
  * @version $Id:JDBCDataStoreFactoryTest.java,v 1.1.2.1 2004/05/09 15:35:34 aaime Exp $
  */
 public class JDBCDataStoreFactoryTest extends TestCase {

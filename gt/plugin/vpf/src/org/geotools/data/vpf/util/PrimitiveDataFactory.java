@@ -28,6 +28,7 @@ import org.geotools.feature.FeatureType;
  * Created on July 8, 2004, 12:10 PM
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @source $URL$
  */
 public class PrimitiveDataFactory {
     protected EdgeData readEdge(TableRow edge) {

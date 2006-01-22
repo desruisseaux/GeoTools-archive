@@ -51,6 +51,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * </p>
  *
  * @author dzwiers
+ * @source $URL$
  */
 public class WFSBasicComplexTypes {
     public final static String LOCK_KEY = "WFSBasicComplexTypes.LOCKID.KEY";

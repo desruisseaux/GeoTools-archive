@@ -28,6 +28,7 @@ import org.geotools.filter.SQLEncoder;
  * Please see {@link org.geotools.data.jdbc.JDBCDataStore class JDBCDataStore} and
  * {@link org.geotools.data.DataStore interface DataStore} for DataStore usage details.
  * @author Rob Atkinson rob@socialchange.net.au
+ * @source $URL$
  */
 
 public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore {

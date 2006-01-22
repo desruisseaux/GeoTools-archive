@@ -37,6 +37,7 @@ import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class PostgisDataStoreFactory extends AbstractDataStoreFactory
     implements org.geotools.data.DataStoreFactorySpi {

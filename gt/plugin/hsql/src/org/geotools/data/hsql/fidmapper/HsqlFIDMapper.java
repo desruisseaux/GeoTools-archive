@@ -33,6 +33,7 @@ import org.geotools.feature.Feature;
  * in the getID method.
  *
  * @author aalam
+ * @source $URL$
  */
 public class HsqlFIDMapper extends AbstractFIDMapper {
 	private static final long serialVersionUID = 1L;

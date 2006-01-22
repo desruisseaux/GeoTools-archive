@@ -42,6 +42,7 @@ import javax.media.jai.RasterFactory;
  * @author <a href="mailto:aaime@users.sf.net">Andrea Aime</a>
  * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini
  *         (simboss)</a>
+ * @source $URL$
  */
 public class ArcGridRaster {
     /** Column number tag in the header file */

@@ -43,6 +43,7 @@ import javax.swing.Icon;
  * Handle for a WFS service.
  *
  * @since 0.6
+ * @source $URL$
  */
 public class WFSService extends AbstractService {
     private URI uri = null;

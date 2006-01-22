@@ -31,6 +31,7 @@ import java.sql.Statement;
  * Extender catalog tables.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2CoordinateSystem {
     private int srsId;

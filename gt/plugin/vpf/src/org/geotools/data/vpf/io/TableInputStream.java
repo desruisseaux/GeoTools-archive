@@ -34,6 +34,7 @@ import org.geotools.data.vpf.util.DataUtils;
  * Class <code>TableInputStream</code> implements
  *
  * @author <a href="mailto:kobit@users.sf.net">Artur Hefczyc</a>
+ * @source $URL$
  * @version $Id$
  * @deprecated
  */

@@ -40,6 +40,7 @@ import org.geotools.geometry.coordinatesequence.CSBuilderFactory;
 /**
  * The default JTS handler for shapefile. Currently uses the default JTS
  * GeometryFactory, since it doesn't seem to matter.
+ * @source $URL$
  */
 public class MultiLineHandler implements ShapeHandler {
 	final ShapeType shapeType;

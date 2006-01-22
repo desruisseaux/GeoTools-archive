@@ -37,6 +37,7 @@ import org.geotools.data.DataSourceException;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
+ * @source $URL$
  * @version $Id$
  *
  * @task REVISIT: This assumes that the DB does not manage the PK itself.  I need to work out a way

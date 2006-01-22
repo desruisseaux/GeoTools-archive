@@ -31,6 +31,7 @@ import org.geotools.data.jdbc.ConnectionPool;
  * to the database.
  * </p>
  * @author jgarnett
+ * @source $URL$
  */
 public class OracleTestFixture {	
 	    public OracleConnection connection;

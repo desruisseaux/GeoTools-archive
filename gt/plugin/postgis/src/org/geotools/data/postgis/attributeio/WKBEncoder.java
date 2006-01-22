@@ -76,6 +76,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Note: when using PostGIS's asbinary(...) method, use 'XDR' as a parameter to
  * use BigEndian format in the WKB representation.
  * </p>
+ * @source $URL$
  */
 public class WKBEncoder implements WKBGeometryTypes {
     private static byte wkbXDR = 0;

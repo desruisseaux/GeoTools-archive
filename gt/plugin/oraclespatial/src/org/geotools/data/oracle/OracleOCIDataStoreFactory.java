@@ -55,6 +55,7 @@ import org.geotools.data.jdbc.ConnectionPool;
  *
  * @author Chris Holmes, TOPP
  * @author Bernard de Terwangne, star.be
+ * @source $URL$
  */
 public class OracleOCIDataStoreFactory implements DataStoreFactorySpi {
     private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";

@@ -39,6 +39,7 @@ import java.util.Iterator;
  * </p>
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  * @version $Id$
  */
 public class MIFDataStore extends AbstractDataStore {

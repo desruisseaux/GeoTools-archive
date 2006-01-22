@@ -30,6 +30,7 @@ import org.geotools.filter.SQLEncoder;
  * @author Amr Alam, Refractions Research
  * @author Gary Sheppard garysheppard&#64;psu.edu
  * @author Andrea Aime aaime&#64;users.sourceforge.net
+ * @source $URL$
  */
 public class HsqlSQLBuilder extends DefaultSQLBuilder {
     public HsqlSQLBuilder(SQLEncoder encoder) {

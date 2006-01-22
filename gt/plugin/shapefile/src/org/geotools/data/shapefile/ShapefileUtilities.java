@@ -10,6 +10,7 @@ package org.geotools.data.shapefile;
 /**
  *
  * @author  Ian Schneider
+ * @source $URL$
  */
 public class ShapefileUtilities {
     

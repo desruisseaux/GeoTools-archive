@@ -38,6 +38,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * DOCUMENT ME!
  *
  * @author dzwiers 
+ * @source $URL$
  */
 public class WFSFeatureSource extends AbstractFeatureSource {
     protected WFSDataStore ds;

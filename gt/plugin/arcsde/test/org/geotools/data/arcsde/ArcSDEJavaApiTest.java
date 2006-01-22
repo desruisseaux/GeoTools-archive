@@ -48,6 +48,7 @@ import com.esri.sde.sdk.client.SeTable;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 public class ArcSDEJavaApiTest extends TestCase {

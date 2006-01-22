@@ -11,6 +11,7 @@ import org.geotools.filter.SQLEncoder;
  * datatypes.
  * @author Gary Sheppard garysheppard@psu.edu
  * @author Andrea Aime aaime@users.sourceforge.net
+ * @source $URL$
  */
 public class MySQLSQLBuilder extends DefaultSQLBuilder {
     

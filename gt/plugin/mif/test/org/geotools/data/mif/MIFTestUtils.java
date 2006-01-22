@@ -43,6 +43,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  */
 public class MIFTestUtils {
     public static final int SRID = 26591;

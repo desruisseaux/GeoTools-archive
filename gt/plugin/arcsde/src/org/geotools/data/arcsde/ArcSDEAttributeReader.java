@@ -35,6 +35,7 @@ import com.esri.sde.sdk.client.SeShape;
  * This class sends its logging to the log named "org.geotools.data".
  * 
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 class ArcSDEAttributeReader implements AttributeReader {

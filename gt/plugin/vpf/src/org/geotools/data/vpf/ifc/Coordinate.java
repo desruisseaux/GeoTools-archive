@@ -20,6 +20,7 @@ package org.geotools.data.vpf.ifc;
  * Interface <code>Coordinate</code> defines 
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
+ * @source $URL$
  * @version $Id$
  * @deprecated
  */

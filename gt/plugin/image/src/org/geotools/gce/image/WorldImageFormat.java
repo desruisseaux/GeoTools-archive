@@ -49,6 +49,7 @@ import java.util.HashMap;
  *         .png+.pgw. .wld may be used in place of the format specific
  *         extension (.jpg+.wld, etc) Designed to be used with
  *         GridCoverageExchange.
+ * @source $URL$
  */
 public class WorldImageFormat extends AbstractGridFormat implements Format {
     /**

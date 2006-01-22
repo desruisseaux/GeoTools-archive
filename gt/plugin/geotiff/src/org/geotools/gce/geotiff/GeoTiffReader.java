@@ -59,6 +59,7 @@ import javax.media.jai.RenderedOp;
  * Georeferencing metadata available to the Geotools library.
  *
  * @author Bryce Nordgren, USDA Forest Service
+ * @source $URL$
  */
 public class GeoTiffReader implements GridCoverageReader {
     /**

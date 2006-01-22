@@ -47,6 +47,7 @@ import java.util.Set;
  * DOCUMENT ME!
  *
  * @author David Adler
+ * @source $URL$
  */
 public class SQLEncoderDB2Test extends DB2TestCase {
     private static Map DB2_SPATIAL_PREDICATES = new HashMap();

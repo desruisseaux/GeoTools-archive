@@ -30,6 +30,7 @@ import java.util.Iterator;
  * Proposal: AttributeType utilities class.
  * </p>
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  */
 public class AttributeTypes {
     // Returned by getFieldLength() functions when field length is undefined

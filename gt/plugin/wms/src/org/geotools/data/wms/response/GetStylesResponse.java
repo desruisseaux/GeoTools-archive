@@ -27,6 +27,7 @@ import org.xml.sax.SAXException;
  *TODO Provide access to Style objects
  * 
  * @author Richard Gould
+ * @source $URL$
  */
 public class GetStylesResponse extends AbstractResponse {
 

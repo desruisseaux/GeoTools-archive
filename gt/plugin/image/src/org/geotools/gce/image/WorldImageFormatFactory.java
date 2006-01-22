@@ -27,6 +27,7 @@ import java.util.Map;
  *
  * @author rgould TODO To change the template for this generated type comment
  *         go to Window - Preferences - Java - Code Style - Code Templates
+ * @source $URL$
  */
 public class WorldImageFormatFactory implements GridFormatFactorySpi {
     public Format createFormat() {

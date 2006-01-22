@@ -39,6 +39,7 @@ import org.geotools.feature.SchemaException;
  * classes and feature types. 
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
  *
+ * @source $URL$
  */
 public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
     /**

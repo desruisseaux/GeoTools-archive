@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  * @author dzwiers
  *
+ * @source $URL$
  */
 public class WFSDataStoreReadTest extends TestCase {
     

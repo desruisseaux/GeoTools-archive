@@ -41,6 +41,7 @@ import com.vividsolutions.jts.geom.LineString;
  * the filter test suite.
  *
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 public class SQLEncoderLocationsXYTest extends TestCase {
     /** Standard logging instance */

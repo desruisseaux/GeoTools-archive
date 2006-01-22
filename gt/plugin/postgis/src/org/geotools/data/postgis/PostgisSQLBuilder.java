@@ -31,6 +31,7 @@ import org.geotools.filter.SQLEncoderPostgis;
  * Builds sql for postgis.
  *
  * @author Chris Holmes
+ * @source $URL$
  */
 public class PostgisSQLBuilder extends DefaultSQLBuilder {
     /** If true, WKB format is used instead of WKT */

@@ -23,6 +23,7 @@ package org.geotools.data.geomedia;
  * @author Julian J. Ray
  *
  * @todo Add CSGUID information to suppot SRIDs
+ * @source $URL$
  */
 class GFeatureType {
     private String mTypeName;

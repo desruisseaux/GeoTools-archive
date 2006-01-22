@@ -36,6 +36,7 @@ import com.esri.sde.sdk.client.SeConnection;
  * ArcSDE database
  *
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 public class ArcSDEConnectionPoolTest extends TestCase {

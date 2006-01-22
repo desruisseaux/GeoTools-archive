@@ -16,6 +16,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  * Creates ConnectionPool objects for a certain JDBC database instance.
  * @author Rob Atkinson rob@socialchange.net.NOSPAM.au
  * @author Gary Sheppard garysheppard@psu.edu
+ * @source $URL$
  */
 public class JDBCConnectionFactory {
 

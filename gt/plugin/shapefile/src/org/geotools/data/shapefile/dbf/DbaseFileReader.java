@@ -63,6 +63,7 @@ import org.geotools.resources.NumberParser;
  * </PRE></CODE>
  * 
  * @author Ian Schneider
+ * @source $URL$
  */
 public class DbaseFileReader {
 

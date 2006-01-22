@@ -36,6 +36,7 @@ import java.util.Map;
  * </p>
  *
  * @since 0.6
+ * @source $URL$
  */
 public class WFSServiceFactory implements ServiceFactory {
     private static WFSDataStoreFactory wfsDSFactory;

@@ -27,6 +27,7 @@ import java.util.Map;
  * grid files.
  *
  * @author aaime
+ * @source $URL$
  */
 public class ArcGridFormatFactory implements GridFormatFactorySpi {
     /**

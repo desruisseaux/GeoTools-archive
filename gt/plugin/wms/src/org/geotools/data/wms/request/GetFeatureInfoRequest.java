@@ -33,6 +33,7 @@ import org.geotools.data.ows.Layer;
  * </p>
  *
  * @author Richard Gould, Refractions Research
+ * @source $URL$
  */
 public interface GetFeatureInfoRequest extends Request{
     /** Represents the INFO_FORMAT parameter */

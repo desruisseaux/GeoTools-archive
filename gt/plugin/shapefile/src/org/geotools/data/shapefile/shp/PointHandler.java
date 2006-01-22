@@ -31,6 +31,7 @@ import com.vividsolutions.jts.geom.Point;
  *
  * @author aaime
  * @author Ian Schneider
+ * @source $URL$
  * @version
  */
 public class PointHandler implements ShapeHandler {

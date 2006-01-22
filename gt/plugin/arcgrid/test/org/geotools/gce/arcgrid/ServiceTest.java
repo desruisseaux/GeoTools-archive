@@ -32,6 +32,7 @@ import java.util.Iterator;
  * DOCUMENT ME!
  *
  * @author ian
+ * @source $URL$
  */
 public class ServiceTest extends TestCaseSupport {
     final String TEST_FILE = "ArcGrid.asc";

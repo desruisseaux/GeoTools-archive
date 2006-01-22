@@ -26,6 +26,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @author Andrea Aime
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
  *  
+ * @source $URL$
  */
 public class SDOAttributeIO implements AttributeIO {
 

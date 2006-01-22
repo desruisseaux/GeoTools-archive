@@ -19,6 +19,7 @@ import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
+ * @source $URL$
  */
 public class WMS1_3_0 extends WMS1_1_1 {
 	

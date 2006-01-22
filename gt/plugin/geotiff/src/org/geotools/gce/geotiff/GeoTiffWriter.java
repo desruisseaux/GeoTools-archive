@@ -72,6 +72,7 @@ import javax.media.jai.RenderedOp;
  * @author giannecchini TODO To change the template for this generated type
  *         comment go to Window - Preferences - Java - Code Style - Code
  *         Templates
+ * @source $URL$
  */
 public class GeoTiffWriter implements GridCoverageWriter {
     private ImageOutputStream destination;

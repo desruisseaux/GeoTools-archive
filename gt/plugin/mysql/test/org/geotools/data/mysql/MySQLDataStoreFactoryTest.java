@@ -34,6 +34,7 @@ import org.geotools.data.DataStoreFactorySpi.Param;
  * 
  * @author jgarnett, Refractions Research, Inc.
  * @author $Author: aaime $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class MySQLDataStoreFactoryTest extends TestCase {

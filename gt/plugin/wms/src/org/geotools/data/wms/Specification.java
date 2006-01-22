@@ -73,6 +73,7 @@ import org.geotools.data.wms.request.PutStylesRequest;
  * </p>
  *
  * @author Jody Garnett, Refractions Reasearch
+ * @source $URL$
  */
 public abstract class Specification {
 

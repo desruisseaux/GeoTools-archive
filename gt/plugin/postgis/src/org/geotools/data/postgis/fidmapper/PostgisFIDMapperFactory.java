@@ -33,6 +33,7 @@ import org.geotools.feature.FeatureType;
  * 
  * @author Andrea Aime
  *
+ * @source $URL$
  */
 public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
     protected FIDMapper buildNoPKMapper(String schema, String tableName,

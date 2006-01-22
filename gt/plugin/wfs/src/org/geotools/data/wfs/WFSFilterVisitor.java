@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * @author dzwiers
+ * @source $URL$
  */
 public class WFSFilterVisitor implements FilterVisitor {
 	    private Stack postStack = new Stack();

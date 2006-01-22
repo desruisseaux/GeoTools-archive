@@ -30,6 +30,7 @@ import com.esri.sde.sdk.client.SeException;
  * instances.
  * 
  * @author Jake Fear
+ * @source $URL$
  * @version
  */
 class ArcTransactionState implements Transaction.State {

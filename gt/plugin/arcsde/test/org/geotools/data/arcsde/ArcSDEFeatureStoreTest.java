@@ -62,6 +62,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Unit tests for transaction support
  *
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 public class ArcSDEFeatureStoreTest extends TestCase {

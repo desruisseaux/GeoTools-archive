@@ -24,6 +24,7 @@ import org.geotools.feature.AttributeType;
  * constrains it to those two types.
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
  *
+ * @source $URL$
  */
 class ColumnPair {
     /**

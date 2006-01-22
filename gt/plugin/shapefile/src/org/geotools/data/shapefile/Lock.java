@@ -29,6 +29,7 @@ import java.util.logging.Logger;
  * locking for shapefiles.
  * 
  * @author jeichar
+ * @source $URL$
  */
 public class Lock {
 

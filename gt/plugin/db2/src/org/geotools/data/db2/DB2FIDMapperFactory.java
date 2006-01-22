@@ -34,6 +34,7 @@ import java.util.logging.Logger;
  * Overrides DefaultFIDMapperFactory methods for DB2-specific handling.
  *
  * @author David Adler - IBM Corporation
+ * @source $URL$
  */
 public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
     private static final Logger LOGGER = Logger.getLogger(

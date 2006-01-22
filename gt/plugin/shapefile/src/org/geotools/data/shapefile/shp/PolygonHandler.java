@@ -39,6 +39,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Wrapper for a Shapefile polygon.
  * @author aaime
  * @author Ian Schneider
+ * @source $URL$
  * @version
  */
 public class PolygonHandler implements ShapeHandler {

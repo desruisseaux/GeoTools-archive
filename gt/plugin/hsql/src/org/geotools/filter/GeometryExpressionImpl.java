@@ -24,6 +24,7 @@ import org.geotools.feature.Feature;
  * internally defined manner.
  *
  * @author Rob Hranac, TOPP
+ * @source $URL$
  * @version $Id$
  */
 public class GeometryExpressionImpl extends DefaultExpression {

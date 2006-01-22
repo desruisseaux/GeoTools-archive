@@ -25,6 +25,7 @@ import junit.framework.TestSuite;
  * DOCUMENT ME!
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  */
 public class MIFStringTokenizerTest extends TestCase {
     private MIFStringTokenizer tok = null;

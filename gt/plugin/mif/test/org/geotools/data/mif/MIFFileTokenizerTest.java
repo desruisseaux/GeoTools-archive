@@ -28,6 +28,7 @@ import java.io.FileReader;
  * DOCUMENT ME!
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  */
 public class MIFFileTokenizerTest extends TestCase {
     MIFFileTokenizer tok = null;

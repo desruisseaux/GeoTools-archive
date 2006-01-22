@@ -50,6 +50,7 @@ import org.geotools.filter.Filter;
  * </p>
  *
  * @author dzwiers
+ * @source $URL$
  */
 public class DirectoryDataStore implements DataStore, LockingManager {
     // the directory for this ds

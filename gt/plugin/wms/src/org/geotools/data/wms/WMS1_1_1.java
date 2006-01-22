@@ -46,6 +46,7 @@ import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
  * </p>
  * 
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class WMS1_1_1 extends WMS1_1_0 {
     public WMS1_1_1() {

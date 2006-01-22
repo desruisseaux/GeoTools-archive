@@ -32,6 +32,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * JTS Geometries with additional ordinates beyond xyz.
  * </p>
  * @author jgarnett
+ * @source $URL$
  */
 public class GeometryConverter {
 	protected OracleConnection connection;

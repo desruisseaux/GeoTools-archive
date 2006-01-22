@@ -66,6 +66,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * etc.
  * 
  * @author Gabriel Rold?n
+ * @source $URL$
  * @version $Id$
  */
 public class ArcSDEAdapter {

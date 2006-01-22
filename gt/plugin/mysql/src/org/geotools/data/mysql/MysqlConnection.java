@@ -30,6 +30,7 @@ import java.sql.SQLException;
  *
  * @author Rob Hranac, Vision for New York
  * @author Chris Holmes, Vision for New York
+ * @source $URL$
  * @version $Id$
  */
 public class MysqlConnection implements javax.sql.DataSource {

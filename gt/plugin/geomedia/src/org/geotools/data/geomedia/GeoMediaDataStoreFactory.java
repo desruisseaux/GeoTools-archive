@@ -37,6 +37,7 @@ import org.geotools.data.jdbc.ConnectionPool;
  *
  * @author Jody Garnett, Refractions Research
  * @author Sean Geoghegan, Defence Science and Technology Organisation
+ * @source $URL$
  */
 public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
     /** A logger for logging */

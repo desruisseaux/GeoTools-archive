@@ -42,6 +42,7 @@ import org.geotools.feature.SchemaException;
  * Hopefully some one will take advantage of this class to provide 
  * the full functionality.
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
+ * @source $URL$
  */
 public class VPFFileStore extends AbstractDataStore {
     /**

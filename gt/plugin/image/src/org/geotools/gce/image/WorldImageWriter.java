@@ -67,6 +67,7 @@ import javax.media.jai.RenderedOp;
  * @author simone giannecchini
  * @author rgould
  * @author alessio fabiani
+ * @source $URL$
  */
 public class WorldImageWriter implements GridCoverageWriter {
     /** format for this writer */

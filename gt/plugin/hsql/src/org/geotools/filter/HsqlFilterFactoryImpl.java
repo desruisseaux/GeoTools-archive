@@ -26,6 +26,7 @@ package org.geotools.filter;
  * needed for query generation.
  *
  * @author Amr Alam, Refractions Research
+ * @source $URL$
  */
 public class HsqlFilterFactoryImpl extends FilterFactoryImpl {
     /**

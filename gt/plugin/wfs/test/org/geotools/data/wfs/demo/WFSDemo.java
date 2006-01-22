@@ -21,6 +21,7 @@ import org.geotools.feature.IllegalAttributeException;
  * </p>
  * @author dzwiers Refractions Research
  *
+ * @source $URL$
  */
 public class WFSDemo {
     public static void main(String[] args){

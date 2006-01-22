@@ -51,6 +51,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  * part of the properties.
  *
  * @author Julian J. Ray
+ * @source $URL$
  * @version 1.0
  */
 public class GeoMediaConnectionFactory {

@@ -45,6 +45,7 @@ import java.util.Map;
  * </p>
  *
  * @author Bryce Nordgren / USDA Forest Service
+ * @source $URL$
  */
 public class GeoTiffFormatFactorySpi implements GridFormatFactorySpi {
     /**

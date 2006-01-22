@@ -16,6 +16,7 @@ import java.nio.channels.ReadableByteChannel;
 /**
  *
  * @author  Ian Schneider
+ * @source $URL$
  */
 public abstract class TestCaseSupport extends TestCase {
     /** Creates a new instance of TestCaseSupport */

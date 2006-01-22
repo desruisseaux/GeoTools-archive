@@ -51,6 +51,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * ArcSDEDataStore class.
  * 
  * @author Jake Fear, jfear@polexis.com
+ * @source $URL$
  * @version
  */
 class ArcSDEFeatureWriter implements FeatureWriter {

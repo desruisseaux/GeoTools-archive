@@ -52,6 +52,7 @@ import javax.xml.parsers.FactoryConfigurationError;
  * DOCUMENT ME!
  *
  * @author Christiaan ten Klooster
+ * @source $URL$
  */
 public class ArcGridRenderTest extends TestCaseSupport {
     private static boolean setup = false;

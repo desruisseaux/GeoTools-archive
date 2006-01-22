@@ -39,6 +39,7 @@ import java.util.HashMap;
  *
  * @author jeichar
  * @author simone giannecchini</a>
+ * @source $URL$
  */
 public class ArcGridFormat extends AbstractGridFormat implements Format {
     public static final DefaultParameterDescriptor CRS = new DefaultParameterDescriptor("crs",

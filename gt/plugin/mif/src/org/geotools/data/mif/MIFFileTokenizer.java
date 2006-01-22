@@ -24,6 +24,7 @@ import java.io.IOException;
  * Simple tokenizer class for BufferedReaders
  *
  * @author Luca S. Percich, AMA-MI
+ * @source $URL$
  * @version $Id$
  */
 public class MIFFileTokenizer extends MIFStringTokenizer {
