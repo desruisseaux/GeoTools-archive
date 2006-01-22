@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * features and output their contents to the standard output
  *
  * @author aaime
+ * @source $URL$
  */
 public class ShapeReader {
     private static URL getResource(String path) {

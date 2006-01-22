@@ -39,6 +39,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * only one tile. Consequently, sample values are set directly in the raster (no need to deal for
  * multi-tiles).
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

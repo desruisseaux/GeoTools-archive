@@ -53,6 +53,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * DefaultQuery method demoed in org.geotools.demo.data.ShapeReprojector would
  * be used instead.
  *
+ * @source $URL$
  * @version $Id$
  * @author rschulz
  */

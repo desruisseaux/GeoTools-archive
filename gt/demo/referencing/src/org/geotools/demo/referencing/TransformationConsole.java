@@ -62,6 +62,7 @@ import org.geotools.geometry.GeneralDirectPosition;
  *
  * To exit from the application, enter "exit".
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

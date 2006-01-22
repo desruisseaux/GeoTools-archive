@@ -30,6 +30,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author jgarnett
+ * @source $URL$
  * @version $Id
  */
 public class PropertyFeatureReader implements FeatureReader {

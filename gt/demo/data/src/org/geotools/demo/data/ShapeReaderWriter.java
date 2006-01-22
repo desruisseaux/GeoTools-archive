@@ -39,6 +39,7 @@ import org.geotools.filter.LiteralExpression;
  * features and output a subset to a new shapefile. 
  *
  * @author aaime
+ * @source $URL$
  */
 public class ShapeReaderWriter {
     

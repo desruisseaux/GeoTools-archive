@@ -52,6 +52,7 @@ import javax.swing.table.DefaultTableModel;
  * DOCUMENT ME!
  *
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 public abstract class AbstractDSSelectionCard extends WizzardCard {

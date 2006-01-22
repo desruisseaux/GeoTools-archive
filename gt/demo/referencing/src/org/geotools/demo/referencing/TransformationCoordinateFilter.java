@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.CoordinateFilter;
  * or 90 + lat of origin. There are also some problems with projections that
  * have issues with 90 lat. 
  *
+ * @source $URL$
  * @version $Id:
  * @author rschulz
  */

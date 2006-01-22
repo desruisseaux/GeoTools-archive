@@ -41,6 +41,7 @@ import org.geotools.feature.FeatureType;
  * DOCUMENT ME!
  *
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 public class SourceFeatureTypeCard extends WizzardCard {

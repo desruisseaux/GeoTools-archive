@@ -57,6 +57,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * </code></pre>
  *
  * @author jgarnett
+ * @source $URL$
  */
 public class PropertyAttributeReader implements AttributeReader {
     /** DOCUMENT ME!  */

@@ -35,6 +35,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * features and output their contents to the standard output
  *
  * @author aaime
+ * @source $URL$
  */
 public class ShapeReprojector {
     private static URL getResource(String path) {

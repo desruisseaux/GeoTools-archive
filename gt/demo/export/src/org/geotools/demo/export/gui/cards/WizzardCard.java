@@ -26,6 +26,7 @@ import javax.swing.JPanel;
  * DOCUMENT ME!
  *
  * @author Gabriel Roldan, Axios Engineering
+ * @source $URL$
  * @version $Id$
  */
 public abstract class WizzardCard {

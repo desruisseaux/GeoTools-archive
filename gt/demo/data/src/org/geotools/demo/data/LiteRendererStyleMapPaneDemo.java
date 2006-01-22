@@ -51,6 +51,7 @@ import org.geotools.styling.StyleBuilder;
  * </p>
  * @author jeichar
  * @since 0.9.0
+ * @source $URL$
  */
 public class LiteRendererStyleMapPaneDemo {
 
