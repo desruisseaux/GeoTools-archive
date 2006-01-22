@@ -152,7 +152,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </table>
  *
  * @author Simon Raess
- * @version $Id: FeatureTypeTransformer.java,v 1.3 2004/01/09 16:14:36 cholmesny Exp $
+ * @version $Id$
  *
  * @task TODO: Support GeometryCollection.
  * @task REVISIT: Should support a bit more for the header, like being able to

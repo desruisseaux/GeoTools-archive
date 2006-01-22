@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: XMLReader.java,v 1.4 2004/04/21 11:05:37 jive Exp $
+ * @version $Id$
  */
 public class XMLReader {
     /**

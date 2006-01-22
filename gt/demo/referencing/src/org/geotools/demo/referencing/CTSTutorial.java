@@ -76,7 +76,7 @@ import org.geotools.referencing.datum.BursaWolfParameters;
  * START SNIPPET and END SNIPPET comments are used by the wiki to display code snippets from svn.
  * Factory creation is repeated below so that it shows up in the tutorial code snippets.
  * 
- * @version $Id:$
+ * @version $Id$
  * @author Rueben Schulz
  *
  * TODO using the auto crs factory

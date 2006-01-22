@@ -49,7 +49,7 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @version $Id: AnchorPointImpl.java,v 1.7 2003/09/06 04:52:31 seangeo Exp $
+ * @version $Id$
  */
 public class AnchorPointImpl extends AbstractGTComponent implements AnchorPoint,
     Cloneable {

@@ -40,7 +40,7 @@ import java.util.Map;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: TestDTO.java,v 1.2 2004/02/17 17:19:15 dmzwiers Exp $
+ * @version $Id$
  */
 public class TestDTO {
     /** the test name */

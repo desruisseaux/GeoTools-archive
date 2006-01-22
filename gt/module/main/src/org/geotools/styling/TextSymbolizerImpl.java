@@ -53,7 +53,7 @@ import java.util.Map;
  * text symbols should be rendered.
  *
  * @author Ian Turton, CCG
- * @version $Id: TextSymbolizerImpl.java,v 1.17 2003/09/06 04:52:31 seangeo Exp $
+ * @version $Id$
  */
 public class TextSymbolizerImpl extends AbstractGTComponent
     implements TextSymbolizer2, Cloneable {

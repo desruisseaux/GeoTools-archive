@@ -46,7 +46,7 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @version $Id: PointPlacementImpl.java,v 1.10 2003/09/06 04:52:31 seangeo Exp $
+ * @version $Id$
  */
 public class PointPlacementImpl extends AbstractGTComponent
     implements PointPlacement, Cloneable {

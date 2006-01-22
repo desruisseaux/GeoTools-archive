@@ -38,7 +38,7 @@ import java.io.IOException;
  * </p>
  *
  * @author Chris Holmes
- * @version $Id: FIDReader.java,v 1.2 2003/11/04 00:28:49 cholmesny Exp $
+ * @version $Id$
  */
 public interface FIDReader {
     /**

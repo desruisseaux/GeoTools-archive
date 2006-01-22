@@ -1,5 +1,5 @@
 /*
- *    $Id: BasicEdge.java,v 1.3 2004/05/12 03:48:12 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

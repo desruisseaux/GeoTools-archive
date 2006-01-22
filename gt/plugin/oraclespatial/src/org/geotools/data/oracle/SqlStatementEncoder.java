@@ -30,7 +30,7 @@ import org.geotools.filter.SQLEncoderException;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @version $Id: SqlStatementEncoder.java,v 1.2 2003/11/05 00:53:37 seangeo Exp $ Last Modified: $Date: 2003/11/05 00:53:37 $
+ * @version $Id$ Last Modified: $Date: 2003/11/05 00:53:37 $
  */
 final class SqlStatementEncoder {
     /** A logger for logging */

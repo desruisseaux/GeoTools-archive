@@ -21,7 +21,7 @@ package org.geotools.gml;
  *
  * @author Ian Turton, CCG
  * @author Rob Hranac, Vision for New York
- * @version $Id: SubHandler.java,v 1.5 2003/08/14 18:36:47 cholmesny Exp $
+ * @version $Id$
  */
 public abstract class SubHandler {
     /** Indicates start of a geometry. */

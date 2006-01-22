@@ -89,7 +89,7 @@ import org.geotools.util.ProgressListener;
  * @author Rob Hranac, VFNY
  * @author Ian Schneider, USDA-ARS
  * @author Jody Garnett, Refractions Research, Inc.
- * @version $Id: FeatureCollection.java,v 1.12 2003/07/30 21:31:41 jmacgill Exp $
+ * @version $Id$
  */
 public interface FeatureCollection extends ResourceCollection, FeatureResults, Feature {
     

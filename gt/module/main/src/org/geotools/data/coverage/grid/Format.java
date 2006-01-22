@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: Format.java,v 1.6 2004/04/29 21:56:14 desruisseaux Exp $
+ ** $Id$
  **
  ** $Source: /cvsroot/geoapi/src/org/opengis/coverage/grid/Format.java,v $
  **

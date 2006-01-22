@@ -29,7 +29,7 @@ import org.geotools.filter.Filter;
  * implement createAttributeType
  *
  * @author Ian Schneider, USDA-ARS
- * @version $Id: AttributeTypeFactory.java,v 1.7 2003/12/19 00:55:26 jive Exp $
+ * @version $Id$
  */
 public abstract class AttributeTypeFactory implements Factory {
     /** The instance to be returned by {@link #defaultInstance()} */

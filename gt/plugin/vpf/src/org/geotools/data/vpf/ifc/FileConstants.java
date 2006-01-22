@@ -20,7 +20,7 @@ package org.geotools.data.vpf.ifc;
  * FileConstants.java Created: Fri Dec 27 23:16:01 2002
  *
  * @author <a href="mailto:kobit@users.sf.net">Artur Hefczyc</a>
- * @version $Id: FileConstants.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @version $Id$
  */
 public interface FileConstants {
     //VPF Separators

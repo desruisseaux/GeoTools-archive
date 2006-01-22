@@ -78,7 +78,7 @@ import org.geotools.filter.Expression;
  * standards with names and semantics which are as close as possible.
  * </ul>
  * </p>
- * @version $Id: Stroke.java,v 1.13 2003/08/10 08:33:39 seangeo Exp $
+ * @version $Id$
  * @author James Macgill
  */
 public interface Stroke extends GTComponent {

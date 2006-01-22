@@ -59,7 +59,7 @@ import org.geotools.event.GTComponent;
  * &lt;/xsd:element&gt;
  * </code></pre>
  *
- * @version $Id: FeatureTypeStyle.java,v 1.14 2003/09/06 04:14:12 seangeo Exp $
+ * @version $Id$
  * @author James Macgill, CCG
  */
 public interface FeatureTypeStyle extends GTComponent {

@@ -50,7 +50,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @version $Id: LinePlacementImpl.java,v 1.6 2003/09/06 04:52:31 seangeo Exp $
+ * @version $Id$
  */
 public class LinePlacementImpl extends AbstractGTComponent
     implements LinePlacement, Cloneable {

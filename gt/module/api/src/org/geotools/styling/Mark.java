@@ -84,7 +84,7 @@ import org.geotools.filter.Expression;
  * </p>
  *
  * @author James Macgill
- * @version $Id: Mark.java,v 1.15 2003/09/06 04:14:12 seangeo Exp $
+ * @version $Id$
  */
 public interface Mark extends Symbol {
 	public static final Mark[] MARKS_EMPTY = new Mark[0];

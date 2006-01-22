@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: LineCoveredByFeatureLineValidation.java,v 1.4 2004/04/20 03:59:18 jive Exp $
+ * @version $Id$
  */
 public class LineCoveredByFeatureLineValidation
     extends DefaultIntegrityValidation {

@@ -36,7 +36,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  *
  * @author Rob Hranac, Vision for New York
  * @author Chris Holmes, TOPP
- * @version $Id: PostgisConnectionFactory.java,v 1.7.2.1 2004/04/09 15:36:24 aaime Exp $
+ * @version $Id$
  *
  * @task REVISIT: connection pooling, implementing java.sql.Datasource.  I
  *       removed the implementing because that class should be provided by the

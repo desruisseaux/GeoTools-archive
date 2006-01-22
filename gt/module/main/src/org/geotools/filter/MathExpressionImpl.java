@@ -31,7 +31,7 @@ import org.geotools.feature.Feature;
  * the denominator in an ExpressionMath division operation.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: MathExpressionImpl.java,v 1.7 2003/07/23 18:13:32 cholmesny Exp $
+ * @version $Id$
  */
 public class MathExpressionImpl extends DefaultExpression
     implements MathExpression {

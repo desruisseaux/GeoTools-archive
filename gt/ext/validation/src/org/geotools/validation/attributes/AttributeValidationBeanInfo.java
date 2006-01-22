@@ -38,7 +38,7 @@ import org.geotools.validation.DefaultFeatureValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: AttributeValidationBeanInfo.java,v 1.1 2004/02/17 20:11:51 dmzwiers Exp $
+ * @version $Id$
  */
 public class AttributeValidationBeanInfo
     extends DefaultFeatureValidationBeanInfo {

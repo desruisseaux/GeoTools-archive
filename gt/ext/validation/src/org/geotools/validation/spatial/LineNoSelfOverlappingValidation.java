@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Point;
 *
 * @author bowens, Refractions Research, Inc.
 * @author $Author: jive $ (last modification)
-* @version $Id: LineNoSelfOverlappingValidation.java,v 1.6 2004/04/26 21:06:01 jive Exp $
+* @version $Id$
 */
 public class LineNoSelfOverlappingValidation extends DefaultFeatureValidation {
    /** The logger for the validation module. */

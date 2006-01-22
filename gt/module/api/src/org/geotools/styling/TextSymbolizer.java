@@ -101,7 +101,7 @@ import java.util.Map;
  * </li>
  * </ul>
  * </p>
- * $Id: TextSymbolizer.java,v 1.7 2003/08/06 18:11:24 desruisseaux Exp $
+ * $Id$
  *
  * @author Ian Turton, CCG
  */

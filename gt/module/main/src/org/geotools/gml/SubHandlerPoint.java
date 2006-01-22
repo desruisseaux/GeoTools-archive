@@ -26,7 +26,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  * @author Ian Turton, CCG
  * @author Rob Hranac, Vision for New York
- * @version $Id: SubHandlerPoint.java,v 1.5 2003/08/14 18:36:47 cholmesny Exp $
+ * @version $Id$
  */
 public class SubHandlerPoint extends SubHandler {
     /** The coordinate of the point. */

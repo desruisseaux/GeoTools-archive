@@ -67,7 +67,7 @@ import java.util.logging.Logger;
  * </p>
  *
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ArcSDEDataStore.java,v 1.8 2004/06/28 10:24:32 jfear Exp $
+ * @version $Id$
  */
 class ArcSDEDataStore extends AbstractDataStore {
     /** DOCUMENT ME! */

@@ -26,7 +26,7 @@ package org.geotools.filter;
  * to use.
  *
  * @author Ian Turton, CCG
- * @version $Id: AbstractFilterImpl.java,v 1.6 2003/07/22 22:41:06 cholmesny Exp $
+ * @version $Id$
  */
 public abstract class AbstractFilterImpl
     extends org.geotools.filter.AbstractFilter {

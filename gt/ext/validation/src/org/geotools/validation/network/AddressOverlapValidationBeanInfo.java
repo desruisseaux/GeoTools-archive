@@ -36,7 +36,7 @@ import org.geotools.validation.DefaultIntegrityValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: AddressOverlapValidationBeanInfo.java,v 1.2 2004/04/08 21:39:02 dmzwiers Exp $
+ * @version $Id$
  */
 public class AddressOverlapValidationBeanInfo
     extends DefaultIntegrityValidationBeanInfo {

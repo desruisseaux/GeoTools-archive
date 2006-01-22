@@ -48,7 +48,7 @@ import org.geotools.feature.SchemaException;
  *
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
- * @version $Id: FIDFeatureReader.java,v 1.5 2003/11/28 08:49:52 seangeo Exp $
+ * @version $Id$
  */
 public class FIDFeatureReader implements FeatureReader {
     /** The logger for the data module. */

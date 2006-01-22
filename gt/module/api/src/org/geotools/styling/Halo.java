@@ -84,7 +84,7 @@ import org.geotools.filter.Expression;
  * </li>
  * </ul>
  * </p>
- * $Id: Halo.java,v 1.5 2003/08/01 16:54:12 ianturton Exp $
+ * $Id$
  *
  * @author Ian Turton, CCG
  */

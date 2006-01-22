@@ -58,7 +58,7 @@ import org.geotools.feature.FeatureType;
  *
  * @author Ian Schneider
  * @author Jody Garnett, Refractions Research
- * @version $Id: FeatureWriter.java,v 1.2 2003/12/01 22:00:48 cholmesny Exp $
+ * @version $Id$
  */
 public interface FeatureWriter {
     /**

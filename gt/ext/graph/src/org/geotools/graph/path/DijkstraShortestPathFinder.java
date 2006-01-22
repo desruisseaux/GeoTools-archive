@@ -1,5 +1,5 @@
 /*
- *    $Id: DijkstraShortestPathFinder.java,v 1.4 2004/06/26 01:11:23 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

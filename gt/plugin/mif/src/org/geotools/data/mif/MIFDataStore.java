@@ -39,7 +39,7 @@ import java.util.Iterator;
  * </p>
  *
  * @author Luca S. Percich, AMA-MI
- * @version $Id: MIFDataStore.java,v 1.11 2005/07/12 10:19:51 lpercich Exp $
+ * @version $Id$
  */
 public class MIFDataStore extends AbstractDataStore {
     // MIF Header clause names

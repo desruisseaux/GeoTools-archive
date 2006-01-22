@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Specification.
  *
  * @author Cameron Shorter
- * @version $Id: MapContext.java,v 1.3 2003/12/23 17:21:02 aaime Exp $
+ * @version $Id$
  */
 public interface MapContext {
     /**

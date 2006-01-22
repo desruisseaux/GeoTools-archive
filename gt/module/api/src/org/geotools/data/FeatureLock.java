@@ -33,7 +33,7 @@ package org.geotools.data;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc.
- * @version $Id: FeatureLock.java,v 1.4 2003/11/05 00:51:35 jive Exp $
+ * @version $Id$
  *
  * @see <a
  *      href="http://vwfs.refractions.net/docs/Database_Research.pdf">Database

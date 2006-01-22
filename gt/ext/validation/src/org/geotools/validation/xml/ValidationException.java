@@ -25,7 +25,7 @@ package org.geotools.validation.xml;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: ValidationException.java,v 1.2 2004/02/17 17:19:14 dmzwiers Exp $
+ * @version $Id$
  */
 public class ValidationException extends Exception {
     public ValidationException() {

@@ -39,7 +39,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * by {@link RenderedMarks}. It is designed for reuse with many different affine transforms and
  * shapes. This class is <strong>not</strong> thread-safe.
  *
- * @version $Id: TransformedShape.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class TransformedShape extends AffineTransform implements Shape {

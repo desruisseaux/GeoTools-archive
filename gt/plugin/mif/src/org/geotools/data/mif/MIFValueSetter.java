@@ -22,7 +22,7 @@ package org.geotools.data.mif;
  * text lines and converting them into features.</p>
  *
  * @author Luca S. Percich, AMA-MI
- * @version $Id: MIFValueSetter.java,v 1.4 2005/06/16 14:06:42 lpercich Exp $
+ * @version $Id$
 */
 public abstract class MIFValueSetter {
     protected String strValue = null; // The object value as string

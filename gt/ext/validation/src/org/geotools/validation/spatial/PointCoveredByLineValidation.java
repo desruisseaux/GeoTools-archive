@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.Point;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: PointCoveredByLineValidation.java,v 1.4 2004/02/27 21:28:50 dmzwiers Exp $
+ * @version $Id$
  */
 public class PointCoveredByLineValidation extends PointLineAbstractValidation {
     /**

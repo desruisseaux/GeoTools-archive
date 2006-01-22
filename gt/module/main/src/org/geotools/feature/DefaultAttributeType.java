@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Rob Hranac, VFNY
  * @author Chris Holmes, TOPP
  * @author Ian Schneider
- * @version $Id: DefaultAttributeType.java,v 1.27 2004/04/03 13:47:18 aaime Exp $
+ * @version $Id$
  */
 public class DefaultAttributeType implements AttributeType {
     /** Name of this attribute. */

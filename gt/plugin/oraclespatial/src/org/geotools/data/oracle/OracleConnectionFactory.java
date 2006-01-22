@@ -31,7 +31,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @version $Id: OracleConnectionFactory.java,v 1.5 2003/08/15 00:42:47 seangeo Exp $
+ * @version $Id$
  */
 public class OracleConnectionFactory {
     /** The prefix of an Oracle JDBC url */

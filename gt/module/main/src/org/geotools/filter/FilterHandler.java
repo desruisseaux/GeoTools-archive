@@ -25,7 +25,7 @@ import org.xml.sax.ContentHandler;
  * filter information.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: FilterHandler.java,v 1.3 2003/07/30 00:08:56 cholmesny Exp $
+ * @version $Id$
  */
 public interface FilterHandler extends ContentHandler {
     /**

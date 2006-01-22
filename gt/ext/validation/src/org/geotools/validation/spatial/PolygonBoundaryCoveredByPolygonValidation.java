@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: PolygonBoundaryCoveredByPolygonValidation.java,v 1.4 2004/02/27 21:28:50 dmzwiers Exp $
+ * @version $Id$
  */
 public class PolygonBoundaryCoveredByPolygonValidation
     extends PolygonPolygonAbstractValidation {

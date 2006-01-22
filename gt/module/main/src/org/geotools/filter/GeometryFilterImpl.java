@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author Rob Hranac, TOPP
- * @version $Id: GeometryFilterImpl.java,v 1.15 2004/04/12 16:53:20 aaime Exp $
+ * @version $Id$
  *
  * @task REVISIT: make this class (and all filters) immutable, implement
  *       cloneable and return new filters when calling addLeftGeometry and

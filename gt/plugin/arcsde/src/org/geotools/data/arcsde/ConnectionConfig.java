@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  * connection properties
  * 
  * @author Gabriel Rold?n
- * @version $Id: ConnectionConfig.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
+ * @version $Id$
  */
 public class ConnectionConfig {
 	/**

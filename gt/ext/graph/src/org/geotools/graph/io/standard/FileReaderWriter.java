@@ -1,5 +1,5 @@
 /*
- *    $Id: FileReaderWriter.java,v 1.2 2004/05/05 06:07:39 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

@@ -56,7 +56,7 @@ import org.geotools.validation.DefaultFeatureValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: LineNoSelfOverlappingValidationBeanInfo.java,v 1.2 2004/04/26 21:04:43 jive Exp $
+ * @version $Id$
  */
 public class LineNoSelfOverlappingValidationBeanInfo extends DefaultFeatureValidationBeanInfo{
     /**

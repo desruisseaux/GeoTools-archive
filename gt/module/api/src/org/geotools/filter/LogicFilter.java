@@ -26,7 +26,7 @@ import java.util.Iterator;
  *
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @version $Id: LogicFilter.java,v 1.4 2003/08/07 21:30:36 cholmesny Exp $
+ * @version $Id$
  */
 public interface LogicFilter extends Filter {
     /**

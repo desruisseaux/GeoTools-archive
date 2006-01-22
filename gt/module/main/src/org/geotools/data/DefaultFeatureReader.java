@@ -30,7 +30,7 @@ import org.geotools.feature.SchemaException;
  * Basic support for reading Features from an AttributeReader.
  *
  * @author Ian Schneider
- * @version $Id: DefaultFeatureReader.java,v 1.2 2003/11/04 00:28:49 cholmesny Exp $
+ * @version $Id$
  */
 public class DefaultFeatureReader implements FeatureReader {
     private final AttributeReader attributeReader;

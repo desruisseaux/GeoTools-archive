@@ -49,7 +49,7 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @version $Id: DisplacementImpl.java,v 1.6 2003/09/06 04:52:31 seangeo Exp $
+ * @version $Id$
  */
 public class DisplacementImpl extends AbstractGTComponent
     implements Displacement, Cloneable {

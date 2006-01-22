@@ -26,7 +26,7 @@ import java.io.IOException;
  *    validation??
  *  
  *
- * @version $Id: AttributeWriter.java,v 1.2 2003/12/01 22:00:37 cholmesny Exp $
+ * @version $Id$
  * @author  Ian Schneider
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
  */

@@ -27,7 +27,7 @@ package org.geotools.styling;
  *
  * @author James Macgill
  * @author Ian Turton
- * @version $Id: StyleVisitor.java,v 1.2 2003/08/19 13:03:03 ianturton Exp $
+ * @version $Id$
  */
 public interface StyleVisitor {
 	

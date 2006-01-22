@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.TopologyException;
  * Implements a Bounding Box expression.
  *
  * @author Ian Turton, CCG
- * @version $Id: BBoxExpressionImpl.java,v 1.4 2003/07/22 22:41:07 cholmesny Exp $
+ * @version $Id$
  */
 public class BBoxExpressionImpl
     extends org.geotools.filter.LiteralExpressionImpl implements BBoxExpression {

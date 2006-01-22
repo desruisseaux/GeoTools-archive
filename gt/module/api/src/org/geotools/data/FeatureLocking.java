@@ -42,7 +42,7 @@ import org.geotools.filter.Filter;
  * @author Ray Gallagher
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @version $Id: FeatureLocking.java,v 1.2 2003/12/01 22:00:40 cholmesny Exp $
+ * @version $Id$
  */
 public interface FeatureLocking extends FeatureStore {
     /**

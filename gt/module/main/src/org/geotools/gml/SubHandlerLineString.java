@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  * @author Ian Turton, CCG
  * @author Rob Hranac, Vision for New York
- * @version $Id: SubHandlerLineString.java,v 1.6 2003/08/14 18:36:47 cholmesny Exp $
+ * @version $Id$
  */
 public class SubHandlerLineString extends SubHandler {
     /** List of coordinates for LineString. */

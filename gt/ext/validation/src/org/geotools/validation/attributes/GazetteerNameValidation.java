@@ -69,7 +69,7 @@ import org.xml.sax.InputSource;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: GazetteerNameValidation.java,v 1.2 2004/02/17 17:19:15 dmzwiers Exp $
+ * @version $Id$
  */
 public class GazetteerNameValidation extends DefaultFeatureValidation {
     /** used to store the gazetteer url */

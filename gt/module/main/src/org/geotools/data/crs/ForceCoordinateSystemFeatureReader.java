@@ -57,7 +57,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author jgarnett, Refractions Research, Inc.
  * @author aaime
  * @author $Author: jive $ (last modification)
- * @version $Id: ForceCoordinateSystemFeatureReader.java,v 1.1 2003/12/19 01:05:08 jive Exp $
+ * @version $Id$
  */
 public class ForceCoordinateSystemFeatureReader implements FeatureReader {
     protected FeatureReader reader;

@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Envelope;
 /**
  * This specifies the interface to create filters.
  *
- * @version $Id: FilterFactory.java,v 1.7 2003/08/07 19:55:22 cholmesny Exp $
+ * @version $Id$
  *
  * @task TODO: This needs to be massively overhauled.  This should be the
  *       source of immutability of filters.  See {@link FeatureTypeFactory},

@@ -34,7 +34,7 @@ import org.geotools.feature.Feature;
  * simplify/make meaningful filter logic.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: CompareFilter.java,v 1.3 2003/08/07 19:55:21 cholmesny Exp $
+ * @version $Id$
  */
 public interface CompareFilter extends Filter {
     /**

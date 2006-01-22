@@ -71,7 +71,7 @@ public final class Source implements Taglet {
      * The pattern to use for fetching the module name from an URL.
      */
     private final Pattern findModule = Pattern.compile(
-            ".+\\Q/geotools/trunk/gt/\\E\\p{Alnum}+\\/([\\p{Alnum}\\-]+)\\/.+");
+            ".+\\Q/geotools/trunk/gt/\\E\\(p{Alnum}+)\\/([\\p{Alnum}\\-]+)\\/.+");
 
     /**
      * Constructs a default <code>@source</code> taglet.
@@ -164,10 +164,13 @@ public final class Source implements Taglet {
             if (!matchModule.matches()) {
                 continue;
             }
-            final String module = matchModule.group(1);
+            final String category = matchModule.group(1);
+            final String module   = matchModule.group(2);
             buffer.append('\n');
             buffer.append(i==0 ? "<DD>" : "    ");
             buffer.append("<CODE><B>");
+            buffer.append(category);
+            buffer.append('/');
             buffer.append(module);
             buffer.append("</B></CODE> &nbsp; (<A HREF=\"");
             buffer.append(MAVEN_REPOSITORY_BASE_URL);
@@ -175,7 +178,6 @@ public final class Source implements Taglet {
             buffer.append(module);
             buffer.append("/\"><CODE>gt2-");
             buffer.append(module);
-            buffer.append("-</CODE><VAR>version</VAR><CODE>");
             buffer.append(".jar</CODE></A>) (<A HREF=\"");
             buffer.append(MAVEN_REPORTS_BASE_URL);
             buffer.append(module);

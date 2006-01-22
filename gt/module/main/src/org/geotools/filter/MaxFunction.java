@@ -28,7 +28,7 @@ import org.geotools.feature.Feature;
  * A function that returns the maximum of two arguments.
  *
  * @author James
- * @version $Id: MaxFunction.java,v 1.5 2003/07/22 22:41:08 cholmesny Exp $
+ * @version $Id$
  */
 public class MaxFunction extends FunctionExpressionImpl
     implements FunctionExpression {

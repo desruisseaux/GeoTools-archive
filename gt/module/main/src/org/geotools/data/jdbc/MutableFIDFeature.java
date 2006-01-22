@@ -1,4 +1,4 @@
-/* $Id: MutableFIDFeature.java,v 1.1.2.1 2004/04/09 15:30:52 aaime Exp $
+/* $Id$
  * 
  * Created on 13/01/2004
  */
@@ -11,7 +11,7 @@ import org.geotools.feature.IllegalAttributeException;
 /**
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: aaime $
- * @version $Id: MutableFIDFeature.java,v 1.1.2.1 2004/04/09 15:30:52 aaime Exp $
+ * @version $Id$
  * Last Modified: $Date: 2004/04/09 15:30:52 $ 
  */
 public class MutableFIDFeature extends DefaultFeature {

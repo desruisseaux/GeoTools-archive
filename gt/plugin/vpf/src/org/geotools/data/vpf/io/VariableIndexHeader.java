@@ -23,7 +23,7 @@ import org.geotools.data.vpf.ifc.VPFHeader;
  * VariableIndexHeader.java Created: Tue Mar 11 23:41:57 2003
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @version $Id: VariableIndexHeader.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @version $Id$
  */
 public class VariableIndexHeader implements VPFHeader {
     /**

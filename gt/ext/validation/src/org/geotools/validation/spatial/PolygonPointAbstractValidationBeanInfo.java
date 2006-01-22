@@ -58,7 +58,7 @@ import org.geotools.validation.DefaultIntegrityValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: PolygonPointAbstractValidationBeanInfo.java,v 1.3 2004/04/08 21:39:10 dmzwiers Exp $
+ * @version $Id$
  */
 public class PolygonPointAbstractValidationBeanInfo extends DefaultIntegrityValidationBeanInfo{
     /**

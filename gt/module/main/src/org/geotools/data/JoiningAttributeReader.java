@@ -25,7 +25,7 @@ import org.geotools.feature.AttributeType;
  * Attribute Reader that joins.
  *
  * @author Ian Schneider
- * @version $Id: JoiningAttributeReader.java,v 1.2 2003/11/04 00:28:50 cholmesny Exp $
+ * @version $Id$
  */
 public class JoiningAttributeReader implements AttributeReader {
     private AttributeReader[] readers;

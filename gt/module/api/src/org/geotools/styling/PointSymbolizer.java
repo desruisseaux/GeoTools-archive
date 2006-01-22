@@ -96,7 +96,7 @@ package org.geotools.styling;
  * </p>
  *
  * @author James Macgill
- * @version $Id: PointSymbolizer.java,v 1.6 2003/10/17 22:50:10 ianschneider Exp $
+ * @version $Id$
  */
 public interface PointSymbolizer extends Symbolizer {
     /**

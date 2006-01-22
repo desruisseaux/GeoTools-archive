@@ -33,7 +33,7 @@ import org.geotools.data.FileDataStoreFactorySpi;
  * Implementation of the DataStore service provider interface for Shapefiles.
  *
  * @author Chris Holmes, TOPP
- * @version $Id: ShapefileDataStoreFactory.java,v 1.7 2004/05/06 21:50:10 ianschneider Exp $
+ * @version $Id$
  */
 public class ShapefileDataStoreFactory
     implements FileDataStoreFactorySpi {

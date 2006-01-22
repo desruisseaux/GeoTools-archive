@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: OrphanNodeValidation.java,v 1.4 2004/04/08 21:39:03 dmzwiers Exp $
+ * @version $Id$
  */
 public class OrphanNodeValidation extends DefaultIntegrityValidation {
     /** the FeatureSource name datastoreId:typename */

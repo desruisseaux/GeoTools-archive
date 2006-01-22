@@ -22,7 +22,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * An XMLEncoder for Filters and Expressions.
  *
- * @version $Id: FilterTransformer.java,v 1.9 2004/03/29 21:31:21 ianschneider Exp $
+ * @version $Id$
  * @author Ian Schneider
  *
  */

@@ -31,7 +31,7 @@ import org.geotools.feature.Feature;
  * filter.
  *
  * @author Rob Hranac, TOPP
- * @version $Id: BetweenFilterImpl.java,v 1.8 2004/03/13 06:25:31 cholmesny Exp $
+ * @version $Id$
  *
  * @task REVISIT: I think AbstractFilter right now does not consider between a
  *       math filter. ch

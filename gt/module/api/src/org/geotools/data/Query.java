@@ -58,7 +58,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  *
  * @author Chris Holmes
- * @version $Id: Query.java,v 1.13 2004/03/07 02:08:58 cholmesny Exp $
+ * @version $Id$
  */
 public interface Query {
     /** TODO: should this be ANY_URI */

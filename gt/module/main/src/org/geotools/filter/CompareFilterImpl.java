@@ -40,7 +40,7 @@ import org.geotools.feature.Feature;
  * to simplify/make meaningful filter logic.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: CompareFilterImpl.java,v 1.12 2004/03/13 06:25:31 cholmesny Exp $
+ * @version $Id$
  */
 public class CompareFilterImpl extends AbstractFilterImpl
     implements CompareFilter {

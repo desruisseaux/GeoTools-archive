@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence.Double;
  * LineString object.
  *
  * @author Andrea Aime
- * @version $Id: PackedLineIterator.java 10319 2005-01-06 15:54:24Z aaime $
+ * @version $Id$
  */
 class PackedLineIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */

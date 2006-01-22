@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author bowens, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: IsValidGeometryValidation.java,v 1.4 2004/03/09 19:37:38 dmzwiers Exp $
+ * @version $Id$
  */
 public class IsValidGeometryValidation extends DefaultFeatureValidation {
     /** The logger for the validation module. */

@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  *
  * @author Ian Turton, CCG
  * @author Rob Hranac, Vision for New York
- * @version $Id: SubHandlerMulti.java,v 1.6 2003/08/14 18:36:47 cholmesny Exp $
+ * @version $Id$
  */
 public class SubHandlerMulti extends SubHandler {
     /** The logger for the GML module. */

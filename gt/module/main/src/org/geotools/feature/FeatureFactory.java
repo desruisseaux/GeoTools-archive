@@ -30,7 +30,7 @@ package org.geotools.feature;
  * Please see experimental FeatureFactory2 (a subclass) for the current best
  * idea of what is needed.
  * </p>
- * @version $Id: FeatureFactory.java,v 1.3 2003/08/05 22:48:23 cholmesny Exp $
+ * @version $Id$
  *
  * @task REVISIT: consider a static create(Object[] attributes,  String
  *       FeatureID, FeatureType type) method.

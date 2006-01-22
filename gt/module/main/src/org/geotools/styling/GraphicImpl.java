@@ -51,7 +51,7 @@ import java.util.Iterator;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @version $Id: GraphicImpl.java,v 1.20 2004/02/12 11:17:04 aaime Exp $
+ * @version $Id$
  */
 public class GraphicImpl extends AbstractGTComponent implements Graphic,
     Cloneable {

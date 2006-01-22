@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: LineNotTouchingPolygonInteriorValidation.java,v 1.5 2004/04/15 18:18:01 dmzwiers Exp $
+ * @version $Id$
  */
 public class LineNotTouchingPolygonInteriorValidation
     extends LinePolygonAbstractValidation {

@@ -56,7 +56,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  * 
  * @author Ian Schneider
- * @version $Id: DefaultFeatureCollection.java,v 1.6 2003/12/04 23:17:23 aaime Exp $
+ * @version $Id$
  */
 public class DefaultFeatureCollection implements FeatureCollection {
     

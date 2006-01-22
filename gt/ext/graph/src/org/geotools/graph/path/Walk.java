@@ -1,5 +1,5 @@
 /*
- *    $Id: Walk.java,v 1.13 2004/07/15 00:52:57 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

@@ -38,7 +38,7 @@ import org.geotools.validation.DefaultIntegrityValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: UniqueFIDValidationBeanInfo.java,v 1.3 2004/02/17 17:19:15 dmzwiers Exp $
+ * @version $Id$
  */
 public class UniqueFIDValidationBeanInfo
     extends DefaultIntegrityValidationBeanInfo {

@@ -25,7 +25,7 @@ import org.geotools.feature.Feature;
  * It should handle xpath attributePaths of features, and should
  * report the attribute found at the attributePath of a feature.
  * </p>
- * @version $Id: AttributeExpression.java,v 1.5 2003/09/07 14:19:33 jmacgill Exp $
+ * @version $Id$
  */
 public interface AttributeExpression extends Expression {
     /**

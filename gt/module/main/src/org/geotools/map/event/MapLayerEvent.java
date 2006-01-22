@@ -27,7 +27,7 @@ import java.util.EventObject;
  * @author Andrea Aime
  * @author Ian Turton
  * @author Martin Desruisseaux
- * @version $Id: MapLayerEvent.java,v 1.3 2004/04/18 03:24:34 groldan Exp $
+ * @version $Id$
  *
  * @see Layer
  * @see LayerListener

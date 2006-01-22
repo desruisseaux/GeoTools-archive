@@ -22,7 +22,7 @@ import org.geotools.feature.Feature;
  * Defines an OpenGIS Filter object, with default behaviors for all methods.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: Filter.java,v 1.14 2004/03/15 20:15:53 aaime Exp $
+ * @version $Id$
  */
 public interface Filter extends FilterType {
     /**

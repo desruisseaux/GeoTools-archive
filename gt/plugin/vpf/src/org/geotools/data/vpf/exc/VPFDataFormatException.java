@@ -24,7 +24,7 @@ package org.geotools.data.vpf.exc;
  * </p>
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @version $Id: VPFDataFormatException.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @version $Id$
  */
 public class VPFDataFormatException extends RuntimeException {
     /**

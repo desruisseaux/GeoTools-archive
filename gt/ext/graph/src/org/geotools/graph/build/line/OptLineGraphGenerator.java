@@ -1,5 +1,5 @@
 /*
- *    $Id: OptLineGraphGenerator.java,v 1.5 2004/05/16 21:14:03 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

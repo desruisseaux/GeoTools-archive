@@ -48,7 +48,7 @@ import org.geotools.event.GTComponent;
  * &lt;/xsd:element&gt;
  * </code></pre> 
  * 
- * @version $Id: Style.java,v 1.12 2003/10/10 18:31:28 ianschneider Exp $
+ * @version $Id$
  * @author James Macgill
  */
 public interface Style extends GTComponent {

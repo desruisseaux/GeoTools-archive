@@ -33,7 +33,7 @@ import org.geotools.feature.Feature;
  * uniquely.
  *
  * @author Rob Hranac, TOPP
- * @version $Id: FidFilterImpl.java,v 1.13 2004/02/20 00:18:31 seangeo Exp $
+ * @version $Id$
  */
 public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
     /** Logger for the default core module. */

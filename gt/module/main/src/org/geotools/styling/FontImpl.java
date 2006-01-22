@@ -49,7 +49,7 @@ import org.opengis.util.Cloneable;
  * Provides a Java representation of the Font element of an SLD.
  *
  * @author Ian Turton, CCG
- * @version $Id: FontImpl.java,v 1.6 2003/09/06 04:52:31 seangeo Exp $
+ * @version $Id$
  */
 public class FontImpl extends AbstractGTComponent implements Font, Cloneable {
     /** The logger for the default core module. */

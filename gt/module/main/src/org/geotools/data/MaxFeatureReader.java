@@ -29,7 +29,7 @@ import org.geotools.feature.IllegalAttributeException;
  * features passed in.
  *
  * @author Chris Holmes
- * @version $Id: MaxFeatureReader.java,v 1.1 2003/11/11 02:33:05 cholmesny Exp $
+ * @version $Id$
  */
 public class MaxFeatureReader implements FeatureReader {
     protected final FeatureReader featureReader;

@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author James Macgill, CCG
- * @version $Id: StyleImpl.java,v 1.19 2003/10/10 18:33:24 ianschneider Exp $
+ * @version $Id$
  */
 public class StyleImpl extends AbstractGTComponent
     implements org.geotools.styling.Style, Cloneable {

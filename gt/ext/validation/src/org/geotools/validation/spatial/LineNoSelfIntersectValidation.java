@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.LineString;
  *
  * @author bowens, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: LineNoSelfIntersectValidation.java,v 1.6 2004/04/26 21:03:42 jive Exp $
+ * @version $Id$
  * - bowens: changed intersects to crosses
  */
 public class LineNoSelfIntersectValidation extends DefaultFeatureValidation {

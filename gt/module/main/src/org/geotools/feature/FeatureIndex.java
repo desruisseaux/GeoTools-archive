@@ -30,7 +30,7 @@ package org.geotools.feature;
  *
  * @author Ray Gallagher
  * @author Ian Schneider
- * @version $Id: FeatureIndex.java,v 1.7 2003/07/23 14:46:45 ianschneider Exp $
+ * @version $Id$
  */
 public interface FeatureIndex extends CollectionListener {
     /** Gets an "in order" Iterator of the Features as indexed.

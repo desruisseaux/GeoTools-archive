@@ -67,7 +67,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author jgarnett, Refractions Research, Inc.
  * @author aaime
  * @author $Author: jive $ (last modification)
- * @version $Id: ReprojectFeatureReader.java,v 1.1 2003/12/19 01:08:58 jive Exp $
+ * @version $Id$
  */
 public class ReprojectFeatureReader implements FeatureReader {
     FeatureReader reader;

@@ -131,7 +131,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Rob Hranac, TOPP
  * @author Ian Schneider, USDA-ARS
  * @author dzwiers
- * @version $Id: Feature.java,v 1.11 2003/11/26 00:30:05 jive Exp $
+ * @version $Id$
  *
  * @see org.geotools.feature.FeatureType
  * @see org.geotools.feature.DefaultFeature

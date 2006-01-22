@@ -49,7 +49,7 @@ import java.util.Map;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @version $Id: ExternalGraphicImpl.java,v 1.10 2004/04/08 13:26:05 jfc173 Exp $
+ * @version $Id$
  */
 public class ExternalGraphicImpl extends AbstractGTComponent
     implements ExternalGraphic, Symbol, Cloneable {

@@ -35,7 +35,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
- * @version $Id: VPFInputStream.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @version $Id$
  */
 public abstract class VPFInputStream implements FileConstants,
                                                 DataTypesDefinition {

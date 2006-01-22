@@ -26,7 +26,7 @@ package org.geotools.filter;
  * infomration from the Filter strucure, for example a list of all bboxes.
  *
  * @author James Macgill
- * @version $Id: FilterVisitor.java,v 1.8 2003/08/07 19:55:22 cholmesny Exp $
+ * @version $Id$
  *
  * @task REVISIT: These need to throw some sort of checked exception as the
  *       implementing classes are swallowing exceptions or throwing runtime

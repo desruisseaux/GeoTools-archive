@@ -21,7 +21,7 @@ import org.geotools.feature.AttributeType;
 /**
  * Provides support for creating AttributeReaders.
  * 
- * @version $Id: AbstractAttributeIO.java,v 1.2 2003/11/04 00:28:49 cholmesny Exp $
+ * @version $Id$
  * @author  Ian Schneider
  */
 public abstract class AbstractAttributeIO {

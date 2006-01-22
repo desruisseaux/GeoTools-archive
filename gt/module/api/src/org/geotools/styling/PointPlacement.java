@@ -68,7 +68,7 @@ import org.geotools.filter.Expression;
  * </p>
  * 
  * <p>
- * $Id: PointPlacement.java,v 1.4 2003/08/01 16:54:21 ianturton Exp $
+ * $Id$
  * </p>
  *
  * @author Ian Turton

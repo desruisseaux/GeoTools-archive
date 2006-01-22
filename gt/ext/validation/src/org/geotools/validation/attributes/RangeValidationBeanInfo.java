@@ -38,7 +38,7 @@ import org.geotools.validation.DefaultFeatureValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: RangeValidationBeanInfo.java,v 1.3 2004/04/17 00:02:59 jive Exp $
+ * @version $Id$
  */
 public class RangeValidationBeanInfo extends DefaultFeatureValidationBeanInfo {
     /**

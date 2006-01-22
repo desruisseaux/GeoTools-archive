@@ -37,7 +37,7 @@ import java.util.ResourceBundle;
  *
  * @author David Zwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: ValidationBeanInfo.java,v 1.3 2004/04/26 18:45:54 jive Exp $
+ * @version $Id$
  */
 public class ValidationBeanInfo extends SimpleBeanInfo {
     /**
@@ -142,7 +142,7 @@ public class ValidationBeanInfo extends SimpleBeanInfo {
      *
      * @author dzwiers, Refractions Research, Inc.
      * @author $Author: jive $ (last modification)
-     * @version $Id: ValidationBeanInfo.java,v 1.3 2004/04/26 18:45:54 jive Exp $
+     * @version $Id$
      */
     class URLPropertyEditor extends PropertyEditorSupport {
         /** the editor's data */

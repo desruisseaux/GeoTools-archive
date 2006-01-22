@@ -1,5 +1,5 @@
 /*
- *    $Id: BasicGraphable.java,v 1.5 2004/05/21 20:51:34 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

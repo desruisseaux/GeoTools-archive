@@ -29,7 +29,7 @@ import org.geotools.data.DataStore;
  * 
  * @author jgarnett, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: PostgisDataStoreFactoryTest.java,v 1.3 2004/01/14 10:24:59 jive Exp $
+ * @version $Id$
  */
 public class PostgisDataStoreFactoryOnlineTest extends TestCase {
     static PostgisDataStoreFactory factory

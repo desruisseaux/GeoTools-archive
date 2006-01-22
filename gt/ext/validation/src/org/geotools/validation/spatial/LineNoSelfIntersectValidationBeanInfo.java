@@ -30,7 +30,7 @@ import org.geotools.validation.DefaultFeatureValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: LineNoSelfIntersectValidationBeanInfo.java,v 1.2 2004/04/21 11:07:10 jive Exp $
+ * @version $Id$
  */
 public class LineNoSelfIntersectValidationBeanInfo extends DefaultFeatureValidationBeanInfo {
     /**

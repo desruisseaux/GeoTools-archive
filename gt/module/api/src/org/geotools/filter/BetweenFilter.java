@@ -30,7 +30,7 @@ import org.geotools.feature.Feature;
  * filter.
  *
  * @author Rob Hranac, TOPP
- * @version $Id: BetweenFilter.java,v 1.3 2003/08/07 19:55:21 cholmesny Exp $
+ * @version $Id$
  */
 public interface BetweenFilter extends CompareFilter {
 

@@ -30,7 +30,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  * installed with GEOS support, to handle all the advanced spatial queries.
  *
  * @author Chris Holmes, TOPP
- * @version $Id: SQLEncoderPostgisGeos.java,v 1.3.2.1 2004/05/02 15:27:02 aaime Exp $
+ * @version $Id$
  */
 public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
     implements org.geotools.filter.FilterVisitor {

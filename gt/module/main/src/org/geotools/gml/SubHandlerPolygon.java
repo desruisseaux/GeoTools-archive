@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.TopologyException;
  *
  * @author Ian Turton, CCG
  * @author Rob Hranac, Vision for New York
- * @version $Id: SubHandlerPolygon.java,v 1.11 2003/09/07 17:32:05 jmacgill Exp $
+ * @version $Id$
  */
 public class SubHandlerPolygon extends SubHandler {
     /** The logger for the GML module. */

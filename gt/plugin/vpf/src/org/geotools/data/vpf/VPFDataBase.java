@@ -36,7 +36,7 @@ import org.geotools.feature.SchemaException;
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project
  *         OneMap
- * @version $Id: VPFDataBase.java,v 1.1 2004/05/03 11:48:20 knutejoh Exp $
+ * @version $Id$
  */
 public class VPFDataBase implements FileConstants {
     /**

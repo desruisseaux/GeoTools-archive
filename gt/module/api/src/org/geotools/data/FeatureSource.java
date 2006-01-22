@@ -58,7 +58,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Ray Gallagher
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @version $Id: FeatureSource.java,v 1.4 2004/02/11 14:09:54 aaime Exp $
+ * @version $Id$
  */
 public interface FeatureSource {
     /**

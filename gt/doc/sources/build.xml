@@ -6,7 +6,7 @@
      Before running, make sure to set 'basedir' and 'homepath' properties.
      'basedir' is the destination directory; 'homepath' is the CVS installation.
 
-     Version: $Id: build.xml,v 1.1 2004/05/09 15:47:13 desruisseaux Exp $
+     Version: $Id$
      ======================================================================== -->
 
 

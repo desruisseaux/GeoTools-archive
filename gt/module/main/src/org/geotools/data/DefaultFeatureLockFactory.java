@@ -21,7 +21,7 @@ package org.geotools.data;
  *
  * @author Jody Garnett, Refractions Research, Inc.
  * @author Chris Holmes, TOPP.
- * @version $Id: DefaultFeatureLockFactory.java,v 1.2 2003/10/01 23:41:48 jive Exp $
+ * @version $Id$
  *
  * @task REVISIT: Should more of this code move to the parent?  I guess if
  *       other implementations came along they may want to implement

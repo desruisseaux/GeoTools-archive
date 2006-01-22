@@ -15,7 +15,7 @@
       </editor>
     </authorgroup>
     <date>$Date: 2003/04/25 22:56:19 $</date>
-    <edition>$Id: userguide.xml,v 1.4 2003/04/25 22:56:19 camerons Exp $</edition>
+    <edition>$Id$</edition>
     <abstract>
       <para>Guide to aid <filename>geotools2</filename></para>
       users 

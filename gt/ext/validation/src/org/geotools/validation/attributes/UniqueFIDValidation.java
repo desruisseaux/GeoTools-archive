@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author bowens, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: UniqueFIDValidation.java,v 1.2 2004/02/17 17:19:15 dmzwiers Exp $
+ * @version $Id$
  */
 public class UniqueFIDValidation extends DefaultIntegrityValidation {
     /** Type Ref or "" for all */

@@ -20,7 +20,7 @@ package org.geotools.data.vpf.ifc;
  * VPFHeader.java Created: Mon Feb 24 22:51:07 2003
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @version $Id: VPFHeader.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @version $Id$
  */
 public interface VPFHeader {
     /**

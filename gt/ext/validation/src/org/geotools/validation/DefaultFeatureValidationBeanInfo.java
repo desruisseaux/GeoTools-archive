@@ -36,7 +36,7 @@ import java.util.ResourceBundle;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: DefaultFeatureValidationBeanInfo.java,v 1.2 2004/02/17 17:19:13 dmzwiers Exp $
+ * @version $Id$
  */
 public class DefaultFeatureValidationBeanInfo extends ValidationBeanInfo {
     /**

@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Factory for creating DefaultAttributeTypes.
  *
  * @author Ian Schneider
- * @version $Id: DefaultAttributeTypeFactory.java,v 1.11 2004/02/16 06:53:38 aaime Exp $
+ * @version $Id$
  */
 public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
 	private FilterFactory ff;

@@ -95,7 +95,7 @@ import org.geotools.filter.Expression;
  * </p>
  *
  * @author James Macgill, CCG
- * @version $Id: Fill.java,v 1.12 2003/09/06 04:14:12 seangeo Exp $
+ * @version $Id$
  */
 public interface Fill extends GTComponent {
 	

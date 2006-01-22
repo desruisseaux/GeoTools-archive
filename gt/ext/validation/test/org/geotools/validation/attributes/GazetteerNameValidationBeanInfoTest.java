@@ -20,7 +20,7 @@ import junit.framework.TestCase;
  * 
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: sploreg $ (last modification)
- * @version $Id: GazetteerNameValidationBeanInfoTest.java,v 1.1 2004/04/29 21:57:32 sploreg Exp $
+ * @version $Id$
  */
 public class GazetteerNameValidationBeanInfoTest extends TestCase {
 

@@ -30,7 +30,7 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: GMLHandlerGeometry.java,v 1.7 2003/08/14 18:36:47 cholmesny Exp $
+ * @version $Id$
  */
 public interface GMLHandlerGeometry extends ContentHandler {
     /**

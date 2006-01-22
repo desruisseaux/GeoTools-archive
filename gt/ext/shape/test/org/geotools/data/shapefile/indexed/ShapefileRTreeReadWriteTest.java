@@ -36,7 +36,7 @@ import org.geotools.TestData;
 
 
 /**
- * @version $Id: ShapefileReadWriteTest.java 17482 2006-01-09 22:10:05Z desruisseaux $
+ * @version $Id$
  * @author Ian Schneider
  */
 public class ShapefileRTreeReadWriteTest extends TestCaseSupport {

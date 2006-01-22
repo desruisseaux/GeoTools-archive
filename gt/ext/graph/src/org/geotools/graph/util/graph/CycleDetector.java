@@ -1,5 +1,5 @@
 /*
- *    $Id: CycleDetector.java,v 1.2 2004/05/08 15:13:01 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

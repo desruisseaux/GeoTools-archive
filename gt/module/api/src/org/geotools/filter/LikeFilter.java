@@ -22,7 +22,7 @@ import org.geotools.feature.Feature;
  * Defines a like filter, which checks to see if an attribute matches a REGEXP.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: LikeFilter.java,v 1.5 2003/08/07 21:30:36 cholmesny Exp $
+ * @version $Id$
  */
 public interface LikeFilter extends Filter {
     /**

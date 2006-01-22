@@ -23,7 +23,7 @@ package org.geotools.data.vpf.ifc;
  * Created: Fri Apr 04 14:06:29 2003
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @version $Id: VPFLibraryIfc.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @version $Id$
  */
 public interface VPFLibraryIfc {
     /**

@@ -1,5 +1,5 @@
 /*
- *    $Id: Path.java,v 1.3 2004/05/23 17:11:25 jdeolive Exp $
+ *    $Id$
  * 
  * 
  *    Geotools2 - OpenSource mapping toolkit

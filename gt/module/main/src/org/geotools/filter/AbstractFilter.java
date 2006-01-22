@@ -26,7 +26,7 @@ import org.geotools.feature.Feature;
  * methods.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: AbstractFilter.java,v 1.11 2004/03/15 20:15:53 aaime Exp $
+ * @version $Id$
  */
 public abstract class AbstractFilter implements Filter {
     /** The logger for the default core module. */

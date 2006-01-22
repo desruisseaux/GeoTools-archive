@@ -30,7 +30,7 @@ import java.sql.SQLException;
  *
  * @author Rob Hranac, Vision for New York
  * @author Chris Holmes, Vision for New York
- * @version $Id: MysqlConnection.java,v 1.2 2003/08/21 16:04:02 cholmesny Exp $
+ * @version $Id$
  */
 public class MysqlConnection implements javax.sql.DataSource {
     //private static Category _log = Category.getInstance(MysqlConnection.class.getName());

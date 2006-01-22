@@ -1,5 +1,5 @@
 /*
- *   $Id: OptDirectedGraphBuilder.java,v 1.2 2004/04/28 23:40:05 jdeolive Exp $
+ *   $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

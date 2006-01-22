@@ -30,7 +30,7 @@ import org.geotools.factory.FactoryFinder;
  * <code><pre>
  * FeatureLock lock = FeatureLockFactory.generate( "MyLock", 3600 );
  * </pre></code>
- * @version $Id: FeatureLockFactory.java,v 1.2 2003/10/01 23:40:31 jive Exp $
+ * @version $Id$
  * @task REVISIT: Combine this with a factory to also make Query objects?
  * @author Chris Holmes, TOPP
  */

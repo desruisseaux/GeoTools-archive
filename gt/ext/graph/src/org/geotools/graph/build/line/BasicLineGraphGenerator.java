@@ -1,5 +1,5 @@
 /*
- *     $Id: BasicLineGraphGenerator.java,v 1.4 2004/05/18 19:42:04 jdeolive Exp $
+ *     $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

@@ -1,5 +1,5 @@
 /*
- *    $Id: BasicXYNode.java,v 1.2 2004/04/29 17:49:07 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

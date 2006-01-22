@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  * <p></p>
  *
  * @author dzwiers, Refractions Research, Inc.
- * @version $Id: WriterUtils.java,v 1.3 2004/04/17 15:02:00 cholmesny Exp $
+ * @version $Id$
  */
 class WriterUtils {
     /** Used internally to create log information to detect errors. */

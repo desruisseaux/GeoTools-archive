@@ -253,6 +253,8 @@ public final class Hints extends RenderingHints {
      * impacts rendering (which is why extending {@linkplain java.awt.RenderingHints.Key rendering
      * key} is not a complete non-sense), but may impact other aspects of an application as well.
      *
+     * @since 2.1
+     * @source $URL$
      * @version $Id$
      * @author Martin Desruisseaux
      */

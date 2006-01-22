@@ -28,7 +28,7 @@ import org.geotools.styling.Style;
  *
  * @author Cameron Shorter
  * @author Martin Desruisseaux
- * @version $Id: MapLayer.java,v 1.3 2004/04/18 03:23:03 groldan Exp $
+ * @version $Id$
  */
 public interface MapLayer {
     /**

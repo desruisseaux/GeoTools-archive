@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * 
  * @author bowens, Refractions Research, Inc.
  * @author $Author: sploreg $ (last modification)
- * @version $Id: RangeFeatureValidationTest.java,v 1.1 2004/04/29 21:57:32 sploreg Exp $
+ * @version $Id$
  */
 public class RangeFeatureValidationTest extends TestCase {
 	private GeometryFactory gf;

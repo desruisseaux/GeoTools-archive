@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: PolygonNoGapsValidation.java,v 1.5 2004/04/16 00:21:14 dmzwiers Exp $
+ * @version $Id$
  */
 public class PolygonNoGapsValidation extends DefaultFeatureValidation {
     /**

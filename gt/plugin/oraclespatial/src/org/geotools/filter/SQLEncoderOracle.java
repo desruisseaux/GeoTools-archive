@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
  * </p>
  *
  * @author $Author: seangeo $
- * @version $Id: SQLEncoderOracle.java,v 1.12 2003/11/26 22:57:45 seangeo Exp $
+ * @version $Id$
  */
 public class SQLEncoderOracle extends SQLEncoder {
     /** The capabilities of the encoder */

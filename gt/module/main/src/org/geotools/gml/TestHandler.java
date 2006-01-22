@@ -26,7 +26,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * handler just prints every JTS geometry that it gets to the standard output.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: TestHandler.java,v 1.5 2003/08/14 18:36:47 cholmesny Exp $
+ * @version $Id$
  */
 public class TestHandler extends XMLFilterImpl implements GMLHandlerJTS {
     public void geometry(Geometry geometry) {

@@ -115,7 +115,7 @@ import java.util.Set;
  * </ol>
  * @author Jody Garnett
  * @author Chris Holmes, TOPP
- * @version $Id: Transaction.java,v 1.3 2004/03/02 23:06:26 jive Exp $
+ * @version $Id$
  */
 public interface Transaction {
      

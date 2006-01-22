@@ -70,7 +70,7 @@ import org.geotools.filter.Filter;
  * </ul>
  * 
  * @author Jody Garnett, Refractions Research
- * @version $Id: DataStore.java,v 1.4 2004/01/11 02:31:07 jive Exp $
+ * @version $Id$
  */
 public interface DataStore{
 

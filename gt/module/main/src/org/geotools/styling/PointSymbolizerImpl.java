@@ -47,7 +47,7 @@ import org.opengis.util.Cloneable;
  * points are to be rendered.
  *
  * @author Ian Turton, CCG
- * @version $Id: PointSymbolizerImpl.java,v 1.13 2003/10/17 22:50:59 ianschneider Exp $
+ * @version $Id$
  */
 public class PointSymbolizerImpl extends AbstractGTComponent
     implements PointSymbolizer, Cloneable {

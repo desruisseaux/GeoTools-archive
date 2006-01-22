@@ -37,7 +37,7 @@ import org.geotools.validation.ValidationResults;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: SQLValidation.java,v 1.2 2004/02/16 18:48:10 dmzwiers Exp $
+ * @version $Id$
  */
 public class SQLValidation extends DefaultFeatureValidation {
     private String sql;

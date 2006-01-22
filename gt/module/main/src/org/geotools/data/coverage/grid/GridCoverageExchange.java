@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: GridCoverageExchange.java,v 1.13 2004/05/07 10:29:28 desruisseaux Exp $
+ ** $Id$
  **
  ** $Source: /cvsroot/geoapi/src/org/opengis/coverage/grid/GridCoverageExchange.java,v $
  **

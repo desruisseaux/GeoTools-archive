@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-/* $Id: JDBCDataStoreConfig.java,v 1.1.2.2 2004/04/18 09:19:43 aaime Exp $
+/* $Id$
  *
  * Created on 8/01/2004
  */
@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: aaime $
- * @version $Id: JDBCDataStoreConfig.java,v 1.1.2.2 2004/04/18 09:19:43 aaime Exp $ Last Modified: $Date: 2004/04/18 09:19:43 $
+ * @version $Id$ Last Modified: $Date: 2004/04/18 09:19:43 $
  */
 public class JDBCDataStoreConfig {
     public static final String FID_GEN_INSERT_NULL = "INSERT_NULL";

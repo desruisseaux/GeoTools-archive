@@ -1,4 +1,4 @@
-/* $Id: OracleConnectionFactoryTest.java,v 1.2 2003/08/15 00:42:02 seangeo Exp $
+/* $Id$
  *
  * Created on 4/08/2003
  */
@@ -16,7 +16,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  * 
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @version $Id: OracleConnectionFactoryTest.java,v 1.2 2003/08/15 00:42:02 seangeo Exp $ Last
+ * @version $Id$ Last
  *          Modified: $Date: 2003/08/15 00:42:02 $
  */
 public class OracleConnectionFactoryTest extends TestCase {

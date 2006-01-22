@@ -56,7 +56,7 @@ import java.util.ResourceBundle;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: LineNoPseudoNodeValidationBeanInfo.java,v 1.3 2004/04/08 21:39:10 dmzwiers Exp $
+ * @version $Id$
  */
 public class LineNoPseudoNodeValidationBeanInfo extends LineAbstractValidationBeanInfo{
     /**

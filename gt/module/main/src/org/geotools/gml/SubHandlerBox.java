@@ -26,7 +26,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  *
  * @author Ian Turton, CCG
  * @author Rob Hranac, Vision for New York
- * @version $Id: SubHandlerBox.java,v 1.6 2003/08/14 18:36:47 cholmesny Exp $
+ * @version $Id$
  */
 public class SubHandlerBox extends SubHandler {
     /** The logger for the GML module */

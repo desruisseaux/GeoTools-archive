@@ -22,7 +22,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * A convenience expression to form a geometry literal from an  envelope.
  *
  * @author Ian Turton, CCG
- * @version $Id: BBoxExpression.java,v 1.3 2003/08/07 19:55:21 cholmesny Exp $
+ * @version $Id$
  */
 public interface BBoxExpression extends LiteralExpression {
     /**

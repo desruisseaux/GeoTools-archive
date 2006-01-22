@@ -25,7 +25,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Defines an expression that holds a literal for return.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: LiteralExpressionImpl.java,v 1.10 2003/07/23 19:56:07 cholmesny Exp $
+ * @version $Id$
  */
 public class LiteralExpressionImpl extends DefaultExpression
     implements LiteralExpression {

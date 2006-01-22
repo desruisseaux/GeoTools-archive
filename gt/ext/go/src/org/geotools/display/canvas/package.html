@@ -9,9 +9,9 @@
     explanation for this package is provided in the {@linkplain org.opengis.go.display.canvas OpenGIS&reg; javadoc}.
     The remaining discussion on this page is specific to the Geotools implementation.
 
-    <P ALIGN="justify">A {@linkplain org.opengis.go.display.canvas.Canvas canvas} contains one ore more
-    {@linkplain org.opengis.go.display.primitive.Graphic graphic} objects. A graphic object may wrap an
-    image, a geometric shape, a collection of symbols, <cite>etc.</cite> Since this package can't cover
+    <P ALIGN="justify">A {@linkplain org.geotools.display.canvas.DefaultCanvas2D canvas} contains one ore more
+    {@linkplain org.geotools.display.canvas.GraphicPrimitive2D graphic} objects. A graphic object may wrap
+    an image, a geometric shape, a collection of symbols, <cite>etc.</cite> Since this package can't cover
     all possible usages, most of the classes provided in {@link org.geotools.display.canvas} and in
     {@link org.geotools.display.primitive} packages are designed with subclassing in mind. The design has
     some similarities with AWT graphic components. The following is a comparaison between AWT and the
@@ -57,13 +57,12 @@
     <P>&nbsp;</P>
     <H2>Painting with {@code Canvas} (compared to AWT)</H2>
 
-    <P ALIGN="justify">An {@link org.geotools.display.canvas.Canvas2D} object contains a set of
-    {@link org.geotools.display.primitive.Graphic2D} objects (not to be confused with AWT
-    {@link java.awt.Graphics2D} object). Every kind of primitive graphic (image, polygon...)
-    is handled by a specialized subclass ({@link org.geotools.display.primitive.GraphicImage2D},
+    <P ALIGN="justify">A {@link org.geotools.display.canvas.DefaultCanvas2D} object contains a set of
+    {@link org.geotools.display.canvas.GraphicPrimitive2D} objects. Every kind of graphic primitive
+    (image, polygon...) is handled by a specialized subclass ({@link org.geotools.display.primitive.GraphicImage2D},
     {@link org.geotools.display.primitive.GraphicPolygon2D}, <cite>etc.</cite>) extending
-    {@link org.geotools.display.primitive.Graphic2D}. When the rendering engine need to repaint
-    a graphic, it invokes its {@link org.geotools.display.primitive.Graphic2D#paint paint(...)}
+    {@link org.geotools.display.primitive.GraphicPrimitive2D}. When the rendering engine need to repaint
+    a graphic, it invokes its {@link org.geotools.display.canvas.GraphicPrimitive2D#paint paint(...)}
     method. The paint method receives a {@link java.awt.Graphics2D} object setup as below:</P>
 
     <P ALIGN="center">
@@ -93,13 +92,13 @@
     </TABLE>
 
     <P ALIGN="justify">This configuration is convenient for rendering "real world" objects.
-    The {@code Graphic} primitive implementor doesn't need to care about the zoom factor.
+    The {@code GraphicPrimitive2D} implementor doesn't need to care about the zoom factor.
     However, this configuration is unconvenient for text or symbols rendering. For example
     a font with a size of 12 units will be understood as a 12 meters high font. On a map
     with a 1:50000 scale, 12 meters high characters will appear like tiny points. In such
     cases, the {@code Graphic} implementor need to setup explicitly the {@link java.awt.Graphics2D}
-    object as in "Painting with AWT" above. Don't forget to reset the {@code Graphics2D} in
-    its initial state once finished.</P>
+    object as in "Painting with AWT" above. Don't forget to reset the {@code GraphicsPrimitive2D}
+    in its initial state once finished.</P>
 
     <p>&nbsp;</p>
     <h2>Affine transform tips</h2>

@@ -54,7 +54,7 @@ import org.geotools.filter.Filter;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc
- * @version $Id: PostgisFeatureLocking.java,v 1.9.2.1 2004/04/09 15:36:24 aaime Exp $
+ * @version $Id$
  */
 public class PostgisFeatureLocking extends PostgisFeatureStore
     implements FeatureLocking {

@@ -94,7 +94,7 @@ import org.geotools.validation.ValidationResults;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: developer_docs.xml,v 1.1 2004/02/24 00:57:20 dmzwiers Exp $
+ * @version $Id$
  */
 public class NullZeroValidation extends DefaultFeatureValidation {
     private String attributeName;
@@ -253,7 +253,7 @@ import java.util.ResourceBundle;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: developer_docs.xml,v 1.1 2004/02/24 00:57:20 dmzwiers Exp $
+ * @version $Id$
  */
 public class NullZeroValidationBeanInfo extends DefaultFeatureValidationBeanInfo {
     /**
@@ -358,7 +358,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * 
  * @author bowens, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: developer_docs.xml,v 1.1 2004/02/24 00:57:20 dmzwiers Exp $
+ * @version $Id$
  */
 public class NullZeroValidationTest extends TestCase {
   private RoadValidationResults results;

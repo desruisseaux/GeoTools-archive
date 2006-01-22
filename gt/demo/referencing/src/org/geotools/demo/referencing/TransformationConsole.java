@@ -62,7 +62,7 @@ import org.geotools.geometry.GeneralDirectPosition;
  *
  * To exit from the application, enter "exit".
  *
- * @version $Id: TransformationConsole.java,v 1.1 2004/02/05 16:04:15 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class TransformationConsole {

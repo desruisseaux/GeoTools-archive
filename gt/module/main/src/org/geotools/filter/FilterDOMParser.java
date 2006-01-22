@@ -33,7 +33,7 @@ import org.w3c.dom.NodeList;
  * A dom based parser to build filters as per OGC 01-067
  *
  * @author Ian Turton, CCG
- * @version $Id: FilterDOMParser.java,v 1.11 2004/05/07 20:20:46 jmacgill Exp $
+ * @version $Id$
  *
  * @task TODO: split this class up into multiple methods.
  */

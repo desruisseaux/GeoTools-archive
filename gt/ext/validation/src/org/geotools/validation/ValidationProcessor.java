@@ -102,7 +102,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author bowens, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: ValidationProcessor.java,v 1.13 2004/04/22 10:17:09 jive Exp $
+ * @version $Id$
  */
 public class ValidationProcessor {
     private static final Logger LOGGER = Logger.getLogger(

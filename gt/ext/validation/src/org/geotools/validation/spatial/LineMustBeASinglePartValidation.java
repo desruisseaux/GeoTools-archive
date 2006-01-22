@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.LineString;
  *
  * @author bowens, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: LineMustBeASinglePartValidation.java,v 1.4 2004/04/20 03:57:59 jive Exp $
+ * @version $Id$
  */
 public class LineMustBeASinglePartValidation extends DefaultFeatureValidation {
     /** The logger for the validation module. */

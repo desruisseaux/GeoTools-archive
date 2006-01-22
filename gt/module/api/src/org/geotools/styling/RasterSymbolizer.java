@@ -139,7 +139,7 @@ import org.geotools.filter.Expression;
  *   &lt;/ContrastEnhancement&gt;
  * &lt;/RasterSymbolizer&gt;
  * </PRE>
- * $Id: RasterSymbolizer.java,v 1.2 2003/08/20 21:39:38 cholmesny Exp $
+ * $Id$
  * </p>
  *
  * @author Ian Turton, CCG

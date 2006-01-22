@@ -50,7 +50,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author James Macgill
- * @version $Id: FeatureTypeStyleImpl.java,v 1.14 2003/09/06 04:52:31 seangeo Exp $
+ * @version $Id$
  */
 public class FeatureTypeStyleImpl extends AbstractGTComponent
     implements FeatureTypeStyle, Cloneable {

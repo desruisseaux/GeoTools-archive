@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * <p></p>
  *
  * @author Chris Holmes, TOPP
- * @version $Id: CartesianDistanceFilter.java,v 1.3 2003/07/23 16:14:31 cholmesny Exp $
+ * @version $Id$
  *
  * @task REVISIT: add units for distance.
  */

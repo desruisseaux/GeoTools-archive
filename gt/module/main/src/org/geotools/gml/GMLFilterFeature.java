@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: GMLFilterFeature.java,v 1.18 2003/09/10 15:55:18 cholmesny Exp $
+ * @version $Id$
  */
 public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
     //private FeatureSchema metadata = new FeatureSchema();

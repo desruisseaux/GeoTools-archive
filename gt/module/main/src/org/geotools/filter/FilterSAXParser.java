@@ -29,7 +29,7 @@ import org.xml.sax.Attributes;
  *
  * @author Rob Hranac, Vision for New York<br>
  * @author Chris Holmes, TOPP
- * @version $Id: FilterSAXParser.java,v 1.6 2003/08/11 17:25:39 cholmesny Exp $
+ * @version $Id$
  */
 public class FilterSAXParser {
     /** The logger for the filter module. */

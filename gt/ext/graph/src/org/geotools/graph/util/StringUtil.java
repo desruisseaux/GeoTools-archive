@@ -1,5 +1,5 @@
 /*
- $Id: StringUtil.java,v 1.1 2004/04/19 15:29:38 jdeolive Exp $
+ $Id$
   
   Copyright (c) 2003, Ministry of Sustainable Resource Management
    Government of British Columbia, Canada

@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: PolygonNotCoveredByPolygonValidation.java,v 1.4 2004/02/27 23:41:22 dmzwiers Exp $
+ * @version $Id$
  */
 public class PolygonNotCoveredByPolygonValidation
     extends PolygonPolygonAbstractValidation {

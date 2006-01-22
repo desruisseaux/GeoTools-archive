@@ -33,7 +33,7 @@ package org.geotools.styling;
  * symbolizers and rules.
  *
  * @author James Macgill, CCG
- * @version $Id: BasicLineStyle.java,v 1.3 2003/07/22 16:37:10 ianturton Exp $
+ * @version $Id$
  */
 public class BasicLineStyle extends StyleImpl
     implements org.geotools.styling.Style {

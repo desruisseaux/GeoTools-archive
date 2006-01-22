@@ -1,5 +1,5 @@
 /*
- *    $Id: DirectedCycleDetector.java,v 1.2 2004/05/16 21:14:03 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

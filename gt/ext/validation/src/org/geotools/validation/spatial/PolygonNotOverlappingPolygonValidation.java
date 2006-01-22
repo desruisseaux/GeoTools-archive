@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: PolygonNotOverlappingPolygonValidation.java,v 1.9 2004/04/26 21:08:12 jive Exp $
+ * @version $Id$
  */
 public class PolygonNotOverlappingPolygonValidation
     extends PolygonPolygonAbstractValidation {

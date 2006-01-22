@@ -1,5 +1,5 @@
 /*
- *    $Id: DBReaderWriter.java,v 1.4 2004/05/19 01:07:34 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

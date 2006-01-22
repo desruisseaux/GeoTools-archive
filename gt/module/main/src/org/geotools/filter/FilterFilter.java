@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: FilterFilter.java,v 1.23 2003/10/29 23:11:47 cholmesny Exp $
+ * @version $Id$
  */
 public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
     /** The logger for the filter module. */

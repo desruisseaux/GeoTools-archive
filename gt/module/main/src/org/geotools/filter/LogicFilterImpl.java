@@ -32,7 +32,7 @@ import org.geotools.feature.Feature;
  * with an internally defined type (AND, OR, NOT).
  *
  * @author Rob Hranac, TOPP
- * @version $Id: LogicFilterImpl.java,v 1.8 2003/08/11 18:48:25 cholmesny Exp $
+ * @version $Id$
  */
 public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
     /** The logger for the default core module. */

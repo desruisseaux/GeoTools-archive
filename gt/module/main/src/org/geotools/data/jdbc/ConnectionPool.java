@@ -40,7 +40,7 @@ import javax.sql.PooledConnection;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: cholmesny $
- * @version $Id: ConnectionPool.java,v 1.2 2003/11/05 15:37:02 cholmesny Exp $ Last Modified: $Date: 2003/11/05 15:37:02 $
+ * @version $Id$ Last Modified: $Date: 2003/11/05 15:37:02 $
  */
 public final class ConnectionPool {
     /** A logger */
@@ -205,7 +205,7 @@ public final class ConnectionPool {
      *
      * @author Sean Geoghegan, Defence Science and Technology Organisation
      * @author $Author: cholmesny $
-     * @version $Id: ConnectionPool.java,v 1.2 2003/11/05 15:37:02 cholmesny Exp $ Last Modified: $Date: 2003/11/05 15:37:02 $
+     * @version $Id$ Last Modified: $Date: 2003/11/05 15:37:02 $
      */
     private class ConnectionListManager implements ConnectionEventListener {
         /**
@@ -269,7 +269,7 @@ public final class ConnectionPool {
      *
      * @author Sean Geoghegan, Defence Science and Technology Organisation
      * @author $Author: cholmesny $
-     * @version $Id: ConnectionPool.java,v 1.2 2003/11/05 15:37:02 cholmesny Exp $ Last Modified: $Date: 2003/11/05 15:37:02 $
+     * @version $Id$ Last Modified: $Date: 2003/11/05 15:37:02 $
      */
     private class ConnectionPoolCleaner implements Runnable {
         /** Time to wait between cleaning */

@@ -23,7 +23,7 @@ import org.geotools.feature.Feature;
  * Implements a default expression, with helpful variables and static methods.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: DefaultExpression.java,v 1.7 2004/04/04 16:01:21 aaime Exp $
+ * @version $Id$
  */
 public abstract class DefaultExpression implements Expression {
     

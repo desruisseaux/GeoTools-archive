@@ -25,7 +25,7 @@ import java.util.EventListener;
  * The listener that's notified when a bounding box changes its area of interest.
  *
  * @author Andrea Aime
- * @version $Id: MapBoundsListener.java,v 1.2 2004/03/14 18:44:22 aaime Exp $
+ * @version $Id$
  *
  * @see AreaOfInterestEvent
  */

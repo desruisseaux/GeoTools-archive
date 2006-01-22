@@ -34,7 +34,7 @@ import org.geotools.validation.DefaultIntegrityValidation;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: LineAbstractValidation.java,v 1.2 2004/02/17 17:19:13 dmzwiers Exp $
+ * @version $Id$
  */
 public abstract class LineAbstractValidation extends DefaultIntegrityValidation {
     private String lineTypeRef;

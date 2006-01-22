@@ -40,7 +40,7 @@ import org.geotools.filter.Filter;
  * </p>
  *
  * @author Chris Holmes
- * @version $Id: FilteringFeatureReader.java,v 1.2 2003/11/04 00:28:49 cholmesny Exp $
+ * @version $Id$
  */
 public class FilteringFeatureReader implements FeatureReader {
     protected final FeatureReader featureReader;

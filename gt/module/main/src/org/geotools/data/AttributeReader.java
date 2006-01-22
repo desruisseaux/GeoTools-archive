@@ -26,7 +26,7 @@ import java.io.IOException;
  * row-based approach for accessing the data.
  *
  * @author Ian Schneider
- * @version $Id: AttributeReader.java,v 1.2 2003/12/01 22:00:34 cholmesny Exp $
+ * @version $Id$
  *
  * @see AttributeAcceptor
  */

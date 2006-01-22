@@ -19,7 +19,7 @@ package org.geotools.feature;
  * Interface to be implemented by all listeners of CollectionEvents.
  *
  * @author Ray Gallagher
- * @version $Id: CollectionListener.java,v 1.5 2003/05/07 16:53:04 jmacgill Exp $
+ * @version $Id$
  */
 public interface CollectionListener {
     /**

@@ -18,7 +18,7 @@ package org.geotools.feature;
 
 /**
  *
- * @version $Id: FeatureDocument.java,v 1.2 2003/07/17 07:09:52 ianschneider Exp $
+ * @version $Id$
  * @author  Ian Schneider
  */
 public interface FeatureDocument extends IndexedFeatureCollection, FeatureList {

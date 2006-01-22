@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author Jody Garnett, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: LineCoveredByPolygonValidation.java,v 1.4 2004/02/27 19:44:12 dmzwiers Exp $
+ * @version $Id$
  */
 public class LineCoveredByPolygonValidation
     extends LinePolygonAbstractValidation {

@@ -59,7 +59,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
  * @author bowens
- * @version $Id: Validator.java,v 1.2 2004/02/18 18:27:18 dmzwiers Exp $
+ * @version $Id$
  */
 public class BatchValidator {
     private static Properties dataStoreProp;

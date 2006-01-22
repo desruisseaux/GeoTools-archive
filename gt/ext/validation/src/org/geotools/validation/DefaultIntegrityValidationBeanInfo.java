@@ -34,7 +34,7 @@ import java.beans.PropertyDescriptor;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: DefaultIntegrityValidationBeanInfo.java,v 1.2 2004/02/17 17:19:14 dmzwiers Exp $
+ * @version $Id$
  */
 public class DefaultIntegrityValidationBeanInfo extends ValidationBeanInfo {
     /**

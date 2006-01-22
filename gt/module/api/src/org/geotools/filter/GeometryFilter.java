@@ -41,7 +41,7 @@ import org.geotools.feature.Feature;
  *
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @version $Id: GeometryFilter.java,v 1.4 2003/08/07 21:30:36 cholmesny Exp $
+ * @version $Id$
  *
  * @task: REVISIT: make this class (and all filters) immutable, implement
  *       cloneable and return new filters when calling addLeftGeometry and

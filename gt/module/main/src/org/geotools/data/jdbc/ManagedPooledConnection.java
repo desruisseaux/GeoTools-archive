@@ -32,7 +32,7 @@ import javax.sql.PooledConnection;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: cholmesny $
- * @version $Id: ManagedPooledConnection.java,v 1.1 2003/09/22 18:54:39 cholmesny Exp $ Last Modified: $Date: 2003/09/22 18:54:39 $
+ * @version $Id$ Last Modified: $Date: 2003/09/22 18:54:39 $
  */
 final class ManagedPooledConnection {
     /** The timestamp the last use of the connection */

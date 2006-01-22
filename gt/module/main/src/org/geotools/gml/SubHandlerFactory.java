@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * type.
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: SubHandlerFactory.java,v 1.8 2003/08/14 18:36:47 cholmesny Exp $
+ * @version $Id$
  */
 public class SubHandlerFactory {
     /** The logger for the GML module */

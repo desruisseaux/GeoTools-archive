@@ -90,7 +90,7 @@ import java.util.Map;
  * </p>
  *
  * @author James Macgill, CCG
- * @version $Id: ExternalGraphic.java,v 1.11 2004/04/08 13:27:07 jfc173 Exp $
+ * @version $Id$
  */
 public interface ExternalGraphic extends Symbol {
 	public static final ExternalGraphic[] EXTERNAL_GRAPHICS_EMPTY = new ExternalGraphic[0];

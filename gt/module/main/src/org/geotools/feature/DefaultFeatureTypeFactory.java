@@ -29,7 +29,7 @@ import java.util.List;
  * want.
  *
  * @author Ian Schneider, USDA-ARS
- * @version $Id: DefaultFeatureTypeFactory.java,v 1.6 2003/08/20 19:56:18 cholmesny Exp $
+ * @version $Id$
  */
 public class DefaultFeatureTypeFactory extends FeatureTypeFactory {
     private List attributeTypes = new ArrayList();

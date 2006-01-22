@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: AngleSizeValidation.java,v 1.4 2004/02/27 19:44:13 dmzwiers Exp $
+ * @version $Id$
  */
 public class AngleSizeValidation extends DefaultIntegrityValidation {
 	

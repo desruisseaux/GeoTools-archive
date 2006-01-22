@@ -46,7 +46,7 @@ import org.opengis.util.Cloneable;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
- * @version $Id: MarkImpl.java,v 1.13 2003/09/06 04:52:31 seangeo Exp $
+ * @version $Id$
  */
 public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
     /** The logger for the default core module. */

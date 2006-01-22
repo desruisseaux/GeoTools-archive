@@ -26,7 +26,7 @@ import org.geotools.data.vpf.ifc.VPFRow;
  * SpatialIndexInputStream.java Created: Mon Feb 24 22:25:15 2003
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @version $Id: SpatialIndexInputStream.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @version $Id$
  */
 public class SpatialIndexInputStream extends VPFInputStream {
     /** Variable constant <code>SPATIAL_INDEX_ROW_SIZE</code> keeps value of */

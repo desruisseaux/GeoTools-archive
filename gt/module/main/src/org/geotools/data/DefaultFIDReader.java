@@ -27,7 +27,7 @@ import org.geotools.feature.FeatureType;
  * ResultSetFIDReader should be used.
  *
  * @author Chris Holmes
- * @version $Id: DefaultFIDReader.java,v 1.4 2004/01/20 05:29:10 jive Exp $
+ * @version $Id$
  */
 public class DefaultFIDReader implements FIDReader {
     protected static final String CLOSE_MESG = "Close has already been called"

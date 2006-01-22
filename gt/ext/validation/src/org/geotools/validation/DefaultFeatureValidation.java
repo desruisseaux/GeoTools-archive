@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
  *
  * @author Jody Garnett, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: DefaultFeatureValidation.java,v 1.3 2004/04/20 03:58:00 jive Exp $
+ * @version $Id$
  */
 public class DefaultFeatureValidation implements FeatureValidation {
     /** The logger for the validation module. */

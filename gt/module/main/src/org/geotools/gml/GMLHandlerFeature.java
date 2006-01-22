@@ -29,7 +29,7 @@ import org.xml.sax.ContentHandler;
  * </p>
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: GMLHandlerFeature.java,v 1.6 2003/08/14 18:36:47 cholmesny Exp $
+ * @version $Id$
  */
 public interface GMLHandlerFeature extends ContentHandler {
     /**

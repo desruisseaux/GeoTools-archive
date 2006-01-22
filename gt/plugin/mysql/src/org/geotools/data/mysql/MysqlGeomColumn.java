@@ -48,7 +48,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * of the column when queried with the ID from the feature table.
  *
  * @author Chris Holmes, Vision for New York
- * @version $Id: MysqlGeomColumn.java,v 1.3.2.1 2004/05/02 20:17:58 aaime Exp $
+ * @version $Id$
  */
 public class MysqlGeomColumn {
     /** For get and set Storage type, see SFS for SQL spec */

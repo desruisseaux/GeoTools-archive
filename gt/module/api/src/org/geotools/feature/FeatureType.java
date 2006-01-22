@@ -150,7 +150,7 @@ import org.opengis.feature.FeatureTypeFactory;
  * @author Chris Holmes, TOPP
  * @author David Zwiers, Refractions
  * @author Jody Garnett, Refractions
- * @version $Id: FeatureType.java,v 1.13 2004/01/09 22:29:31 jive Exp $
+ * @version $Id$
  * @see org.geotools.feature.Feature
  * @see org.geotools.feature.FeatureTypeFactory
  * @see org.geotools.feature.type.NestedAttributeType

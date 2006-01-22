@@ -1,5 +1,5 @@
 /*
- *    $Id: CountingWalker.java,v 1.1 2004/04/23 16:20:04 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

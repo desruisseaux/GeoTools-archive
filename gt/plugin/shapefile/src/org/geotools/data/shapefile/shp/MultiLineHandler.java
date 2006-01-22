@@ -33,7 +33,7 @@ import org.geotools.geometry.coordinatesequence.CSBuilderFactory;
 
 
 /*
- * $Id: MultiLineHandler.java,v 1.4 2003/11/13 22:10:35 jmacgill Exp $
+ * $Id$
  * @author aaime
  * @author Ian Schneider
  */

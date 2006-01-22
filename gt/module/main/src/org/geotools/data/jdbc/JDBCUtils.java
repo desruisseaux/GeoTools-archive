@@ -1,4 +1,4 @@
-/* $Id: JDBCUtils.java,v 1.1 2003/11/28 08:49:51 seangeo Exp $
+/* $Id$
  * 
  * Created on 28/11/2003
  */
@@ -17,7 +17,7 @@ import org.geotools.data.Transaction;
 /**
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @version $Id: JDBCUtils.java,v 1.1 2003/11/28 08:49:51 seangeo Exp $
+ * @version $Id$
  * Last Modified: $Date: 2003/11/28 08:49:51 $ 
  */
 public class JDBCUtils {

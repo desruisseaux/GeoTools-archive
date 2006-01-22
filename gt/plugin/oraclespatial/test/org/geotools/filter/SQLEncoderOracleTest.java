@@ -1,4 +1,4 @@
-/* $Id: SQLEncoderOracleTest.java,v 1.5 2003/11/26 22:57:45 seangeo Exp $
+/* $Id$
  *
  * Created on 31/07/2003
  */
@@ -19,7 +19,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @version $Id: SQLEncoderOracleTest.java,v 1.5 2003/11/26 22:57:45 seangeo Exp $ Last Modified: $Date: 2003/11/26 22:57:45 $
+ * @version $Id$ Last Modified: $Date: 2003/11/26 22:57:45 $
  */
 public class SQLEncoderOracleTest extends TestCase {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");

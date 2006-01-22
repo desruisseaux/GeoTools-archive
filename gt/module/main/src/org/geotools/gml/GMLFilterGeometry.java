@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: GMLFilterGeometry.java,v 1.7 2003/08/14 18:36:47 cholmesny Exp $
+ * @version $Id$
  */
 public class GMLFilterGeometry extends org.xml.sax.helpers.XMLFilterImpl
     implements GMLHandlerGeometry {

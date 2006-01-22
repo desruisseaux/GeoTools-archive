@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.LineString;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
- * @version $Id: LineIntersectsLineWithNodeValidation.java,v 1.5 2004/04/26 21:01:59 jive Exp $
+ * @version $Id$
  */
 public class LineIntersectsLineWithNodeValidation
     extends LineLineAbstractValidation {

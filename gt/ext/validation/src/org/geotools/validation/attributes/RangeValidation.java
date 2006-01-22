@@ -66,7 +66,7 @@ import org.geotools.validation.ValidationResults;
  *
  * @author rgould, Refractions Research, Inc.
  * @author $Author: cholmesny $ (last modification)
- * @version $Id: RangeValidation.java,v 1.4 2004/04/17 15:59:33 cholmesny Exp $
+ * @version $Id$
  */
 public class RangeValidation extends DefaultFeatureValidation {
     private int max = Integer.MAX_VALUE;

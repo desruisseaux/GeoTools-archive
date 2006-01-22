@@ -20,7 +20,7 @@ package org.geotools.data.vpf.ifc;
  * Interface <code>Coordinate</code> defines 
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @version $Id: Coordinate.java,v 1.1 2003/06/15 11:42:07 kobit Exp $
+ * @version $Id$
  * @deprecated
  */
 public interface Coordinate {

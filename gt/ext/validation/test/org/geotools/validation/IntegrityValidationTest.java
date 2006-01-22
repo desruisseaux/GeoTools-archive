@@ -22,7 +22,7 @@ import org.geotools.validation.attributes.UniqueFIDValidation;
  *
  * @author jgarnett, Refractions Research, Inc.
  * @author $Author: sploreg $ (last modification)
- * @version $Id: IntegrityValidationTest.java,v 1.1 2004/04/29 21:57:32 sploreg Exp $
+ * @version $Id$
  */
 public class IntegrityValidationTest extends DataTestCase {
     MemoryDataStore store;

@@ -31,7 +31,7 @@ import org.geotools.data.vpf.io.VPFDate;
  * </p>
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
- * @version $Id: DataUtils.java,v 1.1 2003/06/15 11:42:06 kobit Exp $
+ * @version $Id$
  */
 public class DataUtils implements DataTypesDefinition {
     /**

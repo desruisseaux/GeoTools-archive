@@ -106,7 +106,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Chris Holmes, TOPP
  * @author Andrea Aime
  * @author Paolo Rizzi
- * @version $Id: PostgisDataStore.java,v 1.18.2.3 2004/05/02 15:31:43 aaime Exp $
+ * @version $Id$
  *
  * @task REVISIT: So Paolo Rizzi has a number of improvements in
  *       http://jira.codehuas.org/browse/GEOT-379  I rolled in a few of them,

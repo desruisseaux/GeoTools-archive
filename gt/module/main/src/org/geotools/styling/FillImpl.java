@@ -35,7 +35,7 @@ import org.opengis.util.Cloneable;
 
 
 /**
- * @version $Id: FillImpl.java,v 1.10 2003/09/06 04:52:31 seangeo Exp $
+ * @version $Id$
  * @author James Macgill, CCG
  */
 public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {

@@ -77,7 +77,7 @@ import java.util.logging.Logger;
  *
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
- * @version $Id: FeatureTransformer.java,v 1.21 2004/04/16 15:58:34 cholmesny Exp $
+ * @version $Id$
  *
  * @todo Add support for schemaLocation
  */

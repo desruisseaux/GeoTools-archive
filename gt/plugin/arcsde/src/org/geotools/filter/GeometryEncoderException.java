@@ -21,7 +21,7 @@ package org.geotools.filter;
  * the GeometryEncoderSDE being used.
  *
  * @author Gabriel Roldán
- * @version $Id: GeometryEncoderException.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
+ * @version $Id$
  */
 public class GeometryEncoderException extends Exception {
     /**

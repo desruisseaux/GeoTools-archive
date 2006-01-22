@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
  * <p></p>
  *
  * @author Rob Hranac, Vision for New York
- * @version $Id: GMLFilterDocument.java,v 1.11 2003/12/10 20:54:29 cholmesny Exp $
+ * @version $Id$
  */
 public class GMLFilterDocument extends org.xml.sax.helpers.XMLFilterImpl {
     /** The logger for the GML module */

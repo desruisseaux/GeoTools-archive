@@ -1,4 +1,4 @@
-/* $Id: ConnectionPoolManager.java,v 1.2 2003/11/21 18:51:20 jive Exp $
+/* $Id$
  * 
  * Created on 15/08/2003
  */
@@ -14,7 +14,7 @@ import javax.sql.ConnectionPoolDataSource;
  * 
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: jive $
- * @version $Id: ConnectionPoolManager.java,v 1.2 2003/11/21 18:51:20 jive Exp $
+ * @version $Id$
  * Last Modified: $Date: 2003/11/21 18:51:20 $ 
  */
 public class ConnectionPoolManager {

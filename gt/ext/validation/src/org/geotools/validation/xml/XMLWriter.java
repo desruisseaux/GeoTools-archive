@@ -59,7 +59,7 @@ import org.geotools.validation.dto.TestSuiteDTO;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: XMLWriter.java,v 1.4 2004/04/08 21:39:10 dmzwiers Exp $
+ * @version $Id$
  */
 public class XMLWriter {
     public static void writePlugIn(PlugInDTO dto, Writer w) {

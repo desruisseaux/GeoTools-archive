@@ -56,7 +56,7 @@ import org.geotools.validation.DefaultIntegrityValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: LineCoveredByFeatureLineValidationBeanInfo.java,v 1.1 2004/02/20 18:45:25 dmzwiers Exp $
+ * @version $Id$
  */
 public class LineCoveredByFeatureLineValidationBeanInfo extends DefaultIntegrityValidationBeanInfo{
     /**

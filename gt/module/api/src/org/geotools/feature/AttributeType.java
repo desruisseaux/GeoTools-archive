@@ -58,7 +58,7 @@ import org.geotools.filter.Filter;
  *
  * @author Rob Hranac, VFNY
  * @author Chris Holmes, TOPP
- * @version $Id: AttributeType.java,v 1.11 2003/11/06 23:34:54 ianschneider Exp $
+ * @version $Id$
  */
 public interface AttributeType {
     /** Represents any number of elements. Same '' in a reg-ex */

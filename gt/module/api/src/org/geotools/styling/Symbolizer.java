@@ -75,7 +75,7 @@ import org.geotools.event.GTComponent;
  * <p></p>
  *
  * @author James Macgill, CCG
- * @version $Id: Symbolizer.java,v 1.7 2003/09/06 04:14:12 seangeo Exp $
+ * @version $Id$
  */
 public interface Symbolizer extends GTComponent {
     void accept(StyleVisitor visitor);

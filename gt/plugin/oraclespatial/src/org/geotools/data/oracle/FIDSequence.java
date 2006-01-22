@@ -37,7 +37,7 @@ import org.geotools.data.DataSourceException;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: seangeo $
- * @version $Id: FIDSequence.java,v 1.4 2003/08/08 07:37:18 seangeo Exp $
+ * @version $Id$
  *
  * @task REVISIT: This assumes that the DB does not manage the PK itself.  I need to work out a way
  *       to check that is does and then defer to the DB in that case.

@@ -87,7 +87,7 @@ xmlns:xi="http://www.w3.org/2001/XInclude"
   <!-- Use the following if you want to use ant to style this file when offline
 "file:../../extbin/gtbuild/xxe/dtd/sdocbook/sdocbook.dtd"-->
 
-  <!-- $Id: developersguide.xml,v 1.11 2003/11/04 20:46:59 camerons Exp $ -->
+  <!-- $Id$ -->
 
   <appendix id="glossary">
     <title>Glossary</title>

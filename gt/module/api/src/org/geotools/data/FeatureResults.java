@@ -79,7 +79,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Ray Gallagher
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @version $Id: FeatureResults.java,v 1.1 2003/12/01 22:00:44 cholmesny Exp $
+ * @version $Id$
  */
 public interface FeatureResults {
 	

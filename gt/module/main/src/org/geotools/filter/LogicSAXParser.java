@@ -116,7 +116,7 @@ import java.util.logging.Logger;
  *
  * @author Rob Hranac, Vision for New York
  * @author Chris Holmes, TOPP
- * @version $Id: LogicSAXParser.java,v 1.6 2003/07/30 00:08:56 cholmesny Exp $
+ * @version $Id$
  */
 public class LogicSAXParser {
     /** The logger for the filter module. */

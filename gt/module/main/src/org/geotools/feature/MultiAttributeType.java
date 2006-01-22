@@ -25,7 +25,7 @@ import java.util.List;
  * better ways to do this, but this seems to work.
  *
  * @author Chris Holmes
- * @version $Id: MultiAttributeType.java,v 1.5 2003/11/06 23:36:27 ianschneider Exp $
+ * @version $Id$
  */
 public class MultiAttributeType extends DefaultAttributeType {
     /** Number of instances of this attribute in the schema. */

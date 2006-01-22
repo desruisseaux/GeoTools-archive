@@ -50,7 +50,7 @@ import org.geotools.validation.ValidationResults;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: NullZeroValidation.java,v 1.6 2004/04/21 00:27:02 dmzwiers Exp $
+ * @version $Id$
  */
 public class NullZeroValidation extends DefaultFeatureValidation {
 	/** XPATH expression for attribtue */

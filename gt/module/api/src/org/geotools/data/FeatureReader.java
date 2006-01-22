@@ -79,7 +79,7 @@ import org.geotools.feature.IllegalAttributeException;
  *
  * @author Ian Schneider
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
- * @version $Id: FeatureReader.java,v 1.2 2003/12/01 22:00:41 cholmesny Exp $
+ * @version $Id$
  */
 public interface FeatureReader {
     /**

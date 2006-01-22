@@ -83,7 +83,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
+ * @version $Id$
  */
 public abstract class GeometryBuilder {
 	/** DOCUMENT ME! */
@@ -553,7 +553,7 @@ public abstract class GeometryBuilder {
 	 * <code>Point</code> s from <code>SeShape</code> points and viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
-	 * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
+	 * @version $Id$
 	 */
 	private static class PointBuilder extends GeometryBuilder {
 		/** the empty point singleton */
@@ -610,7 +610,7 @@ public abstract class GeometryBuilder {
 	 * viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
-	 * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
+	 * @version $Id$
 	 */
 	private static class MultiPointBuilder extends GeometryBuilder {
 		/** the empty multipoint singleton */
@@ -676,7 +676,7 @@ public abstract class GeometryBuilder {
 	 * viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
-	 * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
+	 * @version $Id$
 	 */
 	private static class LineStringBuilder extends GeometryBuilder {
 		/** the empty linestring singleton */
@@ -752,7 +752,7 @@ public abstract class GeometryBuilder {
 	 * multilinestrings and viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
-	 * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
+	 * @version $Id$
 	 */
 	private static class MultiLineStringBuilder extends LineStringBuilder {
 		/** the empty multilinestring singleton */
@@ -821,7 +821,7 @@ public abstract class GeometryBuilder {
 	 * viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
-	 * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
+	 * @version $Id$
 	 */
 	private static class PolygonBuilder extends GeometryBuilder {
 		/** the empty polygon singleton */
@@ -909,7 +909,7 @@ public abstract class GeometryBuilder {
 	 * and viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
-	 * @version $Id: GeometryBuilder.java,v 1.4 2004/06/23 15:12:16 jfear Exp $
+	 * @version $Id$
 	 */
 	private static class MultiPolygonBuilder extends PolygonBuilder {
 		/** the empty multipolygon singleton */

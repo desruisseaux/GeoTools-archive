@@ -28,7 +28,7 @@ import org.geotools.feature.FeatureType;
  * internally defined manner.
  *
  * @author Rob Hranac, TOPP
- * @version $Id: AttributeExpressionImpl.java,v 1.11 2003/07/23 15:50:27 cholmesny Exp $
+ * @version $Id$
  */
 public class AttributeExpressionImpl extends DefaultExpression
     implements AttributeExpression {

@@ -40,7 +40,7 @@ import org.geotools.filter.Filter;
  * @author Ray Gallagher
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @version $Id: FeatureStore.java,v 1.2 2003/12/01 22:00:47 cholmesny Exp $
+ * @version $Id$
  */
 public interface FeatureStore extends FeatureSource {
     /**

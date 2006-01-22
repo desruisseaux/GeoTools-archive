@@ -77,7 +77,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  * do some solid tests to see which is actually faster.
  *
  * @author Chris Holmes, TOPP
- * @version $Id: PostgisFeatureStore.java,v 1.7.2.3 2004/05/02 15:31:43 aaime Exp $
+ * @version $Id$
  *
  * @task HACK: too little code reuse with PostgisDataStore.
  * @task TODO: make individual operations truly atomic.  If the transaction is

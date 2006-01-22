@@ -1,5 +1,5 @@
 /*
- *    $Id: GraphFuser.java,v 1.5 2004/06/14 15:55:03 jdeolive Exp $
+ *    $Id$
  * 
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org

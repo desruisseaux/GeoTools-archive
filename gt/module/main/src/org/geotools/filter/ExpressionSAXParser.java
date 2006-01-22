@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Rob Hranac, TOPP<br>
  * @author Chris Holmes, TOPP
- * @version $Id: ExpressionSAXParser.java,v 1.9 2003/11/04 21:51:18 cholmesny Exp $
+ * @version $Id$
  */
 public class ExpressionSAXParser {
     /** The logger for the filter module. */

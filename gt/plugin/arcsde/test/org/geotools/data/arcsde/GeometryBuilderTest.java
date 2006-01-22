@@ -52,7 +52,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * DOCUMENT ME!
  *
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: GeometryBuilderTest.java,v 1.1 2004/03/11 00:36:41 groldan Exp $
+ * @version $Id$
  */
 public class GeometryBuilderTest extends TestCase {
     /** DOCUMENT ME! */

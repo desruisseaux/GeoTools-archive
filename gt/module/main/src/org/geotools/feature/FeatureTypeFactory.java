@@ -30,7 +30,7 @@ import org.geotools.xml.gml.GMLSchema;
  * 
  * @deprecated Please use FeatureTypeBuilder
  * @author Ian Schneider
- * @version $Id: FeatureTypeFactory.java,v 1.12 2004/02/21 10:16:50 aaime Exp $
+ * @version $Id$
  */
 public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
     /**

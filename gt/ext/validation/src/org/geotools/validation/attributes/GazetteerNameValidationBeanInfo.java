@@ -38,7 +38,7 @@ import org.geotools.validation.DefaultFeatureValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
- * @version $Id: GazetteerNameValidationBeanInfo.java,v 1.3 2004/04/08 21:39:11 dmzwiers Exp $
+ * @version $Id$
  */
 public class GazetteerNameValidationBeanInfo
     extends DefaultFeatureValidationBeanInfo {
