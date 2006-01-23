@@ -35,6 +35,7 @@ import org.geotools.styling.Symbolizer;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public abstract class SymbolizerChooserDialog extends JDialog implements SLDEditor {
     public static final int POINT = 1;

@@ -35,6 +35,7 @@ import org.geotools.resources.TestData;
 
 /**
  *
+ * @source $URL$
  * @version $Id$
  * @author wolf
  */

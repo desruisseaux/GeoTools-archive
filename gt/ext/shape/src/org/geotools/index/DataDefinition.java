@@ -43,6 +43,7 @@ import java.util.ArrayList;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class DataDefinition {
     private Charset charset;

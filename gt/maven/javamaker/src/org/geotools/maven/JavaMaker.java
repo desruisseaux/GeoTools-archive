@@ -42,6 +42,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @goal generate
  * @phase process-classes
  * @description Copies .class files generated from OpenOffice IDL
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

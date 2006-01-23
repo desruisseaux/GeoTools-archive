@@ -33,6 +33,7 @@ import org.geotools.map.MapLayer;
  * it is used to keep the information about legend tree root and layer node
  * such as name, expanded icon, collapsed icon, and isSelected when mean
  * isLayerVisible or does user select the checkbox for this layer node
+ * @source $URL$
  */
 public class LegendLayerNodeInfo extends LegendNodeInfo {
     /** The logger for the Legend module. */

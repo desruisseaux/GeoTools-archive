@@ -20,6 +20,7 @@ package org.geotools.brewer.color;
  * DOCUMENT ME!
  *
  * @author James Macgill
+ * @source $URL$
  */
 public class SampleScheme {
     int[][] sampleScheme = new int[15][];

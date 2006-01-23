@@ -103,6 +103,7 @@ import javax.swing.JToolBar;
  * </blockquote>
  *
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  */
 public class MapLegendViewer extends JFrame {

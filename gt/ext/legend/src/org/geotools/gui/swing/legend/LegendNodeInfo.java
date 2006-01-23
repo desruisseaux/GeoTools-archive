@@ -32,6 +32,7 @@ import javax.swing.Icon;
  * class.
  *
  * @author jianhuij
+ * @source $URL$
  */
 public abstract class LegendNodeInfo extends Object
     implements java.io.Serializable {

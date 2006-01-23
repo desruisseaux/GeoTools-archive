@@ -46,6 +46,7 @@ import org.geotools.index.TreeException;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public abstract class PageStore {
     public static final short SPLIT_QUADRATIC = 1;

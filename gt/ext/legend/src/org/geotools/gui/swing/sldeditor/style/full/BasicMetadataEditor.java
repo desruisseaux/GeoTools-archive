@@ -35,6 +35,7 @@ import org.geotools.gui.swing.sldeditor.util.FormUtils;
  * Basic component for editors that need a name/title/abstract  editing fields
  *
  * @author wolf
+ * @source $URL$
  */
 public abstract class BasicMetadataEditor extends JComponent {
     protected JLabel metadataLabel;

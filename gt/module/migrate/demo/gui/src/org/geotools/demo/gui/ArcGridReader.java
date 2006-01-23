@@ -47,6 +47,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author aaime
  * @author rschulz
+ * @source $URL$
  */
 public class ArcGridReader {
     public static void main(String[] args) throws Exception {

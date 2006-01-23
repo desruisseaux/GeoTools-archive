@@ -45,6 +45,7 @@ import org.geotools.styling.Symbol;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultSymbolEditor extends SymbolEditor {
     private Symbol symbol;

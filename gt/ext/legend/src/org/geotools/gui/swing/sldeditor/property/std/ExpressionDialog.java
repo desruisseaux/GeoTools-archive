@@ -54,6 +54,7 @@ import org.geotools.gui.swing.sldeditor.util.FormUtils;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class ExpressionDialog extends JDialog implements SLDEditor {
     private static Logger LOGGER = Logger.getLogger("it.satanet.swing.gui.sldeditor");

@@ -51,6 +51,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * by calling setCavasSize before calling go.
  *
  * @author James Macgill, PennState
+ * @source $URL$
  * @version $Id$
  */
 public class GenerateSVG {

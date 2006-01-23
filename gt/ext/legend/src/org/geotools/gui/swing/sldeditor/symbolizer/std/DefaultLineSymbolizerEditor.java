@@ -34,6 +34,7 @@ import org.geotools.styling.Symbolizer;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultLineSymbolizerEditor extends SymbolizerEditor implements SLDEditor {
     LineSymbolizer symbolizer;

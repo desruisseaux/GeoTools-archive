@@ -59,6 +59,7 @@ import java.util.logging.Logger;
  * org.geotools.maven.tools.ReportPublisher ~/svnroot/geotools ~/maven/reports
  * </code></blockquote>
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -31,6 +31,7 @@ import org.geotools.index.rtree.memory.MemoryPageStoreTest;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class IndexSuite extends TestCase {
     public IndexSuite(String testName) {

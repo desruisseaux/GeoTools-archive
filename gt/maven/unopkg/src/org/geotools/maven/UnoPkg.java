@@ -44,6 +44,7 @@ import org.apache.maven.artifact.Artifact;
  * 
  * @goal unopkg
  * @phase package
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

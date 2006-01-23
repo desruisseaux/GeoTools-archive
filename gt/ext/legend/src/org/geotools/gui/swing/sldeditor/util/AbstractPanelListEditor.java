@@ -44,6 +44,7 @@ import javax.swing.event.ChangeListener;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public abstract class AbstractPanelListEditor extends JComponent {
     JTabbedPane tbpPanels;

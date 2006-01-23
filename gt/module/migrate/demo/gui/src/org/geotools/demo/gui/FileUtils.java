@@ -8,6 +8,7 @@ import java.io.File;
  * to file management
  *
  * @author wolf
+ * @source $URL$
  */
 public class FileUtils {
     private FileUtils() {

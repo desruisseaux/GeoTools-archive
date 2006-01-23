@@ -29,6 +29,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class NodeCache extends LinkedHashMap {
     private static final Logger LOGGER = Logger.getLogger(

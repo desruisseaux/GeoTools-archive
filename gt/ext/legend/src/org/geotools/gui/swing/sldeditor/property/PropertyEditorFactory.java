@@ -16,6 +16,7 @@ import org.geotools.feature.FeatureType;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public abstract class PropertyEditorFactory implements Factory {
     private static PropertyEditorFactory factory = null;

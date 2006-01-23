@@ -50,6 +50,7 @@ import com.vividsolutions.jts.geom.Point;
  *
  * @author jamesm
  * @author Andrea Aime
+ * @source $URL$
  */
 public class TextStyleTest extends junit.framework.TestCase {
     private static boolean INTERACTIVE = false;

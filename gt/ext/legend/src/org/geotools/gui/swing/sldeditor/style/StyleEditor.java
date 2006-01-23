@@ -12,6 +12,7 @@ import org.geotools.styling.Style;
  * has a no argument public constructor (the so called "default constructor")
  * 
  * @author wolf
+ * @source $URL$
  */
 public interface StyleEditor {
     /**

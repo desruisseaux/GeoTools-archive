@@ -123,6 +123,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author jeichar
  *
  * @since 2.1.x
+ * @source $URL$
  */
 public class ShapefileRenderer implements GTRenderer{
     public static final Logger LOGGER = Logger.getLogger(

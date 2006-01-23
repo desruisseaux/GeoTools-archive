@@ -11,6 +11,7 @@ import org.geotools.styling.Symbol;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class SymbolEditor extends JComponent implements SLDEditor {
     public abstract void setSymbol(Symbol symbol);

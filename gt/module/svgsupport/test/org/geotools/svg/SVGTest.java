@@ -31,6 +31,7 @@ import junit.framework.TestSuite;
  * DOCUMENT ME!
  *
  * @author James
+ * @source $URL$
  */
 public class SVGTest extends TestCase {    
     public SVGTest(java.lang.String testName) throws Exception{

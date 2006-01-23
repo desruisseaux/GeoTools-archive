@@ -31,6 +31,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class IndexHeader {
     public static final byte LSB_ORDER = -1;

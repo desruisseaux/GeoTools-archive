@@ -33,6 +33,7 @@ import org.geotools.feature.SchemaException;
 /**
  * @author Ian Schneider
  * @author James Macgill
+ * @source $URL$
  */
 public class PickleTest extends TestCase {
   

@@ -82,6 +82,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Simple testing for grid coverage rendering
  *
  * @author aaime
+ * @source $URL$
  */
 public class RenderingGridCoverageTest extends TestCase {
     /** Grid coverage width in cells */

@@ -28,6 +28,7 @@ import org.geotools.data.shapefile.indexed.TestCaseSupport;
 
 
 /**
+ * @source $URL$
  * @version $Id$
  * @author Ian Schneider
  */

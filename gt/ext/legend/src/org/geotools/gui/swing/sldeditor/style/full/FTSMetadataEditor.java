@@ -16,6 +16,7 @@ import org.geotools.styling.FeatureTypeStyle;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public class FTSMetadataEditor extends BasicMetadataEditor {
     

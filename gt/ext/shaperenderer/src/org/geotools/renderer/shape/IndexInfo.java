@@ -45,6 +45,7 @@ import java.util.List;
  * associated layer can be obtained by
  *
  * @author jones
+ * @source $URL$
  */
 public class IndexInfo {
     static final byte TREE_NONE = 0;

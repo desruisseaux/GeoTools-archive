@@ -49,6 +49,7 @@ import org.geotools.styling.StyleBuilder;
  *
  * @author Cameron Shorter
  * @author Andrea Aime
+ * @source $URL$
  * @version $Id$
  */
 public class MapToolViewer {

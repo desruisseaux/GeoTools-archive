@@ -11,6 +11,7 @@ import java.awt.event.ComponentEvent;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public class WindowMinSizer {
     private Window window;

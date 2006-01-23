@@ -44,6 +44,7 @@ import java.util.Stack;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class Parameters {
     private int maxNodeEntries;

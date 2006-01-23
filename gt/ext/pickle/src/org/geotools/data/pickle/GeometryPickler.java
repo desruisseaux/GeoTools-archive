@@ -52,6 +52,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * </pre>
  *   
  * @author  Ian Schneider
+ * @source $URL$
  */
 public final class GeometryPickler {
   final int POINT = 1;

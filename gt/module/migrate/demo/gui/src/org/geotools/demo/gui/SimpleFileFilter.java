@@ -10,6 +10,7 @@ import javax.swing.filechooser.FileFilter;
  * extensions
  *
  * @author wolf
+ * @source $URL$
  */
 public class SimpleFileFilter extends FileFilter implements java.io.FileFilter {
     String[] extensions;

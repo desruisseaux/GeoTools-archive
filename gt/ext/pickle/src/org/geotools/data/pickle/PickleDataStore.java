@@ -28,6 +28,7 @@ import org.geotools.filter.Filter;
  * making it sing and dance? Please...
  * </p>
  * @author jgarnett
+ * @source $URL$
  */
 public class PickleDataStore extends AbstractDataStore {
     PickleDataSource zombie;

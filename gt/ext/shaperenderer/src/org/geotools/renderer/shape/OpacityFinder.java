@@ -51,6 +51,7 @@ import org.geotools.styling.UserLayer;
  * Searches for symbolizers with opacity.
  *
  * @author jones
+ * @source $URL$
  */
 public class OpacityFinder implements StyleVisitor {
     private Class[] acceptableTypes;

@@ -42,6 +42,7 @@ import org.geotools.styling.Symbolizer;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultDashArrayEditor extends DashArrayEditor {
     private ArrayList dashArray;

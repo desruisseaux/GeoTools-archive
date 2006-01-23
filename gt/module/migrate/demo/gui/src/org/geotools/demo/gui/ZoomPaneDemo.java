@@ -53,6 +53,7 @@ import org.geotools.gui.swing.event.ZoomChangeListener;
  * (it doesn't have to be in pixel unit) and <CODE>paintComponent(Graphics2D)</CODE>
  * which performs the actual painting.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

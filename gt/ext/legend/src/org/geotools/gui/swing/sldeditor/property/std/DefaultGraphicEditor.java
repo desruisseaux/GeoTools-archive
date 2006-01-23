@@ -39,6 +39,7 @@ import org.geotools.styling.Symbol;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultGraphicEditor extends GraphicEditor {
     Graphic graphic;

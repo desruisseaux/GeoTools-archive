@@ -15,6 +15,7 @@ import org.geotools.gui.swing.sldeditor.property.FeatureTypeChooser;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public class DefaultFeatureTypeChooser extends FeatureTypeChooser {
     JComboBox cmbNames;

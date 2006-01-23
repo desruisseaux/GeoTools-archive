@@ -60,6 +60,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * WARNING: this is unstable and subject to change.
  *
  * @author Cory Horner, Refractions Research Inc.
+ * @source $URL$
  */
 public class StyleGenerator {
     private ColorBrewer colorBrewer;

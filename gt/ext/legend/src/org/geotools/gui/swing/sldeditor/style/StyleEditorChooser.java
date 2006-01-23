@@ -26,6 +26,7 @@ import org.geotools.styling.Style;
 /**
  * Allows editing a simple style based on one featuretype
  * @author wolf
+ * @source $URL$
  */
 public class StyleEditorChooser extends JPanel implements StyleEditor {
     private JPanel editorPanel;

@@ -34,6 +34,7 @@ import org.geotools.styling.Symbolizer;
      * DOCUMENT ME!
      *
      * @author wolf
+ * @source $URL$
      */
     public class SymbolizerListEditor extends AbstractPanelListEditor implements SLDEditor {
         FeatureType featureType;

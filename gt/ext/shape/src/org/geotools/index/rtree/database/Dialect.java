@@ -27,6 +27,7 @@ import java.sql.SQLException;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public interface Dialect {
     public String getCatalogQuery();

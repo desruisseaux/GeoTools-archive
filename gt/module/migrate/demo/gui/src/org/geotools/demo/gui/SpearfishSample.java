@@ -39,6 +39,7 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 /**
  * Simple map viewer
  * @author wolf
+ * @source $URL$
  */
 public class SpearfishSample {
 

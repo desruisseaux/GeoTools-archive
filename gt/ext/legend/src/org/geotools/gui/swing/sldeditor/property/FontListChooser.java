@@ -9,6 +9,7 @@ import org.geotools.gui.swing.sldeditor.SLDEditor;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class FontListChooser extends JComponent implements SLDEditor {
     public abstract String[] getFontNames();

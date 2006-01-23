@@ -19,6 +19,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * TODO: example of typical use...
  * 
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class QuadTree {
 

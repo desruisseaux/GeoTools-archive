@@ -45,6 +45,7 @@ import org.geotools.gui.swing.sldeditor.property.ScaleEditor;
  * A JComboBox designed to edit scales allowing only proper values to be inserted
  *
  * @author aaime
+ * @source $URL$
  */
 public class DefaultScaleEditor extends ScaleEditor {
     private static double[] defaultScales = new double[] {

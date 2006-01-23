@@ -44,6 +44,7 @@ import org.codehaus.plexus.util.cli.DefaultConsumer;
  * @goal rmic
  * @phase compile
  * @description Invokes the RMI compiler (rmic).
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

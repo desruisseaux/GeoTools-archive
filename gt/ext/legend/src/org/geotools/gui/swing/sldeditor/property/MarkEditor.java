@@ -10,6 +10,7 @@ import org.geotools.styling.Mark;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class MarkEditor extends JComponent implements SLDEditor {
     public abstract void setMark(Mark mark);

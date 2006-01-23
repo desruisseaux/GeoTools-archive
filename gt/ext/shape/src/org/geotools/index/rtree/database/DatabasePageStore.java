@@ -35,6 +35,7 @@ import javax.sql.DataSource;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class DatabasePageStore extends PageStore {
     protected static final int DEF_MAX = 50;

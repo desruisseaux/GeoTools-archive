@@ -36,6 +36,7 @@ import org.geotools.styling.Symbolizer;
  * preview.a feature sample needs to be set in RuleEdit.sample for each layer.
  *
  * @author jianhuij, aaime
+ * @source $URL$
  */
 public class PreviewPanel extends javax.swing.JComponent implements SLDEditor {
     /** The logger for the Legend module. */

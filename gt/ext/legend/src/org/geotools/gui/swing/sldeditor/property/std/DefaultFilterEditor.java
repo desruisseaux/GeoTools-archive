@@ -41,6 +41,7 @@ import org.geotools.gui.swing.sldeditor.util.FormUtils;
  * A basic implementation
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultFilterEditor extends FilterEditor {
     /** The SLDEditor package logger */

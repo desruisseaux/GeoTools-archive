@@ -28,6 +28,7 @@ import org.geotools.map.MapContext;
  * stores Context Object reference and others
  *
  * @author jianhuij
+ * @source $URL$
  */
 public class LegendRootNodeInfo extends LegendNodeInfo {
     /** The logger for the Legend module. */

@@ -43,6 +43,7 @@ import org.geotools.styling.PointPlacement;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultLabelPlacementEditor extends LabelPlacementEditor {
     LabelPlacement labelPlacement;

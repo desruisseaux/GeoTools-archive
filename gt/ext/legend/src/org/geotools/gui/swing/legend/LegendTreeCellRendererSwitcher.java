@@ -33,6 +33,7 @@ import javax.swing.tree.TreeCellRenderer;
  * node using LegendTreeLayerCellRenderer,  Rule use LegendTreeRuleCellRenderer
  *
  * @author jianhuij
+ * @source $URL$
  */
 public class LegendTreeCellRendererSwitcher implements javax.swing.tree.TreeCellRenderer {
     /** The logger for the Legend module. */

@@ -11,6 +11,7 @@ import org.geotools.styling.Stroke;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class StrokeEditor extends JComponent implements SLDEditor {
     public abstract void setStroke(Stroke stroke);

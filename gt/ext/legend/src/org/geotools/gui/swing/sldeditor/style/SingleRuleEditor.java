@@ -56,6 +56,7 @@ import org.geotools.styling.Style;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class SingleRuleEditor extends JPanel implements SLDEditor, StyleEditor {
     /** Holds value of property expertMode. */

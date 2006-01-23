@@ -30,6 +30,7 @@ import com.sun.tools.doclets.Taglet;
  * The <code>@tutorial</code> tag. This tag expects a link toward a tutorial page on the
  * Geotools wiki pages (Confluence).
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

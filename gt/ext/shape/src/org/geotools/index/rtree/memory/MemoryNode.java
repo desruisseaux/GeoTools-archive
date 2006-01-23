@@ -44,6 +44,7 @@ import org.geotools.index.rtree.Node;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class MemoryNode extends Node {
     private Node parent;

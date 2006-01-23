@@ -34,6 +34,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class FileSystemNode extends Node {
     private static final Logger LOGGER = Logger.getLogger(

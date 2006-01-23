@@ -46,6 +46,7 @@ import java.util.Collection;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public abstract class Node implements EntryBoundsChangeListener {
     private boolean leaf;

@@ -32,6 +32,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  * for being set in the renderer as the rule icon
  *
  * @author jianhuij
+ * @source $URL$
  */
 public class LegendTreeRuleCellRenderer
     extends javax.swing.tree.DefaultTreeCellRenderer {

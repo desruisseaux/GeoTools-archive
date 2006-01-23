@@ -16,6 +16,7 @@
  */
 /**
  *
+ * @source $URL$
  */
 package org.geotools.renderer.shape;
 

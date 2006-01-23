@@ -27,6 +27,7 @@ import org.geotools.styling.Symbolizer;
  * editor
  *
  * @author jianhuij
+ * @source $URL$
  */
 public abstract class SymbolizerEditor extends JComponent implements SLDEditor {
     public abstract Symbolizer getSymbolizer();

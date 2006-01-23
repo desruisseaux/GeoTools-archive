@@ -29,6 +29,7 @@ import java.util.List;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class Node {
     private Envelope bounds;

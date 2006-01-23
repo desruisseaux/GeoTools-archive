@@ -36,6 +36,7 @@ import org.geotools.styling.Mark;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultMarkEditor extends MarkEditor {
     Mark mark;

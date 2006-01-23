@@ -50,6 +50,7 @@ import org.geotools.styling.Symbolizer;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultGraphicFillEditor extends GraphicEditor {
     JButton btnGraphic;

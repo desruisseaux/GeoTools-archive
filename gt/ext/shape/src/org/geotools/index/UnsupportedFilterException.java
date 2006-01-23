@@ -39,6 +39,7 @@ package org.geotools.index;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class UnsupportedFilterException extends Exception {
     /**

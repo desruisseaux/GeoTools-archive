@@ -34,6 +34,7 @@ import org.geotools.gui.swing.sldeditor.SLDEditor;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class StringListEditor extends JComponent implements SLDEditor {
     JComboBox combo;

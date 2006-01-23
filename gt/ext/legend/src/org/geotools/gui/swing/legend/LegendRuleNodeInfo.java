@@ -36,6 +36,7 @@ import org.geotools.styling.Rule;
  * a feature sample is required to get value out of the rule.
  *
  * @author jianhuij
+ * @source $URL$
  */
 public class LegendRuleNodeInfo extends LegendNodeInfo {
     /** The logger for the Legend module. */

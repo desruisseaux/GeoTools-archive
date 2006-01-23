@@ -39,6 +39,7 @@ import java.awt.geom.PathIterator;
  * @author jeichar
  *
  * @since 2.1.x
+ * @source $URL$
  */
 public class PolygonShapeTest extends TestCase {
     private static final boolean DISPLAY = false;

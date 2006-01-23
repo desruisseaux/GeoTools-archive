@@ -9,6 +9,7 @@ import org.geotools.gui.swing.sldeditor.SLDEditor;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class DashArrayEditor extends JComponent implements SLDEditor {
     public abstract void setDashArray(float[] dash);

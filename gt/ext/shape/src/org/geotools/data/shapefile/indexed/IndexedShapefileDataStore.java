@@ -102,6 +102,7 @@ import java.util.logging.Level;
  * @author Tommaso Nolli
  *
  * @todo fix file creation bug
+ * @source $URL$
  */
 public class IndexedShapefileDataStore extends ShapefileDataStore {
     public static final byte TREE_NONE = 0;

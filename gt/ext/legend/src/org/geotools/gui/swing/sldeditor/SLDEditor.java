@@ -30,6 +30,7 @@ import org.geotools.styling.StyleFactoryFinder;
  * DOCUMENT ME!
  *
  * @author jianhuij
+ * @source $URL$
  */
 public interface SLDEditor {
     public static StyleFactory styleFactory = StyleFactoryFinder.createStyleFactory();

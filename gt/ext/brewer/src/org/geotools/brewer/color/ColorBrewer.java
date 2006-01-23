@@ -40,6 +40,7 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * @author James Macgill
  * @author Cory Horner, Refractions Research Inc.
+ * @source $URL$
  */
 public class ColorBrewer {
     

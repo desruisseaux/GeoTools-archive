@@ -43,6 +43,7 @@ import org.geotools.index.Data;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class Entry implements Cloneable {
     private Envelope bounds;

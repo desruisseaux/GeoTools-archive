@@ -20,6 +20,7 @@ import org.geotools.filter.function.ClassificationFunction;
 /**
  *
  * @author James Macgill
+ * @source $URL$
  */
 public class PaletteFunction extends FunctionExpressionImpl implements FunctionExpression{
     

@@ -37,6 +37,7 @@ import java.io.IOException;
  * @author jeichar
  *
  * @since 0.9.0
+ * @source $URL$
  */
 public class LabelingTest extends TestCase {
     private static final int CENTERX = 160;

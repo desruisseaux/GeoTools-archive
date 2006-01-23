@@ -36,6 +36,7 @@ import org.geotools.gui.swing.sldeditor.util.FormUtils;
  * A color editor that supports
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultColorEditor extends ExpressionEditor {
     private JButton btnColor;

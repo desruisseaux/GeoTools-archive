@@ -10,6 +10,7 @@ import org.geotools.styling.LabelPlacement;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class LabelPlacementEditor extends JComponent implements SLDEditor {
     public abstract void setLabelPlacement(LabelPlacement labelPlacement);

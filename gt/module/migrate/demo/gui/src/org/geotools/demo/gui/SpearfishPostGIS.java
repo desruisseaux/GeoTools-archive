@@ -35,6 +35,7 @@ import org.geotools.styling.TextSymbolizer;
  *
  * @author wolf
  * @author rschulz
+ * @source $URL$
  */
 public class SpearfishPostGIS {
 

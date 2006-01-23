@@ -25,6 +25,7 @@ import java.io.IOException;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class ShapeFIDReader implements FIDReader {
     protected static final String CLOSE_MESG = "Close has already been called"

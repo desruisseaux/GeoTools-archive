@@ -56,6 +56,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class RTree {
     private Logger logger = Logger.getLogger("org.geotools.index.rtree");

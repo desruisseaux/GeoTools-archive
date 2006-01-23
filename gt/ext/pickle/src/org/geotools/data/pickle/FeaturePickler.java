@@ -33,6 +33,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * <pre>
  * 
  * @author IanSchneider
+ * @source $URL$
  */
 public class FeaturePickler implements java.io.Serializable {
   

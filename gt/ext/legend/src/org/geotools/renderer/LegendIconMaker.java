@@ -78,6 +78,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * DOCUMENT ME!
  *
  * @author jianhuij
+ * @source $URL$
  */
 public class LegendIconMaker {
     /** The logger for the Legend module. */

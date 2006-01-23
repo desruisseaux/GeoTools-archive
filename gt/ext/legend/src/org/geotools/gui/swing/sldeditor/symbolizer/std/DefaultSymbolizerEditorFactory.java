@@ -28,6 +28,7 @@ import org.geotools.gui.swing.sldeditor.symbolizer.SymbolizerEditorFactory;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultSymbolizerEditorFactory extends SymbolizerEditorFactory {
     /**

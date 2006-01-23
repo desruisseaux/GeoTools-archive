@@ -84,6 +84,7 @@ import com.vividsolutions.jts.geom.Point;
  * as an applet. If you don't want it to be an applet, remove the {@link #init()} method.
  *
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  */
 public class MapViewer extends JApplet {

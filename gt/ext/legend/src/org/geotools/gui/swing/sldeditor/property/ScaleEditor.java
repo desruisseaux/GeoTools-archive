@@ -10,6 +10,7 @@ import org.geotools.gui.swing.sldeditor.SLDEditor;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class ScaleEditor extends JComponent implements SLDEditor {
     public abstract void setScaleDenominator(double scale);

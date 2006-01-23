@@ -44,6 +44,7 @@ import org.geotools.styling.Stroke;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultStrokeEditor extends StrokeEditor {
     /** The logger for the Legend module. */

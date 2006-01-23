@@ -56,6 +56,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author jamesm
  * @author Andrea Aime
+ * @source $URL$
  */
 public class RenderStyleTest extends junit.framework.TestCase {
     /** The logger for the rendering module. */

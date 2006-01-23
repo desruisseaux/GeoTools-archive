@@ -35,6 +35,7 @@ import javax.swing.filechooser.FileFilter;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class ImageFilter extends FileFilter {
     private static final Set suffixes = getSuffixes();

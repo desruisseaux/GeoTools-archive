@@ -39,6 +39,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class FileSystemIndexStore implements IndexStore {
     private static final Logger LOGGER = Logger.getLogger(

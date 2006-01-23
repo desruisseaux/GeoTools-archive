@@ -39,6 +39,7 @@ package org.geotools.index.rtree;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public interface EntryBoundsChangeListener {
     public void boundsChanged(Entry e);

@@ -68,6 +68,7 @@ import java.util.logging.Logger;
  * Utility class for Shapefile spatial indexing
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class ShapeFileIndexer {
     public static final String RTREE = "RTREE";

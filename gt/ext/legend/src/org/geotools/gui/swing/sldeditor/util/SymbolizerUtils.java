@@ -44,6 +44,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class SymbolizerUtils implements SLDEditor {
     /**

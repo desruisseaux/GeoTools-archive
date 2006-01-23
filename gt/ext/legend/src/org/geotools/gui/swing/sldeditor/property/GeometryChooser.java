@@ -9,6 +9,7 @@ import org.geotools.gui.swing.sldeditor.SLDEditor;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class GeometryChooser extends JComponent implements SLDEditor {
     public abstract String getSelectedName();

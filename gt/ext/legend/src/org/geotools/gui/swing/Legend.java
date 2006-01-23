@@ -69,6 +69,7 @@ import org.geotools.styling.StyleFactoryFinder;
  *
  * @author jianhuij
  * @author aaime
+ * @source $URL$
  */
 public class Legend extends javax.swing.JPanel implements MapLayerListListener, SLDEditor,
     java.io.Serializable {

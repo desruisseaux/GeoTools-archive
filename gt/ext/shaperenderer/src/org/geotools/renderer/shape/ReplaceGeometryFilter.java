@@ -41,6 +41,7 @@ import java.util.Iterator;
  * process SimpleGeometries.
  *
  * @author Jesse
+ * @source $URL$
  */
 public class ReplaceGeometryFilter implements FilterVisitor {
     /* (non-Javadoc)

@@ -53,6 +53,7 @@ import java.util.EmptyStackException;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class FileSystemNode extends Node {
     static final int ENTRY_SIZE = 40;

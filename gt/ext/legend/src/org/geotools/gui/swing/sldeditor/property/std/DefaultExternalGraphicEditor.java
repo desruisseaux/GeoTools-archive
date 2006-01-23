@@ -46,6 +46,7 @@ import org.geotools.styling.ExternalGraphic;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultExternalGraphicEditor extends ExternalGraphicEditor {
     ExternalGraphic externalGraphic;

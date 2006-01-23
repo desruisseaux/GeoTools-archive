@@ -10,6 +10,7 @@ import org.geotools.styling.Graphic;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class GraphicEditor extends JComponent implements SLDEditor {
     public abstract void setGraphic(Graphic graphic);

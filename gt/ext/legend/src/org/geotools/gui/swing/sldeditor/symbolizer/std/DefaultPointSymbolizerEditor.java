@@ -39,6 +39,7 @@ import org.geotools.styling.Symbolizer;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultPointSymbolizerEditor extends SymbolizerEditor implements SLDEditor {
     PointSymbolizer symbolizer;

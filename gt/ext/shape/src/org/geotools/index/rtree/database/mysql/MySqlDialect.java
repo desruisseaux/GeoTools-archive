@@ -26,6 +26,7 @@ import org.geotools.index.rtree.database.AbstractDialect;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class MySqlDialect extends AbstractDialect {
     /**

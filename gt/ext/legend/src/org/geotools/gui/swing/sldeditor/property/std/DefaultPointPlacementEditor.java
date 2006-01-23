@@ -35,6 +35,7 @@ import org.geotools.styling.PointPlacement;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultPointPlacementEditor extends JComponent implements SLDEditor {
     JLabel lblAnchorX;

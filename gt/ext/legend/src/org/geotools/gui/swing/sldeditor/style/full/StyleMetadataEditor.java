@@ -10,6 +10,7 @@ import org.geotools.styling.Style;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public class StyleMetadataEditor extends BasicMetadataEditor {
     

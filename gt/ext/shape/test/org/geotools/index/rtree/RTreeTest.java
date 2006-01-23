@@ -30,6 +30,7 @@ import java.util.Collection;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class RTreeTest extends TestCase {
     private static final short FILE = 0;

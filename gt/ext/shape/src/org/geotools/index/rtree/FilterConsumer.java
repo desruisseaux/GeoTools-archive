@@ -61,6 +61,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class FilterConsumer implements FilterVisitor {
     private static Logger LOGGER = Logger.getLogger("org.geotools.index.rtree");

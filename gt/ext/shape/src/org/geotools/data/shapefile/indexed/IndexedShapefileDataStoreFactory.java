@@ -53,6 +53,7 @@ import java.util.Map;
  * Implementation of the DataStore service provider interface for Shapefiles.
  *
  * @author Chris Holmes, TOPP
+ * @source $URL$
  * @version $Id$
  */
 public class IndexedShapefileDataStoreFactory

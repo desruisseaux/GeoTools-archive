@@ -43,6 +43,7 @@ import org.geotools.styling.Style;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class StyleDialog extends JDialog {
     private WindowMinSizer minSizer;

@@ -35,6 +35,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * Renderer for rendering root and layer Cell in LegendTree
  *
  * @author jianhuij
+ * @source $URL$
  */
 public class LegendTreeLayerCellRenderer extends javax.swing.JPanel
     implements javax.swing.tree.TreeCellRenderer {

@@ -53,6 +53,7 @@ import javax.swing.WindowConstants;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class FormUtils {
     private static Insets defaultInsets = new Insets(3, 3, 3, 3);

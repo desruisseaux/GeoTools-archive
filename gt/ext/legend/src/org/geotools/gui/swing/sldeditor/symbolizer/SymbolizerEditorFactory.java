@@ -17,6 +17,7 @@ import org.geotools.feature.FeatureType;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public abstract class SymbolizerEditorFactory implements Factory {
     private static SymbolizerEditorFactory factory = null;

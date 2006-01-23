@@ -43,6 +43,7 @@ import org.geotools.styling.Fill;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultFillEditor extends FillEditor {
     /** The logger for the Legend module. */

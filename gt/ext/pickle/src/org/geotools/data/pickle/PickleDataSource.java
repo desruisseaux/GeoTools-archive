@@ -20,6 +20,7 @@ import org.geotools.feature.FeatureType;
 /**
  *
  * @author  Ian Schneider
+ * @source $URL$
  */
 class PickleDataSource  {
   

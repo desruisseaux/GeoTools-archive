@@ -69,6 +69,7 @@ import org.geotools.resources.NIOUtilities;
  *    + add writeCollection method which follows the logic of this...
  * </pre>
  * @author  Ian Schneider
+ * @source $URL$
  */
 public abstract class PickledFeatureProtocol {
   

@@ -34,6 +34,7 @@ import javax.sql.DataSource;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class DatabaseNode extends Node {
     private DataSource dataSource;

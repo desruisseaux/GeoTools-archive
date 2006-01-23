@@ -62,6 +62,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author jamesm
+ * @source $URL$
  */
 public class Rendering2DTest extends TestCase {
     /** path for test data */

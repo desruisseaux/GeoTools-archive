@@ -23,6 +23,7 @@ package org.geotools.index.quadtree;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class StoreException extends Exception {
     /**

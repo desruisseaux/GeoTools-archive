@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultGeometryChooser extends GeometryChooser {
     FeatureType type;

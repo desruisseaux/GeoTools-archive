@@ -47,6 +47,7 @@ import org.geotools.index.rtree.PageStore;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class MemoryPageStore extends PageStore {
     private static final int DEF_MAX = 50;

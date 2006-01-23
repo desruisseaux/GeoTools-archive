@@ -41,6 +41,7 @@ import org.geotools.gui.swing.Legend;
  * double click will open a node.
  *
  * @author jianhuij
+ * @source $URL$
  */
 public class LegendTreeCellNameEditor extends AbstractCellEditor
     implements TreeCellEditor, ActionListener {

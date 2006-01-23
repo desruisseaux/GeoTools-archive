@@ -47,6 +47,7 @@ import org.geotools.styling.Symbolizer;
  *
  * @author Sean Geoghegan
  * @author Jianhui Jin
+ * @source $URL$
  */
 public class StyleCloner {
     private StyleFactory styleFactory;

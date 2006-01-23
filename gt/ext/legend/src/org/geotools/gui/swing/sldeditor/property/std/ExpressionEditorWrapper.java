@@ -35,6 +35,7 @@ import org.geotools.gui.swing.sldeditor.util.FormUtils;
  * friendly editor, with a toggle button to let the user choose if use  one or the other.
  *
  * @author wolf
+ * @source $URL$
  */
 public class ExpressionEditorWrapper extends ExpressionEditor {
     private DefaultExpressionEditor expressionEditor;

@@ -26,6 +26,7 @@ import org.geotools.gui.swing.sldeditor.util.FormUtils;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultPropertyEditorFactory extends PropertyEditorFactory {
     /**

@@ -29,6 +29,7 @@ import java.sql.SQLException;
  * DOCUMENT ME!
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public abstract class AbstractDialect implements Dialect {
     protected static final String CAT_TABLE = "rtrees_cat";

@@ -10,6 +10,7 @@ import org.geotools.styling.Fill;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class FillEditor extends JComponent implements SLDEditor {
     public abstract void setFill(Fill fill);

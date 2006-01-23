@@ -50,6 +50,7 @@ import org.geotools.styling.StyleFactoryFinder;
  * @author wolf To change the template for this generated type comment go to
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
  *         Comments
+ * @source $URL$
  */
 public class DefaultCompactFillEditor extends FillEditor {
 	private static LiteRenderer renderer = new LiteRenderer();

@@ -23,6 +23,7 @@ import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
  *
  * TODO: merge somehow with GeometryChooser and add the ability to
  * filter the attributes shown to the user with a Filter classs
+ * @source $URL$
  */
 public class DefaultFeatureAttributeChooser extends ExpressionEditor {
 	JComboBox cmbAttributes;

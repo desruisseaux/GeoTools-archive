@@ -44,6 +44,7 @@ import java.util.Comparator;
  * read dbf & shape file forward only
  *
  * @author Tommaso Nolli
+ * @source $URL$
  */
 public class DataComparator implements Comparator {
     /**

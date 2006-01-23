@@ -10,6 +10,7 @@ import org.geotools.styling.ExternalGraphic;
 
 /**
  * @author wolf
+ * @source $URL$
  */
 public abstract class ExternalGraphicEditor extends JComponent implements SLDEditor {
     public abstract void setExternalGraphic(ExternalGraphic externalGraphic);
