@@ -58,6 +58,7 @@ import org.geotools.filter.Filter;
  *
  * @author Rob Hranac, VFNY
  * @author Chris Holmes, TOPP
+ * @source $URL$
  * @version $Id$
  */
 public interface AttributeType {

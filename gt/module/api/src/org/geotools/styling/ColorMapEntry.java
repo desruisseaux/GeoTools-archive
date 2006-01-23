@@ -31,6 +31,7 @@ import org.geotools.filter.Expression;
  *  &lt;/xs:complexType&gt;
  *  &lt;/xs:element&gt;
  *  </pre>
+ * @source $URL$
  */
 public interface ColorMapEntry extends GTComponent {
     String getLabel();

@@ -42,6 +42,7 @@ package org.geotools.styling;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
+ * @source $URL$
  */
 public interface NamedLayer extends StyledLayer {
 

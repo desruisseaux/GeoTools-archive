@@ -20,6 +20,7 @@ import org.geotools.feature.FeatureCollection;
  * are kept in memory.
  * </p>
  * @author Jody Garnett, Refractions Research Inc.
+ * @source $URL$
  */
 public interface RandomFeatureAccess extends FeatureCollection {
     /**

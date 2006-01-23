@@ -28,6 +28,7 @@ import java.util.Map;
  * 
  * @author David Zwiers, Refractions Research
  * @author Justin Deoliveira, The Open Planning Project
+ * @source $URL$
  */
 public interface ServiceFinder {
 

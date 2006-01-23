@@ -58,6 +58,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  *
  * @author Chris Holmes
+ * @source $URL$
  * @version $Id$
  */
 public interface Query {

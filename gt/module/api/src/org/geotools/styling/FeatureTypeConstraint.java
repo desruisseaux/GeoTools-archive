@@ -54,6 +54,7 @@ import org.geotools.filter.Filter;
  * <p></p>
  *
  * @author James Macgill
+ * @source $URL$
  */
 public interface FeatureTypeConstraint extends GTComponent {
 	

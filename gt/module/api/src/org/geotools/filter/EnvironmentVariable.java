@@ -27,6 +27,7 @@ import org.geotools.feature.Feature;
  * DOCUMENT ME!
  *
  * @author James
+ * @source $URL$
  */
 public interface EnvironmentVariable extends Expression {
     /**

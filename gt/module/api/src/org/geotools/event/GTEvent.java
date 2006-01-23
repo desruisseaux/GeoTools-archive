@@ -36,6 +36,7 @@ package org.geotools.event;
  * @author Jody Garnett, Refractions Research
  *
  * @since 2.2.M2
+ * @source $URL$
  */
 public interface GTEvent {
 	

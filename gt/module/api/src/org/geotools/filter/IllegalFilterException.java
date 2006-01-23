@@ -17,6 +17,7 @@ package org.geotools.filter;
 
 /**
  * Defines an exception for illegal filters.
+ * @source $URL$
  */
 public class IllegalFilterException extends Exception {
     /** Prevent warning. */

@@ -44,6 +44,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * <pre><code>
  * featureSource.getFeatures( Query.FIDS );
  * </code></pre>
+ * @source $URL$
  */
 class FIDSQuery implements Query {
     static final String[] NO_PROPERTIES = new String[0];

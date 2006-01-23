@@ -20,6 +20,7 @@ import org.geotools.filter.Expression;
 
 /**
  * Abstract base class for implementing style factories.
+ * @source $URL$
  */
 public interface StyleFactory2 extends StyleFactory {
     /**

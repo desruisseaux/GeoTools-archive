@@ -24,6 +24,7 @@ import java.net.URL;
 
 /**
  * Abstract base class for implementing style factories.
+ * @source $URL$
  */
 public interface StyleFactory extends Factory {
     public TextSymbolizer createTextSymbolizer(Fill fill, Font[] fonts,

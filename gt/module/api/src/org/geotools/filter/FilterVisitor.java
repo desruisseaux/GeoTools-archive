@@ -26,6 +26,7 @@ package org.geotools.filter;
  * infomration from the Filter strucure, for example a list of all bboxes.
  *
  * @author James Macgill
+ * @source $URL$
  * @version $Id$
  *
  * @task REVISIT: These need to throw some sort of checked exception as the

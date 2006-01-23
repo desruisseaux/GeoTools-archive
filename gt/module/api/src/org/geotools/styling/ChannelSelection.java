@@ -53,6 +53,7 @@ import org.geotools.event.GTComponent;
  * etc.
  *
  * @author iant
+ * @source $URL$
  */
 public interface ChannelSelection extends GTComponent {
     /**

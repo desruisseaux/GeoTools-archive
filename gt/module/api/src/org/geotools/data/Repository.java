@@ -36,6 +36,7 @@ import java.util.SortedMap;
  * Provide metadata information on FeatureType
  * </li>
  * </ul>
+ * @source $URL$
  */
 public interface Repository {
 	

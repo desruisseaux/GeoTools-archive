@@ -42,6 +42,7 @@ import org.geotools.feature.Feature;
  * <p></p>
  *
  * @author Chris Holmes, TOPP
+ * @source $URL$
  * @version $Id$
  *
  * @task REVISIT: add units for distance.  Should it just be a string?  Or

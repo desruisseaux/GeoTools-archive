@@ -52,6 +52,7 @@ import org.geotools.event.GTComponent;
  * <p></p>
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  */
 public interface LabelPlacement extends GTComponent {
     //TODO: check GeoAPI renaming of LabelPlacement to TextPlacement

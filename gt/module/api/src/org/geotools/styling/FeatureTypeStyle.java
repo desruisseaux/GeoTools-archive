@@ -59,6 +59,7 @@ import org.geotools.event.GTComponent;
  * &lt;/xsd:element&gt;
  * </code></pre>
  *
+ * @source $URL$
  * @version $Id$
  * @author James Macgill, CCG
  */

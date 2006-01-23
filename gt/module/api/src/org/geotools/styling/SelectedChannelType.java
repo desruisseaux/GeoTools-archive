@@ -37,6 +37,7 @@ import org.geotools.filter.Expression;
  *  </pre>
  *
  * @author iant
+ * @source $URL$
  */
 public interface SelectedChannelType extends GTComponent {
     public void setChannelName(String name);

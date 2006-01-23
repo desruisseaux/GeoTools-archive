@@ -150,6 +150,7 @@ import org.opengis.feature.FeatureTypeFactory;
  * @author Chris Holmes, TOPP
  * @author David Zwiers, Refractions
  * @author Jody Garnett, Refractions
+ * @source $URL$
  * @version $Id$
  * @see org.geotools.feature.Feature
  * @see org.geotools.feature.FeatureTypeFactory

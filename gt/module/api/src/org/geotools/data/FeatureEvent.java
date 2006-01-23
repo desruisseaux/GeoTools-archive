@@ -40,6 +40,7 @@ import java.util.EventObject;
  * </p>
  *
  * @since GeoTools 2.0
+ * @source $URL$
  */
 public class FeatureEvent extends EventObject {
     private static final long serialVersionUID = 3154238322369916485L;

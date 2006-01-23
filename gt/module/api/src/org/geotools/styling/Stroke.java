@@ -78,6 +78,7 @@ import org.geotools.filter.Expression;
  * standards with names and semantics which are as close as possible.
  * </ul>
  * </p>
+ * @source $URL$
  * @version $Id$
  * @author James Macgill
  */

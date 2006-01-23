@@ -20,6 +20,7 @@ package org.geotools.filter;
  * replaced by a type safe enum when we move to Java 1.5
  *
  * @author aaime
+ * @source $URL$
  */
 public interface FilterType {
     /* ***********************************************************************

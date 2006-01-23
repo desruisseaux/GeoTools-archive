@@ -30,6 +30,7 @@ import org.geotools.feature.Feature;
  * filter.
  *
  * @author Rob Hranac, TOPP
+ * @source $URL$
  * @version $Id$
  */
 public interface BetweenFilter extends CompareFilter {

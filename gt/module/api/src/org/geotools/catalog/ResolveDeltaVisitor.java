@@ -55,6 +55,7 @@ import java.io.IOException;
  * @author Jody Garnett, Refractions Research
  *
  * @since 0.9.0
+ * @source $URL$
  */
 public interface ResolveDeltaVisitor {
     /**

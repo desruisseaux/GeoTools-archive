@@ -75,6 +75,7 @@ import org.geotools.event.GTComponent;
  * <p></p>
  *
  * @author James Macgill, CCG
+ * @source $URL$
  * @version $Id$
  */
 public interface Symbolizer extends GTComponent {

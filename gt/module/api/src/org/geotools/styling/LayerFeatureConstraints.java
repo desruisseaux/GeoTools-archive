@@ -28,6 +28,7 @@ import org.geotools.event.GTComponent;
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
+ * @source $URL$
  */
 public interface LayerFeatureConstraints extends GTComponent {
 

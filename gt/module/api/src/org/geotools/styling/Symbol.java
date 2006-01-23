@@ -26,6 +26,7 @@ import org.geotools.event.GTComponent;
  * This an empty interface for styling symbol objects to implement
  *
  * @author iant
+ * @source $URL$
  */
 public interface Symbol extends GTComponent {
 	public static final Symbol[] SYMBOLS_EMPTY = new Symbol[0];

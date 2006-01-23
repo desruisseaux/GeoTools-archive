@@ -104,6 +104,7 @@ import java.util.Map;
  * $Id$
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  */
 public interface TextSymbolizer extends Symbolizer {
     /**

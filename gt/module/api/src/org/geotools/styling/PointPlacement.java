@@ -72,6 +72,7 @@ import org.geotools.filter.Expression;
  * </p>
  *
  * @author Ian Turton
+ * @source $URL$
  */
 public interface PointPlacement extends LabelPlacement {
     /**

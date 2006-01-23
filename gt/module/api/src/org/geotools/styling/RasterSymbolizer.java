@@ -143,6 +143,7 @@ import org.geotools.filter.Expression;
  * </p>
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  */
 public interface RasterSymbolizer extends Symbolizer {
     /**

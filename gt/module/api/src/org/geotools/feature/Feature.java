@@ -131,6 +131,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Rob Hranac, TOPP
  * @author Ian Schneider, USDA-ARS
  * @author dzwiers
+ * @source $URL$
  * @version $Id$
  *
  * @see org.geotools.feature.FeatureType

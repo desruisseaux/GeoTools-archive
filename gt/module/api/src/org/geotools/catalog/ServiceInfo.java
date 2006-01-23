@@ -29,6 +29,7 @@ import javax.swing.Icon;
  * @author David Zwiers, Refractions Research
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.6
+ * @source $URL$
  */
 public interface ServiceInfo {
 	 /**

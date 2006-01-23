@@ -21,6 +21,7 @@ import java.util.EventObject;
 /**
  * A simple event object to represent all events triggered by FeatureCollection
  * instances (typically change events).
+ * @source $URL$
  */
 public class CollectionEvent extends EventObject {
     private static final long serialVersionUID = -1864190177730929948L;

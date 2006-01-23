@@ -96,6 +96,7 @@ package org.geotools.styling;
  * </p>
  *
  * @author James Macgill
+ * @source $URL$
  * @version $Id$
  */
 public interface PointSymbolizer extends Symbolizer {

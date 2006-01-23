@@ -87,6 +87,7 @@ import org.geotools.filter.Expression;
  * $Id$
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  */
 public interface Halo extends GTComponent {
     /**

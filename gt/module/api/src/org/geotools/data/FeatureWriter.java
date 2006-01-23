@@ -58,6 +58,7 @@ import org.geotools.feature.FeatureType;
  *
  * @author Ian Schneider
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  * @version $Id$
  */
 public interface FeatureWriter {

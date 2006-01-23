@@ -24,6 +24,7 @@ import org.geotools.feature.Feature;
  * defined manner.
  *
  * @author Rob Hranac, Vision for New York
+ * @source $URL$
  * @version $Id$
  */
 public interface Expression extends ExpressionType {

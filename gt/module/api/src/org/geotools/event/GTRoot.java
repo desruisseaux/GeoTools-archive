@@ -30,6 +30,7 @@ package org.geotools.event;
  * <p></p>
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public interface GTRoot extends GTComponent {
     public static GTRoot NO_PARENT = new GTRoot() {

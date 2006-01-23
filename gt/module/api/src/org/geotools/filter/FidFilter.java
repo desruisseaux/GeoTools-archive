@@ -25,6 +25,7 @@ import java.util.Collection;
  * uniquely.
  *
  * @author Rob Hranac, TOPP
+ * @source $URL$
  * @version $Id$
  */
 public interface FidFilter extends Filter {

@@ -41,6 +41,7 @@ import org.geotools.util.ProgressListener;
  * @since 0.6
  * @see ServiceInfo
  * @see ServiceFinder
+ * @source $URL$
  */
 public interface Service extends Resolve {
 	

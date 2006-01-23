@@ -38,6 +38,7 @@ package org.geotools.event;
  * </p>
  *
  * @author jgarnett
+ * @source $URL$
  */
 public interface GTListener {
     /**

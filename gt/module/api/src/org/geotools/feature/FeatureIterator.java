@@ -24,6 +24,7 @@ package org.geotools.feature;
  * be a drop in replacement when Geotools is able to upgrade to Java 5.
  * </p>
  * @author Ian Schneider
+ * @source $URL$
  */
 public interface FeatureIterator {
     /**

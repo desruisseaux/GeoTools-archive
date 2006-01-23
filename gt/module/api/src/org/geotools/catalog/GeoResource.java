@@ -33,6 +33,7 @@ import java.io.IOException;
  * @author Justin Deoliveira, The Open Planning Project
  *
  * @since 0.6
+ * @source $URL$
  */
 public interface GeoResource extends Resolve {
     /**

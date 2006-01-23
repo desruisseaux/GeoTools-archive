@@ -24,6 +24,7 @@ import org.geotools.feature.Feature;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
+ * @source $URL$
  */
 public interface FeatureVisitor {
     public void visit(Feature feature);

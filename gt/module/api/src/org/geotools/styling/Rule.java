@@ -91,6 +91,7 @@ import org.geotools.filter.Filter;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
+ * @source $URL$
  */
 public interface Rule extends GTComponent {
     /**

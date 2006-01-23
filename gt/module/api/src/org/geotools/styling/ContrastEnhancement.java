@@ -61,6 +61,7 @@ import org.geotools.filter.Expression;
  * enhancement is performed.
  *
  * @author iant
+ * @source $URL$
  */
 public interface ContrastEnhancement extends GTComponent {
     public void setType(Expression type);

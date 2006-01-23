@@ -26,6 +26,7 @@ import org.geotools.filter.Filter;
  * restrictions, and that the restrictions are immutable. 
  * 
  * @author dzwiers
+ * @source $URL$
  */
 public interface PrimativeAttributeType extends AttributeType {
 

@@ -28,6 +28,7 @@ import java.util.EventListener;
  * @author David Zwiers, Refractions Research
  *
  * @since 0.6
+ * @source $URL$
  */
 public interface ResolveChangeListener extends EventListener {
     /**

@@ -27,6 +27,7 @@ package org.geotools.catalog;
  *
  * @author Jody Garnett, Refractions Research
  * @since 2.2.M3
+ * @source $URL$
  */
 public interface ResolveChangeEvent {
     /**

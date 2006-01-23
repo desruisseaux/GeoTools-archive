@@ -17,6 +17,7 @@ package org.geotools.styling;
 
 /**
  * Contains label shield hack
+ * @source $URL$
  */
 public interface TextSymbolizer2 extends TextSymbolizer {
     /* Used for "shield labels" on hwys. */

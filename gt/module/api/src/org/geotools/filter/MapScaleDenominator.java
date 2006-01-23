@@ -24,6 +24,7 @@ package org.geotools.filter;
  * DOCUMENT ME!
  *
  * @author James
+ * @source $URL$
  */
 public interface MapScaleDenominator extends EnvironmentVariable {
     static final String EV_NAME = "sld:MapScaleDenominator";

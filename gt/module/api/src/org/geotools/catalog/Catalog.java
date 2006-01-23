@@ -35,6 +35,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.7.0
  * 
+ * @source $URL$
  */
 public interface Catalog extends Resolve {
 	 /**

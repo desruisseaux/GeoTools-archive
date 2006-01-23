@@ -91,6 +91,7 @@ import org.geotools.event.GTListener;
  * @author Ian Turton, CCG
  * @author James Macgill, CCG
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  * @version SLD 1.0
  *
  * @since GeoTools 2.0

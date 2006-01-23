@@ -12,6 +12,7 @@ import java.util.Iterator;
  * </p>
  * @author Jody Garnett, Refractions Research, Inc.
  * @since GeoTools 2.2
+ * @source $URL$
  */
 public interface ResourceCollection extends Collection {
 

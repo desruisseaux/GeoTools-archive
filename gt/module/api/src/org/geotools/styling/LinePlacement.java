@@ -70,6 +70,7 @@ import org.geotools.filter.Expression;
  * </p>
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  */
 public interface LinePlacement extends LabelPlacement {
     /**

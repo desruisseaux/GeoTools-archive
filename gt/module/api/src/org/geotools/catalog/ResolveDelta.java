@@ -34,6 +34,7 @@ import java.util.Set;
  * @author Jody Garnett
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.6.0
+ * @source $URL$
  */
 public interface ResolveDelta {
     /** List indicating no children are present */

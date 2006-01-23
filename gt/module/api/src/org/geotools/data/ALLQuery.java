@@ -42,6 +42,7 @@ import java.util.Arrays;
  * <pre><code>
  * featureSource.getFeatures( Query.FIDS );
  * </code></pre>
+ * @source $URL$
  */
 class ALLQuery implements Query {
     public final String[] getPropertyNames() {

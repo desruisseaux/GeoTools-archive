@@ -41,6 +41,7 @@ import org.geotools.filter.Filter;
  * @author Jody Garnett, Refractions Research, Inc.
  *
  * @since 2.1.M5
+ * @source $URL$
  */
 public interface FeatureAttributeType extends AttributeType,
     PrimativeAttributeType {

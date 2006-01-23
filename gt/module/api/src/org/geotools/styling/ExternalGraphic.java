@@ -90,6 +90,7 @@ import java.util.Map;
  * </p>
  *
  * @author James Macgill, CCG
+ * @source $URL$
  * @version $Id$
  */
 public interface ExternalGraphic extends Symbol {

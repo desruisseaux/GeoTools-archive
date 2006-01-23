@@ -41,6 +41,7 @@ import org.geotools.event.GTComponent;
  * </p>
  *
  * @author Justin Deoliveira, The Open Planning Project
+ * @source $URL$
  */
 public interface Extent extends GTComponent {
     /**

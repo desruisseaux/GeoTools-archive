@@ -30,6 +30,7 @@ package org.geotools.styling;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ * @source $URL$
  */
 public interface OverlapBehavior {
 

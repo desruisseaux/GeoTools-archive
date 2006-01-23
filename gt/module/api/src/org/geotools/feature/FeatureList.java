@@ -35,6 +35,7 @@ import org.geotools.filter.Filter;
  * </p>
  *  
  * @author Jody Garnett, Refractions Research, Inc.
+ * @source $URL$
  */
 public interface FeatureList extends List, FeatureCollection {
     

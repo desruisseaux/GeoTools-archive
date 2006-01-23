@@ -48,6 +48,7 @@ import org.geotools.filter.Expression;
  * 16:56:47 ianturton Exp $
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  */
 public interface Font extends GTComponent {
 	

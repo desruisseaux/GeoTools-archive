@@ -70,6 +70,7 @@ import org.geotools.filter.Filter;
  * </ul>
  * 
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  * @version $Id$
  */
 public interface DataStore{

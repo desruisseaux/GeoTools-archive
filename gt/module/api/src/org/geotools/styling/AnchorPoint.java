@@ -25,6 +25,7 @@ import org.geotools.filter.Expression;
  * AnchorPoint.java,v 1.5 2003/08/19 13:03:03 ianturton Exp $
  *
  * @author Ian Turton
+ * @source $URL$
  */
 public interface AnchorPoint extends GTComponent {
     //TODO: add AnchorPoint to GeoAPI

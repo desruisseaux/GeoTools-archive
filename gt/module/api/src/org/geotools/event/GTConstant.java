@@ -6,6 +6,7 @@ package org.geotools.event;
  * 
  * @author Jody Garnett, Refractions Research, Inc.
  *
+ * @source $URL$
  */
 public class GTConstant implements GTComponent {	
 	public static final GTRoot SHARED = GTRoot.NO_PARENT;

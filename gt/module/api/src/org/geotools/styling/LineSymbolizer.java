@@ -95,6 +95,7 @@ package org.geotools.styling;
  * </p>
  *
  * @author James Macgill, CCG
+ * @source $URL$
  * @version $Id$
  */
 public interface LineSymbolizer extends Symbolizer {

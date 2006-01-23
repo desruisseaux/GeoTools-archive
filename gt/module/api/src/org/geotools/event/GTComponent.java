@@ -40,6 +40,7 @@ package org.geotools.event;
  * <p>
  * @author Jody Garnett
  *
+ * @source $URL$
  */
 public interface GTComponent {
 	

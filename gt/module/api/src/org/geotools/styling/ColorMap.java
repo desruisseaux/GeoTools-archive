@@ -38,6 +38,7 @@ import org.geotools.event.GTComponent;
  * may be used in the future to match character values.   Not all systems can
  * support opacity in colormaps.  The default opacity is 1.0 (fully opaque).
  * Defaults for quantity and label are system-dependent.
+ * @source $URL$
  */
 public interface ColorMap extends GTComponent {
     public static final int TYPE_RAMP = 1;

@@ -39,6 +39,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author David Zwiers, Refractions Research
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.6
+ * @source $URL$
  */
 public interface GeoResourceInfo {
 

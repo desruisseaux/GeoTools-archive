@@ -20,6 +20,7 @@ import org.geotools.filter.Expression;
 
 /**
  * Note: this isn't in the SLD spec
+ * @source $URL$
  */
 public interface TextMark extends Mark {
     public Expression getSymbol();

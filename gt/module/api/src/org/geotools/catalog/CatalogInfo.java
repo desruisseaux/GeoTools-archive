@@ -28,6 +28,7 @@ import java.net.URI;
  * @author Justin Deoliveira, The Open Planning Project
  *
  * @since 0.6
+ * @source $URL$
  */
 public interface CatalogInfo {
     /**

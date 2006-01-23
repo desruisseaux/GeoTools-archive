@@ -97,6 +97,7 @@ package org.geotools.styling;
  * </p>
  *
  * @author James Macgill
+ * @source $URL$
  * @version $Id$
  */
 public interface PolygonSymbolizer extends Symbolizer {

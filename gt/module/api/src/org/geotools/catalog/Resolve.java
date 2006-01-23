@@ -67,6 +67,7 @@ import java.util.List;
  * @author Justin Deoliveira, The Open Planning Project
  *
  * @since 0.7.0
+ * @source $URL$
  */
 public interface Resolve {
     /**

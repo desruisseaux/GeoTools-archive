@@ -133,6 +133,7 @@ import java.util.List;
  * of a visitor or transformation.
  * </p>
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public interface GTDelta {
 	

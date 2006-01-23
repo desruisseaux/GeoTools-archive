@@ -24,6 +24,7 @@ import org.geotools.event.GTComponent;
  * <p>
  * TODO: investigate why this is here.
  * </p>
+ * @source $URL$
  */
 public interface StyledLayer extends GTComponent {
     public String getName();

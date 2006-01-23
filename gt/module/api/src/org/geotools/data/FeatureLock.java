@@ -33,6 +33,7 @@ package org.geotools.data;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc.
+ * @source $URL$
  * @version $Id$
  *
  * @see <a

@@ -45,6 +45,7 @@ import org.geotools.feature.FeatureType;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
+ * @source $URL$
  */
 public interface UserLayer extends StyledLayer {
     public RemoteOWS getRemoteOWS();

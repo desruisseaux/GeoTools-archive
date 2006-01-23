@@ -41,6 +41,7 @@ import org.geotools.feature.Feature;
  *
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
+ * @source $URL$
  * @version $Id$
  *
  * @task: REVISIT: make this class (and all filters) immutable, implement

@@ -26,6 +26,7 @@ import org.opengis.util.CodeList;
  * @see http://schemas.opengis.net/filter/1.1.0/sort.xsd
  * @author Jody Garnett, Refractions Research.
  * @since GeoTools 2.2, Filter 1.1
+ * @source $URL$
  */
 public final class SortOrder extends CodeList {
 	private static final long serialVersionUID = 7840334200112859571L;

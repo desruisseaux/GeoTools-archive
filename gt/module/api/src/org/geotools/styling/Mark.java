@@ -84,6 +84,7 @@ import org.geotools.filter.Expression;
  * </p>
  *
  * @author James Macgill
+ * @source $URL$
  * @version $Id$
  */
 public interface Mark extends Symbol {

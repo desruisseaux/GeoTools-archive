@@ -51,6 +51,7 @@ import org.geotools.filter.Expression;
  * results for Earth-based DEMs. The default value is system-dependent.
  *
  * @author iant
+ * @source $URL$
  */
 public interface ShadedRelief extends GTComponent {
     /**

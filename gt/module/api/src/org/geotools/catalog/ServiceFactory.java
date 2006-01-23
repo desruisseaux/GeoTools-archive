@@ -26,6 +26,7 @@ import java.util.Map;
  * @author David Zwiers, Refractions Research
  *
  * @since 0.6
+ * @source $URL$
  */
 public interface ServiceFactory {
     /**

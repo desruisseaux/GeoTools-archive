@@ -34,6 +34,7 @@ import org.geotools.feature.Feature;
  * simplify/make meaningful filter logic.
  *
  * @author Rob Hranac, Vision for New York
+ * @source $URL$
  * @version $Id$
  */
 public interface CompareFilter extends Filter {
