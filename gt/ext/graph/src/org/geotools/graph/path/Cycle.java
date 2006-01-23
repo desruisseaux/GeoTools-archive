@@ -31,6 +31,7 @@ import org.geotools.graph.structure.Node;
  * of size n in which nodes 1 through n-1 form a path. 
  *   
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
+ * @source $URL$
  */
 public class Cycle extends Walk {
   

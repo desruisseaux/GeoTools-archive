@@ -45,6 +45,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * If only one Geometry is given, then this test checks to see if it 
  * is disjoint with itself.
  * </p>
+ * @source $URL$
  */
 public class DisjointIntegrity extends RelationIntegrity {
 	private static final Logger LOGGER = Logger.getLogger("org.geotools.validation");

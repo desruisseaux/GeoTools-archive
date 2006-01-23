@@ -35,6 +35,7 @@ import org.geotools.graph.structure.opt.OptNode;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
+ * @source $URL$
  */
 public class OptGraphBuilder extends BasicGraphBuilder {
  

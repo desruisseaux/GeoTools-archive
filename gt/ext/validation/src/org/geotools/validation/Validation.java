@@ -51,6 +51,7 @@ package org.geotools.validation;
  *
  * @author bowens, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public interface Validation {

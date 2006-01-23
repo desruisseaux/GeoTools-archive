@@ -48,6 +48,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * CrossesIntegrity<br>
  * @author bowens, ptozer<br>
  * Created Apr 27, 2004<br>
+ * @source $URL$
  * @version <br>
  * 
  * <b>Puropse:</b><br>

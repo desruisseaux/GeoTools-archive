@@ -39,6 +39,7 @@ import org.geotools.graph.traverse.standard.DepthFirstIterator;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
+ * @source $URL$
  */
 public class GraphPartitioner implements GraphWalker {
 

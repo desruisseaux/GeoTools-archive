@@ -56,6 +56,7 @@ import org.geotools.validation.DefaultFeatureValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: jive $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class LineNoSelfOverlappingValidationBeanInfo extends DefaultFeatureValidationBeanInfo{

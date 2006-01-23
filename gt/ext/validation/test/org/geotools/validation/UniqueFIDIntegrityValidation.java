@@ -30,6 +30,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author bowens, Refractions Research, Inc.
  * @author $Author: sploreg $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class UniqueFIDIntegrityValidation implements IntegrityValidation {

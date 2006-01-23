@@ -90,6 +90,7 @@ import org.geotools.feature.FeatureType;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc.
+ * @source $URL$
  * @version $Id$
  */
 public interface FeatureValidation extends Validation {

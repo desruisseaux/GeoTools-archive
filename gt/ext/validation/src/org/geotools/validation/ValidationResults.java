@@ -34,6 +34,7 @@ import org.geotools.feature.Feature;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc
+ * @source $URL$
  */
 public interface ValidationResults {
     /**

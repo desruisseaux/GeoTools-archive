@@ -37,6 +37,7 @@ import java.util.logging.Logger;
  * <p></p>
  *
  * @author dzwiers, Refractions Research, Inc.
+ * @source $URL$
  * @version $Id$
  */
 class WriterUtils {

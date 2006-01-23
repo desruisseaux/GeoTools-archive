@@ -24,6 +24,7 @@ import org.geotools.feature.Feature;
  * 
  * @author bowens, Refractions Research, Inc.
  * @author $Author: sploreg $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class RoadNetworkValidationResults implements ValidationResults {

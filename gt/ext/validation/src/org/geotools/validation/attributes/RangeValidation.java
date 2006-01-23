@@ -66,6 +66,7 @@ import org.geotools.validation.ValidationResults;
  *
  * @author rgould, Refractions Research, Inc.
  * @author $Author: cholmesny $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class RangeValidation extends DefaultFeatureValidation {

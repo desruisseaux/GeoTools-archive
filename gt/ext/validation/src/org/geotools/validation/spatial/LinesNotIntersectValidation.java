@@ -42,6 +42,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author Brent Owens, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class LinesNotIntersectValidation extends LineLineAbstractValidation {

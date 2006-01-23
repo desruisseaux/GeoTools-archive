@@ -50,6 +50,7 @@ import org.xml.sax.SAXException;
  * <p></p>
  *
  * @author dzwiers, Refractions Research, Inc.
+ * @source $URL$
  * @version $Id$
  *
  * @see XMLConfigReader

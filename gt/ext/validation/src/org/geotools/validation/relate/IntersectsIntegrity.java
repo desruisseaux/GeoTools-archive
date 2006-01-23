@@ -47,6 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * If only one Geometry is given, then this test checks to see if it 
  * intersects part of itself.
  * </p>
+ * @source $URL$
  */
 public class IntersectsIntegrity extends RelationIntegrity {
 	private static final Logger LOGGER = Logger.getLogger("org.geotools.validation");

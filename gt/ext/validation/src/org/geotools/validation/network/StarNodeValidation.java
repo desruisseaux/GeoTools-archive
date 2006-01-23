@@ -39,6 +39,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class StarNodeValidation extends DefaultIntegrityValidation {

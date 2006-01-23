@@ -47,6 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * contains part of itself.
  * </p>
  *
+ * @source $URL$
  */
 public class ContainsIntegrity extends RelationIntegrity {
 	private static final Logger LOGGER = Logger.getLogger("org.geotools.validation");

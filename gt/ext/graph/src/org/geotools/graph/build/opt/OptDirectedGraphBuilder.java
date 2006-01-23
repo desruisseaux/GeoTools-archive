@@ -35,6 +35,7 @@ import org.geotools.graph.structure.opt.OptDirectedNode;
  * 
  * @author Justin Deoliveira, Refractions Research Inc, jdeolive@refractions.net
  *
+ * @source $URL$
  */
 public class OptDirectedGraphBuilder extends BasicDirectedGraphBuilder {
   

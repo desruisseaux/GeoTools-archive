@@ -43,6 +43,7 @@ import org.geotools.validation.xml.ValidationException;
  * </p>
  *
  * @see http://vwfs.refractions.net/docs/Validating_Web_Feature_Server.pdf
+ * @source $URL$
  */
 public class PlugIn {
     Map defaults;

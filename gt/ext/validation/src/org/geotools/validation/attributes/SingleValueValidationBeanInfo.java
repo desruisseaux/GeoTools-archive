@@ -36,6 +36,7 @@ import org.geotools.validation.DefaultFeatureValidationBeanInfo;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class SingleValueValidationBeanInfo

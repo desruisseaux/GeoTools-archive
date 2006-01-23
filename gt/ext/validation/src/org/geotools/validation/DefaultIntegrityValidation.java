@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author Jody Garnett, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class DefaultIntegrityValidation implements IntegrityValidation {

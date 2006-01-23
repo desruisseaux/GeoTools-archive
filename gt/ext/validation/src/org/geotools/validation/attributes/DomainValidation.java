@@ -37,6 +37,7 @@ import org.geotools.validation.ValidationResults;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: dmzwiers $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class DomainValidation extends DefaultFeatureValidation {

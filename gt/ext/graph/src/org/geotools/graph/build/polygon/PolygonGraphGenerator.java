@@ -56,6 +56,7 @@ import com.vividsolutions.jts.index.strtree.STRtree;
 
  * @author Justin Deoliveira, The Open Planning Project
  *
+ * @source $URL$
  */
 public class PolygonGraphGenerator implements GraphGenerator {
 

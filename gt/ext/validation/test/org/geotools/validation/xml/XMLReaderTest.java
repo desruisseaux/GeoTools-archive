@@ -50,6 +50,7 @@ import org.geotools.validation.dto.TestSuiteDTO;
  *
  * @author dzwiers, Refractions Research, Inc.
  * @author $Author: sploreg $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class XMLReaderTest extends TestCase {
