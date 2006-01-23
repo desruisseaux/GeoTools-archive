@@ -22,8 +22,7 @@ package org.geotools.data.arcsde;
  * 
  * @author Gabriel Rold?n
  * @source $URL$
- * @version $Id: GeometryBuildingException.java,v 1.1 2004/06/21 15:00:33
- *          cdillard Exp $
+ * @version $Id$
  */
 public class GeometryBuildingException extends Exception {
 	/**

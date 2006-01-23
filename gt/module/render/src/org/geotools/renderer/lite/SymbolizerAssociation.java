@@ -5,7 +5,6 @@
  * version 2.1 of the License. This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- * @source $URL$
  */
 package org.geotools.renderer.lite;
 
@@ -13,6 +12,9 @@ import org.geotools.styling.Symbolizer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 
+/**
+ * @source $URL$
+ */
 public class SymbolizerAssociation
 {
      public MathTransform2D  xform = null;

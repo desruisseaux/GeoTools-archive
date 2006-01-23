@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.styling;
 
@@ -22,6 +20,10 @@ import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
 
+/**
+ *
+ * @source $URL$
+ */
 public class ExtentImpl extends AbstractGTComponent implements Extent,
     Cloneable {
     private String name;

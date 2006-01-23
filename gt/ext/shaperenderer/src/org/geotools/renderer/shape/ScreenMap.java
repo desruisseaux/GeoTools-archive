@@ -14,12 +14,12 @@
  *    Lesser General Public License for more details.
  *
  */
+package org.geotools.renderer.shape;
+
 /**
  *
  * @source $URL$
  */
-package org.geotools.renderer.shape;
-
 public class ScreenMap {
     int[] pixels;
     int width;

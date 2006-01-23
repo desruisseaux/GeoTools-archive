@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- * @source $URL$
  */
 package org.geotools.catalog.defaults;
 
@@ -20,6 +19,9 @@ import org.geotools.catalog.CatalogInfo;
 import java.net.URI;
 
 
+/**
+ * @source $URL$
+ */
 public class DefaultCatalogInfo implements CatalogInfo {
     protected String title;
     protected String description;

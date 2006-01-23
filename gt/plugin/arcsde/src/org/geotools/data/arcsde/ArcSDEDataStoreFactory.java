@@ -32,8 +32,7 @@ import com.esri.sde.sdk.pe.PeCoordinateSystem;
  *
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL$
- * @version $Id: ArcSDEDataStoreFactory.java,v 1.1 2004/06/21 15:00:33 cdillard
- *          Exp $
+ * @version $Id$
  */
 public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     /** package's logger */

@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.data.postgis;
 
@@ -28,6 +26,11 @@ import org.geotools.data.postgis.attributeio.WKBEncoder;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 
+
+/**
+ *
+ * @source $URL$
+ */
 public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
 
     /** Well Known Text writer (from JTS). */

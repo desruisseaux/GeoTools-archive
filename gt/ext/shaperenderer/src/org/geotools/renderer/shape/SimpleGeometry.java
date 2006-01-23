@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.renderer.shape;
 
@@ -21,6 +19,10 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.shapefile.shp.ShapeType;
 
 
+/**
+ *
+ * @source $URL$
+ */
 public class SimpleGeometry {
     public final ShapeType type;
     public final double[][] coords;

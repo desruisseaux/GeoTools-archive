@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.gui.swing.sldeditor.symbolizer.std;
 
@@ -45,6 +43,10 @@ import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 
 
+/**
+ *
+ * @source $URL$
+ */
 class DefaultSymbolizerChooserDialog extends SymbolizerChooserDialog {
     JRadioButton rbtPoint;
     JRadioButton rbtPolygon;

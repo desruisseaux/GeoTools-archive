@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.brewer.color;
 
@@ -46,6 +44,10 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 
 
+/**
+ *
+ * @source $URL$
+ */
 public class StyleGeneratorTest extends DataTestCase {
     public StyleGeneratorTest(String arg0) {
         super(arg0);

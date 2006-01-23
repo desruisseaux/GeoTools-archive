@@ -106,9 +106,9 @@ import org.geotools.filter.Filter;
  * @author Amr Alam, Refractions Research
  * @author Sean  Geoghegan, Defence Science and Technology Organisation
  * @author Chris Holmes, TOPP
- * @author Andrea Aime $Id: JDBCDataStore.java,v 1.23.2.6 2004/05/09 15:15:42
- *         aaime Exp $
+ * @author Andrea Aime
  * @source $URL$
+ * @version $Id$
  */
 public abstract class JDBCDataStore extends JDBC2DataStore {
 	protected JDBCDataStore( ConnectionPool pool, JDBCDataStoreConfig config ) throws IOException {

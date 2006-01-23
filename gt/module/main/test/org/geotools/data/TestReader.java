@@ -1,7 +1,3 @@
-/**
- * 
- * @source $URL$
- */
 package org.geotools.data;
 
 import java.io.IOException;
@@ -11,6 +7,10 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 
+/**
+ * 
+ * @source $URL$
+ */
 class TestReader implements FeatureReader{
 
     /**

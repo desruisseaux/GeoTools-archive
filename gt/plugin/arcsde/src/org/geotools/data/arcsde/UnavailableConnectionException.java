@@ -24,8 +24,7 @@ package org.geotools.data.arcsde;
  * @author Gabriel Rold?n
  * @author Gabriel Rold?n
  * @source $URL$
- * @version $Id: UnavailableConnectionException.java,v 1.1 2004/06/21 15:00:33
- *          cdillard Exp $
+ * @version $Id$
  * 
  * @task REVISIT: sure there are a better exception to use in somewhere... just
  *       take a look since it seems not very wise to have it here... may be in

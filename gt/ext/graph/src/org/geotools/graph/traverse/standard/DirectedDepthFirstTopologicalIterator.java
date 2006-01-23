@@ -14,7 +14,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- * @source $URL$
  */
  
 package org.geotools.graph.traverse.standard;
@@ -23,6 +22,10 @@ import org.geotools.graph.structure.Graph;
 import org.geotools.graph.util.Queue;
 import org.geotools.graph.util.Stack;
 
+
+/**
+ * @source $URL$
+ */
 public class DirectedDepthFirstTopologicalIterator 
   extends DirectedBreadthFirstTopologicalIterator {
   

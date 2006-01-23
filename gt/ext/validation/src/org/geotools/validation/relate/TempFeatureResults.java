@@ -3,7 +3,6 @@
  *
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
- * @source $URL$
  */
 package org.geotools.validation.relate;
 
@@ -14,7 +13,9 @@ import org.geotools.feature.Feature;
 import org.geotools.validation.Validation;
 import org.geotools.validation.ValidationResults;
 
-
+/**
+ * @source $URL$
+ */
 final class TempFeatureResults implements ValidationResults {
 	Validation trial;
 	List error = new ArrayList();

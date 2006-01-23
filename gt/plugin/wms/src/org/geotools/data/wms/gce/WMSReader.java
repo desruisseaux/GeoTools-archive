@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.data.wms.gce;
 
@@ -48,6 +46,10 @@ import org.opengis.spatialschema.geometry.Envelope;
 import org.xml.sax.SAXException;
 
 
+/**
+ *
+ * @source $URL$
+ */
 public class WMSReader implements GridCoverageReader {
     private Object source;
     private boolean hasNext = true;

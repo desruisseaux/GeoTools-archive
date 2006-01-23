@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.data.jdbc;
 
@@ -48,6 +46,10 @@ import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
 
 
+/**
+ *
+ * @source $URL$
+ */
 public class JDBCFeatureCollection extends DefaultFeatureResults {
     /** The logger for the filter module. */
 //    private static final Logger LOGGER = Logger.getLogger(

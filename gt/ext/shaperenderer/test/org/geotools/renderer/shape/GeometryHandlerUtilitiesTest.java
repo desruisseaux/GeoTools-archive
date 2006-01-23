@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.renderer.shape;
 
@@ -30,6 +28,10 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import java.awt.geom.AffineTransform;
 
 
+/**
+ *
+ * @source $URL$
+ */
 public class GeometryHandlerUtilitiesTest extends TestCase {
     private static final double ACCURACY = 0.00000001;
     public static final AffineTransform at = AffineTransform.getScaleInstance(2,

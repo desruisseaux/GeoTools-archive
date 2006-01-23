@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.renderer.shape;
 
@@ -32,6 +30,10 @@ import org.geotools.renderer.RenderListener;
 import org.geotools.styling.Style;
 
 
+/**
+ *
+ * @source $URL$
+ */ 
 public class QueryTest extends TestCase {
     private static final boolean INTERACTIVE = true;
     private FeatureSource source;

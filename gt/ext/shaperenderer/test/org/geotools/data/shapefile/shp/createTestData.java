@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.data.shapefile.shp;
 
@@ -39,6 +37,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 
+/**
+ *
+ * @source $URL$
+ */
 public class createTestData {
     public static URL createLineData(final Dimension d)
         throws Exception {

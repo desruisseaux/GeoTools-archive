@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.styling;
 
@@ -21,6 +19,10 @@ import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.FactoryFinder;
 
 
+/**
+ *
+ * @source $URL$
+ */
 public class StyleFactoryFinder {
     private static StyleFactory factory = null;
 

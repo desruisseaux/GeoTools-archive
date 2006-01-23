@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- * @source $URL$
  */
 package org.geotools.data.shapefile.indexed;
 
@@ -28,6 +27,9 @@ import org.geotools.data.DataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 
 
+/**
+ * @source $URL$
+ */
 public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
     private IndexedShapefileDataStoreFactory factory;
 

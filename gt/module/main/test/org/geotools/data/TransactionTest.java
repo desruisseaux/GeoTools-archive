@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.data;
 
@@ -35,6 +33,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 import junit.framework.TestCase;
 
+
+/**
+ *
+ * @source $URL$
+ */
 public class TransactionTest extends TestCase {
     MemoryDataStore ds;
     FeatureType type;

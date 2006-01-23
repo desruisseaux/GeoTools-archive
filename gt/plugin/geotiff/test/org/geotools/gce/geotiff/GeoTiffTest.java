@@ -15,7 +15,6 @@
  * public websites:
  *   - http://www.copyright.gov/title17/92chap1.html#105
  *   - http://www.gpoaccess.gov/uscode/  (enter "17USC105" in the search box.)
- * @source $URL$
  */
 package org.geotools.gce.geotiff;
 
@@ -44,6 +43,9 @@ import java.util.Map;
 import java.util.Set;
 
 
+/**
+ * @source $URL$
+ */
 public class GeoTiffTest extends TestCase {
     public GeoTiffTest() {
         super("Basic Geotiff tests");

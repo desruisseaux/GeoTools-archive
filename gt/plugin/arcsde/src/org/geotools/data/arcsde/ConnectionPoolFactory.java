@@ -28,8 +28,7 @@ import org.geotools.data.DataSourceException;
  * 
  * @author Gabriel Rold?n
  * @source $URL$
- * @version $Id: ConnectionPoolFactory.java,v 1.1 2004/06/21 15:00:33 cdillard
- *          Exp $
+ * @version $Id$
  */
 class ConnectionPoolFactory {
 	/** DOCUMENT ME! */

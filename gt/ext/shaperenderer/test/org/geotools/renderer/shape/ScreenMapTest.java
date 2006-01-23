@@ -12,14 +12,15 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.renderer.shape;
 
 import junit.framework.TestCase;
 
-
+/**
+ *
+ * @source $URL$
+ */
 public class ScreenMapTest extends TestCase {
     /*
      * Test method for 'org.geotools.renderer.shape.ScreenMap.set(int, int)'

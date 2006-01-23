@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- * @source $URL$
  */
 package org.geotools.catalog.shapefile;
 
@@ -36,6 +35,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 
+/**
+ * @source $URL$
+ */
 public class ShapefileGeoResource extends AbstractGeoResource {
     private ShapefileService parent;
     private String typeName;

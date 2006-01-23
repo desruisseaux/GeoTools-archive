@@ -12,14 +12,17 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.xml.schema.impl;
 
 import org.geotools.xml.schema.All;
 import org.geotools.xml.schema.Element;
 
+
+/**
+ *
+ * @source $URL$
+ */
 public class AllGT implements All {
 
     private Element[] elements;

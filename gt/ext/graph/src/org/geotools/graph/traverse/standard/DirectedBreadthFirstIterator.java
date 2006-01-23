@@ -14,7 +14,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- * @source $URL$
  */
 
 package org.geotools.graph.traverse.standard;
@@ -25,6 +24,10 @@ import org.geotools.graph.structure.DirectedGraphable;
 import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.traverse.GraphTraversal;
 
+
+/**
+ * @source $URL$
+ */
 public class DirectedBreadthFirstIterator extends BreadthFirstIterator {
 
   public void cont(Graphable current, GraphTraversal traversal) {

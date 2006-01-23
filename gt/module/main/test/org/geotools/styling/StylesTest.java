@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.styling;
 
@@ -38,6 +36,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 
+/**
+ *
+ * @source $URL$
+ */
 public class StylesTest extends TestCase {
     private StyleFactory sf;
     private FilterFactory ff;

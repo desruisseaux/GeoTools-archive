@@ -12,11 +12,14 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.feature.visitor;
 
+
+/**
+ *
+ * @source $URL$
+ */
 public class CalcUtil {
 
 	/**

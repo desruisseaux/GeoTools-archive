@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.feature.type;
 
@@ -22,6 +20,10 @@ import org.geotools.feature.PrimativeAttributeType;
 import org.geotools.filter.Filter;
 
 
+/**
+ *
+ * @source $URL$
+ */
 public class TextualAttributeType extends DefaultAttributeType implements PrimativeAttributeType {
     public TextualAttributeType(String name, boolean nillable, int min,
         int max, Object defaultValue, Filter filter) {

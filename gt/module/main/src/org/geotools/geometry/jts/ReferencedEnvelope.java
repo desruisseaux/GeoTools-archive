@@ -50,6 +50,7 @@ import org.geotools.geometry.DirectPosition2D;
  *
  * @see org.geotools.geometry.Envelope2D
  * @see org.geotools.geometry.GeneralEnvelope
+ * @see org.opengis.metadata.extent.GeographicBoundingBox
  */
 public class ReferencedEnvelope extends Envelope
         implements org.opengis.spatialschema.geometry.Envelope

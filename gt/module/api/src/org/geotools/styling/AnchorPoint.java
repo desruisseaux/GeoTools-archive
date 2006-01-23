@@ -21,11 +21,11 @@ import org.geotools.filter.Expression;
 
 /**
  * An AnchorPoint identifies the location inside a textlabel to use as an
- * "anchor" for positioning it relative to a point geometry.  $Id:
- * AnchorPoint.java,v 1.5 2003/08/19 13:03:03 ianturton Exp $
+ * "anchor" for positioning it relative to a point geometry.
  *
  * @author Ian Turton
  * @source $URL$
+ * @version $Id$
  */
 public interface AnchorPoint extends GTComponent {
     //TODO: add AnchorPoint to GeoAPI
