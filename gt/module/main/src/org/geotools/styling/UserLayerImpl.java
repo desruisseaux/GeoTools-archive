@@ -54,6 +54,7 @@ import org.geotools.feature.FeatureType;
  *this off to the lite renderer as normal.
  *
  * @author  jamesm
+ * @source $URL$
  */
 public class UserLayerImpl extends StyledLayerImpl implements UserLayer 
 {

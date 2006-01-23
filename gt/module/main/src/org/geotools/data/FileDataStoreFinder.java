@@ -41,6 +41,7 @@ import org.geotools.factory.FactoryFinder;
  * @author dzwiers
  *
  * @see DataStoreFinder
+ * @source $URL$
  */
 public class FileDataStoreFinder {
     /** The logger for the filter module. */

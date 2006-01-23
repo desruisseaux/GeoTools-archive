@@ -27,6 +27,7 @@ package org.geotools.xml.schema;
  * </p>
  *
  * @author dzwiers www.refractions.net
+ * @source $URL$
  */
 public interface ElementGrouping {
     /**

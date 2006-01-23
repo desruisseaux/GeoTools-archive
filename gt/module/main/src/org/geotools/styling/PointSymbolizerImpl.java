@@ -47,6 +47,7 @@ import org.opengis.util.Cloneable;
  * points are to be rendered.
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class PointSymbolizerImpl extends AbstractGTComponent

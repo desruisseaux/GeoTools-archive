@@ -31,6 +31,7 @@ import org.geotools.event.GTDelta;
  * </p>
  *
  * @since 2.2.M3
+ * @source $URL$
  */
 public abstract class AbstractGTComponent implements GTComponent {
     //    GTComponent notificationParent = GTRoot.NO_PARENT;

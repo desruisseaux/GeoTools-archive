@@ -38,6 +38,7 @@ import org.geotools.feature.FeatureIterator;
  * </p>
  * @author jgarnett
  * @since 2.1.RC0
+ * @source $URL$
  */
 final class FeatureWriterFeatureIterator implements FeatureIterator {
     FeatureWriter writer;    

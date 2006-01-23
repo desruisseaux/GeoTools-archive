@@ -32,6 +32,7 @@ import javax.sql.PooledConnection;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: cholmesny $
+ * @source $URL$
  * @version $Id$ Last Modified: $Date: 2003/09/22 18:54:39 $
  */
 final class ManagedPooledConnection {

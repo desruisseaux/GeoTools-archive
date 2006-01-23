@@ -28,6 +28,7 @@ import java.sql.Statement;
  * the resulting fid follow the &ltfeatureTypeName&gt.&ltbasic_fid&gt pattern.
  *
  * @author wolf
+ * @source $URL$
  */
 public class TypedFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;

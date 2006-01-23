@@ -26,6 +26,7 @@ import org.geotools.xml.schema.Sequence;
  * </p>
  *
  * @author dzwiers
+ * @source $URL$
  */
 public class SequenceGT implements Sequence {
     private ElementGrouping[] children;

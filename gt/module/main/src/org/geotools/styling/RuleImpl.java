@@ -50,6 +50,7 @@ import java.util.List;
  * Provides the default implementation of Rule.
  *
  * @author James Macgill
+ * @source $URL$
  * @version $Id$
  */
 public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {

@@ -30,6 +30,7 @@ import org.geotools.filter.parser.ParseException;
  * composite expressins and replaces them with simple literals.
  *
  * @author James Macgill, Penn State
+ * @source $URL$
  */
 public class EnvironmentVariableResolver {
  

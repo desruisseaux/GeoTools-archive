@@ -22,6 +22,7 @@ import org.geotools.styling.TextSymbolTest;
 /**
  *
  * @author jamesm
+ * @source $URL$
  */                                
 public class DefaultCoreSuite extends TestCase {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.core");

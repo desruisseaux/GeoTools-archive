@@ -59,6 +59,7 @@ import org.geotools.feature.GeometryAttributeType;
  * 
  *
  * @author aaime
+ * @source $URL$
  */
 public class QueryData implements AttributeReader, AttributeWriter {
     protected Object[] fidAttributes;

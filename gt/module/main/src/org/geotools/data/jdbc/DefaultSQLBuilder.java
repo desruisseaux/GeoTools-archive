@@ -46,6 +46,7 @@ import org.geotools.filter.SQLUnpacker;
  * </p>
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
+ * @source $URL$
  */
 public class DefaultSQLBuilder implements SQLBuilder {
     // The instance of the encoder to be used to generate the WHERE clause

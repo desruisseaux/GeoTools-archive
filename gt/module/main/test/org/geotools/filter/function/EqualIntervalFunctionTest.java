@@ -10,6 +10,7 @@ import org.geotools.filter.parser.ParseException;
 /**
  *
  * @author James
+ * @source $URL$
  */
 public class EqualIntervalFunctionTest extends FunctionTestSupport {
    

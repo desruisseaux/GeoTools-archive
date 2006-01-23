@@ -25,6 +25,7 @@ package org.geotools.data.jdbc.fidmapper;
  * same way in all fid mappers.
  *
  * @author wolf
+ * @source $URL$
  */
 public abstract class AbstractFIDMapper implements FIDMapper {
     /** Set if table FID columns are to be returned as business attributes. */

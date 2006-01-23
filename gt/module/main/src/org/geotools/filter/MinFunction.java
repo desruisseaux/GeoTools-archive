@@ -28,6 +28,7 @@ import org.geotools.feature.Feature;
  * A function that returns the minimum of two arguments.
  *
  * @author James
+ * @source $URL$
  * @version $Id$
  */
 public class MinFunction extends FunctionExpressionImpl

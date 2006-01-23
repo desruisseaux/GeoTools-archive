@@ -43,6 +43,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * JDBCDataStore implementation of the FeatureWriter interface
  *
  * @author aaime
+ * @source $URL$
  */
 public class JDBCFeatureWriter implements FeatureWriter {
     /** The logger for the filter module. */

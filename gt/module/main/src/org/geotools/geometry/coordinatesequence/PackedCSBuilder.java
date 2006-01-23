@@ -14,6 +14,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
  * PackedArrayCSBuilder
  * 
  * @author wolf
+ * @source $URL$
  */
 public abstract class PackedCSBuilder implements CSBuilder {
 	int size = -1;

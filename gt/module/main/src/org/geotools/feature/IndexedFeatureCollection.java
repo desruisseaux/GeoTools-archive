@@ -20,6 +20,7 @@ package org.geotools.feature;
  * An IndexedFeatureCollection extends the functionality of FeatureCollection
  * by allowing FeatureIndex attachement.
  * @author  Ian Schneider
+ * @source $URL$
  */
 public interface IndexedFeatureCollection extends FeatureCollection {
   

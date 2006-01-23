@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Factory for creating DefaultAttributeTypes.
  *
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  */
 public class DefaultAttributeTypeFactory extends AttributeTypeFactory {

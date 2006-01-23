@@ -52,6 +52,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *             See http://jira.codehaus.org/browse/GEOT-219 (close when done).
  *
  * @author Andrea Aime
+ * @source $URL$
  * @version $Id$
  */
 public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {

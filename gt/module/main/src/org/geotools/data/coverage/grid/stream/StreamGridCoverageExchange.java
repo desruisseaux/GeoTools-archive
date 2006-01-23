@@ -46,6 +46,7 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
  *
  * @author jeichar
  * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
+ * @source $URL$
  */
 public class StreamGridCoverageExchange implements GridCoverageExchange {
     Set formats=new java.util.HashSet();

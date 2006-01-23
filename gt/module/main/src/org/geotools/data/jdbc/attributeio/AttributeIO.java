@@ -26,6 +26,7 @@ import java.sql.ResultSet;
  * how to parse and encode Feature attributes into resultset fields
  *
  * @author wolf
+ * @source $URL$
  */
 public interface AttributeIO {
     /**

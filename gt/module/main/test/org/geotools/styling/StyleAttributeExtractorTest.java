@@ -37,6 +37,7 @@ import java.util.Set;
  * Tests style cloning
  *
  * @author Sean Geoghegan
+ * @source $URL$
  */
 public class StyleAttributeExtractorTest extends TestCase {
     private StyleFactory styleFactory;

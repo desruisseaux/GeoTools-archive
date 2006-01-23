@@ -49,6 +49,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * </p>
  *
  * @since 0.6.0
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  *

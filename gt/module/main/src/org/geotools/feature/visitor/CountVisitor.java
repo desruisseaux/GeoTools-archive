@@ -26,6 +26,7 @@ import org.geotools.feature.visitor.SumVisitor.SumResult;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
+ * @source $URL$
  */
 public class CountVisitor implements FeatureCalc {
     int count = 0;

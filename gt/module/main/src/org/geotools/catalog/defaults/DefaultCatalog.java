@@ -48,6 +48,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author David Zwiers, Refractions Research
  * @author Justin Deoliveira, jdeolive@openplans.org
  * @since 0.6
+ * @source $URL$
  */
 public class DefaultCatalog extends AbstractCatalog {
     private HashSet services = new HashSet();

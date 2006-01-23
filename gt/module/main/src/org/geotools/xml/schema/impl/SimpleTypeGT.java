@@ -45,6 +45,7 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author dzwiers
+ * @source $URL$
  */
 public class SimpleTypeGT implements SimpleType {
     // file visible to avoid set* methods

@@ -25,6 +25,7 @@ import org.geotools.filter.FunctionExpression;
  * DOCUMENT ME!
  *
  * @author Cory Horner
+ * @source $URL$
  */
 public class UniqueIntervalFunctionTest extends FunctionTestSupport {
     public UniqueIntervalFunctionTest(String testName) {

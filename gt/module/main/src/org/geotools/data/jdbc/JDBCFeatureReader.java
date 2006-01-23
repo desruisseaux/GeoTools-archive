@@ -33,6 +33,7 @@ import org.geotools.feature.IllegalAttributeException;
  * JDBCDataStore specific implementation of the FeatureReader interface
  *
  * @author aaime
+ * @source $URL$
  */
 public class JDBCFeatureReader implements FeatureReader {
     FeatureType featureType;

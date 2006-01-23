@@ -32,6 +32,7 @@ import org.geotools.xml.gml.GMLSchema;
  * 
  * @author Jody Garnett, Refractions Reserach, Inc.
  * @since GeoTools 2.2
+ * @source $URL$
  */
 public class BaseFeatureState extends FeatureState {
     //final ResourceCollection collection;

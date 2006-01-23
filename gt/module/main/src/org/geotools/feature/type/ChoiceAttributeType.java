@@ -43,6 +43,7 @@ import java.util.Arrays;
  *
  * @author dzwiers
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 public class ChoiceAttributeType implements AttributeType {
     private final boolean nill;

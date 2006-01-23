@@ -27,6 +27,7 @@ import org.opengis.util.Cloneable;
  * LineSymbolizer defines how a line geometry should be rendered.
  *
  * @author James Macgill
+ * @source $URL$
  * @version $Id$
  */
 public class LineSymbolizerImpl extends AbstractGTComponent

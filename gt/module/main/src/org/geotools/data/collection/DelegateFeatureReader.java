@@ -19,6 +19,7 @@ import org.geotools.feature.IllegalAttributeException;
  * will be duplicated.
  * </p>
  * @author Jody Garnett, Refractions Research, Inc.
+ * @source $URL$
  */
 public class DelegateFeatureReader implements FeatureReader {
 	FeatureIterator delegate;

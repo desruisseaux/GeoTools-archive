@@ -30,6 +30,7 @@ import java.util.Set;
  * Catalog delta.
  *
  * @since 0.6.0
+ * @source $URL$
  */
 public class DefaultResolveDelta implements ResolveDelta {
     private List children;

@@ -13,6 +13,7 @@ import org.geotools.feature.collection.DelegateFeatureIterator;
  * @deprecated Unused, moved to org.geotools.feature.collection
  * @author Jody Garnett, Refractions Research, Inc.
  * @since 2.1.RC0
+ * @source $URL$
  */
 public abstract class AbstractFeatureCollection extends AbstractResourceCollection implements FeatureCollection {
      

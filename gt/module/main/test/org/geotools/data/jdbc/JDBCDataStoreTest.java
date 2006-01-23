@@ -32,6 +32,7 @@ import com.mockrunner.mock.jdbc.MockResultSet;
 /** Provides ...
  * 
  *  @author Sean Geoghegan, Defence Science and Technology Organisation.
+ * @source $URL$
  */
 public class JDBCDataStoreTest extends TestCase {
     

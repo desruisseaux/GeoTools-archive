@@ -35,6 +35,7 @@ import java.io.FileOutputStream;
  * Producers SLD to an output stream.
  *
  * @author Ian Schneider
+ * @source $URL$
  */
 public class SLDTransformer extends TransformerBase {
     static final String XLINK_NAMESPACE = "http://www.w3.org/1999/xlink";

@@ -33,6 +33,7 @@ import java.util.logging.Logger;
  * </p>
  *
  * @since 2.2.M3
+ * @source $URL$
  */
 public abstract class AbstractGTRoot extends AbstractGTComponent
     implements GTRoot {

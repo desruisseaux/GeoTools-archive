@@ -46,6 +46,7 @@ import java.util.zip.GZIPOutputStream;
  * IOExchange will create one from the Source object
  * 
  * @author jeichar
+ * @source $URL$
  */
 public class IOExchange {
     private IOExchange() {

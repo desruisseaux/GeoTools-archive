@@ -32,6 +32,7 @@ import org.geotools.feature.Feature;
  * with an internally defined type (AND, OR, NOT).
  *
  * @author Rob Hranac, TOPP
+ * @source $URL$
  * @version $Id$
  */
 public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {

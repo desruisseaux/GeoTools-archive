@@ -103,6 +103,7 @@ import org.geotools.feature.AttributeType;
  * 
  * @author Amr Alam, Refractions Research
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public abstract class JDBC2DataStore extends JDBC1DataStore {
 

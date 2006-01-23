@@ -39,6 +39,7 @@ import org.geotools.feature.IllegalAttributeException;
  * </p>
  * @author jgarnett
  * @since 2.1.RC0
+ * @source $URL$
  */
 final class FeatureWriterIterator implements Iterator {
     FeatureWriter writer;    

@@ -17,6 +17,7 @@ import junit.framework.TestCase;
 /**
  * @author dzwiers
  *
+ * @source $URL$
  */
 public class SchemaMergeTest extends TestCase {
 

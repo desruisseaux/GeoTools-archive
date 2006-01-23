@@ -25,6 +25,7 @@ import org.geotools.feature.AttributeType;
  * Attribute Reader that joins.
  *
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  */
 public class JoiningAttributeReader implements AttributeReader {

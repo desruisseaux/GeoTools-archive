@@ -43,6 +43,7 @@ import org.opengis.coverage.grid.GridCoverageWriter;
  *
  * @author $author$
  * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
+ * @source $URL$
  * @version $Revision: 1.9 $
  */
 public class FileSystemGridCoverageExchange implements GridCoverageExchange {

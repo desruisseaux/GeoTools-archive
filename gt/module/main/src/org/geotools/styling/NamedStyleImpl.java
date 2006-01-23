@@ -33,6 +33,7 @@ import org.geotools.event.AbstractGTComponent;
  * </p>
  *
  * @author jamesm
+ * @source $URL$
  */
 public class NamedStyleImpl extends AbstractGTComponent implements NamedStyle {
     /** DOCUMENT ME! */

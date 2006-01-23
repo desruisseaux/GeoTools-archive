@@ -16,6 +16,7 @@ import org.geotools.filter.SQLEncoderException;
  *  <p>Currently just doing query building, but obviously this can be extended.
  * 
  *  @author Sean Geoghegan, Defence Science and Technology Organisation.
+ * @source $URL$
  */
 public interface SQLBuilder {
 

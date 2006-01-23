@@ -33,6 +33,7 @@ import org.geotools.filter.FilterFactoryFinder;
  * org.geotools.defaultcore.
  *
  * @author iant
+ * @source $URL$
  * @version $Id$
  */
 public class StyleFactoryImpl extends AbstractStyleFactory

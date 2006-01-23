@@ -48,6 +48,7 @@ import org.geotools.filter.NullFilter;
  * i.e. Left - Middle - Right for all expressions which have sub-expressions.
  * </p>
  * @author James Macgill, Penn State
+ * @source $URL$
  */
 public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor {
     

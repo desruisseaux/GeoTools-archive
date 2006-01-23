@@ -67,6 +67,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
  * DOCUMENT ME!
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class MemoryDataStoreTest extends DataTestCase {
     MemoryDataStore data;

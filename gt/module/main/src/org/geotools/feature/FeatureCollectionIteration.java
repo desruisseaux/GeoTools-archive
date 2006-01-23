@@ -41,6 +41,7 @@ import java.util.Iterator;
  *
  * @author Ian Schneider, USDA-ARS
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 public class FeatureCollectionIteration {
     /**

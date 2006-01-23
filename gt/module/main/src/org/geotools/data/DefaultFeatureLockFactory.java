@@ -21,6 +21,7 @@ package org.geotools.data;
  *
  * @author Jody Garnett, Refractions Research, Inc.
  * @author Chris Holmes, TOPP.
+ * @source $URL$
  * @version $Id$
  *
  * @task REVISIT: Should more of this code move to the parent?  I guess if

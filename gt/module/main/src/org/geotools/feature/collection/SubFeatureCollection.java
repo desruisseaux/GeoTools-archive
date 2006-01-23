@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Jody Garnett, Refractions Research, Inc.
  *
+ * @source $URL$
  */
 public class SubFeatureCollection extends AbstractResourceCollection implements FeatureCollection {
 	/** Filter */

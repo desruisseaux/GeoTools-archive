@@ -21,6 +21,7 @@ import org.geotools.xml.gml.FCBuffer;
  * @
  *
  * @author dzwiers www.refractions.net
+ * @source $URL$
  */
 public class GMLStreamingParserStressTest extends TestCase {
 

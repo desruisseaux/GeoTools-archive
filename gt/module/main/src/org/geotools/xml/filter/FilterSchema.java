@@ -77,6 +77,7 @@ import org.geotools.xml.schema.impl.AttributeGT;
  * </p>
  *
  * @author dzwiers
+ * @source $URL$
  */
 public class FilterSchema implements Schema {
     // hint key for FilterCapabilities

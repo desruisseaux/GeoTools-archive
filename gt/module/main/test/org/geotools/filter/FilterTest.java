@@ -47,6 +47,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  *
  * @author James MacGill, CCG
  * @author Rob Hranac, TOPP
+ * @source $URL$
  */
 public class FilterTest extends TestCase {
     /** The logger for the filter module. */

@@ -59,6 +59,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  *
  * @author jgarnett
+ * @source $URL$
  */
 public class MemoryDataStore extends AbstractDataStore {
     /** Memory holds Map of Feature by fid by typeName. */

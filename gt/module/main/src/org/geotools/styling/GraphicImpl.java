@@ -51,6 +51,7 @@ import java.util.Iterator;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class GraphicImpl extends AbstractGTComponent implements Graphic,

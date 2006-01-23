@@ -47,6 +47,7 @@ import java.util.logging.Logger;
  *       encoded.
  * @task REVISIT: need to figure out exceptions, we're currently eating io
  *       errors, which is bad. Probably need a generic visitor exception.
+ * @source $URL$
  */
 public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     /** error message for exceptions */

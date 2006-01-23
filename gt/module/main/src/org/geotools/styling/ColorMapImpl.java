@@ -26,6 +26,7 @@ import java.util.List;
  *
  * @author iant
  * @author aaime
+ * @source $URL$
  */
 public class ColorMapImpl extends AbstractGTComponent implements ColorMap {
     private List list = new ArrayList();

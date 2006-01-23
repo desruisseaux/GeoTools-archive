@@ -31,6 +31,7 @@ import org.geotools.styling.StyleFactoryFinder;
  * Unit test for DuplicatorStyleVisitor.
  *
  * @author Cory Horner, Refractions Research Inc.
+ * @source $URL$
  */
 public class DuplicatorStyleVisitorTest extends TestCase {
     StyleBuilder sb;

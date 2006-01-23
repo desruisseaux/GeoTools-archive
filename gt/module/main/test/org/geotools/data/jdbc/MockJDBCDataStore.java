@@ -20,6 +20,7 @@ import org.geotools.feature.AttributeType;
 /** Provides a Mock JDBC DataStore for testing the abstract DataStore implementation.
  * 
  *  @author Sean Geoghegan, Defence Science and Technology Organisation.
+ * @source $URL$
  */
 public class MockJDBCDataStore extends JDBCDataStore {
 	

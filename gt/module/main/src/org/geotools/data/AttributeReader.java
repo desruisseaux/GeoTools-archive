@@ -26,6 +26,7 @@ import java.io.IOException;
  * row-based approach for accessing the data.
  *
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  *
  * @see AttributeAcceptor

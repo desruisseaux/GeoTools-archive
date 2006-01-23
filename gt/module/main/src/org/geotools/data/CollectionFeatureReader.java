@@ -32,6 +32,7 @@ import java.util.NoSuchElementException;
  * an array of features or a FeatureCollection.
  *
  * @author jones
+ * @source $URL$
  */
 public class CollectionFeatureReader implements FeatureReader {
     private FeatureCollection collection;

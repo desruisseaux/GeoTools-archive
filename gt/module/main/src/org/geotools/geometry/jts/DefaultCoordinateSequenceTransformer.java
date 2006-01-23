@@ -36,6 +36,7 @@ import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
  * or target dimensions. This transformer is not thread-safe.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Andrea Aime
  * @author Martin Desruisseaux

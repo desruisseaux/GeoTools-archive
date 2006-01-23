@@ -38,6 +38,7 @@ import java.util.EventObject;
  * </p>
  *
  * @since 2.2.M3
+ * @source $URL$
  */
 public class GTEventImpl extends EventObject implements GTEvent {
     private static final long serialVersionUID = -5304196462694574579L;

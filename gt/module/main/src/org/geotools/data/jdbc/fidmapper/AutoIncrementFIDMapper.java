@@ -32,6 +32,7 @@ import java.sql.Types;
  * database.
  *
  * @author wolf
+ * @source $URL$
  */
 public class AutoIncrementFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;

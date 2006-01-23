@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
  * {@linkplain CoordinateSequence coordinate sequence}.
  *
  * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Andrea Aime
  */

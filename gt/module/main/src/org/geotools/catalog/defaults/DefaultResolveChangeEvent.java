@@ -24,6 +24,7 @@ import org.geotools.catalog.ResolveDelta;
  * Everything change change change ...
  *
  * @since 0.6.0
+ * @source $URL$
  */
 public class DefaultResolveChangeEvent implements ResolveChangeEvent {
     private Object source;

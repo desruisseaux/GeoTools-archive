@@ -49,6 +49,7 @@ import java.util.Map;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class ExternalGraphicImpl extends AbstractGTComponent

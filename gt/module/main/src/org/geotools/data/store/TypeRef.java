@@ -22,6 +22,7 @@ package org.geotools.data.store;
  * is reduced to an XPath expression in the future.
  * </p>
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class TypeRef {
 	private final String dataStoreId;

@@ -46,6 +46,7 @@ import org.geotools.feature.FeatureType;
  * - at least for Locks. And possibly for "Query". 
  * 
  * @author Jody Garnett
+ * @source $URL$
  */
 public class DefaultRepository implements Repository {	    
 	

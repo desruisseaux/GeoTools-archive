@@ -14,6 +14,7 @@ import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.resources.TestData;
 /**
  * @author jeichar
+ * @source $URL$
  */
 public class IOExchangeTest extends TestCase{
         final String TEST_FILE = "ArcGrid.asc";

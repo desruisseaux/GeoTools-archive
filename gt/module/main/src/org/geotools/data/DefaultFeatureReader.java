@@ -30,6 +30,7 @@ import org.geotools.feature.SchemaException;
  * Basic support for reading Features from an AttributeReader.
  *
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  */
 public class DefaultFeatureReader implements FeatureReader {

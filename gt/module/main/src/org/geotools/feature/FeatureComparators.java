@@ -20,6 +20,7 @@ package org.geotools.feature;
  * A utility class for creating simple Comparators for Features.
  *
  * @author Ian Schneider
+ * @source $URL$
  */
 public final class FeatureComparators {
     /** A utility comparator for comparison by id. */

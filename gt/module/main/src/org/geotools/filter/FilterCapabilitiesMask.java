@@ -26,6 +26,7 @@ import java.util.Map;
  * </p>
  *
  * @author dzwiers
+ * @source $URL$
  */
 public class FilterCapabilitiesMask extends FilterCapabilities{
 	/**

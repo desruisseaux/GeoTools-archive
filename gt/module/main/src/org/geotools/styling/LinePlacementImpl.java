@@ -50,6 +50,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class LinePlacementImpl extends AbstractGTComponent

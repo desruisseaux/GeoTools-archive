@@ -79,6 +79,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * TODO: Move FeatureType manipulation to feature package
  * </p>
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class DataUtilities {
     static Map typeMap = new HashMap();

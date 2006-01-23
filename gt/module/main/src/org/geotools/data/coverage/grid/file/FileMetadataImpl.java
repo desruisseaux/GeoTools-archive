@@ -27,6 +27,7 @@ import org.opengis.coverage.grid.Format;
  *
  * @author jeichar
  * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
+ * @source $URL$
  */
 public class FileMetadataImpl implements FileMetadata {
     String name;

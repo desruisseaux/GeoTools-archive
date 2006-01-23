@@ -70,6 +70,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Subclass must override encode and getValue as usual.
  * </p>
  * @author dzwiers
+ * @source $URL$
  */
 public class FilterComplexTypes {
     public final static String CACHE_SERVICE_EXCEPTIONS = "FilterComplexTypes.CACHE_SERVICE_EXCEPTIONS";

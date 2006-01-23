@@ -67,6 +67,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author aaime
  * @author $Author: jive $ (last modification)
+ * @source $URL$
  * @version $Id$ TODO: handle the case where there is more than one geometry and the other geometries have a different CS than the default geometry
  */
 public class ReprojectFeatureResults extends DataFeatureCollection implements FeatureResults {

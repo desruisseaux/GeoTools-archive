@@ -39,6 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * reached.
  *
  * @author Chris Holmes
+ * @source $URL$
  */
 public class DefaultQuery implements Query {
     /** The properties to fetch */

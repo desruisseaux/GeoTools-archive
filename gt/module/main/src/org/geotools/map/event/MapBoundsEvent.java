@@ -33,6 +33,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Event object for MapContext area of interest and coordinate system changes.
  *
  * @author wolf
+ * @source $URL$
  */
 public class MapBoundsEvent extends EventObject {
     /** Area of interest changed */

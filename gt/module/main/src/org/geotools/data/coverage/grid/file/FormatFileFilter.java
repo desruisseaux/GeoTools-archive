@@ -29,6 +29,7 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 *  @author Jesse Eichar
  * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  * @author $author$ (Last Modified)
+ * @source $URL$
  * @version $Revision: 1.9 $
  */
 public class FormatFileFilter implements FileFilter {

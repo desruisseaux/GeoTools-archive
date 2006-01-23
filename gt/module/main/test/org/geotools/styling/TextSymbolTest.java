@@ -45,6 +45,7 @@ import org.geotools.filter.AttributeExpression;
  *
  * @task REVISIT: redo the Map stuff - I commented it out since DefaultMap is
  *       deprecated - cholmes.
+ * @source $URL$
  */
 public class TextSymbolTest extends TestCase {
     private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactoryFinder

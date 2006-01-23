@@ -23,6 +23,7 @@ import org.geotools.filter.Filter;
  * </p>
  *  
  * @author Jody Garnett, Refractions Research, Inc.
+ * @source $URL$
  */
 public class FilteredIterator implements Iterator {
 	/** Used to close the delgate, or null */

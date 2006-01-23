@@ -27,6 +27,7 @@ import org.geotools.feature.FeatureType;
  * ResultSetFIDReader should be used.
  *
  * @author Chris Holmes
+ * @source $URL$
  * @version $Id$
  */
 public class DefaultFIDReader implements FIDReader {

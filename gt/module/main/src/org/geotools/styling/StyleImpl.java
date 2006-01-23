@@ -45,6 +45,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author James Macgill, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class StyleImpl extends AbstractGTComponent

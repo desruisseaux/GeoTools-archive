@@ -24,6 +24,7 @@ import org.geotools.filter.FilterFactoryFinder;
 
 /**
  * DOCUMENT ME!
+ * @source $URL$
  */
 public class SelectedChannelTypeImpl extends AbstractGTComponent
     implements SelectedChannelType {

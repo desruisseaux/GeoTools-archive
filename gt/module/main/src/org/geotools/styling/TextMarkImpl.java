@@ -23,6 +23,7 @@ import org.geotools.filter.Expression;
  * DOCUMENT ME!
  *
  * @author iant
+ * @source $URL$
  */
 public class TextMarkImpl extends MarkImpl implements TextMark {
     /** The logger for the default core module. */

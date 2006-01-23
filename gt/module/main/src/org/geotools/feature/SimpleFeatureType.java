@@ -23,6 +23,7 @@ import java.util.Collection;
  * A basic implementation of FeatureType.
  *
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  */
 public class SimpleFeatureType extends DefaultFeatureType{

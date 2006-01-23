@@ -17,6 +17,7 @@ import org.geotools.feature.FeatureIterator;
  * see ResourceFetaureIterator.
  * </p>
  * @author Jody Garnett, Refractions Research, Inc.
+ * @source $URL$
  */
 public class DelegateFeatureIterator implements FeatureIterator {
 	Iterator delegate;

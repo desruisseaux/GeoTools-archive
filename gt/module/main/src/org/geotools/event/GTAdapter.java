@@ -24,6 +24,7 @@ package org.geotools.event;
  * </p>
  *
  * @since 2.2.M3
+ * @source $URL$
  */
 public class GTAdapter implements GTListener {
     public void changed(GTEvent event) {

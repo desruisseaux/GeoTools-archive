@@ -24,6 +24,7 @@ import org.opengis.coverage.grid.Format;
  *
  * @author jeichar
  *
+ * @source $URL$
  */
 public interface FileMetadata {
     /**

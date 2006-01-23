@@ -27,6 +27,7 @@ import org.geotools.filter.Filter;
  *
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 public class NumericAttributeType extends DefaultAttributeType implements PrimativeAttributeType {
     /**

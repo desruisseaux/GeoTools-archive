@@ -24,6 +24,7 @@ import java.util.Map;
 
 /**
  * Abstract base class for implementing style factories.
+ * @source $URL$
  */
 public abstract class AbstractStyleFactory implements StyleFactory {
     public abstract TextSymbolizer createTextSymbolizer(Fill fill,

@@ -18,6 +18,7 @@ import java.util.NoSuchElementException;
  * </p>
  * @author jgarnett
  * @since 2.1.RC0
+ * @source $URL$
  */
 public class NoContentIterator implements Iterator {
     Throwable origionalProblem;

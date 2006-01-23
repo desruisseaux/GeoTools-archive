@@ -42,6 +42,7 @@ import org.geotools.filter.NullFilter;
  * Used to duplicate a Filter & or Expression
  *
  * @author Jody Garnett, Refractions Research Inc.
+ * @source $URL$
  */
 public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
     Stack pages = new Stack(); // need a Stack as Filter structure is recursive

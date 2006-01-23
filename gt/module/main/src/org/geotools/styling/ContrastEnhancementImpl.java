@@ -64,6 +64,7 @@ import org.geotools.filter.FilterFactoryFinder;
  * enhancement is performed.
  *
  * @author iant
+ * @source $URL$
  */
 public class ContrastEnhancementImpl extends AbstractGTComponent
     implements ContrastEnhancement {

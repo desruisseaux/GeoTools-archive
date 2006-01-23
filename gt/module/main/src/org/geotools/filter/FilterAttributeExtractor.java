@@ -26,6 +26,7 @@ import java.util.Set;
  * A simple visitor that extracts every attribute used by a filter or an expression
  *
  * @author wolf
+ * @source $URL$
  */
 public class FilterAttributeExtractor implements FilterVisitor {
     protected Set attributeNames = new HashSet();

@@ -25,6 +25,7 @@ import java.util.List;
  * better ways to do this, but this seems to work.
  *
  * @author Chris Holmes
+ * @source $URL$
  * @version $Id$
  */
 public class MultiAttributeType extends DefaultAttributeType {

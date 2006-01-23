@@ -49,6 +49,7 @@ import org.geotools.filter.Filters;
  * </p>
  *
  * @since 0.7.0
+ * @source $URL$
  */
 public class SLD {
     /** <code>NOTFOUND</code> indicates int value was unavailable */

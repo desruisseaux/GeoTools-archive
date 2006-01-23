@@ -39,6 +39,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class DefaultFeatureResults extends DataFeatureCollection {
     

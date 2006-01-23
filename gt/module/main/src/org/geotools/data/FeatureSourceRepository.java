@@ -36,6 +36,7 @@ import org.geotools.feature.FeatureType;
  * the configuration of this class.
  * 
  * @author Jody Garnett
+ * @source $URL$
  */
 public class FeatureSourceRepository implements Repository {	    
 	

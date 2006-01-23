@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
  * A dom based parser to build filters as per OGC 01-067
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  * @version $Id$
  *
  * @task TODO: split this class up into multiple methods.

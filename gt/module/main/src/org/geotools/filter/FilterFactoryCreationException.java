@@ -26,6 +26,7 @@ package org.geotools.filter;
  * the  implementation of the StyleFactory.
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class FilterFactoryCreationException extends java.lang.Exception {

@@ -23,6 +23,7 @@ import org.geotools.feature.Feature;
  * Defines a null filter, which checks to see if an attribute is null.
  *
  * @author Rob Hranac, Vision for New York
+ * @source $URL$
  * @version $Id$
  */
 public class NullFilterImpl extends AbstractFilterImpl implements NullFilter {

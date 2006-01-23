@@ -134,6 +134,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Chris Holmes, TOPP
  * @author Andrea Aime $Id: JDBCDataStore.java,v 1.23.2.6 2004/05/09 15:15:42
  *         aaime Exp $
+ * @source $URL$
  */
 public abstract class JDBC1DataStore implements DataStore {
 	

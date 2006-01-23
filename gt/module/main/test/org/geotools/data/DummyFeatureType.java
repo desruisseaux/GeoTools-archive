@@ -14,6 +14,7 @@ import org.geotools.feature.GeometryAttributeType;
 /**
  * An empty FeatureType implementation used in the AbstractDataSourceTest
  * @author  wolf
+ * @source $URL$
  */
 public class DummyFeatureType implements FeatureType {
     private String typeName;

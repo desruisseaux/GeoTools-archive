@@ -11,6 +11,7 @@ import org.geotools.feature.IllegalAttributeException;
 /**
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: aaime $
+ * @source $URL$
  * @version $Id$
  * Last Modified: $Date: 2004/04/09 15:30:52 $ 
  */

@@ -29,6 +29,7 @@ import org.geotools.data.FeatureReader;
  * will be thrown.
  *  
  * @author jeichar
+ * @source $URL$
  */
 public class FeatureReaderIterator implements Iterator {
 

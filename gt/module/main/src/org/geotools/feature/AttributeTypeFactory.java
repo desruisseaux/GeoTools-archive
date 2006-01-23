@@ -29,6 +29,7 @@ import org.geotools.filter.Filter;
  * implement createAttributeType
  *
  * @author Ian Schneider, USDA-ARS
+ * @source $URL$
  * @version $Id$
  */
 public abstract class AttributeTypeFactory implements Factory {

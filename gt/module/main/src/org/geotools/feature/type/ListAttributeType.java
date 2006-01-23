@@ -29,6 +29,7 @@ import org.geotools.filter.Filter;
  * contains a Sequence of Attributes.
  * 
  * @author dzwiers
+ * @source $URL$
  */
 public class ListAttributeType implements AttributeType {
 

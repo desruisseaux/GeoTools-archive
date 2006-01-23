@@ -96,6 +96,7 @@ import org.geotools.filter.Filter;
  * </p>
  *
  * @author jgarnett
+ * @source $URL$
  */
 public class AbstractDataStore2 implements DataStore {
     /** The logger for the filter module. */

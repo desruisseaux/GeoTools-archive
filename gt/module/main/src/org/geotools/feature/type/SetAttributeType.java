@@ -31,6 +31,7 @@ import org.geotools.filter.Filter;
  * NOTE: Some of the methods in this class has nasty order-dependant assumptions, please fix.
  * 
  * @author dzwiers
+ * @source $URL$
  */
 public class SetAttributeType implements AttributeType {
 

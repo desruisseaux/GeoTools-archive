@@ -33,6 +33,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /*
  * Utilities for gml and xml;
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 final class GMLUtils {
     /** The logger for the filter module. */

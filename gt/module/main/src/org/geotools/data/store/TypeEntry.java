@@ -42,6 +42,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  * 
  * @author jgarnett
+ * @source $URL$
  */
 public interface TypeEntry {
     

@@ -44,6 +44,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Leprosy
  * @since 0.3
  * TODO: test wkt geometry parse.
+ * @source $URL$
  */
 public class GeometricAttributeType extends DefaultAttributeType implements org.geotools.feature.GeometryAttributeType{
     /** CoordianteSystem used by this GeometryAttributeType */

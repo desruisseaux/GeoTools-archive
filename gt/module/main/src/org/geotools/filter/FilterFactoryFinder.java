@@ -32,6 +32,7 @@ import com.vividsolutions.jts.geom.Envelope;
 /**
  * This specifies the interface to create filters.
  *
+ * @source $URL$
  * @version $Id$
  *
  * @task TODO: This needs to be massively overhauled.  This should be the

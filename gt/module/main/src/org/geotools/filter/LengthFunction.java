@@ -23,6 +23,7 @@ import org.geotools.feature.Feature;
  * 
  * @author dzwiers
  *
+ * @source $URL$
  */
 public class LengthFunction extends FunctionExpressionImpl {
 

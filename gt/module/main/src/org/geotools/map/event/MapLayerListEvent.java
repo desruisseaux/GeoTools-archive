@@ -26,6 +26,7 @@ import org.geotools.map.MapLayer;
  * Event object used to report changes in the list of layers managed by a MapContext
  *
  * @author wolf
+ * @source $URL$
  */
 public class MapLayerListEvent extends EventObject {
     /** Holds value of property layer. */

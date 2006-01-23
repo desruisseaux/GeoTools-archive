@@ -48,6 +48,7 @@ import java.util.logging.Logger;
  * </p>
  *
  * @author Andrea Aime
+ * @source $URL$
  */
 public class DefaultFIDMapperFactory implements FIDMapperFactory {
     /** The logger for the filter module. */

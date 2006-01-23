@@ -45,6 +45,7 @@ import org.geotools.feature.FeatureCollectionIteration;
  * DOCUMENT ME!
  *
  * @author Ian Schneider
+ * @source $URL$
  */
 public class FilteringIteration extends FeatureCollectionIteration {
     /**

@@ -50,6 +50,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * @author dzwiers www.refractions.net
  *
  * @see ComplexType
+ * @source $URL$
  */
 public class ComplexElementHandler extends XMLElementHandler {
     

@@ -39,6 +39,7 @@ import org.geotools.filter.Filter;
  * @see FeatureType
  * @author Jody Garnett
  * @since 0.6.0
+ * @source $URL$
  */
 public class Schema {
     /**

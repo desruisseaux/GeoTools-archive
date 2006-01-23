@@ -47,6 +47,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * DOCUMENT ME!
  *
  * @author wolf
+ * @source $URL$
  */
 public class MapContextTest extends TestCase {
     private ArrayList events = null;

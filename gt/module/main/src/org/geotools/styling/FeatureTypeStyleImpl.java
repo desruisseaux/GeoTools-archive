@@ -50,6 +50,7 @@ import java.util.logging.Logger;
  * DOCUMENT ME!
  *
  * @author James Macgill
+ * @source $URL$
  * @version $Id$
  */
 public class FeatureTypeStyleImpl extends AbstractGTComponent

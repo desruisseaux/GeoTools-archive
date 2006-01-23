@@ -27,6 +27,7 @@ import org.geotools.factory.FactoryFinder;
  * A utility class for working with FeatureCollections.
  * Provides a mechanism for obtaining a FeatureCollection instance.
  * @author  Ian Schneider
+ * @source $URL$
  */
 public abstract class FeatureCollections implements Factory {
 

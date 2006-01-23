@@ -30,6 +30,7 @@ import org.geotools.data.Transaction.State;
  * State and only construct a connection when setTransaction is called.
  * </p>
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class JDBCTransactionState implements State {
     private Connection connection;

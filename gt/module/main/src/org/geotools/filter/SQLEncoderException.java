@@ -21,6 +21,7 @@ package org.geotools.filter;
  * the SQLEncoder being used, or that there were io problems.
  *
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 public class SQLEncoderException extends Exception {
     /**

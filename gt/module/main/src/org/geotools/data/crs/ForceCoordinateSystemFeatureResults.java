@@ -61,6 +61,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  *
  * @author aaime
+ * @source $URL$
  * @version $Id$
  */
 public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {

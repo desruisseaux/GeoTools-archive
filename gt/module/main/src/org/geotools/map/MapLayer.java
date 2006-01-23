@@ -28,6 +28,7 @@ import org.geotools.styling.Style;
  *
  * @author Cameron Shorter
  * @author Martin Desruisseaux
+ * @source $URL$
  * @version $Id$
  */
 public interface MapLayer {

@@ -61,6 +61,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  *
  * @author Jody Garnett, Refractions Research Inc
+ * @source $URL$
  */
 public abstract class AbstractFeatureSource implements FeatureSource {
     /** The logger for the filter module. */

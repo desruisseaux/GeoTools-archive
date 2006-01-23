@@ -33,6 +33,7 @@ package org.geotools.styling;
  * symbolizers and rules.
  *
  * @author James Macgill, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class BasicPolygonStyle extends StyleImpl

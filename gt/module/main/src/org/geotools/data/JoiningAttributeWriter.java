@@ -13,6 +13,7 @@ import org.geotools.feature.AttributeType;
 /** Provides ...
  * 
  *  @author Sean Geoghegan, Defence Science and Technology Organisation.
+ * @source $URL$
  */
 public class JoiningAttributeWriter implements AttributeWriter {
     private AttributeWriter[] writers;

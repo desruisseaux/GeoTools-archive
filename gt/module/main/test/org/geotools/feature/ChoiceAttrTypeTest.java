@@ -34,6 +34,7 @@ import java.util.logging.Logger;
  * Tests for the Choice attribute.
  *
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 public class ChoiceAttrTypeTest extends TestCase {
     /** The logger for the default core module. */

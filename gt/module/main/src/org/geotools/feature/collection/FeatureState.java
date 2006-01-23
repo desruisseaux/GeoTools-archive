@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Jody Garnett, Refractions Reserach, Inc.
  * @since GeoTools 2.2
+ * @source $URL$
  */
 public abstract class FeatureState {
 	    

@@ -48,6 +48,7 @@ import org.geotools.factory.FactoryFinder;
  * <p>
  * Example:<br/><code>org.geotools.data.mytype.MyTypeDataStoreFacotry</code>
  * </p>
+ * @source $URL$
  */
 public final class GridFormatFinder {
     private GridFormatFinder() {

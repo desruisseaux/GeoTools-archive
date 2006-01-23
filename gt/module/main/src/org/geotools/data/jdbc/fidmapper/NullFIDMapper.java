@@ -30,6 +30,7 @@ import java.sql.Statement;
  * each time it is loaded from the datastore.
  *
  * @author wolf
+ * @source $URL$
  */
 public class NullFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;

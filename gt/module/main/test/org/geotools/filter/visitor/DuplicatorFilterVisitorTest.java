@@ -30,6 +30,7 @@ import org.geotools.filter.LogicFilter;
  * Unit test for DuplicatorFilterVisitor.
  *
  * @author Cory Horner, Refractions Research Inc.
+ * @source $URL$
  */
 public class DuplicatorFilterVisitorTest extends TestCase {
     FilterFactory fac;

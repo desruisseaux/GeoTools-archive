@@ -27,6 +27,7 @@ import java.sql.Connection;
  * FIDMapper given the FeatureType name and the database metadata
  *
  * @author aaime
+ * @source $URL$
  */
 public interface FIDMapperFactory {
     /**

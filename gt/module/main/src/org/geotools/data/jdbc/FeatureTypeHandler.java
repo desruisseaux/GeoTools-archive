@@ -44,6 +44,7 @@ import org.geotools.feature.GeometryAttributeType;
  * make requests cached allowing at the same time to keep it in-line with a  changing database.
  *
  * @author wolf
+ * @source $URL$
  */
 public class FeatureTypeHandler {
     private FIDMapperFactory fmFactory;

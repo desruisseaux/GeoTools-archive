@@ -23,6 +23,7 @@ import org.geotools.feature.collection.RandomFeatureAccess;
  * </p>
  *   
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class MemoryFeatureCollection extends AbstractFeatureCollection implements RandomFeatureAccess {
     TreeMap contents = new TreeMap();

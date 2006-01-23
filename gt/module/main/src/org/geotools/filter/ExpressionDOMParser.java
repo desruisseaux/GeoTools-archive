@@ -45,6 +45,7 @@ import com.vividsolutions.jts.geom.TopologyException;
  * can get away without a full parser here.
  *
  * @author iant
+ * @source $URL$
  */
 public final class ExpressionDOMParser {
     /** The logger for the filter module. */

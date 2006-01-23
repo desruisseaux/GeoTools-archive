@@ -31,6 +31,7 @@ import org.geotools.filter.IllegalFilterException;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
+ * @source $URL$
  */
 public class AverageVisitor implements FeatureCalc {
     private Expression expr;

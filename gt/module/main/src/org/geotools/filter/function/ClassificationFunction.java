@@ -21,6 +21,7 @@ import org.geotools.util.ProgressListener;
  * 
  * @author James Macgill
  * @author Cory Horner, Refractions Research Inc.
+ * @source $URL$
  */
 public abstract class ClassificationFunction extends FunctionExpressionImpl implements FunctionExpression {
 

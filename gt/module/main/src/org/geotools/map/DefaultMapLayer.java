@@ -36,6 +36,7 @@ import org.geotools.styling.Style;
  * Default implementation of the MapLayer implementation
  *
  * @author wolf
+ * @source $URL$
  */
 public class DefaultMapLayer implements MapLayer {
 	

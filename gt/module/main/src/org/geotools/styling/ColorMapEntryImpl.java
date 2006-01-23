@@ -26,6 +26,7 @@ import org.geotools.filter.FilterFactoryFinder;
  * Default color map entry implementation
  *
  * @author aaime
+ * @source $URL$
  */
 public class ColorMapEntryImpl extends AbstractGTComponent
     implements ColorMapEntry {

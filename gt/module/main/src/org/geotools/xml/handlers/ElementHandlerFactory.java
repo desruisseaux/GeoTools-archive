@@ -43,6 +43,7 @@ import org.xml.sax.SAXException;
  *
  * @see org.geotools.xml.XMLSAXHandler
  * @see Schema
+ * @source $URL$
  */
 public class ElementHandlerFactory {
     public static final String KEY = "org.geotools.xml.handlers.ElementHandlerFactory_KEY";

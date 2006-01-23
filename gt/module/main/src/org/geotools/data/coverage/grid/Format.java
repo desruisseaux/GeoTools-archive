@@ -22,6 +22,7 @@ import org.opengis.parameter.ParameterDescriptorGroup;
  * @UML abstract CV_Format
  * @deprecated You should use org.opengis.coverage.grid.Format instead
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ * @source $URL$
  * @version <A HREF="http://www.opengis.org/docs/01-004.pdf">Grid Coverage specification 1.0</A>
  */
 public interface Format {

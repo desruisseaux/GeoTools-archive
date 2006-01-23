@@ -46,6 +46,7 @@ import org.geotools.feature.SchemaException;
  * Unit test for SQLUnpacker.
  *
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 public class SQLUnpackerTest extends SQLFilterTestSupport {
     /** Standard logging instance */

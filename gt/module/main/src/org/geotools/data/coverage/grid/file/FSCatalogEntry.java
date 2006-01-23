@@ -29,6 +29,7 @@ import org.opengis.coverage.grid.Format;
  * The files should be a GridCoverage file
  *
  * @author $author$
+ * @source $URL$
  * @version $Revision: 1.9 $
  */
 public class FSCatalogEntry {

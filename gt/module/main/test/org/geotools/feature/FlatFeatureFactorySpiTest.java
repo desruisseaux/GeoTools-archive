@@ -14,6 +14,7 @@ import junit.framework.TestSuite;
 /**
  *
  * @author jamesm
+ * @source $URL$
  */
 public class FlatFeatureFactorySpiTest extends TestCase {
     

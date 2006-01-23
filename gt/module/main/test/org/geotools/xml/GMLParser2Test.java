@@ -22,6 +22,7 @@ import junit.framework.TestCase;
  * @
  *
  * @author dzwiers www.refractions.net
+ * @source $URL$
  */
 public class GMLParser2Test extends TestCase {
     public void testBlank(){

@@ -40,6 +40,7 @@ import org.geotools.filter.Filter;
  * </p>
  *
  * @author Chris Holmes
+ * @source $URL$
  * @version $Id$
  */
 public class FilteringFeatureReader implements FeatureReader {

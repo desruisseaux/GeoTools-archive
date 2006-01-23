@@ -11,6 +11,7 @@ import org.geotools.data.collection.ResourceList;
 
 /**
  * Simple SubList based on from, to index.
+ * @source $URL$
  */
 public class SubResourceList extends AbstractResourceList implements ResourceCollection, List {
 	ResourceList collection;	

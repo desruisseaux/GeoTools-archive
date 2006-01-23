@@ -53,6 +53,7 @@ import java.util.Map;
  * text symbols should be rendered.
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class TextSymbolizerImpl extends AbstractGTComponent

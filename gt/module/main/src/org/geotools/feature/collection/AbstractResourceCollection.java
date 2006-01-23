@@ -41,6 +41,7 @@ import org.geotools.data.collection.ResourceCollection;
  * </p>
  * 
  * @author Jody Garnett, Refractions Research, Inc.
+ * @source $URL$
  */
 public abstract class AbstractResourceCollection implements ResourceCollection {
 

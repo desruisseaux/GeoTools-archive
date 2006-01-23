@@ -48,6 +48,7 @@ import junit.framework.TestSuite;
  * Tests the {@link DefaultCoordinateSequenceTransformer} implementation.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

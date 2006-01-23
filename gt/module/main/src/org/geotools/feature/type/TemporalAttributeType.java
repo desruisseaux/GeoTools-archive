@@ -25,6 +25,7 @@ import java.util.Date;
 
 /**
  * A Default class that represents a Temporal attribute.
+ * @source $URL$
  */
 public class TemporalAttributeType extends DefaultAttributeType implements PrimativeAttributeType {
     // this might be right, maybe not, but anyway, its a default formatting

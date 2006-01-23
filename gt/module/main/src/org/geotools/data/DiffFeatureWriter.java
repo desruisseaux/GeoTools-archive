@@ -43,6 +43,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Jody Garnett, Refractions Research
  *
  * @see TransactionStateDiff
+ * @source $URL$
  */
 public abstract class DiffFeatureWriter implements FeatureWriter {
     protected FeatureReader reader;

@@ -40,6 +40,7 @@ import org.geotools.map.event.MapLayerListener;
  * Unit tests for the DefaultMapLayer class
  *
  * @author wolf
+ * @source $URL$
  */
 public class MapLayerTest extends TestCase {
     private ArrayList events = null;

@@ -20,6 +20,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  *
  * @author  jamesm
+ * @source $URL$
  */
 public class MockFeatureCollection implements org.geotools.feature.FeatureCollection {
     

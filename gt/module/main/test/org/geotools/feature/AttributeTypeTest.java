@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.Point;
 /**
  *
  * @author jamesm
+ * @source $URL$
  */
 public class AttributeTypeTest extends TestCase {
     

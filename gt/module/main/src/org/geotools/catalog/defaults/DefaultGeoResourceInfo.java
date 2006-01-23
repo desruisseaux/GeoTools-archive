@@ -25,6 +25,7 @@ import javax.swing.Icon;
 
 /**
  * Implementation of GeoResourceInfo.
+ * @source $URL$
  */
 public class DefaultGeoResourceInfo implements GeoResourceInfo {
     protected String title;

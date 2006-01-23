@@ -21,6 +21,7 @@ package org.geotools.data.coverage.grid.file.test;
  * 
  * @author jeichar
  *
+ * @source $URL$
  */
 public interface StupidNestedMetadata {
     StupidFileData getFileData();

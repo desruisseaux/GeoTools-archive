@@ -33,6 +33,7 @@ import org.geotools.feature.IllegalAttributeException;
  * Tests the ArrayFeatureReader class
  *
  * @author jones
+ * @source $URL$
  */
 public class ArrayFeatureReaderTest extends TestCase {
     private CollectionFeatureReader arrayReader;

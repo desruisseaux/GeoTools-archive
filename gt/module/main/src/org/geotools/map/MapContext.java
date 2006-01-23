@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Specification.
  *
  * @author Cameron Shorter
+ * @source $URL$
  * @version $Id$
  */
 public interface MapContext {

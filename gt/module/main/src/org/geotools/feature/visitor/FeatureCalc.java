@@ -24,6 +24,7 @@ package org.geotools.feature.visitor;
  *
  * @see FeatureVisitor
  * @since 2.2.M2
+ * @source $URL$
  */
 public interface FeatureCalc extends FeatureVisitor {
     /**

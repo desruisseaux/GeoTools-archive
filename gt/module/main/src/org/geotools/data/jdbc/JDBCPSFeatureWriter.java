@@ -54,6 +54,7 @@ import org.geotools.feature.GeometryAttributeType;
  * </p>
  *
  * @author Andrea Aime
+ * @source $URL$
  */
 public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
     /** The logger for the jdbc module. */

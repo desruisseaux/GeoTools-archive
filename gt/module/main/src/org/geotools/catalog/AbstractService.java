@@ -20,6 +20,7 @@ import org.geotools.util.ProgressListener;
 
 /**
  * Abstract implementation of Service.
+ * @source $URL$
  */
 public abstract class AbstractService implements Service {
     /** parent catalog containing the service */

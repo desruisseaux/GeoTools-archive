@@ -56,6 +56,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  * 
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  */
 public class DefaultFeatureCollection implements FeatureCollection {

@@ -31,6 +31,7 @@ import java.util.Arrays;
  * stroke defines how a line is rendered.
  *
  * @author James Macgill, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class StrokeImpl extends AbstractGTComponent implements Stroke,

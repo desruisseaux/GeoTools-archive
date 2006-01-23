@@ -19,6 +19,7 @@ import org.geotools.feature.FeatureType;
  * Stores information about known FeatureTypes.
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
+ * @source $URL$
  */
 public class FeatureTypeInfo {
 	private String featureTypeName;

@@ -17,6 +17,7 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
  * @author Jody Garnett
  *
  * @deprecated Now replaced by {@link CRSAuthorityFactory}.
+ * @source $URL$
  */
 public interface CRSAuthoritySpi extends Factory {
     /**

@@ -38,6 +38,7 @@ import java.util.logging.Logger;
  * feature does.
  *
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 public class FeatureWrappedComplexTest extends TestCase {
     /** The logger for the default core module. */

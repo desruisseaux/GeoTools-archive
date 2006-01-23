@@ -36,6 +36,7 @@ import org.geotools.filter.IllegalFilterException;
  * An utility class designed to ease style building by convinience methods.
  *
  * @author aaime
+ * @source $URL$
  */
 public class StyleBuilder {
     private static final java.util.logging.Logger LOGGER =

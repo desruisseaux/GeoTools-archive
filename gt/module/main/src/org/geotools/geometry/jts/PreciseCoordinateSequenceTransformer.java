@@ -17,6 +17,7 @@ import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
  *
  * @todo Not yet implemented.
  *
+ * @source $URL$
  */
 public class PreciseCoordinateSequenceTransformer implements CoordinateSequenceTransformer {
     CoordinateSequenceFactory csFactory;

@@ -26,6 +26,7 @@ package org.geotools.feature;
  * DefaultFeatureCollections.
  *
  * @author Ian Schneider
+ * @source $URL$
  */
 public class DefaultFeatureCollections extends FeatureCollections {
     /**

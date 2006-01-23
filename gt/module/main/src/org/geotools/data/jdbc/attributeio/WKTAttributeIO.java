@@ -35,6 +35,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  * WKT format. 
  *
  * @author wolf
+ * @source $URL$
  */
 public class WKTAttributeIO implements AttributeIO {
     WKTReader reader;

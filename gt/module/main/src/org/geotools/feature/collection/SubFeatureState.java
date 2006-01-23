@@ -26,6 +26,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Jody Garnett, Refractions Reserach, Inc.
  * @since GeoTools 2.2
+ * @source $URL$
  */
 public class SubFeatureState extends FeatureState {
 	final FeatureCollection collection;

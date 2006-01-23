@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * defaultcore.
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class FilterFactoryImpl implements FilterFactory {

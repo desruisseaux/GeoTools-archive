@@ -28,6 +28,7 @@ import org.opengis.util.Cloneable;
  * PolygonSymbolizer defines how a polygon geometry should be rendered.
  *
  * @author James Macgill, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class PolygonSymbolizerImpl extends AbstractGTComponent

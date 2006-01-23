@@ -28,6 +28,7 @@ import org.geotools.factory.Factory;
  *
  * @UML abstract CV_GridCoverageExchange
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ * @source $URL$
  * @version 2.0
  *
  * @see GridCoverageReader

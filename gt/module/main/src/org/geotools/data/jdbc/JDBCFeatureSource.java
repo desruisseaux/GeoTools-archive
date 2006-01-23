@@ -67,6 +67,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class JDBCFeatureSource implements FeatureSource {
     /** The logger for the filter module. */

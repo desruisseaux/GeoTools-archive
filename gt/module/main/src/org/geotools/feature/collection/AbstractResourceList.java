@@ -38,6 +38,7 @@ import org.geotools.data.collection.ResourceList;
 	 * @author Jody Garnett, Refractions Research, Inc.
 	 * @see AbstractList
 	 * @since GeoTools 2.2
+ * @source $URL$
      */
 
 public abstract class AbstractResourceList extends AbstractResourceCollection implements ResourceList {

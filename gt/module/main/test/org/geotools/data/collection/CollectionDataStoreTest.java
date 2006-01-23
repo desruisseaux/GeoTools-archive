@@ -48,6 +48,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * DOCUMENT ME!
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class CollectionDataStoreTest extends DataTestCase {
     CollectionDataStore data;

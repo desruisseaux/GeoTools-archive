@@ -23,6 +23,7 @@ import java.util.Stack;
 
 /**
  * DOCUMENT ME!
+ * @source $URL$
  */
 public class ASTFactory {
     private ASTFactory() { /* not used */

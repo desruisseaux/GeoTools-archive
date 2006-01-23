@@ -23,6 +23,7 @@ import org.geotools.event.AbstractGTComponent;
  * DOCUMENT ME!
  *
  * @author jamesm
+ * @source $URL$
  */
 public class StyledLayerImpl extends AbstractGTComponent implements StyledLayer {
     protected String name;

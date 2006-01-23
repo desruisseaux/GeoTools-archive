@@ -21,6 +21,7 @@ import org.geotools.feature.AttributeType;
 /**
  * Provides support for creating AttributeReaders.
  * 
+ * @source $URL$
  * @version $Id$
  * @author  Ian Schneider
  */

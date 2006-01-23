@@ -22,6 +22,7 @@ package org.geotools.event;
  * @author chorner
  *
  * @deprecated
+ * @source $URL$
  */
 public class GTCloneUtil {
     public static Object clone(GTComponent component)

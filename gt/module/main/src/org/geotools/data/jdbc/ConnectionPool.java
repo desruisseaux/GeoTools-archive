@@ -40,6 +40,7 @@ import javax.sql.PooledConnection;
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: cholmesny $
+ * @source $URL$
  * @version $Id$ Last Modified: $Date: 2003/11/05 15:37:02 $
  */
 public final class ConnectionPool {

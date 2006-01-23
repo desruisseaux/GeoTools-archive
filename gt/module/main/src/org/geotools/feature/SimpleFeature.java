@@ -70,6 +70,7 @@ package org.geotools.feature;
  *
  * @author David Zwiers, Refractions
  * @author Chris Holmes, TOPP
+ * @source $URL$
  * @version $Id$
  *
  * @task REVISIT: I am not sure that I like getAttribute returning the  object

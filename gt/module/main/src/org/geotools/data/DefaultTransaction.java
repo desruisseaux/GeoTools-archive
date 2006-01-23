@@ -33,6 +33,7 @@ import java.util.Set;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class DefaultTransaction implements Transaction {
     /** Records State by key */

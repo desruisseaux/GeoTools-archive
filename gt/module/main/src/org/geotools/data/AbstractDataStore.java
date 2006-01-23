@@ -76,6 +76,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  *
  * @author jgarnett
+ * @source $URL$
  */
 public abstract class AbstractDataStore implements DataStore {
     /** The logger for the filter module. */

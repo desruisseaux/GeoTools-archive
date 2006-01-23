@@ -31,6 +31,7 @@ import org.geotools.filter.FilterFactoryFinder;
  * DOCUMENT ME!
  *
  * @author iant
+ * @source $URL$
  */
 public class ShadedReliefImpl extends AbstractGTComponent
     implements ShadedRelief {

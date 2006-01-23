@@ -12,6 +12,7 @@ import org.geotools.feature.Feature;
  * This class is actualy a place holder.  It resolves to 1.0 but should actualy be substituted for 
  * a literal that actualy contains the current map scale before use.
  * @author James
+ * @source $URL$
  */
 public class MapScaleDenominatorImpl extends DefaultExpression implements MapScaleDenominator  {
     

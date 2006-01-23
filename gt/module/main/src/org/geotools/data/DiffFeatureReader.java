@@ -36,6 +36,7 @@ import org.geotools.feature.IllegalAttributeException;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class DiffFeatureReader implements FeatureReader {
     FeatureReader reader;

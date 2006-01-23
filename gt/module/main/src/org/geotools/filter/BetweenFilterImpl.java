@@ -31,6 +31,7 @@ import org.geotools.feature.Feature;
  * filter.
  *
  * @author Rob Hranac, TOPP
+ * @source $URL$
  * @version $Id$
  *
  * @task REVISIT: I think AbstractFilter right now does not consider between a

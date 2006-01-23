@@ -50,6 +50,7 @@ import org.opengis.coverage.grid.Format;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public interface GridFormatFactorySpi extends org.geotools.factory.Factory {
     /**

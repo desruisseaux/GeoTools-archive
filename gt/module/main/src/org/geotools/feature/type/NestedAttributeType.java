@@ -38,6 +38,7 @@ import org.geotools.filter.Filter;
  * 
  * @author dzwiers
  *
+ * @source $URL$
  */
 public class NestedAttributeType extends ListAttributeType {
 

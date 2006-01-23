@@ -43,6 +43,7 @@ import org.geotools.geometry.DirectPosition2D;
  * interface for interoperability with GeoAPI.
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  * @author Martin Desruisseaux

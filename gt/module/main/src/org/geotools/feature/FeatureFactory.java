@@ -30,6 +30,7 @@ package org.geotools.feature;
  * Please see experimental FeatureFactory2 (a subclass) for the current best
  * idea of what is needed.
  * </p>
+ * @source $URL$
  * @version $Id$
  *
  * @task REVISIT: consider a static create(Object[] attributes,  String

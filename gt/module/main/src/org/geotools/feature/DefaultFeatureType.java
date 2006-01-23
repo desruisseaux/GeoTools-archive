@@ -27,6 +27,7 @@ import org.geotools.xml.gml.GMLSchema;
  * A basic implementation of FeatureType.
  *
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  */
 public class DefaultFeatureType implements FeatureType {

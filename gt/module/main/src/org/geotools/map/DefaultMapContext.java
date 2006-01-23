@@ -71,6 +71,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * interface
  *
  * @author Andrea Aime
+ * @source $URL$
  */
 public class DefaultMapContext implements MapContext {
     /** The logger for the map module. */

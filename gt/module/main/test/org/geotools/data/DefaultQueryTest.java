@@ -19,6 +19,7 @@ import org.geotools.filter.Filter;
 /**
  *
  * @author jamesm
+ * @source $URL$
  */
 public class DefaultQueryTest extends TestCase {
     

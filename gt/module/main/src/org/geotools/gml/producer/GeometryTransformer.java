@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * DOCUMENT ME!
  *
  * @author Ian Schneider
+ * @source $URL$
  */
 public class GeometryTransformer extends TransformerBase {
     

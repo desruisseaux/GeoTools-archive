@@ -27,6 +27,7 @@ import org.geotools.feature.FeatureType;
  * Represents an Empty, Typed, FeatureWriter.
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class EmptyFeatureWriter implements FeatureWriter {
     FeatureType featureType;

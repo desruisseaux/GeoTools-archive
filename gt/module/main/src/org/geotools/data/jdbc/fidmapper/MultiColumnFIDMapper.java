@@ -33,6 +33,7 @@ import java.sql.Statement;
  * A simple implementation of FIDMapper for multi column primary keys
  *
  * @author wolf
+ * @source $URL$
  */
 public class MultiColumnFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;

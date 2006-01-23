@@ -29,6 +29,7 @@ import java.util.List;
  * DOCUMENT ME!
  *
  * @author jamesm
+ * @source $URL$
  */
 public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
     List styles = new ArrayList();

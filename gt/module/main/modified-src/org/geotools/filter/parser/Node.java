@@ -4,6 +4,7 @@ package org.geotools.filter.parser;
 
 /* All AST nodes must implement this interface.  It provides basic
    machinery for constructing the parent and child relationships
+ * @source $URL$
    between nodes. */
 
 public interface Node {

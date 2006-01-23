@@ -86,6 +86,7 @@ import java.util.logging.Logger;
  * </li>
  * </ul>
  * </p>
+ * @source $URL$
  */
 public class StyledLayerDescriptorImpl extends AbstractGTRoot
     implements StyledLayerDescriptor {

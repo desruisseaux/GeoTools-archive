@@ -33,6 +33,7 @@ import org.geotools.data.DataSourceException;
  * object.
  *
  * @author wolf
+ * @source $URL$
  */
 public class BasicAttributeIO implements AttributeIO {
     /**

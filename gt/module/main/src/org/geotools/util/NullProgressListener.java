@@ -28,6 +28,7 @@ package org.geotools.util;
  * </p>
  *
  * @since 2.2
+ * @source $URL$
  * @version $Id$
  */
 public class NullProgressListener implements ProgressListener {

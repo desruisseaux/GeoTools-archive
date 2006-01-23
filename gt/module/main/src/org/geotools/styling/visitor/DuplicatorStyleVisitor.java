@@ -58,6 +58,7 @@ import org.geotools.styling.UserLayer;
  * </p>
  * 
  * @author Cory Horner, Refractions Research Inc.
+ * @source $URL$
  */
 public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
     implements StyleVisitor {

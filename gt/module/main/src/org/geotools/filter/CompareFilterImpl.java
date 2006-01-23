@@ -40,6 +40,7 @@ import org.geotools.feature.Feature;
  * to simplify/make meaningful filter logic.
  *
  * @author Rob Hranac, Vision for New York
+ * @source $URL$
  * @version $Id$
  */
 public class CompareFilterImpl extends AbstractFilterImpl

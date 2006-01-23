@@ -26,6 +26,7 @@ import org.geotools.filter.FilterAttributeExtractor;
  * properly
  *
  * @author wolf
+ * @source $URL$
  */
 public class StyleAttributeExtractor extends FilterAttributeExtractor
     implements StyleVisitor {

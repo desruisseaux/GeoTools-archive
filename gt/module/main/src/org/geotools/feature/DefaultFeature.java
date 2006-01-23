@@ -51,6 +51,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *       datastore implementors could at least create their features without
  *       validating (though probably should return Features that will check
  *       for validity if someone else tries to change them).
+ * @source $URL$
  */
 public class DefaultFeature implements SimpleFeature, Cloneable {
     /** The unique id of this feature */

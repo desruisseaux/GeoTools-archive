@@ -57,6 +57,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author jgarnett, Refractions Research, Inc.
  * @author aaime
  * @author $Author: jive $ (last modification)
+ * @source $URL$
  * @version $Id$
  */
 public class ForceCoordinateSystemFeatureReader implements FeatureReader {

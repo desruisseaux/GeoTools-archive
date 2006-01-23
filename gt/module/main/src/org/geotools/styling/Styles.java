@@ -28,6 +28,7 @@ import org.geotools.filter.LogicFilter;
  * Warning: these methods are subject to change in the near future. 
  * <p>
  * @author Cory Horner, Refractions Research
+ * @source $URL$
  */
 public class Styles {
 

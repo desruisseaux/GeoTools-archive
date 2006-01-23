@@ -16,6 +16,7 @@ import junit.framework.TestCase;
  * This simply tests and demonstrates how to make a new feature factory.
  *
  * @author Ian Schneider
+ * @source $URL$
  */
 public class FeatureTypeFactoryTest extends TestCase {
   

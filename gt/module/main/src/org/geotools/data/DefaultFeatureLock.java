@@ -40,6 +40,7 @@ package org.geotools.data;
  * @see http://vwfs.refractions.net/docs/Design_Implications.pdf
  * @author jgarnett, Refractions Research, Inc.
  * </p> 
+ * @source $URL$
  */
 public class DefaultFeatureLock implements FeatureLock {
     private final String authorization;

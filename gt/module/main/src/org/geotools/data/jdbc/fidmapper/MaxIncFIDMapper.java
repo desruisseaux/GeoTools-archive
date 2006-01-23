@@ -37,6 +37,7 @@ import java.sql.Types;
  * reliable results.
  *
  * @author aaime
+ * @source $URL$
  */
 public class MaxIncFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;

@@ -63,6 +63,7 @@ import org.geotools.filter.Filter;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class JDBCFeatureLocking extends JDBCFeatureStore
     implements FeatureLocking {

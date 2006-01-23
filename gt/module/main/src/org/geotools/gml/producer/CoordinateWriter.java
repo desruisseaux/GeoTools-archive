@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  *
  * @author Chris Holmes
  * @author Ian Schneider
+ * @source $URL$
  */
 class CoordinateWriter {
     

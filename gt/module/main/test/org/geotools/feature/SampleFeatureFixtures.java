@@ -29,6 +29,7 @@ import org.geotools.feature.type.ChoiceAttributeType;
  * This is a support class which creates test features for use in testing.
  *
  * @author jamesm
+ * @source $URL$
  */
 public class SampleFeatureFixtures {
     /**

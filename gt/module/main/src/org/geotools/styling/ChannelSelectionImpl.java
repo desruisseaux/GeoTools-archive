@@ -23,6 +23,7 @@ import org.geotools.event.AbstractGTComponent;
  * DOCUMENT ME!
  *
  * @author iant
+ * @source $URL$
  */
 public class ChannelSelectionImpl extends AbstractGTComponent
     implements ChannelSelection {

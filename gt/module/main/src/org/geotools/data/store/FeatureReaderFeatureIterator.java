@@ -33,6 +33,7 @@ import org.geotools.feature.IllegalAttributeException;
  * <p>
  * @author jgarnett
  * @since 2.1.RC0
+ * @source $URL$
  */
 final class FeatureReaderFeatureIterator implements FeatureIterator {
     FeatureReader reader;

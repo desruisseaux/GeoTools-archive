@@ -49,6 +49,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @author jeichar
  * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  * @see AbstractFormatFactory
+ * @source $URL$
  */
 public abstract class AbstractGridFormat
     implements Format {

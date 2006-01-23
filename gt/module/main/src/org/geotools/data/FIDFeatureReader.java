@@ -48,6 +48,7 @@ import org.geotools.feature.SchemaException;
  *
  * @author Ian Schneider
  * @author Chris Holmes, TOPP
+ * @source $URL$
  * @version $Id$
  */
 public class FIDFeatureReader implements FeatureReader {

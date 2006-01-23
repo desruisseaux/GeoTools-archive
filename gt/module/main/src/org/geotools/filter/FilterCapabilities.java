@@ -27,6 +27,7 @@ import java.util.List;
  * the filter encoding operations that it can successfully perform.
  *
  * @author Chris Holmes, TOPP
+ * @source $URL$
  */
 public class FilterCapabilities {
     /** The Filter types (shorts from AbstractFilter) supported. */

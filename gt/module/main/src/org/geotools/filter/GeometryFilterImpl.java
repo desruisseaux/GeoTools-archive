@@ -46,6 +46,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author Rob Hranac, TOPP
+ * @source $URL$
  * @version $Id$
  *
  * @task REVISIT: make this class (and all filters) immutable, implement

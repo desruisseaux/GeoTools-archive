@@ -32,6 +32,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  *
  * @author  en
  * @author jgarnett
+ * @source $URL$
  */
 public class FeatureTypeTest extends DataTestCase {
   

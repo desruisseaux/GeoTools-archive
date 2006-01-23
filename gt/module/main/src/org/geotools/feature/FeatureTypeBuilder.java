@@ -58,6 +58,7 @@ import org.geotools.factory.FactoryFinder;
  * </p>
  *
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  */
 public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory {

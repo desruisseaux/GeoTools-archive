@@ -23,6 +23,7 @@ import org.xml.sax.InputSource;
  * TODO: This really needs to be container ready
  * @author jgarnett
  *
+ * @source $URL$
  */
 public class SLDParser {
 

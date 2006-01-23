@@ -45,6 +45,7 @@ import java.util.logging.Logger;
  * has a test case that extends this class.
  *
  * @author Jesse Eichar, Refractions Research
+ * @source $URL$
  */
 public abstract class AbstractDataStoreTest extends DataTestCase {
     /** The logger for the filter module. */

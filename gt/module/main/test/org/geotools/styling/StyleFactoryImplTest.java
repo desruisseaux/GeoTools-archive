@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
  * DOCUMENT ME!
  *
  * @author iant
+ * @source $URL$
  */
 public class StyleFactoryImplTest extends TestCase {
     static StyleFactory styleFactory;

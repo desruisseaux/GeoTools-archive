@@ -23,6 +23,7 @@ import java.util.Collections;
  * Abstract class for a function expression implementation
  *
  * @author James Macgill, PSU
+ * @source $URL$
  */
 public abstract class FunctionExpressionImpl
     extends org.geotools.filter.DefaultExpression implements FunctionExpression {

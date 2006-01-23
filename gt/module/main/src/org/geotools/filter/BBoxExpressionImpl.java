@@ -27,6 +27,7 @@ import com.vividsolutions.jts.geom.TopologyException;
  * Implements a Bounding Box expression.
  *
  * @author Ian Turton, CCG
+ * @source $URL$
  * @version $Id$
  */
 public class BBoxExpressionImpl

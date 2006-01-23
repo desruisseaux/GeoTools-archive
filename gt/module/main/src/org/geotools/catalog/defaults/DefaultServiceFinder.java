@@ -33,6 +33,7 @@ import java.util.Map;
  * mechanism to locate service extension plugins.
  *
  * @since 0.6
+ * @source $URL$
  */
 public class DefaultServiceFinder implements ServiceFinder {
     private Catalog catalog;

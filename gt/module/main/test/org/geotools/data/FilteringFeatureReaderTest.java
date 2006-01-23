@@ -26,6 +26,7 @@ import org.geotools.filter.Filter;
  * Test FilteredFeatureReader for conformance.
  * 
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class FilteringFeatureReaderTest extends DataTestCase {
     FeatureReader roadReader;

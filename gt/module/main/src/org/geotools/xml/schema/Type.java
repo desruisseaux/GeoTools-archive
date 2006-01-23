@@ -31,6 +31,7 @@ import org.xml.sax.SAXException;
  * @see SimpleType
  * @see ComplexType
  * @author dzwiers www.refractions.net
+ * @source $URL$
  */
 public interface Type {
 

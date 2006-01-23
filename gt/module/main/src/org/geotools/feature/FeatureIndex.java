@@ -30,6 +30,7 @@ package org.geotools.feature;
  *
  * @author Ray Gallagher
  * @author Ian Schneider
+ * @source $URL$
  * @version $Id$
  */
 public interface FeatureIndex extends CollectionListener {

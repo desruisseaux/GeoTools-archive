@@ -33,6 +33,7 @@ import org.geotools.feature.Feature;
  * uniquely.
  *
  * @author Rob Hranac, TOPP
+ * @source $URL$
  * @version $Id$
  */
 public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {

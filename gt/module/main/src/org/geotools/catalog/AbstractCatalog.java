@@ -24,6 +24,7 @@ import org.geotools.util.ProgressListener;
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
+ * @source $URL$
  */
 public abstract class AbstractCatalog implements Catalog {
 	

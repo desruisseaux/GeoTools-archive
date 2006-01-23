@@ -46,6 +46,7 @@ import org.geotools.feature.FeatureTypeFactory;
  * </p>
  *
  * @author John Meagher
+ * @source $URL$
  */
 public class BasicFeatureTypes
 {

@@ -16,6 +16,7 @@ import org.geotools.resources.TestData;
  * 
  * @author jeichar
  *
+ * @source $URL$
  */
 public class FileMetadataImplTest extends TestCase {
 

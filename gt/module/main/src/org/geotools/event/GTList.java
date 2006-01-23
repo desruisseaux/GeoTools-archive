@@ -30,6 +30,7 @@ package org.geotools.event;
  * This list is used to maintain list or array properties in implementations
  * such as FeatureTypeStyle.
  * </p>
+ * @source $URL$
  */
 import java.util.ArrayList;
 import java.util.Collection;

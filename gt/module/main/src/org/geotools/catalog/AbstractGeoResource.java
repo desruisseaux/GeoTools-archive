@@ -22,6 +22,7 @@ import java.util.List;
 
 /**
  * Abstract implementation of GeoResource.
+ * @source $URL$
  */
 public abstract class AbstractGeoResource implements GeoResource {
     /**

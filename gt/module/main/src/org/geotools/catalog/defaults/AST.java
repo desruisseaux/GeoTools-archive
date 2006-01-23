@@ -21,6 +21,7 @@ package org.geotools.catalog.defaults;
  * @author David Zwiers, Refractions Research
  *
  * @since 0.6
+ * @source $URL$
  */
 public interface AST {
     public static final int AND = 1;

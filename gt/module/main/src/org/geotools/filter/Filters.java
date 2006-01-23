@@ -56,6 +56,7 @@ import org.geotools.filter.visitor.DuplicatorFilterVisitor;
  * 
  * @author Jody Garnett, Refractions Research
  * @since GeoTools 2.2.M3
+ * @source $URL$
  */
 public class Filters {
 	/** <code>NOTFOUND</code> indicates int value was unavailable */

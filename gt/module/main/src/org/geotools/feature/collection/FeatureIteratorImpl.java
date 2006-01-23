@@ -12,6 +12,7 @@ import org.geotools.feature.FeatureCollection;
  * be a drop in replacement when Geotools is able to upgrade to Java 5.
  * </p>
  * @author Ian Schneider
+ * @source $URL$
  */
 public class FeatureIteratorImpl implements FeatureIterator {
     /** The iterator from the FeatureCollection to return features from. */

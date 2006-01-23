@@ -30,6 +30,7 @@ import org.geotools.factory.FactoryFinder;
  * <code><pre>
  * FeatureLock lock = FeatureLockFactory.generate( "MyLock", 3600 );
  * </pre></code>
+ * @source $URL$
  * @version $Id$
  * @task REVISIT: Combine this with a factory to also make Query objects?
  * @author Chris Holmes, TOPP

@@ -31,6 +31,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * added to the output stream in a sequential order.
  *
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ * @source $URL$
  * @version 2.0
  * @deprecated You should use the interfaces provided with GeoApi instead.
  * @see GridCoverageExchange#getWriter

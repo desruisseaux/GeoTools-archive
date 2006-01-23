@@ -29,6 +29,7 @@ import java.util.List;
  * want.
  *
  * @author Ian Schneider, USDA-ARS
+ * @source $URL$
  * @version $Id$
  */
 public class DefaultFeatureTypeFactory extends FeatureTypeFactory {

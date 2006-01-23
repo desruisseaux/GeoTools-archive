@@ -49,6 +49,7 @@ import org.geotools.feature.IllegalAttributeException;
  * </code></pre>
  * 
  * @author Jody Garnett, Refractions Research
+ * @source $URL$
  */
 public class ReTypeFeatureReader implements FeatureReader {
     FeatureReader reader;

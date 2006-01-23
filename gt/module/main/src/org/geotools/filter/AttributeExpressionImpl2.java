@@ -29,6 +29,7 @@ import org.geotools.feature.FeatureType;
  * internally defined manner.
  *
  * @author Rob Hranac, TOPP
+ * @source $URL$
  * @version $Id$
  */
 public class AttributeExpressionImpl2 extends DefaultExpression

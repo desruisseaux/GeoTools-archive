@@ -34,6 +34,7 @@ import java.sql.Types;
  *
  * @author aaime Andrea Aime
  * @author Dani Daniele Franzoni
+ * @source $URL$
  */
 public class BasicFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;

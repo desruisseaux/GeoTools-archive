@@ -41,6 +41,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * ExpressionBuilder is the main entry point for parsing Expressions and Filters
  * from a non-xml language.
  * <p>
+ * @source $URL$
  * @version GeoTools 2.2 Revised to take a FilterFactory.
  * @author  Ian Schneider
  */
