@@ -40,6 +40,7 @@ package org.geotools.renderer.lite;
  * }
  * </pre>
  * </p>
+ * @source $URL$
  */
 public class ListenerList {
     /**

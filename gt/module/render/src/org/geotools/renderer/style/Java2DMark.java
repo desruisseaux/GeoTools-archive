@@ -27,6 +27,7 @@ import java.util.logging.Logger;
  * Utility class that will return the Shape for well known marks
  *
  * @author Ian Turton
+ * @source $URL$
  * @version $Id$
  */
 public class Java2DMark {

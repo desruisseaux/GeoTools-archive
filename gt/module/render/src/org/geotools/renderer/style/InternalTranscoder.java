@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 /**
  *
  * @author  jamesm 
+ * @source $URL$
  */
 final class InternalTranscoder extends ImageTranscoder {
 

@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.LinearRing;
  * LineString object.
  *
  * @author Andrea Aime
+ * @source $URL$
  * @version $Id$
  */
 class LineIterator extends AbstractLiteIterator {

@@ -31,6 +31,7 @@ import org.geotools.styling.TextSymbolizer;
  * 
  * @author jeichar
  * @since 0.9.0
+ * @source $URL$
  */
 public interface LabelCache {
 	/**

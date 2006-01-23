@@ -20,6 +20,7 @@ import org.geotools.util.NumberRange;
 /**
  *
  * @author jamesm
+ * @source $URL$
  */
 public class SLDStyleFactoryTest extends TestCase {
     

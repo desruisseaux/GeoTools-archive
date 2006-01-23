@@ -28,6 +28,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * 
  * @author dblasby
+ * @source $URL$
  */
 public class RendererUtilities
 {

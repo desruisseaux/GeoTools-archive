@@ -31,6 +31,7 @@ import org.geotools.styling.PolygonSymbolizer;
  * of caching them
  *
  * @author jamesm
+ * @source $URL$
  */
 public class DynamicPolygonStyle2D extends org.geotools.renderer.style.PolygonStyle2D {
     Feature feature;

@@ -9,6 +9,7 @@ package org.geotools.renderer.lite;
 /**
  *
  * @author  jfc173
+ * @source $URL$
  */
 public class GlyphProperty {
     

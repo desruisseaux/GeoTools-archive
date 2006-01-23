@@ -33,6 +33,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * objects.
  *
  * @author Andrea Aime
+ * @source $URL$
  * @version $Id$
  */
 class PolygonIterator extends AbstractLiteIterator {

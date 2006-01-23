@@ -35,6 +35,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Base interface for renderer. This is very much work in progress.
  * <strong>Note: this interface will changes in future versions.</strong>
  *
+ * @source $URL$
  * @version $Id$
  * @author James Macgill
  */

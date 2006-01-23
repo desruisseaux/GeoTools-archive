@@ -36,6 +36,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * other, simpler iterator to carry on its duties.
  *
  * @author Andrea Aime
+ * @source $URL$
  * @version $Id$
  */
 class GeomCollectionIterator extends AbstractLiteIterator {

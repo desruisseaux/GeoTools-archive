@@ -30,6 +30,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Accepts geometries and collapses all the vertices that will be rendered to the same pixel. 
  * @author jeichar
  * @since 2.1.x
+ * @source $URL$
  */
 public class Decimator {
 	

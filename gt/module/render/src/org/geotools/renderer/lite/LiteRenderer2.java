@@ -101,6 +101,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  * 
  * @author James Macgill
  * @author Andrea Aime
+ * @source $URL$
  * @version $Id$
  * @deprecated LiteRenderer has been replaced by StreamingRenderer.
  */

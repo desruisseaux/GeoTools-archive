@@ -24,6 +24,7 @@ import com.vividsolutions.jts.geom.TopologyException;
 /**
  *
  * @author jamesm,iant
+ * @source $URL$
  */
 public class LiteShapeTest extends TestCase {
     private java.net.URL base = getClass().getResource("testData/");

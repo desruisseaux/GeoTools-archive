@@ -29,6 +29,7 @@ import org.geotools.resources.Utilities;
  * Style to represent points as small filled and stroked shapes
  *
  * @author Andrea Aime
+ * @source $URL$
  * @version $Id$
  */
 public class MarkStyle2D extends PolygonStyle2D {

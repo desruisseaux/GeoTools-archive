@@ -15,6 +15,7 @@ import org.apache.batik.transcoder.TranscoderInput;
 /**
  *
  * @author  James
+ * @source $URL$
  */
 public class SVGGlyphRenderer implements GlyphRenderer {
     

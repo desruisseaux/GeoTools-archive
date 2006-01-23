@@ -128,6 +128,7 @@ labeling code.
 
 This change could affect the j2d renderer as it appears to use the
 "AbsoluteLineDisplacement" flag.
+ * @source $URL$
 */
  
 public class SLDStyleFactory {

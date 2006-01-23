@@ -27,6 +27,7 @@ import java.util.logging.Logger;
  * Utility class used to get well known marks
  *
  * @author Ian Turton
+ * @source $URL$
  * @version $Id$
  */
 class Java2DMark {

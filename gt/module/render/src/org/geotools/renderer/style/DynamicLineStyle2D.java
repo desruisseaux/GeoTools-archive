@@ -33,6 +33,7 @@ import org.geotools.styling.Stroke;
  * caching them
  *
  * @author jamesm
+ * @source $URL$
  */
 public class DynamicLineStyle2D extends org.geotools.renderer.style.LineStyle2D {
     /** The feature that will be styled as a polygon */

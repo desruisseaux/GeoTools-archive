@@ -55,6 +55,7 @@ import org.opengis.spatialschema.geometry.Envelope;
  *
  * @author Martin Desruisseaux
  * @author Andrea Aime
+ * @source $URL$
  * @version $Id$
  *
  * @task Add support for SLD stylers

@@ -121,6 +121,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  * @author jessie eichar
  * @author Andrea Aime
  *
+ * @source $URL$
  * @version $Id$
  */
 public class StreamingRenderer implements GTRenderer {

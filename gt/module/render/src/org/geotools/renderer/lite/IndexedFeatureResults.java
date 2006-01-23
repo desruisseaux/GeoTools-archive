@@ -26,6 +26,7 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  * IndexedFeatureReader
  * 
  * @author wolf
+ * @source $URL$
  */
 public class IndexedFeatureResults implements FeatureResults {
 	STRtree index = new STRtree();

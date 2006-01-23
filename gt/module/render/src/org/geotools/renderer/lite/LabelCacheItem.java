@@ -21,6 +21,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author jeichar
  * @author dblasby
+ * @source $URL$
  */
 public class LabelCacheItem implements Comparable
 {

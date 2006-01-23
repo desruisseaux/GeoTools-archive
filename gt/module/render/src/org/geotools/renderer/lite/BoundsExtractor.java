@@ -41,6 +41,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * @author jones
  * 
+ * @source $URL$
  */
 public class BoundsExtractor implements FilterVisitor {
 	Envelope clippedbbox;

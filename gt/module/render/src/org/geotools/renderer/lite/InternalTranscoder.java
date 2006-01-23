@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 /**
  *
  * @author  jamesm 
+ * @source $URL$
  */
 public class InternalTranscoder extends org.apache.batik.transcoder.image.ImageTranscoder {
 

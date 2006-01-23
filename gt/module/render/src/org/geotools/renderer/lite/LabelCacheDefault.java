@@ -108,6 +108,7 @@ import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
  * 
  *  @author jeichar,dblasby
  * @since 0.9.0
+ * @source $URL$
  */
 public class LabelCacheDefault implements LabelCache {
 

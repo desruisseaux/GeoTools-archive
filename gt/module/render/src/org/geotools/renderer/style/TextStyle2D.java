@@ -70,6 +70,7 @@ import org.geotools.resources.Utilities;
      * 
      *   This replaces the old behavior which converted a LinePlacement -> pointplacement and set the absoluteLineDisplacement flag!
 	 * 
+ * @source $URL$
 	 * */
 	 
 public class TextStyle2D extends Style2D {

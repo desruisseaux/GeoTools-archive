@@ -15,6 +15,7 @@ import org.geotools.filter.FilterFactoryFinder;
 /**
  *
  * @author  jfc173
+ * @source $URL$
  */
 public class GlyphPropertiesList {
     

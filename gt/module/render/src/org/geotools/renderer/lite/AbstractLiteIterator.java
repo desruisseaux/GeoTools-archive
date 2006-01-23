@@ -41,6 +41,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
  * thread safe.
  *
  * @author Andrea Aime
+ * @source $URL$
  */
 public abstract class AbstractLiteIterator implements PathIterator {
 
