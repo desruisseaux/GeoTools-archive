@@ -20,9 +20,9 @@ import org.geotools.data.wms.WMSOperationType;
 
 
 /**
- * DOCUMENT ME!
+ * Available WMS Operations are listed in a Request element.
  *
- * @author rgould Available WMS Operations are listed in a Request element.
+ * @author rgould
  * @source $URL$
  */
 public class WMSRequest {

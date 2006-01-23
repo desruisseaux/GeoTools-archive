@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 package org.geotools.data.wms.test;
 
@@ -28,6 +26,11 @@ import org.geotools.referencing.CRS;
 import org.geotools.resources.TestData;
 import org.opengis.spatialschema.geometry.Envelope;
 
+
+/**
+ *
+ * @source $URL$
+ */
 public class Geot553Test extends TestCase {
     
     public void testGeot553 () throws Exception {

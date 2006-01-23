@@ -12,8 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- * @source $URL$
  */
 
 package org.geotools.data.wms.test;
@@ -44,7 +42,10 @@ import org.geotools.xml.handlers.DocumentHandler;
 import org.geotools.xml.schema.Schema;
 import org.xml.sax.SAXException;
 
-
+/**
+ *
+ * @source $URL$
+ */
 public class WMS1_0_0_OnlineTest extends ServerTestCase {
     protected URL server;
     protected Specification spec;
