@@ -224,13 +224,30 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
     }
 
     /**
+     * Returns the operation method for the specified name.
+     *
+     * @param  method The case insensitive {@linkplain Identifier#getCode identifier code}
+     *         of the operation method to search for (e.g. {@code "Transverse_Mercator"}).
+     * @return The operation method.
+     * @throws NoSuchIdentifierException if there is no operation method registered for the
+     *         specified name.
+     *
+     * @since 2.2
+     */
+    public OperationMethod getOperationMethod(final String name)
+            throws NoSuchIdentifierException
+    {
+        return getProvider(name);
+    }
+
+    /**
      * Returns the math transform provider for the specified operation method.
      * This provider can be used in order to query parameter for a method name
      * (e.g. <code>getProvider("Transverse_Mercator").getParameters()</code>),
      * or any of the alias in a given locale.
      *
      * @param  method The case insensitive {@linkplain Identifier#getCode identifier code}
-     *         of the operation method to search for (e.g. <code>"Transverse_Mercator"</code>).
+     *         of the operation method to search for (e.g. {@code "Transverse_Mercator"}).
      * @return The math transform provider.
      * @throws NoSuchIdentifierException if there is no provider registered for the specified
      *         method.

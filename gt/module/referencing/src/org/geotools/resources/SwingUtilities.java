@@ -91,11 +91,9 @@ public final class SwingUtilities {
      *         be registered to whatever kind of frame this method will constructs. In the special
      *         case where this method constructs an {@linkplain JInternalFrame internal frame} and
      *         the {@code listener} is not an instance of {@link InternalFrameListener}, then
-     *         this method will wrap the {@code listener} into an
-     *         {@code InternalFrameListener}.
+     *         this method will wrap the {@code listener} into an {@code InternalFrameListener}.
      * @return The frame. This frame is not initially visible. The method
-     *         {@code Component.setVisible(true)} must be invoked
-     *         in order to show the frame.
+     *         {@code Component.setVisible(true)} must be invoked in order to show the frame.
      */
     public static Component toFrame(Component owner,
                                     final JComponent     panel,
@@ -143,6 +141,25 @@ public final class SwingUtilities {
         frame.getContentPane().add(panel);
         frame.pack();
         return frame;
+    }
+
+    /**
+     * Set the title of the parent frame or internal frame of the specified component.
+     */
+    public static void setTitle(Component component, final String title) {
+        while (component != null) {
+            if (component instanceof JInternalFrame) {
+                ((JInternalFrame) component).setTitle(title);
+            }
+            if (component instanceof Frame) {
+                ((Frame) component).setTitle(title);
+                return;
+            }
+            if (component instanceof Dialog) {
+                ((Dialog) component).setTitle(title);
+                return;
+            }
+        }
     }
 
     /**

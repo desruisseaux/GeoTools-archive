@@ -54,6 +54,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  *
  * @see GeneralEnvelope
  * @see org.geotools.geometry.jts.ReferencedEnvelope
+ * @see org.opengis.metadata.extent.GeographicBoundingBox
  */
 public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneable {
     /**
@@ -86,7 +87,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
         } else if (envelope instanceof GeneralEnvelope) {
             crs = ((GeneralEnvelope) envelope).getCoordinateReferenceSystem();
         } else {
-            crs = envelope.getLowerCorner().getCoordinateReferenceSystem();
+            crs = GeneralEnvelope.getCoordinateReferenceSystem(envelope);
         }
         setCoordinateReferenceSystem(crs); // Paranoiac check.
     }

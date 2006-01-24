@@ -304,6 +304,40 @@ public class FactoryGroup {
     }
 
     /**
+     * Returns the operation method for the specified name. This method scans all operations
+     * registered in the {@linkplain #getMathTransformFactory current math transform factory}.
+     *
+     * @param  method The case insensitive {@linkplain Identifier#getCode identifier code}
+     *         of the operation method to search for (e.g. {@code "Transverse_Mercator"}).
+     * @return The operation method.
+     * @throws NoSuchIdentifierException if there is no operation method registered for the
+     *         specified name.
+     *
+     * @see DefaultMathTransformFactory#getOperationMethod
+     *
+     * @since 2.2
+     */
+    public OperationMethod getOperationMethod(final String name)
+            throws NoSuchIdentifierException
+    {
+        final MathTransformFactory mtFactory = getMathTransformFactory();
+        if (mtFactory instanceof DefaultMathTransformFactory) {
+            // Special processing for Geotools implementation.
+            return ((DefaultMathTransformFactory) mtFactory).getOperationMethod(name);
+        }
+        // Not a geotools implementation. Scan all methods.
+        final Set operations = mtFactory.getAvailableMethods(Operation.class);
+        for (final Iterator it=operations.iterator(); it.hasNext();) {
+            final OperationMethod method = (OperationMethod) it.next();
+            if (AbstractIdentifiedObject.nameMatches(method, name)) {
+                return method;
+            }
+        }
+        throw new NoSuchIdentifierException(Errors.format(
+                  ErrorKeys.NO_TRANSFORM_FOR_CLASSIFICATION_$1, name), name);
+    }
+
+    /**
      * Creates a transform from a group of parameters and add the method used to a list.
      * This variant of {@code createParameterizedTransform(...)} provide a way for
      * the client to keep trace of any {@linkplain OperationMethod operation method}

@@ -23,6 +23,8 @@ package org.geotools.geometry;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Arrays;
+import javax.units.Unit;
+import javax.units.ConversionException;
 
 // OpenGIS dependencies
 import org.opengis.util.Cloneable;
@@ -47,11 +49,19 @@ import org.geotools.resources.geometry.XRectangle2D;
  * <p>
  * This particular implementation of {@code Envelope} is said "General" because it
  * uses coordinates of an arbitrary dimension.
+ * <p>
+ * <strong>Tip:</strong> The metadata package provides a
+ * {@link org.opengis.metadata.extent.GeographicBoundingBox}, which can be used as
+ * a kind of envelope with a coordinate reference system fixed to WGS 84 (EPSG:4326).
  *
  * @since 2.0
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see Envelope2D
+ * @see org.geotools.geometry.jts.ReferencedEnvelope
+ * @see org.opengis.metadata.extent.GeographicBoundingBox
  */
 public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     /**
@@ -80,17 +90,10 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             ordinates = (double[]) e.ordinates.clone();
             crs = e.crs;
         } else {
-            // TODO: See if we can simplify this code with GeoAPI 2.1
-            final DirectPosition lower, upper;
-            lower = envelope.getLowerCorner();
-            upper = envelope.getUpperCorner();
-            crs   = lower.getCoordinateReferenceSystem();
-            final int dimension = lower.getDimension();
-            if (!Utilities.equals(crs, upper.getCoordinateReferenceSystem()) ||
-                dimension != upper.getDimension())
-            {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.MALFORMED_ENVELOPE));
-            }
+            final DirectPosition lower = envelope.getLowerCorner();
+            final DirectPosition upper = envelope.getUpperCorner();
+            crs = getCoordinateReferenceSystem(envelope);
+            final int dimension = crs.getCoordinateSystem().getDimension();
             ordinates = new double[2*dimension];
             for (int i=0; i<dimension; i++) {
                 ordinates[i]           = lower.getOrdinate(i);
@@ -209,6 +212,24 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
+     * Returns the coordinate reference system from an arbitrary envelope. This method performs
+     * some sanity checking for ensuring that the envelope CRS is consistent.
+     *
+     * @todo See if we can simplify this code with GeoAPI 2.1.
+     */
+    static CoordinateReferenceSystem getCoordinateReferenceSystem(final Envelope envelope) {
+        final DirectPosition lower = envelope.getLowerCorner();
+        final DirectPosition upper = envelope.getUpperCorner();
+        if (lower.getDimension() == upper.getDimension()) {
+            final CoordinateReferenceSystem crs = lower.getCoordinateReferenceSystem();
+            if (Utilities.equals(crs, upper.getCoordinateReferenceSystem())) {
+                return crs;
+            }
+        }
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.MALFORMED_ENVELOPE));
+    }
+
+    /**
      * Returns the coordinate reference system in which the coordinates are given.
      *
      * @return The coordinate reference system, or {@code null}.
@@ -307,6 +328,26 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
+     * Returns the envelope length along the specified dimension, in terms of the given units.
+     *
+     * @param  unit The unit for the return value.
+     * @return The length in terms of the given unit.
+     * @throws ConversionException if the length can't be converted to the specified units.
+     *
+     * @since 2.2
+     */
+    public double getLength(final int dimension, final Unit unit) throws ConversionException {
+        double value = getLength(dimension);
+        if (crs != null) {
+            final Unit source = crs.getCoordinateSystem().getAxis(dimension).getUnit();
+            if (source != null) {
+                value = source.getConverterTo(unit).convert(value);
+            }
+        }
+        return value;
+    }
+
+    /**
      * Set the envelope's range along the specified dimension.
      *
      * @param dimension The dimension to set.
@@ -320,12 +361,31 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             minimum = maximum = 0.5*(minimum+maximum);
         }
         if (dimension >= 0) {
-            // Do not make any change if 'dimension' is out of range.
+            // An exception will be thrown before any change if 'dimension' is out of range.
             ordinates[dimension+ordinates.length/2] = maximum;
             ordinates[dimension                   ] = minimum;
         } else {
             throw new ArrayIndexOutOfBoundsException(dimension);
         }
+    }
+
+    /**
+     * Set this envelope to the same coordinate values than the specified envelope.
+     *
+     * @param  envelope The new envelope to copy coordinates from.
+     * @throws MismatchedDimensionException if the specified envelope doesn't have the expected
+     *         number of dimensions.
+     *
+     * @since 2.2
+     */
+    public void setEnvelope(final GeneralEnvelope envelope) throws MismatchedDimensionException {
+        GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), getDimension());
+        if (envelope.crs != null) {
+            crs = envelope.crs;
+            assert crs.getCoordinateSystem().getDimension() == getDimension();
+        }
+        System.arraycopy(ordinates, 0, envelope.ordinates, 0, ordinates.length);
+        assert equals(envelope);
     }
 
     /**
@@ -440,7 +500,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * @throws MismatchedDimensionException if the specified point doesn't have
      *         the expected dimension.
      */
-    public void add(final GeneralDirectPosition position) throws MismatchedDimensionException {
+    public void add(final DirectPosition position) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
         GeneralDirectPosition.ensureDimensionMatch("position", position.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, position.getCoordinateReferenceSystem()) : position;
@@ -449,6 +509,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             if (value < ordinates[i    ]) ordinates[i    ]=value;
             if (value > ordinates[i+dim]) ordinates[i+dim]=value;
         }
+        assert isEmpty() || contains(position);
     }
 
     /**
@@ -462,16 +523,17 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * @throws MismatchedDimensionException if the specified envelope doesn't
      *         have the expected dimension.
      */
-    public void add(final GeneralEnvelope envelope) throws MismatchedDimensionException {
+    public void add(final Envelope envelope) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
         GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
-        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
+        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
         for (int i=0; i<dim; i++) {
-            final double min = envelope.ordinates[i    ];
-            final double max = envelope.ordinates[i+dim];
+            final double min = envelope.getMinimum(i);
+            final double max = envelope.getMaximum(i);
             if (min < ordinates[i    ]) ordinates[i    ]=min;
             if (max > ordinates[i+dim]) ordinates[i+dim]=max;
         }
+        assert isEmpty() || contains(envelope, true);
     }
 
     /**
@@ -486,7 +548,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * @throws MismatchedDimensionException if the specified point doesn't have
      *         the expected dimension.
      */
-    public boolean contains(final GeneralDirectPosition position) throws MismatchedDimensionException {
+    public boolean contains(final DirectPosition position) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
         GeneralDirectPosition.ensureDimensionMatch("point", position.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, position.getCoordinateReferenceSystem()) : position;
@@ -495,6 +557,77 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             if (!(value >= ordinates[i    ])) return false;
             if (!(value <= ordinates[i+dim])) return false;
             // Use '!' in order to take 'NaN' in account.
+        }
+        return true;
+    }
+
+    /**
+     * Returns {@code true} if this envelope completly encloses the specified envelope.
+     * If one or more edges from the specified envelope coincide with an edge from this
+     * envelope, then this method returns {@code true} only if {@code edgesInclusive}
+     * is {@code true}.
+     *
+     * @param  envelope The envelope to test for inclusion.
+     * @param  edgesInclusive {@code true} if this envelope edges are inclusive.
+     * @return {@code true} if this envelope completly encloses the specified one.
+     * @throws MismatchedDimensionException if the specified envelope doesn't have
+     *         the expected dimension.
+     *
+     * @since 2.2
+     */
+    public boolean contains(final Envelope envelope, final boolean edgesInclusive)
+            throws MismatchedDimensionException
+    {
+        final int dim = ordinates.length/2;
+        GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
+        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
+        for (int i=0; i<dim; i++) {
+            double inner = envelope.getMinimum(i);
+            double outer = ordinates[i];
+            if (!(edgesInclusive ? inner >= outer : inner > outer)) { // ! is for catching NaN.
+                return false;
+            }
+            inner = envelope.getMaximum(i);
+            outer = ordinates[i+dim];
+            if (!(edgesInclusive ? inner <= outer : inner < outer)) { // ! is for catching NaN.
+                return false;
+            }
+        }
+        assert intersects(envelope, edgesInclusive);
+        return true;
+    }
+
+    /**
+     * Returns {@code true} if this envelope intersects the specified envelope.
+     * If one or more edges from the specified envelope coincide with an edge from this
+     * envelope, then this method returns {@code true} only if {@code edgesInclusive}
+     * is {@code true}.
+     *
+     * @param  envelope The envelope to test for intersection.
+     * @param  edgesInclusive {@code true} if this envelope edges are inclusive.
+     * @return {@code true} if this envelope intersects the specified one.
+     * @throws MismatchedDimensionException if the specified envelope doesn't have
+     *         the expected dimension.
+     *
+     * @since 2.2
+     */
+    public boolean intersects(final Envelope envelope, final boolean edgesInclusive)
+            throws MismatchedDimensionException
+    {
+        final int dim = ordinates.length/2;
+        GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
+        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
+        for (int i=0; i<dim; i++) {
+            double inner = envelope.getMaximum(i);
+            double outer = ordinates[i];
+            if (!(edgesInclusive ? inner >= outer : inner > outer)) { // ! is for catching NaN.
+                return false;
+            }
+            inner = envelope.getMinimum(i);
+            outer = ordinates[i+dim];
+            if (!(edgesInclusive ? inner <= outer : inner < outer)) { // ! is for catching NaN.
+                return false;
+            }
         }
         return true;
     }
@@ -509,13 +642,13 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * @throws MismatchedDimensionException if the specified envelope doesn't
      *         have the expected dimension.
      */
-    public void intersect(final GeneralEnvelope envelope) throws MismatchedDimensionException {
+    public void intersect(final Envelope envelope) throws MismatchedDimensionException {
         final int dim = ordinates.length/2;
         GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
-        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
+        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
         for (int i=0; i<dim; i++) {
-            double min = Math.max(ordinates[i    ], envelope.ordinates[i    ]);
-            double max = Math.min(ordinates[i+dim], envelope.ordinates[i+dim]);
+            double min = Math.max(ordinates[i    ], envelope.getMinimum(i));
+            double max = Math.min(ordinates[i+dim], envelope.getMaximum(i));
             if (min > max) {
                 // Make an empty envelope (min==max)
                 // while keeping it legal (min<=max).

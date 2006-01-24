@@ -486,12 +486,12 @@ public final class CRSUtilities {
     }
     
     /**
-     * Transforms an envelope. The transformation is only approximative.
+     * Transforms an envelope. The transformation is only approximative. Note that the returned
+     * envelope may not have the same number of dimensions than the original envelope.
      *
      * @param  transform The transform to use.
-     * @param  envelope Envelope to transform. This envelope will not be modified.
-     * @return The transformed envelope. It may not have the same number of dimensions
-     *         than the original envelope.
+     * @param  envelope Envelope to transform, or {@code null}. This envelope will not be modified.
+     * @return The transformed envelope, or {@code null} if {@code envelope} was null.
      * @throws TransformException if a transform failed.
      *
      * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
@@ -499,6 +499,9 @@ public final class CRSUtilities {
     public static GeneralEnvelope transform(final MathTransform transform, final Envelope envelope)
             throws TransformException
     {
+        if (envelope == null) {
+            return null;
+        }
         final int sourceDim = transform.getSourceDimensions();
         final int targetDim = transform.getTargetDimensions();
         if (envelope.getDimension() != sourceDim) {
