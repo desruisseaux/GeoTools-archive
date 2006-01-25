@@ -81,11 +81,13 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
 
     /**
      * The SQL command to use for creating the {@code queryAll} statement.
+     * Used for iteration over all codes.
      */
     final String sqlAll;
 
     /**
      * The SQL command to use for creating the {@code querySingle} statement.
+     * Used for fetching the description from a code.
      */
     private final String sqlSingle;
 
@@ -163,21 +165,20 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         final int length = buffer.length();
         buffer.append(" ORDER BY ");
         buffer.append(table.codeColumn);
-//        buffer.trimToSize(); // TODO: Uncomment when we will be allowed to compile for J2SE 1.5.
         sqlAll = factory.adaptSQL(buffer.toString());
 
         buffer.setLength(length);
         buffer.append(hasWhere ? " AND " : " WHERE ");
         buffer.append(table.codeColumn);
         buffer.append(" = ?");
-//        buffer.trimToSize(); // TODO: Uncomment when we will be allowed to compile for J2SE 1.5.
         sqlSingle = factory.adaptSQL(buffer.toString());
     }
 
     /**
      * Returns all codes.
      */
-    private synchronized ResultSet getAll() throws SQLException {
+    private ResultSet getAll() throws SQLException {
+        assert Thread.holdsLock(this);
         if (queryAll == null) {
             queryAll = connection.prepareStatement(sqlAll);
         }
@@ -187,13 +188,13 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     /**
      * Returns a single code.
      */
-    private synchronized ResultSet getSingle(final Object code) throws SQLException {
+    private ResultSet getSingle(final Object code) throws SQLException {
+        assert Thread.holdsLock(this);
         if (querySingle == null) {
             querySingle = connection.prepareStatement(sqlSingle);
         }
         querySingle.setString(1, code.toString());
-        final ResultSet results = querySingle.executeQuery();
-        return results;
+        return querySingle.executeQuery();
     }
 
     /**
@@ -227,7 +228,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * Returns {@code true} if this collection contains no elements.
      * This method fetch at most one row instead of counting all rows.
      */
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         if (size != -1) { // No need to synchronize
             return size == 0;
         }
@@ -251,7 +252,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     /**
      * Count the number of elements in the underlying result set.
      */
-    public int size() {
+    public synchronized int size() {
         if (size >= 0) { // No need to synchronize
             return size;
         }
@@ -295,9 +296,16 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * Returns an iterator over the codes. The iterator is backed by a living {@link ResultSet},
      * which will be closed as soon as the iterator reach the last element.
      */
-    public java.util.Iterator iterator() {
+    public synchronized java.util.Iterator iterator() {
         try {
-            return new Iterator(getAll());
+            final Iterator iterator = new Iterator(getAll());
+            /*
+             * Set the statement to null without closing it, in order to force a new statement
+             * creation if getAll() is invoked before the iterator finish its iteration.  This
+             * is needed because only one ResultSet is allowed for each Statement.
+             */
+            queryAll = null;
+            return iterator;
         } catch (SQLException exception) {
             unexpectedException("iterator", exception);
             return Collections.EMPTY_SET.iterator();
@@ -351,8 +359,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     /**
      * The iterator over the codes. This inner class must kept a reference toward the enclosing
      * {@link AuthorityCodes} in order to prevent a call to {@link AuthorityCodes#finalize}
-     * before the iteration is finished. Consequently, this inner class should not be static
-     * even if adding a "static" keyword do not introduces any compilation error.
+     * before the iteration is finished.
      */
     private final class Iterator implements java.util.Iterator {
         /** The result set, or {@code null} if there is no more elements. */
@@ -375,9 +382,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
                     return;
                 }
             }
-            results.close();
-            results = null;
-            next    = null;
+            finalize();
         }
 
         /** Returns {@code true} if there is more elements. */
@@ -407,9 +412,24 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
 
         /** Closes the underlying result set. */
         protected void finalize() throws SQLException {
+            next = null;
             if (results != null) {
+                final PreparedStatement owner = (PreparedStatement) results.getStatement();
                 results.close();
                 results = null;
+                synchronized (AuthorityCodes.this) {
+                    /*
+                     * We don't need the statement anymore. Gives it back to the enclosing class
+                     * in order to avoid creating a new one when AuthorityCodes.getAll() will be
+                     * invoked again,  or closes the statement if getAll() already created a new
+                     * statement anyway.
+                     */
+                    if (queryAll == null) {
+                        queryAll = owner;
+                    } else {
+                        owner.close();
+                    }
+                }
             }
         }
     }
@@ -449,14 +469,16 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         public Object get(final Object code) {
             String value = null;
             if (code != null) try {
-                final ResultSet results = getSingle(code);
-                while (results.next()) {
-                    if (isAcceptable(results)) {
-                        value = results.getString(2);
-                        break;
+                synchronized (AuthorityCodes.this) {
+                    final ResultSet results = getSingle(code);
+                    while (results.next()) {
+                        if (isAcceptable(results)) {
+                            value = results.getString(2);
+                            break;
+                        }
                     }
+                    results.close();
                 }
-                results.close();
             } catch (SQLException exception) {
                 unexpectedException("get", exception);
             }
