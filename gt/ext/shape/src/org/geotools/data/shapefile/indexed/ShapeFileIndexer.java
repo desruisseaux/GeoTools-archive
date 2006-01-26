@@ -190,6 +190,15 @@ public class ShapeFileIndexer {
         boolean alreadyRunning = true;
         Object sync = null;
 
+        if (this.fileName == null) {
+            throw new IOException("You have to set a shape file name!");
+        }
+
+        File file = new File(this.fileName);
+        
+        if( !file.canWrite() )
+        	return 0;
+        
         synchronized (IDX_CREATION) {
             sync = IDX_CREATION.get(this.fileName);
 
@@ -237,11 +246,8 @@ public class ShapeFileIndexer {
                     + QUADTREE);
             }
 
-            if (this.fileName == null) {
-                throw new IOException("You have to set a shape file name!");
-            }
 
-            File file = new File(this.fileName);
+            
             FileInputStream is = new FileInputStream(file);
             FileChannel channel = is.getChannel();
             ShapefileReader reader = new ShapefileReader(channel, true, false,

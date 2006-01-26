@@ -134,68 +134,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
 		s = createDataStore(maker,tmp.toURL(), true);
 		assertEquals(one.getCount()*2, store.getCount(Query.ALL));
 	}
-    
-    public void testConcurrentReadWrite() throws Exception {
-        System.gc();
-        System.runFinalization(); // If some streams are still open, it may help to close them.
-        final File file = getTempFile();
-        Runnable reader = new Runnable() {
-                public void run() {
-                    int cutoff = 0;
-
-                    try {
-                        FileInputStream fr = new FileInputStream(file);
-
-                        try {
-                            fr.read();
-                        } catch (IOException e1) {
-                            exception = e1;
-
-                            return;
-                        }
-                        if (verbose) {
-                            System.out.println("locked");
-                        }
-                        readStarted = true;
-
-                        while (cutoff < 10) {
-                            synchronized (this) {
-                                try {
-                                    try {
-                                        fr.read();
-                                    } catch (IOException e) {
-                                        exception = e;
-
-                                        return;
-                                    }
-
-                                    wait(500);
-                                    cutoff++;
-                                } catch (InterruptedException e) {
-                                    cutoff = 10;
-                                }
-                            }
-                        }
-                    } catch (FileNotFoundException e) {
-                        assertTrue(false);
-                    }
-                }
-            };
-
-        Thread readThread = new Thread(reader);
-        readThread.start();
-
-        while (!readStarted) {
-            if (exception != null) {
-                throw exception;
-            }
-
-            Thread.yield();
-        }
-
-        test(files[0]);
-    }
-
+   
     void test(String f) throws Exception {
         copyShapefiles(f); // Work on File rather than URL from JAR.
         DataStore s = createDataStore(new IndexedShapefileDataStoreFactory(), TestData.url(f), true);
