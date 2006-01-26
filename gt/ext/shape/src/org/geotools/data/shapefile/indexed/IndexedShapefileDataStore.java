@@ -221,9 +221,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         }
 
         this.treeType = treeType;
-        this.useMemoryMappedBuffer = useMemoryMappedBuffer;
+        this.useMemoryMappedBuffer = new File( shpURL.getFile() ).exists() && useMemoryMappedBuffer;
         this.useIndex = treeType != TREE_NONE;
-        this.createIndex = createIndex && useIndex;
 
         if (this.isLocal()) {
             if (treeType == TREE_QIX) {
@@ -237,9 +236,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                 treeURL = new URL(filename + grxext);
                 this.treeType = TREE_NONE;
             }
+            this.createIndex = new File(new File( treeURL.getFile() ).getParent()).canWrite() && createIndex && useIndex;
         } else {
             treeURL = new URL(filename + grxext);
             this.treeType = TREE_NONE;
+            this.createIndex=false;
         }
     }
 
