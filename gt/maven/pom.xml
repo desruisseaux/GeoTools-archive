@@ -66,7 +66,7 @@
   <!-- ==================================================== -->
   <modules>
     <module>jar-collector</module>
-<!--    <module>javadoc</module> Disabled for now because maven-plugin-tools-ant crash. -->
+    <module>javadoc</module>
     <module>javamaker</module>
     <module>jjtree-javacc</module>
     <module>rmic</module>

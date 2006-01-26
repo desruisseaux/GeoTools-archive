@@ -32,6 +32,7 @@ import com.sun.tools.doclets.Taglet;
  * The <code>@source</code> tag. This tag expects an URL to the source in the SVN repository.
  * The SVN URL keyword is ignored.
  *
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -42,7 +43,7 @@ public final class Source implements Taglet {
      * @param tagletMap the map to register this tag to.
      */
     public static void register(final Map tagletMap) {
-       final Source tag = new Source();
+       final Source tag = new Source(null);
        tagletMap.put(tag.getName(), tag);
     }
 
@@ -64,20 +65,28 @@ public final class Source implements Taglet {
     /**
      * The pattern to use for fetching the URL.
      */
-    private final Pattern findURL = Pattern.compile(
+    final Pattern findURL = Pattern.compile(
             "\\s*\\" + SVN_KEYWORD_DELIMITER + "URL\\s*\\:\\s*(.+)\\s*\\" + SVN_KEYWORD_DELIMITER + "\\s*");
 
     /**
      * The pattern to use for fetching the module name from an URL.
      */
-    private final Pattern findModule = Pattern.compile(
-            ".+\\Q/geotools/trunk/gt/\\E\\(p{Alnum}+)\\/([\\p{Alnum}\\-]+)\\/.+");
+    final Pattern findModule;
 
     /**
      * Constructs a default <code>@source</code> taglet.
+     *
+     * @param tag The SVN tag (e.g. {@code "2.2.RC0"), or {@code null} for the trunk.
      */
-    private Source() {
+    Source(String tag) {
         super();
+        if (tag != null) {
+            tag = "tags/" + tag;
+        } else {
+            tag = "trunk/gt";
+        }
+        findModule = Pattern.compile(
+            ".+\\Q/geotools/" + tag + "/\\E([\\p{Alnum}\\-]+)\\/([\\p{Alnum}\\-]+)\\/.+");
     }
 
     /**
@@ -159,7 +168,7 @@ public final class Source implements Taglet {
             if (!matchURL.matches()) {
                 continue;
             }
-            final String url = matchURL.group(1);
+            final String url = matchURL.group(1).trim();
             final Matcher matchModule = findModule.matcher(url);
             if (!matchModule.matches()) {
                 continue;

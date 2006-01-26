@@ -61,7 +61,7 @@
     <dependency>
       <groupId>sun.jdk</groupId>
       <artifactId>tools</artifactId>
-      <version>1.5.0</version>
+      <version>1.5</version>
       <scope>system</scope>
       <systemPath>${java.home}/../lib/tools.jar</systemPath>
     </dependency>
@@ -72,13 +72,14 @@
   <!-- ==================================================== -->
   <!--     Build configuration                              -->
   <!-- ==================================================== -->
+<!-- Disabled for now because maven-plugin-tools-ant crash.
   <build>
     <plugins>
       <plugin>
       <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
         
-        <!-- Add the Ant plugin tools -->
+        <!- Add the Ant plugin tools ->
         <dependencies>
           <dependency>
             <groupId>org.apache.maven</groupId>
@@ -92,4 +93,5 @@
       </plugin>
     </plugins>
   </build>
+-->
 </project>
