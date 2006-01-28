@@ -104,7 +104,15 @@ public class FilterConsumer implements FilterVisitor {
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
      */
     public void visit(GeometryFilter filter) {
-        if (filter.getFilterType() == Filter.GEOMETRY_BBOX) {
+        if (filter.getFilterType() == Filter.GEOMETRY_BBOX || 
+		filter.getFilterType() == Filter.GEOMETRY_EQUALS || 
+		filter.getFilterType() == Filter.GEOMETRY_INTERSECTS || 
+		filter.getFilterType() == Filter.GEOMETRY_TOUCHES || 
+		filter.getFilterType() == Filter.GEOMETRY_CROSSES || 
+		filter.getFilterType() == Filter.GEOMETRY_WITHIN || 
+		filter.getFilterType() == Filter.GEOMETRY_CONTAINS || 
+		filter.getFilterType() == Filter.GEOMETRY_OVERLAPS || 
+		filter.getFilterType() == Filter.GEOMETRY_DWITHIN ) {
             DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
             DefaultExpression right = (DefaultExpression) filter
                 .getRightGeometry();
