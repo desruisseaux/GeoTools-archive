@@ -938,7 +938,11 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return ((String) value[value.length - 1].getValue()).split(" ");
+			Object keywords = value[value.length -1].getValue();
+			if (keywords == null) {
+				return null;
+			}
+			return ((String) keywords).split(" ");
 		}
 
 		/*

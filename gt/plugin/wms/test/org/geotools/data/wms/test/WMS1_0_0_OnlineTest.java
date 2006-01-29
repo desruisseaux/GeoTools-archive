@@ -157,7 +157,7 @@ public class WMS1_0_0_OnlineTest extends ServerTestCase {
             WMSCapabilities caps = wms.getCapabilities();
             GetMapRequest request = wms.createGetMapRequest();
             request.setFormat("image/jpeg");
-//            System.out.println(request.getFinalURL().toExternalForm());
+            System.out.println(request.getFinalURL().toExternalForm());
             
             assertTrue(request.getFinalURL().toExternalForm().indexOf("JPEG") >= 0);
         } catch(java.net.ConnectException ce){
