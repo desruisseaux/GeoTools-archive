@@ -35,6 +35,7 @@ import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
+import org.opengis.layer.Style;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -108,7 +109,7 @@ public class WebMapServerOnlineTest extends ServerTestCase {
             Random random = new Random();
             int randomInt = random.nextInt(styles.size());
             
-            request.addLayer(layer, (String) styles.get(randomInt));
+            request.addLayer(layer, (Style) styles.get(randomInt));
         }
 
         Set srss = WMSUtils.getSRSs(capabilities);

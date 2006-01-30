@@ -33,6 +33,7 @@ import javax.naming.OperationNotSupportedException;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.Service;
+import org.geotools.data.ows.StyleImpl;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.WMSRequest;
 import org.geotools.data.wms.WMS1_0_0;
@@ -2667,10 +2668,12 @@ public class WMSComplexTypes {
 					styles.add(value[i].getValue());
 				}
 				if (sameName(elems[16], value[i])) {
-					// TODO minScaleDenominator ignored
+					Double max = (Double) value[i].getValue();
+					layer.setScaleHintMin(max.doubleValue());
 				}
 				if (sameName(elems[17], value[i])) {
-					// TODO maxScaleDenominator ignored
+					Double min = (Double) value[i].getValue();
+					layer.setScaleHintMax(min.doubleValue());
 				}
 				if (sameName(elems[18], value[i])) {
 					Layer childLayer = (Layer) value[i].getValue();
@@ -4079,11 +4082,39 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			// TODO only care about the style's name, in value[0]
-			if (value.length != 0) {
-				return value[0].getValue();
-			} 
-			return null;
+			StyleImpl style = new StyleImpl();
+			
+			for (int i = 0; i < value.length; i++) {
+				
+				if (sameName(elems[0], value[i])) {
+					String name = (String) value[i].getValue();
+					style.setName(name);
+				}
+				
+				if (sameName(elems[1], value[i])) {
+					String title = (String) value[i].getValue();
+					style.setTitle(new SimpleInternationalString(title));
+				}
+				
+				if (sameName(elems[2], value[i])) {
+					String _abstract = (String) value[i].getValue();
+					style.setAbstract(new SimpleInternationalString(_abstract));
+				}
+				
+				if (sameName(elems[3], value[i])) {
+					//TODO Implement LegendURL
+				}
+				
+				if (sameName(elems[4], value[i])) {
+					//TODO Implement StyleSheet URL
+				}
+				
+				if (sameName(elems[5], value[i])) {
+					//TODO implement StyleURL
+				}
+			}
+			
+			return style;
 		}
 
 		/*

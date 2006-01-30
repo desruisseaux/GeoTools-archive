@@ -29,6 +29,7 @@ import org.geotools.data.wms.WMSUtils;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.opengis.layer.Style;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 
@@ -150,8 +151,14 @@ public class WMSParameterMaker {
 
             Map layerProperties = fillProperties(layer.getName(), "");
 
+            String[] styles = new String[layer.getStyles().size()];
+            for (int j = 0; j < layer.getStyles().size(); j++) {
+            	Style style = (Style) layer.getStyles().get(j);
+            	styles[i] = style.getName();
+            }
+            
             layerParams[i] = new DefaultParameterDescriptor(layerProperties,
-                    String.class, layer.getStyles().toArray(), null, null,
+                    String.class, styles, null, null,
                     null, null, false);
         }
 

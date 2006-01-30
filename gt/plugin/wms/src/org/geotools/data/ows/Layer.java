@@ -58,7 +58,7 @@ public class Layer implements Comparable {
      */
     private CRSEnvelope latLonBoundingBox = null;
 
-    /** A list of type String */
+    /** A list of type org.opengis.layer.Style */
     private List styles;
     private Boolean queryable = null;
     
@@ -170,6 +170,9 @@ public class Layer implements Comparable {
     /**
      * Accumulates all of the styles specified for this layer and all styles inherited from
      * its ancestors. No duplicates are returned.
+     * 
+     * The List that is returned is of type List<org.opengis.layer.Style>. Before 2.2-RC0
+     * it was of type List<java.lang.String>.
      * 
      * @return List of all styles for this layer and its ancestors
      */

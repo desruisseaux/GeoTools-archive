@@ -16,6 +16,7 @@ import java.util.Stack;
 import org.apache.commons.lang.StringUtils;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
+import org.opengis.layer.Style;
 
 /**
  * @author Richard Gould
@@ -102,7 +103,7 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
     }
     
     public void addLayer( Layer layer ) {
-        addLayer(layer, null);
+        addLayer(layer, "");
     }
 
     public void addLayer( String layerName, String style ) {
@@ -111,6 +112,22 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
             style = ""; //$NON-NLS-1$
         }
         styles.push(style);
+    }
+    
+    public void addLayer( Layer layer, Style style) {
+    	if (style == null) {
+    		addLayer(layer.getName(), "");
+    		return;
+    	}
+    	addLayer(layer.getName(), style.getName());
+    }
+    
+    public void addLayer( String layerName, Style style) {
+    	if (style == null) {
+    		addLayer(layerName, "");
+    		return;
+    	}
+    	addLayer(layerName, style.getName());
     }
 
 

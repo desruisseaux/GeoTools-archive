@@ -21,7 +21,7 @@ public class AbstractGetMapRequestTest extends TestCase {
 		GetMapRequest request = new RequestTest(badURL, null);
 		
 		request.addLayer("Provincial Boundary", "Two words");
-		request.addLayer("Layer2", null);
+		request.addLayer("Layer2", "");
 		
 		URL finalURL = request.getFinalURL();
         //System.out.println(finalURL);

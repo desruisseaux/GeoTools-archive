@@ -21,6 +21,7 @@ import java.util.Properties;
 import java.util.Set;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
+import org.opengis.layer.Style;
 
 
 /**
@@ -139,22 +140,38 @@ public interface GetMapRequest extends Request{
      *        "1.1.1", "1.3.0", etc.)
      */
     public void setVersion(String version);
-
-    /**
-     * Adds a Layer to the list of layers to be requested. This layer will be drawn
-     * below any previously added layers. 
-     * @param layerName the name of the layer to use
-     * @param style the style to use to draw the layer, can also be NULL, "" or "default"
-     */
-    public void addLayer(String layerName, String style);
     
     /**
      * Adds a Layer to the list of layers to be requested. This layer will be drawn
      * below any previously added layers. 
      * @param layer the Layer to use
-     * @param style the style to use to draw the layer, can also be NULL, "" or "default"
+     * @param style the style to use. If it is null, the default style is used.
      */
-    public void addLayer(Layer layer, String style);
+    public void addLayer(Layer layer, Style style);
+    
+    /**
+     * Adds a Layer to the list of layers to be requested. This layer will be drawn
+     * below any previously added layers. 
+     * @param layer the Layer to use
+     * @param style the style to use. If it is null, the default style is used.
+     */
+    public void addLayer(String layerName, Style style);
+
+    /**
+     * Adds a Layer to the list of layers to be requested. This layer will be drawn
+     * below any previously added layers. 
+     * @param layerName the name of the layer to use
+     * @param styleName the style to use to draw the layer, can also be NULL, "" or "default"
+     */
+    public void addLayer(String layerName, String styleName);
+    
+    /**
+     * Adds a Layer to the list of layers to be requested. This layer will be drawn
+     * below any previously added layers. 
+     * @param layer the Layer to use
+     * @param styleName the style to use to draw the layer, can also be NULL, "" or "default"
+     */
+    public void addLayer(Layer layer, String styleName);
     
     /**
      * Adds a Layer to the list of layers to be requested. This layer will be drawn

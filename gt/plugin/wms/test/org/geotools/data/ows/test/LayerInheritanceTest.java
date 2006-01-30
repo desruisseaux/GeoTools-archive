@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import junit.framework.TestCase;
 
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.StyleImpl;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.resources.TestData;
@@ -54,8 +55,8 @@ public class LayerInheritanceTest extends TestCase {
 		
 		// 2 total, this layer plus top most layer
 		assertEquals(layer.getStyles().size(), 2);
-		assertTrue(layer.getStyles().contains("TestStyle"));
-		assertTrue(layer.getStyles().contains("default"));
+		assertTrue(layer.getStyles().contains(new StyleImpl("TestStyle")));
+		assertTrue(layer.getStyles().contains(new StyleImpl("default")));
 		
 		// Next test layer, nested 3 deep but different path
 		layer = (Layer) capabilities.getLayerList().get(4);
