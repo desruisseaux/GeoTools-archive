@@ -18,6 +18,8 @@ package org.geotools.data.ows;
 
 import java.net.URL;
 
+import org.opengis.metadata.citation.ResponsibleParty;
+
 
 /**
  * This is a data model for the OGC WMS Service metadata. Feel
@@ -46,6 +48,12 @@ public class Service {
      * Service
      */
     private String _abstract;
+    
+    /**
+     * Information about a contact person for the service.
+     */
+    private ResponsibleParty contactInformation;
+    
     private int layerLimit;
     private int maxWidth;
     private int maxHeight;
@@ -113,4 +121,21 @@ public class Service {
     public void setMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
     }
+
+    /**
+     * Information about a contact person for the service. Uses the GeoAPI
+     * citation metadata model, which does not map directly to the WMS 
+     * specification, but it is close.
+     * 
+     * The Role field is not used.
+     * 
+     * @return
+     */
+	public ResponsibleParty getContactInformation() {
+		return contactInformation;
+	}
+
+	public void setContactInformation(ResponsibleParty contactInformation) {
+		this.contactInformation = contactInformation;
+	}
 }

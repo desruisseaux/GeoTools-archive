@@ -59,7 +59,7 @@ public class WMS1_3_0_OnlineTest extends WMS1_1_1_OnlineTest{
         this.server = new URL("http://www2.demis.nl/mapserver/Request.asp?Service=WMS&Version=1.3.0&Request=GetCapabilities");
         
         //TODO this server has changed - need to update the three commented out tests below - preferably, find a new server
-        this.server2 = new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&REQUEST=GetCapabilities");
+        this.server2 = new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&REQUEST=GetCapabilities&VERSION=1.3.0");
     }
     
     public void testGetVersion() {
@@ -189,11 +189,10 @@ public class WMS1_3_0_OnlineTest extends WMS1_1_1_OnlineTest{
     
     
     public void testCreateGetMapRequest() throws Exception {
-        WebMapServer wms = new WebMapServer(server);
-        WMSCapabilities caps = wms.getCapabilities();
+        WebMapServer wms = new WebMapServer(server2);
         GetMapRequest request = wms.createGetMapRequest();
         request.setFormat("image/jpeg");
-        //System.out.println(request.getFinalURL().toExternalForm());
+        System.out.println(request.getFinalURL().toExternalForm());
         
         assertTrue(request.getFinalURL().toExternalForm().indexOf("image%2Fjpeg") >= 0);
     }
@@ -249,8 +248,9 @@ public class WMS1_3_0_OnlineTest extends WMS1_1_1_OnlineTest{
             boolean textFound = false;
             while ((line = in.readLine()) != null) {
                 //System.out.println(line);
-                if (line.indexOf("412") != -1) {
+                if (line.indexOf("CubeSERV Feature Query") != -1) {
                     textFound = true;
+                    break;
                 }
             }
             assertTrue(textFound);

@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +41,12 @@ import org.geotools.data.wms.xml.WMSSchema.WMSAttribute;
 import org.geotools.data.wms.xml.WMSSchema.WMSComplexType;
 import org.geotools.data.wms.xml.WMSSchema.WMSElement;
 import org.geotools.data.wms.xml.WMSSchema.WMSSimpleType;
+import org.geotools.metadata.iso.citation.AddressImpl;
+import org.geotools.metadata.iso.citation.ContactImpl;
+import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
+import org.geotools.metadata.iso.citation.TelephoneImpl;
 import org.geotools.ows.ServiceException;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.Element;
@@ -631,9 +637,10 @@ public class WMSComplexTypes {
 					service.setOnlineResource((URL) value[i].getValue());
 				}
 
-				// if (sameName(elems[5], value[i])) {
-				// //TODO contact info not implemented, ignoring
-				// }
+				if (sameName(elems[5], value[i])) {
+					ResponsiblePartyImpl contactInfo = (ResponsiblePartyImpl) value[i].getValue();
+					service.setContactInformation(contactInfo);
+				}
 
 				// if (sameName(elems[6], value[i])) {
 				// //TODO fees not implemented, ignoring
@@ -1049,8 +1056,66 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return null;
-			// throw new OperationNotSupportedException();
+			
+			ResponsiblePartyImpl contactPerson = null;
+			for (int i = 0; i < value.length; i++) {
+				if (sameName(elems[0], value[i])) {
+					contactPerson = (ResponsiblePartyImpl) value[i].getValue();
+				}
+			}
+			if (contactPerson == null) {
+				contactPerson = new ResponsiblePartyImpl();
+			}
+			
+			TelephoneImpl telephone = null;
+			AddressImpl address = null;
+			ContactImpl contact = new ContactImpl();
+			
+			for (int i = 0; i < value.length; i++) {
+				
+				contactPerson.setContactInfo(contact);
+				
+				if (sameName(elems[1], value[i])) {
+					String positionName = (String) value[i].getValue();
+					contactPerson.setPositionName(new SimpleInternationalString(positionName));
+				}
+				
+				if (sameName(elems[2], value[i])) {
+					address = (AddressImpl) value[i].getValue();
+				}
+				
+				if (sameName(elems[3], value[i])) {					
+					String voice = (String) value[i].getValue();
+					if (telephone == null) {
+						telephone = new TelephoneImpl();
+					}
+					telephone.setVoice(voice);
+				}
+				
+				if (sameName(elems[4], value[i])) {
+					String fax = (String) value[i].getValue();
+					if (telephone == null) {
+						telephone = new TelephoneImpl();
+					}
+					telephone.setFacsimile(fax);
+				}				
+				
+				contact.setPhone(telephone);
+			}
+			
+			for (int i = 0; i < value.length; i++) {
+				if (sameName(elems[5], value[i])) {
+					String email = (String) value[i].getValue();
+					
+					if (address == null) {
+						address = new AddressImpl();
+					}
+					address.setElectronicMailAddresses(Collections.singleton(email));
+				}
+			}
+			contact.setAddress(address);
+					
+			return contactPerson;
 		}
 
 		/*
@@ -1068,7 +1133,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return null;
+			return ResponsiblePartyImpl.class;
 		}
 
 		/*
@@ -1145,8 +1210,22 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return null;
-			// throw new OperationNotSupportedException();
+			
+			ResponsiblePartyImpl responsibleParty = new ResponsiblePartyImpl();
+
+			for (int i = 0; i < value.length; i++) {
+				if (sameName(elems[0], value[i])) {
+					String name = (String) value[i].getValue();
+					responsibleParty.setIndividualName(name);
+				}
+				
+				if (sameName(elems[1], value[i])) {
+					String organization = (String) value[i].getValue();
+					responsibleParty.setOrganisationName(new SimpleInternationalString(organization));
+				}
+			}
+			
+			return responsibleParty;
 		}
 
 		/*
@@ -1164,7 +1243,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return null;
+			return ResponsiblePartyImpl.class;
 		}
 
 		/*
@@ -1239,8 +1318,41 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return null;
-			// throw new OperationNotSupportedException();
+			AddressImpl address = new AddressImpl();
+			
+			for (int i = 0; i < value.length; i++) {
+//				if (sameName(elems[0], value[i])) {
+//					String addressType = (String) value[0].getValue();
+//					//nothing to do with address Type - it does not fit into the GeoAPI citation model
+//				}
+				
+				if (sameName(elems[1], value[i])) {
+					String address1 = (String) value[1].getValue();
+					address.setDeliveryPoints(Collections.singleton(address1));
+				}
+				
+				if (sameName(elems[2], value[i])) {
+					String city = (String) value[2].getValue();
+					address.setCity(new SimpleInternationalString(city));
+				}
+				
+				if (sameName(elems[3], value[i])) {
+					String state = (String) value[3].getValue();
+					address.setAdministrativeArea(new SimpleInternationalString(state));
+				}
+				
+				if (sameName(elems[4], value[i])) {
+					String postalCode = (String) value[4].getValue();
+					address.setPostalCode(postalCode);
+				}
+				
+				if (sameName(elems[5], value[i])) {
+					String country = (String) value[5].getValue();
+					address.setCountry(new SimpleInternationalString(country));
+				}
+			}
+			
+			return address;
 		}
 
 		/*
@@ -1258,7 +1370,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return null;
+			return AddressImpl.class;
 		}
 
 		/*

@@ -21,23 +21,23 @@
   <!-- Contact information -->
   <ContactInformation>
     <ContactPersonPrimary>
-      <ContactPerson>Tom Barclay</ContactPerson>
-      <ContactOrganization>Microsoft</ContactOrganization>
+      <ContactPerson>Some guy</ContactPerson>
+      <ContactOrganization>Some company</ContactOrganization>
     </ContactPersonPrimary>
 
     <ContactPosition>Researcher</ContactPosition>
     <ContactAddress>
       <AddressType>postal</AddressType>
-      <Address>455 Market Street, Suite 1690</Address>
+      <Address>555 Street St.</Address>
       <City>San Francisco</City>
       <StateOrProvince>CA</StateOrProvince>
 
-      <PostCode>94105</PostCode>
+      <PostCode>11111</PostCode>
       <Country>USA</Country>
     </ContactAddress>
-    <ContactVoiceTelephone>+1 415 778 8223</ContactVoiceTelephone>
-    <ContactFacsimileTelephone>+1 425 706 7329</ContactFacsimileTelephone>
-    <ContactElectronicMailAddress>tbarclay@microsoft.com</ContactElectronicMailAddress>
+    <ContactVoiceTelephone>+1 555 555 5555</ContactVoiceTelephone>
+    <ContactFacsimileTelephone>+1 555 555 5556</ContactFacsimileTelephone>
+    <ContactElectronicMailAddress>email@domain.com</ContactElectronicMailAddress>
 
   </ContactInformation>
   <!-- Fees or access constraints imposed. -->
