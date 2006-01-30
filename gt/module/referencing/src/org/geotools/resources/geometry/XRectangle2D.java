@@ -21,13 +21,10 @@ package org.geotools.resources.geometry;
 
 // J2SE dependencies
 import java.awt.Shape;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
+import java.io.Serializable;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -62,52 +59,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * This rectangle can be used as argument in the {@link XRectangle2D} constructor for
      * initializing a new {@code XRectangle2D} to infinite bounds.
      */
-    public static final Rectangle2D INFINITY = new Infinite();
-    
-    /**
-     * The implementation of {@link XRectangle2D#INFINITY}.
-     */
-    private static final class Infinite extends Rectangle2D implements Serializable {
-        private static final long serialVersionUID = 5281254268988984523L;
-        public double getX()       {return java.lang.Double.NEGATIVE_INFINITY;}
-        public double getY()       {return java.lang.Double.NEGATIVE_INFINITY;}
-        public double getMinX()    {return java.lang.Double.NEGATIVE_INFINITY;}
-        public double getMinY()    {return java.lang.Double.NEGATIVE_INFINITY;}
-        public double getMaxX()    {return java.lang.Double.POSITIVE_INFINITY;}
-        public double getMaxY()    {return java.lang.Double.POSITIVE_INFINITY;}
-        public double getWidth()   {return java.lang.Double.POSITIVE_INFINITY;}
-        public double getHeight()  {return java.lang.Double.POSITIVE_INFINITY;}
-        public double getCenterX() {return java.lang.Double.NaN;}
-        public double getCenterY() {return java.lang.Double.NaN;}
-
-        public void        add       (Rectangle2D   rect)                     {            }
-        public void        add       (Point2D      point)                     {            }
-        public void        add       (double x, double y)                     {            }
-        public int     outcode       (double x, double y)                     {return 0;   }
-        public int     outcode       (Point2D      point)                     {return 0;   }
-        public boolean contains      (Point2D      point)                     {return true;}
-        public boolean contains      (Rectangle2D   rect)                     {return true;}
-        public boolean contains      (double x, double y)                     {return true;}
-        public boolean contains      (double x, double y, double w, double h) {return true;}
-        public boolean intersects    (Rectangle2D   rect)                     {return true;}
-        public boolean intersects    (double x, double y, double w, double h) {return true;}
-        public boolean intersectsLine(double x, double y, double u, double v) {return true;}
-        public boolean intersectsLine(Line2D        line)                     {return true;}
-
-        public boolean     isEmpty           ()                 {return false;}
-        public Rectangle2D getFrame          ()                 {return this;}
-        public Rectangle2D getBounds2D       ()                 {return this;}
-        public Rectangle2D createUnion       (Rectangle2D rect) {return this;}
-        public Rectangle2D createIntersection(Rectangle2D rect) {return (Rectangle2D)rect.clone();}
-        public void setRect(double x, double y, double w, double h) {
-            throw new UnsupportedOperationException();
-            // REVISIT: Throws UnmodifiableGeometryException instead?
-            //          (defined in renderer module for now)
-        }
-        private Object readResolve() throws ObjectStreamException {
-            return INFINITY;
-        }
-    };
+    public static final Rectangle2D INFINITY = InfiniteRectangle2D.INFINITY;
 
     /**
      * Serial number for interoperability with different versions.
