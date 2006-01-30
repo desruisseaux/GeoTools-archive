@@ -1,0 +1,94 @@
+package org.geotools.data.ows;
+
+import java.util.List;
+
+import org.opengis.layer.Style;
+import org.opengis.layer.StyleSheetURL;
+import org.opengis.layer.StyleURL;
+import org.opengis.util.InternationalString;
+
+public class StyleImpl implements Style {
+
+	private String name;
+	private InternationalString title;
+	private InternationalString _abstract;
+	private List legendURLs;
+	private StyleSheetURL styleSheetURL;
+	private StyleURL styleURL;
+	private List featureStyles;
+	private List graphicStyles;
+	
+	public StyleImpl() {
+		
+	}
+	
+	public StyleImpl(String name) {
+		this.name = name;
+	}
+	
+	public InternationalString getAbstract() {
+		return _abstract;
+	}
+	public void setAbstract(InternationalString _abstract) {
+		this._abstract = _abstract;
+	}
+	public List getFeatureStyles() {
+		return featureStyles;
+	}
+	public void setFeatureStyles(List featureStyles) {
+		this.featureStyles = featureStyles;
+	}
+	public List getGraphicStyles() {
+		return graphicStyles;
+	}
+	public void setGraphicStyles(List graphicStyles) {
+		this.graphicStyles = graphicStyles;
+	}
+	public List getLegendURLs() {
+		return legendURLs;
+	}
+	public void setLegendURLs(List legendURLs) {
+		this.legendURLs = legendURLs;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public StyleSheetURL getStyleSheetURL() {
+		return styleSheetURL;
+	}
+	public void setStyleSheetURL(StyleSheetURL styleSheetURL) {
+		this.styleSheetURL = styleSheetURL;
+	}
+	public StyleURL getStyleURL() {
+		return styleURL;
+	}
+	public void setStyleURL(StyleURL styleURL) {
+		this.styleURL = styleURL;
+	}
+	public InternationalString getTitle() {
+		return title;
+	}
+	public void setTitle(InternationalString title) {
+		this.title = title;
+	}
+	
+	/**
+	 * Because the style's name is declared as unique identifier in the
+	 * interface javadocs, we will use that as our equals comparison.
+	 * 
+	 * So if two Styles have the same name, they are considered equal.
+	 * 
+	 */
+	public boolean equals(Object obj) {
+		if (obj instanceof Style) {
+			Style style2 = (Style) obj;
+			return style2.getName().equals(getName());
+		}
+		return super.equals(obj);
+	}
+	
+	
+}
