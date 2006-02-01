@@ -229,7 +229,11 @@ public abstract class AbstractFeatureSource implements FeatureSource {
             //State state = t.getState(dataStore);
             int delta = 0;
             if(t != Transaction.AUTO_COMMIT){
-                Map diff = ((AbstractDataStore)dataStore).state(t).diff(namedQuery(query).getTypeName());
+                if (!(t.getState(dataStore) instanceof TransactionStateDiff)) {
+                	//we cannot proceed; abort!
+                	return -1;
+                }
+            	Map diff = ((AbstractDataStore)dataStore).state(t).diff(namedQuery(query).getTypeName());
                 Iterator it = diff.keySet().iterator();
                 Set newFIDs = new HashSet();
                 while(it.hasNext()){
