@@ -236,12 +236,16 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
     public Object clone() {
         try {
             MarkImpl clone = (MarkImpl) super.clone();
-            clone.fill = (Fill) ((Cloneable) fill).clone();
-            clone.stroke = (Stroke) stroke.clone();
+            if (fill != null) {
+            	clone.fill = (Fill) ((Cloneable) fill).clone();
+            }
+            if (stroke != null) {
+            	clone.stroke = (Stroke) stroke.clone();
+            }
 
             return clone;
         } catch (CloneNotSupportedException e) {
-            // this will never happend
+            // this will never happen
             throw new RuntimeException("Failed to clone MarkImpl");
         }
     }
