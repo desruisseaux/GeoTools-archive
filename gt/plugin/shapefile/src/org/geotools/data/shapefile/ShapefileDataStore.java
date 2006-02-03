@@ -130,7 +130,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         }
 
         try {
-            filename = java.net.URLDecoder.decode(url.toString(), "US-ASCII");
+            filename = java.net.URLDecoder.decode(url.getFile(), "US-ASCII");
         } catch (java.io.UnsupportedEncodingException use) {
             throw new java.net.MalformedURLException("Unable to decode " + url
                 + " cause " + use.getMessage());
@@ -155,11 +155,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             xmlext = ".SHP.XML";
         }
 
-        shpURL = new URL(filename + shpext);
-        dbfURL = new URL(filename + dbfext);
-        shxURL = new URL(filename + shxext);
-        prjURL = new URL(filename + prjext);
-        xmlURL = new URL(filename + xmlext);
+        shpURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + shpext);
+        dbfURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + dbfext);
+        shxURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + shxext);
+        prjURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + prjext);
+        xmlURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + xmlext);
     }
 
     /**
@@ -764,7 +764,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         if (cs != null) {
             String s = cs.toWKT();
             FileWriter out = new FileWriter(getStorageFile(prjURL, temp));
-
+            
             try {
                 out.write(s);
             } finally {
@@ -1072,7 +1072,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             readWriteLock.lockWrite();
 
             if (dest.exists()) {
-                dest.delete();
+                if( !dest.delete() )
+                	throw new IOException("Unable to original file");
             }
 
             if (storage.exists() && !storage.renameTo(dest)) {
