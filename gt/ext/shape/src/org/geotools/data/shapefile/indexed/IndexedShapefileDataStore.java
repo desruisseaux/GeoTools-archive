@@ -86,6 +86,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -195,7 +196,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         }
 
         try {
-            filename = java.net.URLDecoder.decode(url.toString(), "US-ASCII");
+            filename = java.net.URLDecoder.decode(url.getFile(), "US-ASCII");
         } catch (java.io.UnsupportedEncodingException use) {
             throw new java.net.MalformedURLException("Unable to decode " + url
                 + " cause " + use.getMessage());
@@ -226,19 +227,19 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
         if (this.isLocal()) {
             if (treeType == TREE_QIX) {
-                treeURL = new URL(filename + qixext);
+                treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + qixext);
                 this.treeType = TREE_QIX;
                 LOGGER.fine("Using qix tree");
             } else if (treeType == TREE_GRX) {
-                treeURL = new URL(filename + grxext);
+                treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + grxext);
                 LOGGER.fine("Using grx tree");
             } else {
-                treeURL = new URL(filename + grxext);
+                treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + grxext);
                 this.treeType = TREE_NONE;
             }
             this.createIndex = new File(new File( treeURL.getFile() ).getParent()).canWrite() && createIndex && useIndex;
         } else {
-            treeURL = new URL(filename + grxext);
+            treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + grxext);
             this.treeType = TREE_NONE;
             this.createIndex=false;
         }
