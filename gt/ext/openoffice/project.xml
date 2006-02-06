@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-openoffice</name>
   <id>openoffice</id>
-  <currentVersion>2.2.x</currentVersion>
+  <currentVersion>2.3.x</currentVersion>
   <package>org.geotools.openoffice</package>
   <shortDescription>Bridges to OpenOffice suite.</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
@@ -46,7 +46,7 @@
     <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
       <properties>
         <jar.manifest.classpath>true</jar.manifest.classpath>
       </properties>
@@ -54,7 +54,7 @@
     <dependency>
       <artifactId>epsg-hsql</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
       <properties>
         <jar.manifest.classpath>true</jar.manifest.classpath>
       </properties>

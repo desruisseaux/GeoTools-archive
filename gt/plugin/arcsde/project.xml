@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-arcsde</name>
   <id>arcsde</id>
-  <currentVersion>2.2.x</currentVersion>
+  <currentVersion>2.3.x</currentVersion>
   <package>org.geotools</package>
   <shortDescription>arcsde datasource module</shortDescription>
   <description>arcsde datasource module</description>
@@ -42,17 +42,17 @@
     <dependency>
       <artifactId>api</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>
     <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>
     <dependency>
       <id>opengis+legacy</id>
@@ -62,7 +62,7 @@
     <dependency>
       <artifactId>epsg-wkt</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>
     <dependency>
       <artifactId>units</artifactId>

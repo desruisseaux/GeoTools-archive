@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-referencing</name>
   <id>referencing</id>
-  <currentVersion>2.2.x</currentVersion>
+  <currentVersion>2.3.x</currentVersion>
   <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10270</issueTrackingUrl>
   <shortDescription>Geotools</shortDescription>
   <description>

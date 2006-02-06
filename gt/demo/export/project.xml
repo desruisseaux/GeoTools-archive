@@ -5,7 +5,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-export-wizzard-demo</name>
   <id>export-demo</id>
-  <currentVersion>2.2.x</currentVersion>
+  <currentVersion>2.3.x</currentVersion>
   <package>org.geotools</package>
   <shortDescription>Swing wizzard to export features</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
@@ -22,17 +22,17 @@
     <dependency>
       <artifactId>api</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>  
     <dependency>
       <groupId>gt2</groupId>
       <artifactId>main</artifactId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>
     <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>
     <dependency>
       <groupId>JTS</groupId>

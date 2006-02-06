@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-postgis</name>
   <id>postgis</id>
-  <currentVersion>2.2.x</currentVersion>
+  <currentVersion>2.3.x</currentVersion>
   <package>org.geotools</package>
   <shortDescription>postgis module</shortDescription>
   <description>Used extract and edit features from a PostGIS 
@@ -48,17 +48,17 @@ freely available.</description>
     <dependency>
       <artifactId>api</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>    
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>
     <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>
     <dependency>
       <id>postgis-driver</id>

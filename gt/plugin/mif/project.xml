@@ -4,7 +4,7 @@
   <name>geotools-mif</name>
   <extend>${basedir}/../../project.xml</extend>
   <id>mif</id>
-  <currentVersion>2.2.x</currentVersion>
+  <currentVersion>2.3.x</currentVersion>
   <package>org.geotools</package>
   <shortDescription>MapInfo MIF format module</shortDescription>
   <description>MIF module</description>
@@ -43,17 +43,17 @@
     <dependency>
       <artifactId>api</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>  
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>
     <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
-      <version>2.2.x</version>
+      <version>2.3.x</version>
     </dependency>
     <dependency>
       <id>JTS</id>
