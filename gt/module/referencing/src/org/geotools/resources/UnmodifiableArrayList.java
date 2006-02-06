@@ -28,7 +28,21 @@ import java.util.AbstractList;
 
 
 /**
- * An unmodifiable view of an array.
+ * An unmodifiable view of an array. Invoking
+ *
+ * <blockquote><code>
+ * new UnmodifiableArrayList(array);
+ * </code></blockquote>
+ *
+ * is equivalent to
+ *
+ * <blockquote><code>
+ * {@linkplain Collections#unmodifiableList Collections.unmodifiableList}({@linkplain
+ * Arrays#asList Arrays.asList}(array)));
+ * </code></blockquote>
+ *
+ * But this class provides a very slight performance improvement since it uses one less level
+ * of indirection.
  *
  * @since 2.1
  * @source $URL$

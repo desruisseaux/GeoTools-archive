@@ -113,6 +113,14 @@ import org.geotools.renderer.Renderer2D;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D} as part of the port
+ *             of J2D-renderer to the new GO-1 based API. Note that it is not possible to mix
+ *             J2D-renderer classes with GO-1 rendering engine. Migration from J2D-renderer to the
+ *             GO-1 API will requires the replacement of all deprecated classes together. Because
+ *             the new GO-1 rendering engine is a work in progress, see
+ *             <A HREF="http://jira.codehaus.org/browse/GEOT-776">GEOT-776</A> in order to determine
+ *             if enough functionalites have been ported for yours need.
  */
 public class Renderer implements Renderer2D {
     /**
@@ -439,6 +447,8 @@ public class Renderer implements Renderer2D {
      * Construct a new renderer for the specified component.
      *
      * @param owner The widget that own this renderer, or <code>null</code> if none.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D}.
      */
     public Renderer(final Component owner) {
         final CoordinateSystem cs = LocalCoordinateSystem.PROMISCUOUS;
@@ -462,6 +472,8 @@ public class Renderer implements Renderer2D {
      * @see #getLocale
      * @see Component#getName
      * @see RenderedLayer#getName
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getTitle}.
      */
     public synchronized String getName(final Locale locale) {
         for (Component c=mapPane; c!=null; c=c.getParent()) {
@@ -486,6 +498,8 @@ public class Renderer implements Renderer2D {
      * @see Component#getLocale
      * @see JComponent#getDefaultLocale
      * @see Locale#getDefault
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getLocale}.
      */
     public Locale getLocale() {
         if (mapPane != null) try {
@@ -502,6 +516,8 @@ public class Renderer implements Renderer2D {
     /**
      * Returns the current rendering context. Used by {@link GeoMouseEvent}
      * in order to gets a "snapshot" of current coordinate system states.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getRenderingContext}.
      */
     final RenderingContext getRenderingContext() {
         // Use the offscreen context, since it doesn't includes the translation
@@ -517,6 +533,8 @@ public class Renderer implements Renderer2D {
      * transformations will performed on the fly as needed at rendering time.
      *
      * @return The two dimensional coordinate system used for display.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getObjectiveCRS}.
      */
     public CoordinateSystem getCoordinateSystem() {
         return context.mapCS;
@@ -532,6 +550,8 @@ public class Renderer implements Renderer2D {
      *           with a two dimensional {@link CompoundCoordinateSystem#getHeadCS headCS}.
      * @throws TransformException If <code>cs</code> can't be reduced to a two-dimensional
      *         coordinate system, or if data can't be transformed for some other reason.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#setObjectiveCRS}.
      */
     public void setCoordinateSystem(CoordinateSystem cs) throws TransformException {
         cs = CTSUtilities.getCoordinateSystem2D(cs);
@@ -572,6 +592,8 @@ public class Renderer implements Renderer2D {
 
     /**
      * Update {@link #normalizeToDots} for the specified coordinate system.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#updateNormalizationFactor}.
      */
     private void updateNormalizationFactor(final CoordinateSystem cs) {
         final Ellipsoid ellipsoid = CTSUtilities.getHeadGeoEllipsoid(cs);
@@ -588,6 +610,8 @@ public class Renderer implements Renderer2D {
      *        degrees depending of whatever <code>ellipsoid</code> is <code>null</code> or not.
      * @param ellipsoid The ellipsoid if the coordinate system is geographic, or <code>null</code>
      *        otherwise.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getNormalizationFactor}.
      */
     private double getNormalizationFactor(Unit unit, final Ellipsoid ellipsoid) {
         double m = 1;
@@ -638,6 +662,8 @@ public class Renderer implements Renderer2D {
      *
      * @return The enclosing area computed from available data, or <code>null</code>
      *         if this area can't be computed.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getEnvelope2D}.
      */
     public Rectangle2D getPreferredArea() {
         final Rectangle2D area = this.preferredArea;
@@ -649,6 +675,8 @@ public class Renderer implements Renderer2D {
      * internal computation. User should not call this method directly.
      *
      * @param newArea The new preferred area (will not be cloned).
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#setEnvelope}.
      */
     private void setPreferredArea(final Rectangle2D newArea) {
         final Rectangle2D oldArea;
@@ -666,6 +694,8 @@ public class Renderer implements Renderer2D {
      *
      * @param  sourceClassName  The caller's class name, for logging purpose.
      * @param  sourceMethodName The caller's method name, for logging purpose.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#computeEnvelope}.
      */
     private void computePreferredArea(final String sourceClassName, final String sourceMethodName) {
         assert Thread.holdsLock(this);
@@ -713,6 +743,8 @@ public class Renderer implements Renderer2D {
      * @param  coordinateSystem The coordinate system for <code>[old|new]SubArea</code>.
      * @param  sourceClassName  The caller's class name, for logging purpose.
      * @param  sourceMethodName The caller's method name, for logging purpose.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#graphicEnvelopeChanged}.
      */
     private void changePreferredArea(Rectangle2D oldSubArea,
                                      Rectangle2D newSubArea,
@@ -766,6 +798,8 @@ public class Renderer implements Renderer2D {
      *         mise-à-jour a pu se faire. Si elle n'a pas pu être faite faute d'informations, alors
      *         cette méthode retourne <code>null</code>. Dans ce dernier cas, il faudra recalculer
      *         <code>area</code> à partir de zéro.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#replace}.
      */
     private static Rectangle2D changeArea(Rectangle2D area,
                                           final Rectangle2D oldSubArea,
@@ -856,6 +890,8 @@ public class Renderer implements Renderer2D {
      *
      * @task TODO: Transformations should use MathTransform.derivative(...)
      *             instead, but it is not yet implemented for projections.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getTypicalCellDimension}.
      */
     public Dimension2D getPreferredPixelSize() {
         double minWidth  = Double.POSITIVE_INFINITY;
@@ -916,6 +952,8 @@ public class Renderer implements Renderer2D {
      *
      * @return The rendering scale factor as a number between 0 and 1, or {@link Float#NaN}.
      * @see RenderingContext#getScale
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getScale}.
      */
     public float getScale() {
         final Float scaleFactor = this.scaleFactor; // Avoid the need for synchronization.
@@ -948,6 +986,8 @@ public class Renderer implements Renderer2D {
      * @see #removeAllLayers
      * @see #getLayers
      * @see #getLayerCount
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#add}.
      */
     public synchronized void addLayer(final RenderedLayer layer) throws IllegalArgumentException {
         synchronized (layer.getTreeLock()) {
@@ -955,7 +995,7 @@ public class Renderer implements Renderer2D {
                 return;
             }
             if (layer.renderer != null) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.RENDERER_NOT_OWNER_$1, layer));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.CANVAS_NOT_OWNER_$1, layer));
             }
             layer.renderer = this;
             /*
@@ -1032,6 +1072,8 @@ public class Renderer implements Renderer2D {
      * @see #removeAllLayers
      * @see #getLayers
      * @see #getLayerCount
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#remove}.
      */
     public synchronized void removeLayer(final RenderedLayer layer) throws IllegalArgumentException
     {
@@ -1040,7 +1082,7 @@ public class Renderer implements Renderer2D {
             return;
         }
         if (layer.renderer != this) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.RENDERER_NOT_OWNER_$1, layer));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.CANVAS_NOT_OWNER_$1, layer));
         }
         repaint(); // Must be invoked first
         flushOffscreenBuffer(layer.getZOrder());
@@ -1073,6 +1115,8 @@ public class Renderer implements Renderer2D {
      * @see #removeLayer
      * @see #getLayers
      * @see #getLayerCount
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#removeAll}.
      */
     public synchronized void removeAllLayers() {
         repaint(); // Must be invoked first
@@ -1105,6 +1149,8 @@ public class Renderer implements Renderer2D {
      * @see #removeLayer
      * @see #removeAllLayers
      * @see #getLayerCount
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getGraphics}.
      */
     public synchronized RenderedLayer[] getLayers() {
         sortLayers();
@@ -1124,6 +1170,8 @@ public class Renderer implements Renderer2D {
      * @see #addLayer
      * @see #removeLayer
      * @see #removeAllLayers
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getGraphics}.
      */
     public int getLayerCount() {
         return layerCount;
@@ -1160,6 +1208,8 @@ public class Renderer implements Renderer2D {
      * @see RenderingHints#KEY_RENDERING
      * @see RenderingHints#KEY_COLOR_RENDERING
      * @see RenderingHints#KEY_INTERPOLATION
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getRenderingHint}.
      */
     public synchronized Object getRenderingHint(final RenderingHints.Key key) {
         return hints.get(key);
@@ -1178,6 +1228,8 @@ public class Renderer implements Renderer2D {
      * @see RenderingHints#KEY_RENDERING
      * @see RenderingHints#KEY_COLOR_RENDERING
      * @see RenderingHints#KEY_INTERPOLATION
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#setRenderingHint}.
      */
     public synchronized void setRenderingHint(RenderingHints.Key key, Object value) {
         if (value != null) {
@@ -1243,6 +1295,8 @@ public class Renderer implements Renderer2D {
      * @param  zOrder The z-order to query.
      * @return One of {@link ImageType#NONE}, {@link ImageType#VOLATILE} or
      *         {@link ImageType#BUFFERED} enumeration.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getOffscreenBuffered}.
      */
     public synchronized ImageType getOffscreenBuffered(final float zOrder) {
         if (offscreenZRanges != null) {
@@ -1257,6 +1311,8 @@ public class Renderer implements Renderer2D {
     /**
      * Set the offscreen buffer type for the range that contains the given
      * {@linkplain RenderedLayer#getZOrder z-order}.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#setOffscreenBuffered}.
      */
     private void setOffscreenBuffered(final float zOrder, final ImageType type) {
         final int index = offscreenZRanges.indexOfRange(new Float(zOrder));
@@ -1285,6 +1341,8 @@ public class Renderer implements Renderer2D {
      * @param upper The upper z-order, inclusive.
      * @param type  {@link ImageType#VOLATILE} for enabling offscreen buffering for the specified
      *              range, or {@link ImageType#NONE} for disabling it.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#setOffscreenBuffered}.
      */
     public synchronized void setOffscreenBuffered(final float lower,
                                                   final float upper,
@@ -1360,6 +1418,8 @@ public class Renderer implements Renderer2D {
      * flushed. This method is invoked by any of {@link RenderedLayer#repaint} methods.
      *
      * @param zOrder The z-order of the offscreen buffer to flush.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#flushOffscreenBuffer}.
      */
     final synchronized void flushOffscreenBuffer(final float zOrder) {
         if (offscreenZRanges != null) {
@@ -1380,6 +1440,8 @@ public class Renderer implements Renderer2D {
 
     /**
      * Flush all offscreen buffers.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#flushOffscreenBuffers}.
      */
     private void flushOffscreenBuffers() {
         assert Thread.holdsLock(this);
@@ -1403,6 +1465,8 @@ public class Renderer implements Renderer2D {
      * @param  image The image.
      * @param  config The graphics configuration.
      * @return The state, as one of {@link VolatileImage} constants.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#validate}.
      */
     private static int validate(final Image image, final GraphicsConfiguration config) {
         if (image == null) {
@@ -1416,6 +1480,8 @@ public class Renderer implements Renderer2D {
 
     /**
      * Returns <code>true</code> if rendering data was lost since last validate call.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#contentsLost}.
      */
     private static boolean contentsLost(final Image image) {
         if (image instanceof VolatileImage) {
@@ -1427,6 +1493,8 @@ public class Renderer implements Renderer2D {
     /**
      * Returns a string representation of a coordinate system. This method is
      * used for formatting a logging message in {@link #getMathTransform}.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#toString}.
      */
     private static String toString(final CoordinateSystem cs) {
         final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(cs));
@@ -1444,6 +1512,8 @@ public class Renderer implements Renderer2D {
     /**
      * Set the {@link #textToDevice} transform to the specified translation.
      * Returns <code>true</code> if the transform changed as a result of this call.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#setDisplayToDeviceTranslation}.
      */
     private boolean setTextToDevice(final int tx, final int ty) {
         assert (textToDevice.getType() & ~AffineTransform.TYPE_TRANSLATION) == 0 : textToDevice;
@@ -1456,6 +1526,8 @@ public class Renderer implements Renderer2D {
 
     /**
      * Returns the math transform factory associated to this renderer.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getMathTransformFactory}.
      */
     final synchronized MathTransformFactory getMathTransformFactory() {
         return factory.getMathTransformFactory();
@@ -1476,6 +1548,8 @@ public class Renderer implements Renderer2D {
      * @see #getRenderingHint
      * @see #setRenderingHint
      * @see Hints#COORDINATE_TRANSFORMATION_FACTORY
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getMathTransform}.
      */
     final synchronized MathTransform getMathTransform(final CoordinateSystem sourceCS,
                                                       final CoordinateSystem targetCS,
@@ -1564,6 +1638,8 @@ public class Renderer implements Renderer2D {
      * @return The fitted coordinate system, or <code>base</code> if the transform is the identity
      *         transform.
      * @throws NoninvertibleTransformException if the affine transform is not invertible.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#createDerivedCRS}.
      */
     private CoordinateSystem createFittedCoordinateSystem(final String           name,
                                                           final CoordinateSystem base,
@@ -1628,6 +1704,8 @@ public class Renderer implements Renderer2D {
      *               When printing, layers like {@link RenderedGridCoverage} should block until
      *               all data are available instead of painting only available data and invokes
      *               {@link RenderedLayer#repaint()} later.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#paint}.
      */
     public synchronized void paint(final Graphics2D         graph,
                                    final Rectangle zoomableBounds,
@@ -1978,6 +2056,8 @@ renderOffscreen:while (true) {
      * from any thread (it doesn't need to be the <cite>Swing</cite> thread). Note that this
      * method doesn't invoke any {@link #flushOffscreenBuffer} method; this is up to the caller
      * to invokes the appropriate method.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#repaint}.
      */
     private void repaint() {
         final Component mapPane = this.mapPane;
@@ -2001,6 +2081,8 @@ renderOffscreen:while (true) {
      *
      * @param  bounds The rectangle in "real world" rendering coordinates.
      * @return The rectangle in "dot" (or Java2D) coordinates.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#objectiveToDisplay}.
      */
     final Rectangle mapToText(final Rectangle2D bounds) {
         return (Rectangle) XAffineTransform.transform(mapToText, bounds, new Rectangle());
@@ -2016,6 +2098,8 @@ renderOffscreen:while (true) {
      * @param  sourceClassName  The caller's class name, for logging purpose.
      * @param  sourceMethodName The caller's method name, for logging purpose.
      * @param  exception        The exception.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#handleException}.
      */
     static void handleException(final String className,
                                 final String methodName,
@@ -2032,6 +2116,8 @@ renderOffscreen:while (true) {
      *
      * @param layer The layer for which the offscreen rendering failed.
      * @param exception The exception.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#handleOffscreenException}.
      */
     private void handleOffscreenException(final RenderedLayer layer, final Exception exception) {
         final Locale locale = getLocale();
@@ -2062,6 +2148,8 @@ renderOffscreen:while (true) {
      * @param  event The mouse event.
      * @return The tool tip text, or <code>null</code> if there is no tool tip for the given
      *         mouse location.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getToolTipText}.
      */
     public synchronized String getToolTipText(final GeoMouseEvent event) {
         sortLayers();
@@ -2091,6 +2179,8 @@ renderOffscreen:while (true) {
      *
      * @param  event The mouse event.
      * @return The action, or <code>null</code> if there is no action for the given mouve event.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#getAction}.
      */
     public synchronized Action getAction(final GeoMouseEvent event) {
         sortLayers();
@@ -2122,6 +2212,8 @@ renderOffscreen:while (true) {
      *
      * @see Tools#formatValue
      * @see MouseCoordinateFormat#format(GeoMouseEvent)
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#format}.
      */
     final synchronized boolean formatValue(final GeoMouseEvent event,
                                            final StringBuffer toAppendTo)
@@ -2148,6 +2240,8 @@ renderOffscreen:while (true) {
      * @param change The zoom <strong>change</strong> in <strong>device</strong> coordinate
      *        system, or <code>null</code> if unknow. If <code>null</code>, then all layers
      *        will be fully redrawn during the next rendering.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#zoomChanged}.
      */
     private void zoomChanged(final AffineTransform change) {
         if (change!=null && change.isIdentity()) {
@@ -2172,6 +2266,8 @@ renderOffscreen:while (true) {
      * scale change. For example the zoom change may be just a translation or a rotation.
      *
      * @param scaleFactor The new scale factor.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#setScale}.
      */
     private void scaleChanged(final float scaleFactor) {
         final Float oldScale = this.scaleFactor;
@@ -2191,6 +2287,8 @@ renderOffscreen:while (true) {
      * may fire a <code>"preferredArea"</code> change events.
      *
      * @param listener The property change listener to be added
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#addPropertyChangeListener}.
      */
     public void addPropertyChangeListener(final PropertyChangeListener listener) {
         listeners.addPropertyChangeListener(listener);
@@ -2202,6 +2300,8 @@ renderOffscreen:while (true) {
      *
      * @param propertyName The name of the property to listen on.
      * @param listener     The PropertyChangeListener to be added.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#addPropertyChangeListener}.
      */
     public void addPropertyChangeListener(final String propertyName,
                                           final PropertyChangeListener listener)
@@ -2215,6 +2315,8 @@ renderOffscreen:while (true) {
      * was registered for all properties.
      *
      * @param listener The property change listener to be removed
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#removePropertyChangeListener}.
      */
     public void removePropertyChangeListener(final PropertyChangeListener listener) {
         listeners.removePropertyChangeListener(listener);
@@ -2225,6 +2327,8 @@ renderOffscreen:while (true) {
      *
      * @param propertyName The name of the property that was listened on.
      * @param listener     The PropertyChangeListener to be removed.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#removePropertyChangeListener}.
      */
     public void removePropertyChangeListener(final String propertyName,
                                              final PropertyChangeListener listener)
@@ -2240,6 +2344,8 @@ renderOffscreen:while (true) {
      * rendering after this method call.
      *
      * @see #dispose
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#clearCache}.
      */
     private void clearCache() {
         assert Thread.holdsLock(this);
@@ -2267,6 +2373,8 @@ renderOffscreen:while (true) {
      *
      * @see RenderedLayer#dispose
      * @see PlanarImage#dispose
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedCanvas2D#dispose}.
      */
     public synchronized void dispose() {
         flushOffscreenBuffers();

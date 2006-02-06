@@ -202,6 +202,7 @@ public final class VocabularyKeys {
     public static final int SAMPLE_MODEL                       =   145;
     public static final int SATURATION                         =   146;
     public static final int SCALE_$1                           =   147;
+    public static final int SEARCH                             =   229;
     public static final int SET_PREFERRED_RESOLUTION           =   148;
     public static final int SHOW_MAGNIFIER                     =   149;
     public static final int SIGNED_INTEGER_$1                  =   150;

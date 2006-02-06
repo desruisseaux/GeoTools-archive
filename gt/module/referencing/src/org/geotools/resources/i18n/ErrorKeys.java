@@ -57,6 +57,7 @@ public final class ErrorKeys {
     public static final int CANT_SEPARATE_CRS_$1                   =   164;
     public static final int CANT_SET_PARAMETER_VALUE_$1            =   177;
     public static final int CANT_TRANSFORM_ENVELOPE                =    26;
+    public static final int CANVAS_NOT_OWNER_$1                    =   121;
     public static final int COLINEAR_AXIS_$2                       =    27;
     public static final int COVERAGE_ALREADY_BOUND_$2              =    28;
     public static final int DATABASE_FAILURE_$2                    =   165;
@@ -175,7 +176,6 @@ public final class ErrorKeys {
     public static final int PROJECTION_CHECK_FAILED_$3             =   181;
     public static final int RANGE_OVERLAP_$4                       =   120;
     public static final int RECURSIVE_CALL_$2                      =   172;
-    public static final int RENDERER_NOT_OWNER_$1                  =   121;
     public static final int RGB_OUT_OF_RANGE_$1                    =   122;
     public static final int RMI_FAILURE                            =   123;
     public static final int TOO_MANY_OCCURENCES_$2                 =   124;

@@ -65,14 +65,12 @@ public class Matrix3 extends Matrix3d implements XMatrix {
               m10, m11, m12,
               m20, m21, m22);
     }
-    
+
     /**
      * Constructs a 3&times;3 matrix from the specified affine transform.
      */
     public Matrix3(final AffineTransform transform) {
-        m00=transform.getScaleX(); m01=transform.getShearX(); m02=transform.getTranslateX();
-        m10=transform.getShearY(); m11=transform.getScaleY(); m12=transform.getTranslateY();
-        m22=1;
+        setMatrix(transform);
     }
 
     /**
@@ -139,6 +137,28 @@ public class Matrix3 extends Matrix3d implements XMatrix {
             m = new Matrix3(matrix);
         }
         mul(m);
+    }
+
+    /**
+     * Sets this matrix to the specified affine transform.
+     *
+     * @since 2.3
+     */
+    public void setMatrix(final AffineTransform transform) {
+        m00=transform.getScaleX(); m01=transform.getShearX(); m02=transform.getTranslateX();
+        m10=transform.getShearY(); m11=transform.getScaleY(); m12=transform.getTranslateY();
+        m20=0;                     m21=0;                     m22=1;
+    }
+
+    /**
+     * Returns {@code true} if this matrix is equals to the specified affine transform.
+     *
+     * @since 2.3
+     */
+    public boolean equalsAffine(final AffineTransform transform) {
+        return m00==transform.getScaleX() && m01==transform.getShearX() && m02==transform.getTranslateX() &&
+               m10==transform.getShearY() && m11==transform.getScaleY() && m12==transform.getTranslateY() &&
+               m20==0                     && m21==0                     && m22==1;
     }
 
     /**

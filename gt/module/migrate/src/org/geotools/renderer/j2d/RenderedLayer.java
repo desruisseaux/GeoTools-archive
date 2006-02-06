@@ -90,6 +90,14 @@ import org.geotools.resources.geometry.XAffineTransform;
  *
  * @see Renderer
  * @see RenderingContext
+ *
+ * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D} as part of the
+ *             port of J2D-renderer to the new GO-1 based API. Note that it is not possible to mix
+ *             J2D-renderer classes with GO-1 rendering engine. Migration from J2D-renderer to the
+ *             GO-1 API will requires the replacement of all deprecated classes together. Because
+ *             the new GO-1 rendering engine is a work in progress, see
+ *             <A HREF="http://jira.codehaus.org/browse/GEOT-776">GEOT-776</A> in order to determine
+ *             if enough functionalites have been ported for yours need.
  */
 public abstract class RenderedLayer {
     /**
@@ -272,6 +280,8 @@ public abstract class RenderedLayer {
      *
      * @see #getLocale
      * @see Renderer#getName
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getName}.
      */
     public String getName(Locale locale) {
         if (locale == null) {
@@ -291,6 +301,8 @@ public abstract class RenderedLayer {
      *
      * @see Renderer#getLocale
      * @see Component#getLocale
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getLocale}.
      */
     public Locale getLocale() {
         final Renderer renderer = this.renderer;
@@ -302,6 +314,8 @@ public abstract class RenderedLayer {
      *
      * @return The renderer (never <code>null</code>).
      * @throws IllegalStateException if this layer has not been added to any renderer.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getCanvas}.
      */
     public Renderer getRenderer() throws IllegalStateException {
         final Renderer renderer = this.renderer;
@@ -323,6 +337,8 @@ public abstract class RenderedLayer {
      * @see #getPreferredArea
      * @see #getPreferredPixelSize
      * @see RenderingContext#mapCS
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getObjectiveCRS}.
      */
     public final CoordinateSystem getCoordinateSystem() {
         return coordinateSystem;
@@ -346,6 +362,8 @@ public abstract class RenderedLayer {
      *         coordinate system, or if this method do not accept the new coordinate system
      *         for some other reason. In case of failure, this method should keep the old CS
      *         and leave this layer in a consistent state.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#setObjectiveCRS}.
      */
     protected void setCoordinateSystem(final CoordinateSystem cs) throws TransformException {
         if (cs == null) {
@@ -403,6 +421,8 @@ public abstract class RenderedLayer {
      *
      * @see #getPreferredPixelSize
      * @see #getCoordinateSystem
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getEnvelope}.
      */
     public Rectangle2D getPreferredArea() {
         final Rectangle2D preferredArea = this.preferredArea;
@@ -416,6 +436,8 @@ public abstract class RenderedLayer {
      * @see #getPreferredArea
      * @see #setPreferredPixelSize
      * @see #getCoordinateSystem
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#setEnvelope}.
      */
     public void setPreferredArea(final Rectangle2D area) {
         final Rectangle2D oldArea;
@@ -437,6 +459,8 @@ public abstract class RenderedLayer {
      *
      * @see #getPreferredArea
      * @see #getCoordinateSystem
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getTypicalCellDimension}.
      */
     public Dimension2D getPreferredPixelSize() {
         final Dimension2D preferredPixelSize = this.preferredPixelSize;
@@ -454,6 +478,8 @@ public abstract class RenderedLayer {
      * @see #getPreferredPixelSize
      * @see #setPreferredArea
      * @see #getCoordinateSystem
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#setTypicalCellDimension}.
      */
     public void setPreferredPixelSize(final Dimension2D size) {
         final Dimension2D oldSize;
@@ -471,6 +497,8 @@ public abstract class RenderedLayer {
      * {@link Float#POSITIVE_INFINITY}.
      *
      * @see #setZOrder
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getZOrderHint}.
      */
     public float getZOrder() {
         final float zOrder = this.zOrder; // Avoid synchronization
@@ -483,6 +511,8 @@ public abstract class RenderedLayer {
      * <var>z-order</var> replaces the default value returned by {@link #getZOrder}.
      *
      * @throws IllegalArgumentException if the specified <code>zOrder</code> is {@link Float#NaN}.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#setZOrderHint}.
      */
     public void setZOrder(final float zOrder) throws IllegalArgumentException {
         if (Float.isNaN(zOrder)) {
@@ -515,6 +545,8 @@ public abstract class RenderedLayer {
      * Determines whether this layer should be visible when its container is visible.
      *
      * @return <code>true</code> if the layer is visible, <code>false</code> otherwise.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getVisible}.
      */
     public boolean isVisible() {
         return visible;
@@ -532,6 +564,8 @@ public abstract class RenderedLayer {
      *   <li><code>{@link Renderer#removeLayer(RenderedLayer) Renderer.removeLayer}(this)</code>
      *       appelera <code>setVisible(false)</code>.</li>
      * </ul>
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#setVisible}.
      */
     public void setVisible(final boolean visible) {
         synchronized (getTreeLock()) {
@@ -546,6 +580,8 @@ public abstract class RenderedLayer {
 
     /**
      * Set the dirty area for all layers. This method is invoked by {@link Renderer#paint} only.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#setDirtyArea}.
      */
     static void setDirtyArea(final RenderedLayer[] layers, int count, final Shape area) {
         while (--count >= 0) {
@@ -562,6 +598,8 @@ public abstract class RenderedLayer {
      * Note that this method repaint only the area rendered during the last to {@link #paint}.
      * If this layer now cover a wider area, then the area to repaint must be specified with
      * a call to {@link #repaint(Rectangle2D)} instead.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#refresh()}.
      */
     public void repaint() {
         repaintComponent(paintedArea!=null ? paintedArea.getBounds() : null);
@@ -576,6 +614,8 @@ public abstract class RenderedLayer {
      * @param bounds The dirty region to repaint, in the "real world"
      *        {@linkplain #getCoordinateSystem rendering coordinate system}. A
      *        <code>null</code> value repaint everything.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#refresh(Rectangle2D)}.
      */
     public void repaint(final Rectangle2D bounds) {
         if (bounds != null) {
@@ -594,6 +634,8 @@ public abstract class RenderedLayer {
      * the <cite>Swing</cite> thread).
      *
      * @param bounds The dirty region to repaint, in dots (1/72 of inch).
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#refresh(Rectangle2D,Rectangle)}.
      */
     final void repaintComponent(final Rectangle bounds) {
         /*
@@ -713,6 +755,8 @@ public abstract class RenderedLayer {
      *         do not keep a reference to it outside this <code>paint</code> method.
      * @throws TransformException If a coordinate transformation failed during the rendering
      *         process.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#paint}.
      */
     protected abstract void paint(final RenderingContext context) throws TransformException;
 
@@ -724,6 +768,8 @@ public abstract class RenderedLayer {
      * @param context Information relatives to the rendering context. Will be passed
      *        unchanged to {@link #paint}.
      * @param clipBounds The area to paint, in Java2D coordinates ({@link RenderingContext#textCS}).
+     *
+     * @deprecated Replaced by {@link org.geotools.display.canvas.BufferedGraphic2D#paint}.
      */
     final void update(final RenderingContext context, final Rectangle clipBounds)
             throws TransformException
@@ -761,6 +807,8 @@ public abstract class RenderedLayer {
      *         method.
      *
      * @see PlanarImage#prefetchTiles
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#prefetch}.
      */
     protected void prefetch(final RenderingContext context) {
     }
@@ -780,6 +828,8 @@ public abstract class RenderedLayer {
      *         smaller {@linkplain RenderedLayer#getZOrder z-order}) will not be queried.
      *
      * @see MouseCoordinateFormat#format(GeoMouseEvent)
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#formatValue}.
      */
     boolean formatValue(final GeoMouseEvent event, final StringBuffer toAppendTo) {
         return false;
@@ -801,6 +851,8 @@ public abstract class RenderedLayer {
      *         Ce texte peut être nul pour signifier qu'il ne faut rien écrire.
      *
      * @see Renderer#getToolTipText
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getToolTipText}.
      */
     protected String getToolTipText(final GeoMouseEvent event) {
         return null;
@@ -817,6 +869,8 @@ public abstract class RenderedLayer {
      *
      * @param  event The mouse event.
      * @return The action for the layer, or <code>null</code> if none.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getAction}.
      */
     protected Action getAction(final GeoMouseEvent event) {
         return null;
@@ -831,6 +885,8 @@ public abstract class RenderedLayer {
      * @param  x <var>x</var> coordinate.
      * @param  y <var>y</var> coordinate.
      * @return <code>true</code> if this layer is visible and may contains the specified point.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getDisplayBounds}.
      */
     final boolean contains(final int x, final int y) {
         assert Thread.holdsLock(getTreeLock());
@@ -874,6 +930,8 @@ public abstract class RenderedLayer {
      * @param change The zoom <strong>change</strong> in <strong>Java2D</strong> coordinate
      *        system, or <code>null</code> if unknow. If <code>null</code>, then this layer
      *        will be fully redrawn during the next rendering.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#zoomChanged}.
      */
     void zoomChanged(final AffineTransform change) {
         assert Thread.holdsLock(getTreeLock());
@@ -917,6 +975,8 @@ public abstract class RenderedLayer {
      * by the underlying system}.
      *
      * @param listener The property change listener to be added.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#addPropertyChangeListener}.
      */
     public void addPropertyChangeListener(final PropertyChangeListener listener) {
         listeners.addPropertyChangeListener(listener);
@@ -928,6 +988,8 @@ public abstract class RenderedLayer {
      *
      * @param propertyName The name of the property to listen on.
      * @param listener     The PropertyChangeListener to be added.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#addPropertyChangeListener}.
      */
     public void addPropertyChangeListener(final String propertyName,
                                           final PropertyChangeListener listener)
@@ -941,6 +1003,8 @@ public abstract class RenderedLayer {
      * was registered for all properties.
      *
      * @param listener The property change listener to be removed
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#removePropertyChangeListener}.
      */
     public void removePropertyChangeListener(final PropertyChangeListener listener) {
         listeners.removePropertyChangeListener(listener);
@@ -951,6 +1015,8 @@ public abstract class RenderedLayer {
      *
      * @param propertyName The name of the property that was listened on.
      * @param listener     The PropertyChangeListener to be removed.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#removePropertyChangeListener}.
      */
     public void removePropertyChangeListener(final String propertyName,
                                              final PropertyChangeListener listener)
@@ -960,6 +1026,8 @@ public abstract class RenderedLayer {
 
     /**
      * Returns the lock for synchronisation.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#getTreeLock}.
      */
     protected final Object getTreeLock() {
         final Renderer renderer = this.renderer;
@@ -970,6 +1038,8 @@ public abstract class RenderedLayer {
      * Log a message saying that this layer is rebuilding its cache.
      *
      * @param classname The caller class name.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#logCacheRebuild}.
      */
     final void logUpdateCache(final String classname) {
         if (Renderer.LOGGER.isLoggable(Level.FINER)) {
@@ -989,6 +1059,8 @@ public abstract class RenderedLayer {
      * sera plus affichée avant un certain temps.  Cette méthode ne doit pas changer
      * le paramétrage de cette couche; son seul impact sera de rendre le prochain
      * traçage un peu plus lent.
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#clearCache}.
      */
     void clearCache() {
         assert Thread.holdsLock(getTreeLock());
@@ -1011,6 +1083,8 @@ public abstract class RenderedLayer {
      *
      * @see Renderer#dispose
      * @see PlanarImage#dispose
+     *
+     * @deprecated Replaced by {@link org.geotools.display.primitive.GraphicPrimitive2D#dispose}.
      */
     public void dispose() {
         synchronized (getTreeLock()) {

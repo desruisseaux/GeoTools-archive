@@ -47,6 +47,14 @@ import org.geotools.ct.CoordinateTransformationFactory;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by the set of hints in {@link org.geotools.display.canvas.AbstractCanvas} as part
+ *             of the port of J2D-renderer to the new GO-1 based API. Note that it is not possible
+ *             to mix J2D-renderer classes with GO-1 rendering engine. Migration from J2D-renderer
+ *             to the GO-1 API will requires the replacement of all deprecated classes together.
+ *             Because the new GO-1 rendering engine is a work in progress, see
+ *             <A HREF="http://jira.codehaus.org/browse/GEOT-776">GEOT-776</A> in order to determine
+ *             if enough functionalites have been ported for yours need.
  */
 public final class Hints extends RenderingHints.Key {
     /**

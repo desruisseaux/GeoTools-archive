@@ -262,8 +262,8 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
-     * A coordinate position consisting of all the minimal ordinates for each
-     * dimension for all points within the {@code Envelope}.
+     * A coordinate position consisting of all the {@linkplain #getMinimum minimal ordinates}
+     * for each dimension for all points within the {@code Envelope}.
      *
      * @return The lower corner.
      */
@@ -276,8 +276,8 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
-     * A coordinate position consisting of all the maximal ordinates for each
-     * dimension for all points within the {@code Envelope}.
+     * A coordinate position consisting of all the {@linkplain #getMaximum maximal ordinates}
+     * for each dimension for all points within the {@code Envelope}.
      *
      * @return The upper corner.
      */
@@ -285,6 +285,21 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         final int dim = ordinates.length/2;
         final GeneralDirectPosition position = new GeneralDirectPosition(dim);
         System.arraycopy(ordinates, dim, position.ordinates, 0, dim);
+        position.setCoordinateReferenceSystem(crs);
+        return position;
+    }
+
+    /**
+     * A coordinate position consisting of all the {@linkplain #getCenter(int) middle ordinates}
+     * for each dimension for all points within the {@code Envelope}.
+     *
+     * @since 2.3
+     */
+    public DirectPosition getCenter() {
+        final GeneralDirectPosition position = new GeneralDirectPosition(ordinates.length/2);
+        for (int i=position.ordinates.length; --i>=0;) {
+            position.ordinates[i] = getCenter(i);
+        }
         position.setCoordinateReferenceSystem(crs);
         return position;
     }
@@ -382,10 +397,10 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), getDimension());
         if (envelope.crs != null) {
             crs = envelope.crs;
-            assert crs.getCoordinateSystem().getDimension() == getDimension();
+            assert crs.getCoordinateSystem().getDimension() == getDimension() : crs;
         }
         System.arraycopy(ordinates, 0, envelope.ordinates, 0, ordinates.length);
-        assert equals(envelope);
+        assert equals(envelope) : envelope;
     }
 
     /**

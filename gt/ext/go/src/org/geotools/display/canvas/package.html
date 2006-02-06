@@ -9,8 +9,8 @@
     explanation for this package is provided in the {@linkplain org.opengis.go.display.canvas OpenGIS&reg; javadoc}.
     The remaining discussion on this page is specific to the Geotools implementation.
 
-    <P ALIGN="justify">A {@linkplain org.geotools.display.canvas.DefaultCanvas2D canvas} contains one ore more
-    {@linkplain org.geotools.display.canvas.GraphicPrimitive2D graphic} objects. A graphic object may wrap
+    <P ALIGN="justify">A {@linkplain org.geotools.display.canvas.BufferedCanvas2D canvas} contains one ore more
+    {@linkplain org.geotools.display.primitive.GraphicPrimitive2D graphic} objects. A graphic object may wrap
     an image, a geometric shape, a collection of symbols, <cite>etc.</cite> Since this package can't cover
     all possible usages, most of the classes provided in {@link org.geotools.display.canvas} and in
     {@link org.geotools.display.primitive} packages are designed with subclassing in mind. The design has
@@ -57,12 +57,12 @@
     <P>&nbsp;</P>
     <H2>Painting with {@code Canvas} (compared to AWT)</H2>
 
-    <P ALIGN="justify">A {@link org.geotools.display.canvas.DefaultCanvas2D} object contains a set of
-    {@link org.geotools.display.canvas.GraphicPrimitive2D} objects. Every kind of graphic primitive
+    <P ALIGN="justify">A {@link org.geotools.display.canvas.BufferedCanvas2D} object contains a set of
+    {@link org.geotools.display.primitive.GraphicPrimitive2D} objects. Every kind of graphic primitive
     (image, polygon...) is handled by a specialized subclass ({@link org.geotools.display.primitive.GraphicImage2D},
     {@link org.geotools.display.primitive.GraphicPolygon2D}, <cite>etc.</cite>) extending
     {@link org.geotools.display.primitive.GraphicPrimitive2D}. When the rendering engine need to repaint
-    a graphic, it invokes its {@link org.geotools.display.canvas.GraphicPrimitive2D#paint paint(...)}
+    a graphic, it invokes its {@link org.geotools.display.primitive.GraphicPrimitive2D#paint paint(...)}
     method. The paint method receives a {@link java.awt.Graphics2D} object setup as below:</P>
 
     <P ALIGN="center">

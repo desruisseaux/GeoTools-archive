@@ -20,6 +20,7 @@
 package org.geotools.resources;
 
 // J2SE library
+import java.util.Locale;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -27,6 +28,7 @@ import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
+import java.awt.IllegalComponentStateException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 
@@ -367,6 +369,19 @@ public final class SwingUtilities {
                                                 "Label.foreground",
                                                 "Label.font");
         return label;
+    }
+
+    /**
+     * Returns the locale for the specified component, or a default one if the component
+     * is not yet part of a container hierarchy.
+     */
+    public static Locale getLocale(final Component component) {
+        if (component != null) try {
+            return component.getLocale();
+        } catch (IllegalComponentStateException ignore) {
+            // Ignore. Will returns de default locale below.
+        }
+        return JComponent.getDefaultLocale();
     }
 
     /**

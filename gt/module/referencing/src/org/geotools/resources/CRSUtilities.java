@@ -52,6 +52,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
@@ -128,7 +129,7 @@ public final class CRSUtilities {
      *
      * is {@code true}. If no such axis occurs in this coordinate system,
      * then {@code -1} is returned.
-     * <br><br>
+     * <p>
      * For example, {@code dimensionColinearWith(CoordinateSystemAxis.TIME)}
      * returns the dimension number of time axis.
      *
@@ -502,6 +503,18 @@ public final class CRSUtilities {
         if (envelope == null) {
             return null;
         }
+        if (transform.isIdentity()) {
+            /*
+             * Slight optimisation: Just copy the envelope. Note that we need to set the CRS
+             * to null because we don't know what the target CRS was supposed to be. Even if
+             * an identity transform often imply that the target CRS is the same one than the
+             * source CRS, it is not always the case. The metadata may be differents, or the
+             * transform may be a datum shift without Bursa-Wolf parameters, etc.
+             */
+            final GeneralEnvelope e = new GeneralEnvelope(envelope);
+            e.setCoordinateReferenceSystem(null);
+            return e;
+        }
         final int sourceDim = transform.getSourceDimensions();
         final int targetDim = transform.getTargetDimensions();
         if (envelope.getDimension() != sourceDim) {
@@ -548,7 +561,7 @@ public final class CRSUtilities {
     /**
      * Transform an envelope. The transformation is only approximative.
      * Invoking this method is equivalent to invoking the following:
-     * <br>
+     * <p>
      * <pre>transform(transform, new GeneralEnvelope(source)).toRectangle2D()</pre>
      *
      * @param  transform The transform to use. Source and target dimension must be 2.
@@ -611,13 +624,47 @@ public final class CRSUtilities {
      * @param transform The transform to apply.
      * @param origin The position where to compute the delta transform in the source CS.
      * @param source The distance vector to be delta transformed
+     * @return       The result of the transformation.
+     * @throws TransformException if the transformation failed.
+     *
+     * @since 2.3
+     */
+    public static DirectPosition deltaTransform(final MathTransform  transform,
+                                                final DirectPosition origin,
+                                                final DirectPosition source)
+            throws TransformException
+    {
+        final int sourceDim = transform.getSourceDimensions();
+        final int targetDim = transform.getTargetDimensions();
+        DirectPosition P1 = new GeneralDirectPosition(sourceDim);
+        DirectPosition P2 = new GeneralDirectPosition(sourceDim);
+        for (int i=0; i<sourceDim; i++) {
+            final double c = origin.getOrdinate(i);
+            final double d = source.getOrdinate(i) * 0.5;
+            P1.setOrdinate(i, c-d);
+            P2.setOrdinate(i, c+d);
+        }
+        P1 = transform.transform(P1, (sourceDim==targetDim) ? P1 : null);
+        P2 = transform.transform(P2, (sourceDim==targetDim) ? P2 : null);
+        for (int i=0; i<targetDim; i++) {
+            P2.setOrdinate(i, P2.getOrdinate(i) - P1.getOrdinate(i));
+        }
+        return P2;
+    }
+
+    /**
+     * Transforms the relative distance vector specified by {@code source} and stores
+     * the result in {@code dest}.  A relative distance vector is transformed without
+     * applying the translation components.
+     *
+     * @param transform The transform to apply.
+     * @param origin The position where to compute the delta transform in the source CS.
+     * @param source The distance vector to be delta transformed
      * @param dest   The resulting transformed distance vector, or {@code null}
      * @return       The result of the transformation.
      * @throws TransformException if the transformation failed.
      *
      * @see AffineTransform#deltaTransform(Point2D,Point2D)
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static Point2D deltaTransform(final MathTransform2D transform,
                                          final Point2D         origin,

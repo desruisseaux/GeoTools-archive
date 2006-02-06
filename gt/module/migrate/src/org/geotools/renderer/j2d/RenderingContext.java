@@ -80,6 +80,14 @@ import org.geotools.resources.geometry.XAffineTransform;
  *
  * @see Renderer#paint
  * @see RenderedLayer#paint
+ *
+ * @deprecated Replaced by {@link org.geotools.display.canvas.RenderingContext} as part of the port
+ *             of J2D-renderer to the new GO-1 based API. Note that it is not possible to mix
+ *             J2D-renderer classes with GO-1 rendering engine. Migration from J2D-renderer to the
+ *             GO-1 API will requires the replacement of all deprecated classes together. Because
+ *             the new GO-1 rendering engine is a work in progress, see
+ *             <A HREF="http://jira.codehaus.org/browse/GEOT-776">GEOT-776</A> in order to determine
+ *             if enough functionalites have been ported for yours need.
  */
 public final class RenderingContext implements org.geotools.renderer.event.RenderingContext {
     /**
@@ -112,6 +120,8 @@ public final class RenderingContext implements org.geotools.renderer.event.Rende
      *
      * @see #textCS
      * @see #setCoordinateSystem
+     *
+     * @deprecated Renamed as {@link org.geotools.display.canvas.RenderingContext#objectiveCRS}.
      */
     public final CoordinateSystem mapCS;
 
@@ -127,6 +137,8 @@ public final class RenderingContext implements org.geotools.renderer.event.Rende
      * @see #mapCS
      * @see #deviceCS
      * @see #setCoordinateSystem
+     *
+     * @deprecated Renamed as {@link org.geotools.display.canvas.RenderingContext#displayCRS}.
      */
     public final CoordinateSystem textCS;
 
@@ -139,6 +151,8 @@ public final class RenderingContext implements org.geotools.renderer.event.Rende
      *
      * @see #textCS
      * @see #setCoordinateSystem
+     *
+     * @deprecated Renamed as {@link org.geotools.display.canvas.RenderingContext#deviceCRS}.
      */
     public final CoordinateSystem deviceCS;
 
@@ -294,6 +308,8 @@ public final class RenderingContext implements org.geotools.renderer.event.Rende
      * @see #getGraphics
      * @see #getAffineTransform
      * @see Graphics2D#setTransform
+     *
+     * @deprecated Renamed as {@link org.geotools.display.canvas.RenderingContext#setGraphicsCRS}.
      */
     public void setCoordinateSystem(final CoordinateSystem cs) throws TransformException {
         graphics.setTransform((cs==mapCS) ? mapToDevice : // Optimization for a pretty common case.

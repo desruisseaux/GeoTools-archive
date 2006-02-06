@@ -135,8 +135,8 @@
              breakiterator    = "true"
              noqualifier      = "all"
              overview         = "module/main/src/overview.html"
-             windowtitle      = "Geotools 2.2 API"
-             doctitle         = "Geotools 2.2 API"
+             windowtitle      = "Geotools 2.3 API"
+             doctitle         = "Geotools 2.3 API"
              header           = "Geotools&lt;br&gt;Build ${TODAY}"
              maxmemory        = "512M">
 

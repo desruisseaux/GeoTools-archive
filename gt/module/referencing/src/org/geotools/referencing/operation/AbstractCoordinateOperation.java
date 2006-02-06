@@ -149,7 +149,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     /**
      * Constructs a new coordinate operation with the same values than the specified
      * defining conversion, together with the specified source and target CRS. This
-     * constructor is used by {@link ConversionImpl} only.
+     * constructor is used by {@link DefaultConversion} only.
      */
     AbstractCoordinateOperation(final Conversion               definition,
                                 final CoordinateReferenceSystem sourceCRS,

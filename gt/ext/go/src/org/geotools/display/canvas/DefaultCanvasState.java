@@ -47,7 +47,7 @@ import org.geotools.geometry.GeneralDirectPosition;
  * current state of the canvas is taken and the values will never change (even if the canvas
  * changes state).
  *
- * @since 2.2
+ * @since 2.3
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux

@@ -17,14 +17,16 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.renderer.j2d;
+package org.geotools.display.canvas;
 
 // J2SE and JAI dependencies
+import java.util.List;
+import java.util.ArrayList;
 import java.awt.image.VolatileImage;
 import java.awt.image.BufferedImage;
-import java.io.ObjectStreamException;
-import java.util.NoSuchElementException;
-import javax.media.jai.EnumeratedParameter;
+
+// OpenGIS dependencies
+import org.opengis.util.CodeList;
 
 
 /**
@@ -32,24 +34,29 @@ import javax.media.jai.EnumeratedParameter;
  * {@link VolatileImage} for fast rendering, or by a {@link BufferedImage} for
  * longer persistence.
  *
+ * @since 2.3
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see Renderer#setOffscreenBuffered
- *
- * @deprecated Replaced by {@link org.geotools.display.canvas.ImageType}.
+ * @see BufferedCanvas2D#setOffscreenBuffered
  */
-public final class ImageType extends EnumeratedParameter {
+public final class ImageType extends CodeList/*<ImageType>*/ {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -3858397481670269518L;
-    
+    private static final long serialVersionUID = 5596401799358607369L;
+
+    /**
+     * List of all enumerations of this type.
+     * Must be declared before any enum declaration.
+     */
+    private static final List/*<ImageType>*/ VALUES = new ArrayList/*<ImageType>*/(3);
+
     /**
      * The enum for layers not backed by any offscreen buffer.
      */
-    public static final ImageType NONE = new ImageType("NONE", 0);
+    public static final ImageType NONE = new ImageType("NONE");
     
     /**
      * The enum for offscreen buffer backed by a {@link VolatileImage}.
@@ -63,55 +70,38 @@ public final class ImageType extends EnumeratedParameter {
      *
      * in Sun's RFE database.
      */
-    public static final ImageType VOLATILE = new ImageType("VOLATILE", 1);
+    public static final ImageType VOLATILE = new ImageType("VOLATILE");
     
     /**
      * The enum for offscreen buffer backed by a {@link BufferedImage}.
      * At the difference of {@link #VOLATILE}, buffered image supports
      * transparency. It may be more appropriate for layer above the base map.
      */
-    public static final ImageType BUFFERED = new ImageType("BUFFERED", 2);
+    public static final ImageType BUFFERED = new ImageType("BUFFERED");
+    
+    /**
+     * Constructs an enum with the given name. The new enum is
+     * automatically added to the list returned by {@link #values}.
+     *
+     * @param name The enum name. This name must not be in use by an other enum of this type.
+     */
+    private ImageType(final String name) {
+        super(name, VALUES);
+    }
 
     /**
-     * Image types by value. Used to canonicalize after deserialization.
+     * Returns the list of {@code ImageType}s.
      */
-    private static final ImageType[] ENUMS = {NONE, VOLATILE, BUFFERED};
-    static {
-        for (int i=0; i<ENUMS.length; i++) {
-            if (ENUMS[i].getValue()!=i) {
-                throw new AssertionError(ENUMS[i]);
-            }
+    public static ImageType[] values() {
+        synchronized (VALUES) {
+            return (ImageType[]) VALUES.toArray(new ImageType[VALUES.size()]);
         }
     }
-    
-    /**
-     * Constructs a new enum with the specified value.
-     */
-    private ImageType(final String name, final int value) {
-        super(name, value);
-    }
-    
-    /**
-     * Returns the enum for the specified value.
-     *
-     * @param value The enum value.
-     * @return The enum for the specified value.
-     * @throws NoSuchElementException if there is no enum for the specified value.
-     */
-    private static ImageType getEnum(final int value) throws NoSuchElementException {
-        if (value>=0 && value<ENUMS.length) return ENUMS[value];
-        throw new NoSuchElementException(String.valueOf(value));
-    }
 
     /**
-     * Uses a single instance of {@link ImageType} after deserialization.
-     * It allows client code to test <code>enum1==enum2</code> instead of
-     * <code>enum1.equals(enum2)</code>.
-     *
-     * @return A single instance of this enum.
-     * @throws ObjectStreamException if deserialization failed.
+     * Returns the list of enumerations of the same kind than this enum.
      */
-    private Object readResolve() throws ObjectStreamException {
-        return getEnum(getValue());
+    public /*{ImageType}*/ CodeList[] family() {
+        return values();
     }
 }

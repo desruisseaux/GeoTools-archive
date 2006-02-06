@@ -18,20 +18,22 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.renderer.j2d;
+package org.geotools.display.canvas;
 
 // J2SE dependencies
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import javax.units.Unit;
+import javax.units.SI;
 
 // Geotools dependencies
-import org.geotools.units.Unit;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
-import org.geotools.renderer.geom.Geometry; // For Javadoc
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -42,8 +44,6 @@ import org.geotools.renderer.geom.Geometry; // For Javadoc
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.display.canvas.RenderingStatistics}.
  */
 final class RenderingStatistics {
     /**
@@ -60,19 +60,23 @@ final class RenderingStatistics {
     private static final Level LEVEL = Level.FINE;
 
     /**
-     * <code>true</code> if the statistics are loggable.
+     * {@code true} if the statistics are loggable.
      */
     private boolean loggable;
 
     /**
-     * While a rendering is in process, the starting time in milliseconds ellapsed
-     * since January 1st, 1971. Once the rendering is finished, the ellapsed time.
+     * The starting time in milliseconds ellapsed since January 1st, 1971.
      */
-    private long time;
+    private long startTime;
+
+    /**
+     * The ellapsed time, or 0 if the rendering is not yet finished.
+     */
+    private long ellapsedTime;
 
     /**
      * The number of points recomputed, rendered and the total number of points while painting
-     * an {@link Geometry}. Those informations are updated only by {@link RenderedGeometries}.
+     * a geometry.
      */
     private int recomputed, rendered, total;
 
@@ -93,32 +97,41 @@ final class RenderingStatistics {
     /**
      * The resolution units.
      */
-    private Unit units = Unit.DIMENSIONLESS;
+    private Unit units;
 
     /**
-     * Default constructor.
+     * The logger to use.
      */
-    public RenderingStatistics() {
+    private final Logger logger;
+
+    /**
+     * Creates initially empty rendering statistics.
+     */
+    public RenderingStatistics(final Logger logger) {
+        this.logger = logger;
     }
 
     /**
-     * Initialize the statistics. Invoked by {@link Renderer#paint} only.
+     * Initializes the statistics. Invoked by {@link BufferedCanvas2D#paint} only.
      */
     final void init() {
-        loggable        = Renderer.LOGGER.isLoggable(LEVEL);
-        time            = System.currentTimeMillis();
-        recomputed      = rendered = total = 0;
-        units           = Unit.DIMENSIONLESS;
+        startTime       = System.currentTimeMillis();
+        ellapsedTime    = 0;
+        recomputed      = 0;
+        rendered        = 0;
+        total           = 0;
         resolution      = 0;
         resolutionScale = 1;
+        units           = Unit.ONE;
+        loggable        = logger.isLoggable(LEVEL);
     }
 
     /**
-     * Set the multiplication factor for the <code>resolution</code> argument in calls to
-     * {@link #addGeometry}. This is used when the resolution is provided in degrees: this
-     * scale will then be applied for transforming the resolution from degrees to meters.
-     * Of course, this is only a very approximative transformation, since real transformations
-     * are not linears.
+     * Sets the multiplication factor for the {@code resolution} argument in calls to
+     * {@link #addGeometry}. This is used when the resolution is provided in degrees:
+     * this scale will then be applied for transforming the resolution from degrees to
+     * meters. Of course, this is only a very approximative transformation, since real
+     * transformations are not linears.
      */
     final void setResolutionScale(final double scale, final Unit units) {
         resolutionScale = scale;
@@ -149,39 +162,63 @@ final class RenderingStatistics {
 
     /**
      * Declares that a rendering is finished. This method update the statistics and logs
-     * a message with the specified level. Invoked by {@link Renderer#paint} only.
+     * a message with the specified level. Invoked by {@link BufferedCanvas2D#paint} only.
      *
-     * @param renderer The caller.
+     * @param canvas The caller.
      */
-    final void finish(final Renderer renderer) {
-        time = System.currentTimeMillis() - time;
-        if (isLoggable() && time>=TIME_THRESHOLD) {
-            final Locale     locale = renderer.getLocale();
-            final Logging resources = Logging.getResources(locale);
-            final String       name = renderer.getName(locale);
-            final Double       time = new Double(this.time / 1000.0);
-            final LogRecord    record;
-            if (total==0 || rendered==0) {
-                record = resources.getLogRecord(LEVEL, LoggingKeys.PAINTING_LAYER_$2, name, time);
-            } else {
-                record = new LogRecord(LEVEL,
-                         resources.getString(LoggingKeys.PAINTING_LAYER_$2, name, time) +
-                         System.getProperty("line.separator", "\n") +
-                         resources.getString(LoggingKeys.POLYGON_CACHE_USE_$4,
-                              new Double((double)rendered/(double)total),
-                              new Double((double)(rendered-recomputed)/(double)rendered),
-                              new Double(resolution/rendered), units));
-            }
-            record.setSourceClassName(Utilities.getShortClassName(renderer));
-            record.setSourceMethodName("paint");
-            Renderer.LOGGER.log(record);
+    final void finish(final AbstractCanvas canvas) {
+        ellapsedTime = System.currentTimeMillis() - startTime;
+        if (isLoggable() && ellapsedTime>=TIME_THRESHOLD) {
+            logger.log(createLogRecord(canvas));
         }
     }
 
     /**
-     * Returns <code>true</code> if the statistics are loggable.
+     * Creates a log record for the specified canvas.
+     *
+     * @param canvas The caller, or {@code null} if unknown.
+     */
+    private LogRecord createLogRecord(final AbstractCanvas canvas) {
+        final Double ellapsed = new Double((ellapsedTime!=0 ? ellapsedTime :
+                                            System.currentTimeMillis() - startTime) / 1000);
+        final Locale locale;
+        final String title;
+        if (canvas != null) {
+            locale = canvas.getLocale();
+            title  = canvas.getTitle();
+        } else {
+            locale = Locale.getDefault();
+            title  = Vocabulary.format(VocabularyKeys.UNKNOW);
+        }
+        final Logging resources = Logging.getResources(locale);
+        final LogRecord  record;
+        if (total==0 || rendered==0) {
+            record = resources.getLogRecord(LEVEL, LoggingKeys.PAINTING_LAYER_$2, title, ellapsed);
+        } else {
+            record = new LogRecord(LEVEL,
+                     resources.getString(LoggingKeys.PAINTING_LAYER_$2, title, ellapsed) +
+                     System.getProperty("line.separator", "\n") +
+                     resources.getString(LoggingKeys.POLYGON_CACHE_USE_$4,
+                          new Double((double)rendered/(double)total),
+                          new Double((double)(rendered-recomputed)/(double)rendered),
+                          new Double(resolution/rendered), units));
+        }
+        record.setSourceClassName(Utilities.getShortClassName(canvas));
+        record.setSourceMethodName("paint");
+        return record;
+    }
+
+    /**
+     * Returns {@code true} if the statistics are loggable.
      */
     final boolean isLoggable() {
         return loggable;
+    }
+
+    /**
+     * Returns a string representation of this set of statistics.
+     */
+    public String toString() {
+        return createLogRecord(null).getMessage();
     }
 }
