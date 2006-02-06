@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-ext</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
   </parent>
 
 
@@ -67,12 +67,12 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-referencing</artifactId>
-      <version>2.2-SNAPSHOT</version>
+      <version>2.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-hsql</artifactId>
-      <version>2.2-SNAPSHOT</version>
+      <version>2.3-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -124,7 +124,7 @@
       <plugin>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-javamaker</artifactId>
-        <version>2.2-SNAPSHOT</version>
+        <version>2.3-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>
@@ -151,7 +151,7 @@
       <plugin>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-unopkg</artifactId>
-        <version>2.2-SNAPSHOT</version>
+        <version>2.3-SNAPSHOT</version>
         <configuration>
           <finalName>geotools</finalName>
         </configuration>

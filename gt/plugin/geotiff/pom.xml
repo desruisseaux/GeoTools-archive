@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-plugin</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
   </parent>
 
 
@@ -75,22 +75,22 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
-      <version>2.2-SNAPSHOT</version>
+      <version>2.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-coverage</artifactId>
-      <version>2.2-SNAPSHOT</version>
+      <version>2.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-referencing</artifactId>
-      <version>2.2-SNAPSHOT</version>
+      <version>2.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-wkt</artifactId>
-      <version>2.2-SNAPSHOT</version>
+      <version>2.3-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
