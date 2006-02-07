@@ -317,7 +317,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      *
      * @see #NORTHING
      * @see #SOUTHING
-     * @see #GEOCENTRIC_y
+     * @see #GEOCENTRIC_Y
      * @see #DISPLAY_Y
      * @see #ROW
      */

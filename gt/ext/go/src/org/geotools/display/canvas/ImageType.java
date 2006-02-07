@@ -69,6 +69,9 @@ public final class ImageType extends CodeList/*<ImageType>*/ {
      * <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4881082.html">4881082</A>
      *
      * in Sun's RFE database.
+     *
+     * @todo Update this doc when we will be allowed to compile for J2SE 1.5, since transparency
+     *       is supported there.
      */
     public static final ImageType VOLATILE = new ImageType("VOLATILE");
     

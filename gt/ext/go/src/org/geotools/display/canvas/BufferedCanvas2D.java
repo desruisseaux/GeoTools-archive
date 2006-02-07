@@ -94,7 +94,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class BufferedCanvas2D extends ReferencedCanvas2D {
+public class BufferedCanvas2D extends ReferencedCanvas2D {
     /**
      * {@code true} for enabling usage of {@link GraphicsJAI}.
      */
@@ -207,7 +207,7 @@ public abstract class BufferedCanvas2D extends ReferencedCanvas2D {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the title assigned to this {@code Canvas}.
      * If no title were {@linkplain #setTitle explicitly set}, then
      * this method returns the title of the window which contains this canvas.
      */
@@ -233,8 +233,8 @@ public abstract class BufferedCanvas2D extends ReferencedCanvas2D {
     }
 
     /**
-     * {@inheritDoc}. The default implementation returns the locale of the {@link Component}
-     * that own this canvas, if any. Otherwise, a default locale will be returned.
+     * Returns the locale for this object. The default implementation returns the locale of the
+     * {@link Component} that own this canvas, if any. Otherwise, a default locale will be returned.
      *
      * @see Component#getLocale
      * @see JComponent#getDefaultLocale
@@ -285,7 +285,7 @@ public abstract class BufferedCanvas2D extends ReferencedCanvas2D {
     }
 
     /**
-     * {@inheritDoc}
+     * Removes the given {@code Graphic} from this canvas.
      */
     public synchronized void remove(final Graphic graphic) {
         repaint(); // Must be invoked first
@@ -294,7 +294,7 @@ public abstract class BufferedCanvas2D extends ReferencedCanvas2D {
     }
 
     /**
-     * {@inheritDoc}
+     * Remove all graphics from this canvas.
      */
     public synchronized void removeAll() {
         repaint(); // Must be invoked first
@@ -303,7 +303,7 @@ public abstract class BufferedCanvas2D extends ReferencedCanvas2D {
     }
 
     /**
-     * {@inheritDoc}
+     * Invoked automatically when a graphic registered in this canvas changed.
      */
     protected void graphicPropertyChanged(final AbstractGraphic graphic,
                                           final PropertyChangeEvent event)
@@ -1049,7 +1049,10 @@ renderOffscreen:while (true) {
     }
 
     /**
-     * {@inheritDoc}
+     * Clears all cached data. Invoking this method may help to release some resources for other
+     * applications. It should be invoked when we know that the map is not going to be rendered
+     * for a while. Note that this method doesn't changes the renderer setting; it will just slow
+     * down the first rendering after this method call.
      */
     protected void clearCache() {
         flushOffscreenBuffers();
@@ -1061,7 +1064,9 @@ renderOffscreen:while (true) {
     }
 
     /**
-     * {@inheritDoc}
+     * Method that may be called when a {@code Canvas} is no longer needed. The results
+     * of referencing a canvas or any of its graphics after a call to {@code dispose()}
+     * are undefined.
      */
     public void dispose() {
         flushOffscreenBuffers();

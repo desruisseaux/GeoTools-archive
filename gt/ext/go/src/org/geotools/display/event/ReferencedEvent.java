@@ -28,7 +28,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 
 /**
  * Common interface for events corresponding in some geographic location. They are typically mouse
- * events with {@linkplain org.opengis.display.canvas.ReferencedCanvas#getDisplayToObjectiveTransform
+ * events with {@linkplain org.geotools.display.canvas.ReferencedCanvas#getDisplayToObjectiveTransform
  * display to objective transform} capabilities.
  *
  * @since 2.3
@@ -39,7 +39,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 public interface ReferencedEvent {
     /**
      * Returns the mouse's position in terms of
-     * {@linkplain org.opengis.display.canvas.ReferencedCanvas#getDisplayCRS display CRS}.
+     * {@linkplain org.geotools.display.canvas.ReferencedCanvas#getDisplayCRS display CRS}.
      * This method is similar to {@link java.awt.event.MouseEvent#getPoint()} except that
      * the mouse location is corrected for deformations caused by some artifacts like the
      * {@linkplain org.geotools.gui.swing.ZoomPane#setMagnifierVisible magnifying glass}.
@@ -48,7 +48,7 @@ public interface ReferencedEvent {
 
     /**
      * Returns the mouse's position in terms of
-     * {@linkplain org.opengis.display.canvas.ReferencedCanvas#getObjectiveCRS objective CRS}.
+     * {@linkplain org.geotools.display.canvas.ReferencedCanvas#getObjectiveCRS objective CRS}.
      */
     DirectPosition getObjectivePosition();
 

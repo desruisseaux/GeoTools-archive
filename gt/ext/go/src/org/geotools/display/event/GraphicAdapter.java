@@ -23,6 +23,7 @@
 package org.geotools.display.event;
 
 // OpenGIS dependencies
+import org.opengis.go.display.primitive.Graphic;    // For javadoc
 import org.opengis.go.display.event.GraphicChangeEvent;
 import org.opengis.go.display.event.GraphicListener;
 import org.opengis.go.display.event.GraphicMouseEvent;

@@ -56,7 +56,7 @@ import org.geotools.resources.i18n.Errors;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ReferencedGraphic extends AbstractGraphic {
+public abstract class ReferencedGraphic extends AbstractGraphic {
     /**
      * An envelope that completly encloses the graphic. Note that there is no guarantee
      * that the returned envelope is the smallest bounding box that encloses the graphic,
@@ -118,8 +118,8 @@ public class ReferencedGraphic extends AbstractGraphic {
      * subclass need to transform some additional internal data, it should override the
      * {@link #transform} method.
      * <p>
-     * This method fires a {@value #OBJECTIVE_CRS_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#OBJECTIVE_CRS_PROPERTY}
+     * property change event.
      *
      * @param  crs The new objective CRS.
      * @throws TransformException If this method do not accept the new CRS. In such case,
@@ -256,8 +256,8 @@ public class ReferencedGraphic extends AbstractGraphic {
      * Set the envelope for this graphic. Subclasses should invokes this method as soon as they
      * known their envelope.
      * <p>
-     * This method fires a {@value #ENVELOPE_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#ENVELOPE_PROPERTY}
+     * property change event.
      *
      * @throws TransformException if the specified envelope can't be transformed to the
      *         {@linkplain #getObjectiveCRS objective CRS}.

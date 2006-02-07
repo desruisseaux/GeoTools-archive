@@ -135,8 +135,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      *
      * @todo The above-cited optimization is not yet really done. Lets see if it would be worth.
      *       If we choose to go ahead, this field should be set in {@link #setDisplayCRS} and lazy
-     *       creation performed in {@link #getDeviceCRS}, only if {@link #hasDeviceListeners} is
-     *       {@code false}.
+     *       creation performed in {@link #getDeviceCRS}.
      */
     private transient Conversion displayToDevice;
 
@@ -206,29 +205,21 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     private Double scaleFactor;
 
     /**
-     * {@code true} if this canvas has {@value #DISPLAY_CRS_PROPERTY} properties listeners. Used in
-     * order to reduce the amount of {@link PropertyChangeEvent} objects created in the common case
-     * where no listener have interest in this property. May be a significant optimisation, since
-     * this property change everytime the zoom change.
+     * {@code true} if this canvas has
+     * {@value org.geotools.display.canvas.DisplayObject#DISPLAY_CRS_PROPERTY} properties
+     * listeners. Used in order to reduce the amount of {@link PropertyChangeEvent} objects
+     * created in the common case where no listener have interest in this property. May be
+     * a significant optimisation, since this property change everytime the zoom change.
      *
      * @see #listenersChanged
      */
     private boolean hasDisplayListeners;
 
     /**
-     * {@code true} if this canvas has {@value #DEVICE_CRS_PROPERTY} properties listeners. Used in
-     * order to reduce the amount of {@link PropertyChangeEvent} objects created in the common case
-     * where no listener have interest in this property. May be a significant optimisation, since
-     * this property change everytime the zoom change.
-     *
-     * @see #listenersChanged
-     */
-    private boolean hasDeviceListeners;
-
-    /**
-     * {@code true} if this canvas has {@value #ENVELOPE_PROPERTY} properties listeners.
-     * Note that it is not worth to check for this flag in the all cases; only
-     * in the most frequent ones (e.g. {@link #add}, {@link #remove}...).
+     * {@code true} if this canvas has
+     * {@value org.geotools.display.canvas.DisplayObject#ENVELOPE_PROPERTY} properties listeners.
+     * Note that it is not worth to check for this flag in the all cases; only in the most frequent
+     * ones (e.g. {@link #add}, {@link #remove}...).
      *
      * @see #listenersChanged
      */
@@ -241,7 +232,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * @param  dimension The number of dimensions, which must be 2 or 3.
      * @throws IllegalArgumentException if the specified number of dimensions is not supported.
      */
-    public ReferencedCanvas(final DisplayFactory factory, final int dimension)
+    protected ReferencedCanvas(final DisplayFactory factory, final int dimension)
             throws IllegalArgumentException
     {
         this(factory, getDefaultCRS(dimension), null);
@@ -255,9 +246,9 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * @param objectiveCRS The initial objective CRS.
      * @param hints        The initial set of hints, or {@code null} if none.
      */
-    public ReferencedCanvas(final DisplayFactory factory,
-                            final CoordinateReferenceSystem objectiveCRS,
-                            final Hints hints)
+    protected ReferencedCanvas(final DisplayFactory factory,
+                               final CoordinateReferenceSystem objectiveCRS,
+                               final Hints hints)
     {
         super(factory, hints);
         this.envelope = new GeneralEnvelope(objectiveCRS);
@@ -326,8 +317,9 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * Returns a typical cell dimension in terms of {@linkplain #getObjectiveCRS objective CRS}.
      * For images, a cell is usually a pixel. For other kind of graphics, "cell dimension" shall
      * be understood as some dimension representative of the graphic resolution. The default
-     * implementation invokes {@link ReferencedGraphic#getTypicalCellDimension} for each graphic
-     * and returns the finest resolution.
+     * implementation invokes <code>{@link ReferencedGraphic#getTypicalCellDimension
+     * getTypicalCellDimension}(position)</code> for each graphic and returns the finest
+     * resolution.
      *
      * @param  position A position where to evaluate the typical cell size, or {@code null} for
      *         a default one.
@@ -456,8 +448,8 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * {@link BufferedCanvas2D#zoomChanged}. Note that some zoom changes do not imply a
      * scale change. For example the zoom change may be just a translation or a rotation.
      * <p>
-     * This method fires a {@value #SCALE_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#SCALE_PROPERTY}
+     * property change event.
      *
      * @param scaleFactor The new scale factor.
      */
@@ -484,16 +476,15 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
 
     /**
      * Adds the given {@code Graphic} to this {@code Canvas}. This implementation respect the
-     * <var>z</var>-order retrieved by calling {@code Graphic.getGraphicStyle().getZOrderHint()}.
-     * When two added {@code Graphic}s have the same <var>z</var>-order, the most recently added
-     * will be on top.
+     * <var>z</var>-order retrieved by calling {@link Graphic#getZOrderHint()}. When two added
+     * {@code Graphic}s have the same <var>z</var>-order, the most recently added will be on top.
      * <p>
      * If no CRS were explicitly set to this canvas (either at construction time or through a call
-     * to {@link #setObjectiveCRS setObjectiveCRS}, then this method will set the canvas objective
+     * to {@link #setObjectiveCRS setObjectiveCRS}), then this method will set the canvas objective
      * CRS to the CRS of the first graphic added.
      * <p>
-     * This method fires {@value #GRAPHICS_PROPERTY} and {@value #ENVELOPE_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change events}.
+     * This method fires {@value org.geotools.display.canvas.DisplayObject#GRAPHICS_PROPERTY} and
+     * {@value org.geotools.display.canvas.DisplayObject#ENVELOPE_PROPERTY} property change events.
      */
     public Graphic add(Graphic graphic) {
         Envelope oldEnvelope = null;
@@ -551,7 +542,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         synchronized (this) {
             if (graphic instanceof ReferencedGraphic) {
                 final ReferencedGraphic referenced = (ReferencedGraphic) graphic;
-                if (((DisplayObject) referenced).owner == this) {
+                if (referenced.getCanvas() == this) {
                     if (hasEnvelopeListeners) {
                         oldEnvelope = new GeneralEnvelope(envelope);
                     }
@@ -737,17 +728,18 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the objective Coordinate Reference System for this {@code Canvas}.
      * All graphic primitives are notified of the CRS change by a call to
-     * {@link ReferencedGraphic#setObjectiveCRS}.
+     * <code>{@linkplain ReferencedGraphic#setObjectiveCRS setObjectiveCRS}(crs)</code>.
      * <p>
      * After the objective CRS change, this method invokes {@link #setDisplayCRS setDisplayCRS}
      * with a new, automatically computed, display CRS. The new display CRS try to preserve the
      * same {@linkplain #getScale scale factor} than the previous one.
      * <p>
-     * This method fires the following {@linkplain PropertyChangeEvent property change events}
-     * in no particular order: {@value #OBJECTIVE_CRS_PROPERTY}, {@value #DISPLAY_CRS_PROPERTY},
-     * {@value #DEVICE_CRS_PROPERTY}, {@value #ENVELOPE_PROPERTY}.
+     * This method fires the following property change events in no particular order:
+     * {@value org.geotools.display.canvas.DisplayObject#OBJECTIVE_CRS_PROPERTY},
+     * {@value org.geotools.display.canvas.DisplayObject#DISPLAY_CRS_PROPERTY},
+     * {@value org.geotools.display.canvas.DisplayObject#ENVELOPE_PROPERTY}.
      */
     public void setObjectiveCRS(final CoordinateReferenceSystem crs) throws TransformException {
         final CoordinateReferenceSystem oldCRS;
@@ -851,9 +843,10 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * Recomputes inconditionnaly the {@linkplain #envelope}. The envelope will be computed
      * from the value provided by {@link ReferencedGraphic#envelope} for all graphics.
      * <p>
-     * <strong>NOTE:</strong> Callers are responsible for firing an event after the envelope
-     * change. This method do not fire an {@value #ENVELOPE_PROPERTY} change event itself because
-     * this step is often only an intermediate step (see for example #setObjectiveCRS}).
+     * <strong>NOTE:</strong> Callers are responsible for firing an event after the envelope change.
+     * This method doesn't fire an {@value org.geotools.display.canvas.DisplayObject#ENVELOPE_PROPERTY}
+     * change event itself because this step is often only an intermediate step (see for example
+     * {@link #setObjectiveCRS}).
      *
      * @param  sourceClassName  The caller's class name,  for logging purpose.
      * @param  sourceMethodName The caller's method name, for logging purpose.
@@ -903,8 +896,8 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * the {@link #envelope} without iterating over all graphics again.
      * <p>
      * <strong>NOTE:</strong> Callers are responsible to fire an event after the envelope change.
-     * This method do not fire an {@value #ENVELOPE_PROPERTY} change event itself because this
-     * step is usually not the final step (see for example #add}.
+     * This method doesn't fire an {@value org.geotools.display.canvas.DisplayObject#ENVELOPE_PROPERTY}
+     * change event itself because this step is usually not the final step (see for example {@link #add}.
      *
      * @param  oldEnvelope      The old envelope of the graphic that changed.
      * @param  newEnvelope      The new envelope of the graphic that changed.
@@ -1044,8 +1037,8 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      *   <li>{@link ReferencedCanvas#setObjectiveToDisplayTransform(Matrix)}</li>
      * </ul>
      * <p>
-     * This method fires a {@value #DISPLAY_CRS_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#DISPLAY_CRS_PROPERTY}
+     * property change event.
      *
      * @param  crs The display coordinate reference system.
      * @throws TransformException If the data can't be transformed.
@@ -1095,9 +1088,6 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
 
     /**
      * Returns the Coordinate Reference System associated with the device of this {@code Canvas}.
-     * Unless otherwise specified by a call to {@link #setDeviceCRS setDeviceCRS}, the default
-     * implementation assumes a device CRS related to the {@linkplain #getDisplayCRS display CRS}
-     * through an identity transform.
      */
     public final synchronized DerivedCRS getDeviceCRS() {
         if (deviceCRS == null) try {
@@ -1133,11 +1123,13 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      *   <li>{@link ReferencedCanvas#setObjectiveToDeviceTransforms}</li>
      * </ul>
      * <p>
-     * This method fires a {@value #DEVICE_CRS_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#DEVICE_CRS_PROPERTY}
+     * property change event.
      *
      * @param  crs The device coordinate reference system.
      * @throws TransformException If the data can't be transformed.
+     *
+     * @todo Consider removing this method.
      */
     protected void setDeviceCRS(DerivedCRS crs) throws TransformException {
         final CoordinateReferenceSystem oldCRS;
@@ -1153,9 +1145,6 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             }
             oldCRS = deviceCRS;
             deviceCRS = crs;
-        }
-        if (hasDeviceListeners) {
-            listeners.firePropertyChange(DEVICE_CRS_PROPERTY, oldCRS, crs);
         }
     }
 
@@ -1511,12 +1500,12 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     }
 
     /**
-     * {@inheritDoc}
+     * Invoked when a property change listener has been {@linkplain #addPropertyChangeListener
+     * added} or {@linkplain #removePropertyChangeListener removed}.
      */
     protected void listenersChanged() {
         super.listenersChanged();
         hasDisplayListeners  = listeners.hasListeners(DISPLAY_CRS_PROPERTY);
-        hasDeviceListeners   = listeners.hasListeners(DEVICE_CRS_PROPERTY);
         hasEnvelopeListeners = listeners.hasListeners(ENVELOPE_PROPERTY);
     }
 

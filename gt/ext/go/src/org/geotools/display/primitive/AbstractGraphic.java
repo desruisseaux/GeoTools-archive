@@ -52,7 +52,7 @@ import org.geotools.display.canvas.DisplayObject;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class AbstractGraphic extends DisplayObject implements Graphic {
+public abstract class AbstractGraphic extends DisplayObject implements Graphic {
     /**
      * The default {@linkplain #getZOrderHint z-order}.
      */
@@ -94,13 +94,11 @@ public class AbstractGraphic extends DisplayObject implements Graphic {
     private Graphic parent;
 
     /**
-     * Tells if this graphic is visible. On construction, graphics are initially invisible. They are
-     * made visibles when {@linkplain org.geotools.display.canvas.AbstractCanvas#add added to a
-     * canvas} through a call to {@code setVisible(true)}.
+     * Tells if this graphic is visible.
      *
      * @see #setVisible
      */
-    private boolean visible;
+    private boolean visible = true;
 
     /**
      * The z value for this graphic.
@@ -140,8 +138,8 @@ public class AbstractGraphic extends DisplayObject implements Graphic {
     /**
      * Sets the name of this {@code Graphic} to the given value.
      * <p>
-     * This method fires a {@value #NAME_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#NAME_PROPERTY}
+     * property change event.
      */
     public void setName(final String name) {
         final String old;
@@ -163,8 +161,8 @@ public class AbstractGraphic extends DisplayObject implements Graphic {
     /**
      * Sets the parent of this {@code Graphic}.
      * <p>
-     * This method fires a {@value #PARENT_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#PARENT_PROPERTY}
+     * property change event.
      */
     public void setParent(final Graphic parent) {
         final Graphic old;
@@ -521,8 +519,8 @@ public class AbstractGraphic extends DisplayObject implements Graphic {
      * Sets the <var>z</var> order hint value for this graphic. Graphics with highest
      * <var>z</var> order will be painted on top of graphics with lowest <var>z</var> order.
      * <p>
-     * This method fires a {@value #Z_ORDER_HINT_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#Z_ORDER_HINT_PROPERTY}
+     * property change event.
      */
     public void setZOrderHint(final double zOrderHint) {
         if (Double.isNaN(zOrderHint)) {
@@ -545,7 +543,7 @@ public class AbstractGraphic extends DisplayObject implements Graphic {
 
     /**
      * Determines whether this graphic should be visible when its {@linkplain #getCanvas canvas}
-     * is visible.
+     * is visible. The default value is {@code true}.
      *
      * @return {@code true} if the graphic is visible, {@code false} otherwise.
      */
@@ -555,18 +553,10 @@ public class AbstractGraphic extends DisplayObject implements Graphic {
 
     /**
      * Sets the visible value. This method may be invoked when the user wants to hide momentarily
-     * this graphic. It is also invoked when this graphic is added or removed from a Getools
-     * implementation of canvas. To be more specific:
+     * this graphic.
      * <p>
-     * <ul>
-     *   <li><code>{@linkplain org.geotools.display.canvas.AbstractCanvas#add
-     *       AbstractCanvas.add}(this)</code> invokes {@code setVisible(true)}.</li>
-     *   <li><code>{@linkplain org.geotools.display.canvas.AbstractCanvas#remove
-     *       AbstractCanvas.remove}(this)</code> invokes {@code setVisible(false)}.</li>
-     * </ul>
-     * <p>
-     * This method fires a {@value #VISIBLE_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#VISIBLE_PROPERTY}
+     * property change event.
      */
     public void setVisible(final boolean visible) {
         synchronized (getTreeLock()) {
@@ -642,7 +632,6 @@ public class AbstractGraphic extends DisplayObject implements Graphic {
             if (canvas != null) {
                 canvas.remove(this);
             }
-            visible = false;
             super.dispose();
         }
     }

@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -66,8 +64,6 @@ import org.geotools.factory.Hints;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
-import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.display.primitive.AbstractGraphic;
 
@@ -75,7 +71,7 @@ import org.geotools.display.primitive.AbstractGraphic;
 /**
  * Manages the display and user manipulation of {@link Graphic} instances. A newly constructed
  * {@code Canvas} is initially empty. To make something appears, {@link Graphic}s must be added
- * using one of {@code add(...)} methods. The visual content depends of the {@code Graphic}
+ * using the {@link #add add} method. The visual content depends of the {@code Graphic}
  * subclass. The contents are usually symbols, features or images, but some implementations
  * can also manage non-geographic elements like a map scale.
  * <p>
@@ -123,7 +119,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * hint is not provided, then the canvas shall prefetch data if and only if the machine has
      * at least two processors.
      *
-     * @see PlanarImage#prefetchTiles
+     * @see javax.media.jai.PlanarImage#prefetchTiles
      * @see Runtime#availableProcessors
      */
     public static final RenderingHints.Key PREFETCH = new HintKey(2, Boolean.class);
@@ -146,23 +142,12 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
             final Object source = event.getSource();
             if (source instanceof Graphic) {
                 final AbstractGraphic graphic = (AbstractGraphic) source;
-                final Canvas target = ((DisplayObject) graphic).owner;
+                final Canvas target = graphic.getCanvas();
                 if (target instanceof AbstractCanvas) {
                     ((AbstractCanvas) target).graphicPropertyChanged(graphic, event);
                 }
             }
         }
-    };
-
-    /**
-     * List of classes that provides rendering hints as public static fields.
-     * This is used by {@link #toRenderingHintKey}.
-     */
-    private static final String[] HINT_CLASSES = {
-        "java.awt.RenderingHints",
-        "org.geotools.factory.Hints",
-        "org.geotools.display.canvas.AbstractCanvas",
-        "javax.media.jai.JAI"
     };
 
     /**
@@ -237,7 +222,8 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
     private double minResolution, maxResolution;
 
     /**
-     * {@code true} if this canvas has {@value #GRAPHICS_PROPERTY} properties listeners.
+     * {@code true} if this canvas has
+     * {@value org.geotools.display.canvas.DisplayObject#GRAPHICS_PROPERTY} properties listeners.
      *
      * @see #listenersChanged
      */
@@ -249,7 +235,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @param factory The display factory associated with this canvas, or {@code null} if none.
      * @param hints   The initial set of hints, or {@code null} if none.
      */
-    public AbstractCanvas(final DisplayFactory factory, final Hints hints) {
+    protected AbstractCanvas(final DisplayFactory factory, final Hints hints) {
         this.factory   = factory;
         this.UID       = Utilities.getShortClassName(this) + '-' + String.valueOf(++nextUID);
         this.hints     = new Hints(hints);
@@ -292,8 +278,8 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * Sets the title of this {@code Canvas}. The title of a {@code Canvas}
      * may or may not be displayed on the titlebar of an application's window.
      * <p>
-     * This method fires a {@value #TITLE_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#TITLE_PROPERTY}
+     * property change event.
      */
     public void setTitle(final String title) {
         final CharSequence old;
@@ -308,8 +294,8 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * Sets the localized title of this {@code Canvas}. The title of a {@code Canvas}
      * may or may not be displayed on the titlebar of an application's window.
      * <p>
-     * This method fires a {@value #TITLE_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#TITLE_PROPERTY}
+     * property change event.
      */
     public void setTitle(final InternationalString title) {
         final CharSequence old;
@@ -322,17 +308,17 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
 
     /**
      * Adds the given {@code Graphic} to this {@code Canvas}. This implementation respect the
-     * <var>z</var>-order retrieved by calling {@code Graphic.getGraphicStyle().getZOrderHint()}.
-     * When two added {@code Graphic}s have the same <var>z</var>-order, the most recently added
-     * will be on top.
+     * <var>z</var>-order retrieved by calling {@link Graphic#getZOrderHint()}. When two added
+     * {@code Graphic}s have the same <var>z</var>-order, the most recently added will be on top.
      * <p>
      * Most {@code Canvas} do not draw anything as long as at least one graphic hasn't be added.
      * In Geotools implementation, an {@link AbstractGraphic} can be added to only one
-     * {@code AbstractCanvas} object. If the specified graphic has already been added to
-     * an other canvas, then this method creates a clone before to add the graphic.
+     * {@link AbstractCanvas} object. If the specified graphic has already been added to
+     * an other canvas, then this method {@linkplain AbstractGraphic#clone creates a clone}
+     * before to add the graphic.
      * <p>
-     * This method fires a {@value #GRAPHICS_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#GRAPHICS_PROPERTY}
+     * property change event.
      *
      * @param  graphic Graphic to add to this canvas. This method call will be ignored if
      *         {@code graphic} has already been added to this canvas.
@@ -351,7 +337,8 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
             oldGraphics = sortedGraphics; // May be null.
             if (graphic instanceof AbstractGraphic) {
                 AbstractGraphic candidate = (AbstractGraphic) graphic;
-                if (((DisplayObject) candidate).owner == this) {
+                final Canvas canvas = candidate.getCanvas();
+                if (canvas == this) {
                     /*
                      * The supplied graphic is already part of this canvas.
                      * There is nothing to do.
@@ -360,14 +347,14 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
                     return candidate;
                 }
                 assert !graphics.containsKey(candidate) : candidate;
-                if (((DisplayObject) candidate).owner != null) try {
+                if (canvas != null) try {
                     graphic = candidate = (AbstractGraphic) ((DisplayObject) candidate).clone();
                 } catch (CloneNotSupportedException e) {
                     throw new IllegalArgumentException(
                             Errors.format(ErrorKeys.CANVAS_NOT_OWNER_$1, graphic.getName()));
                     // TODO: Add the cause when we will be allowed to compile for J2SE 1.5.
                 }
-                ((DisplayObject) candidate).owner = this;
+                ((DisplayObject) candidate).setCanvas(this);
                 candidate.addPropertyChangeListener(PROPERTIES_LISTENER);
             }
             /*
@@ -383,7 +370,6 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
                 graphics.put(graphic, graphic);
             }
             sortedGraphics = null;
-            graphic.setVisible(true);
         }
         if (hasGraphicsListeners) {
             listeners.firePropertyChange(GRAPHICS_PROPERTY, oldGraphics, null);
@@ -406,10 +392,10 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
     /**
      * Removes the given {@code Graphic} from this {@code Canvas}. Note that if the graphic is
      * going to be added back to the same canvas later, then it is more efficient to invoke
-     * <code>{@link Graphic#setVisible Graphic.setVisible}(false)</code> instead.
+     * {@link Graphic#setVisible} instead.
      * <p>
-     * This method fires a {@value #GRAPHICS_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#GRAPHICS_PROPERTY}
+     * property change event.
      *
      * @param  graphic The graphic to remove. This method call will be ignored if {@code graphic}
      *         has already been removed from this canvas.
@@ -426,25 +412,24 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
             oldGraphics = sortedGraphics; // May be null.
             if (graphic instanceof AbstractGraphic) {
                 final AbstractGraphic candidate = (AbstractGraphic) graphic;
-                if (((DisplayObject) candidate).owner == null) {
+                final Canvas canvas = candidate.getCanvas();
+                if (canvas == null) {
                     assert !graphics.containsKey(candidate) : candidate;
                     return;
                 }
-                if (((DisplayObject) candidate).owner != this) {
+                if (canvas != this) {
                     assert !graphics.containsKey(candidate) : candidate;
                     throw new IllegalArgumentException(Errors.format(
                                 ErrorKeys.CANVAS_NOT_OWNER_$1, candidate.getName()));
                 }
                 assert Thread.holdsLock(candidate.getTreeLock());
-                candidate.setVisible(false);
                 candidate.removePropertyChangeListener(PROPERTIES_LISTENER);
-                ((DisplayObject) candidate).clearCache();
-                ((DisplayObject) candidate).owner = null;
+                candidate.clearCache();
+                ((DisplayObject) candidate).setCanvas(null);
             } else {
                 if (!graphics.containsKey(graphic)) {
                     return;
                 }
-                graphic.setVisible(false);
             }
             if (graphics.remove(graphic) != graphic) {
                 throw new AssertionError(graphic); // Should never happen.
@@ -458,8 +443,8 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
     /**
      * Remove all graphics from this canvas.
      * <p>
-     * This method fires a {@value #GRAPHICS_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#GRAPHICS_PROPERTY}
+     * property change event.
      *
      * @see #add
      * @see #remove
@@ -471,13 +456,12 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
             oldGraphics = sortedGraphics; // May be null.
             for (final Iterator it=graphics.keySet().iterator(); it.hasNext();) {
                 final Graphic graphic = (Graphic) it.next();
-                graphic.setVisible(false);
                 if (graphic instanceof AbstractGraphic) {
                     final AbstractGraphic candidate = (AbstractGraphic) graphic;
                     assert Thread.holdsLock(candidate.getTreeLock());
                     candidate.removePropertyChangeListener(PROPERTIES_LISTENER);
-                    ((DisplayObject) candidate).clearCache();
-                    ((DisplayObject) candidate).owner = null;
+                    candidate.clearCache();
+                    ((DisplayObject) candidate).setCanvas(null);
                 }
             }
             clearCache();
@@ -692,8 +676,8 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
     /**
      * Returns the objective Coordinate Reference System (the projection of a georeferenced CRS)
      * for this {@code Canvas}. This is the "real world" CRS used for displaying all graphics.
-     * Note that underlying data in graphic primitives don't need to be in this CRS.
-     * Transformations will applied on the fly as needed at rendering time.
+     * Note that underlying data in graphic primitives don't need to be in terms of this CRS.
+     * Transformations will be applied on the fly as needed at rendering time.
      */
     public abstract CoordinateReferenceSystem getObjectiveCRS();
 
@@ -850,122 +834,11 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
     }
 
     /**
-     * Returns the rendering hint associated with the hint name. The default implementation looks
-     * for a rendering hint key of the given name in some known classes like {@link RenderingHints}
-     * and {@link javax.media.jai.JAI}, and invokes {@link #getRenderingHint} with that key.
-     * 
-     * @param  name the name of the hint.
-     * @return The hint value for the specified key, or {@code null} if none.
-     */
-    public Object getImplHint(final String name) throws IllegalArgumentException {
-        return getRenderingHint(toRenderingHintKey(name, "getImplHint"));
-    }
-
-    /**
-     * Sets a rendering hint for implementation or platform specific rendering information.
-     * The default implementation looks for a rendering hint key of the given name in some
-     * known classes like {@link RenderingHints} and {@link javax.media.jai.JAI}, and invokes
-     * {@link #getRenderingHint} with that key. For example the two following method calls are
-     * close to equivalent:
-     * <p>
-     * <ol>
-     *   <li><pre>setRenderingHint({@linkplain javax.media.jai.JAI#KEY_TILE_CACHE}, value);</pre></li>
-     *   <li><pre>setImplHint("KEY_TILE_CACHE", value);</pre></li>
-     * </ol>
-     * <p>
-     * The main differences are that approach 1 is more type-safe but will fails on a machine
-     * without JAI installation, while approach 2 is not type-safe but will silently ignore
-     * the hint on a machine without JAI installation. Likewise, a user can write for example
-     * <code>setImplHint("FINEST_RESOLUTION", value)</code> for setting the {@link #FINEST_RESOLUTION}
-     * hint without dependency to the {@code AbstractCanvas} Geotools implementation.
-     *
-     * @param name  the name of the hint.
-     * @param value The hint value. A {@code null} value remove the hint.
-     */
-    public void setImplHint(final String name, final Object value) {
-        final RenderingHints.Key key = toRenderingHintKey(name, "setImplHint");
-        if (key != null) {
-            setRenderingHint(key, value);
-        } else {
-            getLogger().fine(Logging.getResources(getLocale()).getString(
-                    LoggingKeys.HINT_IGNORED_$1, name));
-        }
-    }
-
-    /**
-     * Returns the rendering hint key for the specified name.
-     *
-     * @param  name       The key name.
-     * @param  methodName The caller name, for logging purpose only.
-     * @return A rendering hint key of the given name, or {@code null}
-     *         if no key were found for the given name.
-     */
-    private static RenderingHints.Key toRenderingHintKey(String name, final String methodName) {
-        if (true) {
-            /*
-             * Converts the name in upper case, adding '_' as needed.
-             * For example "someName" will be converted as "SOME_NAME".
-             */
-            final int length = name.length();
-            final StringBuffer buffer = new StringBuffer(length);
-            for (int i=0; i<length; i++) {
-                char c = name.charAt(i);
-                if (Character.isUpperCase(c)) {
-                    if (i!=0 && Character.isLowerCase(name.charAt(i-1))) {
-                        buffer.append('_');
-                    }
-                } else {
-                    c = Character.toUpperCase(c);
-                }
-                buffer.append(c);
-            }
-            name = buffer.toString();
-        }
-        /*
-         * Now searchs for the public static constants defined in some known classes.
-         */
-        for (int i=0; i<HINT_CLASSES.length; i++) {
-            try {
-                return (RenderingHints.Key) Class.forName(HINT_CLASSES[i]).getField(name).get(null);
-            } catch (Exception e) {
-                /*
-                 * May be SecurityException, ClassNotFoundException, NoSuchFieldException,
-                 * IllegalAccessException, NullPointerException, ClassCastException and more...
-                 * We ignore all of them and just try the next class.
-                 */
-                final LogRecord record = new LogRecord(Level.FINEST, name);
-                record.setSourceClassName("AbstractCanvas");
-                record.setSourceMethodName(methodName);
-                record.setThrown(e);
-                LOGGER.log(record);
-            }
-        }
-        return null;
-    }
-
-    /**
      * {@inheritDoc}
      */
     protected void listenersChanged() {
         super.listenersChanged();
         hasGraphicsListeners = listeners.hasListeners(GRAPHICS_PROPERTY);
-    }
-
-    /**
-     * Invoked when an unexpected exception occured. This exception may happen while a rendering
-     * is in process, so this method should not popup any dialog box and returns fast. The default
-     * implementation sends a record to the {@linkplain #getLogger() logger}.
-     *
-     * @param  sourceClassName  The caller's class name, for logging purpose.
-     * @param  sourceMethodName The caller's method name, for logging purpose.
-     * @param  exception        The exception.
-     */
-    protected void handleException(final String sourceClassName,
-                                   final String sourceMethodName,
-                                   final Exception exception)
-    {
-        Utilities.unexpectedException(getLogger().getName(),
-                sourceClassName, sourceMethodName, exception);
     }
 
     /**
@@ -999,7 +872,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * pool. It is an error to reference a {@code Canvas} after its dispose method has been called.
      *
      * @see AbstractGraphic#dispose
-     * @see PlanarImage#dispose
+     * @see javax.media.jai.PlanarImage#dispose
      */
     public synchronized void dispose() {
         final List/*<Graphic>*/ graphics = getGraphics();

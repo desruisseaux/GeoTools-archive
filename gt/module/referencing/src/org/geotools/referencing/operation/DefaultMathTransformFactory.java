@@ -226,7 +226,7 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
     /**
      * Returns the operation method for the specified name.
      *
-     * @param  method The case insensitive {@linkplain Identifier#getCode identifier code}
+     * @param  name The case insensitive {@linkplain Identifier#getCode identifier code}
      *         of the operation method to search for (e.g. {@code "Transverse_Mercator"}).
      * @return The operation method.
      * @throws NoSuchIdentifierException if there is no operation method registered for the

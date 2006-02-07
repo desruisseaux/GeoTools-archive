@@ -68,7 +68,7 @@ import org.geotools.display.event.ReferencedEvent;
  * default implementation uses <cite>Java2D</cite> geometry objects like {@link Shape} and
  * {@link AffineTransform}, which are somewhat lightweight objects. There is no dependency
  * toward AWT toolkit in this class (which means that this class can be used as a basis for
- * SWT renderer as well), and this class do not assume a rectangular widget.
+ * SWT renderer as well), and this class does not assume a rectangular widget.
  *
  * @since 2.3
  * @source $URL$
@@ -160,13 +160,12 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      *
      * @param factory The display factory associated with this canvas, or {@code null} if none.
      */
-    public ReferencedCanvas2D(final DisplayFactory factory) {
+    protected ReferencedCanvas2D(final DisplayFactory factory) {
         super(factory, 2);
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
+     * Sets the objective Coordinate Reference System for this {@code Canvas}.
      * If the specified CRS has more than two dimensions, then it must be a
      * {@linkplain org.opengis.referencing.crs.CompoundCRS compound CRS} with
      * a two dimensional head.
@@ -213,8 +212,8 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      * Sets the display bounds in terms of {@linkplain #getDisplayCRS display CRS}.
      * The display shape doesn't need to be {@linkplain Rectangle rectangular}.
      * <p>
-     * This method fires a {@value #DISPLAY_BOUNDS_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#DISPLAY_BOUNDS_PROPERTY}
+     * property change event.
      */
     public void setDisplayBounds(Shape bounds) {
         if (bounds == null) {
@@ -416,20 +415,23 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
 
     /**
      * Invokes <code>{@linkplain #setObjectiveToDeviceTransforms
-     * setObjectiveToDeviceTransforms}(@linkplain #objectiveToDisplay},
+     * setObjectiveToDeviceTransforms}{@linkplain #objectiveToDisplay},
      * {@linkplain #displayToDevice})</code> with the current affine transform values.
-     * Subclasses should invoke this method when they changed the (@link #objectiveToDisplay}
+     * Subclasses should invoke this method when they changed the {@link #objectiveToDisplay}
      * or the {@link #displayToDevice} affine transform. This method does nothing if the
      * current affine transform values didn't changed since the last time this method was
      * invoked.
      *
-     * @return {@code true} if at least one of (@link #objectiveToDisplay} and
+     * @return {@code true} if at least one of {@link #objectiveToDisplay} and
      *         {@link #displayToDevice} affine transforms changed since the last
      *         time this method was invoked.
      * @throws TransformException if this method failed to setup the {@linkplain #getDisplayCRS
      *         display} and {@linkplain #getDeviceCRS device} CRS from the affine transforms.
      *
      * @see #setObjectiveToDeviceTransforms
+     *
+     * @todo Consider deleting this method. We could add new new Matrix implementation extending
+     *       {@code AffineTransform} instead.
      */
     protected boolean updateObjectiveToDeviceTransforms() throws TransformException {
         assert Thread.holdsLock(getTreeLock());

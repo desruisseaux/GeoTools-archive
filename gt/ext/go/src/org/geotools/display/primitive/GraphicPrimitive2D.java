@@ -19,12 +19,14 @@
  */
 package org.geotools.display.primitive;
 
-// OpenGIS dependencies
+// J2SE dependencies
+import java.awt.Graphics2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -37,7 +39,7 @@ import org.geotools.resources.i18n.LoggingKeys;
 /**
  * Base class for Geotools implementations of {@link org.opengis.go.display.primitive.Graphic}
  * primitives. This implementation is designed for use with
- * {@link org.geotools.go.display.canvas.BufferedCanvas2D}.
+ * {@link org.geotools.display.canvas.BufferedCanvas2D}.
  *
  * @since 2.3
  * @source $URL$
@@ -84,10 +86,10 @@ public abstract class GraphicPrimitive2D extends ReferencedGraphic2D {
      *
      * <blockquote><code>
      * {@linkplain java.awt.Graphics2D} graphics =
-     * context.{@linkplain RenderingContext#getGraphics getGraphics()};</br>
+     * context.{@linkplain RenderingContext#getGraphics getGraphics()};<br>
      *
      * context.{@linkplain RenderingContext#setGraphicsCRS setGraphicsCRS}(context.{@linkplain
-     * RenderingContext#objectiveCRS objectiveCRS});</br>
+     * RenderingContext#objectiveCRS objectiveCRS});<br>
      *
      * // </code>NOTE: Skip the above line if you want to perform the rendering in<code><br>
      *
@@ -98,24 +100,22 @@ public abstract class GraphicPrimitive2D extends ReferencedGraphic2D {
      *
      * try {<br>
      *
-     * &nbsp;&nbsp;&nbsp;&nbsp;//
-     * </code><cite>Paint here map features in geographic coordinates (usually meters or
+     * &nbsp;&nbsp;&nbsp;&nbsp;
+     * // </code><cite>Paint here map features in geographic coordinates (usually meters or
      * angular degrees).</cite><code><br>
      *
      * &nbsp;&nbsp;&nbsp;&nbsp;
-     * context.{@linkplain RenderingContext#addPaintedArea(...);<br>
-     *
-     * <br>
+     * context.{@linkplain RenderingContext#addPaintedArea addPaintedArea}(...);<br>
      *
      * &nbsp;&nbsp;&nbsp;&nbsp;
      * context.{@linkplain RenderingContext#setGraphicsCRS setGraphicsCRS}(context.{@linkplain
-     * RenderingContext#displayCRS displayCRS});</br>
+     * RenderingContext#displayCRS displayCRS});<br>
      *
      * &nbsp;&nbsp;&nbsp;&nbsp;
      * // </code><cite>Write here texts or labels. Coordinates are in <u>dots</u>.</cite><code><br>
      *
      * &nbsp;&nbsp;&nbsp;&nbsp;
-     * context.{@linkplain RenderingContext#addPaintedArea(...);<br>
+     * context.{@linkplain RenderingContext#addPaintedArea addPaintedArea}(...);<br>
      *
      * } finally {<br>
      *
@@ -128,8 +128,8 @@ public abstract class GraphicPrimitive2D extends ReferencedGraphic2D {
      * During the rendering process, implementations are encouraged to declare a (potentially
      * approximative) bounding shape of their painted area with calls to
      * {@link RenderingContext#addPaintedArea(Shape)}. This is an optional operation: providing
-     * those hints only help {@link BufferedCanvas2D} to speed up future rendering and events
-     * processing.
+     * those hints only help {@link org.geotools.display.canvas.BufferedCanvas2D} to speed up
+     * future rendering and events processing.
      *
      * @param  context Information relatives to the rendering context. This object contains the
      *         {@link Graphics2D} to use and methods for getting {@link MathTransform} objects.

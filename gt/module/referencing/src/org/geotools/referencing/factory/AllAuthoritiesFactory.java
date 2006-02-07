@@ -117,7 +117,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
      * to {@link FactoryFinder}.
      *
      * @param hints An optional set of hints, or {@code null} if none.
-     * @paral factories A set of user-specified factories to try before to delegate
+     * @param factories A set of user-specified factories to try before to delegate
      *        to {@link FactoryFinder}, or {@code null} if none.
      */
     public AllAuthoritiesFactory(final Hints hints, final Collection/*<AuthorityFactory>*/ factories) {
@@ -128,7 +128,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
      * Creates a new factory using the specified hints, user factories and name separator.
      *
      * @param hints An optional set of hints, or {@code null} if none.
-     * @paral factories A set of user-specified factories to try before to delegate
+     * @param factories A set of user-specified factories to try before to delegate
      *        to {@link FactoryFinder}, or {@code null} if none.
      * @param separator The separator between the authority name and the code.
      */

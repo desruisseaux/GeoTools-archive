@@ -64,6 +64,7 @@ import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.metadata.Identifier; // For javadoc
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -307,7 +308,7 @@ public class FactoryGroup {
      * Returns the operation method for the specified name. This method scans all operations
      * registered in the {@linkplain #getMathTransformFactory current math transform factory}.
      *
-     * @param  method The case insensitive {@linkplain Identifier#getCode identifier code}
+     * @param  name The case insensitive {@linkplain Identifier#getCode identifier code}
      *         of the operation method to search for (e.g. {@code "Transverse_Mercator"}).
      * @return The operation method.
      * @throws NoSuchIdentifierException if there is no operation method registered for the

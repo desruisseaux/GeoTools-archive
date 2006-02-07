@@ -28,6 +28,7 @@ import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
+import java.beans.PropertyChangeEvent; // For javadoc
 
 // OpenGIS dependencies
 import org.opengis.go.display.canvas.Canvas;
@@ -53,7 +54,7 @@ import org.geotools.referencing.crs.DefaultEngineeringCRS;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ReferencedGraphic2D extends ReferencedGraphic {
+public abstract class ReferencedGraphic2D extends ReferencedGraphic {
     /**
      * A geometric shape that fully contains the area painted during the last
      * {@linkplain GraphicPrimitive2D#paint rendering}. This shape must be in terms of the
@@ -64,11 +65,11 @@ public class ReferencedGraphic2D extends ReferencedGraphic {
     private transient Shape displayBounds = XRectangle2D.INFINITY;
 
     /**
-     * {@code true} if this canvas or graphic has {@value #DISPLAY_BOUNDS_PROPERTY} properties
-     * listeners. Used in order to reduce the amount of {@link PropertyChangeEvent} objects
-     * created in the common case where no listener have interest in this property. This
-     * optimisation may be worth since a {@value #DISPLAY_BOUNDS_PROPERTY} property change
-     * event may be sent every time a graphic is painted.
+     * {@code true} if this canvas or graphic has
+     * {@value org.geotools.display.canvas.DisplayObject#DISPLAY_BOUNDS_PROPERTY} properties
+     * listeners. Used in order to reduce the amount of {@link PropertyChangeEvent} objects created
+     * in the common case where no listener have interest in this property. This optimisation may
+     * be worth since a those change event may be sent every time a graphic is painted.
      *
      * @see #listenersChanged
      */
@@ -118,14 +119,18 @@ public class ReferencedGraphic2D extends ReferencedGraphic {
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the objective coordinate refernece system for this graphic.
+     * If the specified CRS has more than two dimensions, then it must be a
+     * {@linkplain org.opengis.referencing.crs.CompoundCRS compound CRS} with
+     * a two dimensional head.
      */
     public void setObjectiveCRS(final CoordinateReferenceSystem crs) throws TransformException {
         super.setObjectiveCRS(CRSUtilities.getCRS2D(crs));
     }
 
     /**
-     * {@inheritDoc}
+     * Set the envelope for this graphic. Subclasses should invokes this method as soon as they
+     * known their envelope.
      */
     protected void setEnvelope(final Envelope envelope) throws TransformException {
         synchronized (getTreeLock()) {
@@ -152,16 +157,17 @@ public class ReferencedGraphic2D extends ReferencedGraphic {
     }
 
     /**
-     * Sets the display bounds in terms of {@linkplain #getDisplayCRS display CRS}. The display
-     * may be approximative, as long as it completely encloses the display area (possibly clipped
-     * to the {@linkplain ReferencedCanvas2D#getDisplayBounds canvas display bounds}. Simple shapes
-     * with fast {@code contains(...)} and {@code intersects(...)} methods are encouraged.
+     * Sets the display bounds in terms of {@linkplain ReferencedCanvas2D#getDisplayCRS display CRS}.
+     * The display may be approximative, as long as it completely encloses the display area (possibly
+     * clipped to the {@linkplain ReferencedCanvas2D#getDisplayBounds canvas display bounds}.
+     * Simple shapes with fast {@code contains(...)} and {@code intersects(...)} methods are
+     * encouraged.
      * <p>
      * Some canvas implementations will invoke this method automatically in their
      * {@linkplain org.geotools.display.canvas.BufferedCanvas2D rendering method}.
      * <p>
-     * This method fires a {@value #DISPLAY_BOUNDS_PROPERTY}
-     * {@linkplain PropertyChangeEvent property change event}.
+     * This method fires a {@value org.geotools.display.canvas.DisplayObject#DISPLAY_BOUNDS_PROPERTY}
+     * property change event.
      */
     public void setDisplayBounds(Shape bounds) {
         if (bounds == null) {
@@ -183,9 +189,9 @@ public class ReferencedGraphic2D extends ReferencedGraphic {
      * <cite>Swing</cite>). This {@code refresh()} method can be invoked from any thread;
      * it doesn't need to be the <cite>Swing</cite> thread.
      * <p>
-     * Note that this method repaint only the area rendered during the last call to {@link #paint}.
-     * If this graphic now cover a wider area, then the area to repaint must be specified with a call
-     * to {@link #refresh(Rectangle2D)} instead.
+     * Note that this method repaint only the area painted during the last {@linkplain
+     * GraphicPrimitive2D#paint rendering}. If this graphic now cover a wider area, then the
+     * area to repaint must be specified with a call to {@link #refresh(Rectangle2D)} instead.
      */
     public void refresh() {
         synchronized (getTreeLock()) {
@@ -279,7 +285,8 @@ public class ReferencedGraphic2D extends ReferencedGraphic {
     }
 
     /**
-     * {@inheritDoc}
+     * Invoked when a property change listener has been {@linkplain #addPropertyChangeListener
+     * added} or {@linkplain #removePropertyChangeListener removed}.
      */
     protected void listenersChanged() {
         super.listenersChanged();
@@ -287,7 +294,7 @@ public class ReferencedGraphic2D extends ReferencedGraphic {
     }
 
     /**
-     * {@inheritDoc}
+     * Clears all cached data.
      */
     protected void clearCache() {
         assert Thread.holdsLock(getTreeLock());
