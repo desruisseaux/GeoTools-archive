@@ -40,5 +40,5 @@ public interface LayerFeatureConstraints extends GTComponent {
 	/**
 	 * @param constraints The new feature type constraints.
 	 */
-	void setFeatrureTypeConstraints(FeatureTypeConstraint[] constraints);
+	void setFeatureTypeConstraints(FeatureTypeConstraint[] constraints);
 }

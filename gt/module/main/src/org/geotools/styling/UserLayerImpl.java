@@ -68,6 +68,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
 	
 	RemoteOWS remoteOWS;
     ArrayList styles = new GTList( this, "styles" );
+    FeatureTypeConstraint[] constraints = new FeatureTypeConstraint[0];
     
     public RemoteOWS getRemoteOWS()
     {
@@ -94,7 +95,6 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
 		fireChanged();
 	}
 	
-    
     public void setRemoteOWS(RemoteOWS service)
     {
     	RemoteOWS old = this.remoteOWS;
@@ -104,9 +104,12 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     }
     
     public FeatureTypeConstraint[] getLayerFeatureConstraints(){
-        return new FeatureTypeConstraint[0]; // was null
+    	return constraints;
     }
+    
     public void setLayerFeatureConstraints(FeatureTypeConstraint[] constraints){
+    	this.constraints = constraints;
+		fireChanged();
     }
     
     public Style[] getUserStyles(){
@@ -116,6 +119,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     public void setUserStyles(Style[] styles){ 
     	this.styles.clear();
     	this.styles.addAll(Arrays.asList(styles));
+		fireChanged();
     }    
 
     public void addUserStyle(Style style){

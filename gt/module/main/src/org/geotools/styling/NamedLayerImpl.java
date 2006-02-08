@@ -42,6 +42,7 @@ public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
 
     public void setLayerFeatureConstraints(FeatureTypeConstraint[] featureTypeConstraints) {
     	this.featureTypeConstraints = featureTypeConstraints;
+    	fireChanged();
     }
     
     public Style[] getStyles() {
@@ -55,6 +56,7 @@ public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
      */
     public void addStyle(Style sl) {
         styles.add(sl);
+        fireChanged();
     }
 
     public void accept(StyleVisitor visitor) {

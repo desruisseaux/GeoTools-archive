@@ -12,7 +12,7 @@ public class LayerFeatureConstraintsImpl extends AbstractGTComponent
 		return constraints;
 	}
 
-	public void setFeatrureTypeConstraints(FeatureTypeConstraint[] constraints) {
+	public void setFeatureTypeConstraints(FeatureTypeConstraint[] constraints) {
 		FeatureTypeConstraint[] old = this.constraints;
 		this.constraints = constraints;
 		

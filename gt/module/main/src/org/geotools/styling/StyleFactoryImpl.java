@@ -145,7 +145,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory
     
     public LayerFeatureConstraints createLayerFeatureConstraints(FeatureTypeConstraint[] featureTypeConstraints) {
     	LayerFeatureConstraints constraints = new LayerFeatureConstraintsImpl();
-    	constraints.setFeatrureTypeConstraints(featureTypeConstraints);
+    	constraints.setFeatureTypeConstraints(featureTypeConstraints);
     	
     	return constraints;
     }

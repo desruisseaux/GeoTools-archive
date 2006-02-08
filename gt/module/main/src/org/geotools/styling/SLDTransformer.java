@@ -286,19 +286,14 @@ public class SLDTransformer extends TransformerBase {
         public void visit(Rule rule) {
             start("Rule");
             element("Name", rule.getName());
-            element("Abstract", rule.getAbstract());
             element("Title", rule.getTitle());
+            element("Abstract", rule.getAbstract());
 
-            if (rule.getMaxScaleDenominator() != Double.POSITIVE_INFINITY) {
-                element("MaxScaleDenominator",
-                    rule.getMaxScaleDenominator() + "");
+            Graphic[] gr = rule.getLegendGraphic();
+            for (int i = 0; i < gr.length; i++) {
+                gr[i].accept(this);
             }
-
-            if (rule.getMinScaleDenominator() != 0.0) {
-                element("MinScaleDenominator",
-                    rule.getMinScaleDenominator() + "");
-            }
-
+            
             if (rule.getFilter() != null) {
                 filterTranslator.encode(rule.getFilter());
             }
@@ -308,14 +303,17 @@ public class SLDTransformer extends TransformerBase {
                 end("ElseFilter");
             }
 
-            Graphic[] gr = rule.getLegendGraphic();
+            if (rule.getMinScaleDenominator() != 0.0) {
+                element("MinScaleDenominator",
+                    rule.getMinScaleDenominator() + "");
+            }
 
-            for (int i = 0; i < gr.length; i++) {
-                gr[i].accept(this);
+            if (rule.getMaxScaleDenominator() != Double.POSITIVE_INFINITY) {
+                element("MaxScaleDenominator",
+                    rule.getMaxScaleDenominator() + "");
             }
 
             Symbolizer[] sym = rule.getSymbolizers();
-
             for (int i = 0; i < sym.length; i++) {
                 sym[i].accept(this);
             }
@@ -377,7 +375,9 @@ public class SLDTransformer extends TransformerBase {
         }
 
         public void visit(StyledLayerDescriptor sld) {
-            start("StyledLayerDescriptor");
+            AttributesImpl atts = new AttributesImpl();
+            atts.addAttribute("", "version", "version", "", "1.0.0");
+        	start("StyledLayerDescriptor", atts);
 
             StyledLayer[] layers = sld.getStyledLayers();
 
@@ -426,9 +426,14 @@ public class SLDTransformer extends TransformerBase {
             }
 
             FeatureTypeConstraint[] lfc = layer.getLayerFeatureConstraints();
+            if ((lfc != null) && lfc.length > 0) {
+            	start("LayerFeatureConstraints");
 
-            for (int i = 0; i < lfc.length; i++) {
-                visit(lfc[i]);
+            	for (int i = 0; i < lfc.length; i++) {
+            		visit(lfc[i]);
+            	}
+            	
+            	end("LayerFeatureConstraints");
             }
 
             Style[] styles = layer.getUserStyles();
@@ -449,17 +454,19 @@ public class SLDTransformer extends TransformerBase {
 
         public void visit(FeatureTypeConstraint ftc) {
         	start("FeatureTypeConstraint");
-        	element("FeatureTypeName", ftc.getFeatureTypeName());
-        	visit(ftc.getFilter());
+        	
+        	if (ftc != null) {
+        		element("FeatureTypeName", ftc.getFeatureTypeName());
+        		visit(ftc.getFilter());
 
-        	Extent[] extent = ftc.getExtents();
+        		Extent[] extent = ftc.getExtents();
 
-            for (int i = 0; i < extent.length; i++) {
-                visit(extent[i]);
-            }
-
-            end("FeatureTypeConstraint");
-            //TODO: implement this visitor (NamedLayer/UserLayer needs to implement FeatureTypeConstraint first)
+        		for (int i = 0; i < extent.length; i++) {
+        			visit(extent[i]);
+        		}
+        	}
+            
+        	end("FeatureTypeConstraint");
         }
 
         public void visit(Extent extent) {
