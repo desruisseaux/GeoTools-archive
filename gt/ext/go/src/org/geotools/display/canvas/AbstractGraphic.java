@@ -20,13 +20,15 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.display.primitive;
+package org.geotools.display.canvas;
 
 // J2SE dependencies
 import java.util.Locale;
+import java.util.logging.Logger;
 import java.text.NumberFormat;
 import java.text.FieldPosition;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 // OpenGIS dependencies
 import org.opengis.go.display.canvas.Canvas;
@@ -40,7 +42,6 @@ import org.opengis.go.display.style.Symbology;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.display.canvas.DisplayObject;
 
 
 /**
@@ -84,6 +85,11 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
     }
 
     /**
+     * The canvas that own this graphic, or {@code null} if none.
+     */
+    private Canvas canvas;
+
+    /**
      * The name assigned to this graphic.
      */
     private String name;
@@ -109,11 +115,52 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
     private double zOrder = DEFAULT_Z_ORDER;
 
     /**
+     * {@code true} if this canvas or graphic has {@value #SCALE_PROPERTY} properties listeners.
+     * Used in order to reduce the amount of {@link PropertyChangeEvent} objects created in the
+     * common case where no listener have interest in this property. This optimisation may be
+     * worth since a {@value #SCALE_PROPERTY} property change event is sent for every graphics
+     * everytime a zoom change.
+     * <p>
+     * This field is read only by {@link ReferencedCanvas#setScale}.
+     *
+     * @see #listenersChanged
+     */
+    boolean hasScaleListeners;
+
+    /**
      * Creates a new graphic. The {@linkplain #getZOrderHint z-order} default to positive infinity
      * (i.e. this graphic is drawn on top of everything else). Subclasses should invokes setters
      * methods in order to define properly this graphic properties.
      */
     protected AbstractGraphic() {
+    }
+
+    /**
+     * If this display object is contained in a canvas, returns the canvas that own it.
+     * Otherwise, returns {@code null}.
+     */
+    final Canvas getCanvas() {
+        return canvas;
+    }
+
+    /**
+     * Set the canvas to the specified value. Used by {@link AbstractCanvas} only.
+     */
+    final void setCanvas(final Canvas canvas) {
+        this.canvas = canvas;
+    }
+
+    /**
+     * Returns the locale for this object. If this graphic is contained in a
+     * {@linkplain AbstractCanvas canvas}, then the default implementation returns the canvas
+     * locale. Otherwise, this method returns the {@linkplain Locale#getDefault system locale}.
+     */
+    public Locale getLocale() {
+        final Canvas canvas = getCanvas();
+        if (canvas instanceof DisplayObject) {
+            return ((DisplayObject) canvas).getLocale();
+        }
+        return super.getLocale();
     }
 
     /**
@@ -146,8 +193,8 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
         synchronized (getTreeLock()) {
             old = this.name;
             this.name = name;
+            listeners.firePropertyChange(NAME_PROPERTY, old, name);
         }
-        listeners.firePropertyChange(NAME_PROPERTY, old, name);
     }
 
     /**
@@ -169,8 +216,8 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
         synchronized (getTreeLock()) {
             old = this.parent;
             this.parent = parent;
+            listeners.firePropertyChange(PARENT_PROPERTY, old, name);
         }
-        listeners.firePropertyChange(PARENT_PROPERTY, old, name);
     }
 
     /**
@@ -530,15 +577,15 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
         final double oldZOrder;
         synchronized (getTreeLock()) {
             oldZOrder = this.zOrder;
-            if (zOrder == oldZOrder) {
+            if (zOrderHint == oldZOrder) {
                 return;
             }
             this.zOrder = zOrderHint;
             refresh();
+            // TODO: Autoboxing with J2SE 1.5.
+            listeners.firePropertyChange(Z_ORDER_HINT_PROPERTY,
+                                         new Double(oldZOrder), new Double(zOrderHint));
         }
-        // TODO: Autoboxing with J2SE 1.5.
-        listeners.firePropertyChange(Z_ORDER_HINT_PROPERTY,
-                                     new Double(oldZOrder), new Double(zOrderHint));
     }
 
     /**
@@ -565,8 +612,8 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
             }
             this.visible = visible;
             refresh();
+            listeners.firePropertyChange(VISIBLE_PROPERTY, !visible, visible);
         }
-        listeners.firePropertyChange(VISIBLE_PROPERTY, !visible, visible);
     }
 
     /**
@@ -618,7 +665,9 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
      * @throws CloneNotSupportedException if this graphic is not cloneable.
      */
     protected Object clone() throws CloneNotSupportedException {
+        assert Thread.holdsLock(getTreeLock());
         final AbstractGraphic clone = (AbstractGraphic) super.clone();
+        clone.canvas = null;
         clone.parent = null;
         return clone;
     }
@@ -634,6 +683,58 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
             }
             super.dispose();
         }
+    }
+
+    /**
+     * Invoked when a property change listener has been {@linkplain #addPropertyChangeListener
+     * added} or {@linkplain #removePropertyChangeListener removed}.
+     */
+    //@Override
+    void listenersChanged() {
+        super.listenersChanged();
+        hasScaleListeners = hasListeners(SCALE_PROPERTY);
+    }
+
+    /**
+     * Check if there are any listeners for a specific property, <strong>excluding</strong>
+     * the {@link AbstractCanvas} listener proxy. This is used for avoiding notifications
+     * for {@link #SCALE_PROPERTY} and {@link #DISPLAY_BOUNDS_PROPERTY}, which are set by
+     * {@link AbstractCanvas} subclasses. We take the trouble to make this optimisation
+     * because the two above-cited events are fired everytime the zoom change.
+     */
+    final boolean hasListeners(final String property) {
+        if (listeners.hasListeners(property)) {
+            final PropertyChangeListener[] list = listeners.getPropertyChangeListeners();
+            for (int i=0; i<list.length; i++) {
+                if (list[i] != AbstractCanvas.PROPERTIES_LISTENER) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns the logger for all messages to be logged by the Geotools implementation of GO-1. If
+     * this object is a {@linkplain Graphic graphic} which is contained in a {@linkplain Canvas
+     * canvas}, then the default implementation returns the canvas logger. Otherwise, this method
+     * returns a default one.
+     */
+    protected Logger getLogger() {
+        final Canvas canvas = getCanvas();
+        if (canvas instanceof DisplayObject) {
+            return ((DisplayObject) canvas).getLogger();
+        }
+        return super.getLogger();
+    }
+
+    /**
+     * Returns the lock for synchronisation. If this object is contained in a canvas,
+     * then this method returns the same lock than the canvas.
+     */
+    protected final Object getTreeLock() {
+        final Canvas canvas = this.canvas;
+        return (canvas!=null) ? (Object)canvas : (Object)this;
     }
 
     /**

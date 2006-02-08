@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.display.primitive;
+package org.geotools.display.canvas;
 
 // J2SE dependencies
 import java.awt.Graphics2D;
@@ -136,7 +136,7 @@ public abstract class GraphicPrimitive2D extends ReferencedGraphic2D {
      * @throws TransformException If a coordinate transformation failed during the rendering
      *         process.
      */
-    public abstract void paint(final RenderingContext context) throws TransformException;
+    protected abstract void paint(final RenderingContext context) throws TransformException;
 
     /**
      * Hints that this graphic might be painted in the near future. Some implementations may
@@ -148,7 +148,7 @@ public abstract class GraphicPrimitive2D extends ReferencedGraphic2D {
      *
      * @see javax.media.jai.PlanarImage#prefetchTiles
      */
-    public void prefetch(final RenderingContext context) {
+    protected void prefetch(final RenderingContext context) {
     }
 
     /**

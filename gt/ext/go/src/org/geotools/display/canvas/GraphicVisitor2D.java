@@ -27,8 +27,6 @@ import org.opengis.go.display.primitive.Graphic;
 
 // Geotools dependencies
 import org.geotools.display.event.ReferencedEvent;
-import org.geotools.display.primitive.ReferencedGraphic;
-import org.geotools.display.primitive.ReferencedGraphic2D;
 
 
 /**

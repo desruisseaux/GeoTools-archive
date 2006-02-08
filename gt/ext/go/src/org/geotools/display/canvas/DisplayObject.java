@@ -33,7 +33,6 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 
 // OpenGIS dependencies
-import org.opengis.go.display.canvas.Canvas;
 import org.opengis.go.display.primitive.Graphic;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Logging;
@@ -41,12 +40,10 @@ import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
- * The base class for {@linkplain AbstractCanvas canvas} and
- * {@linkplain org.geotools.display.primitive.AbstractGraphic graphic primitives}.
- * This base class provides support for {@linkplain PropertyChangeListener property
+ * The base class for {@linkplain AbstractCanvas canvas} and {@linkplain AbstractGraphic graphic
+ * primitives}. This base class provides support for {@linkplain PropertyChangeListener property
  * change listeners}, and some basic services particular to the Geotools implementation
- * like {@linkplain #getLogger logging}, {@linkplain #getTreeLock synchronization},
- * <cite>etc.</cite>
+ * like {@linkplain #getLogger logging}, <cite>etc.</cite>
  *
  * @since 2.3
  * @source $URL$
@@ -72,7 +69,7 @@ public class DisplayObject {
 
     /**
      * The name of the {@linkplain PropertyChangeEvent property change event} fired when the
-     * {@linkplain org.geotools.display.primitive.AbstractGraphic#getName graphic name} changed.
+     * {@linkplain AbstractGraphic#getName graphic name} changed.
      */
     public static final String NAME_PROPERTY = "name";
 
@@ -102,23 +99,20 @@ public class DisplayObject {
 
     /**
      * The name of the {@linkplain PropertyChangeEvent property change event} fired when the
-     * {@linkplain org.geotools.display.primitive.AbstractGraphic#getVisible graphic visibility}
-     * changed.
+     * {@linkplain AbstractGraphic#getVisible graphic visibility} changed.
      */
     public static final String VISIBLE_PROPERTY = "visible";
 
     /**
      * The name of the {@linkplain PropertyChangeEvent property change event} fired when the
-     * {@linkplain org.geotools.display.primitive.AbstractGraphic#getZOrderHint z order hint}
-     * changed.
+     * {@linkplain AbstractGraphic#getZOrderHint z order hint} changed.
      */
     public static final String Z_ORDER_HINT_PROPERTY = "zOrderHint";
 
     /**
      * The name of the {@linkplain PropertyChangeEvent property change event}
      * fired when the {@linkplain ReferencedCanvas#getEnvelope canvas envelope} or
-     * {@linkplain org.geotools.display.primitive.ReferencedGraphic#getEnvelope graphic envelope}
-     * changed.
+     * {@linkplain ReferencedGraphic#getEnvelope graphic envelope} changed.
      */
     public static final String ENVELOPE_PROPERTY = "envelope";
 
@@ -136,7 +130,7 @@ public class DisplayObject {
 
     /**
      * The name of the {@linkplain PropertyChangeEvent property change event} fired when the
-     * {@linkplain org.geotools.display.primitive.AbstractGraphic#getParent graphic parent} changed.
+     * {@linkplain AbstractGraphic#getParent graphic parent} changed.
      */
     public static final String PARENT_PROPERTY = "parent";
 
@@ -144,24 +138,6 @@ public class DisplayObject {
      * Listeners to be notified about any changes in this canvas properties.
      */
     protected final PropertyChangeSupport listeners;
-
-    /**
-     * The canvas that own this graphic, or {@code null} if none.
-     */
-    private Canvas canvas;
-
-    /**
-     * {@code true} if this canvas or graphic has {@value #SCALE_PROPERTY} properties listeners.
-     * Used in order to reduce the amount of {@link PropertyChangeEvent} objects created in the
-     * common case where no listener have interest in this property. This optimisation may be
-     * worth since a {@value #SCALE_PROPERTY} property change event is sent for every graphics
-     * everytime a zoom change.
-     * <p>
-     * This field is read only by {@link ReferencedCanvas#setScale}.
-     *
-     * @see #listenersChanged
-     */
-    boolean hasScaleListeners;
 
     /**
      * Creates a new instance of display object.
@@ -358,62 +334,22 @@ public class DisplayObject {
      * interrested to know if there is any registered listener of a particular kind. Such
      * subclasses can override this method in order to perform their check only once.
      */
-    protected void listenersChanged() {
-        hasScaleListeners = listeners.hasListeners(SCALE_PROPERTY);
+    void listenersChanged() {
     }
 
     /**
-     * If this display object is contained in a canvas, returns the canvas that own it.
-     * Otherwise, returns {@code null}.
-     *
-     * @todo We should try to get ride of this association.
-     */
-    protected final Canvas getCanvas() {
-        return canvas;
-    }
-
-    /**
-     * Set the canvas to the specified value. Used by {@link AbstractCanvas} only.
-     */
-    final void setCanvas(final Canvas canvas) {
-        this.canvas = canvas;
-    }
-
-    /**
-     * Returns the locale for this object. If this object is a {@linkplain Graphic graphic} which
-     * is contained in a {@linkplain Canvas canvas}, then the default implementation returns the
-     * canvas locale. Otherwise, this method returns the {@linkplain Locale#getDefault system
-     * locale}.
+     * Returns the locale for this object. The default implementation returns the
+     * {@linkplain Locale#getDefault system locale}.
      */
     public Locale getLocale() {
-        final Canvas canvas = getCanvas();
-        if (canvas instanceof DisplayObject) {
-            return ((DisplayObject) canvas).getLocale();
-        }
         return Locale.getDefault();
     }
 
     /**
-     * Returns the logger for all messages to be logged by the Geotools implementation of GO-1. If
-     * this object is a {@linkplain Graphic graphic} which is contained in a {@linkplain Canvas
-     * canvas}, then the default implementation returns the canvas logger. Otherwise, this method
-     * returns a default one.
+     * Returns the logger for all messages to be logged by the Geotools implementation of GO-1.
      */
     protected Logger getLogger() {
-        final Canvas canvas = getCanvas();
-        if (canvas instanceof DisplayObject) {
-            return ((DisplayObject) canvas).getLogger();
-        }
         return LOGGER;
-    }
-
-    /**
-     * Returns the lock for synchronisation. If this object is contained in a canvas,
-     * then this method returns the same lock than the canvas.
-     */
-    protected final Object getTreeLock() {
-        final Canvas canvas = this.canvas;
-        return (canvas!=null) ? (Object)canvas : (Object)this;
     }
 
     /**
@@ -435,22 +371,6 @@ public class DisplayObject {
     }
 
     /**
-     * Creates a new {@code DisplayObject} of the same type as this object.
-     * <p>
-     * By default, {@code DisplayObject} are not cloneable. Subclasses need to implement the
-     * {@link Cloneable} interface if they support cloning.
-     *
-     * @return The cloned object.
-     * @throws CloneNotSupportedException if this object is not cloneable.
-     */
-    protected Object clone() throws CloneNotSupportedException {
-        assert Thread.holdsLock(getTreeLock());
-        final DisplayObject clone = (DisplayObject) super.clone();
-        clone.canvas = null;
-        return clone;
-    }
-
-    /**
      * Clears all cached data. Invoking this method may help to release some resources for other
      * applications. It should be invoked when we know that the map is not going to be rendered
      * for a while. For example it may be invoked from {@link java.applet.Applet#stop()}. Note
@@ -469,12 +389,12 @@ public class DisplayObject {
      * {@link Graphic} or {@link Canvas} in any way after its dispose method has been called.
      */
     public void dispose() {
-        synchronized (getTreeLock()) {
-            clearCache();
+        synchronized (listeners) {
             final PropertyChangeListener[] list = listeners.getPropertyChangeListeners();
             for (int i=list.length; --i>=0;) {
                 listeners.removePropertyChangeListener(list[i]);
             }
+            listenersChanged();
         }
     }
 }

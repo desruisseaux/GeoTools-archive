@@ -65,7 +65,6 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.UnmodifiableArrayList;
-import org.geotools.display.primitive.AbstractGraphic;
 
 
 /**
@@ -137,14 +136,16 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
     /**
      * A listener to be notified when a graphic property changed.
      */
-    private static final PropertyChangeListener PROPERTIES_LISTENER = new PropertyChangeListener() {
+    static final PropertyChangeListener PROPERTIES_LISTENER = new PropertyChangeListener() {
         public void propertyChange(final PropertyChangeEvent event) {
             final Object source = event.getSource();
             if (source instanceof Graphic) {
                 final AbstractGraphic graphic = (AbstractGraphic) source;
                 final Canvas target = graphic.getCanvas();
                 if (target instanceof AbstractCanvas) {
-                    ((AbstractCanvas) target).graphicPropertyChanged(graphic, event);
+                    synchronized (target) {
+                        ((AbstractCanvas) target).graphicPropertyChanged(graphic, event);
+                    }
                 }
             }
         }
@@ -281,12 +282,9 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * This method fires a {@value org.geotools.display.canvas.DisplayObject#TITLE_PROPERTY}
      * property change event.
      */
-    public void setTitle(final String title) {
-        final CharSequence old;
-        synchronized (this) {
-            old = this.title;
-            this.title = title;
-        }
+    public synchronized void setTitle(final String title) {
+        final CharSequence old = this.title;
+        this.title = title;
         listeners.firePropertyChange(TITLE_PROPERTY, old, title);
     }
 
@@ -297,12 +295,9 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * This method fires a {@value org.geotools.display.canvas.DisplayObject#TITLE_PROPERTY}
      * property change event.
      */
-    public void setTitle(final InternationalString title) {
-        final CharSequence old;
-        synchronized (this) {
-            old = this.title;
-            this.title = title;
-        }
+    public synchronized void setTitle(final InternationalString title) {
+        final CharSequence old = this.title;
+        this.title = title;
         listeners.firePropertyChange(TITLE_PROPERTY, old, title);
     }
 
@@ -331,48 +326,42 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @see #removeAll
      * @see #getGraphics
      */
-    public Graphic add(Graphic graphic) throws IllegalArgumentException {
-        final List oldGraphics;
-        synchronized (this) {
-            oldGraphics = sortedGraphics; // May be null.
-            if (graphic instanceof AbstractGraphic) {
-                AbstractGraphic candidate = (AbstractGraphic) graphic;
-                final Canvas canvas = candidate.getCanvas();
-                if (canvas == this) {
-                    /*
-                     * The supplied graphic is already part of this canvas.
-                     * There is nothing to do.
-                     */
-                    assert graphics.containsKey(candidate) : candidate;
-                    return candidate;
-                }
+    public synchronized Graphic add(Graphic graphic) throws IllegalArgumentException {
+        final List oldGraphics = sortedGraphics; // May be null.
+        if (graphic instanceof AbstractGraphic) {
+            AbstractGraphic candidate = (AbstractGraphic) graphic;
+            final Canvas canvas = candidate.getCanvas();
+            if (canvas == this) {
+                // The supplied graphic is already part of this canvas.
+                assert graphics.containsKey(candidate) : candidate;
+            } else {
                 assert !graphics.containsKey(candidate) : candidate;
                 if (canvas != null) try {
-                    graphic = candidate = (AbstractGraphic) ((DisplayObject) candidate).clone();
+                    graphic = candidate = (AbstractGraphic) candidate.clone();
                 } catch (CloneNotSupportedException e) {
                     throw new IllegalArgumentException(
                             Errors.format(ErrorKeys.CANVAS_NOT_OWNER_$1, graphic.getName()));
                     // TODO: Add the cause when we will be allowed to compile for J2SE 1.5.
                 }
-                ((DisplayObject) candidate).setCanvas(this);
+                candidate.setCanvas(this);
                 candidate.addPropertyChangeListener(PROPERTIES_LISTENER);
             }
-            /*
-             * Add the new graphic in the 'graphics' array. The array will growth as needed and
-             * 'sortedGraphics' is set to null  so that the array will be resorted when needed.
-             * If an identical graphic (in the sense of Object.equals(....)) existed prior this
-             * method call, then the previous graphic instance will be kept (instead of the new
-             * supplied one) but reordered as if it was just added.
-             */
-            final Graphic previous = (Graphic) graphics.put(graphic, graphic);
-            if (previous != null) {
-                graphic = previous;
-                graphics.put(graphic, graphic);
-            }
-            sortedGraphics = null;
         }
+        /*
+         * Add the new graphic in the 'graphics' array. The array will growth as needed and
+         * 'sortedGraphics' is set to null  so that the array will be resorted when needed.
+         * If an identical graphic (in the sense of Object.equals(....)) existed prior this
+         * method call, then the previous graphic instance will be kept (instead of the new
+         * supplied one).
+         */
+        final Graphic previous = (Graphic) graphics.put(graphic, graphic);
+        if (previous != null) {
+            graphic = previous;
+            graphics.put(graphic, graphic);
+        }
+        sortedGraphics = null;
         if (hasGraphicsListeners) {
-            listeners.firePropertyChange(GRAPHICS_PROPERTY, oldGraphics, null);
+            listeners.firePropertyChange(GRAPHICS_PROPERTY, oldGraphics, getGraphics());
         }
         return graphic;
     }
@@ -406,37 +395,35 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @see #removeAll
      * @see #getGraphics
      */
-    public void remove(final Graphic graphic) throws IllegalArgumentException {
-        final List oldGraphics;
-        synchronized (this) {
-            oldGraphics = sortedGraphics; // May be null.
-            if (graphic instanceof AbstractGraphic) {
-                final AbstractGraphic candidate = (AbstractGraphic) graphic;
-                final Canvas canvas = candidate.getCanvas();
-                if (canvas == null) {
-                    assert !graphics.containsKey(candidate) : candidate;
-                    return;
-                }
-                if (canvas != this) {
-                    assert !graphics.containsKey(candidate) : candidate;
-                    throw new IllegalArgumentException(Errors.format(
-                                ErrorKeys.CANVAS_NOT_OWNER_$1, candidate.getName()));
-                }
-                assert Thread.holdsLock(candidate.getTreeLock());
-                candidate.removePropertyChangeListener(PROPERTIES_LISTENER);
-                candidate.clearCache();
-                ((DisplayObject) candidate).setCanvas(null);
-            } else {
-                if (!graphics.containsKey(graphic)) {
-                    return;
-                }
+    public synchronized void remove(final Graphic graphic) throws IllegalArgumentException {
+        final List oldGraphics = sortedGraphics; // May be null.
+        if (graphic instanceof AbstractGraphic) {
+            final AbstractGraphic candidate = (AbstractGraphic) graphic;
+            final Canvas canvas = candidate.getCanvas();
+            if (canvas == null) {
+                assert !graphics.containsKey(candidate) : candidate;
+                return;
             }
-            if (graphics.remove(graphic) != graphic) {
-                throw new AssertionError(graphic); // Should never happen.
+            if (canvas != this) {
+                assert !graphics.containsKey(candidate) : candidate;
+                throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.CANVAS_NOT_OWNER_$1, candidate.getName()));
+            }
+            assert Thread.holdsLock(candidate.getTreeLock());
+            candidate.removePropertyChangeListener(PROPERTIES_LISTENER);
+            candidate.clearCache();
+            candidate.setCanvas(null);
+        } else {
+            if (!graphics.containsKey(graphic)) {
+                return;
             }
         }
+        if (graphics.remove(graphic) != graphic) {
+            throw new AssertionError(graphic); // Should never happen.
+        }
+        sortedGraphics = null;
         if (hasGraphicsListeners) {
-            listeners.firePropertyChange(GRAPHICS_PROPERTY, oldGraphics, null);
+            listeners.firePropertyChange(GRAPHICS_PROPERTY, oldGraphics, getGraphics());
         }
     }
 
@@ -450,24 +437,22 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @see #remove
      * @see #getGraphics
      */
-    public void removeAll() {
-        final List oldGraphics;
-        synchronized (this) {
-            oldGraphics = sortedGraphics; // May be null.
-            for (final Iterator it=graphics.keySet().iterator(); it.hasNext();) {
-                final Graphic graphic = (Graphic) it.next();
-                if (graphic instanceof AbstractGraphic) {
-                    final AbstractGraphic candidate = (AbstractGraphic) graphic;
-                    assert Thread.holdsLock(candidate.getTreeLock());
-                    candidate.removePropertyChangeListener(PROPERTIES_LISTENER);
-                    candidate.clearCache();
-                    ((DisplayObject) candidate).setCanvas(null);
-                }
+    public synchronized void removeAll() {
+        final List oldGraphics = sortedGraphics; // May be null.
+        for (final Iterator it=graphics.keySet().iterator(); it.hasNext();) {
+            final Graphic graphic = (Graphic) it.next();
+            if (graphic instanceof AbstractGraphic) {
+                final AbstractGraphic candidate = (AbstractGraphic) graphic;
+                assert Thread.holdsLock(candidate.getTreeLock());
+                candidate.removePropertyChangeListener(PROPERTIES_LISTENER);
+                candidate.clearCache();
+                candidate.setCanvas(null);
             }
-            clearCache();
         }
+        sortedGraphics = null;
+        clearCache(); // Must be after 'sortedGraphics=null'
         if (hasGraphicsListeners) {
-            listeners.firePropertyChange(GRAPHICS_PROPERTY, oldGraphics, null);
+            listeners.firePropertyChange(GRAPHICS_PROPERTY, oldGraphics, getGraphics());
         }
     }
 
@@ -499,17 +484,14 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      *
      * @param graphic The graphic that changed.
      * @param event   The property change event.
-     *
-     * @todo Need to register only for the properties of interests.
      */
     protected void graphicPropertyChanged(final AbstractGraphic graphic,
                                           final PropertyChangeEvent event)
     {
+        assert Thread.holdsLock(this);
         final String propertyName = event.getPropertyName();
-        if (propertyName.equalsIgnoreCase("zOrderHint")) {
-            synchronized (this) {
-                sortedGraphics = null; // Will force a new sorting according z-order.
-            }
+        if (propertyName.equalsIgnoreCase(Z_ORDER_HINT_PROPERTY)) {
+            sortedGraphics = null; // Will force a new sorting according z-order.
             return;
         }
     }
@@ -564,7 +546,6 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @todo Not yet implemented.
      */
     public void removeCanvasListener(final CanvasListener listener) {
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -590,11 +571,10 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @todo Not yet implemented.
      */
     public void removeCanvasHandler(CanvasHandler handler) {
-        throw new UnsupportedOperationException();
     }
 
     /**
-     * Returns the currently active {@code CanvasHandler} or null if no handler is active.
+     * Returns the currently active {@code CanvasHandler} or {@code null} if no handler is active.
      *
      * @todo Not yet implemented.
      */
@@ -836,7 +816,8 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
     /**
      * {@inheritDoc}
      */
-    protected void listenersChanged() {
+    //@Override
+    void listenersChanged() {
         super.listenersChanged();
         hasGraphicsListeners = listeners.hasListeners(GRAPHICS_PROPERTY);
     }
@@ -851,7 +832,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @see #dispose
      */
     protected void clearCache() {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         final List/*<Graphic>*/ graphics = getGraphics();
         for (int i=graphics.size(); --i>=0;) {
             final Graphic graphic = (Graphic) graphics.get(i);

@@ -77,8 +77,6 @@ import org.geotools.util.RangeSet;
 import org.geotools.resources.GraphicsUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.geometry.XAffineTransform;
-import org.geotools.display.primitive.AbstractGraphic;
-import org.geotools.display.primitive.GraphicPrimitive2D;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Logging;
@@ -314,9 +312,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
             final Object value = event.getOldValue();
             if (value instanceof Number) {
                 final double oldZOrder = ((Number) value).doubleValue();
-                synchronized (this) {
-                    flushOffscreenBuffer(oldZOrder);
-                }
+                flushOffscreenBuffer(oldZOrder);
             }
         }
     }
@@ -715,7 +711,7 @@ renderOffscreen:while (true) {
                        final Rectangle          clipBounds)
             throws TransformException
     {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         if (graphic.getVisible()) {
             final Shape paintedArea = graphic.getDisplayBounds();
             if (paintedArea==null || clipBounds==null || paintedArea.intersects(clipBounds)) {
@@ -756,6 +752,7 @@ renderOffscreen:while (true) {
                         final Rectangle2D objectiveArea,
                         final Rectangle   displayArea)
     {
+        // Do NOT synchronize before next block.
         /*
          * If the current thread is not the Swing thread, schedule for
          * execution in the Swing thread and returns immediatement.
@@ -1028,7 +1025,7 @@ renderOffscreen:while (true) {
      * Flush all offscreen buffers.
      */
     private void flushOffscreenBuffers() {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         if (offscreenBuffers != null) {
             for (int i=0; i<offscreenBuffers.length; i++) {
                 final Image image = offscreenBuffers[i];

@@ -58,8 +58,6 @@ import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.referencing.operation.matrix.Matrix3;
-import org.geotools.display.primitive.ReferencedGraphic2D;
-import org.geotools.display.primitive.ReferencedGraphic;
 import org.geotools.display.event.ReferencedEvent;
 
 
@@ -215,15 +213,13 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      * This method fires a {@value org.geotools.display.canvas.DisplayObject#DISPLAY_BOUNDS_PROPERTY}
      * property change event.
      */
-    public void setDisplayBounds(Shape bounds) {
+    public synchronized void setDisplayBounds(Shape bounds) {
         if (bounds == null) {
             bounds = XRectangle2D.INFINITY;
         }
         final Shape old;
-        synchronized (this) {
-            old = displayBounds;
-            displayBounds = bounds;
-        }
+        old = displayBounds;
+        displayBounds = bounds;
         listeners.firePropertyChange(DISPLAY_BOUNDS_PROPERTY, old, bounds);
     }
 
@@ -237,7 +233,7 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      * @return The rectangle in terms of {@linkplain #getDisplayCRS display CRS}.
      */
     protected final Rectangle objectiveToDisplay(final Rectangle2D bounds) {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         return (Rectangle) XAffineTransform.transform(objectiveToDisplay, bounds, new Rectangle());
     }
 
@@ -272,6 +268,7 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      * @return {@code true} if the specified area is already in process of being painted.
      */
     final boolean isDirtyArea(final Rectangle area) {
+        assert Thread.holdsLock(this);
         if (dirtyArea == null) {
             return true;
         }
@@ -289,6 +286,7 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      *        {@linkplain #getDisplayCRS display CRS}.
      */
     protected void paintStarted(final Shape dirtyArea) {
+        assert Thread.holdsLock(this);
         this.dirtyArea = dirtyArea;
     }
 
@@ -301,6 +299,7 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      *        if a failure occured.
      */
     protected void paintFinished(final boolean success) {
+        assert Thread.holdsLock(this);
         dirtyArea = null;
     }
 
@@ -434,7 +433,7 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      *       {@code AffineTransform} instead.
      */
     protected boolean updateObjectiveToDeviceTransforms() throws TransformException {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         if (displayToDeviceMatrix.equalsAffine(displayToDevice)) {
             if (objectiveToDisplayMatrix.equalsAffine(objectiveToDisplay)) {
                 // No change detected.
@@ -473,7 +472,7 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      * @see ReferencedGraphic2D#zoomChanged
      */
     protected void zoomChanged(final AffineTransform change) {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         final List/*<Graphic>*/ graphics = getGraphics();
         for (int i=graphics.size(); --i>=0;) {
             final Graphic graphic = (Graphic) graphics.get(i);

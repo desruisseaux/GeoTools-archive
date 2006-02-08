@@ -45,15 +45,15 @@ import org.geotools.resources.i18n.ErrorKeys;
 /**
  * Informations relative to a rendering in progress. A {@code RenderingContext} instance is
  * created by {@link BufferedCanvas2D#paint} at rendering time, which iterates over all graphic
- * objects and invokes {@link org.geotools.display.primitive.GraphicPrimitive2D#paint} for each
- * of them. The rendering context is disposed once the rendering is completed.
- * {@code RenderingContext} instances contain the following informations:
+ * objects and invokes {@link GraphicPrimitive2D#paint} for each of them. The rendering context
+ * is disposed once the rendering is completed. {@code RenderingContext} instances contain the
+ * following informations:
  * <p>
  * <ul>
  *   <li>The {@link Graphics2D} handler to use for rendering.</li>
  *   <li>The coordinate reference systems in use and the transformations between them.</li>
  *   <li>The area rendered up to date. This information shall be updated by each
- *       {@link org.geotools.display.primitive.GraphicPrimitive2D} while they are painting.</li>
+ *       {@link GraphicPrimitive2D} while they are painting.</li>
  *   <li>The map scale.</li>
  * </ul>
  * <p>
@@ -62,8 +62,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * are {@linkplain MathTransform transforms}):
  * 
  * <p align="center">
- * {@link org.geotools.display.primitive.GraphicPrimitive2D#getCoordinateReferenceSystem graphicCRS}
- * &nbsp; <img src="doc-files/right.png">
+ * &nbsp; {@code graphicCRS}    &nbsp; <img src="doc-files/right.png">
  * &nbsp; {@link #objectiveCRS} &nbsp; <img src="doc-files/right.png">
  * &nbsp; {@link #displayCRS}   &nbsp; <img src="doc-files/right.png">
  * &nbsp; {@code deviceCRS}
@@ -75,7 +74,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Martin Desruisseaux
  *
  * @see BufferedCanvas2D#paint
- * @see org.geotools.display.primitive.GraphicPrimitive2D#paint
+ * @see GraphicPrimitive2D#paint
  */
 public final class RenderingContext {
     /**
@@ -95,8 +94,8 @@ public final class RenderingContext {
     /**
      * A snapshot of {@link ReferencedCanvas#getObjectiveCRS} at the time of painting. This is the
      * "real world" coordinate reference system that the user will see on the screen. Data from all
-     * {@link org.geotools.display.primitive.GraphicPrimitive2D} must be transformed to this CRS
-     * before to be painted. Units are usually "real world" metres.
+     * {@link GraphicPrimitive2D} must be transformed to this CRS before to be painted. Units are
+     * usually "real world" metres.
      * <p>
      * This coordinate system is usually set once for a given {@link BufferedCanvas2D} and do not
      * change anymore, except if the user wants to change the projection see on screen.
@@ -157,7 +156,7 @@ public final class RenderingContext {
     /**
      * {@code true} if the map is printed instead of painted on screen. When printing, graphic
      * primitives should block until all data are available instead of painting only available
-     * data and invoke {@link org.geotools.display.primitive.GraphicPrimitive2D#refresh()} later.
+     * data and invoke {@link GraphicPrimitive2D#refresh()} later.
      */
     private final boolean isPrinting;
 
@@ -339,8 +338,7 @@ public final class RenderingContext {
      *
      * <ul>
      *   <li><p><b>({@code graphicCRS}, {@linkplain #objectiveCRS}):</b><br>
-     *       Arbitrary transform from the data CRS (used internally in a
-     *       {@link org.geotools.display.primitive.GraphicPrimitive2D})
+     *       Arbitrary transform from the data CRS (used internally in a {@link GraphicPrimitive2D})
      *       to the objective CRS (set in {@link BufferedCanvas2D}).</p></li>
      * 
      *   <li><p><b>({@link #objectiveCRS}, {@link #displayCRS}):</b><br>
@@ -384,8 +382,7 @@ public final class RenderingContext {
     /**
      * Returns {@code true} if the output device is a printer instead of screen. When printing,
      * graphic primitives should block until all data are available instead of painting only
-     * available data and invoke {@link org.geotools.display.primitive.GraphicPrimitive2D#refresh()}
-     * later.
+     * available data and invoke {@link GraphicPrimitive2D#refresh()} later.
      */
     public boolean isPrinting() {
         return isPrinting;
@@ -416,13 +413,12 @@ public final class RenderingContext {
 
     /**
      * Declares that an area has been painted. This method should be invoked from
-     * {@link org.geotools.display.primitive.GraphicPrimitive2D#paint} at rendering time.
-     * {@link BufferedCanvas2D} uses this information in order to determine which graphic
-     * primitives need to be repainted when a screen area is damaged. If {@code addPaintedArea(...)}
-     * methods are never invoked from a particular
-     * {@link org.geotools.display.primitive.GraphicPrimitive2D}, then the canvas will assumes
-     * that the painted area is unknow and conservatively repaint all graphic primitives during
-     * subsequent rendering.
+     * {@link GraphicPrimitive2D#paint} at rendering time. {@link BufferedCanvas2D}
+     * uses this information in order to determine which graphic primitives need to
+     * be repainted when a screen area is damaged. If {@code addPaintedArea(...)}
+     * methods are never invoked from a particular {@link GraphicPrimitive2D}, then
+     * the canvas will assumes that the painted area is unknow and conservatively
+     * repaint all graphic primitives during subsequent rendering.
      *
      * @param  area A bounding shape of the area just painted. This shape may be approximative,
      *         as long as it completely encloses the painted area. Simple shapes with fast

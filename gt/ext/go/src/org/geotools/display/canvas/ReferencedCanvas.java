@@ -76,8 +76,6 @@ import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.IdentityTransform;
-import org.geotools.display.primitive.ReferencedGraphic;
-import org.geotools.display.primitive.AbstractGraphic;
 import org.geotools.display.event.ReferencedEvent;
 
 
@@ -203,6 +201,17 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * of any scale change.
      */
     private Double scaleFactor;
+
+    /**
+     * {@code true} if this canvas or graphic has {@value #SCALE_PROPERTY} properties listeners.
+     * Used in order to reduce the amount of {@link PropertyChangeEvent} objects created in the
+     * common case where no listener have interest in this property. This optimisation may be
+     * worth since a {@value #SCALE_PROPERTY} property change event is sent for every graphics
+     * everytime a zoom change.
+     *
+     * @see #listenersChanged
+     */
+    private boolean hasScaleListeners;
 
     /**
      * {@code true} if this canvas has
@@ -463,7 +472,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
                 final Graphic candidate = (Graphic) graphics.get(i);
                 if (candidate instanceof AbstractGraphic) {
                     final AbstractGraphic graphic = ((AbstractGraphic) candidate);
-                    if (((DisplayObject) graphic).hasScaleListeners) {
+                    if (graphic.hasScaleListeners) {
                         graphic.listeners.firePropertyChange(SCALE_PROPERTY, oldScale, newScale);
                     }
                 }
@@ -486,47 +495,43 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * This method fires {@value org.geotools.display.canvas.DisplayObject#GRAPHICS_PROPERTY} and
      * {@value org.geotools.display.canvas.DisplayObject#ENVELOPE_PROPERTY} property change events.
      */
-    public Graphic add(Graphic graphic) {
+    public synchronized Graphic add(Graphic graphic) {
         Envelope oldEnvelope = null;
-        synchronized (this) {
-            graphic = super.add(graphic);
-            if (graphic instanceof ReferencedGraphic) {
-                final ReferencedGraphic   referenced   = (ReferencedGraphic) graphic;
-                CoordinateReferenceSystem graphicCRS   = referenced.getObjectiveCRS();
-                CoordinateReferenceSystem objectiveCRS = getObjectiveCRS();
-                if (useDefaultCRS) {
-                    try {
-                        setObjectiveCRS(graphicCRS);
-                        objectiveCRS = graphicCRS;
-                        useDefaultCRS = false;
-                        getLogger().info(Logging.getResources(getLocale()).getString(
-                                         LoggingKeys.CHANGED_COORDINATE_REFERENCE_SYSTEM));
-                    } catch (TransformException unexpected) {
-                        /*
-                         * Should not happen, since this canvas do not yet have any graphic.
-                         * Log the warning and continue with the Canvas CRS unchanged.
-                         */
-                        handleException("add", unexpected);
-                    }
-                }
-                /*
-                 * Now set the graphic CRS to this canvas CRS and update the canvas envelope.
-                 */
+        graphic = super.add(graphic);
+        if (graphic instanceof ReferencedGraphic) {
+            final ReferencedGraphic   referenced   = (ReferencedGraphic) graphic;
+            CoordinateReferenceSystem graphicCRS   = referenced.getObjectiveCRS();
+            CoordinateReferenceSystem objectiveCRS = getObjectiveCRS();
+            if (useDefaultCRS) {
                 try {
-                    referenced.setObjectiveCRS(objectiveCRS);
-                } catch (TransformException exception) {
-                    final IllegalArgumentException e;
-                    e = new IllegalArgumentException(exception.getLocalizedMessage());
-                    e.initCause(exception); // TODO: put straight into 'new' with J2SE 1.5.
-                    throw e;
+                    setObjectiveCRS(graphicCRS);
+                    objectiveCRS = graphicCRS;
+                    useDefaultCRS = false;
+                } catch (TransformException unexpected) {
+                    /*
+                     * Should not happen, since this canvas do not yet have any graphic.
+                     * Log the warning and continue with the Canvas CRS unchanged.
+                     */
+                    handleException("add", unexpected);
                 }
-                if (hasEnvelopeListeners) {
-                    oldEnvelope = new GeneralEnvelope(envelope);
-                }
-                graphicCRS = referenced.getObjectiveCRS(); // May have changed.
-                final Envelope graphicEnvelope = referenced.getEnvelope();
-                graphicEnvelopeChanged(null, graphicEnvelope, graphicCRS, "ReferencedCanvas", "add");
             }
+            /*
+             * Now set the graphic CRS to this canvas CRS and update the canvas envelope.
+             */
+            try {
+                referenced.setObjectiveCRS(objectiveCRS);
+            } catch (TransformException exception) {
+                final IllegalArgumentException e;
+                e = new IllegalArgumentException(exception.getLocalizedMessage());
+                e.initCause(exception); // TODO: put straight into 'new' with J2SE 1.5.
+                throw e;
+            }
+            if (hasEnvelopeListeners) {
+                oldEnvelope = new GeneralEnvelope(envelope);
+            }
+            graphicCRS = referenced.getObjectiveCRS(); // May have changed.
+            final Envelope graphicEnvelope = referenced.getEnvelope();
+            graphicEnvelopeChanged(null, graphicEnvelope, graphicCRS, "ReferencedCanvas", "add");
         }
         if (oldEnvelope != null) {
             listeners.firePropertyChange(ENVELOPE_PROPERTY, oldEnvelope, envelope);
@@ -537,23 +542,21 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     /**
      * {@inheritDoc}
      */
-    public void remove(final Graphic graphic) {
+    public synchronized void remove(final Graphic graphic) {
         Envelope oldEnvelope = null;
-        synchronized (this) {
-            if (graphic instanceof ReferencedGraphic) {
-                final ReferencedGraphic referenced = (ReferencedGraphic) graphic;
-                if (referenced.getCanvas() == this) {
-                    if (hasEnvelopeListeners) {
-                        oldEnvelope = new GeneralEnvelope(envelope);
-                    }
-                    final CoordinateReferenceSystem graphicCRS = referenced.getObjectiveCRS();
-                    final Envelope graphicEnvelope = referenced.getEnvelope();
-                    graphicEnvelopeChanged(graphicEnvelope, null, graphicCRS,
-                                           "ReferencedCanvas", "remove");
+        if (graphic instanceof ReferencedGraphic) {
+            final ReferencedGraphic referenced = (ReferencedGraphic) graphic;
+            if (referenced.getCanvas() == this) {
+                if (hasEnvelopeListeners) {
+                    oldEnvelope = new GeneralEnvelope(envelope);
                 }
+                final CoordinateReferenceSystem graphicCRS = referenced.getObjectiveCRS();
+                final Envelope graphicEnvelope = referenced.getEnvelope();
+                graphicEnvelopeChanged(graphicEnvelope, null, graphicCRS,
+                                       "ReferencedCanvas", "remove");
             }
-            super.remove(graphic);
         }
+        super.remove(graphic);
         if (oldEnvelope != null) {
             listeners.firePropertyChange(ENVELOPE_PROPERTY, oldEnvelope, envelope);
         }
@@ -562,13 +565,10 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     /**
      * {@inheritDoc}
      */
-    public void removeAll() {
-        final Envelope oldEnvelope;
-        synchronized (this) {
-            oldEnvelope = new GeneralEnvelope(envelope);
-            super.removeAll();
-            envelope.setToNull();
-        }
+    public synchronized void removeAll() {
+        final Envelope oldEnvelope = new GeneralEnvelope(envelope);
+        super.removeAll();
+        envelope.setToNull();
         listeners.firePropertyChange(ENVELOPE_PROPERTY, oldEnvelope, envelope);
     }
 
@@ -582,18 +582,14 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         final String propertyName = event.getPropertyName();
         final Envelope oldEnvelope;
         if (propertyName.equalsIgnoreCase(ENVELOPE_PROPERTY)) {
-            synchronized (this) {
-                oldEnvelope = hasEnvelopeListeners ? new GeneralEnvelope(envelope) : null;
-                graphicEnvelopeChanged((GeneralEnvelope)    event.getOldValue(),
-                                       (GeneralEnvelope)    event.getNewValue(),
-                                       ((ReferencedGraphic) event.getSource()).getObjectiveCRS(),
-                                       "ReferencedGraphic", "setEnvelope");
-            }
+            oldEnvelope = hasEnvelopeListeners ? new GeneralEnvelope(envelope) : null;
+            graphicEnvelopeChanged((GeneralEnvelope)    event.getOldValue(),
+                                   (GeneralEnvelope)    event.getNewValue(),
+                                   ((ReferencedGraphic) event.getSource()).getObjectiveCRS(),
+                                   "ReferencedGraphic", "setEnvelope");
         } else if (propertyName.equalsIgnoreCase(OBJECTIVE_CRS_PROPERTY)) {
-            synchronized (this) {
-                oldEnvelope = new GeneralEnvelope(envelope);
-                computeEnvelope("ReferencedGraphic", "setObjectiveCRS");
-            }
+            oldEnvelope = new GeneralEnvelope(envelope);
+            computeEnvelope("ReferencedGraphic", "setObjectiveCRS");
         } else {
             return;
         }
@@ -741,90 +737,89 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * {@value org.geotools.display.canvas.DisplayObject#DISPLAY_CRS_PROPERTY},
      * {@value org.geotools.display.canvas.DisplayObject#ENVELOPE_PROPERTY}.
      */
-    public void setObjectiveCRS(final CoordinateReferenceSystem crs) throws TransformException {
-        final CoordinateReferenceSystem oldCRS;
-        final GeneralEnvelope oldEnvelope;
-        synchronized (this) {
-            oldCRS = getObjectiveCRS();
-            assert oldCRS == getObjectiveCoordinateReferenceSystem();
-            if (CRSUtilities.equalsIgnoreMetadata(crs, oldCRS)) {
-                return;
-            }
-            oldEnvelope = new GeneralEnvelope(envelope);
-            /*
-             * Try to setup the CRS in the envelope.  This operation may fail if the specified
-             * CRS has an incompatible number of dimensions, so it is important to invoke this
-             * method before to make any more change. This is in order to keep the renderer in
-             * a consistent state in case of failure.
-             */
-            envelope.setCoordinateReferenceSystem(crs);
-            /*
-             * Compute the display CRS from the new objective CRS (keeping the same zoom factor
-             * than the previous display CRS), but do not store the result yet.  We compute the
-             * display CRS now in order to avoid any change in case of failure, and will invoke
-             * setDisplayCRS(...) only after all transformation steps below will succeed.
-             */
-            DerivedCRS displayCRS = this.displayCRS;
-            if (displayCRS != null) try {
-                final Conversion fromBase = displayCRS.getConversionFromBase();
-                displayCRS = /*getFactoryGroup().getCRSFactory().*/createDerivedCRS(
-                        displayProperties, fromBase, crs, displayCRS.getCoordinateSystem());
-            } catch (FactoryException exception) {
-                throw new TransformException(Errors.format(
-                        ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
-            }
-            /*
-             * Now transform each individual graphic primitives. The transformation must succeed
-             * for all of them. If there is any failure, then we will roolback the change to the
-             * previous CRS.
-             */
-            final List/*<Graphic>*/ graphics = getGraphics();
-            final int graphicCount = graphics.size();
-            int changed = 0;
-            try {
-                while (changed < graphicCount) {
-                    final Graphic graphic = (Graphic) graphics.get(changed);
-                    if (graphic instanceof ReferencedGraphic) {
-                        ((ReferencedGraphic) graphic).setObjectiveCRS(crs);
-                    }
-                    changed++; // Increment only if previous call succeed.
-                }
-            } catch (TransformException exception) {
-                /*
-                 * At least one graphic primitives can't accept the new CRS. Roll back all
-                 * CRS changes (restore the previous one) before to rethrow the exception.
-                 */
-                while (--changed >= 0) {
-                    final Graphic graphic = (Graphic) graphics.get(changed);
-                    if (graphic instanceof ReferencedGraphic) try {
-                        ((ReferencedGraphic) graphic).setObjectiveCRS(oldCRS);
-                    } catch (TransformException unexpected) {
-                        // Should not happen, since we are rolling
-                        // back to an old CRS that previously worked.
-                        handleException("setObjectiveCRS", unexpected);
-                    }
-                }
-                envelope.setCoordinateReferenceSystem(oldCRS);
-                clearCache();
-                throw exception;
-            }
-            /*
-             * The CRS change has been successful for all graphic primitives.
-             * Now updates internal states.
-             */
-            clearCache();
-            scaleFactor   = null;
-            useDefaultCRS = false;
-            updateNormalizationFactor(crs);
-            computeEnvelope("ReferencedCanvas", "setObjectiveCRS");
-            /*
-             * Set the display CRS last because it may fires a property change event,
-             * and we don't want to expose our changes before they are completed.
-             */
-            if (displayCRS != null) {
-                setDisplayCRS(displayCRS);
-            }
+    public synchronized void setObjectiveCRS(final CoordinateReferenceSystem crs)
+            throws TransformException
+    {
+        final CoordinateReferenceSystem oldCRS = getObjectiveCRS();
+        assert oldCRS == getObjectiveCoordinateReferenceSystem();
+        if (CRSUtilities.equalsIgnoreMetadata(crs, oldCRS)) {
+            return;
         }
+        final GeneralEnvelope oldEnvelope = new GeneralEnvelope(envelope);
+        /*
+         * Try to setup the CRS in the envelope.  This operation may fail if the specified
+         * CRS has an incompatible number of dimensions, so it is important to invoke this
+         * method before to make any more change. This is in order to keep the renderer in
+         * a consistent state in case of failure.
+         */
+        envelope.setCoordinateReferenceSystem(crs);
+        /*
+         * Compute the display CRS from the new objective CRS (keeping the same zoom factor
+         * than the previous display CRS), but do not store the result yet.  We compute the
+         * display CRS now in order to avoid any change in case of failure, and will invoke
+         * setDisplayCRS(...) only after all transformation steps below will succeed.
+         */
+        DerivedCRS displayCRS = this.displayCRS;
+        if (displayCRS != null) try {
+            final Conversion fromBase = displayCRS.getConversionFromBase();
+            displayCRS = /*getFactoryGroup().getCRSFactory().*/createDerivedCRS(
+                    displayProperties, fromBase, crs, displayCRS.getCoordinateSystem());
+        } catch (FactoryException exception) {
+            throw new TransformException(Errors.format(
+                    ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
+        }
+        /*
+         * Now transform each individual graphic primitives. The transformation must succeed
+         * for all of them. If there is any failure, then we will roolback the change to the
+         * previous CRS.
+         */
+        final List/*<Graphic>*/ graphics = getGraphics();
+        final int graphicCount = graphics.size();
+        int changed = 0;
+        try {
+            while (changed < graphicCount) {
+                final Graphic graphic = (Graphic) graphics.get(changed);
+                if (graphic instanceof ReferencedGraphic) {
+                    ((ReferencedGraphic) graphic).setObjectiveCRS(crs);
+                }
+                changed++; // Increment only if previous call succeed.
+            }
+        } catch (TransformException exception) {
+            /*
+             * At least one graphic primitives can't accept the new CRS. Roll back all
+             * CRS changes (restore the previous one) before to rethrow the exception.
+             */
+            while (--changed >= 0) {
+                final Graphic graphic = (Graphic) graphics.get(changed);
+                if (graphic instanceof ReferencedGraphic) try {
+                    ((ReferencedGraphic) graphic).setObjectiveCRS(oldCRS);
+                } catch (TransformException unexpected) {
+                    // Should not happen, since we are rolling
+                    // back to an old CRS that previously worked.
+                    handleException("setObjectiveCRS", unexpected);
+                }
+            }
+            envelope.setCoordinateReferenceSystem(oldCRS);
+            clearCache();
+            throw exception;
+        }
+        /*
+         * The CRS change has been successful for all graphic primitives.
+         * Now updates internal states.
+         */
+        clearCache();
+        scaleFactor   = null;
+        useDefaultCRS = false;
+        updateNormalizationFactor(crs);
+        computeEnvelope("ReferencedCanvas", "setObjectiveCRS");
+        /*
+         * Set the display CRS last because it may fires a property change event,
+         * and we don't want to expose our changes before they are completed.
+         */
+        if (displayCRS != null) {
+            setDisplayCRS(displayCRS);
+        }
+        assert getObjectiveCRS() == crs;
         listeners.firePropertyChange(OBJECTIVE_CRS_PROPERTY, oldCRS, crs);
         listeners.firePropertyChange(ENVELOPE_PROPERTY, oldEnvelope, envelope);
     }
@@ -852,7 +847,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * @param  sourceMethodName The caller's method name, for logging purpose.
      */
     private void computeEnvelope(final String sourceClassName, final String sourceMethodName) {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         envelope.setToNull();
         CoordinateReferenceSystem lastCRS = null;
         MathTransform           transform = null;
@@ -911,7 +906,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
                                         final String sourceClassName,
                                         final String sourceMethodName)
     {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         final GeneralEnvelope oldProjected, newProjected;
         try {
             final MathTransform transform = getMathTransform(crs, getObjectiveCRS(),
@@ -1043,43 +1038,41 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * @param  crs The display coordinate reference system.
      * @throws TransformException If the data can't be transformed.
      */
-    protected void setDisplayCRS(DerivedCRS crs) throws TransformException {
+    protected synchronized void setDisplayCRS(DerivedCRS crs) throws TransformException {
         final CoordinateReferenceSystem oldCRS;
-        synchronized (this) {
-            try {
-                crs = validateBaseCRS(crs, getObjectiveCRS());
-            } catch (FactoryException exception) {
-                throw new TransformException(Errors.format(
-                            ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
-            }
-            /*
-             * Compute the device CRS from the new display CRS (keeping the same transform than
-             * the previous device CRS), but do not store the result yet. We compute the device
-             * CRS now in order to avoid any change in case of failure.
-             */
-            DerivedCRS deviceCRS = this.deviceCRS;
-            if (deviceCRS != null) try {
-                displayToDevice = deviceCRS.getConversionFromBase();
-                deviceCRS = /*getFactoryGroup().getCRSFactory().*/createDerivedCRS(
-                        deviceProperties, displayToDevice, crs, deviceCRS.getCoordinateSystem());
-            } catch (FactoryException exception) {
-                throw new TransformException(Errors.format(
+        try {
+            crs = validateBaseCRS(crs, getObjectiveCRS());
+        } catch (FactoryException exception) {
+            throw new TransformException(Errors.format(
                         ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
-            }
-            if (displayProperties == null) {
-                displayProperties = AbstractIdentifiedObject.getProperties(crs, null);
-            }
-            oldCRS = displayCRS;
-            displayCRS = crs;
-            scaleFactor = null;
-            displayPosition = null;
-            /*
-             * Set the device CRS last because it may fires a property change event,
-             * and we don't want to expose our changes before they are completed.
-             */
-            if (deviceCRS != null) {
-                setDeviceCRS(deviceCRS);
-            }
+        }
+        /*
+         * Compute the device CRS from the new display CRS (keeping the same transform than
+         * the previous device CRS), but do not store the result yet. We compute the device
+         * CRS now in order to avoid any change in case of failure.
+         */
+        DerivedCRS deviceCRS = this.deviceCRS;
+        if (deviceCRS != null) try {
+            displayToDevice = deviceCRS.getConversionFromBase();
+            deviceCRS = /*getFactoryGroup().getCRSFactory().*/createDerivedCRS(
+                    deviceProperties, displayToDevice, crs, deviceCRS.getCoordinateSystem());
+        } catch (FactoryException exception) {
+            throw new TransformException(Errors.format(
+                    ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
+        }
+        if (displayProperties == null) {
+            displayProperties = AbstractIdentifiedObject.getProperties(crs, null);
+        }
+        oldCRS = displayCRS;
+        displayCRS = crs;
+        scaleFactor = null;
+        displayPosition = null;
+        /*
+         * Set the device CRS last because it may fires a property change event,
+         * and we don't want to expose our changes before they are completed.
+         */
+        if (deviceCRS != null) {
+            setDeviceCRS(deviceCRS);
         }
         if (hasDisplayListeners) {
             listeners.firePropertyChange(DISPLAY_CRS_PROPERTY, oldCRS, crs);
@@ -1131,21 +1124,19 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      *
      * @todo Consider removing this method.
      */
-    protected void setDeviceCRS(DerivedCRS crs) throws TransformException {
+    protected synchronized void setDeviceCRS(DerivedCRS crs) throws TransformException {
         final CoordinateReferenceSystem oldCRS;
-        synchronized (this) {
-            try {
-                crs = validateBaseCRS(crs, getDisplayCRS());
-            } catch (FactoryException exception) {
-                throw new TransformException(Errors.format(
-                            ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
-            }
-            if (deviceProperties == null) {
-                deviceProperties = AbstractIdentifiedObject.getProperties(crs, null);
-            }
-            oldCRS = deviceCRS;
-            deviceCRS = crs;
+        try {
+            crs = validateBaseCRS(crs, getDisplayCRS());
+        } catch (FactoryException exception) {
+            throw new TransformException(Errors.format(
+                        ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
         }
+        if (deviceProperties == null) {
+            deviceProperties = AbstractIdentifiedObject.getProperties(crs, null);
+        }
+        oldCRS = deviceCRS;
+        deviceCRS = crs;
     }
 
     /**
@@ -1219,7 +1210,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     private DerivedCRS createDerivedCRS(final boolean device, final Matrix transform)
             throws FactoryException
     {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         DerivedCRS crs;
         Map properties;
         if (device) {
@@ -1357,10 +1348,10 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * @see #setImplHint
      * @see Hints#COORDINATE_OPERATION_FACTORY
      */
-    public synchronized MathTransform getMathTransform(final CoordinateReferenceSystem sourceCRS,
-                                                       final CoordinateReferenceSystem targetCRS,
-                                                       final String sourceClassName,
-                                                       final String sourceMethodName)
+    final synchronized MathTransform getMathTransform(final CoordinateReferenceSystem sourceCRS,
+                                                      final CoordinateReferenceSystem targetCRS,
+                                                      final String sourceClassName,
+                                                      final String sourceMethodName)
             throws FactoryException
     {
         /*
@@ -1428,7 +1419,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * @throws FactoryException if the affine method can't be fetched.
      */
     private FactoryGroup getFactoryGroup() throws FactoryException {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         if (crsFactories == null) {
             crsFactories = FactoryGroup.createInstance(hints);
             affineMethod = crsFactories.getOperationMethod("affine");
@@ -1457,7 +1448,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     protected final GeneralDirectPosition toObjectivePosition(final DirectPosition coordinate)
             throws TransformException
     {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         if (objectivePosition == null) {
             objectivePosition = new TransformedDirectPosition(getObjectiveCRS(), hints);
         }
@@ -1478,7 +1469,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     protected final GeneralDirectPosition toDisplayPosition(final DirectPosition coordinate)
             throws TransformException
     {
-        assert Thread.holdsLock(getTreeLock());
+        assert Thread.holdsLock(this);
         if (displayPosition == null) {
             displayPosition = new TransformedDirectPosition(getDisplayCRS(), hints);
         }
@@ -1503,8 +1494,10 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * Invoked when a property change listener has been {@linkplain #addPropertyChangeListener
      * added} or {@linkplain #removePropertyChangeListener removed}.
      */
-    protected void listenersChanged() {
+    //@Override
+    void listenersChanged() {
         super.listenersChanged();
+        hasScaleListeners    = listeners.hasListeners(SCALE_PROPERTY);
         hasDisplayListeners  = listeners.hasListeners(DISPLAY_CRS_PROPERTY);
         hasEnvelopeListeners = listeners.hasListeners(ENVELOPE_PROPERTY);
     }

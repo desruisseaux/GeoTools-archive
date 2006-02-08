@@ -20,7 +20,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.display.primitive;
+package org.geotools.display.canvas;
 
 // J2SE dependencies
 import javax.swing.Action;
@@ -39,7 +39,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.display.event.ReferencedEvent;
-import org.geotools.display.canvas.ReferencedCanvas;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -125,7 +124,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
      * @throws TransformException If this method do not accept the new CRS. In such case,
      *         this method should keep the old CRS and leaves this graphic in a consistent state.
      */
-    public void setObjectiveCRS(final CoordinateReferenceSystem crs) throws TransformException {
+    protected void setObjectiveCRS(final CoordinateReferenceSystem crs) throws TransformException {
         if (crs == null) {
             throw new IllegalArgumentException(Errors.getResources(getLocale())
                       .getString(ErrorKeys.BAD_ARGUMENT_$2, "crs", crs));
@@ -183,9 +182,9 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
                     clearCache();
                 }
             }
+            listeners.firePropertyChange(OBJECTIVE_CRS_PROPERTY, oldCRS, crs);
+            refresh();
         }
-        listeners.firePropertyChange(OBJECTIVE_CRS_PROPERTY, oldCRS, crs);
-        refresh();
     }
 
     /**
@@ -275,9 +274,9 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
             mt = getMathTransform(sourceCRS, targetCRS, "ReferencedGraphic", "setEnvelope");
             old = new GeneralEnvelope(envelope);
             envelope.setEnvelope(CRSUtilities.transform(mt, newEnvelope));
+            assert envelope.getCoordinateReferenceSystem() == old.getCoordinateReferenceSystem();
+            listeners.firePropertyChange(ENVELOPE_PROPERTY, old, envelope);
         }
-        assert envelope.getCoordinateReferenceSystem() == old.getCoordinateReferenceSystem();
-        listeners.firePropertyChange(ENVELOPE_PROPERTY, old, envelope);
     }
 
     /**
@@ -319,7 +318,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
      *
      * @see ReferencedCanvas#getToolTipText
      */
-    public String getToolTipText(final ReferencedEvent event) {
+    protected String getToolTipText(final ReferencedEvent event) {
         return null;
     }
 
@@ -334,7 +333,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
      *
      * @see ReferencedCanvas#getAction
      */
-    public Action getAction(final ReferencedEvent event) {
+    protected Action getAction(final ReferencedEvent event) {
         return null;
     }
 
@@ -353,7 +352,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
      * @see ReferencedCanvas#format
      * @see MouseCoordinateFormat#format(GeoMouseEvent)
      */
-    public boolean format(final ReferencedEvent event, final StringBuffer toAppendTo) {
+    protected boolean format(final ReferencedEvent event, final StringBuffer toAppendTo) {
         return false;
     }
 }

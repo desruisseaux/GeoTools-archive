@@ -9,26 +9,49 @@
     explanation for this package is provided in the {@linkplain org.opengis.go.display.canvas OpenGIS&reg; javadoc}.
     The remaining discussion on this page is specific to the Geotools implementation.
 
-    <P ALIGN="justify">A {@linkplain org.geotools.display.canvas.BufferedCanvas2D canvas} contains one ore more
-    {@linkplain org.geotools.display.primitive.GraphicPrimitive2D graphic} objects. A graphic object may wrap
-    an image, a geometric shape, a collection of symbols, <cite>etc.</cite> Since this package can't cover
-    all possible usages, most of the classes provided in {@link org.geotools.display.canvas} and in
-    {@link org.geotools.display.primitive} packages are designed with subclassing in mind. The design has
-    some similarities with AWT graphic components. The following is a comparaison between AWT and the
-    Geotools Canvas implementation:</P>
+    <P ALIGN="justify">A {@linkplain org.geotools.display.canvas.AbstractCanvas canvas} contains one ore more
+    {@linkplain org.geotools.display.canvas.AbstractGraphic graphic primitives}. A graphic primitive may be
+    an image, a geometric shape, a collection of symbols, <cite>etc.</cite> Since this package can't cover all
+    possible usages, most classes are designed with subclassing in mind. In the particular case of rendering
+    targeting a <cite>Java2D</cite> output device, every kind of graphic primitive is handled by a specialized subclass
+    ({@link org.geotools.display.primitive.GraphicImage2D}, {@link org.geotools.display.primitive.GraphicPolygon2D},
+    <cite>etc.</cite>) extending {@link org.geotools.display.canvas.GraphicPrimitive2D}. The first concrete canvas
+    class capable to manage those graphic primitives is {@link org.geotools.display.canvas.BufferedCanvas2D}.</P>
 
     <P>&nbsp;</P>
-    <H2>Painting with AWT</H2>
+    <H2>Coordinate Reference Systems</H2>
+    <P ALIGN="justify">The base classes (up to {@link org.geotools.display.canvas.ReferencedCanvas} and its
+    {@link org.geotools.display.canvas.ReferencedGraphic} counterpart) do not assume a two-dimensional
+    rendering. They should be usable for a 3D rendering engine as well. The first subclasses targeting
+    specifically a 2D rendering are {@link org.geotools.display.canvas.ReferencedCanvas2D} and its
+    {@link org.geotools.display.canvas.ReferencedGraphic2D} counterpart.</P>
 
-    <P ALIGN=justify>An {@linkplain java.awt.Container AWT container} contains an arbitrary amount of
-    {@linkplain java.awt.Component components}. Each component (button, scrolling bar, <cite>etc.</cite>)
-    is implemented by a specialized subclass ({@link java.awt.Button}, {@link java.awt.Scrollbar}, <cite>etc.</cite>)
-    extending {@link java.awt.Component}. When the rendering engine needs to repaint a component, it invokes
-    the component's {@link java.awt.Component#paint(java.awt.Graphics) paint(...)} method. The paint method
-    receives a {@link java.awt.Graphics2D} object setup as below:</P>
+    <P ALIGN="justify">In Geotools implementation, there is four
+    {@linkplain org.opengis.referencing.crs.CoordinateReferenceSystem coordinate reference systems}
+    involved in rendering. {@link org.geotools.display.canvas.AbstractCanvas} declares abstract methods
+    for three of them, but the actual CRS management is performed in the
+    {@link org.geotools.display.canvas.ReferencedCanvas} subclass. The CRS are enumerated below
+    (arrows are {@linkplain org.opengis.referencing.operation.MathTransform transforms}):</P>
 
-    <P ALIGN="center">
-    <TABLE BORDER =1 cellpadding=4>
+    <TABLE ALIGN="center" BORDER=1 cellpadding=4><TR><TD>
+    data CRS
+    &nbsp; <img src="doc-files/right.png">
+    &nbsp; {@linkplain org.geotools.display.canvas.AbstractCanvas#getObjectiveCRS objective CRS}
+    &nbsp; <img src="doc-files/right.png">
+    &nbsp; {@linkplain org.geotools.display.canvas.AbstractCanvas#getDisplayCRS display CRS}
+    &nbsp; <img src="doc-files/right.png">
+    &nbsp; {@linkplain org.geotools.display.canvas.AbstractCanvas#getDeviceCRS device CRS}
+    </TD></TR></TABLE>
+
+    <P>&nbsp;</P>
+    <H2>Painting</H2>
+    <P ALIGN=justify>In the {@link org.geotools.display.canvas.BufferedCanvas2D} implementation, when a graphic
+    needs a refresh, the canvas invokes its {@link org.geotools.display.canvas.GraphicPrimitive2D#paint paint(...)}
+    method. The paint method receives indirectly (through {@link org.geotools.display.canvas.RenderingContext})
+    a {@link java.awt.Graphics2D} object in the default <cite>Java2D</cite> state. This default state uses a
+    coordinate reference system (named <strong>display CRS</strong> above) with properties as below:</P>
+
+    <TABLE BORDER=1 cellpadding=4>
       <TR>
         <TH ALIGN="right" bgcolor=bisque nowrap>Axis origin (0,0):</TH>
         <TD bgcolor=lightgoldenrodyellow>Screen or paper Upper Left corner.</TD>
@@ -51,22 +74,16 @@
     <P ALIGN=justify>This configuration is appropriate for text rendering. A font may
     be 12 points high, which usually means 12 pixels on a screen output device or 1/6
     of inch on a paper. The {@code paint(...)} method may apply temporary changes to the
-    {@link java.awt.Graphics2D} configuration, but may rollback {@code Graphics2D} to its
+    {@link java.awt.Graphics2D} configuration, but shall rollback {@code Graphics2D} to its
     inital state before to return.</P>
 
-    <P>&nbsp;</P>
-    <H2>Painting with {@code Canvas} (compared to AWT)</H2>
+    <P ALIGN="justify">In some occasions, a graphic may wish to performs its rendering
+    directly in "real world" coordinates. This is called <strong>objective CRS</strong>
+    above. It can be set through a call to a
+    {@link org.geotools.display.canvas.RenderingContext#setGraphicsCRS setGraphicsCRS}
+    convenience method and usually has the following properties:</P>
 
-    <P ALIGN="justify">A {@link org.geotools.display.canvas.BufferedCanvas2D} object contains a set of
-    {@link org.geotools.display.primitive.GraphicPrimitive2D} objects. Every kind of graphic primitive
-    (image, polygon...) is handled by a specialized subclass ({@link org.geotools.display.primitive.GraphicImage2D},
-    {@link org.geotools.display.primitive.GraphicPolygon2D}, <cite>etc.</cite>) extending
-    {@link org.geotools.display.primitive.GraphicPrimitive2D}. When the rendering engine need to repaint
-    a graphic, it invokes its {@link org.geotools.display.primitive.GraphicPrimitive2D#paint paint(...)}
-    method. The paint method receives a {@link java.awt.Graphics2D} object setup as below:</P>
-
-    <P ALIGN="center">
-    <TABLE BORDER =1 cellpadding=4>
+    <TABLE BORDER=1 cellpadding=4>
       <TR>
         <TH ALIGN="right" bgcolor=bisque nowrap>Axis origin (0,0):</TH>
         <TD bgcolor=lightgoldenrodyellow>Objective CRS dependent.
@@ -92,13 +109,10 @@
     </TABLE>
 
     <P ALIGN="justify">This configuration is convenient for rendering "real world" objects.
-    The {@code GraphicPrimitive2D} implementor doesn't need to care about the zoom factor.
-    However, this configuration is unconvenient for text or symbols rendering. For example
-    a font with a size of 12 units will be understood as a 12 meters high font. On a map
-    with a 1:50000 scale, 12 meters high characters will appear like tiny points. In such
-    cases, the {@code Graphic} implementor need to setup explicitly the {@link java.awt.Graphics2D}
-    object as in "Painting with AWT" above. Don't forget to reset the {@code GraphicsPrimitive2D}
-    in its initial state once finished.</P>
+    With such CRS, the {@code GraphicPrimitive2D} implementor doesn't need to care about the
+    scale factor. However, this configuration is unconvenient for text or symbols rendering.
+    For example a font with a size of 12 units will be understood as a 12 meters high font.
+    On a map with a 1:50000 scale, 12 meters high characters will appear like tiny points.</P>
 
     <p>&nbsp;</p>
     <h2>Affine transform tips</h2>

@@ -20,7 +20,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.display.primitive;
+package org.geotools.display.canvas;
 
 // J2SE dependencies
 import java.awt.Shape;
@@ -39,7 +39,6 @@ import org.opengis.referencing.operation.TransformException;
 // Geotools dependencies
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.display.canvas.ReferencedCanvas2D;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 
 
@@ -124,7 +123,7 @@ public abstract class ReferencedGraphic2D extends ReferencedGraphic {
      * {@linkplain org.opengis.referencing.crs.CompoundCRS compound CRS} with
      * a two dimensional head.
      */
-    public void setObjectiveCRS(final CoordinateReferenceSystem crs) throws TransformException {
+    protected void setObjectiveCRS(final CoordinateReferenceSystem crs) throws TransformException {
         super.setObjectiveCRS(CRSUtilities.getCRS2D(crs));
     }
 
@@ -152,7 +151,7 @@ public abstract class ReferencedGraphic2D extends ReferencedGraphic {
      * <p>
      * This method never returns {@code null}.
      */
-    public final Shape getDisplayBounds() {
+    final Shape getDisplayBounds() {
         return displayBounds;
     }
 
@@ -169,7 +168,7 @@ public abstract class ReferencedGraphic2D extends ReferencedGraphic {
      * This method fires a {@value org.geotools.display.canvas.DisplayObject#DISPLAY_BOUNDS_PROPERTY}
      * property change event.
      */
-    public void setDisplayBounds(Shape bounds) {
+    final void setDisplayBounds(Shape bounds) {
         if (bounds == null) {
             bounds = XRectangle2D.INFINITY;
         }
@@ -177,9 +176,9 @@ public abstract class ReferencedGraphic2D extends ReferencedGraphic {
         synchronized (getTreeLock()) {
             old = displayBounds;
             displayBounds = bounds;
-        }
-        if (hasBoundsListeners) {
-            listeners.firePropertyChange(DISPLAY_BOUNDS_PROPERTY, old, bounds);
+            if (hasBoundsListeners) {
+                listeners.firePropertyChange(DISPLAY_BOUNDS_PROPERTY, old, bounds);
+            }
         }
     }
 
@@ -257,7 +256,7 @@ public abstract class ReferencedGraphic2D extends ReferencedGraphic {
      *        or {@code null} if unknow. If {@code null}, then this graphic will be fully redrawn
      *        during the next rendering.
      */
-    public void zoomChanged(final AffineTransform change) {
+    protected void zoomChanged(final AffineTransform change) {
         synchronized (getTreeLock()) {
             final Shape displayBounds = getDisplayBounds();
             if (displayBounds.equals(XRectangle2D.INFINITY)) {
@@ -288,9 +287,10 @@ public abstract class ReferencedGraphic2D extends ReferencedGraphic {
      * Invoked when a property change listener has been {@linkplain #addPropertyChangeListener
      * added} or {@linkplain #removePropertyChangeListener removed}.
      */
-    protected void listenersChanged() {
+    //@Override
+    void listenersChanged() {
         super.listenersChanged();
-        hasBoundsListeners = listeners.hasListeners(DISPLAY_BOUNDS_PROPERTY);
+        hasBoundsListeners = hasListeners(DISPLAY_BOUNDS_PROPERTY);
     }
 
     /**

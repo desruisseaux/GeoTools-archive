@@ -395,12 +395,12 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      */
     public void setEnvelope(final GeneralEnvelope envelope) throws MismatchedDimensionException {
         GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), getDimension());
+        System.arraycopy(envelope.ordinates, 0, ordinates, 0, ordinates.length);
         if (envelope.crs != null) {
             crs = envelope.crs;
             assert crs.getCoordinateSystem().getDimension() == getDimension() : crs;
+            assert !envelope.getClass().equals(getClass()) || equals(envelope) : envelope;
         }
-        System.arraycopy(ordinates, 0, envelope.ordinates, 0, ordinates.length);
-        assert equals(envelope) : envelope;
     }
 
     /**
