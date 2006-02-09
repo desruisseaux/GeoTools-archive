@@ -68,12 +68,14 @@ public abstract class TransformerBase {
      */
     public Transformer createTransformer() throws TransformerException {
         TransformerFactory tFactory = TransformerFactory.newInstance();
+        if (indentation > -1) {
+        	tFactory.setAttribute("indent-number", new Integer(indentation));
+        }
         Transformer transformer = tFactory.newTransformer();
 
         if (indentation > -1) {
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
-                indentation + "");
+        	transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", Integer.toString(indentation));
         } else {
             transformer.setOutputProperty(OutputKeys.INDENT, "no");
         }
