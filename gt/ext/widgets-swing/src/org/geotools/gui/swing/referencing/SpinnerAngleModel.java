@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gui.swing;
+package org.geotools.gui.swing.referencing;
 
 // Swing (for JSpinner)
 import javax.swing.JSpinner;
@@ -51,7 +51,6 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see JSpinner
  * @see SpinnerNumberModel
  *
- * @since 2.0
  * @source $URL$
  * @version $Id$
  * @author Adapted from Hans Muller

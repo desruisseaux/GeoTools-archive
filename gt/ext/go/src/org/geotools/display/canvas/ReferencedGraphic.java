@@ -29,6 +29,7 @@ import javax.swing.Action;
 import org.opengis.go.display.canvas.Canvas;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -93,7 +94,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
                       .getString(ErrorKeys.BAD_ARGUMENT_$2, "crs", crs));
         }
         envelope = new GeneralEnvelope(crs);
-        envelope.setToInfinite();
+        envelope.setToNull();
     }
 
     /**
@@ -155,7 +156,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
                      */
                     final GeneralEnvelope newEnvelope;
                     final DirectPosition origin;
-                    if (envelope.isInfinite()) {
+                    if (envelope.isNull() || envelope.isInfinite()) {
                         origin = new GeneralDirectPosition(oldCRS);
                         newEnvelope = new GeneralEnvelope(envelope);
                     } else {
@@ -240,8 +241,8 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
      * that the returned envelope is the smallest bounding box that encloses the graphic, only
      * that the graphic lies entirely within the indicated envelope.
      * <p>
-     * The default implementation returns an envelope with infinite bounds. Subclasses should
-     * compute their envelope and invoke {@link #setEnvelope} as soon as they can.
+     * The default implementation returns a {@linkplain GeneralEnvelope#setToNull null envelope}.
+     * Subclasses should compute their envelope and invoke {@link #setEnvelope} as soon as they can.
      *
      * @see #setEnvelope
      */
@@ -299,11 +300,25 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
      * Set the typical cell dimension. Subclasses may invoke this method after they computed
      * some typical value. The default implementation of {@link #getTypicalCellDimension}
      * will returns this value for all positions.
+     *
+     * @param  size A typical cell size, in terms of objective CRS.
+     * @throws MismatchedDimensionException if the specified cell size doesn't have the
+     *         expected number of dimensions.
      */
-    protected void setTypicalCellDimension(final double[] size) {
-        final double[] oldSize;
+    protected void setTypicalCellDimension(final double[] size)
+            throws MismatchedDimensionException
+    {
         synchronized (getTreeLock()) {
-            oldSize = typicalCellDimension;
+            if (size != null) {
+                final int dimension = size.length;
+                final int expectedDimension = envelope.getDimension();
+                if (dimension != expectedDimension) {
+                    throw new MismatchedDimensionException(Errors.getResources(getLocale()).
+                              getString(ErrorKeys.MISMATCHED_DIMENSION_$3,
+                              new Integer(dimension), new Integer(expectedDimension)));
+                }
+            }
+            final double[] oldSize = typicalCellDimension;
             typicalCellDimension = (size!=null) ? (double[])size.clone() : null;
         }
     }

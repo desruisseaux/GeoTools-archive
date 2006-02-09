@@ -262,7 +262,6 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         super(factory, hints);
         this.envelope = new GeneralEnvelope(objectiveCRS);
         this.envelope.setToNull();
-        updateNormalizationFactor(objectiveCRS);
     }
 
     /**
@@ -583,10 +582,16 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         final Envelope oldEnvelope;
         if (propertyName.equalsIgnoreCase(ENVELOPE_PROPERTY)) {
             oldEnvelope = hasEnvelopeListeners ? new GeneralEnvelope(envelope) : null;
-            graphicEnvelopeChanged((GeneralEnvelope)    event.getOldValue(),
-                                   (GeneralEnvelope)    event.getNewValue(),
-                                   ((ReferencedGraphic) event.getSource()).getObjectiveCRS(),
-                                   "ReferencedGraphic", "setEnvelope");
+            final Object source = event.getSource();
+            final CoordinateReferenceSystem crs;
+            if (source instanceof ReferencedGraphic) {
+                crs = ((ReferencedGraphic) source).getObjectiveCRS();
+            } else {
+                crs = getObjectiveCRS();
+            }
+            graphicEnvelopeChanged((Envelope) event.getOldValue(),
+                                   (Envelope) event.getNewValue(),
+                                   crs, "ReferencedGraphic", "setEnvelope");
         } else if (propertyName.equalsIgnoreCase(OBJECTIVE_CRS_PROPERTY)) {
             oldEnvelope = new GeneralEnvelope(envelope);
             computeEnvelope("ReferencedGraphic", "setObjectiveCRS");
@@ -954,7 +959,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             }
             return true;
         }
-        if (newEnvelope == null) {
+        if (newEnvelope == null || newEnvelope.isNull()) {
             /*
              * An envelope may have been removed and no new envelope replace it. If the old
              * envelope was fully included inside the canvas envlope (NOT touching edges),
@@ -962,7 +967,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
              */
             return (oldEnvelope == null) || envelope.contains(oldEnvelope, false);
         }
-        if (oldEnvelope != null) {
+        if (oldEnvelope != null && !oldEnvelope.isNull()) {
             /*
              * An envelope has been removed (or replaced by the new envelope). Checks if the
              * removal of the old envelope may reduces the canvas envelope, in which case we

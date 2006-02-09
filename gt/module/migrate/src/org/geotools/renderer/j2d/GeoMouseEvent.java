@@ -34,7 +34,7 @@ import org.geotools.pt.CoordinatePoint;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.renderer.DeformableViewer;
+import org.geotools.gui.swing.DeformableViewer;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;

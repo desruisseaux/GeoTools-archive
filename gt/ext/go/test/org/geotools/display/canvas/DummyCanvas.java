@@ -19,6 +19,13 @@
  */
 package org.geotools.display.canvas;
 
+// J2SE dependencies
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
+
+// OpenGIS dependencies
+import org.opengis.go.display.primitive.Graphic;
+
 
 /**
  * A dummy graphic implementation for testing purpose.
@@ -27,11 +34,17 @@ package org.geotools.display.canvas;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class DummyCanvas extends ReferencedCanvas {
+final class DummyCanvas extends ReferencedCanvas2D {
     /**
      * Creates a new canvas.
      */
     DummyCanvas() {
-        super(null, 2);
+        super(null);
+    }
+
+    /**
+     * Dummy method: ignores the repaint call.
+     */
+    public void repaint(Graphic graphic, Rectangle2D objectiveArea, Rectangle displayArea) {
     }
 }

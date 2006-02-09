@@ -360,6 +360,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
             graphics.put(graphic, graphic);
         }
         sortedGraphics = null;
+        assert oldGraphics==null || getGraphics().containsAll(oldGraphics) : oldGraphics;
         if (hasGraphicsListeners) {
             listeners.firePropertyChange(GRAPHICS_PROPERTY, oldGraphics, getGraphics());
         }
@@ -422,6 +423,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
             throw new AssertionError(graphic); // Should never happen.
         }
         sortedGraphics = null;
+        assert oldGraphics==null || oldGraphics.containsAll(getGraphics()) : oldGraphics;
         if (hasGraphicsListeners) {
             listeners.firePropertyChange(GRAPHICS_PROPERTY, oldGraphics, getGraphics());
         }

@@ -160,6 +160,10 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      */
     protected ReferencedCanvas2D(final DisplayFactory factory) {
         super(factory, 2);
+        // The following must be invoked here instead than in super-class because
+        // 'normalizeToDots' is not yet assigned when the super-class constructor
+        // is run.
+        updateNormalizationFactor(getObjectiveCRS());
     }
 
     /**

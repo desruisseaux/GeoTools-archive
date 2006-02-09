@@ -104,7 +104,6 @@ import java.util.logging.LogRecord;
 // Miscellaneous
 import java.util.Arrays;
 import java.io.Serializable;
-import org.geotools.renderer.DeformableViewer;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;

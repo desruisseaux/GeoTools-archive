@@ -90,14 +90,12 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             ordinates = (double[]) e.ordinates.clone();
             crs = e.crs;
         } else {
-            final DirectPosition lower = envelope.getLowerCorner();
-            final DirectPosition upper = envelope.getUpperCorner();
             crs = getCoordinateReferenceSystem(envelope);
-            final int dimension = crs.getCoordinateSystem().getDimension();
+            final int dimension = envelope.getDimension();
             ordinates = new double[2*dimension];
             for (int i=0; i<dimension; i++) {
-                ordinates[i]           = lower.getOrdinate(i);
-                ordinates[i+dimension] = upper.getOrdinate(i);
+                ordinates[i]           = envelope.getMinimum(i);
+                ordinates[i+dimension] = envelope.getMaximum(i);
             }
             checkCoherence();
         }
@@ -473,7 +471,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     /**
      * Determines whether or not this envelope is empty. An envelope is non-empty only if it has
      * at least one {@linkplain #getDimension dimension}, and the {@linkplain #getLength length}
-     * is greater that 0 along all dimensions. Note that an empty envelope is always {@linkplain
+     * is greater than 0 along all dimensions. Note that an empty envelope is always {@linkplain
      * #isNull null}, but the converse is not always true.
      */
     public boolean isEmpty() {
