@@ -57,7 +57,7 @@ import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.TransformedDirectPosition;
-import org.geotools.referencing.operation.matrix.Matrix3;
+import org.geotools.referencing.operation.matrix.AffineTransform2D;
 import org.geotools.display.event.ReferencedEvent;
 
 
@@ -80,23 +80,17 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      * independent.
      * <p>
      * If a subclass changes the values provided in this matrix, then it should invokes
-     * {@link #updateObjectiveToDeviceTransforms} in order to reflect those changes into
-     * this canvas CRS, and <code>{@linkplain #zoomChanged zoomChanged}(change)</code>
-     * in order to notify listeners.
+     * <code>{@linkplain #setObjectiveToDisplayTransform(org.opengis.referencing.operation.Matrix)
+     * setObjectiveToDisplayTransform}(objectiveToDisplay)</code> in order to reflect those changes
+     * into this canvas CRS, and <code>{@linkplain #zoomChanged zoomChanged}(change)</code> in
+     * order to notify listeners.
      *
      * @see #getObjectiveCRS
      * @see #getDisplayCRS
      * @see #getObjectiveToDisplayTransform
-     * @see #updateObjectiveToDeviceTransforms
      * @see #zoomChanged
      */
-    protected final AffineTransform objectiveToDisplay = new AffineTransform();
-
-    /**
-     * The {@link #objectiveToDisplay} affine transform as a matrix.
-     * Used by {@link #updateObjectiveToDeviceTransforms} only.
-     */
-    private final Matrix3 objectiveToDisplayMatrix = new Matrix3();
+    protected final AffineTransform2D objectiveToDisplay = new AffineTransform2D();
 
     /**
      * The affine transform from the {@linkplain #getDisplayCRS display CRS} to the {@linkplain
@@ -106,24 +100,15 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      * and {@link Rectangle#y} values of the {@linkplain #getDisplayBounds display bounds}
      * respectively. This transform is often the identity transform.
      * <p>
-     * This transform zoom independent, but device dependent (the converse of
-     * {@link #objectiveToDisplay}).
-     * <p>
      * If a subclass changes the values provided in this matrix, then it should invokes
-     * {@link #updateObjectiveToDeviceTransforms} in order to reflect those changes into
-     * this canvas CRS.
+     * <code>{@linkplain #setDisplayToDeviceTransform(org.opengis.referencing.operation.Matrix)
+     * setDisplayToDeviceTransform}(displayToDevice)</code> in order to reflect those changes
+     * into this canvas CRS.
      *
      * @see #getDisplayCRS
      * @see #getDeviceCRS
-     * @see #updateObjectiveToDeviceTransforms
      */
-    protected final AffineTransform displayToDevice = new AffineTransform();
-
-    /**
-     * The {@link #displayToDevice} affine transform as a matrix.
-     * Used by {@link #updateObjectiveToDeviceTransforms} only.
-     */
-    private final Matrix3 displayToDeviceMatrix = new Matrix3();
+    protected final AffineTransform2D displayToDevice = new AffineTransform2D();
 
     /**
      * The affine transform from the units used in the {@linkplain #getObjectiveCRS objective CRS}
@@ -414,47 +399,6 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
             getLogger().log(record);
         }
         return 7200/2.54 * m;
-    }
-
-    /**
-     * Invokes <code>{@linkplain #setObjectiveToDeviceTransforms
-     * setObjectiveToDeviceTransforms}{@linkplain #objectiveToDisplay},
-     * {@linkplain #displayToDevice})</code> with the current affine transform values.
-     * Subclasses should invoke this method when they changed the {@link #objectiveToDisplay}
-     * or the {@link #displayToDevice} affine transform. This method does nothing if the
-     * current affine transform values didn't changed since the last time this method was
-     * invoked.
-     *
-     * @return {@code true} if at least one of {@link #objectiveToDisplay} and
-     *         {@link #displayToDevice} affine transforms changed since the last
-     *         time this method was invoked.
-     * @throws TransformException if this method failed to setup the {@linkplain #getDisplayCRS
-     *         display} and {@linkplain #getDeviceCRS device} CRS from the affine transforms.
-     *
-     * @see #setObjectiveToDeviceTransforms
-     *
-     * @todo Consider deleting this method. We could add new new Matrix implementation extending
-     *       {@code AffineTransform} instead.
-     */
-    protected boolean updateObjectiveToDeviceTransforms() throws TransformException {
-        assert Thread.holdsLock(this);
-        if (displayToDeviceMatrix.equalsAffine(displayToDevice)) {
-            if (objectiveToDisplayMatrix.equalsAffine(objectiveToDisplay)) {
-                // No change detected.
-                return false;
-            } else {
-                // Only the objective to display transform changed.
-                objectiveToDisplayMatrix.setMatrix(objectiveToDisplay);
-                setObjectiveToDisplayTransform(objectiveToDisplayMatrix);
-                return true;
-            }
-        } else {
-            // The display to device transform changed too (this is less frequent).
-            displayToDeviceMatrix.setMatrix(displayToDevice);
-            objectiveToDisplayMatrix.setMatrix(objectiveToDisplay);
-            setObjectiveToDeviceTransforms(objectiveToDisplayMatrix, displayToDeviceMatrix);
-            return true;
-        }
     }
 
     /**

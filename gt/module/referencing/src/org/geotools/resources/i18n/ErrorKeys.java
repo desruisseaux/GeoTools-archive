@@ -92,6 +92,7 @@ public final class ErrorKeys {
     public static final int ILLEGAL_IDENTIFIER_$1                  =   169;
     public static final int ILLEGAL_INSTRUCTION_$1                 =   170;
     public static final int ILLEGAL_KEY_$1                         =   186;
+    public static final int ILLEGAL_MATRIX_SIZE                    =   187;
     public static final int ILLEGAL_OCCURS_FOR_PARAMETER_$4        =    50;
     public static final int ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1   =    51;
     public static final int INCOMPATIBLE_COORDINATE_SYSTEM_TYPE    =   149;

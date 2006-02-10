@@ -122,20 +122,9 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
 
     /**
      * Properties for the {@linkplain #deviceCRS device CRS}. They are saved here because
-     * {@link #deviceCRS} will be recreated often (everytime the zoom change).
+     * {@link #deviceCRS} may be recreated often (everytime the zoom change).
      */
     private Map deviceProperties;
-
-    /**
-     * The conversion from {@link #displayCRS} to {@link #deviceCRS} if a new device CRS need to be
-     * constructed, or {@code null} otherwise. This is used for lazy creation (as an optimisation)
-     * in the common case where there is no device CRS listeners.
-     *
-     * @todo The above-cited optimization is not yet really done. Lets see if it would be worth.
-     *       If we choose to go ahead, this field should be set in {@link #setDisplayCRS} and lazy
-     *       creation performed in {@link #getDeviceCRS}.
-     */
-    private transient Conversion displayToDevice;
 
     /**
      * A temporary position used for coordinate transformations from an arbitrary CRS to the
@@ -457,7 +446,8 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * scale change. For example the zoom change may be just a translation or a rotation.
      * <p>
      * This method fires a {@value org.geotools.display.canvas.DisplayObject#SCALE_PROPERTY}
-     * property change event.
+     * property change event for every listeners registered in this canvas, as well as every
+     * listeners registered in each {@linkplain AbstractGraphic graphic} contained in this canvas.
      *
      * @param scaleFactor The new scale factor.
      */
@@ -766,9 +756,9 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
          */
         DerivedCRS displayCRS = this.displayCRS;
         if (displayCRS != null) try {
-            final Conversion fromBase = displayCRS.getConversionFromBase();
+            final Conversion objectiveToDisplay = displayCRS.getConversionFromBase();
             displayCRS = /*getFactoryGroup().getCRSFactory().*/createDerivedCRS(
-                    displayProperties, fromBase, crs, displayCRS.getCoordinateSystem());
+                    displayProperties, objectiveToDisplay, crs, displayCRS.getCoordinateSystem());
         } catch (FactoryException exception) {
             throw new TransformException(Errors.format(
                     ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
@@ -1001,15 +991,15 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      */
     public final synchronized DerivedCRS getDisplayCRS() {
         if (displayCRS == null) try {
-            final FactoryGroup      crsFactories = getFactoryGroup();
-            final CoordinateReferenceSystem base = getObjectiveCRS();
-            final CoordinateSystem     displayCS = DefaultCartesianCS.DISPLAY;
-            final Matrix identity = MatrixFactory.create(displayCS.getDimension(),
-                                        base.getCoordinateSystem().getDimension());
+            final FactoryGroup              crsFactories = getFactoryGroup();
+            final CoordinateReferenceSystem objectiveCRS = getObjectiveCRS();
+            final CoordinateSystem             displayCS = DefaultCartesianCS.DISPLAY;
+            final Matrix                        identity = MatrixFactory.create(
+                    displayCS.getDimension(), objectiveCRS.getCoordinateSystem().getDimension());
             final MathTransform mt = crsFactories.getMathTransformFactory().createAffineTransform(identity);
             displayProperties = AbstractIdentifiedObject.getProperties(displayCS, null);
             displayCRS = crsFactories.getCRSFactory().createDerivedCRS(
-                            displayProperties, affineMethod, base, mt, displayCS);
+                            displayProperties, affineMethod, objectiveCRS, mt, displayCS);
         } catch (FactoryException exception) {
             /*
              * Should never happen, because the CRS that we tried to create is somewhat basic
@@ -1043,60 +1033,44 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * @param  crs The display coordinate reference system.
      * @throws TransformException If the data can't be transformed.
      */
-    protected synchronized void setDisplayCRS(DerivedCRS crs) throws TransformException {
-        final CoordinateReferenceSystem oldCRS;
+    protected synchronized void setDisplayCRS(final DerivedCRS crs) throws TransformException {
+        final CoordinateReferenceSystem oldCRS = displayCRS;
         try {
-            crs = validateBaseCRS(crs, getObjectiveCRS());
+            displayCRS = validateBaseCRS(crs, getObjectiveCRS());
         } catch (FactoryException exception) {
             throw new TransformException(Errors.format(
                         ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
         }
-        /*
-         * Compute the device CRS from the new display CRS (keeping the same transform than
-         * the previous device CRS), but do not store the result yet. We compute the device
-         * CRS now in order to avoid any change in case of failure.
-         */
-        DerivedCRS deviceCRS = this.deviceCRS;
-        if (deviceCRS != null) try {
-            displayToDevice = deviceCRS.getConversionFromBase();
-            deviceCRS = /*getFactoryGroup().getCRSFactory().*/createDerivedCRS(
-                    deviceProperties, displayToDevice, crs, deviceCRS.getCoordinateSystem());
-        } catch (FactoryException exception) {
-            throw new TransformException(Errors.format(
-                    ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
-        }
         if (displayProperties == null) {
             displayProperties = AbstractIdentifiedObject.getProperties(crs, null);
         }
-        oldCRS = displayCRS;
-        displayCRS = crs;
-        scaleFactor = null;
+        scaleFactor     = null;
         displayPosition = null;
-        /*
-         * Set the device CRS last because it may fires a property change event,
-         * and we don't want to expose our changes before they are completed.
-         */
-        if (deviceCRS != null) {
-            setDeviceCRS(deviceCRS);
-        }
         if (hasDisplayListeners) {
             listeners.firePropertyChange(DISPLAY_CRS_PROPERTY, oldCRS, crs);
         }
+        /*
+         * In theory, the 'deviceCRS' has changed too  since it need to be rebuilt with the new
+         * 'displayCRS' as the base CRS. However, because must users will not care about device
+         * CRS,  we do not recompute it here  (remember that this 'setDisplayCRS' method may be
+         * invoked often). A new 'deviceCRS' will be automatically recomputed by 'getDeviceCRS()'
+         * if needed.
+         */
     }
 
     /**
      * Returns the Coordinate Reference System associated with the device of this {@code Canvas}.
      */
     public final synchronized DerivedCRS getDeviceCRS() {
+        final DerivedCRS displayCRS = getDisplayCRS();
         if (deviceCRS == null) try {
             final FactoryGroup      crsFactories = getFactoryGroup();
-            final CoordinateReferenceSystem base = getDisplayCRS();
-            final CoordinateSystem      deviceCS = base.getCoordinateSystem();
+            final CoordinateSystem      deviceCS = displayCRS.getCoordinateSystem();
             final Matrix identity = MatrixFactory.create(deviceCS.getDimension());
             final MathTransform mt = crsFactories.getMathTransformFactory().createAffineTransform(identity);
             deviceProperties = AbstractIdentifiedObject.getProperties(deviceCS, null);
             deviceCRS = crsFactories.getCRSFactory().createDerivedCRS(
-                            deviceProperties, affineMethod, base, mt, deviceCS);
+                            deviceProperties, affineMethod, displayCRS, mt, deviceCS);
         } catch (FactoryException exception) {
             /*
              * Should never happen, because the CRS that we tried to create is somewhat basic
@@ -1106,33 +1080,40 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             throw new IllegalStateException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
             // TODO: include the cause when we will be allowed to compile for J2SE 1.5.
         }
+        /*
+         * If the 'displayCRS' has changed since the last time that this method has been invoked,
+         * then recomputes a new 'deviceCRS' using the new 'displayCRS' as its base and the same
+         * conversion than the old CRS.
+         */
+        if (deviceCRS.getBaseCRS() != displayCRS) try {
+            final Conversion displayToDevice = deviceCRS.getConversionFromBase();
+            deviceCRS = /*getFactoryGroup().getCRSFactory().*/createDerivedCRS(
+                    deviceProperties, displayToDevice, displayCRS, deviceCRS.getCoordinateSystem());
+        } catch (FactoryException exception) {
+            throw new IllegalStateException(Errors.format(
+                    ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
+            // TODO: include the cause when we will be allowed to compile for J2SE 1.5.
+        }
         assert deviceProperties!=null && !deviceProperties.isEmpty() : deviceProperties;
         assert deviceCRS.getBaseCRS() == getDisplayCRS() : deviceCRS;
+        assert deviceCRS.getCoordinateSystem() == displayCRS.getCoordinateSystem() : deviceCRS;
         return deviceCRS;
     }
 
     /**
      * Sets the device Coordinate Reference System for this {@code Canvas}.
-     * This method is usually invoked by subclasses rather than users. For example this method
-     * may be invoked as a side-effect of the following methods:
-     * <p>
-     * <ul>
-     *   <li>{@link ReferencedCanvas#setDisplayCRS}</li>
-     *   <li>{@link ReferencedCanvas#setObjectiveToDeviceTransforms}</li>
-     * </ul>
-     * <p>
-     * This method fires a {@value org.geotools.display.canvas.DisplayObject#DEVICE_CRS_PROPERTY}
-     * property change event.
+     * This method is usually invoked by subclasses rather than users. At the difference of
+     * {@link #setDisplayCRS setDisplayCRS(...)} (which is invoked everytime the zoom change),
+     * this method is usually invoked only once since the
+     * {@linkplain DerivedCRS#getConversionFromBase conversion} from display CRS to derived CRS
+     * is usually constant.
      *
      * @param  crs The device coordinate reference system.
      * @throws TransformException If the data can't be transformed.
-     *
-     * @todo Consider removing this method.
      */
-    protected synchronized void setDeviceCRS(DerivedCRS crs) throws TransformException {
-        final CoordinateReferenceSystem oldCRS;
+    protected synchronized void setDeviceCRS(final DerivedCRS crs) throws TransformException {
         try {
-            crs = validateBaseCRS(crs, getDisplayCRS());
+            deviceCRS = validateBaseCRS(crs, getDisplayCRS());
         } catch (FactoryException exception) {
             throw new TransformException(Errors.format(
                         ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
@@ -1140,8 +1121,6 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         if (deviceProperties == null) {
             deviceProperties = AbstractIdentifiedObject.getProperties(crs, null);
         }
-        oldCRS = deviceCRS;
-        deviceCRS = crs;
     }
 
     /**
@@ -1233,45 +1212,31 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     }
 
     /**
-     * Sets the {@linkplain #getObjectiveCRS objective} to {@linkplain #getDisplayCRS display}
-     * to {@linkplain #getDeviceCRS device} transforms to the specified affine transforms. This
-     * method creates a new display and device CRS and invokes {@link #setDisplayCRS} and
+     * Sets the {@linkplain #getDisplayCRS display} to {@linkplain #getDeviceCRS device} transform
+     * to the specified affine transform. This method creates a new device CRS and invokes
      * {@link #setDeviceCRS} with the result.
      *
-     * @param  objectiveToDisplay The {@linkplain #getObjectiveCRS objective} to
-     *         {@linkplain #getDisplayCRS display} affine transform as a matrix.
-     * @param  displayToDevice The {@linkplain #getDisplayCRS display} to
+     * @param  transform The {@linkplain #getDisplayCRS display} to
      *         {@linkplain #getDeviceCRS device} affine transform as a matrix.
      * @throws TransformException if the transform can not be set to the specified value.
-     *
-     * @see ReferencedCanvas2D#updateObjectiveToDeviceTransforms
      */
-    public synchronized void setObjectiveToDeviceTransforms(final Matrix objectiveToDisplay,
-                                                            final Matrix displayToDevice)
+    public synchronized void setDisplayToDeviceTransform(final Matrix transform)
             throws TransformException
     {
-        // Set deviceCRS to null in order to prevent useless adjustement by setDisplayCRS(...),
-        // since we are going to overwrite any recomputed value by setDeviceCRS(...) anyway.
-        deviceCRS = null; 
+        final DerivedCRS crs;
         try {
-            setDisplayCRS(createDerivedCRS(true, objectiveToDisplay));
-            setDeviceCRS (createDerivedCRS(false, displayToDevice));
+            crs = createDerivedCRS(false, transform);
         } catch (FactoryException exception) {
             // Should not occurs for an affine transform, since it is quite a basic one.
             throw new TransformException(exception.getLocalizedMessage(), exception);
         }
+        setDeviceCRS(crs);
     }
 
     /**
      * Sets the {@linkplain #getObjectiveCRS objective} to {@linkplain #getDisplayCRS display}
      * transform to the specified affine transform. This method creates a new display CRS and
      * invokes {@link #setDisplayCRS} with the result.
-     * <p>
-     * Invoking this method is equivalent to invoking
-     * <code>{@linkplain #setObjectiveToDeviceTransforms setObjectiveToDeviceTransforms}(transform,
-     * <var>displayToDevice</var>)</code> where <var>displayToDevice</var> is the previous
-     * {@linkplain #getDisplayCRS display} to {@linkplain #getDeviceCRS device} transform,
-     * which is left unchanged.
      *
      * @param  transform The {@linkplain #getObjectiveCRS objective} to
      *         {@linkplain #getDisplayCRS display} affine transform as a matrix.

@@ -275,7 +275,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
                 final AxisDirection srcAxe = srcAxis[srcIndex];
                 if (search.equals(srcAxe.absolute())) {
                     if (hasFound) {
-                        // TODO: Use the localized version of 'getName' in GeoAPI 1.1
+                        // TODO: Use the localized version of 'getName' in GeoAPI 2.1
                         throw new IllegalArgumentException(Errors.format(ErrorKeys.COLINEAR_AXIS_$2,
                                                            srcAxe.name(), dstAxe.name()));
                     }
@@ -300,7 +300,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
                 }
             }
             if (!hasFound) {
-                // TODO: Use the localized version of 'getName' in GeoAPI 1.1
+                // TODO: Use the localized version of 'getName' in GeoAPI 2.1
                 throw new IllegalArgumentException(Errors.format(
                             ErrorKeys.NO_SOURCE_AXIS_$1, dstAxis[dstIndex].name()));
             }

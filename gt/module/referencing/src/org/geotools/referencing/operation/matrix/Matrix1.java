@@ -26,6 +26,10 @@ import javax.vecmath.SingularMatrixException;
 // OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
 
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+
 
 /**
  * A matrix of fixed {@value #SIZE}&times;{@value #SIZE} size. This trivial matrix is returned as a
@@ -66,8 +70,7 @@ public class Matrix1 implements XMatrix, Serializable {
      */
     public Matrix1(final Matrix matrix) {
         if (matrix.getNumRow()!=SIZE || matrix.getNumCol()!=SIZE) {
-            // TODO: localize. Same message than BursaWolfParameters.
-            throw new IllegalArgumentException("Illegal matrix size.");
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_MATRIX_SIZE));
         }
         m00 = matrix.getElement(0,0);
     }
@@ -167,8 +170,7 @@ public class Matrix1 implements XMatrix, Serializable {
      */
     public final void multiply(final Matrix matrix) {
         if (matrix.getNumRow()!=SIZE || matrix.getNumCol()!=SIZE) {
-            // TODO: localize. Same message than BursaWolfParameters.
-            throw new IllegalArgumentException("Illegal matrix size.");
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_MATRIX_SIZE));
         }
         m00 *= matrix.getElement(0,0);
     }

@@ -25,6 +25,10 @@ import javax.vecmath.Matrix4d;
 // OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
 
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+
 
 /**
  * A matrix of fixed {@value #SIZE}&times;{@value #SIZE} size. This specialized matrix provides
@@ -74,8 +78,7 @@ public class Matrix4 extends Matrix4d implements XMatrix {
      */
     public Matrix4(final Matrix matrix) {
         if (matrix.getNumRow()!=SIZE || matrix.getNumCol()!=SIZE) {
-            // TODO: localize. Same message than BursaWolfParameters.
-            throw new IllegalArgumentException("Illegal matrix size.");
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_MATRIX_SIZE));
         }
         for (int j=0; j<SIZE; j++) {
             for (int i=0; i<SIZE; i++) {

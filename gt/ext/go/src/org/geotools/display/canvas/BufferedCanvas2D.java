@@ -450,19 +450,28 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
                 handleException("BufferedCanvas2D", "paint", exception);
             }
             /*
-             * Now takes in account the zoom change.
+             * Now takes in account the zoom change. The 'displayCRS' must be recreated. Failure
+             * to create this CRS will make the rendering process impossible. In such case, we
+             * will paint the stack trace right into the component and exit from this method.
              */
             objectiveToDisplay.setTransform(zoom);
+            try {
+                setObjectiveToDisplayTransform(objectiveToDisplay);
+            } catch (TransformException exception) {
+                GraphicsUtilities.paintStackTrace(output, displayBounds, exception);
+                paintFinished(false);
+                return;
+            }
         }
         /*
-         * If the zoom or the device changed, then the 'displayCRS' and 'deviceCRS' must be
-         * recreated. Failure to create those CRS will make the rendering process impossible.
-         * In such case, we will paint the stack trace right into the component and exit from
-         * this method.
+         * If the device changed, then the 'deviceCRS' must be recreated. Failure to create this
+         * CRS will make the rendering process impossible. In such case, we will paint the stack
+         * trace right into the component and exit from this method.
          */
+        // TODO: concatenate with the information provided in config. Check if changed since last call.
         displayToDevice.setToTranslation(-displayBounds.x, -displayBounds.y);
         try {
-            updateObjectiveToDeviceTransforms();
+            setDisplayToDeviceTransform(displayToDevice);
         } catch (TransformException exception) {
             GraphicsUtilities.paintStackTrace(output, displayBounds, exception);
             paintFinished(false);

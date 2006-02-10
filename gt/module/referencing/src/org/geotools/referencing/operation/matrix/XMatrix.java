@@ -19,6 +19,9 @@
  */
 package org.geotools.referencing.operation.matrix;
 
+// Java3D dependencies
+import javax.vecmath.SingularMatrixException;
+
 // OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
 
@@ -66,8 +69,10 @@ public interface XMatrix extends Matrix {
 
     /**
      * Inverts this matrix in place.
+     *
+     * @throws SingularMatrixException if this matrix is not invertible.
      */
-    void invert();
+    void invert() throws SingularMatrixException;
 
     /**
      * Sets the value of this matrix to the result of multiplying itself with the specified matrix.

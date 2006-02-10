@@ -26,6 +26,10 @@ import java.awt.geom.AffineTransform;
 // OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
 
+// Geotools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+
 
 /**
  * A matrix of fixed {@value #SIZE}&times;{@value #SIZE} size. This specialized matrix provides
@@ -79,8 +83,7 @@ public class Matrix3 extends Matrix3d implements XMatrix {
      */
     public Matrix3(final Matrix matrix) {
         if (matrix.getNumRow()!=SIZE || matrix.getNumCol()!=SIZE) {
-            // TODO: localize. Same message than BursaWolfParameters.
-            throw new IllegalArgumentException("Illegal matrix size.");
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_MATRIX_SIZE));
         }
         for (int j=0; j<SIZE; j++) {
             for (int i=0; i<SIZE; i++) {
@@ -124,6 +127,17 @@ public class Matrix3 extends Matrix3d implements XMatrix {
      */
     public final boolean isAffine() {
         return m20==0 && m21==0 && m22==1;
+    }
+
+    /**
+     * Returns {@code true} if at least one value is {@code NaN}.
+     *
+     * @since 2.3
+     */
+    public final boolean isNaN() {
+        return Double.isNaN(m00) || Double.isNaN(m01) || Double.isNaN(m02) ||
+               Double.isNaN(m10) || Double.isNaN(m11) || Double.isNaN(m12) ||
+               Double.isNaN(m20) || Double.isNaN(m21) || Double.isNaN(m22);
     }
 
     /**
