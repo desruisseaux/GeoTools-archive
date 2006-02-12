@@ -645,11 +645,13 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
      * @throws IllegalStateException if this graphic is not cloneable.
      */
     public final Graphic cloneGraphic() throws IllegalStateException {
-        try {
-            return (Graphic) clone();
-        } catch (CloneNotSupportedException exception) {
-            throw new IllegalStateException(exception.getLocalizedMessage());
-            // TODO: bundle the cause when we will be allowed to compile for J2SE 1.5.
+        synchronized (getTreeLock()) {
+            try {
+                return (Graphic) clone();
+            } catch (CloneNotSupportedException exception) {
+                throw new IllegalStateException(exception.getLocalizedMessage());
+                // TODO: bundle the cause when we will be allowed to compile for J2SE 1.5.
+            }
         }
     }
 

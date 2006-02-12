@@ -30,7 +30,7 @@ import org.geotools.referencing.crs.DefaultEngineeringCRS;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class DummyGraphic extends ReferencedGraphic {
+final class DummyGraphic extends ReferencedGraphic implements Cloneable {
     /**
      * Creates a dummy graphic.
      */

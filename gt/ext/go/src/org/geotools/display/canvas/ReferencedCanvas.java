@@ -224,6 +224,14 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     private boolean hasEnvelopeListeners;
 
     /**
+     * If {@code true}, do not listen anymore to envelope and objective CRS changes. This flag is
+     * set temporarily during {@link #setObjectiveCRS} execution, in order to take in account the
+     * CRS changes only after the change has been applied to all graphics (for avoiding costly
+     * envelope recomputation after each graphic changes).
+     */
+    private transient boolean disableGraphicListener;
+
+    /**
      * Creates an initially empty canvas with a default CRS of the specified number of dimensions.
      *
      * @param  factory   The display factory associated with this canvas, or {@code null} if none.
@@ -568,6 +576,9 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
                                           final PropertyChangeEvent event)
     {
         super.graphicPropertyChanged(graphic, event);
+        if (disableGraphicListener) {
+            return;
+        }
         final String propertyName = event.getPropertyName();
         final Envelope oldEnvelope;
         if (propertyName.equalsIgnoreCase(ENVELOPE_PROPERTY)) {
@@ -772,6 +783,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         final int graphicCount = graphics.size();
         int changed = 0;
         try {
+            disableGraphicListener = true;
             while (changed < graphicCount) {
                 final Graphic graphic = (Graphic) graphics.get(changed);
                 if (graphic instanceof ReferencedGraphic) {
@@ -797,6 +809,8 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             envelope.setCoordinateReferenceSystem(oldCRS);
             clearCache();
             throw exception;
+        } finally {
+            disableGraphicListener = false;
         }
         /*
          * The CRS change has been successful for all graphic primitives.
@@ -991,15 +1005,23 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      */
     public final synchronized DerivedCRS getDisplayCRS() {
         if (displayCRS == null) try {
-            final FactoryGroup              crsFactories = getFactoryGroup();
-            final CoordinateReferenceSystem objectiveCRS = getObjectiveCRS();
-            final CoordinateSystem             displayCS = DefaultCartesianCS.DISPLAY;
-            final Matrix                        identity = MatrixFactory.create(
-                    displayCS.getDimension(), objectiveCRS.getCoordinateSystem().getDimension());
-            final MathTransform mt = crsFactories.getMathTransformFactory().createAffineTransform(identity);
+            final FactoryGroup crsFactories;
+            final CoordinateReferenceSystem objectiveCRS;
+            final CoordinateSystem displayCS;
+            final int sourceDim, targetDim;
+            final Matrix identity;
+            final MathTransform mt;
+            
+            crsFactories      = getFactoryGroup();
+            objectiveCRS      = getObjectiveCRS();
+            displayCS         = DefaultCartesianCS.DISPLAY;
+            sourceDim         = objectiveCRS.getCoordinateSystem().getDimension();
+            targetDim         = displayCS.getDimension();
+            identity          = MatrixFactory.create(targetDim+1, sourceDim+1);
+            mt                = crsFactories.getMathTransformFactory().createAffineTransform(identity);
             displayProperties = AbstractIdentifiedObject.getProperties(displayCS, null);
-            displayCRS = crsFactories.getCRSFactory().createDerivedCRS(
-                            displayProperties, affineMethod, objectiveCRS, mt, displayCS);
+            displayCRS        = crsFactories.getCRSFactory().createDerivedCRS(
+                                    displayProperties, affineMethod, objectiveCRS, mt, displayCS);
         } catch (FactoryException exception) {
             /*
              * Should never happen, because the CRS that we tried to create is somewhat basic
@@ -1064,13 +1086,18 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     public final synchronized DerivedCRS getDeviceCRS() {
         final DerivedCRS displayCRS = getDisplayCRS();
         if (deviceCRS == null) try {
-            final FactoryGroup      crsFactories = getFactoryGroup();
-            final CoordinateSystem      deviceCS = displayCRS.getCoordinateSystem();
-            final Matrix identity = MatrixFactory.create(deviceCS.getDimension());
-            final MathTransform mt = crsFactories.getMathTransformFactory().createAffineTransform(identity);
+            final FactoryGroup crsFactories;
+            final CoordinateSystem deviceCS;
+            final Matrix identity;
+            final MathTransform mt;
+
+            crsFactories     = getFactoryGroup();
+            deviceCS         = displayCRS.getCoordinateSystem();
+            identity         = MatrixFactory.create(deviceCS.getDimension()+1);
+            mt               = crsFactories.getMathTransformFactory().createAffineTransform(identity);
             deviceProperties = AbstractIdentifiedObject.getProperties(deviceCS, null);
-            deviceCRS = crsFactories.getCRSFactory().createDerivedCRS(
-                            deviceProperties, affineMethod, displayCRS, mt, deviceCS);
+            deviceCRS        = crsFactories.getCRSFactory().createDerivedCRS(
+                                   deviceProperties, affineMethod, displayCRS, mt, deviceCS);
         } catch (FactoryException exception) {
             /*
              * Should never happen, because the CRS that we tried to create is somewhat basic
@@ -1220,12 +1247,12 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      *         {@linkplain #getDeviceCRS device} affine transform as a matrix.
      * @throws TransformException if the transform can not be set to the specified value.
      */
-    public synchronized void setDisplayToDeviceTransform(final Matrix transform)
+    protected synchronized void setDisplayToDeviceTransform(final Matrix transform)
             throws TransformException
     {
         final DerivedCRS crs;
         try {
-            crs = createDerivedCRS(false, transform);
+            crs = createDerivedCRS(true, transform);
         } catch (FactoryException exception) {
             // Should not occurs for an affine transform, since it is quite a basic one.
             throw new TransformException(exception.getLocalizedMessage(), exception);
@@ -1247,7 +1274,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     {
         final DerivedCRS crs;
         try {
-            crs = createDerivedCRS(true, transform);
+            crs = createDerivedCRS(false, transform);
         } catch (FactoryException exception) {
             // Should not occurs for an affine transform, since it is quite a basic one.
             throw new TransformException(exception.getLocalizedMessage(), exception);

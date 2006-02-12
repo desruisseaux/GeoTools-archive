@@ -22,6 +22,7 @@ package org.geotools.display.canvas;
 // J2SE dependencies
 import java.util.List;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.awt.RenderingHints;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -150,7 +151,7 @@ public class ReferencedObjectTest extends TestCase implements PropertyChangeList
          * Tests disposal.
          */
         assertTrue  (graphic.hasScaleListeners);
-        assertEquals("Our test listener should be the only one.",
+        assertEquals("Our test listener should be the only one registered.",
                      1, graphic.listeners.getPropertyChangeListeners().length);
         graphic.dispose();
         assertFalse (graphic.hasScaleListeners);
@@ -289,9 +290,34 @@ public class ReferencedObjectTest extends TestCase implements PropertyChangeList
         assertTrue("Typical cell dimensions should be the smallest one.",
                    Arrays.equals(new double[]{1,2}, canvas.getTypicalCellDimension(null)));
         /*
+         * Tests graphic addition in an other canvas.
+         */
+        if (true) {
+            final DummyCanvas canvas2 = new DummyCanvas();
+            assertNotSame(graphic3, canvas2.add(graphic3));
+            assertEquals(graphic3.getEnvelope(), canvas2.getEnvelope());
+            canvas2.dispose();
+        }
+        /*
+         * Tests CRS changes. Note: we disable the WARNING level in order to avoid polluting
+         * the standard output with warnings that are know to be normal for this test suite.
+         */
+        canvas.getLogger().setLevel(Level.SEVERE);
+        canvas.objectiveToDisplay.setToScale(10, 10);
+        assertTrue("The objective to display transform should be the identity transform.",
+                   canvas.getObjectiveToDisplayTransform().isIdentity());
+        canvas.setObjectiveToDisplayTransform(canvas.objectiveToDisplay);
+        assertFalse("The objective to display transform should not be the identity anymore.",
+                   canvas.getObjectiveToDisplayTransform().isIdentity());
+        // The following is not a usual thing to do, just a trick for trying a different CRS.
+        canvas.setObjectiveCRS(canvas.getDisplayCRS());
+        assertTrue("Typical cell dimensions should have been updated.",
+                   Arrays.equals(new double[]{10,20}, canvas.getTypicalCellDimension(null)));
+        assertEnvelopeEquals(50, -100, 100, 250, canvas.getEnvelope());
+        /*
          * Tests disposal.
          */
-        assertEquals("Our test listener should be the only one.",
+        assertEquals("Our test listener should be the only one registered.",
                      1, canvas.listeners.getPropertyChangeListeners().length);
         canvas.dispose();
         assertEquals("All listeners should have been removed after canvas disposal.",

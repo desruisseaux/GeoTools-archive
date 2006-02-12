@@ -325,27 +325,38 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @see #remove
      * @see #removeAll
      * @see #getGraphics
+     *
+     * @todo Current implementation has a risk of thread lock if {@code canvas1.add(graphic2)} and
+     *       {@code canvas2.add(graphic1)} are invoked in same time in two concurrent threads, where
+     *       {@code canvas1} and {@code canvas2} are two instances of {@code AbstractCanvas},
+     *       {@code graphic1} and {@code graphic2} are two instances of {@code AbstractGraphic},
+     *       {@code graphic1} was already added to {@code canvas1} and {@code graphic2} was already
+     *       added to {@code canvas2} before the above-cited {@code add} method calls.
      */
     public synchronized Graphic add(Graphic graphic) throws IllegalArgumentException {
         final List oldGraphics = sortedGraphics; // May be null.
         if (graphic instanceof AbstractGraphic) {
             AbstractGraphic candidate = (AbstractGraphic) graphic;
-            final Canvas canvas = candidate.getCanvas();
-            if (canvas == this) {
-                // The supplied graphic is already part of this canvas.
-                assert graphics.containsKey(candidate) : candidate;
-            } else {
-                assert !graphics.containsKey(candidate) : candidate;
-                if (canvas != null) try {
-                    graphic = candidate = (AbstractGraphic) candidate.clone();
-                } catch (CloneNotSupportedException e) {
-                    throw new IllegalArgumentException(
-                            Errors.format(ErrorKeys.CANVAS_NOT_OWNER_$1, graphic.getName()));
-                    // TODO: Add the cause when we will be allowed to compile for J2SE 1.5.
+            synchronized (candidate.getTreeLock()) {
+                final Canvas canvas = candidate.getCanvas();
+                if (canvas == this) {
+                    // The supplied graphic is already part of this canvas.
+                    assert graphics.containsKey(candidate) : candidate;
+                } else {
+                    assert !graphics.containsKey(candidate) : candidate;
+                    if (canvas != null) try {
+                        graphic = candidate = (AbstractGraphic) candidate.clone();
+                    } catch (CloneNotSupportedException e) {
+                        throw new IllegalArgumentException(
+                                Errors.format(ErrorKeys.CANVAS_NOT_OWNER_$1, graphic.getName()));
+                        // TODO: Add the cause when we will be allowed to compile for J2SE 1.5.
+                    }
+                    candidate.setCanvas(this);
+                    candidate.addPropertyChangeListener(PROPERTIES_LISTENER);
                 }
-                candidate.setCanvas(this);
-                candidate.addPropertyChangeListener(PROPERTIES_LISTENER);
             }
+            // The graphic lock should now be the same as the canvas lock.
+            assert Thread.holdsLock(candidate.getTreeLock());
         }
         /*
          * Add the new graphic in the 'graphics' array. The array will growth as needed and

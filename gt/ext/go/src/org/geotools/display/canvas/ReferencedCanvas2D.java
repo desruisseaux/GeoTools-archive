@@ -197,7 +197,14 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
 
     /**
      * Sets the display bounds in terms of {@linkplain #getDisplayCRS display CRS}.
-     * The display shape doesn't need to be {@linkplain Rectangle rectangular}.
+     * The display shape is usually {@linkplain Rectangle rectangular}, but this is not mandatory.
+     * <p>
+     * The display bounds could be the {@linkplain #getEnvelope envelope} of all graphics
+     * {@linkplain #objectiveToDisplay transformed} from objective to display CRS, in which
+     * case it would be zoom-dependent. But more often, this is rather the
+     * {@linkplain java.awt.Component#getBounds() widget bounds}, which is zoom-independent
+     * (instead, the content displayed in the widget changes). In the later case,
+     * {@code setDisplayBounds} is usually not invoked after {@link #setDisplayCRS}.
      * <p>
      * This method fires a {@value org.geotools.display.canvas.DisplayObject#DISPLAY_BOUNDS_PROPERTY}
      * property change event.
@@ -348,8 +355,11 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
         super.updateNormalizationFactor(crs);
         final Ellipsoid ellipsoid = CRSUtilities.getHeadGeoEllipsoid(crs);
         final CoordinateSystem cs = crs.getCoordinateSystem();
-        normalizeToDots.setToScale(getNormalizationFactor(cs.getAxis(0).getUnit(), ellipsoid),
-                                   getNormalizationFactor(cs.getAxis(0).getUnit(), ellipsoid));
+        final Unit          unit0 = cs.getAxis(0).getUnit();
+        final Unit          unit1 = cs.getAxis(1).getUnit();
+        final boolean    sameUnit = Utilities.equals(unit0, unit1);
+        normalizeToDots.setToScale(getNormalizationFactor(unit0, ellipsoid, true),
+                                   getNormalizationFactor(unit1, ellipsoid, !sameUnit));
     }
 
     /**
@@ -360,8 +370,10 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      * @param unit The unit. If {@code null}, then the unit will be assumed to be metres or
      *        degrees depending of whatever {@code ellipsoid} is {@code null} or not.
      * @param ellipsoid The ellipsoid if the CRS is geographic, or {@code null} otherwise.
+     * @param log {@code true} if this method is allowed to log a warning in case of failure.
+     *        This is used in order to avoid logging the same message twice.
      */
-    private double getNormalizationFactor(Unit unit, final Ellipsoid ellipsoid) {
+    private double getNormalizationFactor(Unit unit, final Ellipsoid ellipsoid, final boolean log) {
         double m = 1;
         try {
             if (ellipsoid != null) {
@@ -391,12 +403,15 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
              * scale, it is not crucial to the renderer working. Log a warning message and continue.
              * We keep the m value computed so far, which will be assumed to be a length in metres.
              */
-            final LogRecord record = Logging.getResources(getLocale()).getLogRecord(Level.WARNING,
-                                                          LoggingKeys.UNEXPECTED_UNIT_$1, unit);
-            record.setSourceClassName ("ReferencedCanvas2D");
-            record.setSourceMethodName("setObjectiveCRS");
-            record.setThrown(exception);
-            getLogger().log(record);
+            if (log) {
+                final LogRecord record;
+                record = Logging.getResources(getLocale()).getLogRecord(Level.WARNING,
+                                              LoggingKeys.UNEXPECTED_UNIT_$1, unit);
+                record.setSourceClassName ("ReferencedCanvas2D");
+                record.setSourceMethodName("setObjectiveCRS");
+                record.setThrown(exception);
+                getLogger().log(record);
+            }
         }
         return 7200/2.54 * m;
     }
