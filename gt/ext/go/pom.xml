@@ -49,6 +49,13 @@
         <role>Module Maintainer</role>
       </roles>
     </developer>
+    <developer>
+      <name>Antoine Hnawia</name>
+      <organization>Institut de Recherche pour le développement</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
   </developers>
 
 
