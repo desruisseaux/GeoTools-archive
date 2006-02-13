@@ -305,6 +305,7 @@ public class ShapefileRenderer implements GTRenderer{
         }
     }
 
+    
     private Set processTransaction(Graphics2D graphics, Envelope bbox,
         MathTransform transform, DataStore ds, Transaction transaction,
         String typename, Query query, List ruleList, List elseRuleList,
@@ -477,6 +478,10 @@ public class ShapefileRenderer implements GTRenderer{
 
                     if (modifiedFIDs.contains(type.getTypeName() + "." + index)) {
                         shpreader.next();
+                        //Vitali Diatchkov. We should skip DBF record also. It
+                        //is important if SLD is used based on attributes and some features
+                        //are in transaction. - Features are styled with alien's attributes in this case - bug.
+                        dbfreader.skip();
 
                         continue;
                     }
