@@ -38,6 +38,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 
 /**
@@ -285,9 +286,8 @@ public class IndexInfo {
                 info.indexFile = info.openIndexFile();
                 goodRecs = info.queryTree(bbox);
             } catch (Exception e) {
-                ShapefileRenderer.LOGGER.fine(
-                    "Exception occured attempting to use indexing:"
-                    + e.toString());
+                ShapefileRenderer.LOGGER.log(Level.FINE, 
+                    "Exception occured attempting to use indexing:", e);
                 goodRecs = null;
             }
         }
