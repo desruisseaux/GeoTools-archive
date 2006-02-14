@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2005, Geotools Project Managment Committee (PMC)
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2006, Geotools Project Managment Committee (PMC)
+ * (C) 2006, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -602,38 +602,45 @@ public class DefaultPointSymbolizer extends DefaultGraphicStyle implements Point
     }
     
     /**
-     * {@inheritDoc}
+     * Sets the properties of this {@code GraphicStyle} from the properties of the specified
+     * {@code GraphicStyle}.
      */
-    public void setPropertiesFrom(final GraphicStyle graphicStyle) {
-        if (graphicStyle instanceof DefaultPointSymbolizer) {
-            final PointSymbolizer ps = (PointSymbolizer) graphicStyle;
-            setFillBackgroundColor      (ps.getFillBackgroundColor());
-            setFillColor                (ps.getFillColor());
-            setFillGradientPoints       (ps.getFillGradientPoints());
-            setFillOpacity              (ps.getFillOpacity());
-            setFillPattern              (ps.getFillPattern());
-            setFillStyle                (ps.getFillStyle());
-            setMark                     (ps.getMark());
-            setOpacity                  (ps.getOpacity());
-            setRotation                 (ps.getRotation());
-            setSize                     (ps.getSize());
-            setStrokeBeginArrowStyle    (ps.getStrokeBeginArrowStyle());
-            setStrokeColor              (ps.getStrokeColor());
-            setStrokeDashArray          (ps.getStrokeDashArray());
-            setStrokeDashOffset         (ps.getStrokeDashOffset());
-            setStrokeEndArrowStyle      (ps.getStrokeEndArrowStyle());
-            setStrokeFillBackgroundColor(ps.getStrokeFillBackgroundColor());
-            setStrokeFillColor          (ps.getStrokeFillColor());
-            setStrokeFillGradientPoints (ps.getStrokeFillGradientPoints());
-            setStrokeFillOpacity        (ps.getStrokeFillOpacity());
-            setStrokeFillPattern        (ps.getStrokeFillPattern());
-            setStrokeFillStyle          (ps.getStrokeFillStyle());
-            setStrokeLineCap            (ps.getStrokeLineCap());
-            setStrokeLineGap            (ps.getStrokeLineGap());
-            setStrokeLineJoin           (ps.getStrokeLineJoin());
-            setStrokeLinePattern        (ps.getStrokeLinePattern());
-            setStrokeLineStyle          (ps.getStrokeLineStyle());
-            setStrokeWidth              (ps.getStrokeWidth());
+    public synchronized void setPropertiesFrom(final GraphicStyle graphicStyle) {
+        setGroupChangeEvents(true);
+        try {
+            super.setPropertiesFrom(graphicStyle);
+            if (graphicStyle instanceof DefaultPointSymbolizer) {
+                final PointSymbolizer ps = (PointSymbolizer) graphicStyle;
+                setFillBackgroundColor      (ps.getFillBackgroundColor());
+                setFillColor                (ps.getFillColor());
+                setFillGradientPoints       (ps.getFillGradientPoints());
+                setFillOpacity              (ps.getFillOpacity());
+                setFillPattern              (ps.getFillPattern());
+                setFillStyle                (ps.getFillStyle());
+                setMark                     (ps.getMark());
+                setOpacity                  (ps.getOpacity());
+                setRotation                 (ps.getRotation());
+                setSize                     (ps.getSize());
+                setStrokeBeginArrowStyle    (ps.getStrokeBeginArrowStyle());
+                setStrokeColor              (ps.getStrokeColor());
+                setStrokeDashArray          (ps.getStrokeDashArray());
+                setStrokeDashOffset         (ps.getStrokeDashOffset());
+                setStrokeEndArrowStyle      (ps.getStrokeEndArrowStyle());
+                setStrokeFillBackgroundColor(ps.getStrokeFillBackgroundColor());
+                setStrokeFillColor          (ps.getStrokeFillColor());
+                setStrokeFillGradientPoints (ps.getStrokeFillGradientPoints());
+                setStrokeFillOpacity        (ps.getStrokeFillOpacity());
+                setStrokeFillPattern        (ps.getStrokeFillPattern());
+                setStrokeFillStyle          (ps.getStrokeFillStyle());
+                setStrokeLineCap            (ps.getStrokeLineCap());
+                setStrokeLineGap            (ps.getStrokeLineGap());
+                setStrokeLineJoin           (ps.getStrokeLineJoin());
+                setStrokeLinePattern        (ps.getStrokeLinePattern());
+                setStrokeLineStyle          (ps.getStrokeLineStyle());
+                setStrokeWidth              (ps.getStrokeWidth());
+            }
+        } finally {
+            setGroupChangeEvents(false);
         }
     }
 }

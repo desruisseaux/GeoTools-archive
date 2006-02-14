@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2005, Geotools Project Managment Committee (PMC)
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2006, Geotools Project Managment Committee (PMC)
+ * (C) 2006, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -426,30 +426,36 @@ public class DefaultLineSymbolizer extends DefaultGraphicStyle implements LineSy
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the properties of this {@code GraphicStyle} from the properties of the specified
+     * {@code GraphicStyle}.
      */
     public synchronized void setPropertiesFrom(final GraphicStyle graphicStyle) {
-        super.setPropertiesFrom(graphicStyle);
-        if (graphicStyle instanceof LineSymbolizer) {
-            final LineSymbolizer ls = (LineSymbolizer) graphicStyle;
-            setStrokeBeginArrowStyle    (ls.getStrokeBeginArrowStyle());
-            setStrokeColor              (ls.getStrokeColor());
-            setStrokeDashArray          (ls.getStrokeDashArray());
-            setStrokeDashOffset         (ls.getStrokeDashOffset());
-            setStrokeEndArrowStyle      (ls.getStrokeEndArrowStyle());
-            setStrokeFillBackgroundColor(ls.getStrokeFillBackgroundColor());
-            setStrokeFillColor          (ls.getStrokeFillColor());
-            setStrokeFillGradientPoints (ls.getStrokeFillGradientPoints());
-            setStrokeFillOpacity        (ls.getStrokeFillOpacity());
-            setStrokeFillPattern        (ls.getStrokeFillPattern());
-            setStrokeFillStyle          (ls.getStrokeFillStyle());
-            setStrokeLineCap            (ls.getStrokeLineCap());
-            setStrokeLineGap            (ls.getStrokeLineGap());
-            setStrokeLineJoin           (ls.getStrokeLineJoin());
-            setStrokeLinePattern        (ls.getStrokeLinePattern());
-            setStrokeLineStyle          (ls.getStrokeLineStyle());
-            setStrokeOpacity            (ls.getStrokeOpacity());
-            setStrokeWidth              (ls.getStrokeWidth());
+        setGroupChangeEvents(true);
+        try {
+            super.setPropertiesFrom(graphicStyle);
+            if (graphicStyle instanceof LineSymbolizer) {
+                final LineSymbolizer ls = (LineSymbolizer) graphicStyle;
+                setStrokeBeginArrowStyle    (ls.getStrokeBeginArrowStyle());
+                setStrokeColor              (ls.getStrokeColor());
+                setStrokeDashArray          (ls.getStrokeDashArray());
+                setStrokeDashOffset         (ls.getStrokeDashOffset());
+                setStrokeEndArrowStyle      (ls.getStrokeEndArrowStyle());
+                setStrokeFillBackgroundColor(ls.getStrokeFillBackgroundColor());
+                setStrokeFillColor          (ls.getStrokeFillColor());
+                setStrokeFillGradientPoints (ls.getStrokeFillGradientPoints());
+                setStrokeFillOpacity        (ls.getStrokeFillOpacity());
+                setStrokeFillPattern        (ls.getStrokeFillPattern());
+                setStrokeFillStyle          (ls.getStrokeFillStyle());
+                setStrokeLineCap            (ls.getStrokeLineCap());
+                setStrokeLineGap            (ls.getStrokeLineGap());
+                setStrokeLineJoin           (ls.getStrokeLineJoin());
+                setStrokeLinePattern        (ls.getStrokeLinePattern());
+                setStrokeLineStyle          (ls.getStrokeLineStyle());
+                setStrokeOpacity            (ls.getStrokeOpacity());
+                setStrokeWidth              (ls.getStrokeWidth());
+            }
+        } finally {
+            setGroupChangeEvents(false);
         }
     }
 }

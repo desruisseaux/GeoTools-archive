@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2005, Geotools Project Managment Committee (PMC)
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2006, Geotools Project Managment Committee (PMC)
+ * (C) 2006, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -368,26 +368,33 @@ public class DefaultTextSymbolizer extends DefaultGraphicStyle implements TextSy
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the properties of this {@code GraphicStyle} from the properties of the specified
+     * {@code GraphicStyle}.
      */
-    public void setPropertiesFrom(final GraphicStyle graphicStyle) {
-        if (graphicStyle instanceof DefaultTextSymbolizer) {
-            final TextSymbolizer ts = (TextSymbolizer) graphicStyle;
-            setBackgroundColor      (ts.getBackgroundColor());
-            setFillBackgroundColor  (ts.getFillBackgroundColor());
-            setFillColor            (ts.getFillColor());
-            setFillGradientPoints   (ts.getFillGradientPoints());
-            setFillOpacity          (ts.getFillOpacity());
-            setFillPattern          (ts.getFillPattern());
-            setFillStyle            (ts.getFillStyle());
-            setFont                 (ts.getFont());
-            setHaloColor            (ts.getHaloColor());
-            setHaloRadius           (ts.getHaloRadius());
-            setRotation             (ts.getRotation());
-            setXAnchor              (ts.getXAnchor());
-            setXDisplacement        (ts.getXDisplacement());
-            setYAnchor              (ts.getYAnchor());
-            setYDisplacement        (ts.getYDisplacement());
+    public synchronized void setPropertiesFrom(final GraphicStyle graphicStyle) {
+        setGroupChangeEvents(true);
+        try {
+            super.setPropertiesFrom(graphicStyle);
+            if (graphicStyle instanceof DefaultTextSymbolizer) {
+                final TextSymbolizer ts = (TextSymbolizer) graphicStyle;
+                setBackgroundColor    (ts.getBackgroundColor());
+                setFillBackgroundColor(ts.getFillBackgroundColor());
+                setFillColor          (ts.getFillColor());
+                setFillGradientPoints (ts.getFillGradientPoints());
+                setFillOpacity        (ts.getFillOpacity());
+                setFillPattern        (ts.getFillPattern());
+                setFillStyle          (ts.getFillStyle());
+                setFont               (ts.getFont());
+                setHaloColor          (ts.getHaloColor());
+                setHaloRadius         (ts.getHaloRadius());
+                setRotation           (ts.getRotation());
+                setXAnchor            (ts.getXAnchor());
+                setXDisplacement      (ts.getXDisplacement());
+                setYAnchor            (ts.getYAnchor());
+                setYDisplacement      (ts.getYDisplacement());
+            }
+        } finally {
+            setGroupChangeEvents(false);
         }
     }
 }

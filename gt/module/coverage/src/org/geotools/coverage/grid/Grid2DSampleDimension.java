@@ -360,7 +360,7 @@ final class Grid2DSampleDimension extends GridSampleDimension {
      * Returns the color interpretation of the sample dimension.
      */
     public ColorInterpretation getColorInterpretation() {
-        return TypeMap.getColorInterpretation(getColorModel(band, numBands), band);
+        return TypeMap.getColorInterpretation(getColorModel(), band);
     }
 
     /**

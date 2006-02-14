@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2005, Geotools Project Managment Committee (PMC)
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2006, Geotools Project Managment Committee (PMC)
+ * (C) 2006, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -178,19 +178,23 @@ public class DefaultPolygonSymbolizer extends DefaultLineSymbolizer implements P
     }
 
     /**
-     * Sets the properties of this {@code GraphicStyle} from the properties of the specified
-     * {@code GraphicStyle}.
+     * {@inheritDoc}
      */
     public synchronized void setPropertiesFrom(final GraphicStyle graphicStyle) {
-        super.setPropertiesFrom(graphicStyle);
-        if (graphicStyle instanceof PolygonSymbolizer) {
-            final PolygonSymbolizer ps = (PolygonSymbolizer) graphicStyle;
-            setFillBackgroundColor(ps.getFillBackgroundColor());
-            setFillColor          (ps.getFillColor());
-            setFillGradientPoints (ps.getFillGradientPoints());
-            setFillOpacity        (ps.getFillOpacity());
-            setFillPattern        (ps.getFillPattern());
-            setFillStyle          (ps.getFillStyle());
+        setGroupChangeEvents(true);
+        try {
+            super.setPropertiesFrom(graphicStyle);
+            if (graphicStyle instanceof PolygonSymbolizer) {
+                final PolygonSymbolizer ps = (PolygonSymbolizer) graphicStyle;
+                setFillBackgroundColor(ps.getFillBackgroundColor());
+                setFillColor          (ps.getFillColor());
+                setFillGradientPoints (ps.getFillGradientPoints());
+                setFillOpacity        (ps.getFillOpacity());
+                setFillPattern        (ps.getFillPattern());
+                setFillStyle          (ps.getFillStyle());
+            }
+        } finally {
+            setGroupChangeEvents(false);
         }
     }
 }

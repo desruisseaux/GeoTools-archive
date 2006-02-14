@@ -429,7 +429,7 @@ public class FactoryRegistry extends ServiceRegistry {
                  * math transform on a machine without JAI installation. Since the service
                  * may not be essential (this is the case of WarpTransform2D), just skip it.
                  */
-                loadingFailure(category, error);
+                loadingFailure(category, error, false);
                 continue;
             } catch (Error error) {
                 if (!Utilities.getShortClassName(error).equals("ServiceConfigurationError")) {
@@ -441,7 +441,7 @@ public class FactoryRegistry extends ServiceRegistry {
                  * Failed to register a service for a reason probably related to the plugin
                  * initialisation. It may be some service-dependent missing resources.
                  */
-                loadingFailure(category, error);
+                loadingFailure(category, error, true);
                 continue;
             }
             final Class factoryClass = factory.getClass();
@@ -527,12 +527,22 @@ public class FactoryRegistry extends ServiceRegistry {
     /**
      * Invoked when a service can't be loaded. Log a warning, but do not stop the process.
      */
-    private static void loadingFailure(final Class category, final Throwable error) {
-        final LogRecord record = Logging.format(Level.WARNING,
-                LoggingKeys.CANT_LOAD_SERVICE_$1, Utilities.getShortName(category));
+    private static void loadingFailure(final Class category, final Throwable error,
+                                       final boolean showStackTrace)
+    {
+        final String name = Utilities.getShortName(category);
+        final LogRecord record;
+        if (showStackTrace) {
+            record = Logging.format(Level.WARNING, LoggingKeys.CANT_LOAD_SERVICE_$1, name);
+            record.setThrown(error);
+        } else {
+            record = new LogRecord(Level.WARNING, Logging.getResources(null).getString(
+                                   LoggingKeys.CANT_LOAD_SERVICE_$1, name) + " (" +
+                                   Utilities.getShortClassName(error) + ": " +
+                                   error.getLocalizedMessage() + ')');
+        }
         record.setSourceClassName("FactoryRegistry");
         record.setSourceMethodName("scanForPlugins");
-        record.setThrown(error);
         LOGGER.log(record);
     }
 

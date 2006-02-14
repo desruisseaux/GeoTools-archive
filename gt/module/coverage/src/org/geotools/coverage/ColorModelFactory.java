@@ -50,11 +50,10 @@ import org.geotools.util.WeakValueHashMap;
  * This factory provides only one public static method: {@link #getColorModel}.  Instances
  * of {@link ColorModel} are shared among all callers in the running virtual machine.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 final class ColorModelFactory {
     /**
@@ -195,14 +194,14 @@ final class ColorModelFactory {
             return new ComponentColorModel(cs, nBits, false, true, Transparency.OPAQUE, type);
         }
         /*
-         * Calcule le nombre de couleurs de la palette
-         * en cherchant l'index le plus élevé des thèmes.
+         * Computes the number of entries required for the color palette.
+         * We take the upper range value of the last category.
          */
         final int mapSize = (int)Math.round(categories[categories.length-1].maximum)+1;
         final int[]  ARGB = new int[mapSize];
         /*
-         * Interpole les codes de couleurs dans la palette. Les couleurs
-         * correspondantes aux plages non-définies par un thème seront transparentes.
+         * Interpolate the colors in the color palette. Colors that do not fall
+         * in the range of a category will be set to a transparent color.
          */
         for (int i=0; i<categories.length; i++) {
             final Category category = categories[i];

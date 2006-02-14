@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2005, Geotools Project Managment Committee (PMC)
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2006, Geotools Project Managment Committee (PMC)
+ * (C) 2006, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,14 +23,15 @@
 package org.geotools.display.style;
 
 // J2SE dependencies
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.RenderingHints;
+import java.beans.PropertyChangeEvent;     // For javadoc
+import java.beans.PropertyChangeListener;  // For javadoc
 
 // OpenGIS dependencies
 import org.opengis.go.display.primitive.Graphic;  // For javadoc
 import org.opengis.go.display.style.GraphicStyle;
+import org.opengis.go.display.style.event.GraphicStyleEvent;  // For javadoc
 import org.opengis.go.display.style.event.GraphicStyleListener;
 
 // Geotools dependencies
@@ -59,14 +60,14 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
     /**
      * List of the registered graphic style listeners.
      */
-    private List graphicStyleListeners;
+    private GraphicStyleListenerList graphicStyleListeners;
     
     /**
      * Creates a default instance of graphic style.
      */
     public DefaultGraphicStyle() {
-        hints                   = new Hints(null);
-        graphicStyleListeners   = new ArrayList();
+        hints                 = new Hints(null);
+        graphicStyleListeners = new GraphicStyleListenerList(this);
     }
 
     /**
@@ -88,11 +89,26 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
     }
 
     /**
-     * Registers the given object as a listener to receive events when the
-     * properties of this style have changed.
+     * Registers the given object as a listener to receive events when the properties of this style
+     * have changed. A GO-1 {@linkplain GraphicStyleListener graphic style listener} is similar to
+     * a Java {@linkplain PropertyChangeListener property change listener}, except for the following
+     * differences:
+     *
+     * <ul>
+     *   <li><p>Property change listeners can be
+     *       {@linkplain #addPropertyChangeListener(String,PropertyChangeListener) registered
+     *       for a single property}, while graphic style listeners are always registered for
+     *       all properties.</p></li>
+     *   <li><p>A {@linkplain PropertyChangeEvent property change event} represents a change in
+     *       a single property, while a {@linkplain GraphicStyleEvent graphic style event} can
+     *       represents changes in many properties. See {@link #setPropertiesFrom} for an
+     *       example.</p></li>
+     * </ul>
      */
     public synchronized void addGraphicStyleListener(final GraphicStyleListener listener) {
-        graphicStyleListeners.add(listener);
+        if (graphicStyleListeners.add(listener)) {
+            listeners.addPropertyChangeListener(graphicStyleListeners);
+        }
     }
     
     /**
@@ -101,7 +117,31 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
      * events when the properties of this style have changed.
      */
     public synchronized void removeGraphicStyleListener(final GraphicStyleListener listener) {
-        graphicStyleListeners.remove(listener);
+        if (graphicStyleListeners.remove(listener)) {
+            listeners.removePropertyChangeListener(graphicStyleListeners);
+        }
+    }
+
+    /**
+     * Specifies if {@linkplain PropertyChangeEvent property change events} should be grouped into
+     * a single {@linkplain GraphicStyleEvent graphic style event}. If {@code true}, then all
+     * subsequent {@linkplain PropertyChangeEvent property change events} will be grouped into
+     * a single {@linkplain GraphicStyleEvent graphic style event} until
+     * <code>{@linkplain #setGroupChangeEvents setGroupChangeEvents}(false)</code> is
+     * invoked. This method is typically invoked in a block like below:
+     *
+     * <blockquote><pre>
+     * setGroupChangeEvents(true);
+     * try {
+     *     // Performs a bunch of changes here.
+     * } finally {
+     *     setGroupChangeEvents(false);
+     * }
+     * </pre></blockquote>
+     */
+    protected void setGroupChangeEvents(final boolean grouping) {
+        // Do not synhronize; synchronization is performed by GraphicStyleListenerList.
+        graphicStyleListeners.setGroupChangeEvents(grouping);
     }
 
     /**
@@ -118,10 +158,30 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
 
     /**
      * Sets the properties of this {@code GraphicStyle} from the properties of the specified
-     * {@code GraphicStyle}.  May throw an exception if the given object is not the same type
-     * as this one.
+     * {@code GraphicStyle}. This method does not copy the listeners neither the implementation
+     * hints.
      * <p>
-     * The default implementation do not set the listeners neither the implementation hints.
+     * This method may fires many {@linkplain PropertyChangeEvent property change events}, one for
+     * every property that changed. But it fires at most one {@linkplain GraphicStyleEvent graphic
+     * style event} with the list of all modified properties as an array.
+     * <p>
+     * Subclasses should implement this method as below:
+     *
+     * <blockquote><pre>
+     * public synchronized void setPropertiesFrom(GraphicStyle graphicStyle) {
+     *     setGroupChangeEvents(true);
+     *     try {
+     *         super.setPropertiesFrom(graphicStyle);
+     *         if (graphicStyle instanceof MySymbolizer) {
+     *             final MySymbolizer ms = (MySymbolizer) graphicStyle;
+     *             setMyProperty(ms.getMyProperty());
+     *             // etc...
+     *         }
+     *     } finally {
+     *         setGroupChangeEvents(false);
+     *     }
+     * }
+     * </pre></blockquote>
      */
     public void setPropertiesFrom(final GraphicStyle graphicStyle) {
     }
@@ -140,7 +200,7 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
             throw new AssertionError(exception);
         }
         clone.hints = (Hints) hints.clone();
-        clone.graphicStyleListeners = new ArrayList(graphicStyleListeners);
+        clone.graphicStyleListeners = new GraphicStyleListenerList(graphicStyleListeners);
         return clone;
     }
 }
