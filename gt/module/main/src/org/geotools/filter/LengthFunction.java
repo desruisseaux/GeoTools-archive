@@ -17,6 +17,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
 
 /**
  * Takes an AttributeExpression, and computes the length of the data for the attribute.
@@ -54,7 +56,7 @@ public class LengthFunction extends FunctionExpressionImpl {
 	/* (non-Javadoc)
 	 * @see org.geotools.filter.Expression#getValue(org.geotools.feature.Feature)
 	 */
-	public Object getValue(Feature feature) {
+	public Object evaluate(Feature feature) {
 		return new Integer(ae.getValue(feature).toString().length());
 	}
 	/* (non-Javadoc)

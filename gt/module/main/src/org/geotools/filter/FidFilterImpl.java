@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
+import org.opengis.filter.FilterVisitor;
 
 
 /**
@@ -43,11 +44,13 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
     /** List of the feature IDs. */
     private Set fids = new HashSet();
 
+    
     /**
      * Empty constructor.
      */
     protected FidFilterImpl() {
-        filterType = AbstractFilter.FID;
+    	super(FilterFactoryFinder.createFilterFactory());
+    	filterType = AbstractFilter.FID;
     }
 
     /**
@@ -56,7 +59,8 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
      * @param initialFid The type of comparison.
      */
     protected FidFilterImpl(String initialFid) {
-        filterType = AbstractFilter.FID;
+    	super(FilterFactoryFinder.createFilterFactory());
+    	filterType = AbstractFilter.FID;
         addFid(initialFid);
     }
 
@@ -78,7 +82,7 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
      * @return <tt>true</tt> if the feature's ID matches an fid held by this
      * filter, <tt>false</tt> otherwise.
      */
-    public boolean contains(Feature feature) {
+    public boolean evaluate(Feature feature) {
         if (feature == null) {
             return false;
         }
@@ -143,11 +147,27 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
      * Returns all the fids in this filter.
      *
      * @return An array of all the fids in this filter.
+     * 
+     * @deprecated use {@link #getIDs()}
      */
-    public String[] getFids() {
+    public final String[] getFids() {
         return (String[]) fids.toArray(new String[0]);
     }
 
+    /**
+     * @see org.opengis.filter.FeatureId#getIDs()
+     */
+    public Set getIDs() {
+    	return getFidsSet();
+    }
+    
+    /**
+     * @see org.opengis.filter.FeatureId#setIDs(Set)
+     */
+    public void setIDs(Set ids) {
+    	this.fids = ids;
+    }
+   
     /**
      * Accessor method for fid set.
      *
@@ -195,7 +215,7 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
+	public Object accept(FilterVisitor visitor, Object extraData) {
+    	return visitor.visit(this,extraData);
     }
 }

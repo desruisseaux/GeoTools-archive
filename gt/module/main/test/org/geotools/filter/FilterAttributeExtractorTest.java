@@ -29,6 +29,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -173,7 +174,8 @@ public class FilterAttributeExtractorTest extends TestCase {
         // Set up the string test.
         testAttribute = new AttributeExpressionImpl(testSchema, "testString");
 
-        CompareFilterImpl filter = new CompareFilterImpl(AbstractFilter.COMPARE_EQUALS);
+        CompareFilter filter = FilterFactoryFinder.createFilterFactory()
+        	.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
         Expression testLiteral;
         filter.addLeftValue(testAttribute);
         testLiteral = new LiteralExpressionImpl("test string data");
@@ -277,8 +279,9 @@ public class FilterAttributeExtractorTest extends TestCase {
         coords[1] = new Coordinate(3, 4);
         coords[2] = new Coordinate(5, 6);
 
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         // Test Equals
-        GeometryFilterImpl filter = new GeometryFilterImpl(AbstractFilter.GEOMETRY_EQUALS);
+        GeometryFilter filter = factory.createGeometryFilter(AbstractFilter.GEOMETRY_EQUALS);
         Expression left = new AttributeExpressionImpl(testSchema, "testGeometry");
         filter.addLeftGeometry(left);
 
@@ -296,7 +299,8 @@ public class FilterAttributeExtractorTest extends TestCase {
 
     public void testDistanceGeometry() throws Exception {
         // Test DWithin
-        GeometryDistanceFilter filter = new CartesianDistanceFilter(AbstractFilter.GEOMETRY_DWITHIN);
+        GeometryDistanceFilter filter = FilterFactoryFinder.createFilterFactory()
+        	.createGeometryDistanceFilter(AbstractFilter.GEOMETRY_DWITHIN);
         Expression left = new AttributeExpressionImpl(testSchema, "testGeometry");
         filter.addLeftGeometry(left);
 

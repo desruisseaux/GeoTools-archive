@@ -13,13 +13,14 @@ import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureList;
-import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.SortBy;
 import org.geotools.filter.SortOrder;
+import org.geotools.filter.expression.AttributeExpression;
+import org.opengis.filter.expression.PropertyName;
 
 public class SubFeatureList extends SubFeatureCollection implements FeatureList, RandomFeatureAccess {
     List sort; 
@@ -103,9 +104,9 @@ public class SubFeatureList extends SubFeatureCollection implements FeatureList,
                         return compare;
                     }
                     protected int compare( Feature feature1, Feature feature2, SortBy order){
-                        AttributeExpression name = order.getPropertyName();
-                        Comparable value1 = (Comparable) name.getValue( feature1 );
-                        Comparable value2 = (Comparable) name.getValue( feature2 );
+                        PropertyName name = order.getPropertyName();
+                        Comparable value1 = (Comparable) name.evaluate( feature1 );
+                        Comparable value2 = (Comparable) name.evaluate( feature2 );
                         
                         if( order.getSortOrderType() == SortOrder.ASCENDING ){
                             return value1.compareTo( value2 );

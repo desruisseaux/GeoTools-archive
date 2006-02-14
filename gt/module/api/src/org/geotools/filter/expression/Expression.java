@@ -13,9 +13,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter;
+package org.geotools.filter.expression;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.FilterVisitor;
 
 
 /**
@@ -27,15 +28,27 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public interface Expression extends ExpressionType {
+public interface Expression extends ExpressionType, org.opengis.filter.expression.Expression {
     
 	/**
      * Gets the type of this expression.
      *
      * @return Expression type.
+     * 
+     * @deprecated The enumeration based type system has been replaced by a
+     * class based type system.
      */
     short getType();
 
+    /**
+	 * Evaluates the expression against an instance of {@link Feature}. 
+	 *
+	 * @param feature The feature being evaluated.
+	 * 
+	 * @return The result.
+	 */
+	Object evaluate(Feature feature);
+    
     /**
      * Returns a value for this expression.  The feature argument is used if a
      * feature is needed to evaluate the expression, as in the case of an
@@ -47,6 +60,8 @@ public interface Expression extends ExpressionType {
      *
      * @return Value of the expression, evaluated with the feature object if
      *         necessary.
+     *         
+     * @deprecated use {@link org.opengis.filter.expression.Expression#evaluate(Feature)}
      */
     Object getValue(Feature feature);
 
@@ -59,6 +74,8 @@ public interface Expression extends ExpressionType {
      *
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
+     * @deprecated use use {@link org.opengis.filter.expression.Expression#accept(ExpressionVisitor, Object)}
      */
     void accept(FilterVisitor visitor);
+    
 }

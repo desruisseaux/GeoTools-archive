@@ -18,10 +18,10 @@ package org.geotools.feature.visitor;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.expression.Expression;
 
 
 /**

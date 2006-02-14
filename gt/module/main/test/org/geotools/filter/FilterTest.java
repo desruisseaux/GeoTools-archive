@@ -31,6 +31,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -242,7 +243,8 @@ public class FilterTest extends TestCase {
         // Set up the string test.
         testAttribute = new AttributeExpressionImpl(testSchema, "testString");
 
-        CompareFilterImpl filter = new CompareFilterImpl(AbstractFilter.COMPARE_EQUALS);
+        CompareFilter filter = FilterFactoryFinder.createFilterFactory()
+        	.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
         Expression testLiteral;
         filter.addLeftValue(testAttribute);
 
@@ -260,7 +262,8 @@ public class FilterTest extends TestCase {
 
         assertTrue(!filter.contains(testFeature));
 
-	filter = new CompareFilterImpl(AbstractFilter.COMPARE_LESS_THAN);
+	filter = FilterFactoryFinder.createFilterFactory()
+		.createCompareFilter(AbstractFilter.COMPARE_LESS_THAN);
 	filter.addLeftValue(testAttribute);
 
         // Test for false positive.
@@ -289,7 +292,8 @@ public class FilterTest extends TestCase {
     public static void compareNumberRunner(Expression testAttribute,
         short filterType, boolean test1, boolean test2, boolean test3)
         throws IllegalFilterException {
-        CompareFilterImpl filter = new CompareFilterImpl(filterType);
+        CompareFilter filter = FilterFactoryFinder.createFilterFactory()
+        	.createCompareFilter(filterType);
         Expression testLiteral;
         filter.addLeftValue(testAttribute);
 
@@ -466,8 +470,10 @@ public class FilterTest extends TestCase {
         coords[1] = new Coordinate(3, 4);
         coords[2] = new Coordinate(5, 6);
 
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        
         // Test Equals
-        GeometryFilterImpl filter = new GeometryFilterImpl(AbstractFilter.GEOMETRY_EQUALS);
+        GeometryFilter filter = factory.createGeometryFilter(AbstractFilter.GEOMETRY_EQUALS);
         Expression left = new AttributeExpressionImpl(testSchema, "testGeometry");
         filter.addLeftGeometry(left);
 
@@ -488,7 +494,7 @@ public class FilterTest extends TestCase {
         assertTrue(!filter.contains(testFeature));
 
         // Test Disjoint
-        filter = new GeometryFilterImpl(AbstractFilter.GEOMETRY_DISJOINT);
+        filter = factory.createGeometryFilter(AbstractFilter.GEOMETRY_DISJOINT);
         left = new AttributeExpressionImpl(testSchema, "testGeometry");
         filter.addLeftGeometry(left);
 
@@ -513,7 +519,7 @@ public class FilterTest extends TestCase {
         assertTrue(!filter.contains(testFeature));
 
         // Test BBOX
-        filter = new GeometryFilterImpl(AbstractFilter.GEOMETRY_BBOX);
+        filter = factory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
         left = new AttributeExpressionImpl(testSchema, "testGeometry");
         filter.addLeftGeometry(left);
 
@@ -547,7 +553,9 @@ public class FilterTest extends TestCase {
 
     public void testDistanceGeometry() throws Exception {
         // Test DWithin
-        GeometryDistanceFilter filter = new CartesianDistanceFilter(AbstractFilter.GEOMETRY_DWITHIN);
+        GeometryDistanceFilter filter = FilterFactoryFinder.createFilterFactory()
+        	.createGeometryDistanceFilter(AbstractFilter.GEOMETRY_DWITHIN);
+        	
         Expression left = new AttributeExpressionImpl(testSchema, "testGeometry");
         filter.addLeftGeometry(left);
 
@@ -572,7 +580,8 @@ public class FilterTest extends TestCase {
         LOGGER.info("contains feature: " + filter.contains(testFeature));
 
         //Test Beyond
-        GeometryDistanceFilter filterB = new CartesianDistanceFilter(AbstractFilter.GEOMETRY_BEYOND);
+        GeometryDistanceFilter filterB = FilterFactoryFinder.createFilterFactory()
+        	.createGeometryDistanceFilter(AbstractFilter.GEOMETRY_BEYOND);
         filterB.addLeftGeometry(left);
         filterB.addRightGeometry(right);
         filterB.setDistance(20);

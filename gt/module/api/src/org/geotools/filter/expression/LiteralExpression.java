@@ -13,9 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter;
+package org.geotools.filter.expression;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.expression.Literal;
 
 
 /**
@@ -26,13 +28,15 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public interface LiteralExpression extends Expression {
+public interface LiteralExpression extends Expression, Literal {
     /**
      * Sets the literal.
      *
      * @param literal The literal to store inside this expression.
      *
      * @throws IllegalFilterException This literal type is not in scope.
+     * 
+     * @deprecated use {@link Literal#setValue(Object)}
      */
     void setLiteral(Object literal) throws IllegalFilterException;
 
@@ -43,6 +47,8 @@ public interface LiteralExpression extends Expression {
      *
      * @return the literal held by this expression.  Ignores the passed in
      *         feature.
+     *         
+     * @deprecated use {@link Expression#evaluate(Feature)}.
      */
     Object getValue(Feature feature);
 
@@ -57,6 +63,8 @@ public interface LiteralExpression extends Expression {
      * Retrieves the literal of this expression.
      *
      * @return the literal held by this expression.
+     * 
+     * @deprecated use {@link Literal#getValue()}.
      */
     Object getLiteral();
 }

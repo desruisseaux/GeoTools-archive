@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.Expression;
+import org.geotools.filter.expression.Expression;
 
 /**
  * Obtains the data needed for a Quantile operation (classification of features into classes of equal size). 

@@ -25,7 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
+import org.geotools.filter.expression.Expression;
 import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
 import org.geotools.gui.swing.sldeditor.util.FormUtils;
 
@@ -110,7 +110,7 @@ public class ExpressionEditorWrapper extends ExpressionEditor {
     }
 
     /**
-     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#setExpression(org.geotools.filter.Expression)
+     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#setExpression(org.geotools.filter.expression.Expression)
      */
     public void setExpression(Expression expression) {
         if (simpleEditor.canEdit(expression)) {
@@ -123,7 +123,7 @@ public class ExpressionEditorWrapper extends ExpressionEditor {
     }
 
     /**
-     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#canEdit(org.geotools.filter.Expression)
+     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#canEdit(org.geotools.filter.expression.Expression)
      */
     public boolean canEdit(Expression expression) {
         return true;

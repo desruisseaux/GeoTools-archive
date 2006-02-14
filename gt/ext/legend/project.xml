@@ -49,40 +49,62 @@
       <artifactId>api</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
+>>>>>>> .merge-right.r18003
     </dependency>    
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
       <url>http://www.geotools.org</url>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <artifactId>render</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
       <url>http://www.geotools.org</url>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <id>widgets-swing</id>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+		<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>	
     </dependency>
     <dependency>
       <artifactId>legacy</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
       <url>http://www.geotools.org</url>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <artifactId>migrate</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
       <url>http://www.geotools.org</url>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <artifactId>shapefile</artifactId>

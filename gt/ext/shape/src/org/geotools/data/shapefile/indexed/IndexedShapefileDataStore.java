@@ -66,7 +66,7 @@ import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.LockTimeoutException;

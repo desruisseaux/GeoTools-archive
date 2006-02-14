@@ -31,13 +31,13 @@ import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.BBoxExpression;
 import org.geotools.validation.ValidationResults;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -169,7 +169,8 @@ public class CrossesIntegrity extends RelationIntegrity
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		Filter filter = null;
 
-		filter = (Filter) ff.createBBoxExpression(bBox);
+		//JD: fix this!!
+		//filter = (Filter) ff.createBBoxExpression(bBox);
 
 		FeatureResults featureResultsA = featureSourceA.getFeatures(filter);
 		FeatureResults featureResultsB = featureSourceB.getFeatures(filter);

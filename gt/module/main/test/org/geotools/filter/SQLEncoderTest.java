@@ -18,6 +18,8 @@ package org.geotools.filter;
 
 import java.io.StringWriter;
 
+import org.geotools.filter.expression.Expression;
+
 
 /**
  * Unit test for sql encoding of filters into where statements.

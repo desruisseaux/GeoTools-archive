@@ -17,6 +17,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.LiteralExpression;
+import org.opengis.filter.expression.ExpressionVisitor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -30,6 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class LiteralExpressionImpl extends DefaultExpression
     implements LiteralExpression {
+	
     /** Holds a reference to the literal. */
     private Object literal = null;
 
@@ -115,14 +118,44 @@ public class LiteralExpressionImpl extends DefaultExpression
     }
 
     /**
+     * This method calls {@link #setValue(Object)}.
+     * 
+     * @deprecated use {@link #setValue(Object)}.
+     * 
+     */
+    public final void setLiteral(Object literal) throws IllegalFilterException {
+        setValue(literal);
+    }
+
+    /**
+     * This method calls {@link #getValue()}.
+     * 
+     * @deprecated use {@link #getValue()}.
+     * 
+     */
+    public final Object getLiteral() {
+        return getValue();
+    }
+
+    /**
+     * Retrieves the literal of this expression.
+     *
+     * @return the literal held by this expression.
+     * 
+     */
+    public Object getValue() {
+    	return literal;
+    }
+    
+    /**
      * Sets the literal.
      *
      * @param literal The literal to store inside this expression.
      *
      * @throws IllegalFilterException This literal type is not in scope.
      */
-    public final void setLiteral(Object literal) throws IllegalFilterException {
-        if (literal instanceof Double) {
+    public final void setValue(Object literal) {
+    	if (literal instanceof Double) {
             expressionType = LITERAL_DOUBLE;
         } else if (literal instanceof Integer) {
             expressionType = LITERAL_INTEGER;
@@ -131,23 +164,17 @@ public class LiteralExpressionImpl extends DefaultExpression
         } else if (literal instanceof Geometry) {
             expressionType = LITERAL_GEOMETRY;
         } else {
-            throw new IllegalFilterException(
-                "Attempted to add a literal with non-supported type "
-                + "(ie. not Double, Integer, String).");
+        	
+            
+    		throw new IllegalFilterException(
+	            "Attempted to add a literal with non-supported type "
+	            + "(ie. not Double, Integer, String).")
+        ;
         }
 
         this.literal = literal;
     }
-
-    /**
-     * Retrieves the literal of this expression.
-     *
-     * @return the literal held by this expression.
-     */
-    public Object getLiteral() {
-        return literal;
-    }
-
+    
     /**
      * Gets the value of this literal.
      *
@@ -158,8 +185,9 @@ public class LiteralExpressionImpl extends DefaultExpression
      *
      * @throws IllegalArgumentException Feature does not match declared schema.
      */
-    public Object getValue(Feature feature) throws IllegalArgumentException {
-        return literal;
+    public Object evaluate(Feature feature)
+    	throws IllegalArgumentException {
+    	return literal;
     }
 
     /**
@@ -241,7 +269,7 @@ public class LiteralExpressionImpl extends DefaultExpression
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
+    public Object accept(ExpressionVisitor visitor, Object extraData) {
+    	return visitor.visit(this,extraData);
     }
 }

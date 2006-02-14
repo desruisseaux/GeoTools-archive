@@ -22,6 +22,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
 
 
 /**
@@ -55,7 +57,7 @@ public class MinFunction extends FunctionExpressionImpl
      *
      * @return Value of the feature object.
      */
-    public Object getValue(Feature feature) {
+    public Object evaluate(Feature feature) {
         double first = ((Number) expA.getValue(feature)).doubleValue();
         double second = ((Number) expB.getValue(feature)).doubleValue();
 

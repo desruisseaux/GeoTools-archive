@@ -9,12 +9,12 @@ package org.geotools.brewer.color;
 //import edu.psu.geovista.colorbrewer.OriginalColor;
 import java.awt.Color;
 import org.geotools.feature.Feature;
-import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
-import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.filter.function.ClassificationFunction;
 
 /**
@@ -102,10 +102,10 @@ public class PaletteFunction extends FunctionExpressionImpl implements FunctionE
         return prelim;
     }
     
-    public Object getValue(Feature feature){
+    public Object evaluate(Feature feature){
         int classNum = classifier.getNumberOfClasses();
         ColorBrewer brewer = new ColorBrewer();
-        int klass = ((Integer) classifier.getValue(feature)).intValue();
+        int klass = ((Integer) classifier.evaluate(feature)).intValue();
 
         BrewerPalette pal = brewer.getPalette(paletteName);
         Color colors[] = pal.getColors(classNum);

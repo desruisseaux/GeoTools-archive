@@ -29,11 +29,11 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.BoundsVisitor;
 import org.geotools.feature.visitor.CalcResult;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
 import org.geotools.filter.visitor.AbstractFilterVisitor;
 
 
@@ -131,7 +131,7 @@ public class Collection_BoundsFunction extends FunctionExpressionImpl
             });
     }
 
-    public Object getValue(Feature feature) {
+    public Object evaluate(Feature feature) {
 		FeatureCollection featureCollection;
 
 		if (feature instanceof FeatureCollection) {

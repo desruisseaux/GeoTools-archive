@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.expression.AttributeExpression;
+import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
@@ -60,34 +62,53 @@ public class AttributeExpressionImpl2 extends DefaultExpression
      *
      * @throws IllegalFilterException If the attribute path is not in the
      *         schema.
+     *         
+     *  @deprecated use {@link #setPropertyName(String)}.
      */
-    public void setAttributePath(String attPath) throws IllegalFilterException {
-        
-                throw new IllegalFilterException(
-                    "Attribute: " +attPath+ " is not in stated schema "+".");
+    public final void setAttributePath(String attPath) throws IllegalFilterException {
+        setPropertyName(attPath);
+    }
+
+    /**
+     * This method calls {@link #getPropertyName()}.
+     * 
+     * @deprecated use {@link #getPropertyName()}
+     */
+    public final String getAttributePath() {
+      	return getPropertyName();
     }
 
     /**
      * Gets the path to the attribute to be evaluated by this expression.
      *
-     * @return the path.
+     * @see {@link org.opengis.filter.expression.PropertyName#getPropertyName()}.
      */
-    public String getAttributePath() {
-        return attPath;
+   public String getPropertyName() {
+		return attPath;
+   }	
+    
+   /**
+    * Unsupported operation
+    * 
+    * @throws IllegalFilterException.
+    */
+   public void setPropertyName(String name) {
+	  
+	  throw new IllegalFilterException(
+		           "Attribute: " +attPath+ " is not in stated schema "+".");
+	  
+   }
+   
+   /**
+      * Gets the value of this attribute from the passed feature.
+      *
+      * @param feature Feature from which to extract attribute value.
+      */
+    public Object evaluate(Feature feature) {
+    	return feature.getAttribute(attPath);
     }
-
+    
     /**
-     * Gets the value of this attribute from the passed feature.
-     *
-     * @param feature Feature from which to extract attribute value.
-     *
-     * @return DOCUMENT ME!
-     */
-    public Object getValue(Feature feature) {
-        return feature.getAttribute(attPath);
-    }
-
-     /**
      * Return this expression as a string.
      *
      * @return String representation of this attribute expression.
@@ -142,7 +163,7 @@ public class AttributeExpressionImpl2 extends DefaultExpression
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
+    public Object accept(ExpressionVisitor visitor, Object extraData) {
+    	return visitor.visit(this,extraData);
     }
 }

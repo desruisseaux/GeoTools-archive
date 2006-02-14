@@ -21,7 +21,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
-import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.util.SimpleInternationalString;

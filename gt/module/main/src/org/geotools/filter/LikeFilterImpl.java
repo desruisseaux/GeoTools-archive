@@ -21,6 +21,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.ExpressionType;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.PropertyIsLike;
 
 
 /**
@@ -157,6 +161,21 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 					pattern);
     }
 	
+	public void setWildCard(String wildCard) {
+		this.wildcardMulti = wildCard;
+		match = null;
+	}
+	
+	public void setSingleChar(String singleChar) {
+		this.wildcardSingle = singleChar;
+		match = null;
+	}
+	
+	public void setEscape(String escape) {
+		this.escape = escape;
+		match = null;
+	}
+	
 	
     private Matcher getMatcher(){
         if(match == null){
@@ -256,7 +275,8 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      * Constructor which flags the operator as like.
      */
     protected LikeFilterImpl() {
-        filterType = LIKE;
+    	super(FilterFactoryFinder.createFilterFactory());
+    	filterType = LIKE;
     }
 
     /**
@@ -266,26 +286,46 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      *
      * @throws IllegalFilterException Filter is illegal.
      */
-    public void setValue(Expression attribute) throws IllegalFilterException {
-        if ((attribute.getType() != ExpressionType.ATTRIBUTE_STRING)
-                || permissiveConstruction) {
-            this.attribute = attribute;
-        } else {
-            throw new IllegalFilterException(
-                "Attempted to add something other than a string attribute "
-                + "expression to a like filter.");
-        }
+    public final void setValue(Expression attribute) throws IllegalFilterException {
+    	setExpression(attribute);
+    	
+        
     }
 
      /**
      * Gets the Value (left hand side) of this filter.
      *
      * @return The expression that is the value of the filter.
+     * 
+     * @deprecated use {@link #getExpression()}.
      */
-    public Expression getValue() {
+    public final Expression getValue() {
         return attribute;
     }
 
+    /**
+     * Gets the expression for hte filter.
+     * <p>
+     * This method calls th deprecated {@link #getValue()} for backwards 
+     * compatability with subclasses.
+     * </p>
+     */
+    public org.opengis.filter.expression.Expression getExpression() {
+    	return getValue();
+    }
+    
+    public void setExpression(org.opengis.filter.expression.Expression e) {
+    	Expression attribute = (Expression)e;
+    	if ((attribute.getType() != ExpressionType.ATTRIBUTE_STRING)
+                || permissiveConstruction) {
+    		this.attribute = attribute;
+        } else {
+            throw new IllegalFilterException(
+                "Attempted to add something other than a string attribute "
+                + "expression to a like filter.");
+        }
+    }
+    
     /**
      * Sets the match pattern for this FilterLike.
      *
@@ -296,8 +336,14 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      * @param wildcardSingle the string that represents a single character (1)
      *        wildcard
      * @param escape the string that represents an escape character
+     * 
+     * @deprecated use one of 
+     * 	{@link PropertyIsLike#setExpression(Expression)}
+     * 	{@link PropertyIsLike#setWildCard(String)
+     * 	{@link PropertyIsLike#setSingleChar(String)}
+     * 	{@link PropertyIsLike#setEscape(String)}
      */
-    public void setPattern(Expression p, String wildcardMulti,
+    public final void setPattern(Expression p, String wildcardMulti,
         String wildcardSingle, String escape) {
         setPattern(p.toString(), wildcardMulti, wildcardSingle, escape);
     }
@@ -312,37 +358,60 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      * @param wildcardSingle the string that represents a single character (1)
      *        wildcard
      * @param escape the string that represents an escape character
+     * 
+     * @deprecated use one of 
+     * 	{@link PropertyIsLike#setLiteral(String)}
+     * 	{@link PropertyIsLike#setWildCard(String)
+     * 	{@link PropertyIsLike#setSingleChar(String)}
+     * 	{@link PropertyIsLike#setEscape(String)}
      */
-    public void setPattern(String pattern, String wildcardMulti,
+    public final void setPattern(String pattern, String wildcardMulti,
         String wildcardSingle, String escape) {
-        match = null; // empty cache
-        this.pattern = pattern;
-        this.wildcardMulti = wildcardMulti;
-        this.wildcardSingle = wildcardSingle;
-        this.escape = escape;
+        
+        setLiteral(pattern);
+        setWildCard(wildcardMulti);
+        setSingleChar(wildcardSingle);
+        setEscape(escape);
     }
 
     /**
      * Accessor method to retrieve the pattern.
      *
      * @return the pattern being matched.
+     * 
+     * @deprecated use {@link #getLiteral()}
      */
-    public String getPattern() {
-        return this.pattern;
+    public final String getPattern() {
+        return getLiteral();
+    }
+    
+    /**
+     * Returns the pattern.
+     */
+    public String getLiteral() {
+    	return this.pattern;
     }
 
     /**
-     * Determines whether or not a given feature matches this pattern.
-     *
-     * @param feature Specified feature to examine.
-     *
-     * @return Flag confirming whether or not this feature is inside the
-     *         filter.
-     *
-     * @task REVISIT: could the pattern be null such that a null = null?
+     * Sets the pattern.
      */
-    public boolean contains(Feature feature) {
-        // Checks to ensure that the attribute has been set
+    public void setLiteral(String literal) {
+    	this.pattern = literal;
+    	match = null;
+    }
+    
+    /**
+      * Determines whether or not a given feature matches this pattern.
+      *
+      * @param feature Specified feature to examine.
+      *
+      * @return Flag confirming whether or not this feature is inside the
+      *         filter.
+      *
+      * @task REVISIT: could the pattern be null such that a null = null?
+      */
+    public boolean evaluate(Feature feature) {
+    	//Checks to ensure that the attribute has been set
         if (attribute == null) {
             return false;
         }
@@ -355,18 +424,18 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
             //LOGGER.finest("pattern: " + pattern);
             //LOGGER.finest("string: " + attribute.getValue(feature));
             //return attribute.getValue(feature).toString().matches(pattern);
-            Object value = attribute.getValue(feature);
+            Object value = attribute.evaluate(feature);
 
             if (null == value) {
                 return false;
             }
 
             Matcher matcher = getMatcher();
-            matcher.reset(attribute.getValue(feature).toString());
+            matcher.reset(attribute.evaluate(feature).toString());
 
             return matcher.matches();
     }
-
+    
     /**
      * Return this filter as a string.
      *
@@ -384,23 +453,52 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
     public java.lang.String getEscape() {
         return escape;
     }
-
-    /**
+    
+     /**
      * Getter for property wildcardMulti.
      *
      * @return Value of property wildcardMulti.
+     * 
+     * @deprecated use {@link #getWildCard()}.
+     *  
      */
-    public java.lang.String getWildcardMulti() {
+    public final String getWildcardMulti() {
         return wildcardMulti;
     }
 
     /**
+     * <p>
+     * THis method calls {@link #getWildcardMulti()} for subclass backwards
+     * compatability.
+     * </p>
+     * 
+     * @see org.opengis.filter.PropertyIsLike#getWildCard().
+     */
+    public String getWildCard() {
+    	return getWildcardMulti();
+    }
+    
+    /**
      * Getter for property wildcardSingle.
      *
      * @return Value of property wildcardSingle.
+     * 
+     * @deprecated use {@link #getSingleChar()}
      */
-    public java.lang.String getWildcardSingle() {
+    public final String getWildcardSingle() {
         return wildcardSingle;
+    }
+    
+    /**
+     * <p>
+     * THis method calls {@link #getWildcardSingle()()} for subclass backwards
+     * compatability.
+     * </p>
+     * 
+     * @see org.opengis.filter.PropertyIsLike#getSingleChar()().
+     */
+    public String getSingleChar() {
+    	return getWildcardSingle();
     }
 
     /**
@@ -488,7 +586,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
+     public Object accept(FilterVisitor visitor, Object extraData) {
+    	return visitor.visit(this,extraData);
     }
 }

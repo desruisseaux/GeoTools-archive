@@ -16,9 +16,9 @@
  */
 package org.geotools.filter.function;
 
-import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
 
 
 /**

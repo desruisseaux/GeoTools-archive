@@ -14,9 +14,10 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.filter;
+package org.geotools.filter.expression;
 
 import org.geotools.factory.Factory;
+import org.opengis.filter.expression.Function;
 
 /**
  * Interface for a function expression implementation
@@ -24,7 +25,7 @@ import org.geotools.factory.Factory;
  * @author James Macgill, PSU
  * @source $URL$
  */
-public interface FunctionExpression extends Expression, Factory{
+public interface FunctionExpression extends Expression, Factory, Function {
 	   
 	/**
      *   Returns the number of arguments this <Function> requires.
@@ -56,6 +57,7 @@ public interface FunctionExpression extends Expression, Factory{
      * Gets the arguments to be evaluated by this function.
      *
      * @return an array of the args to be evaluated.
+     * @deprecated use {@link Function#getParameters()}
      */
     Expression[] getArgs();
 
@@ -70,6 +72,7 @@ public interface FunctionExpression extends Expression, Factory{
      * Sets the arguments to be evaluated by this function.
      *
      * @param args an array of expressions to be evaluated.
+     * @deprecated use {@link Function#setParameters(List)}
      */
     void setArgs(Expression[] args);
 }

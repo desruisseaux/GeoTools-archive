@@ -5,7 +5,7 @@ package org.geotools.gui.swing.sldeditor.property;
 
 import javax.swing.JComponent;
 
-import org.geotools.filter.Expression;
+import org.geotools.filter.expression.Expression;
 import org.geotools.gui.swing.sldeditor.SLDEditor;
 
 /**

@@ -56,21 +56,33 @@
       <artifactId>api</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>  
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+		<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>	
     </dependency>
     <dependency>
       <artifactId>dir_ds</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <id>JTS</id>
@@ -86,11 +98,17 @@
       <artifactId>graph</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <artifactId>postgis</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <id>junit</id>
@@ -114,6 +132,10 @@
       <artifactId>shapefile</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
+>>>>>>> .merge-right.r18003
     </dependency>
 
   </dependencies>

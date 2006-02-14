@@ -6,10 +6,12 @@
 
 package org.geotools.filter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Collections;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -24,7 +26,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author  James
  * @source $URL$
  */
-public class AreaFunction implements org.geotools.filter.FunctionExpression { 
+public class AreaFunction extends FunctionExpressionImpl 
+	implements org.geotools.filter.expression.FunctionExpression { 
     
     /**
      * Holds the geometry to calculate the area of
@@ -40,16 +43,10 @@ public class AreaFunction implements org.geotools.filter.FunctionExpression {
         return DefaultExpression.FUNCTION;
     }
     
-    
-    /** Returns a value for this expression.
-     *
-     * @param feature Specified feature to use when returning value.
-     * @return Value of the feature object.
-     */
-    public Object getValue(Feature feature) {
-        Geometry g = (Geometry)geom.getValue(feature);
-       
-        return new Double( getArea( g ));
+    public Object evaluate(Feature feature) {
+    	Geometry g = (Geometry)geom.evaluate(feature);
+    	
+    	return new Double( getArea( g ));
     }
     
     public int getArgCount() {
@@ -61,8 +58,8 @@ public class AreaFunction implements org.geotools.filter.FunctionExpression {
     }
     
     public void setArgs(Expression[] args) {
-        geom = args[0];
-        this.args = args;
+    	geom = (Expression)args[0];
+    	this.args = args;
     }
     
     /** Used by FilterVisitors to perform some action on this filter instance.
@@ -79,10 +76,7 @@ public class AreaFunction implements org.geotools.filter.FunctionExpression {
      *
      *
      */
-    public void accept(FilterVisitor visitor) {
-         visitor.visit(this);
-    }
-    
+
     public Expression[] getArgs() {
         return args;
     }

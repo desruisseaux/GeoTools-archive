@@ -26,8 +26,8 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 
-import org.geotools.filter.Expression;
-import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
 import org.geotools.gui.swing.sldeditor.util.FormUtils;
 
@@ -125,7 +125,7 @@ public class DefaultColorEditor extends ExpressionEditor {
     }
 
     /**
-     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#canEdit(org.geotools.filter.Expression)
+     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#canEdit(org.geotools.filter.expression.Expression)
      */
     public boolean canEdit(Expression expression) {
         if(expression instanceof LiteralExpression) {

@@ -22,6 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.opengis.filter.FilterVisitor;
 
 
 /**
@@ -43,16 +45,10 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public class CompareFilterImpl extends AbstractFilterImpl
+public abstract class CompareFilterImpl extends BinaryComparisonAbstract
     implements CompareFilter {
     /** The logger for the default core module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
-
-    /** Holds the 'left' value of this comparison filter. */
-    protected Expression leftValue = null;
-
-    /** Holds the 'right' value of this comparison filter. */
-    protected Expression rightValue = null;
 
     /**
      * Constructor with filter type.
@@ -62,7 +58,8 @@ public class CompareFilterImpl extends AbstractFilterImpl
      * @throws IllegalFilterException Non-compare type.
      */
     protected CompareFilterImpl(short filterType) throws IllegalFilterException {
-        if (isCompareFilter(filterType)) {
+    	super(FilterFactoryFinder.createFilterFactory());
+    	if (isCompareFilter(filterType)) {
             this.filterType = filterType;
         } else {
             throw new IllegalFilterException(
@@ -70,6 +67,10 @@ public class CompareFilterImpl extends AbstractFilterImpl
         }
     }
 
+    protected CompareFilterImpl(FilterFactory factory, org.opengis.filter.expression.Expression e1, org.opengis.filter.expression.Expression e2) {
+    	super(factory,e1,e2);
+    }
+    
     /**
      * Adds the 'left' value to this filter.
      *
@@ -79,19 +80,26 @@ public class CompareFilterImpl extends AbstractFilterImpl
      *
      * @task REVISIT: immutability?
      */
-    public void addLeftValue(Expression leftValue)
+    public final void addLeftValue(Expression leftValue)
         throws IllegalFilterException {
-        // Checks if this is math filter or not and handles appropriately
+        
+    	setExpression1(leftValue);
+    }
+    
+    public void setExpression1(org.opengis.filter.expression.Expression leftValue) {
+    	//Checks if this is math filter or not and handles appropriately
         if (isMathFilter(filterType)) {
-            if (DefaultExpression.isMathExpression(leftValue.getType())
+            if (DefaultExpression.isMathExpression(leftValue)
                     || permissiveConstruction) {
-                this.leftValue = leftValue;
+                this.expression1 = leftValue;
             } else {
-                throw new IllegalFilterException(
-                    "Attempted to add non-math expression to math filter.");
+            	throw new IllegalFilterException(
+                    "Attempted to add non-math expression to math filter."
+				);	
             }
+                
         } else {
-            this.leftValue = leftValue;
+            this.expression1 = leftValue;
         }
     }
 
@@ -104,38 +112,49 @@ public class CompareFilterImpl extends AbstractFilterImpl
      *
      * @task REVISIT: make immutable.
      */
-    public void addRightValue(Expression rightValue)
+    public final void addRightValue(Expression rightValue)
         throws IllegalFilterException {
-        // Checks if this is math filter or not and handles appropriately
-        if (isMathFilter(filterType)) {
-            if (DefaultExpression.isMathExpression(leftValue.getType())
-                    || permissiveConstruction) {
-                this.rightValue = rightValue;
-            } else {
-                throw new IllegalFilterException(
-                    "Attempted to add non-math expression to math filter.");
-            }
-        } else {
-            this.rightValue = rightValue;
-        }
+       
+    	setExpression2(rightValue);
     }
 
+    public void setExpression2(org.opengis.filter.expression.Expression rightValue) {
+    	 // Checks if this is math filter or not and handles appropriately
+        if (isMathFilter(filterType)) {
+            if (DefaultExpression.isMathExpression(rightValue)
+                    || permissiveConstruction) {
+                this.expression2 = rightValue;
+            } else {
+            	
+            	throw new IllegalFilterException(
+                    "Attempted to add non-math expression to math filter."
+    			);
+                
+            }
+        } else {
+            this.expression2 = rightValue;
+        }
+    }
     /**
      * Gets the left expression.
      *
      * @return The expression on the left of the comparison.
+     * 
+     * * @deprecated use {@link #getExpression1()}
      */
-    public Expression getLeftValue() {
-        return this.leftValue;
+    public final Expression getLeftValue() {
+        return (Expression)getExpression1();
     }
 
     /**
      * Gets the right expression.
      *
      * @return The expression on the right of the comparison.
+     *
+     * @deprecated use {@link #getExpression2()}
      */
-    public Expression getRightValue() {
-        return this.rightValue;
+    public final Expression getRightValue() {
+        return (Expression)getExpression2();
     }
 
     /**
@@ -146,142 +165,63 @@ public class CompareFilterImpl extends AbstractFilterImpl
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
      */
-    public boolean contains(Feature feature) {
-        LOGGER.entering("CompareFilter", "contains");
-
-        // Checks for error condition
-        if ((leftValue == null) | (rightValue == null)) {
-            LOGGER.finer("one value has not been set");
-
-            return false;
-        }
-
-        try {
-            // Non-math comparison
-
-	if (!(leftValue.getValue(feature) instanceof Number && 
-	      rightValue.getValue(feature) instanceof Number))
-	{
-		
-		if (LOGGER.isLoggable(Level.FINEST)) 
-        {
-            LOGGER.finest("is equals thingy");
-            LOGGER.finest("left value class: "
-                + leftValue.getValue(feature).getClass().toString());
-            LOGGER.finest("right value class: "
-                + rightValue.getValue(feature).getClass().toString());
-        }
-		
-		    Object leftObj = leftValue.getValue(feature);
-		    Object rightObj = rightValue.getValue(feature);
-		    
-		    if (!(leftObj.getClass() == rightObj.getClass()))  //both Number case handled above
-		    {
-		    	if ( (Number.class.isAssignableFrom( leftObj.getClass() )) && (rightObj.getClass() == String.class) )
-		    	{
-		    		try{
-		    			rightObj = new Double( Double.parseDouble( (String) rightObj ));
-		    			leftObj  = new Double(  ((Number) leftObj).doubleValue() );
-		    		}
-		    		catch(Exception e)
-					{
-				    	leftObj = leftObj.toString();
-				    	rightObj = rightObj.toString();
-					}
-		    	}
-		    	else if ( (leftObj.getClass() == String.class) && (Number.class.isAssignableFrom( rightObj.getClass() )) )
-		    	{
-		    		try{
-		    			leftObj = new Double( Double.parseDouble( (String) leftObj ) );
-		    			rightObj  = new Double(  ((Number) rightObj).doubleValue() );
-		    		}
-		    		catch(Exception e)
-					{
-				    	leftObj = leftObj.toString();
-				    	rightObj = rightObj.toString();
-					}
-		    	}
-		    	else
-		    	{
-		    		leftObj = leftObj.toString();
-		    		rightObj = rightObj.toString();
-		    	}
-		    }
-		
-            if (filterType == COMPARE_EQUALS)    // non number-number 
-            {
-            		return leftObj.equals(rightObj);   	
-            }
-
-            if (filterType == COMPARE_NOT_EQUALS) 
-            {
-            	return (!(leftObj.equals(rightObj)));
-            }
-		   
-		    if (leftObj.getClass() == rightObj.getClass() &&
-		    		leftObj instanceof Comparable) 
-		    {
-				Comparable leftComp = (Comparable)leftObj;
-				Comparable rightComp = (Comparable)rightObj;
-				int comparison = leftComp.compareTo(rightComp);
-				if (filterType == COMPARE_LESS_THAN) {
-				    return (comparison < 0);
-				}
-				
-				if (filterType == COMPARE_GREATER_THAN) {
-				    return (comparison > 0);
-				}
-				
-				if (filterType == COMPARE_LESS_THAN_EQUAL) {
-				    return (comparison <= 0);
-				}
-				
-				if (filterType == COMPARE_GREATER_THAN_EQUAL) {
-				    return (comparison >= 0);
-				} 
-		    }
-			else 
-			{
-			    throw new IllegalArgumentException();
-			}   
-	}
-            // Math comparisons
-            double leftResult = ((Number) leftValue.getValue(feature))
-                .doubleValue();
-            double rightResult = ((Number) rightValue.getValue(feature))
-                .doubleValue();
-
-
-            if (filterType == COMPARE_EQUALS) {
-                return leftResult == rightResult;
-            } 
-
-            if (filterType == COMPARE_NOT_EQUALS) {
-                return leftResult != rightResult;
-            } 
-            
-            if (filterType == COMPARE_LESS_THAN) {
-                return (leftResult < rightResult);
-            }
-
-            if (filterType == COMPARE_GREATER_THAN) {
-                return (leftResult > rightResult);
-            }
-
-            if (filterType == COMPARE_LESS_THAN_EQUAL) {
-                return (leftResult <= rightResult);
-            }
-
-            if (filterType == COMPARE_GREATER_THAN_EQUAL) {
-                return (leftResult >= rightResult);
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } catch (IllegalArgumentException iae) {
-            return false;
-        }
+    public abstract boolean evaluate(Feature feature);
+  
+    /**
+     * Subclass convenience method which compares to instances of comparables
+     * in a pretty lax way, converting types among String, Number, Double when 
+     * appropriate.
+     * 
+     * @return same contract as {@link Comparable#compareTo(java.lang.Object)}.
+     */
+    protected int compare (Comparable leftObj, Comparable rightObj) {
+    	//implements a lax compare, doing some back flips for numbers
+    	if (!(leftObj instanceof Number && rightObj instanceof Number)) 
+    	{	
+    		//check for case of one number one string
+    		if (!(leftObj.getClass() == rightObj.getClass()))  
+    	    {
+        		//differnt classes, if numbers lets try and match them up
+    	    	if ( (Number.class.isAssignableFrom( leftObj.getClass() )) && (rightObj.getClass() == String.class) )
+    	    	{
+    	    		try{
+    	    			rightObj = new Double( Double.parseDouble( (String) rightObj ));
+    	    			leftObj  = new Double(  ((Number) leftObj).doubleValue() );
+    	    		}
+    	    		catch(Exception e)
+    				{
+    			    	leftObj = leftObj.toString();
+    			    	rightObj = rightObj.toString();
+    				}
+    	    	}
+    	    	else if ( (leftObj.getClass() == String.class) && (Number.class.isAssignableFrom( rightObj.getClass() )) )
+    	    	{
+    	    		try{
+    	    			leftObj = new Double( Double.parseDouble( (String) leftObj ) );
+    	    			rightObj  = new Double(  ((Number) rightObj).doubleValue() );
+    	    		}
+    	    		catch(Exception e)
+    				{
+    			    	leftObj = leftObj.toString();
+    			    	rightObj = rightObj.toString();
+    				}
+    	    	}
+    	    	else
+    	    	{
+    	    		leftObj = leftObj.toString();
+    	    		rightObj = rightObj.toString();
+    	    	}
+    	    }
+    	}
+    	else {
+    		//both numbers, make double
+    		leftObj = new Double(((Number)leftObj).doubleValue());
+    		rightObj = new Double(((Number)rightObj).doubleValue());
+    	}
+    	
+    	return leftObj.compareTo(rightObj);
     }
-
+    
     /**
      * Returns a string representation of this filter.
      *
@@ -313,7 +253,7 @@ public class CompareFilterImpl extends AbstractFilterImpl
         if (filterType == COMPARE_NOT_EQUALS) {
             operator = " != ";
         }
-        return "[ " + leftValue + operator + rightValue + " ]";
+        return "[ " + expression1 + operator + expression2 + " ]";
     }
 
     /**
@@ -334,11 +274,11 @@ public class CompareFilterImpl extends AbstractFilterImpl
             //
             return
                 filterType == cFilter.getFilterType()
-            	&& (    leftValue == cFilter.getLeftValue()
-            			|| (leftValue != null && leftValue.equals( cFilter.getLeftValue() ) )
+            	&& (    expression1 == cFilter.getLeftValue()
+            			|| (expression1 != null && expression1.equals( cFilter.getLeftValue() ) )
             	    )
-            	&& (    rightValue == cFilter.getRightValue()
-            			|| (rightValue != null && rightValue.equals( cFilter.getRightValue() ) )
+            	&& (    expression2 == cFilter.getRightValue()
+            			|| (expression2 != null && expression2.equals( cFilter.getRightValue() ) )
             			);            
         } else {
             return false;
@@ -354,9 +294,9 @@ public class CompareFilterImpl extends AbstractFilterImpl
         int result = 17;
         result = (37 * result) + filterType;
         result = (37 * result)
-            + ((leftValue == null) ? 0 : leftValue.hashCode());
+            + ((expression1 == null) ? 0 : expression1.hashCode());
         result = (37 * result)
-            + ((rightValue == null) ? 0 : rightValue.hashCode());
+            + ((expression2 == null) ? 0 : expression2.hashCode());
 
         return result;
     }
@@ -371,9 +311,5 @@ public class CompareFilterImpl extends AbstractFilterImpl
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
-    }
-    
-   
+     public abstract Object accept(FilterVisitor visitor, Object extraData);
 }

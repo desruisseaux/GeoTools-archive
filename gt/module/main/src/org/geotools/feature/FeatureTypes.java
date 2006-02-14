@@ -19,7 +19,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
-import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.geometry.JTS;
 import org.geotools.xml.gml.GMLSchema;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

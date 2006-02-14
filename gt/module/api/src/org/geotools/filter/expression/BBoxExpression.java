@@ -13,7 +13,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter;
+package org.geotools.filter.expression;
+
+import org.geotools.filter.IllegalFilterException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -25,7 +27,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  * @version $Id$
  */
-public interface BBoxExpression extends LiteralExpression {
+public interface BBoxExpression extends LiteralExpression{
     /**
      * Set the bbox for this expression
      *

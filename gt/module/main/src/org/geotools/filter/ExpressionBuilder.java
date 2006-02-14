@@ -24,6 +24,10 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.expression.MathExpression;
 import org.geotools.filter.parser.ExpressionException;
 import org.geotools.filter.parser.ExpressionParser;
 import org.geotools.filter.parser.ExpressionParserTreeConstants;

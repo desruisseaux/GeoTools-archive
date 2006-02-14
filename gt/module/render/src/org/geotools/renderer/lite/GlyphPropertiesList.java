@@ -8,9 +8,9 @@ package org.geotools.renderer.lite;
 
 import java.util.Vector;
 
-import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.expression.Expression;
 
 /**
  *

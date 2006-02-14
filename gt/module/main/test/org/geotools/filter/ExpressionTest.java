@@ -29,6 +29,12 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.expression.AddImpl;
+import org.geotools.filter.expression.DivideImpl;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.expression.MultiplyImpl;
+import org.geotools.filter.expression.SubtractImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -294,7 +300,9 @@ public class ExpressionTest extends TestCase {
     
     public void testInvalidMath(){
         try{
-            MathExpressionImpl bad = new MathExpressionImpl(DefaultExpression.ATTRIBUTE);
+            
+            FilterFactoryFinder.createFilterFactory()
+            	.createMathExpression(DefaultExpression.ATTRIBUTE);
             fail("Only math types should be allowed when constructing");
         }
         catch(IllegalFilterException ife){
@@ -302,10 +310,11 @@ public class ExpressionTest extends TestCase {
     }
     
     public void testDisalowedLeftAndRightExpressions() throws IllegalFilterException {
+    	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         GeometryFactory gf = new GeometryFactory(new PrecisionModel());
         Expression geom = new LiteralExpressionImpl(gf.createPoint(new Coordinate(2,2)));
         Expression text = new LiteralExpressionImpl("text");
-        MathExpressionImpl mathTest = new MathExpressionImpl(Expression.MATH_ADD);
+        MathExpressionImpl mathTest = new AddImpl(null,null);
         try{
             mathTest.addLeftValue(geom);
             fail("geometries are not allowed in math expressions");
@@ -323,7 +332,7 @@ public class ExpressionTest extends TestCase {
     public void testIncompleteMathExpression() throws IllegalFilterException {
         Expression testAttribute1 = new LiteralExpressionImpl(new Integer(4));
 
-        MathExpressionImpl mathTest = new MathExpressionImpl(DefaultExpression.MATH_ADD);
+        MathExpressionImpl mathTest = new AddImpl(null,null);
         mathTest.addLeftValue(testAttribute1);
         try{
             mathTest.getValue(testFeature);
@@ -331,7 +340,7 @@ public class ExpressionTest extends TestCase {
         }
         catch(IllegalArgumentException ife){
         }
-        mathTest = new MathExpressionImpl(DefaultExpression.MATH_ADD);
+        mathTest = new AddImpl(null,null);
         mathTest.addRightValue(testAttribute1);
         try{
             mathTest.getValue(testFeature);
@@ -352,7 +361,7 @@ public class ExpressionTest extends TestCase {
         Expression testAttribute2 = new LiteralExpressionImpl(new Integer(2));
         
         // Test addition
-        MathExpressionImpl mathTest = new MathExpressionImpl(DefaultExpression.MATH_ADD);
+        MathExpressionImpl mathTest = new AddImpl(null,null);
         mathTest.addLeftValue(testAttribute1);
         mathTest.addRightValue(testAttribute2);
         LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +
@@ -361,7 +370,7 @@ public class ExpressionTest extends TestCase {
         assertEquals(new Double(6), mathTest.getValue(testFeature));
         
         // Test subtraction
-        mathTest = new MathExpressionImpl(DefaultExpression.MATH_SUBTRACT);
+        mathTest = new SubtractImpl(null,null);
         mathTest.addLeftValue(testAttribute1);
         mathTest.addRightValue(testAttribute2);
         LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +
@@ -370,7 +379,7 @@ public class ExpressionTest extends TestCase {
         assertEquals(new Double(2), mathTest.getValue(testFeature));
         
         // Test multiplication
-        mathTest = new MathExpressionImpl(DefaultExpression.MATH_MULTIPLY);
+        mathTest = new MultiplyImpl(null,null);
         mathTest.addLeftValue(testAttribute1);
         mathTest.addRightValue(testAttribute2);
         LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +
@@ -379,7 +388,7 @@ public class ExpressionTest extends TestCase {
         assertEquals(new Double(8), mathTest.getValue(testFeature));
         
         // Test division
-        mathTest = new MathExpressionImpl(DefaultExpression.MATH_DIVIDE);
+        mathTest = new DivideImpl(null,null);
         mathTest.addLeftValue(testAttribute1);
         mathTest.addRightValue(testAttribute2);
         LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +

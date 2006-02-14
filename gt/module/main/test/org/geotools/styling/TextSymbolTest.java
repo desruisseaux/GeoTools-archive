@@ -35,7 +35,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.expression.AttributeExpression;
 
 
 /**

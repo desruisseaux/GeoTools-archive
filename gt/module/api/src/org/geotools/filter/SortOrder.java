@@ -18,43 +18,24 @@ package org.geotools.filter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opengis.filter.sort.SortBy;
 import org.opengis.util.CodeList;
 
 /**
  * Captures the SortBy order, ASC or DESC.
+ * 
+ * @deprecated Please use org.opengis.filter.sort.SortOrder
  * 
  * @see http://schemas.opengis.net/filter/1.1.0/sort.xsd
  * @author Jody Garnett, Refractions Research.
  * @since GeoTools 2.2, Filter 1.1
  * @source $URL$
  */
-public final class SortOrder extends CodeList {
-	private static final long serialVersionUID = 7840334200112859571L;
-	private static final List all = new ArrayList(2);
+public final class SortOrder extends Object {
+	/** Can now use the geoapi SortOrder directly */
+	public static final org.opengis.filter.sort.SortOrder ASCENDING  = org.opengis.filter.sort.SortOrder.ASCENDING;
 
-	/**
-	 * Represents acending order.
-	 * <p>
-	 * Note this has the string representation of ASC to agree
-	 * with the Filter 1.1 specification.
-	 * </p>
-	 */
-	public static final SortOrder ASCENDING  = new SortOrder("ASC");
+	/** Can now use the geoapi SortOrder directly */
+	public static final org.opengis.filter.sort.SortOrder DESCENDING = org.opengis.filter.sort.SortOrder.DESCENDING;		
 	
-	/**
-	 * Represents descending order.
-	 * <p>
-	 * Note this has the string representation of DESC to agree
-	 * with the Filter 1.1 specification.
-	 * </p> 
-	 */	
-	public static final SortOrder DESCENDING = new SortOrder("DESC");
-	
-	private SortOrder( String name ){
-		super(name, all );
-	}
-			
-	public CodeList[] family() {
-		return (CodeList[]) all.toArray( new CodeList[ all.size()]);
-	}	
 }

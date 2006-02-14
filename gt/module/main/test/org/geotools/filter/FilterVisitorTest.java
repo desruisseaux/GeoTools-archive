@@ -6,6 +6,13 @@
 
 package org.geotools.filter;
 
+import org.geotools.filter.expression.AddImpl;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.expression.MathExpression;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -169,7 +176,7 @@ public class FilterVisitorTest extends TestCase implements FilterVisitor {
         Expression testAttribute2 = new LiteralExpressionImpl(new Integer(2));
         
         // Test addition
-        MathExpressionImpl mathTest = new MathExpressionImpl(DefaultExpression.MATH_ADD);
+        MathExpressionImpl mathTest = new AddImpl(null,null);
         mathTest.addLeftValue(testAttribute1);
         mathTest.addRightValue(testAttribute2);
         

@@ -11,16 +11,16 @@ import org.geotools.event.GTComponent;
 import org.geotools.event.GTRoot;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.LiteralExpression;
 
 /**
  * Utility class for Styles.

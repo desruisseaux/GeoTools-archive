@@ -12,9 +12,9 @@ import javax.swing.JComboBox;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.Expression;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
 import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
 
 /**
@@ -85,7 +85,7 @@ public class DefaultFeatureAttributeChooser extends ExpressionEditor {
 	}
 
     /**
-     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#canEdit(org.geotools.filter.Expression)
+     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#canEdit(org.geotools.filter.expression.Expression)
      */
     public boolean canEdit(Expression expression) {
 		return expression instanceof AttributeExpression;

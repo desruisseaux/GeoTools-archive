@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.arcsde.ArcSDEAdapter;
+import org.geotools.filter.expression.AttributeExpression;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;

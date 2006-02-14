@@ -302,8 +302,11 @@
     </dependency>
     <dependency>
       <id>geoapi</id>
-      <version>2.0</version>
+      <version>02092006</version>
       <url>http://geoapi.sourceforge.net</url>
+	<properties>
+		<eclipse.dependency>true</eclipse.dependency>
+	</properties>
     </dependency>
     <dependency>
       <groupId>maven</groupId>

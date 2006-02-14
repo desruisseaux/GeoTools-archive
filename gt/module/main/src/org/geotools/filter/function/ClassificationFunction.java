@@ -8,12 +8,12 @@ package org.geotools.filter.function;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
-import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.util.ProgressListener;
 
 /**
@@ -85,7 +85,7 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
         classNum = ((Number) ((LiteralExpression) args[1]).getLiteral()).intValue();
     }
     
-    public abstract Object getValue(Feature feature);
+    public abstract Object evaluate(Feature feature);
     
 	public Object getValue(int index) {
 		return null;

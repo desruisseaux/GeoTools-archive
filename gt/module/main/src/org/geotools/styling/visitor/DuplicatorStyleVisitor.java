@@ -17,9 +17,9 @@
 package org.geotools.styling.visitor;
 
 import org.geotools.event.GTCloneUtil;
-import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.expression.Expression;
 import org.geotools.filter.visitor.DuplicatorFilterVisitor;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.Displacement;

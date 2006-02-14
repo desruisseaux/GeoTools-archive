@@ -742,17 +742,21 @@ public class Rendering2DTest extends TestCase {
         StyleBuilder builder=new StyleBuilder();
         Rule rule = builder.createRule(builder.createLineSymbolizer());
         rules.add(rule);
-        rule.setFilter(new AbstractFilterImpl(){
+        rule.setFilter(
+        		//JD: remove this null parameter
+    		new AbstractFilterImpl(null){
         	int i=0;
-			public boolean contains(Feature feature) {
+			public boolean evaluate(Feature feature) {
 				i++;
 				return i<3;
 			}
 
-			public void accept(FilterVisitor visitor) {
-				visitor.visit(this);
-			}
-        	
+//			public void accept(FilterVisitor visitor) {
+//				visitor.visit(this);
+//			}
+        	public Object accept(org.opengis.filter.FilterVisitor visitor, Object extraData) {
+        		return extraData;
+        	}
         });
         LiteFeatureTypeStyle fts=new LiteFeatureTypeStyle(null, rules, elseRules);
         

@@ -16,6 +16,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.opengis.filter.BinaryLogicOperator;
+
 import java.util.Iterator;
 
 
@@ -29,7 +31,7 @@ import java.util.Iterator;
  * @source $URL$
  * @version $Id$
  */
-public interface LogicFilter extends Filter {
+public interface LogicFilter extends Filter, BinaryLogicOperator {
     /**
      * Determines whether the feature matches the appropriate logic
      * relationships.
@@ -38,24 +40,10 @@ public interface LogicFilter extends Filter {
      *
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
+     *         
+     * @deprecated use {@link Filter#evaluate(Feature)}.
      */
     boolean contains(Feature feature);
-
-    /**
-     * Implements a logical NOT with this filter and returns the merged filter.
-     *
-     * @return NOTed filter.
-     */
-    Filter not();
-
-    /**
-     * Implements a logical AND with this filter and returns the merged filter.
-     *
-     * @param filter Parent of the filter: must implement GMLHandlerGeometry.
-     *
-     * @return ANDed filter.
-     */
-    Filter and(Filter filter);
 
     /**
      * Gets an iterator for the filters held by this logic filter.
@@ -63,15 +51,6 @@ public interface LogicFilter extends Filter {
      * @return the iterator of the filters.
      */
     Iterator getFilterIterator();
-
-    /**
-     * Implements a logical OR with this filter and returns the merged filter.
-     *
-     * @param filter Parent of the filter: must implement GMLHandlerGeometry.
-     *
-     * @return ORed filter.
-     */
-    Filter or(Filter filter);
 
     /**
      * Adds a sub filter to this filter.

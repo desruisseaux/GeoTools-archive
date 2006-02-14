@@ -7,11 +7,11 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.filter.Expression;
-import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FunctionExpression;
-import org.geotools.filter.MathExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.ExpressionType;
+import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.expression.MathExpression;
 import org.geotools.filter.parser.ParseException;
 
 /**

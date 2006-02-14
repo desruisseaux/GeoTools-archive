@@ -74,9 +74,9 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
-import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLEncoderPostgisGeos;
+import org.geotools.filter.expression.LiteralExpression;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

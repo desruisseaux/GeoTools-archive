@@ -18,9 +18,9 @@ import java.util.Vector;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.expression.Expression;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.Graphic;
 

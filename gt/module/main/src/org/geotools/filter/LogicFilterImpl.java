@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
+import org.opengis.filter.FilterVisitor;
+
 
 
 /**
@@ -35,21 +37,29 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
+public abstract class LogicFilterImpl extends BinaryLogicAbstract implements LogicFilter {
     /** The logger for the default core module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
 
-    /** Holds all sub filters of this filter. */
-    private List subFilters = new ArrayList();
-
+      protected LogicFilterImpl(FilterFactory factory) {
+    	this(factory,new ArrayList());
+    }
+    
+    protected LogicFilterImpl(FilterFactory factory, List children) {
+    	super(factory,children);
+    }
+    
     /**
      * Constructor with type (must be valid).
      *
      * @param filterType The final relation between all sub filters.
      *
      * @throws IllegalFilterException If the filtertype is not a logic type.
+     * @deprecated Consructing with type constants should be replaced with 
+     * an actual java type.
      */
     protected LogicFilterImpl(short filterType) throws IllegalFilterException {
+    	super(FilterFactoryFinder.createFilterFactory(), new ArrayList());
         LOGGER.finest("filtertype " + filterType);
 
         if (isLogicFilter(filterType)) {
@@ -71,6 +81,8 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
      */
     protected LogicFilterImpl(Filter filter, short filterType)
         throws IllegalFilterException {
+    	
+    	super(FilterFactoryFinder.createFilterFactory(),new ArrayList());
         if (isLogicFilter(filterType)) {
             this.filterType = filterType;
         } else {
@@ -78,7 +90,7 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
                 "Attempted to create logic filter with non-logic type.");
         }
 
-        subFilters.add(filter);
+        children.add(filter);
     }
 
     /**
@@ -93,6 +105,8 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
      */
     protected LogicFilterImpl(Filter filter1, Filter filter2, short filterType)
         throws IllegalFilterException {
+    	super(FilterFactoryFinder.createFilterFactory(),new ArrayList());
+    	
         if (isLogicFilter(filterType)) {
             this.filterType = filterType;
         } else {
@@ -101,8 +115,8 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
         }
 
         // Push the initial filter on the stack
-        subFilters.add(filter1);
-
+        children.add(filter1);
+       
         // Add the second filter via internal method to check for illegal NOT
         this.addFilter(filter2);
     }
@@ -119,8 +133,8 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
      *       filter.
      */
     public final void addFilter(Filter filter) throws IllegalFilterException {
-        if ((filterType != LOGIC_NOT) || (subFilters.size() == 0)) {
-            subFilters.add(filter);
+        if ((filterType != LOGIC_NOT) || (children.size() == 0)) {
+            children.add(filter);
         } else {
             throw new IllegalFilterException(
                 "Attempted to add an more than one filter to a NOT filter.");
@@ -133,7 +147,7 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
      * @return the iterator of the filters.
      */
     public Iterator getFilterIterator() {
-        return subFilters.iterator();
+        return children.iterator();
     }
 
     /**
@@ -144,34 +158,8 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
      */
-    public boolean contains(Feature feature) {
-        Iterator iterator = subFilters.iterator();
-        boolean contains = false;
-
-        // Return true if there are no sub filters; fail fast logic.
-        if (!iterator.hasNext()) {
-            return false;
-        } else if (filterType == LOGIC_OR) {
-            contains = false;
-
-            while (iterator.hasNext()) {
-                contains = ((Filter) iterator.next()).contains(feature)
-                    || contains;
-            }
-        } else if (filterType == LOGIC_AND) {
-            contains = true;
-
-            while (iterator.hasNext()) {
-                contains = ((Filter) iterator.next()).contains(feature)
-                    && contains;
-            }
-        } else if (filterType == LOGIC_NOT) {
-            contains = !((Filter) subFilters.get(0)).contains(feature);
-        }
-
-        return contains;
-    }
-
+    public abstract boolean evaluate(Feature feature);
+   
     /**
      * Implements a logical OR with this filter and returns the merged filter.
      *
@@ -189,7 +177,7 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
         //HACK: assuming it is the result of each method
         //REVISIT: should return a new copy, must implement cloneable to do so.
         if (filterType == super.LOGIC_OR) {
-            subFilters.add(filter);
+            children.add(filter);
 
             return this;
         } else {
@@ -213,7 +201,7 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
         //HACK: not sure what should be returned by this method
         //HACK: assuming it is the result of each method
         if (filterType == super.LOGIC_AND) {
-            subFilters.add(filter);
+            children.add(filter);
 
             return this;
         } else {
@@ -232,7 +220,7 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
         //HACK: not sure what should be returned by this method
         //HACK: assuming it is the result of each method
         if (filterType == super.LOGIC_NOT) {
-            return (Filter) subFilters.get(0);
+            return (Filter) children.get(0);
         } else {
             return super.not();
         }
@@ -242,11 +230,13 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
      * package private method to get the internal storage of filters.
      *
      * @return the internal sub filter list.
+     * 
+     * @deprecated use {@link #getChildren()}
      */
     List getSubFilters() {
-        return subFilters;
+        return children;
     }
-
+    
     /**
      * Returns a string representation of this filter.
      *
@@ -255,7 +245,7 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
     public String toString() {
         String returnString = "[";
         String operator = "";
-        Iterator iterator = subFilters.iterator();
+        Iterator iterator = children.iterator();
 
         if (filterType == LOGIC_OR) {
             operator = " OR ";
@@ -295,15 +285,15 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
             LOGGER.finest("filter type match:"
                 + (logFilter.getFilterType() == this.filterType));
             LOGGER.finest("same size:"
-                + (logFilter.getSubFilters().size() == this.subFilters.size())
+                + (logFilter.getSubFilters().size() == this.children.size())
                 + "; inner size: " + logFilter.getSubFilters().size()
-                + "; outer size: " + this.subFilters.size());
+                + "; outer size: " + this.children.size());
             LOGGER.finest("contains:"
-                + logFilter.getSubFilters().containsAll(this.subFilters));
+                + logFilter.getSubFilters().containsAll(this.children));
 
             return ((logFilter.getFilterType() == this.filterType)
-            && (logFilter.getSubFilters().size() == this.subFilters.size())
-            && logFilter.getSubFilters().containsAll(this.subFilters));
+            && (logFilter.getSubFilters().size() == this.children.size())
+            && logFilter.getSubFilters().containsAll(this.children));
         } else {
             return false;
         }
@@ -317,7 +307,7 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
     public int hashCode() {
         int result = 17;
         result = (37 * result) + filterType;
-        result = (37 * result) + subFilters.hashCode();
+        result = (37 * result) + children.hashCode();
 
         return result;
     }
@@ -332,7 +322,5 @@ public class LogicFilterImpl extends AbstractFilterImpl implements LogicFilter {
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
-    }
+    public abstract Object accept(FilterVisitor visitor, Object extraData);
 }

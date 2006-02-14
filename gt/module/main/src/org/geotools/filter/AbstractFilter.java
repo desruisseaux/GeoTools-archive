@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
 
-
 /**
  * Implements Filter interface, with constants and default behaviors for
  * methods.
@@ -29,8 +28,9 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public abstract class AbstractFilter implements Filter {
-    /** The logger for the default core module. */
+public abstract class AbstractFilter extends FilterAbstract implements Filter {
+   
+	/** The logger for the default core module. */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.core");
 
 
@@ -41,15 +41,45 @@ public abstract class AbstractFilter implements Filter {
     protected boolean permissiveConstruction = true;
 
     /**
+     * 
+     * @param factory
+     */
+    protected AbstractFilter(FilterFactory factory) {
+		super(factory);
+	}
+    
+    /**
      * Implements a 'contained by' check for a given feature, defaulting to
      * true.
+     * <p>
+     * This calls through to {@link #evaluate(Feature)}.
+     * </p>
      *
      * @param feature Specified feature to examine.
      *
      * @return Result of 'contains' test.
+     * 
+     * @deprecated use {@link Filter#evaluate(Feature)}
      */
-    public abstract boolean contains(Feature feature);
-
+    public final boolean contains(Feature feature) {
+    	return evaluate(feature);
+    }
+    
+    /**
+     * This method checks if the object is an instance of {@link Feature} and 
+     * if so, calls through to {@link Filter#evaluate(Feature)}. This is done 
+     * to maintain backwards compatability with previous version of Filter api 
+     * which depended on Feature. If the object is not an instance of feature 
+     * the super implementation is called.
+     */
+    public boolean evaluate(Object object) {
+    	if (object instanceof Feature) {
+    		return evaluate((Feature)object);
+    	}
+    	
+    	return super.evaluate(object);
+    }
+    
     /* todo: replace public abstract void accept(FilterVisitor visitor); */
     /* ************************************************************************
      * Following static methods check for certain aggregate types, based on
@@ -146,6 +176,10 @@ public abstract class AbstractFilter implements Filter {
      * Retrieves the type of filter.
      *
      * @return a short representation of the filter type.
+     * 
+     * @deprecated The enumeration base type system is replaced with a class 
+     * 	based type system. An 'instanceof' check should be made instead of 
+     * 	calling this method.
      */
     public short getFilterType() {
         return filterType;
@@ -160,6 +194,10 @@ public abstract class AbstractFilter implements Filter {
      *
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
+     *        
+     *  @deprecated use {@link org.opengis.filter.Filter#accept(FilterVisitor, Object)}
      */
-    public abstract void accept(FilterVisitor visitor);
+    public final void accept(FilterVisitor visitor) {
+    	accept(new FilterVisitorFilterWrapper(visitor),null);
+    }
 }

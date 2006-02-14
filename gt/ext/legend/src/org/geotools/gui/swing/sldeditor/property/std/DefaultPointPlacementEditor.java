@@ -22,7 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
+import org.geotools.filter.expression.Expression;
 import org.geotools.gui.swing.sldeditor.SLDEditor;
 import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
 import org.geotools.gui.swing.sldeditor.util.FormUtils;

@@ -16,6 +16,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.opengis.filter.FeatureId;
+
 import java.util.Collection;
 
 
@@ -28,7 +30,7 @@ import java.util.Collection;
  * @source $URL$
  * @version $Id$
  */
-public interface FidFilter extends Filter {
+public interface FidFilter extends Filter, FeatureId {
     /**
      * Determines whether or not the given feature's ID matches this filter.
      *
@@ -36,6 +38,8 @@ public interface FidFilter extends Filter {
      *
      * @return <tt>true</tt> if the feature's ID matches an fid held by this
      *         filter, <tt>false</tt> otherwise.
+     *         
+     * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
     boolean contains(Feature feature);
 
@@ -50,6 +54,7 @@ public interface FidFilter extends Filter {
      * Returns all the fids in this filter.
      *
      * @return An array of all the fids in this filter.
+     * @deprecated use {@link FeatureId#getIDs()}
      */
     String[] getFids();
 

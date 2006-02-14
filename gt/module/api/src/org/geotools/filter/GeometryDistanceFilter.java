@@ -16,6 +16,7 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.opengis.filter.spatial.DistanceBufferOperator;
 
 
 /**
@@ -48,7 +49,7 @@ import org.geotools.feature.Feature;
  * @task REVISIT: add units for distance.  Should it just be a string?  Or
  *       should it actually resolve the definition?
  */
-public interface GeometryDistanceFilter extends GeometryFilter {
+public interface GeometryDistanceFilter extends GeometryFilter, DistanceBufferOperator {
     /**
      * Returns true if the passed in object is the same as this filter.  Checks
      * to make sure the filter types are the same as well as all three of the
@@ -76,6 +77,9 @@ public interface GeometryDistanceFilter extends GeometryFilter {
      *
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
+     *         
+     * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)} 
+     * 
      */
     boolean contains(Feature feature);
 
@@ -83,6 +87,8 @@ public interface GeometryDistanceFilter extends GeometryFilter {
      * Gets the distance allowed by this filter.
      *
      * @return distance the length beyond which this filter is valid or not.
+     * 
+     * @deprecated use {@link DistanceBufferOperator#getDistance()}
      */
     double getDistance();
 }

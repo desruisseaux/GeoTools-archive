@@ -27,36 +27,57 @@
       <artifactId>api</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>  
     <dependency>
       <id>main</id>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <id>render</id>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <artifactId>coverage</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <artifactId>legacy</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <id>widgets-swing</id>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <id>JTS</id>

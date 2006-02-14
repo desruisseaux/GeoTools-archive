@@ -93,7 +93,7 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
      * @param expression the expression to encode.
      * @throws IOException 
      */
-    private void encode(org.geotools.filter.Expression expression) throws IOException {
+    private void encode(org.geotools.filter.expression.Expression expression) throws IOException {
         if (expression != null) {
             try {
                 out.write((new FilterTransformer()).transform(expression));
@@ -104,7 +104,7 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
     }
 
     public void encodeCssParam(String name,
-        org.geotools.filter.Expression expression) {
+        org.geotools.filter.expression.Expression expression) {
         try {
             out.write("<CssParameter name='" + name + "'>\n");
             encode(expression);

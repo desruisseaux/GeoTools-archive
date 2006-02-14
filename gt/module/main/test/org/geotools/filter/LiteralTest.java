@@ -22,6 +22,8 @@
  */
 package org.geotools.filter;
 
+import org.geotools.filter.expression.LiteralExpression;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

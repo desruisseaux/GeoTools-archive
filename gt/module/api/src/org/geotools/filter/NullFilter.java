@@ -16,6 +16,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.opengis.filter.PropertyIsNull;
 
 
 /**
@@ -26,7 +28,7 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public interface NullFilter extends Filter {
+public interface NullFilter extends Filter, PropertyIsNull {
     /**
      * Determines whether or not a given feature is 'inside' this filter.
      *
@@ -37,6 +39,8 @@ public interface NullFilter extends Filter {
      *
      * @task REVISIT: change arg to AttributeExpression?
      * @task REVISIT: change name to setNullCheckValue.
+     * 
+     * @deprecated use {@link PropertyIsNull#setExpression(Expression)}
      */
     void nullCheckValue(Expression nullCheck) throws IllegalFilterException;
 
@@ -44,6 +48,8 @@ public interface NullFilter extends Filter {
      * Returns the expression being checked for null.
      *
      * @return the Expression to null check.
+     * 
+     * @deprecated use {@link PropertyIsNull#getExpression()}
      */
     Expression getNullCheckValue();
 
@@ -55,6 +61,8 @@ public interface NullFilter extends Filter {
      *
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
+     *         
+     * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
     boolean contains(Feature feature);
 }

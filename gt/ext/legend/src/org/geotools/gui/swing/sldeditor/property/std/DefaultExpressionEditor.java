@@ -39,8 +39,8 @@ import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionBuilder;
+import org.geotools.filter.expression.Expression;
 import org.geotools.filter.parser.ParseException;
 import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
 import org.geotools.gui.swing.sldeditor.util.FormUtils;
@@ -165,7 +165,7 @@ public class DefaultExpressionEditor extends ExpressionEditor {
     }
 
     /**
-     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#canEdit(org.geotools.filter.Expression)
+     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#canEdit(org.geotools.filter.expression.Expression)
      */
     public boolean canEdit(Expression expression) {
         return true;

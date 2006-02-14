@@ -37,7 +37,7 @@ package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
 import org.geotools.event.GTList;
-import org.geotools.filter.Expression;
+import org.geotools.filter.expression.Expression;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -65,7 +65,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
     private Halo halo;
     private LabelPlacement placement;
     private String geometryPropertyName = null;
-    private org.geotools.filter.Expression label = null;
+    private org.geotools.filter.expression.Expression label = null;
     private Graphic graphic = null;
     private Expression priority = null;
     private HashMap optionsMap = null; //null=nothing in it
@@ -188,7 +188,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
      *
      * @return Label expression.
      */
-    public org.geotools.filter.Expression getLabel() {
+    public org.geotools.filter.expression.Expression getLabel() {
         return label;
     }
 

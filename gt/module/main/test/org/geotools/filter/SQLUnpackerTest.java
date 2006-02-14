@@ -40,6 +40,7 @@ import junit.framework.TestSuite;
 
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.expression.AddImpl;
 
 
 /**
@@ -55,8 +56,8 @@ public class SQLUnpackerTest extends SQLFilterTestSupport {
 
     /** Filters on which to perform tests */
     private BetweenFilterImpl btwnFilter;
-    private CompareFilterImpl compFilter;
-    private GeometryFilterImpl geomFilter;
+    private CompareFilter compFilter;
+    private GeometryFilter geomFilter;
     private LikeFilterImpl likeFilter;
     private NullFilterImpl nullFilter;
     private AttributeExpressionImpl attrExp1;
@@ -142,7 +143,7 @@ public class SQLUnpackerTest extends SQLFilterTestSupport {
             attrExp2 = new AttributeExpressionImpl(testSchema, "testGeometry");
             litExp1 = new LiteralExpressionImpl(new Integer(65));
             litExp2 = new LiteralExpressionImpl(new Integer(35));
-            mathExp1 = new MathExpressionImpl(DefaultExpression.MATH_ADD);
+            mathExp1 = new AddImpl(null,null);
             mathExp1.addLeftValue(litExp1);
             mathExp1.addRightValue(litExp2);
 
@@ -151,11 +152,13 @@ public class SQLUnpackerTest extends SQLFilterTestSupport {
             btwnFilter.addMiddleValue(attrExp1);
             btwnFilter.addRightValue(mathExp1);
 
-            compFilter = new CompareFilterImpl(AbstractFilter.COMPARE_LESS_THAN);
+            FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+            compFilter = factory.createCompareFilter(AbstractFilter.COMPARE_LESS_THAN);
             compFilter.addLeftValue(attrExp1);
             compFilter.addRightValue(litExp2);
 
-            geomFilter = new GeometryFilterImpl(AbstractFilter.GEOMETRY_TOUCHES);
+            
+            geomFilter = factory.createGeometryFilter(AbstractFilter.GEOMETRY_TOUCHES);
             geomFilter.addLeftGeometry(attrExp2);
             geomFilter.addRightGeometry(litExp2);
 

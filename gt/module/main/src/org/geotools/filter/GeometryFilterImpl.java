@@ -18,7 +18,10 @@ package org.geotools.filter;
 
 import java.util.logging.Logger;
 
+import org.geotools.coverage.processing.operation.Exp;
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.opengis.filter.FilterVisitor;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -61,17 +64,19 @@ import com.vividsolutions.jts.geom.Geometry;
  *       is that lots of code will need to  be changed for immutability.
  *       (comments by cholmes) - MUTABLE FACTORIES!  Sax and immutability.
  */
-public class GeometryFilterImpl extends AbstractFilterImpl
+public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
     implements GeometryFilter {
     /** Class logger */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
-    /** Holds the 'left' value of this comparison filter. */
-    protected Expression leftGeometry = null;
-
-    /** Holds the 'right' value of this comparison filter. */
-    protected Expression rightGeometry = null;
-
+    protected GeometryFilterImpl(FilterFactory factory) {
+    	super(factory);
+    }
+    
+    protected GeometryFilterImpl(FilterFactory factory,org.opengis.filter.expression.Expression e1,org.opengis.filter.expression.Expression e2) {
+    	super(factory,e1,e2);
+    }
+    
     /**
      * Constructor with filter type.
      *
@@ -81,6 +86,9 @@ public class GeometryFilterImpl extends AbstractFilterImpl
      */
     protected GeometryFilterImpl(short filterType)
         throws IllegalFilterException {
+    	
+    	super(FilterFactoryFinder.createFilterFactory());
+    	
         if (isGeometryFilter(filterType)) {
             this.filterType = filterType;
         } else {
@@ -96,18 +104,26 @@ public class GeometryFilterImpl extends AbstractFilterImpl
      *
      * @throws IllegalFilterException Filter is not internally consistent.
      *
-     * @task REVISIT: make all filters immutable.
+     * @deprecated use {@link #setExpression1(org.opengis.filter.expression.Expression)}
      */
-    public void addLeftGeometry(Expression leftGeometry)
+    public final void addLeftGeometry(Expression leftGeometry)
         throws IllegalFilterException {
-        // Checks if this is geometry filter or not and handles appropriately
+
+    	setExpression1(leftGeometry);
+    }
+    
+    public void setExpression1(org.opengis.filter.expression.Expression expression) {
+    	Expression leftGeometry = (Expression)expression;
+    	
+    	//Checks if this is geometry filter or not and handles appropriately
         if (DefaultExpression.isGeometryExpression(leftGeometry.getType())
                 || permissiveConstruction) {
-            this.leftGeometry = leftGeometry;
+            super.setExpression1(leftGeometry);
         } else {
             throw new IllegalFilterException("Attempted to add (left)"
                 + " non-geometry expression" + " to geometry filter.");
         }
+    	
     }
 
     /**
@@ -117,38 +133,95 @@ public class GeometryFilterImpl extends AbstractFilterImpl
      *
      * @throws IllegalFilterException Filter is not internally consistent.
      *
-     * @task REVISIT: make immutable.
+     * @deprecated use {@link #set
+     * 
      */
-    public void addRightGeometry(Expression rightGeometry)
+    public final void addRightGeometry(Expression rightGeometry)
         throws IllegalFilterException {
-        // Checks if this is math filter or not and handles appropriately
+        
+    	setExpression2(rightGeometry);
+    }
+  
+    public void setExpression2(org.opengis.filter.expression.Expression expression) {
+    	Expression rightGeometry = (Expression)expression;
+    	
+    	//Checks if this is math filter or not and handles appropriately
         if (DefaultExpression.isGeometryExpression(rightGeometry.getType())
                 || permissiveConstruction) {
-            this.rightGeometry = rightGeometry;
+            super.setExpression2(rightGeometry);
         } else {
             throw new IllegalFilterException("Attempted to add (right)"
                 + " non-geometry" + "expression to geometry filter.");
         }
     }
-
     /**
      * Retrieves the expression on the left side of the comparison.
      *
      * @return the expression on the left.
+     * @deprecated use {@link org.opengis.filter.spatial.BinarySpatialOperator#getExpression1()}
      */
-    public Expression getLeftGeometry() {
-        return leftGeometry;
+    public final Expression getLeftGeometry() {
+        return (Expression)getExpression1();
     }
-
+    
     /**
      * Retrieves the expression on the right side of the comparison.
      *
      * @return the expression on the right.
+     * @deprecated use {@link {@link org.opengis.filter.spatial.BinarySpatialOperator#getExpression2()}
      */
-    public Expression getRightGeometry() {
-        return rightGeometry;
+    public final Expression getRightGeometry() {
+        return (Expression)getExpression2();
     }
 
+    /**
+     * Subclass convenience method for returning left expression as a 
+     * JTS geometry.
+     */
+    protected Geometry getLeftGeometry(Feature feature) {
+    	org.opengis.filter.expression.Expression leftGeometry = getExpression1();
+    	
+    	 if (leftGeometry != null) {
+             Object obj = leftGeometry.evaluate(feature);
+
+             //LOGGER.finer("leftGeom = " + o.toString()); 
+             return (Geometry) obj;
+         } else {
+             return feature.getDefaultGeometry();
+         }
+    }
+    
+    /**
+     * Subclass convenience method for returning right expression as a 
+     * JTS geometry.
+     */
+    protected Geometry getRightGeometry(Feature feature) {
+    	org.opengis.filter.expression.Expression rightGeometry = getExpression2();
+    	
+    	 if (rightGeometry != null) {
+             return (Geometry) rightGeometry.evaluate(feature);
+         } else {
+             return feature.getDefaultGeometry();
+         }
+    }
+    
+    /**
+     * Subclass convenience method for validating the internals of the 
+     */
+    protected boolean validate(Feature feature) {
+    	
+    	// Checks for error condition
+        Geometry right = getRightGeometry(feature);
+        Geometry left = getLeftGeometry(feature);
+
+       // default behaviour: if the geometry that is to be filtered is not
+        // there we default to not returning anything
+        if(left == null)
+            return false;
+        
+        return true;
+    }
+    
     /**
      * Determines whether or not a given feature is 'inside' this filter.
      *
@@ -156,97 +229,7 @@ public class GeometryFilterImpl extends AbstractFilterImpl
      *
      * @return Flag confirming whether or not this feature is inside filter.
      */
-    public boolean contains(Feature feature) {
-        // Checks for error condition
-        Geometry right = null;
-
-        if (rightGeometry != null) {
-            right = (Geometry) rightGeometry.getValue(feature);
-        } else {
-            right = feature.getDefaultGeometry();
-        }
-
-        Geometry left = null;
-
-        if (leftGeometry != null) {
-            Object obj = leftGeometry.getValue(feature);
-
-            //LOGGER.finer("leftGeom = " + o.toString()); 
-            left = (Geometry) obj;
-        } else {
-            left = feature.getDefaultGeometry();
-        }
-        
-        // default behaviour: if the geometry that is to be filtered is not
-        // there we default to not returning anything
-        if(left == null)
-            return false;
-        
-        // optimization: since JTS is far from being optimized and computes all 
-        // the times the geometry graphs to perform operations, we perform simple
-        // comparisons on the bounding boxes before using JTS
-        Envelope envRight = right.getEnvelopeInternal();
-        Envelope envLeft = left.getEnvelopeInternal();
-
-        // Handles all normal geometry cases
-        if (filterType == GEOMETRY_EQUALS) {
-            if(envRight.equals(envLeft))
-                return left.equals(right);
-            else    
-                return false;
-        } else if (filterType == GEOMETRY_DISJOINT) {
-            if(envRight.intersects(envLeft))
-                return left.disjoint(right);
-            else
-                return true;
-        } else if (filterType == GEOMETRY_INTERSECTS) {
-            if(envRight.intersects(envLeft))
-                return left.intersects(right);
-            else
-                return false;
-        } else if (filterType == GEOMETRY_CROSSES) {
-            if(envRight.intersects(envLeft))
-                return left.crosses(right);
-            else
-                return false;
-        } else if (filterType == GEOMETRY_WITHIN) {
-            if(envRight.contains(envLeft))
-                return left.within(right);
-            else
-                return false;
-        } else if (filterType == GEOMETRY_CONTAINS) {
-            if(envLeft.contains(envRight))
-                return left.contains(right);
-            else
-                return false;
-        } else if (filterType == GEOMETRY_OVERLAPS) {
-            if(envLeft.intersects(envRight))
-                return left.overlaps(right);
-            else
-                return false;
-
-            //this is now handled in CartesianDistanceFilter.
-            //} else if (filterType == GEOMETRY_BEYOND) {
-            //return left.within(right);
-        } else if (filterType == GEOMETRY_TOUCHES) {
-            return left.touches(right);
-        } else if (filterType == GEOMETRY_BBOX) {
-            
-            if(envRight.contains(envLeft) || envLeft.contains(envRight)) {
-                return true;
-            } else if(envRight.intersects(envLeft)) {
-                return left.intersects(right);
-            } else {
-                return false;
-            }
-
-            // Note that this is a pretty permissive logic
-            //  if the type has somehow been mis-set (can't happen externally)
-            //  then true is returned in all cases
-        } else {
-            return true;
-        }
-    }
+    public abstract boolean evaluate(Feature feature);
 
     /**
      * Return this filter as a string.
@@ -277,7 +260,10 @@ public class GeometryFilterImpl extends AbstractFilterImpl
             operator = " bbox ";
         }
 
-        if ((leftGeometry == null) && (rightGeometry == null)) {
+        org.opengis.filter.expression.Expression leftGeometry = getExpression1();
+        org.opengis.filter.expression.Expression rightGeometry = getExpression2();
+        
+        if ((expression1 == null) && (rightGeometry == null)) {
             return "[ " + "null" + operator + "null" + " ]";
         } else if (leftGeometry == null) {
             return "[ " + "null" + operator + rightGeometry.toString() + " ]";
@@ -306,17 +292,17 @@ public class GeometryFilterImpl extends AbstractFilterImpl
             isEqual = geomFilter.getFilterType() == this.filterType;
             LOGGER.finest("filter type match:" + isEqual + "; in:"
                 + geomFilter.getFilterType() + "; out:" + this.filterType);
-            isEqual = (geomFilter.leftGeometry != null)
-                ? (isEqual && geomFilter.leftGeometry.equals(this.leftGeometry))
-                : (isEqual && (this.leftGeometry == null));
+            isEqual = (geomFilter.expression1 != null)
+                ? (isEqual && geomFilter.expression1.equals(this.expression1))
+                : (isEqual && (this.expression1 == null));
             LOGGER.finest("left geom match:" + isEqual + "; in:"
-                + geomFilter.leftGeometry + "; out:" + this.leftGeometry);
-            isEqual = (geomFilter.rightGeometry != null)
+                + geomFilter.expression1 + "; out:" + this.expression1);
+            isEqual = (geomFilter.expression2 != null)
                 ? (isEqual
-                && geomFilter.rightGeometry.equals(this.rightGeometry))
-                : (isEqual && (this.rightGeometry == null));
+                && geomFilter.expression2.equals(this.expression2))
+                : (isEqual && (this.expression2 == null));
             LOGGER.finest("right geom match:" + isEqual + "; in:"
-                + geomFilter.rightGeometry + "; out:" + this.rightGeometry);
+                + geomFilter.expression2 + "; out:" + this.expression2);
 
             return isEqual;
         } else {
@@ -330,6 +316,9 @@ public class GeometryFilterImpl extends AbstractFilterImpl
      * @return a hash code value for this geometry filter.
      */
     public int hashCode() {
+    	org.opengis.filter.expression.Expression leftGeometry = getExpression1();
+        org.opengis.filter.expression.Expression rightGeometry = getExpression2();
+         
         int result = 17;
         result = (37 * result) + filterType;
         result = (37 * result)
@@ -340,17 +329,4 @@ public class GeometryFilterImpl extends AbstractFilterImpl
         return result;
     }
 
-    /**
-     * Used by FilterVisitors to perform some action on this filter instance.
-     * Typicaly used by Filter decoders, but may also be used by any thing
-     * which needs infomration from filter structure. Implementations should
-     * always call: visitor.visit(this); It is importatant that this is not
-     * left to a parent class unless the parents API is identical.
-     *
-     * @param visitor The visitor which requires access to this filter, the
-     *        method must call visitor.visit(this);
-     */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
-    }
 }

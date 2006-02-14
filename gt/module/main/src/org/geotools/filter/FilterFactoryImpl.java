@@ -21,10 +21,35 @@
  */
 package org.geotools.filter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.expression.AddImpl;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.BBoxExpression;
+import org.geotools.filter.expression.DivideImpl;
+import org.geotools.filter.expression.ExpressionType;
+import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.expression.MathExpression;
+import org.geotools.filter.expression.MultiplyImpl;
+import org.geotools.filter.expression.SubtractImpl;
+import org.geotools.filter.spatial.BBOXImpl;
+import org.geotools.filter.spatial.BeyondImpl;
+import org.geotools.filter.spatial.ContainsImpl;
+import org.geotools.filter.spatial.CrossesImpl;
+import org.geotools.filter.spatial.DWithinImpl;
+import org.geotools.filter.spatial.DisjointImpl;
+import org.geotools.filter.spatial.EqualsImpl;
+import org.geotools.filter.spatial.IntersectsImpl;
+import org.geotools.filter.spatial.OverlapsImpl;
+import org.geotools.filter.spatial.TouchesImpl;
+import org.geotools.filter.spatial.WithinImpl;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -37,7 +62,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  * @version $Id$
  */
-public class FilterFactoryImpl implements FilterFactory {
+public class FilterFactoryImpl extends Expr implements FilterFactory {
     /**
      * Creates a new instance of FilterFactoryImpl
      */
@@ -117,10 +142,36 @@ public class FilterFactoryImpl implements FilterFactory {
      * @return The new compare filter.
      *
      * @throws IllegalFilterException if there were creation problems.
+     * 
+     * @deprecated @see org.geotools.filter.FilterFactory#createCompareFilter(short)
      */
     public CompareFilter createCompareFilter(short type)
         throws IllegalFilterException {
-        return new CompareFilterImpl(type);
+    	
+    	switch(type) {
+    		case FilterType.COMPARE_EQUALS:
+    			return new IsEqualsToImpl(this);
+    			
+    		case FilterType.COMPARE_NOT_EQUALS:
+    			return new IsNotEqualToImpl(this);
+    			
+    		case FilterType.COMPARE_GREATER_THAN:
+    			return new IsGreaterThanImpl(this);
+    			
+    		case FilterType.COMPARE_GREATER_THAN_EQUAL:
+    			return new IsGreaterThanOrEqualToImpl(this);
+    			
+    		case FilterType.COMPARE_LESS_THAN:
+    			return new IsLessThenImpl(this);
+    			
+    		case FilterType.COMPARE_LESS_THAN_EQUAL:
+    			return new IsLessThenOrEqualToImpl(this);
+    			
+    		case FilterType.BETWEEN:
+    			return new BetweenFilterImpl(this);
+    	}
+    	
+    	throw new IllegalFilterException("Must be one of <,<=,==,>,>=,<>");
     }
 
     /**
@@ -154,7 +205,42 @@ public class FilterFactoryImpl implements FilterFactory {
      */
     public GeometryFilter createGeometryFilter(short filterType)
         throws IllegalFilterException {
-        return new GeometryFilterImpl(filterType);
+    	switch(filterType) {
+    		case FilterType.GEOMETRY_EQUALS:
+    			return new EqualsImpl(this,null,null);
+    			
+    		case FilterType.GEOMETRY_DISJOINT:
+    			return new DisjointImpl(this,null,null);
+    			
+    		case FilterType.GEOMETRY_DWITHIN:
+    			return new DWithinImpl(this,null,null);
+    			
+    		case FilterType.GEOMETRY_INTERSECTS:
+    			return new IntersectsImpl(this,null,null);
+    			
+    		case FilterType.GEOMETRY_CROSSES:
+    			return new CrossesImpl(this,null,null);
+    			
+    		case FilterType.GEOMETRY_WITHIN:
+    			return new WithinImpl(this,null,null);
+    			
+    		case FilterType.GEOMETRY_CONTAINS:
+    			return new ContainsImpl(this,null,null);
+    			
+    		case FilterType.GEOMETRY_OVERLAPS:
+    			return new OverlapsImpl(this,null,null);
+    			
+    		case FilterType.GEOMETRY_BEYOND:
+    			return new BeyondImpl(this,null,null);
+    			
+    		case FilterType.GEOMETRY_BBOX:
+    			return new BBOXImpl(this,null,null);
+    			
+    		case FilterType.GEOMETRY_TOUCHES:
+    			return new TouchesImpl(this,null,null);
+    	}
+       
+        throw new IllegalFilterException("Not one of the accepted spatial filter types.");
     }
 
     /**
@@ -169,7 +255,18 @@ public class FilterFactoryImpl implements FilterFactory {
      */
     public GeometryDistanceFilter createGeometryDistanceFilter(short filterType)
         throws IllegalFilterException {
-        return new CartesianDistanceFilter(filterType);
+    	
+    	switch(filterType) {
+			case FilterType.GEOMETRY_BEYOND:
+				return new BeyondImpl(this,null,null);
+				
+			case FilterType.GEOMETRY_DWITHIN:
+				return new DWithinImpl(this,null,null);
+			
+    	}
+   
+    	throw new IllegalFilterException("Not one of the accepted spatial filter types.");
+        
     }
 
     /**
@@ -246,10 +343,25 @@ public class FilterFactoryImpl implements FilterFactory {
      *
      * @throws IllegalFilterException If there were any problems creating the
      *         filter, including wrong type.
+     *         
+     * @deprecated use one of {@link org.opengis.filter.FilterFactory#and(Filter, Filter)}
+     * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
+     * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
      */
     public LogicFilter createLogicFilter(short filterType)
         throws IllegalFilterException {
-        return new LogicFilterImpl(filterType);
+    	
+    	List children = new ArrayList();
+    	switch (filterType) {
+	    	case FilterType.LOGIC_AND:
+	    		return new AndImpl(this,children);
+	    	case FilterType.LOGIC_OR:
+	    		return new OrImpl(this,children);
+	    	case FilterType.LOGIC_NOT:
+	    		return new NotImpl(this);
+    	}
+    	
+        throw new IllegalFilterException("Must be one of AND,OR,NOT.");
     }
 
     /**
@@ -262,12 +374,30 @@ public class FilterFactoryImpl implements FilterFactory {
      *
      * @throws IllegalFilterException If there were any problems creating the
      *         filter, including wrong type.
+     *         
+     * @deprecated use one of {@link org.opengis.filter.FilterFactory#and(Filter, Filter)}
+     * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
+     * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
      */
     public LogicFilter createLogicFilter(Filter filter, short filterType)
         throws IllegalFilterException {
-        return new LogicFilterImpl(filter, filterType);
+    	
+    	List children = new ArrayList();
+    	children.add(filter);
+    	
+    	switch (filterType) {
+	    	case FilterType.LOGIC_AND:
+	    		return new AndImpl(this,children);
+	    	case FilterType.LOGIC_OR:
+	    		return new OrImpl(this,children);
+	    	case FilterType.LOGIC_NOT:
+	    		return new NotImpl(this,filter);
+    	}
+    	
+        throw new IllegalFilterException("Must be one of AND,OR,NOT.");
     }
 
+    
     /**
      * Creates a logic filter from two filters and a type.
      *
@@ -279,19 +409,47 @@ public class FilterFactoryImpl implements FilterFactory {
      *
      * @throws IllegalFilterException If there were any problems creating the
      *         filter, including wrong type.
+     *         
+     * @deprecated use one of {@link org.opengis.filter.FilterFactory#and(Filter, Filter)}
+     * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
+     * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
      */
     public LogicFilter createLogicFilter(Filter filter1, Filter filter2,
         short filterType) throws IllegalFilterException {
-        return new LogicFilterImpl(filter1, filter2, filterType);
+    	
+    	List children = new ArrayList();
+    	children.add(filter1);
+    	children.add(filter2);
+    	
+    	switch (filterType) {
+	    	case FilterType.LOGIC_AND:
+	    		return new AndImpl(this,children);
+	    	case FilterType.LOGIC_OR:
+	    		return new OrImpl(this,children);
+	    	case FilterType.LOGIC_NOT:
+	    		//TODO: perhaps throw an exception here?
+	    		return new NotImpl(this,filter1);
+    	}
+    	
+        throw new IllegalFilterException("Must be one of AND,OR,NOT.");
     }
+    
+    
 
     /**
      * Creates a Math Expression
      *
      * @return The new Math Expression
+     * 
+     * @deprecated use one of
+     * 	{@link org.opengis.filter.FilterFactory#add(Expression, Expression)}
+     * 	{@link org.opengis.filter.FilterFactory#subtract(Expression, Expression)}
+     * 	{@link org.opengis.filter.FilterFactory#multiply(Expression, Expression)}
+     * 	{@link org.opengis.filter.FilterFactory#divide(Expression, Expression)}
+     * 
      */
     public MathExpression createMathExpression() {
-        return new MathExpressionImpl();
+    	throw new UnsupportedOperationException();
     }
 
     /**
@@ -305,7 +463,19 @@ public class FilterFactoryImpl implements FilterFactory {
      */
     public MathExpression createMathExpression(short expressionType)
         throws IllegalFilterException {
-        return new MathExpressionImpl(expressionType);
+    	
+    	switch(expressionType) {
+	    	case ExpressionType.MATH_ADD:
+	    		return new AddImpl(null,null);
+	    	case ExpressionType.MATH_SUBTRACT:
+	    		return new SubtractImpl(null,null);
+	    	case ExpressionType.MATH_MULTIPLY:
+	    		return new MultiplyImpl(null,null);
+	    	case ExpressionType.MATH_DIVIDE:
+	    		return new DivideImpl(null,null);
+    	}	
+    	
+        throw new IllegalFilterException("Unsupported math expression");
     }
 
     /**
@@ -369,5 +539,24 @@ public class FilterFactoryImpl implements FilterFactory {
 	public Map getImplementationHints() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public Filter and(Filter f1, Filter f2) {
+		org.opengis.filter.Filter f = and((org.opengis.filter.Filter)f1,(org.opengis.filter.Filter)f2);
+		return (Filter)f;
+	}
+	
+	public Filter or(Filter f1, Filter f2) {
+		org.opengis.filter.Filter f = or((org.opengis.filter.Filter)f1,(org.opengis.filter.Filter)f2);
+		return (Filter)f;
+	}
+	
+	public Filter not(Filter f) {
+		org.opengis.filter.Filter f1 = not((org.opengis.filter.Filter)f);
+		return (Filter)f1;
+	}
+	
+	public SortBy sort(String propertyName, SortOrder order) {
+		throw new UnsupportedOperationException();
 	}
 }

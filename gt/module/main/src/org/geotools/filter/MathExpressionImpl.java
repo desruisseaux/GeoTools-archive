@@ -17,6 +17,9 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.MathExpression;
+import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
@@ -34,35 +37,26 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public class MathExpressionImpl extends DefaultExpression
+public abstract class MathExpressionImpl extends DefaultExpression
     implements MathExpression {
+	
     /** Holds the 'left' value of this math expression. */
-    private Expression leftValue = null;
+    private org.opengis.filter.expression.Expression leftValue = null;
 
     /** Holds the 'right' value of this math expression. */
-    private Expression rightValue = null;
+    private org.opengis.filter.expression.Expression rightValue = null;
 
+    
     /**
      * No argument constructor.
      */
     protected MathExpressionImpl() {
+    	
     }
-
-    /**
-     * Constructor with expression type.
-     *
-     * @param expType The mathematical relationship between values.
-     *
-     * @throws IllegalFilterException Attempting to declare illegal type.
-     */
-    protected MathExpressionImpl(short expType) throws IllegalFilterException {
-        // Check to see if this is a valid math type before adding.
-        if (isMathExpression(expType)) {
-            this.expressionType = expType;
-        } else {
-            throw new IllegalFilterException(
-                "Attempted to add non-math expression to math expression.");
-        }
+    
+    protected MathExpressionImpl(org.opengis.filter.expression.Expression e1,org.opengis.filter.expression.Expression e2) {
+    	this.leftValue = e1;
+    	this.rightValue = e2;
     }
 
     /**
@@ -71,14 +65,13 @@ public class MathExpressionImpl extends DefaultExpression
      * @param leftValue Expression to add to this expression.
      *
      * @throws IllegalFilterException Attempting to add non-math expression.
+     * 
+     * @deprecated use {@link #setExpression1(org.opengis.filter.expression.Expression)}
      */
-    public void addLeftValue(Expression leftValue)
+    public final void addLeftValue(Expression leftValue)
         throws IllegalFilterException {
-    	if (isGeometryExpression(leftValue.getType()) ) {
-    		throw new IllegalFilterException(
-            "Attempted to add Geometry expression to math expression.");
-    	}
-        this.leftValue = leftValue;
+    	
+    	setExpression1(leftValue);
     }
 
     /**
@@ -87,33 +80,85 @@ public class MathExpressionImpl extends DefaultExpression
      * @param rightValue Expression to add to this expression.
      *
      * @throws IllegalFilterException Attempting to add non-math expression.
+     * 
+     * @deprecated use {@link #setExpression2(org.opengis.filter.expression.Expression)}
      */
-    public void addRightValue(Expression rightValue)
+    public final void addRightValue(Expression rightValue)
         throws IllegalFilterException {
-        // Check to see if this is a valid math expression before adding.
-        if (isGeometryExpression(rightValue.getType()) ) {
-        	throw new IllegalFilterException(
-            "Attempted to add Geometry expression to math expression.");
-        }
-        this.rightValue = rightValue;        
+        
+    	setExpression2(rightValue);
     }
 
     /**
-     * Gets the left expression.
-     *
-     * @return the expression on the left of the comparison.
+     * Gets the left or first expression.
+     * 
+     * @deprecated use {@link #getExpression1()}.
      */
-    public Expression getLeftValue() {
-        return leftValue;
+    public final Expression getLeftValue() {
+        return (Expression)getExpression1();
+    }
+    
+    /**
+     * 
+     * Gets the left or first expression.
+     *
+     * @return the expression on the first side of the comparison.
+     */
+    public org.opengis.filter.expression.Expression getExpression1() {
+	    return leftValue;
+    }
+    
+    /**
+     * 
+     * Gets the left or first expression.
+     *
+     * @return the expression on the first side of the comparison.
+     * 
+     * @throws IllegalFilterException
+     */
+    public void setExpression1(org.opengis.filter.expression.Expression expression) {
+    	Expression leftValue = (Expression)expression;
+    	if (isGeometryExpression(leftValue.getType()) ) {
+    		throw new IllegalFilterException(
+            "Attempted to add Geometry expression to math expression.");
+    	}
+        this.leftValue = leftValue;
     }
 
     /**
      * Gets the right expression.
      *
      * @return the expression on the right of the comparison.
+     * 
+     * @deprecated use {@link #getExpression2()}.
      */
-    public Expression getRightValue() {
-        return rightValue;
+    public final Expression getRightValue() {
+        return (Expression) getExpression2();
+    }
+    
+    /**
+     * Gets the second expression.
+     *
+     * @return the expression on the second side of the comparison.
+     */
+    public org.opengis.filter.expression.Expression getExpression2() {
+	    return rightValue;
+    }
+    
+    /**
+     * Gets the second expression.
+     *
+     * @return the expression on the second side of the comparison.
+     * @throws IllegalFilterException
+     */
+    public void setExpression2(org.opengis.filter.expression.Expression expression) {
+    	Expression rightValue = (Expression)expression;
+    	//Check to see if this is a valid math expression before adding.
+        if (isGeometryExpression(rightValue.getType()) ) {
+        	throw new IllegalFilterException(
+            "Attempted to add Geometry expression to math expression.");
+        }
+        this.rightValue = rightValue;        	
     }
 
     /**
@@ -134,123 +179,23 @@ public class MathExpressionImpl extends DefaultExpression
      *
      * @throws IllegalArgumentException Feature does not match declared schema.
      */
-    public Object getValue(Feature feature) throws IllegalArgumentException {
-        // Checks to make sure both sub expressions exist.
+    public abstract Object evaluate(Feature feature) throws IllegalArgumentException;
+    
+    /** 
+     * Convenience method which ensures that both expressions have been 
+     * set. If any of operands not set an exception is thrown.
+     */
+    protected void ensureOperandsSet() throws IllegalArgumentException {
+    	  // Checks to make sure both sub expressions exist.
         if ((leftValue == null) || (rightValue == null)) {
             throw new IllegalArgumentException(
                 "Attempted read math expression with missing sub expressions.");
-        }                
-        double leftDouble = Filters.number( leftValue.getValue(feature) );
-        double rightDouble = Filters.number( rightValue.getValue(feature) );
-        
-        // Standard return values.
-        if (expressionType == MATH_ADD) {
-            return number(leftDouble + rightDouble);
-        } else if (expressionType == MATH_SUBTRACT) {
-            return number(leftDouble - rightDouble);
-        } else if (expressionType == MATH_MULTIPLY) {
-            return number(leftDouble * rightDouble);
-        } else if (expressionType == MATH_DIVIDE) {
-            return number(leftDouble / rightDouble);
-        } else {
-            // If the type has somehow been mis-set (can't happen externally)
-            // then throw an exception.
-            throw new IllegalArgumentException(
-                "Attempted read math expression with invalid type "
-                + "(ie. Add, Subtract, etc.).");
-        }
+        } 
     }
+
     protected Object number( double number ){
     	//return Filters.puts( number );  // non strongly typed
     	return new Double( number );      // Getools 2.1 style
     }
     
-    /**
-     * Returns a string representation of this expression
-     *
-     * @return String representation of the math expression.
-     */
-    public String toString() {
-        String operation;
-
-        switch (expressionType) {
-        case MATH_ADD:
-            operation = " + ";
-
-            break;
-
-        case MATH_SUBTRACT:
-            operation = " - ";
-
-            break;
-
-        case MATH_MULTIPLY:
-            operation = " * ";
-
-            break;
-
-        case MATH_DIVIDE:
-            operation = " / ";
-
-            break;
-
-        default:
-            operation = " ? "; //should never happen.
-
-            break;
-        }
-
-        return "(" + leftValue.toString() + operation + rightValue.toString()
-        + ")";
-    }
-
-    /**
-     * Compares this expression to the specified object.  Returns true  if the
-     * passed in object is the same as this expression.  Checks  to make sure
-     * the expression types as well as the left and right values are equal.
-     *
-     * @param obj - the object to compare this ExpressionLiteral against.
-     *
-     * @return true if specified object is equal to this expression; false
-     *         otherwise.
-     */
-    public boolean equals(Object obj) {
-        if (obj instanceof MathExpressionImpl) {
-            MathExpression expMath = (MathExpression) obj;
-
-            return ((expMath.getType() == this.expressionType)
-            && expMath.getLeftValue().equals(this.leftValue)
-            && expMath.getRightValue().equals(this.rightValue));
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Override of hashCode method.
-     *
-     * @return a hash code value for this math expression.
-     */
-    public int hashCode() {
-        int result = 23;
-        result = (37 * result) + expressionType;
-        result = (37 * result) + leftValue.hashCode();
-        result = (37 * result) + rightValue.hashCode();
-
-        return result;
-    }
-
-    /**
-     * Used by FilterVisitors to perform some action on this filter instance.
-     * Typicaly used by Filter decoders, but may also be used by any thing
-     * which needs infomration from filter structure. Implementations should
-     * always call: visitor.visit(this); It is importatant that this is not
-     * left to a parent class unless the parents API is identical.
-     *
-     * @param visitor The visitor which requires access to this filter, the
-     *        method must call visitor.visit(this);
-     */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
-    }
 }

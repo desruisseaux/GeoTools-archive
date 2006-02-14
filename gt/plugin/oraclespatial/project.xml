@@ -32,16 +32,25 @@
       <artifactId>api</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>  
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <id>JTS</id>
@@ -63,7 +72,7 @@
          Uncomment the following section, it downloads a jar full of
          "Mock Objects" so you can compile without downloading the real
          thing from oracle.
-     -->
+-->
     <dependency>
       <artifactId>dummy_spatial</artifactId>
       <groupId>oracle</groupId>

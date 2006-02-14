@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.expression.AttributeExpression;
+import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
@@ -86,43 +88,59 @@ public class AttributeExpressionImpl extends DefaultExpression
      *
      * @throws IllegalFilterException If the attribute path is not in the
      *         schema.
+     *         
+     *  @deprecated use {@link #setPropertyName(String)}
      */
-    public void setAttributePath(String attPath) throws IllegalFilterException {
-        LOGGER.entering("ExpressionAttribute", "setAttributePath", attPath);
-        LOGGER.finest("schema: " + schema + "\n\nattribute: " + attPath);
+    public final void setAttributePath(String attPath) throws IllegalFilterException {
+       setPropertyName(attPath);
+    }
 
-        if (schema != null) {
-            if (schema.hasAttributeType(attPath)) {
-                this.attPath = attPath;
-            } else {
-                throw new IllegalFilterException(
-                    "Attribute: " +attPath+ " is not in stated schema "+schema.getTypeName()+".");
-            }
-        } else {
-            this.attPath = attPath;
-        }
+    /**
+     * This method calls {@link #getPropertyName()}.
+     * 
+     * @deprecated use {@link #getPropertyName()}
+     */
+    public final String getAttributePath() {
+      	return getPropertyName();
     }
 
     /**
      * Gets the path to the attribute to be evaluated by this expression.
      *
-     * @return the path.
+     * @see {@link org.opengis.filter.expression.PropertyName#getPropertyName()}.
      */
-    public String getAttributePath() {
-        return attPath;
-    }
+   public String getPropertyName() {
+		return attPath;
+   }	
+   
+   public void setPropertyName(String attPath) {
+	   LOGGER.entering("ExpressionAttribute", "setAttributePath", attPath);
+       LOGGER.finest("schema: " + schema + "\n\nattribute: " + attPath);
 
-    /**
-     * Gets the value of this attribute from the passed feature.
-     *
-     * @param feature Feature from which to extract attribute value.
-     *
-     * @return DOCUMENT ME!
-     */
-    public Object getValue(Feature feature) {
-        return feature.getAttribute(attPath);
+       if (schema != null) {
+           if (schema.hasAttributeType(attPath)) {
+               this.attPath = attPath;
+           } else {
+        	   
+        	   throw new IllegalFilterException(
+                   "Attribute: " +attPath+ " is not in stated schema "+schema.getTypeName()+"."
+               );	   
+        	   
+           }
+       } else {
+           this.attPath = attPath;
+       }
+    }	
+    
+   /**
+      * Gets the value of this attribute from the passed feature.
+      *
+      * @param feature Feature from which to extract attribute value.
+      */
+    public Object evaluate(Feature feature) {
+    	return feature.getAttribute(attPath);
     }
-
+    
      /**
      * Return this expression as a string.
      *
@@ -188,7 +206,7 @@ public class AttributeExpressionImpl extends DefaultExpression
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
+    public Object accept(ExpressionVisitor visitor, Object extraData) {
+    	return visitor.visit(this,extraData);
     }
 }

@@ -21,6 +21,10 @@ package org.geotools.filter;
 import java.util.logging.Logger;
 
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.expression.MathExpression;
 
 import com.vividsolutions.jts.geom.Geometry;
 

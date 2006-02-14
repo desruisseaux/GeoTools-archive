@@ -16,6 +16,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.opengis.filter.spatial.BinarySpatialOperator;
 
 
 /**
@@ -56,7 +58,7 @@ import org.geotools.feature.Feature;
  *       is that lots of code will need to  be changed for immutability.
  *       (comments by cholmes) - MUTABLE FACTORIES!  Sax and immutability.
  */
-public interface GeometryFilter extends Filter {
+public interface GeometryFilter extends Filter, BinarySpatialOperator {
     /**
      * Adds the 'right' value to this filter.
      *
@@ -64,7 +66,7 @@ public interface GeometryFilter extends Filter {
      *
      * @throws IllegalFilterException Filter is not internally consistent.
      *
-     * @task REVISIT: make immutable.
+     * @deprecated use {@link BinarySpatialOperator#setExpression2(Expression)}
      */
     void addRightGeometry(Expression rightGeometry)
         throws IllegalFilterException;
@@ -77,6 +79,8 @@ public interface GeometryFilter extends Filter {
      * @throws IllegalFilterException Filter is not internally consistent.
      *
      * @task REVISIT: make all filters immutable.
+     * 
+     * @deprecated use {@link BinarySpatialOperator#setExpression1(Expression)}
      */
     void addLeftGeometry(Expression leftGeometry) throws IllegalFilterException;
 
@@ -95,6 +99,8 @@ public interface GeometryFilter extends Filter {
      * Retrieves the expression on the right side of the spatial comparison.
      *
      * @return the geometry expression on the right.
+     * 
+     * @deprecated use {@link BinarySpatialOperator#getExpression2()}.
      */
     Expression getRightGeometry();
 
@@ -102,6 +108,8 @@ public interface GeometryFilter extends Filter {
      * Retrieves the expression on the left side of the spatial comparison.
      *
      * @return the geometry expression on the left.
+     * 
+     * @deprecated use {@link BinarySpatialOperator#getExpression1()}.
      */
     Expression getLeftGeometry();
 }

@@ -60,7 +60,7 @@ import org.apache.batik.transcoder.SVGAbstractTranscoder;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.geotools.feature.Feature;
-import org.geotools.filter.Expression;
+import org.geotools.filter.expression.Expression;
 import org.geotools.renderer.lite.CustomGlyphRenderer;
 import org.geotools.renderer.lite.GlyphRenderer;
 import org.geotools.renderer.lite.SVGGlyphRenderer;

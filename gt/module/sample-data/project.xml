@@ -26,6 +26,9 @@
       <artifactId>referencing</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
       <!-- We don't really need the referencing module, but we use
            org.geotools.resources.TestData which is defined there. -->
     </dependency>

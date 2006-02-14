@@ -18,6 +18,7 @@ package org.geotools.filter;
 import org.geotools.feature.Feature;
 
 
+
 /**
  * Defines an OpenGIS Filter object, with default behaviors for all methods.
  *
@@ -25,7 +26,17 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public interface Filter extends FilterType {
+public interface Filter extends FilterType, org.opengis.filter.Filter {
+	
+	/**
+	 * Evaluates the filter against an instance of {@link Feature}. 
+	 *
+	 * @param feature The feature being tested.
+	 * 
+	 * @return True if the feature is filtered, otherwise false.
+	 */
+	boolean evaluate(Feature feature);
+	
     /**
      * Implements the semantics of "no filtering", that is, every call to
      * contains will return true. Logic table:<br>
@@ -36,10 +47,21 @@ public interface Filter extends FilterType {
      * </pre>
      */
     static final Filter NONE = new Filter() {
+	    	/**
+			 * @deprecated use {@link #evaluate(org.opengis.feature.Feature)}
+			 */
             public final boolean contains(Feature f) {
-                return true;
+                return evaluate((Feature)f);
             }
-
+            
+            public boolean evaluate(Feature feature) {
+	            return true;
+            }
+            
+            public boolean evaluate(Object object) {
+            	return true;
+            }
+            
             public final Filter or(Filter f) {
                 return this;
             }
@@ -60,6 +82,10 @@ public interface Filter extends FilterType {
                 v.visit(this);
             }
 
+            public Object accept(org.opengis.filter.FilterVisitor visitor, Object extraData) {
+            	return extraData;
+            }
+            
             public final String toString() {
                 return "Filter.NONE";
             }
@@ -75,10 +101,18 @@ public interface Filter extends FilterType {
      * </pre>
      */
     static final Filter ALL = new Filter() {
+    		/**
+    		 * @deprecated use {@link #evaluate(org.opengis.feature.Feature)}
+    		 */
             public final boolean contains(Feature f) {
-                return false;
+            	return evaluate((Feature)f);
             }
-
+            public boolean evaluate(Feature feature) {
+	            return false;
+            }
+            public boolean evaluate(Object object) {
+            	return false;
+            }
             public final Filter or(Filter f) {
                 return f;
             }
@@ -97,6 +131,10 @@ public interface Filter extends FilterType {
 
             public final void accept(FilterVisitor v) {
                 v.visit(this);
+            }
+            
+            public Object accept(org.opengis.filter.FilterVisitor visitor, Object extraData) {
+            	return extraData;
             }
 
             public final String toString() {
@@ -142,6 +180,8 @@ public interface Filter extends FilterType {
      * @param feature Specified feature to examine.
      *
      * @return True if filter contains passed feature.
+     * 
+     * @deprecated use {@link #evaluate(Feature)}
      */
     boolean contains(Feature feature);
 
@@ -176,6 +216,10 @@ public interface Filter extends FilterType {
      * @return DOCUMENT ME!
      *
      * @task Gets a short representation of the type of this filter.
+     * 
+     * @deprecated The enumeration base type system is replaced with a class 
+     * based type system. An 'instanceof' check should be made instead of 
+     * calling this method.
      */
     short getFilterType();
 
@@ -188,6 +232,8 @@ public interface Filter extends FilterType {
      *
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
+     *        
+     * @deprecated use {@link org.opengis.filter.Filter#accept(FilterVisitor, Object)}.
      */
     void accept(FilterVisitor visitor);
 }

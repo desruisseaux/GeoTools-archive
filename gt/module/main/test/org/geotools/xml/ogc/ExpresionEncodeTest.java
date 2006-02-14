@@ -22,12 +22,12 @@ import java.io.StringWriter;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.filter.BetweenFilter;
-import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
+import org.geotools.filter.expression.Expression;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.filter.FilterSchema;
 

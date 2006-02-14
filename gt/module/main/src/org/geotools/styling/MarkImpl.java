@@ -38,7 +38,7 @@ package org.geotools.styling;
 
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
+import org.geotools.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 

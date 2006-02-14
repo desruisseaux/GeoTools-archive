@@ -16,6 +16,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.opengis.filter.BinaryComparisonOperator;
 
 
 /**
@@ -37,7 +39,7 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public interface CompareFilter extends Filter {
+public interface CompareFilter extends Filter, BinaryComparisonOperator {
     /**
      * Adds the 'left' value to this filter.
      *
@@ -46,6 +48,7 @@ public interface CompareFilter extends Filter {
      * @throws IllegalFilterException Filter is not internally consistent.
      *
      * @task REVISIT: immutability?
+     * @deprecated use {@link BinaryComparisonOperator#setExpression1(Expression)}
      */
     void addLeftValue(Expression leftValue) throws IllegalFilterException;
 
@@ -57,6 +60,8 @@ public interface CompareFilter extends Filter {
      * @throws IllegalFilterException Filter is not internally consistent.
      *
      * @task REVISIT: make immutable.
+     * 
+     * @deprecated use {@link BinaryComparisonOperator#setExpression2(Expression)}
      */
     void addRightValue(Expression rightValue) throws IllegalFilterException;
 
@@ -64,6 +69,8 @@ public interface CompareFilter extends Filter {
      * Gets the left expression.
      *
      * @return The expression on the left of the comparison.
+     * 
+     * @deprecated use {@link BinaryComparisonOperator#getExpression1()}
      */
     Expression getLeftValue();
 
@@ -71,6 +78,8 @@ public interface CompareFilter extends Filter {
      * Gets the right expression.
      *
      * @return The expression on the right of the comparison.
+     * 
+     * @deprecated use {@link BinaryComparisonOperator#getExpression2()}
      */
     Expression getRightValue();
 
@@ -80,6 +89,8 @@ public interface CompareFilter extends Filter {
      * @param feature Specified feature to examine.
      *
      * @return Whether or not this feature is inside the filter.
+     * 
+     * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
     boolean contains(Feature feature);
 }

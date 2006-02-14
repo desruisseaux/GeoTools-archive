@@ -38,7 +38,7 @@
 package org.geotools.styling;
 
 import org.geotools.event.GTComponent;
-import org.geotools.filter.Expression;
+import org.geotools.filter.expression.Expression;
 
 
 /**

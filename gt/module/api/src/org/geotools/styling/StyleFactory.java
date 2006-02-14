@@ -16,8 +16,8 @@
 package org.geotools.styling;
 
 import org.geotools.factory.Factory;
-import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
+import org.geotools.filter.expression.Expression;
 
 import java.net.URL;
 

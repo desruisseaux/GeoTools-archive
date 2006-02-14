@@ -25,8 +25,8 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.MaxVisitor;
 import org.geotools.feature.visitor.MinVisitor;
 import org.geotools.feature.visitor.UniqueVisitor;
-import org.geotools.filter.Expression;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.expression.Expression;
 import org.geotools.util.NullProgressListener;
 
 
@@ -177,23 +177,23 @@ public class EqualIntervalFunction extends ClassificationFunction {
     	return -1;
     }
 
-    public Object getValue(Feature feature) {
-        FeatureCollection coll = feature.getParent();
+    public Object evaluate(Feature feature) {
+    	 FeatureCollection coll = feature.getParent();
 
-        if (coll == null) {
-            return null;
-        }
+         if (coll == null) {
+             return null;
+         }
 
-        if (!(coll.equals(fc))) {
-            fc = coll;
-            calculateMinAndMax();
-        }
+         if (!(coll.equals(fc))) {
+             fc = coll;
+             calculateMinAndMax();
+         }
 
-        int slot = calculateSlot(expr.getValue(feature));
+         int slot = calculateSlot(expr.evaluate(feature));
 
-        return new Integer(slot);
+         return new Integer(slot);
     }
-
+    
     public void setExpression(Expression e) {
         super.setExpression(e);
         isValid = false; // the expression has changed, so we set the flag

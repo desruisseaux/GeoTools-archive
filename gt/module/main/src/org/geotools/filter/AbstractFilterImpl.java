@@ -21,6 +21,7 @@
  */
 package org.geotools.filter;
 
+
 /**
  * Abstract filter implementation provides or and and methods for child filters
  * to use.
@@ -31,7 +32,12 @@ package org.geotools.filter;
  */
 public abstract class AbstractFilterImpl
     extends org.geotools.filter.AbstractFilter {
-    /**
+   
+	protected AbstractFilterImpl(FilterFactory factory) {
+		super(factory);
+	}
+
+	/**
      * Default implementation for OR - should be sufficient for most filters.
      *
      * @param filter Parent of the filter: must implement GMLHandlerGeometry.
@@ -40,7 +46,7 @@ public abstract class AbstractFilterImpl
      */
     public Filter or(Filter filter) {
         try {
-            return new LogicFilterImpl(this, filter, LOGIC_OR);
+        	return factory.createLogicFilter(this,filter,LOGIC_OR);
         } catch (IllegalFilterException ife) {
             return filter;
         }
@@ -55,7 +61,7 @@ public abstract class AbstractFilterImpl
      */
     public Filter and(Filter filter) {
         try {
-            return new LogicFilterImpl(this, filter, LOGIC_AND);
+            return factory.createLogicFilter(this,filter,LOGIC_AND);
         } catch (IllegalFilterException ife) {
             return filter;
         }
@@ -68,7 +74,7 @@ public abstract class AbstractFilterImpl
      */
     public Filter not() {
         try {
-            return new LogicFilterImpl(this, LOGIC_NOT);
+            return factory.createLogicFilter(this,LOGIC_NOT);
         } catch (IllegalFilterException ife) {
             return this;
         }

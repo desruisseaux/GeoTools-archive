@@ -17,6 +17,10 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.PropertyIsNull;
 
 
 /**
@@ -28,13 +32,14 @@ import org.geotools.feature.Feature;
  */
 public class NullFilterImpl extends AbstractFilterImpl implements NullFilter {
     /** The null check value, which must be an attribute expression. */
-    private Expression nullCheck = null;
+    private org.opengis.filter.expression.Expression nullCheck = null;
 
     /**
      * Constructor which sets the type as null check.
      */
     protected NullFilterImpl() {
-        filterType = NULL;
+    	super(FilterFactoryFinder.createFilterFactory());
+    	filterType = NULL;
     }
 
     /**
@@ -47,26 +52,44 @@ public class NullFilterImpl extends AbstractFilterImpl implements NullFilter {
      *
      * @task REVISIT: change arg to AttributeExpression?
      * @task REVISIT: change name to setNullCheckValue.
+     * 
+     * @deprecated use {@link PropertyIsNull#setExpression(Expression)}
      */
-    public void nullCheckValue(Expression nullCheck)
+    public final void nullCheckValue(Expression nullCheck)
         throws IllegalFilterException {
-        if (nullCheck instanceof AttributeExpression) {
-            this.nullCheck = nullCheck;
-        } else {
-            throw new IllegalFilterException(
-                "Attempted to add non-attribute expression to a null filter.");
-        }
+    	setExpression(nullCheck);
     }
 
     /**
      * Returns the expression being checked for null.
      *
      * @return the Expression to null check.
+     * 
+     * @deprecated use {@link #getExpression()}.
      */
-    public Expression getNullCheckValue() {
-        return nullCheck;
+    public final Expression getNullCheckValue() {
+        return (Expression) getExpression();
     }
 
+    /**
+     * Returns the expression which represents the null check.
+     */
+    public org.opengis.filter.expression.Expression getExpression() {
+    	return nullCheck;
+    }
+   
+    /**
+     * Sets the expression which represents the null check.
+     */
+    public void setExpression(org.opengis.filter.expression.Expression nullCheck) {
+    	if (nullCheck instanceof AttributeExpression) {
+            this.nullCheck = nullCheck;
+        } else {
+            throw new IllegalFilterException(
+                "Attempted to add non-attribute expression to a null filter.");
+        }
+    }
+    
     /**
      * Determines whether or not a given feature is 'inside' this filter.
      *
@@ -75,11 +98,11 @@ public class NullFilterImpl extends AbstractFilterImpl implements NullFilter {
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
      */
-    public boolean contains(Feature feature) {
-        if (nullCheck == null) {
+    public boolean evaluate(Feature feature) {
+    	if (nullCheck == null) {
             return false;
         } else {
-            return (nullCheck.getValue(feature) == null);
+            return (nullCheck.evaluate(feature) == null);
         }
     }
 
@@ -136,7 +159,7 @@ public class NullFilterImpl extends AbstractFilterImpl implements NullFilter {
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
+    public Object accept(FilterVisitor visitor, Object extraData) {
+    	return visitor.visit(this,extraData);
     }
 }

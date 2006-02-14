@@ -27,6 +27,10 @@ import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.expression.MathExpression;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

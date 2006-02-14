@@ -13,9 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter;
+package org.geotools.filter.expression;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.expression.BinaryExpression;
 
 
 /**
@@ -33,13 +35,16 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public interface MathExpression extends Expression {
+public interface MathExpression extends Expression, BinaryExpression {
     /**
      * Returns the value for this expression.
      *
      * @param feature Feature to use when return sub expression values.
      *
      * @return Value of this expression.
+     * 
+     * @deprecated use {@link Expression#evaluate(Feature)}.
+     * 
      */
     Object getValue(Feature feature);
 
@@ -49,6 +54,8 @@ public interface MathExpression extends Expression {
      * @param rightValue Expression to add to this expression.
      *
      * @throws IllegalFilterException Attempting to add non-math expression.
+     *
+     * @deprecated use {@link BinaryExpression#setExpression2(Expression)}
      */
     void addRightValue(Expression rightValue) throws IllegalFilterException;
 
@@ -56,6 +63,8 @@ public interface MathExpression extends Expression {
      * Gets the type of this expression.
      *
      * @return Expression type.
+     * @deprecated The expression type system has been replaced by an actual 
+     * class type system.
      */
     short getType();
 
@@ -63,6 +72,7 @@ public interface MathExpression extends Expression {
      * Gets the left expression.
      *
      * @return the expression on the left of the comparison.
+     * @deprecated use {@link BinaryExpression#getExpression1()}.
      */
     Expression getLeftValue();
 
@@ -70,6 +80,7 @@ public interface MathExpression extends Expression {
      * Gets the right expression.
      *
      * @return the expression on the right of the comparison.
+     * @deprecated use {@link BinaryExpression#getExpression2()}.
      */
     Expression getRightValue();
 
@@ -79,6 +90,8 @@ public interface MathExpression extends Expression {
      * @param leftValue Expression to add to this expression.
      *
      * @throws IllegalFilterException Attempting to add non-math expression.
+     * 
+     * @deprecated use {@link BinaryExpression#setExpression1(Expression)}
      */
     void addLeftValue(Expression leftValue) throws IllegalFilterException;
 }

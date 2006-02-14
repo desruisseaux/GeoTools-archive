@@ -45,6 +45,8 @@ import java.util.Arrays;
  * @source $URL$
  */
 class ALLQuery implements Query {
+	
+	
     public final String[] getPropertyNames() {
         return null;
     }
@@ -165,6 +167,6 @@ class ALLQuery implements Query {
     }
 
     public SortBy[] getSortBy() {
-        return SortBy.UNSORTED;
+    	return SortBy.UNSORTED;
     }
 }

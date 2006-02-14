@@ -43,21 +43,34 @@
       <artifactId>api</artifactId>
       <groupId>gt2</groupId>
       <version>2.3.x</version>
+			<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency> 
   <dependency>
    <artifactId>main</artifactId>
    <groupId>gt2</groupId>
    <version>2.3.x</version>
+		<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
   </dependency>
   <dependency>
     <artifactId>referencing</artifactId>
     <groupId>gt2</groupId>
     <version>2.3.x</version>
+		<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
   </dependency>
   <dependency>
     <artifactId>coverage</artifactId>
     <groupId>gt2</groupId>
     <version>2.3.x</version>
+		<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
+>>>>>>> .merge-right.r18003
   </dependency>
   <dependency>
    <groupId>JTS</groupId>
@@ -88,6 +101,9 @@
    <artifactId>image</artifactId>
    <version>2.3.x</version>
    <type>jar</type>
+	<properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
   </dependency>
  </dependencies>
  <build>

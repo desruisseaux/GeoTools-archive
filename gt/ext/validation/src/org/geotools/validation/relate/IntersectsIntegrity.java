@@ -129,7 +129,8 @@ public class IntersectsIntegrity extends RelationIntegrity {
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		Filter filter = null;
 
-		filter = (Filter) ff.createBBoxExpression(bBox);
+		//JD: fix this!!
+		//filter = (Filter) ff.createBBoxExpression(bBox);
 
 		FeatureResults featureResultsA = featureSourceA.getFeatures(filter);
 		FeatureResults featureResultsB = featureSourceB.getFeatures(filter);
@@ -214,7 +215,8 @@ public class IntersectsIntegrity extends RelationIntegrity {
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		Filter filter = null;
 
-		filter = (Filter) ff.createBBoxExpression(bBox);
+		//JD: fix this!!
+		//filter = (Filter) ff.createBBoxExpression(bBox);
 
 		FeatureResults featureResults = featureSourceA.getFeatures(filter);
 		

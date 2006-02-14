@@ -21,6 +21,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.expression.MathExpression;
+
 
 /**
  * A simple visitor that extracts every attribute used by a filter or an expression
@@ -157,14 +163,14 @@ public class FilterAttributeExtractor implements FilterVisitor {
     }
 
     /**
-     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.AttributeExpression)
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.expression.AttributeExpression)
      */
     public void visit(AttributeExpression expression) {
         attributeNames.add(expression.getAttributePath());
     }
 
     /**
-     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.expression.Expression)
      */
     public void visit(Expression expression) {
         if (expression instanceof AttributeExpression) {
@@ -179,14 +185,14 @@ public class FilterAttributeExtractor implements FilterVisitor {
     }
 
     /**
-     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LiteralExpression)
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.expression.LiteralExpression)
      */
     public void visit(LiteralExpression expression) {
         // nothing to do
     }
 
     /**
-     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.MathExpression)
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.expression.MathExpression)
      */
     public void visit(MathExpression expression) {
         if (expression.getLeftValue() != null) {
@@ -199,7 +205,7 @@ public class FilterAttributeExtractor implements FilterVisitor {
     }
 
     /**
-     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FunctionExpression)
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.expression.FunctionExpression)
      */
     public void visit(FunctionExpression expression) {
         Expression[] args = expression.getArgs();

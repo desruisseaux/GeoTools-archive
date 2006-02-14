@@ -17,6 +17,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.opengis.filter.PropertyIsBetween;
 
 /**
  * Defines a 'between' filter (which is a specialized compare filter). A
@@ -33,7 +35,7 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public interface BetweenFilter extends CompareFilter {
+public interface BetweenFilter extends CompareFilter, PropertyIsBetween {
 
      /**
      * Determines whether or not a given feature is 'inside' this filter.
@@ -41,23 +43,50 @@ public interface BetweenFilter extends CompareFilter {
      * @param feature Specified feature to examine.
      *
      * @return Whether or not this feature is inside the filter.
+     * 
+     * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
     boolean contains(Feature feature);
+    
+    /**
+     * @deprecated use {@link PropertyIsBetween#getLowerBoundary()}
+     */
+    org.opengis.filter.expression.Expression getExpression1();
 
+    /**
+     * @deprecated use {@link PropertyIsBetween#getUpperBoundary()()}
+     */
+    org.opengis.filter.expression.Expression getExpression2();
+
+    /**
+     * @deprecated use {@link PropertyIsBetween#setLowerBoundary(Expression)()}
+     */
+    void setExpression1(org.opengis.filter.expression.Expression expression);
+    
+    /**
+     * @deprecated use {@link PropertyIsBetween#setUpperBoundary(Expression)()}
+     */
+    void setExpression2(org.opengis.filter.expression.Expression expression);
+    
     /**
      * Gets the middle value of the between.  Should generally be an 
      * AttributeExpression: 1 <= area <= 200 makes sense,
      * 1 <= 200 <= area should just use a less-than-or-equal filter.
      *
      * @return the expression in the middle.
+     * 
+     * @deprecated use {@link PropertyIsBetween#getExpression()}
      */
     Expression getMiddleValue();
-
-     /**
+    
+    /**
      * Sets the values to be compared as between the left and right values.
      *
      * @param middleValue The expression to be compared.
      * @task REVISIT: rename to setMiddleValue?  You can't have more than 1.
+     * 
+     * @deprecated use {@link PropertyIsBetween#setExpression(Expression)}
      */
     void addMiddleValue(Expression middleValue);
+    
 }

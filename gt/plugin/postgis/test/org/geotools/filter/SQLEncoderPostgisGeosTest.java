@@ -165,7 +165,8 @@ public static Test suite() {
 }
 
 public void test1() throws Exception {
-    GeometryFilterImpl gf = new GeometryFilterImpl(AbstractFilter.GEOMETRY_BBOX);
+	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+    GeometryFilter gf = factory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
     LiteralExpressionImpl right = new BBoxExpressionImpl(new Envelope(0,
                 300, 0, 300));
     gf.addRightGeometry(right);
@@ -178,14 +179,15 @@ public void test1() throws Exception {
     encoder.setLooseBbox(true);
     encoder.setSRID(2356);
 
-    String out = encoder.encode((AbstractFilterImpl) gf);
+    String out = encoder.encode((AbstractFilter) gf);
     LOGGER.fine("Resulting SQL filter is \n" + out);
     assertEquals("WHERE \"testGeometry\" && GeometryFromText('POLYGON"
         + " ((0 0, 0 300, 300 300, 300 0, 0 0))'" + ", 2356)", out);
 }
 
 public void test2() throws Exception {
-    GeometryFilterImpl gf = new GeometryFilterImpl(AbstractFilter.GEOMETRY_BBOX);
+	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+    GeometryFilter gf = factory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
     LiteralExpressionImpl left = new BBoxExpressionImpl(new Envelope(10,
                 300, 10, 300));
     gf.addLeftGeometry(left);
@@ -193,7 +195,7 @@ public void test2() throws Exception {
     SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos(2346);
     encoder.setDefaultGeometry("testGeometry");
 
-    String out = encoder.encode((AbstractFilterImpl) gf);
+    String out = encoder.encode((AbstractFilter) gf);
     LOGGER.fine("Resulting SQL filter is \n" + out);
     assertEquals(out,
         "WHERE GeometryFromText('POLYGON ((10 10, 10 300, 300 300, 300 10, 10 10))', 2346) && \"testGeometry\" AND intersects(GeometryFromText('POLYGON ((10 10, 10 300, 300 300, 300 10, 10 10))', 2346), \"testGeometry\")");
@@ -222,15 +224,15 @@ public void test3() throws Exception {
             new Double(5)));
 
     SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos(2346);
-    String out = encoder.encode((AbstractFilterImpl) compFilter);
+    String out = encoder.encode((AbstractFilter) compFilter);
     LOGGER.fine("Resulting SQL filter is \n" + out);
     assertEquals(out, "WHERE \"testInteger\" = 5.0");
 }
 
 //DJB: to test disjoint's behavior
-public void test4() throws Exception
-{
-    GeometryFilterImpl gf = new GeometryFilterImpl(AbstractFilter.GEOMETRY_DISJOINT);
+public void test4() throws Exception{
+	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+    GeometryFilter gf = factory.createGeometryFilter(AbstractFilter.GEOMETRY_DISJOINT);
     LiteralExpressionImpl left = new BBoxExpressionImpl(new Envelope(10,
                 300, 10, 300));
     gf.addLeftGeometry(left);
@@ -238,7 +240,7 @@ public void test4() throws Exception
     SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos(2346);
     encoder.setDefaultGeometry("testGeometry");
 
-    String out = encoder.encode((AbstractFilterImpl) gf);
+    String out = encoder.encode((AbstractFilter) gf);
     
     LOGGER.fine("Resulting SQL filter is \n" + out);
     assertEquals(out,
@@ -246,7 +248,8 @@ public void test4() throws Exception
 }
 
 public void testException() throws Exception {
-    GeometryFilterImpl gf = new GeometryFilterImpl(AbstractFilter.GEOMETRY_BEYOND);
+	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+    GeometryFilter gf = factory.createGeometryFilter(AbstractFilter.GEOMETRY_BEYOND);
     LiteralExpressionImpl right = new BBoxExpressionImpl(new Envelope(10,
                 10, 300, 300));
     gf.addRightGeometry(right);
@@ -257,7 +260,7 @@ public void testException() throws Exception {
 
     try {
         SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos(2346);
-        String out = encoder.encode((AbstractFilterImpl) gf);
+        String out = encoder.encode((AbstractFilter) gf);
         LOGGER.fine("out is " + out);
     } catch (SQLEncoderException e) {
         LOGGER.fine(e.getMessage());

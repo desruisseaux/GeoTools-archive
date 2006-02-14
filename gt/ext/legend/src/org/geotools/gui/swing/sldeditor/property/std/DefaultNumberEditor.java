@@ -28,9 +28,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.geotools.filter.Expression;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
 import org.geotools.gui.swing.sldeditor.util.FormUtils;
 
@@ -171,7 +171,7 @@ public class DefaultNumberEditor extends ExpressionEditor {
     }
 
     /**
-     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#canEdit(org.geotools.filter.Expression)
+     * @see org.geotools.gui.swing.sldeditor.property.ExpressionEditor#canEdit(org.geotools.filter.expression.Expression)
      */
     public boolean canEdit(Expression expression) {
         if(expression instanceof LiteralExpression) {

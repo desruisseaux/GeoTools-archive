@@ -20,15 +20,15 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.CompareFilter;
-import org.geotools.filter.ExpressionType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LogicFilter;
-import org.geotools.filter.MathExpression;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.ExpressionType;
+import org.geotools.filter.expression.MathExpression;
 
 import java.awt.Color;
 import java.util.HashSet;

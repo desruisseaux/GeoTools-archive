@@ -17,6 +17,14 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.ExpressionAbstract;
+import org.geotools.filter.expression.FilterVisitorExpressionWrapper;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Divide;
+import org.opengis.filter.expression.ExpressionVisitor;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.Subtract;
 
 
 /**
@@ -26,9 +34,9 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public abstract class DefaultExpression implements Expression {
+public abstract class DefaultExpression extends ExpressionAbstract implements Expression {
     
-    /** Defines the type of this expression. */
+  	/** Defines the type of this expression. */
     protected short expressionType;
 
     /** Defines the type of this expression. */
@@ -44,6 +52,15 @@ public abstract class DefaultExpression implements Expression {
     }
 
     /**
+     * This method calls {@link #evaluate(Feature)}.
+     * 
+     * @deprecated use {@link #evaluate(Feature)}.
+     */
+    public final Object getValue(Feature feature) {
+        return evaluate(feature);
+    }
+    
+    /**
      * Returns a value for this expression.  If the expression is an attribute
      * expression then the attribute of the feature should be returned.  If a
      * literal then the feature is ignored, the literal is returned as it has
@@ -55,10 +72,33 @@ public abstract class DefaultExpression implements Expression {
      *
      * @task REVISIT: make abstract?
      */
-    public Object getValue(Feature feature) {
-        return new Object();
+    public Object evaluate(Feature feature) {
+    	return new Object();
     }
-
+    
+    /**
+     * 
+     * This method checks if the object is an instance of {@link Feature} and 
+     * if so, calls through to {@link #evaluate(Feature)}. This is done 
+     * to maintain backwards compatability with previous version of Expression api 
+     * which depended on Feature. If the object is not an instance of feature 
+     * the super implementation is called.
+     */
+    public Object evaluate(Object object) {
+    	if (object instanceof Feature) {
+    		return evaluate((Feature)object);
+    	}
+    	return new Object();
+    }
+    
+    /**
+     * 
+     * @deprecated use {@link org.opengis.filter.expression.Expression#accept(ExpressionVisitor, Object)}
+     */
+    public final void accept(FilterVisitor visitor) {
+    	accept(new FilterVisitorExpressionWrapper(visitor),null);
+    }
+    
     /* ***********************************************************************
      * Following static methods check for certain aggregate types, based on
      * (above) declared types.  Note that these aggregate types do not
@@ -87,6 +127,7 @@ public abstract class DefaultExpression implements Expression {
      * @param expressionType Type of expression for check.
      *
      * @return Whether or not this is a math expression type.
+     * @deprecated use {@link #is
      */
     protected static boolean isMathExpression(short expressionType) {
         return ((expressionType == MATH_ADD)
@@ -94,6 +135,20 @@ public abstract class DefaultExpression implements Expression {
         || (expressionType == MATH_MULTIPLY) || (expressionType == MATH_DIVIDE));
     }
 
+    /**
+     * Checks to see if this expression is a math expresson based on its type.
+     * 
+     * @param expression expression to check.
+     *
+     * @return Whether or not this is a math expression.
+     */
+    protected static boolean isMathExpression(org.opengis.filter.expression.Expression expression) {
+    	return expression instanceof Add || 
+    		expression instanceof Subtract || 
+    		expression instanceof Multiply || 
+    		expression instanceof Divide;
+    }
+    
     /**
      * Checks to see if passed type is geometry.
      *
@@ -119,7 +174,7 @@ public abstract class DefaultExpression implements Expression {
         return ((expressionType == ATTRIBUTE_GEOMETRY)
         || (expressionType == LITERAL_GEOMETRY));
     }
-
+    
     /**
      * Checks to see if passed type is geometry.
      *

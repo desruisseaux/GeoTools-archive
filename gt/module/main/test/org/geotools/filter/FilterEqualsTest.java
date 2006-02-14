@@ -33,6 +33,9 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.expression.AddImpl;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.SubtractImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -237,10 +240,10 @@ public class FilterEqualsTest extends TestCase {
 	    MathExpressionImpl testMath2;
 	    testExp1 = new LiteralExpressionImpl(new Double(5));
 	    testExp2 = new LiteralExpressionImpl(new Double(5));
-	    testMath1 = new MathExpressionImpl(DefaultExpression.MATH_ADD);
+	    testMath1 = new AddImpl(null,null);
 	    testMath1.addLeftValue(testExp1);
 	    testMath1.addRightValue(testExp2);
-	    testMath2 =  new MathExpressionImpl(DefaultExpression.MATH_ADD);
+	    testMath2 =  new AddImpl(null,null);
 	    testMath2.addLeftValue(testExp2);
 	    testMath2.addRightValue(testExp1);
 	    assertTrue(testMath1.equals(testMath2));
@@ -250,7 +253,7 @@ public class FilterEqualsTest extends TestCase {
 	    assertTrue(!testMath1.equals(testMath2));
 	    testMath1.addLeftValue(testExp4);
 	    assertTrue(testMath1.equals(testMath2));
-	    testMath1 = new MathExpressionImpl(DefaultExpression.MATH_SUBTRACT);
+	    testMath1 = new SubtractImpl(null,null);
 	    testMath1.addLeftValue(testExp4);
 	    testMath1.addLeftValue(testExp2);
 	    assertTrue(!testMath1.equals(testMath2));
@@ -287,8 +290,9 @@ public class FilterEqualsTest extends TestCase {
 
     public void testCompareFilter()
 	throws IllegalFilterException {
-	CompareFilterImpl cFilter1 = new CompareFilterImpl(AbstractFilter.COMPARE_EQUALS);
-	CompareFilterImpl cFilter2 = new CompareFilterImpl(AbstractFilter.COMPARE_EQUALS);
+    	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+	CompareFilter cFilter1 = factory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+	CompareFilter cFilter2 = factory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
 	testExp1 = new LiteralExpressionImpl(new Integer(45));
 	testExp2 = new LiteralExpressionImpl(new Integer(45));
 	testExp3 = new AttributeExpressionImpl(testSchema, "testInteger");
@@ -324,7 +328,8 @@ public class FilterEqualsTest extends TestCase {
 	bFilter1.addRightValue(testLit1);
 	bFilter2.addRightValue(testLit2);
 	assertTrue(bFilter2.equals(bFilter1));
-	tFilter1 = new CompareFilterImpl(AbstractFilter.COMPARE_EQUALS);
+	tFilter1 = FilterFactoryFinder.createFilterFactory()
+		.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
 	assertTrue(!bFilter2.equals(tFilter1));
 	bFilter2.addRightValue(new LiteralExpressionImpl(new Integer(65)));
 	assertTrue(!bFilter2.equals(bFilter1));
@@ -355,8 +360,9 @@ public class FilterEqualsTest extends TestCase {
 
     public void testLogicFilter()
 	throws IllegalFilterException{
-	CompareFilterImpl cFilter1 = new CompareFilterImpl(AbstractFilter.COMPARE_EQUALS);
-	CompareFilterImpl cFilter2 = new CompareFilterImpl(AbstractFilter.COMPARE_EQUALS);
+    FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+	CompareFilter cFilter1 = factory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+	CompareFilter cFilter2 = factory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
 	testExp1 = new LiteralExpressionImpl(new Integer(45));
 	testExp2 = new LiteralExpressionImpl(new Integer(45));
 	testExp3 = new AttributeExpressionImpl(testSchema, "testInteger");
@@ -365,18 +371,19 @@ public class FilterEqualsTest extends TestCase {
 	cFilter2.addLeftValue(testExp2);
 	cFilter1.addRightValue(testExp2);
 	cFilter2.addRightValue(testExp4);
-	LogicFilterImpl logFilter1 = new LogicFilterImpl(cFilter1, cFilter2, AbstractFilter.LOGIC_AND);
-	LogicFilterImpl logFilter2 = new LogicFilterImpl(cFilter1, cFilter2, AbstractFilter.LOGIC_AND);
+	
+	LogicFilter logFilter1 = factory.createLogicFilter(cFilter1,cFilter2,AbstractFilter.LOGIC_AND);
+	LogicFilter logFilter2 = factory.createLogicFilter(cFilter1,cFilter2,AbstractFilter.LOGIC_AND);
 	assertTrue(logFilter1.equals(logFilter2));
 	
-	logFilter1 = new LogicFilterImpl(cFilter2, AbstractFilter.LOGIC_NOT);
+	logFilter1 = factory.createLogicFilter(cFilter2, AbstractFilter.LOGIC_NOT);
 	assertTrue(!logFilter1.equals(logFilter2));
 	cFilter1.addRightValue(testExp3);
-	logFilter2 = new LogicFilterImpl(cFilter1, AbstractFilter.LOGIC_NOT);
+	logFilter2 = factory.createLogicFilter(cFilter1, AbstractFilter.LOGIC_NOT);
 	assertTrue(logFilter1.equals(logFilter2));
         assertTrue(!logFilter1.equals(new BetweenFilterImpl()));
-	Filter logFilter3 = new LogicFilterImpl(logFilter1, logFilter2, AbstractFilter.LOGIC_OR);
-	Filter logFilter4 = new LogicFilterImpl(logFilter1, logFilter2, AbstractFilter.LOGIC_OR);
+	Filter logFilter3 = factory.createLogicFilter(logFilter1, logFilter2, AbstractFilter.LOGIC_OR);
+	Filter logFilter4 = factory.createLogicFilter(logFilter1, logFilter2, AbstractFilter.LOGIC_OR);
 	assertTrue(logFilter3.equals(logFilter4));
 
 	//Questionable behavior.  Is this what we want?
@@ -411,8 +418,9 @@ public class FilterEqualsTest extends TestCase {
 
      public void testGeometryFilter()
 	throws IllegalFilterException {
-	GeometryFilterImpl geomFilter1 = new GeometryFilterImpl(AbstractFilter.GEOMETRY_DISJOINT);
-	GeometryFilterImpl geomFilter2 = new GeometryFilterImpl(AbstractFilter.GEOMETRY_DISJOINT);
+    	 FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+	GeometryFilter geomFilter1 = factory.createGeometryFilter(AbstractFilter.GEOMETRY_DISJOINT);
+	GeometryFilter geomFilter2 = factory.createGeometryFilter(AbstractFilter.GEOMETRY_DISJOINT);
 	testExp1 = new LiteralExpressionImpl(new Integer(45));
 	testExp2 = new LiteralExpressionImpl(new Integer(45));
 	testExp3 = new AttributeExpressionImpl(testSchema, "testGeometry");

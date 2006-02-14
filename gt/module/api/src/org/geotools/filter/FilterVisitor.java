@@ -15,6 +15,12 @@
  */
 package org.geotools.filter;
 
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.expression.MathExpression;
+
 /**
  * An interface for classes that want to perform operations on a Filter
  * hiarachy. It forms part of a GoF Visitor Patern implementation. A call to

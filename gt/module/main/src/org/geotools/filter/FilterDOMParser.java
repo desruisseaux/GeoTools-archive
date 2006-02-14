@@ -23,6 +23,7 @@ package org.geotools.filter;
 
 import java.util.logging.Logger;
 
+import org.geotools.filter.expression.Expression;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -313,7 +314,8 @@ public final class FilterDOMParser {
                 } else if (type == AbstractFilter.NULL) {
                     return parseNullFilter(child);
                 } else {
-                    filter = new CompareFilterImpl(type);
+                	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+                    filter = factory.createCompareFilter(type);
                 }
 
                 // find and parse left and right values

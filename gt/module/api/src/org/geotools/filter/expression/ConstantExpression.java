@@ -1,10 +1,20 @@
-package org.geotools.filter;
+package org.geotools.filter.expression;
 
 import java.awt.Color;
 import java.math.BigDecimal;
 import java.util.Date;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Divide;
+import org.opengis.filter.expression.ExpressionVisitor;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.expression.Subtract;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -29,7 +39,8 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
 	public static final ConstantExpression UNNAMED = constant( "" );
 	
 	final short type;
-	final Object value;
+	Object value;
+	
 	private ConstantExpression( Object value ){
 		this( type( value ), value );
 	}
@@ -37,32 +48,85 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
 		this.type = type;
 		this.value = value;
 	}
-	public void setLiteral(Object literal) throws IllegalFilterException {
+	/**
+	 * @deprecated use {@link #setValue(Object)}
+	 */
+	public final void setLiteral(Object literal) throws IllegalFilterException {
 		throw new UnsupportedOperationException("Default value is immutable");
 	}
-	public Object getValue(Feature feature) {
+	/**
+	 * @deprecated use {@link #evaluate(Feature)}
+	 */
+	public final Object getValue(Feature feature) {
+		return evaluate(feature);
+	}
+	public Object evaluate(Feature feature) {
+		return getValue();
+	}
+	public Object evaluate(Object object) {
+		return getValue();
+	}
+	public Object getValue() {
 		return value;
+	}
+	public void setValue(Object constant) {
+		throw new UnsupportedOperationException("Default value is immutable");
 	}
 	public short getType() {
-		return LITERAL_INTEGER;
+		return type;
 	}
-	public Object getLiteral() {
-		return value;
+	/**
+	 * @deprecated use {@link #getValue()}
+	 */
+	public final Object getLiteral() {
+		return getValue();
 	}
-	public void accept(FilterVisitor visitor) {
-		visitor.visit( this );				
+	/**
+	 * @deprecated use {@link #accept(ExpressionVisitor, Object)}.
+	 */
+	public void accept(final FilterVisitor visitor) {
+		accept(
+			new ExpressionVisitor() {
+	
+				public Object visit(Add expression, Object extraData) {
+					return null;
+				}
+				public Object visit(Divide expression, Object extraData) {
+					return null;
+				}
+				public Object visit(Function expression, Object extraData) {
+					return null;
+				}
+				public Object visit(Literal expression, Object extraData) {
+					visitor.visit(ConstantExpression.this);
+					return null;
+				}
+				public Object visit(Multiply expression, Object extraData) {
+					return null;
+				}
+				public Object visit(PropertyName expression, Object extraData) {
+					return null;
+				}
+				public Object visit(Subtract expression, Object extraData) {
+					return null;
+				}
+			}, null
+		);
 	}	
+	public Object accept(ExpressionVisitor visitor, Object extraData) {
+		return visitor.visit(this,extraData);
+	}
 	protected Object clone() throws CloneNotSupportedException {
-		return this; // we are immutable!
+		return new ConstantExpression(value);
 	}
 	public boolean equals(Object obj) {
 		if(!(obj instanceof LiteralExpression)) return false;		
 		LiteralExpression other = (LiteralExpression) obj;
-		Object otherLiteral = other.getLiteral();
+		Object otherLiteral = other.getValue();
 		if( value == null ) return otherLiteral == null;
 		
 		if( value.getClass().isAssignableFrom( otherLiteral.getClass() ) ){
-			return value.equals( other.getLiteral() );	
+			return value.equals( other.getValue() );	
 		}
 		if( value instanceof Number ){
 			if( otherLiteral instanceof Number ){

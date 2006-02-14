@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
 import org.geotools.filter.Filters;
+import org.geotools.filter.expression.Expression;
 
 
 /**

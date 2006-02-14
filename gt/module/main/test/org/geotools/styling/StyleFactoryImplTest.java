@@ -20,9 +20,10 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.geotools.feature.Feature;
-import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.expression.Expression;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 

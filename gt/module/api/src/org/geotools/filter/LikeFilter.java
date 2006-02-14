@@ -16,6 +16,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.opengis.filter.PropertyIsLike;
 
 
 /**
@@ -25,7 +27,7 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  */
-public interface LikeFilter extends Filter {
+public interface LikeFilter extends Filter, PropertyIsLike {
     /**
      * Sets the match pattern for this FilterLike.
      *
@@ -36,6 +38,12 @@ public interface LikeFilter extends Filter {
      * @param wildcardSingle The string that represents a single character (1)
      *        wildcard.
      * @param escape The string that represents an escape character.
+     * 
+     * @deprecated use one of 
+     * 	{@link PropertyIsLike#setExpression(Expression)}
+     * 	{@link PropertyIsLike#setWildCard(String)
+     * 	{@link PropertyIsLike#setSingleChar(String)}
+     * 	{@link PropertyIsLike#setEscape(String)}
      */
     void setPattern(String pattern, String wildcardMulti,
         String wildcardSingle, String escape);
@@ -44,6 +52,8 @@ public interface LikeFilter extends Filter {
      * Getter for property wildcardMulti.
      *
      * @return Value of property wildcardMulti.
+     * 
+     * @deprecated use {@link PropertyIsLike#getWildCard()}
      */
     String getWildcardMulti();
 
@@ -51,6 +61,8 @@ public interface LikeFilter extends Filter {
      * Accessor for property escape.
      *
      * @return Value of property escape.
+     * 
+     * @deprecated use {@link PropertyIsLike#getEscape()}
      */
     String getEscape();
 
@@ -64,6 +76,13 @@ public interface LikeFilter extends Filter {
      * @param wildcardSingle the string that represents a single character (1)
      *        wildcard.
      * @param escape The string that represents an escape character.
+     * 
+     * @deprecated use one of 
+     * 	{@link PropertyIsLike#setExpression(Expression)}
+     * 	{@link PropertyIsLike#setWildCard(String)
+     * 	{@link PropertyIsLike#setSingleChar(String)}
+     * 	{@link PropertyIsLike#setEscape(String)}
+     * 
      */
     void setPattern(Expression p, String wildcardMulti, String wildcardSingle,
         String escape);
@@ -72,6 +91,8 @@ public interface LikeFilter extends Filter {
      * Accessor method to retrieve the pattern.
      *
      * @return the pattern being matched.
+     * 
+     * @deprecated use {@link PropertyIsLike#getLiteral()}
      */
     String getPattern();
 
@@ -82,6 +103,7 @@ public interface LikeFilter extends Filter {
      *
      * @throws IllegalFilterException Filter is illegal, adding something other
      *         than a string attribute.
+     * @deprecated use {@link PropertyIsLike#setExpression(Expression)}
      */
     void setValue(Expression attribute) throws IllegalFilterException;
 
@@ -89,6 +111,8 @@ public interface LikeFilter extends Filter {
      * Gets the Value (left hand side) of this filter.
      *
      * @return The expression that is the value of the filter.
+     * 
+     * @deprecated use {@link PropertyIsLike#getExpression()}
      */
     Expression getValue();
 
@@ -96,6 +120,8 @@ public interface LikeFilter extends Filter {
      * Accessor for property wildcardSingle.
      *
      * @return Value of property wildcardSingle.
+     * 
+     * @deprecated use {@link PropertyIsLike#getSingleChar()()}
      */
     String getWildcardSingle();
 
@@ -108,6 +134,7 @@ public interface LikeFilter extends Filter {
      *         filter.
      *
      * @task REVISIT: could the pattern be null such that a null = null?
+     * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
     boolean contains(Feature feature);
 }

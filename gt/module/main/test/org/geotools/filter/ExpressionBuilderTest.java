@@ -7,6 +7,7 @@
 
 package org.geotools.filter;
 
+import org.geotools.filter.expression.Expression;
 import org.geotools.filter.parser.ParseException;
 
 /**

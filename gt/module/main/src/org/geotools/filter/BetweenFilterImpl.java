@@ -17,6 +17,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Expression;
+import org.opengis.filter.FilterVisitor;
 
 
 /**
@@ -40,8 +42,13 @@ import org.geotools.feature.Feature;
 public class BetweenFilterImpl extends CompareFilterImpl
     implements BetweenFilter {
     /** The 'middle' value, which must be an attribute expression. */
-    protected Expression middleValue = null;
+    protected org.opengis.filter.expression.Expression middleValue = null;
 
+    protected BetweenFilterImpl(FilterFactory factory) {
+    	super(factory,null,null);
+    	this.filterType = BETWEEN;
+    }
+    
     /**
      * Constructor which flags the operator as between.
      *
@@ -55,9 +62,30 @@ public class BetweenFilterImpl extends CompareFilterImpl
      * Sets the values to be compared as between the left and right values.
      *
      * @param middleValue The expression to be compared.
+     * 
+     * @deprecated use {@link #setExpression(org.opengis.filter.expression.Expression)}
      */
-    public void addMiddleValue(Expression middleValue) {
-        this.middleValue = middleValue;
+    public final void addMiddleValue(Expression middleValue) {
+        setExpression(middleValue);
+    }
+    
+    /**
+     * Sets the expression or middle value.
+     */
+    public void setExpression(org.opengis.filter.expression.Expression expression) {
+    	this.middleValue = expression;
+    	
+    }
+
+    /**
+     * Gets the middle value of the between.
+     *
+     * @return The expression in the middle.
+     * 
+     * @deprecated use {@link #getExpression()}
+     */
+    public final Expression getMiddleValue() {
+        return (Expression) getExpression();
     }
 
     /**
@@ -65,10 +93,38 @@ public class BetweenFilterImpl extends CompareFilterImpl
      *
      * @return The expression in the middle.
      */
-    public Expression getMiddleValue() {
-        return middleValue;
+    public org.opengis.filter.expression.Expression getExpression() {
+    	return middleValue;
     }
-
+    
+    /**
+     * Returns the left,lower, or first expression.
+     */
+    public org.opengis.filter.expression.Expression getLowerBoundary() {
+    	return getExpression1();
+    }
+    
+    /**
+     * Sets the left,lower, or first expression.
+     */
+    public void setLowerBoundary(org.opengis.filter.expression.Expression lowerBounds) {
+    	setExpression1(lowerBounds);
+    }
+    
+    /**
+     * Returns the right,upper, or second expression.
+     */
+    public org.opengis.filter.expression.Expression getUpperBoundary() {
+    	return getExpression2();
+    }
+    
+    /**
+     * Sets the right,upper, or second expression.
+     */
+    public void setUpperBoundary(org.opengis.filter.expression.Expression upperBounds) {
+    	setExpression2(upperBounds);
+    }
+    
     /**
      * Determines whether or not a given feature is 'inside' this filter.
      *
@@ -77,7 +133,7 @@ public class BetweenFilterImpl extends CompareFilterImpl
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
      */
-    public boolean contains(Feature feature) {
+    public boolean evaluate(Feature feature) {
         if (middleValue == null) {
             return false;
         } else {
@@ -93,9 +149,10 @@ public class BetweenFilterImpl extends CompareFilterImpl
 		
 		return (left <= mid) && (right >= mid);
 	    */
-	    Object leftObj = leftValue.getValue(feature);
-	    Object rightObj = rightValue.getValue(feature);
-	    Object middleObj = middleValue.getValue(feature);
+	    Object leftObj = expression1.evaluate(feature);
+	    Object rightObj = expression2.evaluate(feature);
+	    Object middleObj = middleValue.evaluate(feature);
+	    
 	    if (leftObj instanceof Number &&
 		middleObj instanceof Number &&
 		rightObj instanceof Number) {
@@ -133,8 +190,8 @@ public class BetweenFilterImpl extends CompareFilterImpl
      * @return String representation of the between filter.
      */
     public String toString() {
-        return "[ " + leftValue.toString() + " < " + middleValue.toString()
-        + " < " + rightValue.toString() + " ]";
+        return "[ " + expression1.toString() + " < " + middleValue.toString()
+        + " < " + expression2.toString() + " ]";
     }
 
     /**
@@ -151,9 +208,9 @@ public class BetweenFilterImpl extends CompareFilterImpl
             BetweenFilterImpl bFilter = (BetweenFilterImpl) oFilter;
 
             return ((bFilter.getFilterType() == this.filterType)
-            && bFilter.getLeftValue().equals(this.leftValue)
+            && bFilter.getLeftValue().equals(this.expression1)
             && bFilter.getMiddleValue().equals(this.middleValue)
-            && bFilter.getRightValue().equals(this.rightValue));
+            && bFilter.getRightValue().equals(this.expression2));
         } else {
             return false;
         }
@@ -168,11 +225,11 @@ public class BetweenFilterImpl extends CompareFilterImpl
         int result = 17;
 
         result = (37 * result)
-            + ((leftValue == null) ? 0 : leftValue.hashCode());
+            + ((expression1 == null) ? 0 : expression1.hashCode());
         result = (37 * result)
             + ((middleValue == null) ? 0 : middleValue.hashCode());
         result = (37 * result)
-            + ((rightValue == null) ? 0 : rightValue.hashCode());
+            + ((expression2 == null) ? 0 : expression2.hashCode());
 
         return result;
     }
@@ -187,7 +244,7 @@ public class BetweenFilterImpl extends CompareFilterImpl
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
+    public Object accept(FilterVisitor visitor, Object extraData) {
+    	return visitor.visit(this,extraData);
     }
 }

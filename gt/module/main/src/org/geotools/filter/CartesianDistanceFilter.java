@@ -17,6 +17,8 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -51,11 +53,21 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @task REVISIT: add units for distance.
  */
-public class CartesianDistanceFilter extends GeometryFilterImpl
+public abstract class CartesianDistanceFilter extends GeometryFilterImpl
     implements GeometryDistanceFilter {
     /** The distance value */
     private double distance;
-
+    /** the distnace units */
+    private String units;
+    
+    protected CartesianDistanceFilter(FilterFactory factory) {
+    	super(factory);
+    }
+    
+    protected CartesianDistanceFilter(FilterFactory factory, Expression e1,Expression e2) {
+    	super(factory,e1,e2);
+    }
+    
     /**
      * Constructor which flags the operator as between.
      *
@@ -94,6 +106,14 @@ public class CartesianDistanceFilter extends GeometryFilterImpl
     public double getDistance() {
         return distance;
     }
+    
+    public String getDistanceUnits() {
+    	return units;
+    }
+    
+    public void setUnits(String units) {
+		this.units = units;
+	}
 
     /**
      * Determines whether or not a given feature is 'inside' this filter.
@@ -103,42 +123,8 @@ public class CartesianDistanceFilter extends GeometryFilterImpl
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
      */
-    public boolean contains(Feature feature) {
-        Geometry right = null;
-
-        if (rightGeometry != null) {
-            right = (Geometry) rightGeometry.getValue(feature);
-        } else {
-            right = feature.getDefaultGeometry();
-        }
-
-        Geometry left = null;
-
-        if (leftGeometry != null) {
-            Object obj = leftGeometry.getValue(feature);
-
-            //LOGGER.finer("leftGeom = " + o.toString()); 
-            left = (Geometry) obj;
-        } else {
-            left = feature.getDefaultGeometry();
-        }
-
-        // Handles all normal geometry cases
-        if (filterType == GEOMETRY_BEYOND) {
-            return !left.isWithinDistance(right, distance);
-
-            //return left.beyond(right);
-        } else if (filterType == GEOMETRY_DWITHIN) {
-            return left.isWithinDistance(right, distance);
-
-            // Note that this is a pretty permissive logic
-            //  if the type has somehow been mis-set (can't happen externally)
-            //  then true is returned in all cases
-        } else {
-            return true;
-        }
-    }
-
+    public abstract boolean evaluate(Feature feature);
+ 
     /**
      * Returns a string representation of this filter.
      *
@@ -156,6 +142,9 @@ public class CartesianDistanceFilter extends GeometryFilterImpl
 
         String distStr = ", distance: " + distance;
 
+        org.opengis.filter.expression.Expression leftGeometry = getExpression1();
+        org.opengis.filter.expression.Expression rightGeometry = getExpression2();
+        
         if ((leftGeometry == null) && (rightGeometry == null)) {
             return "[ " + "null" + operator + "null" + distStr + " ]";
         } else if (leftGeometry == null) {
@@ -206,7 +195,4 @@ public class CartesianDistanceFilter extends GeometryFilterImpl
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
-    }
 }

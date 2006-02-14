@@ -26,8 +26,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.UniqueVisitor;
-import org.geotools.filter.Expression;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.expression.Expression;
 import org.geotools.util.NullProgressListener;
 
 
@@ -116,7 +116,7 @@ public class UniqueIntervalFunction extends ClassificationFunction {
     	return -1;
     }
 
-    public Object getValue(Feature feature) {
+    public Object evaluate(Feature feature) {
 		FeatureCollection fcNew;
 
 		if (feature instanceof FeatureCollection) {

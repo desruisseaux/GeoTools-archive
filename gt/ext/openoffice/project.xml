@@ -49,6 +49,7 @@
       <version>2.3.x</version>
       <properties>
         <jar.manifest.classpath>true</jar.manifest.classpath>
+				<eclipse.dependency>true</eclipse.dependency>
       </properties>
     </dependency>
     <dependency>
@@ -57,6 +58,7 @@
       <version>2.3.x</version>
       <properties>
         <jar.manifest.classpath>true</jar.manifest.classpath>
+				<eclipse.dependency>true</eclipse.dependency>
       </properties>
     </dependency>
     <dependency>
