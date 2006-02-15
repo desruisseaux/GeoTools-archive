@@ -302,7 +302,7 @@
     </dependency>
     <dependency>
       <id>geoapi</id>
-      <version>02092006</version>
+      <version>02142006</version>
       <url>http://geoapi.sourceforge.net</url>
 	<properties>
 		<eclipse.dependency>true</eclipse.dependency>
