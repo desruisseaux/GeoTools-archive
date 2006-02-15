@@ -49,10 +49,8 @@ public class GeometryExpressionImpl extends DefaultExpression {
      * Gets the value of this attribute from the passed feature.
      *
      * @param feature Feature from which to extract attribute value.
-     *
-     * @return DOCUMENT ME!
      */
-    public Object getValue(Feature feature) {
+    public Object evaluate(Feature feature) {
         return feature.getAttribute(attPath);
     }
 
@@ -74,8 +72,11 @@ public class GeometryExpressionImpl extends DefaultExpression {
      *
      * @param visitor The visitor which requires access to this filter, the
      *        method must call visitor.visit(this);
+     *
+     * @todo This method can't be overriden anymore as of Geotools 2.3. Replaced by
+     * {@link org.opengis.filter.expression.Expression#accept(ExpressionVisitor, Object)}.
      */
-    public void accept(FilterVisitor visitor) {
-        visitor.visit(this);
-    }
+//    public void accept(FilterVisitor visitor) {
+//        visitor.visit(this);
+//    }
 }
