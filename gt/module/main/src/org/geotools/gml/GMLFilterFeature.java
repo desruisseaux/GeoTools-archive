@@ -167,8 +167,7 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
 
         // if it ends with Member we'll assume it's a feature for the time being
         // nasty hack to fix members of multi lines and polygons
-        if (localName.endsWith("Member") && !localName.endsWith("StringMember")
-                && !localName.endsWith("polygonMember")) {
+        if (isFeatureMember(localName)) {
             attributes = new Vector();
             attributeNames = new Vector();
 
@@ -214,6 +213,11 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
         } else {
             parent.startElement(namespaceURI, localName, qName, atts);
         }
+    }
+
+    private boolean isFeatureMember(String localName) {
+      return localName.endsWith("Member") && !localName.endsWith("StringMember")
+              && !localName.endsWith("polygonMember") && !localName.endsWith("pointMember");
     }
 
     /**
@@ -271,8 +275,7 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
      */
     public void endElement(String namespaceURI, String localName, String qName)
         throws SAXException {
-        if (localName.endsWith("Member") && !localName.endsWith("StringMember")
-                && !localName.endsWith("polygonMember")) {
+        if (isFeatureMember(localName)) {
             FeatureTypeFactory factory = FeatureTypeFactory.newInstance(typeName);
 
             //            AttributeType attDef[] = new AttributeTypeDefault[attributes.size()];
