@@ -76,7 +76,7 @@ public class PlateCarree extends EquidistantCylindrical {
      * @author John Grange
      */
     public static class Provider extends AbstractProvider {
-    	/**
+        /**
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
@@ -92,9 +92,9 @@ public class PlateCarree extends EquidistantCylindrical {
         /**
          * Constructs a new provider. 
          */
-		public Provider() {
-			super(PARAMETERS);
-		}
+        public Provider() {
+            super(PARAMETERS);
+        }
 
         /**
          * Returns the operation type for this map projection.
@@ -110,15 +110,15 @@ public class PlateCarree extends EquidistantCylindrical {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-		protected MathTransform createMathTransform(final ParameterValueGroup parameters) 
-				throws ParameterNotFoundException
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters) 
+                throws ParameterNotFoundException
         {
-			if (isSpherical(parameters)) {
-				return new PlateCarree(parameters);
-			} else {
-				throw new UnsupportedOperationException(Errors.format(
-	                    ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
-			}
-		}
+            if (isSpherical(parameters)) {
+                return new PlateCarree(parameters);
+            } else {
+                throw new UnsupportedOperationException(Errors.format(
+                        ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
+            }
+        }
     }
 }

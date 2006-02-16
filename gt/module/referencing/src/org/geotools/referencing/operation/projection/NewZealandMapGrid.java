@@ -67,12 +67,12 @@ public class NewZealandMapGrid extends MapProjection {
     /**
      * For compatibility with different versions during deserialization.
      */
-	private static final long serialVersionUID = 8394817836243729133L;
+    private static final long serialVersionUID = 8394817836243729133L;
 
     /**
      * Coefficients for forward and inverse projection.
      */
-	private static final Complex[] A = {
+    private static final Complex[] A = {
             new Complex(  0.7557853228,  0.0         ),
             new Complex(  0.249204646,   0.003371507 ),
             new Complex( -0.001541739,   0.041058560 ),

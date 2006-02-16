@@ -108,13 +108,13 @@ public class AlbersEqualArea extends MapProjection {
      * Constants used by the spherical and elliptical Albers projection. 
      */
     private final double n, c, rho0;
-    
+
     /**
      * An error condition indicating itteration will not converge for the 
      * inverse ellipse. See Snyder (14-20)
      */
     private final double ec;
-    
+
     /**
      * Standards parallel 1 in radians, for {@link #getParameterValues} implementation.
      */
@@ -124,7 +124,7 @@ public class AlbersEqualArea extends MapProjection {
      * Standards parallel 2 in radians, for {@link #getParameterValues} implementation.
      */
     private double phi2;
-    
+
     /**
      * Constructs a new map projection from the supplied parameters.
      *
@@ -150,7 +150,7 @@ public class AlbersEqualArea extends MapProjection {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ANTIPODE_LATITUDES_$2,
                                                new Latitude(Math.toDegrees(phi1)),
                                                new Latitude(Math.toDegrees(phi2))));
-         
+
         double  sinphi = Math.sin(phi1);
         double  cosphi = Math.cos(phi1);
         double  n      = sinphi;
@@ -179,14 +179,14 @@ public class AlbersEqualArea extends MapProjection {
         }
         this.n = n;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -197,7 +197,7 @@ public class AlbersEqualArea extends MapProjection {
         set(expected, Provider.STANDARD_PARALLEL_2, values, phi2);
         return values;
     }
-    
+
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
      * and stores the result in {@code ptDst} (linear distance on a unit sphere).
@@ -231,7 +231,7 @@ public class AlbersEqualArea extends MapProjection {
         }
         return new Point2D.Double(x,y);
     }
-    
+
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
      * and stores the result in {@code ptDst}.
@@ -276,7 +276,7 @@ public class AlbersEqualArea extends MapProjection {
         }
         return new Point2D.Double(x,y);
     }
-    
+
     /**
      * Iteratively solves equation (3-16) from Snyder.
      *
@@ -304,7 +304,7 @@ public class AlbersEqualArea extends MapProjection {
         } 
         throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
     }
-    
+
     /** 
      * Calculates q, Snyder equation (3-12)
      *
@@ -321,7 +321,7 @@ public class AlbersEqualArea extends MapProjection {
             return sinphi + sinphi;
         }
     }
-    
+
     /**
      * Returns a hash value for this projection.
      */
@@ -348,10 +348,10 @@ public class AlbersEqualArea extends MapProjection {
         }
         return false;
     }
-    
-    
-    
-    
+
+
+
+
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
@@ -359,7 +359,7 @@ public class AlbersEqualArea extends MapProjection {
     ////////                                                                          ////////
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for an {@linkplain AlbersEqualArea Albers Equal Area} projection.

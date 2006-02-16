@@ -67,7 +67,7 @@ public class EquidistantCylindrical extends MapProjection {
      * Cosinus of the standard_parallel_1 parameter.
      */
     private final double cosStandardParallel;
-    
+
     /**
      * standard_parallel_1 parameter, used in getParameterValues(). 
      * Set to {@link Double#NaN} for the {@code Plate_Carree} case.
@@ -94,7 +94,7 @@ public class EquidistantCylindrical extends MapProjection {
         } else {
             // standard parallel is the equator (Plate Carree or Equirectangular)
             standardParallel = Double.NaN;
-        	cosStandardParallel = 1.0;
+            cosStandardParallel = 1.0;
         }
         assert latitudeOfOrigin == 0 : latitudeOfOrigin;
     }
@@ -105,7 +105,7 @@ public class EquidistantCylindrical extends MapProjection {
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -188,7 +188,7 @@ public class EquidistantCylindrical extends MapProjection {
          * of "standard_parallel_1". I have sided with ESRI and Snyder in this case.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-        		new NamedIdentifier(Citations.OGC,      "Equidistant_Cylindrical"),
+                new NamedIdentifier(Citations.OGC,      "Equidistant_Cylindrical"),
                 new NamedIdentifier(Citations.EPSG,     "Equidistant Cylindrical"),
                 new NamedIdentifier(Citations.ESRI,     "Equidistant_Cylindrical"),
                 new NamedIdentifier(Citations.EPSG,     "9823"),
@@ -225,11 +225,11 @@ public class EquidistantCylindrical extends MapProjection {
                 throws ParameterNotFoundException
         {
             if (isSpherical(parameters)) {
-				return new EquidistantCylindrical(parameters);
-			} else {
-				throw new UnsupportedOperationException(Errors.format(
-	                      ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
-			}
+                return new EquidistantCylindrical(parameters);
+            } else {
+                throw new UnsupportedOperationException(Errors.format(
+                          ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
+            }
         }
     }
 }
