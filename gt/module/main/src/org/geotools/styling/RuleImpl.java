@@ -180,7 +180,7 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
     public void setFilter(Filter filter) {
         Filter old = this.filter;
         this.filter = filter;
-        fireChildChanged("filder", filter, old);
+        fireChildChanged("filter", filter, old);
     }
 
     public boolean hasElseFilter() {

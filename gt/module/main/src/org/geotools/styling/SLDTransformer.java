@@ -172,9 +172,7 @@ public class SLDTransformer extends TransformerBase {
             }
 
             if (text.getPlacement() != null) {
-                start("LabelPlacement");
                 text.getPlacement().accept(this);
-                end("LabelPlacement");
             }
 
             if (text.getHalo() != null) {
