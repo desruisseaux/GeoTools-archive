@@ -41,6 +41,7 @@ import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
+import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;
@@ -288,10 +289,11 @@ public class ArcSDEAdapter {
 		SeColumnDefinition[] seColumns = null;
 		String rowIdColumnName = null;
 		String shapeFIDColumnname = null;
-
+		SeConnection conn = null;
 		try {
 			seColumns = table.describe();
-			SeRegistration reg = new SeRegistration(connPool.getConnection(),table.getQualifiedName());
+			conn = connPool.getConnection();
+			SeRegistration reg = new SeRegistration(conn,table.getQualifiedName());
 			rowIdColumnName = reg.getRowIdColumnName();
 			if ((rowIdColumnName != null) && !(rowIdColumnName.trim().equals(""))) {
 				LOGGER.warning("Figured Row-ID Column named '" + rowIdColumnName + "' for table " + table.getQualifiedName());
@@ -310,6 +312,8 @@ public class ArcSDEAdapter {
 			LOGGER.log(Level.SEVERE, "Unable to get connection while attempting to determine SDE RowID Column for table " + table.getName());
 			throw new DataSourceException("Error obtaining table schema from "
 					+ table.getQualifiedName());
+		}finally{
+			connPool.release(conn);
 		}
 
 		int nCols = seColumns.length;
