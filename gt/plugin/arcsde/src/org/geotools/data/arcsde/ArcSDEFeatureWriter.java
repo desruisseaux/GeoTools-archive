@@ -307,7 +307,11 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 
 			}
 		} catch (Exception e) {
+			
 			LOGGER.log(Level.WARNING, e.getMessage(), e);
+			if (LOGGER.getLevel().intValue() > Level.FINE.intValue()) {
+				e.printStackTrace();
+			}
 			throw new DataSourceException(e.getMessage(), e);
 		} finally {
 			releaseConnection(connection);

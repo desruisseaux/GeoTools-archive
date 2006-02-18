@@ -16,14 +16,17 @@
  */
 package org.geotools.data.arcsde;
 
-import com.esri.sde.sdk.client.SeColumnDefinition;
-import com.esri.sde.sdk.client.SeConnection;
-import com.esri.sde.sdk.client.SeCoordinateReference;
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeExtent;
-import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeTable;
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
@@ -41,16 +44,15 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.esri.sde.sdk.client.SeColumnDefinition;
+import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeCoordinateReference;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeExtent;
+import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeTable;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -564,6 +566,7 @@ class ArcSDEDataStore extends AbstractDataStore {
             FeatureType schema = getSchema(typeName);
             sdeQuery = ArcSDEQuery.createQuery(this, schema, query);
             
+            
             sdeQuery.execute();
 
             AttributeReader attReader = new ArcSDEAttributeReader(sdeQuery);
@@ -588,8 +591,14 @@ class ArcSDEDataStore extends AbstractDataStore {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new DataSourceException("Types do not match: "
                 + ex.getMessage(), ex);
-        } catch (Throwable t) {
+        }catch(IOException e){
+        	throw e;
+    	}catch (Exception t) {
             LOGGER.log(Level.SEVERE, t.getMessage(), t);
+            if (LOGGER.isLoggable(Level.FINE)) {
+            	t.printStackTrace();
+			}
+            
 
             if (sdeQuery != null) {
                 sdeQuery.close();

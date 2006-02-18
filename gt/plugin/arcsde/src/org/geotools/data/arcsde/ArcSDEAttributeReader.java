@@ -87,6 +87,13 @@ class ArcSDEAttributeReader implements AttributeReader {
 	 * was not called between calls to hasNext()
 	 */
 	private boolean hasNextAlreadyCalled = false;
+	
+	/**
+	 * the AttributeType.getName() value of the attribute which is an SDE-managed
+	 * RowID for this featureType.  If it's null, there's no such SDE-managed RowID in this
+	 * SeTable
+	 */
+	private String featureIDAttributeName; 
 
 	/**
 	 * The query that defines this readers interaction with an ArcSDE instance.
@@ -100,7 +107,16 @@ class ArcSDEAttributeReader implements AttributeReader {
 		this.query = query;
 		this.schema = query.getSchema();
 		this.currentValues = new Object[this.schema.getAttributeCount()];
-
+		for (int i = 0; i < schema.getAttributeCount(); i++) {
+			if (schema.getAttributeType(i) instanceof ArcSDEAttributeType) {
+				ArcSDEAttributeType t = (ArcSDEAttributeType)schema.getAttributeType(i);
+				if (t.isFeatureIDAttribute()) {
+					this.featureIDAttributeName = t.getName();
+					break;
+				}
+			}
+		}
+		
 		this.fidPrefix = new StringBuffer(this.schema.getTypeName())
 				.append(".");
 		this.fidPrefixLen = this.fidPrefix.length();
@@ -112,6 +128,13 @@ class ArcSDEAttributeReader implements AttributeReader {
 			this.geometryBuilder = GeometryBuilder.builderFor(geometryClass);
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	/*public void setFeatureIDAttributeName(String s) {
+		featureIDAttributeName = s;
+	}*/
 
 	/**
 	 * 
@@ -159,27 +182,36 @@ class ArcSDEAttributeReader implements AttributeReader {
 					int attCount = this.schema.getAttributeCount();
 
 					// actual number of columns returned. Can be 1 more then
-					// attCount. In this case, it means the default geometry
-					// was not included in the query, and the SeShape object
-					// is returned as the last column since it is the only way
-					// to fetch the feature id.
+					// attCount. In this case, it means the discovered FID column
+					// wasn't included in the query and was added as the final column.
 					int columns = currentRow.getColumns().length;
 					Object value;
 
 					for (int i = 0; i < columns; i++) {
 						value = currentRow.getObject(i);
+						//LOGGER.warning("Fetched '" + value +"' from row '" + query.getSchema().getAttributeType(i).getName());
+						
+						// if there's an SDE-maintained RowID column on this table, let's use that for the
+						// featureID.
+						if (featureIDAttributeName != null) {
+							if (schema.getAttributeType(i).getName().equalsIgnoreCase(featureIDAttributeName)) {
+								if (value == null) {
+									// This means that the FID field for this table has returned us a null value.  There's no way
+									// to reliably obtain an FID for this feature, so we'll either have to leave it blank, or
+									// cause an error here.  Leaving an FID blank is bad, I guess.  So we'll throw an error.
+									throw new DataSourceException("Unable to reliably determine an FID column for this table, so we defaulted to using the '" + featureIDAttributeName +"' column.  But it was null, leaving us no FID for this feature.");
+								} else {
+									this.currentFid = Long.parseLong(value.toString());
+									LOGGER.fine("Fetched fid " + this.currentFid + " from column " + featureIDAttributeName);
+									continue;
+								}
+							}
+						}
 
 						if (value instanceof SeShape) {
 							SeShape shape = (SeShape) value;
-
-							// grab the feature id
-							this.currentFid = shape.getFeatureId().longValue();
-
-							// see if the geometry was part of the query
-							if (columns == attCount) {
-								value = this.geometryBuilder.construct(shape);
-								this.currentValues[i] = value;
-							}
+							value = this.geometryBuilder.construct(shape);
+							this.currentValues[i] = value;
 						} else {
 							this.currentValues[i] = value;
 						}

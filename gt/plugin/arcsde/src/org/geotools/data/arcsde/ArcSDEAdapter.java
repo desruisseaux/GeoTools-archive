@@ -31,6 +31,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.filter.Filter;
@@ -43,6 +44,7 @@ import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -58,7 +60,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * from geotool's Query's, mapping SDE types to Java ones and JTS Geometries,
  * etc.
  * 
- * @author Gabriel Rold?n
+ * @author Gabriel Roldan
  * @source $URL$
  * @version $Id$
  */
@@ -190,28 +192,15 @@ public class ArcSDEAdapter {
 			throws SeException {
 		SeColumnDefinition colDef = null;
 		String colName = type.getName();
-		int fieldLength;
-		int fieldScale;
 		boolean nillable = type.isNillable();
 
 		SdeTypeDef def = getSdeType(type.getType());
 
-		LOGGER.info("def.type=" + def.colDefType + ", string type="
-				+ SeColumnDefinition.TYPE_STRING);
+		int sdeColType = def.colDefType;
+		int fieldLength = def.size;
+		int fieldScale = def.scale;
 
-		if (type.getType() == String.class) {
-//			fieldLength = (type.getFieldLength() == 0) ? def.size : type
-//					.getFieldLength();
-			fieldLength = def.size;
-			fieldScale = def.scale;
-		} else {
-			fieldLength = def.size;
-//			fieldScale = (type.getFieldLength() == 0) ? def.scale : type
-//					.getFieldLength();
-			fieldScale = def.scale;
-		}
-
-		colDef = new SeColumnDefinition(colName, def.colDefType, fieldLength,
+		colDef = new SeColumnDefinition(colName, sdeColType, fieldLength,
 				fieldScale, nillable);
 
 		return colDef;
@@ -259,7 +248,7 @@ public class ArcSDEAdapter {
 			String typeName, URI namespace) throws IOException {
 		SeLayer sdeLayer = connPool.getSdeLayer(typeName);
 		SeTable sdeTable = connPool.getSdeTable(typeName);
-		AttributeType[] types = createAttributeTypes(sdeLayer, sdeTable);
+		AttributeType[] types = createAttributeTypes(connPool, sdeLayer, sdeTable);
 		FeatureType type = null;
 
 		try {
@@ -289,24 +278,47 @@ public class ArcSDEAdapter {
 	 * @throws DataSourceException
 	 *             DOCUMENT ME!
 	 */
-	private static AttributeType[] createAttributeTypes(SeLayer sdeLayer,
+	private static AttributeType[] createAttributeTypes(ArcSDEConnectionPool connPool, 
+			SeLayer sdeLayer,
 			SeTable table) throws DataSourceException {
 		boolean isNilable;
 		int fieldLen;
 		Object defValue;
 
 		SeColumnDefinition[] seColumns = null;
+		String rowIdColumnName = null;
+		String shapeFIDColumnname = null;
 
 		try {
 			seColumns = table.describe();
+			SeRegistration reg = new SeRegistration(connPool.getConnection(),table.getQualifiedName());
+			rowIdColumnName = reg.getRowIdColumnName();
+			if ((rowIdColumnName != null) && !(rowIdColumnName.trim().equals(""))) {
+				LOGGER.warning("Figured Row-ID Column named '" + rowIdColumnName + "' for table " + table.getQualifiedName());
+			} else {
+				shapeFIDColumnname = sdeLayer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID);
+				LOGGER.warning("No Row-ID Column registered on table '" + table.getQualifiedName() + "', using SE_SAHPE_ATTRIBUTE_FID value '" + shapeFIDColumnname + "'");
+			}
 		} catch (SeException ex) {
 			LOGGER.log(Level.WARNING, ex.getSeError().getErrDesc(), ex);
+			if (LOGGER.isLoggable(Level.FINE)) {
+				ex.printStackTrace();
+			}
+			throw new DataSourceException("Error obtaining table schema from "
+					+ table.getQualifiedName());
+		} catch (UnavailableConnectionException uce) {
+			LOGGER.log(Level.SEVERE, "Unable to get connection while attempting to determine SDE RowID Column for table " + table.getName());
 			throw new DataSourceException("Error obtaining table schema from "
 					+ table.getQualifiedName());
 		}
 
 		int nCols = seColumns.length;
-		AttributeType[] attTypes = new AttributeType[nCols];
+		AttributeType[] attTypes;
+		if (shapeFIDColumnname == null) {
+			attTypes = new AttributeType[nCols];
+		} else {
+			attTypes = new AttributeType[nCols + 1];
+		}
 		AttributeType attribute = null;
 		Class typeClass = null;
 
@@ -340,11 +352,20 @@ public class ArcSDEAdapter {
 						"Raster columns are not supported yet");
 			} else {
 				typeClass = (Class) sde2JavaTypes.get(sdeType);
-				attribute = AttributeTypeFactory.newAttributeType(seColumns[i]
-						.getName(), typeClass, isNilable, fieldLen, defValue);
+				attribute = new ArcSDEAttributeType(AttributeTypeFactory.newAttributeType(seColumns[i]
+						.getName(), typeClass, isNilable, fieldLen, defValue));
+				if (attribute.getName().equalsIgnoreCase(rowIdColumnName)) {
+					((ArcSDEAttributeType)attribute).setFeatureIDAttribute(true);
+				} else {
+					((ArcSDEAttributeType)attribute).setFeatureIDAttribute(false);
+				}
 			}
-
 			attTypes[i] = attribute;
+		}
+		if (shapeFIDColumnname != null) {
+			ArcSDEAttributeType shapeFIDAttributeType = new ArcSDEAttributeType(AttributeTypeFactory.newAttributeType(shapeFIDColumnname, Integer.class, true, 10, null)); 
+			shapeFIDAttributeType.setFeatureIDAttribute(true);
+			attTypes[nCols] = shapeFIDAttributeType;
 		}
 
 		return attTypes;
@@ -634,4 +655,48 @@ public class ArcSDEAdapter {
 					+ this.size + ", scale=" + this.scale + "]";
 		}
 	}
+}
+
+/**
+ * SDE tracks a bit more information about it's attributes than the base AttributeType does.  Mainly, whether or not
+ * a given attribute is the "featureID" attribute for a given featureType.
+ * 
+ * This simply wrapps whatever default base AttributeType is passed in, and allows one to track that additional information.
+
+ * @author Saul Farber <saul.farber@state.ma.us>
+ *
+ */
+class ArcSDEAttributeType implements AttributeType {
+	
+	private AttributeType base;
+	private boolean isFeatureIDAttribute;
+	
+	public ArcSDEAttributeType(AttributeType baseType) {
+		base = baseType;
+	}
+	
+	// These methods are just pass-thrus from the base type
+	public int getMinOccurs() { return base.getMinOccurs(); }
+	public int getMaxOccurs() { return base.getMaxOccurs(); }
+	public Class getType() { return base.getType(); }
+	public boolean isNillable() { return base.isNillable(); }
+	public Object createDefaultValue() { return base.createDefaultValue(); }
+	public Filter getRestriction() { return base.getRestriction(); }
+	public void validate(Object obj) throws IllegalArgumentException { base.validate(obj); }
+	public String getName() { return base.getName(); }
+	
+	public Object parse(Object value) throws IllegalArgumentException { return base.parse(value); }
+	
+	public Object duplicate(Object o) throws IllegalAttributeException {
+		return base.duplicate(o);
+	}
+	
+	public boolean isFeatureIDAttribute() {
+		return isFeatureIDAttribute;
+	}
+	
+	public void setFeatureIDAttribute(boolean b) {
+		isFeatureIDAttribute = b;
+	}
+	
 }

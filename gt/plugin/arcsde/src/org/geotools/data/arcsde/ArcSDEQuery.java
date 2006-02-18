@@ -16,6 +16,24 @@
  */
 package org.geotools.data.arcsde;
 
+import java.io.IOException;
+import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.Query;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
+import org.geotools.filter.Filter;
+import org.geotools.filter.GeometryEncoderException;
+import org.geotools.filter.GeometryEncoderSDE;
+import org.geotools.filter.SQLEncoderException;
+import org.geotools.filter.SQLEncoderSDE;
+import org.geotools.filter.SQLUnpacker;
+
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -28,21 +46,6 @@ import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.Query;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
-import org.geotools.filter.GeometryEncoderException;
-import org.geotools.filter.GeometryEncoderSDE;
-import org.geotools.filter.SQLEncoderException;
-import org.geotools.filter.SQLEncoderSDE;
-import org.geotools.filter.SQLUnpacker;
-import java.io.IOException;
-import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -178,7 +181,7 @@ class ArcSDEQuery {
         String[] queryColumns = query.getPropertyNames();
 
         //guess which properties needs actually be retrieved.
-        queryColumns = getQueryColumns(pool, typeName, queryColumns);
+        queryColumns = getQueryColumns(pool, typeName, queryColumns, schema);
 
         FeatureType querySchema = null;
 
@@ -211,7 +214,7 @@ class ArcSDEQuery {
      * @throws DataSourceException DOCUMENT ME!
      */
     private static String[] getQueryColumns(ArcSDEConnectionPool pool,
-        String typeName, String[] queryColumns) throws DataSourceException {
+        String typeName, String[] queryColumns, FeatureType schema) throws DataSourceException {
         if ((queryColumns == null) || (queryColumns.length == 0)) {
             SeTable table = pool.getSdeTable(typeName);
             SeColumnDefinition[] sdeCols = null;
@@ -227,6 +230,35 @@ class ArcSDEQuery {
             for (int i = 0; i < sdeCols.length; i++) {
                 queryColumns[i] = sdeCols[i].getName();
             }
+        }
+        
+        boolean hasFIDColumn = false;
+        for (int i = 0; i < queryColumns.length; i++) {
+        	AttributeType type = schema.getAttributeType(schema.find(queryColumns[i]));
+        	if (type instanceof ArcSDEAttributeType) {
+        		if  (((ArcSDEAttributeType)type).isFeatureIDAttribute()) {
+        			hasFIDColumn = true;
+        			break;
+        		}
+        	}
+        }
+        
+        if (!hasFIDColumn) {
+        	LOGGER.warning("No FID attribute was contained in your query.  Appending the discovered one to the list of columns to be fetched.");
+        	for (int i = 0; i < schema.getAttributeCount(); i++) {
+        		AttributeType type = schema.getAttributeType(i);
+            	if (type instanceof ArcSDEAttributeType) {
+            		if  (((ArcSDEAttributeType)type).isFeatureIDAttribute()) {
+            			String[] newQCols = new String[queryColumns.length + 1];
+            			System.arraycopy(queryColumns, 0, newQCols, 0, queryColumns.length);
+            			newQCols[queryColumns.length] = type.getName();
+            			LOGGER.warning("Appendend " + newQCols[queryColumns.length] + " to column list.");
+                    	queryColumns = newQCols;
+            			break;
+            		}
+            	}
+        	}
+        	
         }
 
         return queryColumns;
@@ -375,8 +407,7 @@ class ArcSDEQuery {
 
     /**
      * Returns the attribute names of the FeatureType passed to the
-     * constructor, plus the geometry attribute name if it was not part of the
-     * request, due to the need to grab the SeShape to obtain its feature id.
+     * constructor.
      *
      * @return DOCUMENT ME!
      *
@@ -388,22 +419,6 @@ class ArcSDEQuery {
 
         for (int i = 0; i < this.schema.getAttributeCount(); i++) {
             attNames[i] = this.schema.getAttributeType(i).getName();
-        }
-
-        if (this.schema.getDefaultGeometry() == null) {
-            LOGGER.info("geometry att not included in query. Adding it "
-                + " to be able of fetching feature ids, but will not appear "
-                + "in results");
-
-            String[] atts = new String[1 + attNames.length];
-            System.arraycopy(attNames, 0, atts, 0, attNames.length);
-
-            SeLayer layer = this.connectionPool.getSdeLayer(this.schema
-                    .getTypeName());
-            String spatialCol = layer.getSpatialColumn();
-            atts[attNames.length] = spatialCol;
-            attNames = atts;
-            LOGGER.info("Added spatial column " + spatialCol);
         }
 
         return attNames;
