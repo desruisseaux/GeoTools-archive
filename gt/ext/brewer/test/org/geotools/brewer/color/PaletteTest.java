@@ -5,33 +5,33 @@ import junit.framework.TestCase;
 public class PaletteTest extends TestCase {
 	ColorBrewer brewer;
 
-	public void testSequential() {
+	public void testSequential() throws Exception {
 		brewer = new ColorBrewer();
-		brewer.loadPalettes("SEQUENTIAL");
+		brewer.loadPalettes(ColorBrewer.SEQUENTIAL);
 		String[] names = brewer.getPaletteNames();
-		assertEquals(true, names.length != 0);
+		assertEquals(18, names.length);
 		assertNotNull(brewer.getDescription()); //we have a description!
 		BrewerPalette palette = brewer.getPalette("YlGnBu");
 		assertNotNull(palette); //we have a palette!
 		assertNotNull(palette.getDescription()); //we have another description!
 	}
 
-	public void testDiverging() {
+	public void testDiverging() throws Exception {
 		brewer = new ColorBrewer();
-		brewer.loadPalettes("DIVERGING");
+		brewer.loadPalettes(ColorBrewer.DIVERGING);
 		String[] names = brewer.getPaletteNames();
-		assertEquals(true, names.length != 0);
+		assertEquals(9, names.length);
 		assertNotNull(brewer.getDescription()); //we have a description!
 		BrewerPalette palette = brewer.getPalette("PuOr");
 		assertNotNull(palette); //we have a palette!
 		assertNotNull(palette.getDescription()); //we have another description!
 	}
 
-	public void testQualitative() {
+	public void testQualitative() throws Exception {
 		brewer = new ColorBrewer();
-		brewer.loadPalettes("QUALITATIVE");
+		brewer.loadPalettes(ColorBrewer.QUALITATIVE);
 		String[] names = brewer.getPaletteNames();
-		assertEquals(true, names.length != 0);
+		assertEquals(8, names.length);
 		assertNotNull(brewer.getDescription()); //we have a description!
 		BrewerPalette palette = brewer.getPalette("Set3");
 		assertNotNull(palette); //we have a palette!

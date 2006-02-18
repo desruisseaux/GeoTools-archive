@@ -20,9 +20,14 @@ import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.geotools.event.GTComponent;
+import org.geotools.event.GTRoot;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.Filter;
 import org.geotools.filter.Filters;
 import org.geotools.filter.expression.Expression;
 
@@ -1559,7 +1564,7 @@ SYMBOLIZER:
     	return "#" + Integer.toHexString(c.getRGB() & 0x00ffffff);
     }
     
-    public static Style[] getStyles(StyledLayerDescriptor sld) {
+    public static Style[] styles(StyledLayerDescriptor sld) {
         StyledLayer[] layers = sld.getStyledLayers();
         List styles = new ArrayList();
         for (int i = 0; i < layers.length; i++) {
@@ -1574,13 +1579,27 @@ SYMBOLIZER:
         return (Style[]) styles.toArray(new Style[styles.size()]);
     }
     
-    public static FeatureTypeStyle[] getFeatureTypeStyles(StyledLayerDescriptor sld) {
-        Style[] styles = getStyles(sld);
+    public static FeatureTypeStyle[] featureTypeStyles(StyledLayerDescriptor sld) {
+        Style[] style = styles(sld);
         List fts = new ArrayList();
-        for (int i = 0; i < styles.length; i++) {
-            fts.addAll(toList(styles[i].getFeatureTypeStyles()));
+        for (int i = 0; i < style.length; i++) {
+            fts.addAll(toList(style[i].getFeatureTypeStyles()));
         }
         return (FeatureTypeStyle[]) fts.toArray(new FeatureTypeStyle[fts.size()]);
+    }
+    
+    public static FeatureTypeStyle featureTypeStyle(StyledLayerDescriptor sld, FeatureType type) {
+        //alternatively, we could use a StyleVisitor here
+        Style[] styles = styles(sld);
+        for (int i = 0; i < styles.length; i++) {
+            FeatureTypeStyle[] fts = styles[i].getFeatureTypeStyles();
+            for (int j = 0; j < fts.length; j++) {
+                if (type.getTypeName().equals(fts[j].getName())) {
+                    return fts[j];
+                }
+            }
+        }
+        return null;
     }
     
     private static List toList(Object[] array) {
@@ -1591,15 +1610,136 @@ SYMBOLIZER:
         return list;
     }
     
-    public static Style getDefaultStyle(StyledLayerDescriptor sld) {
-        Style[] styles = getStyles(sld);
-        for (int i = 0; i < styles.length; i++) {
-            if (styles[i].isDefault()) {
-                return styles[i];
+    public static Style defaultStyle(StyledLayerDescriptor sld) {
+        Style[] style = styles(sld);
+        for (int i = 0; i < style.length; i++) {
+            if (style[i].isDefault()) {
+                return style[i];
             }
         }
         //no default, so just grab the first one
-        return styles[0];
+        return style[0];
     }
+
+	/**
+	 * Climbs the style hierarchy until null or an SLD is found.
+	 * 
+	 * @param object
+	 * @return SLD
+	 */
+	public static StyledLayerDescriptor styledLayerDescriptor(Object gtComponent) {
+		if (!(gtComponent instanceof GTComponent)) return null;
+		GTComponent component = (GTComponent) gtComponent;
+		while (component.getNote().getParent() != GTRoot.NO_PARENT) {
+			component = component.getNote().getParent();
+			if (component instanceof StyledLayerDescriptor) {
+				return (StyledLayerDescriptor) component;
+			}
+		}
+		return null;
+	}
+    
+	public static Filter[] filters(Rule[] rule) {
+		Filter[] filter = new Filter[rule.length];
+		for (int i = 0; i < rule.length; i++) {
+			filter[i] = rule[0].getFilter();
+		}
+		return filter;
+	}
+    
+	public static Filter[] filters(Style style) {
+		Rule[] rule = rules(style);
+		return filters(rule);
+	}
+    
+	public static Rule[] rules(Style style) {
+		Set ruleSet = new HashSet();
+		FeatureTypeStyle[] fts = style.getFeatureTypeStyles();
+		for (int i = 0; i < fts.length; i++) {
+			Rule[] ftsRules = fts[i].getRules();
+			for (int j = 0; j < ftsRules.length; j++) {
+				ruleSet.add(ftsRules[j]);
+			}
+		}
+		if (ruleSet.size() > 0) {
+			return toRuleArray(ruleSet.toArray());
+		} else {
+			return new Rule[0];
+		}
+	}
+
+	public static String[] colors(Style style) {
+		Set colorSet = new HashSet();
+		Rule[] rule = rules(style);
+		for (int i = 0; i < rule.length; i++) {
+			String[] color = colors(rule[i]);
+			for (int j = 0; j < color.length; j++) {
+				colorSet.add(color[j]);
+			}
+		}
+		if (colorSet.size() > 0) {
+			return toStringArray(colorSet.toArray());
+		} else {
+			return new String[0];
+		}
+	}
+    
+	public static String[] colors(Rule rule) {
+		Set colorSet = new HashSet();
+		Symbolizer[] symbolizer = rule.getSymbolizers();
+		for (int i = 0; i < symbolizer.length; i++) {
+			if (symbolizer[i] instanceof PolygonSymbolizer) {
+				PolygonSymbolizer symb = (PolygonSymbolizer) symbolizer[i];
+				colorSet.add(symb.getFill().getColor().toString());
+			} else if (symbolizer[i] instanceof LineSymbolizer) {
+				LineSymbolizer symb = (LineSymbolizer) symbolizer[i];
+				colorSet.add(symb.getStroke().getColor().toString());		
+			} else if (symbolizer[i] instanceof PointSymbolizer) {
+				PointSymbolizer symb = (PointSymbolizer) symbolizer[i];
+				colorSet.add(symb.getGraphic().getMarks()[0].getFill().getColor().toString());	
+			}
+		}
+		if (colorSet.size() > 0) {
+			return toStringArray(colorSet.toArray());
+		} else {
+			return new String[0];
+		}
+	}
+
+	private static String[] toStringArray(Object[] object) {
+		String[] result = new String[object.length];
+		for (int i = 0; i < object.length; i++) {
+			result[i] = (String) object[i];
+		}
+		return result;
+	}
+
+	private static Rule[] toRuleArray(Object[] object) {
+		Rule[] result = new Rule[object.length];
+		for (int i = 0; i < object.length; i++) {
+			result[i] = (Rule) object[i];
+		}
+		return result;
+	}
+	
+	/**
+	 * Converts a java.awt.Color into an HTML Colour
+	 * 
+	 * @param color
+	 * @return HTML Color (fill) in hex #RRGGBB
+	 */
+	public static String toHTMLColor(Color color) {
+		String red = "0" + Integer.toHexString(color.getRed());
+		red = red.substring(red.length() - 2);
+		String grn = "0" + Integer.toHexString(color.getGreen());
+		grn = grn.substring(grn.length() - 2);
+		String blu = "0" + Integer.toHexString(color.getBlue());
+		blu = blu.substring(blu.length() - 2);
+		return ("#" + red + grn + blu).toUpperCase();
+	}
+
+	public static Color toColor(String htmlColor) {
+		return new Color(Integer.parseInt(htmlColor.substring(1), 16));
+	}
 
 }
