@@ -18,21 +18,16 @@ package org.geotools.data.arcsde;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.channels.SelectableChannel;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.Query;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
@@ -47,9 +42,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeFilter;
 import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -81,44 +74,40 @@ public class ArcSDEAdapter {
 	private static final Map java2SDETypes = new HashMap();
 
 	static {
-		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_STRING),
-				String.class);
-		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT16),
-				Short.class);
-		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT32),
-				Integer.class);
-		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT32),
-				Float.class);
-		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT64),
-				Double.class);
-		sde2JavaTypes
-				.put(new Integer(SeColumnDefinition.TYPE_DATE), Date.class);
-		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_BLOB),
-				byte[].class);
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_STRING),	String.class);
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT16),	Short.class);
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT32),	Integer.class);
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT64),	Long.class);
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT32),	Float.class);
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT64),	Double.class);
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_DATE), 	Date.class);
+		//@TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_BLOB),	byte[].class);
+		//@TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_CLOB),	String.class);
+		//@TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_UUID),	String.class);
+		//@TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_XML),		org.w3c.dom.Document.class);
+		
+		//deprecated codes as for ArcSDE 9.0+. Adding them to maintain < 9.0 compatibility
+		//though the assigned int codes matched their new counterparts, I let them here as a reminder 
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_SMALLINT),	Short.class);
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INTEGER),		Integer.class);
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT),		Float.class);
+		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_DOUBLE),		Double.class);
 
 		/**
 		 * By now keep using the deprecated constants (TYPE_INTEGER, etc.),
 		 * switching directly to the new ones gives problems with ArcSDE
 		 * instances prior to version 9.0.
 		 */
-
 		// SeColumnDefinition.TYPE_RASTER is not supported...
-		java2SDETypes.put(String.class, new SdeTypeDef(
-				SeColumnDefinition.TYPE_STRING, 255, 0));
-		java2SDETypes.put(Short.class, new SdeTypeDef(
-				SeColumnDefinition.TYPE_SMALLINT, 4, 0));
-		java2SDETypes.put(Integer.class, new SdeTypeDef(
-				SeColumnDefinition.TYPE_INTEGER, 10, 0));
-		java2SDETypes.put(Float.class, new SdeTypeDef(
-				SeColumnDefinition.TYPE_FLOAT, 5, 2));
-		java2SDETypes.put(Double.class, new SdeTypeDef(
-				SeColumnDefinition.TYPE_DOUBLE, 15, 4));
-		java2SDETypes.put(Date.class, new SdeTypeDef(
-				SeColumnDefinition.TYPE_DATE, 1, 0));
-		java2SDETypes.put(byte[].class, new SdeTypeDef(
-				SeColumnDefinition.TYPE_BLOB, 1, 0));
-		java2SDETypes.put(Number.class, new SdeTypeDef(
-				SeColumnDefinition.TYPE_DOUBLE, 15, 4));
+		java2SDETypes.put(String.class, 	new SdeTypeDef(SeColumnDefinition.TYPE_STRING, 255, 0));
+		java2SDETypes.put(Short.class, 		new SdeTypeDef(SeColumnDefinition.TYPE_SMALLINT, 4, 0));
+		java2SDETypes.put(Integer.class, 	new SdeTypeDef(SeColumnDefinition.TYPE_INTEGER, 10, 0));
+		java2SDETypes.put(Float.class, 		new SdeTypeDef(SeColumnDefinition.TYPE_FLOAT, 5, 2));
+		java2SDETypes.put(Double.class, 	new SdeTypeDef(SeColumnDefinition.TYPE_DOUBLE, 15, 4));
+		java2SDETypes.put(Date.class, 		new SdeTypeDef(SeColumnDefinition.TYPE_DATE, 1, 0));
+		java2SDETypes.put(Long.class, 		new SdeTypeDef(SeColumnDefinition.TYPE_INTEGER, 10, 0));
+		java2SDETypes.put(byte[].class, 	new SdeTypeDef(SeColumnDefinition.TYPE_BLOB, 1, 0));
+		java2SDETypes.put(Number.class, 	new SdeTypeDef(SeColumnDefinition.TYPE_DOUBLE, 15, 4));
 	}
 
 	/**
@@ -403,7 +392,7 @@ public class ArcSDEAdapter {
 			} catch (FactoryException e) {
 				String msg = "CRS factory does not knows how to parse the "
 						+ "CRS for layer " + sdeLayer.getName() + ": " + WKT;
-				LOGGER.log(Level.SEVERE, msg, e);
+				LOGGER.log(Level.CONFIG, msg, e);
 				// throw new DataSourceException(msg, e);
 			}
 
