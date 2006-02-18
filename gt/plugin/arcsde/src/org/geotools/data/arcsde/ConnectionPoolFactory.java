@@ -36,10 +36,10 @@ class ConnectionPoolFactory {
 			.getPackage().getName());
 
 	/** DOCUMENT ME! */
-	private static ConnectionPoolFactory singleton;
+	private static final ConnectionPoolFactory singleton =  new ConnectionPoolFactory();
 
 	/** DOCUMENT ME! */
-	private Map currentPools = new HashMap();
+	private final Map currentPools = new HashMap();
 
 	/**
 	 * Creates a new SdeConnectionPoolFactory object.
@@ -54,10 +54,6 @@ class ConnectionPoolFactory {
 	 * @return DOCUMENT ME!
 	 */
 	public synchronized static ConnectionPoolFactory getInstance() {
-		if (singleton == null) {
-			singleton = new ConnectionPoolFactory();
-		}
-
 		return singleton;
 	}
 

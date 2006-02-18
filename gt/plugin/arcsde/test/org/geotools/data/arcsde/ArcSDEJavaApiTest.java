@@ -59,15 +59,9 @@ public class ArcSDEJavaApiTest extends TestCase {
 	/** utility to load test parameters and build a datastore with them */
 	private TestData testData;
 
-	/**
-	 * Constructor for ArcSDEJavaApiTest.
-	 * 
-	 * @param arg0
-	 */
-	public ArcSDEJavaApiTest(String arg0) {
-		super(arg0);
-	}
-
+	private SeConnection conn;
+	private ArcSDEConnectionPool pool;
+	
 	/**
 	 * DOCUMENT ME!
 	 * 
@@ -89,6 +83,8 @@ public class ArcSDEJavaApiTest extends TestCase {
 		super.setUp();
 		this.testData = new TestData();
 		this.testData.setUp();
+		this.pool = this.testData.getDataStore().getConnectionPool();
+		this.conn = this.pool.getConnection();
 	}
 
 	/**
@@ -98,19 +94,14 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 *             DOCUMENT ME!
 	 */
 	protected void tearDown() throws Exception {
-		this.testData.tearDown(false, true);
-		this.testData = null;
 		super.tearDown();
+		this.testData.tearDown(false, true); //this also closes the connection
+		this.testData = null;
 	}
 
 	public void testNullSQLConstruct() throws Exception {
-		ArcSDEConnectionPool pool = this.testData.getDataStore()
-				.getConnectionPool();
-		String typeName = this.testData.getPolygon_table();
-
 		String[] columns = { "POP_ADMIN" };
 		SeSqlConstruct sql = null;
-		SeConnection conn = pool.getConnection();
 
 		try {
 			SeQuery rowQuery = new SeQuery(conn, columns, sql);
@@ -123,13 +114,10 @@ public class ArcSDEJavaApiTest extends TestCase {
 	}
 
 	public void testEmptySQLConstruct() throws Exception {
-		ArcSDEConnectionPool pool = this.testData.getDataStore()
-				.getConnectionPool();
 		String typeName = this.testData.getPolygon_table();
 
 		String[] columns = { "POP_ADMIN" };
 		SeSqlConstruct sql = new SeSqlConstruct(typeName);
-		SeConnection conn = pool.getConnection();
 
 		SeQuery rowQuery = new SeQuery(conn, columns, sql);
 		rowQuery.prepareQuery();
@@ -167,8 +155,6 @@ public class ArcSDEJavaApiTest extends TestCase {
 					.getSpatialColumn(), filterShape, SeFilter.METHOD_ENVP,
 					true);
 			SeFilter[] spatFilters = { bboxFilter };
-
-			SeConnection conn = pool.getConnection();
 
 			for (int i = 0; i < 26; i++) {
 				LOGGER.fine("Running iteration #" + i);
@@ -220,10 +206,6 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 */
 	public void testCalculateCount() throws Exception {
 		try {
-			ArcSDEConnectionPool pool = this.testData.getDataStore()
-					.getConnectionPool();
-			SeConnection conn = pool.getConnection();
-
 			String typeName = this.testData.getPolygon_table();
 			String where = "POP_ADMIN < 270000";
 			int expCount = 4;
@@ -599,10 +581,6 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 */
 	public void testCreateBaseTable() throws SeException, IOException,
 			UnavailableConnectionException {
-		ArcSDEConnectionPool connPool = this.testData.getDataStore()
-				.getConnectionPool();
-		SeConnection conn = connPool.getConnection();
-
 		SeLayer layer = new SeLayer(conn);
 		SeTable table = null;
 
@@ -698,9 +676,7 @@ public class ArcSDEJavaApiTest extends TestCase {
 			System.out.println(e.getSeError().getErrDesc());
 			e.printStackTrace();
 			throw e;
-		} finally {
-			connPool.release(conn);
-		}
+		} 
 	} // End method createBaseTable
 
 	/**
@@ -722,10 +698,6 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 */
 	public void testCreateNonStandardSchema() throws SeException, IOException,
 			UnavailableConnectionException {
-		ArcSDEConnectionPool connPool = this.testData.getDataStore()
-				.getConnectionPool();
-		SeConnection conn = connPool.getConnection();
-
 		SeLayer layer = new SeLayer(conn);
 		SeTable table = null;
 
@@ -846,8 +818,6 @@ public class ArcSDEJavaApiTest extends TestCase {
 			} catch (Exception e) {
 				// intentionally blank
 			}
-
-			connPool.release(conn);
 		}
 	} // End method createBaseTable
 

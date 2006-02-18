@@ -117,9 +117,9 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
+        super.tearDown();
         this.testData.tearDown(false, true);
         this.testData = null;
-        super.tearDown();
     }
 
     /**
@@ -476,8 +476,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         LOGGER.fine("SQL filter: " + sqlFilter);
 
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        LogicFilter mixedFilter = ff.createLogicFilter(sqlFilter,
-                FilterType.LOGIC_AND);
+        LogicFilter mixedFilter = ff.createLogicFilter(sqlFilter, FilterType.LOGIC_AND);
         mixedFilter.addFilter(bboxFilter);
         LOGGER.fine("Mixed filter: " + mixedFilter);
 

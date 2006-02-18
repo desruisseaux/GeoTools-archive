@@ -30,6 +30,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
+import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -113,7 +114,7 @@ public class ArcSDEQueryTest extends TestCase {
         }
         this.queryAll = null;
         this.queryFiltered = null;
-        testData.tearDown(true, false);
+        testData.tearDown(true, true);
         testData = null;
     }
 
@@ -129,10 +130,15 @@ public class ArcSDEQueryTest extends TestCase {
     	assertNotNull(queryAll.connectionPool);
     	assertNotNull(queryAll.connection);
     	
+    	//should nevel do this, just to assert it is 
+    	//not closed by returned to the pool
+    	SeConnection conn = queryAll.connection;
+    	
     	this.queryAll.close();
 
     	assertNull(queryAll.connectionPool);
     	assertNull(queryAll.connection);
+    	assertFalse(conn.isClosed());
     }
 
     /**
