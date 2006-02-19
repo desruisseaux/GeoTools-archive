@@ -80,6 +80,11 @@
       <version>2.3-SNAPSHOT</version>
     </dependency>
     <dependency>
+      <groupId>commons-pool</groupId>
+      <artifactId>commons-pool</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
       <groupId>com.esri</groupId>
       <artifactId>jsde_sdk</artifactId>
       <version>9.0</version>
