@@ -51,11 +51,9 @@ import org.geotools.metadata.iso.citation.CitationImpl;
  * coordinates in (<var>longitude</var>, <var>latitude</var>) order, while most geographic CRS
  * specified in the EPSG database use the opposite axis order.
  * <p>
- * <strong>Avoid this class as much as possible.</strong> A good client application should
- * work correctly with arbitrary axis order. This class exists only for compatibility with
- * external data or applications that assume (<var>longitude</var>, <var>latitude</var>)
- * axis order no matter what the EPSG database said. Examples include <cite>Proj4</cite>
- * and applications that uses it, like <cite>PostGIS</cite>. Note that using this "ordered
+ * It is better to avoid this class if you can. This class exists primarily for compatibility with
+ * external data or applications that assume (<var>longitude</var>, <var>latitude</var>) axis order
+ * no matter what the EPSG database said, for example Shapefiles. Note that using this "ordered
  * axis authority factory" may have a negative impact on performance, accuracy and range of
  * supported CRS.
  * <p>
