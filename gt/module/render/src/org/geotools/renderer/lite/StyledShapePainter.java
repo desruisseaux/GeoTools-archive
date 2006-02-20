@@ -180,7 +180,7 @@ public class StyledShapePainter {
                         Rectangle2D rect = tp.getAnchorRect();
                         AffineTransform at = graphics.getTransform();
                         double width = rect.getWidth() * at.getScaleX();
-                        double height = rect.getHeight() * at.getScaleY();
+                        double height = -1.0*rect.getHeight() * at.getScaleY();//DJB: -1 because its flipped upside down by default. This flips it up.
                         Rectangle2D scaledRect = new Rectangle2D.Double(0, 0,
                                 width, height);
                         paint = new TexturePaint(image, scaledRect);
