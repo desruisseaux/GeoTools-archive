@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <pomVersion>3</pomVersion>
   <name>geotools-gtbuild</name>
@@ -305,7 +305,7 @@
       <version>02142006</version>
       <url>http://geoapi.sourceforge.net</url>
 	<properties>
-		<eclipse.dependency>true</eclipse.dependency>
+		<eclipse.dependency>false</eclipse.dependency>
 	</properties>
     </dependency>
     <dependency>
