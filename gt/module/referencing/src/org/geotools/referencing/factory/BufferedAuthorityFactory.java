@@ -78,6 +78,8 @@ import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
@@ -94,11 +96,10 @@ import org.geotools.resources.i18n.ErrorKeys;
  * they are in use somewhere else in the Java virtual machine, but will be discarted
  * (and recreated on the fly if needed) otherwise.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
@@ -203,7 +204,19 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     synchronized boolean isReady() {
         try {
             return getBackingStore().isReady();
+        } catch (FactoryNotFoundException exception) {
+            /*
+             * The factory is not available. This is error may be normal; it happens
+             * for example if no gt2-epsg-hsql.jar (or similar JAR) are found in the
+             * classpath, which is the case for example in GeoServer 1.3. Do not log
+             * any stack trace,  since stack traces suggest more serious errors than
+             * what we really have here.
+             */
         } catch (FactoryException exception) {
+            /*
+             * The factory creation failed for an other reason, which may be more
+             * serious. Now it is time to log a warning with a stack trace.
+             */
             final Citation   citation = getAuthority();
             final Collection   titles = citation.getAlternateTitles();
             InternationalString title = citation.getTitle();
@@ -220,13 +233,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
                     }
                 }
             }
-            final LogRecord record = new LogRecord(Level.FINE, "Unavailable factory: "+title);
+            final LogRecord record = Logging.format(Level.WARNING,
+                    LoggingKeys.UNAVAILABLE_AUTHORITY_FACTORY_$1, title);
             record.setSourceClassName(Utilities.getShortClassName(this));
             record.setSourceMethodName("isReady");
             record.setThrown(exception);
             LOGGER.log(record);
-            return false;
         }
+        return false;
     }
 
     /**

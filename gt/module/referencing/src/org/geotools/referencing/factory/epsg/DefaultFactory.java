@@ -50,9 +50,10 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.FactoryNotFoundException;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
@@ -226,9 +227,10 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      * <blockquote><pre>META-INF/services/org.geotools.referencing.factory.epsg.DataSource</pre></blockquote>
      *
      * @return The connection to the EPSG database.
+     * @throws FactoryException if no data source were found.
      * @throws SQLException if this method failed to etablish a connection.
      */
-    private AbstractAuthorityFactory createFactory() throws SQLException {
+    private AbstractAuthorityFactory createFactory() throws FactoryException, SQLException {
         assert Thread.holdsLock(this);
         if (datasource != null) {
             return datasource.createFactory(new Hints(FactoryGroup.HINT_KEY, factories));
@@ -278,10 +280,10 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                 sources = getDataSources();
             }
             if (!sources.hasNext()) {
-                if (failure == null) {
-                    failure = new SQLException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
+                if (failure != null) {
+                    throw failure;
                 }
-                throw failure;
+                throw new FactoryNotFoundException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
             }
             source = (DataSource) sources.next();
         };

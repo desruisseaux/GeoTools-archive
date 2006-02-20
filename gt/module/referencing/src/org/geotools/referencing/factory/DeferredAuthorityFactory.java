@@ -36,6 +36,8 @@ import org.opengis.referencing.FactoryException;
 import org.geotools.factory.Hints;
 import org.geotools.factory.OptionalFactory;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -184,6 +186,9 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
         assert Thread.holdsLock(this);
         if (backingStore == null) {
             backingStore = createBackingStore();
+            if (backingStore == null) {
+                throw new FactoryNotFoundException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
+            }
         }
         used = true; // Tell to the disposer to wait again.
         return backingStore;
@@ -194,7 +199,8 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      * {@code createXXX(...)} method is invoked.
      *
      * @return The backing store to uses in {@code createXXX(...)} methods.
-     * @throws FactoryException if the creation of backing store failed.
+     * @throws FactoryNotFoundException if the backing store has not been found.
+     * @throws FactoryException if the creation of backing store failed for an other reason.
      */
     protected abstract AbstractAuthorityFactory createBackingStore() throws FactoryException;
 

@@ -52,6 +52,7 @@ public final class LoggingKeys {
     public static final int SAMPLE_TRANSCODE_$3                 =    16;
     public static final int SEND_REPAINT_EVENT_$1               =    17;
     public static final int SEND_REPAINT_EVENT_$5               =    18;
+    public static final int UNAVAILABLE_AUTHORITY_FACTORY_$1    =    34;
     public static final int UNEXPECTED_UNIT_$1                  =    19;
     public static final int UNKNOW_PARAMETER_$3                 =    20;
     public static final int UNKNOW_STYLE_$2                     =    21;
