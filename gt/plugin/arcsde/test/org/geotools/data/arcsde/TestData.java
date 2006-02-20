@@ -279,7 +279,7 @@ public class TestData {
      * @param pool DOCUMENT ME!
      */
     public void deleteTempTable(ArcSDEConnectionPool pool) {
-        SeConnection conn = null;
+        PooledConnection conn = null;
 
         try {
             conn = pool.getConnection();
@@ -289,11 +289,7 @@ public class TestData {
         } catch (Exception e) {
             LOGGER.warning(e.getMessage());
         } finally {
-            try {
-                pool.release(conn);
-            } catch (Exception e) {
-                LOGGER.warning(e.getMessage());
-            }
+        	conn.close();
         }
     }
 
@@ -315,7 +311,7 @@ public class TestData {
 
         deleteTempTable(connPool);
 
-        SeConnection conn = connPool.getConnection();
+        PooledConnection conn = connPool.getConnection();
 
         try {
             SeColumnDefinition[] coldefs;
@@ -338,7 +334,7 @@ public class TestData {
             e.printStackTrace();
             throw e;
         } finally {
-            connPool.release(conn);
+            conn.close();
         }
     }
 

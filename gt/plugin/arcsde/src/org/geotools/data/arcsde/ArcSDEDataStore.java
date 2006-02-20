@@ -46,7 +46,6 @@ import org.geotools.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
-import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
@@ -139,31 +138,9 @@ class ArcSDEDataStore extends AbstractDataStore {
      *         list of registeres feature classes on the backend, or while
      *         obtaining the full qualified name of one of them
      */
-    public String[] getTypeNames() {
-        String[] featureTypesNames = null;
-
-        try {
-            List sdeLayers = connectionPool.getAvailableSdeLayers();
-            featureTypesNames = new String[sdeLayers.size()];
-
-            String typeName;
-            int i = 0;
-
-            for (Iterator it = sdeLayers.iterator(); it.hasNext(); i++) {
-                typeName = ((SeLayer) it.next()).getQualifiedName();
-                featureTypesNames[i] = typeName;
-            }
-        } catch (SeException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new RuntimeException("Exception while fetching layer name: "
-                + ex.getMessage(), ex);
-        } catch (DataSourceException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new RuntimeException("Exception while getting layers list: "
-                + ex.getMessage(), ex);
-        }
-
-        return featureTypesNames;
+    public String[] getTypeNames() throws IOException{
+        List layerNames = connectionPool.getAvailableLayerNames();
+        return (String[])layerNames.toArray(new String[layerNames.size()]);
     }
 
     /**
@@ -198,7 +175,7 @@ class ArcSDEDataStore extends AbstractDataStore {
 
         // connection used to retrieve the user name if a non qualified type
         // name was passed in
-        SeConnection conn = null;
+        PooledConnection conn = null;
 
         // check if it is not qualified and prepend it with "instance.user."
         if (typeName.indexOf('.') == -1) {
@@ -220,7 +197,7 @@ class ArcSDEDataStore extends AbstractDataStore {
                 throw new DataSourceException("error obtaining the user name from a connection",
                     e);
             } finally {
-                getConnectionPool().release(conn);
+                conn.close();
             }
         }
 
@@ -296,7 +273,7 @@ class ArcSDEDataStore extends AbstractDataStore {
         }
 
         // Create a new SeTable/SeLayer with the specified attributes....
-        SeConnection connection = null;
+        PooledConnection connection = null;
         SeTable table = null;
         SeLayer layer = null;
 
@@ -385,8 +362,7 @@ class ArcSDEDataStore extends AbstractDataStore {
             if ((error != null) && tableCreated) {
                 // TODO: remove table if created and then failed
             }
-
-            connectionPool.release(connection);
+            connection.close();
         }
     }
 
@@ -401,7 +377,7 @@ class ArcSDEDataStore extends AbstractDataStore {
      *
      * @throws SeException
      */
-    private SeTable createSeTable(SeConnection connection,
+    private SeTable createSeTable(PooledConnection connection,
         String qualifiedName, String hackColName) throws SeException {
         SeTable table;
         final SeColumnDefinition[] tmpCol = {
@@ -669,7 +645,18 @@ class ArcSDEDataStore extends AbstractDataStore {
      */
     protected FeatureWriter getFeatureWriter(String typeName)
         throws IOException {
-        SeLayer layer = connectionPool.getSdeLayer(typeName);
+    	PooledConnection conn;
+    	SeLayer layer;
+    	try {
+			conn = connectionPool.getConnection();
+    	}catch(UnavailableConnectionException e){
+    		throw new DataSourceException(e);
+    	}
+    	try{
+			layer = connectionPool.getSdeLayer(conn, typeName);
+		} finally{
+			conn.close();
+		}
 
         return new ArcSDEFeatureWriter(this, null, layer);
     }
@@ -705,6 +692,7 @@ class ArcSDEDataStore extends AbstractDataStore {
      */
     public FeatureWriter getFeatureWriter(String typeName, Filter filter,
         Transaction transaction) throws IOException {
+    	
         FeatureType featureType = getSchema(typeName);
         AttributeType[] attributes = featureType.getAttributeTypes();
         String[] names = new String[attributes.length];
@@ -775,8 +763,9 @@ class ArcSDEDataStore extends AbstractDataStore {
                 }
             }
         }
-
+        
         SeLayer layer = connectionPool.getSdeLayer(typeName);
+        
         FeatureWriter writer = new ArcSDEFeatureWriter(this, state, layer, list);
 
         return writer;

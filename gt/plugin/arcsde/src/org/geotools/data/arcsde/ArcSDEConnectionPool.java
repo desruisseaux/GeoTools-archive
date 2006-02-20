@@ -19,11 +19,11 @@ package org.geotools.data.arcsde;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
@@ -105,24 +105,8 @@ public class ArcSDEConnectionPool {
     /** default number of connections a pool increments by */
     public static final int DEFAULT_INCREMENT = 1;
 
-    /**
-     * default interval in milliseconds a calling thread waits for an available
-     * connection
-     */
-    private static final long DEFAULT_WAIT_TIME = 1000;
-
-    /**
-     * default number of milliseconds a calling thread waits before
-     * <code>getConnection</code> throws an <code>UnavailableException</code>
-     */
-    public static final int DEFAULT_MAX_WAIT_TIME = 10000;
-
-    /**
-     * number of milliseconds to wait in the wait loop until reach the timeout
-     * period
-     */
-    private long waitTime = DEFAULT_WAIT_TIME;
-
+    public static final int DEFAULT_MAX_WAIT_TIME = 1000;
+    
     /** DOCUMENT ME! */
     private SeConnectionFactory seConnectionFactory;
 
@@ -133,17 +117,10 @@ public class ArcSDEConnectionPool {
     private ObjectPool pool;
 
     /**
-     * Holds a cache of SeLayers, which is cleared every time the connection
-     * used to create the SeLayer objects is closed.
+     * Holds a cache of tablename/shapeColumn, for all the layers
+     * visible for this pool's connections.
      */
-    private HashMap cachedLayers;
-
-    /**
-     * The connection used to retrieve the list of SeLayers, holded to compare
-     * it upon the one recieved in <code>destroyObject</code> and clear the
-     * layers cache if we're going to close it.
-     */
-    private SeConnection layerCacheConnection;
+    private HashMap /*<String,String>*/ cachedLayers;
 
     /**
      * Indicates that this Connection Pool is closed and it should not return
@@ -184,11 +161,11 @@ public class ArcSDEConnectionPool {
                                           exhaustedAction, maxWait);
         LOGGER.info("Created pool " + pool);
 
-        SeConnection[] preload = new SeConnection[minConnections];
+        PooledConnection[] preload = new PooledConnection[minConnections];
 
         try {
             for (int i = 0; i < minConnections; i++) {
-                preload[i] = (SeConnection) this.pool.borrowObject();
+                preload[i] = (PooledConnection) this.pool.borrowObject();
             }
 
             for (int i = 0; i < minConnections; i++) {
@@ -208,25 +185,6 @@ public class ArcSDEConnectionPool {
     public int getPoolSize() {
         synchronized (this.pool) {
             return this.pool.getNumActive() + this.pool.getNumIdle();
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param seConnection DOCUMENT ME!
-     */
-    public void release(SeConnection seConnection) {
-        if (seConnection == null) {
-            LOGGER.fine("trying to release a null connection");
-
-            return;
-        }
-
-        try {
-            this.pool.returnObject(seConnection);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -271,7 +229,7 @@ public class ArcSDEConnectionPool {
      * @throws UnavailableConnectionException
      * @throws IllegalStateException DOCUMENT ME!
      */
-    public SeConnection getConnection()
+    public PooledConnection getConnection()
                                throws DataSourceException, 
                                       UnavailableConnectionException {
         if (this.closed) {
@@ -279,7 +237,7 @@ public class ArcSDEConnectionPool {
         }
 
         try {
-            return (SeConnection) this.pool.borrowObject();
+            return (PooledConnection) this.pool.borrowObject();
         } catch (NoSuchElementException e) {
             LOGGER.log(Level.WARNING, "Getting connection: " + e.getMessage(), e);
             throw new UnavailableConnectionException(this.pool.getNumActive(),
@@ -291,60 +249,24 @@ public class ArcSDEConnectionPool {
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws SeException DOCUMENT ME!
-     */
-    private SeConnection newConnection() throws SeException {
-        SeConnection seConn = new SeConnection(this.config.getServerName(),
-                                               this.config.getPortNumber()
-                                                          .intValue(),
-                                               this.config.getDatabaseName(),
-                                               this.config.getUserName(),
-                                               this.config.getUserPassword()
-                                              );
-        LOGGER.fine("created new connection " + seConn);
+    public SeTable getSdeTable(String tableName) throws DataSourceException {
+    	PooledConnection conn;
+    	try{
+    		conn = getConnection();
+    	}catch(UnavailableConnectionException e){
+    		throw new DataSourceException(e);
+    	}
+        try {
+            SeTable table = new SeTable(conn, tableName);
 
-        seConn.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
-
-        // SeConnection.SeStreamSpec stSpec = seConn.getStreamSpec();
-
-        /*
-         * System.out.println("getMinBufSize=" + stSpec.getMinBufSize());
-         * System.out.println("getMaxBufSize=" + stSpec.getMaxBufSize());
-         * System.out.println("getMaxArraySize=" + stSpec.getMaxArraySize());
-         * System.out.println("getMinObjects=" + stSpec.getMinObjects());
-         * System.out.println("getAttributeArraySize=" +
-         * stSpec.getAttributeArraySize());
-         * System.out.println("getShapePointArraySize=" +
-         * stSpec.getShapePointArraySize());
-         * System.out.println("getStreamPoolSize=" +
-         * stSpec.getStreamPoolSize());
-         */
-        /*
-         * stSpec.setMinBufSize(1024 * 1024); stSpec.setMaxBufSize(10 * 1024 *
-         * 1024); stSpec.setMaxArraySize(10000); stSpec.setMinObjects(1024);
-         * stSpec.setAttributeArraySize(1024 * 1024);
-         * stSpec.setShapePointArraySize(1024 * 1024);
-         * stSpec.setStreamPoolSize(10);
-         */
-        /*
-         * System.out.println("********************************************");
-         * System.out.println("getMinBufSize=" + stSpec.getMinBufSize());
-         * System.out.println("getMaxBufSize=" + stSpec.getMaxBufSize());
-         * System.out.println("getMaxArraySize=" + stSpec.getMaxArraySize());
-         * System.out.println("getMinObjects=" + stSpec.getMinObjects());
-         * System.out.println("getAttributeArraySize=" +
-         * stSpec.getAttributeArraySize());
-         * System.out.println("getShapePointArraySize=" +
-         * stSpec.getShapePointArraySize());
-         * System.out.println("getStreamPoolSize=" +
-         * stSpec.getStreamPoolSize());
-         */
-        return seConn;
+            return table;
+        } catch (SeException ex) {
+            throw new DataSourceException("Can't obtain the table " +
+                                          tableName + ": " + ex.getMessage(), ex
+                                         );
+        }finally{
+        	conn.close();
+        }
     }
 
     /**
@@ -356,12 +278,8 @@ public class ArcSDEConnectionPool {
      *
      * @throws DataSourceException DOCUMENT ME!
      */
-    public SeTable getSdeTable(String tableName) throws DataSourceException {
-        SeConnection conn = null;
-
+    public SeTable getSdeTable(SeConnection conn, String tableName) throws DataSourceException {
         try {
-            conn = getConnection();
-
             SeTable table = new SeTable(conn, tableName);
 
             return table;
@@ -369,15 +287,27 @@ public class ArcSDEConnectionPool {
             throw new DataSourceException("Can't obtain the table " +
                                           tableName + ": " + ex.getMessage(), ex
                                          );
-        } catch (UnavailableConnectionException ex) {
-            throw new DataSourceException("Can't obtain the table " +
-                                          tableName + ": " + ex.getMessage(), ex
-                                         );
-        } finally {
-            release(conn);
         }
     }
 
+    public synchronized SeLayer getSdeLayer(String typeName)
+    throws NoSuchElementException, IOException {
+    	PooledConnection conn;
+    	SeLayer layer;
+    	
+    	try {
+			conn = getConnection();
+		} catch (UnavailableConnectionException e) {
+			throw new DataSourceException(e);
+		}
+		try{
+			layer = getSdeLayer(conn, typeName);
+		}finally{
+			conn.close();
+		}
+    	return layer;
+    }
+    
     /**
      * DOCUMENT ME!
      *
@@ -388,22 +318,24 @@ public class ArcSDEConnectionPool {
      * @throws NoSuchElementException DOCUMENT ME!
      * @throws IOException DOCUMENT ME!
      */
-    public SeLayer getSdeLayer(String typeName)
+    public synchronized SeLayer getSdeLayer(SeConnection conn, String typeName)
                         throws NoSuchElementException, IOException {
-        // attempt to get the SeLayer object from cache before creating a new
-        // one, because creation is costly for SeLayer objects.
-        SeLayer layer = (SeLayer) this.cachedLayers.get(typeName);
 
-        // if the layer was not cached, create it
-        if (layer == null) {
-            // check for race condition
-            if ((layer = (SeLayer) this.cachedLayers.get(typeName)) != null) {
-                return layer;
-            }
+    	SeLayer layer = null;
 
-            List layers = getAvailableSdeLayers();
-
+    	if(cachedLayers.containsKey(typeName)){
+    		
+    		String shapeColumn = (String)cachedLayers.get(typeName);
+    		try {
+				layer = new SeLayer(conn, typeName, shapeColumn);
+			} catch (SeException e) {
+				throw new DataSourceException("Getting layer " +  typeName, e);
+			}
+    		
+    	}else{
+    		List layers;
             try {
+				layers = conn.getLayers();
                 for (Iterator it = layers.iterator(); it.hasNext();) {
                     layer = (SeLayer) it.next();
 
@@ -413,34 +345,37 @@ public class ArcSDEConnectionPool {
 
                     layer = null;
                 }
-            } catch (SeException ex) {
-                throw new NoSuchElementException(ex.getMessage());
+            } catch (SeException e) {
+				throw new DataSourceException("Getting layer list: " + e.getMessage(), e);
             }
 
+            if (layer == null) {
+                throw new NoSuchElementException(typeName);
+            }
             // cache the layer.
-            if (layer != null) {
-                this.cachedLayers.put(typeName, layer);
-            }
-        }
+            this.cachedLayers.put(typeName, layer.getSpatialColumn());
+    	}
 
-        return layer;
+    	return layer;
     }
 
     /**
-     * gets the list of available SeLayers on the database
+     * Gets the list of available layer names on the database
      *
-     * @return a <code>List&lt;SeLayer&gt;</code> with the registered
+     * @return a <code>List&lt;String&gt;</code> with the registered
      *         featureclasses on the ArcSDE database
      *
      * @throws DataSourceException
      */
-    public List getAvailableSdeLayers() throws DataSourceException {
-        SeConnection conn = null;
+    public List /*<String>*/ getAvailableLayerNames() throws DataSourceException {
+        PooledConnection conn = null;
 
+        List layerNames = new LinkedList();
         try {
             conn = getConnection();
-
-            return conn.getLayers();
+            for(Iterator it =  conn.getLayers().iterator(); it.hasNext();){
+            	layerNames.add(((SeLayer)it.next()).getQualifiedName());
+            }
         } catch (SeException ex) {
             throw new DataSourceException("Error querying the layers list" +
                                           ex.getSeError().getSdeError() + " (" +
@@ -452,8 +387,9 @@ public class ArcSDEConnectionPool {
                                           ex
                                          );
         } finally {
-            release(conn);
+            conn.close();
         }
+        return layerNames;
     }
 
     /**
@@ -567,7 +503,7 @@ public class ArcSDEConnectionPool {
      * @author Gabriel Roldan, Axios Engineering
      * @version $Id
      */
-    private class SeConnectionFactory extends BasePoolableObjectFactory {
+    class SeConnectionFactory extends BasePoolableObjectFactory {
         /** DOCUMENT ME! */
         private ConnectionConfig config;
 
@@ -589,17 +525,7 @@ public class ArcSDEConnectionPool {
          * @throws SeException if the connection can't be created
          */
         public Object makeObject() throws SeException {
-            String server = config.getServerName();
-            int port = config.getPortNumber().intValue();
-            String database = config.getDatabaseName();
-            String user = config.getUserName();
-            String pwd = config.getUserPassword();
-
-            SeConnection seConn = new SeConnection(server, port, database,
-                                                   user, pwd
-                                                  );
-            LOGGER.fine("created new connection " + seConn);
-
+            PooledConnection seConn = new PooledConnection(ArcSDEConnectionPool.this.pool, config);
             return seConn;
         }
 
@@ -623,8 +549,9 @@ public class ArcSDEConnectionPool {
          * @return DOCUMENT ME!
          */
         public boolean validateObject(Object obj) {
-            return (obj instanceof SeConnection) &&
-                   !((SeConnection) obj).isClosed();
+            boolean valid = (obj instanceof PooledConnection);
+            valid = valid && !((PooledConnection) obj).isClosed();
+            return valid;
         }
 
         /**
@@ -635,23 +562,8 @@ public class ArcSDEConnectionPool {
          * @param obj DOCUMENT ME!
          */
         public void destroyObject(Object obj) {
-            SeConnection conn = (SeConnection) obj;
-
-            if (layerCacheConnection == conn) {
-                LOGGER.info("Clearing the cache of SeLayers since the connection they hold is going to be removed from the pool");
-                cachedLayers.clear();
-                layerCacheConnection = null;
-            }
-
-            if (!conn.isClosed()) {
-                LOGGER.info("Closing connection " + conn);
-
-                try {
-                    conn.close();
-                } catch (SeException e) {
-                    LOGGER.log(Level.SEVERE, "Can't close connection " + conn, e);
-                }
-            }
+            PooledConnection conn = (PooledConnection) obj;
+            conn.destroy();
         }
     }
 }

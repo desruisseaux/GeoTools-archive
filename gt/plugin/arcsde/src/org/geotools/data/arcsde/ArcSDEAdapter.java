@@ -41,7 +41,6 @@ import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
-import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;
@@ -289,7 +288,7 @@ public class ArcSDEAdapter {
 		SeColumnDefinition[] seColumns = null;
 		String rowIdColumnName = null;
 		String shapeFIDColumnname = null;
-		SeConnection conn = null;
+		PooledConnection conn = null;
 		try {
 			seColumns = table.describe();
 			conn = connPool.getConnection();
@@ -313,7 +312,7 @@ public class ArcSDEAdapter {
 			throw new DataSourceException("Error obtaining table schema from "
 					+ table.getQualifiedName());
 		}finally{
-			connPool.release(conn);
+			conn.close();
 		}
 
 		int nCols = seColumns.length;

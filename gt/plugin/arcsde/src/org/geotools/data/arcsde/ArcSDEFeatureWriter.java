@@ -217,7 +217,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			this.notInserted = false;
 		} else {
 			Feature feature = (Feature) this.features.get(this.currentIndex);
-			SeConnection connection = null;
+			PooledConnection connection = null;
 
 			try {
 				connection = getConnection();
@@ -252,7 +252,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			throw new IOException("No feature to be written.");
 		}
 
-		SeConnection connection = null;
+		PooledConnection connection = null;
 
 		try {
 			Feature feature = (Feature) this.features.get(this.currentIndex);
@@ -309,7 +309,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 		} catch (Exception e) {
 			
 			LOGGER.log(Level.WARNING, e.getMessage(), e);
-			if (LOGGER.getLevel().intValue() > Level.FINE.intValue()) {
+			if (LOGGER.isLoggable(Level.FINE)) {
 				e.printStackTrace();
 			}
 			throw new DataSourceException(e.getMessage(), e);
@@ -512,7 +512,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * @throws UnavailableConnectionException
 	 *             DOCUMENT ME!
 	 */
-	private synchronized SeConnection getConnection()
+	private synchronized PooledConnection getConnection()
 			throws DataSourceException, UnavailableConnectionException {
 		if (this.transactionState != null) {
 			return this.transactionState.getConnection();
@@ -526,12 +526,12 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * 
 	 * @param connection
 	 */
-	private synchronized void releaseConnection(SeConnection connection) {
+	private synchronized void releaseConnection(PooledConnection connection) {
 		if (this.transactionState != null) {
 			// NO-OP, the transactionState object will release the connection
 			// after it commits or rollsback the operations.
 		} else {
-			this.dataStore.getConnectionPool().release(connection);
+			connection.close();
 		}
 	}
 }

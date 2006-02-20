@@ -35,7 +35,6 @@ import org.geotools.filter.SQLEncoderSDE;
 import org.geotools.filter.SQLUnpacker;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
-import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeFilter;
@@ -79,7 +78,7 @@ class ArcSDEQuery {
      * NOTE: this member is package visible only for unit test pourposes
      * </p>
      */
-    SeConnection connection = null;
+    PooledConnection connection = null;
 
     /**
      * The exact feature type this query is about to request from the arcsde
@@ -297,7 +296,7 @@ class ArcSDEQuery {
      */
     private SeQuery getSeQuery() throws SeException, IOException {
         if (this.query == null) {
-            SeConnection conn = getConnection();
+            PooledConnection conn = getConnection();
             try {
 				String[] propsToQuery = getPropertiesToFetch();
 				this.query = createSeQueryForFetch(conn, propsToQuery, true);
@@ -338,7 +337,7 @@ class ArcSDEQuery {
      *         SeQuery or setting it the spatial constraints.
      * @throws DataSourceException DOCUMENT ME!
      */
-    private SeQuery createSeQueryForFetch(SeConnection connection,
+    private SeQuery createSeQueryForFetch(PooledConnection connection,
         String[] propertyNames, boolean setReturnGeometryMasks)
         throws SeException, DataSourceException {
         if (LOGGER.isLoggable(Level.FINE)) {
@@ -383,7 +382,7 @@ class ArcSDEQuery {
      *         SeQuery or setting it the spatial constraints.
      * @throws DataSourceException DOCUMENT ME!
      */
-    private SeQuery createSeQueryForQueryInfo(SeConnection connection,
+    private SeQuery createSeQueryForQueryInfo(PooledConnection connection,
         String[] propertyNames, boolean setReturnGeometryMasks)
         throws SeException, DataSourceException {
         if (LOGGER.isLoggable(Level.FINE)) {
@@ -583,7 +582,7 @@ class ArcSDEQuery {
      */
     private void releaseConnection() {
         if (this.connectionPool != null && this.connection != null) {
-            this.connectionPool.release(this.connection);
+            this.connection.close();
             this.connection = null;
         }
     }
@@ -595,7 +594,7 @@ class ArcSDEQuery {
      *
      * @throws DataSourceException DOCUMENT ME!
      */
-    private SeConnection getConnection() throws DataSourceException {
+    private PooledConnection getConnection() throws DataSourceException {
         if (this.connection == null) {
             try {
             	if(this.connectionPool == null){

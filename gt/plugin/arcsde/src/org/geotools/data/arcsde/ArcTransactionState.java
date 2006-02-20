@@ -37,7 +37,7 @@ class ArcTransactionState implements Transaction.State {
 	private static final Logger LOGGER = Logger
 			.getLogger(ArcTransactionState.class.getPackage().getName());
 
-	private SeConnection connection;
+	private PooledConnection connection;
 
 	private ArcSDEDataStore dataStore;
 
@@ -91,7 +91,7 @@ class ArcTransactionState implements Transaction.State {
 	 */
 	public void setTransaction(Transaction transaction) {
 		if ((transaction == null) && (this.connection != null)) {
-			this.dataStore.getConnectionPool().release(this.connection);
+			this.connection.close();
 		} else if (transaction != null) {
 			try {
 				connection = dataStore.getConnectionPool().getConnection();
@@ -112,7 +112,7 @@ class ArcTransactionState implements Transaction.State {
 	 * 
 	 * @return DOCUMENT ME!
 	 */
-	SeConnection getConnection() {
+	PooledConnection getConnection() {
 		return connection;
 	}
 }
