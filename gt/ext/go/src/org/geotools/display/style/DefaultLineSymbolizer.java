@@ -430,7 +430,7 @@ public class DefaultLineSymbolizer extends DefaultGraphicStyle implements LineSy
      * {@code GraphicStyle}.
      */
     public synchronized void setPropertiesFrom(final GraphicStyle graphicStyle) {
-        setGroupChangeEvents(true);
+        acquireEventLock();
         try {
             super.setPropertiesFrom(graphicStyle);
             if (graphicStyle instanceof LineSymbolizer) {
@@ -455,7 +455,7 @@ public class DefaultLineSymbolizer extends DefaultGraphicStyle implements LineSy
                 setStrokeWidth              (ls.getStrokeWidth());
             }
         } finally {
-            setGroupChangeEvents(false);
+            releaseEventLock();
         }
     }
 }

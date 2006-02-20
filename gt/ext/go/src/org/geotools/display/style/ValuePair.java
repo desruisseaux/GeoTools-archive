@@ -19,6 +19,12 @@
  */
 package org.geotools.display.style;
 
+// J2SE dependencies
+import java.beans.PropertyChangeEvent;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+
 
 /**
  * A pair of old and new values in a property change event. The old value can never change,
@@ -41,9 +47,21 @@ final class ValuePair {
     Object newValue;
 
     /**
-     * Creates a pair for the specified old value.
+     * Creates a pair for the specified event.
      */
-    ValuePair(final Object oldValue) {
-        this.oldValue = oldValue;
+    public ValuePair(final PropertyChangeEvent change) {
+        oldValue = change.getOldValue();
+        newValue = change.getNewValue();
+    }
+
+    /**
+     * Concatenate this change with the specified one. This {@code ValuePair} is setup as if
+     * {@code this} change was applied first, followed by the {@code next} change. If and only
+     * if the concatenation results in an identity change ({@linkplain #oldValue old} and
+     * {@linkplain #newValue new} values being equals), then this method returns {@code true}.
+     */
+    public boolean concatenate(final ValuePair next) {
+        newValue = next.newValue;
+        return Utilities.equals(oldValue, newValue);
     }
 }

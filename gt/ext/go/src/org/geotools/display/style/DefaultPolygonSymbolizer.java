@@ -181,7 +181,7 @@ public class DefaultPolygonSymbolizer extends DefaultLineSymbolizer implements P
      * {@inheritDoc}
      */
     public synchronized void setPropertiesFrom(final GraphicStyle graphicStyle) {
-        setGroupChangeEvents(true);
+        acquireEventLock();
         try {
             super.setPropertiesFrom(graphicStyle);
             if (graphicStyle instanceof PolygonSymbolizer) {
@@ -194,7 +194,7 @@ public class DefaultPolygonSymbolizer extends DefaultLineSymbolizer implements P
                 setFillStyle          (ps.getFillStyle());
             }
         } finally {
-            setGroupChangeEvents(false);
+            releaseEventLock();
         }
     }
 }

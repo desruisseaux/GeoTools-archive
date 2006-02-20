@@ -372,7 +372,7 @@ public class DefaultTextSymbolizer extends DefaultGraphicStyle implements TextSy
      * {@code GraphicStyle}.
      */
     public synchronized void setPropertiesFrom(final GraphicStyle graphicStyle) {
-        setGroupChangeEvents(true);
+        acquireEventLock();
         try {
             super.setPropertiesFrom(graphicStyle);
             if (graphicStyle instanceof DefaultTextSymbolizer) {
@@ -394,7 +394,7 @@ public class DefaultTextSymbolizer extends DefaultGraphicStyle implements TextSy
                 setYDisplacement      (ts.getYDisplacement());
             }
         } finally {
-            setGroupChangeEvents(false);
+            releaseEventLock();
         }
     }
 }

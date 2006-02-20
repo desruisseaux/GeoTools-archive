@@ -606,7 +606,7 @@ public class DefaultPointSymbolizer extends DefaultGraphicStyle implements Point
      * {@code GraphicStyle}.
      */
     public synchronized void setPropertiesFrom(final GraphicStyle graphicStyle) {
-        setGroupChangeEvents(true);
+        acquireEventLock();
         try {
             super.setPropertiesFrom(graphicStyle);
             if (graphicStyle instanceof DefaultPointSymbolizer) {
@@ -640,7 +640,7 @@ public class DefaultPointSymbolizer extends DefaultGraphicStyle implements Point
                 setStrokeWidth              (ps.getStrokeWidth());
             }
         } finally {
-            setGroupChangeEvents(false);
+            releaseEventLock();
         }
     }
 }

@@ -123,25 +123,32 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
     }
 
     /**
-     * Specifies if {@linkplain PropertyChangeEvent property change events} should be grouped into
-     * a single {@linkplain GraphicStyleEvent graphic style event}. If {@code true}, then all
-     * subsequent {@linkplain PropertyChangeEvent property change events} will be grouped into
-     * a single {@linkplain GraphicStyleEvent graphic style event} until
-     * <code>{@linkplain #setGroupChangeEvents setGroupChangeEvents}(false)</code> is
-     * invoked. This method is typically invoked in a block like below:
+     * Tells that all subsequent {@linkplain PropertyChangeEvent property change events}
+     * should be grouped into a single {@linkplain GraphicStyleEvent graphic style event}
+     * until {@link #releaseEventLock} is invoked. This method is typically invoked in a
+     * block like below:
      *
      * <blockquote><pre>
-     * setGroupChangeEvents(true);
+     * acquireEventLock();
      * try {
      *     // Performs a bunch of changes here.
      * } finally {
-     *     setGroupChangeEvents(false);
+     *     releaseEventLock();
      * }
      * </pre></blockquote>
      */
-    protected void setGroupChangeEvents(final boolean grouping) {
+    protected void acquireEventLock() {
         // Do not synhronize; synchronization is performed by GraphicStyleListenerList.
-        graphicStyleListeners.setGroupChangeEvents(grouping);
+        graphicStyleListeners.acquireEventLock();
+    }
+
+    /**
+     * Fires a single {@linkplain GraphicStyleEvent graphic style event} for all changes that
+     * occured since the call to {@link #acquireEventLock}.
+     */
+    protected void releaseEventLock() {
+        // Do not synhronize; synchronization is performed by GraphicStyleListenerList.
+        graphicStyleListeners.releaseEventLock();
     }
 
     /**
@@ -169,7 +176,7 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
      *
      * <blockquote><pre>
      * public synchronized void setPropertiesFrom(GraphicStyle graphicStyle) {
-     *     setGroupChangeEvents(true);
+     *     {@linkplain #acquireEventLock()};
      *     try {
      *         super.setPropertiesFrom(graphicStyle);
      *         if (graphicStyle instanceof MySymbolizer) {
@@ -178,7 +185,7 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
      *             // etc...
      *         }
      *     } finally {
-     *         setGroupChangeEvents(false);
+     *         {@linkplain #releaseEventLock()};
      *     }
      * }
      * </pre></blockquote>

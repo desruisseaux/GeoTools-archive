@@ -144,18 +144,24 @@ final class GraphicStyleListenerList implements PropertyChangeListener {
     }
 
     /**
-     * If {@code true}, all subsequent {@linkplain PropertyChangeEvent property change events}
-     * will be grouped into a single {@linkplain GraphicStyleEvent graphic style event} until
-     * <code>{@linkplain #setGroupChangeEvents setGroupChangeEvents}(false)</code> is invoked.
+     * Tells that all subsequent {@linkplain PropertyChangeEvent property change events}
+     * should be grouped into a single {@linkplain GraphicStyleEvent graphic style event}
+     * until {@link #releaseEventLock} is invoked.
      */
-    public void setGroupChangeEvents(final boolean grouping) {
+    public void acquireEventLock() {
+        synchronized (source) {
+            ++groupCount;
+        }
+    }
+
+    /**
+     * Fires a single {@linkplain GraphicStyleEvent graphic style event} for all changes that
+     * occured since the call to {@link #acquireEventLock}.
+     */
+    public void releaseEventLock() {
         final GraphicStyleEvent      event;
         final GraphicStyleListener[] listeners;
         synchronized (source) {
-            if (grouping) {
-                ++groupCount;
-                return;
-            }
             if (groupCount == 0) {
                 throw new IllegalStateException();
             }
@@ -172,20 +178,29 @@ final class GraphicStyleListenerList implements PropertyChangeListener {
     /**
      * Invoked when a property changed. This method add the modified property to an internal list,
      * and notifies all {@linkplain GraphicStyleListener graphic style listeners} at once when
-     * <code>{@linkplain #setGroupChangeEvents setGroupChangeEvents}(false)</code> is invoked.
+     * {@link #releaseEventLock} is invoked.
      */
     public void propertyChange(final PropertyChangeEvent change) {
         final GraphicStyleEvent      event;
         final GraphicStyleListener[] listeners;
         synchronized (source) {
             final String name = change.getPropertyName();
-            ValuePair pair = new ValuePair(change.getOldValue());
+            final ValuePair pair = new ValuePair(change);
             final ValuePair previous = (ValuePair) changes.put(name, pair);
             if (previous != null) {
-                pair = previous;
-                changes.put(name, previous);
+                /*
+                 * This property already changed previously (note that we didn't invoked Map.get
+                 * prior to Map.put in order to avoid accessing the map twice; most of the time,
+                 * 'previous' will be null). Restore the previous value pair, except if the latest
+                 * change cancel the previous one. In this later case, we will discart completly
+                 * the change.
+                 */
+                if (previous.concatenate(pair)) {
+                    changes.remove(name);
+                } else {
+                    changes.put(name, previous);
+                }
             }
-            pair.newValue = change.getNewValue();
             if (groupCount != 0) {
                 return;
             }
