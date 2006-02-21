@@ -102,9 +102,6 @@ public class ArcSDEConnectionPool {
     /** default number of maximun allowable connections a pool can hold */
     public static final int DEFAULT_MAX_CONNECTIONS = 2;
 
-    /** default number of connections a pool increments by */
-    public static final int DEFAULT_INCREMENT = 1;
-
     public static final int DEFAULT_MAX_WAIT_TIME = 1000;
     
     /** DOCUMENT ME! */
@@ -501,7 +498,7 @@ public class ArcSDEConnectionPool {
      * objects pool, that provides ArcSDE's SeConnections.
      *
      * @author Gabriel Roldan, Axios Engineering
-     * @version $Id
+     * @version $Id$
      */
     class SeConnectionFactory extends BasePoolableObjectFactory {
         /** DOCUMENT ME! */

@@ -80,9 +80,6 @@ public class ConnectionConfig {
 	public static final String MAX_CONNECTIONS_PARAM = "pool.maxConnections";
 
 	/** DOCUMENT ME! */
-	public static final String CONNECTIONS_INCREMENT_PARAM = "pool.increment";
-
-	/** DOCUMENT ME! */
 	public static final String CONNECTION_TIMEOUT_PARAM = "pool.timeOut";
 
 	/**
@@ -120,9 +117,6 @@ public class ConnectionConfig {
 
 	/** DOCUMENT ME! */
 	Integer connTimeOut = null;
-
-	/** DOCUMENT ME! */
-	Integer increment = null;
 
 	/**
 	 * DOCUMENT ME!
@@ -226,8 +220,6 @@ public class ConnectionConfig {
 				ArcSDEConnectionPool.DEFAULT_CONNECTIONS);
 		this.maxConnections = getInt(params.get(MAX_CONNECTIONS_PARAM),
 				ArcSDEConnectionPool.DEFAULT_MAX_CONNECTIONS);
-		this.increment = getInt(params.get(CONNECTIONS_INCREMENT_PARAM),
-				ArcSDEConnectionPool.DEFAULT_INCREMENT);
 		this.connTimeOut = getInt(params.get(CONNECTION_TIMEOUT_PARAM),
 				ArcSDEConnectionPool.DEFAULT_MAX_WAIT_TIME);
 
@@ -241,11 +233,6 @@ public class ConnectionConfig {
 					+ " must be a positive integer";
 		}
 
-		if (this.increment.intValue() <= 0) {
-			exceptionMsg = CONNECTIONS_INCREMENT_PARAM
-					+ " must be a positive integer";
-		}
-
 		if (this.connTimeOut.intValue() <= 0) {
 			exceptionMsg = CONNECTION_TIMEOUT_PARAM
 					+ " must be a positive integer";
@@ -253,11 +240,6 @@ public class ConnectionConfig {
 
 		if (this.minConnections.intValue() > this.maxConnections.intValue()) {
 			exceptionMsg = MIN_CONNECTIONS_PARAM + " must be lower than "
-					+ MAX_CONNECTIONS_PARAM;
-		}
-
-		if (this.increment.intValue() > this.maxConnections.intValue()) {
-			exceptionMsg = CONNECTIONS_INCREMENT_PARAM + " must be lower than "
 					+ MAX_CONNECTIONS_PARAM;
 		}
 
@@ -478,15 +460,6 @@ public class ConnectionConfig {
 	 * 
 	 * @return DOCUMENT ME!
 	 */
-	public Integer getIncrement() {
-		return increment;
-	}
-
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @return DOCUMENT ME!
-	 */
 	public Integer getMaxConnections() {
 		return maxConnections;
 	}
@@ -525,8 +498,6 @@ public class ConnectionConfig {
 		sb.append(this.maxConnections);
 		sb.append(", connTimeOut=");
 		sb.append(this.connTimeOut);
-		sb.append(", connIncrement=");
-		sb.append(this.increment);
 		sb.append("]");
 
 		return sb.toString();

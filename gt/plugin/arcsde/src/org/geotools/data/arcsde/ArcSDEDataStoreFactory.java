@@ -43,7 +43,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 8.x";
     
     /** DOCUMENT ME! */
-    private static Param[] paramMetadata = new Param[11];
+    private static Param[] paramMetadata = new Param[10];
     
     static {
         paramMetadata[0] = new Param("namespace", String.class,
@@ -75,13 +75,10 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                 "Maximun number of open connections (will not work if < 2)",
                 false,
                 new Integer(ArcSDEConnectionPool.DEFAULT_MAX_CONNECTIONS));
-        paramMetadata[9] = new Param("pool.increment", Integer.class,
-                "Number of connections created on each pool size increment",
-                false, new Integer(ArcSDEConnectionPool.DEFAULT_INCREMENT));
-        paramMetadata[10] = new Param(
+        paramMetadata[9] = new Param(
                 "pool.timeOut",
                 Integer.class,
-                "Number of milliseconds a calling thread should wait for an available connection",
+                "Milliseconds to wait for an available connection before failing to connect",
                 false, new Integer(ArcSDEConnectionPool.DEFAULT_MAX_WAIT_TIME));
     }
     
