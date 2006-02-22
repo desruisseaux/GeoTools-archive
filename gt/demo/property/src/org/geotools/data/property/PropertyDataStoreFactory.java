@@ -19,19 +19,26 @@ package org.geotools.data.property;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
- * DOCUMENT ME!
+ * DataStore factory that creates {@linkplain org.geotools.data.property.PropertyDataStore}s
  *
  * @author jgarnett
  * @source $URL$
  * @version $Id$
  */
 public class PropertyDataStoreFactory implements DataStoreFactorySpi {
-    //    public DataSourceMetadataEnity createMetadata( Map params )
+	private static final Logger LOGGER = Logger.getLogger(PropertyDataStoreFactory.class.getPackage().getName());
+	
+	
+	//    public DataSourceMetadataEnity createMetadata( Map params )
     //            throws IOException {
     //        if( !canProcess( params )){
     //            throw new IOException( "Provided params cannot be used to connect");
@@ -54,7 +61,7 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
      * @throws IOException DOCUMENT ME!
      */
     public DataStore createDataStore(Map params) throws IOException {
-    	File dir = new File(String.valueOf(params.get(DIRECTORY.key)));
+    	File dir = directoryLookup(params);
         if (dir.exists() && dir.isDirectory()) {
             return new PropertyDataStore(dir);
         } else {
@@ -72,7 +79,7 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
      * @throws IOException DOCUMENT ME!
      */
     public DataStore createNewDataStore(Map params) throws IOException {
-    	File dir = new File(String.valueOf(params.get(DIRECTORY.key)));
+    	File dir = directoryLookup(params);
 
         if (dir.exists()) {
             throw new IOException(dir + " already exists");
@@ -142,11 +149,13 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
      */
     public boolean canProcess(Map params) {
         try {
-        	File file = new File(String.valueOf(params.get(DIRECTORY.key)));
-            return file.exists() && file.isDirectory();
+        	directoryLookup(params);
+            return true;
         } catch (Exception erp) {
-        	erp.printStackTrace();
-            return false;
+        	if(LOGGER.isLoggable(Level.FINE)){
+        		LOGGER.log(Level.FINE, "can't process parameters", erp);
+        	}
+        	return false;
         }
     }
     
@@ -154,5 +163,35 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
      */
     public Map getImplementationHints(){
         return java.util.Collections.EMPTY_MAP;
+    }
+    
+    /**
+     * Lookups the directory containing property files in the params argument, and
+     * returns the corresponding <code>java.io.File</code>.
+     * <p>
+     * The file is first checked for existence as an absolute path in the filesystem. If
+     * such a directory is not found, then it is treated as a relative path, taking Java
+     * system property <code>"user.dir"</code> as the base.
+     * </p>
+     * @param params
+     * @return
+     * @throws IllegalArgumentException if directory is not a directory.
+     * @throws FileNotFoundException if directory does not exists
+     * @throws IOException if {@linkplain #DIRECTORY} doesn't find parameter in <code>params</code>
+     * file does not exists.
+     */
+    private File directoryLookup(Map params)throws IOException, FileNotFoundException,IllegalArgumentException{
+    	File directory = (File)DIRECTORY.lookUp(params);
+    	if(!directory.exists()){
+    		File currentDir = new File(System.getProperty("user.dir"));
+    		directory = new File(currentDir, (String)params.get(DIRECTORY.key));
+    		if(!directory.exists()){
+    			throw new FileNotFoundException(directory.getAbsolutePath());
+    		}
+    		if(!directory.isDirectory()){
+    			throw new IllegalArgumentException(directory.getAbsolutePath() + " is not a directory");
+    		}
+    	}
+    	return directory;
     }
 }
