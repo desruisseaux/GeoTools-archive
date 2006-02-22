@@ -23,6 +23,7 @@ package org.geotools.resources.image;
 import java.awt.Color;
 import java.awt.color.ColorSpace;
 import java.awt.image.DataBuffer;
+import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.util.Arrays;
 
@@ -344,5 +345,21 @@ public final class ColorUtilities {
             }
         }
         return index;
+    }
+
+    /**
+     * Tries to guess the number of bands from the specified color model. The recommanded approach
+     * is to invoke {@link java.awt.image.SampleModel#getNumBands}. This method should be used only
+     * as a fallback when the sample model is not available. This method uses some heuristic rules
+     * for guessing the number of bands, so the return value may not be exact in all cases.
+     */
+    public static int getNumBands(final ColorModel model) {
+        if (model instanceof IndexColorModel) {
+            if (model instanceof MultiBandsIndexColorModel) {
+                return ((MultiBandsIndexColorModel) model).numBands;
+            }
+            return 1;
+        }
+        return model.getNumComponents();
     }
 }

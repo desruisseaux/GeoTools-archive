@@ -44,6 +44,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.AbstractInternationalString;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NumberRange;
@@ -281,7 +282,7 @@ public final class TypeMap {
     }
 
     /**
-     * Return the sample dimension type for the specified sample model and band number. If
+     * Returns the sample dimension type for the specified sample model and band number. If
      * the sample model use an undefined data type, then this method returns {@code null}.
      *
      * @param  model The sample model.
@@ -506,9 +507,9 @@ public final class TypeMap {
         throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                                            "value", new Double(value)));
     }
-    
+
     /**
-     * Return the color interpretation code for the specified color model and band number.
+     * Returns the color interpretation code for the specified color model and band number.
      *
      * @param  model The color model.
      * @param  band  The band to query.
@@ -518,7 +519,7 @@ public final class TypeMap {
     public static ColorInterpretation getColorInterpretation(final ColorModel model, final int band)
             throws IllegalArgumentException
     {
-        if (band<0 || band>=model.getNumComponents()) {
+        if (band<0 || band>=ColorUtilities.getNumBands(model)) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,
                                                new Integer(band)));
         }

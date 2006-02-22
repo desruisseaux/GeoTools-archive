@@ -32,6 +32,11 @@ import java.util.Arrays;
 
 /**
  * An {@link IndexColorModel} tolerant with image having more than one band.
+ * <p>
+ * <strong>Reminder:</strong> {@link #getNumComponents} will returns 3 or 4 no matter
+ * how many bands were specified to the constructor. This is not specific to this class;
+ * {@code IndexColorModel} behave that way. So we can't rely on this method for checking
+ * the number of bands.
  *
  * @since 2.0
  * @source $URL$
@@ -43,7 +48,7 @@ final class MultiBandsIndexColorModel extends IndexColorModel {
     /**
      * The number of bands.
      */
-    private final int numBands;
+    final int numBands;
 
     /**
      * The visible band.
@@ -88,6 +93,16 @@ final class MultiBandsIndexColorModel extends IndexColorModel {
     /**
      * Returns a data element array representation of a pixel in this color model,
      * given an integer pixel representation in the default RGB color model.
+     * <p>
+     * This method returns an array with a length equals to the number of bands specified to
+     * the constructor ({@code IndexColorModel} would returns an array of length 1). All array
+     * elements are set to the same value. Replicating the pixel value is a somewhat arbitrary
+     * choice, but this choice make this image appears as a gray scale image if the underlying
+     * {@link DataBuffer} were displayed again with a RGB color model instead of this one. Such
+     * a gray scale image seems more neutral than an image where only the Red component would vary.
+     * <p>
+     * All other {@code getDataElement} methods in this color model are ultimately defined in terms
+     * of this method, so overriding this method should be enough.
      */
     public Object getDataElements(final int RGB, Object pixel) {
         if (pixel == null) {
@@ -124,7 +139,7 @@ final class MultiBandsIndexColorModel extends IndexColorModel {
 
     /**
      * Returns an array of unnormalized color/alpha components for a specified pixel
-     * in this color model.
+     * in this color model. This method is the converse of {@link #getDataElements}.
      */
     public int[] getComponents(final Object pixel, final int[] components, final int offset) {
         final int i;
