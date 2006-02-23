@@ -135,7 +135,7 @@ public class IndexFile {
 	      if (this.useMemoryMappedBuffer) {
 	          
 	      } else {
-	          if (this.channelOffset + buf.limit() <= pos || this.lastIndex == -1) {
+	          if (pos-this.channelOffset<0 || this.channelOffset + buf.limit() <= pos || this.lastIndex == -1) {
 	              LOGGER.finest("Filling buffer...");
 	              this.channelOffset = pos;
 	              this.channel.position(pos);

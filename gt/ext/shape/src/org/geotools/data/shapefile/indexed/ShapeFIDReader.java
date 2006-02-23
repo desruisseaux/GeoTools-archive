@@ -90,7 +90,7 @@ public class ShapeFIDReader implements FIDReader {
         }
 
         buffer.delete(len, buffer.length());
-        buffer.append(reader.getRecordNumber());
+        buffer.append(reader.getRecordNumber()-1);
 
         return buffer.toString();
     }

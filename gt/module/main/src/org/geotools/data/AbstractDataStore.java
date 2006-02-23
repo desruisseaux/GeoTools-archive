@@ -480,20 +480,6 @@ public abstract class AbstractDataStore implements DataStore {
             return new EmptyFeatureWriter(featureType);
         }
 
-        FeatureWriter writer = getFeatureWriter(typeName, transaction);
-
-        if (filter != Filter.NONE) {
-            writer = new FilteringFeatureWriter(writer, filter);
-        }
-
-        return writer;
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String, org.geotools.data.Transaction)
-     */
-    public FeatureWriter getFeatureWriter(String typeName,
-        Transaction transaction) throws IOException {
         if (transaction == null) {
             throw new NullPointerException(
                 "getFeatureWriter requires Transaction: "
@@ -510,7 +496,7 @@ public abstract class AbstractDataStore implements DataStore {
         		writer = getFeatureWriter(typeName);
 			}
         } else {
-            writer = state(transaction).writer(typeName);
+            writer = state(transaction).writer(typeName, filter);
         }
 
         if (lockingManager != null) {
@@ -519,7 +505,20 @@ public abstract class AbstractDataStore implements DataStore {
             writer = lockingManager.checkedWriter(writer, transaction);
         }
 
+        if (filter != Filter.NONE) {
+            writer = new FilteringFeatureWriter(writer, filter);
+        }
+
         return writer;
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String, org.geotools.data.Transaction)
+     */
+    public FeatureWriter getFeatureWriter(String typeName,
+        Transaction transaction) throws IOException {
+
+    	return getFeatureWriter(typeName, Filter.NONE, transaction);
     }
 
     /* (non-Javadoc)

@@ -28,6 +28,7 @@ import org.geotools.data.Transaction.State;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
+import org.geotools.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -299,16 +300,17 @@ public class TransactionStateDiff implements State {
      * </p>
      *
      * @param typeName Type Name to record differences against
+     * @param filter 
      *
      * @return A FeatureWriter that records Differences against a FeatureReader
      *
      * @throws IOException If a FeatureRader could not be constucted to record
      *         differences against
      */
-    public synchronized FeatureWriter writer(final String typeName)
+    public synchronized FeatureWriter writer(final String typeName, Filter filter)
         throws IOException {
         Map diff = diff(typeName);
-        FeatureReader reader = store.getFeatureReader(typeName);
+        FeatureReader reader = store.getFeatureReader(typeName, new DefaultQuery(typeName, filter));
 
         return new DiffFeatureWriter(reader, diff) {
                 public void fireNotification(int eventType, Envelope bounds) {

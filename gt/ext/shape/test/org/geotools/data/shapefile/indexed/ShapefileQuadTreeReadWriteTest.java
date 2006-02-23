@@ -16,8 +16,6 @@
 package org.geotools.data.shapefile.indexed;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,11 +24,9 @@ import java.util.Map;
 
 import junit.framework.AssertionFailedError;
 
-import com.vividsolutions.jts.geom.Geometry;
-
+import org.geotools.TestData;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
@@ -38,7 +34,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.TestData;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -98,12 +95,11 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         FeatureSource source = s1.getFeatureSource(typeName);
         FeatureType type = source.getSchema();
         FeatureCollection one = source.getFeatures();
-        File tmp = getTempFile();
 
         IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();
 
-        doubleWrite(type, one, tmp, maker, false);
-        doubleWrite(type, one, tmp, maker, true);
+        doubleWrite(type, one, getTempFile(), maker, false);
+        doubleWrite(type, one, getTempFile(), maker, true);
 	}
 
 	private DataStore createDataStore(IndexedShapefileDataStoreFactory fac, URL url, boolean memoryMapped) throws IOException {
@@ -142,11 +138,10 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         FeatureSource source = s.getFeatureSource(typeName);
         FeatureType type = source.getSchema();
         FeatureCollection one = source.getFeatures();
-        File tmp = getTempFile();
 
         IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();
-        test(type, one, tmp, maker, false);
-        test(type, one, tmp, maker, true);
+        test(type, one, getTempFile(), maker, false);
+        test(type, one, getTempFile(), maker, true);
     }
 
     private void test(FeatureType type, FeatureCollection one, File tmp,
@@ -171,20 +166,13 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         s = createDataStore(new IndexedShapefileDataStoreFactory(), tmp.toURL(), true);
         typeName = s.getTypeNames()[0];
 
-        FeatureResults two = s.getFeatureSource(typeName).getFeatures();
-
-        compare(one.collection(), two.collection());
+        FeatureCollection two = s.getFeatureSource(typeName).getFeatures();
+        
+        compare(one.features(), two.features() );
     }
 
-    static void compare(FeatureCollection one, FeatureCollection two)
+    static void compare(FeatureIterator fs1, FeatureIterator fs2)
         throws Exception {
-        if (one.size() != two.size()) {
-            throw new Exception("Number of Features unequal : " + one.size()
-                + " != " + two.size());
-        }
-
-        FeatureIterator fs1 = one.features();
-        FeatureIterator fs2 = two.features();
 
         int i = 0;
 

@@ -33,6 +33,7 @@ import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.TestData;
@@ -163,9 +164,16 @@ public class ShapefileTest extends TestCaseSupport {
         typeName = s.getTypeNames()[0];
 
         FeatureSource source = s.getFeatureSource(typeName);
-        FeatureCollection fc = source.getFeatures().collection();
+        FeatureCollection fc = source.getFeatures();
 
-        ShapefileRTreeReadWriteTest.compare(features, fc);
+        FeatureIterator f1iter = features.features();
+        FeatureIterator f2iter = fc.features();
+        try{
+        ShapefileRTreeReadWriteTest.compare(f1iter.next(), f2iter.next());
+        }finally{
+        	f1iter.close();
+        	f2iter.close();
+        }
     }
 
     public void testSkippingRecords() throws Exception {

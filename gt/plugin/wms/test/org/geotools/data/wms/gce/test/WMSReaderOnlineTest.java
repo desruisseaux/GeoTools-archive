@@ -53,13 +53,13 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author rgould
  * @source $URL$
  */
-public class WMSReaderTest extends ServerTestCase {
+public class WMSReaderOnlineTest extends ServerTestCase {
     WMSCapabilities capabilities;
     WMSReader reader;
     URL server;
     WMSFormat format;
 
-    public WMSReaderTest(String arg0) {
+    public WMSReaderOnlineTest(String arg0) {
         super(arg0);
     }
 

@@ -1067,6 +1067,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         File dest = new File(src.getFile());
         FileChannel in = null;
         FileChannel out = null;
+        
+        if( storage.equals(dest) )
+        	return;
 
         try {
             readWriteLock.lockWrite();

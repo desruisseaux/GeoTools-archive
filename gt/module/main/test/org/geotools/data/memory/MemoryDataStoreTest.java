@@ -369,7 +369,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertEquals(1, count(reader));
 
         TransactionStateDiff state = (TransactionStateDiff) t.getState(data);
-        FeatureWriter writer = state.writer("road");
+        FeatureWriter writer = state.writer("road", Filter.NONE);
         Feature feature;
 
         while (writer.hasNext()) {

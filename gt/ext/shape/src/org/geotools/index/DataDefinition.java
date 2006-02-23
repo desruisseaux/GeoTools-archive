@@ -96,7 +96,7 @@ public class DataDefinition {
      *
      * @throws TreeException DOCUMENT ME!
      */
-    public void addField(Class clazz) throws TreeException {
+    public void addField(Class clazz) {
         if (clazz.isAssignableFrom(Short.class)) {
             this.fields.add(new Field(clazz, 2));
         } else if (clazz.isAssignableFrom(Integer.class)) {
@@ -109,7 +109,7 @@ public class DataDefinition {
         } else if (clazz.isAssignableFrom(Double.class)) {
             this.fields.add(new Field(clazz, 8));
         } else {
-            throw new TreeException("Unknow len of class " + clazz
+            throw new IllegalArgumentException("Unknow len of class " + clazz
                 + "use addField(int)");
         }
     }
