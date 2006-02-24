@@ -54,12 +54,15 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiLineString;
 
 
@@ -743,6 +746,69 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertTrue(coversLax(reader, FINAL));
     }
 
+    /**
+     * Test the transaction when multiple edits occur using a transaction
+     * and a fid filter.
+     */
+    public void testModifyInTransactionFidFilter() throws Exception {
+        Transaction t1 = new DefaultTransaction();
+        
+        GeometryFactory fac=new GeometryFactory();
+        
+        FeatureWriter writer1 = data.getFeatureWriter("road", rd1Filter, t1);
+        writer1.next().setDefaultGeometry( fac.createLineString(
+                new Coordinate[]{new Coordinate(0,0), new Coordinate(0,1)}));
+        writer1.write();
+        
+        writer1.close();
+
+        FeatureReader reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t1);
+        Geometry geom1 = reader.next().getDefaultGeometry();
+        reader.close();
+        assertEquals(new Coordinate(0,0), geom1.getCoordinates()[0]);
+        assertEquals(new Coordinate(0,1), geom1.getCoordinates()[1]);
+        
+        writer1 = data.getFeatureWriter("road", rd1Filter, t1);
+        writer1.next().setDefaultGeometry( fac.createLineString(
+                new Coordinate[]{new Coordinate(10,0), new Coordinate(10,1)}));
+        writer1.write();
+        writer1.close();
+        
+        reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t1);
+        geom1 = reader.next().getDefaultGeometry();
+        reader.close();
+        assertEquals(new Coordinate(10,0), geom1.getCoordinates()[0]);
+        assertEquals(new Coordinate(10,1), geom1.getCoordinates()[1]);
+        
+        
+        FeatureWriter writer = data.getFeatureWriterAppend("road", t1);
+        Feature feature=writer.next();
+        feature.setDefaultGeometry( fac.createLineString(
+                new Coordinate[]{new Coordinate(20,0), new Coordinate(20,1)}));
+        writer.write();
+        writer.close();
+        FidFilter filter=FilterFactoryFinder.createFilterFactory().createFidFilter(feature.getID());
+        
+        reader = data.getFeatureReader(new DefaultQuery("road", filter), t1);
+        geom1 = reader.next().getDefaultGeometry();
+        reader.close();
+        assertEquals(new Coordinate(20,0), geom1.getCoordinates()[0]);
+        assertEquals(new Coordinate(20,1), geom1.getCoordinates()[1]);
+
+        
+        writer1 = data.getFeatureWriter("road", filter, t1);
+        writer1.next().setDefaultGeometry( fac.createLineString(
+                new Coordinate[]{new Coordinate(30,0), new Coordinate(30,1)}));
+        writer1.write();
+        writer1.close();
+        
+        reader = data.getFeatureReader(new DefaultQuery("road", filter), t1);
+        geom1 = reader.next().getDefaultGeometry();
+        reader.close();
+        assertEquals(new Coordinate(30,0), geom1.getCoordinates()[0]);
+        assertEquals(new Coordinate(30,1), geom1.getCoordinates()[1]);
+    }
+    
     // Feature Source Testing
     public void testGetFeatureSourceRoad() throws IOException {
         FeatureSource road = data.getFeatureSource("road");

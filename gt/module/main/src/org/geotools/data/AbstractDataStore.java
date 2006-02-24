@@ -356,7 +356,7 @@ public abstract class AbstractDataStore implements DataStore {
 
         if (transaction != Transaction.AUTO_COMMIT) {
             Map diff = state(transaction).diff(typeName);
-            reader = new DiffFeatureReader(reader, diff);
+            reader = new DiffFeatureReader(reader, diff, query.getFilter());
         }
 
         if (!filter.equals( Filter.NONE ) ) {

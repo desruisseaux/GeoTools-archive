@@ -108,7 +108,6 @@ public class IndexedFidWriter {
         }
 
         try {
-        	
         	// need to copy rest of file from reader
         	while( hasNext() ){
         		next();

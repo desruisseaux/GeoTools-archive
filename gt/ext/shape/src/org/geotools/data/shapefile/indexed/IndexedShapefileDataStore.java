@@ -389,6 +389,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             writer = ((InProcessLockingManager) getLockingManager()).checkedWriter(writer, transaction);
         }
 
+        while(writer.hasNext() )
+            writer.next();
         return writer;
 	}
 	
@@ -416,6 +418,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	protected FeatureReader getFeatureReader(String typeName, Query query)
 			throws IOException {
+		if( query.getFilter()==Filter.ALL )
+			return new EmptyFeatureReader(getSchema());
+			
 		String[] propertyNames = query.getPropertyNames();
 		String defaultGeomName = schema.getDefaultGeometry().getName();
 

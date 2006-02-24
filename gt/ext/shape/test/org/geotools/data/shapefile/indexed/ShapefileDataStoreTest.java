@@ -30,9 +30,12 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -333,6 +336,32 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         }
     }
 
+    public void testTestTransaction() throws Exception {
+        IndexedShapefileDataStore sds = createDataStore();
+
+        int idx = sds.getCount(Query.ALL);
+        
+        FeatureStore store=(FeatureStore) sds.getFeatureSource(sds.getCurrentTypeName());
+        
+        Transaction transaction=new DefaultTransaction();
+        store.setTransaction(transaction);
+        Feature[] newFeatures1=new Feature[1];
+        Feature[] newFeatures2=new Feature[2];
+        GeometryFactory fac=new GeometryFactory();
+        newFeatures1[0]=DataUtilities.template(sds.getSchema());
+        newFeatures1[0].setDefaultGeometry(fac.createPoint(new Coordinate(0,0)));
+        newFeatures2[0]=DataUtilities.template(sds.getSchema());
+        newFeatures2[0].setDefaultGeometry(fac.createPoint(new Coordinate(0,0)));
+        newFeatures2[1]=DataUtilities.template(sds.getSchema());
+        newFeatures2[1].setDefaultGeometry(fac.createPoint(new Coordinate(0,0)));
+        
+        store.addFeatures(DataUtilities.reader(newFeatures1));
+        store.addFeatures(DataUtilities.reader(newFeatures2));
+        transaction.commit();
+        assertEquals(idx+3, sds.getCount(Query.ALL));
+        
+    }
+    
     private FeatureCollection createFeatureCollection()
         throws Exception {
         FeatureTypeFactory factory = FeatureTypeFactory.newInstance("junk");

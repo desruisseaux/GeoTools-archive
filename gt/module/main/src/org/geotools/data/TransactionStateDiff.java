@@ -310,9 +310,9 @@ public class TransactionStateDiff implements State {
     public synchronized FeatureWriter writer(final String typeName, Filter filter)
         throws IOException {
         Map diff = diff(typeName);
-        FeatureReader reader = store.getFeatureReader(typeName, new DefaultQuery(typeName, filter));
+        FeatureReader reader = new FilteringFeatureReader(store.getFeatureReader(typeName, new DefaultQuery(typeName, filter)), filter);
 
-        return new DiffFeatureWriter(reader, diff) {
+        return new DiffFeatureWriter(reader, diff, filter) {
                 public void fireNotification(int eventType, Envelope bounds) {
                     switch (eventType) {
                     case FeatureEvent.FEATURES_ADDED:
