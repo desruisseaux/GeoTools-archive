@@ -326,7 +326,7 @@ public class ShapefileRenderer implements GTRenderer{
 
         try {
             diff = state.diff(typename);
-            fids = diff.keySet();
+            fids = new HashSet(diff.keySet());
         } catch (IOException e) {
             fids = Collections.EMPTY_SET;
         }
