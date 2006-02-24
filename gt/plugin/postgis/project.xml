@@ -87,7 +87,7 @@ freely available.</description>
     </dependency>
     <dependency>
       <id>wkb4j</id>
-      <version>1.0-RC1</version>
+      <version>1.0-RC1-modified</version>
       <url>http://wkb4j.sf.net/</url>
        <properties>
         <relese.bundle>true</relese.bundle>
