@@ -87,8 +87,7 @@ public class CustomGlyphRenderer implements GlyphRenderer {
                 list.setPropertyValue(nextName, props.get(nextName));
             } else {
                 //DO I WANT TO THROW AN EXCEPTION OR ADD THE NEW PROPERTY TO THE LIST OR DO NOTHING?
-                System.out.println("Tried to set the property " + nextName
-                + " to a glyph that does not have this property.");
+
             }
         }
         
