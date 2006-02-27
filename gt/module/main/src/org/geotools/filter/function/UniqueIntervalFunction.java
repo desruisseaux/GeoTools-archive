@@ -37,7 +37,7 @@ import org.geotools.util.NullProgressListener;
  * @author Cory Horner
  * @source $URL$
  */
-public class UniqueIntervalFunction extends ClassificationFunction {
+public class UniqueIntervalFunction extends ExplicitClassificationFunction {
     Object unique = null; //sorted list of unique values
     Set[] values = null; //the contents of each bin (set of objects)
     boolean isValid = false; //we have valid data

@@ -38,16 +38,15 @@ import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.expression.Expression;
 import org.geotools.filter.function.ClassificationFunction;
-import org.geotools.filter.function.EqualIntervalFunction;
-import org.geotools.filter.function.QuantileFunction;
-import org.geotools.filter.function.UniqueIntervalFunction;
+import org.geotools.filter.function.CustomClassifierFunction;
+import org.geotools.filter.function.ExplicitClassificationFunction;
+import org.geotools.filter.function.RangedClassificationFunction;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Mark;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
@@ -69,7 +68,6 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  */
 public class StyleGenerator {
-    private ColorBrewer colorBrewer;
     private Color[] colors;
     private int numClasses;
     private Expression expression;
@@ -80,7 +78,7 @@ public class StyleGenerator {
     private ClassificationFunction function;
     private double opacity = 0.5;
     private Stroke defaultStroke;
-    private String id;
+    private String typeId;
     private String titleSpacer = " to ";
     private int elseMode = ELSEMODE_IGNORE;
     
@@ -89,21 +87,19 @@ public class StyleGenerator {
     public final static int ELSEMODE_INCLUDEASMAX = 2;
     
     /**
-     * 
+     * Creates an instance of the StyleGenerator with the components it needs.
+     *  
      * @param colors 
-     * @param paletteName
-     * @param expression
-     * @param collection 
      * @param function classificationFunction containing our desired breaks
-     * @param id unique string to tag the FTS with
+     * @param typeId "colorbrewer:"+typeId = SemanticTypeIdentifier
      */
-    public StyleGenerator(Color[] colors, ClassificationFunction function, String id) {
+    public StyleGenerator(Color[] colors, ClassificationFunction function, String typeId) {
         this.colors = colors;
         this.numClasses = function.getNumberOfClasses();
         this.expression = function.getExpression();
         this.collection = function.getCollection();
         this.function = function;
-        this.id = id;
+        this.typeId = typeId;
         ff = FilterFactoryFinder.createFilterFactory();
         sf = StyleFactoryFinder.createStyleFactory();
         sb = new StyleBuilder(sf, ff);
@@ -167,6 +163,14 @@ public class StyleGenerator {
     }
     
     /**
+     * Sets the semantic type identifier, which will be prefixed with "colorbrewer:"
+     * @param typeId
+     */
+    public void setTypeId(String typeId) {
+    	this.typeId = typeId;
+    }
+    
+    /**
      * Sets the text displayed between ranged values (by default " to ").
      * @param titleSpacer
      */
@@ -214,204 +218,45 @@ public class StyleGenerator {
         Geometry geometry = firstFeature.getDefaultGeometry();
 
         //numeric
-    	if (function instanceof EqualIntervalFunction) {
-    		EqualIntervalFunction eiClassifier = (EqualIntervalFunction) function;
-
+        if (function instanceof RangedClassificationFunction) {
+        	RangedClassificationFunction ranged = (RangedClassificationFunction) function;
+        	
     		Object localMin = null;
     		Object localMax = null;
 
             // for each class
             for (int i = 0; i < function.getNumberOfClasses(); i++) {
                 // obtain min/max values
-                localMin = eiClassifier.getMin(i);
-                localMax = eiClassifier.getMax(i);
-
-                // 1.0 --> 1
-                // (this makes our styleExpressions more readable. Note that the
-                // filter always converts to double, so it doesn't care what we
-                // do).
-                localMin = chopInteger(localMin);
-                localMax = chopInteger(localMax);
-
-                // generate a title
-                String title = localMin + titleSpacer + localMax;
-
-                // construct filters
-                Filter filter = null;
-
-                if (localMin == localMax) {
-                    // build filter: =
-                    CompareFilter eqFilter = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
-                    eqFilter.addLeftValue(expression);
-                    eqFilter.addRightValue(ff.createLiteralExpression(localMax));
-                    filter = eqFilter;
-                } else {
-                    // build filter: [min <= x] AND [x < max]
-                    LogicFilter andFilter = null;
-                    CompareFilter lowBoundFilter = null; // less than or
-
-                    // equal
-                    CompareFilter hiBoundFilter = null; // less than
-                    lowBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
-                    lowBoundFilter.addLeftValue(ff.createLiteralExpression(
-                            localMin)); // min
-                    lowBoundFilter.addRightValue(expression); // x
-
-                    // if this is the global maximum, include the max value
-                    if (i == (function.getNumberOfClasses() - 1)) {
-                        hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
-                    } else {
-                        hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
-                    }
-
-                    hiBoundFilter.addLeftValue(expression); // x
-                    hiBoundFilter.addRightValue(ff.createLiteralExpression(
-                            localMax)); // max
-                    andFilter = ff.createLogicFilter(lowBoundFilter,
-                            hiBoundFilter, LogicFilter.LOGIC_AND);
-                    filter = andFilter;
-                }
-
-                // create a symbolizer
-                Symbolizer symb = createSymbolizer(sb, geometry, getColor(i), opacity, defaultStroke);
-
-                // create a rule
-                Rule rule = sb.createRule(symb);
-                rule.setFilter(filter);
-                rule.setTitle(title);
-                rule.setName(getRuleName(i + 1));
+                localMin = ranged.getMin(i);
+                localMax = ranged.getMax(i);
+                Rule rule = createRuleRanged(localMin, localMax, geometry, i);
                 fts.addRule(rule);
             }
-        } else if (function instanceof UniqueIntervalFunction) {
-            UniqueIntervalFunction uniqueClassifier = (UniqueIntervalFunction) function;
-            LogicFilter orFilter = null;
-            CompareFilter filter = null;
-            Rule rule = null;
-
+        } else if (function instanceof ExplicitClassificationFunction) {
+        	ExplicitClassificationFunction explicit = (ExplicitClassificationFunction) function;
             // for each class
+            for (int i = 0; i < function.getNumberOfClasses(); i++) {
+                Set value = (Set) explicit.getValue(i);
+            	Rule rule = createRuleExplicit(value, geometry, i);
+            	fts.addRule(rule);
+            }
+        } else if (function instanceof CustomClassifierFunction) {
+        	CustomClassifierFunction custom = (CustomClassifierFunction) function;
+        	// for each class
             for (int i = 0; i < function.getNumberOfClasses(); i++) {
                 // obtain the set of values for the current bin
-                Set value = (Set) uniqueClassifier.getValue(i);
-
-                // create a sub filter for each unique value, and merge them
-                // into the logic filter
-                Object[] items = value.toArray();
-                Arrays.sort(items);
-                orFilter = ff.createLogicFilter(FilterType.LOGIC_OR);
-
-                String title = "";
-
-                for (int item = 0; item < items.length; item++) {
-                    // construct a filter
-                    try {
-                        filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-                        filter.addLeftValue(expression); // the attribute
-
-                        // we're looking at
-                        filter.addRightValue(ff.createLiteralExpression(
-                                items[item]));
-                    } catch (IllegalFilterException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-
-                        return null;
-                    }
-
-                    // add to the title
-                    title += items[item].toString();
-
-                    if ((item + 1) != items.length) {
-                        title += ", ";
-                    }
-
-                    // add the filter to the logicFilter
-                    orFilter.addFilter(filter);
+                Rule rule = null;
+                if (custom.hasExplicit(i)) {
+                	rule = createRuleExplicit((Set) custom.getValue(i), geometry, i);
+                } else if (custom.hasRanged(i)) {
+                	rule = createRuleRanged(custom.getMin(i), custom.getMax(i), geometry, i);
                 }
-
-                // create the symbolizer
-                Symbolizer symb = createSymbolizer(sb, geometry, getColor(i), opacity, defaultStroke);
-
-                // create the rule
-                rule = sb.createRule(symb);
-
-                if (items.length > 1) {
-                    rule.setFilter(orFilter);
-                } else {
-                    rule.setFilter(filter);
-                }
-
-                rule.setTitle(title);
-                rule.setName(getRuleName(i + 1));
-                fts.addRule(rule);
+                if (rule != null)
+                	fts.addRule(rule);
             }
-        } else if (function instanceof QuantileFunction) {
-        	QuantileFunction quantile = (QuantileFunction) function;
-
-            // for each class
-            for (int i = 0; i < function.getNumberOfClasses(); i++) {
-                // obtain values
-            	Object localMin = quantile.getMin(i);
-                Object localMax = quantile.getMax(i);
-
-                if (localMin instanceof Number && localMax instanceof Number) {
-	                // 1.0 --> 1
-	                // (this makes our styleExpressions more readable. Note that the
-	                // filter always converts to double, so it doesn't care what we
-	                // do).
-	                localMin = chopInteger(localMin);
-	                localMax = chopInteger(localMax);
-                }
-                
-                // generate a title
-                String title = localMin + titleSpacer + localMax;
-
-                // construct filters
-                Filter filter = null;
-
-                if (localMin == localMax) {
-                    // build filter: =
-                    CompareFilter eqFilter = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
-                    eqFilter.addLeftValue(expression);
-                    eqFilter.addRightValue(ff.createLiteralExpression(localMax));
-                    filter = eqFilter;
-                } else {
-                    // build filter: [min <= x] AND [x < max]
-                    LogicFilter andFilter = null;
-                    CompareFilter lowBoundFilter = null; // less than or
-
-                    // equal
-                    CompareFilter hiBoundFilter = null; // less than
-                    lowBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
-                    lowBoundFilter.addLeftValue(ff.createLiteralExpression(
-                            localMin)); // min
-                    lowBoundFilter.addRightValue(expression); // x
-
-                    // if this is the global maximum, include the max value
-                    if (i == (function.getNumberOfClasses() - 1)) {
-                        hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
-                    } else {
-                        hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
-                    }
-
-                    hiBoundFilter.addLeftValue(expression); // x
-                    hiBoundFilter.addRightValue(ff.createLiteralExpression(
-                            localMax)); // max
-                    andFilter = ff.createLogicFilter(lowBoundFilter,
-                            hiBoundFilter, LogicFilter.LOGIC_AND);
-                    filter = andFilter;
-                }
-
-                // create a symbolizer
-                Symbolizer symb = createSymbolizer(sb, geometry, getColor(i), opacity, defaultStroke);
-
-                // create a rule
-                Rule rule = sb.createRule(symb);
-                rule.setFilter(filter);
-                rule.setTitle(title);
-                rule.setName(getRuleName(i + 1));
-                fts.addRule(rule);
-            }
-
+        } else {
+        	//TODO: toss an exception
+        	System.out.println("BOOM: classifier not found");
         }
 
     	// add an else rule to capture any missing features?
@@ -456,7 +301,7 @@ public class StyleGenerator {
 //        }
         
         //our syntax will be: ColorBrewer:id
-        fts.setSemanticTypeIdentifiers(new String[] {"generic:geometry", "colorbrewer:"+id});
+        fts.setSemanticTypeIdentifiers(new String[] {"generic:geometry", "colorbrewer:"+typeId});
 
         return fts;
     }
@@ -530,6 +375,117 @@ public class StyleGenerator {
         } else {
             return "rule" + strVal;
         }
+    }
+
+    private Rule createRuleRanged(Object localMin, Object localMax, Geometry geometry, int i) throws IllegalFilterException {
+        // 1.0 --> 1
+        // (this makes our styleExpressions more readable. Note that the
+        // filter always converts to double, so it doesn't care what we
+        // do).
+        localMin = chopInteger(localMin);
+        localMax = chopInteger(localMax);
+
+        // generate a title
+        String title = localMin + titleSpacer + localMax;
+
+        // construct filters
+        Filter filter = null;
+
+        if (localMin == localMax) {
+            // build filter: =
+            CompareFilter eqFilter = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
+            eqFilter.addLeftValue(expression);
+            eqFilter.addRightValue(ff.createLiteralExpression(localMax));
+            filter = eqFilter;
+        } else {
+            // build filter: [min <= x] AND [x < max]
+            LogicFilter andFilter = null;
+            CompareFilter lowBoundFilter = null; // less than or
+
+            // equal
+            CompareFilter hiBoundFilter = null; // less than
+            lowBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
+            lowBoundFilter.addLeftValue(ff.createLiteralExpression(
+                    localMin)); // min
+            lowBoundFilter.addRightValue(expression); // x
+
+            // if this is the global maximum, include the max value
+            if (i == (function.getNumberOfClasses() - 1)) {
+                hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
+            } else {
+                hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
+            }
+
+            hiBoundFilter.addLeftValue(expression); // x
+            hiBoundFilter.addRightValue(ff.createLiteralExpression(
+                    localMax)); // max
+            andFilter = ff.createLogicFilter(lowBoundFilter,
+                    hiBoundFilter, LogicFilter.LOGIC_AND);
+            filter = andFilter;
+        }
+
+        // create a symbolizer
+        Symbolizer symb = createSymbolizer(sb, geometry, getColor(i), opacity, defaultStroke);
+
+        // create a rule
+        Rule rule = sb.createRule(symb);
+        rule.setFilter(filter);
+        rule.setTitle(title);
+        rule.setName(getRuleName(i + 1));
+        return rule;
+    }
+    
+    private Rule createRuleExplicit(Set value, Geometry geometry, int i) throws IllegalFilterException {
+        // create a sub filter for each unique value, and merge them
+        // into the logic filter
+        Object[] items = value.toArray();
+        Arrays.sort(items);
+        LogicFilter orFilter = ff.createLogicFilter(FilterType.LOGIC_OR);
+        CompareFilter filter = null;
+        String title = "";
+        
+        for (int item = 0; item < items.length; item++) {
+            // construct a filter
+            try {
+                filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
+                filter.addLeftValue(expression); // the attribute
+
+                // we're looking at
+                filter.addRightValue(ff.createLiteralExpression(
+                        items[item]));
+            } catch (IllegalFilterException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+
+                return null;
+            }
+
+            // add to the title
+            title += items[item].toString();
+
+            if ((item + 1) != items.length) {
+                title += ", ";
+            }
+
+            // add the filter to the logicFilter
+            orFilter.addFilter(filter);
+        }
+
+        // create the symbolizer
+        Symbolizer symb = createSymbolizer(sb, geometry, getColor(i), opacity, defaultStroke);
+
+        // create the rule
+        Rule rule = sb.createRule(symb);
+
+        if (items.length > 1) {
+            rule.setFilter(orFilter);
+        } else {
+            rule.setFilter(filter);
+        }
+
+        rule.setTitle(title);
+        rule.setName(getRuleName(i + 1));
+        return rule;
     }
     
 	public static void modifyFTS(FeatureTypeStyle fts, int ruleIndex, String styleExpression) throws IllegalFilterException {
@@ -765,7 +721,10 @@ public class StyleGenerator {
 		}
 	}
 
-	private static boolean isRanged(String styleExpression) {
+	/**
+	 * Determines if a string is an instance of a ranged expression or unique values.
+	 */
+	public static boolean isRanged(String styleExpression) {
 		return styleExpression.matches(".+\\.{2}.+");
 	}
 	

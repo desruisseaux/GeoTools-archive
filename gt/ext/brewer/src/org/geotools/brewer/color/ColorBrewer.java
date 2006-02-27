@@ -80,6 +80,15 @@ public class ColorBrewer {
         return legendType;
     }
 
+    /**
+     * Returns true if the palette exists in this ColorBrewer
+     * @param paletteName
+     * @return
+     */
+    public boolean hasPalette(String paletteName) {
+    	return palettes.containsKey(paletteName);
+    }
+    
     public BrewerPalette[] getPalettes() {
     	Object[] entry = this.palettes.keySet().toArray();
     	BrewerPalette[] palettes = new BrewerPalette[entry.length];

@@ -38,7 +38,7 @@ import org.geotools.util.NullProgressListener;
  * @author Cory Horner, Refractions Research Inc.
  * @source $URL$
  */
-public class EqualIntervalFunction extends ClassificationFunction {
+public class EqualIntervalFunction extends RangedClassificationFunction {
 	Comparable globalMin = null;
     Comparable globalMax = null;
     Comparable[] localMin = null;

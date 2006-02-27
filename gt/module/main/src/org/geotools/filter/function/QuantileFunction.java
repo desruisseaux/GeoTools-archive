@@ -33,7 +33,7 @@ import org.geotools.util.NullProgressListener;
  * @author Cory Horner, Refractions Research Inc.
  * @source $URL$
  */
-public class QuantileFunction extends ClassificationFunction {
+public class QuantileFunction extends RangedClassificationFunction {
 	List[] bin;
 	Comparable globalMin = null;
     Comparable globalMax = null;
