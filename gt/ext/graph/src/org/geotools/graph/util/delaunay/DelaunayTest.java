@@ -43,7 +43,7 @@ public class DelaunayTest {
         viewer.setGraph(g);
         frame.getContentPane().add(viewer);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(400, 400));
+        frame.setSize(new Dimension(400, 400));
         frame.setVisible(true);
         
     }
