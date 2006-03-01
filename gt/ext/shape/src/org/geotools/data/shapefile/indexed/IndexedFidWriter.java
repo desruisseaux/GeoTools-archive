@@ -119,7 +119,11 @@ public class IndexedFidWriter {
         	drain();
         	writeHeader();
         } finally {
-            channel.close();
+        	try{
+        		channel.close();
+        	}finally{
+        		reader.close();
+        	}
         }
 
         closed = true;

@@ -1076,7 +1076,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
             if (dest.exists()) {
                 if( !dest.delete() )
-                	throw new IOException("Unable to original file");
+                	throw new IOException("Unable to delete original file: "+ src);
             }
 
             if (storage.exists() && !storage.renameTo(dest)) {
@@ -1087,7 +1087,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 long copied = out.transferFrom(in, 0, in.size());
 
                 if (len != copied) {
-                    throw new IOException("unable to complete write");
+                    throw new IOException("unable to complete write: "+src);
                 }
 
                 storage.delete();

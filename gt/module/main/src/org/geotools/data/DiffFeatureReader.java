@@ -110,6 +110,9 @@ public class DiffFeatureReader implements FeatureReader {
         }
         Feature peek;
 
+        if( filter==Filter.ALL)
+            return false;
+        
         while( (reader != null) && reader.hasNext() ) {
 
             try {

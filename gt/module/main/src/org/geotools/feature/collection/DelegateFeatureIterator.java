@@ -21,6 +21,7 @@ import org.geotools.feature.FeatureIterator;
  */
 public class DelegateFeatureIterator implements FeatureIterator {
 	Iterator delegate;
+	private FeatureCollection collection;
 	/**
 	 * Wrap the provided iterator up as a FeatureIterator.
 	 * 
@@ -28,6 +29,7 @@ public class DelegateFeatureIterator implements FeatureIterator {
 	 */
 	public DelegateFeatureIterator( FeatureCollection collection, Iterator iterator ){
 		delegate = iterator;
+		this.collection=collection;
 	}
 	public boolean hasNext() {
 		return delegate != null && delegate.hasNext();
@@ -37,6 +39,9 @@ public class DelegateFeatureIterator implements FeatureIterator {
 		return (Feature) delegate.next();
 	}
 	public void close() {
+		if( collection!=null && delegate!=null)
+			collection.close(delegate);
+		collection =null;
 		delegate = null;
 		
 	}

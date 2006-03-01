@@ -1337,7 +1337,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 		public void close() throws IOException {
 			try {
-				shp.close();
+				if( shp!=null )
+					shp.close();
 
 				if (dbf != null) {
 					dbf.close();
