@@ -73,6 +73,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing.operation.transform .WarpTransformTest        .suite());
         suite.addTest(org.geotools.referencing.operation.projection.NewZealandMapGridTest    .suite());
         suite.addTest(org.geotools.referencing                     .ScriptTest               .suite());
+        suite.addTest(org.geotools.referencing                     .CrsTest                  .suite());
         suite.addTest(org.geotools.referencing.factory.wms         .AUTOTest                 .suite());
         suite.addTest(org.geotools.referencing.factory.wms         .CRSTest                  .suite());
         /*

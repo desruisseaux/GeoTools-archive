@@ -96,7 +96,7 @@
       <name>geotools-gt2-users</name>
       <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-gt2-users</subscribe>
       <post>geotools-geotools-gt2-users@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-geotools-gt2-users</archive>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-gt2-users</archive>
     </mailingList>
     <mailingList>
       <name>geotools-devel</name>
@@ -108,13 +108,13 @@
       <name>geotools-gt2-i18n</name>
       <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-gt2-i18n</subscribe>
       <post>geotools-geotools-gt2-i18n@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-geotools-gt2-i18n</archive>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-gt2-i18n</archive>
     </mailingList>
     <mailingList>
       <name>geotools-gt2-commits</name>
       <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-gt2-commits</subscribe>
       <post>geotools-geotools-gt2-commits@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-geotools-gt2-commits</archive>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-gt2-commits</archive>
     </mailingList>
   </mailingLists>
 
@@ -585,7 +585,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>2.0</version>
+          <version>2.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

@@ -1,0 +1,139 @@
+/*
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2004, Geotools Project Managment Committee (PMC)
+ * (C) 2004, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+package org.geotools.referencing;
+
+
+// JUnit dependencies
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+// Geotools dependencies
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.wkt.Parser;
+import org.geotools.resources.CRSUtilities;
+
+// JTS dependencies
+import com.vividsolutions.jts.geom.Coordinate;
+
+
+/**
+ * Tests the {@link CRS} utilities methods.
+ *
+ * @source $URL$
+ * @version $Id$
+ * @author Martin Desruisseaux
+ */
+public class CrsTest extends TestCase {
+    /**
+     * Run the suite from the command line.
+     */
+    public static void main(String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
+        junit.textui.TestRunner.run(suite());
+    }
+
+    /**
+     * Returns the test suite.
+     */
+    public static Test suite() {
+        return new TestSuite(CrsTest.class);
+    }
+
+    /**
+     * Constructs a test case.
+     */
+    public CrsTest(String testName) {
+        super(testName);
+    }
+
+    /**
+     * Tests the transformations of an envelope.
+     */
+    public void testEnvelopeTransformation() throws FactoryException, TransformException {
+        String wkt = "PROJCS[\"NAD_1983_UTM_Zone_10N\",\n"                  +
+                     "  GEOGCS[\"GCS_North_American_1983\",\n"              +
+                     "    DATUM[\"D_North_American_1983\",\n"               +
+                     "    SPHEROID[\"GRS_1980\",6378137,298.257222101]],\n" +
+                     "    PRIMEM[\"Greenwich\",0],\n"                       +
+                     "    UNIT[\"Degree\",0.017453292519943295]],\n"        +
+                     "  PROJECTION[\"Transverse_Mercator\"],\n"             +
+                     "  PARAMETER[\"False_Easting\",500000],\n"             +
+                     "  PARAMETER[\"False_Northing\",0],\n"                 +
+                     "  PARAMETER[\"Central_Meridian\",-123],\n"            +
+                     "  PARAMETER[\"Scale_Factor\",0.9996],\n"              +
+                     "  PARAMETER[\"Latitude_Of_Origin\",0],\n"             +
+                     "  UNIT[\"Meter\",1]]";
+        final CoordinateReferenceSystem mapCRS = CRS.parseWKT(wkt);
+        final CoordinateReferenceSystem WGS84  = DefaultGeographicCRS.WGS84;
+        final MathTransform crsTransform = CRS.transform(WGS84, mapCRS, true);
+        assertFalse(crsTransform.isIdentity());
+
+        final GeneralEnvelope firstEnvelope, transformedEnvelope, oldEnvelope;
+        firstEnvelope = new GeneralEnvelope(new double[] {-124, 42}, new double[] {-122, 43});
+        firstEnvelope.setCoordinateReferenceSystem(WGS84);
+
+        transformedEnvelope = CRSUtilities.transform(crsTransform, firstEnvelope);
+        transformedEnvelope.setCoordinateReferenceSystem(mapCRS);
+
+        oldEnvelope = CRSUtilities.transform(crsTransform.inverse(), transformedEnvelope);
+        oldEnvelope.setCoordinateReferenceSystem(WGS84);
+
+        assertTrue(oldEnvelope.contains(firstEnvelope, true));
+        assertTrue(oldEnvelope.equals  (firstEnvelope, 0.02));
+    }
+
+    /**
+     * Tests the distance between points function
+     */
+    public void testDistance() throws Exception {
+        final Parser parser = new Parser();
+        
+        String wkt = "PROJCS[\"NAD83 / BC Albers\",\n"
+                   + "  GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",\n"
+                   + "    SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],\n"
+                   + "    TOWGS84[0,0,0],AUTHORITY[\"EPSG\",\"6269\"]],\n"
+                   + "    PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],\n"
+                   + "    UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],\n"
+                   + "    AUTHORITY[\"EPSG\",\"4269\"]],\n"
+                   + "  PROJECTION[\"Albers_Conic_Equal_Area\"],\n"
+                   + "  PARAMETER[\"standard_parallel_1\",50],\n"
+                   + "  PARAMETER[\"standard_parallel_2\",58.5],\n"
+                   + "  PARAMETER[\"latitude_of_center\",45],\n"
+                   + "  PARAMETER[\"longitude_of_center\",-126],\n"
+                   + "  PARAMETER[\"false_easting\",1000000],\n"
+                   + "  PARAMETER[\"false_northing\",0],\n"
+                   + "  UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],\n"
+                   + "  AUTHORITY[\"EPSG\",\"3005\"]]";
+        DefaultProjectedCRS crs  = (DefaultProjectedCRS) parser.parseObject(wkt);
+        double d = CRS.distance(new Coordinate(1402848.1938534670, 651571.1729878788),
+                                new Coordinate(1389481.3104009738, 641990.9430108378), crs);
+        double realValue = 16451.33114;
+        assertTrue( Math.abs(d-realValue) < 0.1 );
+    }
+}

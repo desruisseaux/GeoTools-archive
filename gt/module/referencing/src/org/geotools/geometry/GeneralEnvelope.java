@@ -579,12 +579,18 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * If one or more edges from the specified envelope coincide with an edge from this
      * envelope, then this method returns {@code true} only if {@code edgesInclusive}
      * is {@code true}.
+     * <p>
+     * This method assumes that the specified envelope uses the same CRS than this envelope.
+     * For performance reason, it will no be verified unless J2SE assertions are enabled.
      *
      * @param  envelope The envelope to test for inclusion.
      * @param  edgesInclusive {@code true} if this envelope edges are inclusive.
      * @return {@code true} if this envelope completly encloses the specified one.
      * @throws MismatchedDimensionException if the specified envelope doesn't have
      *         the expected dimension.
+     *
+     * @see #intersects(Envelope, boolean)
+     * @see #equals(Envelope, double)
      *
      * @since 2.2
      */
@@ -615,12 +621,18 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * If one or more edges from the specified envelope coincide with an edge from this
      * envelope, then this method returns {@code true} only if {@code edgesInclusive}
      * is {@code true}.
+     * <p>
+     * This method assumes that the specified envelope uses the same CRS than this envelope.
+     * For performance reason, it will no be verified unless J2SE assertions are enabled.
      *
      * @param  envelope The envelope to test for intersection.
      * @param  edgesInclusive {@code true} if this envelope edges are inclusive.
      * @return {@code true} if this envelope intersects the specified one.
      * @throws MismatchedDimensionException if the specified envelope doesn't have
      *         the expected dimension.
+     *
+     * @see #contains(Envelope, boolean)
+     * @see #equals(Envelope, double)
      *
      * @since 2.2
      */
@@ -786,6 +798,38 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
                    Utilities.equals(this.crs, that.crs);
         }
         return false;
+    }
+
+    /**
+     * Compares to the specified envelope for equality with the specified tolerance value.
+     * The tolerance value {@code eps} should be a small positive number. Its value is CRS
+     * dependent. For example {@code eps} should be smaller for geographic CRS than for UTM
+     * projections, because the former typically has a range of -180 to 180° while the later
+     * can have a range of thousands of meters.
+     * <p>
+     * This method assumes that the specified envelope uses the same CRS than this envelope.
+     * For performance reason, it will no be verified unless J2SE assertions are enabled.
+     *
+     * @see #contains(Envelope, boolean)
+     * @see #intersects(Envelope, boolean)
+     *
+     * @since 2.3
+     */
+    public boolean equals(final Envelope envelope, final double eps) {
+        final int dimension = getDimension();
+        if (envelope.getDimension() != dimension) {
+            return false;
+        }
+        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
+        for (int i=0; i<dimension; i++) {
+            // Comparaison below uses '!' in order to catch NaN values.
+            if (!(Math.abs(getMinimum(i) - envelope.getMinimum(i)) <= eps &&
+                  Math.abs(getMaximum(i) - envelope.getMaximum(i)) <= eps))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
