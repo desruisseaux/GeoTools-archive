@@ -31,8 +31,8 @@ import java.net.URL;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
+import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
 import org.geotools.feature.Feature;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -68,27 +68,27 @@ public class TestUtilites {
     	FilterFactoryFinder.createFilterFactory();
     public static boolean INTERACTIVE = false;
 
-    public static ShapefileDataStore getPolygons() throws IOException {
+    public static IndexedShapefileDataStore getPolygons() throws IOException {
         return TestUtilites.getDataStore("lakes.shp");
     }
 
-    public static ShapefileDataStore getDataStore(String filename)
+    public static IndexedShapefileDataStore getDataStore(String filename)
         throws IOException {
         URL url = TestData.url(Rendering2DTest.class, filename);
-        ShapefileDataStoreFactory factory = new ShapefileDataStoreFactory();
+        IndexedShapefileDataStoreFactory factory = new IndexedShapefileDataStoreFactory();
 
-        return (ShapefileDataStore) factory.createDataStore(url);
+        return (IndexedShapefileDataStore) factory.createDataStore(url);
     }
 
-    public static ShapefileDataStore getLines() throws IOException {
+    public static IndexedShapefileDataStore getLines() throws IOException {
         return getDataStore("streams.shp");
     }
 
-    public static ShapefileDataStore getPoints() throws IOException {
+    public static IndexedShapefileDataStore getPoints() throws IOException {
         URL url = TestData.url("shapes/pointtest.shp");
-        ShapefileDataStoreFactory factory = new ShapefileDataStoreFactory();
+        IndexedShapefileDataStoreFactory factory = new IndexedShapefileDataStoreFactory();
 
-        return (ShapefileDataStore) factory.createDataStore(url);
+        return (IndexedShapefileDataStore) factory.createDataStore(url);
     }
 
     public static Style createTestStyle(String polyName, String lineName)

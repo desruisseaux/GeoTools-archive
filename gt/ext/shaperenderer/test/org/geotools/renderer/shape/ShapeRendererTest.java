@@ -16,11 +16,20 @@
  */
 package org.geotools.renderer.shape;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
+import org.geotools.TestData;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
@@ -49,11 +58,74 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class ShapeRendererTest extends TestCase {
 	private static final boolean INTERACTIVE = false;
+    private File shp2;
+    private File shx2;
+    private File prj2;
+    private File dbf2;
+    private String typename;
 
+    protected void setUp() throws Exception {
+        Logger.getLogger("org.geotools.data.shapefile").setLevel(Level.FINE);
+        File shp=new File(TestData.url(Rendering2DTest.class, "theme1.shp").getFile() );
+        File shx=new File(TestData.url(Rendering2DTest.class, "theme1.shx").getFile() );
+        File prj=new File(TestData.url(Rendering2DTest.class, "theme1.prj").getFile() );
+        File dbf=new File(TestData.url(Rendering2DTest.class, "theme1.dbf").getFile() );
+
+        File directory = new File(Rendering2DTest.class.getResource("test-data").getFile());
+        shp2=File.createTempFile("theme2", ".shp", directory);
+        typename=shp2.getName().substring(0, shp2.getName().lastIndexOf("."));
+        shx2=new File(directory, typename+".shx");
+        prj2=new File(directory, typename+".prj");
+        dbf2=new File(directory, typename+".dbf");
+
+        copy(shp,shp2);
+        copy(shx,shx2);
+        copy(prj,prj2);
+        copy(dbf,dbf2);
+    }
+
+    protected void tearDown() throws Exception {
+        shp2.delete();
+        shp2.deleteOnExit();
+        shx2.delete();
+        shx2.deleteOnExit();
+        prj2.delete();
+        prj2.deleteOnExit();
+        dbf2.delete();
+        dbf2.deleteOnExit();
+
+    }
+
+    void copy(File src, File dst) throws IOException {
+        InputStream in = null;
+        OutputStream out = null;
+
+        try {
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dst,false);
+
+            // Transfer bytes from in to out
+            byte[] buf = new byte[1024];
+            int len;
+
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+
+            if (out != null) {
+                out.close();
+            }
+        }
+    }
+    
 	public void testCreateFeature() throws Exception {
 		ShapefileRenderer renderer = new ShapefileRenderer(null);
 		Style style = LabelingTest.loadStyle("LineStyle.sld");
-		ShapefileDataStore ds = TestUtilites.getDataStore("theme1.shp");
+		ShapefileDataStore ds = TestUtilites.getDataStore(shp2.getName());
 		renderer.dbfheader = ShapefileRendererUtil.getDBFReader(ds).getHeader();
 		FeatureType type = renderer.createFeatureType(null, style, ds.getSchema());
 		assertEquals("NAME", type.getAttributeType(0).getName());
@@ -66,12 +138,12 @@ public class ShapeRendererTest extends TestCase {
 	}
 
 	public void testRemoveTransaction() throws Exception{
-		ShapefileDataStore ds=TestUtilites.getDataStore("theme1.shp");
-		Style st=TestUtilites.createTestStyle(null, "theme1");
-		FeatureStore store=(FeatureStore) ds.getFeatureSource();
+		ShapefileDataStore ds=TestUtilites.getDataStore(shp2.getName());
+		Style st=TestUtilites.createTestStyle(null, typename);
+		final FeatureStore store=(FeatureStore) ds.getFeatureSource();
 		Transaction t=new DefaultTransaction();
 		store.setTransaction(t);
-		FeatureCollection collection=store.getFeatures().collection();
+		FeatureCollection collection=store.getFeatures();
 		FeatureIterator iter=collection.features();
 		store.removeFeatures(TestUtilites.filterFactory.createFidFilter(iter.next().getID()));		
 		collection.close(iter);
@@ -87,17 +159,64 @@ public class ShapeRendererTest extends TestCase {
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
 		TestUtilites.showRender("testTransaction", renderer, 2000, env);
-		
 		assertEquals(2,listener.count);
+		t.commit();
+
+        collection=store.getFeatures();
+        iter=collection.features();
+        final Feature feature=iter.next();      
+        collection.close(iter);
+        
+        // now add a new feature new fid should be theme2.4 remove it and assure that it is not rendered
+        store.addFeatures(new FeatureReader(){
+
+            private boolean more=true;
+
+            public FeatureType getFeatureType() {
+                    return store.getSchema();
+            }
+
+            public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+                more=false;
+                return store.getSchema().create(feature.getAttributes(new Object[feature.getNumberOfAttributes()]), "newFeature");
+            }
+
+            public boolean hasNext() throws IOException {
+                return more;
+            }
+
+            public void close() throws IOException {
+                //do nothing
+            }
+            
+        });
+        t.commit();
+        listener.count=0;
+        TestUtilites.showRender("testTransaction", renderer, 2000, env);
+        assertEquals(3,listener.count);
+        
+        iter=store.getFeatures().features();
+        Feature last=null;
+        while( iter.hasNext() ){
+            last=iter.next();
+        }
+        iter.close();
+
+        store.removeFeatures(TestUtilites.filterFactory.createFidFilter(last.getID()));
+
+        listener.count=0;
+        TestUtilites.showRender("testTransaction", renderer, 2000, env);
+        assertEquals(2,listener.count);
+        
 	}
 
 	public void testAddTransaction() throws Exception{
-		final ShapefileDataStore ds=TestUtilites.getDataStore("theme1.shp");
-		Style st=TestUtilites.createTestStyle(null, "theme1");
+		final ShapefileDataStore ds=TestUtilites.getDataStore(shp2.getName());
+		Style st=TestUtilites.createTestStyle(null, typename);
 		FeatureStore store=(FeatureStore) ds.getFeatureSource();
 		Transaction t=new DefaultTransaction();
 		store.setTransaction(t);
-		FeatureCollection collection=store.getFeatures().collection();
+		FeatureCollection collection=store.getFeatures();
 		FeatureIterator iter=collection.features();
 		final Feature feature=iter.next();		
 		collection.close(iter);
@@ -145,8 +264,8 @@ public class ShapeRendererTest extends TestCase {
 	}
 
 	public void testModifyTransaction() throws Exception{
-		ShapefileDataStore ds=TestUtilites.getDataStore("theme1.shp");
-		Style st=TestUtilites.createTestStyle(null, "theme1");
+		ShapefileDataStore ds=TestUtilites.getDataStore(shp2.getName());
+		Style st=TestUtilites.createTestStyle(null, typename);
 		FeatureStore store=(FeatureStore) ds.getFeatureSource();
 		Transaction t=new DefaultTransaction();
 		store.setTransaction(t);
@@ -180,4 +299,5 @@ public class ShapeRendererTest extends TestCase {
 		
 		assertEquals(3,listener.count);
 	}
+    
 }

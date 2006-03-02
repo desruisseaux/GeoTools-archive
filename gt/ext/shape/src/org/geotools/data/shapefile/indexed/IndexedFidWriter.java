@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.geotools.data.shapefile.indexed;
 
@@ -25,9 +25,9 @@ public class IndexedFidWriter {
     long fidIndex;
     private int recordIndex;
     private boolean closed;
-    
+
     private long current;
-    
+
     private long position ;
     private int removes;
 
@@ -87,8 +87,8 @@ public class IndexedFidWriter {
 
     public long next() throws IOException {
 
-    	if( current != -1)
-    		write();
+        if( current != -1)
+            write();
 
         if (reader.hasNext()) {
             String fid = reader.next();
@@ -108,22 +108,21 @@ public class IndexedFidWriter {
         }
 
         try {
-        	// need to copy rest of file from reader
-        	while( hasNext() ){
-        		next();
-        	}
 
-        	if( current!=-1 )
-        		write();
-        	
-        	drain();
-        	writeHeader();
+            while(hasNext())
+                next();
+
+            if( current!=-1 )
+                write();
+
+            drain();
+            writeHeader();
         } finally {
-        	try{
-        		channel.close();
-        	}finally{
-        		reader.close();
-        	}
+            try{
+                channel.close();
+            }finally{
+                reader.close();
+            }
         }
 
         closed = true;
@@ -144,8 +143,8 @@ public class IndexedFidWriter {
      * @throws IOException
      */
     public void remove() throws IOException {
-    	if( current==-1 )
-			throw new IOException("Current fid index is null, next must be called before remove");
+        if( current==-1 )
+            throw new IOException("Current fid index is null, next must be called before remove");
         if (hasNext()) {
             removes++;
             current=-1;
@@ -164,10 +163,10 @@ public class IndexedFidWriter {
      * @see #remove()
      */
     public void write() throws IOException {
-    	if( current==-1 )
-			throw new IOException("Current fid index is null, next must be called before remove");
+        if( current==-1 )
+            throw new IOException("Current fid index is null, next must be called before remove");
 
-    	if (writeBuffer == null) {
+        if (writeBuffer == null) {
             allocateBuffers();
         }
 
@@ -178,7 +177,7 @@ public class IndexedFidWriter {
         writeBuffer.putLong(current);
         writeBuffer.putInt(recordIndex);
 
-        
+
         recordIndex++;
         current=-1;
     }

@@ -154,6 +154,7 @@ public class IndexFile {
 	  public void close() throws IOException {
 	    if (channel != null && channel.isOpen()) {
 	      channel.close();
+
 	      if (buf instanceof MappedByteBuffer) {
 	        NIOUtilities.clean(buf);
 	      } else {

@@ -998,7 +998,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             // @todo respect field length
             if ((colType == Integer.class) || (colType == Short.class)
                     || (colType == Byte.class)) {
-                header.addColumn(colName, 'N', Math.min(fieldLen, 10), 0);
+                header.addColumn(colName, 'N', Math.min(fieldLen, 9), 0);
             } else if (colType == Long.class) {
                 header.addColumn(colName, 'N', Math.min(fieldLen, 19), 0);
             } else if ((colType == Double.class) || (colType == Float.class)

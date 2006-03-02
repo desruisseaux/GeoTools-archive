@@ -117,10 +117,10 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * A DataStore implementation which allows reading and writing from Shapefiles.
- * 
+ *
  * @author Ian Schneider
  * @author Tommaso Nolli
- * 
+ *
  * @todo fix file creation bug
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/constantTimeFid/src/org/geotools/data/shapefile/indexed/IndexedShapefileDataStore.java $
@@ -134,7 +134,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	final URL treeURL;
 
-	private URL fixURL;
+	public URL fixURL;
 
 	byte treeType;
 
@@ -149,7 +149,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Creates a new instance of ShapefileDataStore.
-	 * 
+	 *
 	 * @param url
 	 *            The URL of the shp file to use for this DataSource.
 	 */
@@ -160,7 +160,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Creates a new instance of ShapefileDataStore.
-	 * 
+	 *
 	 * @param url
 	 *            The URL of the shp file to use for this DataSource.
 	 * @param namespace
@@ -173,7 +173,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Creates a new instance of ShapefileDataStore.
-	 * 
+	 *
 	 * @param url
 	 *            The URL of the shp file to use for this DataSource.
 	 * @param namespace
@@ -189,7 +189,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Creates a new instance of ShapefileDataStore.
-	 * 
+	 *
 	 * @param url
 	 *            The URL of the shp file to use for this DataSource.
 	 * @param useMemoryMappedBuffer
@@ -202,7 +202,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Creates a new instance of ShapefileDataStore.
-	 * 
+	 *
 	 * @param url
 	 *            The URL of the shp file to use for this DataSource.
 	 * @param useMemoryMappedBuffer
@@ -217,7 +217,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Creates a new instance of ShapefileDataStore.
-	 * 
+	 *
 	 * @param url
 	 *            The URL of the shp file to use for this DataSource.
 	 * @param namespace
@@ -228,7 +228,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 *            enable/disable automatic index creation if needed
 	 * @param treeType
 	 *            DOCUMENT ME!
-	 * 
+	 *
 	 * @throws NullPointerException
 	 *             DOCUMENT ME!
 	 * @throws .
@@ -273,7 +273,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		}
 
 		// test that the shx file can be accessed
-		
+
 		this.treeType = treeType;
 		this.useMemoryMappedBuffer = new File(shpURL.getFile()).exists()
 				&& useMemoryMappedBuffer;
@@ -301,7 +301,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			this.createIndex = false;
 			fixURL=null;
 		}
-		
+
 	}
 
 	protected void finalize() throws Throwable {
@@ -330,7 +330,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Determine if the location of this shape is local or remote.
-	 * 
+	 *
 	 * @return true if local, false if remote
 	 */
 	public boolean isLocal() {
@@ -338,7 +338,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	}
 
 	protected Filter getUnsupportedFilter(String typeName, Filter filter) {
-		
+
 		if (filter instanceof FidFilter && fixURL!=null )
 			return Filter.NONE;
 
@@ -364,7 +364,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 		return Filter.NONE;
 	}
-	
+
 	public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction) throws IOException {
 		if (transaction == null) {
             throw new NullPointerException(
@@ -393,7 +393,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             writer.next();
         return writer;
 	}
-	
+
     private TransactionStateDiff state(Transaction transaction) {
         synchronized (transaction) {
             TransactionStateDiff state = (TransactionStateDiff) transaction
@@ -412,7 +412,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * Use the spatial index if available and adds a small optimization: if no
 	 * attributes are going to be read, don't uselessly open and read the dbf
 	 * file.
-	 * 
+	 *
 	 * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String,
 	 *      org.geotools.data.Query)
 	 */
@@ -420,7 +420,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			throws IOException {
 		if( query.getFilter()==Filter.ALL )
 			return new EmptyFeatureReader(getSchema());
-			
+
 		String[] propertyNames = query.getPropertyNames();
 		String defaultGeomName = schema.getDefaultGeometry().getName();
 
@@ -448,13 +448,13 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * DOCUMENT ME!
-	 * 
+	 *
 	 * @param typeName
 	 * @param r
 	 * @param readerSchema
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws SchemaException
 	 * @throws IOException
 	 */
@@ -468,7 +468,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			if( fixURL==null )
 				return new org.geotools.data.FIDFeatureReader(r,
 						new ShapeFIDReader(getCurrentTypeName(), r), readerSchema);
-			
+
 			return new org.geotools.data.FIDFeatureReader(r,
 					new IndexedFidReader(getCurrentTypeName(), r,
 							getReadChannel(fixURL)), readerSchema);
@@ -481,16 +481,16 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	/**
 	 * Returns the attribute reader, allowing for a pure shape reader, or a
 	 * combined dbf/shp reader.
-	 * 
+	 *
 	 * @param readDbf -
 	 *            if true, the dbf fill will be opened and read
 	 * @param readGeometry
 	 *            DOCUMENT ME!
 	 * @param filter -
 	 *            a Filter to use
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	protected Reader getAttributesReader(boolean readDbf, boolean readGeometry,
@@ -541,7 +541,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	/**
 	 * Uses the Fid index to quickly lookup the shp offset and the record number
 	 * for the list of fids
-	 * 
+	 *
 	 * @param fids
 	 *            the fids of the features to find.
 	 * @return a list of Data objects
@@ -599,15 +599,15 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		} finally {
 			reader.close();
 		}
-		
+
 		return records;
 	}
 
 	/**
 	 * Queries the spatial index
-	 * 
+	 *
 	 * @param bbox
-	 * 
+	 *
 	 * @return a List of <code>Data</code> objects
 	 */
 	private List queryTree(Envelope bbox) throws DataSourceException,
@@ -624,11 +624,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * RTree query
-	 * 
+	 *
 	 * @param bbox
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws DataSourceException
 	 * @throws IOException
 	 */
@@ -653,11 +653,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * QuadTree Query
-	 * 
+	 *
 	 * @param bbox
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws DataSourceException
 	 * @throws IOException
 	 * @throws TreeException
@@ -715,9 +715,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Convenience method for opening a ShapefileReader.
-	 * 
+	 *
 	 * @return An IndexFile
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	protected IndexFile openIndexFile() throws IOException {
@@ -733,9 +733,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Convenience method for opening a DbaseFileReader.
-	 * 
+	 *
 	 * @return A new DbaseFileReader
-	 * 
+	 *
 	 * @throws IOException
 	 *             If an error occurs during creation.
 	 */
@@ -751,9 +751,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Convenience method for opening an RTree index.
-	 * 
+	 *
 	 * @return A new RTree.
-	 * 
+	 *
 	 * @throws IOException
 	 *             If an error occurs during creation.
 	 * @throws DataSourceException
@@ -792,9 +792,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Convenience method for opening a QuadTree index.
-	 * 
+	 *
 	 * @return A new QuadTree
-	 * 
+	 *
 	 * @throws StoreException
 	 */
 	protected synchronized QuadTree openQuadTree() throws StoreException {
@@ -823,7 +823,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	/**
 	 * Get an array of type names this DataStore holds.<BR/>ShapefileDataStore
 	 * will always return a single name.
-	 * 
+	 *
 	 * @return An array of length one containing the single type held.
 	 */
 	public String[] getTypeNames() {
@@ -834,7 +834,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * Create the type name of the single FeatureType this DataStore represents.<BR/>
 	 * For example, if the urls path is file:///home/billy/mytheme.shp, the type
 	 * name will be mytheme.
-	 * 
+	 *
 	 * @return A name based upon the last path component of the url minus the
 	 *         extension.
 	 */
@@ -857,10 +857,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * A convenience method to check if a type name is correct.
-	 * 
+	 *
 	 * @param requested
 	 *            The type name requested.
-	 * 
+	 *
 	 * @throws IOException
 	 *             If the type name is not available
 	 */
@@ -872,14 +872,14 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Create a FeatureWriter for the given type name.
-	 * 
+	 *
 	 * @param typeName
 	 *            The typeName of the FeatureType to write
 	 * @param transaction
 	 *            DOCUMENT ME!
-	 * 
+	 *
 	 * @return A new FeatureWriter.
-	 * 
+	 *
 	 * @throws IOException
 	 *             If the typeName is not available or some other error occurs.
 	 */
@@ -893,12 +893,12 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	/**
 	 * Obtain the FeatureType of the given name. ShapefileDataStore contains
 	 * only one FeatureType.
-	 * 
+	 *
 	 * @param typeName
 	 *            The name of the FeatureType.
-	 * 
+	 *
 	 * @return The FeatureType that this DataStore contains.
-	 * 
+	 *
 	 * @throws IOException
 	 *             If a type by the requested name is not present.
 	 */
@@ -949,9 +949,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Create the AttributeTypes contained within this DataStore.
-	 * 
+	 *
 	 * @return An array of new AttributeTypes
-	 * 
+	 *
 	 * @throws IOException
 	 *             If AttributeType reading fails
 	 */
@@ -1014,10 +1014,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	/**
 	 * Gets the bounding box of the file represented by this data store as a
 	 * whole (that is, off all of the features in the shape)
-	 * 
+	 *
 	 * @return The bounding box of the datasource or null if unknown and too
 	 *         expensive for the method to calculate.
-	 * 
+	 *
 	 * @throws DataSourceException
 	 *             DOCUMENT ME!
 	 */
@@ -1188,7 +1188,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Builds the RTree index
-	 * 
+	 *
 	 * @throws TreeException
 	 *             DOCUMENT ME!
 	 */
@@ -1232,7 +1232,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	/**
 	 * Builds the QuadTree index
-	 * 
+	 *
 	 * @throws TreeException
 	 *             DOCUMENT ME!
 	 */
@@ -1308,7 +1308,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 		/**
 		 * Create the shape reader
-		 * 
+		 *
 		 * @param atts -
 		 *            the attributes that we are going to read.
 		 * @param shp -
@@ -1523,16 +1523,16 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 					temp));
 			dbfHeader = createDbaseHeader();
 			dbfWriter = new DbaseFileWriter(dbfHeader, dbfChannel);
-			
+
 			FileChannel fidIndexChannel=(FileChannel) getWriteChannel(getStorageURL(fixURL, temp));
-			
+
 			indexedFidWriter = new IndexedFidWriter(fidIndexChannel,
 						new IndexedFidReader(getCurrentTypeName(), temp!=0?getReadChannel(fixURL):fidIndexChannel));
 		}
 
 		/**
 		 * Go back and update the headers with the required info.
-		 * 
+		 *
 		 * @throws IOException
 		 *             DOCUMENT ME!
 		 */
@@ -1555,9 +1555,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		/**
 		 * Attempt to create a DbaseFileHeader for the FeatureType. Note, we
 		 * cannot set the number of records until the write has completed.
-		 * 
+		 *
 		 * @return DOCUMENT ME!
-		 * 
+		 *
 		 * @throws IOException
 		 *             DOCUMENT ME!
 		 * @throws DbaseFileException
@@ -1612,7 +1612,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 		/**
 		 * In case someone doesn't close me.
-		 * 
+		 *
 		 * @throws Throwable
 		 *             DOCUMENT ME!
 		 */
@@ -1628,7 +1628,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 		/**
 		 * Clean up our temporary write if there was one
-		 * 
+		 *
 		 * @throws IOException
 		 *             DOCUMENT ME!
 		 */
@@ -1646,7 +1646,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 		/**
 		 * Release resources and flush the header information.
-		 * 
+		 *
 		 * @throws IOException
 		 *             DOCUMENT ME!
 		 */
@@ -1780,7 +1780,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 			// we have to write the current feature back into the stream
 			if (currentFeature != null) {
-				write(); 
+				write();
 			}
 
 			// is there another? If so, return it
@@ -1793,7 +1793,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 					throw new DataSourceException("Error in reading", iae);
 				}
 			}
-			
+
 			long id;
 			if( indexedFidWriter!=null )
 				id=indexedFidWriter.next();

@@ -273,7 +273,7 @@ public class IndexInfo {
         List goodRecs;
         private int cnt;
 
-        public Reader(IndexInfo info, ShapefileReader reader, Envelope bbox) {
+        public Reader(IndexInfo info, ShapefileReader reader, Envelope bbox) throws IOException {
             shp = reader;
 
             try {
@@ -281,6 +281,9 @@ public class IndexInfo {
                     info.rtree = info.openRTree();
                 } else if (info.treeType == QUAD_TREE) {
                     info.qtree = info.openQuadTree();
+                }else{
+                	goodRecs=null;
+                	return;
                 }
 
                 info.indexFile = info.openIndexFile();
@@ -289,6 +292,9 @@ public class IndexInfo {
                 ShapefileRenderer.LOGGER.log(Level.FINE, 
                     "Exception occured attempting to use indexing:", e);
                 goodRecs = null;
+            }finally{
+            	if( info.indexFile!=null )
+            		info.indexFile.close();
             }
         }
 

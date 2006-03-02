@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 import javax.media.jai.util.Range;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.FIDReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -116,22 +117,21 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-
 /**
  * A LiteRenderer Implementations that is optimized for shapefiles.
- *
+ * 
  * @author jeichar
- *
  * @since 2.1.x
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/src/org/geotools/renderer/shape/ShapefileRenderer.java $
  */
-public class ShapefileRenderer implements GTRenderer{
-    public static final Logger LOGGER = Logger.getLogger(
-            "org.geotools.renderer.shape");
+public class ShapefileRenderer implements GTRenderer {
+    public static final Logger LOGGER = Logger.getLogger("org.geotools.renderer.shape");
 
     /** Tolerance used to compare doubles for equality */
     private static final double TOLERANCE = 1e-6;
-    private static final GeometryFactory geomFactory = new GeometryFactory(new LiteCoordinateSequenceFactory());
+    private static final GeometryFactory geomFactory = new GeometryFactory(
+            new LiteCoordinateSequenceFactory());
     private static final Coordinate[] COORDS;
     private static final MultiPolygon MULTI_POLYGON_GEOM;
     private static final Polygon POLYGON_GEOM;
@@ -148,20 +148,16 @@ public class ShapefileRenderer implements GTRenderer{
         COORDS[3] = new Coordinate(0.0, 5.0);
         COORDS[4] = new Coordinate(0.0, 0.0);
         LINE_GEOM = geomFactory.createLinearRing(COORDS);
-        MULTI_LINE_GEOM = geomFactory.createMultiLineString(new LineString[] {
-                    LINE_GEOM
-                });
+        MULTI_LINE_GEOM = geomFactory.createMultiLineString(new LineString[]{LINE_GEOM});
         POLYGON_GEOM = geomFactory.createPolygon(LINE_GEOM, new LinearRing[0]);
-        MULTI_POLYGON_GEOM = geomFactory.createMultiPolygon(new Polygon[] {
-                    POLYGON_GEOM
-                });
+        MULTI_POLYGON_GEOM = geomFactory.createMultiPolygon(new Polygon[]{POLYGON_GEOM});
         POINT_GEOM = geomFactory.createPoint(COORDS[2]);
         MULTI_POINT_GEOM = geomFactory.createMultiPoint(COORDS);
     }
 
     /**
-     * This listener is added to the list of listeners automatically. It should
-     * be removed if the default logging is not needed.
+     * This listener is added to the list of listeners automatically. It should be removed if the
+     * default logging is not needed.
      */
     public static final DefaultRenderListener DEFAULT_LISTENER = new DefaultRenderListener();
     static int NUM_SAMPLES = 200;
@@ -183,8 +179,8 @@ public class ShapefileRenderer implements GTRenderer{
     IndexInfo[] layerIndexInfo;
 
     /**
-     * Maps between the AttributeType index of the new generated FeatureType
-     * and the real attributeType
+     * Maps between the AttributeType index of the new generated FeatureType and the real
+     * attributeType
      */
     int[] attributeIndexing;
 
@@ -196,23 +192,23 @@ public class ShapefileRenderer implements GTRenderer{
 
     private Graphics2D outputGraphics;
 
-    public ShapefileRenderer(MapContext context) {
+    public ShapefileRenderer( MapContext context ) {
         setContext(context);
     }
 
     public ShapefileRenderer() {
     }
 
-    public void paint(Graphics2D graphics, Rectangle paintArea,
-        Envelope mapArea) {
+    public void paint( Graphics2D graphics, Rectangle paintArea, Envelope mapArea ) {
         if (mapArea == null || paintArea == null) {
             LOGGER.info("renderer passed null arguments");
             return;
-        } //Other arguments get checked later
-        paint(graphics, paintArea, mapArea, RendererUtilities.worldToScreenTransform(mapArea, paintArea));
+        } // Other arguments get checked later
+        paint(graphics, paintArea, mapArea, RendererUtilities.worldToScreenTransform(mapArea,
+                paintArea));
     }
 
-    private DbaseFileHeader getDBFHeader(ShapefileDataStore ds) {
+    private DbaseFileHeader getDBFHeader( ShapefileDataStore ds ) {
         DbaseFileReader reader = null;
 
         try {
@@ -235,13 +231,11 @@ public class ShapefileRenderer implements GTRenderer{
         return null;
     }
 
-    private void processStylersNoCaching(Graphics2D graphics,
-        ShapefileDataStore datastore, Query query, Envelope bbox,
-        MathTransform mt, Style style, IndexInfo info, Transaction transaction)
-        throws IOException {
+    private void processStylersNoCaching( Graphics2D graphics, ShapefileDataStore datastore,
+            Query query, Envelope bbox, MathTransform mt, Style style, IndexInfo info,
+            Transaction transaction ) throws IOException {
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("processing " + style.getFeatureTypeStyles().length
-                + " stylers");
+            LOGGER.fine("processing " + style.getFeatureTypeStyles().length + " stylers");
         }
 
         FeatureTypeStyle[] featureStylers = style.getFeatureTypeStyles();
@@ -255,7 +249,7 @@ public class ShapefileRenderer implements GTRenderer{
             return;
         }
 
-        for (int i = 0; i < featureStylers.length; i++) {
+        for( int i = 0; i < featureStylers.length; i++ ) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 LOGGER.fine("processing style " + i);
             }
@@ -264,15 +258,14 @@ public class ShapefileRenderer implements GTRenderer{
             String typeName = datastore.getSchema().getTypeName();
 
             if ((typeName != null)
-                    && (datastore.getSchema().isDescendedFrom(null,
-                        fts.getFeatureTypeName())
-                    || typeName.equalsIgnoreCase(fts.getFeatureTypeName()))) {
+                    && (datastore.getSchema().isDescendedFrom(null, fts.getFeatureTypeName()) || typeName
+                            .equalsIgnoreCase(fts.getFeatureTypeName()))) {
                 // get applicable rules at the current scale
                 Rule[] rules = fts.getRules();
                 List ruleList = new ArrayList();
                 List elseRuleList = new ArrayList();
 
-                for (int j = 0; j < rules.length; j++) {
+                for( int j = 0; j < rules.length; j++ ) {
                     if (LOGGER.isLoggable(Level.FINE)) {
                         LOGGER.fine("processing rule " + j);
                     }
@@ -292,20 +285,17 @@ public class ShapefileRenderer implements GTRenderer{
                 // TODO: find a better way to declare the scale ranges so that
                 // we
                 // get style caching also between multiple rendering runs
-                NumberRange scaleRange = new NumberRange(scaleDenominator,
-                        scaleDenominator);
+                NumberRange scaleRange = new NumberRange(scaleDenominator, scaleDenominator);
 
-                Set modifiedFIDs = processTransaction(graphics, bbox, mt,
-                        datastore, transaction, typeName, query, ruleList,
-                        elseRuleList, scaleRange);
+                Set modifiedFIDs = processTransaction(graphics, bbox, mt, datastore, transaction,
+                        typeName, query, ruleList, elseRuleList, scaleRange);
 
-                processShapefile(graphics, datastore, bbox, mt, info, type, query,
-                    ruleList, elseRuleList, modifiedFIDs, scaleRange);
+                processShapefile(graphics, datastore, bbox, mt, info, type, query, ruleList,
+                        elseRuleList, modifiedFIDs, scaleRange);
             }
         }
     }
 
-    
     private Set processTransaction(Graphics2D graphics, Envelope bbox,
         MathTransform transform, DataStore ds, Transaction transaction,
         String typename, Query query, List ruleList, List elseRuleList,
@@ -314,8 +304,7 @@ public class ShapefileRenderer implements GTRenderer{
             return Collections.EMPTY_SET;
         }
 
-        TransactionStateDiff state = (TransactionStateDiff) transaction
-            .getState(ds);
+        TransactionStateDiff state = (TransactionStateDiff) transaction.getState(ds);
 
         if (state == null) {
             return Collections.EMPTY_SET;
@@ -335,7 +324,7 @@ public class ShapefileRenderer implements GTRenderer{
             Feature feature;
             String fid;
 
-            for (Iterator iter = fids.iterator(); iter.hasNext();) {
+            for( Iterator iter = fids.iterator(); iter.hasNext(); ) {
                 if (renderingStopRequested) {
                     break;
                 }
@@ -344,12 +333,12 @@ public class ShapefileRenderer implements GTRenderer{
                 fid = (String) iter.next();
                 feature = (Feature) diff.get(fid);
 
-                if( !query.getFilter().contains(feature) )
+                if (!query.getFilter().contains(feature))
                     continue;
-                
+
                 if (feature != null) {
-                    //					 applicable rules
-                    for (Iterator it = ruleList.iterator(); it.hasNext();) {
+                    // applicable rules
+                    for( Iterator it = ruleList.iterator(); it.hasNext(); ) {
                         Rule r = (Rule) it.next();
 
                         if (LOGGER.isLoggable(Level.FINER)) {
@@ -372,8 +361,8 @@ public class ShapefileRenderer implements GTRenderer{
                             Symbolizer[] symbolizers = r.getSymbolizers();
 
                             try {
-                                processSymbolizers(graphics, feature,
-                                    symbolizers, scaleRange, transform);
+                                processSymbolizers(graphics, feature, symbolizers, scaleRange,
+                                        transform);
                             } catch (Exception e) {
                                 fireErrorEvent(e);
 
@@ -392,8 +381,7 @@ public class ShapefileRenderer implements GTRenderer{
                             LOGGER.finer("rules with an else filter");
                         }
 
-                        for (Iterator it = elseRuleList.iterator();
-                                it.hasNext();) {
+                        for( Iterator it = elseRuleList.iterator(); it.hasNext(); ) {
                             Rule r = (Rule) it.next();
                             Symbolizer[] symbolizers = r.getSymbolizers();
 
@@ -402,8 +390,8 @@ public class ShapefileRenderer implements GTRenderer{
                             }
 
                             try {
-                                processSymbolizers(graphics, feature,
-                                    symbolizers, scaleRange, transform);
+                                processSymbolizers(graphics, feature, symbolizers, scaleRange,
+                                        transform);
                             } catch (Exception e) {
                                 fireErrorEvent(e);
 
@@ -426,11 +414,10 @@ public class ShapefileRenderer implements GTRenderer{
         return fids;
     }
 
-    private void processShapefile(Graphics2D graphics,
-        ShapefileDataStore datastore, Envelope bbox, MathTransform mt,
-        IndexInfo info, FeatureType type, Query query, List ruleList, List elseRuleList,
-        Set modifiedFIDs, NumberRange scaleRange) throws IOException {
-        int index = 0;
+    private void processShapefile( Graphics2D graphics, ShapefileDataStore datastore,
+            Envelope bbox, MathTransform mt, IndexInfo info, FeatureType type, Query query,
+            List ruleList, List elseRuleList, Set modifiedFIDs, NumberRange scaleRange )
+            throws IOException {
         DbaseFileReader dbfreader = null;
 
         try {
@@ -439,10 +426,18 @@ public class ShapefileRenderer implements GTRenderer{
             fireErrorEvent(e);
         }
 
-        OpacityFinder opacityFinder = new OpacityFinder(getAcceptableSymbolizers(
-                    type.getDefaultGeometry()));
+        FIDReader fidReader = null;
+        try {
+            fidReader = ShapefileRendererUtil.getFidReader(datastore);
+        } catch (Exception e) {
+            fireErrorEvent(e);
+            return;
+        }
 
-        for (Iterator iter = ruleList.iterator(); iter.hasNext();) {
+        OpacityFinder opacityFinder = new OpacityFinder(getAcceptableSymbolizers(type
+                .getDefaultGeometry()));
+
+        for( Iterator iter = ruleList.iterator(); iter.hasNext(); ) {
             Rule rule = (Rule) iter.next();
             rule.accept(opacityFinder);
         }
@@ -450,18 +445,16 @@ public class ShapefileRenderer implements GTRenderer{
         IndexInfo.Reader shpreader = null;
 
         try {
-            shpreader = new IndexInfo.Reader(info,
-                    ShapefileRendererUtil.getShpReader(datastore, bbox, mt,
-                        opacityFinder.hasOpacity), bbox);
+            shpreader = new IndexInfo.Reader(info, ShapefileRendererUtil.getShpReader(datastore,
+                    bbox, mt, opacityFinder.hasOpacity), bbox);
         } catch (Exception e) {
             fireErrorEvent(e);
+            return;
         }
 
         try {
-            while (true) {
+            while( true ) {
                 try {
-                    index++;
-
                     if (renderingStopRequested) {
                         break;
                     }
@@ -476,7 +469,8 @@ public class ShapefileRenderer implements GTRenderer{
                         LOGGER.fine("trying to read geometry ...");
                     }
 
-                    if (modifiedFIDs.contains(type.getTypeName() + "." + index)) {
+                    String nextFid = fidReader.next();
+                    if (modifiedFIDs.contains(nextFid)) {
                         shpreader.next();
                         //Vitali Diatchkov. We should skip DBF record also. It
                         //is important if SLD is used based on attributes and some features
@@ -497,11 +491,10 @@ public class ShapefileRenderer implements GTRenderer{
                         continue;
                     }
 
-                    Feature feature = createFeature(type, record, dbfreader,
-                            type.getTypeName() + "." + index);
-                    if( !query.getFilter().contains(feature) )
+                    Feature feature = createFeature(type, record, dbfreader, nextFid);
+                    if (!query.getFilter().contains(feature))
                         continue;
-                    
+
                     if (renderingStopRequested) {
                         break;
                     }
@@ -520,7 +513,7 @@ public class ShapefileRenderer implements GTRenderer{
                     }
 
                     // applicable rules
-                    for (Iterator it = ruleList.iterator(); it.hasNext();) {
+                    for( Iterator it = ruleList.iterator(); it.hasNext(); ) {
                         Rule r = (Rule) it.next();
 
                         if (LOGGER.isLoggable(Level.FINER)) {
@@ -542,8 +535,7 @@ public class ShapefileRenderer implements GTRenderer{
 
                             Symbolizer[] symbolizers = r.getSymbolizers();
 
-                            processSymbolizers(graphics, feature, geom,
-                                symbolizers, scaleRange);
+                            processSymbolizers(graphics, feature, geom, symbolizers, scaleRange);
 
                             if (LOGGER.isLoggable(Level.FINER)) {
                                 LOGGER.finer("... done!");
@@ -557,8 +549,7 @@ public class ShapefileRenderer implements GTRenderer{
                             LOGGER.finer("rules with an else filter");
                         }
 
-                        for (Iterator it = elseRuleList.iterator();
-                                it.hasNext();) {
+                        for( Iterator it = elseRuleList.iterator(); it.hasNext(); ) {
                             Rule r = (Rule) it.next();
                             Symbolizer[] symbolizers = r.getSymbolizers();
 
@@ -566,8 +557,7 @@ public class ShapefileRenderer implements GTRenderer{
                                 LOGGER.finer("processing Symobolizer ...");
                             }
 
-                            processSymbolizers(graphics, feature, geom,
-                                symbolizers, scaleRange);
+                            processSymbolizers(graphics, feature, geom, symbolizers, scaleRange);
 
                             if (LOGGER.isLoggable(Level.FINER)) {
                                 LOGGER.finer("... done!");
@@ -583,44 +573,44 @@ public class ShapefileRenderer implements GTRenderer{
                 }
             }
         } finally {
-            if (dbfreader != null) {
-                dbfreader.close();
-            }
-
-            if (shpreader != null) {
-                shpreader.close();
+            try {
+                if (dbfreader != null) {
+                    dbfreader.close();
+                }
+            } finally {
+                try {
+                    if (shpreader != null) {
+                        shpreader.close();
+                    }
+                } finally {
+                    if (fidReader == null)
+                        fidReader.close();
+                }
             }
         }
     }
 
-    private Class[] getAcceptableSymbolizers(
-        GeometryAttributeType defaultGeometry) {
+    private Class[] getAcceptableSymbolizers( GeometryAttributeType defaultGeometry ) {
         if (Polygon.class.isAssignableFrom(defaultGeometry.getType())
-                || MultiPolygon.class.isAssignableFrom(
-                    defaultGeometry.getType())) {
-            return new Class[] {
-                PointSymbolizer.class, LineSymbolizer.class,
-                PolygonSymbolizer.class
-            };
+                || MultiPolygon.class.isAssignableFrom(defaultGeometry.getType())) {
+            return new Class[]{PointSymbolizer.class, LineSymbolizer.class, PolygonSymbolizer.class};
         }
 
-        return new Class[] { PointSymbolizer.class, LineSymbolizer.class };
+        return new Class[]{PointSymbolizer.class, LineSymbolizer.class};
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param type
      * @param record
      * @param dbfreader
      * @param id DOCUMENT ME!
-     *
      * @return
-     *
      * @throws Exception
      */
-    Feature createFeature(FeatureType type, Record record,
-        DbaseFileReader dbfreader, String id) throws Exception {
+    Feature createFeature( FeatureType type, Record record, DbaseFileReader dbfreader, String id )
+            throws Exception {
         if (type.getAttributeCount() == 1) {
             return type.create(new Object[1], id);
         } else {
@@ -629,11 +619,10 @@ public class ShapefileRenderer implements GTRenderer{
             Object[] all = dbfreader.readEntry();
             Object[] values = new Object[type.getAttributeCount()];
 
-            for (int i = 0; i < (values.length - 1); i++) {
+            for( int i = 0; i < (values.length - 1); i++ ) {
                 values[i] = all[attributeIndexing[i]];
 
-                if (header.getFieldName(attributeIndexing[i]).equals(type
-                            .getAttributeType(i))) {
+                if (header.getFieldName(attributeIndexing[i]).equals(type.getAttributeType(i))) {
                     System.out.println("ok");
                 }
             }
@@ -646,22 +635,19 @@ public class ShapefileRenderer implements GTRenderer{
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param defaultGeometry
-     *
      * @return
      */
-    private Object getGeom(GeometryAttributeType defaultGeometry) {
+    private Object getGeom( GeometryAttributeType defaultGeometry ) {
         if (defaultGeom == null) {
             if (MultiPolygon.class.isAssignableFrom(defaultGeometry.getType())) {
                 defaultGeom = MULTI_POLYGON_GEOM;
-            } else if (MultiLineString.class.isAssignableFrom(
-                        defaultGeometry.getType())) {
+            } else if (MultiLineString.class.isAssignableFrom(defaultGeometry.getType())) {
                 defaultGeom = MULTI_LINE_GEOM;
             } else if (Point.class.isAssignableFrom(defaultGeometry.getType())) {
                 defaultGeom = POINT_GEOM;
-            } else if (MultiPoint.class.isAssignableFrom(
-                        defaultGeometry.getType())) {
+            } else if (MultiPoint.class.isAssignableFrom(defaultGeometry.getType())) {
                 defaultGeom = MULTI_POINT_GEOM;
             }
         }
@@ -671,28 +657,25 @@ public class ShapefileRenderer implements GTRenderer{
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param query
      * @param style
      * @param schema DOCUMENT ME!
-     *
      * @return
-     *
      * @throws FactoryConfigurationError
      * @throws SchemaException
      */
-    FeatureType createFeatureType(Query query, Style style, FeatureType schema)
-        throws SchemaException {
-        String[] attributes = findStyleAttributes((query == null) ? Query.ALL
-                                                                  : query,
-                style, schema);
+    FeatureType createFeatureType( Query query, Style style, FeatureType schema )
+            throws SchemaException {
+        String[] attributes = findStyleAttributes((query == null) ? Query.ALL : query, style,
+                schema);
         AttributeType[] types = new AttributeType[attributes.length];
         attributeIndexing = new int[attributes.length];
 
-        for (int i = 0; i < types.length; i++) {
+        for( int i = 0; i < types.length; i++ ) {
             types[i] = schema.getAttributeType(attributes[i]);
 
-            for (int j = 0; j < dbfheader.getNumFields(); j++) {
+            for( int j = 0; j < dbfheader.getNumFields(); j++ ) {
                 if (dbfheader.getFieldName(j).equals(attributes[i])) {
                     attributeIndexing[i] = j;
 
@@ -701,59 +684,54 @@ public class ShapefileRenderer implements GTRenderer{
             }
         }
 
-        FeatureType type = FeatureTypeBuilder.newFeatureType(types,
-                schema.getTypeName(), schema.getNamespace(), false, null,
-                schema.getDefaultGeometry());
+        FeatureType type = FeatureTypeBuilder.newFeatureType(types, schema.getTypeName(), schema
+                .getNamespace(), false, null, schema.getDefaultGeometry());
 
         return type;
     }
 
     /**
-     * Inspects the <code>MapLayer</code>'s style and retrieves it's needed
-     * attribute names, returning at least the default geometry attribute
-     * name.
-     *
+     * Inspects the <code>MapLayer</code>'s style and retrieves it's needed attribute names,
+     * returning at least the default geometry attribute name.
+     * 
      * @param query DOCUMENT ME!
-     * @param style the <code>Style</code> to determine the needed attributes
-     *        from
+     * @param style the <code>Style</code> to determine the needed attributes from
      * @param schema the featuresource schema
-     *
-     * @return the minimun set of attribute names needed to render
-     *         <code>layer</code>
+     * @return the minimun set of attribute names needed to render <code>layer</code>
      */
-    private String[] findStyleAttributes(final Query query, Style style,
-        FeatureType schema) {
-        StyleAttributeExtractor sae = new StyleAttributeExtractor() {
-                public void visit(Rule rule) {
-                    
-                	
-                	DuplicatorStyleVisitor dupeStyleVisitor = new DuplicatorStyleVisitor(StyleFactoryFinder.createStyleFactory(), FilterFactoryFinder.createFilterFactory());
-                	dupeStyleVisitor.visit(rule);
-                	Rule clone = (Rule) dupeStyleVisitor.getCopy();
-                	
-//                    Rule clone=StyleFactoryFinder.createStyleFactory().createRule();
-//                    clone.setAbstract(rule.getAbstract());
-//                    clone.setFilter(rule.getFilter());
-//                    clone.setSymbolizers(rule.getSymbolizers());
-//                    clone.setIsElseFilter(rule.hasElseFilter());
-//                    clone.setLegendGraphic(rule.getLegendGraphic());
-//                    clone.setMaxScaleDenominator(rule.getMaxScaleDenominator());
-//                    clone.setMinScaleDenominator(rule.getMinScaleDenominator());
-//                    clone.setName(rule.getName());
-//                    clone.setTitle(rule.getTitle());
-//                    
-//                    if ((query != Query.ALL)
-//                            && !query.getFilter().equals(Filter.NONE)) {
-//                        if (clone.getFilter() == null) {
-//                            clone.setFilter(query.getFilter());
-//                        } else {
-//                            clone.setFilter(clone.getFilter().and(query.getFilter()));
-//                        }
-//                    }
+    private String[] findStyleAttributes( final Query query, Style style, FeatureType schema ) {
+        StyleAttributeExtractor sae = new StyleAttributeExtractor(){
+            public void visit( Rule rule ) {
 
-                    super.visit(clone);
-                }
-            };
+                DuplicatorStyleVisitor dupeStyleVisitor = new DuplicatorStyleVisitor(
+                        StyleFactoryFinder.createStyleFactory(), FilterFactoryFinder
+                                .createFilterFactory());
+                dupeStyleVisitor.visit(rule);
+                Rule clone = (Rule) dupeStyleVisitor.getCopy();
+
+                // Rule clone=StyleFactoryFinder.createStyleFactory().createRule();
+                // clone.setAbstract(rule.getAbstract());
+                // clone.setFilter(rule.getFilter());
+                // clone.setSymbolizers(rule.getSymbolizers());
+                // clone.setIsElseFilter(rule.hasElseFilter());
+                // clone.setLegendGraphic(rule.getLegendGraphic());
+                // clone.setMaxScaleDenominator(rule.getMaxScaleDenominator());
+                // clone.setMinScaleDenominator(rule.getMinScaleDenominator());
+                // clone.setName(rule.getName());
+                // clone.setTitle(rule.getTitle());
+                //                    
+                // if ((query != Query.ALL)
+                // && !query.getFilter().equals(Filter.NONE)) {
+                // if (clone.getFilter() == null) {
+                // clone.setFilter(query.getFilter());
+                // } else {
+                // clone.setFilter(clone.getFilter().and(query.getFilter()));
+                // }
+                // }
+
+                super.visit(clone);
+            }
+        };
 
         sae.visit(style);
 
@@ -764,16 +742,16 @@ public class ShapefileRenderer implements GTRenderer{
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param graphics
      * @param feature DOCUMENT ME!
      * @param geom
      * @param symbolizers
      * @param scaleRange
      */
-    private void processSymbolizers(Graphics2D graphics, Feature feature,
-        SimpleGeometry geom, Symbolizer[] symbolizers, NumberRange scaleRange) {
-        for (int m = 0; m < symbolizers.length; m++) {
+    private void processSymbolizers( Graphics2D graphics, Feature feature, SimpleGeometry geom,
+            Symbolizer[] symbolizers, NumberRange scaleRange ) {
+        for( int m = 0; m < symbolizers.length; m++ ) {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("applying symbolizer " + symbolizers[m]);
             }
@@ -784,24 +762,23 @@ public class ShapefileRenderer implements GTRenderer{
 
             if (symbolizers[m] instanceof TextSymbolizer) {
                 try {
-                    labelCache.put((TextSymbolizer) symbolizers[m], feature,
-                        getLiteShape2(geom), scaleRange);
+                    labelCache.put((TextSymbolizer) symbolizers[m], feature, getLiteShape2(geom),
+                            scaleRange);
                 } catch (Exception e) {
                     fireErrorEvent(e);
                 }
             } else {
-                Style2D style = styleFactory.createStyle(feature,
-                        symbolizers[m], scaleRange);
+                Style2D style = styleFactory.createStyle(feature, symbolizers[m], scaleRange);
                 painter.paint(graphics, getShape(geom), style, scaleDenominator);
 
-                //				 try {
-                //				 style = styleFactory.createStyle(feature, getTestStyle(),
-                //				 scaleRange);
-                //				 painter.paint(graphics, getLiteShape2(geom), style,
-                //				 scaleDenominator);
-                //				 } catch (Exception e) {
-                //				 fireErrorEvent(e);
-                //				 }
+                // try {
+                // style = styleFactory.createStyle(feature, getTestStyle(),
+                // scaleRange);
+                // painter.paint(graphics, getLiteShape2(geom), style,
+                // scaleDenominator);
+                // } catch (Exception e) {
+                // fireErrorEvent(e);
+                // }
             }
 
             fireFeatureRenderedEvent(feature);
@@ -810,29 +787,25 @@ public class ShapefileRenderer implements GTRenderer{
 
     /**
      * Applies each of a set of symbolizers in turn to a given feature.
-     * 
      * <p>
      * This is an internal method and should only be called by processStylers.
      * </p>
-     *
+     * 
      * @param graphics
      * @param feature The feature to be rendered
-     * @param symbolizers An array of symbolizers which actually perform the
-     *        rendering.
-     * @param scaleRange The scale range we are working on... provided in order
-     *        to make the style factory happy
+     * @param symbolizers An array of symbolizers which actually perform the rendering.
+     * @param scaleRange The scale range we are working on... provided in order to make the style
+     *        factory happy
      * @param transform DOCUMENT ME!
-     *
      * @throws TransformException
      * @throws FactoryException
      */
-    private void processSymbolizers(final Graphics2D graphics,
-        final Feature feature, final Symbolizer[] symbolizers,
-        Range scaleRange, MathTransform transform)
-        throws TransformException, FactoryException {
+    private void processSymbolizers( final Graphics2D graphics, final Feature feature,
+            final Symbolizer[] symbolizers, Range scaleRange, MathTransform transform )
+            throws TransformException, FactoryException {
         LiteShape2 shape;
 
-        for (int m = 0; m < symbolizers.length; m++) {
+        for( int m = 0; m < symbolizers.length; m++ ) {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("applying symbolizer " + symbolizers[m]);
             }
@@ -841,11 +814,9 @@ public class ShapefileRenderer implements GTRenderer{
             shape = new LiteShape2(g, transform, getDecimator(transform), false);
 
             if (symbolizers[m] instanceof TextSymbolizer) {
-                labelCache.put((TextSymbolizer) symbolizers[m], feature, shape,
-                    scaleRange);
+                labelCache.put((TextSymbolizer) symbolizers[m], feature, shape, scaleRange);
             } else {
-                Style2D style = styleFactory.createStyle(feature,
-                        symbolizers[m], scaleRange);
+                Style2D style = styleFactory.createStyle(feature, symbolizers[m], scaleRange);
                 painter.paint(graphics, shape, style, scaleDenominator);
             }
         }
@@ -855,15 +826,13 @@ public class ShapefileRenderer implements GTRenderer{
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param mathTransform DOCUMENT ME!
-     *
      * @return
-     *
      * @throws org.opengis.referencing.operation.NoninvertibleTransformException
      */
-    private Decimator getDecimator(MathTransform mathTransform)
-        throws org.opengis.referencing.operation.NoninvertibleTransformException {
+    private Decimator getDecimator( MathTransform mathTransform )
+            throws org.opengis.referencing.operation.NoninvertibleTransformException {
         Decimator decimator = (Decimator) decimators.get(mathTransform);
 
         if (decimator == null) {
@@ -879,55 +848,45 @@ public class ShapefileRenderer implements GTRenderer{
         return decimator;
     }
 
-
     /**
-     * Creates a JTS shape that is an approximation of the SImpleGeometry. This
-     * is ONLY use for labelling and is only created if a text symbolizer is
-     * part of the current style.
-     *
+     * Creates a JTS shape that is an approximation of the SImpleGeometry. This is ONLY use for
+     * labelling and is only created if a text symbolizer is part of the current style.
+     * 
      * @param geom the geometry to wrap
-     *
      * @return
-     *
      * @throws TransformException
      * @throws FactoryException
      * @throws RuntimeException DOCUMENT ME!
      */
-    LiteShape2 getLiteShape2(SimpleGeometry geom)
-        throws TransformException, FactoryException {
+    LiteShape2 getLiteShape2( SimpleGeometry geom ) throws TransformException, FactoryException {
         Geometry jtsGeom;
-        if ((geom.type == ShapeType.POLYGON)
-                || (geom.type == ShapeType.POLYGONM)
+        if ((geom.type == ShapeType.POLYGON) || (geom.type == ShapeType.POLYGONM)
                 || (geom.type == ShapeType.POLYGONZ)) {
             double[] points = getPointSample(geom, true);
             CoordinateSequence seq = new LiteCoordinateSequence(points);
             Polygon poly;
 
             try {
-                poly = geomFactory.createPolygon(geomFactory.createLinearRing(
-                            seq), new LinearRing[] {  });
+                poly = geomFactory.createPolygon(geomFactory.createLinearRing(seq),
+                        new LinearRing[]{});
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
-            jtsGeom = geomFactory.createMultiPolygon(new Polygon[] { poly });
-        } else if ((geom.type == ShapeType.ARC)
-                || (geom.type == ShapeType.ARCM)
+            jtsGeom = geomFactory.createMultiPolygon(new Polygon[]{poly});
+        } else if ((geom.type == ShapeType.ARC) || (geom.type == ShapeType.ARCM)
                 || (geom.type == ShapeType.ARCZ)) {
             double[] points = getPointSample(geom, false);
             CoordinateSequence seq = new LiteCoordinateSequence(points);
-            jtsGeom = geomFactory.createMultiLineString(new LineString[] {
-                        geomFactory.createLineString(seq)
-                    });
-        } else if ((geom.type == ShapeType.MULTIPOINT)
-                || (geom.type == ShapeType.MULTIPOINTM)
+            jtsGeom = geomFactory.createMultiLineString(new LineString[]{geomFactory
+                    .createLineString(seq)});
+        } else if ((geom.type == ShapeType.MULTIPOINT) || (geom.type == ShapeType.MULTIPOINTM)
                 || (geom.type == ShapeType.MULTIPOINTZ)) {
             double[] points = getPointSample(geom, false);
             CoordinateSequence seq = new LiteCoordinateSequence(points);
             jtsGeom = geomFactory.createMultiPoint(seq);
         } else {
-            jtsGeom = geomFactory.createPoint(new Coordinate(
-                        geom.coords[0][0], geom.coords[0][1]));
+            jtsGeom = geomFactory.createPoint(new Coordinate(geom.coords[0][0], geom.coords[0][1]));
         }
 
         LiteShape2 shape = new LiteShape2(jtsGeom, null, null, false);
@@ -936,18 +895,16 @@ public class ShapefileRenderer implements GTRenderer{
     }
 
     /**
-     * takes a random sampling from the geometry. Only uses the larges part of
-     * the geometry.
-     *
+     * takes a random sampling from the geometry. Only uses the larges part of the geometry.
+     * 
      * @param geom
      * @param isPolygon DOCUMENT ME!
-     *
      * @return
      */
-    private double[] getPointSample(SimpleGeometry geom, boolean isPolygon) {
+    private double[] getPointSample( SimpleGeometry geom, boolean isPolygon ) {
         int largestPart = 0;
 
-        for (int i = 0; i < geom.coords.length; i++) {
+        for( int i = 0; i < geom.coords.length; i++ ) {
             if (geom.coords[i].length > geom.coords[largestPart].length) {
                 largestPart = i;
             }
@@ -958,28 +915,24 @@ public class ShapefileRenderer implements GTRenderer{
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param geom
-     *
      * @return
      */
-    private Shape getShape(SimpleGeometry geom) {
+    private Shape getShape( SimpleGeometry geom ) {
         if ((geom.type == ShapeType.ARC) || (geom.type == ShapeType.ARCM)
                 || (geom.type == ShapeType.ARCZ)) {
             return new MultiLineShape(geom);
         }
 
-        if ((geom.type == ShapeType.POLYGON)
-                || (geom.type == ShapeType.POLYGONM)
+        if ((geom.type == ShapeType.POLYGON) || (geom.type == ShapeType.POLYGONM)
                 || (geom.type == ShapeType.POLYGONZ)) {
             return new PolygonShape(geom);
         }
 
         if ((geom.type == ShapeType.POINT) || (geom.type == ShapeType.POINTM)
-                || (geom.type == ShapeType.POINTZ)
-                || (geom.type == ShapeType.MULTIPOINT)
-                || (geom.type == ShapeType.MULTIPOINTM)
-                || (geom.type == ShapeType.MULTIPOINTZ)) {
+                || (geom.type == ShapeType.POINTZ) || (geom.type == ShapeType.MULTIPOINT)
+                || (geom.type == ShapeType.MULTIPOINTM) || (geom.type == ShapeType.MULTIPOINTZ)) {
             return new MultiPointShape(geom);
         }
 
@@ -988,52 +941,48 @@ public class ShapefileRenderer implements GTRenderer{
 
     /**
      * Checks if a rule can be triggered at the current scale level
-     *
+     * 
      * @param r The rule
-     *
      * @return true if the scale is compatible with the rule settings
      */
-    private boolean isWithInScale(Rule r) {
+    private boolean isWithInScale( Rule r ) {
         return ((r.getMinScaleDenominator() - TOLERANCE) <= scaleDenominator)
-        && ((r.getMaxScaleDenominator() + TOLERANCE) > scaleDenominator);
+                && ((r.getMaxScaleDenominator() + TOLERANCE) > scaleDenominator);
     }
 
     /**
-     * adds a listener that responds to error events of feature rendered
-     * events.
-     *
+     * adds a listener that responds to error events of feature rendered events.
+     * 
      * @param listener the listener to add.
-     *
      * @see RenderListener
      */
-    public void addRenderListener(RenderListener listener) {
+    public void addRenderListener( RenderListener listener ) {
         renderListeners.add(listener);
     }
 
     /**
      * Removes a render listener.
-     *
+     * 
      * @param listener the listener to remove.
-     *
      * @see RenderListener
      */
-    public void removeRenderListener(RenderListener listener) {
+    public void removeRenderListener( RenderListener listener ) {
         renderListeners.remove(listener);
     }
 
-    private void fireFeatureRenderedEvent(Feature feature) {
+    private void fireFeatureRenderedEvent( Feature feature ) {
         Object[] objects = renderListeners.getListeners();
 
-        for (int i = 0; i < objects.length; i++) {
+        for( int i = 0; i < objects.length; i++ ) {
             RenderListener listener = (RenderListener) objects[i];
             listener.featureRenderer(feature);
         }
     }
 
-    private void fireErrorEvent(Exception e) {
+    private void fireErrorEvent( Exception e ) {
         Object[] objects = renderListeners.getListeners();
 
-        for (int i = 0; i < objects.length; i++) {
+        for( int i = 0; i < objects.length; i++ ) {
             RenderListener listener = (RenderListener) objects[i];
             listener.errorOccurred(e);
         }
@@ -1041,17 +990,16 @@ public class ShapefileRenderer implements GTRenderer{
 
     /**
      * Setter for property scaleDenominator.
-     *
+     * 
      * @param scaleDenominator New value of property scaleDenominator.
      */
-    protected void setScaleDenominator(double scaleDenominator) {
+    protected void setScaleDenominator( double scaleDenominator ) {
         this.scaleDenominator = scaleDenominator;
     }
 
     /**
-     * If you call this method from another thread than the one that called
-     * <code>paint</code> or <code>render</code> the rendering will be
-     * forcefully stopped before termination
+     * If you call this method from another thread than the one that called <code>paint</code> or
+     * <code>render</code> the rendering will be forcefully stopped before termination
      */
     public void stopRendering() {
         renderingStopRequested = true;
@@ -1060,7 +1008,7 @@ public class ShapefileRenderer implements GTRenderer{
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return Returns the caching.
      */
     public boolean isCaching() {
@@ -1069,10 +1017,10 @@ public class ShapefileRenderer implements GTRenderer{
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param caching The caching to set.
      */
-    public void setCaching(boolean caching) {
+    public void setCaching( boolean caching ) {
         this.caching = caching;
     }
 
@@ -1080,17 +1028,15 @@ public class ShapefileRenderer implements GTRenderer{
         return context;
     }
 
-
     public boolean isConcatTransforms() {
         return concatTransforms;
     }
 
-    public void setConcatTransforms(boolean concatTransforms) {
+    public void setConcatTransforms( boolean concatTransforms ) {
         this.concatTransforms = concatTransforms;
     }
 
-    public IndexInfo useIndex(ShapefileDataStore ds)
-        throws IOException, StoreException {
+    public IndexInfo useIndex( ShapefileDataStore ds ) throws IOException, StoreException {
         IndexInfo info;
         String filename = null;
         URL url = ShapefileRendererUtil.getshpURL(ds);
@@ -1102,8 +1048,8 @@ public class ShapefileRenderer implements GTRenderer{
         try {
             filename = java.net.URLDecoder.decode(url.toString(), "US-ASCII");
         } catch (java.io.UnsupportedEncodingException use) {
-            throw new java.net.MalformedURLException("Unable to decode " + url
-                + " cause " + use.getMessage());
+            throw new java.net.MalformedURLException("Unable to decode " + url + " cause "
+                    + use.getMessage());
         }
 
         filename = filename.substring(0, filename.length() - 4);
@@ -1119,12 +1065,10 @@ public class ShapefileRenderer implements GTRenderer{
             if (!new File(shx.getPath()).exists()) {
                 info = new IndexInfo(IndexInfo.TREE_NONE, null, null);
             } else if (!grxTree.exists() && qixTree.exists()) {
-                info = new IndexInfo(IndexInfo.QUAD_TREE,
-                        new URL(filename + qixext), shx);
+                info = new IndexInfo(IndexInfo.QUAD_TREE, new URL(filename + qixext), shx);
                 LOGGER.fine("Using quad tree");
             } else if (grxTree.exists()) {
-                info = new IndexInfo(IndexInfo.R_TREE,
-                        new URL(filename + grxext), shx);
+                info = new IndexInfo(IndexInfo.R_TREE, new URL(filename + grxext), shx);
                 LOGGER.fine("Using r-tree");
             } else {
                 info = new IndexInfo(IndexInfo.TREE_NONE, null, null);
@@ -1138,26 +1082,25 @@ public class ShapefileRenderer implements GTRenderer{
     }
 
     /**
-     * By default ignores all feature renderered events and logs all exceptions
-     * as severe.
+     * By default ignores all feature renderered events and logs all exceptions as severe.
      */
     private static class DefaultRenderListener implements RenderListener {
         /**
          * @see org.geotools.renderer.lite.RenderListener#featureRenderer(org.geotools.feature.Feature)
          */
-        public void featureRenderer(Feature feature) {
+        public void featureRenderer( Feature feature ) {
             // do nothing.
         }
 
         /**
          * @see org.geotools.renderer.lite.RenderListener#errorOccurred(java.lang.Exception)
          */
-        public void errorOccurred(Exception e) {
+        public void errorOccurred( Exception e ) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
-    public void setJava2DHints(RenderingHints hints) {
+    public void setJava2DHints( RenderingHints hints ) {
         this.hints = hints;
     }
 
@@ -1165,15 +1108,15 @@ public class ShapefileRenderer implements GTRenderer{
         return hints;
     }
 
-    public void setRendererHints(Map hints) {
-        rendererHints=hints;
+    public void setRendererHints( Map hints ) {
+        rendererHints = hints;
     }
 
     public Map getRendererHints() {
         return rendererHints;
     }
 
-    public void setContext(MapContext context) {
+    public void setContext( MapContext context ) {
         if (context == null) {
             context = new DefaultMapContext();
         }
@@ -1183,7 +1126,7 @@ public class ShapefileRenderer implements GTRenderer{
         MapLayer[] layers = context.getLayers();
         layerIndexInfo = new IndexInfo[layers.length];
 
-        for (int i = 0; i < layers.length; i++) {
+        for( int i = 0; i < layers.length; i++ ) {
             DataStore ds = layers[i].getFeatureSource().getDataStore();
             assert (ds instanceof ShapefileDataStore);
 
@@ -1192,19 +1135,17 @@ public class ShapefileRenderer implements GTRenderer{
             try {
                 layerIndexInfo[i] = useIndex(sds);
             } catch (Exception e) {
-                layerIndexInfo[i] = new IndexInfo(IndexInfo.TREE_NONE, null,
-                        null);
-                LOGGER.fine("Exception while trying to use index"
-                    + e.getLocalizedMessage());
+                layerIndexInfo[i] = new IndexInfo(IndexInfo.TREE_NONE, null, null);
+                LOGGER.fine("Exception while trying to use index" + e.getLocalizedMessage());
             }
         }
     }
 
-    public void paint(Graphics2D graphics, Rectangle paintArea, AffineTransform worldToScreen) {
+    public void paint( Graphics2D graphics, Rectangle paintArea, AffineTransform worldToScreen ) {
         if (worldToScreen == null || paintArea == null) {
             LOGGER.info("renderer passed null arguments");
             return;
-        } //Other arguments get checked later
+        } // Other arguments get checked later
         // First, create the bbox in real world coordinates
         Envelope mapArea;
         try {
@@ -1215,7 +1156,8 @@ public class ShapefileRenderer implements GTRenderer{
         }
     }
 
-    public void paint(Graphics2D graphics, Rectangle paintArea, Envelope envelope, AffineTransform transform) {
+    public void paint( Graphics2D graphics, Rectangle paintArea, Envelope envelope,
+            AffineTransform transform ) {
         this.outputGraphics = graphics;
 
         if (hints != null) {
@@ -1236,35 +1178,41 @@ public class ShapefileRenderer implements GTRenderer{
         }
 
         /*
-         * If we are rendering to a component which has already set up some form
-         * of transformation then we can concatenate our transformation to it.
-         * An example of this is the ZoomPane component of the swinggui module.
+         * If we are rendering to a component which has already set up some form of transformation
+         * then we can concatenate our transformation to it. An example of this is the ZoomPane
+         * component of the swinggui module.
          */
         if (concatTransforms) {
             AffineTransform atg = graphics.getTransform();
 
-            //          graphics.setTransform(new AffineTransform());
+            // graphics.setTransform(new AffineTransform());
             atg.concatenate(transform);
             transform = atg;
         }
 
         try {
-            setScaleDenominator(RendererUtilities.calculateScale(envelope,
-                    context.getCoordinateReferenceSystem(), paintArea.width,
-                    paintArea.height, 90)); // 90 = OGC standard DPI (see SLD spec page 37)
+            setScaleDenominator(RendererUtilities.calculateScale(envelope, context
+                    .getCoordinateReferenceSystem(), paintArea.width, paintArea.height, 90)); // 90 =
+            // OGC
+            // standard
+            // DPI
+            // (see
+            // SLD
+            // spec
+            // page
+            // 37)
         } catch (Exception e) // probably either (1) no CRS (2) error xforming
-         {
-            setScaleDenominator(1 / transform.getScaleX()); //DJB old method - the best we can do
+        {
+            setScaleDenominator(1 / transform.getScaleX()); // DJB old method - the best we can do
         }
 
         MapLayer[] layers = context.getLayers();
 
         // get detstination CRS
-        CoordinateReferenceSystem destinationCrs = context
-            .getCoordinateReferenceSystem();
+        CoordinateReferenceSystem destinationCrs = context.getCoordinateReferenceSystem();
         labelCache.start();
 
-        for (int i = 0; i < layers.length; i++) {
+        for( int i = 0; i < layers.length; i++ ) {
             MapLayer currLayer = layers[i];
 
             if (!currLayer.isVisible()) {
@@ -1282,10 +1230,9 @@ public class ShapefileRenderer implements GTRenderer{
 
             try {
                 ShapefileDataStore ds = (ShapefileDataStore) currLayer.getFeatureSource()
-                                                                      .getDataStore();
-                CoordinateReferenceSystem dataCRS = ds.getSchema()
-                                                      .getDefaultGeometry()
-                                                      .getCoordinateSystem();
+                        .getDataStore();
+                CoordinateReferenceSystem dataCRS = ds.getSchema().getDefaultGeometry()
+                        .getCoordinateSystem();
                 MathTransform mt;
 
                 try {
@@ -1296,45 +1243,40 @@ public class ShapefileRenderer implements GTRenderer{
                 }
 
                 MathTransform at = FactoryFinder.getMathTransformFactory(null)
-                                                .createAffineTransform(new GeneralMatrix(
-                            transform));
+                        .createAffineTransform(new GeneralMatrix(transform));
 
                 if (mt == null) {
                     mt = at;
                 } else {
-                    mt = FactoryFinder.getMathTransformFactory(null)
-                                      .createConcatenatedTransform(mt, at);
+                    mt = FactoryFinder.getMathTransformFactory(null).createConcatenatedTransform(
+                            mt, at);
                 }
 
-                //dbfheader must be set so that the attributes required for theming can be read in.
+                // dbfheader must be set so that the attributes required for theming can be read in.
                 dbfheader = getDBFHeader(ds);
 
                 // graphics.setTransform(transform);
                 // extract the feature type stylers from the style object
                 // and process them
-                
-                    Transaction transaction = null;
 
-                    if (currLayer.getFeatureSource() instanceof FeatureStore) {
-                        transaction = ((FeatureStore) currLayer
-                            .getFeatureSource()).getTransaction();
-                    }
+                Transaction transaction = null;
 
-                    processStylersNoCaching(graphics, ds, currLayer.getQuery(),
-                        bbox, mt, currLayer.getStyle(), layerIndexInfo[i],
-                        transaction);
+                if (currLayer.getFeatureSource() instanceof FeatureStore) {
+                    transaction = ((FeatureStore) currLayer.getFeatureSource()).getTransaction();
+                }
+
+                processStylersNoCaching(graphics, ds, currLayer.getQuery(), bbox, mt, currLayer
+                        .getStyle(), layerIndexInfo[i], transaction);
             } catch (Exception exception) {
-                fireErrorEvent(new Exception("Exception rendering layer "
-                        + currLayer, exception));
+                fireErrorEvent(new Exception("Exception rendering layer " + currLayer, exception));
             }
 
             labelCache.endLayer(graphics, paintArea);
         }
 
         labelCache.end(graphics, paintArea);
-        LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio()
-            + " , hits " + styleFactory.getHits() + ", requests "
-            + styleFactory.getRequests());
+        LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio() + " , hits "
+                + styleFactory.getHits() + ", requests " + styleFactory.getRequests());
     }
 
 }
