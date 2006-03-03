@@ -205,7 +205,7 @@ public class StreamingRenderer implements GTRenderer {
     /** Factory that will resolve symbolizers into rendered styles */
     private SLDStyleFactory styleFactory = new SLDStyleFactory();
     
-    LabelCache labelCache=new LabelCacheDefault();
+    protected LabelCache labelCache=new LabelCacheDefault();
     
     /** The painter class we use to depict shapes onto the screen */
     private StyledShapePainter painter = new StyledShapePainter(labelCache);

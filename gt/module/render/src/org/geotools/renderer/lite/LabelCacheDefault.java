@@ -412,7 +412,8 @@ public class LabelCacheDefault implements LabelCache {
     			//do nothing
 			}
     	}
-    	labelCache.clear();
+        labelCache.clear();
+        labelCacheNonGrouped.clear();
     }
 
 	/**
