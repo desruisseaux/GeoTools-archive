@@ -32,6 +32,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -107,6 +108,15 @@ public class TransformedDirectPosition extends GeneralDirectPosition {
      * CRS to a common CRS is more frequent than the other way around.
      */
     private transient CoordinateOperation operation;
+
+    /**
+     * Creates a new direct position with the {@linkplain DefaultGeographicCRS#WGS84 WGS84} CRS.
+     *
+     * @since 2.3
+     */
+    public TransformedDirectPosition() {
+        this(DefaultGeographicCRS.WGS84, null);
+    }
 
     /**
      * Creates a new direct position with the specified coordinate reference system.

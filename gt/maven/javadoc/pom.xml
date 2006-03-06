@@ -72,14 +72,13 @@
   <!-- ==================================================== -->
   <!--     Build configuration                              -->
   <!-- ==================================================== -->
-<!-- Disabled for now because maven-plugin-tools-ant crash.
   <build>
     <plugins>
       <plugin>
       <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
         
-        <!- Add the Ant plugin tools ->
+        <!-- Add the Ant plugin tools -->
         <dependencies>
           <dependency>
             <groupId>org.apache.maven</groupId>
@@ -93,5 +92,5 @@
       </plugin>
     </plugins>
   </build>
--->
+
 </project>

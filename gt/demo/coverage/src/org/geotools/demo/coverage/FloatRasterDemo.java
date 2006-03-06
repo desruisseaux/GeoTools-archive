@@ -80,8 +80,8 @@ public class FloatRasterDemo extends junit.framework.TestCase {
          * default value.
          */
         Color[] colors = new Color[] {Color.BLUE, Color.CYAN, Color.WHITE, Color.YELLOW, Color.RED};
-        gc = factory.create("My colored coverage", raster, crs,
-                            envelope, null, null, null, new Color[][] {colors}, null);
+        gc = factory.create("My colored coverage", raster, envelope,
+                            null, null, null, new Color[][] {colors}, null);
         ((GridCoverage2D) gc).geophysics(false).show();
     }
 

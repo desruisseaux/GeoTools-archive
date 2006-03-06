@@ -49,6 +49,23 @@
     </developer>
   </developers>
 
+  <contributors>
+    <contributor>
+      <name>Cédric Briançon</name>
+      <organization>Geomatys</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Hoa Nguyen</name>
+      <organization>Geomatys</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </contributor>
+  </contributors>
+
 
 
   <!-- ==================================================== -->

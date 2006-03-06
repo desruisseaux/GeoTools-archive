@@ -48,7 +48,7 @@ public class CommentUpdater implements FileFilter {
      * The sequence of characters starting a comment.
      * Must be first on a line.
      */
-    private static final String START_COMMENT = "/*";
+    private static final String START_COMMENT = "/**";
 
     /**
      * The sequence of characters ending a comment.
