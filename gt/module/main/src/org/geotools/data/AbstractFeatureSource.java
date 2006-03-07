@@ -68,20 +68,20 @@ public abstract class AbstractFeatureSource implements FeatureSource {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
     
     /**
-     * Retrieve the Transaction this FeatureSource is opperating against.
+     * Retrieve the Transaction this FeatureSource is operating against.
      *
      * <p>
      * For a plain FeatureSource that cannot modify this will always be Transaction.AUTO_COMMIT.
      * </p>
      *
-     * @return Transacstion FeatureSource is opperating against
+     * @return Transacstion FeatureSource is operating against
      */
     public Transaction getTransaction() {
         return Transaction.AUTO_COMMIT;
     }
     
     /**
-     * Provides an interface to for the Resutls of a Query.
+     * Provides an interface to for the Results of a Query.
      *
      * <p>
      * Various queries can be made against the results, the most basic being to retrieve Features.
@@ -180,7 +180,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      * DefaultQuery, if query.getTypeName is not equal to
      * getSchema().getTypeName().
      * </p>
-     * @param query Origional query
+     * @param query Original query
      * @return Query with getTypeName() equal to getSchema().getTypeName()
      */
     protected Query namedQuery( Query query ){

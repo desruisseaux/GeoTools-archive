@@ -24,6 +24,8 @@ package org.geotools.styling;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.resources.Utilities;
+
 
 /**
  * DOCUMENT ME!
@@ -62,4 +64,27 @@ public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
     public void accept(StyleVisitor visitor) {
         visitor.visit(this);
     }
+
+	public boolean equals(Object oth) {
+        if (this == oth) {
+            return true;
+        }
+        
+        if (oth instanceof NamedLayerImpl) {
+        	NamedLayerImpl other = (NamedLayerImpl) oth;
+
+        	if (!Utilities.equals(styles, other.styles))
+        		return false;
+        	
+        	if (featureTypeConstraints.length != other.featureTypeConstraints.length) return false;
+        	
+        	for (int i = 0; i < featureTypeConstraints.length; i++) {
+        		if (!Utilities.equals(featureTypeConstraints[i], other.featureTypeConstraints[i]))
+        			return false;
+        	}
+        	return true;
+        }
+
+        return false;
+	}
 }

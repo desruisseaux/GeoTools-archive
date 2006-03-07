@@ -377,8 +377,18 @@ public class SLDTransformer extends TransformerBase {
             atts.addAttribute("", "version", "version", "", "1.0.0");
         	start("StyledLayerDescriptor", atts);
 
-            StyledLayer[] layers = sld.getStyledLayers();
+        	if ((sld.getName() != null) && (sld.getName().length() > 0)) {
+        		element("Name", sld.getName()); //optional
+        	}
+        	if ((sld.getTitle() != null) && (sld.getTitle().length() > 0)) {
+        		element("Title", sld.getTitle()); //optional
+        	}
+        	if ((sld.getAbstract() != null) && (sld.getAbstract().length() > 0)) {
+        		element("Abstract", sld.getAbstract()); //optional
+        	}
 
+        	StyledLayer[] layers = sld.getStyledLayers();
+            
             for (int i = 0; i < layers.length; i++) {
                 if (layers[i] instanceof NamedLayer) {
                     visit((NamedLayer) layers[i]);
@@ -398,11 +408,14 @@ public class SLDTransformer extends TransformerBase {
             element("Name", layer.getName());
 
             FeatureTypeConstraint[] lfc = layer.getLayerFeatureConstraints();
-
-            for (int i = 0; i < lfc.length; i++) {
-                visit(lfc[i]);
+            if ((lfc != null) && lfc.length > 0) {
+            	start("LayerFeatureConstraints"); //optional
+	            for (int i = 0; i < lfc.length; i++) {
+	                visit(lfc[i]);
+	            }
+	        	end("LayerFeatureConstraints");
             }
-
+            
             Style[] styles = layer.getStyles();
 
             for (int i = 0; i < styles.length; i++) {
@@ -423,16 +436,17 @@ public class SLDTransformer extends TransformerBase {
                 visit(layer.getRemoteOWS());
             }
 
+        	start("LayerFeatureConstraints"); //required
             FeatureTypeConstraint[] lfc = layer.getLayerFeatureConstraints();
             if ((lfc != null) && lfc.length > 0) {
-            	start("LayerFeatureConstraints");
-
             	for (int i = 0; i < lfc.length; i++) {
             		visit(lfc[i]);
             	}
-            	
-            	end("LayerFeatureConstraints");
+            } else { //create an empty FeatureTypeConstraint, since it is required
+            	start("FeatureTypeConstraint");
+            	end("FeatureTypeConstraint");
             }
+        	end("LayerFeatureConstraints");
 
             Style[] styles = layer.getUserStyles();
 

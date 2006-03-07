@@ -146,6 +146,15 @@
         <role>Documentation</role>
       </roles>
     </developer>    
+    <developer>
+      <name>Cory Horner</name>
+      <id>chorner</id>
+      <email>chorner@refractions.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
   </developers>
 
   <contributors>

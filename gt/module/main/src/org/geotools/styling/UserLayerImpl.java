@@ -12,6 +12,7 @@ import java.util.Arrays;
 import org.geotools.data.DataStore;
 import org.geotools.event.GTList;
 import org.geotools.feature.FeatureType;
+import org.geotools.resources.Utilities;
 
 /**
  * DJB: on inlinefeature support:
@@ -130,4 +131,31 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     public void accept(StyleVisitor visitor) {
         visitor.visit(this);
     }
+
+	public boolean equals(Object oth) {
+        if (this == oth) {
+            return true;
+        }
+
+        if (oth instanceof UserLayerImpl) {
+        	UserLayerImpl other = (UserLayerImpl) oth;
+        	
+        	if (!(Utilities.equals(inlineFeatureDatastore, other.inlineFeatureDatastore)
+        	&& Utilities.equals(inlineFeatureType, other.inlineFeatureType)
+        	&& Utilities.equals(remoteOWS, other.remoteOWS)
+        	&& Utilities.equals(styles, other.styles))) {
+        		return false;
+        	}
+
+        	if (constraints.length != other.constraints.length) return false;
+        	
+        	for (int i = 0; i < constraints.length; i++) {
+        		if (!Utilities.equals(constraints[i], other.constraints[i]))
+        			return false;
+        	}
+        	return true;
+        }
+        
+        return false;
+	}
 }

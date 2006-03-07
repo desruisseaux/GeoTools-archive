@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -1668,6 +1669,35 @@ SYMBOLIZER:
 		}
 	}
 
+	public static Symbolizer[] symbolizers(Style style) {
+		Set symbolizers = new HashSet();
+		Rule[] rule = rules(style);
+		for (int i = 0; i < rule.length; i++) {
+			Symbolizer[] symb = rule[i].getSymbolizers();
+			for (int j = 0; j < symb.length; j++) {
+				symbolizers.add(symb[j]);
+			}
+		}
+		if (symbolizers.size() > 0) {
+			return toSymbolizerArray(symbolizers.toArray());
+		} else {
+			return new Symbolizer[0];
+		}
+	}
+	
+	public static Symbolizer[] symbolizers(Rule rule) {
+		Set symbolizers = new HashSet();
+		Symbolizer[] symb = rule.getSymbolizers();
+		for (int j = 0; j < symb.length; j++) {
+			symbolizers.add(symb[j]);
+		}
+		if (symbolizers.size() > 0) {
+			return toSymbolizerArray(symbolizers.toArray());
+		} else {
+			return new Symbolizer[0];
+		}
+	}
+	
 	public static String[] colors(Style style) {
 		Set colorSet = new HashSet();
 		Rule[] rule = rules(style);
@@ -1718,6 +1748,14 @@ SYMBOLIZER:
 		Rule[] result = new Rule[object.length];
 		for (int i = 0; i < object.length; i++) {
 			result[i] = (Rule) object[i];
+		}
+		return result;
+	}
+
+	private static Symbolizer[] toSymbolizerArray(Object[] object) {
+		Symbolizer[] result = new Symbolizer[object.length];
+		for (int i = 0; i < object.length; i++) {
+			result[i] = (Symbolizer) object[i];
 		}
 		return result;
 	}

@@ -198,7 +198,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
      * Iterator may (or may) not support modification.
      */
     final public Iterator iterator() {
-    	Iterator iterator = openIteartor();
+    	Iterator iterator = openIterator();
     	open.add( iterator );
     	return iterator;    	    	
     }
@@ -212,7 +212,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
      * 
      * @return Iterator, should be closed closeIterator 
      */
-    protected Iterator openIteartor(){
+    protected Iterator openIterator(){
     	try {
             return new FeatureWriterIterator( writer() );
         }

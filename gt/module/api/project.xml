@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
@@ -21,7 +21,17 @@
       <roles>
         <role>Java Developer</role>
         <role>Documentation</role>
-	<role>Module Maintainer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Cory Horner</name>
+      <id>chorner</id>
+      <email>chorner@refractions.net</email>
+      <organization>Refractions Research, Inc.</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
   </developers>

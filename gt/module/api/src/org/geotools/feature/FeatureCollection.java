@@ -277,14 +277,14 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * FeatureCollection "view" indicated by provided filter.
      * <p>
      * The contents of the returned FeatureCollection are determined by
-     * applying the provider Fitler to the entire contents of this
+     * applying the provider Filter to the entire contents of this
      * FeatureCollection. The result is "live" and modifications will
      * be shared.
      * <p>
      * This method is used cut down on the number of filter based methods
      * required for a useful FeatureCollection construct. The FeatureCollections
      * returned really should be considered as a temporary "view" used to
-     * control the range of a removeAll, or modify opperation.
+     * control the range of a removeAll, or modify operation.
      * <p>
      * Example Use:
      * <pre><code>

@@ -34,15 +34,17 @@
  */
 package org.geotools.styling;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 import org.geotools.event.AbstractGTRoot;
 import org.geotools.event.GTDelta;
 import org.geotools.event.GTDeltaImpl;
 import org.geotools.event.GTEvent;
 import org.geotools.event.GTEventImpl;
 import org.geotools.event.GTNoteImpl;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -246,4 +248,21 @@ public class StyledLayerDescriptorImpl extends AbstractGTRoot
     public void accept(StyleVisitor visitor) {
         visitor.visit(this);
     }
+
+	public boolean equals(Object oth) {
+        if (this == oth) {
+            return true;
+        }
+
+        if (oth instanceof StyledLayerDescriptorImpl) {
+        	StyledLayerDescriptorImpl other = (StyledLayerDescriptorImpl) oth;
+        	
+        	return (Utilities.equals(abstractStr, other.abstractStr)
+        	&& Utilities.equals(layers, other.layers)
+        	&& Utilities.equals(name, other.name)
+        	&& Utilities.equals(title, other.title));
+        }
+        
+        return false;
+	}
 }

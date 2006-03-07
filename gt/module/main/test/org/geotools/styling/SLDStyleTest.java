@@ -16,21 +16,29 @@
  */
 package org.geotools.styling;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Polygon;
+import java.awt.Color;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.expression.Expression;
 import org.geotools.filter.expression.ExpressionType;
 import org.geotools.resources.TestData;
-import java.io.IOException;
-import java.net.URL;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -40,6 +48,10 @@ import java.net.URL;
  * @source $URL$
  */
 public class SLDStyleTest extends TestCase {
+    StyleFactory sf = StyleFactoryFinder.createStyleFactory();
+    FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+    StyleBuilder sb = new StyleBuilder(sf, ff);
+
     /**
      * Creates a new SLDStyleTest object.
      *
@@ -69,11 +81,10 @@ public class SLDStyleTest extends TestCase {
         //java.net.URL base = getClass().getResource("testData/");
         // base = getClass().getResource("testData");
         // base = getClass().getResource("/testData");
-        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
 
         //java.net.URL surl = new java.net.URL(base + "/test-sld.xml");
         java.net.URL surl = TestData.getResource(this, "test-sld.xml");
-        SLDParser stylereader = new SLDParser(factory, surl);
+        SLDParser stylereader = new SLDParser(sf, surl);
         StyledLayerDescriptor sld = stylereader.parseSLD();
         assertEquals("My Layer", sld.getName());
         assertEquals("A layer by me", sld.getTitle());
@@ -97,22 +108,88 @@ public class SLDStyleTest extends TestCase {
             ((Number) lineSym.getStroke().getWidth().getValue(null)).intValue());
     }
 
-    public void testParseSLD() throws Exception {
-        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
+    /**
+     * XML --> SLD --> XML 
+     * @throws Exception
+     */
+    public void testSLDParser() throws Exception {
         java.net.URL surl = TestData.getResource(this, "example-sld.xml");
-        SLDParser stylereader = new SLDParser(factory, surl);
+        SLDParser stylereader = new SLDParser(sf, surl);
         StyledLayerDescriptor sld = stylereader.parseSLD();
-
+        
         //convert back to xml again
         SLDTransformer aTransformer = new SLDTransformer();
         String xml = aTransformer.transform(sld);
 
-        //System.out.println(xml);
         assertNotNull(xml);
-        //we're content if this didn't throw an exception...
-        //TODO: add a real test case
+        //we're content for the moment if this didn't throw an exception...
+        //TODO: convert the buffer/resource to a string and compare
     }
 
+    /**
+	 * SLD --> XML --> SLD
+	 * @throws Exception
+	 */
+    public void testSLDTransformer() throws Exception {
+    	//create an SLD
+    	StyledLayerDescriptor sld = sf.createStyledLayerDescriptor();
+    	StyledLayerDescriptor sld2;
+    	sld.setName("SLD Name");
+    	sld.setTitle("SLD Title");
+    	UserLayer layer = sf.createUserLayer();
+    	layer.setName("UserLayer Name");
+
+    	Style style = sf.createStyle();
+    	style.setName("Style Name");
+    	style.setTitle("Style Title");
+    	Rule rule1 = sb.createRule(sb.createLineSymbolizer(new Color(0), 2));
+    	// note: symbolizers containing a fill will likely fail, as the SLD
+		// transformation loses a little data (background colour?)
+    	FeatureTypeStyle fts1 = sf.createFeatureTypeStyle(new Rule[] {rule1});
+    	fts1.setSemanticTypeIdentifiers(new String[] {"generic:geometry"});
+    	style.setFeatureTypeStyles(new FeatureTypeStyle[] {fts1});
+    	layer.setUserStyles(new Style[] {style});
+    	sld.setStyledLayers(new UserLayer[] {layer});
+    	
+    	//convert it to XML
+        SLDTransformer aTransformer = new SLDTransformer();
+        String xml = aTransformer.transform(sld);
+
+        //back to SLD
+        InputStream is = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+        
+        SLDParser stylereader = new SLDParser(sf, is);
+        
+        sld2 = stylereader.parseSLD();
+// UNCOMMENT FOR DEBUGGING
+//        assertEquals(SLD.rules(SLD.styles(sld)[0]).length, SLD.rules(SLD.styles(sld2)[0]).length);
+//        for (int i = 0; i < SLD.rules(SLD.styles(sld)[0]).length; i++) {
+//            Rule aRule = SLD.rules(SLD.styles(sld)[0])[i];
+//            Rule bRule = SLD.rules(SLD.styles(sld2)[0])[i];
+//            System.out.println(i+":"+aRule);
+//        	Symbolizer[] symb1 = SLD.symbolizers(aRule);
+//        	Symbolizer[] symb2 = SLD.symbolizers(bRule);
+//        	for (int j = 0; j < symb1.length; j++) {
+//        		//symbolizers are equal
+//        		assertTrue(symb1[j].equals(symb2[j]));
+//        	}
+//        	//rules are equal
+//            assertTrue(aRule.equals(bRule));
+//        }
+//        //feature type styles are equal
+//        assertTrue(SLD.featureTypeStyles(sld)[0].equals(SLD.featureTypeStyles(sld2)[0]));
+//        //styles are equal
+//        assertTrue(SLD.styles(sld)[0].equals(SLD.styles(sld2)[0]));
+//        //layers are equal
+//        StyledLayer layer1 = sld.getStyledLayers()[0];
+//        StyledLayer layer2 = sld2.getStyledLayers()[0];
+//        boolean result = layer1.equals(layer2); 
+//        assertTrue(result);
+        
+        //everything is equal
+        assertTrue(sld2.equals(sld));
+    }
+    
     public void testParseSLD_NameSpaceAware() throws Exception {
         URL surl = TestData.getResource(this, "test-ns.sld");
         StyleFactory factory = StyleFactoryFinder.createStyleFactory();
