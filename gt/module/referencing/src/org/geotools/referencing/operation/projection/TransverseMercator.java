@@ -620,6 +620,7 @@ public class TransverseMercator extends MapProjection {
                 new NamedIdentifier(Citations.EPSG,     "9807"),
                 new NamedIdentifier(Citations.GEOTIFF,  "CT_TransverseMercator"),
                 new NamedIdentifier(Citations.ESRI,     "Transverse_Mercator"),
+                new NamedIdentifier(Citations.ESRI,     "Gauss_Kruger"),
                 new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
                                     VocabularyKeys.TRANSVERSE_MERCATOR_PROJECTION))
             });

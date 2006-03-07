@@ -46,17 +46,16 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Those information can appear in arbitrary columns, providing that the column order
  * stay the same for every record in a particular {@code RecordList} instance.
  * Records can appear in arbitrary order.
- * <br><br>
+ * <p>
  * Data can be floating point value ({@code float} type). Current implementation
  * expects pixels distributed on a regular grid. The grid interval will be automatically
  * computed when needed. The interval computation should be accurate even if there is
  * missing and/or duplicated records.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 final class RecordList {
     /**

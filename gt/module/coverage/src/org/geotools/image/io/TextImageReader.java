@@ -51,7 +51,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * containing pixel values (often geophysical values, like sea level anomalies).
  * This base class provides a convenient way to get {@link BufferedReader} for
  * reading lines.
- * <br><br>
+ * <p>
  * {@code TextImageReader} accepts many input types, including {@link File},
  * {@link URL}, {@link Reader}, {@link InputStream} and {@link ImageInputStream}.
  * The {@link Spi} provider automatically advises those input types. The above
@@ -60,11 +60,10 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * gain yet more control on character encoding by overriding the {@link #getCharset}
  * method.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public abstract class TextImageReader extends SimpleImageReader {
     /**
@@ -81,22 +80,20 @@ public abstract class TextImageReader extends SimpleImageReader {
     private BufferedReader reader;
     
     /**
-     * Construct a new image reader storing pixels
-     * as {@link DataBuffer#TYPE_FLOAT}.
+     * Constructs a new image reader storing pixels as {@link DataBuffer#TYPE_FLOAT}.
      *
-     * @param provider the {@link ImageReaderSpi} that is
-     *                 invoking this constructor, or null.
+     * @param provider The {@link ImageReaderSpi} that is invoking this constructor, or
+     *                 {@code null}.
      */
     protected TextImageReader(final ImageReaderSpi provider) {
         this(provider, DataBuffer.TYPE_FLOAT);
     }
     
     /**
-     * Construct a new image reader storing pixels
-     * in buffer of the specified type.
+     * Constructs a new image reader storing pixels in buffer of the specified type.
      *
-     * @param provider the {@link ImageReaderSpi} that is
-     *                 invoking this constructor, or null.
+     * @param provider The {@link ImageReaderSpi} that is invoking this constructor, or
+     *                 {@code null}.
      * @param rawImageType The buffer type. It should be a constant from
      *        {@link DataBuffer}. Common types are {@link DataBuffer#TYPE_INT},
      *        {@link DataBuffer#TYPE_FLOAT} and {@link DataBuffer#TYPE_DOUBLE}.
@@ -122,16 +119,14 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Retourne l'encodage des caractères qui seront à lire. L'implémentation
-     * par défaut retourne l'encodage spécifié dans l'objet {@link Spi} qui a
-     * créé ce décodeur. Les classes dérivées peuvent redéfinir cette méthode
-     * pour déterminer l'encodage d'une façon plus élaborée.
+     * Returns the character set to uses for decoding the string from the input stream.
+     * The default implementation returns the character set specified to the {@link Spi}
+     * object given to this {@code TextImageReader} constructor. Subclasses may override
+     * this method if they want to detect the character encoding in some other way.
      *
-     * @param  input Flot à lire.
-     * @return Encodage du flot à lire, ou {@code null} pour utiliser
-     *         l'encodage par défaut de la plateforme locale.
-     * @throws IOException si une lecture du flot {@code input} était
-     *         nécessaire et a échoué.
+     * @param  input The input stream.
+     * @return The character encoding, or {@code null} for the platform default encoding.
+     * @throws IOException If reading from the input stream failed.
      *
      * @see Spi#charset
      */
@@ -140,14 +135,15 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Retourne l'objet à utiliser pour lire chaque ligne d'une image. L'implémentation par
-     * défaut construit un nouvel objet {@link LineFormat} en utilisant les conventions
-     * locales spécifiées par {@link Spi#locale}. Les classes dérivées peuvent redéfinir
-     * cette méthode pour construire un objet {@link LineFormat} d'une façon plus élaborée.
+     * Returns the line format to use for parsing every lines in the input stream. The default
+     * implementation creates a new {@link LineFormat} instance using the locale specified by
+     * {@link Spi#locale}. Subclasses should override this method if they want more constrol
+     * on the parser to be created.
      *
-     * @param  imageIndex Index de l'image à lire.
-     * @throws IOException si l'opération nécessitait une lecture du fichier (par exemple
-     *         des informations inscrites dans un en-tête) et que cette lecture a échouée.
+     * @param  imageIndex the index of the image to be queried.
+     * @throws IOException If reading from the input stream failed.
+     *
+     * @see Spi#locale
      */
     public LineFormat getLineFormat(final int imageIndex) throws IOException {
         if (originatingProvider instanceof Spi) {
@@ -160,35 +156,37 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Retourne la valeur représentant les données manquantes, ou {@link Double#NaN}
-     * s'il n'y en a pas. Cette valeur s'appliquera à toutes les colonnes du fichier
-     * sauf les colonnes des <var>x</var> et des <var>y</var>.  L'implémentation par
-     * défaut retourne la valeur qui avait été spécifiée dans l'objet {@link Spi} qui
-     * a créé ce décodeur. Les classes dérivées peuvent redéfinir cette méthode pour
-     * déterminer cette valeur d'une façon plus élaborée.
+     * Returns the pad value for missing data, or {@link Double#NaN} if none. The pad value will
+     * applies to all columns except the one for {@link TextRecordImageReader#getColumnX x} and
+     * {@link TextRecordImageReader#getColumnY y} values, if any.
      *
-     * @param  imageIndex Index de l'image à lire.
-     * @throws IOException si l'opération nécessitait une lecture du fichier (par exemple
-     *         des informations inscrites dans un en-tête) et que cette lecture a échouée.
+     * The default implementation returns the pas value specified to the {@link Spi} object given
+     * to this {@code TextImageReader} constructor. Subclasses may override this method if they
+     * want to detect the pad value in some other way.
+     *
+     * @param  imageIndex the index of the image to be queried.
+     * @throws IOException If reading from the input stream failed.
+     *
+     * @see Spi#padValue
      */
     public double getPadValue(final int imageIndex) throws IOException {
         return (originatingProvider instanceof Spi) ? ((Spi)originatingProvider).padValue : Double.NaN;
     }
     
     /**
-     * Retourne l'entré {@link #input} sous forme d'objet {@link BufferedReader}. Si possible,
-     * cette méthode tentera de retourner plus spécifiquement un objet {@link LineNumberReader}.
-     * Cette méthode convertira automatiquement les objets de classes {@link File}, {@link URL},
-     * {@link Reader}, {@link InputStream} et {@link ImageInputStream}.
-     * <br><br>
-     * Cette méthode ne construira un nouveau objet {@link Reader} que la première fois
-     * où elle sera appelée. Tous les appels subséquents retourneront le {@link Reader}
-     * ouvert. En conséquent, ce flot <strong>ne doit pas</strong> être fermé. Les méthodes
-     * {@code setInput(...)} et {@link #reset()} s'occuperont de le fermer si nécessaire.
+     * Returns the {@link #input} as an {@link BufferedReader} object, if possible. If the input
+     * is already a buffered reader, it is returned unchanged. Otherwise, this method creates a
+     * {@link LineReader} from {@link File}, {@link URL}, {@link Reader}, {@link InputStream} and
+     * {@link ImageInputStream} inputs.
+     * <p>
+     * This method creates a new {@link LineReader} only when first invoked. All subsequent calls
+     * wll returns the same {@link LineReader}. Concequently, this reader should never be closed
+     * by the caller. It will be closed by methods {@link #setInput setInput(...)} and
+     * {@link #reset()}.
      *
-     * @return {@link #getInput} sous forme de flot {@link LineNumberReader} si possible,
-     *         ou {@link BufferedReader} sinon.
-     * @throws IOException si le flot n'a pas pu être ouvert.
+     * @return {@link #getInput} as an {@link LineReader} if possible, or {@link BufferedReader}
+     *         otherwise.
+     * @throws IOException If the buffered reader can't be created.
      */
     protected final BufferedReader getReader() throws IOException {
         if (reader == null) {
@@ -241,8 +239,13 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Spécifie le flot à utiliser en entré. Si un autre flot
-     * était ouvert avant l'appel de cette méthode, il sera fermé.
+     * Sets the input source to use. If a reader were created by a previous call to
+     * {@link #getReader}, it will be closed before to change the input source.
+     *
+     * @param input           The input object to use for future decoding.
+     * @param seekForwardOnly If {@code true}, images and metadata may only be read
+     *                        in ascending order from this input source.
+     * @param ignoreMetadata  If {@code true}, metadata may be ignored during reads.
      */
     public void setInput(final Object  input,
                          final boolean seekForwardOnly,
@@ -267,13 +270,12 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Retourne une chaîne de caractères donnant la position actuelle du flot. La
-     * chaîne retournée sera par exemple "Ligne 14 dans le fichier HUV18204.asc".
-     * Cette méthode retourne {@code null} si la position du flot n'a pas pu
-     * être déterminée.
+     * Returns a string representation of the current stream position. For example this method
+     * may returns something like {@code "Line 14 in file HUV18204.asc"}. This method returns
+     * {@code null} if the stream position is unknown.
      *
-     * @param message Un message optionel à placer après la position, ou
-     *        {@code null} s'il n'y en a pas.
+     * @param message An optional message to append to the stream position, or {@code null}
+     *        if none.
      */
     protected String getPositionString(final String message) {
         final String file;
@@ -314,8 +316,8 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Remet ce décodeur dans son état initial.
-     * Si un flot avait été ouvert, il sera fermé.
+     * Restores the {@code TextImageReader} to its initial state. If a reader were created by a
+     * previous call to {@link #getReader}, it will be closed before to reset this reader.
      */
     public void reset() {
         close();
@@ -336,7 +338,9 @@ public abstract class TextImageReader extends SimpleImageReader {
      * {@link #charset} = Charset.forName("ISO-LATIN-1"); // ISO Latin Alphabet No. 1 (ISO-8859-1)
      * </pre></blockquote>
      *
-     * @version 1.0
+     * @since 2.1
+     * @source $URL$
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     public static abstract class Spi extends ImageReaderSpi {
@@ -393,7 +397,7 @@ public abstract class TextImageReader extends SimpleImageReader {
         protected double padValue = Double.NaN;
         
         /**
-         * Construct a new SPI for {@link TextImageReader}. This
+         * Constructs a new SPI for {@link TextImageReader}. This
          * constructor initialize the following fields to default
          * values:
          *

@@ -53,7 +53,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * or ASCII files with no meta-data and no color information. There pixel values
  * may be floating point values instead of integers.  Such formats are of common
  * use in remote sensing.
- * <br><br>
+ * <p>
  * This base class makes it easier to construct images from floating point values.
  * It provides default implementations for most {@link ImageReader} methods. Since
  * {@code SimpleImageReader} does not expect to know anything about image's
@@ -63,11 +63,10 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * <a href="http://java.sun.com/products/java-media/jai/">Java Advanced Imaging</a>
  * operators after reading.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see RawBinaryImageReader
  * @see TextRecordImageReader
@@ -101,10 +100,10 @@ public abstract class SimpleImageReader extends ImageReader {
     private long streamOrigin;
     
     /**
-     * Construct a new image reader.
+     * Constructs a new image reader.
      *
-     * @param provider the {@link ImageReaderSpi} that is
-     *                 invoking this constructor, or null.
+     * @param provider The {@link ImageReaderSpi} that is invoking this constructor, or
+     *                 {@code null}.
      */
     protected SimpleImageReader(final ImageReaderSpi provider) {
         super(provider);
@@ -170,7 +169,7 @@ public abstract class SimpleImageReader extends ImageReader {
     
     /**
      * Returns the number of images available from the current input source.
-     * Default implementation returns 1.
+     * The default implementation returns 1.
      *
      * @param  allowSearch If true, the number of images will be returned
      *         even if a search is required.
@@ -189,7 +188,7 @@ public abstract class SimpleImageReader extends ImageReader {
     
     /**
      * Returns the number of bands available for the specified image.
-     * Default implementation returns 1.
+     * The default implementation returns 1.
      *
      * @param  imageIndex  The image index.
      * @throws IOException if an error occurs reading the information from the input source.
@@ -303,8 +302,7 @@ public abstract class SimpleImageReader extends ImageReader {
      *         to {@code getNumBands(imageIndex)} exclusive. Index are independent
      *         of any {@link ImageReadParam#setSourceBands} setting.
      * @return The expected range of values, or {@code null} if unknow.
-     * @throws IOException If an error occurs reading the data information from
-     *         the input source.
+     * @throws IOException If an error occurs reading the data information from the input source.
      */
     public abstract Range getExpectedRange(final int imageIndex, final int bandIndex)
         throws IOException;
