@@ -57,6 +57,16 @@ import org.hsqldb.jdbc.jdbcDataSource;
  * in a temporary directory. Future connections to the EPSG database while reuse the cached
  * tables, if available. Otherwise, the scripts will be executed again in order to recreate
  * them.
+ * <p>
+ * If the EPSG database should be created in a different directory (or already exists in that
+ * directory), this directory can be specified in two ways:
+ * <p>
+ * <ul>
+ *   <li>It may be given explicitly as an argument to the {@linkplain #HSQLDataSource(File)
+ *       constructor}.</li>
+ *   <li>It may be specified as a {@linkplain System#getProperty(String) system property}
+ *       nammed {@value #DIRECTORY_KEY}.</li>
+ * </ul>
  *
  * @since 2.2
  * @source $URL$
@@ -66,43 +76,73 @@ import org.hsqldb.jdbc.jdbcDataSource;
  */
 public class HSQLDataSource extends jdbcDataSource implements DataSource {
     /**
+     * The key for fetching the database directory from {@linkplain System#getProperty(String)
+     * system properties}.
+     *
+     * @since 2.3
+     */
+    public static final String DIRECTORY_KEY = "EPSG-HSQL.directory";
+
+    /**
+     * The database name.
+     *
+     * @since 2.3
+     */
+    public static final String DATABASE_NAME = "EPSG";
+
+    /**
      * The directory where the database is stored.
      */
     private File directory;
 
     /**
-     * Creates a new instance of this data source
+     * Creates a new instance of this data source. If the {@value #DIRECTORY_KEY}
+     * {@linkplain System#getProperty(String) system property} is defined and contains
+     * the name of a directory with a valid {@linkplain File#getParent parent}, then the
+     * {@value #DATABASE_NAME} database will be saved in that directory. Otherwise, a
+     * temporary directory will be used.
      */
     public HSQLDataSource() {
-        File directory = new File(System.getProperty("java.io.tmpdir", "."), "Geotools");
-        if (directory.isDirectory() || directory.mkdir()) {
-            directory = new File(directory, "Databases/HSQL");
-            if (directory.isDirectory() || directory.mkdirs()) {
-                /*
-                 * Constructs the full path to the HSQL database. Note: we do not use
-                 * File.toURI() because HSQL doesn't seem to expect an encoded URL
-                 * (e.g. "%20" instead of spaces).
-                 */
-                final StringBuffer url = new StringBuffer("jdbc:hsqldb:file:");
-                final String path = directory.getAbsolutePath().replace(File.separatorChar, '/');
-                if (path.length()==0 || path.charAt(0)!='/') {
-                    url.append('/');
-                }
-                url.append(path);
-                if (url.charAt(url.length()-1) != '/') {
-                    url.append('/');
-                }
-                url.append("EPSG");
-                setDatabase(url.toString());
-                this.directory = directory;
-            }
+        this(getDirectory());
+    }
+
+    /**
+     * Creates a new instance of this data source using the {@value #DATABASE_NAME} database in the
+     * specified directory. If {@code directory} is {@code null}, then callers are responsible
+     * to invoke {@link #setDatabase} explicitly.
+     *
+     * @param directory The directory for the {@value #DATABASE_NAME} HSQL database,
+     *        or {@code null} if none.
+     *
+     * @since 2.3
+     */
+    public HSQLDataSource(final File directory) {
+        this.directory = directory;
+        if (directory != null) {
             /*
-             * If the temporary directory do not exists or can't be created,
-             * lets the 'database' attribute unset. If the user do not set it
-             * explicitly (for example through JNDI), an exception will be thrown
-             * when 'getConnection()' will be invoked.
+             * Constructs the full path to the HSQL database. Note: we do not use
+             * File.toURI() because HSQL doesn't seem to expect an encoded URL
+             * (e.g. "%20" instead of spaces).
              */
+            final StringBuffer url = new StringBuffer("jdbc:hsqldb:file:");
+            final String path = directory.getAbsolutePath().replace(File.separatorChar, '/');
+            if (path.length()==0 || path.charAt(0)!='/') {
+                url.append('/');
+            }
+            url.append(path);
+            if (url.charAt(url.length()-1) != '/') {
+                url.append('/');
+            }
+            url.append(DATABASE_NAME);
+            setDatabase(url.toString());
+            this.directory = directory;
         }
+        /*
+         * If the temporary directory do not exists or can't be created,
+         * lets the 'database' attribute unset. If the user do not set it
+         * explicitly (for example through JNDI), an exception will be thrown
+         * when 'getConnection()' will be invoked.
+         */
         setUser("SA"); // System administrator. No password.
     }
 
@@ -117,6 +157,38 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
      */
     public int getPriority() {
         return NORMAL_PRIORITY - 30;
+    }
+
+    /**
+     * Returns the default directory for the EPSG database. If the {@value #DIRECTORY_KEY}
+     * {@linkplain System#getProperty(String) system property} is defined and contains the
+     * name of a directory with a valid {@linkplain File#getParent parent}, then the
+     * {@value #DATABASE_NAME} database will be saved in that directory. Otherwise,
+     * a temporary directory will be used.
+     */
+    private static File getDirectory() {
+        try {
+            final String property = System.getProperty(DIRECTORY_KEY);
+            if (property != null) {
+                final File directory = new File(property);
+                if (directory.isDirectory() || directory.mkdir()) {
+                    return directory;
+                }
+            }
+        } catch (SecurityException e) {
+            /*
+             * Can't fetch the base directory from system properties.
+             * Fallback on the default temporary directory.
+             */
+        }
+        File directory = new File(System.getProperty("java.io.tmpdir", "."), "Geotools");
+        if (directory.isDirectory() || directory.mkdir()) {
+            directory = new File(directory, "Databases/HSQL");
+            if (directory.isDirectory() || directory.mkdirs()) {
+                return directory;
+            }
+        }
+        return null;
     }
 
     /**
@@ -143,7 +215,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
              * to locate the temporary directory, or to create the subdirectory.
              */
             // TODO: localize
-            throw new SQLException("Can't write to the temporary directory.");
+            throw new SQLException("Can't write to the database directory.");
         }
         Connection connection = super.getConnection();
         if (!dataExists(connection)) {
@@ -199,7 +271,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
                  * The database has been fully created. Now, make it read-only.
                  */
                 if (directory != null) {
-                    final File file = new File(directory, "EPSG.properties");
+                    final File file = new File(directory, DATABASE_NAME + ".properties");
                     final InputStream propertyIn = new FileInputStream(file);
                     final Properties properties  = new Properties();
                     properties.load(propertyIn);

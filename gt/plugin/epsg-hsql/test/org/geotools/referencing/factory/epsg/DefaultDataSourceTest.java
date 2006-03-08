@@ -258,7 +258,9 @@ public class DefaultDataSourceTest extends TestCase {
         factory.setTimeout(200);
         try {
             assertTrue(factory.isConnected());
-            Thread.currentThread().sleep(500);
+            Thread.currentThread().sleep(1000);
+            System.gc();
+            System.runFinalization();
             assertFalse(factory.isConnected());
         } catch (InterruptedException e) {
             fail(e.getLocalizedMessage());
