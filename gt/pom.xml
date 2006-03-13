@@ -891,14 +891,7 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
-    <repository>
-      <id>planetmirror</id>
-      <name>PlanetMirror - mirror of Ibiblio</name>
-      <url>http://public.planetmirror.com/pub/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
+
     <repository>
       <id>geotools</id>
       <name>Geotools repository</name>
@@ -906,6 +899,19 @@
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </repository>
+
+    <!-- The following is a mirror to be used when Ibiblio is down. It must
+         appears after the Geotools repository, because it seems to provide
+         jsr108.jar with an invalid pom.xml file. We want to use the JAR from
+         our repository instead. -->
+    <repository>
+      <id>planetmirror</id>
+      <name>PlanetMirror - mirror of Ibiblio</name>
+      <url>http://public.planetmirror.com/pub/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>
