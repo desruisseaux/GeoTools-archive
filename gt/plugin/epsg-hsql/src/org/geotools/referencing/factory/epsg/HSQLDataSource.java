@@ -171,6 +171,13 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
             final String property = System.getProperty(DIRECTORY_KEY);
             if (property != null) {
                 final File directory = new File(property);
+                /*
+                 * Creates the directory if needed (mkdir), but NOT the parent directories (mkdirs)
+                 * because a missing parent directory may be a symptom of an installation problem.
+                 * For example if 'directory' is a subdirectory in the temporary directory (~/tmp/),
+                 * this temporary directory should already exists. If it doesn't, an administrator
+                 * should probably looks at this problem.
+                 */
                 if (directory.isDirectory() || directory.mkdir()) {
                     return directory;
                 }

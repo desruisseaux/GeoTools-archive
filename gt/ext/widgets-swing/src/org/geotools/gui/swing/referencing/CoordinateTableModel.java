@@ -115,11 +115,11 @@ public class CoordinateTableModel extends AbstractTableModel {
         }
         validArea = new GeneralEnvelope(CRSUtilities.getEnvelope(crs));
     }
-    
+
     /**
      * Returns the CRS for this table model
      */
-    public CoordinateReferenceSystem getCRS() {
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
     }
 

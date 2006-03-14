@@ -58,6 +58,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.coverage.     ScaledColorSpaceTest.suite());
         suite.addTest(org.geotools.coverage.grid.GridGeometryTest    .suite());
         suite.addTest(org.geotools.coverage.grid.SampleTranscoderTest.suite());
+        suite.addTest(org.geotools.coverage.grid.FloatRasterTest     .suite());
         suite.addTest(org.geotools.coverage.grid.GridCoverageTest    .suite());
         suite.addTest(org.geotools.coverage.grid.InterpolatorTest    .suite());
         suite.addTest(org.geotools.coverage.grid.ResampleTest        .suite());

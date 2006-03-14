@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ImageFunction;
+import javax.media.jai.RasterFactory;
 import javax.media.jai.util.CaselessStringKey;
 import javax.units.Unit;
 
@@ -239,17 +240,19 @@ public class GridCoverageFactory extends AbstractFactory {
             }
         }
         final WritableRaster raster;
-        raster = WritableRaster.createBandedRaster(DataBuffer.TYPE_FLOAT, width, height, 1, null);
+        // Need to use JAI raster factory, since WritableRaster
+        // does not supports TYPE_FLOAT as of J2SE 1.5.0_06.
+        raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT, width, height, 1, null);
         for (int j=0; j<height; j++) {
             int i=0;
             final float[] row = matrix[j];
             if (row != null) {
-                while (i < row.length) {
-                    raster.setSample(i++, j, 0, row[i]);
+                for (; i<row.length; i++) {
+                    raster.setSample(i, j, 0, row[i]);
                 }
             }
-            while (i < width) {
-                raster.setSample(i++, j, 0, Float.NaN);
+            for (; i<width; i++) {
+                raster.setSample(i, j, 0, Float.NaN);
             }
         }
         return create(name, raster, envelope);

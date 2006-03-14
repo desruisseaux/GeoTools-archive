@@ -66,11 +66,10 @@ import org.geotools.resources.XArray;
  *      Yvan        Dubois
  * </pre></blockquote>
  *
+ * @since 2.0
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class TableWriter extends FilterWriter {
     /**
@@ -211,7 +210,7 @@ public class TableWriter extends FilterWriter {
     private boolean skipCR;
 
     /**
-     * Create a new table writer with a default column separator.
+     * Creates a new table writer with a default column separator.
      * Note: this writer may produces bad output on Windows console,
      * unless the underlying stream use the correct codepage (e.g.
      * <code>OutputStreamWriter(System.out,&nbsp;"Cp437")</code>).
@@ -232,7 +231,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Create a new table writer with the specified
+     * Creates a new table writer with the specified
      * amount of spaces as column separator.
      *
      * @param out Writer object to provide the underlying stream,
@@ -246,7 +245,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Create a new table writer with the specified column separator.
+     * Creates a new table writer with the specified column separator.
      *
      * @param out Writer object to provide the underlying stream,
      *        or {@code null} if there is no underlying stream.
@@ -270,7 +269,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Write a border or a corner to the specified stream.
+     * Writes a border or a corner to the specified stream.
      *
      * @param out              The destination stream.
      * @param horizontalBorder -1 for left border, +1 for right border,  0 for center.

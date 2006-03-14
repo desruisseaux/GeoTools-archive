@@ -55,7 +55,7 @@ import org.opengis.util.Cloneable;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.referencing.processing.RangeSpecifier}.
+ * @deprecated Replaced by {@link org.geotools.coverage.processing.RangeSpecifier}.
  */
 public class RangeSpecifier implements Serializable, Cloneable {
     /**
