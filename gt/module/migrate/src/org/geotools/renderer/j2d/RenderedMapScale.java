@@ -270,7 +270,7 @@ public class RenderedMapScale extends RenderedLegend {
     public void setUnits(final Unit units) throws UnitException {
         if (units==null || !Unit.METRE.canConvert(units)) {
             throw new UnitException(Errors.getResources(getLocale()).getString(
-                                    ErrorKeys.BAD_ARGUMENT_$2, "units", units));
+                                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "units", units));
         }
         final Unit old;
         synchronized (getTreeLock()) {

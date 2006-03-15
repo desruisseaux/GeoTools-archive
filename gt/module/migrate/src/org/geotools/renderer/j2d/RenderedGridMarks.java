@@ -496,11 +496,11 @@ public class RenderedGridMarks extends RenderedMarks {
      */
     public void setAutoDecimation(final int spaceX, final int spaceY) {
         if (spaceX < 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                                                "spaceX", new Integer(spaceX)));
         }
         if (spaceY < 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                                                "spaceY", new Integer(spaceY)));
         }
         if (spaceX!=this.spaceX || spaceY!=this.spaceY) {
@@ -567,7 +567,7 @@ public class RenderedGridMarks extends RenderedMarks {
      */
     public void setMarkPaint(final Paint paint) {
         if (paint == null) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                                                "paint", paint));
         }
         final Paint oldPaint;

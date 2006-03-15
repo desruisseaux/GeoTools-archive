@@ -264,7 +264,7 @@ public abstract class RenderedLayer {
     public RenderedLayer(final CoordinateSystem cs) {
         if (cs == null) {
             throw new IllegalArgumentException(Errors.getResources(getLocale())
-                      .getString(ErrorKeys.BAD_ARGUMENT_$2, "cs", cs));
+                      .getString(ErrorKeys.ILLEGAL_ARGUMENT_$2, "cs", cs));
         }
         coordinateSystem = cs;
         listeners = new PropertyChangeSupport(this);
@@ -368,7 +368,7 @@ public abstract class RenderedLayer {
     protected void setCoordinateSystem(final CoordinateSystem cs) throws TransformException {
         if (cs == null) {
             throw new IllegalArgumentException(Errors.getResources(getLocale())
-                      .getString(ErrorKeys.BAD_ARGUMENT_$2, "cs", cs));
+                      .getString(ErrorKeys.ILLEGAL_ARGUMENT_$2, "cs", cs));
         }
         final CoordinateSystem oldCS;
         synchronized (getTreeLock()) {

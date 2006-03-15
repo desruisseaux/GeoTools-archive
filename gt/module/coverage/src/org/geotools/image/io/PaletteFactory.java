@@ -371,20 +371,30 @@ public class PaletteFactory {
      * The returned model will use index from {@code lower} inclusive to
      * {@code upper} exclusive. Other index will have a transparent color.
      *
-     * @param  The palette's name to load. This name doesn't need to contains a path
-     *         or an extension. Path and extension are set according value specified
-     *         at construction time.
+     * @param  name The palette's name to load. This name doesn't need to contains a path
+     *              or an extension. Path and extension are set according value specified
+     *              at construction time.
      * @param  lower Palette's lower index (inclusive).
      * @param  upper Palette's upper index (exclusive).
      * @return The index color model, or {@code null} if the palettes was not found.
      * @throws IOException if an error occurs during reading.
      * @throws IIOException if an error occurs during parsing.
+     *
+     * @since 2.3
      */
-    private IndexColorModel getIndexColorModel(final String name,
-                                               final int    lower,
-                                               final int    upper)
+    public IndexColorModel getIndexColorModel(final String name,
+                                              final int    lower,
+                                              final int    upper)
             throws IOException
     {
+        if (lower < 0) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                                               "lower", new Integer(lower)));
+        }
+        if (upper <= lower) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
+                                               new Integer(lower), new Integer(upper)));
+        }
         final Color[] colors = getColors(name);
         if (colors == null) {
             return (parent!=null) ? parent.getIndexColorModel(name, lower, upper) : null;

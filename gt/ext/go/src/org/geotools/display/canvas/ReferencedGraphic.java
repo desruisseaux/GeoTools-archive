@@ -91,7 +91,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
     {
         if (crs == null) {
             throw new IllegalArgumentException(Errors.getResources(getLocale())
-                      .getString(ErrorKeys.BAD_ARGUMENT_$2, "crs", crs));
+                      .getString(ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs));
         }
         envelope = new GeneralEnvelope(crs);
         envelope.setToNull();
@@ -128,7 +128,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
     protected void setObjectiveCRS(final CoordinateReferenceSystem crs) throws TransformException {
         if (crs == null) {
             throw new IllegalArgumentException(Errors.getResources(getLocale())
-                      .getString(ErrorKeys.BAD_ARGUMENT_$2, "crs", crs));
+                      .getString(ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs));
         }
         final CoordinateReferenceSystem oldCRS;
         synchronized (getTreeLock()) {

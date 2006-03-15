@@ -28,7 +28,6 @@ public final class ErrorKeys {
     public static final int ANGLE_OVERFLOW_$1                      =     1;
     public static final int ANTIPODE_LATITUDES_$2                  =     2;
     public static final int AZIMUTH_OUT_OF_RANGE_$1                =     3;
-    public static final int BAD_ARGUMENT_$2                        =     4;
     public static final int BAD_BAND_NUMBER_$1                     =     5;
     public static final int BAD_COEFFICIENT_$2                     =     6;
     public static final int BAD_COORDINATE_$1                      =     7;
