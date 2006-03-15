@@ -28,6 +28,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.RenderedCoverage;
 import org.geotools.coverage.processing.Operations;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.FactoryFinder;
@@ -108,7 +109,7 @@ public final class GridCoverageRenderer {
      */
     private RenderedImage image;
     
-    protected  final static CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(null);
+    protected  final static CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
     
     /**
      * Creates a new GridCoverageRenderer object.
