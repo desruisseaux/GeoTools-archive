@@ -52,14 +52,12 @@ import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileReader.Record;
+import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultFeature;
-import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactoryFinder;
@@ -72,7 +70,6 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.GTRenderer;
-import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.lite.Decimator;
 import org.geotools.renderer.lite.LabelCache;
@@ -91,10 +88,7 @@ import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleAttributeExtractor;
-import org.geotools.styling.StyleBuilder;
-import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
-import org.geotools.styling.StyleVisitor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.visitor.DuplicatorStyleVisitor;
@@ -426,14 +420,6 @@ public class ShapefileRenderer implements GTRenderer {
             fireErrorEvent(e);
         }
 
-        FIDReader fidReader = null;
-        try {
-            fidReader = ShapefileRendererUtil.getFidReader(datastore);
-        } catch (Exception e) {
-            fireErrorEvent(e);
-            return;
-        }
-
         OpacityFinder opacityFinder = new OpacityFinder(getAcceptableSymbolizers(type
                 .getDefaultGeometry()));
 
@@ -452,6 +438,14 @@ public class ShapefileRenderer implements GTRenderer {
             return;
         }
 
+        FIDReader fidReader = null;
+        try {
+            fidReader = ShapefileRendererUtil.getFidReader(datastore,shpreader);
+        } catch (Exception e) {
+            fireErrorEvent(e);
+            return;
+        }
+        
         try {
             while( true ) {
                 try {

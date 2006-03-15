@@ -1289,7 +1289,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * DbaseFileReader
 	 */
 	protected static class Reader extends AbstractAttributeIO implements
-			AttributeReader {
+			AttributeReader, RecordNumberTracker {
 		private static final DataComparator dataComparator = new DataComparator();
 
 		protected ShapefileReader shp;

@@ -16,8 +16,20 @@
  */
 package org.geotools.renderer.shape;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+
 import org.geotools.data.DataSourceException;
+import org.geotools.data.shapefile.indexed.RecordNumberTracker;
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.index.Data;
@@ -29,24 +41,16 @@ import org.geotools.index.quadtree.StoreException;
 import org.geotools.index.quadtree.fs.FileSystemIndexStore;
 import org.geotools.index.rtree.RTree;
 import org.geotools.index.rtree.fs.FileSystemPageStore;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
 
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * Encapsulates index information for a layer in the MapContext.  The
- * associated layer can be obtained by
- *
+ * Encapsulates index information for a layer in the MapContext. The associated layer can be
+ * obtained by
+ * 
  * @author jones
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/src/org/geotools/renderer/shape/IndexInfo.java $
  */
 public class IndexInfo {
     static final byte TREE_NONE = 0;
@@ -59,7 +63,7 @@ public class IndexInfo {
     private RTree rtree;
     private QuadTree qtree;
 
-    public IndexInfo(byte treeType, URL treeURL, URL shxURL) {
+    public IndexInfo( byte treeType, URL treeURL, URL shxURL ) {
         this.treeType = treeType;
         this.treeURL = treeURL;
         this.shxURL = shxURL;
@@ -67,15 +71,13 @@ public class IndexInfo {
 
     /**
      * RTree query
-     *
+     * 
      * @param bbox
-     *
      * @return
-     *
      * @throws DataSourceException
      * @throws IOException
      */
-    List queryRTree(Envelope bbox) throws DataSourceException, IOException {
+    List queryRTree( Envelope bbox ) throws DataSourceException, IOException {
         List goodRecs = null;
 
         try {
@@ -98,25 +100,23 @@ public class IndexInfo {
 
     /**
      * QuadTree Query
-     *
+     * 
      * @param bbox
-     *
      * @return
-     *
      * @throws DataSourceException
      * @throws IOException
      * @throws TreeException DOCUMENT ME!
      */
-    List queryQuadTree(Envelope bbox)
-        throws DataSourceException, IOException, TreeException {
+    List queryQuadTree( Envelope bbox ) throws DataSourceException, IOException, TreeException {
         List tmp = null;
+        List goodRecs = null;
 
         try {
             if ((qtree != null) && !bbox.contains(qtree.getRoot().getBounds())) {
                 tmp = qtree.search(bbox);
 
                 if (tmp.size() > 0) {
-                    // WARNING: QuadTree records number begins from 0
+                    // WARNING: QuadTree record number begins from 0
                     Collections.sort(tmp);
 
                     DataDefinition def = new DataDefinition("US-ASCII");
@@ -125,13 +125,13 @@ public class IndexInfo {
 
                     Data data = null;
                     Integer recno = null;
-
-                    for (int i = 0; i < tmp.size(); i++) {
+                    goodRecs = new ArrayList(tmp.size());
+                    for( int i = 0; i < tmp.size(); i++ ) {
                         recno = (Integer) tmp.get(i);
                         data = new Data(def);
                         data.addValue(new Integer(recno.intValue() + 1));
-                        data.addValue(new Long(indexFile.getOffsetInBytes(
-                                    recno.intValue())));
+                        data.addValue(new Long(indexFile.getOffsetInBytes(recno.intValue())));
+                        goodRecs.add(data);
                     }
                 }
             }
@@ -149,14 +149,13 @@ public class IndexInfo {
             }
         }
 
-        return tmp;
+        return goodRecs;
     }
 
     /**
      * Convenience method for opening an RTree index.
-     *
+     * 
      * @return A new RTree.
-     *
      * @throws IOException If an error occurs during creation.
      * @throws DataSourceException DOCUMENT ME!
      */
@@ -177,9 +176,8 @@ public class IndexInfo {
 
     /**
      * Convenience method for opening a QuadTree index.
-     *
+     * 
      * @return A new QuadTree
-     *
      * @throws StoreException
      */
     QuadTree openQuadTree() throws StoreException {
@@ -191,9 +189,8 @@ public class IndexInfo {
 
     /**
      * Convenience method for opening a ShapefileReader.
-     *
+     * 
      * @return An IndexFile
-     *
      * @throws IOException
      */
     IndexFile openIndexFile() throws IOException {
@@ -203,31 +200,26 @@ public class IndexInfo {
             return null;
         }
 
-        //return new IndexFile(rbc, this.useMemoryMappedBuffer);
+        // return new IndexFile(rbc, this.useMemoryMappedBuffer);
         return new IndexFile(rbc, false);
     }
 
     /**
-     * Obtain a ReadableByteChannel from the given URL. If the url protocol is
-     * file, a FileChannel will be returned. Otherwise a generic channel will
-     * be obtained from the urls input stream.
-     *
+     * Obtain a ReadableByteChannel from the given URL. If the url protocol is file, a FileChannel
+     * will be returned. Otherwise a generic channel will be obtained from the urls input stream.
+     * 
      * @param url DOCUMENT ME!
-     *
      * @return DOCUMENT ME!
-     *
      * @throws IOException DOCUMENT ME!
      */
-    private ReadableByteChannel getReadChannel(URL url)
-        throws IOException {
+    private ReadableByteChannel getReadChannel( URL url ) throws IOException {
         ReadableByteChannel channel = null;
 
         if (url.getProtocol().equals("file")) {
             File file = new File(url.getFile());
 
             if (!file.exists() || !file.canRead()) {
-                throw new IOException(
-                    "File either doesn't exist or is unreadable : " + file);
+                throw new IOException("File either doesn't exist or is unreadable : " + file);
             }
 
             FileInputStream in = new FileInputStream(file);
@@ -241,22 +233,23 @@ public class IndexInfo {
     }
 
     //
-    //	public ShapefileReader.Record getNextRecord(ShapefileReader shpreader, Envelope bbox) throws Exception {
-    //	if( treeType== IndexInfo.TREE_GRX ||  treeType== TREE_QIX){
+    // public ShapefileReader.Record getNextRecord(ShapefileReader shpreader, Envelope bbox) throws
+    // Exception {
+    // if( treeType== IndexInfo.TREE_GRX || treeType== TREE_QIX){
     //
-    //		List goodRecs = null;
-    //            try {
-    //                goodRecs = queryTree(bbox);
-    //            } catch (TreeException e) {
-    //                throw new IOException("Error querying index: " + 
-    //                                      e.getMessage());
-    //        }
-    //        	}
-    //	ShapefileReader.Record record = shpreader
-    //		.nextRecord();
-    //		return record;
-    //	}
-    private List queryTree(Envelope bbox) throws IOException, TreeException {
+    // List goodRecs = null;
+    // try {
+    // goodRecs = queryTree(bbox);
+    // } catch (TreeException e) {
+    // throw new IOException("Error querying index: " +
+    // e.getMessage());
+    // }
+    // }
+    // ShapefileReader.Record record = shpreader
+    // .nextRecord();
+    // return record;
+    // }
+    private List queryTree( Envelope bbox ) throws IOException, TreeException {
         if (treeType == IndexInfo.R_TREE) {
             return queryRTree(bbox);
         } else if (treeType == IndexInfo.QUAD_TREE) {
@@ -267,12 +260,13 @@ public class IndexInfo {
         return null;
     }
 
-    static class Reader {
+    static class Reader implements RecordNumberTracker {
         private ShapefileReader shp;
         List goodRecs;
-        private int cnt;
+        private int cnt = 0;
+        private int recno = 1;
 
-        public Reader(IndexInfo info, ShapefileReader reader, Envelope bbox) throws IOException {
+        public Reader( IndexInfo info, ShapefileReader reader, Envelope bbox ) throws IOException {
             shp = reader;
 
             try {
@@ -280,26 +274,32 @@ public class IndexInfo {
                     info.rtree = info.openRTree();
                 } else if (info.treeType == QUAD_TREE) {
                     info.qtree = info.openQuadTree();
-                }else{
-                	goodRecs=null;
-                	return;
                 }
 
                 info.indexFile = info.openIndexFile();
                 goodRecs = info.queryTree(bbox);
             } catch (Exception e) {
-                ShapefileRenderer.LOGGER.log(Level.FINE, 
-                    "Exception occured attempting to use indexing:", e);
+                ShapefileRenderer.LOGGER.log(Level.FINE,
+                        "Exception occured attempting to use indexing:", e);
                 goodRecs = null;
-            }finally{
-            	if( info.indexFile!=null )
-            		info.indexFile.close();
+            } finally {
+                if (info.indexFile != null)
+                    info.indexFile.close();
             }
+
         }
 
+        public int getRecordNumber() {
+            return this.recno;
+        }
         public boolean hasNext() throws IOException {
             if (this.goodRecs != null) {
-                return this.cnt < this.goodRecs.size();
+                if (this.cnt < this.goodRecs.size()) {
+                    Data data = (Data) this.goodRecs.get(this.cnt);
+                    this.recno = ((Integer) data.getValue(0)).intValue();
+                    return true;
+                }
+                return false;
             }
 
             return shp.hasNext();
@@ -308,6 +308,7 @@ public class IndexInfo {
         public ShapefileReader.Record next() throws IOException {
             if (this.goodRecs != null) {
                 Data data = (Data) this.goodRecs.get(this.cnt);
+                this.recno = ((Integer) data.getValue(0)).intValue();
 
                 Long l = (Long) data.getValue(1);
                 ShapefileReader.Record record = shp.recordAt(l.intValue());
@@ -316,7 +317,7 @@ public class IndexInfo {
 
                 return record;
             }
-
+            recno++;
             return shp.nextRecord();
         }
 

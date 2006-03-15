@@ -22,6 +22,7 @@ import org.geotools.data.FIDReader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.indexed.IndexedFidReader;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
+import org.geotools.data.shapefile.indexed.RecordNumberTracker;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.renderer.shape.MultiLineHandler;
@@ -94,23 +95,23 @@ public class ShapefileRendererUtil {
         return ds.shpURL;
     }
 
-    public static FIDReader getFidReader( ShapefileDataStore datastore )
+    public static FIDReader getFidReader( ShapefileDataStore datastore, RecordNumberTracker tracker )
             throws MalformedURLException {
         if (datastore instanceof IndexedShapefileDataStore) {
             IndexedShapefileDataStore ids = (IndexedShapefileDataStore)datastore;
             if( ids.fixURL==null )
-                return createBasicFidReader(datastore);
+                return createBasicFidReader(datastore, tracker);
             try{
-                return new IndexedFidReader(datastore.getCurrentTypeName(), datastore.getReadChannel(ids.fixURL));
+                return new IndexedFidReader(datastore.getCurrentTypeName(), tracker, datastore.getReadChannel(ids.fixURL));
             }catch (Exception e) {
-                return createBasicFidReader(datastore);
+                return createBasicFidReader(datastore,tracker);
             }
         } else {
-            return createBasicFidReader(datastore);
+            return createBasicFidReader(datastore, tracker);
         }
     }
 
-    private static FIDReader createBasicFidReader(ShapefileDataStore datastore) {
+    private static FIDReader createBasicFidReader(ShapefileDataStore datastore, final RecordNumberTracker tracker) {
         final String typename = datastore.getCurrentTypeName() + ".";
         return new FIDReader(){
             int i = 0;
@@ -129,7 +130,7 @@ public class ShapefileRendererUtil {
                 if (closed)
                     throw new IllegalStateException("Reader is closed"); //$NON-NLS-1$
                 i++;
-                return typename + i;
+                return typename + tracker.getRecordNumber();
             }
 
         };
