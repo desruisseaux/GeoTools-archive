@@ -110,7 +110,6 @@ public class IndexInfo {
     List queryQuadTree(Envelope bbox)
         throws DataSourceException, IOException, TreeException {
         List tmp = null;
-        List goodRecs = null;
 
         try {
             if ((qtree != null) && !bbox.contains(qtree.getRoot().getBounds())) {
@@ -150,7 +149,7 @@ public class IndexInfo {
             }
         }
 
-        return goodRecs;
+        return tmp;
     }
 
     /**
