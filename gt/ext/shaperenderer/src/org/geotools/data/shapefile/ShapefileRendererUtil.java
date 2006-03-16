@@ -16,10 +16,13 @@
  */
 package org.geotools.data.shapefile;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.ReadableByteChannel;
 
 import org.geotools.data.FIDReader;
-import org.geotools.data.shapefile.dbf.DbaseFileReader;
+import org.geotools.data.shapefile.dbf.IndexedDbaseFileReader;
 import org.geotools.data.shapefile.indexed.IndexedFidReader;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.data.shapefile.indexed.RecordNumberTracker;
@@ -31,10 +34,8 @@ import org.geotools.renderer.shape.PointHandler;
 import org.geotools.renderer.shape.PolygonHandler;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.channels.ReadableByteChannel;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Allows access the the ShapefileReaders.
@@ -83,8 +84,8 @@ public class ShapefileRendererUtil {
         return reader;
     }
 
-    public static DbaseFileReader getDBFReader( ShapefileDataStore ds ) throws IOException {
-        return new DbaseFileReader(ds.getReadChannel(ds.dbfURL));
+    public static IndexedDbaseFileReader getDBFReader( ShapefileDataStore ds ) throws IOException {
+        return new IndexedDbaseFileReader(ds.getReadChannel(ds.dbfURL));
     }
 
     public static ReadableByteChannel getShpReadChannel( ShapefileDataStore ds ) throws IOException {

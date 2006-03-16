@@ -123,6 +123,10 @@ public class IndexedDbaseFileReader extends DbaseFileReader{
 	  super( channel, useMemoryMappedBuffer);
   }
 
+  public boolean IsRandomAccessEnabled(){
+      return this.randomAccessEnabled;
+  }
+  
 public static void main(String[] args) throws Exception {
     FileChannel channel = new FileInputStream(args[0]).getChannel();
     IndexedDbaseFileReader reader = new IndexedDbaseFileReader(channel, true);

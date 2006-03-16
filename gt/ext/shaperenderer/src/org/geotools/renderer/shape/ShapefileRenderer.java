@@ -49,6 +49,7 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
+import org.geotools.data.shapefile.dbf.IndexedDbaseFileReader;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileReader.Record;
@@ -290,10 +291,9 @@ public class ShapefileRenderer implements GTRenderer {
         }
     }
 
-    private Set processTransaction(Graphics2D graphics, Envelope bbox,
-        MathTransform transform, DataStore ds, Transaction transaction,
-        String typename, Query query, List ruleList, List elseRuleList,
-        NumberRange scaleRange) {
+    private Set processTransaction( Graphics2D graphics, Envelope bbox, MathTransform transform,
+            DataStore ds, Transaction transaction, String typename, Query query, List ruleList,
+            List elseRuleList, NumberRange scaleRange ) {
         if (transaction == Transaction.AUTO_COMMIT) {
             return Collections.EMPTY_SET;
         }
@@ -412,7 +412,7 @@ public class ShapefileRenderer implements GTRenderer {
             Envelope bbox, MathTransform mt, IndexInfo info, FeatureType type, Query query,
             List ruleList, List elseRuleList, Set modifiedFIDs, NumberRange scaleRange )
             throws IOException {
-        DbaseFileReader dbfreader = null;
+        IndexedDbaseFileReader dbfreader = null;
 
         try {
             dbfreader = ShapefileRendererUtil.getDBFReader(datastore);
@@ -466,22 +466,20 @@ public class ShapefileRenderer implements GTRenderer {
                     String nextFid = fidReader.next();
                     if (modifiedFIDs.contains(nextFid)) {
                         shpreader.next();
-                        //Vitali Diatchkov. We should skip DBF record also. It
-                        //is important if SLD is used based on attributes and some features
-                        //are in transaction. - Features are styled with alien's attributes in this case - bug.
-                        dbfreader.skip();
-
+                        if( !dbfreader.IsRandomAccessEnabled() )
+                            dbfreader.skip();
                         continue;
                     }
-
+                    if( dbfreader.IsRandomAccessEnabled() )
+                        dbfreader.goTo(shpreader.getRecordNumber());
                     ShapefileReader.Record record = shpreader.next();
 
                     SimpleGeometry geom = (SimpleGeometry) record.shape();
 
                     if (geom == null) {
                         LOGGER.finest("skipping geometry");
-                        dbfreader.skip();
-
+                        if( !dbfreader.IsRandomAccessEnabled() )
+                            dbfreader.skip();
                         continue;
                     }
 
