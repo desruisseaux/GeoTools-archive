@@ -65,7 +65,9 @@ public class IllegalAttributeException extends Exception {
     }
 
     public String toString() {
-    	String message = "IllegalAttribute: " + expected.getType().getName();
+    	String message = "IllegalAttribute: " 
+            + ((expected == null) ? "null": expected.getType().getName());
+
         message += (" , but got "
         + ((invalid == null) ? "null" : invalid.getClass().getName()));
 
@@ -80,7 +82,8 @@ public class IllegalAttributeException extends Exception {
      * @return an error message reporting the problem.
      */
     static String errorMessage(AttributeType expected, Object invalid) {
-        String message = "expected " + expected.getType().getName();
+        String message = "expected " 
+            + ((expected == null) ? "null": expected.getType().getName());
         message += (" , but got "
         + ((invalid == null) ? "null" : invalid.getClass().getName()));
 
