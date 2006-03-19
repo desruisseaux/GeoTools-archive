@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
@@ -38,7 +39,7 @@ import org.geotools.data.jdbc.ConnectionPool;
  * @source $URL$
  */
 public class OracleDataStoreFactory implements DataStoreFactorySpi {
-     
+	private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");     
     private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
 
     /**
@@ -102,6 +103,7 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
 				try {
 					value = param.lookUp( params );
 				} catch (IOException e) {
+					LOGGER.warning( param.key+":"+e );
 					// could not upconvert/parse to expected type!
 					// even if this parameter is not required
 					// we are going to refuse to process

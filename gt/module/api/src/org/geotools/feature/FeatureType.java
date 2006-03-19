@@ -421,15 +421,30 @@ public interface FeatureType {
     Feature duplicate( Feature feature ) throws IllegalAttributeException;
 
     /**
-     * Scheduled for removal in Geotools 2.2, please use FeatureFactory.
+     * Creates a new feature, with a generated unique featureID.
      * <p>
-     * Creates a new feature, with a generated unique featureID. This is less than ideal, as a
-     * FeatureID should be persistant over time, generally created by a datasource. This method is
-     * more for testing that doesn't need featureID.
+     * Generating a FeatureID is less than ideal, as a FeatureID should be something
+     * special about the "real world object" being modeled as a feature.
+     * <p>
+     * As an example: the "Effiel Tower" is a great feature id (there is only one) and we can
+     * use that Feature ID in serveral systems:
+     * <ul>
+     * <li>In a tour guide FeatureTypes one which records (NAME, LOCATION, COST); and
+     * <li>In a historical reference (NAME, LOCATION, HIEGHT, DATE, HISTORY)
+     * </ul>
+     * <p>
+     * Explicitly a FeatureID should be persistant over time, and between systems.
+     * <p>
+     * The FeatureIDs "generated" by this method are generally created by a datasource.
+     * This method is more for testing that doesn't need featureID.
+     * </p>
+     * <p>
+     * Warning: This class does not follow the geotools guidelines of sepearting out
+     * Interface from Factory, in geotools 2.3 there will be a formal FeatureFactory
+     * allowing you to provide application specific FeatureImplementations as an orthogonal
+     * concern to definition of type.
      * </p>
      * 
-     * @deprecated This method will be remove in 2.2, please use FeatureFactory obtained from
-     *             FactoryFinder
      * @param attributes the array of attribute values
      * @return The created feature
      * @throws IllegalAttributeException if the FeatureType does not validate the attributes.
@@ -439,11 +454,9 @@ public interface FeatureType {
     /**
      * Scheduled for removal in Geotools 2.2, please use FeatureFactory.
      * <p>
-     * Creates a new feature, with the proper featureID.
+     * Creates a new feature, with the indicated featureID.
      * </p>
      * 
-     * @deprecated This method will be remove in 2.2, please use FeatureFactory obtained from
-     *             FactoryFinder
      * @param attributes the array of attribute values.
      * @param featureID the feature ID.
      * @return the created feature.

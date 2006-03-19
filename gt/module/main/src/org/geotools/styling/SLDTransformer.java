@@ -321,9 +321,9 @@ public class SLDTransformer extends TransformerBase {
 
         public void visit(Mark mark) {
             start("Mark");
-            start("WellKnownName");
-            filterTranslator.encode(mark.getWellKnownName());
-            end("WellKnownName");
+            if (mark.getWellKnownName() != null) {
+            	element("WellKnownName", mark.getWellKnownName().toString());
+            }
 
             if (mark.getFill() != null) {
                 mark.getFill().accept(this);

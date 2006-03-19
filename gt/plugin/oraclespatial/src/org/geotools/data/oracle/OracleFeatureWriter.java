@@ -17,6 +17,7 @@
 package org.geotools.data.oracle;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
@@ -42,6 +43,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * @version $Id$
  */
 public class OracleFeatureWriter extends JDBCTextFeatureWriter {
+	private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");
+	
     public OracleFeatureWriter(FeatureReader fReader, QueryData queryData)
         throws IOException {
         super(fReader, queryData);
@@ -49,6 +52,8 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
 
     protected String getGeometryInsertText(Geometry geom, int srid)
         throws IOException {
+    	//return "?"; // Please use a prepaired statement to insert your geometry
+    	
         String geomText = SQLEncoderOracle.toSDOGeom(geom, srid);
         return geomText;
     }

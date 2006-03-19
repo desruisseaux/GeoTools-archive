@@ -17,13 +17,13 @@ package org.geotools.renderer.lite;
 
 // J2SE dependencies
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 
 import javax.media.jai.ImageMIPMap;
 
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.RenderedCoverage;
@@ -46,8 +46,6 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.spatialschema.geometry.Envelope;
 
 
 /**
@@ -196,7 +194,8 @@ public final class GridCoverageRenderer {
 				(MathTransform) crsToDeviceGeometry(this.gridCoverage.getGridGeometry().getGridRange(), newEnvelope),
 				newEnvelope.getCoordinateReferenceSystem()
     	);
-    	GridCoverage2D prjGridCoverage = (GridCoverage2D) Operations.DEFAULT.resample(
+    	Operations coverageOperations = new Operations(new RenderingHints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
+    	GridCoverage2D prjGridCoverage = (GridCoverage2D) coverageOperations.resample(
     			this.gridCoverage,
     			displayCRS,
 				newGridGeometry,

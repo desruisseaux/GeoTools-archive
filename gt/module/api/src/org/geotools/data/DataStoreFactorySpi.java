@@ -534,5 +534,19 @@ public interface DataStoreFactorySpi extends Factory {
                 throw targetException.getCause();
             }
         }
+        /**
+         * key=Type description
+         */
+        public String toString() {
+        	StringBuffer buf = new StringBuffer();
+        	buf.append( key );
+        	buf.append( '=' );
+        	buf.append( type.getName() );
+        	buf.append( ' ' );
+        	if( required )
+        		buf.append( "REQUIRED ");
+        	buf.append( description );
+        	return buf.toString();
+        }
     }
 }

@@ -58,6 +58,7 @@ public class WFSDataStoreReadTest extends TestCase {
     }
         
     public static void doFeatureType(URL url,boolean get, boolean post, int i) throws IOException, SAXException{
+    	if( url == null) return;
         try{
         WFSDataStore wfs = getDataStore(url);
         System.out.println("FeatureTypeTest + "+url);
@@ -82,7 +83,8 @@ public class WFSDataStoreReadTest extends TestCase {
     }
     
     public static void doFeatureReader(URL url, boolean get, boolean post, int i) throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
-        try{
+    	if( url == null) return;
+    	try{
         System.out.println("FeatureReaderTest + "+url);
         WFSDataStore wfs = getDataStore(url);
         assertNotNull("No featureTypes",wfs.getTypeNames());
@@ -112,7 +114,8 @@ public class WFSDataStoreReadTest extends TestCase {
     }
     
     public static void doFeatureReaderWithFilter(URL url, boolean get, boolean post, int i) throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
-        try{
+    	if( url == null) return;
+    	try{
         System.out.println("FeatureReaderWithFilterTest + "+url);
         WFSDataStore wfs = getDataStore(url);
         assertNotNull("No featureTypes",wfs.getTypeNames());

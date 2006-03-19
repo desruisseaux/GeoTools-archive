@@ -519,4 +519,12 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
 	public void visit(FeatureTypeConstraint arg0) {
         throw new UnsupportedOperationException();
 	}
+
+	public void visit(ColorMap arg0) {
+        throw new UnsupportedOperationException();
+	}
+
+	public void visit(ColorMapEntry arg0) {
+        throw new UnsupportedOperationException();
+	}
 }

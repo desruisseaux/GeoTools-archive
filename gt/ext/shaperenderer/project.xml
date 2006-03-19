@@ -79,7 +79,7 @@
     </dependency>
     <dependency>
       <id>JTS</id>
-      <version>1.6</version>
+      <version>1.7</version>
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
       <properties>
         <release.bundle>true</release.bundle>

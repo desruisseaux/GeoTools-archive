@@ -21,11 +21,21 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * <p>
- * Represents a feature of arbitrary complexity. This interface answers the
- * question: How do we access feature attributes? The most generic approach
- * would be to pass all feature attributes as objects and use Java variable
- * and method references to access them.  However, this is also the most
- * useless approach because it establishes no unified methods for getting
+ * Represents a feature of arbitrary complexity.
+ * <p>
+ * This interface answers the question: How do we store feature attributes?
+ * (The answer to the more useful question, How do we access feature attribute,
+ * is contained in the Expression class.
+ * <p>
+ * <p>
+ * Warning: We are revising the Feature Model to be more complete in the
+ * next round of GeoTools. If you do any data access in your classes please try
+ * and make use of Expression to access your information, if you do this you will
+ * not be affected by the change (beyond a few search and replace operations).
+ * </p>
+ * The most generic approach would be to pass all feature attributes as objects
+ * and use Java variable and method references to access them.  However, this is
+ * also the most useless approach because it establishes no unified methods for getting
  * attribute information (since it is totally Object dependent), without
  * elaborate reflection/introspection, which is inconvenient to use. Unlike
  * its {@link FeatureType} counterpart, this interface does not attempt to

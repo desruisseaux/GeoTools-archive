@@ -17,6 +17,7 @@
 package org.geotools.filter;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +34,8 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -289,8 +292,9 @@ public class SQLEncoderOracle extends SQLEncoder {
     /**
      * Converts JTS Geometry to a String version of a SDO Geometry.  This
      * should move to a utility class, as we now have more than  one class
-     * using this (which is why it changed to public static). TODO: Multi
-     * Geometries
+     * using this (which is why it changed to public static)
+     * 
+     * TODO: Multi eometries
      *
      * @param geometry The JTS Geometry to convert.
      * @param srid DOCUMENT ME!
@@ -304,7 +308,13 @@ public class SQLEncoderOracle extends SQLEncoder {
             return toSDOGeom((LineString) geometry, srid);
         } else if (Polygon.class.isAssignableFrom(geometry.getClass())) {
             return toSDOGeom((Polygon) geometry, srid);
-        } else {
+        } else if (MultiLineString.class.isAssignableFrom(geometry.getClass())) {
+            return toSDOGeom((MultiLineString) geometry, srid);
+        }
+        else if (MultiPolygon.class.isAssignableFrom(geometry.getClass())) {
+            return toSDOGeom((MultiPolygon) geometry, srid);
+        }
+        else {
             LOGGER.warning("Got a literal geometry that I can't handle: "
                 + geometry.getClass().getName());
 
@@ -312,6 +322,30 @@ public class SQLEncoderOracle extends SQLEncoder {
         }
     }
 
+    /**
+     * TODO: Encode more then 1
+     * @param line
+     * @param srid
+     * @return
+     */
+    private static String toSDOGeom(MultiLineString line, int srid) {
+         if( line.getNumGeometries() == 1 ){
+        	 return toSDOGeom( line.getGeometryN(0), srid);        	 
+         }
+         throw new UnsupportedOperationException("Cannot encode MultiLineString (yet)");
+    }
+    /**
+     * TODO: Encode more then 1
+     * @param line
+     * @param srid
+     * @return
+     */
+    private static String toSDOGeom(MultiPolygon polygon, int srid) {
+        if( polygon.getNumGeometries() == 1 ){
+       	 return toSDOGeom( polygon.getGeometryN(0), srid);        	 
+        }
+        throw new UnsupportedOperationException("Cannot encode MultiPolygon (yet)");
+   }
     /**
      * Converts a LineString Geometry in an SDO SQL geometry construction
      * statement.

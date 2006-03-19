@@ -83,7 +83,7 @@ public class QuickOracleTest extends DataTestCase {
 
         PropertyResourceBundle resource;
         resource =
-            new PropertyResourceBundle(this.getClass().getResourceAsStream("test.properties"));
+            new PropertyResourceBundle(this.getClass().getResourceAsStream("remote.properties"));
 
         String namespace = resource.getString("namespace");
         String host = resource.getString("host");
@@ -105,6 +105,7 @@ public class QuickOracleTest extends DataTestCase {
         }
         catch( Throwable t ){
         	System.out.println("Could not load test fixture, configure "+getClass().getResource("fixture.properties"));
+        	t.printStackTrace();
         	return;
         }
         reset();

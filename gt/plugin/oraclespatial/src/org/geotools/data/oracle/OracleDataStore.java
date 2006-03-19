@@ -19,6 +19,7 @@ import oracle.sql.Datum;
 import oracle.sql.STRUCT;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
@@ -34,6 +35,7 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.oracle.attributeio.SDOAttributeIO;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.FeatureType;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderOracle;
 import org.geotools.geometry.JTS;
@@ -335,5 +337,53 @@ public class OracleDataStore extends JDBCDataStore {
 				}
 	    	}
 	    }
+    }
+    
+    /** This is used by helper classes to hammer sql back to the database */
+    public boolean sql( Transaction t, String sql ) throws IOException, SQLException  {
+    	Connection conn = getConnection( t );
+    	Statement st = conn.createStatement();
+    	LOGGER.info( sql );
+    	return st.execute( sql );    	
+    }
+    
+    public void createSchema(FeatureType featureType) throws IOException {
+    	String tableName = featureType.getTypeName();
+    	Transaction t = new DefaultTransaction("createSchema");
+    	
+    	CoordinateReferenceSystem crs = featureType.getDefaultGeometry().getCoordinateSystem();
+    	// TODO: lookup srid for crs
+    	Envelope bounds = new Envelope();
+		bounds.expandToInclude( -180, -90 );
+		bounds.expandToInclude( 180, 90 );
+		int srid = -1;
+		
+    	SQLEncoderOracle encoder = new SQLEncoderOracle("fid",srid); // should figure out from encoding
+    	SqlStatementEncoder statements = new SqlStatementEncoder( encoder, tableName, "fid" );
+    	
+    	try {
+			sql( t, "DROP TABLE "+tableName );
+			sql( t, "DELETE FROM user_sdo_geom_metadata WHERE TABLE_NAME='"+tableName+"'");			
+    	}
+    	catch( SQLException ignore ){
+    		// table probably did not exist
+    	}
+    	try{
+    		sql( t, statements.makeCreateTableSQL( featureType ) );
+    		
+  
+    		sql( t, statements.makeAddGeomMetadata( featureType, bounds, srid ) );
+    		//sql( t, statements.makeCreateFidIndex() );
+    		//sql( t, statements.makeCreateGeomIndex( featureType ) );
+    		
+    		t.commit();
+    		
+    	} catch (SQLException e) {
+    		t.rollback();
+    		throw (IOException) new IOException( e.getLocalizedMessage() ).initCause( e );
+		}    	    	
+    	finally {
+    		t.close();
+    	}
     }
 }

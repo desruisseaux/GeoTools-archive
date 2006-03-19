@@ -63,7 +63,7 @@ public class OracleTestFixture {
 	       // DriverManager.registerDriver( new oracle.jdbc.driver.OracleDriver() );
 	       
 	       properties = new Properties();
-	       properties.load(this.getClass().getResourceAsStream("test.properties"));
+	       properties.load(this.getClass().getResourceAsStream("remote.properties"));
 	       
 	       schemaName = properties.getProperty("schema");
 	       

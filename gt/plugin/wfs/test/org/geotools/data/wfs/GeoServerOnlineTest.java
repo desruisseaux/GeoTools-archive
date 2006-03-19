@@ -44,30 +44,37 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class GeoServerOnlineTest extends TestCase {
 
-    private URL url = null;
+    protected URL url = null;
+    
     public void setUp() throws MalformedURLException { 
-//         url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
-       url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
-         if( url != null && url.toString().indexOf("localhost")!= -1 ) {
-             InputStream stream = null;             
-             try {
-                 stream = url.openStream();
-             }
-             catch( Throwable t ) {
-                 System.err.println("Warning you local geoserver is not available - "+getName()+" test disabled ");
-                 url = null;
-             }
-             finally {
-                 if( stream != null )
-                    try {
-                        stream.close();
-                    } catch (IOException e) {
-                        // whatever
-                    }
-             }
-         }
-    } 
+    	url = targetCapabilities("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
+    }
+    
+    /** Subclasses may override 
+     * @throws MalformedURLException
+     */
+    protected URL targetCapabilities(String capabilities) throws MalformedURLException{
+    	URL url = new URL(capabilities);
+        InputStream stream = null;             
+        try {
+            stream = url.openStream();
+            return url;
+        }
+        catch( Throwable t ) {
+            System.err.println( getName()+ " disabled: target unavailable "+capabilities );
+            return null;
+        }
+        finally {
+            if( stream != null )
+               try {
+                   stream.close();
+               } catch (IOException e) {
+                   // whatever
+               }
+        }
+    }
     public void testTypes() throws IOException, NoSuchElementException {
+    	if( url == null) return;
         WFSDataStore wfs; 
         try {
             wfs = WFSDataStoreReadTest.getDataStore(url);
