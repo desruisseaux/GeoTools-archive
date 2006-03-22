@@ -50,16 +50,27 @@ public class DelaunayTriangulator {
         while (iter.hasNext()){
             Feature next = iter.next();
             Geometry geom = next.getDefaultGeometry();
-            Point centroid = geom.getCentroid();
-            DelaunayNode node = new DelaunayNode();            
-            node.setCoordinate(centroid.getCoordinate());             
+            Point centroid;
+            if (geom instanceof Point){
+                centroid = (Point) geom;
+            } else {
+                centroid = geom.getCentroid();
+            }
+            DelaunayNode node = new DelaunayNode();   
+            node.setCoordinate(centroid.getCoordinate());  
+            node.setFeature(next);
             if (!(arrayContains(node, nodes, index))){
                 nodes[index] = node;
                 index++;                
             }                  
         }
         
-        return triangulate(nodes);
+        DelaunayNode[] trimmed = new DelaunayNode[index];
+        for (int i = 0; i < index; i++){
+            trimmed[i] = nodes[i];
+        }
+        
+        return triangulate(trimmed);
     }
     
     private static boolean arrayContains(DelaunayNode node, DelaunayNode[] nodes, int index){
@@ -80,8 +91,8 @@ public class DelaunayTriangulator {
     public static Graph triangulate(DelaunayNode[] nodes){
         //this algorithm is from "Computational Geometry: Algorithms and Applications" by M. de Berg et al., 
         //written in 1997 and printed by Springer-Verlag (New York).  Pseudocode from section 9.3 (pp. 190-194).
-        //A few additional checks for degenerate cases were needed.  They're commented below.
-        
+        //A few additional checks for degenerate cases were needed.  They're commented below.        
+               
         //find the initial bounding triangle and supplement the nodes with its corners        
         DelaunayNode[] tempNodes = new DelaunayNode[nodes.length+3];
         double max = 0;
@@ -125,12 +136,7 @@ public class DelaunayTriangulator {
         e2.setFaceB(UNBOUNDED);
         e3.setFaceB(UNBOUNDED);
         
-        triangleList.add(first);        
-        
-        LOGGER.fine("adding nodes in this order:");
-        for (int i = 0; i < nodes.length; i++){
-            LOGGER.fine("" + nodes[i]);
-        }        
+        triangleList.add(first);                
         
         //add nodes one at a time.
         for (int i = 0; i < nodes.length; i++){
