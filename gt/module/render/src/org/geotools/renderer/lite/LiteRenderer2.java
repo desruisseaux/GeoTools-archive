@@ -49,10 +49,9 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.expression.BBoxExpression;
 import org.geotools.filter.expression.Expression;
-import org.geotools.geometry.JTS;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.RenderListener;
@@ -489,7 +488,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 	  */
 	public static double calculateScale(Envelope envelope, CoordinateReferenceSystem coordinateReferenceSystem,int imageWidth,int imageHeight,double DPI) throws Exception 
 	{
-		double diagonalGroundDistance = CRS.distance(
+		double diagonalGroundDistance = JTS.orthodromicDistance(
 				            new Coordinate(envelope.getMinX(),envelope.getMinY()),
 				            new Coordinate(envelope.getMaxX(),envelope.getMaxY()),
 							coordinateReferenceSystem
@@ -570,7 +569,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                     {
                        // Envelope eee=  JTS.transform(envelope, transform);// this is the old way
                     	    //10 = make 10 points on each side of the bbox & transform the polygon
-                        envelope = JTS.transform(envelope, transform,10); // this will usually be a "bigger" bbox
+                        envelope = org.geotools.geometry.JTS.transform(envelope, transform,10); // this will usually be a "bigger" bbox
                     }
                     else
                     	transform = null; //reset transform

@@ -1231,37 +1231,6 @@ public class GeodeticCalculator {
     }
 
     /**
-     * Converts an arbitrary Java2D shape into a JTS geometry. The created JTS geometry
-     * may be any of {@link com.vividsolutions.jts.geom.LineString},
-     * {@link com.vividsolutions.jts.geom.LinearRing} or
-     * {@link com.vividsolutions.jts.geom.MultiLineString}.
-     *
-     * @param  shape    The Java2D shape to create.
-     * @param  factory  The JTS factory to use for creating geometry.
-     * @return The JTS geometry.
-     *
-     * @deprecated Use {@link org.geotools.geometry.jts.JTS#shapeToGeometry} instead. This method
-     *             will be removed in a future version in order to avoid JTS dependency from the
-     *             referencing module.
-     */
-    public static com.vividsolutions.jts.geom.Geometry shapeToGeometry(
-            final Shape shape, final com.vividsolutions.jts.geom.GeometryFactory factory)
-    {
-        try {
-            return (com.vividsolutions.jts.geom.Geometry)
-                   Class.forName("org.geotools.geometry.JTS").getMethod("shapeToGeometry",
-                    new Class[] {com.vividsolutions.jts.geom.Geometry.class,
-                                 com.vividsolutions.jts.geom.GeometryFactory.class})
-                        .invoke(null, new Object[] {shape, factory});
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            // Not a good practice, but we are going to remove this method anyway.
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * Returns a string representation of the current state of this calculator.
      */
     public String toString() {

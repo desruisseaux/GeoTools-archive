@@ -4,7 +4,7 @@ import java.awt.Rectangle;
 import java.awt.geom.*;
 
 import org.geotools.factory.Hints;
-import org.geotools.referencing.CRS;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -171,7 +171,7 @@ public class RendererUtilities
 		    	double image_min_y = (origProject[1] - envelope.getMinY() )/envelope.getHeight() *imageHeight;
 		    	double image_max_y = (origProject[3] - envelope.getMinY() )/envelope.getHeight() *imageHeight;
 		    	
-		    	double distance_ground = CRS.distance(
+		    	double distance_ground = JTS.orthodromicDistance(
 		    			         new Coordinate(newCsLatLong[0],newCsLatLong[1] ),
 		    			         new Coordinate(newCsLatLong[2],newCsLatLong[3] ),
 		    			         DefaultGeographicCRS.WGS84
@@ -183,7 +183,7 @@ public class RendererUtilities
 
     	
     	
-	        double diagonalGroundDistance = CRS.distance(
+	        double diagonalGroundDistance = JTS.orthodromicDistance(
 	               p1,p2,	          
 	                coordinateReferenceSystem
 	                );

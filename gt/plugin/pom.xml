@@ -104,7 +104,7 @@
     <module>image</module>
     <module>mif</module>
     <module>mysql</module>
-    <module>oraclespatial</module>
+<!-- <module>oraclespatial</module> -->
     <module>postgis</module>
     <module>shapefile</module>
     <module>tiger</module>

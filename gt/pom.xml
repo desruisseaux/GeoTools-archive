@@ -478,7 +478,7 @@
       <dependency>
         <groupId>postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>8.0-312.jdbc3</version>
+        <version>8.1-404.jdbc3</version>
       </dependency>
       <dependency>
         <groupId>mysql</groupId>
@@ -709,7 +709,6 @@
           </excludes>
           <forkMode>once</forkMode>
           <argLine>-Xmx512M -enableassertions</argLine>
-          <printSummary>false</printSummary>  <!-- Make the build less verbose -->
           <!-- Ignores test failure only if we are generating a report for publication on
                the web site. See the profiles section at the begining of this pom.xml file. -->
           <testFailureIgnore>${allow.test.failure.ignore}</testFailureIgnore>

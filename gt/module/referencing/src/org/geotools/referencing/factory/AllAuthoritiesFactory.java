@@ -38,6 +38,7 @@ import org.opengis.metadata.citation.Citation;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.metadata.iso.citation.Citations;
@@ -61,7 +62,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * example if any {@code createFoo(...)} method in this class is invoked with a code starting
  * by {@code "EPSG:"}, then this class delegates the object creation to the authority factory
  * provided by <code>FactoryFinder.{@linkplain FactoryFinder#getCRSAuthorityFactory
- * getCRSAuthorityFactory}("EPSG", {@linkplain #hints hints})</code>.
+ * getCRSAuthorityFactory}("EPSG", hints)</code>.
  * <p>
  * This class is not registered in {@link FactoryFinder}, because it is not a real authority
  * factory. There is not a single authority name associated to this factory, but rather a set
@@ -99,13 +100,19 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
     private final char separator;
 
     /**
+     * User-supplied hints provided at construction time.
+     * Its content may or may not be identical to {@link #hints}.
+     */
+    private final Hints userHints;
+
+    /**
      * Creates a new factory using the specified hints and the
      * {@linkplain GenericName#DEFAULT_SEPARATOR default name separator}.
      *
      * @param hints An optional set of hints, or {@code null} if none.
      */
     public AllAuthoritiesFactory(final Hints hints) {
-        this(hints, null, GenericName.DEFAULT_SEPARATOR);
+        this(hints, null);
     }
 
     /**
@@ -138,11 +145,13 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
     {
         super(hints, NORMAL_PRIORITY);
         this.separator = separator;
-        if (hints != null) {
-            this.hints.putAll(hints);
-        }
+        this.userHints = new Hints(hints);
         if (factories!=null && !factories.isEmpty()) {
             this.factories = new LinkedHashSet(factories);
+            for (final Iterator it=this.factories.iterator(); it.hasNext();) {
+                final Factory factory = (Factory) it.next();
+                this.hints.putAll(factory.getImplementationHints());
+            }
         } else {
             this.factories = null;
         }
@@ -230,7 +239,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
         DatumAuthorityFactory factory = (DatumAuthorityFactory) // TODO: remove cast with J2SE 1.5.
                 getAuthorityFactory(DatumAuthorityFactory.class, authority);
         if (factory == null) try {
-            factory = FactoryFinder.getDatumAuthorityFactory(authority, hints);
+            factory = FactoryFinder.getDatumAuthorityFactory(authority, userHints);
         } catch (FactoryRegistryException cause) {
             throw noSuchAuthority(code, cause);
         }
@@ -251,7 +260,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
         CSAuthorityFactory factory = (CSAuthorityFactory) // TODO: remove cast with J2SE 1.5.
                 getAuthorityFactory(CSAuthorityFactory.class, authority);
         if (factory == null) try {
-            factory = FactoryFinder.getCSAuthorityFactory(authority, hints);
+            factory = FactoryFinder.getCSAuthorityFactory(authority, userHints);
         } catch (FactoryRegistryException cause) {
             throw noSuchAuthority(code, cause);
         }
@@ -272,7 +281,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
         CRSAuthorityFactory factory = (CRSAuthorityFactory) // TODO: remove cast with J2SE 1.5.
                 getAuthorityFactory(CRSAuthorityFactory.class, authority);
         if (factory == null) try {
-            factory = FactoryFinder.getCRSAuthorityFactory(authority, hints);
+            factory = FactoryFinder.getCRSAuthorityFactory(authority, userHints);
         } catch (FactoryRegistryException cause) {
             throw noSuchAuthority(code, cause);
         }
@@ -293,7 +302,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
         CoordinateOperationAuthorityFactory factory = (CoordinateOperationAuthorityFactory) // TODO: remove cast with J2SE 1.5.
                 getAuthorityFactory(CoordinateOperationAuthorityFactory.class, authority);
         if (factory == null) try {
-            factory = FactoryFinder.getCoordinateOperationAuthorityFactory(authority, hints);
+            factory = FactoryFinder.getCoordinateOperationAuthorityFactory(authority, userHints);
         } catch (FactoryRegistryException cause) {
             throw noSuchAuthority(code, cause);
         }

@@ -22,6 +22,8 @@ package org.geotools.factory;
 import java.util.Map;
 import java.util.HashMap;
 import java.awt.RenderingHints;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 // Geotools Dependencies
 import org.geotools.resources.Utilities;
@@ -58,7 +60,7 @@ import org.geotools.resources.Utilities;
  */
 public final class Hints extends RenderingHints {
     /**
-     * Hint for the {@link com.vividsolutions.jts.geom.GeometryFactory} instance to use.
+     * The {@link com.vividsolutions.jts.geom.GeometryFactory} instance to use.
      *
      * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
      */
@@ -66,7 +68,7 @@ public final class Hints extends RenderingHints {
             new Key("com.vividsolutions.jts.geom.GeometryFactory");
 
     /**
-     * Hint for the {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory} instance to use.
+     * The {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory} instance to use.
      *
      * @see org.geotools.geometry.jts.FactoryFinder#getCoordinateSequenceFactory
      */
@@ -74,7 +76,7 @@ public final class Hints extends RenderingHints {
             new Key("com.vividsolutions.jts.geom.CoordinateSequenceFactory");
 
     /**
-     * Hint for the {@link com.vividsolutions.jts.geom.PrecisionModel} instance to use.
+     * The {@link com.vividsolutions.jts.geom.PrecisionModel} instance to use.
      *
      * @see org.geotools.geometry.jts.FactoryFinder#getPrecisionModel
      */
@@ -90,7 +92,7 @@ public final class Hints extends RenderingHints {
             new Key(Integer.class);
 
     /**
-     * Hint for the {@link org.opengis.referencing.crs.CRSAuthorityFactory} instance to use.
+     * The {@link org.opengis.referencing.crs.CRSAuthorityFactory} instance to use.
      *
      * @see org.geotools.referencing.FactoryFinder#getCRSAuthorityFactory
      */
@@ -98,7 +100,7 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.crs.CRSAuthorityFactory");
 
     /**
-     * Hint for the {@link org.opengis.referencing.cs.CSAuthorityFactory} instance to use.
+     * The {@link org.opengis.referencing.cs.CSAuthorityFactory} instance to use.
      *
      * @see org.geotools.referencing.FactoryFinder#getCSAuthorityFactory
      */
@@ -106,7 +108,7 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.cs.CSAuthorityFactory");
 
     /**
-     * Hint for the {@link org.opengis.referencing.datum.DatumAuthorityFactory} instance to use.
+     * The {@link org.opengis.referencing.datum.DatumAuthorityFactory} instance to use.
      *
      * @see org.geotools.referencing.FactoryFinder#getDatumAuthorityFactory
      */
@@ -114,7 +116,7 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.datum.DatumAuthorityFactory");
 
     /**
-     * Hint for the {@link org.opengis.referencing.crs.CRSFactory} instance to use.
+     * The {@link org.opengis.referencing.crs.CRSFactory} instance to use.
      *
      * @see org.geotools.referencing.FactoryFinder#getCRSFactory
      */
@@ -122,7 +124,7 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.crs.CRSFactory");
 
     /**
-     * Hint for the {@link org.opengis.referencing.cs.CSFactory} instance to use.
+     * The {@link org.opengis.referencing.cs.CSFactory} instance to use.
      *
      * @see org.geotools.referencing.FactoryFinder#getCSFactory
      */
@@ -130,7 +132,7 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.cs.CSFactory");
 
     /**
-     * Hint for the {@link org.opengis.referencing.datum.DatumFactory} instance to use.
+     * The {@link org.opengis.referencing.datum.DatumFactory} instance to use.
      *
      * @see org.geotools.referencing.FactoryFinder#getDatumFactory
      */
@@ -138,7 +140,7 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.datum.DatumFactory");
 
     /**
-     * Hint for the {@link org.opengis.referencing.operation.CoordinateOperationFactory}
+     * The {@link org.opengis.referencing.operation.CoordinateOperationFactory}
      * instance to use.
      *
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
@@ -147,7 +149,7 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.operation.CoordinateOperationFactory");
 
     /**
-     * Hint for the {@link org.opengis.referencing.operation.CoordinateOperationAuthorityFactory}
+     * The {@link org.opengis.referencing.operation.CoordinateOperationAuthorityFactory}
      * instance to use.
      *
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationAuthorityFactory
@@ -156,7 +158,7 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.operation.CoordinateOperationAuthorityFactory");
 
     /**
-     * Hint for the {@link org.opengis.referencing.operation.MathTransformFactory} instance to use.
+     * The {@link org.opengis.referencing.operation.MathTransformFactory} instance to use.
      *
      * @see org.geotools.referencing.FactoryFinder#getMathTransformFactory
      */
@@ -164,7 +166,7 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.operation.MathTransformFactory");
 
     /**
-     * Hint for the {@link org.opengis.coverage.processing.GridCoverageProcessor} instance to use.
+     * The {@link org.opengis.coverage.processing.GridCoverageProcessor} instance to use.
      *
      * @deprecated The {@code GridCoverageProcessor} interface is not yet stable.
      *             Avoid dependencies if possible.
@@ -174,19 +176,36 @@ public final class Hints extends RenderingHints {
 // TODO     new Key("org.opengis.coverage.processing.GridCoverageProcessor");
 
     /**
-     * Hint for the {@link javax.media.jai.JAI} instance to use.
+     * The {@linkplain javax.media.jai.tilecodec.TileEncoder tile encoder} name
+     * (as a {@link String} value) to use during serialization of image data in
+     * a {@link org.geotools.coverage.grid.GridCoverage2D} object. This encoding
+     * is given to the {@link javax.media.jai.remote.SerializableRenderedImage}
+     * constructor. Valid values include (but is not limited to) {@code "raw"},
+     * {@code "gzip"} and {@code "jpeg"}.
+     * <p>
+     * <strong>Note:</strong> We recommand to avoid the {@code "jpeg"} codec for grid coverages.
+     *
+     * @see org.geotools.coverage.FactoryFinder#getGridCoverageFactory
+     *
+     * @since 2.3
+     */
+    public static final Key TILE_ENCODING =
+            new Key("java.lang.String");
+
+    /**
+     * The {@link javax.media.jai.JAI} instance to use.
      */
     public static final Key JAI_INSTANCE =
             new Key("javax.media.jai.JAI");
 
     /**
-     * Hint for the {@link org.opengis.coverage.SampleDimensionType} to use.
+     * The {@link org.opengis.coverage.SampleDimensionType} to use.
      */
     public static final Key SAMPLE_DIMENSION_TYPE =
             new Key("org.opengis.coverage.SampleDimensionType");
 
     /**
-     * Hint for the default {@link org.opengis.referencing.crs.CoordinateReferenceSystem} to use.
+     * The default {@link org.opengis.referencing.crs.CoordinateReferenceSystem} to use.
      * This is used by some factories capable to provide a default CRS when no one were explicitly
      * specified by the user.
      *
@@ -196,7 +215,8 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.crs.CoordinateReferenceSystem");
 
     /**
-     * Hint for the preferred datum shift method to use for coordinate operation.
+     * The preferred datum shift method to use for
+     * {@linkplain org.opengis.referencing.operation.CoordinateOperation coordinate operations}.
      * Valid values are {@code "Molodenski"}, {@code "Abridged_Molodenski"} or {@code "Geocentric"}.
      * Other values may be supplied if a {@linkplain org.opengis.referencing.operation.MathTransform
      * math transform} exists for that name, but this is not guaranteed to work.
@@ -351,6 +371,38 @@ public final class Hints extends RenderingHints {
                 type = value.getClass();
             }
             return getValueClass().isAssignableFrom(type);
+        }
+
+        /**
+         * Returns a string representation of this key. The string representation
+         * is mostly for debugging purpose. The default implementation tries to
+         * infer the key name using reflection.
+         */
+        public String toString() {
+            int t=0;
+            while (true) {
+                final Class type;
+                switch (t++) {
+                    case 0:  type = Hints.class;     break;
+                    case 1:  type = getValueClass(); break;
+                    default: return super.toString();
+                }
+                final Field[] fields = type.getFields();
+                for (int i=0; i<fields.length; i++) {
+                    final Field f = fields[i];
+                    if (Modifier.isStatic(f.getModifiers())) {
+                        final Object v;
+                        try {
+                            v = f.get(null);
+                        } catch (IllegalAccessException e) {
+                            continue;
+                        }
+                        if (v == this) {
+                            return f.getName();
+                        }
+                    }
+                }
+            }
         }
     }
 }

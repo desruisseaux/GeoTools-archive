@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing;
 
-
 // JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -37,9 +36,6 @@ import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.resources.CRSUtilities;
-
-// JTS dependencies
-import com.vividsolutions.jts.geom.Coordinate;
 
 
 /**
@@ -106,34 +102,5 @@ public class CrsTest extends TestCase {
 
         assertTrue(oldEnvelope.contains(firstEnvelope, true));
         assertTrue(oldEnvelope.equals  (firstEnvelope, 0.02));
-    }
-
-    /**
-     * Tests the distance between points function
-     */
-    public void testDistance() throws Exception {
-        final Parser parser = new Parser();
-        
-        String wkt = "PROJCS[\"NAD83 / BC Albers\",\n"
-                   + "  GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",\n"
-                   + "    SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],\n"
-                   + "    TOWGS84[0,0,0],AUTHORITY[\"EPSG\",\"6269\"]],\n"
-                   + "    PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],\n"
-                   + "    UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],\n"
-                   + "    AUTHORITY[\"EPSG\",\"4269\"]],\n"
-                   + "  PROJECTION[\"Albers_Conic_Equal_Area\"],\n"
-                   + "  PARAMETER[\"standard_parallel_1\",50],\n"
-                   + "  PARAMETER[\"standard_parallel_2\",58.5],\n"
-                   + "  PARAMETER[\"latitude_of_center\",45],\n"
-                   + "  PARAMETER[\"longitude_of_center\",-126],\n"
-                   + "  PARAMETER[\"false_easting\",1000000],\n"
-                   + "  PARAMETER[\"false_northing\",0],\n"
-                   + "  UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],\n"
-                   + "  AUTHORITY[\"EPSG\",\"3005\"]]";
-        DefaultProjectedCRS crs  = (DefaultProjectedCRS) parser.parseObject(wkt);
-        double d = CRS.distance(new Coordinate(1402848.1938534670, 651571.1729878788),
-                                new Coordinate(1389481.3104009738, 641990.9430108378), crs);
-        double realValue = 16451.33114;
-        assertTrue( Math.abs(d-realValue) < 0.1 );
     }
 }

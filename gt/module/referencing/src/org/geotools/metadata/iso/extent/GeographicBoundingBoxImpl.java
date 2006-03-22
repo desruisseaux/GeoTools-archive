@@ -36,6 +36,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.measure.AngleFormat;
@@ -77,6 +78,14 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         world.freeze();
         WORLD = world;
     }
+
+    /**
+     * A set of hints used in order to fetch lenient coordinate operation factory. We accept
+     * lenient transforms because {@link GeographicBoundingBox} are usually for approximative
+     * bounds (e.g. the area of validity of some CRS). If a user wants accurate bounds, he
+     * should probably use an {@link Envelope} with the appropriate CRS.
+     */
+    private static final Hints LENIENT = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
 
     /**
      * The western-most coordinate of the limit of the dataset extent.
@@ -133,11 +142,12 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         // TODO: use a more direct way if we add a 'getCRS()' method straight into Envelope.
         final CoordinateReferenceSystem crs = envelope.getLowerCorner().getCoordinateReferenceSystem();
         if (crs != null) {
-            if (!CRSUtilities.equalsIgnoreMetadata(CRSUtilities.getSubCRS(crs,0,2), DefaultGeographicCRS.WGS84) &&
-                !CRSUtilities.equalsIgnoreMetadata(CRSUtilities.getSubCRS(crs,0,3), DefaultGeographicCRS.WGS84_3D))
+            if (!startsWith(crs, DefaultGeographicCRS.WGS84) &&
+                !startsWith(crs, DefaultGeographicCRS.WGS84_3D))
             {
-                final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory(null);
                 final CoordinateOperation operation;
+                final CoordinateOperationFactory factory;
+                factory = FactoryFinder.getCoordinateOperationFactory(LENIENT);
                 try {
                     operation = factory.createOperation(crs, DefaultGeographicCRS.WGS84);
                 } catch (FactoryException exception) {
@@ -151,6 +161,17 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
             setSouthBoundLatitude(envelope.getMinimum(1));
             setNorthBoundLatitude(envelope.getMaximum(1));
         }
+    }
+
+    /**
+     * Returns {@code true} if the specified {@code crs} starts with the specified {@code head}.
+     */
+    private static final boolean startsWith(final CoordinateReferenceSystem crs,
+                                            final CoordinateReferenceSystem head)
+    {
+        final int dimension = head.getCoordinateSystem().getDimension();
+        return crs.getCoordinateSystem().getDimension()>=dimension &&
+               CRSUtilities.equalsIgnoreMetadata(CRSUtilities.getSubCRS(crs,0,dimension), head);
     }
 
     /**

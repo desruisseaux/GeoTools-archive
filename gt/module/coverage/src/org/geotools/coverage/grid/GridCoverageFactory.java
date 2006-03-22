@@ -53,6 +53,7 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -103,6 +104,7 @@ public class GridCoverageFactory extends AbstractFactory {
      * instead.
      */
     public GridCoverageFactory() {
+        this(null);
     }
 
     /**
@@ -111,18 +113,31 @@ public class GridCoverageFactory extends AbstractFactory {
      * <p>
      * <ul>
      *   <li>{@link Hints#DEFAULT_COORDINATE_REFERENCE_SYSTEM}</li>
+     *   <li>{@link Hints#TILE_ENCODING}</li>
      * </ul>
      */
     public GridCoverageFactory(final Hints hints) {
+        CoordinateReferenceSystem defaultCRS   = null;
+        String                    tileEncoding = null;
         if (hints != null) {
-            Object value;
-            value = hints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
-            if (value!=null && !value.equals(DefaultGeographicCRS.WGS84) &&
-                               !value.equals(DefaultGeographicCRS.WGS84_3D))
+            // TODO: remove casts when we will be allowed to compile for J2SE 1.5.
+            defaultCRS = (CoordinateReferenceSystem) hints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+            if (Utilities.equals(defaultCRS, DefaultGeographicCRS.WGS84) ||
+                Utilities.equals(defaultCRS, DefaultGeographicCRS.WGS84_3D))
             {
-                this.hints.put(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM, value);
+                // Will be handled in a special way by getDefaultCRS(int)
+                defaultCRS = null;
+            }
+            tileEncoding = (String) hints.get(Hints.TILE_ENCODING);
+            if (tileEncoding != null) {
+                tileEncoding = tileEncoding.trim();
+                if (tileEncoding.length() == 0) {
+                    tileEncoding = null;
+                }
             }
         }
+        this.hints.put(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM, defaultCRS  );
+        this.hints.put(Hints.TILE_ENCODING,                       tileEncoding);
     }
 
     /**
@@ -628,7 +643,10 @@ public class GridCoverageFactory extends AbstractFactory {
             final int dimension = gridGeometry.getDimension();
             gridGeometry = new GridGeometry2D(gridGeometry, getDefaultCRS(dimension));
         }
-        return new GridCoverage2D(name, PlanarImage.wrapRenderedImage(image),
-                                  gridGeometry, bands, sources, properties);
+        final GridCoverage2D coverage;
+        coverage = new GridCoverage2D(name, PlanarImage.wrapRenderedImage(image),
+                                      gridGeometry, bands, sources, properties);
+        coverage.tileEncoding = (String) hints.get(Hints.TILE_ENCODING);
+        return coverage;
     }
 }

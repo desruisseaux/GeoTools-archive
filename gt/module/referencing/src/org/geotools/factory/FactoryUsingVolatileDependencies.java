@@ -41,6 +41,11 @@ package org.geotools.factory;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated This class should be a marker interface instead of an {@code AbstractFactory}
+ *             subclass. We will make this change in a future version. When this change is
+ *             done, {@link org.geotools.referencing.factory.AllAuthoritiesFactory} should
+ *             implement this interface.
  */
 public class FactoryUsingVolatileDependencies extends AbstractFactory {
     /**

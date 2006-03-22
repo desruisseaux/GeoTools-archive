@@ -25,29 +25,31 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 // OpenGIS dependencies
+import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;         // For javadoc
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.CoordinateOperation;        // For javadoc
 import org.opengis.referencing.operation.CoordinateOperationFactory; // For javadoc
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.AllAuthoritiesFactory;       // For javadoc
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.util.GenericName;
-
-// JTS dependencies (to be removed)
-import com.vividsolutions.jts.geom.Coordinate;
 
 
 /**
@@ -103,7 +105,7 @@ public final class CRS {
          * @param factory
          * @return Value created using the Factory, visit returns a list of these
          */
-        public Object  factory( CoordinateOperationFactory factory ) throws FactoryException;
+        public Object factory( CoordinateOperationFactory factory ) throws FactoryException;
     }
 
     /**
@@ -125,7 +127,7 @@ public final class CRS {
      */
     public static boolean equalsIgnoreMetadata(final Object object1, final Object object2) {
         // TODO: Copy the implementation from CRSUtilities there.
-        return org.geotools.resources.CRSUtilities.equalsIgnoreMetadata(object1, object2);
+        return CRSUtilities.equalsIgnoreMetadata(object1, object2);
     }
 
     /**
@@ -377,61 +379,86 @@ public final class CRS {
     /**
      * Returns the valid area bounding box for the specified coordinate reference system, or
      * {@code null} if unknown. This method search in the metadata informations associated with
-     * the given CRS.
+     * the given CRS. The returned envelope is expressed in terms of the specified CRS.
      *
      * @param  crs The coordinate reference system, or {@code null}.
-     * @return The envelope, or {@code null} if none.
+     * @return The envelope in terms of the specified CRS, or {@code null} if none.
      *
      * @since 2.2
      */
-    public static Envelope getEnvelope(final CoordinateReferenceSystem crs) {
-        // TODO: Copy the implementation from CRSUtilities there.
-        return org.geotools.resources.CRSUtilities.getEnvelope(crs);
+    public static Envelope getEnvelope(CoordinateReferenceSystem crs) {
+        Envelope envelope = getGeographicEnvelope(crs);
+        if (envelope != null) {
+            // TODO: Use a more direct method if we provide such method in a future GeoAPI version.
+            final CoordinateReferenceSystem sourceCRS;
+            sourceCRS = envelope.getUpperCorner().getCoordinateReferenceSystem();
+            if (sourceCRS != null) try {
+                crs = CRSUtilities.getCRS2D(crs);
+                if (!equalsIgnoreMetadata(sourceCRS, crs)) {
+                    final GeneralEnvelope e;
+                    e = CRSUtilities.transform(transform(sourceCRS, crs, true), envelope);
+                    e.setCoordinateReferenceSystem(crs);
+                    envelope = e;
+                }
+            } catch (FactoryException exception) {
+                /*
+                 * No transformation path was found for the specified CRS. Logs a warning and
+                 * returns null, since it is a legal return value according this method contract.
+                 */
+                envelope = null;
+                Utilities.unexpectedException("org.geotools.referencing", "CRS",
+                                              "getEnvelope", exception);
+            } catch (TransformException exception) {
+                /*
+                 * The envelope is probably outside the range of validity for this CRS.
+                 * It should not occurs, since the envelope is supposed to describe the
+                 * CRS area of validity. Logs a warning and returns null, since it is a
+                 * legal return value according this method contract.
+                 */
+                envelope = null;
+                Utilities.unexpectedException("org.geotools.referencing", "CRS",
+                                              "getEnvelope", exception);
+            }        
+        }
+        return envelope;
     }
 
     /**
-     * ESTIMATE the distance between the two points.
-     *    1. transforms both points to lat/lon
-     *    2. find the distance between the two points
-     * 
-     *  NOTE: we're using ellipsoid calculations.
-     * 
-     * @param p1   first point
-     * @param p2   second point
-     * @param crs  reference system the two points are in
-     * @return approximate distance between the two points, in meters
+     * Returns the valid area bounding box for the specified coordinate reference system, or
+     * {@code null} if unknown. This method search in the metadata informations associated with
+     * the given CRS. The returned envelope is always expressed in terms of the
+     * {@linkplain DefaultGeographicCRS#WGS_84 WGS 84} CRS.
      *
-     * @deprecated Moved to {@link org.geotools.geometry.jts.JTS#orthodromicDistance} (in the
-     *             main module) in order to avoid JTS dependency from the referencing module.
-     *             In addition, the new method should be slightly more efficient and accurate,
-     *             and the method signature (including the exception clause) is more specific.
+     * @param  crs The coordinate reference system, or {@code null}.
+     * @return The envelope, or {@code null} if none.
      */
-    public static double distance(Coordinate p1, Coordinate p2, CoordinateReferenceSystem crs) throws Exception
-	{
-    	GeodeticCalculator gc = new GeodeticCalculator() ;  // WGS84
-    	
-    	double[] cs        = new double[4];
-    	double[] csLatLong = new double[4];
-    	cs[0] = p1.x;
-    	cs[1] = p1.y;
-    	cs[2] = p2.x;
-    	cs[3] = p2.y;    	 
-         
-    	MathTransform transform = distanceOperationFactory.createOperation(crs,DefaultGeographicCRS.WGS84).getMathTransform();
-    	transform.transform(cs, 0, csLatLong, 0, 2);
-    	   //these could be backwards depending on what WSG84 you use
-    	gc.setAnchorPoint(csLatLong[0],csLatLong[1]);
-    	gc.setDestinationPoint(csLatLong[2],csLatLong[3]);
-    
-    	return gc.getOrthodromicDistance();
+    private static Envelope getGeographicEnvelope(final CoordinateReferenceSystem crs) {
+        // TODO: Copy the implementation from CRSUtilities there.
+        return CRSUtilities.getEnvelope(crs);
     }
 
     /**
-     * @deprecated To be deleted once {@link #distance} will be removed from this method.
+     * Returns the valid geographic area for the specified coordinate reference system, or
+     * {@code null} if unknown. This method search in the metadata informations associated
+     * with the given CRS.
+     *
+     * @param  crs The coordinate reference system, or {@code null}.
+     * @return The geographic area, or {@code null} if none.
+     *
+     * @since 2.3
      */
-    private final static CoordinateOperationFactory distanceOperationFactory;
-    static {
-        Hints hints=new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-        distanceOperationFactory=FactoryFinder.getCoordinateOperationFactory(hints);
+    public static GeographicBoundingBox getGeographicBoundingBox(final CoordinateReferenceSystem crs) {
+        final Envelope envelope = getGeographicEnvelope(crs);
+        if (envelope != null) try {
+            return new GeographicBoundingBoxImpl(envelope);
+        } catch (TransformException exception) {
+            /*
+             * Should not occurs, since envelopes are usually already in geographic coordinates.
+             * If it occurs anyway, returns null since it is allowed by this method contract.
+             */
+            Utilities.unexpectedException("org.geotools.referencing", "CRS",
+                                          "getGeographicBoundingBox", exception);
+        }
+        return null;
     }
 }

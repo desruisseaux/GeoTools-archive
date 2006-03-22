@@ -89,6 +89,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.util.SimpleInternationalString;
 
@@ -297,7 +298,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * <var>z</var>) or 4D (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>).
      * The {@linkplain #getDimension number of dimensions} of the coverage is the
      * number of entries in the list of dimension names.
-     *
+     * <p>
      * The default implementation ask for {@linkplain CoordinateSystem coordinate system} axis
      * names, or returns "x", "y"... if this coverage has no CRS.
      *

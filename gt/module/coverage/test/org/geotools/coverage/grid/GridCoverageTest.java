@@ -47,6 +47,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.FactoryFinder;
@@ -130,10 +131,16 @@ public class GridCoverageTest extends TestCase {
     public void testSerialization() throws IOException, ClassNotFoundException {
         final GridCoverage2D coverage = getRandomCoverage();
         assertNotNull(coverage);
+        coverage.tileEncoding = null;
+        /*
+         * The previous line is not something that we should do.
+         * But we want to test the default GridCoverage2D encoding.
+         */
         final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         final ObjectOutputStream out = new ObjectOutputStream(buffer);
         try {
-            out.writeObject(coverage);
+            out.writeObject(coverage.geophysics(false));
+//          out.writeObject(coverage.geophysics(true ));
         } catch (IllegalArgumentException e) {
             /*
              * TODO: this exception occurs when ImageLayout contains a SampleModel or a ColorModel
@@ -142,6 +149,7 @@ public class GridCoverageTest extends TestCase {
              *       OperationsTest). Ignore the exception for now, but we need to revisit this
              *       issue later.
              */
+            e.printStackTrace();
             out.close();
             return;
         }
@@ -151,7 +159,10 @@ public class GridCoverageTest extends TestCase {
          */
         if (System.getProperty("java.version").compareTo("1.5") >= 0) {
             final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
-            final GridCoverage2D read = (GridCoverage2D) in.readObject();
+            GridCoverage2D read;
+            read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(false));
+//          read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(true ));
+//          assertNotSame(read, read.geophysics(true));
             in.close();
         } else {
             Logger.getLogger("org.geotools.coverage.grid")
@@ -224,10 +235,12 @@ public class GridCoverageTest extends TestCase {
             envelope.setRange(i, 10*i, 10*i+5);
         }
         envelope.setCoordinateReferenceSystem(crs);
-        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
-        final GridCoverage2D original = (GridCoverage2D)factory.create("Test", image, envelope,
-                                        new GridSampleDimension[]{band}, null, null);
+        final Hints                 hints = new Hints(Hints.TILE_ENCODING, "raw");
+        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(hints);
+        final GridCoverage2D     original = (GridCoverage2D)factory.create("Test", image, envelope,
+                                            new GridSampleDimension[]{band}, null, null);
         coverage = transform(original);
+        assertEquals("raw", original.tileEncoding);
         /*
          * Grid coverage construction finished. Now test it. Some tests will not be applicable
          * if a subclass overrided the 'transform' method are returned a transformed coverage.

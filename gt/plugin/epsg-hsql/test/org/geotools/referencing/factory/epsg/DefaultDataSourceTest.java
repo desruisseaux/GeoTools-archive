@@ -22,10 +22,7 @@ package org.geotools.referencing.factory.epsg;
 import java.util.Set;
 import java.util.Locale;
 import java.util.Iterator;
-import java.util.Collections;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.LogRecord;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,11 +35,9 @@ import javax.units.Unit;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import junit.framework.TestResult;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
-import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
@@ -59,16 +54,20 @@ import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.Transformation;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
-import org.geotools.referencing.factory.epsg.DefaultFactory;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.util.MonolineFormatter;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Arguments;
@@ -410,6 +409,29 @@ public class DefaultDataSourceTest extends TestCase {
         final Set units = factory.getAuthorityCodes(Unit.class);
         assertFalse(units.isEmpty());
         assertTrue (units.size() > 0);
+    }
+
+    /**
+     * Tests {@link CRS#getEnvelope} and {@link CRS#getGeographicBoundingBox}.
+     */
+    public void testValidArea() throws FactoryException, TransformException {
+        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("7400");
+        final GeographicBoundingBox bbox = CRS.getGeographicBoundingBox(crs);
+        assertEquals(42.25, bbox.getSouthBoundLatitude(), EPS);
+        assertEquals(51.10, bbox.getNorthBoundLatitude(), EPS);
+        assertEquals(-5.20, bbox.getWestBoundLongitude(), EPS);
+        assertEquals( 8.23, bbox.getEastBoundLongitude(), EPS);
+        final Envelope envelope = CRS.getEnvelope(crs);
+        assertEquals(46.948, envelope.getMinimum(0), 1E-3);
+        assertEquals(56.781, envelope.getMaximum(0), 1E-3);
+        assertEquals(-8.375, envelope.getMinimum(1), 1E-3);
+        assertEquals( 6.548, envelope.getMaximum(1), 1E-3);
+        assertNull(CRS.getEnvelope(null));
+        final GeographicBoundingBox rep = new GeographicBoundingBoxImpl(envelope);
+        assertEquals(42.25, rep.getSouthBoundLatitude(), 1E-3);
+        assertEquals(51.10, rep.getNorthBoundLatitude(), 1E-3);
+        assertEquals(-5.20, rep.getWestBoundLongitude(), 1E-3);
+        assertEquals( 8.23, rep.getEastBoundLongitude(), 1E-3);
     }
 
     /**

@@ -113,11 +113,6 @@
   <!-- ==================================================== -->
   <dependencies>
     <dependency>
-      <groupId>com.vividsolutions</groupId>
-      <artifactId>jts</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-    <dependency>
       <groupId>java3d</groupId>
       <artifactId>vecmath</artifactId>
       <!-- The version number is specified in the parent POM. -->

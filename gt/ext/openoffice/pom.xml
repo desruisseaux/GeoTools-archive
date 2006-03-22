@@ -76,12 +76,6 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>com.vividsolutions</groupId> <!-- TODO: Delete this dependency when the JTS dependency -->
-      <artifactId>jts</artifactId>          <!--       will be removed from the referencing module.   -->
-      <scope>provided</scope>  <!-- Hack for avoiding inclusion of JTS dependencies -->
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-    <dependency>
       <groupId>hsqldb</groupId>        <!-- Overrides the HSQL dependency (from gt2-epsg-hsql) with -->
       <artifactId>hsqldb</artifactId>  <!-- "provided" scope instead of "runtime", because the HSQL -->
       <scope>provided</scope>          <!-- engine is already included in OpenOffice environment.   -->

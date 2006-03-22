@@ -20,6 +20,7 @@ package org.geotools.factory;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Collections;
 import javax.imageio.spi.RegisterableService;
@@ -65,28 +66,27 @@ import org.geotools.resources.i18n.ErrorKeys;
  * <p>
  * {@code AbstractFactory} do <strong>not</strong> provides any facility for the first case.
  * Factories implementations shall inspect themselves all relevant hints supplied by the user,
- * and pass them to any dependencies. Do <strong>not</strong> uses the {@link #hints} field for
- * that; uses the hints provided by the user in the constructor. If all dependencies are created
+ * and pass them to any dependencies. Do <strong>not</strong> use the {@link #hints} field for
+ * that; use the hints provided by the user in the constructor. If all dependencies are created
  * at construction time (<cite>constructor injection</cite>), there is no need to keep user's hints
  * once the construction is finished.
  * <p>
  * The {@link #hints} field is for the second case only. Implementations shall copy in this
- * field only the user's hints that are know to be relevant to this factory. Only direct
- * dependencies shall be put in the {@link #hints} map. Indirect dependencies (i.e. hints used
- * by other factories used by this factory) will be inspected automatically by
- * {@link FactoryRegistry} in a recursive way.
+ * field only the user's hints that are know to be relevant to this factory. If a hint is
+ * relevant but the user didn't specified any value, the hint key should be added to the
+ * {@link #hints} map anyway with a {@code null} value. Only direct dependencies shall be put
+ * in the {@link #hints} map. Indirect dependencies (i.e. hints used by other factories used
+ * by this factory) will be inspected automatically by {@link FactoryRegistry} in a recursive way.
  * <p>
- * The lack of constructor expecting a {@link Map} argument is intentional. Implementations
- * should not copy blindly all user-supplied hints into the {@link #hints} field. Instead, they
- * should pickup only the relevant hints and {@linkplain Map#put put} them in the {@link #hints}
- * field. An exception to this rule is when not all factories can be created at construction time.
- * In this case, all user-supplied hints must be kept.
+ * <strong>Note:</strong> The lack of constructor expecting a {@link Map} argument is intentional.
+ * This is in order to discourage blind-copy of all user-supplied hints to the {@link #hints} map.
  * <p>
  * <strong>Example:</strong> Lets two factories, A and B. Factory A need an instance of Factory B.
  * Factory A can be implemented as below:
  *
- * <table><tr><td>
- * <blockquote><pre>
+ * <table border='1'>
+ * <tr><th>Code</th><th>Observations</th></tr>
+ * <tr><td><blockquote><pre>
  * class FactoryA extends AbstractFactory {
  *     FactoryB fb;
  *
@@ -95,9 +95,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  *         this.hints.put(Hints.FACTORY_B, fb);
  *     }
  * }
- * </pre></blockquote>
- * </td><td>
- * <strong>Observations:</strong>
+ * </pre></blockquote></td>
+ * <td>
  * <ul>
  *   <li>The user-supplied map ({@code userHints}) is never modified.</li>
  *   <li>All hints relevant to other factories are used in the constructor. Hints relevant to
@@ -150,14 +149,16 @@ public class AbstractFactory implements Factory, RegisterableService {
      * filled by subclasses at construction time. If possible, constructors should not copy blindly
      * all user-provided hints. They should select only the relevant hints and resolve them as of
      * {@linkplain Factory#getImplementationHints implementation hints} contract.
-     * 
-     * <p><strong>Reminder:</strong> the primary use of this map is to check if this factory can be
-     * reused. It is not for creating new factories.</p>
-     *
-     * <p>Once the hints are accessibles to the user (this usually means when the subclass
-     * construction is finished), this map should not change anymore.</p>
+     * <p>
+     * <strong>Reminder:</strong> the primary use of this map is to check if this factory can be
+     * reused. It is not for creating new factories. This explain why this field is not an instance
+     * of {@link Hints}. An other reason is to allow for null values, as of
+     * {@linkplain Factory#getImplementationHints implementation hints} contract.
+     * <p>
+     * Once the hints are accessibles to the user (this usually means when the subclass
+     * construction is finished), this map should not change anymore.
      */
-    protected final Hints hints = new Hints(null);
+    protected final Map hints = new HashMap();
 
     /**
      * An unmodifiable view of {@link #hints}. This is the actual map to be returned

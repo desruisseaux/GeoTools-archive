@@ -66,7 +66,7 @@ import org.geotools.filter.expression.BBoxExpression;
 import org.geotools.filter.expression.Expression;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.referencing.CRS;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.RenderListener;
@@ -510,7 +510,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	  */
 	public static double calculateScale(Envelope envelope, CoordinateReferenceSystem coordinateReferenceSystem,int imageWidth,int imageHeight,double DPI) throws Exception 
 	{
-		double diagonalGroundDistance = CRS.distance(
+		double diagonalGroundDistance = JTS.orthodromicDistance(
 				            new Coordinate(envelope.getMinX(),envelope.getMinY()),
 				            new Coordinate(envelope.getMaxX(),envelope.getMaxY()),
 							coordinateReferenceSystem

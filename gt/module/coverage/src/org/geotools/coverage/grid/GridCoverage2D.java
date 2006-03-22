@@ -52,6 +52,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.units.Unit;
 
@@ -197,6 +198,13 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     private final boolean isGeophysics;
 
     /**
+     * The preferred encoding to use for serialization using the {@code writeObject} method,
+     * or {@code null} for the default encoding. This value is set by {@link GridCoverageFactory}
+     * according the hints provided to the factory.
+     */
+    String tileEncoding;
+
+    /**
      * Construct a new grid coverage with the same parameter than the specified
      * coverage. This constructor is useful when creating a coverage with
      * identical data, but in which some method has been overriden in order to
@@ -213,6 +221,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         gridGeometry     = coverage.gridGeometry;
         sampleDimensions = coverage.sampleDimensions;
         isGeophysics     = coverage.isGeophysics;
+        tileEncoding     = coverage.tileEncoding;
     }
 
     /**
@@ -1215,7 +1224,7 @@ testLinear: for (int i=0; i<numBands; i++) {
     }
 
     /**
-     * Serialize this grid coverage. Before serialization, a {@linkplain SerializableRenderedImage
+     * Serializes this grid coverage. Before serialization, a {@linkplain SerializableRenderedImage
      * serializable rendered image} is created if it was not already done.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
@@ -1227,8 +1236,23 @@ testLinear: for (int i=0; i<numBands; i++) {
             if (source instanceof SerializableRenderedImage) {
                 serializedImage = (SerializableRenderedImage) source;
             } else {
+                if (tileEncoding == null) {
+                    // Note: "gzip" seems to throws an EOFException during deserialization
+                    //       when used with DataBuffer.TYPE_FLOAT.
+                    switch (source.getSampleModel().getDataType()) {
+                        case DataBuffer.TYPE_FLOAT:     // Fall through
+                        case DataBuffer.TYPE_DOUBLE:    // Fall through
+                        case DataBuffer.TYPE_UNDEFINED: tileEncoding = "raw";  break;
+                        default:                        tileEncoding = "gzip"; break;
+                    }
+                }
                 serializedImage = new SerializableRenderedImage(source, false, null,
-                                                                "gzip", null, null);
+                                                                tileEncoding, null, null);
+                final LogRecord record = Logging.format(Level.FINE,
+                        LoggingKeys.CREATED_SERIALIZABLE_IMAGE_$2, getName(), tileEncoding);
+                record.setSourceClassName("GridCoverage2D");
+                record.setSourceMethodName("writeObject");
+                LOGGER.log(record);
             }
         }
         out.defaultWriteObject();

@@ -91,30 +91,30 @@ public interface Factory {
      * hints provided here are usually not suitable for creating new factories, unless the
      * implementation make some additional garantees (e.g.
      * {@link FactoryUsingVolatileDependencies}).
-     *
-     * <p>The primary purpose of this method is to determine if an <strong>existing</strong>
+     * <p>
+     * The primary purpose of this method is to determine if an <strong>existing</strong>
      * factory instance can be reused for a set of user-supplied hints. This method is invoked by
      * {@link FactoryRegistry} in order to compare this factory's hints against user's hints.
      * This is dependency introspection only; {@code FactoryRegistry} <strong>never</strong>
-     * invokes this method for creating new factories.</p>
-     *
-     * <p>Keys are usually static constants from the {@link Hints} class, while values are
+     * invokes this method for creating new factories.
+     * <p>
+     * Keys are usually static constants from the {@link Hints} class, while values are
      * instances of some key-dependent class. The {@linkplain Map#keySet key set} must contains
      * at least all hints impacting functionality. While the key set may contains all hints
      * supplied by the user, it is recommended to limit the set to only the hints used by this
      * particular factory instance. A minimal set will helps {@link FactoryRegistry} to compares
-     * only hints that matter and avoid the creation of unnecessary instances of this factory.</p>
-     * 
-     * <p>The hint values may be different than the one supplied by the user. If a user supplied a
+     * only hints that matter and avoid the creation of unnecessary instances of this factory.
+     * <p>
+     * The hint values may be different than the one supplied by the user. If a user supplied a
      * hint as a {@link Class} object, this method shall replace it by the actual instance used, if
-     * possible.</p>
-     *
-     * <p>Implementations of this method are usually quite simple. For example if a
+     * possible.
+     * <p>
+     * Implementations of this method are usually quite simple. For example if a
      * {@linkplain org.opengis.referencing.datum.DatumAuthorityFactory datum authority factory}
      * uses an ordinary {@linkplain org.opengis.referencing.datum.DatumFactory datum factory},
      * its method could be implemented as below (note that we should not check if the datum
      * factory is null, since key with null value is the expected behaviour in this case).
-     * Example:</p>
+     * Example:
      *
      * <pre><code>
      * Map hints = new HashMap();

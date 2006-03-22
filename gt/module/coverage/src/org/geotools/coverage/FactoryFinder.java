@@ -76,6 +76,9 @@ public final class FactoryFinder {
      * @return The first grid coverage factory that matches the supplied hints.
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link GridCoverageFactory} interface.
+     *
+     * @see Hints#DEFAULT_COORDINATE_REFERENCE_SYSTEM
+     * @see Hints#TILE_ENCODING
      */
     public static synchronized GridCoverageFactory getGridCoverageFactory(final Hints hints)
             throws FactoryRegistryException

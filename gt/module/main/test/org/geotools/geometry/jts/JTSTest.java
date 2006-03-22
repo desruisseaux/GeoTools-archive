@@ -29,7 +29,9 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
+import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 
@@ -72,6 +74,26 @@ public class JTSTest extends TestCase {
                 "    PARAMETER[\"Scale_Factor\",0.9996],\n"              +
                 "    PARAMETER[\"Latitude_Of_Origin\",0],\n"             +
                 "  UNIT[\"Meter\",1]]";
+    /**
+     * A CRS for testing purpose.
+     */
+    static final String NAD83_BC =
+                "PROJCS[\"NAD83 / BC Albers\",\n"                                                  +
+                "  GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",\n"                        +
+                "    SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],\n" +
+                "    TOWGS84[0,0,0],AUTHORITY[\"EPSG\",\"6269\"]],\n"                              +
+                "    PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],\n"                      +
+                "    UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],\n"         +
+                "    AUTHORITY[\"EPSG\",\"4269\"]],\n"                                             +
+                "  PROJECTION[\"Albers_Conic_Equal_Area\"],\n"                                     +
+                "  PARAMETER[\"standard_parallel_1\",50],\n"                                       +
+                "  PARAMETER[\"standard_parallel_2\",58.5],\n"                                     +
+                "  PARAMETER[\"latitude_of_center\",45],\n"                                        +
+                "  PARAMETER[\"longitude_of_center\",-126],\n"                                     +
+                "  PARAMETER[\"false_easting\",1000000],\n"                                        +
+                "  PARAMETER[\"false_northing\",0],\n"                                             +
+                "  UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],\n"                              +
+                "  AUTHORITY[\"EPSG\",\"3005\"]]";
 
     /**
      * Run the suite from the command line.
@@ -144,5 +166,17 @@ public class JTSTest extends TestCase {
         assertEquals(-123, envelope.getMaxX(), EPS);
         assertEquals(  55, envelope.getMinY(), 0.5);
         assertEquals(  60, envelope.getMaxY(), 0.5);
+    }
+
+    /**
+     * Tests the distance between points function
+     */
+    public void testOrthodromicDistance() throws Exception {
+        final Parser parser = new Parser();
+        final DefaultProjectedCRS crs  = (DefaultProjectedCRS) parser.parseObject(NAD83_BC);
+        double d = JTS.orthodromicDistance(new Coordinate(1402848.1938534670, 651571.1729878788),
+                                           new Coordinate(1389481.3104009738, 641990.9430108378), crs);
+        double realValue = 16451.33114;
+        assertEquals(realValue, d, 0.1);
     }
 }
