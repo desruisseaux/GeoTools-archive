@@ -603,7 +603,7 @@ public class LabelCacheDefault implements LabelCache {
 		
 		 displacementX = ( anchorX* (-textBounds.getWidth()))
 	        + textStyle.getDisplacementX();
-	     displacementY = (anchorY * (textBounds.getHeight()))
+	     displacementY += (anchorY * (textBounds.getHeight()))
 	        - textStyle.getDisplacementY();
 	    
           
