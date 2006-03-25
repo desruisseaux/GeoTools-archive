@@ -149,7 +149,9 @@ public class GridCoverageTest extends TestCase {
              *       OperationsTest). Ignore the exception for now, but we need to revisit this
              *       issue later.
              */
-            e.printStackTrace();
+            if (getClass().equals(GridCoverageTest.class)) {
+                e.printStackTrace();
+            }
             out.close();
             return;
         }

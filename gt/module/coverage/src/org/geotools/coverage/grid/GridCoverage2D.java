@@ -202,7 +202,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * or {@code null} for the default encoding. This value is set by {@link GridCoverageFactory}
      * according the hints provided to the factory.
      */
-    String tileEncoding;
+    transient String tileEncoding;
 
     /**
      * Construct a new grid coverage with the same parameter than the specified
@@ -1237,14 +1237,7 @@ testLinear: for (int i=0; i<numBands; i++) {
                 serializedImage = (SerializableRenderedImage) source;
             } else {
                 if (tileEncoding == null) {
-                    // Note: "gzip" seems to throws an EOFException during deserialization
-                    //       when used with DataBuffer.TYPE_FLOAT.
-                    switch (source.getSampleModel().getDataType()) {
-                        case DataBuffer.TYPE_FLOAT:     // Fall through
-                        case DataBuffer.TYPE_DOUBLE:    // Fall through
-                        case DataBuffer.TYPE_UNDEFINED: tileEncoding = "raw";  break;
-                        default:                        tileEncoding = "gzip"; break;
-                    }
+                    tileEncoding = "gzip";
                 }
                 serializedImage = new SerializableRenderedImage(source, false, null,
                                                                 tileEncoding, null, null);
