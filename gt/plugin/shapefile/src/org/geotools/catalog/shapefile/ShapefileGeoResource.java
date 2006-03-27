@@ -15,24 +15,26 @@
  */
 package org.geotools.catalog.shapefile;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.geotools.catalog.AbstractGeoResource;
 import org.geotools.catalog.GeoResource;
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.catalog.Service;
 import org.geotools.catalog.defaults.DefaultGeoResourceInfo;
 import org.geotools.data.DataStore;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -124,17 +126,20 @@ public class ShapefileGeoResource extends AbstractGeoResource {
                             if (bounds == null) {
                                 bounds = new ReferencedEnvelope(new Envelope(),
                                         crs);
-
-                                for (FeatureReader iter = getFeatureSource(
-                                            monitor).getFeatures().reader();
-                                        iter.hasNext();) {
-                                    Feature element = iter.next();
-
+                                FeatureIterator reader = getFeatureSource( monitor).getFeatures().features();
+                                try{
+                                while( reader.hasNext() ) {
+                                    Feature element = reader.next();
+                                
                                     if (bounds.isNull()) {
                                         bounds.init(element.getBounds());
                                     } else {
                                         bounds.expandToInclude(element.getBounds());
                                     }
+                                }
+                                }
+                                finally {
+                                	reader.close();
                                 }
                             }
                         } catch (Exception e) {

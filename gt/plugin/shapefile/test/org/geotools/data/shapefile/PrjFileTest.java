@@ -34,7 +34,7 @@ public class PrjFileTest extends TestCaseSupport {
   
   static final String TEST_FILE = "wkt/cntbnd01.prj";
   
-  private PrjFileReader prj = null;
+  protected PrjFileReader prj = null;
   
   public PrjFileTest(String testName) throws IOException {
     super(testName);

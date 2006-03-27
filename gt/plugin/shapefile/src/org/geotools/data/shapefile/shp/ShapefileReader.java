@@ -621,7 +621,8 @@ public class ShapefileReader {
 	private int readRecord() throws IOException {
 		if (!fillBuffer())
 			return -1;
-		int recordnumber = buffer.getInt();
+		// burn the record number
+		buffer.getInt();
 		if (!fillBuffer())
 			return -1;
 		int recordlength = buffer.getInt() * 2;

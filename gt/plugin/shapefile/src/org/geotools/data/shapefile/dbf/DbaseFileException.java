@@ -7,7 +7,9 @@ import org.geotools.data.DataSourceException;
  * @source $URL$
  */
 public class DbaseFileException extends DataSourceException {
-    public DbaseFileException(String s){
+
+	private static final long serialVersionUID = -6890880438911014652L;
+	public DbaseFileException(String s){
         super(s);
     }
     public DbaseFileException(String s,Throwable cause){

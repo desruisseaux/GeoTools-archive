@@ -126,8 +126,6 @@ public class MultiPointHandler implements ShapeHandler {
   public void write(ByteBuffer buffer, Object geometry) {
     MultiPoint mp = (MultiPoint) geometry;
     
-    int p = buffer.position();
-    
     Envelope box = mp.getEnvelopeInternal();
     buffer.putDouble(box.getMinX());
     buffer.putDouble(box.getMinY());

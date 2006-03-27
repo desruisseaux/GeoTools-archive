@@ -476,9 +476,9 @@ public class DbaseFileReader {
 					int tempDay = Integer.parseInt(tempString);
 					Calendar cal = Calendar.getInstance();
 					cal.clear();
-					cal.set(cal.YEAR, tempYear);
-					cal.set(cal.MONTH, tempMonth);
-					cal.set(cal.DAY_OF_MONTH, tempDay);
+					cal.set(Calendar.YEAR, tempYear);
+					cal.set(Calendar.MONTH, tempMonth);
+					cal.set(Calendar.DAY_OF_MONTH, tempDay);
 					object = cal.getTime();
 				} catch (NumberFormatException nfe) {
 					// todo: use progresslistener, this isn't a grave error.

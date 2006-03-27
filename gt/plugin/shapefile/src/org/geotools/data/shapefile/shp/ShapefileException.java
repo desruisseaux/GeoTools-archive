@@ -28,7 +28,9 @@ import org.geotools.data.DataSourceException;
  */
 public class ShapefileException extends DataSourceException {
 
-    public ShapefileException(String s) {
+	private static final long serialVersionUID = -6523799964553991364L;
+
+	public ShapefileException(String s) {
         super(s);
     }
     

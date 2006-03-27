@@ -144,9 +144,12 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
         FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
         FeatureReader reader = one.reader();
         
-        
+        try{
         store.addFeatures(reader);
-
+        }finally{
+        	reader.close();
+        }
+        
         s = new IndexedShapefileDataStore(tmp.toURL());
         typeName = s.getTypeNames()[0];
 

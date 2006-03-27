@@ -431,9 +431,9 @@ public class DbaseFileHeader {
       tempUpdateYear = tempUpdateYear + 2000;
     }
     Calendar c = Calendar.getInstance();
-    c.set(c.YEAR, tempUpdateYear);
-    c.set(c.MONTH, tempUpdateMonth-1);
-    c.set(c.DATE, tempUpdateDay);
+    c.set(Calendar.YEAR, tempUpdateYear);
+    c.set(Calendar.MONTH, tempUpdateMonth-1);
+    c.set(Calendar.DATE, tempUpdateDay);
     date = c.getTime();
     
     // read the number of records.
@@ -551,9 +551,9 @@ public class DbaseFileHeader {
     // write the date stuff
     Calendar c = Calendar.getInstance();
     c.setTime(new Date());
-    buffer.put( (byte) (c.get(c.YEAR) % 100));
-    buffer.put( (byte) (c.get(c.MONTH)+1));
-    buffer.put( (byte) (c.get(c.DAY_OF_MONTH)));
+    buffer.put( (byte) (c.get(Calendar.YEAR) % 100));
+    buffer.put( (byte) (c.get(Calendar.MONTH)+1));
+    buffer.put( (byte) (c.get(Calendar.DAY_OF_MONTH)));
     
     // write the number of records in the datafile.
     buffer.putInt(recordCnt);

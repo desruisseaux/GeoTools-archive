@@ -65,6 +65,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.geometry.jts.JTS;
@@ -775,18 +776,21 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         copyAndDelete(shpURL, temp);
         copyAndDelete(shxURL, temp);
         copyAndDelete(dbfURL, temp);
-        copyAndDelete(prjURL, temp);
+        if (!prjURL.equals("")) {
+			copyAndDelete(prjURL, temp);
+		}
     }
 
     /**
-     * Gets the bounding box of the file represented by this data store as a
-     * whole (that is, off all of the features in the shapefile)
-     *
-     * @return The bounding box of the datasource or null if unknown and too
-     *         expensive for the method to calculate.
-     *
-     * @throws DataSourceException DOCUMENT ME!
-     */
+	 * Gets the bounding box of the file represented by this data store as a
+	 * whole (that is, off all of the features in the shapefile)
+	 * 
+	 * @return The bounding box of the datasource or null if unknown and too
+	 *         expensive for the method to calculate.
+	 * 
+	 * @throws DataSourceException
+	 *             DOCUMENT ME!
+	 */
     private Envelope getBounds() throws DataSourceException {
         // This is way quick!!!
         ReadableByteChannel in = null;
@@ -969,8 +973,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             Filter f = type.getRestriction();
 
             if ((f != null) && (f != Filter.ALL) && (f != Filter.NONE)
-                    && ((f.getFilterType() == f.COMPARE_LESS_THAN)
-                    || (f.getFilterType() == f.COMPARE_LESS_THAN_EQUAL))) {
+                    && ((f.getFilterType() == FilterType.COMPARE_LESS_THAN)
+                    || (f.getFilterType() == FilterType.COMPARE_LESS_THAN_EQUAL))) {
                 try {
                     CompareFilter cf = (CompareFilter) f;
 
@@ -1136,7 +1140,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
         public void close() throws IOException {
             try {
-                shp.close();
+            	if( shp != null ){
+            		shp.close();
+            	}
 
                 if (dbf != null) {
                     dbf.close();

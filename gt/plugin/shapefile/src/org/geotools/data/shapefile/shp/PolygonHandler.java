@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.algorithm.RobustCGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -90,7 +91,6 @@ public class PolygonHandler implements ShapeHandler {
     if (geometry instanceof MultiPolygon) {
       multi = (MultiPolygon) geometry;
     } else {
-      Geometry g = (Geometry) geometry;
       multi = geometryFactory.createMultiPolygon(new Polygon[] { (Polygon) geometry });
     }
     
@@ -184,7 +184,7 @@ public class PolygonHandler implements ShapeHandler {
       if(points.length == 0 || points.length > 3){ 
           LinearRing ring = geometryFactory.createLinearRing(points);
 
-          if (cga.isCCW(points)) {
+          if (CGAlgorithms.isCCW(points)) {
             // counter-clockwise
             holes.add(ring);
           } else {
@@ -306,7 +306,7 @@ public class PolygonHandler implements ShapeHandler {
           Coordinate[] coordList = tryRing.getCoordinates();
           
           if ( tryEnv.contains(testEnv) && 
-            (cga.isPointInRing(testPt, coordList) || (pointInList(testPt, coordList)))) {
+            (CGAlgorithms.isPointInRing(testPt, coordList) || (pointInList(testPt, coordList)))) {
             isContained = true;
           }
           
@@ -355,7 +355,6 @@ public class PolygonHandler implements ShapeHandler {
     if (geometry instanceof MultiPolygon) {
       multi = (MultiPolygon) geometry;
     } else {
-      Geometry g = (Geometry) geometry;
       multi = geometryFactory.createMultiPolygon(new Polygon[] { (Polygon) geometry });
     }
     

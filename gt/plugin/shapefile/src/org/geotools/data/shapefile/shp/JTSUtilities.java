@@ -161,7 +161,7 @@ public class JTSUtilities {
 
     coords = p.getExteriorRing().getCoordinates();
     
-    if(cga.isCCW(coords)) {
+    if(CGAlgorithms.isCCW(coords)) {
       outer = reverseRing((LinearRing) p.getExteriorRing());
     } else {
       outer = (LinearRing) p.getExteriorRing();
@@ -170,7 +170,7 @@ public class JTSUtilities {
     for(int t = 0,tt = p.getNumInteriorRing(); t < tt; t++) {
       coords = p.getInteriorRingN(t).getCoordinates();
       
-      if(!(cga.isCCW(coords))) {
+      if(!(CGAlgorithms.isCCW(coords))) {
         holes[t] = reverseRing((LinearRing) p.getInteriorRingN(t));
       } else {
         holes[t] = (LinearRing) p.getInteriorRingN(t);

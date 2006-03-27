@@ -165,8 +165,19 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         FeatureStore store = (FeatureStore) s.getFeatureSource(type
                 .getTypeName());
         FeatureReader reader = one.reader();
-            store.addFeatures(reader);
+        assertNotNull( reader );
+        try {
+			store.addFeatures(reader);
+		} finally {
+			reader.close();
+		}
 
+		try {
+		} catch (Exception e) {
+			reader.close();
+			// ignore
+		}
+                    
             s = new ShapefileDataStore(tmp.toURL());
             typeName = s.getTypeNames()[0];
             FeatureResults two = s.getFeatureSource(typeName).getFeatures();

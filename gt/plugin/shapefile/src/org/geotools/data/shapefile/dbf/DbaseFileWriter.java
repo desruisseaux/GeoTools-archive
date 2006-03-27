@@ -225,7 +225,6 @@ public class DbaseFileWriter  {
     public String getFieldString(int size, String s) {
       buffer.replace(0, size, emptyString);
       buffer.setLength(size);
-      int unit=" ".getBytes().length;
       //international characters must be accounted for so size != length.
       int maxSize=size;
       if(s != null) {

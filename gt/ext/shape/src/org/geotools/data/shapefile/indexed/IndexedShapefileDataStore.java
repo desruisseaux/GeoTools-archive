@@ -998,7 +998,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			return atts;
 		} finally {
 			try {
-				shp.close();
+				if( shp!=null)
+					shp.close();
 			} catch (IOException ioe) {
 				// do nothing
 			}
@@ -1639,6 +1640,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 			copyAndDelete(shpURL, temp);
 			copyAndDelete(shxURL, temp);
+			if (prjURL!=null && !prjURL.equals("")) {
+				copyAndDelete(prjURL, temp);
+			}
 			copyAndDelete(dbfURL, temp);
 			if( fixURL!=null )
 				copyAndDelete(fixURL, temp);
