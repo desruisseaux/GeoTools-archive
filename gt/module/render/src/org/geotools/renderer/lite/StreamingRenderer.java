@@ -1071,7 +1071,15 @@ public class StreamingRenderer implements GTRenderer {
                     for (int t=0;t<n_lfts;t++) {
                         process(feature,fts_array[t],scaleRange,at,destinationCrs);  //draw the feature on the image(s)
                     }
-                } catch (Exception e) {
+                } 
+                catch (OutOfMemoryError oom)
+				{
+                	// close is actually handled in the finally c
+                	//reader.close() ; //DJB -- if we've got an out of memory error, we pretty much have to abort what we're doing!
+                	throw oom;
+				}
+                catch (Exception e) 
+				{
                     fireErrorEvent(e);
                 }
             }
