@@ -90,7 +90,6 @@
     <module>brewer</module>
     <module>graph</module>
     <module>go</module>
-    <module>legend</module>
     <module>openoffice</module>
     <module>pickle</module>
     <module>shape</module>
