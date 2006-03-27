@@ -103,6 +103,12 @@ public class RendererUtilities
      * should be used directly without compensating for distortions in it with respect to the shape of the real Earth.
      *
      * NOTE: we are actually doing a a much more exact calculation, and accounting for non-square pixels (which are allowed in WMS)
+     * 
+     * NOTE: I noticed a bug with this -- the distance calculate can wrap "the wrong direction" around the globe. For example, for -180,-90 to 180,90 
+     *       (ie. the whole world) is actually the distance from the north to south pole because +180 and -180 are really the same thing.  This will
+     *       mean that the calculated distance is actually much less than the distance you think you're calculating.  However, this is unlikely to
+     *       actually have a big effect on your scale calculatations.
+     * 
      *
      * @param envelope
      * @param coordinateReferenceSystem
@@ -143,9 +149,11 @@ public class RendererUtilities
 	    		
 	    		if  ( (csLatLong[0] > csLatLong[2]) || (csLatLong[1] > csLatLong[3]) )
 	    		  throw new Exception ("box is backwards");	
-	    		if  ( ((csLatLong[0] <-180) || (csLatLong[0] >180)) && ((csLatLong[2] <-180) || (csLatLong[2] >180))
-		    			&& ((csLatLong[1] <-90) || (csLatLong[1] >90)) && ((csLatLong[3] <-90) || (csLatLong[3] >90))
-				     )
+	    		
+	    		Envelope e_request = new Envelope(csLatLong[0],csLatLong[2],csLatLong[1],csLatLong[3]);//x x   y y
+	    		Envelope e_world   = new Envelope(-180,180,-90,90);
+	    		
+	    		if  (!(e_request.overlaps(e_world)))
 	    			throw new Exception ("world isnt in the requested bbox");
 	    		//okay, all good.  We need to find the world bbox intersect the requested bbox
 	    		// then we're going to convert that back to the original coordinate reference system
