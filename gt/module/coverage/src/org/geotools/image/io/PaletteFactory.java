@@ -21,6 +21,10 @@ package org.geotools.image.io;
 
 // J2SE dependencies
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.image.RenderedImage;
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.awt.image.IndexColorModel;
 import java.io.BufferedReader;
 import java.io.File;
@@ -405,14 +409,61 @@ public class PaletteFactory {
     }
     
     /**
-     * Vérifie que la valeur {@code value} spécifiée
-     * est dans la plage [0..255] inclusivement.
-     *
-     * @throws ParseException si le nombre n'est pas dans la plage [0..255].
+     * Ensure that the specified valus is inside the {@code [0..255]} range.
+     * If the value is outside that range, a {@link ParseException} is thrown.
      */
     private static int byteValue(final int value) throws ParseException {
         if (value>=0 && value<256) return value;
         throw new ParseException(Errors.format(ErrorKeys.RGB_OUT_OF_RANGE_$1,
                                  new Integer(value)), 0);
+    }
+
+    /**
+     * Returns the specified color palette as an image of the specified size.
+     *
+     * @param  name The palette's name to load. This name doesn't need to contains a path
+     *              or an extension. Path and extension are set according value specified
+     *              at construction time.
+     * @param  size The image size. The palette will be vertical if
+     *              <code>size.{@linkplain Dimension#height height}</code> &gt;
+     *              <code>size.{@linkplain Dimension#width  width }</code>
+     *
+     * @since 2.3
+     */
+    public RenderedImage getImage(final String name, final Dimension size)
+            throws IOException
+    {
+        final IndexColorModel colors;
+        final BufferedImage   image;
+        final WritableRaster  raster;
+        colors = getIndexColorModel(name);
+        image  = new BufferedImage(size.width, size.height, BufferedImage.TYPE_BYTE_INDEXED, colors);
+        raster = image.getRaster();
+        int xmin   = raster.getMinX();
+        int ymin   = raster.getMinY();
+        int width  = raster.getWidth();
+        int height = raster.getHeight();
+        final boolean horizontal = size.width >= size.height;
+        // Computation will be performed as if the image were horizontal.
+        // If it is not, interchanges x and y values.
+        if (!horizontal) {
+            int tmp;
+            tmp = xmin;  xmin  = ymin;   ymin   = tmp;
+            tmp = width; width = height; height = tmp;
+        }
+        final int xmax = xmin + width;
+        final int ymax = ymin + height;
+        final double scale = (double)colors.getMapSize() / (double)width;
+        for (int x=xmin; x<xmax; x++) {
+            final int value = (int) Math.round(scale * (x-xmin));
+            for (int y=ymin; y<ymax; y++) {
+                if (horizontal) {
+                    raster.setSample(x, y, 0, value);
+                } else {
+                    raster.setSample(y, x, 0, value);
+                }
+            }
+        }
+        return image;
     }
 }
