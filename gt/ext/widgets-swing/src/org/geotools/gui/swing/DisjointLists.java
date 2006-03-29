@@ -20,6 +20,7 @@
 package org.geotools.gui.swing;
 
 // Swing and AWT dependencies
+import java.awt.Font;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -39,7 +40,10 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
 // Collections
+import java.util.Set;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,8 +80,11 @@ public class DisjointLists extends JPanel {
          * The list of elements shared by both lists. Not all elements in this list will be
          * displayed. The index of elements to shown are enumerated in the {@link #visibles}
          * array.
+         * <p>
+         * Note: this list is read by {@link DisjointLists#selectElements}. The content
+         *       of this list should never be modified from any method outside this class.
          */
-        private final List choices;
+        final List choices;
 
         /**
          * The index of valids elements in the {@link #choice} list. This array will growth
@@ -125,8 +132,19 @@ public class DisjointLists extends JPanel {
          * Returns the number of valid elements.
          */
         public int getSize() {
-            assert size>=0 && size<=choices.size();
+            assert size>=0 && size<=choices.size() : size;
             return size;
+        }
+
+        /**
+         * Returns all elements in this list.
+         */
+        public Collection getElements() {
+            final Object[] list = new Object[getSize()];
+            for (int i=0; i<list.length; i++) {
+                list[i] = ListElement.unwrap(getElementAt(i));
+            }
+            return Arrays.asList(list);
         }
 
         /**
@@ -191,6 +209,32 @@ public class DisjointLists extends JPanel {
         }
 
         /**
+         * Moves elements at the specified indices from the specified model to this model.
+         * Note: the indice array will be overwritten.
+         *
+         * @param source  The source model.
+         * @param indices Indices of elements in the source model to move.
+         */
+        public void move(final Model source, final int[] indices) {
+            Arrays.sort(indices);
+            for (int i=0; i<indices.length;) {
+                int lower = indices[i];
+                int upper = lower+1;
+                while (++i<indices.length && indices[i]==upper) {
+                    // Collapses consecutive indices in a single move operation.
+                    upper++;
+                }
+                move(source, lower, upper);
+                final int length = (upper-lower);
+                for (int j=i; j<indices.length; j++) {
+                    // Adjusts the remaining indices. Since we just moved previous
+                    // elements, the indices of remaining elements are shifted.
+                    indices[j] -= length;
+                }
+            }
+        }
+
+        /**
          * Adds all elements from the specified collection.
          */
         public void addAll(final Collection items) {
@@ -208,20 +252,14 @@ public class DisjointLists extends JPanel {
         }
 
         /**
-         * Copies all elements to the specified collection.
-         */
-        public void copy(final Collection save) {
-            save.addAll(choices);
-        }
-
-        /**
          * Removes all elements from this model.
          */
         public void clear() {
             choices.clear();
             if (size != 0) {
-                fireIntervalRemoved(this, 0, size-1);
+                final int oldSize = size;
                 size = 0;
+                fireIntervalRemoved(this, 0, oldSize-1);
             }
         }
     }
@@ -261,22 +299,7 @@ public class DisjointLists extends JPanel {
                 return;
             }
             final int[] indices = this.source.getSelectedIndices();
-            Arrays.sort(indices);
-            for (int i=0; i<indices.length;) {
-                int lower = indices[i];
-                int upper = lower+1;
-                while (++i<indices.length && indices[i]==upper) {
-                    // Collapses consecutive indices in a single move operation.
-                    upper++;
-                }
-                target.move(source, lower, upper);
-                final int length = (upper-lower);
-                for (int j=i; j<indices.length; j++) {
-                    // Adjusts the remaining indices. Since we just moved previous
-                    // elements, the indices of remaining elements are shifted.
-                    indices[j] -= length;
-                }
-            }
+            target.move(source, indices);
         }
     }
 
@@ -316,14 +339,14 @@ public class DisjointLists extends JPanel {
          * Setup buttons
          */
         final ClassLoader loader = getClass().getClassLoader();
-        final JButton add        = getButton(loader, "StepBack",    "<",  "Ajouter les éléments sélectionnés");
-        final JButton remove     = getButton(loader, "StepForward", ">",  "Retirer les éléments sélectionnés");
-        final JButton addAll     = getButton(loader, "Rewind",      "<<", "Ajouter tout");
-        final JButton removeAll  = getButton(loader, "FastForward", ">>", "Retirer tout");
-        add      .addActionListener(new Action(right, left, false));
-        remove   .addActionListener(new Action(left, right, false));
-        addAll   .addActionListener(new Action(right, left,  true));
-        removeAll.addActionListener(new Action(left, right,  true));
+        final JButton add       = getButton(loader, "StepForward", ">",  "Add selected elements");
+        final JButton remove    = getButton(loader, "StepBack",    "<",  "Remove selected elements");
+        final JButton addAll    = getButton(loader, "FastForward", ">>", "Add all");
+        final JButton removeAll = getButton(loader, "Rewind",      "<<", "Remove all");
+        add      .addActionListener(new Action(left, right, false));
+        remove   .addActionListener(new Action(right, left, false));
+        addAll   .addActionListener(new Action(left, right,  true));
+        removeAll.addActionListener(new Action(right, left,  true));
         /*
          * Build UI
          */
@@ -384,8 +407,7 @@ public class DisjointLists extends JPanel {
         if (autoSort != this.autoSort) {
             this.autoSort = autoSort;
             if (autoSort) {
-                final List elements = new ArrayList();
-                ((Model) left.getModel()).copy(elements);
+                final List elements = new ArrayList(((Model) left.getModel()).choices);
                 clear();
                 addElements(elements);
             }
@@ -439,7 +461,7 @@ public class DisjointLists extends JPanel {
         final Model left  = (Model) this.left .getModel();
         final Model right = (Model) this.right.getModel();
         if (autoSort) {
-            left.copy(list);
+            list.addAll(left.choices);
             Collections.sort(list);
             left .clear();
             right.clear();
@@ -451,12 +473,47 @@ public class DisjointLists extends JPanel {
      * Returns all elements in the list on the right side.
      */
     public Collection getSelectedElements() {
-        final Model model = (Model) right.getModel();
-        final Object[] list = new Object[model.getSize()];
-        for (int i=0; i<list.length; i++) {
-            list[i] = ListElement.unwrap(model.getElementAt(i));
+        return ((Model) right.getModel()).getElements();
+    }
+
+    /**
+     * Returns all elements in the list on the left side.
+     *
+     * @since 2.3
+     */
+    public Collection getUnselectedElements() {
+        return ((Model) left.getModel()).getElements();
+    }
+
+    /**
+     * Add the specified elements to the selection list (the one to appears on the right side). If
+     * an element specified in the {@code selected} collection has not been previously {@linkplain
+     * #addElements(Collection) added}, it will be ignored.
+     *
+     * @since 2.3
+     */
+    public void selectElements(final Collection selected) {
+        final Model source = (Model) left .getModel();
+        final Model target = (Model) right.getModel();
+        int[] indices = new int[Math.min(selected.size(), source.choices.size())];
+        int indice=0, count=0;
+        for (final Iterator it=source.choices.iterator(); it.hasNext(); indice++) {
+            if (selected.contains(ListElement.unwrap(it.next()))) {
+                indices[count++] = indice;
+            }
         }
-        return Arrays.asList(list);
+        indices = XArray.resize(indices, count);
+        target.move(source, indices);
+    }
+
+    /**
+     * Set the font for both lists on the left and right side.
+     */
+    public void setFont(final Font font) {
+        // Note: 'left' and 'right' may be null during JComponent initialisation.
+        if (left  != null) left .setFont(font);
+        if (right != null) right.setFont(font);
+        super.setFont(font);
     }
 
     /**
@@ -483,5 +540,6 @@ public class DisjointLists extends JPanel {
         final DisjointLists list = new DisjointLists();
         list.addElements(Locale.getAvailableLocales());
         list.showDialog(null, Utilities.getShortClassName(list));
+        System.out.println(list.getSelectedElements());
     }
 }

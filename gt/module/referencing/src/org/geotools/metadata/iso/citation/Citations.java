@@ -493,7 +493,7 @@ public final class Citations {
      * type} in {@code c2}. The comparaison is case-insensitive and ignores leading and trailing
      * spaces. The identifier ordering is not significant.
      * <p>
-     * If (and <em>only</em> if) thee citations do not contains any identifier, then this method
+     * If (and <em>only</em> if) the citations do not contains any identifier, then this method
      * fallback on titles comparaison using the {@link #titleMatches(Citation,Citation)
      * titleMatches} method. This fallback exists for compatibility with client codes using
      * citation {@linkplain Citation#getTitle titles} without identifiers.

@@ -106,6 +106,7 @@ public final class SwingUtilities {
             if (owner == panel) {
                 throw new IllegalArgumentException();
             }
+            // NOTE: All 'addFooListener(...)' below ignore null argument. No need to check ourself.
             if (owner instanceof JDesktopPane) {
                 final JInternalFrame frame = new JInternalFrame(title, true, true, true, true);
                 frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
