@@ -189,6 +189,22 @@ public class SLDStyleTest extends TestCase {
         //everything is equal
         assertTrue(sld2.equals(sld));
     }
+
+    public void testSLDTransformerIndentation() throws Exception {
+    	//create a simple object
+    	StyledLayerDescriptor sld = sf.createStyledLayerDescriptor();
+    	NamedLayer nl = sf.createNamedLayer();
+    	nl.setName("named_layer_1");
+    	sld.addStyledLayer(nl);
+    	//convert it to XML
+        SLDTransformer aTransformer = new SLDTransformer();
+        aTransformer.setIndentation(3); //3 spaces
+        String xml1 = aTransformer.transform(sld);
+        aTransformer.setIndentation(4); //4 spaces
+        String xml2 = aTransformer.transform(sld);
+        //generated xml contains 4 indents, so if indentation is working, the difference should be 4
+        assertEquals(xml1.length() + 4, xml2.length());
+    }
     
     public void testParseSLD_NameSpaceAware() throws Exception {
         URL surl = TestData.getResource(this, "test-ns.sld");

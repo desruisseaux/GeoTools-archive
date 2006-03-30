@@ -69,8 +69,13 @@ public abstract class TransformerBase {
     public Transformer createTransformer() throws TransformerException {
         TransformerFactory tFactory = TransformerFactory.newInstance();
         if (indentation > -1) {
-        	tFactory.setAttribute("indent-number", new Integer(indentation));
+        	try {
+        		tFactory.setAttribute("indent-number", new Integer(indentation));
+        	} catch (IllegalArgumentException e) {
+        		//throw away (java 1.4 doesn't support this method, but java 1.5 requires it)
+        	}
         }
+
         Transformer transformer = tFactory.newTransformer();
 
         if (indentation > -1) {

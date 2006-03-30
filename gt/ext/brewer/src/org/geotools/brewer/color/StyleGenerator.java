@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -68,6 +69,10 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  */
 public class StyleGenerator {
+	
+	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
+	.getLogger("org.geotools.brewer.color");
+
     private Color[] colors;
     private int numClasses;
     private Expression expression;
@@ -256,8 +261,7 @@ public class StyleGenerator {
                 	fts.addRule(rule);
             }
         } else {
-        	//TODO: toss an exception
-        	System.out.println("BOOM: classifier not found");
+        	LOGGER.log(Level.SEVERE, "Error: Classifier not found");
         }
 
     	// add an else rule to capture any missing features?
@@ -281,25 +285,6 @@ public class StyleGenerator {
                 rule[i-1] = tempRule;
         	}
         }
-        
-//        for (int i = 0; i < rule.length; i++) {
-//            String properRuleName = getRuleName(i + 1);
-//            
-//            if (!rule[i].getName().equals(properRuleName)) {
-//                // is in incorrect order, find where the rule for this index
-//                // actually is
-//                for (int j = i + 1; j < rule.length; j++) {
-//                    if (rule[j].getName().equals(properRuleName)) {
-//                        // switch the 2 rules
-//                        Rule tempRule = rule[i];
-//                        rule[i] = rule[j];
-//                        rule[j] = tempRule;
-//
-//                        break;
-//                    }
-//                }
-//            }
-//        }
         
         //our syntax will be: ColorBrewer:id
         fts.setSemanticTypeIdentifiers(new String[] {"generic:geometry", "colorbrewer:"+typeId});
@@ -436,12 +421,18 @@ public class StyleGenerator {
         return rule;
     }
     
-    private Rule createRuleExplicit(Set value, Geometry geometry, int i) throws IllegalFilterException {
+    private Rule createRuleExplicit(Set value, Geometry geometry, int i) {
         // create a sub filter for each unique value, and merge them
         // into the logic filter
         Object[] items = value.toArray();
         Arrays.sort(items);
-        LogicFilter orFilter = ff.createLogicFilter(FilterType.LOGIC_OR);
+        LogicFilter orFilter;
+		try {
+			orFilter = ff.createLogicFilter(FilterType.LOGIC_OR);
+		} catch (IllegalFilterException e1) {
+			LOGGER.log(Level.SEVERE, "Couldn't create filter", e1);
+			return null;
+		}
         CompareFilter filter = null;
         String title = "";
         
@@ -455,9 +446,7 @@ public class StyleGenerator {
                 filter.addRightValue(ff.createLiteralExpression(
                         items[item]));
             } catch (IllegalFilterException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-
+            	LOGGER.log(Level.SEVERE, "Error during rule filter construction", e);
                 return null;
             }
 
@@ -469,7 +458,11 @@ public class StyleGenerator {
             }
 
             // add the filter to the logicFilter
-            orFilter.addFilter(filter);
+            try {
+				orFilter.addFilter(filter);
+			} catch (IllegalFilterException e) {
+				LOGGER.log(Level.SEVERE, "Couldn't add filter to logicFilter", e);
+			}
         }
 
         // create the symbolizer
@@ -640,7 +633,7 @@ public class StyleGenerator {
 			FeatureType featureType, String attributeTypeName, boolean upperBoundClosed)
 			throws IllegalFilterException {
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-		AttributeExpression attrib = ff.createAttributeExpression(featureType, attributeTypeName);
+		AttributeExpression attrib = ff.createAttributeExpression(attributeTypeName);
 		String[] strs = styleExpression.split("\\.\\."); //$NON-NLS-1$
 		if (strs.length != 2) {
 			throw new IllegalArgumentException(
@@ -755,8 +748,7 @@ public class StyleGenerator {
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		// create the first filter
 		CompareFilter cFilter = ff.createCompareFilter(Filter.COMPARE_EQUALS);
-		AttributeExpression attribExpr = ff
-				.createAttributeExpression(featureType, attributeTypeName);
+		AttributeExpression attribExpr = ff.createAttributeExpression(attributeTypeName);
 		cFilter.addLeftValue(attribExpr);
 		cFilter.addRightValue(ff.createLiteralExpression(attribValue[0]));
 		if (attribValue.length == 1) {

@@ -57,6 +57,7 @@ public class StyleGeneratorTest extends DataTestCase {
         		filterInfo+="'"+feature.getAttribute(attribName)+"'";
         		if (it.hasNext()) filterInfo+=", ";
         	}
+        	it.close();
         	System.out.println(filterInfo+")");
         }
     }
@@ -76,8 +77,8 @@ public class StyleGeneratorTest extends DataTestCase {
 
         try {
             expr = ff.createMathExpression(MathExpression.MATH_MULTIPLY);
-            expr.addLeftValue(ff.createAttributeExpression(type, attribName));
-            expr.addRightValue(ff.createAttributeExpression(type, attribName));
+            expr.addLeftValue(ff.createAttributeExpression(attribName));
+            expr.addRightValue(ff.createAttributeExpression(attribName));
             expr2 = ff.createMathExpression(MathExpression.MATH_ADD);
             expr2.addLeftValue(expr);
             expr2.addRightValue(ff.createLiteralExpression(3));

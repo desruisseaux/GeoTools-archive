@@ -30,6 +30,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,6 +45,9 @@ import javax.xml.parsers.ParserConfigurationException;
  * @source $URL$
  */
 public class ColorBrewer {
+	
+	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
+	.getLogger("org.geotools.brewer.color");
     
     public static final PaletteType ALL = new PaletteType(true, true, "ALL");
     public static final PaletteType SUITABLE_RANGED = new PaletteType(true, false);
@@ -52,32 +57,42 @@ public class ColorBrewer {
     public static final PaletteType DIVERGING = new PaletteType(true, false, "DIVERGING");
     public static final PaletteType QUALITATIVE = new PaletteType(false, true, "QUALITATIVE");
     
-    /**
-     * @deprecated
-     */
-    String legendType = null;
-    
     String name = null;
     String description = null;
     Hashtable palettes = new Hashtable();;
-
+    
     /**
      * Creates a new instance of ColorBrewer
      */
     public ColorBrewer() {
     }
 
+    /**
+     * Creates a static instance of ColorBrewer containing all default palettes
+     * 
+     * @return
+     * @throws IOException
+     */
+    public static ColorBrewer instance() {
+    	ColorBrewer me = new ColorBrewer();
+		me.loadPalettes();
+    	return me;
+    }
+    
+    /**
+     * Creates a static instance of ColorBrewer containing a subset of the default palettes
+     * 
+     * @return
+     * @throws IOException
+     */
+    public static ColorBrewer instance(PaletteType type) throws IOException {
+    	ColorBrewer me = new ColorBrewer();
+    	me.loadPalettes(type);
+    	return me;
+    }
+    
     public void registerPalette(BrewerPalette pal) {
         palettes.put(pal.getName(), pal);
-    }
-
-    /**
-     * Returns the legend type of the colorBrewer
-     * @deprecated ColorBrewer no longer knows its legend type, palettes do.
-     * @return
-     */
-    public String getLegendType() {
-        return legendType;
     }
 
     /**
@@ -209,7 +224,7 @@ public class ColorBrewer {
      * @throws IOException 
      *
      */
-    public void loadPalettes() throws IOException {
+    public void loadPalettes() {
     	loadPalettes(SEQUENTIAL);
     	loadPalettes(DIVERGING);
     	loadPalettes(QUALITATIVE);
@@ -220,7 +235,7 @@ public class ColorBrewer {
      * @param type 
      * @throws IOException 
      */
-    public void loadPalettes(PaletteType type) throws IOException {
+    public void loadPalettes(PaletteType type) {
     	if (type.equals(ALL)) {
     		loadPalettes();
     		return;
@@ -235,7 +250,13 @@ public class ColorBrewer {
     	if (type.getName() == null) return;
     	String paletteSet = type.getName().toLowerCase();
         URL url = getClass().getResource("resources/" + paletteSet + ".xml");
-        InputStream stream = url.openStream();
+        InputStream stream;
+		try {
+			stream = url.openStream();
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE,"couldn't open input stream to load palette",e);
+			return;
+		}
         load(stream, type);
     }
     
@@ -360,159 +381,15 @@ public class ColorBrewer {
 				registerPalette(pal); // add the palette
 			}
 		} catch (SAXException sxe) {
-			// Error generated during parsing)
-			Exception x = sxe;
-
-			if (sxe.getException() != null) {
-				x = sxe.getException();
-			}
-
-			x.printStackTrace();
+			LOGGER.log(Level.SEVERE,"Error during palette parsing",sxe);
 		} catch (ParserConfigurationException pce) {
-			// Parser with specified options can't be built
-			pce.printStackTrace();
+			LOGGER.log(Level.SEVERE,"Parser with specified options can't be built",pce);
 		} catch (IOException ioe) {
-			// I/O error
-			ioe.printStackTrace();
+			LOGGER.log(Level.SEVERE,"i/o error during palette parsing",ioe);
 		}
 
 	}
     
-    /**
-	 * Loads the appropriate set of palettes into the ColorBrewer
-	 * 
-	 * @deprecated constants are now gone, use "SEQUENTIAL", "DIVERGING", or "QUALITATIVE" rather than ColorBrewer.SEQUENTIAL, DIVERGING, or QUALITATIVE
-	 * @param legendType "SEQUENTIAL", "DIVERGING", or "QUALITATIVE"
-	 */
-    public void loadPalettes(String legendType) {
-        this.legendType = legendType; // save palette name
-        this.palettes = new Hashtable(); // reset palette
-
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            String palette = legendType.toLowerCase();
-            URL url = getClass().getResource("resources/" + palette + ".xml");
-            InputStream stream = url.openStream();
-            Document document = builder.parse(stream);
-            this.name = fixToString(document.getElementsByTagName("name").item(0)
-                                            .getFirstChild().toString());
-            this.description = fixToString(document.getElementsByTagName(
-                        "description").item(0).getFirstChild().toString());
-
-            SampleScheme scheme = new SampleScheme();
-
-            NodeList samples = document.getElementsByTagName("sample");
-
-            for (int i = 0; i < samples.getLength(); i++) {
-                Node sample = samples.item(i);
-                int size = Integer.parseInt(sample.getAttributes()
-                                                  .getNamedItem("size")
-                                                  .getNodeValue());
-                String values = fixToString(sample.getFirstChild().toString());
-                int[] list = new int[size];
-                StringTokenizer tok = new StringTokenizer(values);
-
-                for (int j = 0; j < size; j++) {
-                    list[j] = Integer.parseInt(tok.nextToken(","));
-                }
-
-                scheme.setSampleScheme(size, list);
-            }
-
-            NodeList palettes = document.getElementsByTagName("palette");
-
-            for (int i = 0; i < palettes.getLength(); i++) {
-                BrewerPalette pal = new BrewerPalette();
-                PaletteSuitability suitability = new PaletteSuitability();
-                NodeList paletteInfo = palettes.item(i).getChildNodes();
-
-                for (int j = 0; j < paletteInfo.getLength(); j++) {
-                    Node item = paletteInfo.item(j);
-
-                    if (item.getNodeName().equals("name")) {
-                        pal.setName(fixToString(item.getFirstChild().toString()));
-                    }
-
-                    if (item.getNodeName().equals("description")) {
-                        pal.setDescription(fixToString(
-                                item.getFirstChild().toString()));
-                    }
-
-                    if (item.getNodeName().equals("colors")) {
-                        StringTokenizer oTok = new StringTokenizer(fixToString(
-                                    item.getFirstChild().toString()));
-                        int numColors = 0;
-                        Color[] colors = new Color[15];
-
-                        for (int k = 0; k < 15; k++) { //alternate condition: "oTok.countTokens() > 0"
-
-                            if (!oTok.hasMoreTokens()) {
-                                break;
-                            }
-
-                            String entry = oTok.nextToken(":");
-                            StringTokenizer iTok = new StringTokenizer(entry);
-                            int r = Integer.parseInt(iTok.nextToken(",").trim());
-                            int g = Integer.parseInt(iTok.nextToken(",").trim());
-                            int b = Integer.parseInt(iTok.nextToken(",").trim());
-                            colors[numColors] = new Color(r, g, b);
-                            numColors++;
-                        }
-
-                        pal.setColors(colors);
-                    }
-
-                    if (item.getNodeName().equals("suitability")) {
-                        NodeList schemeSuitability = item.getChildNodes();
-
-                        for (int k = 0; k < schemeSuitability.getLength();
-                                k++) {
-                            Node palScheme = schemeSuitability.item(k);
-
-                            if (palScheme.getNodeName().equals("scheme")) {
-                                int paletteSize = Integer.parseInt(palScheme.getAttributes()
-                                                                            .getNamedItem("size")
-                                                                            .getNodeValue());
-
-                                String values = fixToString(palScheme.getFirstChild()
-                                                                     .toString());
-                                String[] list = new String[6];
-                                StringTokenizer tok = new StringTokenizer(values);
-
-                                //obtain all 6 values, which should each be G=GOOD, D=DOUBTFUL, B=BAD, or ?=UNKNOWN.
-                                for (int m = 0; m < 6; m++) {
-                                    list[m] = tok.nextToken(",");
-                                }
-
-                                suitability.setSuitability(paletteSize, list);
-                            }
-                        }
-                    }
-                }
-
-                //pal.setType(legendType);
-                pal.setColorScheme(scheme);
-                pal.setPaletteSuitability(suitability);
-                registerPalette(pal); //add the palette
-            }
-        } catch (SAXException sxe) {
-            // Error generated during parsing)
-            Exception x = sxe;
-
-            if (sxe.getException() != null) {
-                x = sxe.getException();
-            }
-
-            x.printStackTrace();
-        } catch (ParserConfigurationException pce) {
-            // Parser with specified options can't be built
-            pce.printStackTrace();
-        } catch (IOException ioe) {
-            // I/O error
-            ioe.printStackTrace();
-        }
-    }
 
     /**
      * Converts "[#text: 1,2,3]" to "1,2,3".
@@ -544,7 +421,6 @@ public class ColorBrewer {
     }
     
     public void reset() {
-        legendType = null;
         name = null;
         description = null;
         palettes = new Hashtable();
