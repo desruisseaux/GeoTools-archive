@@ -54,4 +54,6 @@ public interface ColorMap extends GTComponent {
     public int getType();
 
     public void setType(int type);
+    
+    void accept(StyleVisitor visitor);
 }

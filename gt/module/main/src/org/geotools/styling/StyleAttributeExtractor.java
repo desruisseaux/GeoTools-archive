@@ -465,4 +465,16 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
     public void visit(FeatureTypeConstraint ftc) {
         // TODO Auto-generated method stub
     }
+
+	public void visit(ColorMap map) {
+		ColorMapEntry[] entries = map.getColorMapEntries();
+		
+		for (int i = 0; i < entries.length; i++) {
+			entries[i].accept(this);
+		}
+	}
+
+	public void visit(ColorMapEntry entry) {
+		// TODO Auto-generated method stub
+	}
 }

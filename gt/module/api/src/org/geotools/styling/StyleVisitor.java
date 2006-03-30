@@ -193,4 +193,18 @@ public interface StyleVisitor {
      * @param halo the halo to visit
      */
     void visit(Halo halo);
+    
+    /**
+     * Called when accept is called on a raster color map
+     * 
+     * @param colorMap the color map to visit
+     */
+    void visit(ColorMap colorMap);
+    
+    /**
+     * Called when accept is called on a raster color map entry
+     * 
+     * @param colorMapEntry the color map to visit
+     */
+    void visit(ColorMapEntry colorMapEntry);
 }

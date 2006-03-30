@@ -22,6 +22,8 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.expression.Expression;
 import org.geotools.filter.visitor.DuplicatorFilterVisitor;
 import org.geotools.styling.AnchorPoint;
+import org.geotools.styling.ColorMap;
+import org.geotools.styling.ColorMapEntry;
 import org.geotools.styling.Displacement;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.FeatureTypeConstraint;
@@ -548,4 +550,12 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
 
         getPages().push(copy);
     }
+
+	public void visit(ColorMap arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	public void visit(ColorMapEntry arg0) {
+		// TODO Auto-generated method stub
+	}
 }

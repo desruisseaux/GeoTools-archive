@@ -95,4 +95,8 @@ public class ColorMapEntryImpl extends AbstractGTComponent
     public Expression getQuantity() {
         return quantity;
     }
+
+    public void accept(StyleVisitor visitor) {
+        visitor.visit(this);
+    }
 }

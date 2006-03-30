@@ -216,7 +216,8 @@ public class StyleGenerator {
         FeatureIterator it = collection.features();
         Feature firstFeature = it.next();
         Geometry geometry = firstFeature.getDefaultGeometry();
-
+        it.close();
+        
         //numeric
         if (function instanceof RangedClassificationFunction) {
         	RangedClassificationFunction ranged = (RangedClassificationFunction) function;

@@ -62,4 +62,8 @@ public class ColorMapImpl extends AbstractGTComponent implements ColorMap {
         this.type = type;
         fireChanged();
     }
+    
+    public void accept(StyleVisitor visitor) {
+        visitor.visit(this);
+    }
 }

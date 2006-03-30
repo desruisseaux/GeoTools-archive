@@ -97,11 +97,15 @@ public class SLDTransformer extends TransformerBase {
             start("Stroke");
 
             if (stroke.getGraphicFill() != null) {
+            	start("GraphicFill");
                 stroke.getGraphicFill().accept(this);
+                end("GraphicFill");
             }
 
             if (stroke.getGraphicStroke() != null) {
+            	start("GraphicStroke");
                 stroke.getGraphicStroke().accept(this);
+                end("GraphicStroke");
             }
 
             encodeCssParam("stroke", stroke.getColor());
@@ -210,13 +214,38 @@ public class SLDTransformer extends TransformerBase {
             }
 
             if (raster.getColorMap() != null) {
-                // TODO
-                //raster.getColorMap().getColorMapEntries()[0]
+        		raster.getColorMap().accept(this);
             }
 
             end("RasterSymbolizer");
         }
 
+        public void visit(ColorMap colorMap) {
+        	ColorMapEntry[] mapEntries = colorMap.getColorMapEntries();
+    		start("ColorMap");
+    		for (int i = 0; i < mapEntries.length; i++) {
+    			mapEntries[i].accept(this);
+    		}
+    		end("ColorMap");
+        }
+        
+        public void visit(ColorMapEntry colorEntry) {
+        	if (colorEntry != null) {
+                AttributesImpl atts = new AttributesImpl();
+                atts.addAttribute("", "color", "color", "", colorEntry.getColor().toString());
+                if (colorEntry.getOpacity() != null) {
+                	atts.addAttribute("", "opacity", "opacity", "", colorEntry.getOpacity().toString());
+                }
+        		if (colorEntry.getQuantity() != null) {
+        			atts.addAttribute("", "quantity", "quantity", "", colorEntry.getQuantity().toString());
+        		}
+        		if (colorEntry.getLabel() != null) {
+        			atts.addAttribute("", "label", "label", "", colorEntry.getLabel());
+        		}
+                element("ColorMapEntry", null, atts);
+        	}
+        }
+        
         public void visit(Symbolizer sym) {
             try {
                 contentHandler.startElement("", "!--", "!--", NULL_ATTS);
@@ -244,10 +273,8 @@ public class SLDTransformer extends TransformerBase {
 
         public void visit(ExternalGraphic exgr) {
             start("ExternalGraphic");
-            element("Format", exgr.getFormat());
 
             AttributesImpl atts = new AttributesImpl();
-
             try {
             	atts.addAttribute("", "xlink", "xmlns:xlink", "", XLINK_NAMESPACE);
                 atts.addAttribute(XLINK_NAMESPACE, "type", "xlink:type", "", "simple");
@@ -255,8 +282,10 @@ public class SLDTransformer extends TransformerBase {
             } catch (java.net.MalformedURLException murle) {
                 throw new Error("SOMEONE CODED THE X LINK NAMESPACE WRONG!!");
             }
-
             element("OnlineResource", null, atts);
+
+            element("Format", exgr.getFormat());
+
             end("ExternalGraphic");
         }
 
@@ -273,7 +302,9 @@ public class SLDTransformer extends TransformerBase {
             start("Fill");
 
             if (fill.getGraphicFill() != null) {
+            	start("GraphicFill");
                 fill.getGraphicFill().accept(this);
+                end("GraphicFill");
             }
 
             encodeCssParam("fill", fill.getColor());
@@ -289,7 +320,9 @@ public class SLDTransformer extends TransformerBase {
 
             Graphic[] gr = rule.getLegendGraphic();
             for (int i = 0; i < gr.length; i++) {
-                gr[i].accept(this);
+                start("LegendGraphic");
+            	gr[i].accept(this);
+                end("LegendGraphic");
             }
             
             if (rule.getFilter() != null) {
@@ -346,11 +379,15 @@ public class SLDTransformer extends TransformerBase {
         }
 
         public void visit(Halo halo) {
-            start("Halo");
-            halo.getFill().accept(this);
-            start("Radius");
-            filterTranslator.encode(halo.getRadius());
-            end("Radius");
+        	start("Halo");
+        	if (halo.getRadius() != null) {
+	            start("Radius");
+	            filterTranslator.encode(halo.getRadius());
+	            end("Radius");
+        	}
+            if (halo.getFill() != null) {
+            	halo.getFill().accept(this);
+            }
             end("Halo");
         }
 
@@ -359,15 +396,15 @@ public class SLDTransformer extends TransformerBase {
 
             encodeGeometryProperty(gr.getGeometryPropertyName());
 
-            element("Size", gr.getSize());
-            element("Opacity", gr.getOpacity());
-            element("Rotation", gr.getRotation());
-
             Symbol[] symbols = gr.getSymbols();
 
             for (int i = 0; i < symbols.length; i++) {
                 symbols[i].accept(this);
             }
+
+            element("Opacity", gr.getOpacity());
+            element("Size", gr.getSize());
+            element("Rotation", gr.getRotation());
 
             end("Graphic");
         }

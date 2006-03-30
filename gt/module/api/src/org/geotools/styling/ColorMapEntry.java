@@ -49,4 +49,6 @@ public interface ColorMapEntry extends GTComponent {
     void setQuantity(Expression quantity);
 
     Expression getQuantity();
+    
+    void accept(StyleVisitor visitor);
 }
