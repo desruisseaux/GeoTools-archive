@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.FileChannel;
 
 /**
  *
@@ -163,7 +164,9 @@ public class ShapefileHeader {
   }
 
   public static void main(String[] args) throws Exception {
-    System.out.println(ShapefileReader.readHeader(new FileInputStream(new File(args[0])).getChannel(),true));
+    FileChannel channel = new FileInputStream(new File(args[0])).getChannel();
+	System.out.println(ShapefileReader.readHeader(channel,true));
+	channel.close();
   }
 }
 

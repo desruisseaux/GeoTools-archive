@@ -26,6 +26,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.geotools.data.shapefile.Lock;
+import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.resources.NIOUtilities;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -65,12 +66,16 @@ public class ShapefileWriter {
   int offset;
   int lp;
   int cnt;
-  
+  private StreamLogging shpLogger=new StreamLogging("SHP Channel in ShapefileWriter");
+  private StreamLogging shxLogger=new StreamLogging("SHX Channel in ShapefileWriter");
+
   /** Creates a new instance of ShapeFileWriter 
  * @throws IOException */
   public ShapefileWriter(FileChannel shpChannel, FileChannel shxChannel, Lock lock) throws IOException {
     this.shpChannel = shpChannel;
     this.shxChannel = shxChannel;
+    shpLogger.open();
+    shxLogger.open();
   }
   
 //  private void allocateBuffers(int geomCnt, int fileLength) throws IOException {
@@ -217,8 +222,14 @@ public class ShapefileWriter {
    * Close the underlying Channels.
    */
   public void close() throws IOException {
-    shpChannel.close();
-    shxChannel.close();
+	  if( shpChannel.isOpen()){
+		    shpLogger.close();
+		    shpChannel.close();
+	  }
+	  if( shxChannel.isOpen()){
+		  shxChannel.close();
+		  shxLogger.close();
+	  }
     shpChannel = null;
     shxChannel = null;
     handler = null;

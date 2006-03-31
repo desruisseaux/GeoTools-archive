@@ -116,24 +116,26 @@ public class ShapefileTest extends TestCaseSupport {
         final ShapefileReader     reader1  = new ShapefileReader(channel1, lock);
         final ShapefileReader     reader2  = new ShapefileReader(channel2, lock);
         final IndexFile           index    = new IndexFile(channel3);
-
-        for (int i = 0; i < index.getRecordCount(); i++) {
-            if (reader1.hasNext()) {
-                Geometry g1 = (Geometry) reader1.nextRecord().shape();
-                Geometry g2 = (Geometry) reader2.shapeAt(2 * (index.getOffset(i)));
-                assertTrue(g1.equalsExact(g2));
-
-                g2 = (Geometry) reader2.shapeAt(index.getOffsetInBytes(i));
-                assertTrue(g1.equalsExact(g2));
-            } else {
-                fail("uneven number of records");
-            }
+        try{
+	        for (int i = 0; i < index.getRecordCount(); i++) {
+	            if (reader1.hasNext()) {
+	                Geometry g1 = (Geometry) reader1.nextRecord().shape();
+	                Geometry g2 = (Geometry) reader2.shapeAt(2 * (index.getOffset(i)));
+	                assertTrue(g1.equalsExact(g2));
+	
+	                g2 = (Geometry) reader2.shapeAt(index.getOffsetInBytes(i));
+	                assertTrue(g1.equalsExact(g2));
+	            } else {
+	                fail("uneven number of records");
+	            }
 
             //assertEquals(reader1.nextRecord().offset(),index.getOffset(i));
         }
-        channel3.close();
-        channel2.close();
-        channel1.close();
+	    }finally{
+	    	reader1.close();
+	    	reader2.close();
+	    	index.close();
+	    }
     }
 
     public void testHolyPolygons() throws Exception {
@@ -184,7 +186,8 @@ public class ShapefileTest extends TestCaseSupport {
             idx++;
             r.nextRecord();
         }
-
+        
+        r.close();
         assertEquals(49, idx);
     }
 
@@ -201,13 +204,14 @@ public class ShapefileTest extends TestCaseSupport {
                     record.maxY), geom.getEnvelopeInternal());
             record.toString();
         }
-
+        reader.close();
         copyShapefiles(STATEPOP);
         reader = new ShapefileReader(TestData.openChannel(this, STATEPOP), lock);
 
         for (int i = 0, ii = offsets.size(); i < ii; i++) {
             reader.shapeAt(((Integer) offsets.get(i)).intValue());
         }
+        reader.close();
     }
 
     private void loadShapes(String resource, int expected) throws Exception {
@@ -219,22 +223,22 @@ public class ShapefileTest extends TestCaseSupport {
             reader.nextRecord().shape();
             cnt++;
         }
-
+        reader.close();
         assertEquals("Number of Geometries loaded incorect for : " + resource, expected, cnt);
-        c.close();
     }
 
     private void loadMemoryMapped(String resource, int expected) throws Exception {
         final ReadableByteChannel c = TestData.openChannel(resource);
         ShapefileReader reader = new ShapefileReader(c, lock);
         int cnt = 0;
-
-        while (reader.hasNext()) {
-            reader.nextRecord().shape();
-            cnt++;
+        try{
+	        while (reader.hasNext()) {
+	            reader.nextRecord().shape();
+	            cnt++;
+	        }
+        }finally{
+        	reader.close();
         }
-
         assertEquals("Number of Geometries loaded incorect for : " + resource, expected, cnt);
-        c.close();
     }
 }

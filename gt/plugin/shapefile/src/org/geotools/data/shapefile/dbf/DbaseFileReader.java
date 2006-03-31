@@ -34,6 +34,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.Calendar;
 
+import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.resources.NIOUtilities;
 import org.geotools.resources.NumberParser;
 
@@ -113,7 +114,7 @@ public class DbaseFileReader {
 	protected final boolean randomAccessEnabled;
 
 	protected int currentOffset = 0;
-
+	private StreamLogging streamLogger=new StreamLogging("Dbase File Reader");
 	/**
 	 * Creates a new instance of DBaseFileReader
 	 * 
@@ -140,7 +141,7 @@ public class DbaseFileReader {
 
 		this.useMemoryMappedBuffer = useMemoryMappedBuffer;
 		this.randomAccessEnabled = (channel instanceof FileChannel);
-
+		streamLogger.open();
 		header = new DbaseFileHeader();
 		header.readHeader(channel);
 
@@ -244,10 +245,12 @@ public class DbaseFileReader {
 	public void close() throws IOException {
 		if (channel.isOpen()) {
 			channel.close();
+			streamLogger.close();
 		}
 		if (buffer instanceof MappedByteBuffer) {
 			NIOUtilities.clean(buffer);
 		}
+		
 		buffer = null;
 		channel = null;
 		charBuffer = null;
@@ -548,6 +551,7 @@ public class DbaseFileReader {
 			System.out.println(++r + ","
 					+ java.util.Arrays.asList(reader.readEntry()));
 		}
+		reader.close();
 	}
 
 }

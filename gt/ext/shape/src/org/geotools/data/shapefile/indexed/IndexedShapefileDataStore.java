@@ -39,12 +39,10 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.EmptyFeatureReader;
-import org.geotools.data.EmptyFeatureWriter;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
-import org.geotools.data.FilteringFeatureWriter;
 import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -245,7 +243,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		}
 
 		try {
-			filename = java.net.URLDecoder.decode(url.toString(), "US-ASCII");
+			filename = java.net.URLDecoder.decode(url.getFile(), "US-ASCII");
 		} catch (java.io.UnsupportedEncodingException use) {
 			throw new java.net.MalformedURLException("Unable to decode " + url
 				+ " cause " + use.getMessage());
@@ -280,23 +278,23 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		this.useIndex = treeType != TREE_NONE && isLocal();
 
 		if (this.isLocal()) {
-			fixURL = new URL(filename + fixext);
+			fixURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + fixext);
 			if (treeType == TREE_QIX) {
-				treeURL = new URL(filename + qixext);
+				treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + qixext);
 				this.treeType = TREE_QIX;
 				LOGGER.fine("Using qix tree");
 			} else if (treeType == TREE_GRX) {
-				treeURL = new URL(filename + grxext);
+				treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + grxext);
 				LOGGER.fine("Using grx tree");
 			} else {
-				treeURL = new URL(filename + grxext);
+				treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + qixext);
 				this.treeType = TREE_NONE;
 			}
 			this.createIndex = new File(new File(treeURL.getFile()).getParent())
 					.canWrite()
 					&& createIndex && useIndex;
 		} else {
-			treeURL = new URL(filename + grxext);
+			treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + qixext);
 			this.treeType = TREE_NONE;
 			this.createIndex = false;
 			fixURL=null;
@@ -948,71 +946,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	}
 
 	/**
-	 * Create the AttributeTypes contained within this DataStore.
-	 *
-	 * @return An array of new AttributeTypes
-	 *
-	 * @throws IOException
-	 *             If AttributeType reading fails
-	 */
-	protected AttributeType[] readAttributes() throws IOException {
-		ShapefileReader shp = openShapeReader();
-		IndexedDbaseFileReader dbf = (IndexedDbaseFileReader) openDbfReader();
-		AbstractCRS cs = null;
-
-		try {
-			PrjFileReader prj = openPrjReader();
-
-			if (prj != null) {
-				cs = (AbstractCRS) prj.getCoodinateSystem();
-			}
-		} catch (FactoryException fe) {
-			cs = null;
-		}
-
-		try {
-			GeometryAttributeType geometryAttribute = (GeometryAttributeType) AttributeTypeFactory
-					.newAttributeType("the_geom", JTSUtilities
-							.findBestGeometryClass(shp.getHeader()
-									.getShapeType()), true, 0, null, cs);
-
-			AttributeType[] atts;
-
-			// take care of the case where no dbf and query wants all =>
-			// geometry only
-			if (dbf != null) {
-				DbaseFileHeader header = dbf.getHeader();
-				atts = new AttributeType[header.getNumFields() + 1];
-				atts[0] = geometryAttribute;
-
-				for (int i = 0, ii = header.getNumFields(); i < ii; i++) {
-					Class clazz = header.getFieldClass(i);
-					atts[i + 1] = AttributeTypeFactory.newAttributeType(header
-							.getFieldName(i), clazz, true, header
-							.getFieldLength(i));
-				}
-			} else {
-				atts = new AttributeType[] { geometryAttribute };
-			}
-
-			return atts;
-		} finally {
-			try {
-				if( shp!=null)
-					shp.close();
-			} catch (IOException ioe) {
-				// do nothing
-			}
-
-			try {
-				dbf.close();
-			} catch (IOException ioe) {
-				// do nothing
-			}
-		}
-	}
-
-	/**
 	 * Gets the bounding box of the file represented by this data store as a
 	 * whole (that is, off all of the features in the shape)
 	 *
@@ -1640,9 +1573,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 			copyAndDelete(shpURL, temp);
 			copyAndDelete(shxURL, temp);
-			if (prjURL!=null && !prjURL.equals("")) {
-				copyAndDelete(prjURL, temp);
-			}
 			copyAndDelete(dbfURL, temp);
 			if( fixURL!=null )
 				copyAndDelete(fixURL, temp);

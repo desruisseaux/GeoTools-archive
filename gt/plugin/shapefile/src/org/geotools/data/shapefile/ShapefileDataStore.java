@@ -491,7 +491,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             return null;
         }
 
-        return new PrjFileReader(rbc);
+        PrjFileReader prj=null;
+        try{
+        	prj = new PrjFileReader(rbc);
+        }catch (Exception e) {
+        	rbc.close();
+        }
+        return prj;
     }
 
     /**
@@ -626,15 +632,19 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         DbaseFileReader dbf = openDbfReader();
         AbstractCRS cs = null;
 
-        try {
-            PrjFileReader prj = openPrjReader();
+		PrjFileReader prj=null;
+		try {
+			prj = openPrjReader();
 
-            if (prj != null) {
-                cs = (AbstractCRS) prj.getCoodinateSystem();
-            }
-        } catch (FactoryException fe) {
-            cs = null;
-        }
+			if (prj != null) {
+				cs = (AbstractCRS) prj.getCoodinateSystem();
+			}
+		} catch (FactoryException fe) {
+			cs = null;
+		}finally{
+			if( prj!=null)
+				prj.close();
+		}
 
         try {
             GeometryAttributeType geometryAttribute = (GeometryAttributeType) AttributeTypeFactory
@@ -723,10 +733,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             FileChannel shxChannel = (FileChannel) getWriteChannel(getStorageURL(
                         shxURL, temp));
 
-            ShapefileWriter writer = new ShapefileWriter(shpChannel,
-                    shxChannel, readWriteLock);
+            ShapefileWriter writer = null;
 
             try {
+            	writer = new ShapefileWriter(shpChannel,
+                        shxChannel, readWriteLock);
                 Envelope env = new Envelope(-179, 179, -89, 89);
                 Envelope transformedBounds;
 
@@ -745,6 +756,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
                 writer.writeHeaders(transformedBounds, shapeType, 0, 100);
             } finally {
+            	if( writer!=null )
                 writer.close();
             }
 

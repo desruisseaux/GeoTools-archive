@@ -48,6 +48,11 @@ public class PrjFileTest extends TestCaseSupport {
   protected void setUp() throws Exception {
     prj = new PrjFileReader(TestData.openChannel(TEST_FILE));
   }
+  
+  protected void tearDown() throws Exception {
+	  prj.close();
+	super.tearDown();
+}
 
   public void testGeneral() {
     if (verbose) {

@@ -29,6 +29,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Logger;
 
+import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.data.shapefile.shp.ShapefileHeader;
 import org.geotools.resources.NIOUtilities;
 
@@ -59,6 +60,8 @@ public class IndexFile {
 	  private int recLen;
 	  private ShapefileHeader header = null;
 	  private int[] content;
+      private StreamLogging streamLogger=new StreamLogging("IndexFile");
+
 
 	  /** Load the index file from the given channel.
 	   * @param channel The channel to read from.
@@ -76,6 +79,7 @@ public class IndexFile {
 	  throws IOException 
 	  {
 	    this.useMemoryMappedBuffer = useMemoryMappedBuffer;
+	    streamLogger.open();
 	    readHeader(channel);
 	    if (channel instanceof FileChannel) {
 	        
@@ -154,7 +158,8 @@ public class IndexFile {
 	  public void close() throws IOException {
 	    if (channel != null && channel.isOpen()) {
 	      channel.close();
-
+		  streamLogger.close();
+		    
 	      if (buf instanceof MappedByteBuffer) {
 	        NIOUtilities.clean(buf);
 	      } else {

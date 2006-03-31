@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.resources.NIOUtilities;
 
 
@@ -60,6 +61,8 @@ public class DbaseFileWriter  {
   private final Number NULL_NUMBER = new Integer(0);
   private final String NULL_STRING = "";
   private final Date NULL_DATE = new Date();
+  private StreamLogging streamLogger=new StreamLogging("Dbase File Writer");
+
   
   /** Create a DbaseFileWriter using the specified header and writing to the given
    * channel.
@@ -71,7 +74,7 @@ public class DbaseFileWriter  {
     header.writeHeader(out);
     this.header = header;
     this.channel = out;
-    
+    streamLogger.open();
     init();
   }
   
@@ -189,11 +192,13 @@ public class DbaseFileWriter  {
 //    buffer.position(0);
 //    buffer.put((byte) 0).position(0).limit(1);
 //    write();
-    channel.close();
+	  if( channel.isOpen()){
+		  channel.close();
+		    streamLogger.close();
+	  }
     if (buffer instanceof MappedByteBuffer) {
       NIOUtilities.clean(buffer);
     }
-    
     buffer = null;
     channel = null;
     formatter = null;

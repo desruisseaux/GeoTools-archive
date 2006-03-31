@@ -24,6 +24,7 @@ import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
 import org.geotools.data.FIDReader;
+import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 
 
@@ -43,11 +44,13 @@ public class IndexedFidReader implements FIDReader {
     private int currentShxIndex = -1;
     private RecordNumberTracker reader;
     private long currentId;
+    StreamLogging streamLogger=new StreamLogging("IndexedFidReader");
 
     public IndexedFidReader(String typeName, ReadableByteChannel readChannel)
         throws IOException {
         this.typeName = typeName + ".";
         this.readChannel = readChannel;
+        streamLogger.open();
         getHeader();
 
         buffer = ByteBuffer.allocateDirect(12 * 1024);
@@ -223,6 +226,7 @@ public class IndexedFidReader implements FIDReader {
                 reader.close();
         } finally {
             readChannel.close();
+            streamLogger.close();
         }
     }
 

@@ -250,44 +250,50 @@ public class ShapeFileIndexer {
             
             FileInputStream is = new FileInputStream(file);
             FileChannel channel = is.getChannel();
-            ShapefileReader reader = new ShapefileReader(channel, true, false,
-                    lock);
-
+            ShapefileReader reader=null;
             String ext = this.fileName.substring(this.fileName.lastIndexOf('.'));
             String rtreeName = this.fileName.substring(0,
-                    this.fileName.lastIndexOf('.'));
-
-            if (!ext.equalsIgnoreCase(".shp")) {
-                throw new TreeException("The file to index must have "
-                    + "'.shp' extension");
-            }
-
-            // Build index name
-            if (this.idxType.equals(RTREE)) {
-                rtreeName += (ext.equals(".shp") ? ".grx" : ".GRX");
-            } else if (this.idxType.equals(QUADTREE)) {
-                rtreeName += (ext.equals(".shp") ? ".qix" : ".QIX");
-            }
+            		this.fileName.lastIndexOf('.'));
 
             // Temporary file for building...
             File treeFile = new File(rtreeName + ".bld");
+            
+            try{
+            	reader = new ShapefileReader(channel, true, false,
+                        lock);
 
-            // Delete temporary file if exists
-            if (treeFile.exists()) {
-                if (!treeFile.delete()) {
-                    throw new TreeException("Unable to delete " + treeFile
-                        + " cannot create a new index!");
-                }
+	            if (!ext.equalsIgnoreCase(".shp")) {
+	                throw new TreeException("The file to index must have "
+	                    + "'.shp' extension");
+	            }
+	
+	            // Build index name
+	            if (this.idxType.equals(RTREE)) {
+	                rtreeName += (ext.equals(".shp") ? ".grx" : ".GRX");
+	            } else if (this.idxType.equals(QUADTREE)) {
+	                rtreeName += (ext.equals(".shp") ? ".qix" : ".QIX");
+	            }
+	
+	
+	            // Delete temporary file if exists
+	            if (treeFile.exists()) {
+	                if (!treeFile.delete()) {
+	                    throw new TreeException("Unable to delete " + treeFile
+	                        + " cannot create a new index!");
+	                }
+	            }
+	
+	            if (this.idxType.equals(RTREE)) {
+	                cnt = this.buildRTree(reader, treeFile, verbose);
+	            } else if (this.idxType.equals(QUADTREE)) {
+	                cnt = this.buildQuadTree(reader, treeFile, verbose);
+	            }
+            }finally{
+            	if( reader!=null )
+            		reader.close();
+            	if( is!=null )
+            		is.close();
             }
-
-            if (this.idxType.equals(RTREE)) {
-                cnt = this.buildRTree(reader, treeFile, verbose);
-            } else if (this.idxType.equals(QUADTREE)) {
-                cnt = this.buildQuadTree(reader, treeFile, verbose);
-            }
-
-            reader.close();
-            is.close();
 
             // Final index file
             File finalFile = new File(rtreeName);
@@ -426,16 +432,17 @@ public class ShapeFileIndexer {
         FileInputStream fisIdx = new FileInputStream(idxFileName);
         FileChannel channelIdx = fisIdx.getChannel();
         IndexFile shpIndex = new IndexFile(channelIdx);
-
+        QuadTree tree=null;
+        int cnt = 0;
+        try{
         int numRecs = shpIndex.getRecordCount();
         ShapefileHeader header = reader.getHeader();
         Envelope bounds = new Envelope(header.minX(), header.maxX(),
                 header.minY(), header.maxY());
 
-        QuadTree tree = new QuadTree(numRecs, bounds);
+		tree = new QuadTree(numRecs, bounds);
 
         Record rec = null;
-        int cnt = 0;
 
         while (reader.hasNext()) {
             rec = reader.nextRecord();
@@ -446,10 +453,11 @@ public class ShapeFileIndexer {
                 System.out.print('.');
             }
         }
-
+        }finally{
         channelIdx.close();
         fisIdx.close();
-
+        shpIndex.close();
+        }
         FileSystemIndexStore store = new FileSystemIndexStore(file, order);
         store.store(tree);
 

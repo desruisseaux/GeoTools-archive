@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.data.shapefile.shp.IndexFile;
 
 
@@ -30,11 +31,14 @@ public class IndexedFidWriter {
 
     private long position ;
     private int removes;
+    StreamLogging streamLogger=new StreamLogging("IndexedFidReader");
+
 
     public IndexedFidWriter(FileChannel writeChannel,
         IndexedFidReader reader2) throws IOException {
         this.channel = writeChannel;
         reader = reader2;
+        streamLogger.open();
         allocateBuffers();
         removes = reader.getRemoves();
         writeBuffer.position(HEADER_SIZE);
@@ -120,6 +124,7 @@ public class IndexedFidWriter {
         } finally {
             try{
                 channel.close();
+                streamLogger.close();
             }finally{
                 reader.close();
             }

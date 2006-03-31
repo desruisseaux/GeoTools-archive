@@ -135,6 +135,7 @@ public static void main(String[] args) throws Exception {
     while (reader.hasNext()) {
       System.out.println(++r + "," + java.util.Arrays.asList(reader.readEntry()));
     }
+    reader.close();
   }
   
 }

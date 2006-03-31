@@ -30,6 +30,7 @@ import java.nio.channels.ReadableByteChannel;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.shapefile.Lock;
+import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.resources.NIOUtilities;
 
 /**
@@ -124,6 +125,7 @@ public class ShapefileReader {
 	private boolean useMemoryMappedBuffer;
 
 	private long currentOffset = 0L;
+	private StreamLogging streamLogger=new StreamLogging("Shapefile Reader");
 
 	/**
 	 * Creates a new instance of ShapeFile.
@@ -142,6 +144,7 @@ public class ShapefileReader {
 			Lock lock) throws IOException, ShapefileException {
 		this.channel = channel;
 		this.useMemoryMappedBuffer=useMemoryMapped;
+		streamLogger.open();
 		randomAccessEnabled = channel instanceof FileChannel;
 		this.lock = lock;
 		lock.lockRead();
@@ -282,6 +285,7 @@ public class ShapefileReader {
 		lock.unlockRead();
 		if (channel.isOpen()) {
 			channel.close();
+			streamLogger.close();
 		}
 		if (buffer instanceof MappedByteBuffer) {
 			NIOUtilities.clean(buffer);
@@ -675,6 +679,7 @@ public class ShapefileReader {
 		while (reader.hasNext()) {
 			System.out.println(reader.nextRecord().shape());
 		}
+		reader.close();
 	}
 
 	/**

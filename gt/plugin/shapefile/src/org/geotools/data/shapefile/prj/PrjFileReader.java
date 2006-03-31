@@ -28,6 +28,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
+import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
 
@@ -43,6 +44,7 @@ public class PrjFileReader {
     ReadableByteChannel channel;
     CharBuffer charBuffer;
     CharsetDecoder decoder;
+    StreamLogging streamLogger=new StreamLogging("PRJ reader");
     
     org.opengis.referencing.crs.CoordinateReferenceSystem cs;
     //private int[] content;
@@ -55,6 +57,7 @@ public class PrjFileReader {
         Charset chars = Charset.forName("ISO-8859-1");
         decoder = chars.newDecoder();
         this.channel = channel;
+        streamLogger.open();
         init();
         
         //ok, everything is ready...
@@ -108,8 +111,6 @@ public class PrjFileReader {
         // The entire file is in little endian
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         
-        
-        
         charBuffer = CharBuffer.allocate(8*1024);
         Charset chars = Charset.forName("ISO-8859-1");
         decoder = chars.newDecoder();
@@ -117,7 +118,12 @@ public class PrjFileReader {
         
     }
     
-    
+    public void close() throws IOException {
+    	if( channel.isOpen()){
+    		channel.close();
+    		streamLogger.close();
+    	}
+	}
     
     
 }
