@@ -470,19 +470,23 @@ public class DisjointLists extends JPanel {
     }
 
     /**
-     * Returns all elements in the list on the right side.
-     */
-    public Collection getSelectedElements() {
-        return ((Model) right.getModel()).getElements();
-    }
-
-    /**
-     * Returns all elements in the list on the left side.
+     * Returns all elements with the specified selection state. If {@code selected} is {@code true},
+     * then this method returns the selected elements on the right side. If {@code selected} is
+     * {@code false}, then this method returns the unselected elements on the left side.
      *
      * @since 2.3
      */
-    public Collection getUnselectedElements() {
-        return ((Model) left.getModel()).getElements();
+    public Collection getElements(final boolean selected) {
+        return ((Model) (selected ? right : left).getModel()).getElements();
+    }
+
+    /**
+     * Returns all elements in the list on the right side.
+     *
+     * @deprecated Use {@code getElements(true)} instead.
+     */
+    public Collection getSelectedElements() {
+        return getElements(true);
     }
 
     /**

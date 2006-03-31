@@ -39,12 +39,11 @@ import org.geotools.resources.Utilities;
 /**
  * Quality information for the data specified by a data quality scope.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
- *
- * @since 2.1
  */
 public class DataQualityImpl extends MetadataEntity implements DataQuality {
     /**
