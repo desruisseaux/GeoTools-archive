@@ -440,7 +440,7 @@ public class ShapeFileIndexer {
         Envelope bounds = new Envelope(header.minX(), header.maxX(),
                 header.minY(), header.maxY());
 
-		tree = new QuadTree(numRecs, bounds);
+        tree = new QuadTree(numRecs, bounds, shpIndex);
 
         Record rec = null;
 

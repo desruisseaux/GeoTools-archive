@@ -84,7 +84,6 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         System.gc();
         System.runFinalization(); // If some streams are still open, it may help to close them.
         final File file = getTempFile();
-        final Boolean bool;
         Runnable reader = new Runnable() {
             public void run() {
                 int cutoff = 0;
@@ -160,7 +159,18 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         String typeName;
         s = (ShapefileDataStore) maker.createDataStore(tmp.toURL(),
                 memorymapped);
-
+        File file = new File(s.dbfURL.getFile());
+        file.deleteOnExit();
+        file = new File(s.prjURL.getFile());
+        file.deleteOnExit();
+        file = new File(s.shpURL.getFile());
+        file.deleteOnExit();
+        file = new File(s.shxURL.getFile());
+        file.deleteOnExit();
+        file = new File(s.xmlURL.getFile());
+        file.deleteOnExit();
+        
+        
         s.createSchema(type);
         FeatureStore store = (FeatureStore) s.getFeatureSource(type
                 .getTypeName());

@@ -19,10 +19,12 @@
  */
 package org.geotools.index.quadtree;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -33,18 +35,24 @@ import java.util.List;
  */
 public class Node {
     private Envelope bounds;
-    private int numShapesId;
-    private int[] shapesId;
+    protected int numShapesId;
+    protected int[] shapesId;
     protected List subNodes;
-
-    public Node(Envelope bounds) {
+    protected Node parent;
+    private boolean visited=false;
+    private boolean childrenVisited=false;
+	protected int id;
+    
+    public Node(Envelope bounds, int id, Node parent) {
+    	this.parent=parent;
+    	this.id=id;
         this.bounds = new Envelope(bounds);
         this.subNodes = new ArrayList(4);
         this.shapesId = new int[4];
         Arrays.fill(this.shapesId, -1);
     }
 
-    /**
+	/**
      * DOCUMENT ME!
      *
      * @return Returns the bounds.
@@ -193,4 +201,38 @@ public class Node {
     public int[] getShapesId() {
         return this.shapesId;
     }
+
+	public Node getParent() {
+		return parent;
+	}
+
+	public void setParent(Node parent) {
+		this.parent = parent;
+	}
+
+	public boolean isVisited() {
+		return visited;
+	}
+
+	public void setVisited(boolean visited) {
+		this.visited = visited;
+	}
+
+	public Node getSibling() throws StoreException {
+		if( parent==null || id==parent.getNumSubNodes()-1)
+			return null;
+		return parent.getSubNode(id+1);
+	}
+
+	public boolean isChildrenVisited() {
+		return childrenVisited;
+	}
+
+	public void setChildrenVisited(boolean childrenVisited) {
+		this.childrenVisited = childrenVisited;
+	}
+
+	public Node copy() throws IOException {
+		return new Node(bounds, id, parent);
+	}
 }

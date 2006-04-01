@@ -36,17 +36,18 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.shapefile.ShapefileDataStore;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
+import org.geotools.data.shapefile.ShapefileDataStore;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -200,7 +201,7 @@ public class IndexedShapefileDataStoreFactory
             Byte type = (Byte) SPATIAL_INDEX_TYPE.lookUp(params);
 
             if (type == null) {
-                type = new Byte(IndexedShapefileDataStore.TREE_GRX);
+                type = new Byte(IndexedShapefileDataStore.TREE_QIX);
             }
 
             ds = new IndexedShapefileDataStore(url, namespace,

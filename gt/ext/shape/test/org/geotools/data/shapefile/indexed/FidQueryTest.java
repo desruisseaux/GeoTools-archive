@@ -10,7 +10,6 @@ import java.util.Set;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
-import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
@@ -186,8 +185,7 @@ public class FidQueryTest extends FIDTestCase {
 		}
 	}
 	
-	private void assertFidsMatch() throws FactoryConfigurationError,
-			IOException {
+	private void assertFidsMatch() throws IOException {
 		long start = System.currentTimeMillis();
 		FilterFactory fac = FilterFactoryFinder.createFilterFactory();
 		DefaultQuery query = new DefaultQuery(TYPE_NAME);

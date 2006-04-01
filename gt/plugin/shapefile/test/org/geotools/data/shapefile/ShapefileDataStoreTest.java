@@ -159,6 +159,12 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         
         assertEquals("test", ds.getSchema().getTypeName());
         file.delete();
+        file=new File("test.prj");
+        file.delete();
+        file=new File("test.dbf");
+        file.delete();
+        file=new File("test.shp");
+        file.delete();
     }
     
     private ShapefileDataStore createDataStore(File f) throws Exception {

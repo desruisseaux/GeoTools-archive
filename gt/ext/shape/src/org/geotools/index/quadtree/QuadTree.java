@@ -3,10 +3,15 @@
  */
 package org.geotools.index.quadtree;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.data.shapefile.shp.IndexFile;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -31,6 +36,10 @@ public class QuadTree {
     private Node root;
     private int numShapes;
     private int maxDepth;
+
+	private IndexFile indexfile;
+
+	private Set iterators=new HashSet();
     
     /**
      * Constructor.
@@ -38,20 +47,8 @@ public class QuadTree {
      * @param numShapes The total number of shapes to index
      * @param maxBounds The bounds of all geometries to be indexed
      */
-    public QuadTree(int numShapes, Envelope maxBounds) {
-        this.numShapes = numShapes;
-        this.maxDepth = 0;
-        this.root = new Node(new Envelope(maxBounds));
-        
-        /* No max depth was defined, try to select a reasonable one
-         * that implies approximately 8 shapes per node.
-         */
-        int numNodes = 1;
-          
-        while(numNodes * 4 < numShapes) {
-            this.maxDepth += 1;
-            numNodes = numNodes * 2;
-        }
+    public QuadTree(int numShapes, Envelope maxBounds, IndexFile file) {
+    	this(numShapes, 0, maxBounds, file);
     }
     
     /**
@@ -60,10 +57,29 @@ public class QuadTree {
      * @param maxDepth The max depth of the index, must be <= 65535
      * @param maxBounds The bounds of all geometries to be indexed
      */
-    public QuadTree(int numShapes, int maxDepth, Envelope maxBounds) {
+    public QuadTree(int numShapes, int maxDepth, Envelope maxBounds, IndexFile file) {
+        if (maxDepth > 65535) {
+            throw new IllegalArgumentException("maxDepth must be <= 65535");
+        }
+
         this.numShapes = numShapes;
         this.maxDepth = maxDepth;
-        this.root = new Node(new Envelope(maxBounds));
+        
+        if( maxBounds!=null )
+        	this.root = new Node(new Envelope(maxBounds), 0, null);
+        
+        if( maxDepth==0 ){
+            /* No max depth was defined, try to select a reasonable one
+             * that implies approximately 8 shapes per node.
+             */
+            int numNodes = 1;
+              
+            while(numNodes * 4 < numShapes) {
+                this.maxDepth += 1;
+                numNodes = numNodes * 2;
+            }
+        }
+        this.indexfile=file;
     }
     
     /**
@@ -72,13 +88,8 @@ public class QuadTree {
      * @param numShapes The total number of shapes to index
      * @param maxDepth The max depth of the index, must be <= 65535
      */
-    public QuadTree(int numShapes, int maxDepth) {
-        if (maxDepth > 65535) {
-            throw new IllegalArgumentException("maxDepth must be <= 65535");
-        }
-        
-        this.numShapes = numShapes;
-        this.maxDepth = maxDepth;
+    public QuadTree(int numShapes, int maxDepth, IndexFile file) {
+    	this(numShapes, maxDepth, null, file);
     }
     
     /**
@@ -135,10 +146,10 @@ public class QuadTree {
             if (quad1.contains(bounds) || quad2.contains(bounds) || 
                 quad3.contains(bounds) || quad4.contains(bounds))
             {
-                node.addSubNode(new Node(quad1));
-                node.addSubNode(new Node(quad2));
-                node.addSubNode(new Node(quad3));
-                node.addSubNode(new Node(quad4));
+                node.addSubNode(new Node(quad1,0, node));
+                node.addSubNode(new Node(quad2,1, node));
+                node.addSubNode(new Node(quad3,2, node));
+                node.addSubNode(new Node(quad4,3, node));
                 
                 // recurse back on this node now that it has subnodes
                 this.insert(node, recno, bounds, md);
@@ -155,61 +166,31 @@ public class QuadTree {
      * @param bounds
      * @return A List of Integer
      */
-    public List search(Envelope bounds) throws StoreException {
-        long start = System.currentTimeMillis();
-
+    public Collection search(Envelope bounds) throws StoreException {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.log(Level.FINEST,
                        "Querying " + bounds);            
         }
 
-        List ret = new ArrayList();
-        this.collectShapeIds(this.root, bounds, ret);
-        
-        if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.log(Level.FINEST,
-                       ret.size() + " ids retrieved in " +
-                       (System.currentTimeMillis() - start) + "ms.");            
+        LazySearchCollection lazySearchCollection;
+        try{
+        	lazySearchCollection = new LazySearchCollection(this, bounds);
+        }catch(RuntimeException e){
+        	LOGGER.warning("IOException occurred while reading root");
+        	return null;
         }
-
-        return ret;
-    }
-
-    /**
-     * 
-     * @param node
-     * @param bounds
-     * @param ids
-     */
-    private void collectShapeIds(Node node, Envelope bounds, List ids) 
-    throws StoreException 
-    {
-        if (!node.getBounds().intersects(bounds)) {
-            return;
-        }
-        
-        // Add the local nodes shapeids to the list.
-        for(int i = 0; i < node.getNumShapeIds(); i++) {
-            ids.add(new Integer(node.getShapeId(i)));
-        }
-        
-        Node subNode = null;
-        for(int i = 0; i < node.getNumSubNodes(); i++) {
-            subNode = node.getSubNode(i);
-            collectShapeIds(subNode, bounds, ids);
-        }
+		return lazySearchCollection;
     }
     
     /**
      * Closes this QuadTree after use...
      * @throws StoreException
      */
-    public void close() throws StoreException {
-        /* This does nothing, the IndexStore need to
-         * override this if something needs to be closed...
-         * 
-         */
-    }
+    public void close(Iterator iter) throws StoreException {
+    	 iterators.remove(iter);
+    	 if( iter instanceof LazySearchIterator )
+    		 ((LazySearchIterator)iter).close();
+      }
     
     /**
      * 
@@ -332,4 +313,23 @@ public class QuadTree {
     public void setRoot(Node root) {
         this.root = root;
     }
+
+	public void close() throws StoreException {
+		try {
+			indexfile.close();
+		} catch (IOException e) {
+			throw new StoreException("error closing indexfile", e.getCause());
+		}
+		if( !iterators.isEmpty() ){
+			throw new StoreException( "There are still open iterators!!" );
+		}
+	}
+
+	public void registerIterator(Iterator object) {
+		iterators.add(object);
+	}
+
+	public IndexFile getIndexfile() {
+		return indexfile;
+	}
 }

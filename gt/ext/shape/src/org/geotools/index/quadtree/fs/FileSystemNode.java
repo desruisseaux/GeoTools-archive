@@ -19,15 +19,16 @@
  */
 package org.geotools.index.quadtree.fs;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.index.quadtree.Node;
-import org.geotools.index.quadtree.StoreException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
-import java.util.logging.Logger;
+
+import org.geotools.index.quadtree.Node;
+import org.geotools.index.quadtree.StoreException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -37,8 +38,6 @@ import java.util.logging.Logger;
  * @source $URL$
  */
 public class FileSystemNode extends Node {
-    private static final Logger LOGGER = Logger.getLogger(
-            "org.geotools.index.quadtree");
     private FileChannel channel;
     private ByteOrder order;
     private int subNodeStartByte;
@@ -54,15 +53,23 @@ public class FileSystemNode extends Node {
      * @param startByte DOCUMENT ME!
      * @param subNodesLength DOCUMENT ME!
      */
-    public FileSystemNode(Envelope bounds, FileChannel channel,
+    public FileSystemNode(Envelope bounds, int id, Node parent, FileChannel channel,
         ByteOrder order, int startByte, int subNodesLength) {
-        super(bounds);
+        super(bounds, id, parent);
         this.channel = channel;
         this.order = order;
         this.subNodeStartByte = startByte;
         this.subNodesLength = subNodesLength;
     }
 
+    public Node copy() throws IOException {
+    	FileSystemNode copy = new FileSystemNode(getBounds(), id, getParent(), channel, order, subNodeStartByte, subNodesLength );
+    	copy.numShapesId=numShapesId;
+    	copy.shapesId=new int [numShapesId];
+    	System.arraycopy(shapesId, 0, copy.shapesId, 0, numShapesId);
+    	copy.numSubNodes=numSubNodes;
+		return copy;
+	}
     /**
      * DOCUMENT ME!
      *
@@ -114,7 +121,7 @@ public class FileSystemNode extends Node {
             int offset = this.subNodeStartByte;
 
             if (pos > 0) {
-                subNode = (FileSystemNode) super.getSubNode(pos - 1);
+                subNode = (FileSystemNode) getSubNode(pos - 1);
                 offset = subNode.getSubNodeStartByte()
                     + subNode.getSubNodesLength();
             }
@@ -128,7 +135,7 @@ public class FileSystemNode extends Node {
             }
 
             for (int i = 0, ii = subNodes.size(); i < ((pos + 1) - ii); i++) {
-                subNode = readNode(this.channel, this.order);
+                subNode = readNode(pos, this, this.channel, this.order);
                 this.addSubNode(subNode);
             }
         } catch (IOException e) {
@@ -148,7 +155,7 @@ public class FileSystemNode extends Node {
      *
      * @throws IOException
      */
-    public static FileSystemNode readNode(FileChannel channel, ByteOrder order)
+    public static FileSystemNode readNode(int id, Node parent, FileChannel channel, ByteOrder order)
         throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(4 + 32 + 4);
         buf.order(order);
@@ -182,7 +189,7 @@ public class FileSystemNode extends Node {
         int numSubNodes = intBuf.get();
 
         // The buffer is completed....
-        FileSystemNode node = new FileSystemNode(env, channel, order,
+        FileSystemNode node = new FileSystemNode(env, id, parent, channel, order,
                 (int) channel.position(), offset);
         node.setShapesId(ids);
         node.setNumSubNodes(numSubNodes);

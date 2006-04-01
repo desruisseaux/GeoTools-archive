@@ -217,7 +217,7 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
         copyShapefiles(ShapefileDataStoreTest.STATE_POP);
         DataStore ds = factory.createDataStore(TestData.url(
                     this, ShapefileDataStoreTest.STATE_POP));
-        testDataStore(IndexedShapefileDataStoreFactory.TREE_GRX, true, true,
+        testDataStore(IndexedShapefileDataStoreFactory.TREE_QIX, true, true,
             (IndexedShapefileDataStore) ds);
     }
 

@@ -26,37 +26,21 @@ package org.geotools.index.quadtree;
  * @source $URL$
  */
 public class StoreException extends Exception {
-    /**
-     *
-     */
+
+	private static final long serialVersionUID = -3356954193373344773L;
+
     public StoreException() {
         super();
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param message
-     */
     public StoreException(String message) {
         super(message);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param cause
-     */
     public StoreException(Throwable cause) {
         super(cause);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param message
-     * @param cause
-     */
     public StoreException(String message, Throwable cause) {
         super(message, cause);
     }

@@ -20,6 +20,8 @@
 package org.geotools.index.quadtree.fs;
 
 import com.vividsolutions.jts.geom.Envelope;
+
+import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.index.quadtree.IndexStore;
 import org.geotools.index.quadtree.Node;
 import org.geotools.index.quadtree.QuadTree;
@@ -193,7 +195,7 @@ public class FileSystemIndexStore implements IndexStore {
      *
      * @see org.geotools.index.quadtree.IndexStore#load()
      */
-    public QuadTree load() throws StoreException {
+    public QuadTree load(IndexFile indexfile) throws StoreException {
         QuadTree tree = null;
 
         try {
@@ -213,7 +215,7 @@ public class FileSystemIndexStore implements IndexStore {
             channel.read(buf);
             buf.flip();
 
-            tree = new QuadTree(buf.getInt(), buf.getInt()) {
+            tree = new QuadTree(buf.getInt(), buf.getInt(), indexfile) {
                         public void insert(int recno, Envelope bounds) {
                             throw new UnsupportedOperationException(
                                 "File quadtrees are immutable");
@@ -224,6 +226,7 @@ public class FileSystemIndexStore implements IndexStore {
                         }
 
                         public void close() throws StoreException {
+                        	super.close();
                             try {
                                 channel.close();
                                 fis.close();
@@ -233,7 +236,7 @@ public class FileSystemIndexStore implements IndexStore {
                         }
                     };
 
-            tree.setRoot(FileSystemNode.readNode(channel, order));
+            tree.setRoot(FileSystemNode.readNode(0, null, channel, order));
 
             LOGGER.finest("QuadTree opened");
         } catch (IOException e) {

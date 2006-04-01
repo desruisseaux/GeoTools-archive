@@ -21,12 +21,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -59,7 +59,6 @@ import org.geotools.data.shapefile.shp.JTSUtilities;
 import org.geotools.data.shapefile.shp.ShapeHandler;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileException;
-import org.geotools.data.shapefile.shp.ShapefileHeader;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.feature.AttributeType;
@@ -136,11 +135,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	byte treeType;
 
-	final boolean createIndex;
+	boolean createIndex;
 
 	final boolean useIndex;
-
-	private QuadTree quadTree;
 
         
 	private RTree rtree;
@@ -310,17 +307,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 				e.printStackTrace();
 				LOGGER
 						.severe("org.geotools.data.shapefile.indexed.IndexedShapeFileDataStore#finalize(): Error closing rtree. "
-								+ e.getLocalizedMessage());
-			}
-		}
-
-		if (quadTree != null) {
-			try {
-				quadTree.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-				LOGGER
-						.severe("org.geotools.data.shapefile.indexed.IndexedShapeFileDataStore#finalize(): Error closing quadTree. "
 								+ e.getLocalizedMessage());
 			}
 		}
@@ -495,7 +481,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			Filter filter) throws IOException {
 		Envelope bbox = null;
 
-		List goodRecs = null;
+		Collection goodRecs = null;
 		if (filter instanceof FidFilter && fixURL!=null ) {
 			FidFilter fidFilter = (FidFilter) filter;
 			goodRecs = queryFidIndex(fidFilter.getFids());
@@ -569,7 +555,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 		List records = new ArrayList(fids.length);
 		try {
-			IndexFile shx = openIndexFile();
+			IndexFile shx = openIndexFile(shxURL);
 			try {
 
 				DataDefinition def = new DataDefinition("US-ASCII");
@@ -608,7 +594,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 *
 	 * @return a List of <code>Data</code> objects
 	 */
-	private List queryTree(Envelope bbox) throws DataSourceException,
+	private Collection queryTree(Envelope bbox) throws DataSourceException,
 			IOException, TreeException {
 		if (this.treeType == TREE_GRX) {
 			return this.queryRTree(bbox);
@@ -661,64 +647,36 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * @throws TreeException
 	 *             DOCUMENT ME!
 	 */
-	private List queryQuadTree(Envelope bbox) throws DataSourceException,
+	private Collection queryQuadTree(Envelope bbox) throws DataSourceException,
 			IOException, TreeException {
-		List tmp = null;
-		List goodRecs = null;
-		IndexFile shx = null;
-		QuadTree tree = null;
+        Collection tmp = null;
 
-		try {
-			tree = this.openQuadTree();
-
-			if ((tree != null) && !bbox.contains(tree.getRoot().getBounds())) {
-				tmp = tree.search(bbox);
-
-				if (tmp.size() > 0) {
-					// WARNING: QuadTree records number begins from 0
-					shx = this.openIndexFile();
-
-					goodRecs = new ArrayList();
-
-					Collections.sort(tmp);
-
-					DataDefinition def = new DataDefinition("US-ASCII");
-					def.addField(Integer.class);
-					def.addField(Long.class);
-
-					Data data = null;
-					Integer recno = null;
-
-					for (int i = 0; i < tmp.size(); i++) {
-						recno = (Integer) tmp.get(i);
-						data = new Data(def);
-						data.addValue(new Integer(recno.intValue() + 1));
-						data.addValue(new Long(shx.getOffsetInBytes(recno
-								.intValue())));
-						goodRecs.add(data);
-					}
-				}
+        try {
+            QuadTree quadTree=openQuadTree();
+			if ((quadTree != null) && !bbox.contains(quadTree.getRoot().getBounds())) {
+                tmp = quadTree.search(bbox);
+                
+                if( tmp==null || !tmp.isEmpty())
+                	return tmp;
 			}
-		} catch (StoreException le) {
-			throw new DataSourceException("Error querying QuadTree", le);
-		} finally {
-			try {
-				shx.close();
-			} catch (Exception ee) {
-			}
+			if( quadTree!=null )
+				quadTree.close();
+        }catch (Exception e) {
+			throw new DataSourceException("Error querying QuadTree", e);
 		}
 
-		return goodRecs;
+    	return null;
 	}
 
 	/**
-	 * Convenience method for opening a ShapefileReader.
+	 * Convenience method for opening an index file.
+	 * @param shxURL TODO
 	 *
 	 * @return An IndexFile
 	 *
 	 * @throws IOException
 	 */
-	protected IndexFile openIndexFile() throws IOException {
+	protected IndexFile openIndexFile(URL shxURL) throws IOException {
 		ReadableByteChannel rbc = getReadChannel(shxURL);
 
 		if (rbc == null) {
@@ -770,6 +728,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 					try {
 						this.buildRTree();
 					} catch (TreeException e) {
+						createIndex=false;
 						return null;
 					}
 				} else {
@@ -796,6 +755,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * @throws StoreException
 	 */
 	protected synchronized QuadTree openQuadTree() throws StoreException {
+		QuadTree quadTree=null;
 		if (quadTree == null) {
 			File file = new File(treeURL.getPath());
 
@@ -804,6 +764,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 					try {
 						this.buildQuadTree();
 					} catch (TreeException e) {
+						createIndex=false;
 						return null;
 					}
 				} else {
@@ -812,7 +773,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			}
 
 			FileSystemIndexStore store = new FileSystemIndexStore(file);
-			quadTree = store.load();
+			try {
+				quadTree = store.load(openIndexFile(shxURL));
+			} catch (IOException e) {
+				throw new StoreException(e);
+			}
 		}
 
 		return quadTree;
@@ -943,44 +908,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		}
 
 		return schema;
-	}
-
-	/**
-	 * Gets the bounding box of the file represented by this data store as a
-	 * whole (that is, off all of the features in the shape)
-	 *
-	 * @return The bounding box of the datasource or null if unknown and too
-	 *         expensive for the method to calculate.
-	 *
-	 * @throws DataSourceException
-	 *             DOCUMENT ME!
-	 */
-	private Envelope getBounds() throws DataSourceException {
-		// This is way quick!!!
-		ReadableByteChannel in = null;
-
-		try {
-			ByteBuffer buffer = ByteBuffer.allocate(100);
-			in = getReadChannel(shpURL);
-			in.read(buffer);
-			buffer.flip();
-
-			ShapefileHeader header = new ShapefileHeader();
-			header.read(buffer, true);
-
-			return new Envelope(header.minX(), header.maxX(), header.minY(),
-					header.maxY());
-		} catch (IOException ioe) {
-			// What now? This seems arbitrarily appropriate !
-			throw new DataSourceException("Problem getting Bbox", ioe);
-		} finally {
-			try {
-				if (in != null) {
-					in.close();
-				}
-			} catch (IOException ioe) {
-			}
-		}
 	}
 
 	/**
@@ -1174,18 +1101,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		if (isLocal()) {
 			LOGGER.info("Creating spatial index for " + shpURL.getPath());
 
-			synchronized (this) {
-				if (quadTree != null) {
-					try {
-						quadTree.close();
-					} catch (StoreException e) {
-						throw new TreeException(e);
-					}
-				}
-
-				quadTree = null;
-			}
-
 			ShapeFileIndexer indexer = new ShapeFileIndexer();
 			indexer.setIdxType(ShapeFileIndexer.QUADTREE);
 			indexer.setShapeFileName(shpURL.getPath());
@@ -1224,7 +1139,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	protected static class Reader extends AbstractAttributeIO implements
 			AttributeReader, RecordNumberTracker {
-		private static final DataComparator dataComparator = new DataComparator();
 
 		protected ShapefileReader shp;
 
@@ -1234,11 +1148,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 		protected ShapefileReader.Record record;
 
-		protected List goodRecs;
-
-		private int cnt;
+		protected Iterator goodRecs;
 
 		private int recno;
+
+		private Data next;
 
 		/**
 		 * Create the shape reader
@@ -1254,18 +1168,13 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		 *            DOCUMENT ME!
 		 */
 		public Reader(AttributeType[] atts, ShapefileReader shp,
-				IndexedDbaseFileReader dbf, List goodRecs) {
+				IndexedDbaseFileReader dbf, Collection goodRecs) {
 			super(atts);
 			this.shp = shp;
 			this.dbf = dbf;
-			this.goodRecs = goodRecs;
+			if( goodRecs!=null )
+				this.goodRecs = goodRecs.iterator();
 
-			// Sort the list for forward only file reads
-			if (this.goodRecs != null) {
-				Collections.sort(this.goodRecs, dataComparator);
-			}
-
-			this.cnt = 0;
 			this.recno = 0;
 		}
 
@@ -1287,9 +1196,17 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		}
 
 		public boolean hasNext() throws IOException {
-			if (this.goodRecs != null) {
-				return this.cnt < this.goodRecs.size();
-			}
+            if (this.goodRecs != null) {
+            	if( next!=null )
+            		return true;
+                if (this.goodRecs.hasNext()) {
+                	
+                    next=(Data)goodRecs.next();
+                    this.recno = ((Integer) next.getValue(0)).intValue();
+                    return true;
+                }
+                return false;
+            }
 
 			int n = shp.hasNext() ? 1 : 0;
 
@@ -1310,18 +1227,18 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		}
 
 		public void next() throws IOException {
+        	if( !hasNext() )
+        		throw new IndexOutOfBoundsException("No more features in reader");
 			if (this.goodRecs != null) {
-				Data data = (Data) this.goodRecs.get(this.cnt);
-				this.recno = ((Integer) data.getValue(0)).intValue();
+				this.recno = ((Integer) next.getValue(0)).intValue();
 
 				if (dbf != null) {
 					dbf.goTo(this.recno);
 				}
 
-				Long l = (Long) data.getValue(1);
+				Long l = (Long) next.getValue(1);
 				shp.goTo((int) l.longValue());
-
-				this.cnt++;
+				next=null;
 			} else {
 				this.recno++;
 			}

@@ -16,14 +16,27 @@
  */
 package org.geotools.data.shapefile;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.net.URI;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.geotools.data.AbstractAttributeIO;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
@@ -76,24 +89,15 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.xml.gml.GMLSchema;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.net.URI;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -114,6 +118,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected URI namespace = null; // namespace provided by the constructor's map
     protected FeatureType schema; // read only
     protected boolean useMemoryMappedBuffer = true;
+	private Set openedChannels=new HashSet();
 
     /**
      * Creates a new instance of ShapefileDataStore.
@@ -299,6 +304,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             InputStream in = url.openConnection().getInputStream();
             channel = Channels.newChannel(in);
         }
+        
+        openedChannels.add(channel);
 
         return channel;
     }
@@ -318,7 +325,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected WritableByteChannel getWriteChannel(URL url)
         throws IOException {
         WritableByteChannel channel;
-
+        
         if (url.getProtocol().equals("file")) { // && useMemoryMappedBuffer) {
 
             File file = null;
@@ -335,11 +342,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             channel = raf.getChannel();
 
             ((FileChannel) channel).lock();
+
         } else {
             OutputStream out = url.openConnection().getOutputStream();
             channel = Channels.newChannel(out);
         }
-
+        
+        
         return channel;
     }
 
@@ -803,7 +812,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 	 * @throws DataSourceException
 	 *             DOCUMENT ME!
 	 */
-    private Envelope getBounds() throws DataSourceException {
+    protected Envelope getBounds() throws DataSourceException {
         // This is way quick!!!
         ReadableByteChannel in = null;
 

@@ -23,8 +23,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -33,7 +33,6 @@ import org.geotools.data.shapefile.indexed.RecordNumberTracker;
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.index.Data;
-import org.geotools.index.DataDefinition;
 import org.geotools.index.LockTimeoutException;
 import org.geotools.index.TreeException;
 import org.geotools.index.quadtree.QuadTree;
@@ -59,7 +58,6 @@ public class IndexInfo {
     final byte treeType;
     final URL treeURL;
     final URL shxURL;
-    private IndexFile indexFile;
     private RTree rtree;
     private QuadTree qtree;
 
@@ -107,49 +105,23 @@ public class IndexInfo {
      * @throws IOException
      * @throws TreeException DOCUMENT ME!
      */
-    List queryQuadTree( Envelope bbox ) throws DataSourceException, IOException, TreeException {
-        List tmp = null;
-        List goodRecs = null;
+    Collection queryQuadTree( Envelope bbox ) throws DataSourceException, IOException, TreeException {
+        Collection tmp = null;
 
         try {
             if ((qtree != null) && !bbox.contains(qtree.getRoot().getBounds())) {
                 tmp = qtree.search(bbox);
-
-                if (tmp.size() > 0) {
-                    // WARNING: QuadTree record number begins from 0
-                    Collections.sort(tmp);
-
-                    DataDefinition def = new DataDefinition("US-ASCII");
-                    def.addField(Integer.class);
-                    def.addField(Long.class);
-
-                    Data data = null;
-                    Integer recno = null;
-                    goodRecs = new ArrayList(tmp.size());
-                    for( int i = 0; i < tmp.size(); i++ ) {
-                        recno = (Integer) tmp.get(i);
-                        data = new Data(def);
-                        data.addValue(new Integer(recno.intValue() + 1));
-                        data.addValue(new Long(indexFile.getOffsetInBytes(recno.intValue())));
-                        goodRecs.add(data);
-                    }
-                }
-            }
-        } catch (StoreException le) {
-            throw new DataSourceException("Error querying QuadTree", le);
-        } finally {
-            try {
-                qtree.close();
-            } catch (Exception ee) {
-            }
-
-            try {
-                indexFile.close();
-            } catch (Exception ee) {
-            }
+                
+                if( tmp!=null && !tmp.isEmpty())
+                	return tmp;
         }
+            if( qtree!=null )
+            	qtree.close();
+        }catch (Exception e) {
+        	ShapefileRenderer.LOGGER.warning(e.getLocalizedMessage());
+		}
 
-        return goodRecs;
+    	return null;
     }
 
     /**
@@ -184,7 +156,11 @@ public class IndexInfo {
         File file = new File(treeURL.getPath());
         FileSystemIndexStore store = new FileSystemIndexStore(file);
 
-        return store.load();
+        try {
+			return store.load(openIndexFile());
+		}  catch (IOException e) {
+			throw new StoreException(e);
+		}
     }
 
     /**
@@ -249,7 +225,7 @@ public class IndexInfo {
     // .nextRecord();
     // return record;
     // }
-    private List queryTree( Envelope bbox ) throws IOException, TreeException {
+    private Collection queryTree( Envelope bbox ) throws IOException, TreeException {
         if (treeType == IndexInfo.R_TREE) {
             return queryRTree(bbox);
         } else if (treeType == IndexInfo.QUAD_TREE) {
@@ -262,31 +238,32 @@ public class IndexInfo {
 
     static class Reader implements RecordNumberTracker {
         private ShapefileReader shp;
-        List goodRecs;
-        private int cnt = 0;
+        Iterator goodRecs;
         private int recno = 1;
+		private Data next;
+		private IndexInfo info;
 
         public Reader( IndexInfo info, ShapefileReader reader, Envelope bbox ) throws IOException {
             shp = reader;
 
             try {
+            	
                 if (info.treeType == R_TREE) {
                     info.rtree = info.openRTree();
                 } else if (info.treeType == QUAD_TREE) {
                     info.qtree = info.openQuadTree();
                 }
 
-                info.indexFile = info.openIndexFile();
-                goodRecs = info.queryTree(bbox);
+                Collection queryTree = info.queryTree(bbox);
+                if( queryTree!=null )
+                	goodRecs = queryTree.iterator();
             } catch (Exception e) {
                 ShapefileRenderer.LOGGER.log(Level.FINE,
                         "Exception occured attempting to use indexing:", e);
                 goodRecs = null;
-            } finally {
-                if (info.indexFile != null)
-                    info.indexFile.close();
             }
 
+            this.info=info;
         }
 
         public int getRecordNumber() {
@@ -294,9 +271,12 @@ public class IndexInfo {
         }
         public boolean hasNext() throws IOException {
             if (this.goodRecs != null) {
-                if (this.cnt < this.goodRecs.size()) {
-                    Data data = (Data) this.goodRecs.get(this.cnt);
-                    this.recno = ((Integer) data.getValue(0)).intValue();
+            	if( next!=null )
+            		return true;
+                if (this.goodRecs.hasNext()) {
+                	
+                    next=(Data)goodRecs.next();
+                    this.recno = ((Integer) next.getValue(0)).intValue();
                     return true;
                 }
                 return false;
@@ -306,15 +286,13 @@ public class IndexInfo {
         }
 
         public ShapefileReader.Record next() throws IOException {
+        	if( !hasNext() )
+        		throw new IndexOutOfBoundsException("No more features in reader");
             if (this.goodRecs != null) {
-                Data data = (Data) this.goodRecs.get(this.cnt);
-                this.recno = ((Integer) data.getValue(0)).intValue();
 
-                Long l = (Long) data.getValue(1);
+                Long l = (Long) next.getValue(1);
                 ShapefileReader.Record record = shp.recordAt(l.intValue());
-
-                this.cnt++;
-
+                next=null;
                 return record;
             }
             recno++;
@@ -323,6 +301,15 @@ public class IndexInfo {
 
         public void close() throws IOException {
             shp.close();
+            try {
+            	if( info.qtree!=null ){
+					info.qtree.close(goodRecs);
+					info.qtree.close();
+            	}
+			} catch (StoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
 }

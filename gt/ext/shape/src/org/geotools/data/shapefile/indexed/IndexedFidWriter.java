@@ -6,10 +6,8 @@ package org.geotools.data.shapefile.indexed;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-
 import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.data.shapefile.shp.IndexFile;
-
 
 /**
  * The Writer writes out the fid and record number of features to the fid
