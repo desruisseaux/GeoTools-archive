@@ -54,7 +54,7 @@ public class DbaseFileTest extends TestCaseSupport {
 
   protected void setUp() throws Exception {
     super.setUp();
-    dbf = new DbaseFileReader(TestData.openChannel(TEST_FILE));
+    dbf = new DbaseFileReader(TestData.openChannel(TEST_FILE),false);
   }
   
   public void testNumberofColsLoaded(){
@@ -80,7 +80,7 @@ public class DbaseFileTest extends TestCaseSupport {
   public void testRowVsEntry() throws Exception {
     Object[] attrs = new Object[dbf.getHeader().getNumFields()];
     ReadableByteChannel ch2 = TestData.openChannel(TEST_FILE);
-    DbaseFileReader dbf2 = new DbaseFileReader(ch2);
+    DbaseFileReader dbf2 = new DbaseFileReader(ch2,false);
     while (dbf.hasNext()) {
       dbf.readEntry(attrs);
       DbaseFileReader.Row r = dbf2.readRow();
@@ -128,7 +128,7 @@ public class DbaseFileTest extends TestCaseSupport {
     }
     dbf.close();
     FileInputStream in = new FileInputStream(f);
-    DbaseFileReader r = new DbaseFileReader(in.getChannel());
+    DbaseFileReader r = new DbaseFileReader(in.getChannel(), false);
     int cnt = 0;
     while (r.hasNext()) {
       cnt++;

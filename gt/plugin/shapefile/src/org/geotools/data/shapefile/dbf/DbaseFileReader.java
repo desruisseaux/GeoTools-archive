@@ -115,17 +115,6 @@ public class DbaseFileReader {
 
 	protected int currentOffset = 0;
 	private StreamLogging streamLogger=new StreamLogging("Dbase File Reader");
-	/**
-	 * Creates a new instance of DBaseFileReader
-	 * 
-	 * @param channel
-	 *            The readable channel to use.
-	 * @throws IOException
-	 *             If an error occurs while initializing.
-	 */
-	public DbaseFileReader(ReadableByteChannel channel) throws IOException {
-		this(channel, true);
-	}
 
 	/**
 	 * Creates a new instance of DBaseFileReader
@@ -544,7 +533,7 @@ public class DbaseFileReader {
 
 	public static void main(String[] args) throws Exception {
 		FileChannel channel = new FileInputStream(args[0]).getChannel();
-		DbaseFileReader reader = new DbaseFileReader(channel);
+		DbaseFileReader reader = new DbaseFileReader(channel,false);
 		System.out.println(reader.getHeader());
 		int r = 0;
 		while (reader.hasNext()) {

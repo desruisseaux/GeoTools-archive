@@ -475,7 +475,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             return null;
         }
 
-        return new DbaseFileReader(rbc);
+        return new DbaseFileReader(rbc, useMemoryMappedBuffer);
     }
 
     /**
