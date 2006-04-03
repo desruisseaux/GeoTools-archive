@@ -1115,7 +1115,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     throw new IOException("unable to complete write: "+src);
                 }
 
-                storage.delete();
             }
         } finally {
             readWriteLock.unlockWrite();
@@ -1127,6 +1126,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             if (out != null) {
                 out.close();
             }
+            storage.delete();
         }
     }
 
