@@ -124,7 +124,7 @@ public class ShapefileDataStoreFactory
             Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
             URI namespace = (URI) NAMESPACEP.lookUp(params);  
             if (mm == null)
-                mm = Boolean.TRUE;
+                mm = Boolean.FALSE;
             ds = new ShapefileDataStore(url, namespace, 
                                         mm.booleanValue());
         } catch (MalformedURLException mue) {
