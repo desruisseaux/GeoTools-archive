@@ -19,7 +19,7 @@ package org.geotools.filter;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.FilterType;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
@@ -243,6 +243,51 @@ public class SQLEncoderPostgis extends SQLEncoder
         String geomText = wkt.write(bbox);
         out.write("GeometryFromText('" + geomText + "', " + srid + ")");
     }
+    
+    /**
+     * Writes the SQL for a Compare Filter.
+     *
+     * DJB: note, postgis overwrites this implementation because of the way
+     *       null is handled.  This is for <PropertyIsNull> filters and <PropertyIsEqual> filters
+     *       are handled.  They will come here with "property = null".  
+     *       NOTE:
+     *        SELECT * FROM <table> WHERE <column> isnull;  -- postgresql
+     *        SELECT * FROM <table> WHERE isnull(<column>); -- oracle???
+     * 
+     * @param filter the comparison to be turned into SQL.
+     *
+     * @throws RuntimeException for io exception with writer
+     */
+    public void visit(CompareFilter filter) throws RuntimeException {
+        LOGGER.finer("exporting SQL ComparisonFilter");
+
+        DefaultExpression left = (DefaultExpression) filter.getLeftValue();
+        DefaultExpression right = (DefaultExpression) filter.getRightValue();
+        LOGGER.finer("Filter type id is " + filter.getFilterType());
+        LOGGER.finer("Filter type text is "
+            + comparisions.get(new Integer(filter.getFilterType())));
+
+        String type = (String) comparisions.get(new Integer(
+                    filter.getFilterType()));
+
+        try {
+        	// a bit hacky, but what else can we really do?
+        	if ( (right == null) && (filter.getFilterType()==FilterType.COMPARE_EQUALS ) )
+        	{
+        		left.accept(this);
+        		out.write(" isnull");
+        	}
+        	else
+        	{
+        		left.accept(this);
+        		out.write(" " + type + " ");
+        		right.accept(this);
+        	}
+        } catch (java.io.IOException ioe) {
+            throw new RuntimeException(IO_ERROR, ioe);
+        }
+    }
+    
     
     
 }
