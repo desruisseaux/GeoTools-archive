@@ -57,7 +57,7 @@ import java.util.logging.Logger;
  */
 public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     /** error message for exceptions */
-    private static final String IO_ERROR = "io problem writing filter";
+    protected static final String IO_ERROR = "io problem writing filter";
 
     /** The filter types that this class can encode */
     private static FilterCapabilities capabilities = null;
@@ -66,7 +66,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
     /** Map of comparison types to sql representation */
-    private static Map comparisions = new HashMap();
+    protected static Map comparisions = new HashMap();
 
     /** Map of spatial types to sql representation */
     private static Map spatial = new HashMap();
@@ -396,6 +396,13 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
 
     /**
      * Writes the SQL for a Compare Filter.
+     *  
+     *  DJB: note, postgis overwrites this implementation because of the way
+     *       null is handled.  This is for <PropertyIsNull> filters and <PropertyIsEqual> filters
+     *       are handled.  They will come here with "property = null".  
+     *       NOTE: 
+     *        SELECT * FROM <table> WHERE <column> isnull;  -- postgresql
+     *        SELECT * FROM <table> WHERE isnull(<column>); -- oracle???
      *
      * @param filter the comparison to be turned into SQL.
      *
