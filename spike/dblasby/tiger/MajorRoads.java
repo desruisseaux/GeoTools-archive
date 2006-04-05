@@ -44,6 +44,7 @@ import com.vividsolutions.jts.index.strtree.SIRtree;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import com.vividsolutions.jts.operation.linemerge.LineMerger;
 import com.vividsolutions.jts.operation.polygonize.Polygonizer;
+import com.vividsolutions.jts.simplify.TopologyPreservingSimplifier;
 
 /**
  *  Load the delme_major table, based either on a state or module
@@ -69,7 +70,11 @@ import com.vividsolutions.jts.operation.polygonize.Polygonizer;
 public class MajorRoads
 {
     String MODULE = "";
-
+    
+    double tolerance1 = 0.00005; // 50% reduction
+    double tolerance2 = 0.00025; // 75% reduction
+    double tolerance3 = 0.00080; //87% reduction
+    
      Hashtable interstate = new Hashtable();    //int to ArrayList of geometry
      Hashtable ushighway = new Hashtable();     //int to ArrayList of geometry
      Hashtable statehighway = new Hashtable();  //int to ArrayList of geometry
@@ -738,7 +743,21 @@ E United States Highway 10
 	     }
 	     catch (SchemaNotFoundException ee)
 		 {
-	     	System.out.println("You must create the poly2 table in the postgis database:");
+	     	System.out.println("you need to have major_roads in your database:");
+	     	System.out.println("		create table major_roads (");
+	     	System.out.println("               state text, ");
+	   		System.out.println("               gen_full geometry,");
+	   		System.out.println("               gen_1 geometry,");
+	   		System.out.println("               gen_2 geometry,");
+	   		System.out.println("               gen_3 geometry,");
+			System.out.println("	           interstate int,");
+			System.out.println("	           ushighway  int,");
+			System.out.println("	           statehighway int,");
+			System.out.println("	           otherName text     ) with oids;");
+			System.out.println("insert into geometry_columns values ('','','major_roads','gen_full',2,1,'GEOMETRY');");
+			System.out.println("insert into geometry_columns values ('','','major_roads','gen_1',2,1,'GEOMETRY');");
+			System.out.println("insert into geometry_columns values ('','','major_roads','gen_2',2,1,'GEOMETRY');");
+			System.out.println("insert into geometry_columns values ('','','major_roads','gen_3',2,1,'GEOMETRY');");
 		 }
 	     catch (Exception e)
 		 {
@@ -805,9 +824,12 @@ E United States Highway 10
 	          while (it.hasNext())
 	          {
 	          	   Geometry g  = (Geometry) it.next();
-	          	   Object[] values = new Object[6];
+	          	   Object[] values = new Object[9];
 	 			   values[ft.find("state")] = MODULE;
-	 			   values[ft.find("the_geom")] = g;
+	 			   values[ft.find("gen_full")] = g;
+	 			      values[ft.find("gen_1")] = generalize(g,tolerance1);
+	 			      values[ft.find("gen_2")] = generalize(g,tolerance2);
+	 			      values[ft.find("gen_3")] = generalize(g,tolerance3);
 	 			   values[ft.find(column)] = key;
 	 			   
 	 			    Feature f = ft.create(values);
@@ -863,5 +885,9 @@ E United States Highway 10
 		buildNetworkTable(other);
 	}
 	
+	private Geometry generalize(Geometry g, double tolerance)
+	{
+		return TopologyPreservingSimplifier.simplify(g,tolerance);
+	}
 	
 }
