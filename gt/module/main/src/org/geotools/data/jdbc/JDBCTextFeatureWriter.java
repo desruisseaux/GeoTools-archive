@@ -82,7 +82,8 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      */
     protected void doInsert(MutableFIDFeature current)
         throws IOException, SQLException {
-        LOGGER.fine("inserting into postgis feature " + current);
+    	if (LOGGER.isLoggable(Level.FINE)) 
+    		LOGGER.fine("inserting into postgis feature " + current);
 
         Statement statement = null;
         Connection conn = null;
@@ -92,7 +93,8 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             statement = conn.createStatement();
 
             String sql = makeInsertSql(current);
-            LOGGER.fine(sql);
+            if (LOGGER.isLoggable(Level.FINE)) 
+            	LOGGER.fine(sql);
             statement.executeUpdate(sql);
 
             // should the ID be generated during an insert, we need to read it back
@@ -251,7 +253,8 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      * @see org.geotools.data.FeatureWriter#remove()
      */
     public void remove() throws IOException {
-        LOGGER.fine("inserting into postgis feature " + current);
+    	if (LOGGER.isLoggable(Level.FINE)) 
+              LOGGER.fine("inserting into postgis feature " + current);
 
         Statement statement = null;
         Connection conn = null;
@@ -261,7 +264,8 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             statement = conn.createStatement();
 
             String sql = makeDeleteSql(current);
-            LOGGER.fine(sql);
+            if (LOGGER.isLoggable(Level.FINE)) 
+            	LOGGER.fine(sql);
             //System.out.println(sql);
             statement.executeUpdate(sql);
         } catch (SQLException sqle) {
@@ -320,7 +324,9 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      */
     protected void doUpdate(Feature live, Feature current)
         throws IOException, SQLException {
-        LOGGER.fine("updating postgis feature " + current);
+    	
+    	if (LOGGER.isLoggable(Level.FINE)) 
+             LOGGER.fine("updating postgis feature " + current);
 
         Statement statement = null;
         Connection conn = null;
@@ -330,8 +336,9 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             statement = conn.createStatement();
 
             String sql = makeUpdateSql(live, current);
-            LOGGER.fine(sql);
-            System.out.println(sql);
+            if (LOGGER.isLoggable(Level.FINE)) 
+            	LOGGER.fine(sql);
+           // System.out.println(sql);
             statement.executeUpdate(sql);
         } catch (SQLException sqle) {
             String msg = "SQL Exception writing geometry column";
