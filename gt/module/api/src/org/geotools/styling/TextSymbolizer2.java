@@ -20,8 +20,16 @@ package org.geotools.styling;
  * @source $URL$
  */
 public interface TextSymbolizer2 extends TextSymbolizer {
-    /* Used for "shield labels" on hwys. */
+	/**
+	 * The nonstandard-SLD graphic element supports putting little graphical-bits onto labels.
+     * Useful for things like interstate road shields or labeled logos
+     * @return - the Graphic object to be rendered under the label text
+     */
     public Graphic getGraphic();
-
+    /**
+     * The nonstandard-SLD graphic element supports putting little graphical-bits onto labels.
+     * Useful for things like interstate road shields or labeled logos
+    * @param g - the Graphic object which will be rendered under the label text
+    */
     public void setGraphic(Graphic graphic);
 }

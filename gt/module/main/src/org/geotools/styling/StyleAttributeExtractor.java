@@ -265,6 +265,12 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         {
         	this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
         }
+        
+        if (text instanceof TextSymbolizer2)
+        {
+        	if ( ((TextSymbolizer2)text).getGraphic() !=null)
+        		((TextSymbolizer2)text).getGraphic().accept(this);
+        }
 
         if (text.getFill() != null) {
             text.getFill().accept(this);

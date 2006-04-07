@@ -22,8 +22,10 @@ import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.GlyphVector;
+import java.awt.image.BufferedImage;
 
 import org.geotools.resources.Utilities;
 
@@ -89,6 +91,8 @@ public class TextStyle2D extends Style2D {
     Paint haloFill;
     Composite haloComposite;
     float haloRadius;
+    Style2D graphic;
+
 
     /** Holds value of property fill. */
     private Paint fill;
@@ -335,4 +339,31 @@ public class TextStyle2D extends Style2D {
     public String toString() {
         return Utilities.getShortClassName(this) + "[\"" + label + "\"]";
     }
+    
+        
+        /**
+         * Sets the style2D to be drawn underneath this text
+         */
+        public void setGraphic(Style2D s) {
+        	graphic = s;
+        }
+        
+       /**
+         * gets the Style2D to be drawn underneath this text
+         */
+        public Style2D getGraphic() {
+        	return graphic;
+        }
+        
+        public Rectangle getGraphicDimensions() {
+        	if (graphic instanceof MarkStyle2D)
+        		return ((MarkStyle2D)graphic).getShape().getBounds();
+        	else if (graphic instanceof GraphicStyle2D) {
+        		BufferedImage i = ((GraphicStyle2D)graphic).getImage();
+        		return new Rectangle(i.getWidth(),i.getHeight());
+        	} else {
+        		throw new RuntimeException("Can't render graphic which is not a MarkStyle2D or a GraphicStyle2D");
+        	}
+        }
+    
 }

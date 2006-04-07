@@ -958,6 +958,16 @@ public class SLDParser {
 			if (childName.equalsIgnoreCase("Halo")) {
 				symbol.setHalo(parseHalo(child));
 			}
+			if (childName.equalsIgnoreCase("Graphic")) {
+				if (LOGGER.isLoggable(Level.FINEST)) {
+					LOGGER.finest("Parsing non-standard Graphic in TextSymbolizer");
+				}
+				if (symbol instanceof TextSymbolizer2)
+				{
+					((TextSymbolizer2)symbol).setGraphic(parseGraphic(child));
+				}
+			}
+			
 			
 			if (childName.equalsIgnoreCase("priority")) 
 			{

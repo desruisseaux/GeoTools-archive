@@ -352,11 +352,29 @@ public class LabelCacheDefault implements LabelCache {
 				if (offscreen(glyphVector, tempTransform,displayArea ))  // is this offscreen?
 					continue;
 				
+				Rectangle glyphBounds = glyphVector.getPixelBounds(new FontRenderContext(tempTransform,true,false), 0,0);
+				
+				//we wind up using the translated shield location a number of times, in overlap calculations, offscreen
+				//calculations, etc.  Let's just pre-calculate it here, as we do the offscreen calculation.
+				Rectangle2D shieldBounds = null;
+				if (labelItem.getTextStyle().getGraphic() != null) {
+					Rectangle area = labelItem.getTextStyle().getGraphicDimensions(); 
+					double[] shieldVerts = new double[] {0.0-glyphBounds.width/2.0,-glyphBounds.height/2.0, area.width-glyphBounds.width/2.0, area.height-glyphBounds.height/2.0}; // translate centering
+					tempTransform.transform(shieldVerts, 0, shieldVerts, 0, 2);
+					shieldBounds = new Rectangle2D.Double(shieldVerts[0],shieldVerts[1],shieldVerts[2]-shieldVerts[0],shieldVerts[3]-shieldVerts[1]);
+					if (!displayArea.contains(shieldBounds))
+						continue;
+				}
+				
+								
+			
 				int space = labelItem.getSpaceAround();
 				if (space >=0) // if <0 then its okay to have overlapping items (!!)
 				{
-					if( overlappingItems(glyphVector, tempTransform, glyphs, space)  )
-						continue;
+					if( overlappingItems(glyphBounds, glyphs, space)  )
+ 						continue;
+					if( shieldBounds != null && overlappingItems(shieldBounds.getBounds(), glyphs, space)  )
+						continue;							
 				}
 				
 				if (goodnessOfFit(glyphVector, tempTransform, representativeGeom ) < MIN_GOODNESS_FIT)
@@ -364,7 +382,23 @@ public class LabelCacheDefault implements LabelCache {
 
 				try {
 				    graphics.setTransform(tempTransform);
-				    
+
+					
+				    if (labelItem.getTextStyle().getGraphic() != null) 
+				    {
+				    	
+			    	    //draw the label shield first, underneath the halo
+			    	    LiteShape2 tempShape = new LiteShape2(new GeometryFactory().createPoint(
+			    	    		   new Coordinate(glyphBounds.width/2.0,   -1.0*glyphBounds.height/2.0)
+			    	    		   ), null, null, false);
+							    	
+				    	//labels should always draw, so we'll just force this one to draw by setting it's min/max scale to 0<10 and then
+				    	//drawing at scale 5.0 on the next line
+			        	labelItem.getTextStyle().getGraphic().setMinMaxScale(0.0, 10.0);
+				    	new StyledShapePainter(this).paint(graphics, tempShape, labelItem.getTextStyle().getGraphic(), 5.0);
+				    	graphics.setTransform(tempTransform);
+				    }
+				    				    
 				    if (labelItem.getTextStyle().getHaloFill() != null) {
 				        // float radious = ts2d.getHaloRadius();
 	
@@ -515,21 +549,21 @@ public class LabelCacheDefault implements LabelCache {
 	/**
 	 * Determines whether labelItems overlaps a previously rendered label.
 	 * 
-	 * @param glyphVector new label
-	 * @param tempTransform 
-	 * @param glyphs list of bounds of previously rendered glyphs.
+	 * @param glyphs list of bounds of previously rendered glyphs/shields.
+	 * @param bounds new rectangle to check
+	 * @param extraSpace extra space added to edges of bounds during check	 
 	 * @return true if labelItem overlaps a previously rendered glyph.
 	 */
-	private boolean overlappingItems(GlyphVector glyphVector, AffineTransform tempTransform, List glyphs,int extraSpace) 
+	private boolean  overlappingItems(Rectangle bounds, List glyphs, int extraSpace) 
 	{
-		Rectangle glyphBounds = glyphVector.getPixelBounds(new FontRenderContext(tempTransform,true,false), 0,0);
-		glyphBounds = new Rectangle(glyphBounds.x-extraSpace,glyphBounds.y-extraSpace,
-				                    glyphBounds.width+extraSpace, glyphBounds.height+extraSpace );
+		bounds = new Rectangle(bounds.x-extraSpace,bounds.y-extraSpace,
+							   bounds.width+extraSpace, bounds.height+extraSpace );
+				
 		for (Iterator iter = glyphs.iterator(); iter.hasNext();) 
 		{
 			Rectangle oldBounds = (Rectangle) iter.next();
-			if( oldBounds.intersects(glyphBounds) )
-				return true;
+			if( oldBounds.intersects(bounds) )
+ 				return true;
 		}
 		return false;
 	}

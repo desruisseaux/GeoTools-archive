@@ -77,10 +77,12 @@ import org.geotools.styling.PointPlacement;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.StyleAttributeExtractor;
+import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbol;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextMark;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.styling.TextSymbolizer2;
 import org.w3c.dom.Document;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -593,8 +595,15 @@ public class SLDStyleFactory {
             dispY = ((Number) p.getDisplacement().getDisplacementY().getValue(feature)).doubleValue();
 
             // rotation
-            rotation = ((Number) p.getRotation().getValue(feature)).doubleValue();
-            rotation *= (Math.PI / 180.0);
+            if  ( (symbolizer instanceof TextSymbolizer2)  && (((TextSymbolizer2)symbolizer).getGraphic() != null) )
+            {
+				// don't rotate labels that are being placed on shields.
+				rotation = 0.0;
+			} else {
+				rotation = ((Number) p.getRotation().getValue(feature)).doubleValue();
+				rotation *= (Math.PI / 180.0);
+			}
+            
             ts2d.setPointPlacement(true);
         } 
         else if (placement instanceof LinePlacement) 
@@ -628,6 +637,21 @@ public class SLDStyleFactory {
             ts2d.setHaloRadius(((Number) halo.getRadius().getValue(feature)).floatValue());
         }
 
+        Graphic graphicShield = null;
+        if  (symbolizer instanceof TextSymbolizer2) 
+        {
+        	    graphicShield = ( (TextSymbolizer2) symbolizer).getGraphic();
+        		if (graphicShield != null) 
+        		{
+        			PointSymbolizer p = StyleFactoryFinder.createStyleFactory().createPointSymbolizer();
+        			p.setGraphic(graphicShield);
+        
+        			Style2D shieldStyle = createPointStyle(feature, p, scaleRange);
+        			ts2d.setGraphic(shieldStyle);
+        		}
+        }
+        
+        
         return ts2d;
     }
 
