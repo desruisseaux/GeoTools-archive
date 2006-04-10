@@ -171,11 +171,11 @@
       <artifactId>gt2-api</artifactId>
       <version>2.3-SNAPSHOT</version>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-referencing</artifactId>
       <version>2.3-SNAPSHOT</version>
-    </dependency>
+    </dependency-->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-sample-data</artifactId>

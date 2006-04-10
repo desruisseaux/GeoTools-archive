@@ -122,19 +122,29 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
-      <version>2.3-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
       <artifactId>gt2-sample-data</artifactId>
       <version>2.3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
+    <!-- because main and sample-data depend on referencing we need a tie breaker -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+
     <dependency>
       <groupId>jdom</groupId>
       <artifactId>jdom</artifactId>
       <!-- The version number is specified in the parent POM. -->
+    </dependency>
+
+    <!-- We need this to make the referencing module useful -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-epsg-hsql</artifactId>
+      <version>2.2-SNAPSHOT</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -149,7 +159,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>false</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
+          <skip>${allow.test.skip}</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
         </configuration>
       </plugin>
     </plugins>

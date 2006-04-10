@@ -97,11 +97,12 @@
       <artifactId>gt2-shapefile</artifactId>
       <version>2.3-SNAPSHOT</version>
     </dependency>
+
+    <!-- Adding J-Unit back in due to conflict-->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-      <scope>provided</scope>   <!-- Needed for compilation, not for running -->
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
