@@ -128,7 +128,11 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
 	            fireNotification(FeatureEvent.FEATURES_REMOVED, live.getBounds());
 	            live = null;
 	            current = null;
-        	}
+        	}else{
+                fireNotification(FeatureEvent.FEATURES_REMOVED, live.getBounds());
+                live = null;
+                current = null;
+            }
         } else if (current != null) {
             // cancel additional content
             current = null;

@@ -135,22 +135,17 @@ public class DiffFeatureReader implements FeatureReader {
                 if (changed == TransactionStateDiff.NULL) {
                     continue;
                 } else {
-                    if (filter.contains(changed)) {
-                        next = changed;
-                        if( encounteredFids!=null )
-                        	encounteredFids.add(next.getID());
-                        return true; // found modified feature
-                    }
-
-                }
-            } else {
-
-                if (filter.contains(peek)) {
-                    next = peek; // found feature
+                    next = changed;
                     if( encounteredFids!=null )
                     	encounteredFids.add(next.getID());
                     return true;
-                } 
+                }
+            } else {
+
+                next = peek; // found feature
+                if( encounteredFids!=null )
+                	encounteredFids.add(next.getID());
+                return true;
             }
         }
 
