@@ -5,9 +5,11 @@ import java.io.File;
 import java.net.URI;
 import java.util.logging.Level;
 
+import javax.naming.OperationNotSupportedException;
+
 import junit.framework.TestCase;
 
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 import org.geotools.xml.schema.Schema;
 import org.xml.sax.SAXException;
 
@@ -24,9 +26,10 @@ import org.xml.sax.SAXException;
 public class XMLParserTest extends TestCase {
     public void testMail(){
         try {            
-            String path = "mails.xml";
+            String path = "xml/mails.xml";
 
-            File f = TestData.file(this,path);
+            File f = TestData.copy(this,path);
+            TestData.copy(this,"xml/mails.xsd");
             URI u = f.toURI();
 
             Object doc = DocumentFactory.getInstance(u,null,Level.WARNING);
@@ -45,9 +48,10 @@ public class XMLParserTest extends TestCase {
     public void testMailWrite(){
 
         try {            
-        String path = "mails.xml";
+        String path = "xml/mails.xml";
 
-        File f = TestData.file(this,path);
+        File f = TestData.copy(this,path);
+        TestData.copy(this,"xml/mails.xsd");
 
         Object doc = DocumentFactory.getInstance(f.toURI(),null,Level.WARNING);
         assertNotNull("Document missing", doc);
@@ -55,7 +59,7 @@ public class XMLParserTest extends TestCase {
         Schema s = SchemaFactory.getInstance(new URI("http://mails/refractions/net"));
                 
         path = "mails_out.xml";
-        f = new File(f.getParentFile(),path);
+        f = TestData.temp(this, path);
         if(f.exists())
             f.delete();
         f.createNewFile();
@@ -71,7 +75,8 @@ public class XMLParserTest extends TestCase {
             e.printStackTrace();
             fail(e.toString());
         } catch (Throwable e) {
-            e.printStackTrace();
+        	assertTrue(e instanceof OperationNotSupportedException);
+//            e.printStackTrace();
 //            fail(e.toString()); Operation not supported yet
         }
     }

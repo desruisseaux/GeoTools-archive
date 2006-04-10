@@ -25,7 +25,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 
 import junit.framework.TestCase;
 
@@ -45,8 +45,9 @@ public class GMLInheritanceTest extends TestCase {
 
             SAXParser parser = spf.newSAXParser();
 
-            String path = "sample/nestedFeatures.xml";
-            File f = TestData.file(this,path);
+            String path = "xml/sample/nestedFeatures.xml";
+            File f = TestData.copy(this,path);
+            TestData.copy(this,"xml/sample/nestedFeatures.xsd");
             URI u = f.toURI();
 
             XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
@@ -76,8 +77,9 @@ public class GMLInheritanceTest extends TestCase {
 
             SAXParser parser = spf.newSAXParser();
 
-            String path = "sample/multiInheritance.xml";
-            File f = TestData.file(this,path);
+            String path = "xml/sample/multiInheritance.xml";
+            File f = TestData.copy(this,path);
+            TestData.copy(this,"xml/sample/multiInheritance.xsd");
             URI u = f.toURI();
 
             XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);

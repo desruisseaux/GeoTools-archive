@@ -11,7 +11,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import junit.framework.TestCase;
 
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 
 
 /**
@@ -39,29 +39,29 @@ public class SchemaParserTest extends TestCase {
     }
 
     public void testMail(){
-        runit("mails.xsd");
+        runit("xml/mails.xsd");
     }
 
     public void testWFS(){
-        runit("wfs/WFS-basic.xsd");
+        runit("xml/wfs/WFS-basic.xsd");
     }
 
     public void testGMLFeature(){
-        runit("gml/feature.xsd");
+        runit("xml/gml/feature.xsd");
     }
 
     public void testGMLGeometry(){
-        runit("gml/geometry.xsd");
+        runit("xml/gml/geometry.xsd");
     }
 
     public void testGMLXLinks(){
-        runit("gml/xlinks.xsd");
+        runit("xml/gml/xlinks.xsd");
     }
 
     private void runit(String path){
         File f;
         try {
-            f = TestData.file(this,path);
+            f = TestData.copy(this,path);
         URI u = f.toURI();
         XSISAXHandler contentHandler = new XSISAXHandler(u);
 //        XSISAXHandler.setLogLevel(Level.INFO);

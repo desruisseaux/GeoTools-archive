@@ -76,24 +76,28 @@ public class FileSystemGridCoverageExchange implements GridCoverageExchange {
     public void refresh() {
         if (root != null) {
         	entries=new ArrayList();
-            refresh(root);
+    		refresh(root);
         }
     }
 
     private void refresh(File file) {
-      File[] files = file.listFiles(new FormatFileFilter(formats,recursive));
-
-      for (int j = 0; j < files.length; j++) {
-          if (files[j].isFile()) {
-              entries.add(new FSCatalogEntry(files[j],formats));
-          }
-
-          if (files[j].isDirectory()) {
-              if (recursive) {
-                  refresh(files[j]);
-              }
-          }
-      }
+    	if (file.isDirectory()) {
+			File[] files = file.listFiles(new FormatFileFilter(formats,recursive));
+			
+			for (int j = 0; j < files.length; j++) {
+			    if (files[j].isFile()) {
+			        entries.add(new FSCatalogEntry(files[j],formats));
+			    }
+			
+			    if (files[j].isDirectory()) {
+			        if (recursive) {
+			            refresh(files[j]);
+			        }
+			    }
+			}
+    	} else if (file.isFile()) {
+	        entries.add(new FSCatalogEntry(file,formats));
+    	}
 
     }
 
@@ -189,7 +193,7 @@ public class FileSystemGridCoverageExchange implements GridCoverageExchange {
             url = (URL) datasource;
         } else if (datasource instanceof File) {
             root = (File) datasource;
-            refresh(root);
+        	refresh();
         }
 
         if ((url != null) && (url.getFile().length() > 0)) {

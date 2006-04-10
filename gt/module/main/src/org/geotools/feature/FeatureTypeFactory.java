@@ -19,8 +19,9 @@ package org.geotools.feature;
 import java.net.URI;
 import java.util.Arrays;
 
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.factory.FactoryFinder;
+import org.geotools.factory.FactoryCreator;
+import org.geotools.factory.FactoryRegistry;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.xml.gml.GMLSchema;
 
 
@@ -41,6 +42,25 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
     public FeatureTypeFactory() {
     	// no op constructor
     }
+
+    /**
+     * The service registry for this manager.
+     * Will be initialized only when first needed.
+     */
+    private static FactoryRegistry registry; 
+    
+    /**
+     * Returns the service registry. The registry will be created the first
+     * time this method is invoked.
+     */
+    private static FactoryRegistry getServiceRegistry() {
+        assert Thread.holdsLock(FeatureTypeFactory.class);
+        if (registry == null) {
+            registry = new FactoryCreator(Arrays.asList(new Class[] {
+                    FeatureTypeFactory.class}));
+        }
+        return registry;
+    } 
     
     /**
      * The most specific way to create a new FeatureType.
@@ -62,7 +82,7 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      */
     public static FeatureType newFeatureType(AttributeType[] types,
         String name, URI ns, boolean isAbstract, FeatureType[] superTypes) 
-        throws FactoryConfigurationError, SchemaException { 
+        throws FactoryRegistryException, SchemaException { 
             return newFeatureType(types, name, ns, isAbstract, superTypes, null);
     }
         
@@ -79,14 +99,14 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      *
      * @return A new FeatureType created from the given arguments.
      *
-     * @throws FactoryConfigurationError If there are problems creating a
+     * @throws FactoryRegistryException If there are problems creating a
      *         factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in
      *         some way.
      */
     public static FeatureType newFeatureType(AttributeType[] types,
         String name, URI ns, boolean isAbstract, FeatureType[] superTypes, AttributeType defaultGeometry)
-        throws FactoryConfigurationError, SchemaException {
+        throws FactoryRegistryException, SchemaException {
         FeatureTypeFactory factory = newInstance(name);
         factory.addTypes(types);
         factory.setNamespace(ns);
@@ -114,14 +134,14 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
          *
          * @return A new FeatureType created from the given arguments.
          *
-         * @throws FactoryConfigurationError If there are problems creating a
+         * @throws FactoryRegistryException If there are problems creating a
          *         factory.
          * @throws SchemaException If the AttributeTypes provided are invalid in
          *         some way.
          */
         public static FeatureType newFeatureType(AttributeType[] types,
             String name, URI ns, boolean isAbstract, FeatureType[] superTypes, GeometryAttributeType defaultGeometry)
-            throws FactoryConfigurationError, SchemaException {
+            throws FactoryRegistryException, SchemaException {
             FeatureTypeFactory factory = newInstance(name);
             factory.addTypes(types);
             factory.setNamespace(ns);
@@ -149,14 +169,14 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      *
      * @return A new FeatureType created from the given arguments.
      *
-     * @throws FactoryConfigurationError If there are problems creating a
+     * @throws FactoryRegistryException If there are problems creating a
      *         factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in
      *         some way.
      */
     public static FeatureType newFeatureType(AttributeType[] types,
         String name, URI ns, boolean isAbstract)
-        throws FactoryConfigurationError, SchemaException {
+        throws FactoryRegistryException, SchemaException {
         return newFeatureType(types, name, ns, isAbstract, null);
     }
 
@@ -170,14 +190,14 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      *
      * @return A new FeatureType created from the given arguments.
      *
-     * @throws FactoryConfigurationError If there are problems creating a
+     * @throws FactoryRegistryException If there are problems creating a
      *         factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in
      *         some way.
      */
     public static FeatureType newFeatureType(AttributeType[] types,
         String name, URI ns)
-        throws FactoryConfigurationError, SchemaException {
+        throws FactoryRegistryException, SchemaException {
         return newFeatureType(types, name, ns, false);
     }
 
@@ -191,13 +211,13 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      *
      * @return A new FeatureType created from the given arguments.
      *
-     * @throws FactoryConfigurationError If there are problems creating a
+     * @throws FactoryRegistryException If there are problems creating a
      *         factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in
      *         some way.
      */
     public static FeatureType newFeatureType(AttributeType[] types, String name)
-        throws FactoryConfigurationError, SchemaException {
+        throws FactoryRegistryException, SchemaException {
         return newFeatureType(types, name, GMLSchema.NAMESPACE, false);
     }
 
@@ -208,16 +228,23 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      *
      * @return A new FeatureTypeFactory instance.
      *
-     * @throws FactoryConfigurationError If there exists a configuration error.
+     * @throws FactoryRegistryException If there exists a configuration error.
      */
-    public static FeatureTypeFactory newInstance(String name)
-        throws FactoryConfigurationError {
-        FeatureTypeFactory factory = (FeatureTypeFactory) FactoryFinder
-            .findFactory("org.geotools.feature.FeatureTypeFactory",
-                "org.geotools.feature.DefaultFeatureTypeFactory");
-        factory.setName(name);
+    public static synchronized FeatureTypeFactory newInstance(String name)
+        throws FactoryRegistryException {
+    	FeatureTypeFactory factory = (FeatureTypeFactory) getServiceRegistry()
+        	.getServiceProvider(FeatureTypeFactory.class, null, null, null);
+    	FeatureTypeFactory newFactory;
+		try {
+			newFactory = (FeatureTypeFactory) factory.getClass().newInstance();
+		} catch (InstantiationException e) {
+			throw new FactoryRegistryException(e.getMessage(), e);
+		} catch (IllegalAccessException e) {
+			throw new FactoryRegistryException(e.getMessage(), e);
+		}
+    	newFactory.setName(name);
 
-        return factory;
+        return newFactory;
     }
 
     /**
@@ -237,11 +264,11 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      * @return A new FeatureTypeFactory which is initialized with the state of
      *         the original FeatureType.
      *
-     * @throws FactoryConfigurationError If a FeatureTypeFactory cannot be
+     * @throws FactoryRegistryException If a FeatureTypeFactory cannot be
      *         found.
      */
     public static FeatureTypeFactory createTemplate(FeatureType original)
-        throws FactoryConfigurationError {
+        throws FactoryRegistryException {
     	
     	FeatureTypeFactory builder = FeatureTypeFactory.newInstance(original.getTypeName());
         builder.importType(original);

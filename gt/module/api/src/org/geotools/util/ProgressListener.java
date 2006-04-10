@@ -20,13 +20,6 @@
  */
 package org.geotools.util;
 
-import java.io.IOException;
-import java.util.Iterator;
-
-import org.geotools.feature.Feature;
-import org.geotools.feature.visitor.FeatureVisitor;
-
-
 /**
  * Monitor the progress of some lengthly operation. This interface makes no
  * assumption about the output device. It may be the standard output stream

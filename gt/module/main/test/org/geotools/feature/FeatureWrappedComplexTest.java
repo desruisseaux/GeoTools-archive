@@ -157,7 +157,7 @@ public class FeatureWrappedComplexTest extends TestCase {
             testFeature.setAttribute("testGeometry", singleNewData);
             fail("a wrapped string should not be able to set a geometry");
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             assertTrue(e instanceof IllegalAttributeException);
         }
     }

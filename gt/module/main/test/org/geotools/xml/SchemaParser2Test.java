@@ -8,7 +8,7 @@ import java.util.logging.Level;
 
 import junit.framework.TestCase;
 
-import org.geotools.resources.TestData;
+import org.geotools.TestData;
 import org.geotools.xml.schema.Schema;
 
 
@@ -26,26 +26,26 @@ public class SchemaParser2Test extends TestCase {
     //		runit("","test/mails.xsd");
     //	}
     public void testWFS() throws URISyntaxException {
-        runit(new URI("http://www.opengis.net/wfs"), "wfs/WFS-basic.xsd");
+        runit(new URI("http://www.opengis.net/wfs"), "xml/wfs/WFS-basic.xsd");
     }
 
     public void testGMLFeature() throws URISyntaxException {
-        runit(new URI("http://www.opengis.net/gml"), "gml/feature.xsd");
+        runit(new URI("http://www.opengis.net/gml"), "xml/gml/feature.xsd");
     }
 
     public void testGMLGeometry() throws URISyntaxException {
-        runit(new URI("http://www.opengis.net/gml"), "gml/geometry.xsd");
+        runit(new URI("http://www.opengis.net/gml"), "xml/gml/geometry.xsd");
     }
 
     public void testGMLXLinks() throws URISyntaxException {
-        runit(new URI("http://www.w3.org/1999/xlink"), "gml/xlinks.xsd");
+        runit(new URI("http://www.w3.org/1999/xlink"), "xml/gml/xlinks.xsd");
     }
 
     private void runit(URI targetNS, String path) {
         Schema s = null;
 
         try {
-            File f = TestData.file(this,path);
+            File f = TestData.copy(this,path);
             s = SchemaFactory.getInstance(targetNS, f.toURI(),
                     Level.INFO);
         } catch (Exception e) {
