@@ -247,21 +247,6 @@
           </execution>
         </executions>
       </plugin>
-<<<<<<< .working
-
-      <!-- TEMPORARY HACK: Disables JUnit tests for now. For a mysterious reason,
-           many implementation class like SimpleFeature are replaced by generated
-           implementations like $Proxy2, leading to numerous ClassCastException.
-           See http://maven.geotools.fr/reports/main/surefire-report.html -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <skip>${allow.test.skip}</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
-        </configuration>
-      </plugin>
-=======
->>>>>>> .merge-right.r19085
     </plugins>
   </build>
 
