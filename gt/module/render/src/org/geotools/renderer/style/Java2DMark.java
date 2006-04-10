@@ -38,6 +38,7 @@ public class Java2DMark {
     static GeneralPath triangle;
     static GeneralPath arrow;
     static Shape X;
+    static GeneralPath hatch;
 
     static {
         cross = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
@@ -94,6 +95,26 @@ public class Java2DMark {
         arrow.lineTo(-.5f, -.1f);
         arrow.lineTo(0f, -.1f);
         arrow.lineTo(0f, -.5f);
+        
+        hatch = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+        hatch.moveTo(.55f,.57f);
+        hatch.lineTo(.52f,.57f);
+        hatch.lineTo(-.57f,-.52f);
+        hatch.lineTo(-.57f,-.57f);
+        hatch.lineTo(-.52f, -.57f);
+        hatch.lineTo(.57f, .52f);
+        hatch.lineTo(.57f,.57f);
+                
+        hatch.moveTo(.57f,-.49f);
+        hatch.lineTo(.49f, -.57f);
+        hatch.lineTo(.57f,-.57f);
+        hatch.lineTo(.57f,-.49f);
+                
+        hatch.moveTo(-.57f,.5f);
+        hatch.lineTo(-.5f, .57f);
+        hatch.lineTo(-.57f,.57f);
+        hatch.lineTo(-.57f,.5f);
+
     }
 
     public static Shape getWellKnownMark(String wellKnownName) {
@@ -134,6 +155,13 @@ public class Java2DMark {
 
             return arrow;
         }
+        
+        if (wellKnownName.equalsIgnoreCase("hatch")) {
+        	LOGGER.finer("returning hatch");
+        	 
+        	return hatch;
+        }
+
 
         // failing that return a square?
         LOGGER.finer("returning square");

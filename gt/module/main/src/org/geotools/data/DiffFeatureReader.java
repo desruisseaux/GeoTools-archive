@@ -17,11 +17,10 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -42,13 +41,15 @@ import org.geotools.filter.Filter;
  */
 public class DiffFeatureReader implements FeatureReader {
     FeatureReader reader;
-    Map diff;
+    Diff diff;
 
     /** Next value as peeked by hasNext() */
     Feature next = null;
     private Filter filter;
-    private int fidIndex;
+    private Set encounteredFids;
 
+	private Iterator diffIterator;
+	private int fidIndex=0;
     /**
      * This constructor grabs a "copy" of the current diff.
      * <p>
@@ -57,10 +58,10 @@ public class DiffFeatureReader implements FeatureReader {
      * </p>
      * 
      * @param reader
-     * @param diff Differences of Feature by FID
+     * @param diff2 Differences of Feature by FID
      */
-    public DiffFeatureReader( FeatureReader reader, Map diff ) {
-        this(reader, diff, Filter.NONE);
+    public DiffFeatureReader( FeatureReader reader, Diff diff2 ) {
+        this(reader, diff2, Filter.NONE);
     }
 
     /**
@@ -71,12 +72,16 @@ public class DiffFeatureReader implements FeatureReader {
      * </p>
      * 
      * @param reader
-     * @param diff Differences of Feature by FID
+     * @param diff2 Differences of Feature by FID
      */
-    public DiffFeatureReader( FeatureReader reader, Map diff, Filter filter ) {
+    public DiffFeatureReader( FeatureReader reader, Diff diff2, Filter filter ) {
         this.reader = reader;
-        this.diff = new HashMap(diff);
+        this.diff = diff2;
         this.filter = filter;
+        if( filter instanceof FidFilter ){
+        	encounteredFids=new HashSet();
+        }
+        diffIterator=diff.added.values().iterator();
     }
 
     /**
@@ -125,15 +130,15 @@ public class DiffFeatureReader implements FeatureReader {
 
             String fid = peek.getID();
 
-            if (diff.containsKey(fid)) {
-                Feature changed = (Feature) diff.remove(fid);
-
-                if (changed == null) {
-                    return hasNext(); // feature removed try again
+            if (diff.modified2.containsKey(fid)) {
+                Feature changed = (Feature) diff.modified2.get(fid);
+                if (changed == TransactionStateDiff.NULL) {
+                    continue;
                 } else {
                     if (filter.contains(changed)) {
                         next = changed;
-
+                        if( encounteredFids!=null )
+                        	encounteredFids.add(next.getID());
                         return true; // found modified feature
                     }
 
@@ -142,7 +147,8 @@ public class DiffFeatureReader implements FeatureReader {
 
                 if (filter.contains(peek)) {
                     next = peek; // found feature
-
+                    if( encounteredFids!=null )
+                    	encounteredFids.add(next.getID());
                     return true;
                 } 
             }
@@ -159,22 +165,21 @@ public class DiffFeatureReader implements FeatureReader {
                 fidIndex = 0;
             }
             while( fidIndex < fidFilter.getFids().length && next == null ) {
-                next = (Feature) diff.get(fidFilter.getFids()[fidIndex]);
+                String fid = fidFilter.getFids()[fidIndex];
+                if( encounteredFids.contains(fid) ){
+                	fidIndex++;
+                	continue;
+                }
+				next = (Feature) diff.modified2.get(fid);
+                if( next==null ){
+                	next = (Feature) diff.added.get(fid);
+                }
                 fidIndex++;
             }
 
         } else {
-
-            while( (diff != null) && !diff.isEmpty() ) {
-                Iterator i = diff.values().iterator();
-                Feature peek = (Feature) i.next();
-                i.remove();
-                if (peek != null)
-                    if (filter.contains(peek)) {
-                        next = peek;
-                        break;
-                    }
-            }
+        	if( diffIterator.hasNext() )
+        		next=(Feature) diffIterator.next();
         }
     }
 
@@ -188,8 +193,8 @@ public class DiffFeatureReader implements FeatureReader {
         }
 
         if (diff != null) {
-            diff.clear();
             diff = null;
+            diffIterator=null;
         }
     }
 }

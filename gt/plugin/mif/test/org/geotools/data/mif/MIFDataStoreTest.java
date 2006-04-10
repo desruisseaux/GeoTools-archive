@@ -345,6 +345,7 @@ public class MIFDataStoreTest extends TestCase {
 
             assertEquals(counter, 2);
         } catch (Exception e) {
+        	e.printStackTrace();
             fail(e.getMessage());
         }
     }

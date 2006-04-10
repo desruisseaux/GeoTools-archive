@@ -14,9 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * Created on 19-ago-2004
- */
 package org.geotools.index.quadtree.fs;
 
 import com.vividsolutions.jts.geom.Envelope;

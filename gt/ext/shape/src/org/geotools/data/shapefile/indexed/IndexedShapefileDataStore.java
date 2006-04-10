@@ -150,7 +150,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	public IndexedShapefileDataStore(URL url)
 			throws java.net.MalformedURLException {
-		this(url, null, true, true, TREE_GRX);
+		this(url, null,  false, true, TREE_QIX);
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	public IndexedShapefileDataStore(URL url, URI namespace)
 			throws java.net.MalformedURLException {
-		this(url, namespace, true, true, TREE_GRX);
+		this(url, namespace, false, true, TREE_QIX );
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	public IndexedShapefileDataStore(URL url, URI namespace,
 			boolean useMemoryMappedBuffer)
 			throws java.net.MalformedURLException {
-		this(url, namespace, useMemoryMappedBuffer, true, TREE_GRX);
+		this(url, namespace, useMemoryMappedBuffer, true, TREE_QIX);
 	}
 
 	/**
@@ -192,7 +192,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	public IndexedShapefileDataStore(URL url, boolean useMemoryMappedBuffer)
 			throws java.net.MalformedURLException {
-		this(url, (URI) null, useMemoryMappedBuffer, true, TREE_GRX);
+		this(url, (URI) null, useMemoryMappedBuffer, true, TREE_QIX);
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	public IndexedShapefileDataStore(URL url, boolean useMemoryMappedBuffer,
 			boolean createIndex) throws java.net.MalformedURLException {
-		this(url, null, useMemoryMappedBuffer, createIndex, TREE_GRX);
+		this(url, null, useMemoryMappedBuffer, createIndex, TREE_QIX);
 	}
 
 	/**

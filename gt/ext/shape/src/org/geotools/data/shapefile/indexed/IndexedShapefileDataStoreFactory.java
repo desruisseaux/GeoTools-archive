@@ -188,7 +188,7 @@ public class IndexedShapefileDataStoreFactory
             Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
 
             if (mm == null) {
-                mm = Boolean.TRUE;
+                mm = Boolean.FALSE;
             }
 
             Boolean idx = (Boolean) CREATE_SPATIAL_INDEX.lookUp(params);

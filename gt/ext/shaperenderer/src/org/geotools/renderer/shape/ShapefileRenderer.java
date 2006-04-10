@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 import javax.media.jai.util.Range;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.Diff;
 import org.geotools.data.FIDReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
@@ -305,32 +306,43 @@ public class ShapefileRenderer implements GTRenderer {
         }
 
         Set fids = new HashSet();
-        Map diff = null;
+        Map modified = null;
+        Map added = null;
+        Diff diff=null;
 
         try {
-            diff = state.diff(typename);
-            fids = new HashSet(diff.keySet());
+			diff = state.diff(typename);
+			modified = diff.modified2;
+			added=diff.added;
+            fids = new HashSet();
         } catch (IOException e) {
             fids = Collections.EMPTY_SET;
+            return fids;
         }
 
         if (!diff.isEmpty()) {
             Feature feature;
-            String fid;
 
-            for( Iterator iter = fids.iterator(); iter.hasNext(); ) {
+            for( Iterator modifiedIter = modified.keySet().iterator(), 
+            		addedIter=added.values().iterator(); 
+            	modifiedIter.hasNext() || addedIter.hasNext(); ) {
                 if (renderingStopRequested) {
                     break;
                 }
 
                 boolean doElse = true;
-                fid = (String) iter.next();
-                feature = (Feature) diff.get(fid);
-
+                if( modifiedIter.hasNext() ){
+                	String fid=(String)modifiedIter.next();
+                	feature = (Feature) modified.get(fid);
+                    fids.add(fid);
+                }else{
+                    feature = (Feature) addedIter.next();
+                }
+                
                 if (!query.getFilter().contains(feature))
                     continue;
 
-                if (feature != null) {
+                if (feature != TransactionStateDiff.NULL) {
                     // applicable rules
                     for( Iterator it = ruleList.iterator(); it.hasNext(); ) {
                         Rule r = (Rule) it.next();

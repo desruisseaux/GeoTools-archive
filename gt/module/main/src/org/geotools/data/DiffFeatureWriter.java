@@ -17,8 +17,6 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.geotools.feature.Feature;
@@ -48,12 +46,10 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public abstract class DiffFeatureWriter implements FeatureWriter {
     protected FeatureReader reader;
-    protected Map diff;
+    protected Diff diff;
     Feature next; // next value aquired by hasNext()
     Feature live; // live value supplied by FeatureReader
     Feature current; // duplicate provided to user
-    private static final String FID_INDEX_KEY = "fidIndex";
-    int nextfidIndex=-1;
 
     /**
      * DiffFeatureWriter construction.
@@ -61,7 +57,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      * @param reader
      * @param diff
      */
-    public DiffFeatureWriter(FeatureReader reader, Map diff) {
+    public DiffFeatureWriter(FeatureReader reader, Diff diff) {
         this(reader, diff, Filter.NONE);
     }
 
@@ -69,28 +65,11 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      * DiffFeatureWriter construction.
      *
      * @param reader
-     * @param diff
+     * @param diff.features
      */
-    public DiffFeatureWriter(FeatureReader reader, Map diff, Filter filter) {
+    public DiffFeatureWriter(FeatureReader reader, Diff diff, Filter filter) {
         this.reader = new DiffFeatureReader(reader, diff, filter);
         this.diff = diff;
-        if( !diff.isEmpty() ){
-            for( Iterator iter = diff.keySet().iterator(); iter.hasNext(); ) {
-                String string = (String) iter.next();
-                
-                try{
-                    String number=string.substring(3);
-                    int tmp=Integer.parseInt(number);
-                    if( tmp>nextfidIndex){
-                        nextfidIndex=tmp;
-                    }
-                }catch( Exception e){
-                    //continue;
-                }
-            }
-            
-        }
-        nextfidIndex++;
     }
 
     /**
@@ -129,8 +108,8 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
                 live = null;
                 next = null;
                 current = type.create(new Object[type.getAttributeCount()],
-                        "new"+nextfidIndex);
-                nextfidIndex++;
+                        "new"+diff.nextFID);
+                diff.nextFID++;
                 return current;
             } catch (IllegalAttributeException e) {
                 throw new IOException("Could not create new content");
@@ -144,10 +123,12 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
     public void remove() throws IOException {
         if (live != null) {
             // mark live as removed
-            diff.put(live.getID(), null);
-            fireNotification(FeatureEvent.FEATURES_REMOVED, live.getBounds());
-            live = null;
-            current = null;
+        	if( diff.added.remove(live.getID())==null ){
+	            diff.modified2.put(live.getID(), TransactionStateDiff.NULL);
+	            fireNotification(FeatureEvent.FEATURES_REMOVED, live.getBounds());
+	            live = null;
+	            current = null;
+        	}
         } else if (current != null) {
             // cancel additional content
             current = null;
@@ -170,7 +151,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
         {
             // We have a modification to record!
             //
-            diff.put(live.getID(), current);
+            diff.modified2.put(live.getID(), current);
 
             Envelope bounds = new Envelope();
             bounds.expandToInclude(live.getBounds());
@@ -181,7 +162,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
         } else if ((live == null) && (current != null)) {
             // We have new content to record
             //
-            diff.put(current.getID(), current);
+            diff.added.put(current.getID(), current);
             fireNotification(FeatureEvent.FEATURES_ADDED, current.getBounds());
             current = null;
         } else {

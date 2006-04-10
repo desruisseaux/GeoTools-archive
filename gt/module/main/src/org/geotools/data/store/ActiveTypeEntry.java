@@ -12,6 +12,7 @@ import org.geotools.data.AbstractFeatureStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.Diff;
 import org.geotools.data.DiffFeatureReader;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.EmptyFeatureWriter;
@@ -326,7 +327,7 @@ final class ActiveTypeEntry implements TypeEntry {
         }
 
         if (transaction != Transaction.AUTO_COMMIT) {
-            Map diff = state(transaction).diff();
+            Diff diff = state(transaction).diff();
             reader = new DiffFeatureReader(reader, diff);
         }
 

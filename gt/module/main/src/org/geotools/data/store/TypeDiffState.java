@@ -17,11 +17,10 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.Diff;
 import org.geotools.data.DiffFeatureReader;
 import org.geotools.data.DiffFeatureWriter;
 import org.geotools.data.FeatureEvent;
@@ -29,6 +28,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.TransactionStateDiff;
 import org.geotools.data.Transaction.State;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
@@ -60,7 +60,7 @@ public class TypeDiffState implements State {
      * a commit() or rollback().
      * </p>
      */
-    Map diffMap = new HashMap();
+    Diff diffMap = new Diff();
 
     private ActiveTypeEntry entry;
 
@@ -82,7 +82,7 @@ public class TypeDiffState implements State {
         }
     }
 
-    public Map diff() throws IOException {
+    public Diff diff() throws IOException {
         return diffMap;        
     }
 
@@ -134,7 +134,7 @@ public class TypeDiffState implements State {
      * @throws IOException If the entire diff cannot be writen out
      * @throws DataSourceException If the entire diff cannot be writen out
      */
-    void applyDiff(Map diff) throws IOException {
+    void applyDiff(Diff diff) throws IOException {
         if (diff.isEmpty()) {
             return;
         }
@@ -149,10 +149,10 @@ public class TypeDiffState implements State {
                 feature = (SimpleFeature)writer.next();
                 fid = feature.getID();
 
-                if (diff.containsKey(fid)) {
-                    update = (Feature) diff.remove(fid);
+                if (diff.modified2.containsKey(fid)) {
+                    update = (Feature) diff.modified2.get(fid);
 
-                    if (update == null) {
+                    if (update == TransactionStateDiff.NULL) {
                         writer.remove();
 
                         // notify
@@ -179,11 +179,9 @@ public class TypeDiffState implements State {
             Feature addedFeature;
             SimpleFeature nextFeature;
 
-            for (Iterator i = diff.values().iterator(); i.hasNext();) {
+            for (Iterator i = diff.added.values().iterator(); i.hasNext();) {
                 addedFeature = (Feature) i.next();
-                i.remove();
 
-                if (addedFeature != null) {
                     fid = addedFeature.getID();
 
                     nextFeature = (SimpleFeature)writer.next();
@@ -202,11 +200,11 @@ public class TypeDiffState implements State {
                             throw new DataSourceException("Could update " + fid,
                                 e);
                         }
-                    }
                 }
             }
         } finally {
             writer.close();
+            diff.clear();
             entry.listenerManager.fireChanged( entry.getTypeName(), transaction, true);
         }
     }
@@ -251,7 +249,7 @@ public class TypeDiffState implements State {
      */
     public synchronized FeatureWriter writer()
         throws IOException {
-        Map diff = null;
+        Diff diff = new Diff();
         FeatureReader reader = entry.createReader();
 
         return new DiffFeatureWriter(reader, diff) {

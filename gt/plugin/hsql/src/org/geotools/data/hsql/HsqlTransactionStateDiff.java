@@ -20,19 +20,20 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.Diff;
 import org.geotools.data.DiffFeatureReader;
 import org.geotools.data.DiffFeatureWriter;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
+import org.geotools.data.TransactionStateDiff;
 import org.geotools.data.Transaction.State;
 import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.feature.Feature;
@@ -93,7 +94,7 @@ public class HsqlTransactionStateDiff extends JDBCTransactionState implements St
             if (typeNameDiff != null) {
                 for (Iterator i = typeNameDiff.values().iterator();
                         i.hasNext();) {
-                    Map diff = (Map) i.next();
+                	Diff diff = (Diff) i.next();
                     diff.clear();
                 }
 
@@ -104,15 +105,15 @@ public class HsqlTransactionStateDiff extends JDBCTransactionState implements St
         }
     }
 
-    public synchronized Map diff(String typeName) throws IOException {
+    public synchronized Diff diff(String typeName) throws IOException {
         if (!exists(typeName)) {
             throw new IOException(typeName + " not defined");
         }
 
         if (typeNameDiff.containsKey(typeName)) {
-            return (Map) typeNameDiff.get(typeName);
+            return (Diff) typeNameDiff.get(typeName);
         } else {
-            Map diff = Collections.synchronizedMap(new HashMap());
+        	Diff diff = new Diff();
             typeNameDiff.put(typeName, diff);
 
             return diff;
@@ -151,7 +152,7 @@ public class HsqlTransactionStateDiff extends JDBCTransactionState implements St
             entry = (Entry) i.next();
 
             String typeName = (String) entry.getKey();
-            Map diff = (Map) entry.getValue();
+            Diff diff = (Diff) entry.getValue();
             applyDiff(typeName, diff);
         }
     }
@@ -187,12 +188,17 @@ public class HsqlTransactionStateDiff extends JDBCTransactionState implements St
      * @throws IOException If the entire diff cannot be writen out
      * @throws DataSourceException If the entire diff cannot be writen out
      */
-    void applyDiff(String typeName, Map diff) throws IOException {
+    void applyDiff(String typeName, Diff diff) throws IOException {
         if (diff.isEmpty()) {
             return;
         }
-
-        FeatureWriter writer = store.getFeatureWriter(typeName);
+        FeatureWriter writer;
+		try{
+        	writer = store.getFeatureWriter(typeName);
+        }catch (UnsupportedOperationException e) {
+			// backwards compatibility
+        	writer = store.getFeatureWriter(typeName);
+		}
         SimpleFeature feature;
         Feature update;
         String fid;
@@ -202,10 +208,10 @@ public class HsqlTransactionStateDiff extends JDBCTransactionState implements St
                 feature = (SimpleFeature)writer.next();
                 fid = feature.getID();
 
-                if (diff.containsKey(fid)) {
-                    update = (Feature) diff.remove(fid);
+                if (diff.modified2.containsKey(fid)) {
+                    update = (Feature) diff.modified2.get(fid);
 
-                    if (update == null) {
+                    if (update == TransactionStateDiff.NULL) {
                         writer.remove();
 
                         // notify
@@ -233,36 +239,34 @@ public class HsqlTransactionStateDiff extends JDBCTransactionState implements St
             Feature addedFeature;
             SimpleFeature nextFeature;
 
-            for (Iterator i = diff.values().iterator(); i.hasNext();) {
+            for (Iterator i = diff.added.values().iterator(); i.hasNext();) {
                 addedFeature = (Feature) i.next();
-                i.remove();
 
-                if (addedFeature != null) {
-                    fid = addedFeature.getID();
+                fid = addedFeature.getID();
 
-                    nextFeature = (SimpleFeature)writer.next();
+                nextFeature = (SimpleFeature)writer.next();
 
-                    if (nextFeature == null) {
-                        throw new DataSourceException("Could not add " + fid);
-                    } else {
-                        try {
-                            nextFeature.setAttributes(addedFeature
-                                .getAttributes(null));
-                            writer.write();
+                if (nextFeature == null) {
+                    throw new DataSourceException("Could not add " + fid);
+                } else {
+                    try {
+                        nextFeature.setAttributes(addedFeature
+                            .getAttributes(null));
+                        writer.write();
 
-                            // notify                        
-                            store.listenerManager.fireFeaturesAdded(typeName,
-                                transaction, nextFeature.getBounds(), true);
-                        } catch (IllegalAttributeException e) {
-                            throw new DataSourceException("Could update " + fid,
-                                e);
-                        }
+                        // notify                        
+                        store.listenerManager.fireFeaturesAdded(typeName,
+                            transaction, nextFeature.getBounds(), true);
+                    } catch (IllegalAttributeException e) {
+                        throw new DataSourceException("Could update " + fid,
+                            e);
                     }
                 }
             }
         } finally {
             writer.close();
             store.listenerManager.fireChanged(typeName, transaction, true);
+            diff.clear();
         }
     }
 
@@ -276,7 +280,7 @@ public class HsqlTransactionStateDiff extends JDBCTransactionState implements St
             entry = (Entry) i.next();
 
             String typeName = (String) entry.getKey();
-            Map diff = (Map) entry.getValue();
+            Diff diff = (Diff) entry.getValue();
 
             diff.clear(); // rollback differences
             store.listenerManager.fireChanged(typeName, transaction, false);
@@ -299,7 +303,7 @@ public class HsqlTransactionStateDiff extends JDBCTransactionState implements St
      */
     public synchronized FeatureReader reader(String typeName)
         throws IOException {
-        Map diff = diff(typeName);
+    	Diff diff = diff(typeName);
         FeatureReader reader = store.getFeatureReader(typeName);
 
         return new DiffFeatureReader(reader, diff);
@@ -321,7 +325,7 @@ public class HsqlTransactionStateDiff extends JDBCTransactionState implements St
      */
     public synchronized FeatureWriter writer(final String typeName, Filter filter)
         throws IOException {
-        Map diff = diff(typeName);
+    	Diff diff = diff(typeName);
         FeatureType schema = store.getSchema(typeName);
         
         FeatureReader reader = store.getFeatureReader(schema, filter, transaction);

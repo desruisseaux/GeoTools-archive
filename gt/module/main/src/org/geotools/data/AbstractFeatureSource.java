@@ -17,10 +17,7 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.feature.FeatureCollection;
@@ -233,20 +230,14 @@ public abstract class AbstractFeatureSource implements FeatureSource {
                 	//we cannot proceed; abort!
                 	return -1;
                 }
-            	Map diff = ((AbstractDataStore)dataStore).state(t).diff(namedQuery(query).getTypeName());
-                Iterator it = diff.keySet().iterator();
-                Set newFIDs = new HashSet();
+            	Diff diff = ((AbstractDataStore)dataStore).state(t).diff(namedQuery(query).getTypeName());
+            	delta=diff.added.size();
+                Iterator it = diff.modified2.values().iterator();
                 while(it.hasNext()){
-                    Object fid = it.next();
-                    
-                    if(fid.toString().startsWith("new")){
-                        if(newFIDs.add(fid)){
-                            delta++;
-                        }
-                    } else{
-                        if(diff.get(fid)==null){
-                            delta--;
-                        }
+                    Object feature = it.next();
+  
+                    if(feature==TransactionStateDiff.NULL){
+                        delta--;
                     }
                 }
             }

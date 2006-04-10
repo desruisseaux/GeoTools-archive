@@ -18,7 +18,6 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,11 +25,15 @@ import java.util.Map.Entry;
 
 import org.geotools.data.Transaction.State;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
 
+
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -75,7 +78,7 @@ public class TransactionStateDiff implements State {
             if (typeNameDiff != null) {
                 for (Iterator i = typeNameDiff.values().iterator();
                         i.hasNext();) {
-                    Map diff = (Map) i.next();
+                    Diff diff = (Diff) i.next();
                     diff.clear();
                 }
 
@@ -86,15 +89,15 @@ public class TransactionStateDiff implements State {
         }
     }
 
-    public synchronized Map diff(String typeName) throws IOException {
+    public synchronized Diff diff(String typeName) throws IOException {
         if (!exists(typeName)) {
             throw new IOException(typeName + " not defined");
         }
 
         if (typeNameDiff.containsKey(typeName)) {
-            return (Map) typeNameDiff.get(typeName);
+            return (Diff) typeNameDiff.get(typeName);
         } else {
-            Map diff = Collections.synchronizedMap(new HashMap());
+            Diff diff = new Diff();
             typeNameDiff.put(typeName, diff);
 
             return diff;
@@ -133,7 +136,7 @@ public class TransactionStateDiff implements State {
             entry = (Entry) i.next();
 
             String typeName = (String) entry.getKey();
-            Map diff = (Map) entry.getValue();
+            Diff diff = (Diff) entry.getValue();
             applyDiff(typeName, diff);
         }
     }
@@ -169,7 +172,7 @@ public class TransactionStateDiff implements State {
      * @throws IOException If the entire diff cannot be writen out
      * @throws DataSourceException If the entire diff cannot be writen out
      */
-    void applyDiff(String typeName, Map diff) throws IOException {
+    void applyDiff(String typeName, Diff diff) throws IOException {
         if (diff.isEmpty()) {
             return;
         }
@@ -189,10 +192,10 @@ public class TransactionStateDiff implements State {
                 feature = (SimpleFeature)writer.next();
                 fid = feature.getID();
 
-                if (diff.containsKey(fid)) {
-                    update = (Feature) diff.remove(fid);
+                if (diff.modified2.containsKey(fid)) {
+                    update = (Feature) diff.modified2.get(fid);
 
-                    if (update == null) {
+                    if (update == NULL) {
                         writer.remove();
 
                         // notify
@@ -220,36 +223,34 @@ public class TransactionStateDiff implements State {
             Feature addedFeature;
             SimpleFeature nextFeature;
 
-            for (Iterator i = diff.values().iterator(); i.hasNext();) {
+            for (Iterator i = diff.added.values().iterator(); i.hasNext();) {
                 addedFeature = (Feature) i.next();
-                i.remove();
 
-                if (addedFeature != null) {
-                    fid = addedFeature.getID();
+                fid = addedFeature.getID();
 
-                    nextFeature = (SimpleFeature)writer.next();
+                nextFeature = (SimpleFeature)writer.next();
 
-                    if (nextFeature == null) {
-                        throw new DataSourceException("Could not add " + fid);
-                    } else {
-                        try {
-                            nextFeature.setAttributes(addedFeature
-                                .getAttributes(null));
-                            writer.write();
+                if (nextFeature == null) {
+                    throw new DataSourceException("Could not add " + fid);
+                } else {
+                    try {
+                        nextFeature.setAttributes(addedFeature
+                            .getAttributes(null));
+                        writer.write();
 
-                            // notify                        
-                            store.listenerManager.fireFeaturesAdded(typeName,
-                                transaction, nextFeature.getBounds(), true);
-                        } catch (IllegalAttributeException e) {
-                            throw new DataSourceException("Could update " + fid,
-                                e);
-                        }
+                        // notify                        
+                        store.listenerManager.fireFeaturesAdded(typeName,
+                            transaction, nextFeature.getBounds(), true);
+                    } catch (IllegalAttributeException e) {
+                        throw new DataSourceException("Could update " + fid,
+                            e);
                     }
                 }
             }
         } finally {
             writer.close();
             store.listenerManager.fireChanged(typeName, transaction, true);
+            diff.clear();
         }
     }
 
@@ -263,7 +264,7 @@ public class TransactionStateDiff implements State {
             entry = (Entry) i.next();
 
             String typeName = (String) entry.getKey();
-            Map diff = (Map) entry.getValue();
+            Diff diff = (Diff) entry.getValue();
 
             diff.clear(); // rollback differences
             store.listenerManager.fireChanged(typeName, transaction, false);
@@ -286,7 +287,7 @@ public class TransactionStateDiff implements State {
      */
     public synchronized FeatureReader reader(String typeName)
         throws IOException {
-        Map diff = diff(typeName);
+        Diff diff = diff(typeName);
         FeatureReader reader = store.getFeatureReader(typeName);
 
         return new DiffFeatureReader(reader, diff);
@@ -309,7 +310,7 @@ public class TransactionStateDiff implements State {
      */
     public synchronized FeatureWriter writer(final String typeName, Filter filter)
         throws IOException {
-        Map diff = diff(typeName);
+        Diff diff = diff(typeName);
         FeatureReader reader = new FilteringFeatureReader(store.getFeatureReader(typeName, new DefaultQuery(typeName, filter)), filter);
 
         return new DiffFeatureWriter(reader, diff, filter) {
@@ -336,4 +337,75 @@ public class TransactionStateDiff implements State {
                 }
             };
     }
+    
+    public static final Feature NULL=new Feature( ){
+
+		public Object getAttribute(String arg0) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Object getAttribute(int arg0) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Object[] getAttributes(Object[] arg0) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Envelope getBounds() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Geometry getDefaultGeometry() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public FeatureType getFeatureType() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public String getID() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public int getNumberOfAttributes() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		public FeatureCollection getParent() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public void setAttribute(int arg0, Object arg1) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void setAttribute(String arg0, Object arg1) throws IllegalAttributeException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void setDefaultGeometry(Geometry arg0) throws IllegalAttributeException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void setParent(FeatureCollection arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+    	
+    };
+
+
 }

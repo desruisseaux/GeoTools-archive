@@ -1,6 +1,20 @@
-/**
- * 
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
  */
+
 package org.geotools.index.quadtree;
 
 import java.io.IOException;
@@ -18,17 +32,9 @@ import org.geotools.index.TreeException;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * An iterator that searches the Quad tree for all the features that intersect
- * the bounds (or probably itersects the bounds).
- * 
- * <p>
- * The search pattern is a kind of breadth first search. It searches:<br>
- * root->child1->child2->child3...->child1Child1->child1Child2...<br>
- * This is so that the large features covering the majority of the bounds are
- * rendered first. All the features of an area are rendered then the next area.
- * If there are many feature such as roads it doesn't give the impression of
- * rendering as fast.
- * </p>
+ * Iterator that search the quad tree depth first.  32000 indices are cached at a time and each time a node is
+ * visited the indices are removed from the node so that the memory footprint is kept small.  Note that if other
+ * iterators operate on the same tree then they can interfere with each other.
  * 
  * @author Jesse
  */
@@ -42,41 +48,31 @@ public class LazySearchIterator implements Iterator {
 		DATA_DEFINITION.addField(Long.class);
 	}
 
-	// the next data to return in next()
-	private Data next = null;
+	Data next = null;
 
-	// the current node that is having its idIndexes added to the cache. This is
-	// used
-	// in filled the cache is used to determine next.
-	private Node current;
+	Node current;
 
-	// the next index in current to be added to the cache when it needs to be
-	// filled
-	private int idIndex = 0;
+	int idIndex = 0;
 
-	// indicates whether this iterator has been closed.
 	private boolean closed;
 
-	// the bounds that we are searching.
 	private Envelope bounds;
 
-	// the cache
-	private Iterator data;
+	Iterator data;
 
-	// the root node
-	private Node root;
 
 	private IndexFile indexfile;
 
-	public LazySearchIterator(Node root, IndexFile file, Envelope bounds) {
+	public LazySearchIterator(Node root, IndexFile indexfile, Envelope bounds) {
 		super();
 		this.current = root;
-		this.root = root;
 		this.bounds = bounds;
 		this.closed = false;
 		this.next = null;
-		this.indexfile=file;
+		this.indexfile=indexfile;
 	}
+
+
 
 	public boolean hasNext() {
 		if (closed)
@@ -87,30 +83,36 @@ public class LazySearchIterator implements Iterator {
 			next = (Data) data.next();
 		} else {
 			fillCache();
-			if (data != null && data.hasNext())
+			if( data!=null && data.hasNext() )
 				next = (Data) data.next();
 		}
 		return next != null;
 	}
 
 	private void fillCache() {
-		List indices = new ArrayList(MAX_INDICES);
-		ArrayList dataList = new ArrayList(MAX_INDICES);
+		List indices=new ArrayList();
+		ArrayList dataList=new ArrayList();
 		try {
-			while (indices.size() < MAX_INDICES && current != null) {
-				if (idIndex < current.getNumShapeIds() && !current.isVisited()
-						&& current.getBounds().intersects(bounds)) {
-					indices.add(new Integer(current.getShapeId(idIndex)));
+			while (indices.size() < MAX_INDICES && current!=null) {
+				if (idIndex < current.getNumShapeIds() && !current.isVisited() && current.getBounds().intersects(bounds)) {
+					indices.add(new Integer( current.getShapeId(idIndex) ) );
 					idIndex++;
 				} else {
 					current.setShapesId(new int[0]);
-					current.setVisited(true);
 					idIndex = 0;
-					boolean found = false;
-					while (!found && current != null) {
-						found = findUnvistedSibling();
-						if (!found && current != null)
-							found = findUnvistedChild();
+					boolean foundUnvisited=false;
+					for (int i = 0; i < current.getNumSubNodes(); i++) {
+						Node node = current.getSubNode(i);
+						if (!node.isVisited()
+								&& node.getBounds().intersects(bounds)){
+						foundUnvisited=true;
+						current = node;
+						break;
+						}
+					}
+					if( !foundUnvisited ){
+						current.setVisited(true);
+						current=current.getParent();
 					}
 				}
 			}
@@ -118,10 +120,9 @@ public class LazySearchIterator implements Iterator {
 			Collections.sort(indices);
 			for (Iterator iter = indices.iterator(); iter.hasNext();) {
 				Integer recno = (Integer) iter.next();
-				Data data = new Data(DATA_DEFINITION);
-				data.addValue(new Integer(recno.intValue() + 1));
-				data.addValue(new Long(indexfile.getOffsetInBytes(recno
-						.intValue())));
+				Data data=new Data(DATA_DEFINITION);
+				data.addValue(new Integer(recno.intValue()+1));
+				data.addValue(new Long(indexfile.getOffsetInBytes(recno.intValue())));
 				dataList.add(data);
 			}
 		} catch (IOException e) {
@@ -131,81 +132,14 @@ public class LazySearchIterator implements Iterator {
 		} catch (StoreException e) {
 			throw new RuntimeException(e);
 		}
-		data = dataList.iterator();
-	}
-
-	private boolean findUnvistedSibling() throws StoreException {
-		if (current == null)
-			return true;
-		Node sibling = current.getSibling();
-		// is last sibling
-		if (sibling == null) {
-			findSiblingWithUnvistedChildren();
-			return false;
-		}
-		
-		if (sibling.isVisited() ) {
-			current = sibling;
-			if (!current.isChildrenVisited())
-				return false;
-			else{
-				return findUnvistedSibling();
-			}
-		}
-		
-		if (!sibling.getBounds().intersects(bounds)) {
-			sibling.setChildrenVisited(true);
-			sibling.setVisited(true);
-			current = sibling;
-			return findUnvistedSibling();
-		}
-		current = sibling;
-		return true;
-	}
-
-	private void findSiblingWithUnvistedChildren() throws StoreException {
-		if (current == root || current == null)
-			return;
-		Node node = current.getParent().getSubNode(0);
-		while (node != null) {
-			if (!node.isChildrenVisited()) {
-				current = node;
-				return;
-			}
-			node = node.getSibling();
-		}
-
-		current = null;
-	}
-
-	private boolean findUnvistedChild() throws StoreException {
-		boolean foundUnvisited = false;
-		for (int i = 0; i < current.getNumSubNodes(); i++) {
-			Node node = current.getSubNode(i);
-			if (!node.isVisited() && node.getBounds().intersects(bounds)) {
-				foundUnvisited = true;
-				current = node;
-				break;
-			} else {
-				node.setChildrenVisited(true);
-				node.setVisited(true);
-			}
-		}
-		if (!foundUnvisited) {
-			current.setChildrenVisited(true);
-			current.setVisited(true);
-			if (current.getSibling() == null
-					|| current.getSibling().isVisited())
-				current = current.getParent();
-		}
-		return foundUnvisited;
+		data=dataList.iterator();
 	}
 
 	public Object next() {
 		if (!hasNext())
 			throw new NoSuchElementException("No more elements available");
 		Data temp = next;
-		next = null;
+		next=null;
 		return temp;
 	}
 

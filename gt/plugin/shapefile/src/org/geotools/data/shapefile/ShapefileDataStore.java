@@ -18,6 +18,7 @@ package org.geotools.data.shapefile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -33,9 +34,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.geotools.data.AbstractAttributeIO;
 import org.geotools.data.AbstractFeatureLocking;
@@ -118,7 +117,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected URI namespace = null; // namespace provided by the constructor's map
     protected FeatureType schema; // read only
     protected boolean useMemoryMappedBuffer = true;
-	private Set openedChannels=new HashSet();
 
     /**
      * Creates a new instance of ShapefileDataStore.
@@ -305,8 +303,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             channel = Channels.newChannel(in);
         }
         
-        openedChannels.add(channel);
-
         return channel;
     }
 
@@ -798,7 +794,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         copyAndDelete(shxURL, temp);
         copyAndDelete(dbfURL, temp);
         if (!prjURL.equals("")) {
+        	try{
 			copyAndDelete(prjURL, temp);
+        	}catch(FileNotFoundException e){
+        		LOGGER.warning(".prj could not be created.");
+        	}
 		}
     }
 

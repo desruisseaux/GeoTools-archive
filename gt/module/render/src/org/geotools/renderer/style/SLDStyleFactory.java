@@ -192,6 +192,7 @@ public class SLDStyleFactory {
         wellKnownMarks.add("Star");
         wellKnownMarks.add("X");
         wellKnownMarks.add("Arrow");
+        wellKnownMarks.add("Hatch");
         wellKnownMarks.add("square");
         wellKnownMarks.add("triangle");
         wellKnownMarks.add("cross");
@@ -199,6 +200,7 @@ public class SLDStyleFactory {
         wellKnownMarks.add("star");
         wellKnownMarks.add("x");
         wellKnownMarks.add("arrow");
+        wellKnownMarks.add("hatch");
         
         /** 
          * Initialize the gliph renderers array with the default ones

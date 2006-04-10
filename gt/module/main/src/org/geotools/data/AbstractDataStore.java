@@ -355,7 +355,7 @@ public abstract class AbstractDataStore implements DataStore {
         FeatureReader reader = getFeatureReader(typeName, query);
 
         if (transaction != Transaction.AUTO_COMMIT) {
-            Map diff = state(transaction).diff(typeName);
+            Diff diff = state(transaction).diff(typeName);
             reader = new DiffFeatureReader(reader, diff, query.getFilter());
         }
 

@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.data.Diff;
 import org.geotools.data.DiffFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
@@ -147,7 +148,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 		
 		if (transaction != Transaction.AUTO_COMMIT) {
 			String typeName = query.getTypeName();
-            Map diff = state(transaction).diff(typeName);
+			Diff diff = state(transaction).diff(typeName);
             reader = new DiffFeatureReader(reader, diff);
         }
 		

@@ -1,7 +1,6 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import junit.framework.TestCase;
 
@@ -23,9 +22,10 @@ public class DiffWriterTest extends TestCase {
         type = DataUtilities.createType("default", "name:String,*geom:Geometry");
         GeometryFactory fac=new GeometryFactory();
         geom = fac.createPoint(new Coordinate(10,10));
-		
-		HashMap diff=new HashMap();
-		diff.put("1", type.create(new Object[]{ "diff1", geom }, "1"));
+
+        Diff diff=new Diff();
+		diff.added.put("1", type.create(new Object[]{ "diff1", geom }, "1"));
+		diff.modified2.put("2", type.create(new Object[]{ "diff2", geom }, "2"));
 		FeatureReader reader=new TestReader(type,type.create(new Object[]{ "original", geom }, "original") );
 		writer=new DiffFeatureWriter(reader, diff){
 
@@ -40,18 +40,18 @@ public class DiffWriterTest extends TestCase {
 		writer.next();
 		Feature feature=writer.next();
 		writer.remove();
-		assertNull(writer.diff.get(feature.getID()));
+		assertNull(writer.diff.added.get(feature.getID()));
 	}
 
 	public void testHasNext() throws Exception {
 		assertTrue(writer.hasNext());
-		assertEquals(1, writer.diff.size());
-		Feature feature=writer.next();
+		assertEquals(2, writer.diff.added.size()+writer.diff.modified2.size());
+		writer.next();
 		assertTrue(writer.hasNext());
-		assertEquals(1, writer.diff.size());
-		feature=writer.next();
+		assertEquals(2, writer.diff.added.size()+writer.diff.modified2.size());
+		writer.next();
 		assertFalse(writer.hasNext());
-		assertEquals(1, writer.diff.size());
+		assertEquals(2, writer.diff.added.size()+writer.diff.modified2.size());
 	}
 	
 	public void testWrite() throws IOException, Exception {
@@ -63,13 +63,13 @@ public class DiffWriterTest extends TestCase {
 		feature.setAttribute("name", "new1");
 		
 		writer.write();
-		assertEquals(2, writer.diff.size() );
+		assertEquals(2, writer.diff.added.size() );
 		feature=writer.next();
 		feature.setAttribute("name", "new2");
 		
 		writer.write();
 		
-		assertEquals(3, writer.diff.size() );
+		assertEquals(3, writer.diff.added.size() );
 	}
 
 
