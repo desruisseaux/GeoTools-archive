@@ -173,8 +173,11 @@ public class DiffFeatureReader implements FeatureReader {
             }
 
         } else {
-        	if( diffIterator.hasNext() )
+        	while( diffIterator.hasNext() && next==null ){
         		next=(Feature) diffIterator.next();
+			if( !filter.contains(next) )
+				next=null;
+		}
         }
     }
 
