@@ -154,8 +154,12 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
         if ((live != null) ) 
         {
             // We have a modification to record!
-            //
-            diff.modified2.put(live.getID(), current);
+            if( diff.added.containsKey(live.getID()) ){
+                diff.added.put(live.getID(), current);
+            }else{
+                diff.modified2.put(live.getID(), current);
+            }
+
 
             Envelope bounds = new Envelope();
             bounds.expandToInclude(live.getBounds());
