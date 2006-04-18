@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.geotools.filter.FilterType;
+import org.geotools.filter.expression.LiteralExpression;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
