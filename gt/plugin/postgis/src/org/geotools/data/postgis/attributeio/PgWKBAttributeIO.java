@@ -26,10 +26,17 @@ import java.util.ArrayList;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
+import org.geotools.util.LiteCoordinateSequenceFactory;
 import org.wkb4j.engine.WKBParser;
 import org.wkb4j.jts.JTSFactory;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 
 
 /**
@@ -61,7 +68,16 @@ public class PgWKBAttributeIO implements AttributeIO {
             return (byte) (c - 'a' + 10);
         }
     }
+    
+//    static Coordinate[] cs = new Coordinate[2];
+//    {
+//        cs[0] = new Coordinate(-100,30);
+//        cs[1] = new Coordinate(-101,31);
+//    }
+//    static Geometry g_temp = (Geometry) new LineString(cs,new PrecisionModel(),4326);
 
+    static GeometryFactory gf = new GeometryFactory(new LiteCoordinateSequenceFactory() );
+    
     /**
      * This method will convert a String of hex characters that represent  the
      * hexadecimal form of a Geometry in Well Known Binary representation to a
@@ -84,26 +100,39 @@ public class PgWKBAttributeIO implements AttributeIO {
     	
     	if (wkbBytes == null)  //DJB: null value from database --> null geometry (the same behavior as WKT).  NOTE: sending back a GEOMETRYCOLLECTION(EMPTY) is also a possibility, but this is not the same as NULL 
     		return null; 
+    	try {
+    		//return g_temp; // for testing only!
+    		WKBReader wkbr = new WKBReader(  );
+       		//WKBReader wkbr = new WKBReader( );
+    		 
+    		Geometry g= wkbr.read(wkbBytes);
+    		return g;
+    		//return new WKBReader().read(wkbBytes);
+    	}
+    	catch (Exception e)
+    	{
+    		throw new DataSourceException("An exception occurred while parsing WKB data", e);    		
+    	}
     	
-        JTSFactory factory = new JTSFactory();
-        WKBParser parser = new WKBParser(factory);
-        try {
-            parser.parseData(wkbBytes, 42102);
-        } catch (Exception e) {
-            throw new DataSourceException("An exception occurred while parsing WKB data", e);
-        }
+//        JTSFactory factory = new JTSFactory();
+//        WKBParser parser = new WKBParser(factory);
+//        try {
+//            parser.parseData(wkbBytes, 42102);
+//        } catch (Exception e) {
+//            throw new DataSourceException("An exception occurred while parsing WKB data", e);
+//        }
 
-        ArrayList geoms = factory.getGeometries();
-
-        if (geoms.size() > 0) {
-            return (Geometry) geoms.get(0);
-        } else if (geoms.size() > 1) {
-            throw new IOException(
-                "Found more than one Geometry in WKB representation ");
-        } else {
-            throw new IOException(
-                "Could not parse WKB representations -  found no Geometries ");
-        }
+//        ArrayList geoms = factory.getGeometries();
+//
+//        if (geoms.size() > 0) {
+//            return (Geometry) geoms.get(0);
+//        } else if (geoms.size() > 1) {
+//            throw new IOException(
+//                "Found more than one Geometry in WKB representation ");
+//        } else {
+//            throw new IOException(
+//                "Could not parse WKB representations -  found no Geometries ");
+//        }
     }
     
     private byte[] hexToBytes(String wkb) {
@@ -128,6 +157,15 @@ public class PgWKBAttributeIO implements AttributeIO {
         }
         return bytes;
     }
+    public void compare(byte[] b1, byte[] b2)
+    {
+    	int len = b2.length;
+    	for (int t=0;t<len;t++)
+    	{
+    		if (b1[t] != b2[t])
+    			System.out.println("differ at position "+t+ "("+b1[t]+" vs "+b2[t]+")");
+    	}
+    }
 
     /**
      * @see org.geotools.data.jdbc.attributeio.AttributeIO#read(java.sql.ResultSet,
@@ -136,7 +174,11 @@ public class PgWKBAttributeIO implements AttributeIO {
     public Object read(ResultSet rs, int position) throws IOException {
         try {
             if(useByteArray) {
-                return WKB2Geometry(rs.getBytes(position));
+            	byte bytes[] = rs.getBytes(position);
+//            	byte b[] = Base64.decode(bytes);
+//            	byte b2[] =  Base64.decode(bytes,0,bytes.length);
+//            	compare(b,b2);
+                return WKB2Geometry(Base64.decode(bytes));
             } else {
                 return WKB2Geometry(hexToBytes(rs.getString(position)));
             }
