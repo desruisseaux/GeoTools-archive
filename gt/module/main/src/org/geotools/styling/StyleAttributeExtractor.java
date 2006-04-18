@@ -28,26 +28,35 @@ import org.geotools.filter.FilterAttributeExtractor;
  * @author wolf
  * @source $URL$
  */
+
+
+/**
+  * ===========================================================================
+  * if you're modifying this, you probably should also take a look at StyleAttributeExtractorTruncated
+  * ===========================================================================
+  *
+ */
+
 public class StyleAttributeExtractor extends FilterAttributeExtractor
     implements StyleVisitor {
-	
-	
+
+
 	/**
 	 *   if the default geometry is used, this will be true.  See GEOS-469
 	 */
 	boolean defaultGeometryUsed = false;
-	
+
 	/**
 	 * reads the read-only-property.
 	 * See GEOS-469
-	 * 
+	 *
 	 * @return true if any of the symbolizers visted use the default geometry.
 	 */
 	public boolean getDefaultGeometryUsed()
 	{
 		return defaultGeometryUsed;
 	}
-	
+
     /**
      * @see org.geotools.styling.StyleVisitor#visit(org.geotools.styling.Style)
      */
@@ -209,11 +218,11 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         {
         	this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
         }
-        
+
         if (ps.getGraphic() != null) {
             ps.getGraphic().accept(this);
         }
-       
+
     }
 
     /**
@@ -227,7 +236,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         {
         	this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
         }
-        
+
         if (line.getStroke() != null) {
             line.getStroke().accept(this);
         }
@@ -265,7 +274,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         {
         	this.defaultGeometryUsed = true; // they want the default geometry (see GEOS-469)
         }
-        
+
         if (text instanceof TextSymbolizer2)
         {
         	if ( ((TextSymbolizer2)text).getGraphic() !=null)
@@ -474,7 +483,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
 
 	public void visit(ColorMap map) {
 		ColorMapEntry[] entries = map.getColorMapEntries();
-		
+
 		for (int i = 0; i < entries.length; i++) {
 			entries[i].accept(this);
 		}
