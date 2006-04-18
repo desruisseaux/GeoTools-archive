@@ -36,7 +36,6 @@ import java.util.Calendar;
 
 import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.resources.NIOUtilities;
-import org.geotools.resources.NumberParser;
 
 /**
  * A DbaseFileReader is used to read a dbase III format file. <br>
@@ -106,8 +105,6 @@ public class DbaseFileReader {
 	int cnt = 1;
 
 	Row row;
-
-	NumberParser numberParser = new NumberParser();
 
 	protected boolean useMemoryMappedBuffer;
 
@@ -482,8 +479,7 @@ public class DbaseFileReader {
 			case 'N':
 				try {
 					if (header.getFieldDecimalCount(fieldNum) == 0) {
-						object = new Integer(numberParser.parseInt(charBuffer,
-								fieldOffset, fieldOffset + fieldLen - 1));
+						object = new Integer(extractNumberString(charBuffer, fieldOffset, fieldLen));
 						break;
 					}
 					// else will fall through to the floating point number
@@ -498,8 +494,7 @@ public class DbaseFileReader {
 
 					// Lets try parsing a long instead...
 					try {
-						object = new Long(numberParser.parseLong(charBuffer,
-								fieldOffset, fieldOffset + fieldLen - 1));
+						object = new Long(extractNumberString(charBuffer, fieldOffset, fieldLen));
 						break;
 					} catch (NumberFormatException e2) {
 
@@ -510,8 +505,7 @@ public class DbaseFileReader {
 			case 'F': // floating point number
 				try {
 
-					object = new Double(numberParser.parseDouble(charBuffer,
-							fieldOffset, fieldOffset + fieldLen - 1));
+					object = new Double(extractNumberString(charBuffer, fieldOffset, fieldLen));
 				} catch (NumberFormatException e) {
 					// todo: use progresslistener, this isn't a grave error,
 					// though it
@@ -529,6 +523,17 @@ public class DbaseFileReader {
 
 		}
 		return object;
+	}
+
+	/**
+	 * @param charBuffer2 TODO
+	 * @param fieldOffset
+	 * @param fieldLen
+	 * @return
+	 */
+	private final String extractNumberString(final CharBuffer charBuffer2, final int fieldOffset, final int fieldLen) {
+		String thing = charBuffer2.subSequence(fieldOffset, fieldOffset + fieldLen).toString().trim();
+		return thing;
 	}
 
 	public static void main(String[] args) throws Exception {
