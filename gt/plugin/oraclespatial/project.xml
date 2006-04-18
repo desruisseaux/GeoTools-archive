@@ -63,21 +63,21 @@
          The test cases will try and connect to an oracle server on localhost;
          or on the server indicated by a XXXX.properties file.
       -->
-	<dependency>
+	<!--dependency>
           <artifactId>ojdbc</artifactId>
           <groupId>oracle</groupId>
           <version>14</version>
-        </dependency>
+        </dependency-->
     <!-- To use for fake:
          Uncomment the following section, it downloads a jar full of
          "Mock Objects" so you can compile without downloading the real
          thing from oracle.
 -->
-    <!--dependency>
+    <dependency>
       <artifactId>dummy_spatial</artifactId>
       <groupId>oracle</groupId>
       <version>8.1.8</version>
-    </dependency-->
+    </dependency>
     <!-- end of optional dependencies -->
     <dependency>
       <id>opengis+legacy</id>
