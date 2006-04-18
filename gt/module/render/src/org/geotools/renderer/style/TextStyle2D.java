@@ -150,12 +150,13 @@ public class TextStyle2D extends Style2D {
     }
 
     /**
+     * recompute each time
      * @return
      */
     public GlyphVector getTextGlyphVector(Graphics2D graphics) {
-        if (textGlyphVector == null) {
+       
             textGlyphVector = font.createGlyphVector(graphics.getFontRenderContext(), label);
-        }
+   
 
         return textGlyphVector;
     }
@@ -163,12 +164,11 @@ public class TextStyle2D extends Style2D {
     /**
      * @return
      */
-    public Shape getHaloShape(Graphics2D graphics) {
-        if (haloShape == null) {
+    public Shape getHaloShape(Graphics2D graphics) 
+    {
             GlyphVector gv = getTextGlyphVector(graphics);
             haloShape = new BasicStroke(2f * haloRadius, BasicStroke.CAP_ROUND,
                     BasicStroke.JOIN_ROUND).createStrokedShape(gv.getOutline());
-        }
         return haloShape;
     }
 

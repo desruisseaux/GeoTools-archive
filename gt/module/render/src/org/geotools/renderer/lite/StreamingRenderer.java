@@ -126,6 +126,8 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  */
 public class StreamingRenderer implements GTRenderer {
     
+	
+	private int defaultMaxFiltersToSendToDatastore = 5; // default value
     public HashMap symbolizerAssociationHT = new HashMap(); //associate a symbolizer with some data
     
     /** Tolerance used to compare doubles for equality */
@@ -680,15 +682,104 @@ public class StreamingRenderer implements GTRenderer {
         return results;
     }
 
+    /**
+     *  JE: If there is a single rule "and" its filter together with the query's filter and send it off to datastore.  This will
+		 allow as more processing to be done on the back end... Very useful if DataStore is a database.  Problem is that worst case each filter
+		 is ran twice.  
+		 Next we will modify it to find a "Common" filter between all rules and send that to the datastore.
+		
+		 DJB: trying to be smarter.
+		      If there are no "elseRules" and no rules w/o a filter, then it makes sense to send them off to the Datastore
+		      We limit the number of Filters sent off to the datastore, just because it could get a bit rediculous.
+		      In general, for a database, if you can limit 10% of the rows being returned you're probably doing quite well.
+		      The main problem is when your filters really mean you're secretly asking for all the data in which case 
+		      sending the filters to the Datastore actually costs you.
+		      But, databases are *much* faster at processing the Filters than JAVA is and can use statistical analysis
+		      to do it.
+		
+     * @param styles
+     * @param q
+     */
 
-	private void processRuleForQuery(LiteFeatureTypeStyle[] styles, DefaultQuery q) {
-		// JE: If there is a single rule "and" its filter together with the query's filter and send it off to datastore.  This will
-		// allow as more processing to be done on the back end... Very useful if DataStore is a database.  Problem is that worst case each filter
-		// is ran twice.  
-		// Next we will modify it to find a "Common" filter between all rules and send that to the datastore.
-		if( styles!=null && styles.length==1 && styles[0].ruleList.length==1 && styles[0].elseRules.length==0){
-			if(styles[0].ruleList[0].getFilter()!=null)
-			q.setFilter(q.getFilter().and(styles[0].ruleList[0].getFilter()));
+	private void processRuleForQuery(LiteFeatureTypeStyle[] styles, DefaultQuery q) 
+	{
+	try{
+		
+		// first we check to see if there are > "getMaxFiltersToSendToDatastore" rules
+		// if so, then we dont do anything since no matter what there's too many to send down.
+		// next we check for any else rules.  If we find any --> dont send anything to Datastore
+		// next we check for rules w/o filters. If we find any --> dont send anything to Datastore
+		//
+		// otherwise, we're gold and can "or" together all the fiters then AND it with the original filter.
+		// ie. SELECT * FROM ... WHERE (the_geom && BBOX) AND (filter1 OR filter2 OR filter3);
+
+		int maxFilters = getMaxFiltersToSendToDatastore();
+		ArrayList filtersToDS = new ArrayList();
+		int actualFilters = 0;
+		
+		if (styles.length > maxFilters)  // there's at least one per
+			return;
+		for (int t=0;t<styles.length;t++)  // look at each featuretypestyle
+		{
+			LiteFeatureTypeStyle style = styles[t];
+			if (style.elseRules.length>0)             // uh-oh has elseRule
+				return; 
+			for (int u=0;u<style.ruleList.length;u++)  // look at each rule in the featuretypestyle
+			{
+				Rule r = style.ruleList[u];
+				if (r.getFilter() == null)
+					return;                            //uh-oh has no filter (want all rows)
+				filtersToDS.add(r.getFilter());
+			}
+		}
+		if (actualFilters > maxFilters)
+			return;
+		
+		FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
+		Filter ruleFiltersCombined;
+		// We're GOLD -- OR together all the Rule's Filters
+		if (filtersToDS.size() ==1)  // special case of 1 filter
+		{
+			ruleFiltersCombined = (Filter) filtersToDS.get(0);
+		}
+		else
+		{
+			//build it up
+			ruleFiltersCombined = (Filter) filtersToDS.get(0);
+			for (int t=1;t<filtersToDS.size();t++) //NOTE: dont redo 1st one
+			{
+				Filter newFilter = (Filter) filtersToDS.get(t);
+				ruleFiltersCombined = filterFactory.createLogicFilter(ruleFiltersCombined, newFilter, Filter.LOGIC_OR);
+			}
+		}
+		// combine with the geometry filter (preexisting)
+		ruleFiltersCombined =  filterFactory.createLogicFilter(q.getFilter(), ruleFiltersCombined, Filter.LOGIC_AND);
+		
+		//set the actual filter
+		q.setFilter(ruleFiltersCombined);
+		}
+	catch(Exception e)
+	{
+		 LOGGER.fine("couldnt send rules to datastore:"+e.getMessage() );
+	}
+}
+	
+	/**
+	 * find out the maximum number of filters we're going to send off to the datastore.  See processRuleForQuery() for details.
+	 * @return
+	 */
+	private int getMaxFiltersToSendToDatastore()
+	{
+	    try{
+	    	Integer result = (Integer) rendererHints.get("maxFiltersToSendToDatastore");
+	    	if (result == null)
+	    		return defaultMaxFiltersToSendToDatastore; // default if not present in hints
+	    	return result.intValue();
+	    	
+	    }
+		catch (Exception e)
+		{
+			return defaultMaxFiltersToSendToDatastore;
 		}
 	}
     
@@ -1014,7 +1105,7 @@ public class StreamingRenderer implements GTRenderer {
      * @throws IllegalAttributeException
      * @throws IllegalFilterException
      */
-    private void processStylers(final Graphics2D graphics,
+   final  private void processStylers(final Graphics2D graphics,
             MapLayer currLayer,
             AffineTransform at,
             CoordinateReferenceSystem destinationCrs,
@@ -1152,7 +1243,7 @@ public class StreamingRenderer implements GTRenderer {
      * @throws TransformException
      * @throws FactoryException
      */
-    private void processSymbolizers( final Graphics2D graphics, final Feature feature,
+    final private void processSymbolizers( final Graphics2D graphics, final Feature feature,
             final Symbolizer[] symbolizers, Range scaleRange, AffineTransform at,
             CoordinateReferenceSystem destinationCrs ) throws TransformException, FactoryException {
         LiteShape2 shape;
@@ -1223,7 +1314,7 @@ public class StreamingRenderer implements GTRenderer {
      * @throws TransformException
      * @throws FactoryException
      */
-    private LiteShape2 getTransformedShape( Geometry g, MathTransform2D transform )
+    private final LiteShape2 getTransformedShape( Geometry g, MathTransform2D transform )
     throws TransformException, FactoryException {
         
         LiteShape2 shape = new LiteShape2(g, transform, getDecimator(transform), false);

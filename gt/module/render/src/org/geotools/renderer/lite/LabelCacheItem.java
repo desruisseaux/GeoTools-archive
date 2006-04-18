@@ -29,6 +29,16 @@ public class LabelCacheItem implements Comparable
 	List geoms=new ArrayList();
 	double priority = 0.0;
 	int spaceAround = 0;
+	String label;
+	
+	public String getLabel()
+	{
+		return label;
+	}
+	public void setLabel(String l)
+	{
+		label = l;
+	}
 	
 	/**
 	 * space around - "dont put any label near me by this # of pixels"
@@ -58,9 +68,11 @@ public class LabelCacheItem implements Comparable
 	/**
 	 * Construct <code>LabelCacheItem</code>.
 	 */
-	public LabelCacheItem(TextStyle2D textStyle, LiteShape2 shape) {
+	public LabelCacheItem(TextStyle2D textStyle, LiteShape2 shape, String label) 
+	{
 		this.textStyle=textStyle;
 		this.geoms.add(shape.getGeometry());
+		this.label = label;
 	}
 	
 	/**

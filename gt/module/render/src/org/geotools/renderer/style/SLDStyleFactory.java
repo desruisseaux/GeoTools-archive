@@ -77,6 +77,7 @@ import org.geotools.styling.PointPlacement;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.StyleAttributeExtractor;
+import org.geotools.styling.StyleAttributeExtractorTruncated;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbol;
 import org.geotools.styling.Symbolizer;
@@ -296,7 +297,7 @@ public class SLDStyleFactory {
                 return style;
             } else {
                 // lets see if it's static or dynamic
-                StyleAttributeExtractor sae = new StyleAttributeExtractor();
+            	StyleAttributeExtractorTruncated sae = new StyleAttributeExtractorTruncated();
                 sae.visit(symbolizer);
 
                 Set nameSet = sae.getAttributeNameSet();
