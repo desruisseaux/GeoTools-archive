@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import junit.framework.TestCase;
 /**
  * DOCUMENT ME!
  *
- * @author $author$
+ * @author Gabriel Roldan
  * @source $URL$
  * @version $Revision: 1.9 $
  */

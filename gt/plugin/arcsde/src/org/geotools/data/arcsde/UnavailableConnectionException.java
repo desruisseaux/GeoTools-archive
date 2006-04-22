@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,14 +21,9 @@ package org.geotools.data.arcsde;
  * calling thread was waiting an available connection for
  * <code>SdeConnectionPool instance's getMaxWaitTime()</code> milliseconds
  * 
- * @author Gabriel Rold?n
- * @author Gabriel Rold?n
+ * @author Gabriel Roldan
  * @source $URL$
  * @version $Id$
- * 
- * @task REVISIT: sure there are a better exception to use in somewhere... just
- *       take a look since it seems not very wise to have it here... may be in
- *       current jdbc package.
  */
 public class UnavailableConnectionException extends Exception {
 	/**
