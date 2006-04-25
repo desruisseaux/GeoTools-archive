@@ -20,13 +20,16 @@
 package org.geotools.coverage;
 
 // J2SE and JAI dependencies
-import java.util.List;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
@@ -335,9 +338,12 @@ public class CoverageStack extends AbstractCoverage {
 
     /**
      * The dimension of the <var>z</var> ordinate (the last value in coordinate points).
-     * This is always the CRS dimension minus 1.
+     * This is always the {@linkplain #getCoordinateReferenceSystem() coordinate reference
+     * system} dimension minus 1.
+     *
+     * @since 2.3
      */
-    private final int zDimension;
+    public final int zDimension;
     
     /**
      * {@code true} if interpolations are allowed.
@@ -1021,7 +1027,7 @@ public class CoverageStack extends AbstractCoverage {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
-    public synchronized Object evaluate(final DirectPosition coord)
+    public Object evaluate(final DirectPosition coord)
             throws CannotEvaluateException
     {
         return evaluate(coord, (double[]) null);
@@ -1225,6 +1231,39 @@ public class CoverageStack extends AbstractCoverage {
             dest[i] = value;
         }
         return dest;
+    }
+    
+    /**
+     * Returns the coverages to be used for the specified <var>z</var> value. Special cases:
+     * <p>
+     * <ul>
+     *   <li>If there is no coverage available for the specified <var>z</var> value, returns
+     *       an {@linkplain Collections#EMPTY_SET empty set}.</li>
+     *   <li>If there is only one coverage available, or if the specified <var>z</var> value
+     *       falls exactly in the middle of the {@linkplain Element#getZRange range value}
+     *       (i.e. no interpolation are needed), or if {@linkplain #setInterpolationEnabled
+     *       interpolations are disabled}, then this method returns a
+     *       {@linkplain Collections#singleton singleton set}.</li>
+     *   <li>Otherwise, this method returns a set containing at least 2 coverages, one before
+     *       and one after the specified <var>z</var> value.</li>
+     * </ul>
+     *
+     * @param z The z value for the coverages to be returned.
+     * @return  The coverages for the specified values. May contains 0, 1 or 2 elements.
+     *
+     * @since 2.3
+     */
+    public synchronized Set/*<Coverage>*/ getCoverages(final double z) {
+        if (!seek(z)) {
+            return Collections.EMPTY_SET;
+        }
+        if (lower == upper) {
+            return Collections.singleton(lower);
+        }
+        final Set set = new LinkedHashSet(4);
+        set.add(lower);
+        set.add(upper);
+        return set;
     }
     
     /**

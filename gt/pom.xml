@@ -496,6 +496,23 @@
         <version>0.1</version>
       </dependency>
 
+      <!-- ESRI -->
+      <dependency>
+        <groupId>com.esri</groupId>
+        <artifactId>jsde_sdk</artifactId>
+        <version>9.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.esri</groupId>
+        <artifactId>jsde_concurrent</artifactId>
+        <version>9.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.esri</groupId>
+        <artifactId>jsde_jpe_sdk</artifactId>
+        <version>9.0</version>
+      </dependency>
+
       <!-- Tests or legacy -->
       <dependency>
         <groupId>junit</groupId>

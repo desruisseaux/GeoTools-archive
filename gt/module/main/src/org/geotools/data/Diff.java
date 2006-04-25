@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.geotools.feature.Feature;
 
+// TODO: replace by java.util.concurrent.ConcurrentHashMap when we will be allowed to target J2SE 1.5
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 
 import com.vividsolutions.jts.geom.Envelope;

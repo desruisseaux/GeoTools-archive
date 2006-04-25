@@ -171,11 +171,6 @@
       <artifactId>gt2-api</artifactId>
       <version>2.3-SNAPSHOT</version>
     </dependency>
-    <!--dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
-      <version>2.3-SNAPSHOT</version>
-    </dependency-->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-sample-data</artifactId>
@@ -224,9 +219,8 @@
     <dependency>
       <groupId>com.esri</groupId>
       <artifactId>jsde_concurrent</artifactId>
-      <version>9.0</version>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
-    
   </dependencies>
 
 
