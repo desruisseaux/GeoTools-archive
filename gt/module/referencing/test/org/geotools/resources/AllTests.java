@@ -51,7 +51,6 @@ public final class AllTests {
         final TestSuite suite = new TestSuite("org.geotools.resources");
         suite.addTest(XMathTest         .suite());
         suite.addTest(UtilitiesTest     .suite());
-        suite.addTest(NumberParserTest  .suite());
         suite.addTest(ResourceBundleTest.suite());
         return suite;
     }
