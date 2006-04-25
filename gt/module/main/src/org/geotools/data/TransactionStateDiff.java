@@ -222,30 +222,32 @@ public class TransactionStateDiff implements State {
 
             Feature addedFeature;
             SimpleFeature nextFeature;
-
-            for (Iterator i = diff.added.values().iterator(); i.hasNext();) {
-                addedFeature = (Feature) i.next();
-
-                fid = addedFeature.getID();
-
-                nextFeature = (SimpleFeature)writer.next();
-
-                if (nextFeature == null) {
-                    throw new DataSourceException("Could not add " + fid);
-                } else {
-                    try {
-                        nextFeature.setAttributes(addedFeature
-                            .getAttributes(null));
-                        writer.write();
-
-                        // notify                        
-                        store.listenerManager.fireFeaturesAdded(typeName,
-                            transaction, nextFeature.getBounds(), true);
-                    } catch (IllegalAttributeException e) {
-                        throw new DataSourceException("Could update " + fid,
-                            e);
-                    }
-                }
+            
+            synchronized (diff) {
+            	for (Iterator i = diff.added.values().iterator(); i.hasNext();) {
+            		addedFeature = (Feature) i.next();
+            		
+            		fid = addedFeature.getID();
+            		
+            		nextFeature = (SimpleFeature)writer.next();
+            		
+            		if (nextFeature == null) {
+            			throw new DataSourceException("Could not add " + fid);
+            		} else {
+            			try {
+            				nextFeature.setAttributes(addedFeature
+            						.getAttributes(null));
+            				writer.write();
+            				
+            				// notify                        
+            				store.listenerManager.fireFeaturesAdded(typeName,
+            						transaction, nextFeature.getBounds(), true);
+            			} catch (IllegalAttributeException e) {
+            				throw new DataSourceException("Could update " + fid,
+            						e);
+            			}
+            		}
+            	}
             }
         } finally {
             writer.close();

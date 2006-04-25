@@ -221,6 +221,12 @@
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.esri</groupId>
+      <artifactId>jsde_concurrent</artifactId>
+      <version>9.0</version>
+    </dependency>
+    
   </dependencies>
 
 

@@ -19,6 +19,7 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -27,6 +28,14 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.LiteralExpression;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A FeatureReader that considers differences.
@@ -48,8 +57,14 @@ public class DiffFeatureReader implements FeatureReader {
     private Filter filter;
     private Set encounteredFids;
 
-	private Iterator diffIterator;
+	private Iterator addedIterator;
+	private Iterator modifiedIterator;
 	private int fidIndex=0;
+	private Iterator spatialIndexIterator;
+	
+	private boolean indexedGeometryFilter = false;
+	private boolean fidFilter = false;
+	
     /**
      * This constructor grabs a "copy" of the current diff.
      * <p>
@@ -78,10 +93,21 @@ public class DiffFeatureReader implements FeatureReader {
         this.reader = reader;
         this.diff = diff2;
         this.filter = filter;
+        encounteredFids=new HashSet();
+
         if( filter instanceof FidFilter ){
-        	encounteredFids=new HashSet();
+        	fidFilter=true;
+        }else if( isSubsetOfBboxFilter(filter) ){
+        	indexedGeometryFilter=true;
         }
-        diffIterator=diff.added.values().iterator();
+        
+        synchronized (diff) {
+        	if( indexedGeometryFilter ){
+        		spatialIndexIterator=getIndexedFeatures().iterator();
+        	}
+        	addedIterator=diff.added.values().iterator();
+        	modifiedIterator=diff.modified2.values().iterator();
+        }
     }
 
     /**
@@ -96,8 +122,8 @@ public class DiffFeatureReader implements FeatureReader {
      */
     public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
         if (hasNext()) {
-            Feature live = next;
-            next = null;
+        	Feature live = next;
+        	next = null;
 
             return live;
         }
@@ -129,56 +155,25 @@ public class DiffFeatureReader implements FeatureReader {
             }
 
             String fid = peek.getID();
+            encounteredFids.add(fid);
 
             if (diff.modified2.containsKey(fid)) {
                 Feature changed = (Feature) diff.modified2.get(fid);
-                if (changed == TransactionStateDiff.NULL) {
+                if (changed == TransactionStateDiff.NULL || !filter.contains(changed) ) {
                     continue;
                 } else {
                     next = changed;
-                    if( encounteredFids!=null )
-                    	encounteredFids.add(next.getID());
                     return true;
                 }
             } else {
 
                 next = peek; // found feature
-                if( encounteredFids!=null )
-                	encounteredFids.add(next.getID());
                 return true;
             }
         }
 
         queryDiff();
         return next != null;
-    }
-
-    private void queryDiff() {
-        if (filter instanceof FidFilter) {
-            FidFilter fidFilter = (FidFilter) filter;
-            if (fidIndex == -1) {
-                fidIndex = 0;
-            }
-            while( fidIndex < fidFilter.getFids().length && next == null ) {
-                String fid = fidFilter.getFids()[fidIndex];
-                if( encounteredFids.contains(fid) ){
-                	fidIndex++;
-                	continue;
-                }
-				next = (Feature) diff.modified2.get(fid);
-                if( next==null ){
-                	next = (Feature) diff.added.get(fid);
-                }
-                fidIndex++;
-            }
-
-        } else {
-        	while( diffIterator.hasNext() && next==null ){
-        		next=(Feature) diffIterator.next();
-			if( !filter.contains(next) )
-				next=null;
-		}
-        }
     }
 
     /**
@@ -192,7 +187,100 @@ public class DiffFeatureReader implements FeatureReader {
 
         if (diff != null) {
             diff = null;
-            diffIterator=null;
+            addedIterator=null;
         }
+    }
+    
+    protected void queryDiff() {
+        if( fidFilter ){
+            queryFidFilter();
+        } else if( indexedGeometryFilter ){
+        	querySpatialIndex();
+        } else {
+        	queryAdded();
+        	queryModified();
+         }
+    }
+
+	protected void querySpatialIndex() {
+		while( spatialIndexIterator.hasNext() && next == null ){
+			Feature f = (Feature) spatialIndexIterator.next();
+			if( encounteredFids.contains(f.getID()) || !filter.contains(f)){
+				continue;
+			}
+			next = f;
+		}
+	}
+    
+	protected void queryAdded() {
+		while( addedIterator.hasNext() && next == null ){
+			next = (Feature) addedIterator.next();
+			if( encounteredFids.contains(next.getID()) || !filter.contains(next)){
+				next = null;
+			}
+		}
+	}
+	
+	protected void queryModified() {
+		while( modifiedIterator.hasNext() && next == null ){
+			next = (Feature) modifiedIterator.next();
+			if( next==TransactionStateDiff.NULL || encounteredFids.contains(next.getID()) || !filter.contains(next) ){
+				next = null;
+			}
+		}
+	}
+	
+	protected void queryFidFilter() {
+		FidFilter fidFilter = (FidFilter) filter;
+		if (fidIndex == -1) {
+		    fidIndex = 0;
+		}
+		while( fidIndex < fidFilter.getFids().length && next == null ) {
+		    String fid = fidFilter.getFids()[fidIndex];
+		    if( encounteredFids.contains(fid) ){
+		    	fidIndex++;
+		    	continue;
+		    }
+			next = (Feature) diff.modified2.get(fid);
+		    if( next==null ){
+		    	next = (Feature) diff.added.get(fid);
+		    }
+		    fidIndex++;
+		}
+	}
+    
+    protected List getIndexedFeatures() {
+        // TODO: check geom is default geom.
+        Envelope env = extractBboxForSpatialIndexQuery((GeometryFilter) filter);
+        return diff.queryIndex(env);
+    }
+
+    protected Envelope extractBboxForSpatialIndexQuery(GeometryFilter f) {
+        GeometryFilter geomFilter = (GeometryFilter) f;
+        Expression leftGeometry = geomFilter.getLeftGeometry();
+        Expression rightGeometry = geomFilter.getRightGeometry();
+        
+        Geometry g;
+        if( leftGeometry instanceof LiteralExpression ){
+        	g=(Geometry) ((LiteralExpression) leftGeometry).getLiteral();
+        }else{
+        	g=(Geometry) ((LiteralExpression) rightGeometry).getLiteral();
+        }
+        return g.getEnvelopeInternal();
+    }
+    
+    protected boolean isDefaultGeometry(AttributeExpression ae) {
+    	return reader.getFeatureType().getDefaultGeometry().getName().equals(ae.getAttributePath());
+    }
+    
+    protected boolean isSubsetOfBboxFilter(Filter f) {
+    	short filterType = f.getFilterType();
+    	return f instanceof GeometryFilter 
+    	&& (filterType == FilterType.GEOMETRY_CONTAINS
+    			|| filterType == FilterType.GEOMETRY_CROSSES
+    			|| filterType == FilterType.GEOMETRY_OVERLAPS
+    			|| filterType == FilterType.GEOMETRY_TOUCHES
+    			|| filterType == FilterType.GEOMETRY_WITHIN
+    			|| filterType == FilterType.GEOMETRY_BBOX);
     }
 }

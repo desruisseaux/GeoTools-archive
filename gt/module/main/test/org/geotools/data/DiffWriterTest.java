@@ -24,8 +24,8 @@ public class DiffWriterTest extends TestCase {
         geom = fac.createPoint(new Coordinate(10,10));
 
         Diff diff=new Diff();
-		diff.added.put("1", type.create(new Object[]{ "diff1", geom }, "1"));
-		diff.modified2.put("2", type.create(new Object[]{ "diff2", geom }, "2"));
+		diff.add("1", type.create(new Object[]{ "diff1", geom }, "1"));
+		diff.modify("original", type.create(new Object[]{ "diff2", geom }, "original"));
 		FeatureReader reader=new TestReader(type,type.create(new Object[]{ "original", geom }, "original") );
 		writer=new DiffFeatureWriter(reader, diff){
 

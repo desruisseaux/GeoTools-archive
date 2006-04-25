@@ -227,6 +227,12 @@
       <version>9.0</version>
       <url>http://support.esri.com/index.cfm?fa=downloads.patchesServicePacks.viewPatch&amp;PID=19&amp;MetaID=1065#install-cUNIX</url>
     </dependency>
+    <dependency>
+      <artifactId>jsde_concurrent</artifactId>
+      <groupId>arcsde</groupId>
+      <version>9.0</version>
+      <url>http://support.esri.com/index.cfm?fa=downloads.patchesServicePacks.viewPatch&amp;PID=19&amp;MetaID=1065#install-cUNIX</url>
+    </dependency>
 
   </dependencies>
 

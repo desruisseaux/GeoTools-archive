@@ -123,16 +123,10 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
     public void remove() throws IOException {
         if (live != null) {
             // mark live as removed
-        	if( diff.added.remove(live.getID())==null ){
-	            diff.modified2.put(live.getID(), TransactionStateDiff.NULL);
-	            fireNotification(FeatureEvent.FEATURES_REMOVED, live.getBounds());
-	            live = null;
-	            current = null;
-        	}else{
-                fireNotification(FeatureEvent.FEATURES_REMOVED, live.getBounds());
-                live = null;
-                current = null;
-            }
+        	diff.remove(live.getID());
+        	fireNotification(FeatureEvent.FEATURES_REMOVED, live.getBounds());
+        	live = null;
+        	current = null;
         } else if (current != null) {
             // cancel additional content
             current = null;
@@ -154,11 +148,8 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
         if ((live != null) ) 
         {
             // We have a modification to record!
-            if( diff.added.containsKey(live.getID()) ){
-                diff.added.put(live.getID(), current);
-            }else{
-                diff.modified2.put(live.getID(), current);
-            }
+            diff.modify(live.getID(), current);
+
 
 
             Envelope bounds = new Envelope();
@@ -170,7 +161,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
         } else if ((live == null) && (current != null)) {
             // We have new content to record
             //
-            diff.added.put(current.getID(), current);
+            diff.add(current.getID(), current);
             fireNotification(FeatureEvent.FEATURES_ADDED, current.getBounds());
             current = null;
         } else {
