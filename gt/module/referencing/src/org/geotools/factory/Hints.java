@@ -317,11 +317,6 @@ public final class Hints extends RenderingHints {
         Key(final String className) {
             super(count++);
             this.className = className;
-            try {
-                assert !Class.forName(className).isPrimitive() : className;
-            } catch (ClassNotFoundException exception) {
-                throw new AssertionError(exception);
-            }
         }
 
         /**
