@@ -1253,7 +1253,7 @@ public class CoverageStack extends AbstractCoverage {
      *
      * @since 2.3
      */
-    public synchronized Set/*<Coverage>*/ getCoverages(final double z) {
+    public synchronized Set/*<Coverage>*/ coveragesAt(final double z) {
         if (!seek(z)) {
             return Collections.EMPTY_SET;
         }
