@@ -19,7 +19,7 @@
  */
 package org.geotools.util;
 
-// Logging
+// J2SE dependencies
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
+// Geotools dependencies
 import org.geotools.io.LineWriter;
 import org.geotools.resources.Utilities;
 
@@ -528,7 +529,7 @@ public class MonolineFormatter extends Formatter {
      * @param level The logging level, or {@code null} if no level should be set.
      */
     public static void initGeotools(final Level level) {
-        final MonolineFormatter f = MonolineFormatter.init("org.geotools", level);
+        final MonolineFormatter f = init("org.geotools", level);
         // As of new MonolineFormatter.init(...) specification, 'f' should never be null.
         if (f.getSourceFormat() == null) {
             // Set the source format only if the user didn't specified
@@ -555,7 +556,7 @@ public class MonolineFormatter extends Formatter {
      */
     private static final class Stdout extends StreamHandler {
         /**
-         * Construct a handler.
+         * Constructs a handler.
          *
          * @param formatter The formatter to use.
          */
@@ -564,7 +565,7 @@ public class MonolineFormatter extends Formatter {
         }
 
         /**
-         * Construct a handler.
+         * Constructs a handler.
          *
          * @param handler The handler to copy properties from.
          * @param formatter The formatter to use.
@@ -588,9 +589,8 @@ public class MonolineFormatter extends Formatter {
         }
 
         /**
-         * Override {@link StreamHandler#close} to do a flush but not
-         * to close the output stream. That is, we do <b>not</b>
-         * close {@link System#out}.
+         * Override {@link StreamHandler#close} to do a flush but not to close the output stream.
+         * That is, we do <b>not</b> close {@link System#out}.
          */
         public void close() {
             flush();

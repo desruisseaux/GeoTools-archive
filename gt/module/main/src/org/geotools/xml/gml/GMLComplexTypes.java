@@ -93,6 +93,17 @@ import com.vividsolutions.jts.geom.Polygon;
 public class GMLComplexTypes {
     // used for debugging
     protected static Logger logger = getLogger();
+
+    /**
+     * Returns the logger to be used for this class.
+     *
+     * @todo Logger.setLevel(...) should not be invoked, because it override any user setting in
+     *       {@code jre/lib/logging.properties}. Users should edit their properties file instead.
+     *       If Geotools is too verbose below the warning level, then some log messages should
+     *       probably be changed from Level.INFO to Level.FINE.
+     *
+     * @todo The logger package should probably be {@code "org.geotools.xml.gml"}.
+     */
     private static final Logger getLogger(){
     	Logger l = Logger.getLogger("net.refractions.gml.static");
     	l.setLevel(Level.WARNING);

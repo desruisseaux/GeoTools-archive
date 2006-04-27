@@ -26,10 +26,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
@@ -1238,13 +1236,13 @@ public class CoverageStack extends AbstractCoverage {
      * <p>
      * <ul>
      *   <li>If there is no coverage available for the specified <var>z</var> value, returns
-     *       an {@linkplain Collections#EMPTY_SET empty set}.</li>
+     *       an {@linkplain Collections#EMPTY_LIST empty list}.</li>
      *   <li>If there is only one coverage available, or if the specified <var>z</var> value
      *       falls exactly in the middle of the {@linkplain Element#getZRange range value}
      *       (i.e. no interpolation are needed), or if {@linkplain #setInterpolationEnabled
      *       interpolations are disabled}, then this method returns a
-     *       {@linkplain Collections#singleton singleton set}.</li>
-     *   <li>Otherwise, this method returns a set containing at least 2 coverages, one before
+     *       {@linkplain Collections#singletonList singleton}.</li>
+     *   <li>Otherwise, this method returns a list containing at least 2 coverages, one before
      *       and one after the specified <var>z</var> value.</li>
      * </ul>
      *
@@ -1253,17 +1251,14 @@ public class CoverageStack extends AbstractCoverage {
      *
      * @since 2.3
      */
-    public synchronized Set/*<Coverage>*/ coveragesAt(final double z) {
+    public synchronized List/*<Coverage>*/ coveragesAt(final double z) {
         if (!seek(z)) {
-            return Collections.EMPTY_SET;
+            return Collections.EMPTY_LIST;
         }
         if (lower == upper) {
-            return Collections.singleton(lower);
+            return Collections.singletonList(lower);
         }
-        final Set set = new LinkedHashSet(4);
-        set.add(lower);
-        set.add(upper);
-        return set;
+        return Arrays.asList(new Coverage[] {lower, upper});
     }
     
     /**

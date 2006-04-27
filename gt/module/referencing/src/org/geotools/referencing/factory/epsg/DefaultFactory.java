@@ -430,7 +430,6 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      *             An arbitrary number of codes can be specified on the command line.
      */
     public static void main(String[] args) {
-        MonolineFormatter.initGeotools(); // Use custom logger.
         final Arguments arguments = new Arguments(args);
         final boolean     printMT = arguments.getFlag("-transform");
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);

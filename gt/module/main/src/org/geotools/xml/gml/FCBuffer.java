@@ -85,10 +85,17 @@ public class FCBuffer extends Thread implements FeatureReader {
         this.ft = ft;
     }
 
+    /**
+     * Returns the logger to be used for this class.
+     *
+     * @todo Logger.setLevel(...) should not be invoked, because it override any user setting in
+     *       {@code jre/lib/logging.properties}. Users should edit their properties file instead.
+     *       If Geotools is too verbose below the warning level, then some log messages should
+     *       probably be changed from Level.INFO to Level.FINE.
+     */
     private static final Logger getLogger() {
         Logger l = Logger.getLogger("org.geotools.xml.gml");
         l.setLevel(Level.WARNING);
-
         return l;
     }
 

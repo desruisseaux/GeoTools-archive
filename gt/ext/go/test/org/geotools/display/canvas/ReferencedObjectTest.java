@@ -23,6 +23,7 @@ package org.geotools.display.canvas;
 import java.util.List;
 import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.awt.RenderingHints;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -302,7 +303,9 @@ public class ReferencedObjectTest extends TestCase implements PropertyChangeList
          * Tests CRS changes. Note: we disable the WARNING level in order to avoid polluting
          * the standard output with warnings that are know to be normal for this test suite.
          */
-        canvas.getLogger().setLevel(Level.SEVERE);
+        final Logger logger = canvas.getLogger();
+        final Level oldLevel = logger.getLevel();
+        logger.setLevel(Level.SEVERE);
         canvas.objectiveToDisplay.setToScale(10, 10);
         assertTrue("The objective to display transform should be the identity transform.",
                    canvas.getObjectiveToDisplayTransform().isIdentity());
@@ -322,5 +325,6 @@ public class ReferencedObjectTest extends TestCase implements PropertyChangeList
         canvas.dispose();
         assertEquals("All listeners should have been removed after canvas disposal.",
                      0, canvas.listeners.getPropertyChangeListeners().length);
+        logger.setLevel(oldLevel);
     }
 }
