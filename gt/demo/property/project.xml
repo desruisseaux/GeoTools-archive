@@ -84,7 +84,14 @@
       <version>0.2</version>
       <url>http://www.opengis.org</url>
     </dependency>
+      <dependency>
+      <artifactId>jsde_concurrent</artifactId>
+      <groupId>arcsde</groupId>
+      <version>9.0</version>
+      <url>http://support.esri.com/index.cfm?fa=downloads.patchesServicePacks.viewPatch&amp;PID=19&amp;MetaID=1065#install-cUNIX</url>
+    </dependency>
   </dependencies>
+  
   <contributors>
     <contributor>
       <name>Gabriel Roldan</name>
