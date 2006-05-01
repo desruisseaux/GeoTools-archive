@@ -96,13 +96,12 @@
     </dependency>
 
     <!-- this dependency is covered by main (via api) and by epsg-wkt -->
-    <!-- because this is confusin to maven we need to give it a clue -->
+    <!-- because this is confusing to maven we need to give it a clue -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-referencing</artifactId>
       <version>2.3-SNAPSHOT</version>
     </dependency>
-
   </dependencies>
 
 </project>

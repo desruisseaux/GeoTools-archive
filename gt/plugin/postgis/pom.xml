@@ -98,30 +98,4 @@
     </dependency>
   </dependencies>
 
-
-
-  <!-- ==================================================== -->
-  <!--     Plugins configuration                            -->
-  <!-- ==================================================== -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!-- This section excludes the tests -->
-          <excludes>
-            <exclude>**/PostgisLockingTest.java</exclude>
-            <exclude>**/PostgisTestSuite.java</exclude>
-            <exclude>**/PostgisDataStoreAPITest.java</exclude>
-            <exclude>**/PostgisDataStoreTest.java</exclude>
-          </excludes>
-          <!-- End exclude tests -->
-          <skip>${allow.test.skip}</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
-          <!-- We bypass for now because PostGIS tests are very long (20 minutes!)  -->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

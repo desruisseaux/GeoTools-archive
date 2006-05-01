@@ -126,7 +126,6 @@
           <!-- TODO: Disables assertions for now until the following is fixed: -->
           <!--       http://jira.codehaus.org/browse/GEOT-792                  -->
           <argLine>-Xmx512M -disableassertions</argLine>
-          <skip>false</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
         </configuration>
       </plugin>
     </plugins>
