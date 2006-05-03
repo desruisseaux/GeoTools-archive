@@ -530,16 +530,17 @@ public class FactoryRegistry extends ServiceRegistry {
     private static void loadingFailure(final Class category, final Throwable error,
                                        final boolean showStackTrace)
     {
-        final String name = Utilities.getShortName(category);
-        final LogRecord record;
+        final String        name = Utilities.getShortName(category);
+        final StringBuffer cause = new StringBuffer(Utilities.getShortClassName(error));
+        final String     message = error.getLocalizedMessage();
+        if (message != null) {
+            cause.append(": ");
+            cause.append(message);
+        }
+        final LogRecord record = Logging.format(Level.WARNING,
+                LoggingKeys.CANT_LOAD_SERVICE_$2, name, cause.toString());
         if (showStackTrace) {
-            record = Logging.format(Level.WARNING, LoggingKeys.CANT_LOAD_SERVICE_$1, name);
             record.setThrown(error);
-        } else {
-            record = new LogRecord(Level.WARNING, Logging.getResources(null).getString(
-                                   LoggingKeys.CANT_LOAD_SERVICE_$1, name) + " (" +
-                                   Utilities.getShortClassName(error) + ": " +
-                                   error.getLocalizedMessage() + ')');
         }
         record.setSourceClassName("FactoryRegistry");
         record.setSourceMethodName("scanForPlugins");
