@@ -222,11 +222,11 @@ public class ShapefileWriter {
    * Close the underlying Channels.
    */
   public void close() throws IOException {
-	  if( shpChannel.isOpen()){
+	  if( shpChannel!=null && shpChannel.isOpen()){
 		    shpLogger.close();
 		    shpChannel.close();
 	  }
-	  if( shxChannel.isOpen()){
+	  if( shxChannel!=null && shxChannel.isOpen()){
 		  shxChannel.close();
 		  shxLogger.close();
 	  }
