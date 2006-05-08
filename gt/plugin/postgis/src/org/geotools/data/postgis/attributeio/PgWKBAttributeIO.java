@@ -47,11 +47,11 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  */
 public class PgWKBAttributeIO implements AttributeIO {
     private boolean useByteArray;
-    
+
     public PgWKBAttributeIO(boolean useByteArray) {
         this.useByteArray = useByteArray;
     }
-    
+
     /**
      * Turns a char that encodes four bits in hexadecimal notation into a byte
      *
@@ -68,7 +68,7 @@ public class PgWKBAttributeIO implements AttributeIO {
             return (byte) (c - 'a' + 10);
         }
     }
-    
+
 //    static Coordinate[] cs = new Coordinate[2];
 //    {
 //        cs[0] = new Coordinate(-100,30);
@@ -77,7 +77,7 @@ public class PgWKBAttributeIO implements AttributeIO {
 //    static Geometry g_temp = (Geometry) new LineString(cs,new PrecisionModel(),4326);
 
     static GeometryFactory gf = new GeometryFactory(new LiteCoordinateSequenceFactory() );
-    
+
     /**
      * This method will convert a String of hex characters that represent  the
      * hexadecimal form of a Geometry in Well Known Binary representation to a
@@ -97,23 +97,23 @@ public class PgWKBAttributeIO implements AttributeIO {
     private Geometry WKB2Geometry(byte[] wkbBytes)
         throws IOException {
         // convert the byte[] to a JTS Geometry object
-    	
-    	if (wkbBytes == null)  //DJB: null value from database --> null geometry (the same behavior as WKT).  NOTE: sending back a GEOMETRYCOLLECTION(EMPTY) is also a possibility, but this is not the same as NULL 
-    		return null; 
+
+    	if (wkbBytes == null)  //DJB: null value from database --> null geometry (the same behavior as WKT).  NOTE: sending back a GEOMETRYCOLLECTION(EMPTY) is also a possibility, but this is not the same as NULL
+    		return null;
     	try {
     		//return g_temp; // for testing only!
     		WKBReader wkbr = new WKBReader(  );
        		//WKBReader wkbr = new WKBReader( );
-    		 
+
     		Geometry g= wkbr.read(wkbBytes);
     		return g;
     		//return new WKBReader().read(wkbBytes);
     	}
     	catch (Exception e)
     	{
-    		throw new DataSourceException("An exception occurred while parsing WKB data", e);    		
+    		throw new DataSourceException("An exception occurred while parsing WKB data", e);
     	}
-    	
+
 //        JTSFactory factory = new JTSFactory();
 //        WKBParser parser = new WKBParser(factory);
 //        try {
@@ -134,7 +134,7 @@ public class PgWKBAttributeIO implements AttributeIO {
 //                "Could not parse WKB representations -  found no Geometries ");
 //        }
     }
-    
+
     private byte[] hexToBytes(String wkb) {
       // convert the String of hex values to a byte[]
       byte[] wkbBytes = new byte[wkb.length() / 2];
@@ -144,10 +144,10 @@ public class PgWKBAttributeIO implements AttributeIO {
           byte b2 = getFromChar(wkb.charAt((i * 2) + 1));
           wkbBytes[i] = (byte) ((b1 << 4) | b2);
       }
-      
+
       return wkbBytes;
     }
-    
+
     private byte[] byteaToBytes(byte[] bytes) {
         for(int i = 0; i < bytes.length; i++) {
             if(bytes[i] >= 'A')
@@ -178,6 +178,8 @@ public class PgWKBAttributeIO implements AttributeIO {
 //            	byte b[] = Base64.decode(bytes);
 //            	byte b2[] =  Base64.decode(bytes,0,bytes.length);
 //            	compare(b,b2);
+            	if (bytes == null) // ie. its a null column -> return a null geometry!
+            		return null;
                 return WKB2Geometry(Base64.decode(bytes));
             } else {
                 return WKB2Geometry(hexToBytes(rs.getString(position)));
@@ -195,7 +197,7 @@ public class PgWKBAttributeIO implements AttributeIO {
         for (int i = 1; i <= md.getColumnCount(); i++) {
             System.out.println(i + " " + md.getColumnName(i) + " " + md.getColumnTypeName(i));
         }
-        
+
     }
 
     /**
@@ -229,6 +231,6 @@ public class PgWKBAttributeIO implements AttributeIO {
         } catch (SQLException e) {
             throw new DataSourceException("SQL exception occurred while reading the geometry.", e);
         }
-        
+
     }
 }
