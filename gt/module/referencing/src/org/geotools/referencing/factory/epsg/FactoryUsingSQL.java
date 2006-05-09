@@ -1315,7 +1315,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                  +         " AND CO.COORD_OP_METHOD_CODE <= " + BURSA_WOLF_MAX_CODE
                                  +         " AND CRS1.DATUM_CODE = ?"
                                  +    " ORDER BY CRS2.DATUM_CODE,"
-                                 +             " ABS(CO.DEPRECATED), CO.COORD_OP_ACCURACY");
+                                 +             " ABS(CO.DEPRECATED), CO.COORD_OP_ACCURACY,"
+                                 +             " CO.COORD_OP_CODE DESC"); // GEOT-846 fix
         stmt.setString(1, code);
         ResultSet result = stmt.executeQuery();
         List bwInfos = null;
