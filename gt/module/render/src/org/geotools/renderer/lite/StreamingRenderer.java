@@ -50,10 +50,13 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
+import org.geotools.data.Transaction;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
@@ -679,10 +682,49 @@ public class StreamingRenderer implements GTRenderer {
             results = featureSource.getFeatures(query);
         }
         
+        if ( (featureSource instanceof FeatureStore) && (doesntHaveFIDFilter(query) ) )
+        {
+        	try{
+        		FeatureStore fs = (FeatureStore) featureSource;
+        		
+        		
+        		if (fs.getTransaction() == Transaction.AUTO_COMMIT)
+        		{
+        			// play it safe, only update the transaction info if its an auto_commit
+        			//    it logically possible that someone could be using the Transaction to do future (or past) processing.
+        			//    We dont want to affect a future Query
+        			//    thats not possible with an AUTO_COMMIT so its safe.
+        			  Transaction t= new DefaultTransaction();
+        			  t.putProperty("doNotGetFIDS",Boolean.TRUE);
+              		  fs.setTransaction(t);
+        		}
+          	}
+        	catch (Exception e)
+        	{
+        		e.printStackTrace();  // we can carry on, but report to user
+        	}
+        }
+        
+        
         return results;
     }
+/**
+ *   get the query's filter and looks for a FIDFilter in it.
+ *     if it finds one --> false
+ *     if no fid filter --> true
+ * @param query
+ * @return
+ */
+    private boolean doesntHaveFIDFilter(Query query) 
+    {
+        FIDFilterFinder finder = new FIDFilterFinder();
+        finder.visit(query.getFilter());
+    
+		return !finder.hasFIDFilter;  //note: not
+	}
 
-    /**
+
+	/**
      *  JE: If there is a single rule "and" its filter together with the query's filter and send it off to datastore.  This will
 		 allow as more processing to be done on the back end... Very useful if DataStore is a database.  Problem is that worst case each filter
 		 is ran twice.  
@@ -1330,9 +1372,9 @@ public class StreamingRenderer implements GTRenderer {
         Decimator decimator=(Decimator) decimators.get(mathTransform);
         if( decimator==null ){
             if (mathTransform != null && !mathTransform.isIdentity())
-                decimator=new Decimator(mathTransform.inverse());
+                decimator=new Decimator(mathTransform.inverse(), screenSize);
             else
-                decimator=new Decimator(null);
+                decimator=new Decimator(null,screenSize);
             
             decimators.put(mathTransform, decimator);
         }

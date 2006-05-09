@@ -16,6 +16,8 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.Rectangle;
+
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -41,24 +43,54 @@ public class Decimator {
 	private double spany=-1;
 
 	/**
-	 * @throws TransformException
-	 * 
+	 * djb - noticed that the old way of finding out the decimation is based on the (0,0) location of the image.
+	 *       This is often wildly unrepresentitive of the scale of the entire map.
+	 *       
+	 *       A better thing to do is to decimate this on a per-shape basis (and use the shape's center).  Another option would be to sample the
+	 *       image at different locations (say 9) and choose the smallest spanx/spany you find.
+	 *       
+	 *       Also, if the xform is an affine Xform, you can be a bit more aggressive in the decimation.  If its not an affine xform (ie. its actually doing a CRS xform), you
+	 *       may find this is a bit too aggressive due to any number of mathematical issues.
+	 *       
+	 *       This is just a simple method that uses the centre of the given rectangle instead of (0,0).
+	 *       
+	 *       NOTE: this could need more work based on CRS, but the rectangle is in pixels so it should be fairly immune to all but crazy projections.
+	 *       
+	 *       
+	 * @param screenToWorld
+	 * @param paintArea
 	 */
-	public  Decimator(MathTransform screenToWorld){
-		if( screenToWorld != null ){
-			double[] original=new double[]{0,0,1,1};
+	public  Decimator(MathTransform screenToWorld, Rectangle paintArea)
+	{
+		if( screenToWorld != null )
+		{
+			double[] original=new double[]{ 
+					          paintArea.x + paintArea.width/2.0,
+					          paintArea.y + paintArea.height/2.0,
+					          paintArea.x + paintArea.width/2.0 +1,
+					          paintArea.y + paintArea.height/2.0 +1,
+					          };
 			double[] coords=new double[4];
 			try {
 				screenToWorld.transform(original,0,coords,0,2);
 			} catch (TransformException e) {
 				return;
 			}
-			this.spanx=Math.abs(coords[0]-coords[2]);
-			this.spany=Math.abs(coords[1]-coords[3]);
+			this.spanx=Math.abs(coords[0]-coords[2]) * 0.8;  //0.8 is just so you dont decimate "too much".  magic number.
+			this.spany=Math.abs(coords[1]-coords[3]) * 0.8;
 		}else{
 			this.spanx=1;
 			this.spany=1;
 		}
+	}
+	
+	/**
+	 * @throws TransformException
+	 * @deprecated use the other constructor (with rectange) see javadox.  This works fine, but it the results are often poor if you're also doing CRS xforms.
+	 */
+	public  Decimator(MathTransform screenToWorld)
+	{
+		this(screenToWorld, new Rectangle()); // do at (0,0)
 	}
 	
 	public final void decimateTransformGeneralize(Geometry geometry,MathTransform transform) throws TransformException 
@@ -234,7 +266,7 @@ public class Decimator {
 			    	//see if this one should be added
 			    	double  x =   newCoordsXformed[t*2];
 			    	double  y =   newCoordsXformed[t*2+1];
-			    	if ( (Math.abs(x-lastX )> 1) ||  ( Math.abs(y-lastY )) >1) 
+			    	if ( (Math.abs(x-lastX )> 0.75) ||  ( Math.abs(y-lastY )) >0.75)  // 0.75 instead of 1 just because it tends to look nicer for slightly more work.  magic number.
 			    	{
 			    		finalCoords[actualCoordsGen*2] = x;
 			    		finalCoords[actualCoordsGen*2+1] = y;
