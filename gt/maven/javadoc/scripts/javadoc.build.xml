@@ -15,30 +15,21 @@
      information will be available to javadoc in the 'target' directory.
 
 
-     ====================================
-     RUNNING THE SCRIPT FROM COMMAND LINE
-     ====================================
+     ===============================
+     RUNNING THE SCRIPT FROM MAVEN 2
+     ===============================
      Just type the following on the command line
      (the first line is optional; see above paragraph):
 
          mvn install
-         ant -f maven/javadoc/scripts/javadoc.build.xml
+         mvn org.geotools:gt2-javadoc:javadoc
 
      By default, this script put the generated HTML pages in the
      'target/javadoc' directory. To select a different directory,
-     add a 'javadoc.build.properties' file in the same directory
-     than this script with the following content:
+     add a 'javadoc.build.properties' file in the 'gt' directory
+     with the following content:
 
          dest.dir = mypath/mydirectory
-
-
-     ====================================
-     RUNNING THE SCRIPT FROM MAVEN 2
-     ====================================
-     Similar to running the script from the command line:
-
-         mvn install
-         mvn org.geotools:gt2-javadoc:javadoc
 
 
      Author:  Martin Desruisseaux
@@ -105,7 +96,6 @@
     <pathelement path="ext/brewer/src"/>
     <pathelement path="ext/go/src"/>
     <pathelement path="ext/graph/src"/>
-    <pathelement path="ext/legend/src"/>
     <pathelement path="ext/openoffice/src"/>
     <pathelement path="ext/pickle/src"/>
     <pathelement path="ext/shape/src"/>
