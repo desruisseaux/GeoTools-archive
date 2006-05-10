@@ -44,6 +44,10 @@
     <format property="TODAY" pattern="yyyy-MM-dd" locale="ca"/>
   </tstamp>
 
+  <!-- Maven classpath, to be edited for each new Geotools version.
+       TODO: find some way to get this info automatically from Maven. -->
+  <property name="taglet.classpath" value="maven/javadoc/target/gt2-javadoc-2.3-SNAPSHOT.jar"/>
+
 
   <!-- ======================================================================
        Gets the configurable properties, including the destination directory.
@@ -113,12 +117,6 @@
     <fileset dir="target">
       <include name="*.jar"/>
     </fileset>
-
-    <!-- For the taglets (because our Maven plugins are not copied in gt/target by default) -->
-    <!-- TODO: Find some way to inherit this dependency from the pom.xml. -->
-    <fileset dir="maven/javadoc/target">
-      <include name="*.jar"/>
-    </fileset>
   </path>
 
 
@@ -166,8 +164,8 @@
 
       <tag name="todo" scope="types,fields,methods,constructors" description="TODO:"/>
       <tag name="task" scope="types,fields,methods,constructors" description="TASK:"/>
-      <taglet name="org.geotools.maven.taglet.Tutorial"/>
-      <taglet name="org.geotools.maven.taglet.Source"  />
+      <taglet path="${taglet.classpath}" name="org.geotools.maven.taglet.Tutorial"/>
+      <taglet path="${taglet.classpath}" name="org.geotools.maven.taglet.Source"  />
 
       <group title="Features, Filters and Styling"      packages="org.geotools.feature*:org.geotools.filter*:org.geotools.styling*"/>
       <group title="Geometries"                         packages="org.geotools.geometry*:org.geotools.topology*:org.geotools.measure*"/>
