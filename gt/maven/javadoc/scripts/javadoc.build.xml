@@ -15,21 +15,30 @@
      information will be available to javadoc in the 'target' directory.
 
 
-     ==================
-     RUNNING THE SCRIPT
-     ==================
+     ====================================
+     RUNNING THE SCRIPT FROM COMMAND LINE
+     ====================================
      Just type the following on the command line
      (the first line is optional; see above paragraph):
 
          mvn install
-         ant -f build-javadoc.xml
+         ant -f maven/javadoc/scripts/javadoc.build.xml
 
      By default, this script put the generated HTML pages in the
      'target/javadoc' directory. To select a different directory,
-     add a 'build-javadoc.properties' file in the same directory
+     add a 'javadoc.build.properties' file in the same directory
      than this script with the following content:
 
          dest.dir = mypath/mydirectory
+
+
+     ====================================
+     RUNNING THE SCRIPT FROM MAVEN 2
+     ====================================
+     Similar to running the script from the command line:
+
+         mvn install
+         mvn org.geotools:gt2-javadoc:javadoc
 
 
      Author:  Martin Desruisseaux
@@ -48,7 +57,7 @@
   <!-- ======================================================================
        Gets the configurable properties, including the destination directory.
        ====================================================================== -->
-  <property file="build-javadoc.properties"/>
+  <property file="javadoc.build.properties"/>
   <target name="init" unless="dest.dir">
     <property name="dest.dir" value="target/javadoc"/>
   </target>
@@ -114,6 +123,12 @@
     <fileset dir="target">
       <include name="*.jar"/>
     </fileset>
+
+    <!-- For the taglets (because our Maven plugins are not copied in gt/target by default) -->
+    <!-- TODO: Find some way to inherit this dependency from the pom.xml. -->
+    <fileset dir="maven/javadoc/target">
+      <include name="*.jar"/>
+    </fileset>
   </path>
 
 
@@ -135,16 +150,18 @@
              breakiterator    = "true"
              noqualifier      = "all"
              overview         = "module/main/src/overview.html"
-             windowtitle      = "Geotools 2.3 API"
-             doctitle         = "Geotools 2.3 API"
+             windowtitle      = "Geotools"
+             doctitle         = "Geotools"
              header           = "Geotools&lt;br&gt;Build ${TODAY}"
              maxmemory        = "512M">
 
       <arg line="-quiet"/>
       <arg line="-keywords"/>
       <arg line="-linksource"/>
+      <arg line="-docfilessubdirs"/>
 
       <package name="org.geotools.*"/>
+
       <excludepackage name="org.geotools.resources.*"/>
 
       <link href="http://java.sun.com/j2se/1.5/docs/api"/>
