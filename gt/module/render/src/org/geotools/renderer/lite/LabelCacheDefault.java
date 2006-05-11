@@ -1555,26 +1555,14 @@ public class LabelCacheDefault implements LabelCache {
 		}
 	}
 
-	private Envelope intersection(Envelope e1,Envelope e2)
-	{
-			double tx1 = e1.getMinX();
-			double ty1 = e1.getMinY();
-			double rx1 = e2.getMinX();
-			double ry1 = e2.getMinY();
-			double tx2 = tx1; tx2 += e1.getWidth();
-			double ty2 = ty1; ty2 += e1.getHeight();
-			double rx2 = rx1; rx2 += e2.getWidth();
-			double ry2 = ry1; ry2 += e2.getHeight();
-			if (tx1 < rx1) tx1 = rx1;
-			if (ty1 < ry1) ty1 = ry1;
-			if (tx2 > rx2) tx2 = rx2;
-			if (ty2 > ry2) ty2 = ry2;
-			tx2 -= tx1;
-			ty2 -= ty1;
-			if ((tx2<0) || (ty2<0))
+	//djb: replaced because old one was from sun's Rectangle class
+		private Envelope intersection(Envelope e1,Envelope e2)
+		{
+			Envelope r = e1.intersection(e2);
+			if (r.getWidth() <0)
 				return null;
-			return new Envelope(tx1,tx1+ tx2, ty1,  ty1+ ty2);
-
+			if (r.getHeight() <0)
+				return null;
+			return r;
 	}
-
 }
