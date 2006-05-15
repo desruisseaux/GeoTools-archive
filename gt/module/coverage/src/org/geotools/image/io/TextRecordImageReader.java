@@ -116,6 +116,11 @@ public class TextRecordImageReader extends TextImageReader {
      * les régions ou le fichier ne définit pas de nouvelles valeurs.
      */
     private static final boolean CLEAR = true;
+
+    /**
+     * An empty array, used as a flag for comment lines.
+     */
+    private static final double[] EMPTY = new double[0];
     
     /**
      * Numéro de colonne des <var>x</var>, compté à partir de 0.
@@ -407,8 +412,8 @@ public class TextRecordImageReader extends TextImageReader {
         if (line == null) {
             return null;
         }
-        if (lineFormat.setLine(line) == 0) {
-            return new double[0];
+        if (isComment(line) || lineFormat.setLine(line) == 0) {
+            return EMPTY;
         }
         values = lineFormat.getValues(values);
         for (int i=0; i<values.length; i++) {
@@ -468,7 +473,7 @@ public class TextRecordImageReader extends TextImageReader {
                 double[]    values = null;
                 RecordList records = null;
                 final boolean  keep = (nextImageIndex==imageIndex) || !seekForwardOnly;
-                // Initialise temporary fields used by 'parseLine'.
+                // Initializes temporary fields used by 'parseLine'.
                 this.xColumn    = getColumnX   (nextImageIndex);
                 this.yColumn    = getColumnY   (nextImageIndex);
                 this.padValue   = getPadValue  (nextImageIndex);
@@ -476,12 +481,18 @@ public class TextRecordImageReader extends TextImageReader {
                 try {
                     String line;
                     while ((line=reader.readLine()) != null) {
-                        values = parseLine(line, values);
-                        if (values  ==  null) break;
-                        if (values.length==0) continue;
+                        final double[] candidate = parseLine(line, values);
+                        if (candidate == null) {
+                            break;
+                        }
+                        if (candidate.length == 0) {
+                            continue;
+                        }
+                        values = candidate;
                         if (keep) {
-                            if (records==null) {
-                                final int expectedLineCount = Math.max(8, Math.min(65536, Math.round(length / (expectedDatumLength*values.length))));
+                            if (records == null) {
+                                final int expectedLineCount = Math.max(8, Math.min(65536,
+                                        Math.round(length / (expectedDatumLength*values.length))));
                                 records = new RecordList(values.length, expectedLineCount);
                             }
                             records.add(values);

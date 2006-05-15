@@ -21,6 +21,7 @@ package org.geotools.openoffice;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TimeZone;
@@ -360,6 +361,22 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
             return message;
         }
         return Utilities.getShortClassName(exception);
+    }
+
+    /**
+     * Returns a table filled with {@link Double#NaN NaN} values. This method is invoked when
+     * an operation failed for a whole table.
+     *
+     * @since 2.3
+     */
+    protected static double[][] getFailure(final int rows, final int cols) {
+        final double[][] dummy = new double[rows][];
+        for (int i=0; i<rows; i++) {
+            final double[] row = new double[cols];
+            Arrays.fill(row, Double.NaN);
+            dummy[i] = row;
+        }
+        return dummy;
     }
 
     /**

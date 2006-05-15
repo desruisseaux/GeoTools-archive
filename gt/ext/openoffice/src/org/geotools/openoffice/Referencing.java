@@ -661,12 +661,12 @@ public final class Referencing extends Formulas implements XReferencing {
                                          .createCoordinateOperation(authorityCode).getValidArea();
             } catch (Exception ignore) {
                 reportException("getBoundingBox", exception);
-                return null;
+                return getFailure(4,4);
             }
         }
         final GeographicBoundingBox box = ExtentImpl.getGeographicBoundingBox(validArea);
         if (box == null) {
-            return null;
+            return getFailure(4,4);
         }
         return new double[][] {
             new double[] {box.getNorthBoundLatitude(),
@@ -807,7 +807,7 @@ public final class Referencing extends Formulas implements XReferencing {
              operation = getCoordinateOperation("getTransformedCoordinates", sourceCRS, targetCRS);
         } catch (FactoryException exception) {
             reportException("getTransformedCoordinates", exception);
-            return null;
+            return getFailure(coordinates.length, 2);
         }
         /*
          * We now have every information needed for applying the coordinate operations.
@@ -864,7 +864,7 @@ public final class Referencing extends Formulas implements XReferencing {
             calculator = getGeodeticCalculator(CRS);
         } catch (Exception exception) {
             reportException("getOrthodromicDistance", exception);
-            return null;
+            return getFailure(source.length, 2);
         }
         boolean failureReported = false;
         final int dim = calculator.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
@@ -912,7 +912,7 @@ public final class Referencing extends Formulas implements XReferencing {
             calculator = getGeodeticCalculator(CRS);
         } catch (Exception exception) {
             reportException("getOrthodromicForward", exception);
-            return null;
+            return getFailure(source.length, 2);
         }
         boolean failureReported = false;
         final int dim = calculator.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();

@@ -159,8 +159,8 @@ public abstract class TextImageReader extends SimpleImageReader {
      * Returns the pad value for missing data, or {@link Double#NaN} if none. The pad value will
      * applies to all columns except the one for {@link TextRecordImageReader#getColumnX x} and
      * {@link TextRecordImageReader#getColumnY y} values, if any.
-     *
-     * The default implementation returns the pas value specified to the {@link Spi} object given
+     * <p>
+     * The default implementation returns the pad value specified to the {@link Spi} object given
      * to this {@code TextImageReader} constructor. Subclasses may override this method if they
      * want to detect the pad value in some other way.
      *
@@ -220,6 +220,29 @@ public abstract class TextImageReader extends SimpleImageReader {
             reader = new LineReader(stream, getCharset(stream));
         }
         return reader;
+    }
+
+    /**
+     * Returns {@code true} if the specified line is a comment. This method is invoked automatically
+     * during a {@link #read read} operation. The default implementation returns {@code true} if the
+     * line is empty of if the first non-whitespace character is '{@code #}', and {@code false}
+     * otherwise. Override this method if comment lines should be determined in a different way.
+     *
+     * @param  line A line to be parsed.
+     * @return {@code true} if the line is a comment and should be ignored, or {@code false} if it
+     *         should be parsed.
+     *
+     * @since 2.3
+     */
+    protected boolean isComment(final String line) {
+        final int length = line.length();
+        for (int i=0; i<length; i++) {
+            final char c = line.charAt(i);
+            if (!Character.isSpaceChar(c)) {
+                return (c == '#');
+            }
+        }
+        return true;
     }
     
     /**

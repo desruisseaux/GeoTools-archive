@@ -157,6 +157,9 @@ public class TextMatrixImageReader extends TextImageReader {
         final LineFormat    format = getLineFormat(imageIndex);
         final float       padValue = (float)getPadValue(imageIndex);
         String line; while ((line=input.readLine())!=null) {
+            if (isComment(line)) {
+                continue;
+            }
             try {
                 format.setLine(line);
                 values = format.getValues(values);
