@@ -9,12 +9,12 @@
 <pluginMetadata>
   <mojos>
     <mojo>
-      <goal>javadoc</goal>
+      <goal>modules</goal>
         
       <!-- This element refers to the Ant target we'll invoke -->
       <call>javadoc</call>
       <description>
-        Generates cross-modules javadoc for the full Geotools project.
+        Generates cross-modules javadoc for main modules only.
       </description>
     </mojo>
   </mojos>

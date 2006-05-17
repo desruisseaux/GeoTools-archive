@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- =======================================================================
+
+     ANT BUILD FILE (Ref. http://jakarta.apache.org/ant )
+
+     This script builds the javadoc for the whole Geotools 2 project.
+     It must be run from the 'gt' directory that contains this script
+     file. This script exists because creating a cross-module javadoc
+     throws an OutOfMemoryError with Maven 1, and is not yet supported
+     in Maven 2.
+
+     It is recommanded (but not essential) to do a Maven 2 build before
+     to run this script, using the "mvn install" command line in the same
+     directory. It will avoid many javadoc warnings, because most classes
+     information will be available to javadoc in the 'target' directory.
+
+
+     ===============================
+     RUNNING THE SCRIPT FROM MAVEN 2
+     ===============================
+     Just type the following on the command line
+     (the first line is optional; see above paragraph):
+
+         mvn install
+         mvn org.geotools:gt2-javadoc:javadoc
+
+     By default, this script put the generated HTML pages in the
+     'target/javadoc' directory. To select a different directory,
+     add a 'javadoc.build.properties' file in the 'gt' directory
+     with the following content:
+
+         dest.dir = mypath/mydirectory
+
+
+     Author:  Martin Desruisseaux
+     Version: $Id$
+     ======================================================================= -->
+
+<project name="Geotools Javadoc" default="javadoc">
+  <description>
+      Javadoc generation for the main modules only.
+  </description>
+  <tstamp>
+    <format property="TODAY" pattern="yyyy-MM-dd" locale="ca"/>
+  </tstamp>
+
+  <!-- Maven classpath, to be edited for each new Geotools version.
+       TODO: find some way to get this info automatically from Maven. -->
+  <property name="taglet.classpath" value="maven/javadoc/target/gt2-javadoc-2.3-SNAPSHOT.jar"/>
+
+
+  <!-- ======================================================================
+       Gets the configurable properties, including the destination directory.
+       ====================================================================== -->
+  <property file="javadoc.build.properties"/>
+  <target name="init" unless="dest.dir">
+    <property name="dest.dir" value="target/javadoc"/>
+  </target>
+
+
+  <!-- ======================================================================
+       Defines the source path. If new modules are added to Geotools and this
+       new module should be documented, please add new lines in this section.
+       ====================================================================== -->
+  <path id="sources.path">
+    <pathelement path="module/api/src"/>
+    <pathelement path="module/coverage/src"/>
+    <pathelement path="module/legacy/src"/>
+    <pathelement path="module/main/src"/>
+    <pathelement path="module/migrate/src"/>
+    <pathelement path="module/migrate/demo/gui/src"/>
+    <pathelement path="module/referencing/src"/>
+    <pathelement path="module/render/src"/>
+    <pathelement path="module/sample-data/src"/>
+    <pathelement path="module/svgsupport/src"/>
+  </path>
+
+
+  <!-- ======================================================================
+       Defines the classpath. This section assumes that the Maven 2 build
+       has been run. All JARs should be grouped in the target directory.
+       ====================================================================== -->
+  <path id="classes.path">
+    <fileset dir="target">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+
+  <!-- ======================================================================
+       The javadoc generation...
+       ====================================================================== -->
+  <target name="javadoc" depends="init">
+    <mkdir dir="${dest.dir}"/>
+    <javadoc sourcepathref    = "sources.path"
+             classpathref     = "classes.path"
+             destdir          = "${dest.dir}"
+             charset          = "ISO-8859-1"
+             encoding         = "ISO-8859-1"
+             locale           = "en_US"
+             source           = "1.4"
+             use              = "true"
+             author           = "true"
+             version          = "false"
+             breakiterator    = "true"
+             noqualifier      = "all"
+             overview         = "module/main/src/overview.html"
+             windowtitle      = "Geotools"
+             doctitle         = "Geotools"
+             header           = "Geotools&lt;br&gt;Build ${TODAY}"
+             maxmemory        = "512M">
+
+      <arg line="-quiet"/>
+      <arg line="-keywords"/>
+      <arg line="-linksource"/>
+      <arg line="-docfilessubdirs"/>
+
+      <package name="org.geotools.*"/>
+
+      <excludepackage name="org.geotools.resources.*"/>
+
+      <link href="http://java.sun.com/j2se/1.5/docs/api"/>
+      <link href="http://java.sun.com/j2ee/1.4/docs/api"/>
+      <link href="http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs"/>
+      <link href="http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi"/>
+      <link href="http://jsr-108.sourceforge.net/javadoc"/>
+      <link href="http://geoapi.sourceforge.net/snapshot/javadoc"/>
+      <link href="http://geoapi.sourceforge.net/pending/javadoc"/>
+      <link href="http://geoapi.sourceforge.net/legacy/javadoc"/>
+      <link href="http://www.jump-project.org/docs/jts/1.6/api"/>
+
+      <tag name="todo" scope="types,fields,methods,constructors" description="TODO:"/>
+      <tag name="task" scope="types,fields,methods,constructors" description="TASK:"/>
+      <taglet path="${taglet.classpath}" name="org.geotools.maven.taglet.Tutorial"/>
+      <taglet path="${taglet.classpath}" name="org.geotools.maven.taglet.Source"  />
+
+      <group title="Features, Filters and Styling"      packages="org.geotools.feature*:org.geotools.filter*:org.geotools.styling*"/>
+      <group title="Geometries"                         packages="org.geotools.geometry*:org.geotools.topology*:org.geotools.measure*"/>
+      <group title="Images and Grid Coverage"           packages="org.geotools.coverage*:org.geotools.gce*:org.geotools.image*"/>
+      <group title="Spatial Referencing by Coordinates" packages="org.geotools.referencing*:org.geotools.parameter*:org.geotools.axis*"/>
+      <group title="Meta Data"                          packages="org.geotools.metadata*"/>
+      <group title="Catalog Services"                   packages="org.geotools.catalog*"/>
+      <group title="Data stores"                        packages="org.geotools.data*"/>
+      <group title="XML and derivatives (GML, SVG)"     packages="org.geotools.xml*:org.geotools.gml*:org.geotools.svg*"/>
+      <group title="Graphs"                             packages="org.geotools.graph*"/>
+      <group title="Renderer and Display Objects"       packages="org.geotools.display*:org.geotools.renderer.lite*:org.geotools.renderer.shape*:org.geotools.map*"/>
+      <group title="Graphic User Interfaces"            packages="org.geotools.gui*"/>
+      <group title="Miscellaneous utilities"            packages="org.geotools.factory*:org.geotools.io*:org.geotools.util*:org.geotools.math*:org.geotools.nature*:org.geotools.event*:org.geotools.index*"/>
+      <group title="Bridges to external applications"   packages="org.geotools.openoffice*"/>
+      <group title="Legacy packages (to be removed)"    packages="org.geotools.pt*:org.geotools.cs*:org.geotools.ct*:org.geotools.cv*:org.geotools.gc*:org.geotools.gp*:org.geotools.units*:org.geotools.renderer*:org.geotools.io.coverage*"/>
+    </javadoc>
+  </target>
+</project>
