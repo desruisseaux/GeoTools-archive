@@ -21,6 +21,7 @@ package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.util.Set;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -33,7 +34,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
-import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -46,19 +46,22 @@ import org.geotools.resources.CRSUtilities;
 
 
 /**
- * A {@linkplain CoordinateOperationFactory coordinate operation factory} using the help
- * of an {@linkplain CoordinateOperationAuthorityFactory authority factory}.
- * When <code>{@linkplain #createOperation createOperation}(sourceCRS, targetCRS)</code> is
- * invoked, this class first fetch the authority codes for source and target CRS and invokes
- * the {@link CoordinateOperationAuthorityFactory#createFromCoordinateReferenceSystemCodes
- * createFromCoordinateReferenceSystemCodes} method from the authority factory. If the
- * authority factory doesn't know about the specified CRS, only then the default (standalone)
- * process from the super-class is used as a fallback.
- * <p>
- * Using an authority factory when available gives access to informations not available otherwise.
- * Examples include {@linkplain CoordinateOperation#getValidArea area of validity},
+ * A {@linkplain CoordinateOperationFactory coordinate operation factory} extended with the extra
+ * informations provided by an {@linkplain CoordinateOperationAuthorityFactory authority factory}.
+ * Such authority factory may help to find transformation paths not available otherwise (often
+ * determined from empirical parameters). Authority factories can also provide additional
+ * informations like the
+ * {@linkplain CoordinateOperation#getValidArea area of validity},
  * {@linkplain CoordinateOperation#getScope scope} and
  * {@linkplain CoordinateOperation#getPositionalAccuracy positional accuracy}.
+ * <p>
+ * When <code>{@linkplain #createOperation createOperation}(sourceCRS, targetCRS)</code> is invoked,
+ * {@code AuthorityBackedFactory} fetch the authority codes for source and target CRS and submits
+ * them to the {@linkplain #getAuthorityFactory underlying authority factory} through a call to its
+ * <code>{@linkplain CoordinateOperationAuthorityFactory#createFromCoordinateReferenceSystemCodes
+ * createFromCoordinateReferenceSystemCodes}(sourceCode, targetCode)</code> method. If the
+ * authority factory doesn't know about the specified CRS, then the default (standalone)
+ * process from the super-class is used as a fallback.
  *
  * @since 2.2
  * @source $URL$
@@ -129,39 +132,68 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
 
     /**
      * Returns an operation for conversion or transformation between two coordinate reference
-     * systems. This invokes the {@link #createFromCoordinateReferenceSystemCodes
-     * createFromCoordinateReferenceSystemCodes} method with the code of the supplied CRS.
-     * If no operation is found for those codes, then this method fallback on the
-     * {@linkplain DefaultCoordinateOperationFactory#createOperation(CoordinateReferenceSystem,
-     * CoordinateReferenceSystem) generic implementation} provided by the super-class.
+     * systems. The default implementation extracts the authority code from the supplied
+     * {@code sourceCRS} and {@code targetCRS}, and submit them to the
+     * <code>{@linkplain CoordinateOperationAuthorityFactory#createFromCoordinateReferenceSystemCodes
+     * createFromCoordinateReferenceSystemCodes}(sourceCode, targetCode)</code> methods.
+     * If no operation is found for those codes, then this method returns {@code null}.
      * <p>
-     * Note that this method may be invoked recursively by the super-class implementation. For
-     * example no operation may be available from the underlying {@linkplain #getAuthorityFactory
-     * authority factory} between two {@linkplain org.opengis.referencing.crs.CompoundCRS compound
-     * CRS}, but an operation may be available between two components of those compound CRS.
+     * Note that this method may be invoked recursively. For example no operation may be available
+     * from the {@linkplain #getAuthorityFactory underlying authority factory} between two
+     * {@linkplain org.opengis.referencing.crs.CompoundCRS compound CRS}, but an operation
+     * may be available between two components of those compound CRS.
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
-     * @throws OperationNotFoundException if no operation path was found from {@code sourceCRS}
-     *         to {@code targetCRS}.
-     * @throws FactoryException if the operation creation failed for some other reason.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}, or {@code null}
+     *         if no such operation is explicitly defined in the underlying database.
+     *
+     * @since 2.3
      */
-    public CoordinateOperation createOperation(final CoordinateReferenceSystem sourceCRS,
-                                               final CoordinateReferenceSystem targetCRS)
-            throws OperationNotFoundException, FactoryException
+    // @Override
+    protected CoordinateOperation createFromDatabase(final CoordinateReferenceSystem sourceCRS,
+                                                     final CoordinateReferenceSystem targetCRS)
     {
-        ensureNonNull("sourceCRS", sourceCRS);
-        ensureNonNull("targetCRS", targetCRS);
         final CoordinateOperationAuthorityFactory authorityFactory = getAuthorityFactory();
-        final Citation authority = authorityFactory.getAuthority();
-        final Identifier sourceCode = AbstractIdentifiedObject.getIdentifier(sourceCRS, authority);
-        if (sourceCode != null) {
-            final Identifier targetCode = AbstractIdentifiedObject.getIdentifier(targetCRS, authority);
-            if (targetCode != null) try {
-                final CoordinateOperation candidate;
-                candidate = createFromCoordinateReferenceSystemCodes(sourceCode.getCode(),
-                                                                     targetCode.getCode());
+        final Citation  authority = authorityFactory.getAuthority();
+        final Identifier sourceID = AbstractIdentifiedObject.getIdentifier(sourceCRS, authority);
+        if (sourceID == null) {
+            return null;
+        }
+        final Identifier targetID = AbstractIdentifiedObject.getIdentifier(targetCRS, authority);
+        if (targetID == null) {
+            return null;
+        }
+        final String sourceCode = sourceID.getCode();
+        final String targetCode = targetID.getCode();
+        final Set operations;
+        try {
+            operations = authorityFactory.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
+        } catch (NoSuchAuthorityCodeException exception) {
+            /*
+             * sourceCode or targetCode is unknow to the underlying authority factory.
+             * Ignores the exception and fallback on the generic algorithm provided by
+             * the super-class.
+             */
+            return null;
+        } catch (FactoryException exception) {
+            /*
+             * Other kind of error. It may be more serious, but the super-class is capable
+             * to provides a raisonable default behavior. Log as a warning and lets continue.
+             *
+             * TODO: localize.
+             */
+            final LogRecord record = new LogRecord(Level.WARNING,
+                  "Failure while creating a coordinate operation from the authority factory.");
+            record.setSourceClassName("AuthorityBackedFactory");
+            record.setSourceMethodName("createFromDatabase");
+            record.setThrown(exception);
+            LOGGER.log(record);
+            return null;
+        }
+        if (operations != null) {
+            for (final Iterator it=operations.iterator(); it.hasNext();) {
+                final CoordinateOperation candidate = (CoordinateOperation) it.next();
                 if (candidate != null) {
                     /*
                      * It is possible that the Identifier in user's CRS is not quite right.   For
@@ -175,58 +207,27 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                     if (CRSUtilities.equalsIgnoreMetadata(sourceCRS, candidate.getSourceCRS()) &&
                         CRSUtilities.equalsIgnoreMetadata(targetCRS, candidate.getTargetCRS()))
                     {
-                        return candidate;
+                        if (accept(candidate)) {
+                            return candidate;
+                        }
                     }
                 }
-            } catch (NoSuchAuthorityCodeException exception) {
-                /*
-                 * sourceCode or targetCode is unknow to the underlying authority factory.
-                 * Ignores the exception and fallback on the generic algorithm provided by
-                 * the super-class.
-                 */
-            } catch (FactoryException exception) {
-                /*
-                 * Other kind of error. It may be more serious, but the super-class is capable
-                 * to provides a raisonable default behavior. Log as a warning and lets continue.
-                 *
-                 * TODO: localize.
-                 */
-                final LogRecord record = new LogRecord(Level.WARNING,
-                      "Failure while creating a coordinate operation from the authority factory.");
-                record.setSourceClassName("AuthorityBackedFactory");
-                record.setSourceMethodName("createOperation");
-                record.setThrown(exception);
-                LOGGER.log(record);
             }
         }
-        return super.createOperation(sourceCRS, targetCRS);
+        return null;
     }
 
     /**
-     * Creates an operation from coordinate reference system codes. The default implementation
-     * delegates the call to the underlying {@linkplain #getAuthorityFactory authority factory}
-     * and returns the first operation found. If no operation is found, then this method returns
-     * {@code null}. Subclasses can override this method if they wish to select a better operation
-     * from the authority codes.
+     * Returns {@code true} if the specified operation is acceptable. This method is invoked
+     * automatically by <code>{@linkplain #createFromDatabase createFromDatabase}(...)</code>
+     * for every operation candidates found. The default implementation returns always {@code
+     * true}. Subclasses should override this method if they wish to filter the coordinate
+     * operations to be returned.
      *
-     * @param  sourceCode   Coded value of source coordinate reference system.
-     * @param  targetCode   Coded value of target coordinate reference system.
-     * @return The operation, or {@code null} if the underlying authority factory doesn't provide
-     *         any operation for the specified source and target CRS.
-     *
-     * @throws NoSuchAuthorityCodeException if a specified code was not found.
-     * @throws FactoryException if the object creation failed for some other reason.
+     * @since 2.3
      */
-    protected CoordinateOperation createFromCoordinateReferenceSystemCodes(final String sourceCode,
-                                                                           final String targetCode)
-            throws FactoryException
-    {
-        final Set operations =
-            getAuthorityFactory().createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
-        if (operations == null || operations.isEmpty()) {
-            return null;
-        }
-        return (CoordinateOperation) operations.iterator().next();
+    protected boolean accept(final CoordinateOperation operation) {
+        return true;
     }
 
     /**

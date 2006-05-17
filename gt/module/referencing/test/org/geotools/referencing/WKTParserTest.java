@@ -44,7 +44,7 @@ import org.geotools.resources.TestData;
 
 
 /**
- * Test the WKT {@link Parser} implementation.
+ * Tests the WKT {@link Parser} implementation.
  *
  * @source $URL$
  * @version $Id$
@@ -252,7 +252,7 @@ public class WKTParserTest extends TestCase {
     private void testParsing(final AbstractParser parser, final String filename)
             throws IOException, ParseException
     {
-        final BufferedReader reader = TestData.getReader(this, filename);
+        final BufferedReader reader = TestData.openReader(this, filename);
         if (reader == null) {
             throw new FileNotFoundException(filename);
         }

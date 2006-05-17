@@ -42,8 +42,6 @@ import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.datum.DefaultEllipsoid;
-import org.geotools.referencing.operation.DefaultOperationMethod;
-import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.matrix.Matrix2;
 

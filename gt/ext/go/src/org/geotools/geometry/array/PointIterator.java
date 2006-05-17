@@ -52,7 +52,7 @@ public abstract class PointIterator implements Iterator, Cloneable {
     }
 
     /**
-     * Returns if {@link #next} or {@link #nextX} has more values.
+     * Returns {@code true} if {@link #next} or {@link #nextX} has more values.
      */
     public abstract boolean hasNext();
 
@@ -72,6 +72,8 @@ public abstract class PointIterator implements Iterator, Cloneable {
     /**
      * Returns the current coordinates as a {@link Point2D} object, and move this iterator to
      * the next coordinate. This method invokes {@link #nextX} followed by {@link #nextY}.
+     *
+     * @todo Return type should be {@link Point2D} when we will be allowed to compile for J2SE 1.5.
      */
     public Object next() {
         return new Point2D.Float(nextX(), nextY());

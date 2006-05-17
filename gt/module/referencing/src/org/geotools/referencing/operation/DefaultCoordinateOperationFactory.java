@@ -220,6 +220,12 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
             assert    dim == getDimension(targetCRS) : dim;
             return createFromAffineTransform(IDENTITY, sourceCRS, targetCRS,
                                              MatrixFactory.create(dim+1));
+        } else {
+            // Query the database (if any) before to try to find the operation by ourself.
+            final CoordinateOperation candidate = createFromDatabase(sourceCRS, targetCRS);
+            if (candidate != null) {
+                return candidate;
+            }
         }
         /////////////////////////////////////////////////////////////////////
         ////                                                             ////
@@ -958,11 +964,12 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          *     target projected CRS
          */
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final GeographicCRS   sourceGeo = (GeographicCRS) sourceCRS.getBaseCRS();
-        final GeographicCRS   targetGeo = (GeographicCRS) targetCRS.getBaseCRS();
-        final CoordinateOperation step1 = createOperationStep(sourceCRS, sourceGeo);
-        final CoordinateOperation step2 = createOperationStep(sourceGeo, targetGeo);
-        final CoordinateOperation step3 = createOperationStep(targetGeo, targetCRS);
+        final GeographicCRS sourceGeo = (GeographicCRS) sourceCRS.getBaseCRS();
+        final GeographicCRS targetGeo = (GeographicCRS) targetCRS.getBaseCRS();
+        CoordinateOperation step1, step2, step3;
+        step1 = tryDB(sourceCRS, sourceGeo); if (step1==null) step1 = createOperationStep(sourceCRS, sourceGeo);
+        step2 = tryDB(sourceGeo, targetGeo); if (step2==null) step2 = createOperationStep(sourceGeo, targetGeo);
+        step3 = tryDB(targetGeo, targetCRS); if (step3==null) step3 = createOperationStep(targetGeo, targetCRS);
         return concatenate(step1, step2, step3);
     }
 
@@ -988,9 +995,12 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
             throws FactoryException
     {
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final GeographicCRS       base  = (GeographicCRS) targetCRS.getBaseCRS();
-        final CoordinateOperation step1 = createOperationStep(sourceCRS, base);
-        final CoordinateOperation step2 = targetCRS.getConversionFromBase();
+        GeographicCRS       base  = (GeographicCRS) targetCRS.getBaseCRS();
+        CoordinateOperation step2 = targetCRS.getConversionFromBase();
+        CoordinateOperation step1 = tryDB(sourceCRS, base);
+        if (step1 == null) {
+            step1 = createOperationStep(sourceCRS, base);
+        }
         return concatenate(step1, step2);
     }
     
@@ -1020,8 +1030,11 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
     {
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
         final GeographicCRS base  = (GeographicCRS) sourceCRS.getBaseCRS();
-        CoordinateOperation step2 = createOperationStep(base, targetCRS);
         CoordinateOperation step1 = sourceCRS.getConversionFromBase();
+        CoordinateOperation step2 = tryDB(base, targetCRS);
+        if (step2 == null) {
+            step2 = createOperationStep(base, targetCRS);
+        }
         MathTransform   transform = step1.getMathTransform();
         try {
             transform = transform.inverse();
@@ -1179,7 +1192,6 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
             throws FactoryException
     {
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-
         final GeographicCRS normTargetCRS = normalize(targetCRS, true);
         final GeodeticDatum datum         = (GeodeticDatum) normTargetCRS.getDatum();
         final GeocentricCRS normSourceCRS = normalize(sourceCRS, datum);
@@ -1564,5 +1576,51 @@ search: for (int j=0; j<targets.length; j++) {
      */
     private static boolean nameMatches(final IdentifiedObject object, final String name) {
         return AbstractIdentifiedObject.nameMatches(object, name);
+    }
+
+    /**
+     * Tries to get a coordinate operation from a database (typically EPSG). The exact behavior
+     * depends on the {@link AuthorityBackedFactory} implementation (the most typical subclass),
+     * but usually the database query is degelated to some instance of
+     * {@link org.opengis.referencing.operation.CoordinateOperationAuthorityFactory}.
+     * If no coordinate operation was found in the database, then this method returns {@code null}.
+     */
+    private final CoordinateOperation tryDB(final SingleCRS sourceCRS, final SingleCRS targetCRS) {
+        return (sourceCRS == targetCRS) ? null : createFromDatabase(sourceCRS, targetCRS);
+    }
+
+    /**
+     * If the coordinate operation is explicitly defined in some database (typically EPSG),
+     * returns it. Otherwise (if there is no database, or if the database doesn't contains
+     * an explicit operation from {@code sourceCRS} to {@code targetCRS}, or if this method
+     * failed to create an operation from the database), returns {@code null}.
+     * <p>
+     * The default implementation always returns {@code null}, since there is no database
+     * connected to a {@code DefaultCoordinateOperationFactory} instance. In other words,
+     * the default implementation is "standalone": it tries to figure out transformation
+     * paths by itself. Subclasses should override this method if they can fetch a more
+     * accurate operation from some database. The mean subclass doing so is
+     * {@link AuthorityBackedFactory}.
+     * <p>
+     * This method is invoked by <code>{@linkplain #createOperation createOperation}(sourceCRS,
+     * targetCRS)</code> before to try to figure out a transformation path by itself. It is also
+     * invoked by various {@code createOperationStep(...)} methods when an intermediate CRS was
+     * obtained by {@link GeneralDerivedCRS#getBaseCRS()} (this case occurs especially during
+     * {@linkplain GeographicCRS geographic} from/to {@linkplain ProjectedCRS projected} CRS
+     * operations). This method is <strong>not</strong> invoked for synthetic CRS generated by
+     * {@code createOperationStep(...)}, since those temporary CRS are not expected to exist
+     * in a database.
+     *
+     * @param  sourceCRS Input coordinate reference system.
+     * @param  targetCRS Output coordinate reference system.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS} if and only if
+     *         one is explicitly defined in some underlying database, or {@code null} otherwise.
+     *
+     * @since 2.3
+     */
+    protected CoordinateOperation createFromDatabase(final CoordinateReferenceSystem sourceCRS,
+                                                     final CoordinateReferenceSystem targetCRS)
+    {
+        return null;
     }
 }

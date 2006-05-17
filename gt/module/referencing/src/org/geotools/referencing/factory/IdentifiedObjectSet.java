@@ -37,7 +37,6 @@ import java.util.logging.LogRecord;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
-import org.opengis.feature.BackingStoreException;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -77,13 +76,17 @@ import org.geotools.resources.Utilities;
  * <h3>Thread safety</h3>
  * This class is not thread-safe.
  *
+ * @since 2.2
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
 public class IdentifiedObjectSet extends AbstractSet implements Serializable {
+    /**
+     * For cross-version compatibility during serialisation.
+     */
+    private static final long serialVersionUID = -4221260663706882719L;
+
     /**
      * The map of object codes (keys), and the actual identified objects (values)
      * when it has been created. Each entry has a null value until the corresponding

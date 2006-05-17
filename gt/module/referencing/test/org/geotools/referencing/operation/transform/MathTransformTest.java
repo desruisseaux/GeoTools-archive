@@ -53,9 +53,9 @@ import org.geotools.referencing.operation.matrix.XMatrix;
 
 
 /**
- * Test the {@link ConcatenatedTransform} classes. Actually, there is many
- * {@link ConcatenatedTransform}, each optimized for special cases.   This
- * test try to test a wide range of subclasses.
+ * Tests the {@link ConcatenatedTransform} classes. Actually, there is many
+ * {@link ConcatenatedTransform}, each optimized for special cases. This
+ * test tries to test a wide range of subclasses.
  *
  * @source $URL$
  * @version $Id$
@@ -75,14 +75,14 @@ public class MathTransformTest extends TestCase {
     public static Test suite() {
         return new TestSuite(MathTransformTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */
     public MathTransformTest(final String name) {
         super(name);
     }
-    
+
     /**
      * Random numbers generator.
      */
@@ -543,7 +543,7 @@ public class MathTransformTest extends TestCase {
     ///////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Returns <code>true</code> if the specified number is real (neither NaN or infinite).
+     * Returns {@code true} if the specified number is real (neither NaN or infinite).
      */
     private static boolean isReal(final double value) {
         return !Double.isNaN(value) && !Double.isInfinite(value);
@@ -608,5 +608,4 @@ public class MathTransformTest extends TestCase {
             }
         }
     }
-
 }

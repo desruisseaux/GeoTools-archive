@@ -16,7 +16,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.referencing.operation;
+package org.geotools.referencing.operation.projection;
 
 // JUnit dependencies
 import junit.framework.AssertionFailedError;
@@ -42,43 +42,46 @@ import org.geotools.resources.Arguments;
 
 
 /**
- * Tests projection equations as well as the integration with {@link MathTransformFactory}. The
- * spherical tests here tests real spheres (tests in <code>"Simple"</code> test scripts
- * are not exactly spherical).
+ * Tests projection equations as well as the integration with {@link MathTransformFactory}.
+ * Projections are tested through creation and testing of {@link MathTransform} objects;
+ * no {@link org.opengis.referencing.operation.Projection} are created here.
+ * <p>
+ * The spherical tests here tests real spheres (tests in {@code "Simple"} test scripts are
+ * not exactly spherical).
  *
  * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
  */
-public class ProjectionTest extends TestCase {
+public class MathTransformTest extends TestCase {
     /**
-     * Set to <code>true</code> for printing some informations to standard output while
+     * Set to {@code true} for printing some informations to standard output while
      * performing tests. Consider this field as constants after the application launch.
      */
     private static boolean VERBOSE = false;
     
-    /** tolerance for test when units are degrees*/
-    private final static double[] TOL_DEG = {1E-6,1E-6};
+    /** Tolerance for test when units are degrees. */
+    private final static double[] TOL_DEG = {1E-6, 1E-6};
     
-    /** tolerance for test when units are metres*/
-    private final static double[] TOL_M = {1E-2,1E-2};
+    /** Tolerance for test when units are metres. */
+    private final static double[] TOL_M = {1E-2, 1E-2};
     
     /** factory to use to create projection transforms*/
     private MathTransformFactory mtFactory;
 
     /**
-     * Construct a test with the given name.
+     * Constructs a test with the given name.
      */
-    public ProjectionTest(final String name) {
+    public MathTransformTest(final String name) {
         super(name);
     }
     
     /**
      * Uses reflection to dynamically create a test suite containing all 
-     * the <code>testXXX()</code> methods - from the JUnit FAQ.
+     * the {@code testXXX()} methods - from the JUnit FAQ.
      */
     public static Test suite() {
-        return new TestSuite(ProjectionTest.class);
+        return new TestSuite(MathTransformTest.class);
     }
     
     /**

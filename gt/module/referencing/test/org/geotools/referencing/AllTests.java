@@ -62,7 +62,6 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing                     .WKTParserTest            .suite());
         suite.addTest(org.geotools.referencing                     .GeodeticCalculatorTest   .suite());
         suite.addTest(org.geotools.referencing.operation           .BasicTest                .suite());
-        suite.addTest(org.geotools.referencing.operation           .ProjectionTest           .suite());
         suite.addTest(org.geotools.referencing.operation           .Transform3DTest          .suite());
         suite.addTest(org.geotools.referencing.operation           .TransformationTest       .suite());
         suite.addTest(org.geotools.referencing.operation.transform .MathTransformTest        .suite());
@@ -71,6 +70,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing.operation.transform .PassthroughTransformTest .suite());
         suite.addTest(org.geotools.referencing.operation.transform .LocalizationGridTest     .suite());
         suite.addTest(org.geotools.referencing.operation.transform .WarpTransformTest        .suite());
+        suite.addTest(org.geotools.referencing.operation.projection.MathTransformTest        .suite());
         suite.addTest(org.geotools.referencing.operation.projection.NewZealandMapGridTest    .suite());
         suite.addTest(org.geotools.referencing                     .ScriptTest               .suite());
         suite.addTest(org.geotools.referencing                     .CrsTest                  .suite());

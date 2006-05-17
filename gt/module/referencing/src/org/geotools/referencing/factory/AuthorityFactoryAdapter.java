@@ -32,7 +32,6 @@ import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.feature.BackingStoreException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;

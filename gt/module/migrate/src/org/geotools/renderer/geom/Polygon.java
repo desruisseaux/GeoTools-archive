@@ -68,7 +68,7 @@ public class Polygon extends Polyline {
     private String name;
 
     /**
-     * The holes, or <code>null</code> if none.
+     * The holes, or {@code null} if none.
      */
     private Polyline[] holes;
 
@@ -90,7 +90,7 @@ public class Polygon extends Polyline {
      * if the rectangle was empty or contains at least one <code>NaN</code> value.
      *
      * @param rectangle Rectangle to copy in the new <code>Polygon</code>.
-     * @param coordinateSystem The rectangle's coordinate system, or <code>null</code> if unknown.
+     * @param coordinateSystem The rectangle's coordinate system, or {@code null} if unknown.
      */
     public Polygon(final Rectangle2D rectangle, final CoordinateSystem coordinateSystem) {
         super(rectangle, coordinateSystem);
@@ -110,7 +110,7 @@ public class Polygon extends Polyline {
 
     /**
      * Set a default name for this polygon. For example, a polygon may have the name of a
-     * lake or an island. This name may be <code>null</code> if this polygon is unnamed.
+     * lake or an island. This name may be {@code null} if this polygon is unnamed.
      */
     public void setName(final String name) {
         this.name = name;
@@ -121,7 +121,7 @@ public class Polygon extends Polyline {
      * to reproject all polygon's points from the old coordinate system to the
      * new one.
      *
-     * @param  coordinateSystem The new coordinate system. A <code>null</code> value reset
+     * @param  coordinateSystem The new coordinate system. A {@code null} value reset
      *         the default coordinate system (usually the one that best fits internal data).
      * @throws TransformException If a transformation failed. In case of failure,
      *         the state of this object will stay unchanged, as if this method has
@@ -463,29 +463,34 @@ public class Polygon extends Polyline {
      * The clip is only approximative in that the resulting polygon may extend outside the clip
      * area. However, it is guaranteed that the resulting polygon contains at least all the
      * interior of the clip area.
-     *
+     * <p>
      * If this method can't perform the clip, or if it believes that it isn't worth doing a clip,
-     * it returns <code>this</code>. If this polygon doesn't intersect the clip area, then this
-     * method returns <code>null</code>. Otherwise, a new polygon is created and returned. The new
-     * polyline will try to share as much internal data as possible with <code>this</code> in order
+     * it returns {@code this}. If this polygon doesn't intersect the clip area, then this
+     * method returns {@code null}. Otherwise, a new polygon is created and returned. The new
+     * polyline will try to share as much internal data as possible with {@code this} in order
      * to keep memory footprint low.
      *
      * @param  clipper The clip area.
-     * @return <code>null</code> if this polygon doesn't intersect the clip, <code>this</code>
+     * @return {@code null} if this polygon doesn't intersect the clip, {@code this}
      *         if no clip has been performed, or a new clipped polygon otherwise.
      */
     public synchronized Geometry clip(final Clipper clipper) {
-        Polyline clipped = (Polyline)super.clip(clipper);
+        Polyline clipped = (Polyline) super.clip(clipper);
         if (clipped==this || clipped==null || holes==null) {
             return clipped;
         }
-        final Polygon shell = new Polygon((Polyline)clipped);
+        final Polygon shell = new Polygon((Polyline) clipped);
         assert shell.getUserObject() == getUserObject() : shell;
         assert shell.holes           == holes           : shell;
+        /*
+         * Clips every holes in the polygons. The clipped holes are stored (for now) in a
+         * local array. The local array will be given later to 'shell' only if at least one
+         * hole was actually clipped.
+         */
         Polyline[] clip = new Polyline[holes.length];
         int count = 0;
         for (int i=0; i<holes.length; i++) {
-            clipped = (Polyline)holes[i].clip(clipper);
+            clipped = (Polyline) holes[i].clip(clipper);
             if (clipped != null) {
                 clip[count++] = clipped;
             }
@@ -493,12 +498,21 @@ public class Polygon extends Polyline {
         if (count == 0) {
             shell.holes = null;
         } else {
+            /*
+             * At this point, the new clipped polygon ('shell') shares the same array of holes than
+             * the original geometry. We will replace the array only if at least one hole is really
+             * different (otherwise we will continue to share the same array in order to reduce the
+             * memory usage). Note that the loop below works also when count < holes.length, because
+             * in such case clip[i] == null during the first execution of the loop, and consequently
+             * holes[i] != clip[i], which does the trick.
+             */
             for (int i=holes.length; --i>=0;) {
                 if (holes[i] != clip[i]) {
                     shell.holes = (Polyline[]) XArray.resize(clip, count);
                     break;
                 }
             }
+            assert shell.holes.length == count;
         }
         shell.refreshFlattenedShape();
         return shell;

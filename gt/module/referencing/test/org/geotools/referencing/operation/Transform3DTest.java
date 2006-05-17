@@ -22,11 +22,9 @@ package org.geotools.referencing.operation;
 import java.util.Collections;
 import java.util.Map;
 import javax.units.NonSI;
-import javax.units.SI;
 
 // J2SE and JUnit dependencies
 import javax.units.SI;
-import javax.units.Unit;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -44,6 +42,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
+
 
 /**
  * Tests of the {@code createProjectedCRS(...)} setting up the CRS with a 3D cartesian output for
