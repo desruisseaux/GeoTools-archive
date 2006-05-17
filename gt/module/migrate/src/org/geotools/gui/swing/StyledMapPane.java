@@ -103,7 +103,7 @@ public class StyledMapPane extends MapPane {
 
     /**
      * Set a new context as the current one. Invoking this method will remove all layers in the
-     * {@linkPlain #getRenderer renderer} and replace them with new layers from the given context.
+     * {@linkplain #getRenderer renderer} and replace them with new layers from the given context.
      *
      * @param context The new context, or <code>null</code> for removing any previous context.
      *
@@ -122,12 +122,12 @@ public class StyledMapPane extends MapPane {
      * 
      * <ul>
      * <li>
-     * If a {@linkPlain Context context} is set, then the context's {@linkPlain
+     * If a {@linkplain Context context} is set, then the context's {@linkplain
      * Context#getBoundingBox bounding box} is returned.
      * </li>
      * <li>
      * Otherwise, the area of interest is computed from the layers currently registered in the
-     * {@linkPlain #getRenderer renderer}.
+     * {@linkplain #getRenderer renderer}.
      * </li>
      * </ul>
      * 
@@ -152,7 +152,7 @@ public class StyledMapPane extends MapPane {
     }
 
     /**
-     * Returns the {@linkPlain StyledRenderer styled renderer} for this map pane.
+     * Returns the {@linkplain StyledRenderer styled renderer} for this map pane.
      *
      * @return DOCUMENT ME!
      *

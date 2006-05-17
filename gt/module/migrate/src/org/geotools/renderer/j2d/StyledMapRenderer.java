@@ -48,8 +48,8 @@ import org.geotools.styling.Style;
 
 
 /**
- * A renderer for rendering {@linkPlain Style styled}{@linkPlain Feature features}. This renderer
- * listen for {@linkPlain CollectionEvent feature collection changes} and invokes {@link
+ * A renderer for rendering {@linkplain Style styled} {@linkplain Feature features}. This renderer
+ * listen for {@linkplain CollectionEvent feature collection changes} and invokes {@link
  * RenderedLayer#repaint} automatically on changes.
  *
  * @author Martin Desruisseaux
@@ -165,7 +165,7 @@ public class StyledMapRenderer extends Renderer {
 
     /**
      * Add a layer to this renderer. A single {@link Layer} may be converted into an arbitrary
-     * amount of {@link RenderedLayer}s. Those rendered layers will have {@linkPlain
+     * amount of {@link RenderedLayer}s. Those rendered layers will have {@linkplain
      * RenderedLayer#getZOrder z-order} values as 4.0, 4.1, 4.2, etc. where 4 is the layer number,
      * and .0, .1, .2... is the rendered layer number for this particular layer.
      *
@@ -215,7 +215,7 @@ public class StyledMapRenderer extends Renderer {
 
     /**
      * Add a layer to this renderer. A single {@link Layer} may be converted into an arbitrary
-     * amount of {@link RenderedLayer}s. Those rendered layers will have {@linkPlain
+     * amount of {@link RenderedLayer}s. Those rendered layers will have {@linkplain
      * RenderedLayer#getZOrder z-order} values as 4.0, 4.1, 4.2, etc. where 4 is the layer number,
      * and .0, .1, .2... is the rendered layer number for this particular layer.
      *

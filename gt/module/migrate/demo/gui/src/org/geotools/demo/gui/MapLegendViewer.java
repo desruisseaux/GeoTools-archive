@@ -56,7 +56,7 @@ import javax.swing.JToolBar;
 
 /**
  * Load and display a shape file. At the difference of the {@link MapToolViewer} demo, this demo use
- * {@link MapPane} with the {@linkPlain Renderer J2D renderer}. This renderer has the following
+ * {@link MapPane} with the {@linkplain Renderer J2D renderer}. This renderer has the following
  * advantages:
  * 
  * <ul>
@@ -211,7 +211,7 @@ public class MapLegendViewer extends JFrame {
     }
 
     /**
-     * Load the data from the specified shapefile and construct a {@linkPlain Context context} with
+     * Load the data from the specified shapefile and construct a {@linkplain Context context} with
      * a default style.
      *
      * @param url The url of the shapefile to load.

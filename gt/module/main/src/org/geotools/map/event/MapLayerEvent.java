@@ -22,7 +22,7 @@ import java.util.EventObject;
 
 
 /**
- * Event fired when some {@linkPlain Layer layer} property changes.
+ * Event fired when some {@linkplain Layer layer} property changes.
  *
  * @author Andrea Aime
  * @author Ian Turton

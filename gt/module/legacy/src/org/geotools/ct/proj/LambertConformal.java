@@ -87,7 +87,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  *
- *@deprecated Replaced by {@linnk org.geotools.referencing.operation.projection.LambertConformal}.
+ *@deprecated Replaced by {@link org.geotools.referencing.operation.projection.LambertConformal}.
  */
 public class LambertConformal extends ConicProjection {
     /** 

@@ -84,7 +84,7 @@ import org.geotools.resources.i18n.Errors;
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  *
- * @deprecated Replaced by {@linnk org.geotools.referencing.operation.projection.Mercator}.
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.projection.Mercator}.
  */
 public class Mercator extends CylindricalProjection {
     /**

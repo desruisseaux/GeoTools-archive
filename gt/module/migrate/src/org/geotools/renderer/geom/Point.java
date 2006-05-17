@@ -309,7 +309,7 @@ public class Point extends Geometry {
      *         failure, the state of this object will stay unchanged (as if
      *         this method has never been invoked).
      * @throws UnmodifiableGeometryException if modifying this geometry would
-     *         corrupt a container. To avoid this exception, {@linkPlain
+     *         corrupt a container. To avoid this exception, {@linkplain
      *         #clone clone} this geometry before to modify it.
      */
     public synchronized void setCoordinateSystem(CoordinateSystem coordinateSystem)

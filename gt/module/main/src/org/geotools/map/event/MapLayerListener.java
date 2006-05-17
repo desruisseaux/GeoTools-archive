@@ -24,7 +24,7 @@ import org.geotools.map.MapLayer;
 
 
 /**
- * The listener that's notified when some {@linkPlain MapLayer layer} property changes.
+ * The listener that's notified when some {@linkplain MapLayer layer} property changes.
  *
  * @author Andrea Aime
  *

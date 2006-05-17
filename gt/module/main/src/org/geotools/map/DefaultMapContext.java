@@ -67,7 +67,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**
- * The default implementation of the {@linkPlain org.geotools.map.MapContext}
+ * The default implementation of the {@linkplain org.geotools.map.MapContext}
  * interface
  *
  * @author Andrea Aime
