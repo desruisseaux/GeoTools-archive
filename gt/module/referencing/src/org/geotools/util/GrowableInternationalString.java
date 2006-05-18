@@ -32,6 +32,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+// OpenGIS utilities
+import org.opengis.util.InternationalString;
+
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -291,6 +294,58 @@ public class GrowableInternationalString extends AbstractInternationalString imp
             }
         }
         return text;
+    }
+
+    /**
+     * Returns {@code true} if all localized texts stored in this international string are
+     * contained in the specified object. More specifically:
+     *
+     * <ul>
+     *   <li><p>If {@code candidate} is an instance of {@link InternationalString}, then this method
+     *       returns {@code true} if, for all <var>{@linkplain Locale locale}</var>-<var>{@linkplain
+     *       String string}</var> pairs contained in {@code this}, <code>candidate.{@linkplain
+     *       InternationalString#toString(Locale) toString}(locale)</code> returns a string
+     *       {@linkplain String#equals equals} to {@code string}.</p></li>
+     *
+     *   <li><p>If {@code candidate} is an instance of {@link CharSequence}, then this method
+     *       returns {@code true} if {@link #toString(Locale)} returns a string {@linkplain
+     *       String#equals equals} to <code>candidate.{@linkplain CharSequence#toString()
+     *       toString()}</code> for all locales.</p></li>
+     *
+     *   <li><p>If {@code candidate} is an instance of {@link Map}, then this methods returns
+     *       {@code true} if all <var>{@linkplain Locale locale}</var>-<var>{@linkplain String
+     *       string}</var> pairs are contained into {@code candidate}.</p></li>
+     *
+     *   <li><p>Otherwise, this method returns {@code false}.</p></li>
+     * </ul>
+     *
+     * @since 2.3
+     */
+    public boolean isSubsetOf(final Object candidate) {
+        if (candidate instanceof InternationalString) {
+            final InternationalString string = (InternationalString) candidate;
+            for (final Iterator it=localMap.entrySet().iterator(); it.hasNext();) {
+                final Map.Entry entry  = (Map.Entry) it.next();
+                final Locale    locale = (Locale) entry.getKey();
+                final String    text   = (String) entry.getValue();
+                if (!text.equals(string.toString(locale))) {
+                    return false;
+                }
+            }
+        } else if (candidate instanceof CharSequence) {
+            final String string = candidate.toString();
+            for (final Iterator it=localMap.values().iterator(); it.hasNext();) {
+                final String text = (String) it.next();
+                if (!text.equals(string)) {
+                    return false;
+                }
+            }
+        } else if (candidate instanceof Map) {
+            return ((Map) candidate).entrySet().containsAll(localMap.entrySet());
+        } else {
+            return false;
+        }
+        return true;
     }
 
     /**

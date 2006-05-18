@@ -32,6 +32,7 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.GeneralDerivedCRS;
 import org.opengis.referencing.operation.OperationMethod;
+import org.geotools.referencing.wkt.Formatter;
 
 
 /**
@@ -39,12 +40,11 @@ import org.opengis.referencing.operation.OperationMethod;
  * (including projections). This conversion has no source and target CRS, and no math
  * transform. Those elements are created by the derived CRS itself.
  *  
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Matthias Basler
- *
- * @since 2.1
  */
 public class DefiningConversion extends DefaultConversion {
     /**
@@ -105,5 +105,14 @@ public class DefiningConversion extends DefaultConversion {
      */
     public ParameterValueGroup getParameterValues() {
         return (ParameterValueGroup) parameters.clone();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected String formatWKT(final Formatter formatter) {
+        final String name = super.formatWKT(formatter);
+        formatter.append(parameters);
+        return name;
     }
 }

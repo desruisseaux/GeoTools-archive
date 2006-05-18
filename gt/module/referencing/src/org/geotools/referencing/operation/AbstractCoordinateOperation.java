@@ -33,6 +33,7 @@ import javax.units.SI;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.Result;
 import org.opengis.metadata.quality.QuantitativeResult;
@@ -48,6 +49,7 @@ import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.PlanarProjection;
 import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.ConicProjection;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
@@ -522,19 +524,40 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
         if (transform != null) code ^= transform.hashCode();
         return code;
     }
-    
+
     /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
+     * Format this operation as a pseudo-WKT format. No WKT format were defined for coordinate
+     * operation at the time this method was written. This method may change in any future version
+     * until a standard format is found.
      *
      * @param  formatter The formatter to use.
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
-        if (sourceCRS != null) formatter.append(sourceCRS.getName().getCode());
-        if (targetCRS != null) formatter.append(targetCRS.getName().getCode());
-        if (transform != null) formatter.append(transform);
+        append(formatter, sourceCRS, "SOURCE");
+        append(formatter, targetCRS, "TARGET");
         return super.formatWKT(formatter);
+    }
+
+    /**
+     * Append the identifier for the specified object name (possibly {@code null}) to the specified
+     * formatter.
+     *
+     * @param formatter The formatter where to append the object name.
+     * @param object    The object to append, or {@code null} if none.
+     * @param type      The label to put in front of the object name.
+     */
+    static void append(final Formatter formatter, final IdentifiedObject object, final String type) {
+        if (object != null) {
+            final Map properties = new HashMap(4);
+            properties.put(IdentifiedObject.NAME_KEY,        formatter.getName(object));
+            properties.put(IdentifiedObject.IDENTIFIERS_KEY, formatter.getIdentifier(object));
+            formatter.append((IdentifiedObject) new AbstractIdentifiedObject(properties) {
+                protected String formatWKT(final Formatter formatter) {
+                    super.formatWKT(formatter);
+                    return type;
+                }
+            });
+        }
     }
 }

@@ -46,6 +46,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 
 // Geotools dependencies
+import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.resources.Utilities;
@@ -336,5 +337,16 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      */
     public int hashCode() {
         return operations.hashCode() ^ (int)serialVersionUID;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected String formatWKT(final Formatter formatter) {
+        final String label = super.formatWKT(formatter);
+        for (final Iterator it=operations.iterator(); it.hasNext();) {
+            formatter.append((CoordinateOperation) it.next());
+        }
+        return label;
     }
 }

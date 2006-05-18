@@ -41,11 +41,10 @@ import org.opengis.referencing.operation.OperationMethod;
  * for the transformation. Also, the stochastic nature of the parameters may result
  * in multiple (different) versions of the same coordinate transformation. 
  *  
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see DefaultConversion
  */

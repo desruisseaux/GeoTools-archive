@@ -25,7 +25,6 @@ package org.geotools.referencing.operation;
 
 // J2SE dependencies and extensions
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;

@@ -562,8 +562,10 @@ public class Formatter {
      *
      * @param  info The object to looks for a preferred identifier.
      * @return The preferred identifier, or {@code null} if none.
+     *
+     * @since 2.3
      */
-    private Identifier getIdentifier(final IdentifiedObject info) {
+    public Identifier getIdentifier(final IdentifiedObject info) {
         Identifier first = null;
         if (info != null) {
             final Collection/*<Identifier>*/ identifiers = info.getIdentifiers();

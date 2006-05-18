@@ -42,6 +42,7 @@ import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
+import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
@@ -254,5 +255,14 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
      */
     public int hashCode() {
         return super.hashCode() ^ method.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected String formatWKT(final Formatter formatter) {
+        final String name = super.formatWKT(formatter);
+        append(formatter, method, "METHOD");
+        return name;
     }
 }

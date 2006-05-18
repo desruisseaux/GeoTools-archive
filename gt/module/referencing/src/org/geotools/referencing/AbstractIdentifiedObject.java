@@ -422,18 +422,23 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         if (growable!=null && !growable.getLocales().isEmpty()) {
             if (remarks == null) {
                 remarks = growable;
-            } else {
+            } else if (!growable.isSubsetOf(remarks)) {
                 Logger.getLogger("org.geotools.referencing").log(Logging.format(
                         Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
             }
         }
+        /*
+         * Get the localized user-defined properties.
+         */
         if (subProperties!=null && subGrowables!=null) {
             for (int i=0; i<subGrowables.length; i++) {
-                if (subGrowables[i]!=null && !subGrowables[i].getLocales().isEmpty()) {
+                growable = subGrowables[i];
+                if (growable!=null && !growable.getLocales().isEmpty()) {
                     final String prefix = localizables[i];
-                    if (subProperties.get(prefix) == null) {
-                        subProperties.put(prefix, subGrowables[i]);
-                    } else {
+                    final Object current = subProperties.get(prefix);
+                    if (current == null) {
+                        subProperties.put(prefix, growable);
+                    } else if (!growable.isSubsetOf(current)) {
                         Logger.getLogger("org.geotools.referencing").log(Logging.format(
                                 Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
                     }

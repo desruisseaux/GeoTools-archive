@@ -147,12 +147,7 @@ public class DefaultPassThroughOperation extends DefaultSingleOperation implemen
     }
     
     /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
+     * {@inheritDoc}
      */
     protected String formatWKT(final Formatter formatter) {
         final String name = super.formatWKT(formatter);

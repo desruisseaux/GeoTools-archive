@@ -20,20 +20,28 @@
 package org.geotools.referencing.operation;
 
 // J2SE dependencies
+import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.Operation;
+import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.ConcatenatedOperation;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -42,7 +50,10 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.BackingStoreException;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
@@ -166,9 +177,20 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         }
         final String sourceCode = sourceID.getCode();
         final String targetCode = targetID.getCode();
-        final Set operations;
+        final boolean inverse;
+        Set operations;
         try {
             operations = authorityFactory.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
+            inverse = (operations == null || operations.isEmpty());
+            if (inverse) {
+                /*
+                 * No operation from 'source' to 'target' available. But maybe there is an inverse
+                 * operation. This is typically the case when the user wants to convert from a
+                 * projected to a geographic CRS. The EPSG database usually contains transformation
+                 * paths for geographic to projected CRS only.
+                 */
+                operations = authorityFactory.createFromCoordinateReferenceSystemCodes(targetCode, sourceCode);
+            }
         } catch (NoSuchAuthorityCodeException exception) {
             /*
              * sourceCode or targetCode is unknow to the underlying authority factory.
@@ -180,41 +202,106 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
             /*
              * Other kind of error. It may be more serious, but the super-class is capable
              * to provides a raisonable default behavior. Log as a warning and lets continue.
-             *
-             * TODO: localize.
              */
-            final LogRecord record = new LogRecord(Level.WARNING,
-                  "Failure while creating a coordinate operation from the authority factory.");
-            record.setSourceClassName("AuthorityBackedFactory");
-            record.setSourceMethodName("createFromDatabase");
-            record.setThrown(exception);
-            LOGGER.log(record);
+            log(exception, authorityFactory);
             return null;
         }
         if (operations != null) {
             for (final Iterator it=operations.iterator(); it.hasNext();) {
-                final CoordinateOperation candidate = (CoordinateOperation) it.next();
-                if (candidate != null) {
-                    /*
-                     * It is possible that the Identifier in user's CRS is not quite right.   For
-                     * example the user may have created his source and target CRS from WKT using
-                     * a different axis order than the official one and still call it "EPSG:xxxx"
-                     * as if it were the official CRS.   It is possible also that the user simply
-                     * doesn't understand authority codes and just gave bogus identifiers. Checks
-                     * if the source and target CRS for the operation just created are really the
-                     * same (ignoring metadata) than the one specified by the user.
-                     */
-                    if (CRSUtilities.equalsIgnoreMetadata(sourceCRS, candidate.getSourceCRS()) &&
-                        CRSUtilities.equalsIgnoreMetadata(targetCRS, candidate.getTargetCRS()))
-                    {
-                        if (accept(candidate)) {
-                            return candidate;
-                        }
+                CoordinateOperation candidate;
+                try {
+                    candidate = (CoordinateOperation) it.next();
+                    if (candidate == null) {
+                        continue;
                     }
+                } catch (BackingStoreException exception) {
+                    log(exception, authorityFactory);
+                    continue;
+                }
+                final CoordinateReferenceSystem source, target;
+                if (inverse) {
+                    source = candidate.getTargetCRS();
+                    target = candidate.getSourceCRS();
+                } else {
+                    source = candidate.getSourceCRS();
+                    target = candidate.getTargetCRS();
+                }
+                /*
+                 * It is possible that the Identifier in user's CRS is not quite right.   For
+                 * example the user may have created his source and target CRS from WKT using
+                 * a different axis order than the official one and still call it "EPSG:xxxx"
+                 * as if it were the official CRS.   It is possible also that the user simply
+                 * doesn't understand authority codes and just gave bogus identifiers. Checks
+                 * if the source and target CRS for the operation just created are really the
+                 * same (ignoring metadata) than the one specified by the user.
+                 */
+                if (!CRSUtilities.equalsIgnoreMetadata(sourceCRS, source) ||
+                    !CRSUtilities.equalsIgnoreMetadata(targetCRS, target))
+                {
+                    continue;
+                }
+                if (inverse) try {
+                    candidate = inverse(candidate);
+                } catch (NoninvertibleTransformException e) {
+                    // The transform is non invertible. Do not log any error message, since it
+                    // may be a normal failure - the transform is not required to be invertible.
+                    continue;
+                } catch (FactoryException exception) {
+                    // Other kind of error. Log a warning and try the next coordinate operation.
+                    log(exception, authorityFactory);
+                    continue;
+                }
+                if (accept(candidate)) {
+                    return candidate;
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the inverse of the specified operation. The new operation is built using the
+     * factories provided by {@code this}.
+     *
+     * @param  operation The operation to invert.
+     * @return The inverse of {@code operation}.
+     * @throws NoninvertibleTransformException if the operation is not invertible.
+     * @throws FactoryException if the operation creation failed for an other reason.
+     */
+    private CoordinateOperation inverse(final CoordinateOperation operation)
+            throws NoninvertibleTransformException, FactoryException
+    {
+        final CoordinateReferenceSystem sourceCRS = operation.getSourceCRS();
+        final CoordinateReferenceSystem targetCRS = operation.getTargetCRS();
+        final Map properties = AbstractIdentifiedObject.getProperties(operation, null);
+        properties.putAll(getTemporaryName(targetCRS, sourceCRS));
+        if (operation instanceof ConcatenatedOperation) {
+            final LinkedList inverted = new LinkedList/*<CoordinateOperation>*/();
+            for (final Iterator it=((ConcatenatedOperation) operation).getOperations().iterator(); it.hasNext();) {
+                inverted.addFirst(inverse((CoordinateOperation) it.next()));
+            }
+            return factories.getCoordinateOperationFactory().createConcatenatedOperation(properties,
+                    (CoordinateOperation[]) inverted.toArray(new CoordinateOperation[inverted.size()]));
+        } else {
+            final MathTransform transform = operation.getMathTransform().inverse();
+            final Class type = AbstractCoordinateOperation.getType(operation);
+            final OperationMethod method = (operation instanceof Operation) ?
+                                           ((Operation) operation).getMethod() : null;
+            return createFromMathTransform(properties, targetCRS, sourceCRS, transform, method, type);
+        }
+    }
+
+    /**
+     * Log a warning when an object can't be created from the specified factory.
+     */
+    private static void log(final Exception exception, final AuthorityFactory factory) {
+        final LogRecord record = Logging.format(Level.WARNING,
+                                 LoggingKeys.CANT_CREATE_COORDINATE_OPERATION_$1,
+                                 factory.getAuthority().getTitle());
+        record.setSourceClassName("AuthorityBackedFactory");
+        record.setSourceMethodName("createFromDatabase");
+        record.setThrown(exception);
+        LOGGER.log(record);
     }
 
     /**

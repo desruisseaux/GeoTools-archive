@@ -41,6 +41,7 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.OperationNotFoundException;
 
@@ -475,11 +476,16 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                         for (int j=i+1; j<count; j++) {
                             out.println(separator);
                             out.println();
+                            final CoordinateOperation op;
                             try {
-                                out.println(opFactory.createOperation(crs[i], crs[j]));
+                                op = opFactory.createOperation(crs[i], crs[j]);
                             } catch (OperationNotFoundException exception) {
                                 out.println(exception.getLocalizedMessage());
+                                continue;
                             }
+                            out.println(op);
+                            out.println();
+                            out.println(op.getMathTransform());
                         }
                     }
                 }

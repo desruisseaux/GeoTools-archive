@@ -48,11 +48,10 @@ import org.opengis.referencing.operation.Projection;
  *  <code>"false_easting"</code> (default to 0) and
  *  <code>"false_northing"</code> (default to 0).</P>
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see org.geotools.referencing.crs.DefaultProjectedCRS
  * @see <A HREF="http://mathworld.wolfram.com/MapProjection.html">Map projections on MathWorld</A>

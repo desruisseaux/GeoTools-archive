@@ -29,6 +29,7 @@ public final class LoggingKeys {
     public static final int APPLIED_OPERATION_$4                =     2;
     public static final int APPLIED_RESAMPLE_$11                =     3;
     public static final int CANT_BIND_DATASOURCE_$1             =    24;
+    public static final int CANT_CREATE_COORDINATE_OPERATION_$1 =    36;
     public static final int CANT_LOAD_SERVICE_$2                =    30;
     public static final int CANT_REGISTER_JAI_OPERATION_$1      =     4;
     public static final int CHANGED_COORDINATE_REFERENCE_SYSTEM =     5;

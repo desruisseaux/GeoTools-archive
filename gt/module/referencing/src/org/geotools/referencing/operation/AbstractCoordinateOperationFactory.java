@@ -372,7 +372,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @param  targetCRS  The destination coordinate reference system.
      * @param  transform  The math transform.
      * @param  method     The operation method, or {@code null}.
-     * @param  type       The required super-class (e.g. <code>{@link Transformation}.class</code>).
+     * @param  type       The required super-class (e.g. <code>{@linkplain Transformation}.class</code>).
      * @return A coordinate operation using the specified math transform.
      * @throws FactoryException if the operation can't be constructed.
      */

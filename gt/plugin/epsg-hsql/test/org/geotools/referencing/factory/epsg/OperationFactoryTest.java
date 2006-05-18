@@ -46,6 +46,7 @@ import org.geotools.referencing.operation.AuthorityBackedFactory;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.util.MonolineFormatter;
 import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -117,7 +118,8 @@ public class OperationFactoryTest extends TestCase {
         assertEquals(1.0, AbstractCoordinateOperation.getAccuracy(operation), 1E-6);
         assertTrue(operation instanceof Transformation);
         /*
-         * Tests a transformation not backed by an authority factory.
+         * Tests a transformation not backed directly by an authority factory.
+         * However, the inverse transform may exist in the authority factory.
          */
         sourceCRS  = crsFactory.createCoordinateReferenceSystem("4326");
         targetCRS  = crsFactory.createCoordinateReferenceSystem("2995");
@@ -132,10 +134,12 @@ public class OperationFactoryTest extends TestCase {
             if (op instanceof Transformation) {
                 count++;
             } else {
-                assertTrue(op instanceof Conversion);
+                assertTrue("Expected Conversion but got " + 
+                           Utilities.getShortName(AbstractCoordinateOperation.getType(op)) + ". ",
+                           (op instanceof Conversion));
             }
         }
         assertEquals("The coordinate operation should contains exactly 1 transformation", 1, count);
-        assertEquals(25, AbstractCoordinateOperation.getAccuracy(operation), 1E-6);
+        assertTrue(AbstractCoordinateOperation.getAccuracy(operation) <= 25);
     }
 }

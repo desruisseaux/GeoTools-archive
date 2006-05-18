@@ -44,11 +44,10 @@ import org.opengis.referencing.operation.ConicProjection;
  * coordinate conversions are defined rather than empirically derived. Note that some
  * conversions have no parameters. 
  *  
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @see DefaultTransformation
  */
