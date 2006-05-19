@@ -623,7 +623,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.0-beta-3</version>
+          <version>2.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -633,27 +633,30 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <version>2.0-beta-1</version>
+          <version>2.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>2.0-beta-3</version>
+          <version>2.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>2.1</version>
+          <!-- Do not use 2.2 yet, since it prevents maven-plugin-tools-ant 2.0.4
+               (used in maven/javadoc) to work. Revisit when an update of tools-ant
+               will be available. -->
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>2.0-beta-4</version>
+          <version>2.0-beta-4</version>  <!-- beta-5 doesn't seem to work -->
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.1.3</version>
+          <version>2.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -749,13 +752,17 @@
           </archive>
         </configuration>
       </plugin>
-    </plugins>
+<!--    </plugins>
   </build>
 
-
+    TODO: The following plugin should lives in the <reporting> section. But we
+          have to exclude it for now because maven-site-plugin seems to depend
+          again on maven-javadoc-plugin-beta-3, which is incompatible with our
+          javadoc configuration below.  Try to uncomment this block when a new
+          maven-site-plugin will be available.
 
   <reporting>
-    <plugins>
+    <plugins> -->
       <!-- ================================================================= -->
       <!--     Javadoc generation for a single module.                       -->
       <!--     Notes:                                                        -->
@@ -764,42 +771,128 @@
       <!--         ("-docfilessubdirs" option), because it has the unwanted  -->
       <!--         side effect to copy .svn directories as well.             -->
       <!--                                                                   -->
-      <!--       - Do not link source code, because it duplicates            -->
+      <!--       - Do NOT link source code, because it duplicates            -->
       <!--         jxr-maven-plugin.  Note that javadoc.build.xml            -->
       <!--         do link source code.                                      -->
+      <!--                                                                   -->
+      <!--       - In theory, the <sourcepath/> and <subpackages/> elements  -->
+      <!--         below are not needed. However our experience show that,   -->
+      <!--         without them, javadoc fails to link expressions like      -->
+      <!--         {@link org.geotools.somepackage}, i.e. a link to a        -->
+      <!--         package (not a class or a method, which still okay).      -->
+      <!--         See http://jira.codehaus.org/browse/MJAVADOC-28           -->
+      <!--                                                                   -->
       <!-- ================================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <source>1.4</source>                      <!-- Necessary to enable javadoc to handle J2SE 1.4 features.               -->
-          <version>false</version>                  <!-- Specifies whether or not the version text is included.                 -->
-          <noqualifier>all</noqualifier>            <!-- Omits qualifying package name from ahead of class names in output.     -->
-          <showPackage>false</showPackage>          <!-- Shows only protected and public classes and members.                   -->
-          <quiet>true</quiet>                       <!-- Shuts off non-error and non-warning messages.                          -->
-          <maxmemory>512M</maxmemory>               <!-- The maximum Java heap size to be used when launching the javadoc.      -->
-          <encoding>ISO-8859-1</encoding>           <!-- Specifies the encoding name of the source files.                       -->
-          <additionalparam>-keywords</additionalparam>  <!-- Set an additional parameter on the command line.                   -->
+          <source>1.4</source>                      <!-- Necessary to enable javadoc to handle J2SE 1.4 features.           -->
+          <version>false</version>                  <!-- Specifies whether or not the version text is included.             -->
+          <noqualifier>all</noqualifier>            <!-- Omits qualifying package name from ahead of class names in output. -->
+          <quiet>true</quiet>                       <!-- Shuts off non-error and non-warning messages.                      -->
+          <maxmemory>512M</maxmemory>               <!-- The maximum Java heap size to be used when launching the javadoc.  -->
+          <encoding>ISO-8859-1</encoding>           <!-- Specifies the encoding name of the source files.                   -->
+          <aggregate>false</aggregate>              <!-- Whether to build an aggregated report at the root.                 -->
+          <additionalparam>-keywords</additionalparam>  <!-- Set an additional parameter on the command line.               -->
+<!--
+          Note: ${project.build.sourceDirectory} should work below. Lets try it.
+          <sourcepath>${basedir}/src</sourcepath>   <!- Specifies the source paths where the subpackages are located.      ->
+          <subpackages>org.geotools</subpackages>   <!- Specifies the package directory where javadoc will be executed.    ->
+-->
+          <excludePackageNames>org.geotools.resources</excludePackageNames>
+
           <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in doc comments. -->
+          <!-- Note: <placement/> should be a combinaison of the letters Xaoptcmf.                                    -->
           <tags>
-            <tag>tutorial:Xt:Tutorial</tag>
-            <tag>todo:tfmc:TODO</tag>
-            <tag>task:tfmc:TODO</tag>
-            <tag>revisit:tfmc:TODO</tag>
-            <tag>source:Xt:Source</tag>
+            <tag> <name>todo</name>     <placement>tfmc</placement> <head>TODO:</head>     </tag>
+            <tag> <name>task</name>     <placement>tfmc</placement> <head>TODO:</head>     </tag>
+            <tag> <name>revisit</name>  <placement>tfmc</placement> <head>TODO:</head>     </tag>
+            <tag> <name>source</name>   <placement>Xt</placement>   <head>Source:</head>   </tag>
+            <tag> <name>tutorial</name> <placement>Xt</placement>   <head>Tutorial:</head> </tag>
           </tags>
 
           <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
           <links>
             <link>http://java.sun.com/j2se/1.5/docs/api</link>
+            <link>http://java.sun.com/j2ee/1.4/docs/api</link>
             <link>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs</link>
             <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
             <link>http://jsr-108.sourceforge.net/javadoc</link>
             <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
+            <link>http://geoapi.sourceforge.net/pending/javadoc</link>
+            <link>http://geoapi.sourceforge.net/legacy/javadoc</link>
             <link>http://www.jump-project.org/docs/jts/1.6/api</link>
           </links>
+
+          <!-- Separates packages on the overview page into whatever groups is specified. -->
+          <groups>
+            <group>
+              <title>Features, Filters and Styling</title>
+              <packages>org.geotools.feature*:org.geotools.filter*:org.geotools.styling*</packages>
+            </group>
+            <group>
+              <title>Geometries</title>
+              <packages>org.geotools.geometry*:org.geotools.topology*:org.geotools.measure*</packages>
+            </group>
+            <group>
+              <title>Images and Grid Coverage</title>
+              <packages>org.geotools.coverage*:org.geotools.gce*:org.geotools.image*</packages>
+            </group>
+            <group>
+              <title>Spatial Referencing by Coordinates</title>
+              <packages>org.geotools.referencing*:org.geotools.parameter*:org.geotools.axis*</packages>
+            </group>
+            <group>
+              <title>Meta Data</title>
+              <packages>org.geotools.metadata*</packages>
+            </group>
+            <group>
+              <title>Catalog Services</title>
+              <packages>org.geotools.catalog*</packages>
+            </group>
+            <group>
+              <title>Data stores</title>
+              <packages>org.geotools.data*</packages>
+            </group>
+            <group>
+              <title>XML and derivatives (GML, SVG)</title>
+              <packages>org.geotools.xml*:org.geotools.gml*:org.geotools.svg*</packages>
+            </group>
+            <group>
+              <title>Graphs</title>
+              <packages>org.geotools.graph*</packages>
+            </group>
+            <group>
+              <title>Renderer and Display Objects</title>
+              <packages>org.geotools.display*:org.geotools.renderer.lite*:org.geotools.renderer.shape*:org.geotools.map*</packages>
+            </group>
+            <group>
+              <title>Graphic User Interfaces</title>
+              <packages>org.geotools.gui*</packages>
+            </group>
+            <group>
+              <title>Miscellaneous utilities</title>
+              <packages>org.geotools.factory*:org.geotools.io*:org.geotools.util*:org.geotools.math*:org.geotools.nature*:org.geotools.event*:org.geotools.index*</packages>
+            </group>
+            <group>
+              <title>Bridges to external applications</title>
+              <packages>org.geotools.openoffice*</packages>
+            </group>
+            <group>
+              <title>Legacy packages (to be removed)</title>
+              <packages>org.geotools.pt*:org.geotools.cs*:org.geotools.ct*:org.geotools.cv*:org.geotools.gc*:org.geotools.gp*:org.geotools.units*:org.geotools.renderer*:org.geotools.io.coverage*</packages>
+            </group>
+          </groups>
         </configuration>
       </plugin>
+ 
+    <!-- See the comment before the javadoc plugin configuration. We need to delete
+         the four next lines when a new maven-site-plugin will be available. -->
+    </plugins>
+  </build>
+  <reporting>
+    <plugins>
 
 
 
@@ -916,19 +1009,6 @@
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>never</updatePolicy>
-      </snapshots>
-    </repository>
-
-    <!-- The following is a mirror to be used when Ibiblio is down. It must
-         appears after the Geotools repository, because it seems to provide
-         jsr108.jar with an invalid pom.xml file. We want to use the JAR from
-         our repository instead. -->
-    <repository>
-      <id>planetmirror</id>
-      <name>PlanetMirror - mirror of Ibiblio</name>
-      <url>http://public.planetmirror.com/pub/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>

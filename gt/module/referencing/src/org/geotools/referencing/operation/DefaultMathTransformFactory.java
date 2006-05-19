@@ -187,7 +187,7 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
      */
     private static final class FilteredSet extends DerivedSet {
         /**
-         * The expected type ({@link Projection.class}) for projections).
+         * The expected type ({@code Projection.class}) for projections).
          */
         private final Class type;
 
