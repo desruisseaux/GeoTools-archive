@@ -43,7 +43,7 @@ public final class Source implements Taglet {
      * @param tagletMap the map to register this tag to.
      */
     public static void register(final Map tagletMap) {
-       final Source tag = new Source(null);
+       final Source tag = new Source();
        tagletMap.put(tag.getName(), tag);
     }
 
@@ -75,18 +75,18 @@ public final class Source implements Taglet {
 
     /**
      * Constructs a default <code>@source</code> taglet.
-     *
-     * @param tag The SVN tag (e.g. {@code "2.2.RC0"), or {@code null} for the trunk.
      */
-    Source(String tag) {
-        super();
-        if (tag != null) {
-            tag = "tags/" + tag;
-        } else {
-            tag = "trunk/gt";
-        }
-        findModule = Pattern.compile(
-            ".+\\Q/geotools/" + tag + "/\\E([\\p{Alnum}\\-]+)\\/([\\p{Alnum}\\-]+)\\/.+");
+    Source() {
+        super();                               //   Typical example         Could be also
+        findModule = Pattern.compile(          //   ---------------------   ---------------------
+                  "\\p{Alnum}+\\Q://\\E"    +  //   http://                 https://
+                 "[\\p{Alnum}\\.\\-]+"      +  //   svn.geotools.org        gtsvn.refractions.net
+                  "\\/geotools\\/"          +  //   /geotools/
+                  "\\p{Alpha}+\\/"          +  //   trunk/                  tags/
+                 "[\\p{Alnum}\\.\\-]+\\/"   +  //   gt/                     2.3-M1/
+                "([\\p{Alnum}\\-]+)\\/"     +  //   module/                 plugins/
+                "([\\p{Alnum}\\-]+)\\/"     +  //   referencing/            epsg-hsql/
+                ".+");
     }
 
     /**

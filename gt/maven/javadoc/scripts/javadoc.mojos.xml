@@ -9,12 +9,22 @@
 <pluginMetadata>
   <mojos>
     <mojo>
-      <goal>javadoc</goal>
-        
-      <!-- This element refers to the Ant target we'll invoke -->
-      <call>javadoc</call>
+      <goal>web</goal> <!-- The Maven goal name.      -->
+      <call>web</call> <!-- The Ant target to invoke. -->
       <description>
-        Generates cross-modules javadoc for the full Geotools project.
+        Generates cross-modules javadoc for the full Geotools project,
+        including source code as HTML pages. This is generally two big
+        for a ZIP file.
+      </description>
+    </mojo>
+
+    <mojo>
+      <goal>zip</goal> <!-- The Maven goal name.      -->
+      <call>zip</call> <!-- The Ant target to invoke. -->
+      <description>
+        Generates cross-modules javadoc only for a subset of Geotools
+        modules, without source code. This goal creates automatically
+        a ZIP file suitable for distribution.
       </description>
     </mojo>
   </mojos>

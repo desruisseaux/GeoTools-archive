@@ -60,28 +60,28 @@ public class SourceTest extends TestCase {
      * Tests the regular expression validity using the tag for this source file.
      */
     public void testCurrentTag() {
-        final String tag =
-          "$URL$";
-        Source s = new Source(null);
-        Matcher m = s.findURL.matcher(tag);
+        Source  s = new Source();
+        Matcher m;
+        String tag, url, category, module;
+        tag = "$URL$";
+        m = s.findURL.matcher(tag);
         assertTrue(m.matches());
-        String url = m.group(1).trim();
-        if (url.indexOf("trunk") >= 0) {
-            // Test only if building from trunk.
-            m = s.findModule.matcher(url);
-            assertTrue(m.matches());
-            String category = m.group(1);
-            String module   = m.group(2);
-            assertEquals("maven", category);
-            assertEquals("javadoc", module);
-        }
+
+        // Try to match the URL provided by SVN.
+        url = m.group(1).trim();
+        m = s.findModule.matcher(url);
+        assertTrue(m.matches());
+        category = m.group(1);
+        module   = m.group(2);
+        assertEquals("maven", category);
+        assertEquals("javadoc", module);
+
         // Try an other URL from a tag.
-        s = new Source("2.2.RC0");
         url = "http://svn.geotools.org/geotools/tags/2.2.RC0/module/api/src/org/geotools/catalog/ResolveChangeListener.java";
         m = s.findModule.matcher(url);
         assertTrue(m.matches());
-        String category = m.group(1);
-        String module   = m.group(2);
+        category = m.group(1);
+        module   = m.group(2);
         assertEquals("module", category);
         assertEquals("api", module);
     }

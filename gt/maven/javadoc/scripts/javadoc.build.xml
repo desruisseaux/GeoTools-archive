@@ -22,7 +22,13 @@
      (the first line is optional; see above paragraph):
 
          mvn install
-         mvn org.geotools:gt2-javadoc:javadoc
+         mvn org.geotools:gt2-javadoc:web
+
+     As an alternative, if only a subset of all javadoc is wanted in a
+     distributable ZIP file, invoke the following instead.
+
+         mvn install
+         mvn org.geotools:gt2-javadoc:zip
 
      By default, this script put the generated HTML pages in the
      'target/javadoc' directory. To select a different directory,
@@ -36,9 +42,13 @@
      Version: $Id$
      ======================================================================= -->
 
-<project name="Geotools Javadoc" default="javadoc">
+<project name="Geotools Javadoc" default="web">
   <description>
-      Javadoc generation for the whole Geotools project.
+    Javadoc generation for the Geotools project. Contains two goals: The "web" goal
+    generates a javadoc for the whole project, including source code as HTML pages.
+    This is generally two big for a ZIP file. The "zip" goal generates javadoc only
+    for a subset of Geotools modules, without source code. This target creates
+    automatically a ZIP file suitable for distribution.
   </description>
   <tstamp>
     <format property="TODAY" pattern="yyyy-MM-dd" locale="ca"/>
@@ -62,51 +72,69 @@
        Defines the source path. If new modules are added to Geotools and this
        new module should be documented, please add new lines in this section.
        ====================================================================== -->
-  <path id="sources.path">
-    <pathelement path="module/api/src"/>
-    <pathelement path="module/coverage/src"/>
-    <pathelement path="module/legacy/src"/>
-    <pathelement path="module/main/src"/>
-    <pathelement path="module/migrate/src"/>
-    <pathelement path="module/migrate/demo/gui/src"/>
-    <pathelement path="module/referencing/src"/>
-    <pathelement path="module/render/src"/>
-    <pathelement path="module/sample-data/src"/>
-    <pathelement path="module/svgsupport/src"/>
-    <pathelement path="plugin/arcgrid/src"/>
-    <pathelement path="plugin/arcsde/src"/>
-    <pathelement path="plugin/db2/src"/>
-    <pathelement path="plugin/directory/src"/>
-    <pathelement path="plugin/epsg-access/src"/>
-    <pathelement path="plugin/epsg-hsql/src"/>
-    <pathelement path="plugin/epsg-postgresql/src"/>
-    <pathelement path="plugin/epsg-wkt/src"/>
-    <pathelement path="plugin/geomedia/src"/>
-    <pathelement path="plugin/geometryless/src"/>
-    <pathelement path="plugin/geotiff/src"/>
-    <pathelement path="plugin/gml/src"/>
-    <pathelement path="plugin/gtopo30/src"/>
-    <pathelement path="plugin/hsql/src"/>
-    <pathelement path="plugin/image/src"/>
-    <pathelement path="plugin/mif/src"/>
-    <pathelement path="plugin/mysql/src"/>
-    <pathelement path="plugin/oraclespatial/src"/>
-    <pathelement path="plugin/postgis/src"/>
-    <pathelement path="plugin/shapefile/src"/>
-    <pathelement path="plugin/tiger/src"/>
-    <pathelement path="plugin/vpf/src"/>
-    <pathelement path="plugin/wfs/src"/>
-    <pathelement path="plugin/wms/src"/>
-    <pathelement path="ext/brewer/src"/>
-    <pathelement path="ext/go/src"/>
-    <pathelement path="ext/graph/src"/>
-    <pathelement path="ext/openoffice/src"/>
-    <pathelement path="ext/pickle/src"/>
-    <pathelement path="ext/shape/src"/>
-    <pathelement path="ext/shaperenderer/src"/>
-    <pathelement path="ext/validation/src"/>
-    <pathelement path="ext/widgets-swing/src"/>
-  </path>
+  <!-- Modules to be included in the ZIP file (a subset of all modules) -->
+  <target name="zip-modules">
+    <property name="javadoc.args" value="-quiet"/>
+    <path id="sources.path">
+      <pathelement path="module/api/src"/>
+      <pathelement path="module/coverage/src"/>
+      <pathelement path="module/main/src"/>
+      <pathelement path="module/referencing/src"/>
+      <pathelement path="module/render/src"/>
+      <pathelement path="module/sample-data/src"/>
+      <pathelement path="module/svgsupport/src"/>
+    </path>
+  </target>
+
+  <!-- All modules (usually for putting on web rather than in a zip file) -->
+  <target name="web-modules">
+    <property name="javadoc.args" value="-quiet -keywords -linksource"/>
+    <path id="sources.path">
+      <pathelement path="module/api/src"/>
+      <pathelement path="module/coverage/src"/>
+      <pathelement path="module/legacy/src"/>
+      <pathelement path="module/main/src"/>
+      <pathelement path="module/migrate/src"/>
+      <pathelement path="module/migrate/demo/gui/src"/>
+      <pathelement path="module/referencing/src"/>
+      <pathelement path="module/render/src"/>
+      <pathelement path="module/sample-data/src"/>
+      <pathelement path="module/svgsupport/src"/>
+      <pathelement path="plugin/arcgrid/src"/>
+      <pathelement path="plugin/arcsde/src"/>
+      <pathelement path="plugin/db2/src"/>
+      <pathelement path="plugin/directory/src"/>
+      <pathelement path="plugin/epsg-access/src"/>
+      <pathelement path="plugin/epsg-hsql/src"/>
+      <pathelement path="plugin/epsg-postgresql/src"/>
+      <pathelement path="plugin/epsg-wkt/src"/>
+      <pathelement path="plugin/geomedia/src"/>
+      <pathelement path="plugin/geometryless/src"/>
+      <pathelement path="plugin/geotiff/src"/>
+      <pathelement path="plugin/gml/src"/>
+      <pathelement path="plugin/gtopo30/src"/>
+      <pathelement path="plugin/hsql/src"/>
+      <pathelement path="plugin/image/src"/>
+      <pathelement path="plugin/mif/src"/>
+      <pathelement path="plugin/mysql/src"/>
+      <pathelement path="plugin/oraclespatial/src"/>
+      <pathelement path="plugin/postgis/src"/>
+      <pathelement path="plugin/shapefile/src"/>
+      <pathelement path="plugin/tiger/src"/>
+      <pathelement path="plugin/vpf/src"/>
+      <pathelement path="plugin/wfs/src"/>
+      <pathelement path="plugin/wms/src"/>
+      <pathelement path="ext/brewer/src"/>
+      <pathelement path="ext/go/src"/>
+      <pathelement path="ext/graph/src"/>
+      <pathelement path="ext/openoffice/src"/>
+      <pathelement path="ext/pickle/src"/>
+      <pathelement path="ext/shape/src"/>
+      <pathelement path="ext/shaperenderer/src"/>
+      <pathelement path="ext/validation/src"/>
+      <pathelement path="ext/widgets-swing/src"/>
+    </path>
+  </target>
 
 
   <!-- ======================================================================
@@ -143,13 +171,8 @@
              header           = "Geotools&lt;br&gt;Build ${TODAY}"
              maxmemory        = "512M">
 
-      <arg line="-quiet"/>
-      <arg line="-keywords"/>
-      <arg line="-linksource"/>
-      <arg line="-docfilessubdirs"/>
-
+      <arg line="${javadoc.args}"/>
       <package name="org.geotools.*"/>
-
       <excludepackage name="org.geotools.resources.*"/>
 
       <link href="http://java.sun.com/j2se/1.5/docs/api"/>
@@ -182,5 +205,17 @@
       <group title="Bridges to external applications"   packages="org.geotools.openoffice*"/>
       <group title="Legacy packages (to be removed)"    packages="org.geotools.pt*:org.geotools.cs*:org.geotools.ct*:org.geotools.cv*:org.geotools.gc*:org.geotools.gp*:org.geotools.units*:org.geotools.renderer*:org.geotools.io.coverage*"/>
     </javadoc>
+  </target>
+
+  
+  <!-- ======================================================================
+       The tasks to be invoked by Maven or from the command line.
+       ====================================================================== -->
+  <target name="web" depends="web-modules,javadoc">
+    <!-- No zip file for this one (too big) -->
+  </target>
+
+  <target name="zip" depends="zip-modules,javadoc">
+    <zip destfile="target/javadoc.zip" basedir="${dest.dir}"/>
   </target>
 </project>
