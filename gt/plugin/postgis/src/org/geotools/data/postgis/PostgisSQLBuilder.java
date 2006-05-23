@@ -40,6 +40,9 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
     /** If true, ByteA function is used to transfer WKB data*/
     protected boolean byteaEnabled = false;
 
+    /** If true, tables are qualified with a schema **/
+    protected boolean schemaEnabled = true;
+    
     /** the datastore **/
     protected JDBCDataStoreConfig config;
     
@@ -183,9 +186,23 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
     public void setByteaEnabled(boolean byteaEnable) {
         byteaEnabled = byteaEnable;
     }
+    /**
+     * Enables/disables schema name qualification.
+     */
+    public void setSchemaEnabled(boolean schemaEnabled) {
+		this.schemaEnabled = schemaEnabled;
+	}
+    /**
+     * @return true if table names are prefixed with the containing schema.
+     */
+    public boolean isSchemaEnabled() {
+		return schemaEnabled;
+	}
     
     public String encodeTableName(String tableName) {
-    	return "\"" + config.getDatabaseSchemaName() + "\".\"" + tableName + "\"";
+    	return schemaEnabled ? 
+			"\"" + config.getDatabaseSchemaName() + "\".\"" + tableName + "\"" : 
+			"\"" + tableName + "\""; 
     }
     
     public String encodeColumnName(String columnName) {
