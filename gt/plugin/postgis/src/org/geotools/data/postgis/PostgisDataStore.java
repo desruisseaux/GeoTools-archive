@@ -215,6 +215,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * geom, leading to greater speed and slightly less accuracy.
      */
     protected boolean looseBbox;
+    
+    /** Flag indicating wether schema support **/
+    protected boolean schemaEnabled = true;
 
     protected PostgisDataStore(ConnectionPool connPool)
         throws IOException {
@@ -326,6 +329,16 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 	//warn about not using GEOS
                 	LOGGER.warning("GEOS is NOT enabled. This will result in limited functionality and performance.");
                 }
+                
+                //check postgres version to determine if schemas should be 
+                // enabled, pre 7.3 -> no
+                int major = dbConnection.getMetaData().getDatabaseMajorVersion();
+                int minor = dbConnection.getMetaData().getDatabaseMinorVersion();
+                
+                if (major < 7 || (major == 7 && minor < 3)) {
+                	//pre 7.3 
+                	schemaEnabled = false;
+                }
             }
         } catch (SQLException sqle) {
             String message = sqle.getMessage();
@@ -376,6 +389,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
         
     	/*
+        //Justin's patch from uDig, should be faster, but untested.
     	Connection conn = null;    	
 		String namespace = config.getNamespace();
 		try {
@@ -582,8 +596,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 				throw new DataSourceException(msg,t);
 			}
 			try {
-				st.execute("SELECT * FROM \"" + config.getDatabaseSchemaName() +
-						"\".\"" +  typeName + "\" LIMIT 0;");
+				
+				PostgisSQLBuilder builder = new PostgisSQLBuilder(-1,config);
+				initBuilder(builder);
+				
+				st.execute("SELECT * FROM " + builder.encodeTableName(typeName) + " LIMIT 0;");
 			} 
 			catch (Throwable t) {
 				String msg = "Error querying relation:" + typeName + "."  +  
@@ -748,10 +765,15 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         encoder.setLooseBbox(looseBbox);
 
         PostgisSQLBuilder builder = new PostgisSQLBuilder(encoder,config);
-        builder.setWKBEnabled(WKBEnabled);
-        builder.setByteaEnabled(byteaEnabled);
-
+        initBuilder(builder);
+        
         return builder;
+    }
+    
+    protected void initBuilder(PostgisSQLBuilder builder) {
+    	builder.setWKBEnabled(WKBEnabled);
+        builder.setByteaEnabled(byteaEnabled);
+        builder.setSchemaEnabled(schemaEnabled);
     }
 
     /**
