@@ -157,7 +157,6 @@ public final class VocabularyKeys {
     public static final int MESSAGE                            =   104;
     public static final int METHOD                             =   105;
     public static final int MINIMUM                            =   106;
-    public static final int MODIFIED_AXIS_$1                   =   222;
     public static final int MOLODENSKI_TRANSFORM               =   107;
     public static final int NADCON_TRANSFORM                   =   108;
     public static final int NAME                               =   109;

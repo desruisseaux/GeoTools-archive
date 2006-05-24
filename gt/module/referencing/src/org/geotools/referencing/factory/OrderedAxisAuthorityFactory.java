@@ -38,6 +38,7 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.cs.AbstractCS;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -86,12 +87,6 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
      * and linear units to meters. The default value is {@code false}.
      */
     private final boolean fixUnits;
-
-    /**
-     * The authority for this factory. Will be inferred from the {@linkplain #factory underlying
-     * factory} when first requested.
-     */
-    private transient Citation authority;
 
     /**
      * Creates a factory which will reorder the axis of all objects created by
@@ -187,43 +182,6 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
     }
 
     /**
-     * Returns the organization or party responsible for definition and maintenance of the
-     * database. The default implementation returns the authority of the {@linkplain #crsFactory
-     * underlying factory} with "(modified axis)" label appended.
-     * <p>
-     * <strong>Note:</strong> the {@linkplain Citation#getTitle title} and {@linkplain
-     * Citation#getAlternateTitles alternates titles} are modified as described above in order
-     * to make it clear for human readers that objects to be created are not from the official
-     * authority. However, this method copies the {@linkplain Citation#getIdentifiers identifiers}
-     * unchanged in order to allow applications to use this factory as a replacement of the
-     * official one.
-     */
-    public Citation getAuthority() {
-        // No need to synchronize; not a big deal if the citation is created twice.
-        if (authority == null) {
-            final Citation fc = crsFactory.getAuthority();
-            final CitationImpl ac = new CitationImpl(fc);
-            ac.setTitle(replace(fc.getTitle()));
-            final Collection alt = ac.getAlternateTitles();
-            alt.clear();
-            for (final Iterator it=fc.getAlternateTitles().iterator(); it.hasNext();) {
-                alt.add(replace((InternationalString) it.next()));
-            }
-            authority = (Citation) ac.unmodifiable();
-        }
-        return authority;
-    }
-
-    /**
-     * Replaces an authority name. This method is invoked by {@link #getAuthority} for deriving
-     * an authority name from the {@linkplain #crsFactory underlying factory}. The default
-     * implementation add "(axis modified)" to the specified name.
-     */
-    private static InternationalString replace(final InternationalString name) {
-        return Vocabulary.formatInternational(VocabularyKeys.MODIFIED_AXIS_$1, name);
-    }
-
-    /**
      * Reorder (if needed) the axis in the specified coordinate system. The
      * default implementation uses the same axis order than the one returned by
      * <code>{@linkplain AbstractCS#standard AbstractCS.standard}(cs)</code>.
@@ -235,7 +193,7 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
      *
      * @throws FactoryException If this method can't rearange the axis for the specified {@code cs}.
      */
-    protected CoordinateSystem replace(CoordinateSystem cs) throws FactoryException {
+    protected CoordinateSystem replace(final CoordinateSystem cs) throws FactoryException {
         CoordinateSystem candidate = (CoordinateSystem) getFromCache(cs);
         if (candidate != null) {
             return candidate;
@@ -313,14 +271,17 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter {
         }
         /*
          * If the axis order changed, creates a new coordinate system using the new axis.
-         * Note: we use 'candidate' as the coordinate system model instead of 'cs' because
-         * the original CS name and remarks are often not anymore appropriate. The name from
-         * Geotools predefined CS are more neutral.
+         * NOTE: If a new authority is going to be given to the new object (i.e. if the
+         * user overrided the 'getAuthority()' method), then we will use 'candidate' as
+         * the coordinate system model instead of 'cs' because the original CS name and
+         * remarks are often not anymore appropriate. The name from Geotools predefined
+         * CS are more neutral.
          */
         if (!changed) {
             return cs;
         }
-        candidate = createCS(candidate, axis);
+        changed = !Utilities.equals(cs.getName().getAuthority(), getAuthority());
+        candidate = createCS(changed ? candidate : cs, axis);
         cache(cs, candidate);
         return candidate;
     }

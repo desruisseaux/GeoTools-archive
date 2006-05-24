@@ -26,6 +26,8 @@ package org.geotools.referencing.operation;
 // J2SE dependencies and extensions
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Collections;
 import javax.units.ConversionException;
 
@@ -48,6 +50,7 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
@@ -439,12 +442,12 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
                                               final CoordinateOperation step2)
             throws FactoryException
     {
-        if (step1==null) return step2;
-        if (step2==null) return step1;
+        if (step1 == null) return step2;
+        if (step2 == null) return step1;
         if (false) {
             // Note: we sometime get this assertion failure if the user provided CRS with two
             //       different ellipsoids but an identical TOWGS84 conversion infos (which is
-            //       wrong).
+            //       usually wrong, but still happen).
             assert equalsIgnoreMetadata(step1.getTargetCRS(), step2.getSourceCRS()) :
                    "CRS 1 =" + step1.getTargetCRS() + '\n' +
                    "CRS 2 =" + step2.getSourceCRS();
@@ -489,9 +492,9 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
                                               final CoordinateOperation step3)
             throws FactoryException
     {
-        if (step1==null) return concatenate(step2, step3);
-        if (step2==null) return concatenate(step1, step3);
-        if (step3==null) return concatenate(step1, step2);
+        if (step1 == null) return concatenate(step2, step3);
+        if (step2 == null) return concatenate(step1, step3);
+        if (step3 == null) return concatenate(step1, step2);
         assert equalsIgnoreMetadata(step1.getTargetCRS(), step2.getSourceCRS()) : step1;
         assert equalsIgnoreMetadata(step2.getTargetCRS(), step3.getSourceCRS()) : step3;
 
@@ -515,7 +518,39 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     private static boolean isIdentity(final CoordinateOperation operation) {
         return (operation instanceof Conversion) && operation.getMathTransform().isIdentity();
     }
-    
+
+    /**
+     * Returns the inverse of the specified operation.
+     *
+     * @param  operation The operation to invert.
+     * @return The inverse of {@code operation}.
+     * @throws NoninvertibleTransformException if the operation is not invertible.
+     * @throws FactoryException if the operation creation failed for an other reason.
+     *
+     * @since 2.3
+     */
+    protected CoordinateOperation inverse(final CoordinateOperation operation)
+            throws NoninvertibleTransformException, FactoryException
+    {
+        final CoordinateReferenceSystem sourceCRS = operation.getSourceCRS();
+        final CoordinateReferenceSystem targetCRS = operation.getTargetCRS();
+        final Map properties = AbstractIdentifiedObject.getProperties(operation, null);
+        properties.putAll(getTemporaryName(targetCRS, sourceCRS));
+        if (operation instanceof ConcatenatedOperation) {
+            final LinkedList inverted = new LinkedList/*<CoordinateOperation>*/();
+            for (final Iterator it=((ConcatenatedOperation) operation).getOperations().iterator(); it.hasNext();) {
+                inverted.addFirst(inverse((CoordinateOperation) it.next()));
+            }
+            return createConcatenatedOperation(properties,
+                    (CoordinateOperation[]) inverted.toArray(new CoordinateOperation[inverted.size()]));
+        }
+        final MathTransform transform = operation.getMathTransform().inverse();
+        final Class type = AbstractCoordinateOperation.getType(operation);
+        final OperationMethod method = (operation instanceof Operation) ?
+                                       ((Operation) operation).getMethod() : null;
+        return createFromMathTransform(properties, targetCRS, sourceCRS, transform, method, type);
+    }
+
 
 
 
@@ -619,7 +654,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     }
 
     /**
-     * Compare the specified objects for equality. If both objects are Geotools
+     * Compares the specified objects for equality. If both objects are Geotools
      * implementations of {@linkplain AbstractIdentifiedObject},
      * then this method will ignore the metadata during the comparaison.
      *

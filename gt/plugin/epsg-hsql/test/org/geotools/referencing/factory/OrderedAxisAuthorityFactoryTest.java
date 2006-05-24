@@ -66,6 +66,15 @@ import org.geotools.metadata.iso.citation.Citations;
  */
 public class OrderedAxisAuthorityFactoryTest extends TestCase {
     /**
+     * {@code true} if metadata (especially identifiers) should be erased, or {@code false} if
+     * they should be kepts. The {@code true} value matches the pre GEOT-854 state, while the
+     * {@code false} value mathes the post GEOT-854 state.
+     *
+     * @see http://jira.codehaus.org/browse/GEOT-854
+     */
+    private static final boolean METADATA_ERASED = false;
+
+    /**
      * {@code true} for tracing operations on the standard output.
      */
     private static boolean verbose;
@@ -142,7 +151,11 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         assertNotSame(crs0.getCoordinateSystem(), crs1.getCoordinateSystem());
         assertSame(((SingleCRS) crs0).getDatum(), ((SingleCRS) crs1).getDatum());
         assertFalse(crs0.getIdentifiers().isEmpty());
-        assertTrue (crs1.getIdentifiers().isEmpty());
+        if (METADATA_ERASED) {
+            assertTrue(crs1.getIdentifiers().isEmpty());
+        } else {
+            assertEquals(crs0.getIdentifiers(), crs1.getIdentifiers());
+        }
         mt = opFactory.createOperation(crs0, crs1).getMathTransform();
         assertFalse(mt.isIdentity());
         assertTrue(mt instanceof LinearTransform);
@@ -163,7 +176,11 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         assertNotSame(crs0.getCoordinateSystem(), crs1.getCoordinateSystem());
         assertSame(((SingleCRS) crs0).getDatum(), ((SingleCRS) crs1).getDatum());
         assertFalse(crs0.getIdentifiers().isEmpty());
-        assertTrue (crs1.getIdentifiers().isEmpty());
+        if (METADATA_ERASED) {
+            assertTrue(crs1.getIdentifiers().isEmpty());
+        } else {
+            assertEquals(crs0.getIdentifiers(), crs1.getIdentifiers());
+        }
         /*
          * Tests a WGS84 geographic CRS (3D) with (NORTH, EAST, UP) axis directions.
          * The factory should reorder the axis with no more operation than an axis swap.
@@ -175,7 +192,11 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         assertNotSame(crs0.getCoordinateSystem(), crs1.getCoordinateSystem());
         assertSame(((SingleCRS) crs0).getDatum(), ((SingleCRS) crs1).getDatum());
         assertFalse(crs0.getIdentifiers().isEmpty());
-        assertTrue (crs1.getIdentifiers().isEmpty());
+        if (METADATA_ERASED) {
+            assertTrue(crs1.getIdentifiers().isEmpty());
+        } else {
+            assertEquals(crs0.getIdentifiers(), crs1.getIdentifiers());
+        }
         mt = opFactory.createOperation(crs0, crs1).getMathTransform();
         assertFalse(mt.isIdentity());
         assertTrue(mt instanceof LinearTransform);
@@ -199,7 +220,11 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         assertSame(((SingleCRS) crs0).getDatum(), ((SingleCRS) crs1).getDatum());
         assertNotSame(((ProjectedCRS) crs0).getBaseCRS(), ((ProjectedCRS) crs1).getBaseCRS());
         assertFalse(crs0.getIdentifiers().isEmpty());
-        assertTrue (crs1.getIdentifiers().isEmpty());
+        if (METADATA_ERASED) {
+            assertTrue(crs1.getIdentifiers().isEmpty());
+        } else {
+            assertEquals(crs0.getIdentifiers(), crs1.getIdentifiers());
+        }
         mt = opFactory.createOperation(crs0, crs1).getMathTransform();
         assertTrue(mt.isIdentity());
         /*
@@ -215,7 +240,11 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         assertNotSame(crs0.getCoordinateSystem(), crs1.getCoordinateSystem());
         assertSame(((SingleCRS) crs0).getDatum(), ((SingleCRS) crs1).getDatum());
         assertFalse(crs0.getIdentifiers().isEmpty());
-        assertTrue (crs1.getIdentifiers().isEmpty());
+        if (METADATA_ERASED) {
+            assertTrue(crs1.getIdentifiers().isEmpty());
+        } else {
+            assertEquals(crs0.getIdentifiers(), crs1.getIdentifiers());
+        }
         mt = opFactory.createOperation(crs0, crs1).getMathTransform();
         assertFalse(mt.isIdentity());
         assertTrue(mt instanceof LinearTransform);

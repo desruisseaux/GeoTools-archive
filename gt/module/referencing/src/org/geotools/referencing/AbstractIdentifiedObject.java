@@ -725,9 +725,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * @return {@code true} if the primary name of at least one alias
      *         matches the specified {@code name}.
      */
-    public static boolean nameMatches(final IdentifiedObject object,
-                                      final String name)
-    {
+    public static boolean nameMatches(final IdentifiedObject object, final String name) {
         if (object instanceof AbstractIdentifiedObject) {
             return ((AbstractIdentifiedObject) object).nameMatches(name);
         } else {

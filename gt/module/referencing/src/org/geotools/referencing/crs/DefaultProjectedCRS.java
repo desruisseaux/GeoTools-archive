@@ -176,7 +176,7 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
      * Returns a conversion from a source to target projected CRS, if this conversion
      * is representable as an affine transform. More specifically, if all projection
      * parameters are identical except the following ones:
-     * <BR>
+     * <P>
      * <UL>
      *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SCALE_FACTOR   scale_factor}</LI>
      *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SEMI_MAJOR     semi_major}</LI>
@@ -184,16 +184,16 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
      *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#FALSE_EASTING  false_easting}</LI>
      *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#FALSE_NORTHING false_northing}</LI>
      * </UL>
-     *
-     * <P>Then the conversion between two projected CRS can sometime be represented as a linear
+     * <P>
+     * Then the conversion between two projected CRS can sometime be represented as a linear
      * conversion. For example if only false easting/northing differ, than the coordinate conversion
      * is simply a translation. If no linear conversion has been found between the two CRS, then
-     * this method returns {@code null}.</P>
+     * this method returns {@code null}.
      *
      * @param  sourceCRS The source coordinate reference system.
      * @param  targetCRS The target coordinate reference system.
      * @param  errorTolerance Relative error tolerance for considering two parameter values as
-     *         equal. This is usually a small number like 1E-12.
+     *         equal. This is usually a small number like {@code 1E-10}.
      * @return The conversion from {@code sourceCRS} to {@code targetCRS} as an
      *         affine transform, or {@code null} if no linear transform has been found.
      */
@@ -201,7 +201,18 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
                                                 final ProjectedCRS targetCRS,
                                                 final double errorTolerance)
     {
-        if (!equals(sourceCRS.getBaseCRS(), targetCRS.getBaseCRS(), false)) {
+        /*
+         * Checks if the datum are the same. To be stricter, we could compare the 'baseCRS'
+         * instead. But this is not always needed. For example we don't really care if the
+         * underlying geographic CRS use different axis order or units. What matter are the
+         * axis order and units of the projected CRS.
+         *
+         * Actually, checking for 'baseCRS' causes an infinite loop (until StackOverflowError)
+         * in CoordinateOperationFactory, because it prevents this method to recognize that the
+         * transform between two projected CRS is the identity transform even if their underlying
+         * geographic CRS use different axis order.
+         */
+        if (!equals(sourceCRS.getDatum(), targetCRS.getDatum(), false)) {
             return null;
         }
         // TODO: remove the cast once we will be allowed to compile for J2SE 1.5.
@@ -334,6 +345,7 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
          * Note that those operation are performed in units of the target CRS.
          */
         final double scale = 0.5 * (scaleX + scaleY);
+        final boolean applyScale = (Math.abs(scale - 1) > errorTolerance);
         final CoordinateSystem sourceCS = sourceCRS.getCoordinateSystem();
         final CoordinateSystem targetCS = targetCRS.getCoordinateSystem();
         final Matrix matrix = AbstractCS.swapAndScaleAxis(sourceCS, targetCS);
@@ -357,15 +369,24 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
             } else {
                 continue;
             }
-            // Apply the scale. Usually all elements on the same row are equal to zero,
-            // except one element in a column which depends on the source axis position.
-            // Note that we must multiply the last column (unit offset) as well.
-            for (int i=0; i<=sourceDim; i++) {
-                matrix.setElement(j,i, matrix.getElement(j,i) * scale);
+            /*
+             * Applies the scale. Usually all elements on the same row are equal to zero,
+             * except one element in a column which depends on the source axis position.
+             * Note that we must multiply the last column (unit offset) as well.
+             */
+            if (applyScale) {
+                for (int i=0; i<=sourceDim; i++) {
+                    matrix.setElement(j,i, matrix.getElement(j,i) * scale);
+                }
             }
-            // Apply the translation. The old value in the matrix is usually 0,
-            // but could be non-zero for some unit conversion, which we keep.
-            matrix.setElement(j, sourceDim, matrix.getElement(j, sourceDim) + (newT - oldT*scale));
+            /*
+             * Applies the translation. The old value in the matrix is usually 0,
+             * but could be non-zero for some unit conversion, which we keep.
+             */
+            final double delta = newT - (applyScale ? oldT*scale : oldT);
+            if (!(Math.abs(delta) <= errorTolerance)) {
+                matrix.setElement(j, sourceDim, matrix.getElement(j, sourceDim) + delta);
+            }
         }
         return matrix;
     }

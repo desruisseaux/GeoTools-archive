@@ -22,8 +22,8 @@ package org.geotools.referencing.operation;
 // J2SE dependencies
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -51,7 +51,6 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.BackingStoreException;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 
@@ -177,6 +176,21 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         }
         final String sourceCode = sourceID.getCode();
         final String targetCode = targetID.getCode();
+        if (sourceCode.equals(targetCode)) {
+            /*
+             * NOTE: This check is mandatory because this method may be invoked in some situations
+             *       where (sourceCode == targetCode) but (sourceCRS != targetCRS). Such situation
+             *       should be illegal  (or at least the MathTransform from sourceCRS to targetCRS
+             *       should be the identity transform),   but unfortunatly it still happen because
+             *       EPSG defines axis order as (latitude,longitude) for geographic CRS while most
+             *       softwares expect (longitude,latitude) no matter what the EPSG authority said.
+             *       We will need to computes a transform from sourceCRS to targetCRS ignoring the
+             *       source and target codes. The superclass can do that, providing that we prevent
+             *       the authority database to (legitimately) claims that the transformation from
+             *       sourceCode to targetCode is the identity transform. See GEOT-854.
+             */
+            return null;
+        }
         final boolean inverse;
         Set operations;
         try {
@@ -214,34 +228,9 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                     if (candidate == null) {
                         continue;
                     }
-                } catch (BackingStoreException exception) {
-                    log(exception, authorityFactory);
-                    continue;
-                }
-                final CoordinateReferenceSystem source, target;
-                if (inverse) {
-                    source = candidate.getTargetCRS();
-                    target = candidate.getSourceCRS();
-                } else {
-                    source = candidate.getSourceCRS();
-                    target = candidate.getTargetCRS();
-                }
-                /*
-                 * It is possible that the Identifier in user's CRS is not quite right.   For
-                 * example the user may have created his source and target CRS from WKT using
-                 * a different axis order than the official one and still call it "EPSG:xxxx"
-                 * as if it were the official CRS.   It is possible also that the user simply
-                 * doesn't understand authority codes and just gave bogus identifiers. Checks
-                 * if the source and target CRS for the operation just created are really the
-                 * same (ignoring metadata) than the one specified by the user.
-                 */
-                if (!CRSUtilities.equalsIgnoreMetadata(sourceCRS, source) ||
-                    !CRSUtilities.equalsIgnoreMetadata(targetCRS, target))
-                {
-                    continue;
-                }
-                if (inverse) try {
-                    candidate = inverse(candidate);
+                    if (inverse) {
+                        candidate = inverse(candidate);
+                    }
                 } catch (NoninvertibleTransformException e) {
                     // The transform is non invertible. Do not log any error message, since it
                     // may be a normal failure - the transform is not required to be invertible.
@@ -250,6 +239,47 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                     // Other kind of error. Log a warning and try the next coordinate operation.
                     log(exception, authorityFactory);
                     continue;
+                } catch (BackingStoreException exception) {
+                    log(exception, authorityFactory);
+                    continue;
+                }
+                /*
+                 * It is possible that the Identifier in user's CRS is not quite right.   For
+                 * example the user may have created his source and target CRS from WKT using
+                 * a different axis order than the official one and still call it "EPSG:xxxx"
+                 * as if it were the official CRS. Checks if the source and target CRS for the
+                 * operation just created are really the same (ignoring metadata) than the one
+                 * specified by the user.
+                 */
+                final CoordinateReferenceSystem source = candidate.getSourceCRS();
+                final CoordinateReferenceSystem target = candidate.getTargetCRS();
+                try {
+                    final MathTransform prepend, append;
+                    if (!equalsIgnoreMetadata(sourceCRS, source)) {
+                        prepend = createOperation(sourceCRS, source).getMathTransform();
+                    } else {
+                        prepend = null;
+                    }
+                    if (!equalsIgnoreMetadata(target, targetCRS)) {
+                        append = createOperation(target, targetCRS).getMathTransform();
+                    } else {
+                        append = null;
+                    }
+                    candidate = transform(sourceCRS, prepend, candidate, append, targetCRS);
+                } catch (FactoryException exception) {
+                    /*
+                     * We have been unable to create a transform from the user-provided CRS to the
+                     * authority-provided CRS. In theory, the two CRS should have been the same and
+                     * the transform would have been the identity transform. In practice, it is not
+                     * always the case because of axis swapping issue (see GEOT-854). The transform
+                     * that we just tried to create in the two previous calls to the createOperation
+                     * method should have been merely an affine transform for swapping axis. If they
+                     * failed, then we are likely to fail for all other transforms provided in the
+                     * database. So stop the loop now (at the very least, do not log the same
+                     * warning for every pass of this loop!)
+                     */
+                    log(exception, authorityFactory);
+                    return null;
                 }
                 if (accept(candidate)) {
                     return candidate;
@@ -260,39 +290,75 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
     }
 
     /**
-     * Returns the inverse of the specified operation. The new operation is built using the
-     * factories provided by {@code this}.
+     * Appends or prepends the specified math transforms to the
+     * {@linkplain CoordinateOperation#getMathTransform operation math transform}.
+     * The new coordinate operation (if any) will share the same metadata
+     * than the original operation, including the authority code.
+     * <p>
+     * This method is used in order to change axis order when the user-specified CRS
+     * disagree with the authority-supplied CRS.
      *
-     * @param  operation The operation to invert.
-     * @return The inverse of {@code operation}.
-     * @throws NoninvertibleTransformException if the operation is not invertible.
-     * @throws FactoryException if the operation creation failed for an other reason.
+     * @param sourceCRS The source CRS to give to the new operation.
+     * @param prepend   The transform to prepend to the operation math transform.
+     * @param operation The operation in which to prepend the math transforms.
+     * @param append    The transform to append to the operation math transform.
+     * @param targetCRS The target CRS to give to the new operation.
+     * @return A new operation, or {@code operation} if {@code prepend} and {@code append} were
+     *         nulls or identity transforms.
+     * @throws FactoryException if the operation can't be constructed.
      */
-    private CoordinateOperation inverse(final CoordinateOperation operation)
-            throws NoninvertibleTransformException, FactoryException
+    private CoordinateOperation transform(final CoordinateReferenceSystem sourceCRS,
+                                          final MathTransform             prepend,
+                                          final CoordinateOperation       operation,
+                                          final MathTransform             append,
+                                          final CoordinateReferenceSystem targetCRS)
+            throws FactoryException
     {
-        final CoordinateReferenceSystem sourceCRS = operation.getSourceCRS();
-        final CoordinateReferenceSystem targetCRS = operation.getTargetCRS();
-        final Map properties = AbstractIdentifiedObject.getProperties(operation, null);
-        properties.putAll(getTemporaryName(targetCRS, sourceCRS));
-        if (operation instanceof ConcatenatedOperation) {
-            final LinkedList inverted = new LinkedList/*<CoordinateOperation>*/();
-            for (final Iterator it=((ConcatenatedOperation) operation).getOperations().iterator(); it.hasNext();) {
-                inverted.addFirst(inverse((CoordinateOperation) it.next()));
-            }
-            return factories.getCoordinateOperationFactory().createConcatenatedOperation(properties,
-                    (CoordinateOperation[]) inverted.toArray(new CoordinateOperation[inverted.size()]));
-        } else {
-            final MathTransform transform = operation.getMathTransform().inverse();
-            final Class type = AbstractCoordinateOperation.getType(operation);
-            final OperationMethod method = (operation instanceof Operation) ?
-                                           ((Operation) operation).getMethod() : null;
-            return createFromMathTransform(properties, targetCRS, sourceCRS, transform, method, type);
+        if ((prepend == null || prepend.isIdentity()) && (append == null || append.isIdentity())) {
+            return operation;
         }
+        final Map properties = AbstractIdentifiedObject.getProperties(operation);
+        /*
+         * In the particular case of concatenated operations, we can not prepend or append a math
+         * transform to the operation as a whole (the math transform for a concatenated operation
+         * is computed automatically as the concatenation of the math transform from every single
+         * operations, and we need to stay consistent with that). Instead, we prepend to the first
+         * single operation and append to the last single operation.
+         */
+        if (operation instanceof ConcatenatedOperation) {
+            final List/*<CoordinateOperation>*/ c = ((ConcatenatedOperation) operation).getOperations();
+            final CoordinateOperation[] op = (CoordinateOperation[]) c.toArray(new CoordinateOperation[c.size()]);
+            if (op.length != 0) {
+                final CoordinateOperation first = op[0];
+                if (op.length == 1) {
+                    op[0] = transform(sourceCRS, prepend, first, append, targetCRS);
+                } else {
+                    final CoordinateOperation last = op[op.length-1];
+                    op[0]           = transform(sourceCRS, prepend, first, null, first.getTargetCRS());
+                    op[op.length-1] = transform(last.getSourceCRS(), null, last, append, targetCRS);
+                }
+                return createConcatenatedOperation(properties, op);
+            }
+        }
+        /*
+         * Single operation case.
+         */
+        MathTransform transform = operation.getMathTransform();
+        if (prepend != null) {
+            transform = mtFactory.createConcatenatedTransform(prepend, transform);
+        }
+        if (append != null) {
+            transform = mtFactory.createConcatenatedTransform(transform, append);
+        }
+        assert !transform.equals(operation.getMathTransform()) : transform;
+        final Class type = AbstractCoordinateOperation.getType(operation);
+        final OperationMethod method = (operation instanceof Operation) ?
+                                       ((Operation) operation).getMethod() : null;
+        return createFromMathTransform(properties, targetCRS, sourceCRS, transform, method, type);
     }
 
     /**
-     * Log a warning when an object can't be created from the specified factory.
+     * Logs a warning when an object can't be created from the specified factory.
      */
     private static void log(final Exception exception, final AuthorityFactory factory) {
         final LogRecord record = Logging.format(Level.WARNING,

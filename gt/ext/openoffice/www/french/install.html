@@ -16,21 +16,19 @@
       <th nowrap>Composante</th>
       <th nowrap>Nom du fichier</th>
       <th nowrap>Taille</th>
-      <th nowrap colspan="2">Téléchargement</th>
+      <th nowrap>Téléchargement</th>
     </tr>
     <tr>
       <td><b><cite>Add-in</cite> Geotools pour OpenOffice</b></td>
       <td><code>geotools.uno.pkg</code></td>
       <td align="right">1&nbsp;649 ko</td>
-      <td><a href="ftp://www.espace.ird.nc/sicade/addin-openoffice/geotools.uno.pkg">par FTP</a></td>
-      <td><a href="../downloads/geotools.uno.pkg">par HTTP</a></td>
+      <td><a href="http://prdownloads.sourceforge.net/geotools/gt2-openoffice-2.2-RC1.uno.pkg?download">par FTP</a></td>
     </tr>
     <tr>
       <td><b>Exemple de feuille de calcul</td>
       <td><code>referencing.ods</code></td>
       <td align="right">24 ko</td>
-      <td><a href="ftp://www.espace.ird.nc/sicade/addin-openoffice/referencing.ods">par FTP</a></td>
-      <td><a href="../downloads/referencing.ods">par HTTP</a></td>
+      <td><a href="downloads/referencing.ods">par HTTP</a></td>
     </tr>
     </table>
 
@@ -59,33 +57,9 @@
     <tr>
       <td nowrap><b>Java Runtime Environment (JRE)</b><br>version 1.4 ou ultérieure (5.0 recommandée)</td>
       <td nowrap><A HREF="http://java.sun.com/j2se/1.5.0/download.html">http://java.sun.com/j2se/1.5.0/download.html</A></td>
-    </tr>
-      <td><b>Java 3D</b> (DirectX ou OpenGL)</td>
-      <td><A HREF="http://java.sun.com/products/java-media/3D/downloads/">http://java.sun.com/products/java-media/3D/downloads/</A>
-          <br>(Sélectionner <cite>API Download</cite>)</td>
-    </tr>
     </table>
 
-    <p>&nbsp</p>
-    <h3>Pourquoi Java3D et comment s’en passer?</h3>
-    <p align="justify">Geotools ne fait pas d’animation tridimensionnelle (3D), bien qu’il peut manipuler
-    des coordonnées à trois dimensions ou plus. Toutefois, il a besoin d’effectuer des calculs matriciels,
-    quel que soit le nombre de dimensions. L’extension standard Java3D de Sun Microsystems comprend des routines
-    à cet effet, les animations 3D faisant un usage intensif de matrices. Java3D n’est pas la seule extension
-    capable de manipuler des matrices, mais il a l’avantage d’être un peu plus standard que les autres dans un
-    environnement Java, et d’être particulièrement optimisé pour des manipulations de matrices de tailles
-    3&times;3 et 4&times;4 (il se trouve que les transformations de coordonnées géographiques utilisent aussi des
-    matrices de ces tailles).</p>
 
-    <p align="justify">Si vous ne souhaitez ou ne pouvez pas installer Java3D, il est possible de contourner
-    ce problème. La seule partie de Java3D réellement utilisée par Geotools est l’archive <code>vecmath.jar</code>;
-    tous le reste est ignoré. Cette archive peut être copiée à partir d’une autre installation (peu importe
-    le système d’exploitation - elle est portable) et installée dans le répertoire <code>jre/lib/ext</code>
-    de la machine cliente, où <code>jre</code> est le répertoire d’installation du Java.</p>
-
-
-    <p>&nbsp</p>
-    <hr>
     <p>&nbsp;</p>
     <h2><a name="install">Installation de l’extension</a></h2>
     <p align="justify">Avant d’installer l’extension Geotools, il peut être utile de configurer
@@ -94,14 +68,14 @@
     sélectionner <cite>Java</cite>. Si aucun environnement Java n’apparaît dans la liste, appuyer sur
     le bouton <cite>Ajouter</cite> et sélectionner le répertoire où un environnement Java est installé.</p>
 
-    <center><img src="../images/install_java.png" alt="Répertoire d'installation du Java"></center>
+    <center><img src="images/install_java.png" alt="Répertoire d'installation du Java"></center>
 
     <p align="justify">Après avoir téléchargé le fichier <code>geotools.uno.pkg</code>, lancer le tableur
     d’Open Office (<cite>Calc</cite>). Aller dans <cite>Outils</cite>, <cite>Gestionnaire de packages</cite>.
     Sélectionner <cite>Mes packages</cite> dans la colonne <cite>Package</cite> et appuyer sur le bouton
     <cite>Ajouter</cite>.</p>
 
-    <center><img src="../images/install_geotools.png" alt="Gestionnaire de packages"></center> 
+    <center><img src="images/install_geotools.png" alt="Gestionnaire de packages"></center> 
 
     <p align="justify">Aller dans le répertoire où se trouve le fichier <code>geotools.uno.pkg</code>
     téléchargé et sélectionnez le, puis appuyer sur le bouton <cite>Ouvrir</cite>. Après que l’extension ait
@@ -124,8 +98,6 @@
     </p></td></tr></table>
 
     
-    <p>&nbsp</p>
-    <hr>
     <p>&nbsp</p>
     <h2><a name="troubleshooting">Résolution de problèmes</a></h2>
     <p align="justify">Si l’exécution des formules fournit par l’extension Geotools ne produit que le

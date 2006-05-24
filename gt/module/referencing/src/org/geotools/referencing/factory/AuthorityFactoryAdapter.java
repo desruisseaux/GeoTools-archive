@@ -359,13 +359,21 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns the properties to be given to an object replacing an original one.
+     * Returns the properties to be given to an object replacing an original one. If the new object
+     * keep the same authority, then all metadata are preserved. Otherwise (i.e. if a new authority
+     * is given to the new object), then the old identifiers will be removed from the new object
+     * metadata.
      *
      * @param  object The original object.
      * @return The properties to be given to the object created as a substitute of {@code object}.
      */
     final Map getProperties(final IdentifiedObject object) {
-        return AbstractIdentifiedObject.getProperties(object, getAuthority());
+        final Citation authority = getAuthority();
+        if (!Utilities.equals(authority, object.getName().getAuthority())) {
+            return AbstractIdentifiedObject.getProperties(object, authority);
+        } else {
+            return AbstractIdentifiedObject.getProperties(object);
+        }
     }
 
     /**
@@ -415,8 +423,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     /**
      * Returns the organization or party responsible for definition and maintenance of the
      * database. The default implementation delegates to the {@linkplain #crsFactory underlying
-     * CRS factory} with no change. Subclasses should override this method if at least one
-     * {@code replace(...)} methods performs a structural change, for example changing axis
+     * CRS factory} with no change. Subclasses may consider to override this method if at least
+     * one {@code replace(...)} methods performs a structural change, for example changing axis
      * order from (<var>latitude</var>, <var>longitude</var>) to (<var>longitude</var>,
      * <var>latitude</var>).
      */
@@ -789,8 +797,13 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
 
     /**
      * Releases resources immediately instead of waiting for the garbage collector.
+     * This method also releases the resources for all factories wrapped in this adapter.
      */
     public void dispose() throws FactoryException {
+        if (pool != null) {
+            pool.clear();
+            pool = null;
+        }
         if (   opFactory instanceof AbstractAuthorityFactory) ((AbstractAuthorityFactory)    opFactory).dispose();
         if (   csFactory instanceof AbstractAuthorityFactory) ((AbstractAuthorityFactory)    csFactory).dispose();
         if (  crsFactory instanceof AbstractAuthorityFactory) ((AbstractAuthorityFactory)   crsFactory).dispose();

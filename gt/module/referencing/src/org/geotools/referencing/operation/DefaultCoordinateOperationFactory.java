@@ -657,7 +657,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
     private static Matrix createLinearConversion(final ProjectedCRS sourceCRS,
                                                  final ProjectedCRS targetCRS)
     {
-        return DefaultProjectedCRS.createLinearConversion(sourceCRS, targetCRS, 1E-12);
+        return DefaultProjectedCRS.createLinearConversion(sourceCRS, targetCRS, 1E-10);
     }
 
 
