@@ -23,6 +23,8 @@ package org.geotools.data.jdbc.fidmapper;
 import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
@@ -36,8 +38,9 @@ import java.sql.Types;
  */
 public class AutoIncrementFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;
-    private String colName;
-    private int dataType;
+    protected String colName;
+    protected int dataType;
+    protected String tableName;
 
     /**
      * DOCUMENT ME!
@@ -46,6 +49,19 @@ public class AutoIncrementFIDMapper extends AbstractFIDMapper {
      * @param dataType
      */
     public AutoIncrementFIDMapper(String colName, int dataType) {
+    	this.tableName=tableName;
+        this.colName = colName;
+        this.dataType = dataType;
+    }
+    
+    /**
+     * DOCUMENT ME!
+     *
+     * @param colName
+     * @param dataType
+     */
+    public AutoIncrementFIDMapper(String tableName, String colName, int dataType) {
+    	this.tableName=tableName;
         this.colName = colName;
         this.dataType = dataType;
     }
@@ -108,7 +124,19 @@ public class AutoIncrementFIDMapper extends AbstractFIDMapper {
      */
     public String createID(Connection conn, Feature feature, Statement statement)
         throws IOException {
-        return null;
+    	if( tableName==null || colName==null )
+    		return null;
+    	try {
+    		String sql="select "+this.colName+" from "+tableName+" order by "+colName+" desc limit 1";
+    		statement.execute(sql);
+    		ResultSet resultSet = statement.getResultSet();
+    		if( resultSet.next() )
+    			return resultSet.getString(this.colName);
+    		else
+    			return null;
+		} catch (SQLException e) {
+			throw (IOException) new IOException().initCause(e);
+		}
     }
 
     /**

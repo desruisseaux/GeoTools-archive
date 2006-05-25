@@ -800,7 +800,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         throws IOException, IllegalAttributeException {
         FeatureWriter writer = writer("road");
         Feature feature;
-
+        
         while (writer.hasNext()) {
             feature = writer.next();
 

@@ -32,6 +32,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 
@@ -262,12 +263,16 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         try {
             conn = queryData.getConnection();
             statement = conn.createStatement();
-
+            Envelope bounds = this.live.getBounds();
             String sql = makeDeleteSql(current);
             if (LOGGER.isLoggable(Level.FINE)) 
             	LOGGER.fine(sql);
             //System.out.println(sql);
             statement.executeUpdate(sql);
+
+            listenerManager.fireFeaturesRemoved(getFeatureType()
+                                                    .getTypeName(),
+                queryData.getTransaction(), bounds, false);
         } catch (SQLException sqle) {
             String msg = "SQL Exception writing geometry column";
             LOGGER.log(Level.SEVERE, msg, sqle);

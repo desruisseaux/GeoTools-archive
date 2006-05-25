@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.Query;
@@ -389,7 +390,14 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
                 //do actual delete
                 LOGGER.fine("sql statment is " + sql);
+                DefaultQuery query=new DefaultQuery(getSchema().getTypeName(), filter);
+                Envelope bounds=bounds(query);
                 statement.executeUpdate(sql);
+                
+                if( bounds!=null && !bounds.isNull())
+	    			getJDBCDataStore().listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+	    					getTransaction(), bounds, false);
+
             }
 
             close(statement);
@@ -469,7 +477,13 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                 whereStmt = encoder.encode((AbstractFilter) encodableFilter);
                 sql = makeModifySql(type, value, whereStmt);
                 LOGGER.finer("encoded modify is " + sql);
+                DefaultQuery query=new DefaultQuery(getSchema().getTypeName(), filter);
+                Envelope bounds=bounds(query);
                 statement.executeUpdate(sql);
+                bounds.expandToInclude(bounds(query));
+                if( bounds!=null && !bounds.isNull())
+	    			getJDBCDataStore().listenerManager.fireFeaturesChanged(getSchema().getTypeName(),
+	    					getTransaction(), bounds, false);
             }
 
         } catch (SQLException sqle) {
@@ -493,7 +507,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         }
     }
 
-    private FidFilter getEncodableFilter(Filter unEncodableFilter)
+	private FidFilter getEncodableFilter(Filter unEncodableFilter)
         throws IOException, FactoryConfigurationError, IllegalAttributeException {
         // this is very similar to getFidSet - the reason is so that we
         // don't spend time constructing geometries when we don't need
@@ -793,11 +807,11 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
     // TODO: change this so that it queries for just the bbox instead of the entire sub-query schema columns!
     //        (this is harder than you might think because of filter requirements!)
     //
-    protected Envelope bounds(Query query) throws IOException {
+    protected ReferencedEnvelope bounds(Query query) throws IOException {
         Filter filter = query.getFilter();
 
         if (filter == Filter.ALL) {
-            return new Envelope();
+            return new ReferencedEnvelope(new Envelope(), query.getCoordinateSystem());
         }
 
         FeatureType schema = getSchema();

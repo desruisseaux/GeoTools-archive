@@ -38,6 +38,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 
@@ -88,6 +89,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
 
         while (reader.hasNext()){
             try {
+            	Envelope bounds=null;
                 Feature f = reader.next();
                 r.add(f.getID());
             	for(int i=0;i<atrs.length;i++){
@@ -95,9 +97,27 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             			Geometry g = (Geometry)f.getAttribute(i);
                 		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
                 		g.setUserData(cs.getIdentifiers().iterator().next().toString());
+                		if( bounds==null ){
+                			bounds=new Envelope(g.getEnvelopeInternal());
+                		}else{
+                			bounds.expandToInclude(g.getEnvelopeInternal());
+                		}
             		}
             	}
                 ts.addAction(new InsertAction(f));
+
+                // Fire a notification.
+                // JE
+                if( bounds==null){
+            		// if bounds are null then send an envelope to say that features were added but
+            		// at an unknown location.
+                    ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+                    		getTransaction(), new Envelope(), false);
+            	}else{
+                    ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+                    		getTransaction(), bounds, false);                	
+            	}
+
             } catch (NoSuchElementException e) {
                 WFSDataStoreFactory.logger.warning(e.toString());
                 throw new IOException(e.toString());
@@ -133,6 +153,12 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         }
 
         ts.addAction(new DeleteAction(getSchema().getTypeName(), filter));
+        // Fire a notification.  I don't know a way of quickly getting the bounds of
+        // an arbitrary filter so I'm sending a NULL envelope to say "some features were removed but I don't
+        // know what."  Can't be null because the convention states that null is sent on commits only.
+        // JE
+        ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+        		getTransaction(), new Envelope(), false);
 
         if (trans == Transaction.AUTO_COMMIT) {
             ts.commit();
@@ -166,6 +192,13 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
 
         ts.addAction(new UpdateAction(getSchema().getTypeName(), filter, props));
 
+        // Fire a notification.  I don't know a way of quickly getting the bounds of
+        // an arbitrary filter so I'm sending a NULL envelope to say "something changed but I don't
+        // know what.  Can't be null because the convention states that null is sent on commits only.
+        // JE
+        ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesChanged(getSchema().getTypeName(),
+        		getTransaction(), new Envelope(), false);
+        
         if (trans == Transaction.AUTO_COMMIT) {
             ts.commit();
         }

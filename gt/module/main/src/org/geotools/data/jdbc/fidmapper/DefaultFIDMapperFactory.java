@@ -178,7 +178,7 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     protected FIDMapper buildSingleColumnFidMapper(String schema,
         String tableName, Connection connection, ColumnInfo ci) {
         if (ci.autoIncrement) {
-            return new AutoIncrementFIDMapper(ci.colName, ci.dataType);
+            return new AutoIncrementFIDMapper(tableName, ci.colName, ci.dataType);
         } else if (isIntegralType(ci.dataType)) {
             return new MaxIncFIDMapper(tableName, ci.colName, ci.dataType,
                 this.returnFIDColumnsAsAttributes);

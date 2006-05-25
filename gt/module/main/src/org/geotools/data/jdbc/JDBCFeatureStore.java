@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
@@ -36,10 +37,14 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * This is a starting point for providing your own FeatureStore implementation.
@@ -245,7 +250,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
     protected void modifyFeatures( AttributeType[] type, Object[] value, FeatureWriter writer ) throws DataSourceException, IOException{
         Feature feature;        
         try {
-            while (writer.hasNext()) {
+        	while (writer.hasNext()) {
                 feature = writer.next();
 
                 for (int i = 0; i < type.length; i++) {
@@ -315,7 +320,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
                 getTransaction());
 
         try {
-            while (reader.hasNext()) {
+        	while (reader.hasNext()) {
                 try {
                     feature = reader.next();
                 } catch (Exception e) {
@@ -340,10 +345,47 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
             reader.close();
             writer.close();
         }
-
         return addedFids;
     }
 
+    public Set addFeatures(FeatureCollection collection) throws IOException {
+        Set addedFids = new HashSet();
+        String typeName = getSchema().getTypeName();
+        Feature feature = null;
+        SimpleFeature newFeature;
+        FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
+                getTransaction());
+
+        Iterator iterator = collection.iterator();
+        try {
+            while (iterator.hasNext()) {
+                try {
+                    feature = (Feature) iterator.next();
+                } catch (Exception e) {
+                    throw new DataSourceException("Could not add Features, problem with provided reader",
+                        e);
+                }
+
+                newFeature = (SimpleFeature)writer.next();
+
+                try {
+                    newFeature.setAttributes(feature.getAttributes(null));
+                } catch (IllegalAttributeException writeProblem) {
+                    throw new DataSourceException("Could not create "
+                        + typeName + " out of provided feature: "
+                        + feature.getID(), writeProblem);
+                }
+
+                writer.write();
+                addedFids.add(newFeature.getID());
+            }
+        } finally {
+            collection.close( iterator );
+            writer.close();
+        }
+
+        return addedFids;
+    }
     /**
      * Removes features indicated by provided filter.
      * 
@@ -379,7 +421,8 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
                 filter, getTransaction());
         Feature feature;
 
-        try {
+        try {        	
+        	
             while (writer.hasNext()) {
                 feature = writer.next();
                 writer.remove();
