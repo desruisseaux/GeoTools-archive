@@ -424,18 +424,6 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     /**
      * Constructs an authority factory using the specified connection.
      *
-     * @param factories  The underlying factories used for objects creation.
-     * @param connection The connection to the underlying EPSG database.
-     *
-     * @deprecated Use {@link #FactoryUsingSQL(Hints,Connection)} instead.
-     */
-    public FactoryUsingSQL(final FactoryGroup factories, final Connection connection) {
-        this(new Hints(FactoryGroup.HINT_KEY, factories), connection);
-    }
-
-    /**
-     * Constructs an authority factory using the specified connection.
-     *
      * @param hints The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      *

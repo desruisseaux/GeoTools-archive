@@ -116,7 +116,7 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
      * following directories:
      * <ul>
      *   <li>The current directory</li>
-     *   <li>The user's home direstory</li>
+     *   <li>The user's home directory</li>
      * </ul>
      */
     public static final String CONFIGURATION_FILE = "EPSG-DataSource.properties";

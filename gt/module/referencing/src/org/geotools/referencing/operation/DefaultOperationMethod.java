@@ -179,29 +179,6 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     }
 
     /**
-     * Constructs an operation method from a set of properties and an array of parameter
-     * descriptors. The properties given in argument follow the same rules than for the
-     * {@linkplain #DefaultOperationMethod(Map, int, int, ParameterDescriptorGroup) constructor
-     * expecting a parameter group}. This convenience constructor build automatically a
-     * parameter group using the same properties than the one specified for this operation
-     * method.
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
-     * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-     * @param parameters The set of parameters, or {@code null} or an empty array if none.
-     *
-     * @deprecated Use the method expecting a parameter group instead.
-     */
-    public DefaultOperationMethod(final Map properties,
-                                  final int sourceDimensions,
-                                  final int targetDimensions,
-                                  final GeneralParameterDescriptor[] parameters)
-    {
-        this(properties, sourceDimensions, targetDimensions, toGroup(properties, parameters));
-    }
-
-    /**
      * Utility method used to kludge {@code GeneralParameterDescriptor[]}
      * into a {@code ParameterDescriptorGroup}.
      * This is a work around for RFE #4093999 in Sun's bug database

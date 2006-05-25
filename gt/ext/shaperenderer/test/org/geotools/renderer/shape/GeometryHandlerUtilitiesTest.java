@@ -18,7 +18,7 @@ package org.geotools.renderer.shape;
 import junit.framework.TestCase;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;

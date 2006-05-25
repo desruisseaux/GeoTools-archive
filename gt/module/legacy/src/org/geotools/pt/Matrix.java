@@ -40,7 +40,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * @deprecated Replaced by {@link org.geotools.referencing.operation.GeneralMatrix}
  *             in the <code>org.geotools.referencing.operation</code> package.
  */
-public class Matrix extends org.geotools.referencing.operation.GeneralMatrix {
+public class Matrix extends org.geotools.referencing.operation.matrix.GeneralMatrix {
     /**
      * Serial number for interoperability with different versions.
      */

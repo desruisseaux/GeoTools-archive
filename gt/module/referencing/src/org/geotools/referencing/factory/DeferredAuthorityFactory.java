@@ -78,48 +78,6 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      * Constructs an instance without initial backing store. Subclasses are responsible for
      * creating an appropriate backing store when the {@link #createBackingStore} method is
      * invoked.
-     *
-     * @param factories The factories to use.
-     * @param priority The priority for this factory, as a number between
-     *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
-     *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
-     *
-     * @see #createBackingStore
-     *
-     * @deprecated Use {@link #DeferredAuthorityFactory(Hints,int)} instead.
-     */
-    protected DeferredAuthorityFactory(final FactoryGroup factories,
-                                       final int          priority)
-    {
-        super(new Hints(FactoryGroup.HINT_KEY, factories), priority, DEFAULT_MAX);
-    }
-
-    /**
-     * Constructs an instance without initial backing store. Subclasses are responsible for
-     * creating an appropriate backing store when the {@link #createBackingStore} method is
-     * invoked.
-     *
-     * @param factories The factories to use.
-     * @param priority The priority for this factory, as a number between
-     *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
-     *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
-     * @param maxStrongReferences The maximum number of objects to keep by strong reference.
-     *
-     * @see #createBackingStore
-     *
-     * @deprecated Use {@link #DeferredAuthorityFactory(Hints,int,int)} instead.
-     */
-    protected DeferredAuthorityFactory(final FactoryGroup factories,
-                                       final int          priority,
-                                       final int maxStrongReferences)
-    {
-        super(new Hints(FactoryGroup.HINT_KEY, factories), priority, maxStrongReferences);
-    }
-
-    /**
-     * Constructs an instance without initial backing store. Subclasses are responsible for
-     * creating an appropriate backing store when the {@link #createBackingStore} method is
-     * invoked.
      * <p>
      * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}

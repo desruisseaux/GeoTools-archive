@@ -100,6 +100,7 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -1315,10 +1316,10 @@ public class StreamingRenderer implements GTRenderer {
                                     .createConcatenatedTransform(
                                     transform,
                                     mathTransformFactory.createAffineTransform(
-                                    new org.geotools.referencing.operation.GeneralMatrix(at)));
+                                    new GeneralMatrix(at)));
                         } else {
                             transform = (MathTransform2D) mathTransformFactory
-                                    .createAffineTransform(new org.geotools.referencing.operation.GeneralMatrix(at));
+                                    .createAffineTransform(new GeneralMatrix(at));
                         }
                     } catch (Exception e) {
                         // fall through

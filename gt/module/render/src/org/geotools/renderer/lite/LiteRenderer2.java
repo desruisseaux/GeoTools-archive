@@ -53,7 +53,7 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.Renderer;
 import org.geotools.renderer.Renderer2D;

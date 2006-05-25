@@ -65,90 +65,6 @@ public class CitationImpl extends MetadataEntity implements Citation {
     private static final long serialVersionUID = -4415559967618358778L;
 
     /**
-     * The <A HREF="http://www.opengeospatial.org">Open Geospatial consortium</A> organisation.
-     * "Open Geospatial consortium" is the new name for "OpenGIS consortium".
-     * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "OGC"
-     * (according ISO 19115, alternate titles often contain abreviations).
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static final Citation OGC = Citations.OGC;
-
-    /**
-     * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> organisation.
-     * "OpenGIS consortium" is the old name for "Open Geospatial consortium".
-     * {@linkplain Citation#getAlternateTitles Alternate titles} for this citation are
-     * "OpenGIS" and "OGC" (according ISO 19115, alternate titles often contain abreviations).
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static final Citation OPEN_GIS = Citations.OPEN_GIS;
-
-    /**
-     * The <A HREF="http://www.esri.com">ESRI</A> organisation.
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static final Citation ESRI = Citations.ESRI;
-    
-    /**
-     * The <A HREF="http://www.oracle.com">Oracle</A> organisation.
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static final Citation ORACLE = Citations.ORACLE;
-
-    /**
-     * The <A HREF="http://www.geotools.org">Geotools</A> project.
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static final Citation GEOTOOLS = Citations.GEOTOOLS;
-
-    /**
-     * The <A HREF="http://www.remotesensing.org/geotiff/geotiff.html">GeoTIFF</A> specification.
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static final Citation GEOTIFF = Citations.GEOTIFF;
-
-    /**
-     * The <A HREF="http://java.sun.com/products/java-media/jai">Java Advanced Imaging</A> library.
-     * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "JAI"
-     * (according ISO 19115, alternate titles often contain abreviations).
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static final Citation JAI = Citations.JAI;
-
-    /**
-     * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> authority.
-     * An {@linkplain Citation#getAlternateTitles alternate title} for this citation is "EPSG"
-     * (according ISO 19115, alternate titles often contain abreviations).
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */    
-    public static final Citation EPSG = Citations.EPSG;
-
-    /**
-     * The <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1</A> "Automatic Projections"
-     * Authority. An {@linkplain Citation#getAlternateTitles alternate title} for this citation is
-     * "AUTO" (according ISO 19115, alternate titles often contain abreviations).
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static final Citation AUTO = Citations.AUTO;
-
-    /**
-     * The <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0</A> "Automatic
-     * Projections" authority. An {@linkplain Citation#getAlternateTitles alternate title} for this
-     * citation is "AUTO2" (according ISO 19115, alternate titles often contain abreviations).
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static final Citation AUTO2 = Citations.AUTO2;
-
-    /**
      * Name by which the cited resource is known.
      */
     private InternationalString title;
@@ -305,46 +221,6 @@ public class CitationImpl extends MetadataEntity implements Citation {
         getAlternateTitles().add(new SimpleInternationalString(identifier));
         getIdentifierTypes().add("Authority name");
         getIdentifiers().add(identifier);
-    }
-
-    /**
-     * Returns a citation of the given name.
-     *
-     * @deprecated Moved as {@link Citations#fromName}.
-     */
-    public static Citation createCitation(final String name) {
-        return Citations.fromName(name);
-    }
-
-    /**
-     * Returns {@code true} if at least one {@linkplain #getTitle title} or
-     * {@linkplain #getAlternateTitles alternate title} is found equals in both citations.
-     * The comparaison is case-insensitive and ignores leading and trailing spaces. The
-     * titles ordering is ignored.
-     *
-     * @param  c1 The first citation to compare.
-     * @param  c2 the second citation to compare.
-     * @return {@code true} if at least one title or alternate title matches.
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static boolean titleMatches(final Citation c1, final Citation c2) {
-        return Citations.titleMatches(c1, c2);
-    }
-
-    /**
-     * Returns {@code true} if the {@linkplain #getTitle title} or any
-     * {@linkplain #getAlternateTitles alternate title} in the given citation matches the given
-     * string. The comparaison is case-insensitive and ignores leading and trailing spaces.
-     *
-     * @param  citation The citation to check for.
-     * @param  title The title or alternate title to compare.
-     * @return {@code true} if the title or alternate title matches the given string.
-     *
-     * @deprecated Moved into the {@link Citations} class.
-     */
-    public static boolean titleMatches(final Citation citation, String title) {
-        return Citations.titleMatches(citation, title);
     }
 
     /**

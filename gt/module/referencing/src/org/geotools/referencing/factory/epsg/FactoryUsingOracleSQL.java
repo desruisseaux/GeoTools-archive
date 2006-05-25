@@ -52,20 +52,6 @@ public class FactoryUsingOracleSQL extends FactoryUsingAnsiSQL {
     /**
      * Constructs an authority factory using the specified connection.
      *
-     * @param factories  The underlying factories used for objects creation.
-     * @param connection The connection to the underlying EPSG database.
-     *
-     * @deprecated Use {@link #FactoryUsingOracleSQL(Hints,Connection)} instead.
-     */
-    public FactoryUsingOracleSQL(final FactoryGroup factories,
-                                 final Connection  connection)
-    {
-        this(new Hints(FactoryGroup.HINT_KEY, factories), connection);
-    }
-
-    /**
-     * Constructs an authority factory using the specified connection.
-     *
      * @param hints      The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      *
@@ -75,27 +61,6 @@ public class FactoryUsingOracleSQL extends FactoryUsingAnsiSQL {
                                  final Connection connection)
     {
         super(hints, connection);
-    }
-
-    /**
-     * Constructs an authority factory using the specified connection to an EPSG database
-     * and a database schema. If the database schema is not supplied, or it is null
-     * or an empty string, then the tables are assumed to be in the same schema as
-     * the user which is being used to connect to the database.  You <strong>MUST</strong>
-     * ensure that the connecting user has permissions to select from all the tables in the
-     * epsg user schema.
-     *
-     * @param factories  The underlying factories used for objects creation.
-     * @param connection The connection to the underlying EPSG database.
-     * @param epsgSchema The database schema in which the epsg tables are stored (optional).
-     *
-     * @deprecated Use {@link #FactoryUsingOracleSQL(Hints,Connection,String)} instead.
-     */
-    public FactoryUsingOracleSQL(final FactoryGroup factories,
-                                 final Connection  connection,
-                                 final String      epsgSchema)
-    {
-        this(new Hints(FactoryGroup.HINT_KEY, factories), connection, epsgSchema);
     }
 
     /**

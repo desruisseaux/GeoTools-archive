@@ -26,6 +26,7 @@ import java.util.Set;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.Factory;                              // For javadoc
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;         // For javadoc
 import org.opengis.referencing.crs.CRSAuthorityFactory;
@@ -53,8 +54,8 @@ import org.geotools.util.GenericName;
 
 
 /**
- * Simple utility class for making use of the {@link CoordinateReferenceSystem}
- * and associated {@link org.opengis.referencing.Factory} implementations.
+ * Simple utility class for making use of the {@linkplain CoordinateReferenceSystem
+ * coordinate reference system} and associated {@linkplain Factory factory} implementations.
  * <p>
  * This utility class is made up of static final functions. This class is
  * not a Factory or a Builder. It makes use of the GeoAPI Factory interfaces
@@ -78,35 +79,6 @@ public final class CRS {
      * A set of hints used in order to fetch lenient coordinate operation factory.
      */
     private static final Hints LENIENT = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-
-    /**
-     * Implement this method to visit each available {@link CoordinateOperationFactory}
-     * known to {@link FactoryFinder}.
-     *
-     * @since 2.1
-     * @version $Id$
-     * @author Jody Garnett (Refractions Research)
-     *
-     * @deprecated No public API uses this interface at this time. If a particular
-     *             {@link CoordinateOperationFactory} implementation is wanted, try
-     *             to provide a {@link Hints#COORDINATE_OPERATION_FACTORY} hint to the
-     *             {@link FactoryFinder#getCoordinateOperationFactory} method instead.
-     *             In a future version, this interface will be removed or expanded if
-     *             the hints way is not suffisient.
-     */
-    public interface OperationVisitor {
-        /**
-         * Implement this method to visit each available CoordinateOperationFactory
-         * known to FactoryFinder.
-         * <p>
-         * You may register additional Factories using META-INF/serivces
-         * please see  
-         * </p>
-         * @param factory
-         * @return Value created using the Factory, visit returns a list of these
-         */
-        public Object factory( CoordinateOperationFactory factory ) throws FactoryException;
-    }
 
     /**
      * Do not allow instantiation of this class.
