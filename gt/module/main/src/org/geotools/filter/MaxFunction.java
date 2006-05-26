@@ -32,6 +32,7 @@ import org.geotools.filter.expression.FunctionExpression;
  * @author James
  * @source $URL$
  * @version $Id$
+ * @deprecated - use org.geotools.filter.function.math.MinFunction instead
  */
 public class MaxFunction extends FunctionExpressionImpl
     implements FunctionExpression {

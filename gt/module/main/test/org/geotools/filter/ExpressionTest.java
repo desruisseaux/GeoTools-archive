@@ -249,7 +249,7 @@ public class ExpressionTest extends TestCase {
         
         assertEquals(FunctionExpressionImpl.FUNCTION,min.getType());
         
-        assertEquals("Min", min.getName());
+        assertEquals("min", min.getName());
         assertEquals(2, min.getArgCount());
         assertEquals(min.getArgs()[0],a);
         assertEquals(min.getArgs()[1],b);
@@ -280,7 +280,7 @@ public class ExpressionTest extends TestCase {
         Expression b = new LiteralExpressionImpl(new Double(1004));
 
         FunctionExpression max = filterFactory.createFunctionExpression(
-                "MaxFunction");
+                "max");
         max.setArgs(new Expression[] { a, b });
         assertEquals(1004d, ((Double) max.getValue(testFeature)).doubleValue(),
             0);
@@ -289,7 +289,7 @@ public class ExpressionTest extends TestCase {
         max.setArgs(new Expression[]{a,b});
         assertEquals(1002d,((Double)max.getValue(testFeature)).doubleValue(),0);
         
-        assertEquals("Max", max.getName());
+        assertEquals("max", max.getName());
         assertEquals(2, max.getArgCount());
         assertEquals(max.getArgs()[0],a);
         assertEquals(max.getArgs()[1],b);
