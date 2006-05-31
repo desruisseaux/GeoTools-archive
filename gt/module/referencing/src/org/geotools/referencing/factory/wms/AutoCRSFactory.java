@@ -33,6 +33,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.ProjectedCRS;
 
 // Geotools dependencies
@@ -40,7 +41,7 @@ import org.geotools.factory.Hints;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.factory.DirectAuthorityFactory;
 
 
 /**
@@ -54,7 +55,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @author Rueben Schulz
  * @author Martin Desruisseaux
  */
-public class AutoCRSFactory extends AbstractAuthorityFactory {
+public class AutoCRSFactory extends DirectAuthorityFactory implements CRSAuthorityFactory {
     /**
      * The authority code. We use {@code AUTO2} citation, but merge {@code AUTO} and
      * {@code AUTO2} identifiers in order to use the same factory for both authorities.

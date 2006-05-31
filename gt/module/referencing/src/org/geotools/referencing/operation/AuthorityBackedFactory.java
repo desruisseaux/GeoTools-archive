@@ -23,6 +23,7 @@ package org.geotools.referencing.operation;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -34,14 +35,7 @@ import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.Operation;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.ConcatenatedOperation;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.*;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -49,7 +43,6 @@ import org.geotools.factory.OptionalFactory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.BackingStoreException;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
@@ -93,6 +86,11 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
     private CoordinateOperationAuthorityFactory authorityFactory;
 
     /**
+     * Used as a guard against infinite recursivity.
+     */
+    private final ThreadLocal/*<Boolean>*/ processing = new ThreadLocal();
+
+    /**
      * Creates a new factory backed by a default EPSG authority factory.
      * This factory will uses a priority slightly higher than the
      * {@linkplain DefaultCoordinateOperationFactory default (standalone) factory}.
@@ -105,16 +103,25 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
      * Creates a new factory backed by an authority factory fetched using the specified hints.
      * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
-     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
-     * a low-level substitute for all the above.
+     * {@code FACTORY} hints.
      *
      * @param hints The hints, or {@code null} if none.
      */
-    public AuthorityBackedFactory(final Hints hints) {
+    public AuthorityBackedFactory(Hints hints) {
         super(hints, NORMAL_PRIORITY + 10);
-        if (hints!=null && !hints.isEmpty()) {
-            authorityFactory = FactoryFinder
-                    .getCoordinateOperationAuthorityFactory(DEFAULT_AUTHORITY, hints);
+        /*
+         * Removes the hint processed by the super-class. This include hints like
+         * LENIENT_DATUM_SHIFT, which usually don't apply to authority factories.
+         * An other way to see this is to said that this class "consumed" the hints.
+         * By removing them, we increase the chances to get an empty map of remaining hints,
+         * which in turn help to get the default CoordinateOperationAuthorityFactory
+         * (instead of forcing a new instance).
+         */
+        hints = new Hints(hints);
+        hints.keySet().removeAll(this.hints.keySet());
+        if (!hints.isEmpty()) {
+            authorityFactory = FactoryFinder.getCoordinateOperationAuthorityFactory(
+                                             DEFAULT_AUTHORITY, hints);
         }
     }
 
@@ -164,6 +171,17 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
     protected CoordinateOperation createFromDatabase(final CoordinateReferenceSystem sourceCRS,
                                                      final CoordinateReferenceSystem targetCRS)
     {
+        /*
+         * Safety check against recursivity: returns null if the given source and target CRS
+         * are already under examination by a previous call to this method. Note: there is no
+         * need to synchronize since the Set is thread-local.
+         */
+        if (Boolean.TRUE.equals(processing.get())) {
+            return null;
+        }
+        /*
+         * Now performs the real work.
+         */
         final CoordinateOperationAuthorityFactory authorityFactory = getAuthorityFactory();
         final Citation  authority = authorityFactory.getAuthority();
         final Identifier sourceID = AbstractIdentifiedObject.getIdentifier(sourceCRS, authority);
@@ -251,21 +269,29 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                  * operation just created are really the same (ignoring metadata) than the one
                  * specified by the user.
                  */
-                final CoordinateReferenceSystem source = candidate.getSourceCRS();
-                final CoordinateReferenceSystem target = candidate.getTargetCRS();
+                CoordinateReferenceSystem source = candidate.getSourceCRS();
+                CoordinateReferenceSystem target = candidate.getTargetCRS();
                 try {
                     final MathTransform prepend, append;
-                    if (!equalsIgnoreMetadata(sourceCRS, source)) {
+                    if (!equalsIgnoreMetadata(sourceCRS, source)) try {
+                        processing.set(Boolean.TRUE);
                         prepend = createOperation(sourceCRS, source).getMathTransform();
+                        source  = sourceCRS;
+                    } finally {
+                        processing.set(Boolean.FALSE);
                     } else {
                         prepend = null;
                     }
-                    if (!equalsIgnoreMetadata(target, targetCRS)) {
+                    if (!equalsIgnoreMetadata(target, targetCRS)) try {
+                        processing.set(Boolean.TRUE);
                         append = createOperation(target, targetCRS).getMathTransform();
+                        target = targetCRS;
+                    } finally {
+                        processing.set(Boolean.FALSE);
                     } else {
                         append = null;
                     }
-                    candidate = transform(sourceCRS, prepend, candidate, append, targetCRS);
+                    candidate = transform(source, prepend, candidate, append, target);
                 } catch (FactoryException exception) {
                     /*
                      * We have been unable to create a transform from the user-provided CRS to the
@@ -354,7 +380,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         final Class type = AbstractCoordinateOperation.getType(operation);
         final OperationMethod method = (operation instanceof Operation) ?
                                        ((Operation) operation).getMethod() : null;
-        return createFromMathTransform(properties, targetCRS, sourceCRS, transform, method, type);
+        return createFromMathTransform(properties, sourceCRS, targetCRS, transform, method, type);
     }
 
     /**
@@ -385,13 +411,13 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
 
     /**
      * Returns {@code true} if this factory and its underlying
-     * {@linkplain #getAuthorityFactory authority factory} are ready for use.
+     * {@linkplain #getAuthorityFactory authority factory} are available for use.
      */
-    public boolean isReady() {
+    public boolean isAvailable() {
         try {
             final CoordinateOperationAuthorityFactory authorityFactory = getAuthorityFactory();
             if (authorityFactory instanceof OptionalFactory) {
-                return ((OptionalFactory) authorityFactory).isReady();
+                return ((OptionalFactory) authorityFactory).isAvailable();
             }
             return true;
         } catch (FactoryRegistryException exception) {

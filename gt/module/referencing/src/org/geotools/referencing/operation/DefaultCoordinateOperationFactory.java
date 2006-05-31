@@ -35,40 +35,10 @@ import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.crs.CompoundCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.crs.GeneralDerivedCRS;
-import org.opengis.referencing.crs.GeocentricCRS;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.crs.SingleCRS;
-import org.opengis.referencing.crs.TemporalCRS;
-import org.opengis.referencing.crs.VerticalCRS;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.CartesianCS;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.cs.EllipsoidalCS;
-import org.opengis.referencing.cs.TimeCS;
-import org.opengis.referencing.cs.VerticalCS;
-import org.opengis.referencing.datum.Ellipsoid;
-import org.opengis.referencing.datum.Datum;
-import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.datum.PrimeMeridian;
-import org.opengis.referencing.datum.TemporalDatum;
-import org.opengis.referencing.datum.VerticalDatum;
-import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.referencing.operation.OperationNotFoundException;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.Transformation;
-import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.Operation;
-import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.cs.*;
+import org.opengis.referencing.crs.*;
+import org.opengis.referencing.datum.*;
+import org.opengis.referencing.operation.*;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -82,7 +52,6 @@ import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.Matrix4;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
@@ -102,6 +71,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Services+for+Geotools+2.1
  */
 public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperationFactory {
     /**
@@ -137,8 +108,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * Constructs a coordinate operation factory using the specified hints.
      * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
-     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
-     * a low-level substitute for all the above.
+     * {@code FACTORY} hints.
      *
      * @param hints The hints, or {@code null} if none.
      */
@@ -150,8 +120,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * Constructs a coordinate operation factory using the specified hints and priority.
      * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
-     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
-     * a low-level substitute for all the above.
+     * {@code FACTORY} hints.
      *
      * @param hints The hints, or {@code null} if none.
      * @param priority The priority for this factory, as a number between
@@ -1543,7 +1512,7 @@ search: for (int j=0; j<targets.length; j++) {
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Compare the specified datum for equality, except the prime meridian.
+     * Compares the specified datum for equality, except the prime meridian.
      *
      * @param  object1 The first object to compare (may be null).
      * @param  object2 The second object to compare (may be null).

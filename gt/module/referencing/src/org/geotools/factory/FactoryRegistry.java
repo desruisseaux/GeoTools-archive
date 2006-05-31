@@ -19,14 +19,7 @@
 package org.geotools.factory;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.Set;
-import java.util.List;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -43,32 +36,29 @@ import org.geotools.resources.i18n.LoggingKeys;
 
 /**
  * A registry for factories, organized by categories (usualy by <strong>interface</strong>).
- * <p>
  * For example <code>{@link org.opengis.referencing.crs.CRSFactory}.class</code> is a category,
  * and <code>{@link org.opengis.referencing.operation.MathTransformFactory}.class</code>
  * is an other category.
- * </p>
  * <p>
  * For each category, implementations are registered in a file placed in the
  * {@code META-INF/services/} directory, as specified in the {@link ServiceRegistry}
  * javadoc. Those files are usually bundled into the JAR file distributed by the vendor.
  * If the same {@code META-INF/services/} file appears many time in different JARs,
  * they are processed as if their content were merged.
- * </p>
  * <p>
- * Example use: <pre><code>
+ * Example use:
+ * <blockquote><pre>
  * Set categories = Collections.singleton(new Class[] {MathTransformProvider.class});
  * FactoryRegistry registry = new FactoryRegistry(categories);
  * 
  * // get the providers
  * Iterator providers = registry.getProviders(MathTransformProvider.class)
- * </code></pre>
- * </p>
+ * </pre></blockquote>
  * <p>
  * <strong>NOTE: This class is not thread safe</strong>. Users are responsable
  * for synchronisation. This is usually done in an utility class wrapping this
  * service registry (e.g. {@link org.geotools.referencing.FactoryFinder}).
- * </p>
+ *
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
@@ -76,14 +66,15 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @author Jody Garnett
  *
  * @see org.geotools.referencing.FactoryFinder
+ * @see org.geotools.coverage.FactoryFinder
  */
 public class FactoryRegistry extends ServiceRegistry {
     /**
-     * Filters only the factories that are {@linkplain OptionalFactory#isReady ready}.
+     * Filters only the factories that are {@linkplain OptionalFactory#isAvailable available}.
      */
-    private static final Filter FILTER = new Filter() {
+    static final Filter FILTER = new Filter() {
         public boolean filter(final Object provider) {
-            return !(provider instanceof OptionalFactory) || ((OptionalFactory) provider).isReady();
+            return !(provider instanceof OptionalFactory) || ((OptionalFactory) provider).isAvailable();
         }
     };
 
@@ -104,9 +95,9 @@ public class FactoryRegistry extends ServiceRegistry {
 
     /**
      * Returns the providers in the registry for the specified category. Providers that are
-     * not {@linkplain OptionalFactory#isReady ready} will be ignored. This method will
-     * {@linkplain #scanForPlugins scan for plugins} the first time it is invoked for the
-     * given category.
+     * not {@linkplain OptionalFactory#isAvailable available} will be ignored. This method
+     * will {@linkplain #scanForPlugins scan for plugins} the first time it is invoked for
+     * the given category.
      *
      * @param category The category to look for. Usually an interface class
      *                 (not the actual implementation class).
@@ -144,9 +135,9 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param  hints    A {@linkplain Hints map of hints}, or {@code null} if none.
      * @param  key      The key to use for looking for a user-provided instance in the hints, or
      *                  {@code null} if none.
-     * @return A factory {@linkplain OptionalFactory#isReady ready} to use for the specified
-     *         category and hints. The returns type is {@code Object} instead of {@link Factory}
-     *         because the factory implementation doesn't need to be a Geotools one.
+     * @return A factory {@linkplain OptionalFactory#isAvailable available} for use for the
+     *         specified category and hints. The returns type is {@code Object} instead of
+     *         {@link Factory} because the factory implementation doesn't need to be a Geotools one.
      * @throws FactoryNotFoundException if no factory was found for the specified category, filter
      *         and hints.
      * @throws FactoryRegistryException if a factory can't be returned for some other reason.
@@ -222,21 +213,11 @@ public class FactoryRegistry extends ServiceRegistry {
     {
         for (final Iterator it=getServiceProviders(category); it.hasNext();) {
             final Object candidate = it.next();
-            if (filter!=null && !filter.filter(candidate)) {
-                continue;
-            }
             if (implementation!=null && !implementation.isInstance(candidate)) {
                 continue;
             }
-            if (hints != null) {
-                if (candidate instanceof Factory) {
-                    if (!isAcceptable((Factory) candidate, category, hints, null)) {
-                        continue;
-                    }
-                }
-                if (!isAcceptable(candidate, category, hints)) {
-                    continue;
-                }
+            if (!isAcceptable(candidate, category, hints, filter)) {
+                continue;
             }
             return candidate;
         }
@@ -245,23 +226,54 @@ public class FactoryRegistry extends ServiceRegistry {
 
     /**
      * Returns {@code true} is the specified {@code factory} meets the requirements specified by a
+     * map of {@code hints} and the filter.
+     *
+     * @param candidate The factory to checks.
+     * @param category  The factory's category. Usually an interface.
+     * @param hints     The optional user requirements, or {@code null}.
+     * @param filter    The optional filter, or {@code null}.
+     * @return {@code true} if the {@code factory} meets the user requirements.
+     */
+    final boolean isAcceptable(final Object candidate,
+                               final Class  category,
+                               final Hints  hints,
+                               final Filter filter)
+    {
+        if (filter!=null && !filter.filter(candidate)) {
+            return false;
+        }
+        if (hints != null) {
+            if (candidate instanceof Factory) {
+                if (!isAcceptable((Factory) candidate, category, hints, (Set) null)) {
+                    return false;
+                }
+            }
+        }
+        return isAcceptable(candidate, category, hints);
+    }
+
+    /**
+     * Returns {@code true} is the specified {@code factory} meets the requirements specified by a
      * map of {@code hints}.
      *
      * @param factory     The factory to checks.
-     * @param category    The factory's category. Usually be an interface class.
-     * @param hints       The user requirements.
+     * @param category    The factory's category. Usually an interface.
+     * @param hints       The user requirements ({@code null} not allowed).
      * @param alreadyDone Should be {@code null} except on recursive calls (for internal use only).
      * @return {@code true} if the {@code factory} meets the user requirements.
      */
     private boolean isAcceptable(final Factory factory,
                                  final Class   category,
                                  final Hints   hints,
-                                       Set     alreadyDone)
+                                 Set/*<Factory>*/ alreadyDone)
     {
-        for (final Iterator it=factory.getImplementationHints().entrySet().iterator(); it.hasNext();) {
+        Hints remaining = null;
+        final Map implementationHints = factory.getImplementationHints();
+        for (final Iterator it=implementationHints.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
+            final Object    key   = entry.getKey();
             final Object    value = entry.getValue();
-            final Object expected = hints.get(entry.getKey());
+            final Object expected = hints.get(key);
             if (expected != null) {
                 /*
                  * We have found a hint that matter. Check if the
@@ -285,16 +297,35 @@ public class FactoryRegistry extends ServiceRegistry {
                 return false;
             }
             /*
-             * Check recursively in factory depencies, if any. The 'alreadyDone' set is a safety
-             * against cyclic dependencies, in order to protect ourself against never-ending loops.
+             * Check recursively in factory dependencies, if any. Not that the dependencies will be
+             * checked against a subset of user's hints.  More specifically, all hints processed by
+             * the current pass will NOT be passed to the factories dependencies.   This is because
+             * the same hint may appears in the "parent" factory and a "child" dependency with
+             * different value. For example the FORCE_LONGITUDE_FIRST_AXIS_ORDER hint has the value
+             * TRUE in OrderedAxisAuthorityFactory, but the later is basically a wrapper around the
+             * EPSG DefaultFactory (typically), which has the value FALSE for the same hint.
+             *
+             * Additional note: The 'alreadyDone' set is a safety against cyclic dependencies,
+             * in order to protect ourself against never-ending loops.
              */
             if (value instanceof Factory) {
+                final Factory dependency = (Factory) value;
                 if (alreadyDone == null) {
                     alreadyDone = new HashSet();
                 }
-                if (!alreadyDone.contains(value)) {
+                if (!alreadyDone.contains(dependency)) {
                     alreadyDone.add(factory);
-                    if (!isAcceptable((Factory) value, category, hints, alreadyDone)) {
+                    if (remaining == null) {
+                        remaining = new Hints(hints);
+                        remaining.keySet().removeAll(implementationHints.keySet());
+                    }
+                    final Class type;
+                    if (key instanceof Hints.Key) {
+                        type = ((Hints.Key) key).getValueClass();
+                    } else {
+                        type = Factory.class; // Kind of unknown factory type...
+                    }
+                    if (!isAcceptable(dependency, type, remaining, alreadyDone)) {
                         return false;
                     }
                 }
@@ -315,8 +346,8 @@ public class FactoryRegistry extends ServiceRegistry {
      * {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory}.
      *
      * @param provider The provider to checks.
-     * @param category The factory's category. Usually an interface class.
-     * @param hints    The user requirements.
+     * @param category The factory's category. Usually an interface.
+     * @param hints    The user requirements, or {@code null} if none.
      * @return {@code true} if the {@code provider} meets the user requirements.
      */
     protected boolean isAcceptable(final Object provider, final Class category, final Hints hints) {
@@ -326,7 +357,7 @@ public class FactoryRegistry extends ServiceRegistry {
     /**
      * Returns all class loaders to be used for scanning plugins. Current implementation
      * returns the following class loaders:
-     *
+     * <p>
      * <ul>
      *   <li>{@linkplain Class#getClassLoader This object class loader}</li>
      *   <li>{@linkplain Thread#getContextClassLoader The thread context class loader}</li>
@@ -452,6 +483,7 @@ public class FactoryRegistry extends ServiceRegistry {
             final Object replacement = getServiceProviderByClass(factoryClass);
             if (replacement != null) {
                 factory = replacement;
+                // Need to register anyway, because the category is not the same.
             }
             if (registerServiceProvider(factory, category)) {
                 /*
@@ -602,8 +634,8 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param base     The base category. Only categories {@linkplain Class#isAssignableFrom
      *                 assignable} to {@code base} will be processed.
      * @param set      {@code true} for setting the ordering, or {@code false} for unsetting.
-     * @param service1 filter for the preferred service.
-     * @param service2 filter for the service to which {@code service1} is preferred.
+     * @param service1 Filter for the preferred service.
+     * @param service2 Filter for the service to which {@code service1} is preferred.
      */
     public boolean setOrdering(final Class  base,
                                final boolean set,

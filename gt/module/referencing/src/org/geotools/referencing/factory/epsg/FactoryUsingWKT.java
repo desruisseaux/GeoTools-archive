@@ -27,6 +27,9 @@ import java.net.URL;
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.cs.CSAuthorityFactory;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.datum.DatumAuthorityFactory;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -47,7 +50,7 @@ import org.geotools.resources.i18n.Errors;
  * connection to an EPSG database is available. It search for a file named
  * {@value #FILENAME} in the first of the following locations where such a
  * file is found:
- *
+ * <p>
  * <ul>
  *   <li>(...todo...)</li>
  *   <li>{@code org/geotools/referencing/factory/espg} directory in the classpath
@@ -61,12 +64,19 @@ import org.geotools.resources.i18n.Errors;
  * @author Rueben Schulz
  * @author Martin Desruisseaux
  */
-public class FactoryUsingWKT extends DeferredAuthorityFactory {
+public class FactoryUsingWKT extends DeferredAuthorityFactory
+        implements CRSAuthorityFactory, CSAuthorityFactory, DatumAuthorityFactory
+{
     /**
      * The filename to read. This file will be searched in all locations
      * described in the {@linkplain FactoryUsingWKT class javadoc}.
      */
     public static final String FILENAME = "epsg.properties";
+
+    /**
+     * The factories to be given to the backing store.
+     */
+    private final FactoryGroup factories;
 
     /**
      * Constructs an authority factory using the default set of factories.
@@ -79,11 +89,11 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory {
      * Constructs an authority factory using a set of factories created from the specified hints.
      * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
-     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
-     * a low-level substitute for all the above.
+     * {@code FACTORY} hints.
      */
     public FactoryUsingWKT(final Hints hints) {
         super(hints, MINIMUM_PRIORITY+20);
+        factories = FactoryGroup.createInstance(hints);
         setTimeout(15*60*1000L); // Closes the connection after at least 15 minutes of inactivity.
     }
 

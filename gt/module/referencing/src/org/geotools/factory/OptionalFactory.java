@@ -41,17 +41,19 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
  *       registered factories. If an {@linkplain ServiceRegistry#setOrdering ordering is set}, it
  *       is taken in account for the iteration order.</li>
  *   <li>If no suitable factory was found before the iterator reachs this optional factory, then
- *       {@link #isReady} is invoked. If it returns {@code true}, then this optional factory is
- *       processed like any other factories. Otherwise it is ignored.</li>
+ *       {@link #isAvailable} is invoked. If it returns {@code true}, then this optional factory
+ *       is processed like any other factories. Otherwise it is ignored.</li>
  * </ul>
  * <p>
  * <strong>NOTE:</strong> {@code OptionalFactory} is not designed for factories with intermittent
- * state (i.e. return value of {@link #isReady} varying in an unpredictable way). The behavior is
- * undetermined if the {@code isReady()} state changes with time.
+ * state (i.e. return value of {@link #isAvailable} varying in an unpredictable way). The behavior
+ * is undetermined if the {@code isAvailable()} state changes with time.
  *
  * @author Martin Desruisseaux
  * @source $URL$
  * @version $Id$
+ *
+ * @see org.geotools.data.DataStoreFactorySpi#isAvailable
  */
 public interface OptionalFactory extends Factory {
     /**
@@ -59,5 +61,5 @@ public interface OptionalFactory extends Factory {
      * An optional factory may returns {@code false} for now but returns {@code true} later.
      * However, the converse is not recommended.
      */
-    public boolean isReady();
+    boolean isAvailable();
 }

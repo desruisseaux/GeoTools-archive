@@ -32,11 +32,10 @@ import org.geotools.referencing.factory.FactoryGroup;
 /**
  * An EPSG factory suitable for Oracle SQL syntax.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author John Grange
- *
- * @since 2.1
  *
  * @todo Since this class is constructed through the service provider API rather than directly
  *       instantiated by the user, we need some way to pass the schema information to this class.

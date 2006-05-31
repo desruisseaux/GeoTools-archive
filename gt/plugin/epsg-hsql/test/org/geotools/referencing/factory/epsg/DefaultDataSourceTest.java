@@ -255,6 +255,7 @@ public class DefaultDataSourceTest extends TestCase {
         System.gc();              // If there is any object holding a connection to the EPSG
         System.runFinalization(); // database, running finalizers may help to close them.
         factory.setTimeout(200);
+        assertEquals("4273", getIdentifier(factory.createCoordinateReferenceSystem("4273")));
         try {
             assertTrue(factory.isConnected());
             Thread.currentThread().sleep(1000);

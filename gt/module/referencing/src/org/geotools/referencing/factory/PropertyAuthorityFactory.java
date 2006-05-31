@@ -35,7 +35,10 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.cs.CSAuthorityFactory;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
@@ -50,24 +53,25 @@ import org.geotools.util.SimpleInternationalString;
  * backed by a property file. This gives some of the benificts of using the
  * {@linkplain org.geotools.referencing.factory.epsg.FactoryUsingSQL EPSG database backed
  * authority factory} (for example), in a portable property file.
- * <br><br>
+ * <p>
  * This factory doesn't cache any result. Any call to a {@code createFoo} method will send a new
  * query to the EPSG database. For caching, this factory should be wrapped in some buffered factory
  * like {@link BufferedAuthorityFactory}.
- * <br><br>
+ * <p>
  * This authority factory has a low priority. By default,
  * {@link org.geotools.referencing.FactoryFinder} will uses it only if it has been unable
  * to get a connection to a more suitable database like EPSG.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  * @author Rueben Schulz
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
-public class PropertyAuthorityFactory extends AbstractAuthorityFactory {
+public class PropertyAuthorityFactory extends DirectAuthorityFactory
+        implements CRSAuthorityFactory, CSAuthorityFactory, DatumAuthorityFactory
+{
     /**
      * The authority for this factory.
      */
@@ -131,6 +135,7 @@ public class PropertyAuthorityFactory extends AbstractAuthorityFactory {
      * Returns the set of authority codes of the given type. The type  
      * argument specify the base class. For example if this factory is 
      * an instance of CRSAuthorityFactory, then:
+     * <p>
      * <ul>
      *  <li>{@code CoordinateReferenceSystem.class} asks for all authority codes accepted by
      *      {@link #createGeographicCRS createGeographicCRS},
@@ -143,7 +148,7 @@ public class PropertyAuthorityFactory extends AbstractAuthorityFactory {
      * </ul>
      *
      * The default implementaiton filters the set of codes based on the
-     * "PROJCS" and "GEOGCS" at the start of the WKT strings.
+     * {@code "PROJCS"} and {@code "GEOGCS"} at the start of the WKT strings.
      *
      * @param  type The spatial reference objects type (may be {@code Object.class}).
      * @return The set of authority codes for spatial reference objects of the given type.

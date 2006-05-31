@@ -618,7 +618,7 @@ public class MetadataBuilder {
      * Constructs a new {@code MetadataBuilder} using default factories.
      */
     public MetadataBuilder() {
-        this(new FactoryGroup());
+        this(FactoryGroup.createInstance(null));
     }
     
     /**

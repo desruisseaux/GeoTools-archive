@@ -75,7 +75,10 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
+public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
+                DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory,
+                CoordinateOperationAuthorityFactory
+{
     /**
      * The authority name for this factory.
      */
@@ -143,7 +146,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory {
                                  final Collection/*<AuthorityFactory>*/ factories,
                                  final char separator)
     {
-        super(hints, NORMAL_PRIORITY);
+        super(NORMAL_PRIORITY);
         this.separator = separator;
         this.userHints = new Hints(hints);
         if (factories!=null && !factories.isEmpty()) {

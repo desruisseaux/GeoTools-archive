@@ -117,11 +117,16 @@ public interface DummyFactory extends InternalFactory {
      * This factory is the only one to accept hints.
      */
     final class Example5 implements DummyFactory {
+        private Object value = Hints.VALUE_INTERPOLATION_BILINEAR;
+
         public Example5() {
             Assert.fail("The constructor with Hints argument should have been used.");
         }
 
         public Example5(Hints hints) {
+            if (hints!=null && hints.containsKey(Hints.KEY_INTERPOLATION)) {
+                value = hints.get(Hints.KEY_INTERPOLATION);
+            }
         }
 
         public String toString() {
@@ -129,8 +134,7 @@ public interface DummyFactory extends InternalFactory {
         }
 
         public Map getImplementationHints() {
-            return Collections.singletonMap(Hints.KEY_INTERPOLATION,
-                                            Hints.VALUE_INTERPOLATION_BILINEAR);
+            return Collections.singletonMap(Hints.KEY_INTERPOLATION, value);
         }
     }
 }

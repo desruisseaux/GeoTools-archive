@@ -53,6 +53,7 @@ import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.parameter.ParameterWriter;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.factory.ReferencingFactory;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -107,7 +108,7 @@ import org.geotools.util.WeakHashSet;
  *
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Parameters
  */
-public class DefaultMathTransformFactory implements MathTransformFactory {
+public class DefaultMathTransformFactory extends ReferencingFactory implements MathTransformFactory {
     /**
      * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.
      * Will be created only when first needed.

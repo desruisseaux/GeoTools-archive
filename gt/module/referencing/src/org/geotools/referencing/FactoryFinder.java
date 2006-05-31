@@ -326,6 +326,11 @@ loop:       for (int i=0; ; i++) {
      * thrown otherwise. If more than one implementation is registered and an
      * {@linkplain #setVendorOrdering ordering is set}, then the preferred
      * implementation is returned. Otherwise an arbitrary one is selected.
+     * <p>
+     * Hints that may be understood includes
+     * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER},
+     * {@link Hints#FORCE_STANDARD_AXIS_UNITS        FORCE_STANDARD_AXIS_UNITS} and
+     * {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS   FORCE_STANDARD_AXIS_DIRECTIONS}.
      *
      * @param  authority The desired authority (e.g. "EPSG").
      * @param  hints An optional map of hints, or {@code null} if none.
@@ -356,6 +361,11 @@ loop:       for (int i=0; ; i++) {
      * thrown otherwise. If more than one implementation is registered and an
      * {@linkplain #setVendorOrdering ordering is set}, then the preferred
      * implementation is returned. Otherwise an arbitrary one is selected.
+     * <p>
+     * Hints that may be understood includes
+     * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER},
+     * {@link Hints#FORCE_STANDARD_AXIS_UNITS        FORCE_STANDARD_AXIS_UNITS} and
+     * {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS   FORCE_STANDARD_AXIS_DIRECTIONS}.
      *
      * @param  authority The desired authority (e.g. "EPSG").
      * @param  hints An optional map of hints, or {@code null} if none.
@@ -547,6 +557,11 @@ loop:       for (int i=0; ; i++) {
 
         /** Returns {@code true} if the specified provider is for the authority. */
         public boolean filter(final Object provider) {
+            if (authority == null) {
+                // If the user didn't specified an authority name, then the factory to use must
+                // be specified explicitly through a hint (e.g. Hints.CRS_AUTHORITY_FACTORY).
+                return false;
+            }
             return Citations.identifierMatches(((AuthorityFactory)provider).getAuthority(), authority);
         }
     }
@@ -582,7 +597,7 @@ loop:       for (int i=0; ; i++) {
     {
         final FactoryRegistry registry = getServiceRegistry();
         registry.getServiceProviders(DatumFactory.class); // Force the initialization of ServiceRegistry
-        FactoryPrinter.DEFAULT.list(registry, out, locale);
+        new FactoryPrinter().list(registry, out, locale);
     }
 
     /**

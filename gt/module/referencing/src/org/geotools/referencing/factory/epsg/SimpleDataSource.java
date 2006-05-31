@@ -34,7 +34,7 @@ import java.lang.reflect.Constructor;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.referencing.factory.AbstractFactory;
+import org.geotools.referencing.factory.ReferencingFactory;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -172,6 +172,8 @@ public class SimpleDataSource implements DataSource {
 
     /**
      * Returns the URL to the database.
+     *
+     * @todo Remove the call to loadDriver when we will be allowed to compile for J2SE 1.6.
      */
     private String getURL() {
         final LogRecord log;
@@ -179,7 +181,7 @@ public class SimpleDataSource implements DataSource {
         if (log != null) {
             log.setSourceClassName("SimpleDataSource");
             log.setSourceMethodName("getConnection");
-            AbstractFactory.LOGGER.log(log);
+            ReferencingFactory.LOGGER.log(log);
         }
         return properties.getProperty("url", "jdbc:odbc:EPSG");
     }

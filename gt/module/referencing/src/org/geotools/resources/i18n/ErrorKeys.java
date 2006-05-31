@@ -210,5 +210,5 @@ public final class ErrorKeys {
     public static final int UNSUPPORTED_FILE_TYPE_$2               =   144;
     public static final int VALUE_OUT_OF_BOUNDS_$3                 =   145;
     public static final int VALUE_TEND_TOWARD_INFINITY             =   146;
-    public static final int ZVALUE_OUTSIDE_COVERAGE_$1             =   148;
+    public static final int ZVALUE_OUTSIDE_COVERAGE_$2             =   148;
 }

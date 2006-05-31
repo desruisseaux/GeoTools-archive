@@ -60,8 +60,8 @@ import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.factory.AbstractFactory;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.ReferencingFactory;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
@@ -84,8 +84,8 @@ import org.geotools.util.WeakHashSet;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
-                                                      implements CoordinateOperationFactory
+public abstract class AbstractCoordinateOperationFactory extends ReferencingFactory
+        implements CoordinateOperationFactory
 {
     /**
      * The identifier for an identity operation.
@@ -165,11 +165,17 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     private final WeakHashSet pool = new WeakHashSet();
 
     /**
+     * Tells if {@link FactoryGroup#hints} has been invoked. It must be invoked exactly once,
+     * but can't be invoked in the constructor because it causes a {@link StackOverflowError}
+     * in some situations.
+     */
+    private boolean hintsInitialized;
+
+    /**
      * Constructs a coordinate operation factory using the specified hints.
      * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
-     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
-     * a low-level substitute for all the above.
+     * {@code FACTORY} hints.
      *
      * @param hints The hints, or {@code null} if none.
      */
@@ -181,8 +187,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * Constructs a coordinate operation factory using the specified hints and priority.
      * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
-     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
-     * a low-level substitute for all the above.
+     * {@code FACTORY} hints.
      *
      * @param hints The hints, or {@code null} if none.
      * @param priority The priority for this factory, as a number between
@@ -191,7 +196,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      *
      * @since 2.2
      */
-    public AbstractCoordinateOperationFactory(final Hints hints, final int priority) {
+    public AbstractCoordinateOperationFactory(Hints hints, final int priority) {
         super(priority);
         factories = FactoryGroup.createInstance(hints);
         mtFactory = factories.getMathTransformFactory();
@@ -205,8 +210,9 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      */
     public Map getImplementationHints() {
         synchronized (hints) { // Note: avoid lock on public object.
-            if (hints.isEmpty()) {
-                factories.getHints(hints);
+            if (!hintsInitialized) {
+                hintsInitialized = true;
+                hints.putAll(factories.getImplementationHints());
             }
         }
         return super.getImplementationHints();

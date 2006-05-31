@@ -35,15 +35,17 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.datum.*;
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
+import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
 
 // Geotools dependencies
-import org.geotools.util.WeakValueHashMap;
+import org.geotools.util.WeakHashSet;
 import org.geotools.factory.Hints;
+import org.geotools.factory.Factory;
 import org.geotools.factory.AbstractFactory;
+import org.geotools.factory.OptionalFactory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -56,24 +58,17 @@ import org.geotools.resources.Utilities;
 /**
  * An authority factory which delegates {@linkplain CoordinateReferenceSystem CRS},
  * {@linkplain CoordinateSystem CS} or {@linkplain Datum datum} objects creation to
- * some other factory implementations. This adapter may be used as a bridge between
- * different implementations that do not rely exclusively on GeoAPI interfaces (not
- * recommanded, but this case happens sometime). This adapter may also be used when
- * some slight changes to the created objects are desired.
- * <p>
- * This class provides a set of {@code replace(...)} methods to be overriden by subclasses in order
- * to replace some {@linkplain CoordinateReferenceSystem CRS}, {@linkplain CoordinateSystem CS} or
+ * some other factory implementations. This class provides a set of {@code replace(...)}
+ * methods to be overriden by subclasses in order to replace some
+ * {@linkplain CoordinateReferenceSystem CRS}, {@linkplain CoordinateSystem CS} or
  * {@linkplain Datum datum} objects by other ones. The replacement rules are determined by the
  * subclass being used. For example the {@link OrderedAxisAuthorityFactory} subclass can replace
  * {@linkplain CoordinateSystem coordinate systems} using (<var>latitude</var>, <var>longitude</var>)
  * axis order by coordinate systems using (<var>longitude</var>, <var>latitude</var>) axis order.
  * <p>
- * In the case that a {@code replace} method returns an object with a different structure than the
- * original one (for example the axis order change described above), then this modified factory
- * should <strong>not</strong> declares the same {@linkplain #getAuthority authority code} than
- * the {@linkplain #crsFactory original factory}. For example an EPSG factory with all coordinate
- * systems forced to (<var>longitude</var>, <var>latitude</var>) axis order is not an EPSG
- * authority factory anymore.
+ * All constructors are protected because this class must be subclassed in order to determine
+ * which of the {@link DatumAuthorityFactory}, {@link CSAuthorityFactory} and
+ * {@link CRSAuthorityFactory} interfaces to implement.
  *
  * @since 2.2
  * @source $URL$
@@ -83,84 +78,108 @@ import org.geotools.resources.Utilities;
  * @todo Use generic types for all {@code replace(...)} methods when we will be allowed
  *       to compile for J2SE 1.5, and remove casts in all {@code createXXX(...)} methods.
  */
-public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
+public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements OptionalFactory {
     /**
-     * The underlying {@linkplain Datum datum} authority factory.
+     * A set of default factories to be used if none were found if {@link #datumFactory},
+     * {@link #csFactory}, {@link #crsFactory} or {@link #operationFactory}. Will be created
+     * only when first needed.
+     */
+    private transient FactoryGroup factories;
+
+    /**
+     * The underlying {@linkplain Datum datum} authority factory,
+     * or {@code null} if none.
      */
     protected final DatumAuthorityFactory datumFactory;
 
     /**
-     * The underlying {@linkplain CoordinateSystem coordinate system} authority factory.
+     * The underlying {@linkplain CoordinateSystem coordinate system} authority factory,
+     * or {@code null} if none.
      */
     protected final CSAuthorityFactory csFactory;
 
     /**
      * The underlying {@linkplain CoordinateReferenceSystem coordinate reference system}
-     * authority factory.
+     * authority factory, or {@code null} if none.
      */
     protected final CRSAuthorityFactory crsFactory;
 
     /**
-     * The underlying {@linkplain CoordinateOperation coordinate operation} authority factory.
+     * The underlying {@linkplain CoordinateOperation coordinate operation} authority factory,
+     * or {@code null} if none.
      */
-    protected final CoordinateOperationAuthorityFactory opFactory;
+    protected final CoordinateOperationAuthorityFactory operationFactory;
 
     /**
-     * A pool of modified objects created up to date. Will be created only when
-     * first needed.
+     * The coordinate operation factory. Will be created only when first needed.
      */
-    private transient Map pool;
+    private transient CoordinateOperationFactory opFactory;
 
     /**
-     * Creates a wrapper around the specified factory. The priority level will be equals to the
-     * specified {@linkplain AbstractAuthorityFactory#priority factory's priority} plus one.
+     * A pool of modified objects created up to date.
      */
-    public AuthorityFactoryAdapter(final AbstractAuthorityFactory factory) {
-        super(factory.factories, factory.priority + 1);
-        this.datumFactory = factory;
-        this.   csFactory = factory;
-        this.  crsFactory = factory;
-        this.   opFactory = factory;
+    final WeakHashSet pool = new WeakHashSet();
+
+    /**
+     * Creates a wrapper around the specified factory. The {@link #priority priority} field
+     * will be set to the same value than the specified factory. Subclasses should override
+     * the {@link #getPriority()} method if they want to set a higher or lower priority for
+     * this instance.
+     *
+     * @param factory The factory to wrap.
+     */
+    protected AuthorityFactoryAdapter(final AuthorityFactory factory) {
+        this((factory instanceof   CRSAuthorityFactory) ? (  CRSAuthorityFactory) factory : null,
+             (factory instanceof    CSAuthorityFactory) ? (   CSAuthorityFactory) factory : null,
+             (factory instanceof DatumAuthorityFactory) ? (DatumAuthorityFactory) factory : null,
+             (factory instanceof CoordinateOperationAuthorityFactory) ?
+                                (CoordinateOperationAuthorityFactory) factory : null);
     }
 
     /**
-     * Creates a wrapper around the specified factories. The priority level will be equals to the
-     * highest specified {@linkplain AbstractAuthorityFactory#priority factory's priority} plus
-     * one.
+     * Creates a wrapper around the specified factories. The {@link #priority priority} field will
+     * be set to the highest priority found in the specified factories. Subclasses should override
+     * the {@link #getPriority()} method if they want to set a higher or lower priority for this
+     * instance.
      *
      * @param crsFactory   The {@linkplain CoordinateReferenceSystem coordinate reference system}
-     *                     authority factory.
-     * @param csFactory    The {@linkplain CoordinateSystem coordinate system} authority factory.
-     * @param datumFactory The {@linkplain Datum datum} authority factory.
+     *                     authority factory, or {@code null}.
+     * @param csFactory    The {@linkplain CoordinateSystem coordinate system} authority factory,
+     *                     or {@code null}.
+     * @param datumFactory The {@linkplain Datum datum} authority factory, or {@code null}.
      * @param opFactory    The {@linkplain CoordinateOperation coordinate operation} authority
-     *                     factory.
+     *                     factory, or {@code null}.
      */
-    public AuthorityFactoryAdapter(final CRSAuthorityFactory                crsFactory,
-                                   final CSAuthorityFactory                  csFactory,
-                                   final DatumAuthorityFactory            datumFactory,
-                                   final CoordinateOperationAuthorityFactory opFactory)
+    protected AuthorityFactoryAdapter(final CRSAuthorityFactory                crsFactory,
+                                      final CSAuthorityFactory                  csFactory,
+                                      final DatumAuthorityFactory            datumFactory,
+                                      final CoordinateOperationAuthorityFactory opFactory)
     {
-        super(getFactoryGroup(new AuthorityFactory[] {crsFactory, csFactory, datumFactory, opFactory}),
-                Math.max(getPriority(datumFactory),
-                Math.max(getPriority(   csFactory),
-                Math.max(getPriority(  crsFactory),
-                Math.max(getPriority(   opFactory), NORMAL_PRIORITY)))));
+        super(Math.max(getPriority(datumFactory),
+              Math.max(getPriority(   csFactory),
+              Math.max(getPriority(  crsFactory),
+                       getPriority(   opFactory)))));
 
-        this.datumFactory = datumFactory;
-        this.   csFactory =    csFactory;
-        this.  crsFactory =   crsFactory;
-        this.   opFactory =    opFactory;
+        store(Hints.               DATUM_AUTHORITY_FACTORY, this.    datumFactory = datumFactory);
+        store(Hints.                  CS_AUTHORITY_FACTORY, this.       csFactory =    csFactory);
+        store(Hints.                 CRS_AUTHORITY_FACTORY, this.      crsFactory =   crsFactory);
+        store(Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY, this.operationFactory =    opFactory);
     }
 
     /**
      * Creates a wrappers around the default factories for the specified authority.
      * The factories are fetched using {@link FactoryFinder}.
+     * <p>
+     * <strong>WARNING:</strong> Do not invoke this constructor from a subclass to be registered in
+     * a {@code META-INF/services/} file for use by {@link FactoryFinder}. It may lead to recursive
+     * calls until a {@link StackOverflowError} is thrown.
      *
-     * @param  authority The authority to wraps (example: {@code "EPSG"}).
+     * @param  authority The authority to wraps (example: {@code "EPSG"}). If {@code null},
+     *         then all authority factories must be explicitly specified in the set of hints.
      * @param  hints An optional set of hints, or {@code null} if none.
      * @throws FactoryRegistryException if at least one factory can not be obtained.
      */
-    public AuthorityFactoryAdapter(final String authority, final Hints hints)
+    protected AuthorityFactoryAdapter(final String authority, final Hints hints)
             throws FactoryRegistryException
     {
         this(FactoryFinder.getCRSAuthorityFactory                (authority, hints),
@@ -170,44 +189,117 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns the priority of the specified factory plus one, or 0 if unknown.
+     * Returns the priority of the specified factory, or {@link #NORMAL_PRIORITY} if unknown.
      */
     private static int getPriority(final AuthorityFactory factory) {
-        return (factory instanceof AbstractFactory) ? ((AbstractFactory) factory).priority + 1 : 0;
+        return (factory instanceof AbstractFactory) ?
+            ((AbstractFactory) factory).getPriority() : NORMAL_PRIORITY;
     }
 
     /**
-     * Infers the factory group from the specified factories. This method is a work around for
-     * RFE #4093999 in Sun's bug database ("Relax constraint on placement of this()/super() call
-     * in constructors").
+     * Adds the specified factory to the set of hints, if non null.
      */
-    private static FactoryGroup getFactoryGroup(AuthorityFactory[] factories) {
-        for (int i=0; i<factories.length; i++) {
-            final AuthorityFactory factory = factories[i];
-            if (factory instanceof AbstractAuthorityFactory) {
-                return ((AbstractAuthorityFactory) factory).factories;
+    private void store(final Hints.Key key, final AuthorityFactory factory) {
+        if (factory != null) {
+            if (hints.put(key, factory) != null) {
+                throw new AssertionError(key);
             }
         }
-        return new FactoryGroup();
     }
 
     /**
-     * Caches a modified object in the internal pool.
-     * @todo Use generic types once we will be allowed to compile for J2SE 1.5.
+     * Returns the implementation hint for the specified factory, or {@code null} if none.
      */
-    final void cache(final IdentifiedObject original, final IdentifiedObject modified) {
-        if (pool == null) {
-            pool = new WeakValueHashMap();
+    private static Object getHint(final AuthorityFactory factory, final Hints.Key key) {
+        if (factory instanceof Factory) {
+            return ((Factory) factory).getImplementationHints().get(key);
         }
-        pool.put(original, modified);
+        return null;
     }
 
     /**
-     * Returns a modified object from the pool.
-     * @todo Use generic types once we will be allowed to compile for J2SE 1.5.
+     * Returns the {@linkplain #hints hints} extented will all hints specified in dependencies.
+     * This is used for fetching a new factory.
      */
-    final IdentifiedObject getFromCache(final IdentifiedObject original) {
-        return (pool!=null) ? (IdentifiedObject) pool.get(original) : null;
+    private Hints hints() {
+        final Hints extended = new Hints(hints);
+        addAll(operationFactory, extended);
+        addAll(    datumFactory, extended);
+        addAll(       csFactory, extended);
+        addAll(      crsFactory, extended);
+        extended.putAll(hints); // Give precedences to the hints from this class.
+        return extended;
+    }
+
+    /**
+     * Adds all hints from the specified factory into the specified set of hints.
+     */
+    private static void addAll(final AuthorityFactory factory, final Hints hints) {
+        if (factory instanceof Factory) {
+            hints.putAll(((Factory) factory).getImplementationHints());
+        }
+    }
+
+    /**
+     * Suggests a factory group to use for the specified authority factory. The {@code factory}
+     * parameter is usually one of {@link #datumFactory}, {@link #csFactory}, {@link #crsFactory}
+     * or {@link #operationFactory} field. It may be {@code null}.
+     */
+    final FactoryGroup getFactoryGroup(final AuthorityFactory factory) {
+        if (factory instanceof DirectAuthorityFactory) {
+            return ((DirectAuthorityFactory) factory).factories;
+        }
+        if (factories == null) {
+            factories = FactoryGroup.createInstance(hints());
+        }
+        return factories;
+    }
+
+    /**
+     * Returns a coordinate operation factory for this adapter.
+     */
+    private final CoordinateOperationFactory getCoordinateOperationFactory() {
+        if (opFactory == null) {
+            final Object candidate = getHint(operationFactory, Hints.COORDINATE_OPERATION_FACTORY);
+            if (candidate instanceof CoordinateOperationFactory) {
+                opFactory = (CoordinateOperationFactory) candidate;
+            } else {
+                opFactory = FactoryFinder.getCoordinateOperationFactory(hints());
+            }
+        }
+        return opFactory;
+    }
+
+    /**
+     * Returns the priority for this factory. Priorities are used by {@link FactoryFinder} for
+     * selecting a preferred factory when many are found for the same service. The default
+     * implementation returns <code>{@linkplain #priority priority} + 1</code>, which implies
+     * that this adapter has precedence over the wrapped factories. Subclasses should override
+     * this method if they want a different priority order for this instance.
+     *
+     * @since 2.3
+     */
+    public int getPriority() {
+        return priority + 1;
+    }
+
+    /**
+     * Returns {@code true} if this factory is ready for use. This method checks the
+     * availability of {@link #crsFactory}, {@link #csFactory}, {@link #datumFactory}
+     * and {@link #operationFactory}.
+     */
+    public boolean isAvailable() {
+        return isAvailable(      crsFactory) &&
+               isAvailable(       csFactory) &&
+               isAvailable(    datumFactory) &&
+               isAvailable(operationFactory);
+    }
+
+    /**
+     * Checks the availability of the specified factory.
+     */
+    private static boolean isAvailable(final AuthorityFactory factory) {
+        return !(factory instanceof OptionalFactory) || ((OptionalFactory) factory).isAvailable();
     }
 
     /**
@@ -250,10 +342,6 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     protected CoordinateReferenceSystem replace(final CoordinateReferenceSystem crs)
             throws FactoryException
     {
-        CoordinateReferenceSystem candidate = (CoordinateReferenceSystem) getFromCache(crs);
-        if (candidate != null) {
-            return candidate;
-        }
         /*
          * Gets the replaced coordinate system and datum, and checks if there is any change.
          */
@@ -271,6 +359,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
          * Creates a new coordinate reference system using the same properties than the
          * original CRS, except for the coordinate system, datum and authority code.
          */
+        CoordinateReferenceSystem modified;
         if (crs instanceof GeneralDerivedCRS) {
             final GeneralDerivedCRS         derivedCRS = (GeneralDerivedCRS) crs;
             final CoordinateReferenceSystem oldBaseCRS = derivedCRS.getBaseCRS();
@@ -278,13 +367,14 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
             if (sameCS && Utilities.equals(baseCRS, oldBaseCRS)) {
                 return crs;
             }
-            final Map properties = getProperties(crs);
-            final CRSFactory crsFactory = factories.getCRSFactory();
-            Conversion fromBase = derivedCRS.getConversionFromBase();
+            final Map         properties = getProperties(crs);
+            final FactoryGroup factories = getFactoryGroup(crsFactory);
+            final CRSFactory  crsFactory = factories.getCRSFactory();
+            Conversion          fromBase = derivedCRS.getConversionFromBase();
             fromBase = new DefiningConversion(getProperties(fromBase),
                            fromBase.getMethod(), fromBase.getParameterValues());
             if (crs instanceof ProjectedCRS) {
-                candidate = factories.createProjectedCRS(properties, (GeographicCRS) baseCRS,
+                modified = factories.createProjectedCRS(properties, (GeographicCRS) baseCRS,
                                                     fromBase, (CartesianCS) cs);
             } else {
                 // TODO: Need a createDerivedCRS method.
@@ -294,40 +384,41 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
         } else if (sameCS) {
             return crs;
         } else {
-            final Map properties = getProperties(crs);
-            final CRSFactory crsFactory = factories.getCRSFactory();
+            final Map         properties = getProperties(crs);
+            final FactoryGroup factories = getFactoryGroup(crsFactory);
+            final CRSFactory  crsFactory = factories.getCRSFactory();
             if (crs instanceof GeographicCRS) {
-                candidate = crsFactory.createGeographicCRS(properties, (GeodeticDatum) datum, (EllipsoidalCS) cs);
+                modified = crsFactory.createGeographicCRS(properties, (GeodeticDatum) datum, (EllipsoidalCS) cs);
             } else if (crs instanceof GeocentricCRS) {
                 final GeodeticDatum gd = (GeodeticDatum) datum;
                 if (cs instanceof CartesianCS) {
-                    candidate = crsFactory.createGeocentricCRS(properties, gd, (CartesianCS) cs);
+                    modified = crsFactory.createGeocentricCRS(properties, gd, (CartesianCS) cs);
                 } else {
-                    candidate = crsFactory.createGeocentricCRS(properties, gd, (SphericalCS) cs);
+                    modified = crsFactory.createGeocentricCRS(properties, gd, (SphericalCS) cs);
                 }
             } else if (crs instanceof VerticalCRS) {
-                candidate = crsFactory.createVerticalCRS(properties, (VerticalDatum) datum, (VerticalCS) cs);
+                modified = crsFactory.createVerticalCRS(properties, (VerticalDatum) datum, (VerticalCS) cs);
             } else if (crs instanceof TemporalCRS) {
-                candidate = crsFactory.createTemporalCRS(properties, (TemporalDatum) datum, (TimeCS) cs);
+                modified = crsFactory.createTemporalCRS(properties, (TemporalDatum) datum, (TimeCS) cs);
             } else if (crs instanceof ImageCRS) {
-                candidate = crsFactory.createImageCRS(properties, (ImageDatum) datum, (AffineCS) cs);
+                modified = crsFactory.createImageCRS(properties, (ImageDatum) datum, (AffineCS) cs);
             } else if (crs instanceof EngineeringCRS) {
-                candidate = crsFactory.createEngineeringCRS(properties, (EngineeringDatum) datum, cs);
+                modified = crsFactory.createEngineeringCRS(properties, (EngineeringDatum) datum, cs);
             } else if (crs instanceof CompoundCRS) {
                 final List/*<CoordinateReferenceSystem>*/ elements =
                         ((CompoundCRS) crs).getCoordinateReferenceSystems();
-                final CoordinateReferenceSystem[] modified = new CoordinateReferenceSystem[elements.size()];
-                for (int i=0; i<modified.length; i++) {
-                    modified[i] = replace((CoordinateReferenceSystem) elements.get(i));
+                final CoordinateReferenceSystem[] m = new CoordinateReferenceSystem[elements.size()];
+                for (int i=0; i<m.length; i++) {
+                    m[i] = replace((CoordinateReferenceSystem) elements.get(i));
                 }
-                candidate = crsFactory.createCompoundCRS(properties, modified);
+                modified = crsFactory.createCompoundCRS(properties, m);
             } else {
                 throw new FactoryException(Errors.format(ErrorKeys.UNSUPPORTED_CRS_$1,
                                                          crs.getName().getCode()));
             }
         }
-        cache(crs, candidate);
-        return candidate;
+        modified = (CoordinateReferenceSystem) pool.canonicalize(modified);
+        return modified;
     }
 
     /**
@@ -343,19 +434,17 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     protected CoordinateOperation replace(final CoordinateOperation operation)
             throws FactoryException
     {
-        CoordinateOperation candidate = (CoordinateOperation) getFromCache(operation);
-        if (candidate == null) {
-            final CoordinateReferenceSystem oldSrcCRS = operation.getSourceCRS();
-            final CoordinateReferenceSystem oldTgtCRS = operation.getTargetCRS();
-            final CoordinateReferenceSystem sourceCRS = replace(oldSrcCRS);
-            final CoordinateReferenceSystem targetCRS = replace(oldTgtCRS);
-            if (Utilities.equals(oldSrcCRS, sourceCRS) && Utilities.equals(oldTgtCRS, targetCRS)) {
-                return operation;
-            }
-            candidate = factories.getCoordinateOperationFactory().createOperation(sourceCRS, targetCRS);
-            cache(operation, candidate);
+        final CoordinateReferenceSystem oldSrcCRS = operation.getSourceCRS();
+        final CoordinateReferenceSystem oldTgtCRS = operation.getTargetCRS();
+        final CoordinateReferenceSystem sourceCRS = replace(oldSrcCRS);
+        final CoordinateReferenceSystem targetCRS = replace(oldTgtCRS);
+        if (Utilities.equals(oldSrcCRS, sourceCRS) && Utilities.equals(oldTgtCRS, targetCRS)) {
+            return operation;
         }
-        return candidate;
+        CoordinateOperation modified;
+        modified = getCoordinateOperationFactory().createOperation(sourceCRS, targetCRS);
+        modified = (CoordinateOperation) pool.canonicalize(modified);
+        return modified;
     }
 
     /**
@@ -391,8 +480,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
         if (datumFactory instanceof AbstractAuthorityFactory) {
             return (AbstractAuthorityFactory) datumFactory;
         }
-        if (opFactory instanceof AbstractAuthorityFactory) {
-            return (AbstractAuthorityFactory) opFactory;
+        if (operationFactory instanceof AbstractAuthorityFactory) {
+            return (AbstractAuthorityFactory) operationFactory;
         }
         if (caller == null) {
             return null;
@@ -741,7 +830,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
 
     /**
      * Creates a parameter descriptor from a code. The default implementation delegates to the
-     * {@linkplain #opFactory underlying operation factory} with no change.
+     * {@linkplain #operationFactory underlying operation factory} with no change.
      */
     public ParameterDescriptor createParameterDescriptor(final String code) throws FactoryException {
         return getFactory("createParameterDescriptor").createParameterDescriptor(code);
@@ -749,7 +838,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
 
     /**
      * Creates an operation method from a code. The default implementation delegates to the
-     * {@linkplain #opFactory underlying operation factory} with no change.
+     * {@linkplain #operationFactory underlying operation factory} with no change.
      */
     public OperationMethod createOperationMethod(final String code) throws FactoryException {
         return getFactory("createOperationMethod").createOperationMethod(code);
@@ -758,17 +847,17 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     /**
      * Creates an operation from a single operation code.
      * The default implementation first invokes the same method from the
-     * {@linkplain #opFactory underlying operation factory}, and next invokes
+     * {@linkplain #operationFactory underlying operation factory}, and next invokes
      * {@link #replace(CoordinateOperation) replace}.
      */
     public CoordinateOperation createCoordinateOperation(final String code) throws FactoryException {
-        return replace(opFactory.createCoordinateOperation(code));
+        return replace(operationFactory.createCoordinateOperation(code));
     }
 
     /**
      * Creates an operation from coordinate reference system codes.
      * The default implementation first invokes the same method from the
-     * {@linkplain #opFactory underlying operation factory}, and next invokes
+     * {@linkplain #operationFactory underlying operation factory}, and next invokes
      * {@link #replace(CoordinateOperation) replace} for each operations.
      */
     public Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
@@ -776,7 +865,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
             throws FactoryException
     {
         final Set/*<CoordinateOperation>*/ operations, modified;
-        operations = opFactory.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
+        operations = operationFactory.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
         modified   = new LinkedHashSet((int) (operations.size()/0.75f) + 1);
         for (final Iterator it=operations.iterator(); it.hasNext();) {
             final CoordinateOperation operation;
@@ -796,17 +885,12 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory {
     }
 
     /**
-     * Releases resources immediately instead of waiting for the garbage collector.
-     * This method also releases the resources for all factories wrapped in this adapter.
+     * Releases resources immediately instead of waiting for the garbage collector. This method do
+     * <strong>not</strong> dispose the resources of wrapped factories (e.g. {@link #crsFactory}),
+     * because they may still in use by other classes.
      */
     public void dispose() throws FactoryException {
-        if (pool != null) {
-            pool.clear();
-            pool = null;
-        }
-        if (   opFactory instanceof AbstractAuthorityFactory) ((AbstractAuthorityFactory)    opFactory).dispose();
-        if (   csFactory instanceof AbstractAuthorityFactory) ((AbstractAuthorityFactory)    csFactory).dispose();
-        if (  crsFactory instanceof AbstractAuthorityFactory) ((AbstractAuthorityFactory)   crsFactory).dispose();
-        if (datumFactory instanceof AbstractAuthorityFactory) ((AbstractAuthorityFactory) datumFactory).dispose();
+        pool.clear();
+        super.dispose();
     }
 }

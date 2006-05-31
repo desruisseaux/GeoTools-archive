@@ -20,6 +20,7 @@
 package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies and extensions
+import java.util.*;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,70 +34,23 @@ import java.sql.SQLException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.ref.SoftReference;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.logging.Level;
 import javax.units.NonSI;
 import javax.units.Unit;
 import javax.units.SI;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.quality.EvaluationMethodType;
 import org.opengis.metadata.quality.PositionalAccuracy;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.crs.CompoundCRS;
-import org.opengis.referencing.crs.GeocentricCRS;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.CartesianCS;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.cs.CSAuthorityFactory;
-import org.opengis.referencing.cs.CSFactory;
-import org.opengis.referencing.cs.EllipsoidalCS;
-import org.opengis.referencing.cs.SphericalCS;
-import org.opengis.referencing.cs.VerticalCS;
-import org.opengis.referencing.datum.Datum;
-import org.opengis.referencing.datum.DatumAuthorityFactory;
-import org.opengis.referencing.datum.DatumFactory;
-import org.opengis.referencing.datum.Ellipsoid;
-import org.opengis.referencing.datum.EngineeringDatum;
-import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.datum.PrimeMeridian;
-import org.opengis.referencing.datum.VerticalDatum;
-import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.operation.ConcatenatedOperation;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.Transformation;
-import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.Projection;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.metadata.Identifier;
+import org.opengis.parameter.*;
+import org.opengis.referencing.*;
+import org.opengis.referencing.cs.*;
+import org.opengis.referencing.crs.*;
+import org.opengis.referencing.datum.*;
+import org.opengis.referencing.operation.*;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
@@ -112,6 +66,7 @@ import org.geotools.metadata.iso.quality.AbsoluteExternalPositionalAccuracyImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.factory.DirectAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
@@ -163,7 +118,10 @@ import org.geotools.util.ScopedName;
  * @author Rueben Schulz
  * @author Matthias Basler
  */
-public class FactoryUsingSQL extends AbstractAuthorityFactory {
+public class FactoryUsingSQL extends DirectAuthorityFactory
+        implements CRSAuthorityFactory, CSAuthorityFactory, DatumAuthorityFactory,
+                   CoordinateOperationAuthorityFactory
+{
     ////////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                            ////////
     ////////      H A R D   C O D E D   V A L U E S    (other than SQL statements)      ////////
@@ -431,6 +389,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      */
     public FactoryUsingSQL(final Hints hints, final Connection connection) {
         super(hints, MAXIMUM_PRIORITY-20);
+        // The following hint has no effect on this class behaviour,
+        // but tells to the user what this factory do about axis order.
+        this.hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
         this.connection = connection;
         ensureNonNull("connection", connection);
     }

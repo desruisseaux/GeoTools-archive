@@ -20,13 +20,22 @@ package org.geotools.factory;
 
 // J2SE dependencies
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.IdentityHashMap;
 import java.util.Collections;
-import javax.imageio.spi.RegisterableService;
+import java.util.Iterator;
+import java.io.Writer;
+import java.io.IOException;
 import javax.imageio.spi.ServiceRegistry;
+import javax.imageio.spi.RegisterableService;
+
+// OpenGIS dependencies
+import org.opengis.referencing.AuthorityFactory;
 
 // Geotools dependencies
+import org.geotools.io.TableWriter;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -119,6 +128,7 @@ public class AbstractFactory implements Factory, RegisterableService {
      * will be used only if there is no other factory in the same
      * {@linkplain ServiceRegistry#getCategories category}.
      *
+     * @see #priority
      * @see #onRegistration
      */
     public static final int MINIMUM_PRIORITY = 1;
@@ -126,6 +136,7 @@ public class AbstractFactory implements Factory, RegisterableService {
     /**
      * The default priority, which is {@value}.
      *
+     * @see #priority
      * @see #onRegistration
      */
     public static final int NORMAL_PRIORITY = 50;
@@ -135,14 +146,19 @@ public class AbstractFactory implements Factory, RegisterableService {
      * priority will be preferred to any other factory in the same
      * {@linkplain ServiceRegistry#getCategories category}.
      *
+     * @see #priority
      * @see #onRegistration
      */
     public static final int MAXIMUM_PRIORITY = 100;
 
     /**
-     * The priority for this factory.
+     * The priority for this factory, as a number between {@link #MINIMUM_PRIORITY} and
+     * {@link #MAXIMUM_PRIORITY} inclusive. Priorities are used by {@link FactoryRegistry}
+     * for selecting a preferred factory when many are found for the same service.
+     *
+     * @see #getPriority
      */
-    public final int priority;
+    protected final int priority;
 
     /**
      * The {@linkplain Factory#getImplementationHints implementation hints}. This map should be
@@ -158,7 +174,7 @@ public class AbstractFactory implements Factory, RegisterableService {
      * Once the hints are accessibles to the user (this usually means when the subclass
      * construction is finished), this map should not change anymore.
      */
-    protected final Map hints = new HashMap();
+    protected final Map hints = new LinkedHashMap();
 
     /**
      * An unmodifiable view of {@link #hints}. This is the actual map to be returned
@@ -189,7 +205,20 @@ public class AbstractFactory implements Factory, RegisterableService {
     }
 
     /**
-     * Returns an {@linkplain java.util.Collections#unmodifiableMap unmodifiable} view of
+     * Returns the priority for this factory, as a number between {@link #MINIMUM_PRIORITY} and
+     * {@link #MAXIMUM_PRIORITY} inclusive. Priorities are used by {@link FactoryRegistry} for
+     * selecting a preferred factory when many are found for the same service. The default
+     * implementation returns {@link #priority} with no change. Subclasses should override
+     * this method if they want to return a higher or lower priority.
+     *
+     * @since 2.3
+     */
+    public int getPriority() {
+        return priority;
+    }
+
+    /**
+     * Returns an {@linkplain Collections#unmodifiableMap unmodifiable} view of
      * {@linkplain #hints}.
      *
      * @return The map of hints, or an empty map if none.
@@ -202,7 +231,7 @@ public class AbstractFactory implements Factory, RegisterableService {
      * Called when this factory is added to the given {@code category} of the given
      * {@code registry}. The factory may already be registered under another category
      * or categories.
-     * <br><br>
+     * <p>
      * This method is invoked automatically when this factory is registered as a plugin,
      * and should not be invoked directly by the user. The default implementation iterates
      * through all services under the same category that extends the {@code AbstractFactory}
@@ -219,9 +248,9 @@ public class AbstractFactory implements Factory, RegisterableService {
             final Object provider = it.next();
             if (provider instanceof AbstractFactory) {
                 final AbstractFactory factory = (AbstractFactory) provider;
-                if (priority > factory.priority) {
+                if (priority > factory.getPriority()) {
                     registry.setOrdering(category, this, factory);
-                } else if (priority < factory.priority) {
+                } else if (priority < factory.getPriority()) {
                     registry.setOrdering(category, factory, this);
                 }
             }
@@ -231,7 +260,7 @@ public class AbstractFactory implements Factory, RegisterableService {
     /**
      * Called when this factory is removed from the given {@code category} of the given
      * {@code registry}. The object may still be registered under another category or categories.
-     * <br><br>
+     * <p>
      * This method is invoked automatically when this factory is no longer registered as a plugin,
      * and should not be invoked directly by the user.
      *
@@ -241,5 +270,121 @@ public class AbstractFactory implements Factory, RegisterableService {
      */
     public void onDeregistration(final ServiceRegistry registry, final Class category) {
         // No action needed.
+    }
+
+    /**
+     * Returns a hash value for this factory. The default implementation computes the hash
+     * value using only immutable properties. This computation do <strong>not</strong> relies
+     * on {@linkplain #getImplementationHints implementation hints}, since there is no garantee
+     * that they will not change.
+     *
+     * @since 2.3
+     */
+    public final int hashCode() {
+        return getClass().hashCode() ^ 37 * priority;
+    }
+
+    /**
+     * Compares this factory with the specified object for equality.
+     * The default implementation returns {@code true} if and only if:
+     * <p>
+     * <ul>
+     *   <li>Both objects are of the exact same class
+     *       (a <cite>is instance of</cite> relationship is not enough).</li>
+     *   <li>{@linkplain #getImplementationHints implementation hints} are
+     *       {@linkplain Map#equals equal}.</li>
+     * </ul>
+     * <p>
+     * The requirement for the <cite>exact same class</cite> is needed for consistency with the
+     * {@linkplain FactoryRegistry factory registry} working, since at most one instance of a given
+     * class {@linkplain FactoryRegistry#getServiceProviderByClass) is allowed} in a registry.
+     *
+     * @since 2.3
+     */
+    public final boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object!=null && object.getClass().equals(getClass())) {
+            final AbstractFactory that = (AbstractFactory) object;
+            return this.priority == that.priority &&
+                   new FactoryComparator(this, that).compare(new HashSet());
+        }
+        return false;
+    }
+
+    /**
+     * Returns a string representation of this factory. This method is mostly for debugging purpose,
+     * so the string format may vary across different implementations or versions. The default
+     * implementation formats all {@linkplain #getImplementationHints implementation hints} as a
+     * tree. If the implementation hints include some {@linkplain Factory factory} dependencies,
+     * then the implementation hints for those dependencies will appears under a tree branch.
+     *
+     * @since 2.3
+     */
+    public String toString() {
+        final String name = format(this);
+        final Map done = new IdentityHashMap(); // We don't want to rely on Factory.equals(...)
+        done.put(this, name);
+        final Writer table;
+        try {
+            table = new TableWriter(null, " ");
+            format(table, this, "  ", done);
+        } catch (IOException e) {
+            // Should never happen, since we are writing in a buffer.
+            throw new AssertionError(e);
+        }
+        return name + System.getProperty("line.separator", "\n") + table.toString();
+    }
+
+    /**
+     * Formats a name for the specified factory.
+     */
+    private static String format(final Factory factory) {
+        String name = Utilities.getShortClassName(factory);
+        if (factory instanceof AuthorityFactory) {
+            name = name + "[\"" + ((AuthorityFactory) factory).getAuthority().getTitle() + "\"]";
+        }
+        return name;
+    }
+
+    /**
+     * Formats recursively the tree.
+     */
+    private static void format(final Writer  table,
+                               final Factory factory,
+                               final String  indent,
+                               final Map/*<Object,String>*/ done) throws IOException
+    {
+        final Map      hints  = factory.getImplementationHints();
+        final String[] keys   = new String[hints.size()];
+        final Object[] values = new Object[keys.length];
+        for (final Iterator it=hints.entrySet().iterator(); it.hasNext();) {
+            Map.Entry entry = (Map.Entry) it.next();
+            String    key   = String.valueOf(entry.getKey());
+            Object    value = entry.getValue();
+            table.write(indent);
+            table.write(key);
+            table.write("\t= ");
+            Factory recursive = null;
+            if (value instanceof Factory) {
+                recursive = (Factory) value;
+                value = format(recursive);
+                final String previous = (String) done.put(recursive, key);
+                if (previous != null) {
+                    done.put(recursive, previous);
+                    table.write("(same as ");  // TODO: localize
+                    table.write(previous);
+                    value = ")";
+                    recursive = null;
+                }
+            }
+            table.write(String.valueOf(value));
+            table.write('\n');
+            if (recursive != null) {
+                final String nextIndent = Utilities.spaces(indent.length() + 2);
+                format(table, recursive, nextIndent, done);
+            }
+        }
     }
 }

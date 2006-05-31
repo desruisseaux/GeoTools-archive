@@ -37,6 +37,8 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo This class may be removed when we will be allowed to compile for J2SE 1.6.
  */
 public final class JDBC {
     /**

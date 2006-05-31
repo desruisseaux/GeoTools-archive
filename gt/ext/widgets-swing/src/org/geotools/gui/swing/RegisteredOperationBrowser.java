@@ -79,7 +79,7 @@ import org.geotools.resources.i18n.Vocabulary;
 /**
  * Browse through the registered JAI operations. This widget display a tree build from a
  * JAI's {@link OperationRegistry}. The tree has the following hierarchy:
- *
+ * <p>
  * <ul>
  *   <li>At the first level, all {@linkplain OperationRegistry#getRegistryModes() registry modes}
  *       (e.g. "rendered", "renderable", etc.) in alphabetical order.</li>

@@ -54,7 +54,6 @@ import org.geotools.util.UnsupportedImplementationException;
  *
  * @see AbstractCS
  * @see org.geotools.referencing.datum.AbstractDatum
- *
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Services+for+Geotools+2.1
  */
 public abstract class AbstractCRS extends AbstractReferenceSystem implements CoordinateReferenceSystem {

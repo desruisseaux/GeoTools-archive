@@ -52,14 +52,9 @@ import org.geotools.resources.i18n.VocabularyKeys;
  */
 final class FactoryPrinter implements Comparator {
     /**
-     * The printer instance.
+     * Constructs a default instance of this printer.
      */
-    public static final FactoryPrinter DEFAULT = new FactoryPrinter();
-
-    /**
-     * Do not allows instantiation of this class except the singleton constant.
-     */
-    private FactoryPrinter() {
+    public FactoryPrinter() {
     }
 
     /**
@@ -69,11 +64,18 @@ final class FactoryPrinter implements Comparator {
     public int compare(final Object object1, final Object object2) {
         final Class/*<Factory>*/ factory1 = (Class) object1;
         final Class/*<Factory>*/ factory2 = (Class) object2;
-        final boolean isAuthority1 = AuthorityFactory.class.isAssignableFrom(factory1);
-        final boolean isAuthority2 = AuthorityFactory.class.isAssignableFrom(factory2);
-        if (isAuthority1 && !isAuthority2) return +1;
-        if (isAuthority2 && !isAuthority1) return -1;
-        return 0;
+        if (false) {
+            // Sort authority factory last
+            final boolean isAuthority1 = AuthorityFactory.class.isAssignableFrom(factory1);
+            final boolean isAuthority2 = AuthorityFactory.class.isAssignableFrom(factory2);
+            if (isAuthority1 && !isAuthority2) return +1;
+            if (isAuthority2 && !isAuthority1) return -1;
+            return 0;
+        } else {
+            // Or sort by name
+            return Utilities.getShortName(factory1).compareToIgnoreCase(
+                   Utilities.getShortName(factory2));
+        }
     }
 
     /**
@@ -84,13 +86,13 @@ final class FactoryPrinter implements Comparator {
      * @param  FactoryRegistry Where the factories are registered.
      * @param  out The output stream where to format the list.
      * @param  locale The locale for the list, or {@code null}.
-     * @throws IOException if an error occurs while writting to {@code out}.
+     * @throws IOException if an error occurs while writing to {@code out}.
      */
     public void list(final FactoryRegistry registry, final Writer out, final Locale locale)
             throws IOException
     {
         /*
-         * Gets the categories in some sorted order. We put the authority factories last.
+         * Gets the categories in some sorted order.
          */
         final List categories = new ArrayList();
         for (final Iterator it=registry.getCategories(); it.hasNext();) {
@@ -108,27 +110,33 @@ final class FactoryPrinter implements Comparator {
         table.nextColumn();
         table.write(resources.getString(VocabularyKeys.AUTHORITY));
         table.nextColumn();
+        table.write(resources.getString(VocabularyKeys.VENDOR));
+        table.nextColumn();
         table.write(resources.getString(VocabularyKeys.IMPLEMENTATIONS));
-        table.writeHorizontalSeparator();
-        final StringBuffer vendors = new StringBuffer();
+        table.nextLine();
+        table.nextLine('\u2550');
+        final StringBuffer vendors         = new StringBuffer();
+        final StringBuffer implementations = new StringBuffer();
         for (final Iterator it=categories.iterator(); it.hasNext();) {
             /*
              * Writes the category name (CRSFactory, DatumFactory, etc.)
              */
             final Class category = (Class) it.next();
             table.write(Utilities.getShortName(category));
-            table.nextColumn('.');
+            table.nextColumn();
             /*
-             * Writes the authority, if applicable.
+             * Write the authorities in a single cell. Same for vendors and implementations.
              */
             for (final Iterator providers=registry.getServiceProviders(category); providers.hasNext();) {
-                if (vendors.length() != 0) {
-                    table  .write ('\n');
-                    vendors.append('\n');
+                if (implementations.length() != 0) {
+                    table          .write ('\n');
+                    vendors        .append('\n');
+                    implementations.append('\n');
                 }
-                final Factory provider = (Factory)providers.next();
+                final Factory provider = (Factory) providers.next();
                 final Citation vendor = provider.getVendor();
                 vendors.append(vendor.getTitle().toString(locale));
+                implementations.append(Utilities.getShortClassName(provider));
                 if (provider instanceof AuthorityFactory) {
                     final Citation authority   = ((AuthorityFactory) provider).getAuthority();
                     final Iterator identifiers = authority.getIdentifiers().iterator();
@@ -143,9 +151,14 @@ final class FactoryPrinter implements Comparator {
             table.nextColumn();
             table.write(vendors.toString());
             vendors.setLength(0);
-            table.nextLine();
+            /*
+             * Writes the implementation class name.
+             */
+            table.nextColumn();
+            table.write(implementations.toString());
+            implementations.setLength(0);
+            table.writeHorizontalSeparator();
         }
-        table.writeHorizontalSeparator();
         table.flush();
     }
 }

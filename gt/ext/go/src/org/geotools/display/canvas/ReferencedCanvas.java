@@ -70,6 +70,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
@@ -176,6 +177,12 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * Will be created when first needed. The actual instance is {@link #hints} dependent.
      */
     private transient FactoryGroup crsFactories;
+
+    /**
+     * The coordinate operation factory. Will be created when first needed.
+     * The actual instance is {@link #hints} dependent.
+     */
+    private transient CoordinateOperationFactory opFactory;
 
     /**
      * {@code true} if this canvas use a {@link #getDefaultCRS default CRS} instead of
@@ -1164,8 +1171,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             throws FactoryException
     {
         if (crs.getBaseCRS() != baseCRS) {
-            final FactoryGroup crsFactories = getFactoryGroup();
-            final CoordinateOperationFactory factory = crsFactories.getCoordinateOperationFactory();
+            final CoordinateOperationFactory factory = getCoordinateOperationFactory();
             final CoordinateOperation operation = factory.createOperation(baseCRS, crs);
             final Conversion conversion;
             /*
@@ -1179,7 +1185,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
                 throw new FactoryException(Errors.format(
                             ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
             }
-            crs = /*crsFactories.getCRSFactory().*/createDerivedCRS(
+            crs = /*getFactoryGroup().getCRSFactory().*/createDerivedCRS(
                     AbstractIdentifiedObject.getProperties(crs, null),
                     conversion, baseCRS, crs.getCoordinateSystem());
         }
@@ -1401,12 +1407,25 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             record.setSourceMethodName(sourceMethodName);
             logger.log(record);
         }
-        CoordinateOperationFactory factory = getFactoryGroup().getCoordinateOperationFactory();
+        CoordinateOperationFactory factory = getCoordinateOperationFactory();
         tr = factory.createOperation(sourceCRS, targetCRS).getMathTransform();
         if (cachedTransform) {
             transforms.put(sourceCRS, tr);
         }
         return tr;
+    }
+
+    /**
+     * Returns the coordinate operation factory. The actual instance is {@link #hints} dependent.
+     */
+    private CoordinateOperationFactory getCoordinateOperationFactory() throws FactoryException {
+        assert Thread.holdsLock(this);
+        if (opFactory == null) {
+            final Hints tmp = new Hints(hints);
+            tmp.putAll(getFactoryGroup().getImplementationHints());
+            opFactory = FactoryFinder.getCoordinateOperationFactory(tmp);
+        }
+        return opFactory;
     }
 
     /**
@@ -1505,6 +1524,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     protected void clearCache() {
         super.clearCache();
         transforms.clear();
+        opFactory         = null;
         crsFactories      = null;
         affineMethod      = null;
         objectivePosition = null;

@@ -20,10 +20,8 @@
 package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Comparator;
 import java.util.Collections;
@@ -34,16 +32,14 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
-import java.io.PrintWriter;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.referencing.cs.CSAuthorityFactory;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.datum.DatumAuthorityFactory;
+import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 
 // Geotools dependencies
 import org.geotools.factory.JNDI;
@@ -61,8 +57,6 @@ import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.resources.Arguments;
-import org.geotools.util.MonolineFormatter;
 
 
 /**
@@ -90,7 +84,10 @@ import org.geotools.util.MonolineFormatter;
  *
  * @see DataSource
  */
-public class DefaultFactory extends DeferredAuthorityFactory {
+public class DefaultFactory extends DeferredAuthorityFactory
+        implements CRSAuthorityFactory, CSAuthorityFactory, DatumAuthorityFactory,
+                   CoordinateOperationAuthorityFactory
+{
     /**
      * The JDBC {@linkplain DataSource data source} name in JNDI.
      */
@@ -102,9 +99,19 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     private static FactoryRegistry datasources;
 
     /**
+     * The priority level for this factory.
+     */
+    static final int PRIORITY = MAXIMUM_PRIORITY-10;
+
+    /**
      * The hints for this factory. Null for now, but may be different in a future version.
      */
     private static final Hints HINTS = null;
+
+    /**
+     * The factories to be given to the backing store.
+     */
+    private final FactoryGroup factories;
 
     /**
      * The data source, or {@code null} if the connection has not yet been etablished.
@@ -127,12 +134,12 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      * Constructs an authority factory using a set of factories created from the specified hints.
      * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
-     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
-     * a low-level substitute for all the above.
+     * {@code FACTORY} hints.
      */
     public DefaultFactory(final Hints hints) {
-        super(hints, MAXIMUM_PRIORITY-10);
-        setTimeout(30*60*1000L); // Closes the connection after at least 30 minutes of inactivity.
+        super(hints, PRIORITY);
+        factories = FactoryGroup.createInstance(hints);
+        setTimeout(30*60*1000L); // Close the connection after at least 30 minutes of inactivity.
     }
 
     /**
@@ -157,7 +164,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         if (datasource == null) {
             // Force the creation of the underlying backing store. It will invokes
             // (indirectly) createBackingStore, which will fetch the DataSource.
-            if (!super.isReady()) {
+            if (!super.isAvailable()) {
                 // Connection failed, but the exception is not available.
                 throw new SQLException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
             }
@@ -168,7 +175,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     /**
      * Set the data source for the EPSG database. If an other EPSG database was already in use,
      * it will be disconnected. Users should not invoke this method on the factory returned by
-     * {@link org.geotools.referencing.FactoryFinder}, since it would have a system-wide effect.
+     * {@link FactoryFinder}, since it could have a system-wide effect.
      *
      * @param  datasource The new datasource.
      * @throws SQLException if an error occured.
@@ -218,6 +225,20 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     }
 
     /**
+     * Invokes {@link DataSource#createFactory} with all hints reserved for it.
+     *
+     * <strong>Note:</strong>   {@link #hints} is usually empty (the super class do not retains
+     * any hint except the authority factories after the backing store is created), but we take
+     * it just for the principle. The potentially relevant hints are the one specified in
+     * {@link #factories}.
+     */
+    private AbstractAuthorityFactory createFactory(final DataSource source) throws SQLException {
+        final Hints sourceHints = new Hints(hints);
+        sourceHints.putAll(factories.getImplementationHints());
+        return source.createFactory(sourceHints);
+    }
+
+    /**
      * Gets the EPSG factory implementation connected to the database. This method is invoked
      * automatically by {@link #createBackingStore}. The default implementation search for a
      * {@link DataSource} registered in JNDI (Java Naming Directory) for the
@@ -234,7 +255,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     private AbstractAuthorityFactory createFactory() throws FactoryException, SQLException {
         assert Thread.holdsLock(this);
         if (datasource != null) {
-            return datasource.createFactory(new Hints(FactoryGroup.HINT_KEY, factories));
+            return createFactory(datasource);
         }
         /*
          * Try to gets the DataSource from JNDI. In case of success, it will be tried
@@ -268,7 +289,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         SQLException             failure = null;
         while (true) {
             if (source != null) try {
-                factory = source.createFactory(new Hints(FactoryGroup.HINT_KEY, factories));
+                factory = createFactory(source);
                 break; // Found a successfull connection: stop the loop.
             } catch (SQLException exception) {
                 // Keep only the exception from the first data source.
@@ -303,12 +324,19 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                                         DATASOURCE_NAME);
                 record.setThrown(exception);
             }
-            record.setSourceMethodName(DefaultFactory.class.getName());
-            record.setSourceMethodName("createBackingStore"); // The public caller.
-            LOGGER.log(record);
+            log(record);
         }
         this.datasource = source;
         return factory;
+    }
+
+    /**
+     * For internal use by {@link #createFactory} and {@link #createBackingStore} only.
+     */
+    private static void log(final LogRecord record) {
+        record.setSourceMethodName(DefaultFactory.class.getName());
+        record.setSourceMethodName("createBackingStore"); // The public caller.
+        LOGGER.log(record);
     }
 
     /**
@@ -336,8 +364,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             throw new FactoryException(Errors.format(ErrorKeys.CANT_CONNECT_DATABASE_$1, "EPSG"),
                                        exception);
         }
-        // TODO: Provide a localized message including the database version.
-        LOGGER.config("Connected to EPSG database \"" + url + "\" on " + product + '.');
+        log(Logging.format(Level.CONFIG, LoggingKeys.CONNECTED_EPSG_DATABASE_$2, url, product));
         if (factory instanceof FactoryUsingSQL) {
             ((FactoryUsingSQL) factory).buffered = this;
         }
@@ -359,32 +386,36 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     }
 
     /**
+     * Ensures that the database connection will be closed on JVM exit. This code will be executed
+     * even if the JVM is terminated because of an exception or with [Ctrl-C]. Note: we create this
+     * shutdown hook only if this factory is registered as a service because it will prevent this
+     * instance to be garbage collected until it is deregistered.
+     */
+    private final class ShutdownHook extends Thread {
+        public ShutdownHook() {
+            super(FactoryUsingSQL.SHUTDOWN_THREAD);
+        }
+
+        public void run() {
+            synchronized (DefaultFactory.this) {
+                try {
+                    dispose();
+                } catch (FactoryException exception) {
+                    // To late for logging, since the JVM is
+                    // in process of shutting down. Ignore...
+                }
+            }
+        }
+    }
+
+    /**
      * Called when this factory is added to the given {@code category} of the given
      * {@code registry}. The object may already be registered under another category.
      */
     public synchronized void onRegistration(final ServiceRegistry registry, final Class category) {
         super.onRegistration(registry, category);
-        /*
-         * Ensures that the database connection will be closed on JVM exit.
-         * This code will be executed even if the JVM is terminated because
-         * of an exception or with [Ctrl-C]. Note: we create this shutdown
-         * hook only if this factory is registered as a service because it
-         * will prevent this instance to be garbage collected until it is
-         * deregistered.
-         */
         if (shutdown == null) {
-            shutdown = new Thread(FactoryUsingSQL.SHUTDOWN_THREAD) {
-                public void run() {
-                    synchronized (DefaultFactory.this) {
-                        try {
-                            dispose();
-                        } catch (FactoryException exception) {
-                            // To late for logging, since the JVM is
-                            // in process of shutting down. Ignore...
-                        }
-                    }
-                }
-            };
+            shutdown = new ShutdownHook();
             Runtime.getRuntime().addShutdownHook(shutdown);
         }
     }
@@ -396,6 +427,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     public synchronized void onDeregistration(final ServiceRegistry registry, final Class category) {
         if (shutdown != null) {
             if (registry.getServiceProviderByClass(getClass()) == null) {
+                // Remove the shutdown hook only if this instance is not
+                // anymore registered as a service under any category.
                 Runtime.getRuntime().removeShutdownHook(shutdown);
                 shutdown = null;
             }
@@ -418,6 +451,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      * </pre></blockquote>
      *
      * The following optional arguments are supported:
+     *
      * <blockquote>
      *   <strong>{@code -encoding} <var>charset</var></strong><br>
      *       Sets the console encoding for this application output. This value has
@@ -430,81 +464,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      * @param args A list of EPSG code to display.
      *             An arbitrary number of codes can be specified on the command line.
      */
-    public static void main(String[] args) {
-        final Arguments arguments = new Arguments(args);
-        final boolean     printMT = arguments.getFlag("-transform");
-        args = arguments.getRemainingArguments(Integer.MAX_VALUE);
-        final PrintWriter out = arguments.out;
-        final char[] separator = new char[79];
-        Arrays.fill(separator, '_');
-        /*
-         * Constructs and prints each object. In the process, keep all coordinate reference systems.
-         * They will be used later for printing math transforms. This is usefull in order to check
-         * if the EPSG database provides enough information that Geotools know about for creating
-         * the coordinate operation.
-         */
-        int count = 0;
-        final CoordinateReferenceSystem[] crs = new CoordinateReferenceSystem[args.length];
-        try {
-            AuthorityFactory factory = null;
-            try {
-                for (int i=0; i<args.length; i++) {
-                    if (factory == null) {
-                        factory = FactoryFinder.getCRSAuthorityFactory("EPSG", HINTS);
-                        if (factory instanceof AbstractAuthorityFactory) {
-                            out.println(((AbstractAuthorityFactory) factory).getBackingStoreDescription());
-                        }
-                    }
-                    final Object object = factory.createObject(args[i]);
-                    out.println(separator);
-                    out.println();
-                    out.println(object);
-                    if (object instanceof CoordinateReferenceSystem) {
-                        crs[count++] = (CoordinateReferenceSystem) object;
-                    }
-                }
-                /*
-                 * If the user asked for math transforms, prints them now. We will try all possible
-                 * combinaisons. If an operation is not found (usually because not yet implemented
-                 * in Geotools), prints the message on a single line (not the whole stack trace) and
-                 * continue. Other kinds of error will stop the process.
-                 */
-                if (printMT) {
-                    final CoordinateOperationFactory opFactory =
-                            FactoryFinder.getCoordinateOperationFactory(HINTS);
-                    for (int i=0; i<count; i++) {
-                        for (int j=i+1; j<count; j++) {
-                            out.println(separator);
-                            out.println();
-                            final CoordinateOperation op;
-                            try {
-                                op = opFactory.createOperation(crs[i], crs[j]);
-                            } catch (OperationNotFoundException exception) {
-                                out.println(exception.getLocalizedMessage());
-                                continue;
-                            }
-                            out.println(op);
-                            out.println();
-                            out.println(op.getMathTransform());
-                        }
-                    }
-                }
-            } finally {
-                /*
-                 * It is possible to dispose the factory right after CRS creation and before math
-                 * transform creation.  However, it is better to dispose after math transforms in
-                 * order to avoid opening and closing the database connection twice (the operation
-                 * factory too may uses this factory).
-                 */
-                if (factory instanceof AbstractAuthorityFactory) {
-                    ((AbstractAuthorityFactory) factory).dispose();
-                }
-            }
-        } catch (Exception exception) {
-            out.flush();
-            exception.printStackTrace(arguments.err);
-            return;
-        }
-        out.flush();
+    public static void main(final String[] args) {
+        Console.main(args);
     }
 }

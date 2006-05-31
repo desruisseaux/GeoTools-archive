@@ -20,6 +20,8 @@ package org.geotools.factory;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Collection;
 import java.lang.reflect.Modifier;
@@ -60,6 +62,12 @@ public class FactoryCreator extends FactoryRegistry {
     private static final Class[] HINTS_ARGUMENT = new Class[] {Hints.class};
 
     /**
+     * Objects under construction for each implementation class.
+     * Used as a guard against infinite recursivity.
+     */
+    private final Set/*<Class>*/ underConstruction = new HashSet();
+
+    /**
      * Constructs a new registry for the specified categories.
      *
      * @param categories The categories.
@@ -98,25 +106,31 @@ public class FactoryCreator extends FactoryRegistry {
             notFound = exception;
         }
         /*
-         * No existing factory found. Creates one using reflection.
+         * No existing factory found. Creates one using reflection. First, we
+         * check if an implementation class was explicitly specified by the user.
          */
         if (hints!=null && key!=null) {
             final Object hint = hints.get(key);
             if (hint != null) {
-                final Class type;
+                final Class[] types;
                 if (hint instanceof Class[]) {
-                    type = ((Class[]) hint)[0];
-                    // Should not fails, since Hints.isCompatibleValue(Object)
-                    // do not allows empty array.
+                    types = (Class[]) hint;
                 } else {
-                    type = (Class) hint;
+                    types = new Class[] {(Class) hint};
                     // Should not fails, since non-class argument should
                     // have been accepted by 'getServiceProvider(...)'.
                 }
-                if (type!=null && category.isAssignableFrom(type)) {
-                    final int modifiers = type.getModifiers();
-                    if (!Modifier.isAbstract(modifiers)) {
-                        return createServiceProvider(category, type, hints);
+                for (int i=0; i<types.length; i++) {
+                    final Class type = types[i];
+                    if (type!=null && category.isAssignableFrom(type)) {
+                        final int modifiers = type.getModifiers();
+                        if (!Modifier.isAbstract(modifiers)) {
+                            final Object candidate = createSafe(category, type, hints);
+                            if (isAcceptable(candidate, category, hints, filter)) {
+                                return candidate;
+                            }
+                            dispose(candidate);
+                        }
                     }
                 }
             }
@@ -124,39 +138,63 @@ public class FactoryCreator extends FactoryRegistry {
         /*
          * No implementation hint provided. Search the first implementation
          * accepting a Hints argument. No-args constructor will be ignored.
+         * Note: all Factory objects should be fully constructed by now,
+         * since the super-class has already iterated over all factories.
          */
         for (final Iterator it=getServiceProviders(category); it.hasNext();) {
             final Object factory = it.next();
-            if (hints!=null && factory instanceof Factory) {
-                final Map impl = ((Factory) factory).getImplementationHints();
-                if (impl!=null && impl.entrySet().containsAll(hints.entrySet())) {
-                    /*
-                     * This factory has already been considered by the super-class, and rejected
-                     * for some reason. Probably it didn't pass the ServiceRegistry.Filter test.
-                     * Avoid the potentially costly object creation below.
-                     */
-                    continue;
-                }
-            }
-            final Class implementation = factory.getClass();
-            try {
-                implementation.getConstructor(HINTS_ARGUMENT);
-            } catch (NoSuchMethodException exception) {
-                // No public constructor with the expected argument.
+            if (filter!=null && !filter.filter(factory)) {
                 continue;
             }
-            final Object candidate = createServiceProvider(category, implementation, hints);
-            if (filter==null || filter.filter(candidate)) {
+            final Class implementation = factory.getClass();
+            final Object candidate;
+            try {
+                candidate = createSafe(category, implementation, hints);
+            } catch (FactoryRegistryException exception) {
+                if (exception.getCause() instanceof NoSuchMethodException) {
+                    // No public constructor with the expected argument.
+                    // Try an other implementation.
+                    continue;
+                } else {
+                    // Other kind of error, probably unexpected.
+                    // Let the exception propagates.
+                    throw exception;
+                }
+            }
+            if (FILTER.filter(candidate) && isAcceptable(candidate, category, hints, filter)) {
                 return candidate;
             }
+            dispose(candidate);
         }
         throw notFound;
     }
 
     /**
+     * Invokes {@link #createServiceProvider}, but checks against recursive calls.
+     * It make debugging easier than inspecting a {@link StackOverflowError}.
+     */
+    private Object createSafe(final Class category,
+                              final Class implementation,
+                              final Hints hints)
+    {
+        if (!underConstruction.add(implementation)) {
+            throw new FactoryRegistryException(Errors.format(ErrorKeys.RECURSIVE_CALL_$2,
+                      Utilities.getShortName(implementation), Utilities.getShortName(category)));
+        }
+        try {
+            return createServiceProvider(category, implementation, hints);
+        } finally {
+            if (!underConstruction.remove(implementation)) {
+                throw new AssertionError();
+            }
+        }
+    }
+
+    /**
      * Creates a new instance of the specified factory using the specified hints.
-     * The default implementation try to instantiate the given implementation class
-     * the first of the following constructor found:
+     * The default implementation tries to instantiate the given implementation class
+     * using the first of the following constructor found:
+     * <p>
      * <ul>
      *   <li>Constructor with a single {@link Hints} argument.</li>
      *   <li>No-argument constructor.</li>
@@ -179,11 +217,12 @@ public class FactoryCreator extends FactoryRegistry {
                 return implementation.getConstructor(HINTS_ARGUMENT).newInstance(new Object[]{hints});
             } catch (NoSuchMethodException exception) {
                 // Constructor do not exists or is not public. We will fallback on the no-arg one.
+                cause = exception;
             }
             try {
                 return implementation.getConstructor((Class[])null).newInstance((Object[])null);
             } catch (NoSuchMethodException exception) {
-                cause = exception; // No constructor accessible
+                // No constructor accessible. Do not store the cause (we keep the one above).
             }
         } catch (IllegalAccessException exception) {
             cause = exception; // constructor is not public (should not happen)
@@ -191,8 +230,20 @@ public class FactoryCreator extends FactoryRegistry {
             cause = exception; // The class is abstract
         } catch (InvocationTargetException exception) {
             cause = exception.getCause(); // Exception in constructor
+            if (cause instanceof FactoryRegistryException) {
+                throw (FactoryRegistryException) cause;
+            }
         }
         throw new FactoryRegistryException(Errors.format(ErrorKeys.CANT_CREATE_FACTORY_$1,
                                            Utilities.getShortName(implementation)), cause);
+    }
+
+    /**
+     * Dispose the specified factory after. This method is invoked when a factory has been
+     * created, and then {@code FactoryCreator} determined that the factory doesn't meet
+     * user's requirements.
+     */
+    private static void dispose(final Object factory) {
+        // Empty for now. This method is merely a reminder for disposal in future Geotools versions.
     }
 }

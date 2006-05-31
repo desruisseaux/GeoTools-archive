@@ -109,6 +109,8 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  * @version $Id$
  * @author Didier Richard
  * @author Martin Desruisseaux
+ *
+ * @tutorial http://docs.codehaus.org/display/GEOTOOLS/How+to+install+the+EPSG+database+in+PostgreSQL
  */
 public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSource {
     /**

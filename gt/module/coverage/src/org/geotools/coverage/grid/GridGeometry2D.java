@@ -420,7 +420,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         }
         final CoordinateReferenceSystem crs = super.getCoordinateReferenceSystem();
         if (FACTORY_GROUP == null) {
-            FACTORY_GROUP = new FactoryGroup();
+            FACTORY_GROUP = FactoryGroup.createInstance(null);
             // No need to synchronize: this is not a big deal
             // if two FactoryGroup instances are created.
         }

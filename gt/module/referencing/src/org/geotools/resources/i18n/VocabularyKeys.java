@@ -243,6 +243,7 @@ public final class VocabularyKeys {
     public static final int USE_BEST_RESOLUTION                =   180;
     public static final int UTC                                =   181;
     public static final int VALUE                              =   182;
+    public static final int VENDOR                             =   222;
     public static final int VERSION_$1                         =   183;
     public static final int VERTICAL                           =   184;
     public static final int VERTICAL_COMPONENT                 =   185;

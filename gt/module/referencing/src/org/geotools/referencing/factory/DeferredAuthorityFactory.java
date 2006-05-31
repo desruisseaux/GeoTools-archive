@@ -23,8 +23,10 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -34,10 +36,13 @@ import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.Factory;
 import org.geotools.factory.OptionalFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
@@ -78,13 +83,8 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      * Constructs an instance without initial backing store. Subclasses are responsible for
      * creating an appropriate backing store when the {@link #createBackingStore} method is
      * invoked.
-     * <p>
-     * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
-     * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
-     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
-     * a low-level substitute for all the above.
      *
-     * @param hints The factories to use as a set of hints.
+     * @param hints An optional set of hints, or {@code null} if none.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
@@ -93,23 +93,16 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      *
      * @since 2.2
      */
-    protected DeferredAuthorityFactory(final Hints hints,
-                                       final int priority)
-    {
-        super(hints, priority, DEFAULT_MAX);
+    protected DeferredAuthorityFactory(final Hints hints, final int priority) {
+        super(priority, DEFAULT_MAX);
     }
 
     /**
      * Constructs an instance without initial backing store. Subclasses are responsible for
      * creating an appropriate backing store when the {@link #createBackingStore} method is
      * invoked.
-     * <p>
-     * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
-     * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
-     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
-     * a low-level substitute for all the above.
      *
-     * @param hints The factories to use as a set of hints.
+     * @param hints An optional set of hints, or {@code null} if none.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
@@ -123,15 +116,15 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
                                        final int priority,
                                        final int maxStrongReferences)
     {
-        super(hints, priority, maxStrongReferences);
+        super(priority, maxStrongReferences);
     }
 
     /**
-     * Returns {@code true} if this factory is ready. The default implementation returns
+     * Returns {@code true} if this factory is available. The default implementation returns
      * {@code false} if {@link #createBackingStore} throws an exception.
      */
-    public boolean isReady() {
-        return super.isReady();
+    public boolean isAvailable() {
+        return super.isAvailable();
     }
 
     /**
@@ -147,6 +140,7 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
             if (backingStore == null) {
                 throw new FactoryNotFoundException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
             }
+            completeHints();
         }
         used = true; // Tell to the disposer to wait again.
         return backingStore;
@@ -232,13 +226,18 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
                         backingStore = null;
                     } catch (FactoryException exception) {
                         backingStore = null;
-                        final LogRecord record = new LogRecord(Level.WARNING,
-                                "Failed to dispose the backing store after timeout."); // TODO: localize
+                        final LogRecord record = Logging.format(Level.WARNING,
+                                LoggingKeys.CANT_DISPOSE_BACKING_STORE);
                         record.setSourceMethodName("run");
                         record.setSourceClassName(Disposer.class.getName());
                         record.setThrown(exception);
                         LOGGER.log(record);
                     }
+                    // Needed in order to lets GC do its job.
+                    hints.remove(Hints.DATUM_AUTHORITY_FACTORY);
+                    hints.remove(Hints.CS_AUTHORITY_FACTORY);
+                    hints.remove(Hints.CRS_AUTHORITY_FACTORY);
+                    hints.remove(Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY);
                 }
             }
         }

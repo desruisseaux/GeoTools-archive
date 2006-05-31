@@ -20,51 +20,20 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.units.ConversionException;
 import javax.units.Unit;
 
 // OpenGIS dependencies
-import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.metadata.Identifier;             // For javadoc
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.referencing.datum.Datum;
-import org.opengis.referencing.datum.DatumFactory;
-import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.datum.VerticalDatum;
-import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.datum.Ellipsoid;
-import org.opengis.referencing.crs.CompoundCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.crs.SingleCRS;
-import org.opengis.referencing.crs.VerticalCRS;
-import org.opengis.referencing.cs.CSFactory;
-import org.opengis.referencing.cs.CartesianCS;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.cs.EllipsoidalCS;
-import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.Operation;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.metadata.Identifier; // For javadoc
+import org.opengis.referencing.cs.*;
+import org.opengis.referencing.crs.*;
+import org.opengis.referencing.datum.*;
+import org.opengis.referencing.operation.*;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -74,7 +43,6 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
-import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -82,6 +50,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.XArray;
 import org.geotools.util.Singleton;
+import org.geotools.util.WeakValueHashMap;
 
 
 /**
@@ -94,18 +63,18 @@ import org.geotools.util.Singleton;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class FactoryGroup {
+public final class FactoryGroup extends ReferencingFactory {
     /**
-     * Hint for the {@code FactoryGroup} instance to use. This hint is a somewhat low-level details
-     * of Geotools implementation, which is why this hint is not listed in the {@link Hints} class.
-     * The {@link Hints#CRS_FACTORY CRS_FACTORY} hint and its friend should be suffisient in most
-     * cases.
-     *
-     * @see #createInstance
-     *
-     * @since 2.2
+     * Pool of already-created factory groups. The keys are snapshot of the {@code FactoryGroup}
+     * <strong>at the time they were created</strong>. Those snapshots are never visible outside
+     * this pool. Values are the {@code FactoryGroup} actually in use.
      */
-    public static final Hints.Key HINT_KEY = new Hints.Key(FactoryGroup.class);
+    private static final Map/*<FactoryGroup,FactoryGroup>*/ pool = new WeakValueHashMap();
+
+    /**
+     * Factory groups under construction. Used as a guard against infinite recursivity.
+     */
+    private static final Set/*<Hints>*/ underConstruction = new HashSet();
 
     /**
      * The {@linkplain Datum datum} factory.
@@ -126,31 +95,27 @@ public class FactoryGroup {
     private CRSFactory crsFactory;
 
     /**
-     * The {@linkplain CoordinateOperation coordinate operation} factory.
-     * If null, then a default factory will be created only when first needed.
-     *
-     * @since 2.2
-     */
-    private CoordinateOperationFactory opFactory;
-
-    /**
      * The {@linkplain MathTransform math transform} factory.
      * If null, then a default factory will be created only when first needed.
      */
     private MathTransformFactory mtFactory;
 
+    // WARNING: Do NOT put a CoordinateOperationFactory field in FactoryGroup. We tried that in
+    // Geotools 2.2, and removed it in Geotools 2.3 because it leads to very tricky recursivity
+    // problems when we try to initialize it with FactoryFinder.getCoordinateOperationFactory.
+    // The Datum, CS, CRS and MathTransform factories above are standalone, while the Geotools
+    // implementation of CoordinateOperationFactory has complex dependencies with all of those,
+    // and even with authority factories.
+
     /**
-     * Constructs an instance using the default factories.
-     * Default factories are:
-     *
-     * <blockquote><pre>
-     * FactoryFinder.{@linkplain FactoryFinder#getDatumFactory         getDatumFactory}(null);
-     * FactoryFinder.{@linkplain FactoryFinder#getCSFactory            getCSFactory}(null);
-     * FactoryFinder.{@linkplain FactoryFinder#getCRSFactory           getCRSFactory}(null);
-     * FactoryFinder.{@linkplain FactoryFinder#getMathTransformFactory MathTransformFactory}(null);
-     * </pre></blockquote>
+     * Creates a snapshot of the specified group.
+     * Used only for creating keys in the {@linkplain #pool}.
      */
-    public FactoryGroup() {
+    private FactoryGroup(final FactoryGroup group) {
+        this.datumFactory = group.datumFactory;
+        this.csFactory    = group.csFactory;
+        this.crsFactory   = group.crsFactory;
+        this.mtFactory    = group.mtFactory;
     }
 
     /**
@@ -162,6 +127,10 @@ public class FactoryGroup {
      * @param   crsFactory The {@linkplain CoordinateReferenceSystem coordinate reference system}
      *                     factory.
      * @param    mtFactory The {@linkplain MathTransform math transform} factory.
+     *
+     * @deprecated Use {@link #createInstance} instead. The fate of this constructor is
+     *             incertain. It may be removed in Geotools 2.3, or refactored as a new
+     *             {@code createInstance} convenience method.
      */
     public FactoryGroup(final DatumFactory      datumFactory,
                         final CSFactory            csFactory,
@@ -177,32 +146,43 @@ public class FactoryGroup {
     /**
      * Constructs an instance using the factories initialized with the specified hints.
      *
-     * @see #createInstance
+     * <strong>Note:</strong> This constructor is incomplete, which is why it is private.
+     * The construction is finished inside the {@link #createInstance} method.
      */
-    public FactoryGroup(Hints hints) {
+    private FactoryGroup(final Hints reduced) {
         /*
          * If hints are provided, we will fetch factory immediately (instead of storing the hints
          * in an inner field) because most factories will retain few hints, while the Hints map
          * may contains big objects. If no hints were provided, we will construct factories only
          * when first needed.
          */
-        if (hints!=null && !hints.isEmpty()) {
-            if (!hints.containsKey(HINT_KEY)) {
-                hints = new Hints(hints);
-                hints.putAll(hints());
-            }
-            datumFactory = FactoryFinder.getDatumFactory              (hints);
-            csFactory    = FactoryFinder.getCSFactory                 (hints);
-            crsFactory   = FactoryFinder.getCRSFactory                (hints);
-            opFactory    = FactoryFinder.getCoordinateOperationFactory(hints);
-            mtFactory    = FactoryFinder.getMathTransformFactory      (hints);
-        }
+        datumFactory =         (DatumFactory) reduced.remove(Hints.DATUM_FACTORY);
+        csFactory    =            (CSFactory) reduced.remove(Hints.CS_FACTORY);
+        crsFactory   =           (CRSFactory) reduced.remove(Hints.CRS_FACTORY);
+        mtFactory    = (MathTransformFactory) reduced.remove(Hints.MATH_TRANSFORM_FACTORY);
     }
 
     /**
-     * Creates an instance from the specified hints. If the hints contains a {@link #HINT_KEY}
-     * value, then the specified factory group will be returned. Otherwise, a new one will be
-     * created.
+     * Fetch all remaining factory. This method should be invoked only if it has been determined
+     * that the default factories may not fit, i.e. there is some remaining hints after the one
+     * removed by the constructor above.
+     */
+    private void complete(final Hints hints) {
+        if (datumFactory == null) datumFactory = FactoryFinder.getDatumFactory        (hints);
+        if (   csFactory == null) csFactory    = FactoryFinder.getCSFactory           (hints);
+        if (  crsFactory == null) crsFactory   = FactoryFinder.getCRSFactory          (hints);
+        if (   mtFactory == null) mtFactory    = FactoryFinder.getMathTransformFactory(hints);
+    }
+
+    // TODO : All this stuff (including the constructor splitted with an external 'complete'
+    //        method) is a very complicated mess. Try to get ride of all of those, and implement
+    //        a cache mechanism straight into FactoryCreator instead.
+
+    /**
+     * Creates an instance from the specified hints. This method recognizes the
+     * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
+     * {@link Hints#DATUM_FACTORY DATUM} and
+     * {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
      *
      * @param  hints The hints, or {@code null} if none.
      * @return A factory group created from the specified set of hints.
@@ -210,46 +190,79 @@ public class FactoryGroup {
      * @since 2.2
      */
     public static FactoryGroup createInstance(final Hints hints) {
-        if (hints != null) {
-            final FactoryGroup candidate = (FactoryGroup) hints.get(HINT_KEY);
-            if (candidate != null) {
-                return candidate;
+        final Hints reduced = new Hints(hints);
+        final FactoryGroup candidate = new FactoryGroup(reduced);
+        synchronized (pool) {
+            if (!reduced.isEmpty()) {
+                /*
+                 * We still have some hints that need to be taken in account. Since we can't guess
+                 * which hints are relevant and which ones are not, we have to create all factories
+                 * now. While not likely, special care must be taken against infinite recursivity
+                 * because StackOverflowErrors are difficult to debug.
+                 */
+                if (!underConstruction.add(hints)) {
+                    // Detected a recursivity.
+                    throw new IllegalStateException();
+                }
+                try {
+                    candidate.complete(hints);
+                } finally {
+                    if (!underConstruction.remove(hints)) {
+                        // Should not happen unless there is a problem with 'hashCode' or 'equals'.
+                        throw new AssertionError();
+                    }
+                }
             }
+            /*
+             * If a factory already exists in the pool, returns the previous instance
+             * and discarts the new one. Otherwise, cache the new instance in the pool
+             * using a snapshot of current state as the key. We use a "snapshot" because
+             * the state of the new instance may change, which is inapropriate for a key.
+             */
+            final FactoryGroup existing = (FactoryGroup) pool.get(candidate);
+            if (existing != null) {
+                return existing;
+            }
+            candidate.snapshot();
         }
-        return new FactoryGroup(hints);
+        return candidate;
     }
 
     /**
-     * Copies in the specified map all values for the {@link Hints#CRS_FACTORY CRS},
-     * {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM} and
-     * {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
-     * A {@link #HINT_KEY} is put in addition for this {@code FactoryGroup} instance,
-     * but it should be considered as low-level detail. This method is provided as a helper
-     * for implementation of {@link org.geotools.factory.Factory#getImplementationHints}
-     * methods.
-     *
-     * @param hints The map to put hints into.
-     *
-     * @since 2.2
+     * Caches this instance in the pool. This method uses a "snapshot" for the key
+     * because the state of this instance may change, which is inapropriate for a key.
      */
-    public void getHints(final Map hints) {
-        hints.put(Hints.                 CRS_FACTORY, getCRSFactory());
-        hints.put(Hints.                  CS_FACTORY, getCSFactory());
-        hints.put(Hints.               DATUM_FACTORY, getDatumFactory());
-        hints.put(Hints.COORDINATE_OPERATION_FACTORY, getCoordinateOperationFactory());
-        hints.put(Hints.      MATH_TRANSFORM_FACTORY, getMathTransformFactory());
-        hints.putAll(hints());
+    private void snapshot() {
+        // Note: WeakValueHashMap is already synchronized.
+        pool.put(new FactoryGroup(this), this);
+    }
+
+    /**
+     * Returns all factories in this group. The returned map contains values for the
+     * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
+     * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
+     *
+     * @since 2.3
+     */
+    public Map getImplementationHints() {
+        synchronized (hints) {
+            if (hints.isEmpty()) {
+                hints.put(Hints.           CRS_FACTORY, getCRSFactory());
+                hints.put(Hints.            CS_FACTORY, getCSFactory());
+                hints.put(Hints.         DATUM_FACTORY, getDatumFactory());
+                hints.put(Hints.MATH_TRANSFORM_FACTORY, getMathTransformFactory());
+            }
+        }
+        return super.getImplementationHints();
     }
 
     /**
      * Returns the hints to be used for lazy creation of <em>default</em> factories in various
-     * {@code getFoo} methods. This is different from {@link #getHints} because the later may
-     * returns non-default factories. The hint provided by this method is needed in order to
-     * avoid never-ending loop when a factory creation requires a {@code FactoryGroup} instance
-     * (for example in {@link DefaultCoordinateOperationFactory}).
+     * {@code getFoo} methods. This is different from {@link #getImplementationHints} because
+     * the later may returns non-default factories.
      */
     private Hints hints() {
-        return new Hints(HINT_KEY, this);
+        return new Hints(hints);
     }
 
     /**
@@ -257,7 +270,17 @@ public class FactoryGroup {
      */
     public DatumFactory getDatumFactory() {
         if (datumFactory == null) {
-            datumFactory = FactoryFinder.getDatumFactory(hints());
+            /*
+             * Note: the synchronized statement is not for preventing 'datumFactory' to be
+             *       initialized twice. This is not a big deal if such case happens, which
+             *       is why the synchronized statement do not appears at a higher lever.
+             *       It is rather for making sure that only one field has been initialized
+             *       for each call to 'snapshot()'.
+             */
+            synchronized (pool) {
+                datumFactory = FactoryFinder.getDatumFactory(hints());
+                snapshot();
+            }
         }
         return datumFactory;
     }
@@ -267,7 +290,11 @@ public class FactoryGroup {
      */
     public CSFactory getCSFactory() {
         if (csFactory == null) {
-            csFactory = FactoryFinder.getCSFactory(hints());
+            // See synchronization note above.
+            synchronized (pool) {
+                csFactory = FactoryFinder.getCSFactory(hints());
+                snapshot();
+            }
         }
         return csFactory;
     }
@@ -277,21 +304,13 @@ public class FactoryGroup {
      */
     public CRSFactory getCRSFactory() {
         if (crsFactory == null) {
-            crsFactory = FactoryFinder.getCRSFactory(hints());
+            // See synchronization note above.
+            synchronized (pool) {
+                crsFactory = FactoryFinder.getCRSFactory(hints());
+                snapshot();
+            }
         }
         return crsFactory;
-    }
-
-    /**
-     * Returns the {@linkplain CoordinateOperation coordinate operation} factory.
-     *
-     * @since 2.2
-     */
-    public CoordinateOperationFactory getCoordinateOperationFactory() {
-        if (opFactory == null) {
-            opFactory = FactoryFinder.getCoordinateOperationFactory(hints());
-        }
-        return opFactory;
     }
 
     /**
@@ -299,7 +318,11 @@ public class FactoryGroup {
      */
     public MathTransformFactory getMathTransformFactory() {
         if (mtFactory == null) {
-            mtFactory = FactoryFinder.getMathTransformFactory(hints());
+            // See synchronization note above.
+            synchronized (pool) {
+                mtFactory = FactoryFinder.getMathTransformFactory(hints());
+                snapshot();
+            }
         }
         return mtFactory;
     }

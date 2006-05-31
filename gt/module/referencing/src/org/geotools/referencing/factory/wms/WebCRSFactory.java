@@ -36,6 +36,7 @@ import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -45,7 +46,7 @@ import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
-import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.factory.DirectAuthorityFactory;
 
 
 /**
@@ -57,7 +58,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class WebCRSFactory extends AbstractAuthorityFactory {
+public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorityFactory {
     /**
      * The map of pre-defined CRS.
      */

@@ -50,7 +50,9 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.referencing.factory.epsg.LongitudeFirstFactory;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.factory.FactoryRegistryException;
 
 
 /**
@@ -73,6 +75,11 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
      * @see http://jira.codehaus.org/browse/GEOT-854
      */
     private static final boolean METADATA_ERASED = false;
+
+    /**
+     * For safety.
+     */
+    private static final String EPSG = "EPSG";
 
     /**
      * {@code true} for tracing operations on the standard output.
@@ -108,32 +115,80 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
     }
 
     /**
+     * Returns the ordered axis factory for the specified set of hints.
+     */
+    private static OrderedAxisAuthorityFactory getFactory(final Hints hints) {
+        CRSAuthorityFactory factory;
+        factory = FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+        assertTrue(factory instanceof LongitudeFirstFactory);
+        factory = (CRSAuthorityFactory) ((LongitudeFirstFactory) factory).getImplementationHints()
+                   .get(Hints.CRS_AUTHORITY_FACTORY);
+        assertTrue(factory instanceof OrderedAxisAuthorityFactory);
+        return (OrderedAxisAuthorityFactory) factory;
+    }
+
+    /**
+     * Tests the registration of the various flavor of {@link OrderedAxisAuthorityFactoryTest}
+     * for the EPSG authority factory.
+     */
+    public void testRegistration() {
+        final Hints  hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+        OrderedAxisAuthorityFactory factory;
+        factory = getFactory(hints);
+        assertTrue(factory.forceStandardDirections);
+        assertTrue(factory.forceStandardUnits);
+
+        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS, Boolean.TRUE);
+        assertSame(factory, getFactory(hints));
+        assertTrue(factory.forceStandardDirections);
+        assertTrue(factory.forceStandardUnits);
+
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.TRUE);
+        assertSame(factory, getFactory(hints));
+        assertTrue(factory.forceStandardDirections);
+        assertTrue(factory.forceStandardUnits);
+
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.FALSE);
+        factory = getFactory(hints);
+        assertTrue (factory.forceStandardDirections);
+        assertFalse(factory.forceStandardUnits);
+
+        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS, Boolean.FALSE);
+        factory = getFactory(hints);
+        assertFalse(factory.forceStandardDirections);
+        assertFalse(factory.forceStandardUnits);
+
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.TRUE);
+        factory = getFactory(hints);
+        assertFalse(factory.forceStandardDirections);
+        assertTrue (factory.forceStandardUnits);
+    }
+
+    /**
      * Tests the axis reordering.
      */
     public void testAxisReordering() throws FactoryException {
-        final String EPSG = "EPSG"; // For safety.
+        /*
+         * Tests the OrderedAxisAuthorityFactory creating using FactoryFinder. The following
+         * conditions are not tested directly, but are required in order to get the test to
+         * succeed:
+         *
+         *    - EPSG factories must be provided for both "official" and "modified" axis order.
+         *    - The "official" axis order must have precedence over the modified one.
+         *    - The hints are correctly understood by FactoryFinder.
+         */
         final AbstractAuthorityFactory factory0, factory1;
         final Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, AbstractAuthorityFactory.class);
         factory0 = (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
         assertFalse(factory0 instanceof OrderedAxisAuthorityFactory);
-        if (true) {
-            // The following line should be enough...
-            factory1 = new OrderedAxisAuthorityFactory(factory0, false);
-        } else {
-            // ... but we want to test the registration mechanism.
-            // TODO: Disabled for now, until MNG-441 get fixed.
-            try {
-                OrderedAxisAuthorityFactory.register(EPSG);
-                factory1 = (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
-            } finally {
-                OrderedAxisAuthorityFactory.unregister(EPSG);
-            }
-            assertNotSame(factory0, factory1);
-            assertTrue(factory1 instanceof OrderedAxisAuthorityFactory);
-            final AbstractAuthorityFactory afterUnregister =
-                    (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
-            assertSame(factory0, afterUnregister);
-        }
+        hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.TRUE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.TRUE);
+        factory1 = (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+        /*
+         * The local variables to be used for all remaining tests
+         * (usefull to setup in the debugger).
+         */
         String code;
         CoordinateReferenceSystem crs0, crs1;
         CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(null);
@@ -229,9 +284,9 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         assertTrue(mt.isIdentity());
         /*
          * Tests a projected CRS with (WEST, SOUTH) axis orientation.
-         * The factory should reorder the axis with no more operation than an axis swap.
-         * While the end result is a matrix like the GeographicCRS case, the path that
-         * lead to this result is much more complex.
+         * The factory should arrange the axis with no more operation than a direction change.
+         * While the end result is a matrix like the GeographicCRS case, the path that lead to
+         * this result is much more complex.
          */
         code = "22275";
         crs0 = factory0.createCoordinateReferenceSystem(code);
@@ -271,17 +326,17 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         Citation authority;
 
         // Tests the official factory.
-        factory   = FactoryFinder.getCRSAuthorityFactory("EPSG", null);
+        factory   = FactoryFinder.getCRSAuthorityFactory(EPSG, null);
         authority = factory.getAuthority();
         assertNotNull(authority);
         assertEquals("European Petroleum Survey Group", authority.getTitle().toString(Locale.US));
-        assertTrue(authority.getIdentifiers().contains("EPSG"));
+        assertTrue(authority.getIdentifiers().contains(EPSG));
 
         // Tests the modified factory.
-        factory   = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        factory   = new OrderedAxisAuthorityFactory(EPSG, null, null);
         authority = factory.getAuthority();
         assertNotNull(authority);
-        assertTrue(authority.getIdentifiers().contains("EPSG"));
+        assertTrue(authority.getIdentifiers().contains(EPSG));
     }
 
     /**
@@ -291,18 +346,18 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         CRSAuthorityFactory factory;
         Citation vendor;
 
-        factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
         vendor  = factory.getVendor();
         assertNotNull(vendor);
         assertEquals("Geotools", vendor.getTitle().toString(Locale.US));
-        assertFalse(vendor.getIdentifiers().contains("EPSG"));
+        assertFalse(vendor.getIdentifiers().contains(EPSG));
     }
 
     /**
      * Tests the amount of codes available.
      */
     public void testCodes() throws FactoryException {
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
         final Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
         assertNotNull(codes);
         assertTrue(codes.size() >= 3000);
@@ -312,7 +367,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
      * A random CRS for fun.
      */
     public void test26910() throws FactoryException {
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
         final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:26910");
         assertNotNull(crs);
         assertSame(crs, factory.createObject("EPSG:26910"));
@@ -322,7 +377,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
      * UDIG requires this to work.
      */
     public void test4326() throws FactoryException {
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
         final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:4326");
         assertNotNull(crs);
         assertSame(crs, factory.createObject("EPSG:4326"));
@@ -332,7 +387,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
      * UDIG requires this to work.
      */
     public void test4269() throws FactoryException {
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
         final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:4269");
         assertNotNull(crs);
         assertSame(crs, factory.createObject("EPSG:4269"));
@@ -346,7 +401,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
             // TODO: not yet implemented: this CRS doesn't exists in the EPSG database.
             return;
         }
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
         final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:42102");
         assertNotNull(crs);
         assertNotNull(crs.getIdentifiers());
@@ -363,7 +418,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         if (!verbose) {
             return;
         }
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, false);
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
         Set codes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         int total = codes.size();
         int count = 0;

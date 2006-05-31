@@ -33,6 +33,7 @@ import org.opengis.referencing.Factory;
 import org.opengis.referencing.ObjectFactory;
 
 // Geotools dependencies
+import org.geotools.factory.AbstractFactory;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.FactoryFinder;  // For javadoc
 import org.geotools.resources.i18n.ErrorKeys;
@@ -57,7 +58,7 @@ import org.geotools.resources.i18n.Errors;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class AbstractFactory extends org.geotools.factory.AbstractFactory implements Factory {
+public class ReferencingFactory extends AbstractFactory implements Factory {
     /**
      * The logger for event related to Geotools's factories.
      */
@@ -66,7 +67,7 @@ public class AbstractFactory extends org.geotools.factory.AbstractFactory implem
     /**
      * Constructs a factory with the default priority.
      */
-    protected AbstractFactory() {
+    protected ReferencingFactory() {
         super();
     }
 
@@ -77,7 +78,7 @@ public class AbstractFactory extends org.geotools.factory.AbstractFactory implem
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
      */
-    protected AbstractFactory(final int priority) {
+    protected ReferencingFactory(final int priority) {
         super(priority);
     }
 

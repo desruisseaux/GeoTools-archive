@@ -223,12 +223,12 @@ public final class Hints extends RenderingHints {
      *
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
-    public static final Key DATUM_SHIFT_METHOD =
-            new Key(String.class);
+    public static final Key DATUM_SHIFT_METHOD = new Key(String.class);
 
     /**
-     * Tells if coordinate operations should be allowed even when a datum shift is required while
-     * no method is found applicable. It may be for example that no
+     * Tells if {@linkplain org.opengis.referencing.operation.CoordinateOperation coordinate
+     * operations} should be allowed even when a datum shift is required while no method is
+     * found applicable. It may be for example that no
      * {@linkplain org.geotools.referencing.datum.BursaWolfParameters Bursa Wolf parameters} were
      * found for a datum shift. The default value is {@link Boolean#FALSE FALSE}, which means that
      * {@linkplain org.geotools.referencing.operation.DefaultCoordinateOperationFactory coordinate
@@ -244,8 +244,79 @@ public final class Hints extends RenderingHints {
      *
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
-    public static final Key LENIENT_DATUM_SHIFT =
-            new Key(Boolean.class);
+    public static final Key LENIENT_DATUM_SHIFT = new Key(Boolean.class);
+
+    /**
+     * Tells if the {@linkplain org.opengis.referencing.cs.CoordinateSystem coordinate systems}
+     * created by an {@linkplain org.opengis.referencing.cs.CSAuthorityFactory authority factory}
+     * should be forced to (<var>longitude</var>,<var>latitude</var>) axis order. This hint is
+     * especially useful for creating
+     * {@linkplan org.opengis.referencing.crs.CoordinateReferenceSystem coordinate reference system}
+     * objects from <A HREF="http://www.epsg.org">EPSG</A> codes. Most
+     * {@linkplan org.opengis.referencing.crs.GeographicCRS geographic CRS} defined in the EPSG
+     * database use (<var>latitude</var>,<var>longitude</var>) axis order. Unfortunatly, many
+     * data sources available in the world uses the opposite axis order and still claim to use
+     * a CRS described by an EPSG code. This hint allows to handle such data.
+     * <p>
+     * This hint shall be passed to the
+     * <code>{@linkplain org.geotools.referencing.FactoryFinder#getCRSAuthorityFactory
+     * FactoryFinder.getCRSAuthorityFactory}(...)</code> method. Whatever this hint is
+     * supported or not is authority dependent. In the default Geotools configuration,
+     * this hint is supported for the {@code "EPSG"} authority.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCSFactory
+     * @see org.geotools.referencing.FactoryFinder#getCRSFactory
+     * @see org.geotools.referencing.factory.OrderedAxisAuthorityFactory
+     * @tutorial http://docs.codehaus.org/display/GEOTOOLS/The+axis+order+issue
+     *
+     * @since 2.3
+     */
+    public static final Key FORCE_LONGITUDE_FIRST_AXIS_ORDER = new Key(Boolean.class);
+
+    /**
+     * Tells if the {@linkplain org.opengis.referencing.cs.CoordinateSystem coordinate systems}
+     * created by an {@linkplain org.opengis.referencing.cs.CSAuthorityFactory authority factory}
+     * should be forced to standard
+     * {@linkplain org.opengis.referencing.cs.CoordinateSystemAxis#getDirection axis directions}.
+     * If {@code true}, then {@linkplain org.opengis.referencing.cs.AxisDirection#SOUTH South} axis
+     * directions are forced to {@linkplain org.opengis.referencing.cs.AxisDirection#NORTH North},
+     * {@linkplain org.opengis.referencing.cs.AxisDirection#WEST West} axis directions are forced
+     * to {@linkplain org.opengis.referencing.cs.AxisDirection#EAST East}, <cite>etc.</cite>
+     * If {@code false}, then the axis directions are left unchanged.
+     * <p>
+     * This hint shall be passed to the
+     * <code>{@linkplain org.geotools.referencing.FactoryFinder#getCRSAuthorityFactory
+     * FactoryFinder.getCRSAuthorityFactory}(...)</code> method. Whatever this hint is
+     * supported or not is authority dependent.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCSFactory
+     * @see org.geotools.referencing.FactoryFinder#getCRSFactory
+     * @see org.geotools.referencing.factory.OrderedAxisAuthorityFactory
+     *
+     * @since 2.3
+     */
+    public static final Key FORCE_STANDARD_AXIS_DIRECTIONS = new Key(Boolean.class);
+
+    /**
+     * Tells if the {@linkplain org.opengis.referencing.cs.CoordinateSystem coordinate systems}
+     * created by an {@linkplain org.opengis.referencing.cs.CSAuthorityFactory authority factory}
+     * should be forced to standard
+     * {@linkplain org.opengis.referencing.cs.CoordinateSystemAxis#getUnit axis units}.
+     * If {@code true}, then all angular units are forced to degrees and linear units
+     * to meters. If {@code false}, then the axis units are left unchanged.
+     * <p>
+     * This hint shall be passed to the
+     * <code>{@linkplain org.geotools.referencing.FactoryFinder#getCRSAuthorityFactory
+     * FactoryFinder.getCRSAuthorityFactory}(...)</code> method. Whatever this hint is
+     * supported or not is authority dependent.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCSFactory
+     * @see org.geotools.referencing.FactoryFinder#getCRSFactory
+     * @see org.geotools.referencing.factory.OrderedAxisAuthorityFactory
+     *
+     * @since 2.3
+     */
+    public static final Key FORCE_STANDARD_AXIS_UNITS = new Key(Boolean.class);
 
     /**
      * Constructs a new object with keys and values initialized

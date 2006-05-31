@@ -41,39 +41,15 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.crs.CompoundCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.DerivedCRS;
-import org.opengis.referencing.crs.EngineeringCRS;
-import org.opengis.referencing.crs.GeocentricCRS;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.ImageCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.crs.TemporalCRS;
-import org.opengis.referencing.crs.VerticalCRS;
-import org.opengis.referencing.cs.CartesianCS;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.cs.CylindricalCS;
-import org.opengis.referencing.cs.EllipsoidalCS;
-import org.opengis.referencing.cs.PolarCS;
-import org.opengis.referencing.cs.SphericalCS;
-import org.opengis.referencing.cs.VerticalCS;
-import org.opengis.referencing.cs.TimeCS;
-import org.opengis.referencing.datum.Datum;
-import org.opengis.referencing.datum.Ellipsoid;
-import org.opengis.referencing.datum.EngineeringDatum;
-import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.datum.ImageDatum;
-import org.opengis.referencing.datum.PrimeMeridian;
-import org.opengis.referencing.datum.TemporalDatum;
-import org.opengis.referencing.datum.VerticalDatum;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.cs.*;
+import org.opengis.referencing.crs.*;
+import org.opengis.referencing.datum.*;
+import org.opengis.referencing.operation.*;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.Factory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -133,10 +109,14 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
      * Constructs an instance wrapping the specified factory with a default number
      * of entries to keep by strong reference.
+     * <p>
+     * This method is protected because subclasses must declare which of the
+     * {@link DatumAuthorityFactory}, {@link CSAuthorityFactory}, {@link CRSAuthorityFactory}
+     * and {@link CoordinateOperationAuthorityFactory} interfaces the choose to implement.
      *
      * @param factory The factory to cache. Can not be {@code null}.
      */
-    public BufferedAuthorityFactory(final AbstractAuthorityFactory factory) {
+    protected BufferedAuthorityFactory(final AbstractAuthorityFactory factory) {
         this(factory, DEFAULT_MAX);
     }
 
@@ -145,19 +125,24 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * argument specify the maximum number of objects to keep by strong reference. If a greater
      * amount of objects are created, then the strong references for the oldest ones are replaced
      * by weak references.
+     * <p>
+     * This method is protected because subclasses must declare which of the
+     * {@link DatumAuthorityFactory}, {@link CSAuthorityFactory}, {@link CRSAuthorityFactory}
+     * and {@link CoordinateOperationAuthorityFactory} interfaces the choose to implement.
      *
      * @param factory The factory to cache. Can not be {@code null}.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      */
-    public BufferedAuthorityFactory(AbstractAuthorityFactory factory,
-                                    final int maxStrongReferences)
+    protected BufferedAuthorityFactory(AbstractAuthorityFactory factory,
+                                       final int maxStrongReferences)
     {
-        super(factory.factories, factory.priority);
+        super(factory.getPriority());
         while (factory instanceof BufferedAuthorityFactory) {
             factory = ((BufferedAuthorityFactory) factory).backingStore;
         }
         this.backingStore        = factory;
         this.maxStrongReferences = maxStrongReferences;
+        completeHints();
     }
 
     /**
@@ -165,7 +150,6 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * constructors only. Subclasses are responsible for creating an appropriate backing store
      * when the {@link DeferredAuthorityFactory#createBackingStore} method is invoked.
      *
-     * @param hints The hints, usually with a {@link FactoryGroup#HINT_KEY} entry.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
@@ -173,12 +157,33 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      *
      * @see DeferredAuthorityFactory#createBackingStore
      */
-    BufferedAuthorityFactory(final Hints hints,
-                             final int priority,
-                             final int maxStrongReferences)
-    {
-        super(hints, priority);
+    BufferedAuthorityFactory(final int priority, final int maxStrongReferences) {
+        super(priority);
         this.maxStrongReferences = maxStrongReferences;
+        // completeHints() will be invoked by DeferredAuthorityFactory.getBackingStore()
+    }
+
+    /**
+     * Completes the set of hints according the value currently set in this object. This method
+     * is invoked by {@code BufferedAuthorityFactory} or by {@code DeferredAuthorityFactory} at
+     * backing store creation time.
+     *
+     * DON'T FORGET to set those hints to {@code null} when {@link DeferredAuthorityFactory}
+     * dispose the backing store.
+     */
+    final void completeHints() {
+        if (backingStore instanceof DatumAuthorityFactory) {
+            hints.put(Hints.DATUM_AUTHORITY_FACTORY, backingStore);
+        }
+        if (backingStore instanceof CSAuthorityFactory) {
+            hints.put(Hints.CS_AUTHORITY_FACTORY, backingStore);
+        }
+        if (backingStore instanceof CRSAuthorityFactory) {
+            hints.put(Hints.CRS_AUTHORITY_FACTORY, backingStore);
+        }
+        if (backingStore instanceof CoordinateOperationAuthorityFactory) {
+            hints.put(Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY, backingStore);
+        }
     }
 
     /**
@@ -195,15 +200,13 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns {@code true} if this factory is ready. The default implementation returns
+     * Returns {@code true} if this factory is available. The default implementation returns
      * {@code false} if no backing store were setup and
      * {@link DeferredAuthorityFactory#createBackingStore} throws an exception.
-     *
-     * @todo Localize the logging message.
      */
-    synchronized boolean isReady() {
+    synchronized boolean isAvailable() {
         try {
-            return getBackingStore().isReady();
+            return getBackingStore().isAvailable();
         } catch (FactoryNotFoundException exception) {
             /*
              * The factory is not available. This is error may be normal; it happens
@@ -236,7 +239,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             final LogRecord record = Logging.format(Level.WARNING,
                     LoggingKeys.UNAVAILABLE_AUTHORITY_FACTORY_$1, title);
             record.setSourceClassName(Utilities.getShortClassName(this));
-            record.setSourceMethodName("isReady");
+            record.setSourceMethodName("isAvailable");
             record.setThrown(exception);
             LOGGER.log(record);
         }

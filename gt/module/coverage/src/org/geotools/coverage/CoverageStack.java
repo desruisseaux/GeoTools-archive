@@ -992,7 +992,7 @@ public class CoverageStack extends AbstractCoverage {
             throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
         }
         throw new OrdinateOutsideCoverageException(Errors.format(
-                  ErrorKeys.ZVALUE_OUTSIDE_COVERAGE_$1, Z), zDimension);
+                  ErrorKeys.ZVALUE_OUTSIDE_COVERAGE_$2, getName(), Z), zDimension);
     }
     
     /**

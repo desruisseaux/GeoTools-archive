@@ -22,8 +22,7 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies and extensions
-import java.util.Map;
+// J2SE dependencies
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Collections;
@@ -42,7 +41,6 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.util.GenericName;
 
 // Geotools dependencies
-import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -51,15 +49,20 @@ import org.geotools.util.NameFactory;
 
 
 /**
- * Base class for authority factories. An <cite>authority</cite> is an
- * organization that maintains definitions of authority codes. An <cite>authority
- * code</cite> is a compact string defined by an authority to reference a particular
- * spatial reference object. For example the
+ * Base class for authority factories. An <cite>authority</cite> is an organization that maintains
+ * definitions of authority codes. An <cite>authority code</cite> is a compact string defined by
+ * an authority to reference a particular spatial reference object. For example the
  * <A HREF="http://www.epsg.org">European Petroleum Survey Group (EPSG)</A> maintains
  * a database of coordinate systems, and other spatial referencing objects, where each
  * object has a code number ID. For example, the EPSG code for a WGS84 Lat/Lon coordinate
- * system is '4326'.
- * <br><br>
+ * system is {@code "4326"}.
+ * <p>
+ * This class defines a default implementation for most methods defined in the
+ * {@link DatumAuthorityFactory}, {@link CSAuthorityFactory} and {@link CRSAuthorityFactory}
+ * interfaces. However, those interfaces do not appear in the {@code implements} clause of
+ * this class declaration. This is up to subclasses to decide which interfaces they declare
+ * to implement.
+ * <p>
  * The default implementation for all {@code createFoo} methods ultimately invokes
  * {@link #createObject}, which may be the only method that a subclass need to override.
  * However, other methods may be overriden as well for better performances.
@@ -69,56 +72,25 @@ import org.geotools.util.NameFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class AbstractAuthorityFactory extends AbstractFactory
-        implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory,
-                   CoordinateOperationAuthorityFactory
+public abstract class AbstractAuthorityFactory extends ReferencingFactory
+        implements AuthorityFactory
 {
     /**
-     * The underlying factories used for objects creation.
-     */
-    protected final FactoryGroup factories;
-
-    /**
-     * Constructs an instance using the specified set of factories.
+     * Constructs an instance using the specified priority level.
      *
-     * @param factories The low-level factories to use.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
      */
-    AbstractAuthorityFactory(final FactoryGroup factories, final int priority) {
+    protected AbstractAuthorityFactory(final int priority) {
         super(priority);
-        this.factories = factories;
-        ensureNonNull("factories", factories);
     }
 
     /**
-     * Constructs an instance using the specified hints. This constructor recognizes the
-     * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
-     * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints. In addition,
-     * the {@link FactoryGroup#HINT_KEY} hint may be used as a low-level substitute for all the
-     * above.
-     *
-     * @param hints The hints.
-     * @param priority The priority for this factory, as a number between
-     *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
-     *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
-     *
-     * @since 2.2
+     * Returns {@code true} if this factory is available. This method may returns
+     * {@code false} for example if a connection to the EPSG database failed.
      */
-    protected AbstractAuthorityFactory(final Hints hints, final int priority) {
-        super(priority);
-        factories = FactoryGroup.createInstance(hints);
-    }
-
-    /**
-     * Returns {@code true} if this factory is ready. The default implementation may
-     * returns {@code false} for example if a connection to the EPSG database failed.
-     *
-     * @todo Consider moving this method in GeoAPI interfaces. However, we need to decide
-     *       first if there is a need for some general API for discovering factory capabilities.
-     */
-    boolean isReady() {
+    boolean isAvailable() {
         return true;
     }
 
@@ -750,7 +722,17 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     }
 
     /**
-     * Creates an operation from coordinate reference system codes.
+     * Creates an operation from coordinate reference system codes. The default implementation
+     * returns an {@linkplain Collections#EMPTY_SET empty set}. We do not delegate to some kind
+     * of {@linkplain CoordinateOperationFactory#createOperation(CoordinateReferenceSystem,
+     * CoordinateReferenceSystem) coordinate operation factory method} because the usual contract
+     * for this method is to extract the information from an authority database like
+     * <A HREF="http://www.epsg.org">EPSG</A>, not to compute operations on-the-fly.
+     * <p>
+     * <strong>Rational:</strong> Coordinate operation factory
+     * {@linkplain org.geotools.referencing.operation.AuthorityBackedFactory backed by an authority}
+     * will invoke this method. If this method invoked the coordinate operation factory in turn, the
+     * application could be trapped in infinite recursive calls.
      *
      * @param sourceCode Coded value of source coordinate reference system.
      * @param targetCode Coded value of target coordinate reference system.
@@ -764,12 +746,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
                                         final String sourceCode, final String targetCode)
             throws FactoryException
     {
-        ensureNonNull("sourceCode", sourceCode);
-        ensureNonNull("targetCode", targetCode);
-        final CoordinateReferenceSystem  sourceCRS = createCoordinateReferenceSystem(sourceCode);
-        final CoordinateReferenceSystem  targetCRS = createCoordinateReferenceSystem(targetCode);
-        final CoordinateOperationFactory opFactory = factories.getCoordinateOperationFactory();
-        return Collections.singleton(opFactory.createOperation(sourceCRS, targetCRS));
+        return Collections.EMPTY_SET;
     }
 
     /**
@@ -782,21 +759,6 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      */
     public void dispose() throws FactoryException {
         // To be overriden by subclasses.
-    }
-
-    /**
-     * Returns the implementation hints for this factory. The returned map contains values for
-     * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
-     * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints. Other values
-     * may be provided as well, at implementation choice.
-     */
-    public Map getImplementationHints() {
-        synchronized (hints) { // Note: avoid lock on public object.
-            if (hints.isEmpty()) {
-                factories.getHints(hints);
-            }
-        }
-        return super.getImplementationHints();
     }
 
     /**
@@ -862,7 +824,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * Called when this factory is added to the given {@code category} of the given
      * {@code registry}. The factory may already be registered under another category
      * or categories.
-     * <br><br>
+     * <p>
      * This method is invoked automatically when this factory is registered as a plugin,
      * and should not be invoked directly by the user. The default implementation iterates
      * through all services under the same category and for the same
@@ -878,17 +840,31 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * @see org.geotools.referencing.FactoryFinder
      */
     public void onRegistration(final ServiceRegistry registry, final Class category) {
+        if (false) {
+            // Do not invoke the super-class method, since we
+            // are using a different sorting algorithm below.
+            super.onRegistration(registry, category);
+        }
         for (final Iterator it=registry.getServiceProviders(category, false); it.hasNext();) {
             final Object provider = it.next();
-            if (provider instanceof AbstractAuthorityFactory) {
+            if (provider!=this && provider instanceof AbstractAuthorityFactory) {
                 final AbstractAuthorityFactory factory = (AbstractAuthorityFactory) provider;
-                final Citation authority = getAuthority();
-                if (authority!=null && authority.equals(factory.getAuthority())) {
-                    if (priority > factory.priority) {
-                        registry.setOrdering(category, this, factory);
-                    } else if (priority < factory.priority) {
-                        registry.setOrdering(category, factory, this);
+                final Citation c1 = this   .getAuthority();
+                final Citation c2 = factory.getAuthority();
+                if (c1!=null && c2!=null && Citations.identifierMatches(c1, c2)) {
+                    final int priority = getPriority();
+                    final int compare  = factory.getPriority();
+                    final Object first, second;
+                    if (priority > compare) {
+                        first  = this;
+                        second = factory;
+                    } else if (priority < compare) {
+                        first  = factory;
+                        second = this;
+                    } else {
+                        continue; // No ordering
                     }
+                    registry.setOrdering(category, first, second);
                 }
             }
         }

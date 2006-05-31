@@ -376,17 +376,18 @@ public class WeakHashSet extends AbstractSet {
     }
 
     /**
-     * Returns an object equals to {@code obj} if such an object already
-     * exist in this {@code WeakHashSet}. Otherwise, add {@code obj}
-     * to this {@code WeakHashSet}. This method is equivalents to the
-     * following code:
+     * Returns an object equals to {@code object} if such an object already exist in this
+     * {@code WeakHashSet}. Otherwise, adds {@code object} to this {@code WeakHashSet}.
+     * This method is equivalents to the following code:
      *
      * <blockquote><pre>
-     * &nbsp;  if (object!=null)
-     * &nbsp;  {
-     * &nbsp;      final Object current=get(object);
-     * &nbsp;      if (current!=null) return current;
-     * &nbsp;      else add(object);
+     * &nbsp;  if (object != null) {
+     * &nbsp;      Object current = get(object);
+     * &nbsp;      if (current != null) {
+     * &nbsp;          return current;
+     * &nbsp;      } else {
+     * &nbsp;          add(object);
+     * &nbsp;      }
      * &nbsp;  }
      * &nbsp;  return object;
      * </pre></blockquote>

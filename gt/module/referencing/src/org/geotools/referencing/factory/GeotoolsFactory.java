@@ -127,8 +127,8 @@ import org.geotools.util.WeakHashSet;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeotoolsFactory extends AbstractFactory
-                          implements CSFactory, DatumFactory, CRSFactory
+public class GeotoolsFactory extends ReferencingFactory
+        implements CSFactory, DatumFactory, CRSFactory
 {
     /**
      * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.
