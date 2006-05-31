@@ -683,6 +683,12 @@ public class StreamingRenderer implements GTRenderer {
             results = featureSource.getFeatures(query);
         }
         
+
+        //commenting this out for now, since it's causing connections to be
+        //left open, since it's making a transaction that is never committed.
+        //I think perhaps not getting FIDs should be set in client software
+        //anyways See GEOS-631 and related issues. -ch
+        /*
         if ( (featureSource instanceof FeatureStore) && (doesntHaveFIDFilter(query) ) )
         {
         	try{
@@ -705,7 +711,7 @@ public class StreamingRenderer implements GTRenderer {
         		e.printStackTrace();  // we can carry on, but report to user
         	}
         }
-        
+        */
         
         return results;
     }
