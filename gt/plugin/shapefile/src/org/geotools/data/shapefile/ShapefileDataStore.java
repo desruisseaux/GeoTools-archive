@@ -489,7 +489,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         try {
             rbc = getReadChannel(prjURL);
         } catch (IOException e) {
-            LOGGER.warning("projection (.prj) for shapefile not available");
+            LOGGER.warning("projection (.prj) for shapefile: "+shpURL.toString()+" is not available");
         }
 
         if (rbc == null) {
