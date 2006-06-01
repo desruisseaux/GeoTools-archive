@@ -337,7 +337,7 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      * @deprecated This method has a system-wide effect. Use
      *             {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} instead, which provides
      *             a case-by-case control. If a system-wide effect is really wanted, use
-     *             {@code System.setProperty("force.longitude.first.axis.order", "true")}.
+     *             {@code System.setProperty("org.geotools.referencing.forceXY", "true")}.
      */
     public static void register(String authority) throws FactoryRegistryException {
         authority = authority.toUpperCase().trim();
@@ -365,7 +365,7 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      * @deprecated This method has a system-wide effect. Use
      *             {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} instead, which provides
      *             a case-by-case control. If a system-wide effect is really wanted, use
-     *             {@code System.setProperty("force.longitude.first.axis.order", "false")}.
+     *             {@code System.setProperty("org.geotools.referencing.forceXY", "false")}.
      */
     public static void unregister(String authority) throws FactoryRegistryException {
         authority = authority.toUpperCase().trim();

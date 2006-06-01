@@ -51,7 +51,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * 
  * This factory will have a {@linkplain #priority priority} lower than the
  * {@linkplain DefaultFactory default factory} priority, <u>except</u> if the
- * {@code "force.longitude.first.axis.order"} {@linkplain System#getProperty(String) system
+ * {@code "org.geotools.referencing.forceXY"} {@linkplain System#getProperty(String) system
  * property} is set to {@code true}. This means that when the
  * {@code FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint is not specified, the system-wide default
  * is the EPSG (<var>latitude</var>,<var>longitude</var>) order, except if the above-cited
@@ -123,12 +123,12 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory
 
     /**
      * Returns the priority to use relative to the {@link DefaultFactory} priority. The default
-     * priority should be lower, except if the {@code "force.longitude.first.axis.order"} system
+     * priority should be lower, except if the {@code "org.geotools.referencing.forceXY"} system
      * property is set to {@code true}.
      */
     private static int relativePriority() {
         try {
-            if (Boolean.getBoolean("force.longitude.first.axis.order")) {
+            if (Boolean.getBoolean("org.geotools.referencing.forceXY")) {
                 return +10;
             }
         } catch (SecurityException e) {
