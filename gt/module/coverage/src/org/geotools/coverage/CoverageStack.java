@@ -47,6 +47,7 @@ import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -65,6 +66,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NumberRange;
 
@@ -342,6 +344,12 @@ public class CoverageStack extends AbstractCoverage {
      * @since 2.3
      */
     public final int zDimension;
+
+    /**
+     * The coordinate reference system for the {@linkplain #zDimension z dimension},
+     * or {@code null} if unknown.
+     */
+    private final CoordinateReferenceSystem zCRS;
     
     /**
      * {@code true} if interpolations are allowed.
@@ -599,6 +607,7 @@ public class CoverageStack extends AbstractCoverage {
             assert this.elements.length == 0;
             this.envelope = new GeneralEnvelope(CRSUtilities.getEnvelope(crs));
         }
+        zCRS = CRSUtilities.getSubCRS(crs, zDimension, zDimension+1);
     }
     
     /**
@@ -611,6 +620,7 @@ public class CoverageStack extends AbstractCoverage {
         numSampleDimensions  = source.numSampleDimensions;
         envelope             = source.envelope;
         zDimension           = source.zDimension;
+        zCRS                 = source.zCRS;
         interpolationEnabled = source.interpolationEnabled;
     }
     
@@ -991,8 +1001,14 @@ public class CoverageStack extends AbstractCoverage {
         } catch (IOException exception) {
             throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
         }
+        final Object Zp;
+        if (zCRS instanceof TemporalCRS) {
+            Zp = DefaultTemporalCRS.wrap((TemporalCRS) zCRS).toDate(z);
+        } else {
+            Zp = Z;
+        }
         throw new OrdinateOutsideCoverageException(Errors.format(
-                  ErrorKeys.ZVALUE_OUTSIDE_COVERAGE_$2, getName(), Z), zDimension);
+                  ErrorKeys.ZVALUE_OUTSIDE_COVERAGE_$2, getName(), Zp), zDimension, getEnvelope());
     }
     
     /**

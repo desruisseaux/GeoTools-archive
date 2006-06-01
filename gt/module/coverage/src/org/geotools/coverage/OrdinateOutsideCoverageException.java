@@ -23,6 +23,7 @@ package org.geotools.coverage;
 import java.util.Date;
 
 // OpenGIS dependencies
+import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.coverage.PointOutsideCoverageException;
 
 // Geotools dependencies
@@ -35,11 +36,10 @@ import org.geotools.resources.i18n.ErrorKeys;
  * This subclass of {@code PointOutsideCoverage} exception is used when the dimension of the
  * out-of-bounds ordinate is known.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class OrdinateOutsideCoverageException extends PointOutsideCoverageException {
     /**
@@ -51,6 +51,11 @@ public class OrdinateOutsideCoverageException extends PointOutsideCoverageExcept
      * The dimension of the out-of-bounds ordinate.
      */
     private final int dimension;
+
+    /**
+     * The coverage envelope, or {@code null} if unknown.
+     */
+    private final Envelope envelope;
     
     /**
      * Creates an exception with the specified message.
@@ -62,6 +67,26 @@ public class OrdinateOutsideCoverageException extends PointOutsideCoverageExcept
     public OrdinateOutsideCoverageException(final String message, final int dimension) {
         super(message);
         this.dimension = dimension;
+        this.envelope  = null;
+    }
+    
+    /**
+     * Creates an exception with the specified message.
+     *
+     * @param  message The detail message. The detail message is saved for 
+     *         later retrieval by the {@link #getMessage()} method.
+     * @param  dimension The dimension of the out-of-bounds ordinate.
+     * @param  envelope The coverage envelope, or {@code null} if unknown.
+     *
+     * @since 2.3
+     */
+    public OrdinateOutsideCoverageException(final String  message,
+                                            final int     dimension,
+                                            final Envelope envelope)
+    {
+        super(message);
+        this.dimension = dimension;
+        this.envelope  = envelope;
     }
 
     /**
@@ -78,6 +103,7 @@ public class OrdinateOutsideCoverageException extends PointOutsideCoverageExcept
     OrdinateOutsideCoverageException(final OrdinateOutsideCoverageException cause, final Date date) {
         super(Errors.format(ErrorKeys.DATE_OUTSIDE_COVERAGE_$1, date));
         dimension = cause.dimension;
+        envelope  = cause.envelope;
         initCause(cause);
     }
 
@@ -86,5 +112,14 @@ public class OrdinateOutsideCoverageException extends PointOutsideCoverageExcept
      */
     public int getOutOfBoundsDimension() {
         return dimension;
+    }
+
+    /**
+     * Returns the coverage envelope, or {@code null} if unknown.
+     *
+     * @since 2.3
+     */
+    public Envelope getCoverageEnvelope() {
+        return envelope;
     }
 }
