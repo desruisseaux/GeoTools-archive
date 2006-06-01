@@ -147,7 +147,7 @@ public class ProgressPrinter implements ProgressListener {
         this.out = out;
         this.maxLength = maxLength;
         final String lineSeparator = System.getProperty("line.separator", "\n");
-        CR_supported=(lineSeparator!=null && lineSeparator.equals("\r\n"));
+        CR_supported = lineSeparator.equals("\r\n") || lineSeparator.equals("\n");
     }
 
     /**

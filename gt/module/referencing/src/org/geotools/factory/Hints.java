@@ -267,6 +267,7 @@ public final class Hints extends RenderingHints {
      * @see org.geotools.referencing.FactoryFinder#getCSFactory
      * @see org.geotools.referencing.FactoryFinder#getCRSFactory
      * @see org.geotools.referencing.factory.OrderedAxisAuthorityFactory
+     * @see org.geotools.referencing.factory.epsg.LongitudeFirstFactory
      * @tutorial http://docs.codehaus.org/display/GEOTOOLS/The+axis+order+issue
      *
      * @since 2.3

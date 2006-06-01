@@ -181,10 +181,6 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      *   <li>{@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS}</li>
      *   <li>All hints understood by {@link FactoryFinder}</li>
      * </ul>
-     * <p>
-     * <strong>WARNING:</strong> Do not invoke this constructor from a subclass to be registered in
-     * a {@code META-INF/services/} file for use by {@link FactoryFinder}. It may lead to recursive
-     * calls until a {@link StackOverflowError} is thrown.
      *
      * @param  authority The authority to wraps (example: {@code "EPSG"}). If {@code null},
      *         then all authority factories must be explicitly specified in the set of hints.
@@ -252,7 +248,7 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      *         units should be left unchanged.
      * @throws FactoryRegistryException if at least one factory can not be obtained.
      *
-     * @deprecated Replaced by {@link #OrderedAxisAuthorityFactory(String,Hints)}.
+     * @deprecated Replaced by {@link #OrderedAxisAuthorityFactory(String,Hints,AxisDirection[])}.
      */
     public OrderedAxisAuthorityFactory(String authority, Hints hints, boolean forceStandardUnits) {
         this(authority, mergeHints(hints, forceStandardUnits), null);
@@ -267,7 +263,8 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      *        angular units to degrees and linear units to meters, or {@code false} if the units
      *        should be left unchanged.
      *
-     * @deprecated Replaced by {@link #OrderedAxisAuthorityFactory(AbstractAuthorityFactory,Hints)}.
+     * @deprecated Replaced by {@link #OrderedAxisAuthorityFactory(AbstractAuthorityFactory,Hints,
+     *             AxisDirection[])}.
      */
     public OrderedAxisAuthorityFactory(final AbstractAuthorityFactory factory,
                                        final boolean forceStandardUnits)
@@ -339,7 +336,8 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      *
      * @deprecated This method has a system-wide effect. Use
      *             {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} instead, which provides
-     *             a case-by-case control.
+     *             a case-by-case control. If a system-wide effect is really wanted, use
+     *             {@code System.setProperty("force.longitude.first.axis.order", "true")}.
      */
     public static void register(String authority) throws FactoryRegistryException {
         authority = authority.toUpperCase().trim();
@@ -366,7 +364,8 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      *
      * @deprecated This method has a system-wide effect. Use
      *             {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} instead, which provides
-     *             a case-by-case control.
+     *             a case-by-case control. If a system-wide effect is really wanted, use
+     *             {@code System.setProperty("force.longitude.first.axis.order", "false")}.
      */
     public static void unregister(String authority) throws FactoryRegistryException {
         authority = authority.toUpperCase().trim();
@@ -429,7 +428,7 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      * {@link #replace(CoordinateSystem) replace} method for ordering the axis in a
      * coordinate system. The default implementation orders the axis according their
      * {@linkplain CoordinateSystemAxis#getDirection direction}, using the direction
-     * table given at {@linkplain OrderedAxisAuthorityFactory(AbstractAuthorityFactory,
+     * table given at {@linkplain #OrderedAxisAuthorityFactory(AbstractAuthorityFactory,
      * Hints, AxisDirection[]) construction time} (see also the class description).
      * Subclasses may override this method if they want to define a more sophesticated
      * axis ordering.

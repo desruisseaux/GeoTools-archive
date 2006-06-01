@@ -101,7 +101,7 @@ public class DefaultFactory extends DeferredAuthorityFactory
     /**
      * The priority level for this factory.
      */
-    static final int PRIORITY = MAXIMUM_PRIORITY-10;
+    static final int PRIORITY = MAXIMUM_PRIORITY - 10;
 
     /**
      * The hints for this factory. Null for now, but may be different in a future version.

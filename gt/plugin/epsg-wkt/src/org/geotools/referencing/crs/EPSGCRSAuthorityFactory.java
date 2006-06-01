@@ -218,7 +218,7 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
      * "PROJCS" and "GEOGCS" at the start of the WKT strings. It is assumed
      * that we only have GeographicCRS and ProjectedCRS's here.
      *
-     * @param type The spatial reference objects type (may be Object.class). 
+     * @param clazz The spatial reference objects type (may be Object.class). 
      * @return The set of authority codes for spatial reference objects of the given type. 
      * If this factory doesn't contains any object of the given type, then this method returns 
      * an empty set. 

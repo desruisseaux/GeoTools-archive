@@ -40,12 +40,30 @@ import org.geotools.metadata.iso.citation.Citations;
  * An EPSG authority factory using (<var>longitude</var>,<var>latitude</var>) axis order.
  * This factory wraps a {@link DefaultFactory} into an {@link OrderedAxisAuthorityFactory}
  * when first needed.
+ * <p>
+ * Users don't need to create explicitly an instance of this class. Instead, one can get
+ * an instance using the following code:
+ *
+ * <blockquote><pre>
+ * Hints hints = new Hints({@linkplain Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER}, Boolean.TRUE);
+ * CRSAuthorityFactory factory = {@linkplain FactoryFinder}.getCRSAuthorityFactory("EPSG", hints);
+ * </pre></blockquote>
+ * 
+ * This factory will have a {@linkplain #priority priority} lower than the
+ * {@linkplain DefaultFactory default factory} priority, <u>except</u> if the
+ * {@code "force.longitude.first.axis.order"} {@linkplain System#getProperty(String) system
+ * property} is set to {@code true}. This means that when the
+ * {@code FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint is not specified, the system-wide default
+ * is the EPSG (<var>latitude</var>,<var>longitude</var>) order, except if the above-cited
+ * system property is set to {@code true}.
  *
  * @since 2.3
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @see OrderedAxisAuthorityFactory
+ * @see Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/The+axis+order+issue
  */
 public class LongitudeFirstFactory extends DeferredAuthorityFactory
@@ -81,7 +99,7 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory
      * @param hints An optional set of hints, or {@code null} for the default values.
      */
     public LongitudeFirstFactory(final Hints hints) {
-        super(hints, DefaultFactory.PRIORITY - 10);
+        super(hints, DefaultFactory.PRIORITY + relativePriority());
         put(null,  Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
         put(hints, Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
         put(hints, Hints.FORCE_STANDARD_AXIS_UNITS);
@@ -101,6 +119,22 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory
             value = Boolean.TRUE;
         }
         hints.put(key, value);
+    }
+
+    /**
+     * Returns the priority to use relative to the {@link DefaultFactory} priority. The default
+     * priority should be lower, except if the {@code "force.longitude.first.axis.order"} system
+     * property is set to {@code true}.
+     */
+    private static int relativePriority() {
+        try {
+            if (Boolean.getBoolean("force.longitude.first.axis.order")) {
+                return +10;
+            }
+        } catch (SecurityException e) {
+            // Fall back on default value.
+        }
+        return -10;
     }
 
     /**
