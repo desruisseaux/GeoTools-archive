@@ -68,7 +68,7 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
      * A two-dimensional ellipsoidal CS with
      * <var>{@linkplain DefaultCoordinateSystemAxis#GEODETIC_LONGITUDE longitude}</var>,
      * <var>{@linkplain DefaultCoordinateSystemAxis#GEODETIC_LATITUDE latitude}</var>
-     * axis in degrees.
+     * axis in decimal degrees.
      */
     public static DefaultEllipsoidalCS GEODETIC_2D = new DefaultEllipsoidalCS(
                     name(VocabularyKeys.GEODETIC_2D),
@@ -193,8 +193,9 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
 
     /**
      * Returns {@code true} if the specified unit is compatible with
-     * {@linkplain NonSI#DEGREE_ANGLE degrees} (or {@linkplain SI#METER meters} in the special case
-     * of height). This method is invoked at construction time for checking units compatibility.
+     * {@linkplain NonSI#DEGREE_ANGLE decimal degrees} (or {@linkplain SI#METER meters} in the
+     * special case of height). This method is invoked at construction time for checking units
+     * compatibility.
      *
      * @since 2.2
      */
@@ -235,12 +236,11 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
 
     /**
      * Returns the longitude found in the specified coordinate point,
-     * always in {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * always in {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * @param  coordinates The coordinate point expressed in this coordinate system.
-     * @return The longitude in the specified array, in {@linkplain NonSI#DEGREE_ANGLE degrees}.
-     * @throws MismatchedDimensionException is the coordinate point doesn't have the expected
-     *         dimension.
+     * @return The longitude in the specified array, in {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
+     * @throws MismatchedDimensionException is the coordinate point doesn't have the expected dimension.
      */
     public double getLongitude(final double[] coordinates)
             throws MismatchedDimensionException
@@ -254,12 +254,11 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
 
     /**
      * Returns the latitude found in the specified coordinate point,
-     * always in {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * always in {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * @param  coordinates The coordinate point expressed in this coordinate system.
-     * @return The latitude in the specified array, in {@linkplain NonSI#DEGREE_ANGLE degrees}.
-     * @throws MismatchedDimensionException is the coordinate point doesn't have the expected
-     *         dimension.
+     * @return The latitude in the specified array, in {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
+     * @throws MismatchedDimensionException is the coordinate point doesn't have the expected dimension.
      */
     public double getLatitude(final double[] coordinates)
             throws MismatchedDimensionException

@@ -88,7 +88,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
     private static final long serialVersionUID = 7536566033885338422L;
 
     /**
-     * The tolerance error for assertions, in degrees.
+     * The tolerance error for assertions, in decimal degrees.
      */
     private static final float EPS = 1E-5f;
 

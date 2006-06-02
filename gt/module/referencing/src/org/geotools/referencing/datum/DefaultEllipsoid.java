@@ -395,8 +395,8 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * on a sphere's surface. The default implementation delegates the work
      * to {@link #orthodromicDistance(double,double,double,double)}.
      *
-     * @param  P1 Longitude and latitude of first point (in degrees).
-     * @param  P2 Longitude and latitude of second point (in degrees).
+     * @param  P1 Longitude and latitude of first point (in decimal degrees).
+     * @param  P2 Longitude and latitude of second point (in decimal degrees).
      * @return The orthodromic distance (in the units of this ellipsoid).
      */
     public double orthodromicDistance(final Point2D P1, final Point2D P2) {
@@ -410,10 +410,10 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * This is different from the <cite>loxodromic distance</cite>, which is a
      * longer distance on a path with a constant direction on the compass.
      *
-     * @param  x1 Longitude of first  point (in degrees).
-     * @param  y1 Latitude  of first  point (in degrees).
-     * @param  x2 Longitude of second point (in degrees).
-     * @param  y2 Latitude  of second point (in degrees).
+     * @param  x1 Longitude of first  point (in decimal degrees).
+     * @param  y1 Latitude  of first  point (in decimal degrees).
+     * @param  x2 Longitude of second point (in decimal degrees).
+     * @param  y2 Latitude  of second point (in decimal degrees).
      * @return The orthodromic distance (in the units of this ellipsoid's axis).
      */
     public double orthodromicDistance(double x1, double y1, double x2, double y2) {

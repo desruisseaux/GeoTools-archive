@@ -82,7 +82,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     private static final double MAX_ERROR = 0.01;
     
     /**
-     * Cosine of 67.5 degrees.
+     * Cosine of 67.5 decimal degrees.
      */
     private static final double COS_67P5 = 0.38268343236508977;
     

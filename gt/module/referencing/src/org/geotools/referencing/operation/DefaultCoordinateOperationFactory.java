@@ -425,13 +425,11 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
     }
 
     /**
-     * Makes sure that the specified geographic CRS uses standard axis
-     * (longitude and latitude in degrees). Optionally, this method can
-     * also make sure that the CRS use the Greenwich prime meridian.
-     * Other datum properties are left unchanged.
-     * If {@code crs} already meets all those conditions, then it is
-     * returned unchanged. Otherwise, a new normalized geographic CRS is
-     * created and returned.
+     * Makes sure that the specified geographic CRS uses standard axis (longitude and latitude in
+     * decimal degrees). Optionally, this method can also make sure that the CRS use the Greenwich
+     * prime meridian. Other datum properties are left unchanged. If {@code crs} already meets all
+     * those conditions, then it is returned unchanged. Otherwise, a new normalized geographic CRS
+     * is created and returned.
      *
      * @param  crs The geographic coordinate reference system to normalize.
      * @param  forceGreenwich {@code true} for forcing the Greenwich prime meridian.
@@ -591,7 +589,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
     }
 
     /**
-     * Returns the longitude value relative to the Greenwich Meridian, expressed in degrees.
+     * Returns the longitude value relative to the Greenwich Meridian, expressed in decimal degrees.
      */
     private static double getGreenwichLongitude(final PrimeMeridian pm) {
         return getGreenwichLongitude(pm, NonSI.DEGREE_ANGLE);
@@ -1123,7 +1121,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          *    target     geocentric CRS
          *
          * "Normalized" means that axis point toward standards direction (East, North, etc.),
-         * units are metres or degrees, prime meridian is Greenwich and height is measured
+         * units are metres or decimal degrees, prime meridian is Greenwich and height is measured
          * above the ellipsoid. However, the horizontal datum is preserved.
          */
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.

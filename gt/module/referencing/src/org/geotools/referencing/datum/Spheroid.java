@@ -60,10 +60,10 @@ final class Spheroid extends DefaultEllipsoid {
      * The orthodromic distance is the shortest distance between two points
      * on a sphere's surface. The orthodromic path is always on a great circle.
      *
-     * @param  x1 Longitude of first point (in degrees).
-     * @param  y1 Latitude of first point (in degrees).
-     * @param  x2 Longitude of second point (in degrees).
-     * @param  y2 Latitude of second point (in degrees).
+     * @param  x1 Longitude of first point (in decimal degrees).
+     * @param  y1 Latitude of first point (in decimal degrees).
+     * @param  x2 Longitude of second point (in decimal degrees).
+     * @param  y2 Latitude of second point (in decimal degrees).
      * @return The orthodromic distance (in the units of this ellipsoid's axis).
      */
     public double orthodromicDistance(double x1, double y1, double x2, double y2) {

@@ -527,8 +527,8 @@ public class ObliqueMercator extends MapProjection {
     /**
      * Maximal error (in metres) tolerated for assertion, if enabled.
      *
-     * @param  longitude The longitude in degrees.
-     * @param  latitude The latitude in degrees.
+     * @param  longitude The longitude in decimal degrees.
+     * @param  latitude The latitude in decimal degrees.
      * @return The tolerance level for assertions, in meters.
      */
     protected double getToleranceForAssertions(final double longitude, final double latitude) {

@@ -291,7 +291,7 @@ public abstract class MapProjection extends AbstractMathTransform
     {
         if (isExpectedParameter(expected, param)) {
             /*
-             * Gets the value supplied by the user. The conversion from
+             * Gets the value supplied by the user. The conversion from decimal
              * degrees to radians (if needed) is performed by AbstractProvider.
              */
             return AbstractProvider.doubleValue(param, group);
@@ -361,7 +361,7 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * Set the value in a parameter group. This convenience method is used
      * by subclasses for {@link #getParameterValues} implementation. Values
-     * are automatically converted from radians to degrees if needed.
+     * are automatically converted from radians to decimal degrees if needed.
      *
      * @param expected  The value returned by {@code getParameterDescriptors().descriptors()}.
      * @param param     One of the {@link AbstractProvider} constants.
@@ -470,8 +470,8 @@ public abstract class MapProjection extends AbstractMathTransform
      * "Close enough" means that the two points are separated by a distance shorter than
      * {@link #getToleranceForAssertions}. This method is used for assertions with J2SE 1.4.
      *
-     * @param point   Point to transform, in degrees if {@code inverse} is false.
-     * @param target  Point to compare to, in metres if {@code inverse} is false.
+     * @param point   Point to transform, in decimal degrees if {@code inverse} is {@code false}.
+     * @param target  Point to compare to, in metres if {@code inverse} is {@code false}.
      * @param inverse {@code true} for an inverse transform instead of a direct one.
      * @return {@code true} if the two points are close enough.
      */
@@ -606,7 +606,8 @@ public abstract class MapProjection extends AbstractMathTransform
      * {@link #falseNorthing} to the point returned by the {@code transformNormalized(...)}
      * call.
      *
-     * @param ptSrc the specified coordinate point to be transformed. Ordinates must be in degrees.
+     * @param ptSrc the specified coordinate point to be transformed.
+     *              Ordinates must be in decimal degrees.
      * @param ptDst the specified coordinate point that stores the result of transforming
      *              {@code ptSrc}, or {@code null}. Ordinates will be in metres.
      * @return      the coordinate point after transforming {@code ptSrc} and storing
@@ -645,7 +646,7 @@ public abstract class MapProjection extends AbstractMathTransform
     
     /**
      * Transforms a list of coordinate point ordinal values. Ordinates must be
-     * (<var>longitude</var>,<var>latitude</var>) pairs in degrees.
+     * (<var>longitude</var>,<var>latitude</var>) pairs in decimal degrees.
      *
      * @throws ProjectionException if a point can't be transformed. This method try
      *         to transform every points even if some of them can't be transformed.
@@ -696,7 +697,7 @@ public abstract class MapProjection extends AbstractMathTransform
     
     /**
      * Transforms a list of coordinate point ordinal values. Ordinates must be
-     * (<var>longitude</var>,<var>latitude</var>) pairs in degrees.
+     * (<var>longitude</var>,<var>latitude</var>) pairs in decimal degrees.
      *
      * @throws ProjectionException if a point can't be transformed. This method try
      *         to transform every points even if some of them can't be transformed.
@@ -771,9 +772,8 @@ public abstract class MapProjection extends AbstractMathTransform
          *
          * @param ptSrc the specified coordinate point to be transformed.
          *              Ordinates must be in metres.
-         * @param ptDst the specified coordinate point that stores the
-         *              result of transforming {@code ptSrc}, or
-         *              {@code null}. Ordinates will be in degrees.
+         * @param ptDst the specified coordinate point that stores the result of transforming
+         *              {@code ptSrc}, or {@code null}. Ordinates will be in decimal degrees.
          * @return the coordinate point after transforming {@code ptSrc}
          *         and stroring the result in {@code ptDst}.
          * @throws ProjectionException if the point can't be transformed.
@@ -928,8 +928,8 @@ public abstract class MapProjection extends AbstractMathTransform
      * {@link AssertionError} will be thrown. Subclasses should override this method if they need
      * to relax the tolerance level.
      *
-     * @param  longitude The longitude in degrees.
-     * @param  latitude The latitude in degrees.
+     * @param  longitude The longitude in decimal degrees.
+     * @param  latitude The latitude in decimal degrees.
      * @return The tolerance level for assertions, in meters.
      */
     protected double getToleranceForAssertions(final double longitude, final double latitude) {

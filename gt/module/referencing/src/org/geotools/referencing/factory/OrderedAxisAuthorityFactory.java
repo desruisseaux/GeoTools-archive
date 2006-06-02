@@ -163,8 +163,8 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
     protected final boolean forceStandardDirections;
 
     /**
-     * {@code true} if this authority factory should also force all angular units to degrees
-     * and linear units to meters. The default value is {@code false}.
+     * {@code true} if this authority factory should also force all angular units to
+     * decimal degrees and linear units to meters. The default value is {@code false}.
      *
      * @see Hints#FORCE_STANDARD_AXIS_UNITS
      * @since 2.3
@@ -244,8 +244,8 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      * @param  authority The authority to wraps (example: {@code "EPSG"}).
      * @param  hints An optional set of hints, or {@code null} if none.
      * @param  forceStandardUnits {@code true} if this authority factory should also force all
-     *         angular units to degrees and linear units to meters, or {@code false} if the
-     *         units should be left unchanged.
+     *         angular units to decimal degrees and linear units to meters, or {@code false} if
+     *         the units should be left unchanged.
      * @throws FactoryRegistryException if at least one factory can not be obtained.
      *
      * @deprecated Replaced by {@link #OrderedAxisAuthorityFactory(String,Hints,AxisDirection[])}.
@@ -260,8 +260,8 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      *
      * @param factory  The factory that produces objects using arbitrary axis order.
      * @param forceStandardUnits {@code true} if this authority factory should also force all
-     *        angular units to degrees and linear units to meters, or {@code false} if the units
-     *        should be left unchanged.
+     *        angular units to decimal degrees and linear units to meters, or {@code false} if
+     *        the units should be left unchanged.
      *
      * @deprecated Replaced by {@link #OrderedAxisAuthorityFactory(AbstractAuthorityFactory,Hints,
      *             AxisDirection[])}.
@@ -514,7 +514,7 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
      * <ul>
      *   <li>Any linear units converted to {@linkplain SI#METER meters}</li>
      *   <li>{@linkplain SI#RADIAN Radians} and {@linkplain NonSI#GRADE grades} converted to
-     *       {@linkplain NonSI#DEGREE_ANGLE degrees}</li>
+     *       {@linkplain NonSI#DEGREE_ANGLE decimal degrees}</li>
      * </ul>
      * <p>
      * This default substitution table may be expanded in future Geotools versions.

@@ -166,7 +166,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
     private static final int MAX_ITER = 10;
 
     /**
-     * Conversion factor from seconds to degrees.
+     * Conversion factor from seconds to decimal degrees.
      */
     private static final double SEC_2_DEG = 3600.0;
 
@@ -181,32 +181,32 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
     private final String longGridName;
 
     /**
-     * The minimum longitude value covered by this grid (degrees)
+     * The minimum longitude value covered by this grid (decimal degrees)
      */
     private double xmin;
 
     /**
-     * The minimum latitude value covered by this grid (degrees)
+     * The minimum latitude value covered by this grid (decimal degrees)
      */
     private double ymin;
 
     /**
-     * The maximum longitude value covered by this grid (degrees)
+     * The maximum longitude value covered by this grid (decimal degrees)
      */
     private double xmax;
 
     /**
-     * The maximum latitude value covered by this grid (degrees)
+     * The maximum latitude value covered by this grid (decimal degrees)
      */
     private double ymax;
 
     /**
-     * The difference between longitude grid points (degrees)
+     * The difference between longitude grid points (decimal degrees)
      */
     private double dx;
 
     /**
-     * The difference between latitude grid points (degrees)
+     * The difference between latitude grid points (decimal degrees)
      */
     private double dy;
 
@@ -658,7 +658,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
      * (<var>x<sub>0</sub></var>,<var>y<sub>0</sub></var>,<var>z<sub>0</sub></var>,
      * 
      * <var>x<sub>1</sub></var>,<var>y<sub>1</sub></var>,<var>z<sub>1</sub></var>
-     * ...).  All input and output values are in degrees.
+     * ...).  All input and output values are in decimal degrees.
      *
      * @param srcPts the array containing the source point coordinates.
      * @param srcOff the offset to the first point to be transformed in the
@@ -713,7 +713,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
 
     /**
      * Transforms nad83 values to nad27. Input and output values are in
-     * degrees.  This is done by itteratively finding a nad27 value that
+     * decimal degrees.  This is done by itteratively finding a nad27 value that
      * shifts to the  input nad83 value. The input nad83 value is used as the
      * first  approximation.
      *

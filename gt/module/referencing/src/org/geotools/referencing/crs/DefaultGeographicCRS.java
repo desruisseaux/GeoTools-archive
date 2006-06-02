@@ -75,7 +75,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
     /**
      * A two-dimensional geographic coordinate reference system using WGS84 datum.
      * This CRS uses (<var>longitude</var>,<var>latitude</var>) ordinates with longitude values
-     * increasing East and latitude values increasing North. Angular units are degrees and
+     * increasing East and latitude values increasing North. Angular units are decimal degrees and
      * prime meridian is Greenwich.
      */
     public static final DefaultGeographicCRS WGS84;
@@ -84,7 +84,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
      * A three-dimensional geographic coordinate reference system using WGS84 datum.
      * This CRS uses (<var>longitude</var>,<var>latitude</var>,<var>height</var>)
      * ordinates with longitude values increasing East, latitude values increasing
-     * North and height above the ellipsoid in metres. Angular units are degrees and
+     * North and height above the ellipsoid in metres. Angular units are decimal degrees and
      * prime meridian is Greenwich.
      */
     public static final DefaultGeographicCRS WGS84_3D;

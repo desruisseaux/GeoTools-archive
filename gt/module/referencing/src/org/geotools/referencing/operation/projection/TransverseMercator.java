@@ -473,7 +473,7 @@ public class TransverseMercator extends MapProjection {
      * <p>
      *        {@code getZone(-52.5, -3);}<br>
      *
-     * @param  centralLongitudeZone1 Longitude in the middle of zone 1, in degrees
+     * @param  centralLongitudeZone1 Longitude in the middle of zone 1, in decimal degrees
      *         relative to Greenwich. Positive longitudes are toward east, and negative
      *         longitudes toward west.
      * @param  zoneWidth Number of degrees of longitudes in one zone. A positive value
@@ -497,7 +497,7 @@ public class TransverseMercator extends MapProjection {
      * typically the central meridian. This method may be invoked to make sure that the central
      * meridian is correctly set.
      *
-     * @param  centralLongitudeZone1 Longitude in the middle of zone 1, in degrees
+     * @param  centralLongitudeZone1 Longitude in the middle of zone 1, in decimal degrees
      *         relative to Greenwich. Positive longitudes are toward east, and negative
      *         longitudes toward west.
      * @param  zoneWidth Number of degrees of longitudes in one zone. A positive value

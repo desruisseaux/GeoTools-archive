@@ -56,7 +56,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
     private static final long serialVersionUID = 541978454643213305L;;
     
     /**
-     * The Greenwich meridian, with angular measurements in degrees.
+     * The Greenwich meridian, with angular measurements in decimal degrees.
      */
     public static final DefaultPrimeMeridian GREENWICH = 
                     new DefaultPrimeMeridian("Greenwich", 0, NonSI.DEGREE_ANGLE);
@@ -88,7 +88,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
 
     /**
      * Constructs a prime meridian from a name. The {@code greenwichLongitude} value
-     * is assumed in {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * is assumed in {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * @param name                The datum name.
      * @param greenwichLongitude  The longitude value relative to the Greenwich Meridian.
@@ -137,7 +137,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
     
     /**
      * Returns the longitude value relative to the Greenwich Meridian, expressed in the specified
-     * units. This convenience method makes it easier to obtain longitude in degrees
+     * units. This convenience method makes it easier to obtain longitude in decimal degrees
      * ({@code getGreenwichLongitude(NonSI.DEGREE_ANGLE)}), regardless of the underlying
      * angular units of this prime meridian.
      *
@@ -214,7 +214,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
             // If the PrimeMeridian is written inside a "GEOGCS",
             // then OpenGIS say that it must be written into the
             // unit of the enclosing geographic coordinate system.
-            // Otherwise, default to degrees.
+            // Otherwise, default to decimal degrees.
             context = NonSI.DEGREE_ANGLE;
         }
         formatter.append(getGreenwichLongitude(context));

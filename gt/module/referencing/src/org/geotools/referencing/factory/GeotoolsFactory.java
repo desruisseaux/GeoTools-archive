@@ -895,8 +895,8 @@ public class GeotoolsFactory extends ReferencingFactory
      * map performing a rotation, then any mixed axes must have identical units.
      * For example, a (<var>lat_deg</var>, <var>lon_deg</var>, <var>height_feet</var>)
      * system can be rotated in the (<var>lat</var>, <var>lon</var>) plane, since both
-     * affected axes are in degrees.  But you should not rotate this coordinate system
-     * in any other plane.
+     * affected axes are in decimal degrees.  But you should not rotate this coordinate
+     * system in any other plane.
      * <p>
      * <strong>NOTE:</strong>
      * It is the user's responsability to ensure that the {@code baseToDerived} transform performs
@@ -926,8 +926,8 @@ public class GeotoolsFactory extends ReferencingFactory
      * map performing a rotation, then any mixed axes must have identical units.
      * For example, a (<var>lat_deg</var>, <var>lon_deg</var>, <var>height_feet</var>)
      * system can be rotated in the (<var>lat</var>, <var>lon</var>) plane, since both
-     * affected axes are in degrees.  But you should not rotate this coordinate system
-     * in any other plane.
+     * affected axes are in decimal degrees. But you should not rotate this coordinate
+     * system in any other plane.
      * <p>
      * <strong>NOTE:</strong>
      * It is the user's responsability to ensure that the {@code baseToDerived} transform performs

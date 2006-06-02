@@ -340,7 +340,7 @@ public class GeodeticCalculator {
 
     /**
      * Returns {@code true} if the specified axis is oriented toward the specified direction and
-     * uses degrees units.
+     * uses decimal degrees units.
      */
     private static boolean isStandard(final CoordinateSystemAxis axis, final AxisDirection direction) {
         return direction.equals(axis.getDirection()) && NonSI.DEGREE_ANGLE.equals(axis.getUnit());
@@ -363,7 +363,7 @@ public class GeodeticCalculator {
      * greater or equal than -90 degrees and lower or equals than +90 degrees. As
      * a convenience, this method returns the latitude in radians.
      *
-     * @param  latitude The latitude value in <strong>degrees</strong>.
+     * @param  latitude The latitude value in <strong>decimal degrees</strong>.
      * @return The latitude value in <strong>radians</strong>.
      * @throws IllegalArgumentException if {@code latitude} is not between -90 and +90 degrees.
      */
@@ -380,10 +380,9 @@ public class GeodeticCalculator {
      * greater or equal than -180 degrees and lower or equals than +180 degrees. As
      * a convenience, this method returns the longitude in radians.
      *
-     * @param  longitude The longitude value in <strong>degrees</strong>.
+     * @param  longitude The longitude value in <strong>decimal degrees</strong>.
      * @return The longitude value in <strong>radians</strong>.
-     * @throws IllegalArgumentException if {@code longitude} is not
-     *                                  between -180 and +180 degrees.
+     * @throws IllegalArgumentException if {@code longitude} is not between -180 and +180 degrees.
      */
     private static double checkLongitude(final double longitude) throws IllegalArgumentException {
         if (longitude>=Longitude.MIN_VALUE && longitude<=Longitude.MAX_VALUE) {
@@ -398,7 +397,7 @@ public class GeodeticCalculator {
      * greater or equal than -180 degrees and lower or equals than +180 degrees.
      * As a convenience, this method returns the azimuth in radians.
      *
-     * @param  azimuth The azimuth value in <strong>degrees</strong>.
+     * @param  azimuth The azimuth value in <strong>decimal degrees</strong>.
      * @return The azimuth value in <strong>radians</strong>.
      * @throws IllegalArgumentException if {@code azimuth} is not between -180 and +180 degrees.
      */
@@ -503,8 +502,8 @@ public class GeodeticCalculator {
      * the {@linkplain #getDestinationPoint() destination point} are discarted.
      * They will need to be specified again.
      *
-     * @param  longitude The longitude in degrees between -180 and +180°
-     * @param  latitude  The latitude  in degrees between  -90 and  +90°
+     * @param  longitude The longitude in decimal degrees between -180 and +180°
+     * @param  latitude  The latitude  in decimal degrees between  -90 and  +90°
      * @throws IllegalArgumentException if the longitude or the latitude is out of bounds.
      */
     public void setAnchorPoint(double longitude, double latitude) throws IllegalArgumentException {
@@ -521,7 +520,7 @@ public class GeodeticCalculator {
 
     /**
      * Set the anchor point. The <var>x</var> and <var>y</var> coordinates
-     * must be the longitude and latitude in degrees, respectively.
+     * must be the longitude and latitude in decimal degrees, respectively.
      *
      * This is a convenience method for
      * <code>{@linkplain #setAnchorPoint(double,double) setAnchorPoint}(x,y)</code>.
@@ -550,8 +549,8 @@ public class GeodeticCalculator {
 
     /**
      * Returns the anchor point. The <var>x</var> and <var>y</var> coordinates
-     * are the longitude and latitude in degrees, respectively. If the anchor
-     * point has never been set, then the default value is (0,0).
+     * are the longitude and latitude in decimal degrees, respectively. If the
+     * anchor point has never been set, then the default value is (0,0).
      *
      * @return The anchor point.
      */
@@ -585,8 +584,8 @@ public class GeodeticCalculator {
      * effect of this call. They will be recomputed the next time {@link #getAzimuth()} or
      * {@link #getOrthodromicDistance()} are invoked.
      *
-     * @param  longitude The longitude in degrees between -180 and +180°
-     * @param  latitude  The latgitude in degrees between  -90 and  +90°
+     * @param  longitude The longitude in decimal degrees between -180 and +180°
+     * @param  latitude  The latgitude in decimal degrees between  -90 and  +90°
      * @throws IllegalArgumentException if the longitude or the latitude is out of bounds.
      */
     public void setDestinationPoint(double longitude, double latitude) throws IllegalArgumentException {
@@ -603,7 +602,7 @@ public class GeodeticCalculator {
 
     /**
      * Set the destination point. The <var>x</var> and <var>y</var> coordinates
-     * must be the longitude and latitude in degrees, respectively.
+     * must be the longitude and latitude in decimal degrees, respectively.
      *
      * This is a convenience method for
      * <code>{@linkplain #setDestinationPoint(double,double) setDestinationPoint}(x,y)</code>.
@@ -639,7 +638,7 @@ public class GeodeticCalculator {
      * {@linkplain #getAnchorPoint anchor point} to the azimuth and distance specified.
      *
      * @return The destination point. The <var>x</var> and <var>y</var> coordinates
-     *         are the longitude and latitude in degrees, respectively.
+     *         are the longitude and latitude in decimal degrees, respectively.
      * @throws IllegalStateException if the azimuth and the distance have not been set.
      */
     public Point2D getDestinationPoint() throws IllegalStateException {
@@ -678,7 +677,7 @@ public class GeodeticCalculator {
      * The destination point will be updated as a side effect of this call. It will be
      * recomputed the next time {@link #getDestinationPoint()} is invoked.
      *
-     * @param  azimuth The azimuth in degrees from -180° to 180°.
+     * @param  azimuth The azimuth in decimal degrees from -180° to 180°.
      * @param  distance The orthodromic distance in the same units as the
      *         {@linkplain #getEllipsoid ellipsoid} axis.
      * @throws IllegalArgumentException if the azimuth or the distance is out of bounds.
@@ -706,7 +705,7 @@ public class GeodeticCalculator {
      * has been invoked after. In this later case, the azimuth will be computed from the
      * {@linkplain #getAnchorPoint anchor point} to the destination point.
      *
-     * @return The azimuth, in degrees from -180° to +180°.
+     * @return The azimuth, in decimal degrees from -180° to +180°.
      * @throws IllegalStateException if the destination point has not been set.
      */
     public double getAzimuth() throws IllegalStateException {
@@ -829,8 +828,8 @@ public class GeodeticCalculator {
      * Calculates the meridian arc length between two points in the same meridian 
      * in the referenced ellipsoid.
      *
-     * @param  latitude1 The latitude of the first  point (in degrees).
-     * @param  latitude2 The latitude of the second point (in degrees).
+     * @param  latitude1 The latitude of the first  point (in decimal degrees).
+     * @param  latitude2 The latitude of the second point (in decimal degrees).
      * @return Returned the meridian arc length between latitude1 and latitude2 
      */
     public double getMeridianArcLength(final double latitude1, final double latitude2) {

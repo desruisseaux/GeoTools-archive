@@ -120,7 +120,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * Returns the parameter descriptors for this math transform, or {@code null} if unknow.
      * This method is similar to {@link OperationMethod#getParameters}, except that
      * {@code MathTransform} returns parameters in standard units (usually
-     * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}).
+     * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE decimal degrees}).
      *
      * @return The parameter descriptors for this math transform, or {@code null}.
      *
@@ -134,9 +134,9 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * Returns the parameter values for this math transform, or {@code null} if unknow.
      * This method is similar to {@link Operation#getParameterValues}, except that
      * {@code MathTransform} returns parameters in standard units (usually
-     * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}). Since this
-     * method returns a copy of the parameter values, any change to a value will have no effect
-     * on this math transform.
+     * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE decimal degrees}).
+     * Since this method returns a copy of the parameter values, any change to a value
+     * will have no effect on this math transform.
      *
      * @return A copy of the parameter values for this math transform, or {@code null}.
      *
