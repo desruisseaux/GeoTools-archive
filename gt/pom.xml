@@ -879,10 +879,6 @@
               <title>Bridges to external applications</title>
               <packages>org.geotools.openoffice*</packages>
             </group>
-            <group>
-              <title>Legacy packages (to be removed)</title>
-              <packages>org.geotools.pt*:org.geotools.cs*:org.geotools.ct*:org.geotools.cv*:org.geotools.gc*:org.geotools.gp*:org.geotools.units*:org.geotools.renderer*:org.geotools.io.coverage*</packages>
-            </group>
           </groups>
         </configuration>
       </plugin>
