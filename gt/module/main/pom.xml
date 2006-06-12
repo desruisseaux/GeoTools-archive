@@ -188,11 +188,6 @@
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>geoapi-legacy</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <!-- The version number is specified in the parent POM. -->

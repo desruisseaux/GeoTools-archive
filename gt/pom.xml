@@ -526,11 +526,6 @@
         <version>0.3.6</version>
         <scope>test</scope>
       </dependency>
-      <dependency>
-        <groupId>org.opengis</groupId>
-        <artifactId>geoapi-legacy</artifactId>
-        <version>0.2</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
