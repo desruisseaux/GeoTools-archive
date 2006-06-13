@@ -111,7 +111,9 @@ public class JMapPane extends JPanel implements MouseListener {
     
 protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // TODO: fix the bounds aspect ratio here!
+        if(renderer == null || mapArea == null){
+            return;
+        }
         Rectangle r = getBounds();
 
         double mapWidth = mapArea.getWidth();
