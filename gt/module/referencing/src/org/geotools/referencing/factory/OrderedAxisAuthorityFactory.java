@@ -38,7 +38,6 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -110,7 +109,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see Hints#FORCE_STANDARD_AXIS_UNITS
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/The+axis+order+issue
  */
-public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
+public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
         implements CSAuthorityFactory, CRSAuthorityFactory, Comparator/*<CoordinateSystemAxis>*/
 {
     /**
@@ -449,62 +448,6 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
     }
 
     /**
-     * Returns a coordinate system with the same properties than the specified one, except for
-     * axis order, units and direction. The axis may be reordered according the criterion defined
-     * by the {@link #compare compare} method. In addition, axis directions and units may also be
-     * modified according the hints provided at construction time.
-     *
-     * @throws FactoryException if an error occured while creating the new coordinate system.
-     */
-    protected CoordinateSystem replace(final CoordinateSystem cs) throws FactoryException {
-        final int dimension = cs.getDimension();
-        final CoordinateSystemAxis[] orderedAxis = new CoordinateSystemAxis[dimension];
-        FactoryGroup factories = null;
-        for (int i=0; i<dimension; i++) {
-            CoordinateSystemAxis axis = cs.getAxis(i);
-            final AxisDirection oldDirection = axis.getDirection();
-            final AxisDirection newDirection = replace(oldDirection);
-            final Unit          oldUnits     = axis.getUnit();
-            final Unit          newUnits     = replace(oldUnits);
-            if (!oldDirection.equals(newDirection) || !oldUnits.equals(newUnits)) {
-                if (factories == null) {
-                    factories = getFactoryGroup(csFactory);
-                }
-                final CSFactory csFactory = factories.getCSFactory();
-                final Map properties = getProperties(axis);
-                axis = csFactory.createCoordinateSystemAxis(properties,
-                        axis.getAbbreviation(), newDirection, newUnits);
-            }
-            orderedAxis[i] = axis;
-        }
-        Arrays.sort(orderedAxis, this);
-        for (int i=0; i<dimension; i++) {
-            if (!orderedAxis[i].equals(cs.getAxis(i))) {
-                CoordinateSystem modified = createCS(cs.getClass(), getProperties(cs), orderedAxis);
-                assert Utilities.sameInterfaces(cs.getClass(), modified.getClass(), CoordinateSystem.class);
-                modified = (CoordinateSystem) pool.canonicalize(modified);
-                return modified;
-            }
-        }
-        // All axis are identical - the CS was actually not changed.
-        return cs;
-    }
-
-    /**
-     * Replaces the specified direction, if applicable. This method is invoked automatically by the
-     * {@link #replace(CoordinateSystem)} method. The default implementation replaces the direction
-     * only if the {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS FORCE_STANDARD_AXIS_DIRECTIONS} hint
-     * was specified as {@link Boolean#TRUE TRUE} at construction time. In such case, the default
-     * substitution table is as specified in the {@link AxisDirection#absolute} method.
-     * Subclasses may override this method if they want to use a different substitution table.
-     *
-     * @since 2.3
-     */
-    protected AxisDirection replace(final AxisDirection direction) {
-        return (forceStandardDirections) ? direction.absolute() : direction;
-    }
-
-    /**
      * Replaces the specified unit, if applicable. This method is invoked automatically by the
      * {@link #replace(CoordinateSystem)} method. The default implementation replaces the unit
      * only if the {@link Hints#FORCE_STANDARD_AXIS_UNITS FORCE_STANDARD_AXIS_UNITS} hint was
@@ -534,78 +477,17 @@ public class OrderedAxisAuthorityFactory extends AuthorityFactoryAdapter
     }
 
     /**
-     * Creates a new coordinate system of the specified kind. This method is invoked automatically
-     * by {@link #replace(CoordinateSystem)} after it determined that the axis order need to be
-     * changed. Subclasses can override this method if they want to performs some extra processing
-     * on the axis order.
-     * 
-     * Note: this method is private for now because I'm not sure it is worth protected access.
+     * Replaces the specified direction, if applicable. This method is invoked automatically by the
+     * {@link #replace(CoordinateSystem)} method. The default implementation replaces the direction
+     * only if the {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS FORCE_STANDARD_AXIS_DIRECTIONS} hint
+     * was specified as {@link Boolean#TRUE TRUE} at construction time. In such case, the default
+     * substitution table is as specified in the {@link AxisDirection#absolute} method.
+     * Subclasses may override this method if they want to use a different substitution table.
      *
-     * @param  type The coordinate system type to create.
-     * @param  properties The properties to gives to the new coordinate system.
-     * @param  axis The axis to give to the new coordinate system. Subclasses are allowed to write
-     *              directly in this array (no need to copy it).
-     * @return A new coordinate system of the specified kind with the specified axis.
-     * @throws FactoryException if the coordinate system can't be created.
+     * @since 2.3
      */
-    private CoordinateSystem createCS(final Class/*<CoordinateSystem>*/ type,
-                                      final Map properties,
-                                      final CoordinateSystemAxis[] axis)
-            throws FactoryException
-    {
-        final int          dimension = axis.length;
-        final FactoryGroup factories = getFactoryGroup(csFactory);
-        final CSFactory    csFactory = factories.getCSFactory();
-        if (CartesianCS.class.isAssignableFrom(type)) {
-            switch (dimension) {
-                case 2: return csFactory.createCartesianCS(properties, axis[0], axis[1]);
-                case 3: return csFactory.createCartesianCS(properties, axis[0], axis[1], axis[2]);
-            }
-        } else
-        if (EllipsoidalCS.class.isAssignableFrom(type)) {
-            switch (dimension) {
-                case 2: return csFactory.createEllipsoidalCS(properties, axis[0], axis[1]);
-                case 3: return csFactory.createEllipsoidalCS(properties, axis[0], axis[1], axis[2]);
-            }
-        } else
-        if (SphericalCS.class.isAssignableFrom(type)) {
-            switch (dimension) {
-                case 3: return csFactory.createSphericalCS(properties, axis[0], axis[1], axis[2]);
-            }
-        } else
-        if (CylindricalCS.class.isAssignableFrom(type)) {
-            switch (dimension) {
-                case 3: return csFactory.createCylindricalCS(properties, axis[0], axis[1], axis[2]);
-            }
-        } else
-        if (PolarCS.class.isAssignableFrom(type)) {
-            switch (dimension) {
-                case 2: return csFactory.createPolarCS(properties, axis[0], axis[1]);
-            }
-        } else
-        if (VerticalCS.class.isAssignableFrom(type)) {
-            switch (dimension) {
-                case 1: return csFactory.createVerticalCS(properties, axis[0]);
-            }
-        } else
-        if (TimeCS.class.isAssignableFrom(type)) {
-            switch (dimension) {
-                case 1: return csFactory.createTimeCS(properties, axis[0]);
-            }
-        } else
-        if (LinearCS.class.isAssignableFrom(type)) {
-            switch (dimension) {
-                case 1: return csFactory.createLinearCS(properties, axis[0]);
-            }
-        } else
-        if (UserDefinedCS.class.isAssignableFrom(type)) {
-            switch (dimension) {
-                case 2: return csFactory.createUserDefinedCS(properties, axis[0], axis[1]);
-                case 3: return csFactory.createUserDefinedCS(properties, axis[0], axis[1], axis[2]);
-            }
-        }
-        throw new FactoryException(Errors.format(ErrorKeys.UNSUPPORTED_COORDINATE_SYSTEM_$1,
-                                   Utilities.getShortName(type)));
+    protected AxisDirection replace(final AxisDirection direction) {
+        return (forceStandardDirections) ? direction.absolute() : direction;
     }
 
     /**

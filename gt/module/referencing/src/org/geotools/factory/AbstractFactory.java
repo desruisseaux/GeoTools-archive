@@ -246,13 +246,21 @@ public class AbstractFactory implements Factory, RegisterableService {
     public void onRegistration(final ServiceRegistry registry, final Class category) {
         for (final Iterator it=registry.getServiceProviders(category, false); it.hasNext();) {
             final Object provider = it.next();
-            if (provider instanceof AbstractFactory) {
+            if (provider!=this && provider instanceof AbstractFactory) {
                 final AbstractFactory factory = (AbstractFactory) provider;
-                if (priority > factory.getPriority()) {
-                    registry.setOrdering(category, this, factory);
-                } else if (priority < factory.getPriority()) {
-                    registry.setOrdering(category, factory, this);
+                final int priority = getPriority();
+                final int compare  = factory.getPriority();
+                final Object first, second;
+                if (priority > compare) {
+                    first  = this;
+                    second = factory;
+                } else if (priority < compare) {
+                    first  = factory;
+                    second = this;
+                } else {
+                    continue; // No ordering
                 }
+                registry.setOrdering(category, first, second);
             }
         }
     }

@@ -681,7 +681,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         }
         throw new PointOutsideCoverageException(pointOutsideCoverage(coord));
     }
-    
+
     /**
      * Returns a sequence of float values for a given two-dimensional point in the coverage.
      *

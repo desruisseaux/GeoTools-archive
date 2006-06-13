@@ -26,7 +26,6 @@ package org.geotools.referencing.factory;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Collections;
-import javax.imageio.spi.ServiceRegistry;
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -818,55 +817,5 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
         final String authority = getAuthority().getTitle().toString();
         return new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$3,
                    code, authority, Utilities.getShortName(type)), authority, code);
-    }
-
-    /**
-     * Called when this factory is added to the given {@code category} of the given
-     * {@code registry}. The factory may already be registered under another category
-     * or categories.
-     * <p>
-     * This method is invoked automatically when this factory is registered as a plugin,
-     * and should not be invoked directly by the user. The default implementation iterates
-     * through all services under the same category and for the same
-     * {@linkplain AuthorityFactory#getAuthority authority}, and set the ordering
-     * according the priority given at construction time.
-     *
-     * @param registry a {@code ServiceRegistry} where this factory has been registered.
-     * @param category a {@code Class} object indicating the registry category under which
-     *                 this object has been registered.
-     *
-     * @see #MINIMUM_PRIORITY
-     * @see #MAXIMUM_PRIORITY
-     * @see org.geotools.referencing.FactoryFinder
-     */
-    public void onRegistration(final ServiceRegistry registry, final Class category) {
-        if (false) {
-            // Do not invoke the super-class method, since we
-            // are using a different sorting algorithm below.
-            super.onRegistration(registry, category);
-        }
-        for (final Iterator it=registry.getServiceProviders(category, false); it.hasNext();) {
-            final Object provider = it.next();
-            if (provider!=this && provider instanceof AbstractAuthorityFactory) {
-                final AbstractAuthorityFactory factory = (AbstractAuthorityFactory) provider;
-                final Citation c1 = this   .getAuthority();
-                final Citation c2 = factory.getAuthority();
-                if (c1!=null && c2!=null && Citations.identifierMatches(c1, c2)) {
-                    final int priority = getPriority();
-                    final int compare  = factory.getPriority();
-                    final Object first, second;
-                    if (priority > compare) {
-                        first  = this;
-                        second = factory;
-                    } else if (priority < compare) {
-                        first  = factory;
-                        second = this;
-                    } else {
-                        continue; // No ordering
-                    }
-                    registry.setOrdering(category, first, second);
-                }
-            }
-        }
     }
 }

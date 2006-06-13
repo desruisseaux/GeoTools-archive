@@ -110,9 +110,9 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * Constructs an instance wrapping the specified factory with a default number
      * of entries to keep by strong reference.
      * <p>
-     * This method is protected because subclasses must declare which of the
+     * This constructor is protected because subclasses must declare which of the
      * {@link DatumAuthorityFactory}, {@link CSAuthorityFactory}, {@link CRSAuthorityFactory}
-     * and {@link CoordinateOperationAuthorityFactory} interfaces the choose to implement.
+     * and {@link CoordinateOperationAuthorityFactory} interfaces they choose to implement.
      *
      * @param factory The factory to cache. Can not be {@code null}.
      */
@@ -126,9 +126,9 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * amount of objects are created, then the strong references for the oldest ones are replaced
      * by weak references.
      * <p>
-     * This method is protected because subclasses must declare which of the
+     * This constructor is protected because subclasses must declare which of the
      * {@link DatumAuthorityFactory}, {@link CSAuthorityFactory}, {@link CRSAuthorityFactory}
-     * and {@link CoordinateOperationAuthorityFactory} interfaces the choose to implement.
+     * and {@link CoordinateOperationAuthorityFactory} interfaces they choose to implement.
      *
      * @param factory The factory to cache. Can not be {@code null}.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.

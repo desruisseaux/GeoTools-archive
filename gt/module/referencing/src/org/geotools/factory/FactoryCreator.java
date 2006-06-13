@@ -19,11 +19,9 @@
 package org.geotools.factory;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Collection;
+import java.util.*;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
 import javax.imageio.spi.ServiceRegistry; // For javadoc
@@ -38,18 +36,10 @@ import org.geotools.resources.i18n.ErrorKeys;
  * A {@linkplain FactoryRegistry factory registry} capable to creates factories if no appropriate
  * instance was found in the registry.
  * <p>
- * Factory created "on the fly" are not cached; all invocation to
- * {@link #getServiceProvider getServiceProvider(...)} will creates them again if no registered
- * factory matches the requirements ({@linkplain javax.imageio.spi.ServiceRegistry.Filter filter}
- * and/or {@linkplain Hints hints}).
- * </p>
- * <p>If caching is wanted, the instances to cache should be declared
- * likes all other services in the {@code META-INF/services/} directory. For the caching to be
- * effective, their no-argument constructor shall setup the factory with
- * {@linkplain Factory#getImplementationHints implementation hints} matching the hints that the
- * application is expected to ask for. It is preferable that such custom implementation
- * {@linkplain ServiceRegistry#setOrdering order} itself after the default implementations.
- * </p>
+ * This class maintains a cache of previously created factories, as {@linkplain WeakReference
+ * weak references}. Calls to {@link #getServiceProvider getServiceProvider} first check if a
+ * previously created factory can fit.
+ *
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
@@ -60,6 +50,11 @@ public class FactoryCreator extends FactoryRegistry {
      * The array of classes for searching the one-argument constructor.
      */
     private static final Class[] HINTS_ARGUMENT = new Class[] {Hints.class};
+
+    /**
+     * List of factories already created. Used as a cache.
+     */
+    private final Map/*<Class, List<Reference>>*/ cache = new HashMap();
 
     /**
      * Objects under construction for each implementation class.
@@ -74,6 +69,25 @@ public class FactoryCreator extends FactoryRegistry {
      */
     public FactoryCreator(final Collection categories) {
         super(categories);
+    }
+
+    /**
+     * Returns the providers available in the cache. To be used by {@link FactoryRegistry}.
+     */
+    final List/*<Reference>*/ getCachedProviders(final Class category) {
+        List c = (List) cache.get(category);
+        if (c == null) {
+            c = new LinkedList();
+            cache.put(category, c);
+        }
+        return c;
+    }
+
+    /**
+     * Caches the specified factory under the specified category.
+     */
+    private void cache(final Class category, final Object factory) {
+        getCachedProviders(category).add(new WeakReference(factory));
     }
 
     /**
@@ -127,6 +141,7 @@ public class FactoryCreator extends FactoryRegistry {
                         if (!Modifier.isAbstract(modifiers)) {
                             final Object candidate = createSafe(category, type, hints);
                             if (isAcceptable(candidate, category, hints, filter)) {
+                                cache(category, candidate);
                                 return candidate;
                             }
                             dispose(candidate);
@@ -162,6 +177,7 @@ public class FactoryCreator extends FactoryRegistry {
                 }
             }
             if (FILTER.filter(candidate) && isAcceptable(candidate, category, hints, filter)) {
+                cache(category, candidate);
                 return candidate;
             }
             dispose(candidate);

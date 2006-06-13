@@ -61,6 +61,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -999,7 +1000,11 @@ public class CoverageStack extends AbstractCoverage {
                 return false; // Missing data.
             }
         } catch (IOException exception) {
-            throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
+            String message = exception.getLocalizedMessage();
+            if (message == null) {
+                message = Utilities.getShortClassName(exception);
+            }
+            throw new CannotEvaluateException(message, exception);
         }
         final Object Zp;
         if (zCRS instanceof TemporalCRS) {

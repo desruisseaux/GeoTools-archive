@@ -314,6 +314,22 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         assertSame(cacheTest, factory1.createCoordinateReferenceSystem("4326"));
     }
 
+    /**
+     * Tests the creation of EPSG:4326 CRS with different axis order.
+     */
+    public void testLongitudeFirst() throws FactoryException {
+if (true) return; // TODO: doesn't work yet.
+        final CoordinateReferenceSystem standard = CRS.decode("EPSG:4326", false);
+        final CoordinateReferenceSystem modified = CRS.decode("EPSG:4326", true );
+        final MathTransform transform = CRS.transform(standard, modified);
+        assertTrue(transform instanceof LinearTransform);
+        final Matrix matrix = ((LinearTransform) transform).getMatrix();
+        assertEquals(new GeneralMatrix(new double[][] {
+            { 0,  1,  0},
+            { 1,  0,  0},
+            { 0,  0,  1}}), new GeneralMatrix(matrix));
+    }
+
     // -------------------------------------------------------------------------
     // The following tests are copied from the legacy plugin/epsg-wkt test suite
     // -------------------------------------------------------------------------

@@ -37,7 +37,7 @@ import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
 import org.geotools.metadata.iso.citation.Citations;
 
 /**
- * An EPSG authority factory using (<var>longitude</var>,<var>latitude</var>) axis order.
+ * An EPSG authority factory using (<var>longitude</var>, <var>latitude</var>) axis order.
  * This factory wraps a {@link DefaultFactory} into an {@link OrderedAxisAuthorityFactory}
  * when first needed.
  * <p>
@@ -51,11 +51,11 @@ import org.geotools.metadata.iso.citation.Citations;
  * 
  * This factory will have a {@linkplain #priority priority} lower than the
  * {@linkplain DefaultFactory default factory} priority, <u>except</u> if the
- * {@code "org.geotools.referencing.forceXY"} {@linkplain System#getProperty(String) system
+ * {@value #SYSTEM_DEFAULT_KEY} {@linkplain System#getProperty(String) system
  * property} is set to {@code true}. This means that when the
- * {@code FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint is not specified, the system-wide default
- * is the EPSG (<var>latitude</var>,<var>longitude</var>) order, except if the above-cited
- * system property is set to {@code true}.
+ * {@code FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint is not specified, the system-wide default is
+ * (<var>longitude</var>, <var>latitude</var>) order if the above-cited system property is set
+ * to {@code true}, and the EPSG (<var>latitude</var>, <var>longitude</var>) order otherwise.
  *
  * @since 2.3
  * @source $URL$
@@ -69,6 +69,25 @@ import org.geotools.metadata.iso.citation.Citations;
 public class LongitudeFirstFactory extends DeferredAuthorityFactory
         implements CRSAuthorityFactory, CSAuthorityFactory
 {
+    /**
+     * The {@linkplain System#getProperty(String) system property} key for setting the default
+     * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint value.
+     * This setting can provide a transition path for projects expecting a (<var>longitude</var>,
+     * <var>latitude</var>) axis order on a system-wide level. Application developpers can set the
+     * default value as below:
+     *
+     * <blockquote><pre>
+     * System.setProperty(SYSTEM_DEFAULT_KEY, "true");
+     * </pre></blockquote>
+     *
+     * Note that this system property applies mostly to the default EPSG factory. Most other
+     * factories ({@code "CRS"}, {@code "AUTO"}, <cite>etc.</cite>) don't need this property
+     * since they use (<var>longitude</var>, <var>latitude</var>) axis order by design.
+     *
+     * @see Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER
+     */
+    public static final String SYSTEM_DEFAULT_KEY = "org.geotools.referencing.forceXY";
+
     /**
      * The service registry to use for fetching the {@linkplain DefaultFactory default factory}
      * instance, or {@code null} if not yet set.
@@ -123,12 +142,12 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory
 
     /**
      * Returns the priority to use relative to the {@link DefaultFactory} priority. The default
-     * priority should be lower, except if the {@code "org.geotools.referencing.forceXY"} system
-     * property is set to {@code true}.
+     * priority should be lower, except if the {@value #SYSTEM_DEFAULT_KEY} system property is
+     * set to {@code true}.
      */
     private static int relativePriority() {
         try {
-            if (Boolean.getBoolean("org.geotools.referencing.forceXY")) {
+            if (Boolean.getBoolean(SYSTEM_DEFAULT_KEY)) {
                 return +10;
             }
         } catch (SecurityException e) {

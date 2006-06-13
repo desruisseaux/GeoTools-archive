@@ -40,7 +40,6 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.spatialschema.geometry.Envelope;
@@ -230,7 +229,7 @@ public class WMSReader implements GridCoverageReader {
 
             	try {
 					crs = CRS.decode(srs);
-				} catch (NoSuchAuthorityCodeException e1) {
+				} catch (FactoryException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}

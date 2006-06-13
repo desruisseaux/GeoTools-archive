@@ -76,20 +76,11 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
     private static final long serialVersionUID = -175151161496419854L;
 
     /**
-     * A lock for avoiding never-ending recursivity in the <CODE>equals</CODE>
-     * method. This lock is necessary because <CODE>AbstractDerivedCRS</CODE>
-     * objects contain a {@link #conversionFromBase} field, which contains a
-     * {@link DefaultConversion#targetCRS} field set to this
-     * <CODE>AbstractDerivedCRS</CODE> object.
-     * <P>
-     * This field can be though as a <CODE>boolean</CODE> flag set to <CODE>true</CODE>
-     * when a comparaison is in progress. A null value means <CODE>false</CODE>, and a non-null
-     * value means <CODE>true</CODE>. The non-null value is used for assertion.
-     * <P>
-     * When an <CODE>equals</CODE> method is invoked, this <CODE>_COMPARING</CODE>
-     * field is set to the originator (either the <CODE>AbstractDerivedCRS</CODE> or the
-     * {@link org.geotools.referencing.operation.AbstractCoordinateOperation} object where
-     * the comparaison begin).
+     * A lock for avoiding never-ending recursivity in the {@code equals} method. This field
+     * contains a {@code boolean} flag set to {@code true} when a comparaison is in progress.
+     * This lock is necessary because {@code AbstractDerivedCRS} objects contain a
+     * {@link #conversionFromBase} field, which contains a {@link DefaultConversion#targetCRS}
+     * field set to this {@code AbstractDerivedCRS} object.
      * <P>
      * <STRONG>DO NOT USE THIS FIELD. It is strictly for internal use by {@link #equals} and
      * {@link org.geotools.referencing.operation.AbstractCoordinateOperation#equals} methods.</STRONG>
@@ -98,7 +89,7 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      *       because {@link org.geotools.referencing.operation.AbstractCoordinateOperation}
      *       lives in a different package.
      */
-    public static AbstractIdentifiedObject _COMPARING;
+    public static final ThreadLocal/*<Boolean>*/ _COMPARING = new ThreadLocal();
 
     /**
      * The base coordinate reference system.
@@ -295,20 +286,17 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
                  * Avoid never-ending recursivity: Conversion has a 'targetCRS' field (inherited from
                  * the AbstractCoordinateOperation super-class) that is set to this AbstractDerivedCRS.
                  */
-                synchronized (AbstractDerivedCRS.class) {
-                    if (_COMPARING != null) {
-                        // NOTE: the following assertion fails for deserialized objects.
-                        // assert \u00A4COMPARING == conversionFromBase;
-                        return true;
-                    }
-                    try {
-                        _COMPARING = this;
-                        return equals(this.conversionFromBase,
-                                      that.conversionFromBase,
-                                      compareMetadata);
-                    } finally {
-                        _COMPARING = null;
-                    }
+                final Boolean comparing = (Boolean) _COMPARING.get();
+                if (comparing!=null && comparing.booleanValue()) {
+                    return true;
+                }
+                try {
+                    _COMPARING.set(Boolean.TRUE);
+                    return equals(this.conversionFromBase,
+                                  that.conversionFromBase,
+                                  compareMetadata);
+                } finally {
+                    _COMPARING.set(Boolean.FALSE);
                 }
             }
         }

@@ -149,6 +149,9 @@ compare:for (int i=0; i<c1.length; i++) {
      *
      * @param  classe The object class (may be {@code null}).
      * @return A short class name for the specified object.
+     *
+     * @todo Consider replacing by {@link Class#getSimpleName} when we will
+     *       be allowed to compile for J2SE 1.5.
      */
     public static String getShortName(Class classe) {
         if (classe == null) {

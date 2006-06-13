@@ -21,11 +21,11 @@ package org.geotools.referencing.factory;
 
 // J2SE dependencies
 import java.util.*;
-import javax.units.ConversionException;
 import javax.units.Unit;
+import javax.units.ConversionException;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;             // For javadoc
+import org.opengis.metadata.Identifier;  // For javadoc
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
@@ -37,6 +37,9 @@ import org.opengis.referencing.operation.*;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.Factory;
+import org.geotools.factory.FactoryCreator;
+import org.geotools.factory.FactoryRegistry;
 import org.geotools.parameter.Parameters;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -50,7 +53,6 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.XArray;
 import org.geotools.util.Singleton;
-import org.geotools.util.WeakValueHashMap;
 
 
 /**
@@ -65,16 +67,9 @@ import org.geotools.util.WeakValueHashMap;
  */
 public final class FactoryGroup extends ReferencingFactory {
     /**
-     * Pool of already-created factory groups. The keys are snapshot of the {@code FactoryGroup}
-     * <strong>at the time they were created</strong>. Those snapshots are never visible outside
-     * this pool. Values are the {@code FactoryGroup} actually in use.
+     * A factory registry used as a cache for factory groups created up to date.
      */
-    private static final Map/*<FactoryGroup,FactoryGroup>*/ pool = new WeakValueHashMap();
-
-    /**
-     * Factory groups under construction. Used as a guard against infinite recursivity.
-     */
-    private static final Set/*<Hints>*/ underConstruction = new HashSet();
+    private static FactoryRegistry cache;
 
     /**
      * The {@linkplain Datum datum} factory.
@@ -108,17 +103,6 @@ public final class FactoryGroup extends ReferencingFactory {
     // and even with authority factories.
 
     /**
-     * Creates a snapshot of the specified group.
-     * Used only for creating keys in the {@linkplain #pool}.
-     */
-    private FactoryGroup(final FactoryGroup group) {
-        this.datumFactory = group.datumFactory;
-        this.csFactory    = group.csFactory;
-        this.crsFactory   = group.crsFactory;
-        this.mtFactory    = group.mtFactory;
-    }
-
-    /**
      * Constructs an instance using the specified factories. If any factory is null,
      * a default instance will be created by {@link FactoryFinder} when first needed.
      *
@@ -144,45 +128,58 @@ public final class FactoryGroup extends ReferencingFactory {
     }
 
     /**
-     * Constructs an instance using the factories initialized with the specified hints.
+     * Creates an instance from the specified hints. This constructor recognizes the
+     * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
+     * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
+     * <p>
+     * This constructor is public mainly for {@link org.geotools.factory.FactoryCreator} usage.
+     * Consider invoking <code>{@linkplain #createInstance createInstance}(hints)</code> instead.
      *
-     * <strong>Note:</strong> This constructor is incomplete, which is why it is private.
-     * The construction is finished inside the {@link #createInstance} method.
+     * @param  hints The hints, or {@code null} if none.
+     *
+     * @since 2.2
      */
-    private FactoryGroup(final Hints reduced) {
+    public FactoryGroup(final Hints hints) {
+        final Hints reduced = new Hints(hints);
         /*
          * If hints are provided, we will fetch factory immediately (instead of storing the hints
          * in an inner field) because most factories will retain few hints, while the Hints map
          * may contains big objects. If no hints were provided, we will construct factories only
          * when first needed.
          */
-        datumFactory =         (DatumFactory) reduced.remove(Hints.DATUM_FACTORY);
-        csFactory    =            (CSFactory) reduced.remove(Hints.CS_FACTORY);
-        crsFactory   =           (CRSFactory) reduced.remove(Hints.CRS_FACTORY);
-        mtFactory    = (MathTransformFactory) reduced.remove(Hints.MATH_TRANSFORM_FACTORY);
+        datumFactory =         (DatumFactory) extract(reduced, Hints.DATUM_FACTORY);
+        csFactory    =            (CSFactory) extract(reduced, Hints.CS_FACTORY);
+        crsFactory   =           (CRSFactory) extract(reduced, Hints.CRS_FACTORY);
+        mtFactory    = (MathTransformFactory) extract(reduced, Hints.MATH_TRANSFORM_FACTORY);
+        /*
+         * Checks if we still have some hints that need to be taken in account. Since we can't guess
+         * which hints are relevant and which ones are not, we have to create all factories now.
+         */
+        if (!reduced.isEmpty()) {
+            setHintsInto(reduced);
+            this.hints.putAll(reduced);
+            initialize();
+            this.hints.clear();
+        }
     }
 
     /**
-     * Fetch all remaining factory. This method should be invoked only if it has been determined
-     * that the default factories may not fit, i.e. there is some remaining hints after the one
-     * removed by the constructor above.
+     * Returns the factory for the specified hint, or {@code null} if the hint is not a factory
+     * instance. It could be for example a {@link Class}.
      */
-    private void complete(final Hints hints) {
-        if (datumFactory == null) datumFactory = FactoryFinder.getDatumFactory        (hints);
-        if (   csFactory == null) csFactory    = FactoryFinder.getCSFactory           (hints);
-        if (  crsFactory == null) crsFactory   = FactoryFinder.getCRSFactory          (hints);
-        if (   mtFactory == null) mtFactory    = FactoryFinder.getMathTransformFactory(hints);
+    private static Factory extract(final Map hints, final Hints.Key key) {
+        final Object candidate = hints.get(key);
+        if (candidate instanceof Factory) {
+            hints.remove(key);
+            return (Factory) candidate;
+        }
+        return null;
     }
-
-    // TODO : All this stuff (including the constructor splitted with an external 'complete'
-    //        method) is a very complicated mess. Try to get ride of all of those, and implement
-    //        a cache mechanism straight into FactoryCreator instead.
 
     /**
      * Creates an instance from the specified hints. This method recognizes the
-     * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
-     * {@link Hints#DATUM_FACTORY DATUM} and
-     * {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
+     * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
+     * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
      *
      * @param  hints The hints, or {@code null} if none.
      * @return A factory group created from the specified set of hints.
@@ -190,51 +187,41 @@ public final class FactoryGroup extends ReferencingFactory {
      * @since 2.2
      */
     public static FactoryGroup createInstance(final Hints hints) {
-        final Hints reduced = new Hints(hints);
-        final FactoryGroup candidate = new FactoryGroup(reduced);
-        synchronized (pool) {
-            if (!reduced.isEmpty()) {
-                /*
-                 * We still have some hints that need to be taken in account. Since we can't guess
-                 * which hints are relevant and which ones are not, we have to create all factories
-                 * now. While not likely, special care must be taken against infinite recursivity
-                 * because StackOverflowErrors are difficult to debug.
-                 */
-                if (!underConstruction.add(hints)) {
-                    // Detected a recursivity.
-                    throw new IllegalStateException();
-                }
-                try {
-                    candidate.complete(hints);
-                } finally {
-                    if (!underConstruction.remove(hints)) {
-                        // Should not happen unless there is a problem with 'hashCode' or 'equals'.
-                        throw new AssertionError();
-                    }
-                }
+        /*
+         * Use the same synchronization lock than FactoryFinder (instead of FactoryGroup) in
+         * order to reduce the risk of dead lock. This is because FactoryGroup creation may
+         * queries FactoryFinder, and some implementations managed by FactoryFinder may ask
+         * for a FactoryGroup in turn.
+         */
+        synchronized (FactoryFinder.class) {
+            if (cache == null) {
+                cache = new FactoryCreator(Arrays.asList(new Class[] {FactoryGroup.class}));
+                cache.registerServiceProvider(new FactoryGroup(null), FactoryGroup.class);
             }
-            /*
-             * If a factory already exists in the pool, returns the previous instance
-             * and discarts the new one. Otherwise, cache the new instance in the pool
-             * using a snapshot of current state as the key. We use a "snapshot" because
-             * the state of the new instance may change, which is inapropriate for a key.
-             */
-            final FactoryGroup existing = (FactoryGroup) pool.get(candidate);
-            if (existing != null) {
-                return existing;
-            }
-            candidate.snapshot();
+            return (FactoryGroup) cache.getServiceProvider(FactoryGroup.class, null, hints, null);
         }
-        return candidate;
     }
 
     /**
-     * Caches this instance in the pool. This method uses a "snapshot" for the key
-     * because the state of this instance may change, which is inapropriate for a key.
+     * Forces the initialisation of all factories. Implementation note: we try to create the
+     * factories in typical dependency order (CRS all because it has the greatest chances to
+     * depends on other factories).
      */
-    private void snapshot() {
-        // Note: WeakValueHashMap is already synchronized.
-        pool.put(new FactoryGroup(this), this);
+    private void initialize() {
+        mtFactory    = getMathTransformFactory();
+        datumFactory = getDatumFactory();
+        csFactory    = getCSFactory();
+        crsFactory   = getCRSFactory();
+    }
+
+    /**
+     * Put all factories available in this group into the specified map of hints.
+     */
+    private void setHintsInto(final Map hints) {
+        if (  crsFactory != null) hints.put(Hints.           CRS_FACTORY,   crsFactory);
+        if (   csFactory != null) hints.put(Hints.            CS_FACTORY,    csFactory);
+        if (datumFactory != null) hints.put(Hints.         DATUM_FACTORY, datumFactory);
+        if (   mtFactory != null) hints.put(Hints.MATH_TRANSFORM_FACTORY,    mtFactory);
     }
 
     /**
@@ -247,10 +234,8 @@ public final class FactoryGroup extends ReferencingFactory {
     public Map getImplementationHints() {
         synchronized (hints) {
             if (hints.isEmpty()) {
-                hints.put(Hints.           CRS_FACTORY, getCRSFactory());
-                hints.put(Hints.            CS_FACTORY, getCSFactory());
-                hints.put(Hints.         DATUM_FACTORY, getDatumFactory());
-                hints.put(Hints.MATH_TRANSFORM_FACTORY, getMathTransformFactory());
+                initialize();
+                setHintsInto(hints);
             }
         }
         return super.getImplementationHints();
@@ -262,7 +247,9 @@ public final class FactoryGroup extends ReferencingFactory {
      * the later may returns non-default factories.
      */
     private Hints hints() {
-        return new Hints(hints);
+        final Hints completed = new Hints(hints);
+        setHintsInto(completed);
+        return completed;
     }
 
     /**
@@ -270,16 +257,8 @@ public final class FactoryGroup extends ReferencingFactory {
      */
     public DatumFactory getDatumFactory() {
         if (datumFactory == null) {
-            /*
-             * Note: the synchronized statement is not for preventing 'datumFactory' to be
-             *       initialized twice. This is not a big deal if such case happens, which
-             *       is why the synchronized statement do not appears at a higher lever.
-             *       It is rather for making sure that only one field has been initialized
-             *       for each call to 'snapshot()'.
-             */
-            synchronized (pool) {
+            synchronized (hints) {
                 datumFactory = FactoryFinder.getDatumFactory(hints());
-                snapshot();
             }
         }
         return datumFactory;
@@ -290,10 +269,8 @@ public final class FactoryGroup extends ReferencingFactory {
      */
     public CSFactory getCSFactory() {
         if (csFactory == null) {
-            // See synchronization note above.
-            synchronized (pool) {
+            synchronized (hints) {
                 csFactory = FactoryFinder.getCSFactory(hints());
-                snapshot();
             }
         }
         return csFactory;
@@ -304,10 +281,8 @@ public final class FactoryGroup extends ReferencingFactory {
      */
     public CRSFactory getCRSFactory() {
         if (crsFactory == null) {
-            // See synchronization note above.
-            synchronized (pool) {
+            synchronized (hints) {
                 crsFactory = FactoryFinder.getCRSFactory(hints());
-                snapshot();
             }
         }
         return crsFactory;
@@ -318,10 +293,8 @@ public final class FactoryGroup extends ReferencingFactory {
      */
     public MathTransformFactory getMathTransformFactory() {
         if (mtFactory == null) {
-            // See synchronization note above.
-            synchronized (pool) {
+            synchronized (hints) {
                 mtFactory = FactoryFinder.getMathTransformFactory(hints());
-                snapshot();
             }
         }
         return mtFactory;

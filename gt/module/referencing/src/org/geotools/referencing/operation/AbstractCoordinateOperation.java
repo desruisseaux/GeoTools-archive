@@ -496,18 +496,15 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                  * Avoid never-ending recursivity: AbstractDerivedCRS has a 'conversionFromBase'
                  * field that is set to this AbstractCoordinateOperation.
                  */
-                synchronized (AbstractDerivedCRS.class) {
-                    if (AbstractDerivedCRS._COMPARING != null) {
-                        // NOTE: the following assertion fails for deserialized objects.
-                        // assert AbstractDerivedCRS.\u00A4COMPARING == targetCRS;
-                        return true;
-                    }
-                    try {
-                        AbstractDerivedCRS._COMPARING = this;
-                        return equals(this.targetCRS, that.targetCRS, compareMetadata);
-                    } finally {
-                        AbstractDerivedCRS._COMPARING = null;
-                    }
+                final Boolean comparing = (Boolean) AbstractDerivedCRS._COMPARING.get();
+                if (comparing!=null && comparing.booleanValue()) {
+                    return true;
+                }
+                try {
+                    AbstractDerivedCRS._COMPARING.set(Boolean.TRUE);
+                    return equals(this.targetCRS, that.targetCRS, compareMetadata);
+                } finally {
+                    AbstractDerivedCRS._COMPARING.set(Boolean.FALSE);
                 }
             }
         }

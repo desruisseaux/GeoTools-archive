@@ -40,7 +40,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.ProgressListener;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -174,7 +174,7 @@ public class WMSGeoResource extends AbstractGeoResource {
                 crs = CRS.decode("EPSG:4326"); //$NON-NLS-1$
                 env = parent.getWMS(null).getEnvelope(layer, crs);                
             } 
-            catch (NoSuchAuthorityCodeException e) {
+            catch (FactoryException e) {
                 throw (IOException) new IOException("Bounds not available").initCause( e ); //$NON-NLS-1$
             }            
             bounds = new ReferencedEnvelope(new Envelope(env.getMinimum(0), env.getMaximum(0), 

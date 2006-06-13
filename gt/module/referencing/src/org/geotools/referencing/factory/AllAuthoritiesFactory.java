@@ -20,11 +20,7 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies
-import java.util.Set;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -95,7 +91,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
      * A set of user-specified factories to try before to delegate to {@link FactoryFinder},
      * or {@code null} if none.
      */
-    private final Set/*<AuthorityFactory>*/ factories;
+    private final Collection/*<AuthorityFactory>*/ factories;
 
     /**
      * The separator between the authority name and the code. The default value is {@code ':'}.
@@ -125,17 +121,26 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
      * the appropriate interface and having the expected {@linkplain AuthorityFactory#getAuthority
      * authority name} will be used. Only if no suitable factory is found, then this class delegates
      * to {@link FactoryFinder}.
+     * <p>
+     * If the {@code factories} collection contains more than one factory for the same authority
+     * and interface, then all additional factories will be {@linkplain FallbackAuthorityFactory
+     * fallbacks}, to be tried in iteration order only if the first acceptable factory failed to
+     * create the requested object.
      *
      * @param hints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
      *        to {@link FactoryFinder}, or {@code null} if none.
      */
-    public AllAuthoritiesFactory(final Hints hints, final Collection/*<AuthorityFactory>*/ factories) {
+    public AllAuthoritiesFactory(final Hints hints,
+                                 final Collection/*<? extends AuthorityFactory>*/ factories)
+    {
         this(hints, factories, GenericName.DEFAULT_SEPARATOR);
     }
 
     /**
-     * Creates a new factory using the specified hints, user factories and name separator.
+     * Creates a new factory using the specified hints, user factories and name
+     * separator. The optional {@code factories} collection is handled as in the
+     * {@linkplain #AllAuthoritiesFactory(Hints, Collection) constructor above}.
      *
      * @param hints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
@@ -143,21 +148,132 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
      * @param separator The separator between the authority name and the code.
      */
     public AllAuthoritiesFactory(final Hints hints,
-                                 final Collection/*<AuthorityFactory>*/ factories,
+                                 final Collection/*<? extends AuthorityFactory>*/ factories,
                                  final char separator)
     {
         super(NORMAL_PRIORITY);
         this.separator = separator;
         this.userHints = new Hints(hints);
         if (factories!=null && !factories.isEmpty()) {
-            this.factories = new LinkedHashSet(factories);
-            for (final Iterator it=this.factories.iterator(); it.hasNext();) {
-                final Factory factory = (Factory) it.next();
-                this.hints.putAll(factory.getImplementationHints());
+            for (final Iterator it=factories.iterator(); it.hasNext();) {
+                final Object factory = it.next();
+                if (factory instanceof Factory) {
+                    this.hints.putAll(((Factory) factory).getImplementationHints());
+                }
             }
+            this.factories = createFallbacks(factories);
         } else {
             this.factories = null;
         }
+    }
+
+    /**
+     * If more than one factory is found for the same authority and interface,
+     * then wraps them as a chain of {@link FallbackAuthorityFactory}.
+     */
+    private static Collection/*<AuthorityFactory>*/ createFallbacks(
+            final Collection/*<? extends AuthorityFactory>*/ factories)
+    {
+        /*
+         * 'authorities' Will contains the set of all authorities found without duplicate values
+         * in the sense of Citations.identifierMatches(...). 'factoriesByType' will contains the
+         * collection of factories for each (authority,type) pair.
+         */
+        int authorityCount=0;
+        final Citation[] authorities = new Citation[factories.size()];
+        final List[] factoriesByType = new List[authorities.length * AUTHORIZED_TYPES.length];
+        final Map/*<AuthorityFactory,Integer>*/ positions = new IdentityHashMap();
+        for (final Iterator it=factories.iterator(); it.hasNext();) {
+            final AuthorityFactory factory = (AuthorityFactory) it.next();
+            Citation authority = factory.getAuthority();
+            /*
+             * Remember the factory position for later use, in order to preserve iteration order.
+             * We take the opportunity for trimming duplicated factories (should not occur often).
+             * Note: we store XORed values (~, not -) as a flag for use after the enclosing loop.
+             */
+            final Integer old = (Integer) positions.put(factory, new Integer(~positions.size()));
+            if (old != null) {
+                positions.put(factory, old);
+                continue;
+            }
+            /*
+             * Check if the authority has already been meet previously. If the authority is found
+             * (no matter the type), then 'authorityIndex' is set to its index. Otherwise the new
+             * authority is added to the 'authorities' list.
+             */
+            int authorityBase;
+            for (authorityBase=0; authorityBase<authorityCount; authorityBase++) {
+                final Citation candidate = authorities[authorityBase];
+                if (Citations.identifierMatches(candidate, authority)) {
+                    authority = candidate;
+                    break;
+                }
+            }
+            if (authorityBase == authorityCount) {
+                authorities[authorityCount++] = authority;
+            }
+            /*
+             * For each type, check if the factory implements the corresponding interface. If it
+             * does, then the factory is added to the list of factories for this (authority,type)
+             * pair. Otherwise it is silently ignored.
+             */
+            authorityBase *= AUTHORIZED_TYPES.length;
+            for (int i=0; i<AUTHORIZED_TYPES.length; i++) {
+                final Class type = AUTHORIZED_TYPES[i];
+                if (type.isInstance(factory)) {
+                    List forType = factoriesByType[authorityBase + i];
+                    if (forType == null) {
+                        factoriesByType[authorityBase + i] = forType = new ArrayList();
+                    }
+                    forType.add(factory);
+                }
+            }
+        }
+        /*
+         * For each (authority,type) pair with two or more factories, chain those factories into
+         * a FallbackAuthorityFactory object.  The definitive factories are stored into an array
+         * (the order is significant) without duplicated values.
+         */
+        final ArrayList/*<AuthorityFactory,Integer>*/ result = new ArrayList();
+        for (int i=0; i<factoriesByType.length; i++) {
+            final List forType = factoriesByType[i];
+            if (forType != null) {
+                AuthorityFactory factory = (AuthorityFactory) forType.get(0);
+                Integer position = (Integer) positions.get(factory);
+                if (forType.size() != 1) {
+                    final Class type = AUTHORIZED_TYPES[i % AUTHORIZED_TYPES.length];
+                    factory = FallbackAuthorityFactory.create(type, forType);
+                    if (position.intValue() < 0) {
+                        position = new Integer(~position.intValue());
+                    }
+                    if (positions.put(factory, position) != null) {
+                        throw new AssertionError(factory); // Should never happen.
+                    }
+                } else if (position.intValue() >= 0) {
+                    // Factory already added to the list.
+                    continue;
+                } else {
+                    // Factory without fallback, and not yet added to the list.
+                    positions.put(factory, new Integer(~position.intValue()));
+                }
+                result.add(factory);
+            }
+        }
+        /*
+         * Sort the factories in iteration order (i.e. in the same order than the user-supplied
+         * factories).
+         */
+        result.trimToSize();
+        Collections.sort(result, new Comparator/*<AuthorityFactory>*/() {
+            public int compare(final Object f1, final Object f2) {
+                final int p1 = ((Integer) positions.get(f1)).intValue();
+                final int p2 = ((Integer) positions.get(f2)).intValue();
+                assert p1 >= 0 : p1;
+                assert p2 >= 0 : p2;
+                return p1 - p2;
+            }
+        });
+        return result;
     }
 
     /**
@@ -336,7 +452,19 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
     }
 
     /**
-     * The upper value (exclusive) allowed for {@link #getAuthorityFactory}.
+     * The types to be recognized for the {@code factories} argument in constructors. While not
+     * technically necessary, we keep this array consistent with {@link #getAuthorityFactory}.
+     */
+    private static final Class[] AUTHORIZED_TYPES = new Class[] {
+        CRSAuthorityFactory.class,
+        DatumAuthorityFactory.class,
+        CSAuthorityFactory.class,
+        CoordinateOperationAuthorityFactory.class
+    };
+
+    /**
+     * The upper value (exclusive) allowed for {@link #getAuthorityFactory}. Usually
+     * equals to the {@link #AUTHORIZED_TYPES} array length (but doesn't need to).
      */
     private static final int TYPE_COUNT = 4;
 

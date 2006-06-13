@@ -35,9 +35,8 @@ import java.util.Map;
 import java.util.logging.LogRecord;
 
 // JAI dependencies
-import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
-import javax.media.jai.TileCache;
+import javax.media.jai.Interpolation;
 
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridCoverage;

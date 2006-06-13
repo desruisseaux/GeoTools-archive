@@ -263,6 +263,19 @@ public final class Hints extends RenderingHints {
      * FactoryFinder.getCRSAuthorityFactory}(...)</code> method. Whatever this hint is
      * supported or not is authority dependent. In the default Geotools configuration,
      * this hint is supported for the {@code "EPSG"} authority.
+     * <p>
+     * If this hint is not provided, then the default value depends on many factors including
+     * {@linkplain System#getProperties system properties} and plugins available in the classpath.
+     * In Geotools implementation, the default value is usually {@link Boolean#FALSE FALSE} with
+     * one exception: If the
+     * {@value org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}
+     * system property is set to {@code true}, then the default value is {@code true} at least
+     * for the {@linkplain org.geotools.referencing.factory.epsg.DefaultFactory default EPSG
+     * factory}.
+     * <p>
+     * If both the above-cited system property and this hint are provided, then this hint has
+     * precedence. This allow axis order control on a data store basis, and keep the system-wide
+     * property as the default value only for cases where axis order is unspecified.
      *
      * @see org.geotools.referencing.FactoryFinder#getCSFactory
      * @see org.geotools.referencing.FactoryFinder#getCRSFactory

@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.lang.ref.Reference;
 import java.awt.RenderingHints;
 import javax.imageio.spi.ServiceRegistry;
 
@@ -211,7 +212,7 @@ public class FactoryRegistry extends ServiceRegistry {
     private Object getServiceProvider(final Class category, final Class implementation,
                                       final Filter filter,  final Hints hints)
     {
-        for (final Iterator it=getServiceProviders(category); it.hasNext();) {
+        for (final Iterator/*<Object>*/ it = getServiceProviders(category); it.hasNext();) {
             final Object candidate = it.next();
             if (implementation!=null && !implementation.isInstance(candidate)) {
                 continue;
@@ -221,6 +222,35 @@ public class FactoryRegistry extends ServiceRegistry {
             }
             return candidate;
         }
+        final List/*<Reference>*/ cached = getCachedProviders(category);
+        if (cached != null) {
+            /*
+             * Checks if a factory previously created by FactoryCreator could fit. This
+             * block should never be executed if this instance is not a FactoryCreator.
+             */
+            for (final Iterator/*<Reference>*/ it=cached.iterator(); it.hasNext();) {
+                final Object candidate = ((Reference) it.next()).get();
+                if (candidate == null) {
+                    it.remove();
+                    continue;
+                }
+                if (implementation!=null && !implementation.isInstance(candidate)) {
+                    continue;
+                }
+                if (!isAcceptable(candidate, category, hints, filter)) {
+                    continue;
+                }
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the providers available in the cache, or {@code null} if none.
+     * To be overrided by {@link FactoryCreator} only.
+     */
+    List/*<Reference>*/ getCachedProviders(final Class category) {
         return null;
     }
 
@@ -648,7 +678,7 @@ public class FactoryRegistry extends ServiceRegistry {
             if (base.isAssignableFrom(category)) {
                 Object impl1 = null;
                 Object impl2 = null;
-                for (final Iterator it=getServiceProviders(category); it.hasNext();) {
+                for (final Iterator it=getServiceProviders(category, false); it.hasNext();) {
                     final Object factory = it.next();
                     if (service1.filter(factory)) impl1 = factory;
                     if (service2.filter(factory)) impl2 = factory;
