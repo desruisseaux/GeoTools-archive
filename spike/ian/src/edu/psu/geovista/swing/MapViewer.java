@@ -12,6 +12,11 @@ import javax.swing.JToolBar;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.gui.swing.JMapPane;
+import org.geotools.gui.swing.PanAction;
+import org.geotools.gui.swing.ResetAction;
+import org.geotools.gui.swing.ZoomInAction;
+import org.geotools.gui.swing.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.renderer.GTRenderer;
