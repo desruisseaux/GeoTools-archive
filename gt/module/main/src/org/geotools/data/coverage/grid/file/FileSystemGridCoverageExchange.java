@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridFormatFinder;
-import org.opengis.catalog.CatalogEntry;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageExchange;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -151,24 +150,6 @@ public class FileSystemGridCoverageExchange implements GridCoverageExchange {
      * @see org.geotools.gc.exchange.GridCoverageExchange#dispose()
      */
     public void dispose() throws IOException {
-    }
-
-    /**
-     * @see org.opengis.catalog.Catalog#add(org.opengis.catalog.CatalogEntry)
-     */
-    public void add(CatalogEntry entry) throws IllegalStateException {
-        throw new IllegalStateException(
-            "Only the FileSystemGridCoverageExchange has permissions to add CatalogEntries");
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.opengis.catalog.Catalog#remove(org.opengis.catalog.CatalogEntry)
-     */
-    public void remove(CatalogEntry entry) throws IllegalStateException {
-        throw new IllegalStateException(
-            "Only the FileSystemGridCoverageExchange has permissions to remove CatalogEntries");
     }
 
     /**
