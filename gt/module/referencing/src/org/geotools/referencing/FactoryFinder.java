@@ -103,6 +103,12 @@ public final class FactoryFinder {
     private static Set/*<String>*/ authorityNames;
 
     /**
+     * Set to {@code true} when {@link #scanForPlugins} is invoked.
+     * For internal use by {@link CRS} only.
+     */
+    static boolean updated;
+
+    /**
      * Do not allows any instantiation of this class.
      */
     private FactoryFinder() {
@@ -197,12 +203,22 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
+     * @deprecated Replaced by {@link #getDatumFactories(Hints)}.
+     */
+    public static Set getDatumFactories() {
+        return getDatumFactories(null);
+    }
+
+    /**
      * Returns a set of all available implementations for the {@link DatumFactory} interface.
      *
+     * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available datum factory implementations.
+     *
+     * @since 2.3
      */
-    public static synchronized Set getDatumFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(DatumFactory.class));
+    public static synchronized Set getDatumFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(DatumFactory.class, null, hints));
     }
 
     /**
@@ -223,12 +239,23 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
+     * @deprecated Replaced by {@link #getCSFactories(Hints)}.
+     */
+    public static Set getCSFactories() {
+        return getCSFactories(null);
+    }
+
+    /**
      * Returns a set of all available implementations for the {@link CSFactory} interface.
      *
+     * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate system factory implementations.
+     *
+     * @since 2.3
      */
-    public static synchronized Set getCSFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(CSFactory.class));
+    public static synchronized Set getCSFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                    CSFactory.class, null, hints));
     }
 
     /**
@@ -249,12 +276,23 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
+     * @deprecated Replaced by {@link #getCRSFactories(Hints)}.
+     */
+    public static Set getCRSFactories() {
+        return getCRSFactories(null);
+    }
+
+    /**
      * Returns a set of all available implementations for the {@link CRSFactory} interface.
      *
+     * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate reference system factory implementations.
+     *
+     * @since 2.3
      */
-    public static synchronized Set getCRSFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(CRSFactory.class));
+    public static synchronized Set getCRSFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                    CRSFactory.class, null, hints));
     }
 
     /**
@@ -282,11 +320,24 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
+     * @deprecated Replaced by {@link #getCoordinateOperationFactories(Hints)}.
+     */
+    public static Set getCoordinateOperationFactories() {
+        return getCoordinateOperationFactories(null);
+    }
+
+    /**
      * Returns a set of all available implementations for the
      * {@link CoordinateOperationFactory} interface.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set of available coordinate operation factory implementations.
+     *
+     * @since 2.3
      */
-    public static synchronized Set getCoordinateOperationFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(CoordinateOperationFactory.class));
+    public static synchronized Set getCoordinateOperationFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                    CoordinateOperationFactory.class, null, hints));
     }
 
     /**
@@ -311,13 +362,24 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
+     * @deprecated Replaced by {@link #getDatumAuthorityFactories(Hints)}.
+     */
+    public static Set getDatumAuthorityFactories() {
+        return getDatumAuthorityFactories(null);
+    }
+
+    /**
      * Returns a set of all available implementations for the {@link DatumAuthorityFactory}
      * interface.
      *
+     * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available datum authority factory implementations.
+     *
+     * @since 2.3
      */
-    public static synchronized Set getDatumAuthorityFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(DatumAuthorityFactory.class));
+    public static synchronized Set getDatumAuthorityFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                    DatumAuthorityFactory.class, null, hints));
     }
 
     /**
@@ -347,12 +409,23 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
+     * @deprecated Replaced by {@link #getCSAuthorityFactories(Hints)}.
+     */
+    public static Set getCSAuthorityFactories() {
+        return getCSAuthorityFactories(null);
+    }
+
+    /**
      * Returns a set of all available implementations for the {@link CSAuthorityFactory} interface.
      *
+     * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate system authority factory implementations.
+     *
+     * @since 2.3
      */
-    public static synchronized Set getCSAuthorityFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(CSAuthorityFactory.class));
+    public static synchronized Set getCSAuthorityFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                    CSAuthorityFactory.class, null, hints));
     }
 
     /**
@@ -380,7 +453,14 @@ loop:       for (int i=0; ; i++) {
         return (CRSAuthorityFactory) getServiceRegistry().getServiceProvider(
                 CRSAuthorityFactory.class, new AuthorityFilter(authority), hints, Hints.CRS_AUTHORITY_FACTORY);
     }
-    
+
+    /**
+     * @deprecated Replaced by {@link #getCRSAuthorityFactories(Hints)}.
+     */
+    public static Set getCRSAuthorityFactories() {
+        return getCRSAuthorityFactories(null);
+    }
+
     /**
      * Returns a set of all available implementations for the {@link CRSAuthorityFactory} interface.
      * This set can be used to list the available codes known to all authorities.
@@ -388,10 +468,14 @@ loop:       for (int i=0; ; i++) {
      * you will need to assume both are close enough, or make use of this set directly
      * rather than use the {@link CRS#decode} convenience method.
      *
+     * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate reference system authority factory implementations.
+     *
+     * @since 2.3
      */
-    public static synchronized Set getCRSAuthorityFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(CRSAuthorityFactory.class));
+    public static synchronized Set getCRSAuthorityFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                    CRSAuthorityFactory.class, null, hints));
     }
 
     /**
@@ -416,16 +500,26 @@ loop:       for (int i=0; ; i++) {
                 CoordinateOperationAuthorityFactory.class,
                 new AuthorityFilter(authority), hints, Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY);
     }
-    
+
+    /**
+     * @deprecated Replaced by {@link #getCoordinateOperationAuthorityFactories(Hints)}.
+     */
+    public static Set getCoordinateOperationAuthorityFactories() {
+        return getCoordinateOperationAuthorityFactories(null);
+    }
+
     /**
      * Returns a set of all available implementations for the
      * {@link CoordinateOperationAuthorityFactory} interface.
      *
+     * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate operation authority factory implementations.
+     *
+     * @since 2.3
      */
-    public static synchronized Set getCoordinateOperationAuthorityFactories() {
+    public static synchronized Set getCoordinateOperationAuthorityFactories(final Hints hints) {
         return new LazySet(getServiceRegistry().getServiceProviders(
-                    CoordinateOperationAuthorityFactory.class));
+                    CoordinateOperationAuthorityFactory.class, null, hints));
     }
 
     /**
@@ -448,11 +542,24 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
+     * @deprecated Replaced by {@link #getMathTransformFactories(Hints)}.
+     */
+    public static Set getMathTransformFactories() {
+        return getMathTransformFactories(null);
+    }
+
+    /**
      * Returns a set of all available implementations for the
      * {@link MathTransformFactory} interface.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set of available math transform factory implementations.
+     *
+     * @since 2.3
      */
-    public static synchronized Set getMathTransformFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(MathTransformFactory.class));
+    public static synchronized Set getMathTransformFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                    MathTransformFactory.class, null, hints));
     }
 
     /**
@@ -469,7 +576,9 @@ loop:       for (int i=0; ; i++) {
      * @param  vendor2 The vendor to which {@code vendor1} is preferred.
      * @return {@code true} if the ordering was set for at least one category.
      */
-    public static boolean setVendorOrdering(final String vendor1, final String vendor2) {
+    public static synchronized boolean setVendorOrdering(final String vendor1,
+                                                         final String vendor2)
+    {
         return getServiceRegistry().setOrdering(Factory.class, true,
                                                 new VendorFilter(vendor1),
                                                 new VendorFilter(vendor2));
@@ -484,7 +593,9 @@ loop:       for (int i=0; ; i++) {
      * @param  vendor2 The vendor to which {@code vendor1} is preferred.
      * @return {@code true} if the ordering was unset for at least one category.
      */
-    public static boolean unsetVendorOrdering(final String vendor1, final String vendor2) {
+    public static synchronized boolean unsetVendorOrdering(final String vendor1,
+                                                           final String vendor2)
+    {
         return getServiceRegistry().setOrdering(Factory.class, false,
                                                 new VendorFilter(vendor1),
                                                 new VendorFilter(vendor2));
@@ -522,7 +633,9 @@ loop:       for (int i=0; ; i++) {
      * @param  authority2 The authority to which {@code authority1} is preferred.
      * @return {@code true} if the ordering was set for at least one category.
      */
-    public static boolean setAuthorityOrdering(final String authority1, final String authority2) {
+    public static synchronized boolean setAuthorityOrdering(final String authority1,
+                                                            final String authority2)
+    {
         return getServiceRegistry().setOrdering(AuthorityFactory.class, true,
                                                 new AuthorityFilter(authority1),
                                                 new AuthorityFilter(authority2));
@@ -537,7 +650,9 @@ loop:       for (int i=0; ; i++) {
      * @param  authority2 The vendor to which {@code authority1} is preferred.
      * @return {@code true} if the ordering was unset for at least one category.
      */
-    public static boolean unsetAuthorityOrdering(final String authority1, final String authority2) {
+    public static synchronized boolean unsetAuthorityOrdering(final String authority1,
+                                                              final String authority2)
+    {
         return getServiceRegistry().setOrdering(AuthorityFactory.class, false,
                                                 new AuthorityFilter(authority1),
                                                 new AuthorityFilter(authority2));
@@ -576,11 +691,12 @@ loop:       for (int i=0; ; i++) {
      * sophisticated applications which dynamically make new plug-ins
      * available at runtime.
      */
-    public static void scanForPlugins() {
+    public static synchronized void scanForPlugins() {
         authorityNames = null;
         if (registry != null) {
             registry.scanForPlugins();
         }
+        updated = true;
     }
 
     /**

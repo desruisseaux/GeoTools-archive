@@ -124,6 +124,18 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
               Math.max(getPriority(  crsFactory),
                        getPriority(   opFactory)))));
 
+        if (this instanceof CRSAuthorityFactory) {
+            ensureNonNull("crsFactory", crsFactory);
+        }
+        if (this instanceof CSAuthorityFactory) {
+            ensureNonNull("csFactory", csFactory);
+        }
+        if (this instanceof DatumAuthorityFactory) {
+            ensureNonNull("datumFactory", datumFactory);
+        }
+        if (this instanceof CoordinateOperationAuthorityFactory) {
+            ensureNonNull("opFactory", opFactory);
+        }
         store(Hints.               DATUM_AUTHORITY_FACTORY, this.    datumFactory = datumFactory);
         store(Hints.                  CS_AUTHORITY_FACTORY, this.       csFactory =    csFactory);
         store(Hints.                 CRS_AUTHORITY_FACTORY, this.      crsFactory =   crsFactory);

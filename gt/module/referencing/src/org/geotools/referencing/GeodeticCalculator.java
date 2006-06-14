@@ -16,6 +16,12 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+/*
+ * Portions of this file is adapted from Fortran code provided by NOAA.
+ * Programmed for CDC-6600 by LCDR L.Pfeifer NGS ROCKVILLE MD 18FEB75
+ * Modified for IBM SYSTEM 360 by John G.Gergen NGS ROCKVILLE MD 7507
+ * Source: ftp://ftp.ngs.noaa.gov/pub/pcsoft/for_inv.3d/source/
+ */
 package org.geotools.referencing;
 
 // J2SE dependencies
@@ -23,18 +29,15 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.text.Format;
 import java.util.Iterator;
 import java.util.List;
 import javax.units.NonSI;
 
 // OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.cs.CoordinateSystem;
@@ -52,13 +55,12 @@ import org.geotools.measure.Longitude;
 import org.geotools.measure.CoordinateFormat;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
-import org.geotools.referencing.operation.transform.IdentityTransform;
-import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -68,14 +70,26 @@ import org.geotools.io.TableWriter;
 
 
 /**
- * Performs geodetic calculations on an ellipsoid. This class encapsulate a generic ellipsoid
- * and calculate the following properties:
+ * Performs geodetic calculations on an {@linkplain Ellipsoid ellipsoid}. This class encapsulates
+ * a generic ellipsoid and calculates the following properties:
  * <p>
  * <ul>
  *   <li>Distance and azimuth between two points.</li>
  *   <li>Point located at a given distance and azimuth from an other point.</li>
  * </ul>
- *
+ * <p>
+ * The calculation use the following informations:
+ * <p>
+ * <ul>
+ *   <li>The {@linkplain #setStartingPosition starting position}, which is always considered valid.
+ *       It is initially set at (0,0) and can only be changed to another legitimate value.</li>
+ *   <li><strong>Only one</strong> of the following:
+ *       <ul>
+ *         <li>The {@linkplain #setDestinationPosition destination position}, or</li>
+ *         <li>An {@linkplain #setDirection azimuth and distance}.</li>
+ *       </ul>
+ *       The latest one set overrides the other and determines what will be calculated.</li>
+ * </ul>
  * <p>
  * Note: This class is not thread-safe. If geodetic calculations are needed in a multi-threads
  * environment, create one distinct instance of {@code GeodeticCalculator} for each thread.
@@ -102,22 +116,23 @@ public class GeodeticCalculator {
     private static final double TOLERANCE_CHECK = 1E-8;
     
     /**
-     * The transform from user coordinates to geodetic coordinates used for computation.
-     * Note: consider this field as final. It is not final only because a constructor
-     * needs to modify them.
+     * The transform from user coordinates to geodetic coordinates used for computation,
+     * or {@code null} if no transformations are required.
      */
-    private MathTransform userToGeodetic;
-    
-    /**
-     * The transform from geodetic coordinates to user coordinates. This is the inverse of
-     * {@link #userToGeodetic}. Will be computed only when first needed.
-     */
-    private transient MathTransform geodeticToUser;
+    private final TransformedDirectPosition userToGeodetic;
 
     /**
      * The coordinate reference system for all methods working on {@link Position} objects.
+     * If {@code null}, will be created the first time {@link #getCoordinateReferenceSystem}
+     * is invoked.
      */
     private CoordinateReferenceSystem coordinateReferenceSystem;
+
+    /**
+     * The coordinate reference system for all methods working on {@link Point2D} objects.
+     * If {@code null}, will be created the first time {@link #getGeographicCRS} is invoked.
+     */
+    private GeographicCRS geographicCRS;
 
     /**
      * The encapsulated ellipsoid.
@@ -170,18 +185,18 @@ public class GeodeticCalculator {
 
     /**
      * The (<var>latitude</var>, <var>longitude</var>) coordinate of the first point
-     * <strong>in radians</strong>. This point is set by {@link #setAnchorPoint}.
+     * <strong>in radians</strong>. This point is set by {@link #setStartingGeographicPoint}.
      */
     private double lat1, long1;
 
     /**
      * The (<var>latitude</var>, <var>longitude</var>) coordinate of the destination point
-     * <strong>in radians</strong>. This point is set by {@link #setDestinationPoint}.
+     * <strong>in radians</strong>. This point is set by {@link #setDestinationGeographicPoint}.
      */
     private double lat2, long2;
 
     /**
-     * The distance and azimuth (in radians) from the anchor point
+     * The distance and azimuth (in radians) from the starting point
      * ({@link #long1}, {@link #lat1}) to the destination point
      * ({@link #long2}, {@link #lat2}).
      */
@@ -200,12 +215,6 @@ public class GeodeticCalculator {
     private boolean directionValid;
 
     /**
-     * The position in geographic coordinates, for transformation purpose only.
-     * Reused in order to reduce object creation.
-     */
-    private transient DirectPosition geopos;
-
-    /**
      * Constructs a new geodetic calculator associated with the WGS84 ellipsoid.
      */
     public GeodeticCalculator() {
@@ -216,15 +225,48 @@ public class GeodeticCalculator {
      * Constructs a new geodetic calculator associated with the specified ellipsoid.
      * All calculations done by the new instance are referenced to this ellipsoid.
      *
-     * @param ellipsoid The reference to the ellipsoid onto which calculates distances and azimuths.
+     * @param ellipsoid The ellipsoid onto which calculates distances and azimuths.
      */
     public GeodeticCalculator(final Ellipsoid ellipsoid) {
+        this(ellipsoid, null);
+    }
+
+    /**
+     * Constructs a new geodetic calculator expecting coordinates in the supplied CRS.
+     * The ellipsoid will be inferred from the CRS.
+     *
+     * @param  crs The reference system for the {@link Position} objects.
+     *
+     * @since 2.2
+     */
+    public GeodeticCalculator(final CoordinateReferenceSystem crs) {
+        this(CRSUtilities.getEllipsoid(crs), crs);
+    }
+
+    /**
+     * For internal use by public constructors only.
+     */
+    private GeodeticCalculator(final Ellipsoid ellipsoid, final CoordinateReferenceSystem crs) {
         if (ellipsoid == null) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "ellipsoid"));
         }
         this.ellipsoid     = ellipsoid;
         this.semiMajorAxis = ellipsoid.getSemiMajorAxis();
         this.semiMinorAxis = ellipsoid.getSemiMinorAxis();
+        if (crs != null) {
+            coordinateReferenceSystem = crs;
+            geographicCRS = getGeographicCRS(crs);
+            /*
+             * Note: there is no need to set Hints.LENIENT_DATUM_SHIFT to Boolean.TRUE here since
+             *       the target CRS computed by our internal getGeographicCRS(crs) method should
+             *       returns a CRS using the same datum than the specified CRS. If the factory 
+             *       fails with a "Bursa-Wolf parameters required" error message, then we probably
+             *       have a bug somewhere.
+             */
+            userToGeodetic = new TransformedDirectPosition(crs, geographicCRS, null);
+        } else {
+            userToGeodetic = null;
+        }
 
         /* calculation of GPNHRI parameters */
         f  = (semiMajorAxis-semiMinorAxis) / semiMajorAxis;
@@ -265,33 +307,6 @@ public class GeodeticCalculator {
         a42 = 0.03125*a;
         a43 = 0.05859375*f4;
         a63 = 5.0*f4/768.0;
-
-        userToGeodetic = geodeticToUser = IdentityTransform.create(2);
-    }
-
-    /**
-     * Constructs a new geodetic calculator expecting coordinates in the supplied CRS.
-     * The ellipsoid will be inferred from the CRS.
-     *
-     * @param  crs The reference system for the {@link Position} objects.
-     * @throws FactoryException if no transform to a geodetic CRS can be created
-     *         for the specified CRS.
-     *
-     * @since 2.2
-     */
-    public GeodeticCalculator(final CoordinateReferenceSystem crs) throws FactoryException {
-        this(CRSUtilities.getEllipsoid(crs));
-        coordinateReferenceSystem = crs;
-        /*
-         * Note: there is no need to set Hints.LENIENT_DATUM_SHIFT to Boolean.TRUE here since
-         *       the target CRS computed by our internal getGeographicCRS(crs) method should
-         *       returns a CRS using the same datum than the specified CRS. If the factory 
-         *       fails with a "Bursa-Wolf parameters required" error message, then we probably
-         *       have a bug somewhere.
-         */
-        userToGeodetic = FactoryFinder.getCoordinateOperationFactory(null)
-                         .createOperation(crs, getGeographicCRS(crs)).getMathTransform();
-        geodeticToUser = null; // Will be computed when first needed.
     }
 
 
@@ -306,12 +321,8 @@ public class GeodeticCalculator {
 
     /**
      * Returns the first two-dimensional geographic CRS using standard axis, creating one if needed.
-     *
-     * @throws FactoryException If the CRS is {@code null} or unrecognized.
      */
-    private static GeographicCRS getGeographicCRS(final CoordinateReferenceSystem crs)
-            throws FactoryException
-    {
+    private static GeographicCRS getGeographicCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof GeographicCRS) {
             final CoordinateSystem cs = crs.getCoordinateSystem();
             if (cs.getDimension() == 2 &&
@@ -335,7 +346,7 @@ public class GeodeticCalculator {
                 }
             }
         }
-        throw new FactoryException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
     }
 
     /**
@@ -437,7 +448,7 @@ public class GeodeticCalculator {
     private static void checkNumberOfPoints(final int numberOfPoints)
             throws IllegalArgumentException
     {
-        if (!(numberOfPoints >= 0)) {
+        if (numberOfPoints < 0) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                         "numberOfPoints", new Integer(numberOfPoints)));
         }
@@ -445,7 +456,7 @@ public class GeodeticCalculator {
 
     /**
      * Returns a localized "No convergence" error message. The error message
-     * includes informations about anchor and destination points.
+     * includes informations about starting and destination points.
      */
     private String getNoConvergenceErrorMessage() {
         final CoordinateFormat cf = new CoordinateFormat();
@@ -479,24 +490,44 @@ public class GeodeticCalculator {
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         if (coordinateReferenceSystem == null) {
-            coordinateReferenceSystem = new DefaultGeographicCRS("Geodetic",
-                    new DefaultGeodeticDatum("Geodetic", ellipsoid, DefaultPrimeMeridian.GREENWICH),
-                        DefaultEllipsoidalCS.GEODETIC_2D);
+            coordinateReferenceSystem = getGeographicCRS();
         }
         return coordinateReferenceSystem;
     }
 
     /**
-     * Returns the referenced ellipsoid.
+     * Returns the geographic coordinate reference system for all methods working
+     * on {@link Point2D} objects. This is inferred from the CRS specified at
+     * {@linkplain #GeodeticCalculator(CoordinateReferenceSystem) construction time}.
      *
-     * @return The referenced ellipsoid.
+     * @since 2.3
+     */
+    public GeographicCRS getGeographicCRS() {
+        if (geographicCRS == null) {
+            final String name = Vocabulary.format(VocabularyKeys.GEODETIC_2D);;
+            geographicCRS = new DefaultGeographicCRS(name,
+                    new DefaultGeodeticDatum(name, getEllipsoid(), DefaultPrimeMeridian.GREENWICH),
+                        DefaultEllipsoidalCS.GEODETIC_2D);
+        }
+        return geographicCRS;
+    }
+
+    /**
+     * Returns the referenced ellipsoid.
      */
     public Ellipsoid getEllipsoid() {
         return ellipsoid;
     }
 
     /**
-     * Set the anchor point.
+     * @deprecated Renamed as {@link #setStartingGeographicPoint(double,double)}.
+     */
+    public void setAnchorPoint(double longitude, double latitude) throws IllegalArgumentException {
+        setStartingGeographicPoint(longitude, latitude);
+    }
+
+    /**
+     * Set the starting point in geographic coordinates.
      * The {@linkplain #getAzimuth() azimuth},
      * the {@linkplain #getOrthodromicDistance() orthodromic distance} and
      * the {@linkplain #getDestinationPoint() destination point} are discarted.
@@ -505,8 +536,12 @@ public class GeodeticCalculator {
      * @param  longitude The longitude in decimal degrees between -180 and +180°
      * @param  latitude  The latitude  in decimal degrees between  -90 and  +90°
      * @throws IllegalArgumentException if the longitude or the latitude is out of bounds.
+     *
+     * @since 2.3
      */
-    public void setAnchorPoint(double longitude, double latitude) throws IllegalArgumentException {
+    public void setStartingGeographicPoint(double longitude, double latitude)
+            throws IllegalArgumentException
+    {
         // Check first in case an exception is raised
         // (in other words, we change all or nothing).
         longitude = checkLongitude(longitude);
@@ -519,76 +554,125 @@ public class GeodeticCalculator {
     }
 
     /**
-     * Set the anchor point. The <var>x</var> and <var>y</var> coordinates
-     * must be the longitude and latitude in decimal degrees, respectively.
-     *
-     * This is a convenience method for
-     * <code>{@linkplain #setAnchorPoint(double,double) setAnchorPoint}(x,y)</code>.
-     *
-     * @param  point The anchor point.
-     * @throws IllegalArgumentException if the longitude or the latitude is out of bounds.
+     * @deprecated Renamed as {@link #setStartingGeographicPoint(Point2D)}.
      */
     public void setAnchorPoint(final Point2D point) throws IllegalArgumentException {
-        setAnchorPoint(point.getX(), point.getY());
+        setStartingGeographicPoint(point);
     }
 
     /**
-     * Set the anchor position in user coordinates, which doesn't need to be geographic.
+     * Set the starting point in geographic coordinates. The <var>x</var> and <var>y</var>
+     * coordinates must be the longitude and latitude in decimal degrees, respectively.
+     *
+     * This is a convenience method for
+     * <code>{@linkplain #setStartingGeographicPoint(double,double)
+     * setStartingGeographicPoint}(x,y)</code>.
+     *
+     * @param  point The starting point.
+     * @throws IllegalArgumentException if the longitude or the latitude is out of bounds.
+     *
+     * @since 2.3
+     */
+    public void setStartingGeographicPoint(final Point2D point) throws IllegalArgumentException {
+        setStartingGeographicPoint(point.getX(), point.getY());
+    }
+
+    /**
+     * @deprecated Renamed as {@link #setStartingPosition}.
+     */
+    public void setAnchorPosition(final Position position) throws TransformException {
+        setStartingPosition(position);
+    }
+
+    /**
+     * Set the starting position in user coordinates, which doesn't need to be geographic.
      * The coordinate reference system is the one specified to the
      * {@linkplain #GeodeticCalculator(CoordinateReferenceSystem) constructor}.
      *
      * @param  position The position in user coordinate reference system.
      * @throws TransformException if the position can't be transformed.
      *
-     * @since 2.2
+     * @since 2.3
      */
-    public void setAnchorPosition(final Position position) throws TransformException {
-        geopos = userToGeodetic.transform(position.getPosition(), geopos);
-        setAnchorPoint(geopos.getOrdinate(0), geopos.getOrdinate(1));
+    public void setStartingPosition(final Position position) throws TransformException {
+        DirectPosition p = position.getPosition();
+        if (userToGeodetic != null) {
+            userToGeodetic.transform(p);
+            p = userToGeodetic;
+        }
+        setStartingGeographicPoint(p.getOrdinate(0), p.getOrdinate(1));
     }
 
     /**
-     * Returns the anchor point. The <var>x</var> and <var>y</var> coordinates
-     * are the longitude and latitude in decimal degrees, respectively. If the
-     * anchor point has never been set, then the default value is (0,0).
-     *
-     * @return The anchor point.
+     * @deprecated Renamed as {@link #getStartingGeographicPoint}.
      */
     public Point2D getAnchorPoint() {
+        return getStartingGeographicPoint();
+    }
+
+    /**
+     * Returns the starting point in geographic coordinates. The <var>x</var> and <var>y</var>
+     * coordinates are the longitude and latitude in decimal degrees, respectively. If the
+     * starting point has never been set, then the default value is (0,0).
+     *
+     * @return The starting point in geographic coordinates.
+     *
+     * @since 2.3
+     */
+    public Point2D getStartingGeographicPoint() {
         return new Point2D.Double(Math.toDegrees(long1), Math.toDegrees(lat1));
     }
 
     /**
-     * Returns the anchor position in user coordinates, which doesn't need to be geographic.
+     * @deprecated Renamed as {@link #getStartingPosition}.
+     */
+    public DirectPosition getAnchorPosition() throws TransformException {
+        return getStartingPosition();
+    }
+
+    /**
+     * Returns the starting position in user coordinates, which doesn't need to be geographic.
      * The coordinate reference system is the one specified to the
      * {@linkplain #GeodeticCalculator(CoordinateReferenceSystem) constructor}.
      *
      * @throws TransformException if the position can't be transformed to user coordinates.
      *
-     * @since 2.2
+     * @since 2.3
      */
-    public DirectPosition getAnchorPosition() throws TransformException {
-        if (geopos == null) {
-            geopos = new DirectPosition2D();
+    public DirectPosition getStartingPosition() throws TransformException {
+        DirectPosition position = userToGeodetic;
+        if (position == null) {
+            position = new DirectPosition2D();
         }
-        geopos.setOrdinate(0, Math.toDegrees(long1));
-        geopos.setOrdinate(1, Math.toDegrees( lat1));
-        if (geodeticToUser == null) {
-            geodeticToUser = userToGeodetic.inverse();
+        position.setOrdinate(0, Math.toDegrees(long1));
+        position.setOrdinate(1, Math.toDegrees( lat1));
+        if (userToGeodetic != null) {
+            position = userToGeodetic.inverseTransform();
         }
-        return geodeticToUser.transform(geopos, null);
+        return position;
     }
 
     /**
-     * Set the destination point. The azimuth and distance values will be updated as a side
-     * effect of this call. They will be recomputed the next time {@link #getAzimuth()} or
-     * {@link #getOrthodromicDistance()} are invoked.
+     * @deprecated Renamed as {@link #setDestinationGeographicPoint(double,double)}.
+     */
+    public void setDestinationPoint(double longitude, double latitude) throws IllegalArgumentException {
+        setDestinationGeographicPoint(longitude, latitude);
+    }
+
+    /**
+     * Set the destination point in geographic coordinates. The azimuth and distance values
+     * will be updated as a side effect of this call. They will be recomputed the next time
+     * {@link #getAzimuth()} or {@link #getOrthodromicDistance()} are invoked.
      *
      * @param  longitude The longitude in decimal degrees between -180 and +180°
      * @param  latitude  The latgitude in decimal degrees between  -90 and  +90°
      * @throws IllegalArgumentException if the longitude or the latitude is out of bounds.
+     *
+     * @since 2.3
      */
-    public void setDestinationPoint(double longitude, double latitude) throws IllegalArgumentException {
+    public void setDestinationGeographicPoint(double longitude, double latitude)
+            throws IllegalArgumentException
+    {
         // Check first in case an exception is raised
         // (in other words, we change all or nothing).
         longitude = checkLongitude(longitude);
@@ -601,16 +685,28 @@ public class GeodeticCalculator {
     }
 
     /**
-     * Set the destination point. The <var>x</var> and <var>y</var> coordinates
-     * must be the longitude and latitude in decimal degrees, respectively.
+     * @deprecated Renamed as {@link #setDestinationGeographicPoint(Point2D)}.
+     */
+    public void setDestinationPoint(final Point2D point) throws IllegalArgumentException {
+        setDestinationGeographicPoint(point);
+    }
+
+    /**
+     * Set the destination point in geographic coordinates. The <var>x</var> and <var>y</var>
+     * coordinates must be the longitude and latitude in decimal degrees, respectively.
      *
      * This is a convenience method for
-     * <code>{@linkplain #setDestinationPoint(double,double) setDestinationPoint}(x,y)</code>.
+     * <code>{@linkplain #setDestinationGeographicPoint(double,double)
+     * setDestinationGeographicPoint}(x,y)</code>.
      *
      * @param  point The destination point.
      * @throws IllegalArgumentException if the longitude or the latitude is out of bounds.
+     *
+     * @since 2.3
      */
-    public void setDestinationPoint(final Point2D point) throws IllegalArgumentException {
+    public void setDestinationGeographicPoint(final Point2D point)
+            throws IllegalArgumentException
+    {
         setDestinationPoint(point.getX(), point.getY());
     }
 
@@ -625,23 +721,38 @@ public class GeodeticCalculator {
      * @since 2.2
      */
     public void setDestinationPosition(final Position position) throws TransformException {
-        geopos = userToGeodetic.transform(position.getPosition(), geopos);
-        setDestinationPoint(geopos.getOrdinate(0), geopos.getOrdinate(1));
+        DirectPosition p = position.getPosition();
+        if (userToGeodetic != null) {
+            userToGeodetic.transform(p);
+            p = userToGeodetic;
+        }
+        setDestinationPoint(p.getOrdinate(0), p.getOrdinate(1));
     }
 
     /**
-     * Returns the destination point. This method returns the point set by the last call to a
-     * <code>{@linkplain #setDestinationPoint(double,double) setDestinationPoint}(...)</code>
+     * @deprecated Renamed as {@link #getDestinationGeographicPoint}.
+     */
+    public Point2D getDestinationPoint() throws IllegalStateException {
+        return getDestinationGeographicPoint();
+    }
+
+    /**
+     * Returns the destination point. This method returns the point set by the last
+     * call to a <code>{@linkplain #setDestinationGeographicPoint(double,double)
+     * setDestinationsetDestinationGeographicPointPoint}(...)</code>
      * method, <strong>except</strong> if
      * <code>{@linkplain #setDirection(double,double) setDirection}(...)</code> has been
      * invoked after. In this later case, the destination point will be computed from the
-     * {@linkplain #getAnchorPoint anchor point} to the azimuth and distance specified.
+     * {@linkplain #getStartingGeographicPoint starting point} to the azimuth and distance
+     * specified.
      *
      * @return The destination point. The <var>x</var> and <var>y</var> coordinates
      *         are the longitude and latitude in decimal degrees, respectively.
      * @throws IllegalStateException if the azimuth and the distance have not been set.
+     *
+     * @since 2.3
      */
-    public Point2D getDestinationPoint() throws IllegalStateException {
+    public Point2D getDestinationGeographicPoint() throws IllegalStateException {
         if (!destinationValid) {
             computeDestinationPoint();
         }
@@ -661,21 +772,22 @@ public class GeodeticCalculator {
         if (!destinationValid) {
             computeDestinationPoint();
         }
-        if (geopos == null) {
-            geopos = new DirectPosition2D();
+        DirectPosition position = userToGeodetic;
+        if (position == null) {
+            position = new DirectPosition2D();
         }
-        geopos.setOrdinate(0, Math.toDegrees(long2));
-        geopos.setOrdinate(1, Math.toDegrees( lat2));
-        if (geodeticToUser == null) {
-            geodeticToUser = userToGeodetic.inverse();
+        position.setOrdinate(0, Math.toDegrees(long2));
+        position.setOrdinate(1, Math.toDegrees( lat2));
+        if (userToGeodetic != null) {
+            position = userToGeodetic.inverseTransform();
         }
-        return geodeticToUser.transform(geopos, null);
+        return position;
     }
 
     /**
-     * Set the azimuth and the distance from the {@linkplain #getAnchorPoint anchor point}.
-     * The destination point will be updated as a side effect of this call. It will be
-     * recomputed the next time {@link #getDestinationPoint()} is invoked.
+     * Set the azimuth and the distance from the {@linkplain #getStartingGeographicPoint
+     * starting point}. The destination point will be updated as a side effect of this call.
+     * It will be recomputed the next time {@link #getDestinationPoint()} is invoked.
      *
      * @param  azimuth The azimuth in decimal degrees from -180° to 180°.
      * @param  distance The orthodromic distance in the same units as the
@@ -703,7 +815,7 @@ public class GeodeticCalculator {
      * <strong>except</strong> if
      * <code>{@linkplain #setDestinationPoint(double,double) setDestinationPoint}(...)</code>
      * has been invoked after. In this later case, the azimuth will be computed from the
-     * {@linkplain #getAnchorPoint anchor point} to the destination point.
+     * {@linkplain #getStartingGeographicPoint starting point} to the destination point.
      *
      * @return The azimuth, in decimal degrees from -180° to +180°.
      * @throws IllegalStateException if the destination point has not been set.
@@ -721,7 +833,7 @@ public class GeodeticCalculator {
      * <strong>except</strong> if
      * <code>{@linkplain #setDestinationPoint(double,double) setDestinationPoint}(...)</code>
      * has been invoked after. In this later case, the distance will be computed from the
-     * {@linkplain #getAnchorPoint anchor point} to the destination point.
+     * {@linkplain #getStartingGeographicPoint starting point} to the destination point.
      *
      * @return The orthodromic distance, in the same units as the
      *         {@linkplain #getEllipsoid ellipsoid} axis.
@@ -753,8 +865,8 @@ public class GeodeticCalculator {
     }
 
     /**
-     * Computes the destination point from the {@linkplain #getAnchorPoint anchor point},
-     * the {@linkplain #getAzimuth azimuth} and the {@linkplain #getOrthodromicDistance
+     * Computes the destination point from the {@linkplain #getStartingGeographicPoint starting
+     * point}, the {@linkplain #getAzimuth azimuth} and the {@linkplain #getOrthodromicDistance
      * orthodromic distance}.
      *
      * @throws IllegalStateException if the azimuth and the distance have not been set.
@@ -877,7 +989,7 @@ public class GeodeticCalculator {
 
     /**
      * Computes the azimuth and orthodromic distance from the
-     * {@linkplain #getAnchorPoint anchor point} and the
+     * {@linkplain #getStartingGeographicPoint starting point} and the
      * {@linkplain #getDestinationPoint destination point}.
      *
      * @throws IllegalStateException if the destination point has not been set.
@@ -1046,16 +1158,16 @@ public class GeodeticCalculator {
      * Calculates the geodetic curve between two points in the referenced ellipsoid.
      * A curve in the ellipsoid is a path which points contain the longitude and latitude
      * of the points in the geodetic curve. The geodetic curve is computed from the
-     * {@linkplain #getAnchorPoint anchor point} to the {@linkplain #getDestinationPoint
-     * destination point}.
+     * {@linkplain #getStartingGeographicPoint starting point} to the
+     * {@linkplain #getDestinationGeographicPoint destination point}.
      *
      * @param  numberOfPoints The number of vertex in the geodetic curve.
      *         <strong>NOTE:</strong> This argument is only a hint and may be ignored
      *         in future version (if we compute a real curve rather than a list of line
      *         segments).
      * @return The path that represents the geodetic curve from the
-     *         {@linkplain #getAnchorPoint anchor point} to the
-     *         {@linkplain #getDestinationPoint destination point}.
+     *         {@linkplain #getStartingGeographicPoint starting point} to the
+     *         {@linkplain #getDestinationGeographicPoint destination point}.
      *
      * @todo We should check for cases where the path cross the 90°N, 90°S, 90°E or 90°W boundaries.
      */
@@ -1092,12 +1204,12 @@ public class GeodeticCalculator {
      * Calculates the geodetic curve between two points in the referenced ellipsoid.
      * A curve in the ellipsoid is a path which points contain the longitude and latitude
      * of the points in the geodetic curve. The geodetic curve is computed from the
-     * {@linkplain #getAnchorPoint anchor point} to the {@linkplain #getDestinationPoint
-     * destination point}.
+     * {@linkplain #getStartingGeographicPoint starting point} to the
+     * {@linkplain #getDestinationGeographicPoint destination point}.
      *
      * @return The path that represents the geodetic curve from the
-     *         {@linkplain #getAnchorPoint anchor point} to the
-     *         {@linkplain #getDestinationPoint destination point}.
+     *         {@linkplain #getStartingGeographicPoint starting point} to the
+     *         {@linkplain #getDestinationGeographicPoint destination point}.
      */
     public Shape getGeodeticCurve() {
         return getGeodeticCurve(10);
@@ -1110,8 +1222,8 @@ public class GeodeticCalculator {
      * curve and the second point is constant.
      *
      * @return The path that represents the loxodromic curve from the
-     *         {@linkplain #getAnchorPoint anchor point} to the
-     *         {@linkplain #getDestinationPoint destination point}.
+     *         {@linkplain #getStartingGeographicPoint starting point} to the
+     *         {@linkplain #getDestinationGeographicPoint destination point}.
      */
     private Shape getLoxodromicCurve() {
         if (true) {

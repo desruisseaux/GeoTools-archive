@@ -318,7 +318,6 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
      * Tests the creation of EPSG:4326 CRS with different axis order.
      */
     public void testLongitudeFirst() throws FactoryException {
-if (true) return; // TODO: doesn't work yet.
         final CoordinateReferenceSystem standard = CRS.decode("EPSG:4326", false);
         final CoordinateReferenceSystem modified = CRS.decode("EPSG:4326", true );
         final MathTransform transform = CRS.transform(standard, modified);

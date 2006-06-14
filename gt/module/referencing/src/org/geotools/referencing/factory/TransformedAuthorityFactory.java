@@ -540,9 +540,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
      * crsFactory}), because they may still in use by other classes.
      */
     public synchronized void dispose() throws FactoryException {
-        if (pool != null) {
-            pool.clear();
-        }
+        pool.clear();
         super.dispose();
     }
 }

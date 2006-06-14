@@ -71,13 +71,18 @@ import org.geotools.resources.i18n.LoggingKeys;
  */
 public class FactoryRegistry extends ServiceRegistry {
     /**
-     * Filters only the factories that are {@linkplain OptionalFactory#isAvailable available}.
+     * The default filter without implementation hints.
      */
-    static final Filter FILTER = new Filter() {
+    private static class DefaultFilter implements Filter {
         public boolean filter(final Object provider) {
             return !(provider instanceof OptionalFactory) || ((OptionalFactory) provider).isAvailable();
         }
-    };
+    }
+
+    /**
+     * Filters only the factories that are {@linkplain OptionalFactory#isAvailable available}.
+     */
+    static final Filter FILTER = new DefaultFilter();
 
     /**
      * The logger for all events related to factory registry.
@@ -105,7 +110,35 @@ public class FactoryRegistry extends ServiceRegistry {
      * @return Factories ready to use for the specified category.
      */
     public Iterator getServiceProviders(final Class category) {
-        Iterator iterator = getServiceProviders(category, FILTER, true);
+        return getServiceProviders(category, null, null);
+    }
+
+    /**
+     * Returns the providers in the registry for the specified category, filter and hints. This
+     * method is similar to <code>{@link #getServiceProviders getServiceProviders}(category)</code>
+     * except that only factories matching the specified filter and hints are returned by the
+     * iterator.
+     *
+     * @param category The category to look for. Usually an interface class
+     *                 (not the actual implementation class).
+     * @param filter   The optional filter, or {@code null}.
+     * @param hints    The optional user requirements, or {@code null}.
+     * @return Factories ready to use for the specified category, filter and hints.
+     *
+     * @since 2.3
+     */
+    public Iterator getServiceProviders(final Class category, final Filter filter, final Hints hints) {
+        final Filter hintsFilter;
+        if (hints == null || hints.isEmpty()) {
+            hintsFilter = FILTER;
+        } else {
+            hintsFilter = new DefaultFilter() {
+                /*@Override*/ public boolean filter(final Object provider) {
+                    return super.filter(provider) && isAcceptable(provider, category, hints, filter);
+                }
+            };
+        }
+        Iterator iterator = getServiceProviders(category, hintsFilter, true);
         if (!iterator.hasNext()) {
             /*
              * No plugin. This method is probably invoked the first time for the specified
@@ -115,7 +148,7 @@ public class FactoryRegistry extends ServiceRegistry {
             for (final Iterator it=getClassLoaders().iterator(); it.hasNext();) {
                 scanForPlugins((ClassLoader) it.next(), category);
             }
-            iterator = getServiceProviders(category, FILTER, true);
+            iterator = getServiceProviders(category, hintsFilter, true);
         }
         return iterator;
     }
@@ -259,7 +292,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * map of {@code hints} and the filter.
      *
      * @param candidate The factory to checks.
-     * @param category  The factory's category. Usually an interface.
+     * @param category  The factory category. Usually an interface.
      * @param hints     The optional user requirements, or {@code null}.
      * @param filter    The optional filter, or {@code null}.
      * @return {@code true} if the {@code factory} meets the user requirements.
@@ -287,7 +320,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * map of {@code hints}.
      *
      * @param factory     The factory to checks.
-     * @param category    The factory's category. Usually an interface.
+     * @param category    The factory category. Usually an interface.
      * @param hints       The user requirements ({@code null} not allowed).
      * @param alreadyDone Should be {@code null} except on recursive calls (for internal use only).
      * @return {@code true} if the {@code factory} meets the user requirements.
@@ -376,7 +409,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory}.
      *
      * @param provider The provider to checks.
-     * @param category The factory's category. Usually an interface.
+     * @param category The factory category. Usually an interface.
      * @param hints    The user requirements, or {@code null} if none.
      * @return {@code true} if the {@code provider} meets the user requirements.
      */

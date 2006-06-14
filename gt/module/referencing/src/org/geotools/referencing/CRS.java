@@ -260,8 +260,6 @@ public final class CRS {
      * @see Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER
      *
      * @since 2.3
-     *
-     * @todo Doesn't work yet. We need a FactoryFinder.getCRSAuthorityFactories(Hints) method.
      */
     public static CoordinateReferenceSystem decode(String code, final boolean longitudeFirst)
             throws NoSuchAuthorityCodeException, FactoryException
@@ -309,6 +307,10 @@ public final class CRS {
     public static synchronized CRSAuthorityFactory getAuthorityFactory(final boolean longitudeFirst)
             throws FactoryRegistryException
     {
+        if (FactoryFinder.updated) {
+            FactoryFinder.updated = false;
+            defaultFactory = xyFactory = null;
+        }
         CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
         if (factory == null) try {
             factory = new DefaultAuthorityFactory(longitudeFirst);

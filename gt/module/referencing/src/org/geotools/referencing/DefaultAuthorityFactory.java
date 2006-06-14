@@ -50,9 +50,15 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
      * if {@code longitudeFirst} is {@code true}.
      */
     DefaultAuthorityFactory(final boolean longitudeFirst) {
-        super(new AllAuthoritiesFactory(longitudeFirst ?
-                new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE) : null,
-                FactoryFinder.getCRSAuthorityFactories()));
+        this(longitudeFirst ? new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE) : null);
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private DefaultAuthorityFactory(final Hints hints) {
+        super(new AllAuthoritiesFactory(hints, FactoryFinder.getCRSAuthorityFactories(hints)));
     }
 
     /**
@@ -62,7 +68,7 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
     static Set/*<String>*/ getSupportedCodes(final String authority) {
     	Set result = Collections.EMPTY_SET;
         boolean isSetCopied = false;
-    	for (final Iterator i=FactoryFinder.getCRSAuthorityFactories().iterator(); i.hasNext();) {
+    	for (final Iterator i=FactoryFinder.getCRSAuthorityFactories(null).iterator(); i.hasNext();) {
             final CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
             if (Citations.identifierMatches(factory.getAuthority(), authority)) {
                 final Set codes;
