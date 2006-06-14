@@ -267,8 +267,8 @@ public final class Hints extends RenderingHints {
      * If this hint is not provided, then the default value depends on many factors including
      * {@linkplain System#getProperties system properties} and plugins available in the classpath.
      * In Geotools implementation, the default value is usually {@link Boolean#FALSE FALSE} with
-     * one exception: If the
-     * {@value org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}
+     * one exception: If the <code>{@value
+     * org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}</code>
      * system property is set to {@code true}, then the default value is {@code true} at least
      * for the {@linkplain org.geotools.referencing.factory.epsg.DefaultFactory default EPSG
      * factory}.

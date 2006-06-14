@@ -50,13 +50,12 @@ import org.geotools.resources.Utilities;
  * Simple utility class for making use of the {@linkplain CoordinateReferenceSystem
  * coordinate reference system} and associated {@linkplain Factory factory} implementations.
  * <p>
- * This utility class is made up of static final functions. This class is
- * not a Factory or a Builder. It makes use of the GeoAPI Factory interfaces
- * provided by {@link FactoryFinder} in the most direct manner possible.
+ * This utility class is made up of static final functions. This class is not a factory or a
+ * builder. It makes use of the GeoAPI factory interfaces provided by {@link FactoryFinder}.
  * <p>
  * The following methods may be added in a future version:
  * <ul>
- *   <li>CoordinateReferenceSystem parseXML(String)</li>
+ *   <li>{@code CoordinateReferenceSystem parseXML(String)}</li>
  * </ul>
  *
  * @since 2.1
@@ -245,8 +244,8 @@ public final class CRS {
      * If the {@code longitudeFirst} argument value is {@code false} (which is the default value),
      * then the {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER}
      * hint is left unset. This is <strong>not</strong> equivalent to setting the above-cited hint
-     * to {@link Boolean#FALSE FALSE}. The difference is that in the later case, the
-     * {@value org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}
+     * to {@link Boolean#FALSE FALSE}. The difference is that in the later case, the <code>{@value
+     * org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}</code>
      * system property would be ignored (since the hint has precedence).
      *
      * @param  code The Coordinate Reference System authority code.
@@ -288,7 +287,7 @@ public final class CRS {
      * Returns the CRS authority factory used by the {@link #decode(String,boolean) decode} methods.
      * This factory is
      * {@linkplain org.geotools.referencing.factory.BufferedAuthorityFactory buffered}, scans over
-     * {@linkplain org.geotools.referencing.factory.AllAuthorityFactory all factories} and uses
+     * {@linkplain org.geotools.referencing.factory.AllAuthoritiesFactory all factories} and uses
      * additional factories as {@linkplain org.geotools.referencing.factory.FallbackAuthorityFactory
      * fallbacks} if there is more than one {@linkplain FactoryFinder#getCRSAuthorityFactories
      * registered factory} for the same authority.

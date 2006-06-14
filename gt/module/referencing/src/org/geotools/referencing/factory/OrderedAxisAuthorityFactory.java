@@ -97,7 +97,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </pre></blockquote>
  *
  * This class is named <cite>ordered axis authority factory</cite> instead of something like
- * <cite>longitude first axis order</code> because the axis order can be user-supplied. The
+ * <cite>longitude first axis order</cite> because the axis order can be user-supplied. The
  * (<var>longitude</var>, <var>latitude</var>) order just appears to be the default one.
  *
  * @since 2.2

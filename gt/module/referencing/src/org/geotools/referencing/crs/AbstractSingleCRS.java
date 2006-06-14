@@ -39,8 +39,8 @@ import org.geotools.referencing.wkt.Formatter;
 
 /**
  * Abstract coordinate reference system, consisting of a single
- * {@linkplain CoordinateSystem Coordinate System} and a single
- * {@linkplain Datum Datum} (as opposed to {@linkplain DefaultCompoundCRS Compound CRS}).
+ * {@linkplain CoordinateSystem coordinate system} and a single
+ * {@linkplain Datum datum} (as opposed to {@linkplain DefaultCompoundCRS compound CRS}).
  * <p>
  * A coordinate reference system consists of an ordered sequence of coordinate system
  * axes that are related to the earth through a datum. A coordinate reference system

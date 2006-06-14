@@ -62,57 +62,54 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Instructions include:
  *
  * <table>
- *   <tr><td nowrap valign="top"><P>{@code SET} <var>name</var> {@code =} <var>wkt</var></P></td><td>
- *   <P align="justify">Set the specified <var>name</var> as a shortcut for the specified Well Know
- *   Text (<var>wkt</var>). This WKT can contains other shortcuts defined previously.</P></td></tr>
+ *   <tr><td nowrap valign="top">{@code SET} <var>name</var> {@code =} <var>wkt</var></td><td>
+ *   Set the specified <var>name</var> as a shortcut for the specified Well Know
+ *   Text (<var>wkt</var>). This WKT can contains other shortcuts defined previously.</td></tr>
  *
- *   <tr><td nowrap valign="top"><P>{@code transform = } <var>wkt</var></P></td><td>
- *   <P align="justify">Set explicitly a {@linkplain MathTransform math transform} to use for
+ *   <tr><td nowrap valign="top">{@code transform = } <var>wkt</var></td><td>
+ *   Set explicitly a {@linkplain MathTransform math transform} to use for
  *   coordinate transformations. This instruction is a more direct alternative to the usage of
- *   {@code source crs} and {@code target crs} instruction.</P></td></tr>
+ *   {@code source crs} and {@code target crs} instruction.</td></tr>
  *
- *   <tr><td nowrap valign="top"><P>{@code source crs = } <var>wkt</var></P></td><td>
- *   <P align="justify">Set the source {@linkplain CoordinateReferenceSystem coordinate reference
+ *   <tr><td nowrap valign="top">{@code source crs = } <var>wkt</var></td><td>
+ *   Set the source {@linkplain CoordinateReferenceSystem coordinate reference
  *   system} to the specified object. This object can be specified as a Well Know Text
- *   (<var>wkt</var>) or as a shortcut previously set.</P></td></tr>
+ *   (<var>wkt</var>) or as a shortcut previously set.</td></tr>
  *
- *   <tr><td nowrap valign="top"><P>{@code target crs = } <var>wkt</var></P></td><td>
- *   <P align="justify">Set the target {@linkplain CoordinateReferenceSystem coordinate reference
+ *   <tr><td nowrap valign="top">{@code target crs = } <var>wkt</var></td><td>
+ *   Set the target {@linkplain CoordinateReferenceSystem coordinate reference
  *   system} to the specified object. This object can be specified as a Well Know Text
  *   (<var>wkt</var>) or as a shortcut previously set. Once both source and target
  *   CRS are specified a {@linkplain MathTransform math transform} from source to
- *   target CRS is automatically infered.</P></td></tr>
+ *   target CRS is automatically infered.</td></tr>
  *
- *   <tr><td nowrap valign="top"><P>{@code source pt = } <var>coord</var></P></td><td>
- *   <P align="justify">Transforms the specified coordinates from source CRS to target CRS
- *   and prints the result.</P>
+ *   <tr><td nowrap valign="top">{@code source pt = } <var>coord</var></td><td>
+ *   Transforms the specified coordinates from source CRS to target CRS
+ *   and prints the result.</td></tr>
  *
- *   <tr><td nowrap valign="top"><P>{@code target pt = } <var>coord</var></P></td><td>
- *   <P align="justify">Inverse transforms the specified coordinates from target CRS to source CRS
- *   and prints the result.</P>
+ *   <tr><td nowrap valign="top">{@code target pt = } <var>coord</var></td><td>
+ *   Inverse transforms the specified coordinates from target CRS to source CRS
+ *   and prints the result.</td></tr>
  *
- *   <tr><td nowrap valign="top"><P>{@code test tolerance = } <var>vector</var></P></td><td>
- *   <P align="justify">Set the maximum difference between the transformed source point and the
+ *   <tr><td nowrap valign="top">{@code test tolerance = } <var>vector</var></td><td>
+ *   Set the maximum difference between the transformed source point and the
  *   target point. Once this value is set, every occurence of the {@code target pt} instruction
  *   will trig this comparaison. If a greater difference is found, an exception is thrown or a
- *   message is printed to the error stream.</P>
+ *   message is printed to the error stream.</td></tr>
  *
- *   <tr><td nowrap valign="top"><P>{@code print set}</P></td><td>
- *   <P align="justify">Prints the set of shortcuts defined in previous calls to {@code SET}
- *   instruction.</P></td></tr>
+ *   <tr><td nowrap valign="top">{@code print set}</td><td>
+ *   Prints the set of shortcuts defined in previous calls to {@code SET} instruction.</td></tr>
  *
- *   <tr><td nowrap valign="top"><P>{@code print crs}</P></td><td>
- *   <P align="justify">Prints the source and target
- *   {@linkplain CoordinateReferenceSystem coordinate reference system},
- *   {@linkplain MathTransform math transform} and its inverse
- *   as Well Know Text (wkt).</P></td></tr>
+ *   <tr><td nowrap valign="top">{@code print crs}</td><td>
+ *   Prints the source and target {@linkplain CoordinateReferenceSystem coordinate reference system}
+ *   {@linkplain MathTransform math transform} and its inverse as Well Know Text (wkt).</td></tr>
  *
- *   <tr><td nowrap valign="top"><P>{@code print pts}</P></td><td>
- *   <P align="justify">Prints the source and target points, their transformed points, and
- *   the distance between them.</P></td></tr>
+ *   <tr><td nowrap valign="top">{@code print pts}</td><td>
+ *   Prints the source and target points, their transformed points, and the distance between
+ *   them.</td></tr>
  *
- *   <tr><td nowrap valign="top"><P>{@code exit}</P></td><td>
- *   <P align="justify">Quit the console.</P></td></tr>
+ *   <tr><td nowrap valign="top">{@code exit}</td><td>
+ *   Quit the console.</td></tr>
  * </table>
  *
  * @since 2.1
@@ -209,7 +206,7 @@ public class Console extends AbstractConsole {
      * Run the console from the command line. Before to process all instructions
      * from the {@linkplain System#in standard input stream}, this method first
      * process the following optional command-line arguments:
-     *
+     * <P>
      * <TABLE CELLPADDING='0' CELLSPACING='0'>
      *   <TR><TD NOWRAP><CODE>-load</CODE> <VAR>&lt;filename&gt;</VAR></TD>
      *       <TD>&nbsp;Load a definition file before to run instructions from

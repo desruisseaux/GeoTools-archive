@@ -78,7 +78,7 @@ import org.geotools.resources.LazySet;
  * and on native code. The usual pattern for more complex services is to register a lightweight
  * proxy for the heavyweight service.</P>
  *
- * <H2>Note on factory ordering in a multi-thread environment</H2>
+ * <H2>Note on factory ordering</H2>
  * <P>This class is thread-safe. However, calls to any {@link #setAuthorityOrdering} or
  * {@link #setVendorOrdering} methods have a system-wide effect. If two threads or two
  * applications need a different ordering, they shall manage their own instance of

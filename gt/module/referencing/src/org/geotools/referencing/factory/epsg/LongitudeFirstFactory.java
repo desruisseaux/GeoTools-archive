@@ -51,7 +51,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * 
  * This factory will have a {@linkplain #priority priority} lower than the
  * {@linkplain DefaultFactory default factory} priority, <u>except</u> if the
- * {@value #SYSTEM_DEFAULT_KEY} {@linkplain System#getProperty(String) system
+ * <code>{@value #SYSTEM_DEFAULT_KEY}</code> {@linkplain System#getProperty(String) system
  * property} is set to {@code true}. This means that when the
  * {@code FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint is not specified, the system-wide default is
  * (<var>longitude</var>, <var>latitude</var>) order if the above-cited system property is set
@@ -142,8 +142,8 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory
 
     /**
      * Returns the priority to use relative to the {@link DefaultFactory} priority. The default
-     * priority should be lower, except if the {@value #SYSTEM_DEFAULT_KEY} system property is
-     * set to {@code true}.
+     * priority should be lower, except if the <code>{@value #SYSTEM_DEFAULT_KEY}</code> system
+     * property is set to {@code true}.
      */
     private static int relativePriority() {
         try {

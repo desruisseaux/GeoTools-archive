@@ -213,7 +213,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
      * {@link #replace(CoordinateSystem)} method. The default implementation returns the axis
      * direction unchanged.
      *
-     * @param  cs The axis direction to replace.
+     * @param  direction The axis direction to replace.
      * @return The new direction, or {@code direction} if no change were needed.
      * @throws FactoryException if an error occured while creating the new axis direction.
      */
@@ -225,7 +225,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
      * Replaces (if needed) the specified axis by a new one. The default implementation
      * invokes {@link #replace(Unit)} and {@link #replace(AxisDirection)}.
      *
-     * @param  cs The coordinate system axis to replace.
+     * @param  axis The coordinate system axis to replace.
      * @return The new coordinate system axis, or {@code axis} if no change were needed.
      * @throws FactoryException if an error occured while creating the new coordinate system axis.
      */
