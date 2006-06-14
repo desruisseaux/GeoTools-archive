@@ -92,10 +92,7 @@
     <path id="sources.path">
       <pathelement path="module/api/src"/>
       <pathelement path="module/coverage/src"/>
-      <pathelement path="module/legacy/src"/>
       <pathelement path="module/main/src"/>
-      <pathelement path="module/migrate/src"/>
-      <pathelement path="module/migrate/demo/gui/src"/>
       <pathelement path="module/referencing/src"/>
       <pathelement path="module/render/src"/>
       <pathelement path="module/sample-data/src"/>
@@ -182,7 +179,6 @@
       <link href="http://jsr-108.sourceforge.net/javadoc"/>
       <link href="http://geoapi.sourceforge.net/snapshot/javadoc"/>
       <link href="http://geoapi.sourceforge.net/pending/javadoc"/>
-      <link href="http://geoapi.sourceforge.net/legacy/javadoc"/>
       <link href="http://www.jump-project.org/docs/jts/1.6/api"/>
 
       <tag name="todo" scope="types,fields,methods,constructors" description="TODO:"/>
