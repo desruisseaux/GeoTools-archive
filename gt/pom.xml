@@ -1014,6 +1014,7 @@
     <module>module</module>
     <module>plugin</module>
     <module>ext</module>
+    <module>demo</module>
   </modules>
 
 </project>
