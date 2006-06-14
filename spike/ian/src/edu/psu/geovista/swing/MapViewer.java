@@ -15,6 +15,7 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.PanAction;
 import org.geotools.gui.swing.ResetAction;
+import org.geotools.gui.swing.SelectAction;
 import org.geotools.gui.swing.ZoomInAction;
 import org.geotools.gui.swing.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
@@ -42,12 +43,15 @@ public class MapViewer {
         Action zoomIn = new ZoomInAction(mp);
         Action zoomOut = new ZoomOutAction(mp);
         Action pan = new PanAction(mp);
+        Action select = new SelectAction(mp);
         Action reset = new ResetAction(mp);
         jtb.add(zoomIn);
         jtb.add(zoomOut);
         jtb.add(pan);
         jtb.addSeparator();
         jtb.add(reset);
+        jtb.addSeparator();
+        jtb.add(select);
         
         content.add(jtb,BorderLayout.NORTH);
         
