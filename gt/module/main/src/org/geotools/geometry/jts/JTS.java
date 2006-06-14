@@ -326,18 +326,14 @@ public final class JTS {
          */
         GeodeticCalculator gc = (GeodeticCalculator) CALCULATORS.get(crs);
         if (gc == null) {
-            try {
-                gc = new GeodeticCalculator(crs);
-            } catch (FactoryException exception) {
-                throw new TransformPathNotFoundException(exception);
-            }
+            gc = new GeodeticCalculator(crs);
             CALCULATORS.put(crs, gc);
         }
         assert crs.equals(gc.getCoordinateReferenceSystem()) : crs;
         final GeneralDirectPosition pos = POSITIONS[Math.min(POSITIONS.length-1,
                                           crs.getCoordinateSystem().getDimension())];
         copy(p1, pos.ordinates);
-        gc.setAnchorPosition(pos);
+        gc.setStartingPosition(pos);
         copy(p2, pos.ordinates);
         gc.setDestinationPosition(pos);
         return gc.getOrthodromicDistance();
