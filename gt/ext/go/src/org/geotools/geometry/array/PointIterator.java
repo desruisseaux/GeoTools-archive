@@ -58,13 +58,13 @@ public abstract class PointIterator implements Iterator, Cloneable {
 
     /**
      * Returns the next <var>x</var> value. Before to invoke this method one more time,
-     * the method {@link #nextY} <strong>must</strong> be invoked.
+     * the {@link #nextY} method <strong>must</strong> be invoked.
      */
     public abstract float nextX();
 
     /**
      * Returns the next <var>y</var> value, and move this iterator to the next coordinate.
-     * Before to invoke this method one more time, the method {@link #nextX} <strong>must</strong>
+     * Before to invoke this method one more time, the {@link #nextX} method <strong>must</strong>
      * be invoked.
      */
     public abstract float nextY();

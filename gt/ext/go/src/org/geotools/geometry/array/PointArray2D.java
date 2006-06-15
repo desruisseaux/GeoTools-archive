@@ -24,7 +24,6 @@ package org.geotools.geometry.array;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.RandomAccess;
@@ -37,6 +36,7 @@ import org.opengis.spatialschema.geometry.geometry.Position;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
+import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -63,37 +63,6 @@ public abstract class PointArray2D implements PointArray, Serializable {
     private static final long serialVersionUID = -4959895593401691530L;
 
     /**
-     * Checks the validity of the specified arguments.
-     *
-     * @param  array The array of (<var>x</var>,<var>y</var>) ordinates.
-     * @param  lower Index of the first <var>x</var> ordinate to consider in {@code array}.
-     * @param  upper Index after the last <var>y</var> ordinate to consider in {@code array}.
-     *         The {@code upper-lower} value must be even.
-     * @throws IllegalArgumentException if the {@code [lower..upper]} range is not valid.
-     */
-    static void checkRange(final float[] array, final int lower, final int upper)
-            throws IllegalArgumentException
-    {
-        assert (array.length & 1) == 0 : array.length;
-        assert (lower        & 1) == 0 : lower;
-        assert (upper        & 1) == 0 : upper;
-        if (upper < lower) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
-                                               new Integer(lower), new Integer(upper)));
-        }
-        if (((upper-lower) & 1) !=0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ODD_ARRAY_LENGTH_$1,
-                                               new Integer(upper-lower)));
-        }
-        if (lower < 0) {
-            throw new ArrayIndexOutOfBoundsException(lower);
-        }
-        if (upper > array.length) {
-            throw new ArrayIndexOutOfBoundsException(upper);
-        }
-    }
-
-    /**
      * Constructs a new array.
      */
     protected PointArray2D() {
@@ -118,12 +87,27 @@ public abstract class PointArray2D implements PointArray, Serializable {
     }
 
     /**
+     * Returns {@code true} if the specified CRS is compatible with the content of this array.
+     */
+    private boolean isCompatible(final CoordinateReferenceSystem crs) {
+        if (crs != null) {
+            final CoordinateReferenceSystem expected = getCoordinateReferenceSystem();
+            if (expected != null) {
+                return CRS.equalsIgnoreMetadata(crs, expected);
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns the index of the first valid ordinate.
      *
      * This method is overriden by all {@code PointArray2D} subclasses in this package.
      * Note that this method is not {@code protected} in this {@code PointArray2D} class
      * because it is used only by {@link #capacity}, which is a package-private helper
      * method for {@link #toFloatArray} implementations only.
+     *
+     * @see #checkRange
      */
     int lower() {
         return 0;
@@ -136,6 +120,8 @@ public abstract class PointArray2D implements PointArray, Serializable {
      * Note that this method is not {@code protected} in this {@code PointArray2D} class
      * because it is used only by {@link #capacity}, which is a package-private helper
      * method for {@link #toFloatArray} implementations only.
+     *
+     * @see #checkRange
      */
     int upper() {
         return 2*length();
@@ -158,35 +144,6 @@ public abstract class PointArray2D implements PointArray, Serializable {
     public abstract long getMemoryUsage();
 
     /**
-     * Returns the first point in this array. If {@code point} is not null, the point is
-     * stored in the specified object and {@code point} is returned for convenience. If
-     * {@code point} is null, a new {@link Point2D} object is allocated and the result is
-     * stored in the new object.
-     *
-     * @param  point The object in which to store the first point, or {@code null}.
-     * @return {@code point} or a new {@link Point2D}, which contains the first point.
-     */
-    public abstract Point2D getFirstPoint(final Point2D point);
-
-    /**
-     * Returns the last point in this array. If {@code point} is not null, the point is
-     * stored in the specified object and {@code point} is returned for convenience. If
-     * {@code point} is null, a new {@link Point2D} object is allocated and the result is
-     * stored in the new object.
-     *
-     * @param  point The object in which to store the last point, or {@code null}.
-     * @return {@code point} or a new {@link Point2D}, which contains the last point.
-     */
-    public abstract Point2D getLastPoint(final Point2D point);
-
-    /**
-     * @deprecated Use {@link #get(int,DirectPosition)} instead.
-     */
-    public final DirectPosition get(final int index) {
-        return get(index, null);
-    }
-
-    /**
      * Gets a copy of the coordinates at the particular location in this {@code PointArray}.
      * If the {@code dest} argument is non-null, that object will be populated with the value
      * from the array.
@@ -197,17 +154,19 @@ public abstract class PointArray2D implements PointArray, Serializable {
      *
      * @param  index The location in the array, from 0 inclusive to the array
      *               {@linkplain #length length} exclusive.
-     * @param  dest An optionnaly pre-allocated direct position.
+     * @param  dest An optionnaly pre-allocated direct position. If non-null, its
+     *         {@linkplain DirectPosition#getCoordinateReferenceSystem associated CRS} must be null
+     *         or compatible with {@linkplain #getCoordinateReferenceSystem this array CRS}. For
+     *         performance reason, it will not be verified unless assertions are enabled.
      * @return The {@code dest} argument, or a new object if {@code dest} was null.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
-     *
-     * @todo Ensures CRS are compatibles.
      */
     public DirectPosition get(final int index, DirectPosition dest)
             throws IndexOutOfBoundsException
     {
         final PointIterator it = iterator(index);
         if (dest != null) {
+            assert isCompatible(dest.getCoordinateReferenceSystem()) : dest;
             dest.setOrdinate(0, it.nextX());
             dest.setOrdinate(1, it.nextY());
         } else {
@@ -277,7 +236,8 @@ public abstract class PointArray2D implements PointArray, Serializable {
     /**
      * Returns the bounding box of all <var>x</var> and <var>y</var> ordinates. If this array
      * is empty, then this method returns {@code null}. The default implementation iterates
-     * through all coordinates provided by {@link PointIterator}.
+     * through all coordinates provided by {@link PointIterator}. Subclasses should override
+     * this method with a more efficient implementation.
      */
     public Rectangle2D getBounds2D() {
         float xmin = Float.POSITIVE_INFINITY;
@@ -288,10 +248,10 @@ public abstract class PointArray2D implements PointArray, Serializable {
         while (it.hasNext()) {
             final float x = it.nextX();
             final float y = it.nextY();
-            if (x<xmin) xmin=x;
-            if (x>xmax) xmax=x;
-            if (y<ymin) ymin=y;
-            if (y>ymax) ymax=y;
+            if (x < xmin) xmin = x;
+            if (x > xmax) xmax = x;
+            if (y < ymin) ymin = y;
+            if (y > ymax) ymax = y;
         }
         if (xmin<=xmax && ymin<=ymax) {
             return new Rectangle2D.Float(xmin, ymin, xmax-xmin, ymax-ymin);
@@ -318,7 +278,9 @@ public abstract class PointArray2D implements PointArray, Serializable {
      * @param  toMerge The points to insert.
      * @param  reverse {@code true} for inserting the coordinates in reverse order.
      */
-    public final PointArray2D insertAt(final int index, final PointArray2D toMerge, final boolean reverse) {
+    public final PointArray2D insertAt(final int index, final PointArray2D toMerge,
+                                       final boolean reverse)
+    {
         return toMerge.insertInto(this, index, reverse);
     }
 
@@ -346,13 +308,13 @@ public abstract class PointArray2D implements PointArray, Serializable {
      *         inserted into. May returns {@code this} if the insertion has been applied in-place.
      */
     public abstract PointArray2D insertAt(final int index, final float toMerge[],
-                                        final int lower, final int upper, final boolean reverse);
+                                          final int lower, final int upper, final boolean reverse);
 
     /**
      * Reverts all coordinate points order in this array. The last point become first, and
      * the first point become last.
      *
-     * @return All array which contains the points in reversed order. May returns {@code true}
+     * @return All array which contains the points in reversed order. May returns {@code this}
      *         if the operation has been applied in-place.
      */
     public abstract PointArray2D reverse();
@@ -377,18 +339,24 @@ public abstract class PointArray2D implements PointArray, Serializable {
      * The destination array will be filled starting at index {@link ArrayData#length}.
      * If {@code resolutionSquared} is greater than 0, then points that are closer than
      * {@code sqrt(resolutionSquared)} from previous one will be skiped.
+     * <p>
+     * <strong>Implementation note</strong><br>
+     * Many implementations will compute distances using Pythagoras formulas, which is okay for
+     * {@linkplain org.opengis.referencing.crs.ProjectedCRS projected CRS} but not strictly right
+     * for {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}. This is not a real
+     * problem when the {@linkplain org.geotools.display.canvas.ReferencedCanvas#getObjectiveCRS
+     * objective CRS} is the same one than the {@linkplain #getCoordinateReferenceSystem data CRS},
+     * since the decimation performed by this {@code toFloatArray} method target specifically the
+     * rendering device. However, it may be a problem when the objective CRS is different, since
+     * points that are equidistant in the data CRS may not be equidistant in the objective CRS. In
+     * order to minimize the deformations induced by map projections, this method should be invoked
+     * only on {@code PointArray2D} objects covering a relatively small geographic area.
+     * {@code PointArray2D} objects covering a large geographic area shall be splitted into smaller
+     * {@code PointArray2D} objects using the {@link #subarray subarray} method.
      *
      * @param  dest The destination array.
      * @param  resolutionSquared The minimum squared distance desired between points.
-     *
-     * @todo Current implementations compute distance using Pythagoras formulas, which
-     *       is okay for projected coordinates but not right for geographic (longitude
-     *       / latitude) coordinates. This is not a real problem when the rendering CS
-     *       is the same than the data CS,  since the decimation performed here target
-     *       specifically the rendering device  (the important thing is that distances
-     *       look okay to user's eyes). However, it may be a problem when the rendering
-     *       CS is different, since points that are equidistant in the data CS may not
-     *       be equidistant in the rendering CS.
+     *         A value of 0 keep all points.
      */
     public abstract void toFloatArray(ArrayData dest, float resolutionSquared);
 
@@ -401,13 +369,6 @@ public abstract class PointArray2D implements PointArray, Serializable {
         final float[] array = data.getArray();
         assert array.length == data.length() * 2;
         return array;
-    }
-
-    /**
-     * @deprecated Use {@link #positions} instead.
-     */
-    public DirectPosition[] toArray() {
-        return (DirectPosition[]) positions().toArray(new DirectPosition[length()]);
     }
 
     /**
@@ -460,21 +421,21 @@ public abstract class PointArray2D implements PointArray, Serializable {
      * the class name, the number of points and the start and end coordinates.
      */
     public final String toString() {
-        final Point2D.Float point = new Point2D.Float();
+        final DirectPosition2D point = new DirectPosition2D();
         final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
         final int length = length();
         buffer.append('[');
         buffer.append(length);
         buffer.append(" points");
         if (length != 0) {
-            getFirstPoint(point);
+            get(0, point);
             buffer.append(" (");
             buffer.append(point.x);
             buffer.append(", ");
             buffer.append(point.y);
             buffer.append(")-(");
 
-            getLastPoint(point);
+            get(length()-1, point);
             buffer.append(point.x);
             buffer.append(", ");
             buffer.append(point.y);
@@ -490,8 +451,8 @@ public abstract class PointArray2D implements PointArray, Serializable {
      * implementation doesn't matter.
      */
     public final boolean equals(final PointArray2D that) {
-        if (that==this) return true;
-        if (that==null) return false;
+        if (that == this) return true;
+        if (that == null) return false;
         if (this.length() != that.length()) {
             return false;
         }
@@ -517,8 +478,39 @@ public abstract class PointArray2D implements PointArray, Serializable {
      * Returns a hash value for this array.
      */
     public final int hashCode() {
-        final Point2D point = getFirstPoint(null);
-        return length() ^ Float.floatToIntBits((float)point.getX())
-                        ^ Float.floatToIntBits((float)point.getY());
+        final DirectPosition point = get(0, null);
+        return length() ^ Float.floatToIntBits((float)point.getOrdinate(0))
+                        ^ Float.floatToIntBits((float)point.getOrdinate(1));
+    }
+
+    /**
+     * Checks the validity of the specified arguments.
+     *
+     * @param  array The array of (<var>x</var>,<var>y</var>) ordinates.
+     * @param  lower Index of the first <var>x</var> ordinate to consider in {@code array}.
+     * @param  upper Index after the last <var>y</var> ordinate to consider in {@code array}.
+     *         The {@code upper-lower} value must be even.
+     * @throws IllegalArgumentException if the {@code [lower..upper]} range is not valid.
+     */
+    static void checkRange(final float[] array, final int lower, final int upper)
+            throws IllegalArgumentException
+    {
+        assert (array.length & 1) == 0 : array.length;
+        assert (lower        & 1) == 0 : lower;
+        assert (upper        & 1) == 0 : upper;
+        if (upper < lower) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
+                                               new Integer(lower), new Integer(upper)));
+        }
+        if (((upper-lower) & 1) !=0) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ODD_ARRAY_LENGTH_$1,
+                                               new Integer(upper-lower)));
+        }
+        if (lower < 0) {
+            throw new ArrayIndexOutOfBoundsException(lower);
+        }
+        if (upper > array.length) {
+            throw new ArrayIndexOutOfBoundsException(upper);
+        }
     }
 }
