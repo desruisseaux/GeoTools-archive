@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ===========================================================================
+         Project configuration file for the Geotools 2 project
+         http://www.geotools.org/
+
+         Version: $Id$
+     =========================================================================== -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt2-plugin</artifactId>
+    <version>2.3-SNAPSHOT</version>
+  </parent>
+
+
+  <!-- ==================================================== -->
+  <!--     Module description                               -->
+  <!-- ==================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>gt2-referencing-3D</artifactId>
+  <packaging>jar</packaging>
+  <name>Vertical coordinate transformations</name>
+  <url>http://maven.geotools.fr/reports/referencing-3D/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/referencing-3D/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/referencing-3D/</url>
+  </scm>
+  <description>
+    Transforms vertical coordinates between "heights above the ellipsoid" and "heights above the geoid".
+    This module provides the algorithms as MathTransform implementation. Installing the JAR on the
+    classpath should be suffisient for making vertical transformations available to an application
+    like any other transforms.
+  </description>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Developers and contributors                      -->
+  <!-- ==================================================== -->
+  <developers>
+    <developer>
+      <name>Pierre Cardinal</name>
+      <roles>
+        <role>Initial contributor</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Dependencies                                     -->
+  <!-- ==================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+</project>

@@ -33,6 +33,7 @@ public final class ErrorKeys {
     public static final int BAD_COORDINATE_$1                      =     7;
     public static final int BAD_ENTRY                              =     8;
     public static final int BAD_GRID_RANGE_$3                      =     9;
+    public static final int BAD_LINE_IN_FILE_$2                    =     4;
     public static final int BAD_LOCALE_$1                          =    10;
     public static final int BAD_PARAMETER_$2                       =    11;
     public static final int BAD_PARAMETER_TYPE_$2                  =    12;
