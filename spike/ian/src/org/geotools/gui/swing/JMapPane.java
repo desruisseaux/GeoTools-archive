@@ -7,6 +7,7 @@ import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Iterator;
@@ -15,15 +16,12 @@ import javax.swing.JPanel;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.geotools.feature.FeatureFactoryImpl;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.map.DefaultMapContext;
-import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.renderer.GTRenderer;
@@ -32,26 +30,22 @@ import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
-import org.geotools.styling.Symbolizer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
 
-public class JMapPane extends JPanel implements MouseListener {
+public class JMapPane extends JPanel implements MouseListener, MouseMotionListener {
     /**
      * what renders the map
      */
     GTRenderer renderer;
 
-    
     /**
      * the map context to render
      */
@@ -80,14 +74,20 @@ public class JMapPane extends JPanel implements MouseListener {
     private BufferedImage baseImage;
 
     private BufferedImage selectImage;
+
     private Style selectionStyle;
-    int selectionLayer = -1;
+
+    private int selectionLayer = -1;
+
+    private int highlightLayer = 0;
+
+    private boolean highlight = true;
 
     FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 
     GeometryFactory gf = new GeometryFactory();
 
-    FeatureCollection selection;
+    FeatureCollection selection, highlightFeature;
 
     public static final int Reset = 0;
 
@@ -103,6 +103,18 @@ public class JMapPane extends JPanel implements MouseListener {
 
     private double zoomFactor = 2.0;
 
+    Style lineHighlightStyle;
+
+    Style pointHighlightStyle;
+
+    Style polygonHighlightStyle;
+
+    Style polygonSelectionStyle;
+
+    Style pointSelectionStyle;
+
+    Style lineSelectionStyle;
+
     public JMapPane() {
         this(null, true, null, null);
     }
@@ -115,10 +127,23 @@ public class JMapPane extends JPanel implements MouseListener {
             GTRenderer render, MapContext context) {
         super(layout, isDoubleBuffered);
         setRenderer(render);
-        
+
         setContext(context);
-        
+
         this.addMouseListener(this);
+        this.addMouseMotionListener(this);
+        
+        lineHighlightStyle = setupStyle(LINE, Color.red);
+
+        pointHighlightStyle = setupStyle(POINT, Color.red);
+
+        polygonHighlightStyle = setupStyle(POLYGON, Color.red);
+
+        polygonSelectionStyle = setupStyle(POLYGON, Color.cyan);
+
+        pointSelectionStyle = setupStyle(POINT, Color.cyan);
+
+        lineSelectionStyle = setupStyle(LINE, Color.cyan);
 
     }
 
@@ -128,10 +153,10 @@ public class JMapPane extends JPanel implements MouseListener {
 
     public void setRenderer(GTRenderer renderer) {
         this.renderer = renderer;
-       
+
         if (this.context != null) {
             this.renderer.setContext(this.context);
-       
+
         }
     }
 
@@ -140,14 +165,12 @@ public class JMapPane extends JPanel implements MouseListener {
     }
 
     public void setContext(MapContext context) {
-        
+
         this.context = context;
-        
-        
-         
+
         if (renderer != null) {
             renderer.setContext(this.context);
-            
+
         }
     }
 
@@ -184,6 +207,70 @@ public class JMapPane extends JPanel implements MouseListener {
         this.selectionLayer = selectionLayer;
     }
 
+    public boolean isHighlight() {
+        return highlight;
+    }
+
+    public void setHighlight(boolean highlight) {
+        this.highlight = highlight;
+    }
+
+    public int getHighlightLayer() {
+        return highlightLayer;
+    }
+
+    public void setHighlightLayer(int highlightLayer) {
+        this.highlightLayer = highlightLayer;
+    }
+
+    public Style getLineHighlightStyle() {
+        return lineHighlightStyle;
+    }
+
+    public void setLineHighlightStyle(Style lineHighlightStyle) {
+        this.lineHighlightStyle = lineHighlightStyle;
+    }
+
+    public Style getLineSelectionStyle() {
+        return lineSelectionStyle;
+    }
+
+    public void setLineSelectionStyle(Style lineSelectionStyle) {
+        this.lineSelectionStyle = lineSelectionStyle;
+    }
+
+    public Style getPointHighlightStyle() {
+        return pointHighlightStyle;
+    }
+
+    public void setPointHighlightStyle(Style pointHighlightStyle) {
+        this.pointHighlightStyle = pointHighlightStyle;
+    }
+
+    public Style getPointSelectionStyle() {
+        return pointSelectionStyle;
+    }
+
+    public void setPointSelectionStyle(Style pointSelectionStyle) {
+        this.pointSelectionStyle = pointSelectionStyle;
+    }
+
+    public Style getPolygonHighlightStyle() {
+        return polygonHighlightStyle;
+    }
+
+    public void setPolygonHighlightStyle(Style polygonHighlightStyle) {
+        this.polygonHighlightStyle = polygonHighlightStyle;
+    }
+
+    public Style getPolygonSelectionStyle() {
+        return polygonSelectionStyle;
+    }
+
+    public void setPolygonSelectionStyle(Style polygonSelectionStyle) {
+        this.polygonSelectionStyle = polygonSelectionStyle;
+    }
+
     protected void paintComponent(Graphics g) {
         boolean changed = false;
         super.paintComponent(g);
@@ -191,7 +278,7 @@ public class JMapPane extends JPanel implements MouseListener {
             return;
         }
         Rectangle r = getBounds();
-        Rectangle dr = new Rectangle(r.width,r.height);
+        Rectangle dr = new Rectangle(r.width, r.height);
         if (!r.equals(oldRect)) {
             changed = true;
             oldRect = r;
@@ -227,43 +314,74 @@ public class JMapPane extends JPanel implements MouseListener {
             baseImage = new BufferedImage(dr.width, dr.height,
                     BufferedImage.TYPE_INT_ARGB);
             Graphics2D ig = baseImage.createGraphics();
-            System.out.println("rendering");
+            /*System.out.println("rendering");*/
             renderer.setContext(context);
             renderer.paint((Graphics2D) ig, dr, mapArea);
         }
         ((Graphics2D) g).drawImage(baseImage, 0, 0, this);
         if (selection != null && selection.size() > 0) {
             // paint selection
-            /*String type = selection.getDefaultGeometry().getGeometryType();
-            System.out.println(type);
-            if(type==null) type="polygon";*/
+            /*
+             * String type = selection.getDefaultGeometry().getGeometryType();
+             * System.out.println(type); if(type==null) type="polygon";
+             */
             String type = "polygon";
-            if(type.equalsIgnoreCase("polygon")){
-                selectionStyle = setupSelectionStyle(POLYGON);    
-            }else if(type.equalsIgnoreCase("point")){
-                selectionStyle = setupSelectionStyle(POINT);
-            }else if(type.equalsIgnoreCase("line")){
-                selectionStyle = setupSelectionStyle(LINE);
+            if (type.equalsIgnoreCase("polygon")) {
+
+                selectionStyle = polygonSelectionStyle;
+            } else if (type.equalsIgnoreCase("point")) {
+
+                selectionStyle = pointSelectionStyle;
+            } else if (type.equalsIgnoreCase("line")) {
+
+                selectionStyle = lineSelectionStyle;
             }
-            
+
             selectionContext = new DefaultMapContext();
-            
-            
-            selectionContext.addLayer(selection,selectionStyle);
+
+            selectionContext.addLayer(selection, selectionStyle);
             renderer.setContext(selectionContext);
-            
-            selectImage = new BufferedImage(dr.width,dr.height,BufferedImage.TYPE_INT_ARGB);
+
+            selectImage = new BufferedImage(dr.width, dr.height,
+                    BufferedImage.TYPE_INT_ARGB);
             Graphics2D ig = selectImage.createGraphics();
-            System.out.println("rendering selection");
-            renderer.paint((Graphics2D) ig, dr , mapArea);
-            
+            /*System.out.println("rendering selection");*/
+            renderer.paint((Graphics2D) ig, dr, mapArea);
+
             ((Graphics2D) g).drawImage(selectImage, 0, 0, this);
+        }
+        if (highlight && highlightFeature!=null && highlightFeature.size()>0) {
+            /*
+             * String type = selection.getDefaultGeometry().getGeometryType();
+             * System.out.println(type); if(type==null) type="polygon";
+             */
+            String type = "polygon";
+            Style highlightStyle = null;
+            if (type.equalsIgnoreCase("polygon")) {
+
+                highlightStyle = polygonHighlightStyle;
+            } else if (type.equalsIgnoreCase("point")) {
+
+                highlightStyle = pointHighlightStyle;
+            } else if (type.equalsIgnoreCase("line")) {
+
+                highlightStyle = lineHighlightStyle;
+            }
+
+            MapContext highlightContext = new DefaultMapContext();
+
+            highlightContext.addLayer(highlightFeature, highlightStyle);
+            renderer.setContext(highlightContext);
+
+            /*System.out.println("rendering highlight");*/
+            renderer.paint((Graphics2D) g, dr, mapArea);
+
         }
     }
 
-    public void doSelection(double x, double y) {
+    public FeatureCollection doSelection(double x, double y, int layer) {
         GeometryFilter f = null;
-
+        FeatureCollection select = null;
         Geometry geometry = gf.createPoint(new Coordinate(x, y));
         try {
             f = ff.createGeometryFilter(GeometryFilter.GEOMETRY_CONTAINS);
@@ -273,16 +391,19 @@ public class JMapPane extends JPanel implements MouseListener {
             e.printStackTrace();
         }
 
-        if (selectionLayer == -1) {
+        if (layer == -1) {
             for (int i = 0; i < context.getLayers().length; i++) {
-                selection = findFeature(f, i);
-                
+                FeatureCollection fx = findFeature(f, i);
+                if (select != null) {
+                    select.addAll(fx);
+                } else {
+                    select = fx;
+                }
             }
         } else {
-            selection = findFeature(f, selectionLayer);
-            
+            select = findFeature(f, layer);
         }
-        repaint();
+        return select;
     }
 
     /**
@@ -304,8 +425,8 @@ public class JMapPane extends JPanel implements MouseListener {
             f.addLeftGeometry(ff.createAttributeExpression(name));
             // System.out.println("looking with " + f);
             FeatureCollection fc = layer.getFeatureSource().getFeatures(f);
-            if(fc.size()>0){
-//                selectionStyle.getFeatureTypeStyles()[0].getRules()[0].setFilter(f);
+            if (fc.size() > 0) {
+                // selectionStyle.getFeatureTypeStyles()[0].getRules()[0].setFilter(f);
                 selectionLayer = i;
             }
             if (fcol == null) {
@@ -314,9 +435,12 @@ public class JMapPane extends JPanel implements MouseListener {
             } else {
                 fcol.addAll(fc);
             }
-            /*GeometryAttributeType gat = layer.getFeatureSource().getSchema().getDefaultGeometry();
-            fcol.setDefaultGeometry((Geometry)gat.createDefaultValue());*/
-            
+            /*
+             * GeometryAttributeType gat =
+             * layer.getFeatureSource().getSchema().getDefaultGeometry();
+             * fcol.setDefaultGeometry((Geometry)gat.createDefaultValue());
+             */
+
             Iterator fi = fc.iterator();
             while (fi.hasNext()) {
                 Feature feat = (Feature) fi.next();
@@ -329,11 +453,11 @@ public class JMapPane extends JPanel implements MouseListener {
         } catch (IllegalFilterException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }/* catch (IllegalAttributeException e) {
-            // TODO Auto-generated catch block
-            System.err.println(e.getMessage());
-//            e.printStackTrace();
-        }*/
+        }/*
+             * catch (IllegalAttributeException e) { // TODO Auto-generated
+             * catch block System.err.println(e.getMessage()); //
+             * e.printStackTrace(); }
+             */
         return fcol;
     }
 
@@ -372,7 +496,8 @@ public class JMapPane extends JPanel implements MouseListener {
             zlevel = 1.0 / zoomFactor;
             break;
         case Select:
-            doSelection(mapX, mapY);
+            selection=doSelection(mapX, mapY, selectionLayer);
+            repaint();
             return;
         default:
             return;
@@ -407,26 +532,30 @@ public class JMapPane extends JPanel implements MouseListener {
         // TODO Auto-generated method stub
 
     }
-    private static final int POLYGON=0;
-    private static final int LINE=1;
-    private static final int POINT=2;
-    private org.geotools.styling.Style setupSelectionStyle(int type) {
+
+    private static final int POLYGON = 0;
+
+    private static final int LINE = 1;
+
+    private static final int POINT = 2;
+
+    private org.geotools.styling.Style setupStyle(int type, Color color) {
         StyleFactory sf = StyleFactoryFinder.createStyleFactory();
-        StyleBuilder sb = new StyleBuilder(sf,ff);
-        
+        StyleBuilder sb = new StyleBuilder(sf, ff);
+
         org.geotools.styling.Style s = sf.createStyle();
         s.setTitle("selection");
-        
+
         // TODO parameterise the color
-        PolygonSymbolizer ps = sb.createPolygonSymbolizer(Color.cyan);
-        ps.setStroke(sb.createStroke(Color.cyan));
-        LineSymbolizer ls = sb.createLineSymbolizer(Color.cyan);
+        PolygonSymbolizer ps = sb.createPolygonSymbolizer(color);
+        ps.setStroke(sb.createStroke(color));
+        LineSymbolizer ls = sb.createLineSymbolizer(color);
         Graphic h = sb.createGraphic();
-        h.setMarks(new Mark[]{sb.createMark("square",Color.cyan)});
+        h.setMarks(new Mark[] { sb.createMark("square", color) });
         PointSymbolizer pts = sb.createPointSymbolizer(h);
-        
-//        Rule r = sb.createRule(new Symbolizer[]{ps,ls,pts});
-        switch(type){
+
+        // Rule r = sb.createRule(new Symbolizer[]{ps,ls,pts});
+        switch (type) {
         case POLYGON:
             s = sb.createStyle(ps);
             break;
@@ -436,8 +565,31 @@ public class JMapPane extends JPanel implements MouseListener {
         case LINE:
             s = sb.createStyle(ls);
         }
-        
+
         return s;
 
+    }
+
+    public void mouseDragged(MouseEvent e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mouseMoved(MouseEvent e) {
+        // TODO Auto-generated method stub
+        Rectangle bounds = this.getBounds();
+        double x = (double) (e.getX());
+        double y = (double) (e.getY());
+        double width = mapArea.getWidth();
+        double height = mapArea.getHeight();
+        
+
+        double mapX = (x * width / (double) bounds.width) + mapArea.getMinX();
+        double mapY = ((bounds.getHeight() - y) * height / (double) bounds.height)
+                + mapArea.getMinY();
+
+        highlightFeature = doSelection(mapX,mapY,highlightLayer);
+        repaint();
+        
     }
 }
