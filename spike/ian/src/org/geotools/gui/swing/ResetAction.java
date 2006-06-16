@@ -26,6 +26,7 @@ public class ResetAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
         map.mapArea = map.context.getAreaOfInterest();
+        map.setReset(true);
         map.repaint();
     }
     public ImageIcon getIcon() {

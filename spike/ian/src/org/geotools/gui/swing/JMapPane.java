@@ -285,7 +285,7 @@ public class JMapPane extends JPanel implements MouseListener, HighlightChangeLi
     public void setPolygonSelectionStyle(Style polygonSelectionStyle) {
         this.polygonSelectionStyle = polygonSelectionStyle;
     }
-
+    private boolean reset=false;
     protected void paintComponent(Graphics g) {
         boolean changed = false;
         super.paintComponent(g);
@@ -294,10 +294,11 @@ public class JMapPane extends JPanel implements MouseListener, HighlightChangeLi
         }
         Rectangle r = getBounds();
         Rectangle dr = new Rectangle(r.width, r.height);
-        if (!r.equals(oldRect)) {
+        if (!r.equals(oldRect)||reset) {
             changed = true;
+            reset=false;
             oldRect = r;
-
+System.out.println("did resize calc");
             double mapWidth = mapArea.getWidth();
             double mapHeight = mapArea.getHeight();
             double scaleX = r.getWidth() / mapArea.getWidth();
@@ -460,12 +461,12 @@ public class JMapPane extends JPanel implements MouseListener, HighlightChangeLi
              * fcol.setDefaultGeometry((Geometry)gat.createDefaultValue());
              */
 
-            Iterator fi = fc.iterator();
+            /*Iterator fi = fc.iterator();
             while (fi.hasNext()) {
                 Feature feat = (Feature) fi.next();
-                /*System.out.println("selected "
-                        + feat.getAttribute("STATE_NAME"));*/
-            }
+                System.out.println("selected "
+                        + feat.getAttribute("STATE_NAME"));
+            }*/
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -607,5 +608,13 @@ public class JMapPane extends JPanel implements MouseListener, HighlightChangeLi
         }
         repaint();
         
+    }
+
+    public boolean isReset() {
+        return reset;
+    }
+
+    public void setReset(boolean reset) {
+        this.reset = reset;
     }
 }
