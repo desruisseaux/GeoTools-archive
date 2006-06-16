@@ -415,8 +415,12 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
      */
     private FeatureCollection findFeature(GeometryFilter f, int i)
             throws IndexOutOfBoundsException {
-        MapLayer layer = context.getLayer(i);
         FeatureCollection fcol = null;
+        if(context!=null&&i>context.getLayers().length){
+            return fcol;
+        }
+        MapLayer layer = context.getLayer(i);
+        
         try {
             String name = layer.getFeatureSource().getSchema()
                     .getDefaultGeometry().getName();
@@ -444,8 +448,8 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             Iterator fi = fc.iterator();
             while (fi.hasNext()) {
                 Feature feat = (Feature) fi.next();
-                System.out.println("selected "
-                        + feat.getAttribute("STATE_NAME"));
+                /*System.out.println("selected "
+                        + feat.getAttribute("STATE_NAME"));*/
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
