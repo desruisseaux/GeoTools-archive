@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureFactoryImpl;
+import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-public class JMapPane extends JPanel implements MouseListener, MouseMotionListener {
+public class JMapPane extends JPanel implements MouseListener, HighlightChangeListener {
     /**
      * what renders the map
      */
@@ -79,8 +79,10 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
 
     private int selectionLayer = -1;
 
-    private int highlightLayer = 0;
-
+    private MapLayer highlightLayer ;
+    
+    private HighlightManager highlightManager;
+    
     private boolean highlight = true;
 
     FilterFactory ff = FilterFactoryFinder.createFilterFactory();
@@ -129,9 +131,9 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
         setRenderer(render);
 
         setContext(context);
-
+        
         this.addMouseListener(this);
-        this.addMouseMotionListener(this);
+        setHighlightManager(new HighlightManager(highlightLayer));
         
         lineHighlightStyle = setupStyle(LINE, Color.red);
 
@@ -215,12 +217,25 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
         this.highlight = highlight;
     }
 
-    public int getHighlightLayer() {
+    public MapLayer getHighlightLayer() {
         return highlightLayer;
     }
 
-    public void setHighlightLayer(int highlightLayer) {
+    public void setHighlightLayer(MapLayer highlightLayer) {
         this.highlightLayer = highlightLayer;
+        if(highlightManager!=null){
+            highlightManager.setHighlightLayer(highlightLayer);
+        }
+    }
+
+    public HighlightManager getHighlightManager() {
+        return highlightManager;
+    }
+
+    public void setHighlightManager(HighlightManager highlightManager) {
+        this.highlightManager = highlightManager;
+        this.highlightManager.addHighlightChangeListener(this);
+        this.addMouseMotionListener(this.highlightManager);
     }
 
     public Style getLineHighlightStyle() {
@@ -579,20 +594,17 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
         
     }
 
-    public void mouseMoved(MouseEvent e) {
+    public void highlightChanged(HighlightChangedEvent e){
         // TODO Auto-generated method stub
-        Rectangle bounds = this.getBounds();
-        double x = (double) (e.getX());
-        double y = (double) (e.getY());
-        double width = mapArea.getWidth();
-        double height = mapArea.getHeight();
         
-
-        double mapX = (x * width / (double) bounds.width) + mapArea.getMinX();
-        double mapY = ((bounds.getHeight() - y) * height / (double) bounds.height)
-                + mapArea.getMinY();
-
-        highlightFeature = doSelection(mapX,mapY,highlightLayer);
+        
+        Filter f = e.getFilter();
+        try {
+            highlightFeature = highlightLayer.getFeatureSource().getFeatures(f);
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
         repaint();
         
     }
