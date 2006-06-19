@@ -9,6 +9,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -34,13 +36,15 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-public class JMapPane extends JPanel implements MouseListener, HighlightChangeListener {
+public class JMapPane extends JPanel implements MouseListener,
+        HighlightChangeListener, PropertyChangeListener {
     /**
      * what renders the map
      */
@@ -79,10 +83,10 @@ public class JMapPane extends JPanel implements MouseListener, HighlightChangeLi
 
     private int selectionLayer = -1;
 
-    private MapLayer highlightLayer ;
-    
+    private MapLayer highlightLayer;
+
     private HighlightManager highlightManager;
-    
+
     private boolean highlight = true;
 
     FilterFactory ff = FilterFactoryFinder.createFilterFactory();
@@ -131,10 +135,10 @@ public class JMapPane extends JPanel implements MouseListener, HighlightChangeLi
         setRenderer(render);
 
         setContext(context);
-        
+
         this.addMouseListener(this);
         setHighlightManager(new HighlightManager(highlightLayer));
-        
+
         lineHighlightStyle = setupStyle(LINE, Color.red);
 
         pointHighlightStyle = setupStyle(POINT, Color.red);
@@ -223,7 +227,7 @@ public class JMapPane extends JPanel implements MouseListener, HighlightChangeLi
 
     public void setHighlightLayer(MapLayer highlightLayer) {
         this.highlightLayer = highlightLayer;
-        if(highlightManager!=null){
+        if (highlightManager != null) {
             highlightManager.setHighlightLayer(highlightLayer);
         }
     }
@@ -285,7 +289,9 @@ public class JMapPane extends JPanel implements MouseListener, HighlightChangeLi
     public void setPolygonSelectionStyle(Style polygonSelectionStyle) {
         this.polygonSelectionStyle = polygonSelectionStyle;
     }
-    private boolean reset=false;
+
+    private boolean reset = false;
+
     protected void paintComponent(Graphics g) {
         boolean changed = false;
         super.paintComponent(g);
@@ -294,11 +300,11 @@ public class JMapPane extends JPanel implements MouseListener, HighlightChangeLi
         }
         Rectangle r = getBounds();
         Rectangle dr = new Rectangle(r.width, r.height);
-        if (!r.equals(oldRect)||reset) {
+        if (!r.equals(oldRect) || reset) {
             changed = true;
-            reset=false;
+            reset = false;
             oldRect = r;
-System.out.println("did resize calc");
+            System.out.println("did resize calc");
             double mapWidth = mapArea.getWidth();
             double mapHeight = mapArea.getHeight();
             double scaleX = r.getWidth() / mapArea.getWidth();
@@ -330,7 +336,7 @@ System.out.println("did resize calc");
             baseImage = new BufferedImage(dr.width, dr.height,
                     BufferedImage.TYPE_INT_ARGB);
             Graphics2D ig = baseImage.createGraphics();
-            /*System.out.println("rendering");*/
+            /* System.out.println("rendering"); */
             renderer.setContext(context);
             renderer.paint((Graphics2D) ig, dr, mapArea);
         }
@@ -361,12 +367,13 @@ System.out.println("did resize calc");
             selectImage = new BufferedImage(dr.width, dr.height,
                     BufferedImage.TYPE_INT_ARGB);
             Graphics2D ig = selectImage.createGraphics();
-            /*System.out.println("rendering selection");*/
+            /* System.out.println("rendering selection"); */
             renderer.paint((Graphics2D) ig, dr, mapArea);
 
             ((Graphics2D) g).drawImage(selectImage, 0, 0, this);
         }
-        if (highlight && highlightFeature!=null && highlightFeature.size()>0) {
+        if (highlight && highlightFeature != null
+                && highlightFeature.size() > 0) {
             /*
              * String type = selection.getDefaultGeometry().getGeometryType();
              * System.out.println(type); if(type==null) type="polygon";
@@ -389,7 +396,7 @@ System.out.println("did resize calc");
             highlightContext.addLayer(highlightFeature, highlightStyle);
             renderer.setContext(highlightContext);
 
-            /*System.out.println("rendering highlight");*/
+            /* System.out.println("rendering highlight"); */
             renderer.paint((Graphics2D) g, dr, mapArea);
 
         }
@@ -432,11 +439,11 @@ System.out.println("did resize calc");
     private FeatureCollection findFeature(GeometryFilter f, int i)
             throws IndexOutOfBoundsException {
         FeatureCollection fcol = null;
-        if(context!=null&&i>context.getLayers().length){
+        if (context != null && i > context.getLayers().length) {
             return fcol;
         }
         MapLayer layer = context.getLayer(i);
-        
+
         try {
             String name = layer.getFeatureSource().getSchema()
                     .getDefaultGeometry().getName();
@@ -461,12 +468,11 @@ System.out.println("did resize calc");
              * fcol.setDefaultGeometry((Geometry)gat.createDefaultValue());
              */
 
-            /*Iterator fi = fc.iterator();
-            while (fi.hasNext()) {
-                Feature feat = (Feature) fi.next();
-                System.out.println("selected "
-                        + feat.getAttribute("STATE_NAME"));
-            }*/
+            /*
+             * Iterator fi = fc.iterator(); while (fi.hasNext()) { Feature feat =
+             * (Feature) fi.next(); System.out.println("selected " +
+             * feat.getAttribute("STATE_NAME")); }
+             */
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -516,7 +522,7 @@ System.out.println("did resize calc");
             zlevel = 1.0 / zoomFactor;
             break;
         case Select:
-            selection=doSelection(mapX, mapY, selectionLayer);
+            selection = doSelection(mapX, mapY, selectionLayer);
             repaint();
             return;
         default:
@@ -592,13 +598,12 @@ System.out.println("did resize calc");
 
     public void mouseDragged(MouseEvent e) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    public void highlightChanged(HighlightChangedEvent e){
+    public void highlightChanged(HighlightChangedEvent e) {
         // TODO Auto-generated method stub
-        
-        
+
         Filter f = e.getFilter();
         try {
             highlightFeature = highlightLayer.getFeatureSource().getFeatures(f);
@@ -607,7 +612,16 @@ System.out.println("did resize calc");
             e1.printStackTrace();
         }
         repaint();
-        
+
+    }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+        // TODO Auto-generated method stub
+        String prop = evt.getPropertyName();
+        if (prop.equalsIgnoreCase("crs")) {
+            context.setAreaOfInterest(context.getAreaOfInterest(),
+                    (CoordinateReferenceSystem) evt.getNewValue());
+        }
     }
 
     public boolean isReset() {
