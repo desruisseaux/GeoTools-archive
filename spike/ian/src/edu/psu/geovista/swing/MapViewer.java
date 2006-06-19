@@ -2,16 +2,23 @@ package edu.psu.geovista.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.wms.xml.ogcComplexType;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.PanAction;
 import org.geotools.gui.swing.ResetAction;
@@ -20,11 +27,18 @@ import org.geotools.gui.swing.ZoomInAction;
 import org.geotools.gui.swing.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
+import org.geotools.referencing.crs.EPSGCRSAuthorityFactory;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
+import org.geowidgets.framework.ui.CRS_SwingUIFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Envelope;
+
+import edu.psu.geovista.geotools.crs.gui.CRSPicker;
 
 
 public class MapViewer {
@@ -52,6 +66,28 @@ public class MapViewer {
         jtb.add(reset);
         jtb.addSeparator();
         jtb.add(select);
+        JButton button= new JButton();
+        button.setToolTipText("Change map prjection");
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                final CRSPicker pick = new CRSPicker();
+                pick.addPropertyChangeListener(new PropertyChangeListener(){
+                    public void propertyChange(PropertyChangeEvent pce){
+                        mp.getContext().setAreaOfInterest(mp.getContext().getAreaOfInterest(),pick.getCrs());
+                        
+                        
+                        
+                    }
+                });
+                JFrame frame = new JFrame();
+                frame.getContentPane().add(pick);
+                frame.pack();
+                frame.setVisible(true);
+                
+                //show change dialog
+            }
+        });
+        jtb.add(button);
         
         content.add(jtb,BorderLayout.NORTH);
         
@@ -83,6 +119,7 @@ public class MapViewer {
         MapContext context = new DefaultMapContext();
         context.addLayer(fs,style[0]);
         context.getLayerBounds();
+        mp.setHighlightLayer(context.getLayer(0));
         
         
         GTRenderer renderer = new StreamingRenderer();
