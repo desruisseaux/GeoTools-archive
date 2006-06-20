@@ -244,11 +244,25 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
     private void addSpatialFilter(GeometryFilter filter, int sdeMethod,
         boolean truth)
         throws SeException, DataSourceException, GeometryBuildingException {
-        AttributeExpression attExpr = (AttributeExpression) filter
-            .getLeftGeometry();
-        LiteralExpression geomExpr = (LiteralExpression) filter
-            .getRightGeometry();
 
+        AttributeExpression attExpr;
+        LiteralExpression geomExpr;
+        Expression left = filter.getLeftGeometry();
+        Expression right = filter.getRightGeometry();
+        if (left instanceof AttributeExpression &&
+            right instanceof LiteralExpression) {
+            attExpr = (AttributeExpression) left;
+            geomExpr = (LiteralExpression) right;
+        } else if (right instanceof AttributeExpression &&
+                   left instanceof LiteralExpression) {
+            attExpr = (AttributeExpression) right;
+            geomExpr = (LiteralExpression) left;
+        } else {
+            String err = "SDE currently supports one geometry and one " +
+                "attribute expr.  You gave: " + left + ", " + right;
+            throw new DataSourceException(err);
+	}
+   
         // Should probably assert that attExpr's property name is equal to
         // spatialCol...
         String spatialCol = this.sdeLayer.getSpatialColumn();
