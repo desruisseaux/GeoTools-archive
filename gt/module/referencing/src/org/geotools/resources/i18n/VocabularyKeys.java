@@ -71,6 +71,7 @@ public final class VocabularyKeys {
     public static final int DISPLAY                            =   228;
     public static final int DISTANCE                           =   211;
     public static final int DOWN                               =    33;
+    public static final int EARTH_GRAVITATIONAL_MODEL          =   230;
     public static final int EAST                               =    34;
     public static final int EASTING                            =    35;
     public static final int ELLIPSOID                          =   226;
@@ -169,6 +170,7 @@ public final class VocabularyKeys {
     public static final int OK                                 =   116;
     public static final int OPERATIONS                         =   117;
     public static final int OPERATION_$1                       =   118;
+    public static final int ORDER                              =   231;
     public static final int ORTHODROMIC_DISTANCE               =   227;
     public static final int ORTHOGRAPHIC_PROJECTION            =   119;
     public static final int ORTHOMETRIC                        =   120;

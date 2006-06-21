@@ -14,3 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
+
+Code and data in this module are derived from NGA/NASA work available for unlimited
+distribution. See http://earth-info.nima.mil/GandG/wgs84/gravitymod/.

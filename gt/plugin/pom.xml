@@ -110,6 +110,7 @@
     <module>mysql</module>
 <!-- <module>oraclespatial</module> -->
     <module>postgis</module>
+    <module>referencing3D</module>
     <module>shapefile</module>
     <module>tiger</module>
     <module>vpf</module>

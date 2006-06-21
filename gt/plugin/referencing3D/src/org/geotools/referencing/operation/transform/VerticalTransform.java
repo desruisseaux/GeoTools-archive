@@ -23,7 +23,7 @@ import org.opengis.referencing.operation.TransformException;
 
 
 /**
- * Base class for transformations between a <cite>height above the ellipsoid</cite> and a
+ * Base class for transformations from a <cite>height above the ellipsoid</cite> to a
  * <cite>height above the geoid</cite>. This transform expects three-dimensional geographic
  * coordinates in (<var>longitude</var>,<var>latitude</var>,<var>height</var>) order. The
  * transformations are usually backed by some ellipsoid-dependent database.
@@ -37,7 +37,7 @@ public abstract class VerticalTransform extends AbstractMathTransform {
     /**
      * Creates a new instance of {@code VerticalTransform}.
      */
-    public VerticalTransform() {
+    protected VerticalTransform() {
     }
 
     /**
@@ -55,14 +55,16 @@ public abstract class VerticalTransform extends AbstractMathTransform {
     }
 
     /**
-     * Returns the height above the ellipsoid for the specified geographic coordinate.
+     * Returns the value to add to a <cite>height above the ellipsoid</cite> in order to get a
+     * <cite>height above the geoid</cite> for the specified geographic coordinate.
      *
      * @param  longitude The geodetic longitude, in decimal degrees.
      * @param  latitude  The geodetic latitude, in decimal degrees.
-     * @return The height above the ellipsoid for the specified geographic coordinates.
-     * @throws TransformException if the height can't be computed for the specified coordinates.
+     * @param  height    The height above the ellipsoid in metres.
+     * @return The value to add in order to get the height above the geoid (in metres).
+     * @throws TransformException if the offset can't be computed for the specified coordinates.
      */
-    public abstract double height(final double longitude, final double latitude)
+    protected abstract double heightOffset(double longitude, double latitude, double height)
             throws TransformException;
 
     /**
@@ -81,10 +83,10 @@ public abstract class VerticalTransform extends AbstractMathTransform {
             step = +3;
         }
         while (--numPts >= 0) {
-            final float x,y;
-            dstPts[dstOff + 0] = x = srcPts[srcOff + 0];
-            dstPts[dstOff + 1] = y = srcPts[srcOff + 1];
-            dstPts[dstOff + 2] = (float) (srcPts[srcOff + 2] + height(x,y));
+            final float x,y,z;
+            dstPts[dstOff + 0] = (float)  (x = srcPts[srcOff + 0]);
+            dstPts[dstOff + 1] = (float)  (y = srcPts[srcOff + 1]);
+            dstPts[dstOff + 2] = (float) ((z = srcPts[srcOff + 2]) + heightOffset(x,y,z));
             srcOff += step;
             dstOff += step;
         }
@@ -106,10 +108,10 @@ public abstract class VerticalTransform extends AbstractMathTransform {
             step = +3;
         }
         while (--numPts >= 0) {
-            final double x,y;
-            dstPts[dstOff + 0] = x = srcPts[srcOff + 0];
-            dstPts[dstOff + 1] = y = srcPts[srcOff + 1];
-            dstPts[dstOff + 2] =     srcPts[srcOff + 2] + height(x,y);
+            final double x,y,z;
+            dstPts[dstOff + 0] = (x = srcPts[srcOff + 0]);
+            dstPts[dstOff + 1] = (y = srcPts[srcOff + 1]);
+            dstPts[dstOff + 2] = (z = srcPts[srcOff + 2]) + heightOffset(x,y,z);
             srcOff += step;
             dstOff += step;
         }
