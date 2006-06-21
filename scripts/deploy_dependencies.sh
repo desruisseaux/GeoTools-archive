@@ -81,7 +81,7 @@ echo
 #deploy_file log4j log4j 1.2.6
 #deploy_file commons-lang commons-lang 2.1
 deploy_file commons-collections commons-collections 2.1
-deploy_file commons-pool commons-pool 2.1
+deploy_file commons-pool commons-pool 1.2
 #deploy_file commons-logging commons-logging 1.0.4
 #deploy_file velocity velocity 1.4
 #deploy_file org/postgis postgis-driver 1.0
@@ -109,9 +109,9 @@ deploy_file org/opengis geoapi-legacy 0.1
 #deploy_file mysql mysql-connector-java 3.0.10
 deploy_file units units 0.01
 #deploy_file java3d vecmath 1.3.1
-deploy_file wkb4j wkb4j 1.0-RC1
+deploy_file org/wkb4j wkb4j 1.0-RC1
 deploy_file com/oracle dummy_spatial 8.1.8
-deploy_file org/picocontainer picocontainer 1.2-SNAPSHOT
+deploy_file org/picocontainer picocontainer 1.2
 #deploy_file com/esri jsde_sdk 9.0
 #deploy_file com/esri jsde_concurrent 9.0
 #deploy_file com/esri jsde_jpe_sdk 9.0
