@@ -80,6 +80,9 @@ public final class EarthGravitationalModel extends VerticalTransform {
                                 SQRT_17 = 4.1231056256176605498214098559741,
                                 SQRT_21 = 4.5825756949558400065880471937280;
 
+    /** The default value for {@link #nmax}. */
+    static final int DEFAULT_ORDER = 180;
+
     /** {@code true} for WGS84 model, or {@code false} for WGS72 model. */
     private final boolean wgs84;
 
@@ -126,7 +129,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
      * Creates a model with the default maximum degree and order.
      */
     EarthGravitationalModel() {
-        this(180, true);
+        this(DEFAULT_ORDER, true);
     }
 
     /**
@@ -371,7 +374,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
                     Collections.singletonMap(NAME_KEY,
                         new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
                                                                 VocabularyKeys.ORDER))),
-                    180, 2, 180, false);
+                    DEFAULT_ORDER, 2, 180, false);
 
         /**
          * The parameters group.
@@ -408,7 +411,10 @@ public final class EarthGravitationalModel extends VerticalTransform {
         protected MathTransform createMathTransform(final ParameterValueGroup values) 
                 throws ParameterNotFoundException, FactoryException
         {
-            final int nmax = intValue(ORDER, values);
+            int nmax = intValue(ORDER, values);
+            if (nmax == 0) {
+                nmax = DEFAULT_ORDER;
+            }
             final EarthGravitationalModel mt = new EarthGravitationalModel(nmax, true);
             final String filename = "EGM180.nor";
             try {

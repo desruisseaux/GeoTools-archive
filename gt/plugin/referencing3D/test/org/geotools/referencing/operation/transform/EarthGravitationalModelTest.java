@@ -21,6 +21,18 @@ package org.geotools.referencing.operation.transform;
 // JUnit dependencies
 import junit.framework.TestCase;
 
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+
+// Geotools dependencies
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.geometry.GeneralDirectPosition;
+
 
 /**
  * Tests the {@link EarthGravitationalModel} class.
@@ -40,5 +52,19 @@ public class EarthGravitationalModelTest extends TestCase {
         assertEquals( 1.505, gh.heightOffset(45, 45,    0), 0.001);
         assertEquals( 1.515, gh.heightOffset(45, 45, 1000), 0.001);
         assertEquals(46.908, gh.heightOffset( 0, 45,    0), 0.001);
+    }
+
+    /**
+     * Tests the creation of the math transform from the factory.
+     */
+    public void testMathTransform() throws FactoryException, TransformException {
+        final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory(null);
+        final ParameterValueGroup p = mtFactory.getDefaultParameters("Earth gravitational model");
+        final MathTransform mt = mtFactory.createParameterizedTransform(p);
+        DirectPosition pos = new GeneralDirectPosition(new double[] {45, 45, 1000});
+        pos = mt.transform(pos, pos);
+        assertEquals(  45.000, pos.getOrdinate(0), 0.001);
+        assertEquals(  45.000, pos.getOrdinate(1), 0.001);
+        assertEquals(1001.515, pos.getOrdinate(2), 0.001);
     }
 }
