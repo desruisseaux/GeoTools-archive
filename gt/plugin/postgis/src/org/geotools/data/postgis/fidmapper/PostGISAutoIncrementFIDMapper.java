@@ -31,7 +31,7 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
 	public String createID(Connection conn, Feature feature, Statement statement) throws IOException {
 		if( can_usepg_get_serial_sequence ){
 			try{
-				statement.execute("SELECT currval(pg_get_serial_sequence("+tableName+","+colName+"))");
+				statement.execute("SELECT currval(pg_get_serial_sequence(\'"+tableName+"\',\'"+colName+"\'))");
 		   		ResultSet resultSet = statement.getResultSet();
 	    		if( resultSet.next() )
 	    			return resultSet.getString(this.colName);

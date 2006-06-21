@@ -16,12 +16,15 @@
  */
 package org.geotools.data.postgis.fidmapper;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
+import org.geotools.feature.FeatureType;
 
 /**
  * Postgis specific FIDMapperFactory that uses the {@link org.geotools.data.postgis.fidmapper.OIDFidMapper OIDFidMapper}
@@ -40,14 +43,19 @@ public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
 
     protected FIDMapper buildLastResortFidMapper(String schema,
         String tableName, Connection connection, ColumnInfo[] colInfos) {
+
+        int major = dbConnection.getMetaData().getDatabaseMajorVersion();
+        if( major>7 )
+            throw new IllegalArgumentException("Tables for postgis 8+ must have a primary key defined");
         return new OIDFidMapper();
     }
     
     protected FIDMapper buildSingleColumnFidMapper(String schema, String tableName, Connection connection, ColumnInfo ci) {
-    	if (ci.isAutoIncrement()) 
+        if (ci.isAutoIncrement())
             return new PostGISAutoIncrementFIDMapper(tableName, ci.getColName(), ci.getDataType());
-    	return super.buildSingleColumnFidMapper(schema, tableName, connection, ci);
+        return super.buildSingleColumnFidMapper(schema, tableName, connection, ci);
     }
+    
     /**
      *  see@DefaultFIDMapperFactory in main module (jdbc)
      *   This version pre-double quotes the column name and table name and passes it to the superclass's version.
