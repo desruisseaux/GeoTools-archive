@@ -44,9 +44,15 @@ public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
     protected FIDMapper buildLastResortFidMapper(String schema,
         String tableName, Connection connection, ColumnInfo[] colInfos) {
 
-        int major = dbConnection.getMetaData().getDatabaseMajorVersion();
+	int major;
+	try {
+		major = connection.getMetaData().getDatabaseMajorVersion();
+	} catch (SQLException e) {
+		major=7;
+	}
         if( major>7 )
             throw new IllegalArgumentException("Tables for postgis 8+ must have a primary key defined");
+
         return new OIDFidMapper();
     }
     
