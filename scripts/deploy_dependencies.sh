@@ -1,4 +1,10 @@
 #!/bin/bash
+# deploy_dependencies.sh: a quick hack to deploy those nasty dependencies
+# to your repository.  
+# Note: for WebDAV use, please see:
+# http://docs.codehaus.org/display/MAVENUSER/Deploying+3rd+Party+Jars+With+WebDAV
+# until maven-2.0.5 is released.
+
 REPO_URL='http://lists.refractions.net/m2'
 REPO_REMOTE='dav:http://lists.refractions.net/m2'
 REPO_ID='refractions'
@@ -118,5 +124,17 @@ deploy_file org/picocontainer picocontainer 1.2
 #deploy_file hsqldb hsqldb 1.8.0.1
 deploy_file xerces xerces 2.4.0
 #deploy_file org/openplans spatialdb 0.1
+
+#others
+echo
+echo "DEPLOYING DEPENDENCIES FOR OTHER PROJECTS"
+echo
+deploy_file com/vividsolutions jts 1.6
+#deploy_file postgresql postgresql 74.213
+#deploy_file mysql mysql-connector-java 3.0.9
+deploy_file org/hibernate hibernate 3.2.0.cr1
+deploy_file org/hibernate hibernate-annotations 3.1beta9
+deploy_file org/hibernate ejb3-persistence 1.0
+#deploy_file velocity velocity 1.3
 
 cd "$START_DIR"
