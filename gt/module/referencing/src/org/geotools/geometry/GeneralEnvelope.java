@@ -801,11 +801,17 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
-     * Compares to the specified envelope for equality with the specified tolerance value.
-     * The tolerance value {@code eps} should be a small positive number. Its value is CRS
-     * dependent. For example {@code eps} should be smaller for geographic CRS than for UTM
-     * projections, because the former typically has a range of -180 to 180° while the later
-     * can have a range of thousands of meters.
+     * Compares to the specified envelope for equality up to the specified relative tolerance value.
+     * The tolerance value {@code eps} is relative to the {@linkplain #getLength envelope length}
+     * along each dimension. More specifically, the actual tolerance value for a given dimension
+     * <var>i</var> is {@code eps}&times;{@code length} where {@code length} is the maximum of
+     * {@linkplain #getLength this envelope length} and the specified envelope length along
+     * dimension <var>i</var>.
+     * <p>
+     * Relative tolerance value (as opposed to absolute tolerance value) help to workaround the
+     * fact that tolerance value are CRS dependent. For example the tolerance value need to be
+     * smaller for geographic CRS than for UTM projections, because the former typically has a
+     * range of -180 to 180° while the later can have a range of thousands of meters.
      * <p>
      * This method assumes that the specified envelope uses the same CRS than this envelope.
      * For performance reason, it will no be verified unless J2SE assertions are enabled.
@@ -822,9 +828,11 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         }
         assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
         for (int i=0; i<dimension; i++) {
+            double epsilon = Math.max(getLength(i), envelope.getLength(i));
+            epsilon = (epsilon>0 && epsilon<Double.POSITIVE_INFINITY) ? epsilon*eps : eps;
             // Comparaison below uses '!' in order to catch NaN values.
-            if (!(Math.abs(getMinimum(i) - envelope.getMinimum(i)) <= eps &&
-                  Math.abs(getMaximum(i) - envelope.getMaximum(i)) <= eps))
+            if (!(Math.abs(getMinimum(i) - envelope.getMinimum(i)) <= epsilon &&
+                  Math.abs(getMaximum(i) - envelope.getMaximum(i)) <= epsilon))
             {
                 return false;
             }
