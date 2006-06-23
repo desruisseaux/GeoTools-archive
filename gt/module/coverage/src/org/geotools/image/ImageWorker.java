@@ -47,13 +47,12 @@ import org.geotools.resources.image.ImageUtilities;
  * be applied by invoking the methods defined in this class, and the final image can
  * be obtained by invoking {@link #getRenderedImage} at the end of the process.
  * 
- * 
- * @author Martin Desruisseaux
- * @author Simone Giannecchini
- * @author Bryce Nordgren
- * @version $Id$
  * @since 2.3
  * @source $URL$
+ * @version $Id$
+ * @author Simone Giannecchini
+ * @author Bryce Nordgren
+ * @author Martin Desruisseaux
  */
 public class ImageWorker {
     /**
