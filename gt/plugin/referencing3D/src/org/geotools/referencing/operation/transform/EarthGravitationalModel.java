@@ -95,7 +95,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
     /** The first Eccentricity Squared (e²) for WGS 84 ellipsoid. */
     private final double esq;
 
-    /** (todo) */
+    /** Even zonal coefficient. */
     private final double c2;
 
     /** WGS 84 Earth's Gravitational Constant w/ atmosphere. */
@@ -139,15 +139,28 @@ public final class EarthGravitationalModel extends VerticalTransform {
         this.nmax  = nmax;
         this.wgs84 = wgs84;
         if (wgs84) {
-            // WGS84 model values
+            /*
+             * WGS84 model values.
+             * NOTE: The Fortran program gives 3.9860015e+14 for 'rkm' constant. This value has been
+             * modified in later programs. From http://cddis.gsfc.nasa.gov/926/egm96/doc/S11.HTML :
+             *
+             *     "We next need to consider the determination of GM, GM0, W0, U0. The value of GM0
+             *      will be that adopted for the updated GM of the WGS84 ellipsoid. This value is
+             *      3.986004418e+14 m³/s², which is identical to that given in the IERS Numerical
+             *      Standards [McCarthy, 1996, Table 4.1]. The best estimate of GM can be taken as
+             *      the same value based on the recommendations of the IAG Special Commission SC3,
+             *      Fundamental Constants [Bursa, 1995b, p. 381]."
+             */
             semiMajor = 6378137.0;
             esq       = 0.00669437999013;
             c2        = 108262.9989050e-8;
-            rkm       = 3.986004418e+14;    // TODO: Fortran program gives 3.9860015e+14
+            rkm       = 3.986004418e+14;
             grava     = 9.7803267714;
             star      = 0.001931851386;
         } else {
-            // WGS72 model values
+            /*
+             * WGS72 model values.
+             */
             semiMajor = 6378135.0;
             esq       = 0.006694317778;
             c2        = 108263.0e-8;
@@ -338,7 +351,6 @@ public final class EarthGravitationalModel extends VerticalTransform {
         }
         return ((s11[0] + s12[0]) * f1 + (previousSht * SQRT_03 * y * f2)) * rkm /
                (semiMajor * (gravn - (height * 0.3086e-5)));
-        // TODO: where the 0.3086e-5 constant come from? I didn't found it in the Fortran code.
     }
 
     /**

@@ -44,14 +44,26 @@ import org.geotools.geometry.GeneralDirectPosition;
  */
 public class EarthGravitationalModelTest extends TestCase {
     /**
-     * Tests the {@link EarthGravitationalModel#heightOffset} method.
+     * Tests the {@link EarthGravitationalModel#heightOffset} method for WGS 84.
      */
-    public void testHeightOffset() throws Exception {
+    public void testHeightOffsetWGS84() throws Exception {
         final EarthGravitationalModel gh = new EarthGravitationalModel();
         gh.load("EGM180.nor");
         assertEquals( 1.505, gh.heightOffset(45, 45,    0), 0.001);
         assertEquals( 1.515, gh.heightOffset(45, 45, 1000), 0.001);
         assertEquals(46.908, gh.heightOffset( 0, 45,    0), 0.001);
+    }
+
+    /**
+     * Tests the {@link EarthGravitationalModel#heightOffset} method for WGS 72.
+     */
+    public void testHeightOffsetWGS72() throws Exception {
+        final EarthGravitationalModel gh = new EarthGravitationalModel(180, false);
+        gh.load("EGM180.nor");
+        assertEquals( 1.475, gh.heightOffset(45, 45,    0), 0.001);
+        assertEquals(46.879, gh.heightOffset( 0, 45,    0), 0.001);
+        assertEquals(23.324, gh.heightOffset( 3, 10,   10), 0.001);
+        assertEquals( 0.380, gh.heightOffset(75,-30,    0), 0.001);
     }
 
     /**
