@@ -1,6 +1,6 @@
 /*
  * Geotools - OpenSource mapping toolkit
- * (C) 2002, Centre for Computational Geography
+ * (C) 2006, Geotools Project Managment Committee (PMC)
  * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
@@ -17,33 +17,36 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.resources.image;
+package org.geotools.image;
 
 // J2SE dependencies
 import java.awt.image.RasterFormatException;
 
 // JAI dependencies
-import javax.media.jai.OpImage;
 import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.WritableRectIter;
 
 
 /**
- * A {@link WritableRectIter} that take source from {@link RectIter} and write to an other
- * {@link WritableRectIter}. This class is useful for implementing {@link OpImage#computeRect}
- * methods.
+ * A {@linkplain WritableRectIter writable iterator} that read pixel values from an image, and
+ * write pixel values to a different image. All {@code get} methods read values from the
+ * <cite>source</cite> image specified at {@linkplain #create creation time}. All {@code set}
+ * methods write values to the <cite>destination</cite> image specified at {@linkplain #create
+ * creation time}, which may or may not be the same than the <cite>source</cite> image. This is
+ * different than the usual {@link WritableRectIter} contract, which read and write values in the
+ * same image. This {@code TransfertRectIter} is convenient for the implementation of some image
+ * operations.
  *
- * @since 2.0
+ * @since 2.3
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo This implementation is referenced in a public API.
- *       Consider moving it somewhere else.
  */
-public final class DualRectIter implements WritableRectIter {
+public final class TransfertRectIter implements WritableRectIter {
     /**
      * The string for error message.
+     *
+     * @todo Localize.
      */
     private static final String ERROR = "Size mismatch";
 
@@ -58,29 +61,29 @@ public final class DualRectIter implements WritableRectIter {
     private final WritableRectIter dst;
 
     /**
-     * Construct a TransferRectIter object.
+     * Constructs a {@code TransfertRectIter} object.
      */
-    private DualRectIter(final RectIter src, final WritableRectIter dst) {
+    private TransfertRectIter(final RectIter src, final WritableRectIter dst) {
         this.src = src;
         this.dst = dst;
     }
 
     /**
-     * Create a {@link WritableRectIter} for the specified source and destination iterator.
+     * Creates a {@link WritableRectIter} for the specified source and destination iterator.
      * The two iterators must iterate over a rectangle of the same size, otherwise a
      * {@link RasterFormatException} may be thrown during the iteration.
      *
      * @param  src The source iterator.
      * @param  dst The destination iterator.
      * @return An iterator that read sample from {@code src} and write sample
-     *         to {@code dst}. If {@code src==dst}, then the destination
+     *         to {@code dst}. If {@code src == dst}, then the destination
      *         iterator itself is returned.
      */
     public static WritableRectIter create(final RectIter src, final WritableRectIter dst) {
         if (src == dst) {
             return dst;
         }
-        return new DualRectIter(src, dst);
+        return new TransfertRectIter(src, dst);
     }
 
     /**
@@ -149,11 +152,11 @@ public final class DualRectIter implements WritableRectIter {
 
     /**
      * Sets the iterator to the next line in the image,
-     * and returns true if the bottom row of the bounding rectangle has been passed.
+     * and returns {@code true} if the bottom row of the bounding rectangle has been passed.
      */
     public boolean nextLineDone() {
-        boolean check=src.nextLineDone();
-        if (check ==  dst.nextLineDone()) {
+        boolean check = src.nextLineDone();
+        if (check == dst.nextLineDone()) {
             return check;
         }
         throw new RasterFormatException(ERROR);
@@ -163,8 +166,8 @@ public final class DualRectIter implements WritableRectIter {
      * Sets the iterator to the next pixel in the image (that is, move rightward).
      */
     public boolean nextPixelDone() {
-        boolean check=src.nextPixelDone();
-        if (check ==  dst.nextPixelDone()) {
+        boolean check = src.nextPixelDone();
+        if (check == dst.nextPixelDone()) {
             return check;
         }
         throw new RasterFormatException(ERROR);
@@ -172,11 +175,11 @@ public final class DualRectIter implements WritableRectIter {
 
     /**
      * Sets the iterator to the next band in the image,
-     * and returns true if the max band has been exceeded.
+     * and returns {@code true} if the max band has been exceeded.
      */
     public boolean nextBandDone() {
-        boolean check=src.nextBandDone();
-        if (check ==  dst.nextBandDone()) {
+        boolean check = src.nextBandDone();
+        if (check == dst.nextBandDone()) {
             return check;
         }
         throw new RasterFormatException(ERROR);
@@ -184,33 +187,33 @@ public final class DualRectIter implements WritableRectIter {
 
 
     /**
-     * Returns true if the bottom row of the bounding rectangle has been passed.
+     * Returns {@code true} if the bottom row of the bounding rectangle has been passed.
      */
     public boolean finishedLines() {
-        boolean check=src.finishedLines();
-        if (check ==  dst.finishedLines()) {
+        boolean check = src.finishedLines();
+        if (check == dst.finishedLines()) {
             return check;
         }
         throw new RasterFormatException(ERROR);
     }
 
     /**
-     * Returns true if the right edge of the bounding rectangle has been passed.
+     * Returns {@code true} if the right edge of the bounding rectangle has been passed.
      */
     public boolean finishedPixels() {
-        boolean check=src.finishedPixels();
-        if (check ==  dst.finishedPixels()) {
+        boolean check = src.finishedPixels();
+        if (check == dst.finishedPixels()) {
             return check;
         }
         throw new RasterFormatException(ERROR);
     }
 
     /**
-     * Returns true if the max band in the image has been exceeded.
+     * Returns {@code true} if the max band in the image has been exceeded.
      */
     public boolean finishedBands() {
-        boolean check=src.finishedBands();
-        if (check ==  dst.finishedBands()) {
+        boolean check = src.finishedBands();
+        if (check == dst.finishedBands()) {
             return check;
         }
         throw new RasterFormatException(ERROR);

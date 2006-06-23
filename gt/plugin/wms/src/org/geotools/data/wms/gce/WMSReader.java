@@ -254,19 +254,20 @@ public class WMSReader implements GridCoverageReader {
         if (image == null) {
             throw new IOException("Image cannot be read from:" + response);
         }
-
-        Envelope envelope = new GeneralEnvelope(new double[] { minx, miny},
-                new double[] { maxx, maxy});
         
         if (crs == null) {
         	crs = DefaultGeographicCRS.WGS84; 
         }
+
+        GeneralEnvelope envelope = new GeneralEnvelope(new double[] { minx, miny},
+                new double[] { maxx, maxy});
+        envelope.setCoordinateReferenceSystem(crs);
         
 
         hasNext = false;
 
         GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
-        GridCoverage coverage = factory.create("wmsMap", image, crs, envelope);
+        GridCoverage coverage = factory.create("wmsMap", image, envelope);
 
         return coverage;
 	}

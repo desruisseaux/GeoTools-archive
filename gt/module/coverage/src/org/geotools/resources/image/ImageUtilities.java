@@ -41,7 +41,6 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 
-
 /**
  * A set of static methods working on images. Some of those methods are useful, but not
  * really rigorous. This is why they do not appear in any "official" package, but instead
@@ -146,7 +145,7 @@ public final class ImageUtilities {
     }
 
     /**
-     * Suggest a set of {@link RenderingHints} for the specified image.
+     * Suggests a set of {@link RenderingHints} for the specified image.
      * The rendering hints may include the following parameters:
      *
      * <ul>
@@ -176,7 +175,7 @@ public final class ImageUtilities {
     }
 
     /**
-     * Suggest a tile size close to {@code tileSize} for the specified {@code imageSize}.
+     * Suggests a tile size close to {@code tileSize} for the specified {@code imageSize}.
      * If this method can't suggest a size, then it returns 0.
      */
     private static int toTileSize(final int imageSize, final int tileSize) {
@@ -319,32 +318,6 @@ public final class ImageUtilities {
     }
 
     /**
-     * Allows or disallow native acceleration for the specified JAI operation. By default, JAI uses
-     * hardware accelerated methods when available. For example, it make use of MMX instructions on
-     * Intel processors. Unfortunatly, some native method crash the Java Virtual Machine under some
-     * circonstances.  For example on JAI 1.1.2, the "Affine" operation on an image with float data
-     * type, bilinear interpolation and an {@link javax.media.jai.ImageLayout} rendering hint cause
-     * an exception in medialib native code.  Disabling the native acceleration (i.e using the pure
-     * Java version) is a convenient workaround until Sun fix the bug.
-     * <p>
-     * <strong>Implementation note:</strong> the current implementation assumes that factories for
-     * native implementations are declared in the {@code com.sun.media.jai.mlib} package, while
-     * factories for pure java implementations are declared in the {@code com.sun.media.jai.opimage}
-     * package. It work for Sun's 1.1.2 implementation, but may change in future versions. If this
-     * method doesn't recognize the package, it does nothing.
-     *
-     * @param operation The operation name (e.g. "Affine").
-     * @param allowed {@code false} to disallow native acceleration.
-     *
-     * @deprecated Moved to {@link org.geotools.image.jai.Registry#setNativeAccelerationAllowed}.
-     */
-    public static void allowNativeAcceleration(final String operation,
-                                               final boolean  allowed)
-    {
-        org.geotools.image.jai.Registry.setNativeAccelerationAllowed(operation, allowed);
-    }
-
-    /**
      * Allows or disallows native acceleration for the specified image format. By default, the
      * image I/O extension for JAI provides native acceleration for PNG and JPEG. Unfortunatly,
      * those native codec has bug in their 1.0 version. Invoking this method will force the use
@@ -358,7 +331,7 @@ public final class ImageUtilities {
      * @param writer {@code false} to set the reader, or {@code true} to set the writer.
      * @param allowed {@code false} to disallow native acceleration.
      */
-    public synchronized static void allowNativeCodec(final String  format,
+    public static synchronized void allowNativeCodec(final String  format,
                                                      final boolean writer,
                                                      final boolean allowed)
     {

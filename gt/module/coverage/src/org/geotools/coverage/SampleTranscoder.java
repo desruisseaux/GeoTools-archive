@@ -52,7 +52,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
-import org.geotools.resources.image.DualRectIter;
+import org.geotools.image.TransfertRectIter;
 
 
 /**
@@ -129,7 +129,7 @@ final class SampleTranscoder extends PointOpImage {
         if (true) {
             // TODO: Detect if source and destination rasters are the same. If they are
             //       the same, we should skip this block. Iteration will then be faster.
-            iterator = DualRectIter.create(RectIterFactory.create(source, destRect), iterator);
+            iterator = TransfertRectIter.create(RectIterFactory.create(source, destRect), iterator);
         }
         int band=0;
         if (!iterator.finishedBands()) do {

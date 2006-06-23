@@ -35,8 +35,6 @@ import javax.swing.JScrollPane;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.operation.Resampler2D;
-import org.geotools.coverage.processing.GridCoverageProcessor2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralDirectPosition;

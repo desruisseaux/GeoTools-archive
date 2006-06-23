@@ -273,7 +273,7 @@ public class ArcGridWriter implements GridCoverageWriter {
         GeneralGridRange newGridrange = new GeneralGridRange(new int[] { 0, 0 },
                 new int[] { Nx, Ny });
         GridGeometry2D newGridGeometry = new GridGeometry2D(newGridrange,
-                gc.getEnvelope(), new boolean[] { false, true });
+                gc.getEnvelope(), new boolean[] { false, true }, false);
 
         GridCoverage2D gcOp = (GridCoverage2D) Operations.DEFAULT.resample(gc,
                               gc.getCoordinateReferenceSystem(), newGridGeometry, null);

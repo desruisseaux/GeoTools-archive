@@ -116,6 +116,7 @@
       <pathelement path="plugin/mysql/src"/>
       <pathelement path="plugin/oraclespatial/src"/>
       <pathelement path="plugin/postgis/src"/>
+      <pathelement path="plugin/referencing3D/src"/>
       <pathelement path="plugin/shapefile/src"/>
       <pathelement path="plugin/tiger/src"/>
       <pathelement path="plugin/vpf/src"/>

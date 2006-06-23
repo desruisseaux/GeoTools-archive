@@ -233,10 +233,10 @@ public class ArcGridVisualizationTest extends TestCaseSupport {
 		RenderedImage destOverlayed=JAI.create("overlay", pb, null);
 
 		//creating a copy of the given grid coverage2D
+        gSEnvelope.setCoordinateReferenceSystem(gc.getCoordinateReferenceSystem());
 		GridCoverage2D subCoverage = (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null).create(
 				"s",
 				destOverlayed,
-				gc.getCoordinateReferenceSystem(),
 				gSEnvelope,
 				gc.getSampleDimensions(),
 				null,
@@ -293,8 +293,9 @@ public class ArcGridVisualizationTest extends TestCaseSupport {
 	    			bands[i]=new GridSampleDimension(new Category[] {values}, null).geophysics(true);
 	    		
 	    		//creating coverage
+                envelope.setCoordinateReferenceSystem(crs);
 	    		coverage = FactoryFinder.getGridCoverageFactory(null).create(
-                        coverageName, image, crs, envelope,bands,null,null);
+                        coverageName, image, envelope, bands, null, null);
 	    	} catch (NoSuchElementException e1) {
 	    		throw new IOException("Error when creating the coverage in world image"+e1.getMessage());
 	    	}

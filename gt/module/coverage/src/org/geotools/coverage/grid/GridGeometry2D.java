@@ -129,18 +129,6 @@ public class GridGeometry2D extends GeneralGridGeometry {
     }
 
     /**
-     * Constructs a new grid geometry from a math transform.
-     *
-     * @deprecated Replaced by <code>{@linkplain #GridGeometry2D(GridRange, MathTransform,
-     *             CoordinateReferenceSystem) GridGeometry2D}(gridRange, gridToCRS, null)</code>.
-     */
-    public GridGeometry2D(final GridRange gridRange, final MathTransform gridToCRS)
-            throws IllegalArgumentException
-    {
-        this(gridRange, gridToCRS, (CoordinateReferenceSystem) null);
-    }
-
-    /**
      * Constructs a new grid geometry from a math transform. The arguments are passed unchanged
      * to the {@linkplain GeneralGridGeometry#GeneralGridGeometry(GridRange, MathTransform,
      * CoordinateReferenceSystem) super-class constructor}. However, they must obey to one
@@ -218,21 +206,6 @@ public class GridGeometry2D extends GeneralGridGeometry {
             throws MismatchedDimensionException
     {
         this(gridRange, userRange, reverse(cs), swapXY(cs));
-    }
-
-    /**
-     * Constructs a new grid geometry from an envelope.
-     *
-     * @deprecated Replaced by {@code GridGeometry(gridRange, userRange, reverse, false)}.
-     *             Users just need to append the {@code false} argument value, so this constructor
-     *             will be removed in a future version in order to keep the API lighter.
-     */
-    public GridGeometry2D(final GridRange gridRange,
-                          final Envelope  userRange,
-                          final boolean[] reverse)
-            throws IllegalArgumentException, MismatchedDimensionException
-    {
-        this(gridRange, userRange, reverse, false);
     }
 
     /**

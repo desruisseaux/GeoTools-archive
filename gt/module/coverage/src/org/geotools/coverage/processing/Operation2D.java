@@ -78,25 +78,6 @@ public abstract class Operation2D extends AbstractOperation {
     }
 
     /**
-     * Returns the {@link GridCoverageProcessor2D} instance used for an operation.
-     * The instance is fetch from the rendering hints given to the {@link #doOperation} method.
-     *
-     * @param  hints The rendering hints, or {@code null} if none.
-     * @return The {@code GridCoverageProcessor2D} instance in use (never {@code null}).
-     *
-     * @deprecated Replaced by {@link #getProcessor}.
-     */
-    protected static GridCoverageProcessor2D getGridCoverageProcessor(final RenderingHints hints) {
-        if (hints != null) {
-            final Object value = hints.get(Hints.GRID_COVERAGE_PROCESSOR);
-            if (value instanceof GridCoverageProcessor2D) {
-                return (GridCoverageProcessor2D) value;
-            }
-        }
-        return GridCoverageProcessor2D.getDefault();
-    }
-
-    /**
      * Returns the factory to use for creating new {@link GridCoverage2D} objects.
      *
      * @since 2.2

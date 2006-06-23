@@ -48,6 +48,7 @@ import javax.media.jai.util.Range;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
@@ -1462,10 +1463,11 @@ public class StreamingRenderer implements GTRenderer {
             );
         }
 
-        grid = new GridCoverage2D(
+        final GridCoverageFactory factory =
+                org.geotools.coverage.FactoryFinder.getGridCoverageFactory(null);
+        grid = factory.create(
         		grid.getName(), 
 				grid.getRenderedImage(), 
-				grid.getCoordinateReferenceSystem(), 
 				grid.getEnvelope(), 
 				targetBands, 
 				new GridCoverage[] {grid}, 

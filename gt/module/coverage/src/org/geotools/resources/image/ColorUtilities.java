@@ -167,7 +167,8 @@ public final class ColorUtilities {
     {
         boolean hasAlpha = false;
         int  transparent = -1;
-        for (int i=0; i<ARGB.length; i++) {
+		final int length = ARGB.length;
+        for (int i=0; i<length; i++) {
             final int alpha = ARGB[i] & 0xFF000000;
             if (alpha != 0xFF000000) {
                 if (alpha==0x00000000 && transparent<0) {
@@ -178,12 +179,12 @@ public final class ColorUtilities {
                 break;
             }
         }
-        final int bits = getBitCount(ARGB.length);
-        final int type = getTransferType(ARGB.length);
+        final int bits = getBitCount(length);
+        final int type = getTransferType(length);
         if (numBands == 1) {
-            return new IndexColorModel(bits, ARGB.length, ARGB, 0, hasAlpha, transparent, type);
+            return new IndexColorModel(bits, length, ARGB, 0, hasAlpha, transparent, type);
         } else {
-            return new MultiBandsIndexColorModel(bits, ARGB.length, ARGB, 0, hasAlpha, transparent,
+            return new MultiBandsIndexColorModel(bits, length, ARGB, 0, hasAlpha, transparent,
                                                  type, numBands, visibleBand);
         }
     }

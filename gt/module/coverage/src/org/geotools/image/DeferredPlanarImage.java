@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.resources.image;
+package org.geotools.image;
 
 // J2SE dependencies
 import java.awt.Color;
@@ -57,35 +57,55 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.WeakValueHashMap;
 
 
 /**
- * Gère l'affichage en différé d'une image composée de tuiles. Lorsqu'une tuile
- * solicitée n'est pas disponible, une tuile comportant une valeur par défaut est 
- * retournée. Lorsque la tuile est enfin disponible, un évènement est déclenché
- * indiquant au composant qui désire afficher l'image que la tuile est maintenant
- * disponible.
+ * A tiled image to be used by renderer when the actual image may take a while to compute. This
+ * image wraps an arbitrary {@linkplain RenderedImage rendered image}, which may (or may not) be
+ * some image expensive to compute. When a tile is requested (through a call to {@link #getTile}
+ * but the tile is not available in the wrapped image, then this class returns some default
+ * (usually black) tile and start the real tile computation in a background thread. When the
+ * actual tile is available, this class fire a {@link TileObserver#tileUpdate tileUpdate} event,
+ * thus given a chance to a renderer to repaint again this image with the new tiles.
  * <p>
- * Le composant qui désire être informé des évènements sur les tuiles doit au préalable 
- * s'enregistrer auprès de la classe <CODE>DefferedPlanarImage</CODE> au travers de la
- * méthode {@link #addTileObserver}. Lorsque le composant est informé qu'une tuile est
- * prête, il lui suffit d'appeler une méthode <CODE>repaint(...)</CODE> pour mettre à
- * jour cette tuile.
+ * Simple example of use:
  *
- * @since 2.0
+ * <blockquote><pre>
+ * public class Renderer extends JPanel implements TileObserver {
+ *     private DeferredPlanarImage image;
+ *
+ *     public Renderer(RenderedImage toPaint) {
+ *         image = new DeferredPlanarImage(toPaint);
+ *         image.addTileObserver(this);
+ *     }
+ *
+ *     public void tileUpdate(WritableRenderedImage source,
+ *                            int tileX, int tileY, boolean willBeWritable)
+ *     {
+ *         repaint();
+ *     }
+ *
+ *     public void paint(Graphics gr) {
+ *         ((Graphics2D) gr).drawRenderedImage(image);
+ *     }
+ * }
+ * </pre></blockquote>
+ *
+ * @since 2.3
  * @source $URL$
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
 public final class DeferredPlanarImage extends PlanarImage
-                            implements WritableRenderedImage, TileObserver, TileComputationListener
+        implements WritableRenderedImage, TileObserver, TileComputationListener
 {
     /**
      * The logger for information messages.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.renderer.j2d");
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.image");
 
     /**
      * The thickness (in pixels) of the box to draw around deferred tiles, or 0 for disabling
@@ -95,7 +115,7 @@ public final class DeferredPlanarImage extends PlanarImage
     private static final int BOX_THICKNESS = 2;
 
     /**
-     * An entry in the {@lini #buffers} map. Contains a sample model and the sample value
+     * An entry in the {@link #buffers} map. Contains a sample model and the sample value
      * used for filling the empty {@link DataBuffer} (usually 0, unless the color model had
      * a transparent pixel different from 0).
      */
@@ -104,7 +124,7 @@ public final class DeferredPlanarImage extends PlanarImage
         /** The fill value.   */ public final int fill;
         /** The box value.    */ public final int box;
 
-        /** Construct a new entry. */
+        /** Constructs a new entry. */
         public Entry(final SampleModel model, final int fill, final int box) {
             this.model = model;
             this.fill  = fill;
@@ -116,7 +136,7 @@ public final class DeferredPlanarImage extends PlanarImage
             return model.hashCode();
         }
 
-        /** Compare this entry with the specified object. */
+        /** Compares this entry with the specified object. */
         public boolean equals(final Object object) {
             if (object instanceof Entry) {
                 final Entry that = (Entry) object;
@@ -182,7 +202,7 @@ public final class DeferredPlanarImage extends PlanarImage
     private transient Raster[] pendings;
    
     /**
-     * Construct a new instance of {@code DeferredPlanarImage}.
+     * Constructs a new instance of {@code DeferredPlanarImage}.
      *
      * @param source The source image.
      */
@@ -197,7 +217,7 @@ public final class DeferredPlanarImage extends PlanarImage
     }
 
     /**
-     * Wrap the specified image in a vector.
+     * Wraps the specified image in a vector.
      *
      * @todo Should be inlined in the constructor if only Sun was to fix RFE #4093999
      *       ("Relax constraint on placement of this()/super() call in constructors").
@@ -368,7 +388,7 @@ public final class DeferredPlanarImage extends PlanarImage
     }
 
     /**
-     * Set all values in the specified bank to the specified value.
+     * Sets all values in the specified bank to the specified value.
      *
      * @param buffer The databuffer in which to set all sample values.
      * @param bank   Index of the bank to set.
@@ -457,7 +477,7 @@ public final class DeferredPlanarImage extends PlanarImage
     }
 
     /**
-     * Invoked when a tile computation has been cancelled. The default implementation do nothing.
+     * Invoked when a tile computation has been cancelled. The default implementation does nothing.
      */
     public void tileCancelled(final Object     eventSource,
                               final TileRequest[] requests,
@@ -470,7 +490,7 @@ public final class DeferredPlanarImage extends PlanarImage
     /**
      * Invoked when a tile computation failed. Default implementation log a warning and lets the
      * program continue as usual. We are not throwing an exception since this failure will alter
-     * the visual rendering, but will not otherwise destabilize the system.
+     * the visual rendering, but will not otherwise harm the system.
      */
     public void tileComputationFailure(final Object     eventSource,
                                        final TileRequest[] requests,

@@ -167,22 +167,6 @@ public class GridCoverageFactory extends AbstractFactory {
     }
 
     /**
-     * @deprecated Replaced by the {@linkplain #create(CharSequence, ImageFunction, GridGeometry2D,
-     *             GridSampleDimension[], Map) variant without CRS}, since the CRS is now included
-     *             in the grid geometry.
-     */
-    public GridCoverage create(final CharSequence              name,
-                               final ImageFunction             function,
-                               final CoordinateReferenceSystem crs,
-                               final GridGeometry2D            gridGeometry,
-                               final GridSampleDimension[]     bands,
-                               final Map                       properties)
-    {
-        return create(name, function, new GridGeometry2D(gridGeometry.getGridRange(),
-                gridGeometry.getGridToCoordinateSystem(), crs), bands, properties);
-    }
-
-    /**
      * Constructs a grid coverage from an {@linkplain ImageFunction image function}.
      *
      * @param name         The grid coverage name.
@@ -288,25 +272,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final Envelope       envelope)
     {
         return create(name, raster, envelope, null, null, null, null, null);
-    }
-
-    /**
-     * @deprecated Replaced by the {@link #create(CharSequence, WritableRaster, Envelope,
-     *             double[], double[], Unit, Color[][], RenderingHints) variant without CRS},
-     *             since the CRS is now included in the envelope.
-     */
-    public GridCoverage create(final CharSequence              name,
-                               final WritableRaster            raster,
-                               final CoordinateReferenceSystem crs,
-                               final Envelope                  envelope,
-                               final double[]                  minValues,
-                               final double[]                  maxValues,
-                               final Unit                      units,
-                               final Color[][]                 colors,
-                               final RenderingHints            hints)
-    {
-        return create(name, raster, GridCoverage2D.toEnvelope(envelope, crs),
-                      minValues, maxValues, units, colors, hints);
     }
 
     /**
@@ -464,18 +429,6 @@ public class GridCoverageFactory extends AbstractFactory {
     }
 
     /**
-     * @deprecated Replaced by the {@link #create(CharSequence, RenderedImage, Envelope) variant
-     *             without CRS}, since the CRS is now included in the envelope.
-     */
-    public GridCoverage create(final CharSequence              name,
-                               final RenderedImage             image,
-                               final CoordinateReferenceSystem crs,
-                               final Envelope                  envelope)
-    {
-        return create(name, image, crs, envelope, null, null, null);
-    }
-
-    /**
      * Constructs a grid coverage from the specified {@linkplain RenderedImage image} and
      * {@linkplain Envelope envelope}. A default set of {@linkplain GridSampleDimension sample
      * dimensions} is used. The {@linkplain CoordinateReferenceSystem coordinate reference system}
@@ -496,23 +449,6 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final Envelope      envelope)
     {
         return create(name, image, envelope, null, null, null);
-    }
-
-    /**
-     * @deprecated Replaced by the {@link #create(CharSequence, RenderedImage, Envelope,
-     *             GridSampleDimension[], GridCoverage[], Map) variant without CRS}, since
-     *             the CRS is now included in the envelope.
-     */
-    public GridCoverage create(final CharSequence              name,
-                               final RenderedImage             image,
-                               final CoordinateReferenceSystem crs,
-                               final Envelope                  envelope,
-                               final GridSampleDimension[]     bands,
-                               final GridCoverage[]            sources,
-                               final Map                       properties)
-    {
-        return create(name, image, GridCoverage2D.toEnvelope(envelope, crs),
-                      bands, sources, properties);
     }
 
     /**

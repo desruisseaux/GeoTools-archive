@@ -166,20 +166,6 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
-     * Constructs a new grid geometry from a math transform.
-     *
-     * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if none.
-     * @param gridToCRS The math transform which allows for the transformations from grid
-     *        coordinates (pixel's <em>center</em>) to real world earth coordinates.
-     *
-     * @deprecated Replaced by <code>{@linkplain #GeneralGridGeometry(GridRange, MathTransform,
-     *             CoordinateReferenceSystem) GeneralGridGeometry}(gridRange, gridToCRS, null)</code>.
-     */
-    public GeneralGridGeometry(final GridRange gridRange, final MathTransform gridToCRS) {
-        this(gridRange, gridToCRS, (CoordinateReferenceSystem) null);
-    }
-
-    /**
      * Constructs a new grid geometry from a {@linkplain MathTransform math transform}. This is
      * the most general constructor, the one that gives the maximal control on the grid geometry
      * to be created.
@@ -290,20 +276,6 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             throws MismatchedDimensionException
     {
         this(gridRange, userRange, reverse(cs), swapXY(cs));
-    }
-
-    /**
-     * Constructs a new grid geometry from an envelope.
-     *
-     * @deprecated Replaced by {@code GeneralGridGeometry(gridRange, userRange, reverse, false)}.
-     *             Users just need to append the {@code false} argument value, so this constructor
-     *             will be removed in a future version in order to keep the API lighter.
-     */
-    public GeneralGridGeometry(final GridRange gridRange,
-                               final Envelope  userRange,
-                               final boolean[] reverse)
-    {
-        this(gridRange, userRange, reverse, false);
     }
 
     /**

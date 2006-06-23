@@ -34,13 +34,13 @@ import javax.media.jai.iterator.RectIter;
 /**
  * A {@link ComponentColorModel} modified for interoperability with Java Advanced Imaging.
  * JAI 1.1 was designed for use with J2SE 1.3 and is not aware of new features in J2SE 1.4.
- * This lead to the following problems:
+ * This leads to the following problems:
  *
  * <ul>
  *   <li>{@link ComponentColorModel} support {@code float} and {@code double}
  *       datatypes since J2SE 1.4 only. The workaround for J2SE 1.3 is to use the
  *       {@link FloatDoubleColorModel} provided with JAI 1.1.</li>
- *   <li>{@link FloatDoubleColorModel} ignore the new API in {@link ColorSpace}, especially
+ *   <li>{@link FloatDoubleColorModel} ignores the new API in {@link ColorSpace}, especially
  *       the {@code getMinValue} and {@code getMaxValue} methods. Consequently,
  *       rendering of any image using our custom {@code ScaledColorSpace} is wrong.</li>
  *   <li>{@link ComponentColorModel} uses {@link java.awt.image.DataBufferFloat} and {@link

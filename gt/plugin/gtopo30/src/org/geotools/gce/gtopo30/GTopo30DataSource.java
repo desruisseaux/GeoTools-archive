@@ -366,9 +366,9 @@ class GTopo30DataSource {
                 coverageName = coverageName.substring(0, extension);
             }
         }
-		
+		env.setCoordinateReferenceSystem(crs);
 		final GridCoverage2D gc = (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null).create(
-                coverageName, image, crs, env, new GridSampleDimension[] { band }, null, metadata);
+                coverageName, image, env, new GridSampleDimension[] { band }, null, metadata);
 		
 		/**
 		 * Freeing everything to be sure we do not leave any dead reference.

@@ -775,8 +775,10 @@ public class WorldImageReader implements GridCoverageReader {
                         null).geophysics(true);
 
             //creating coverage
+            final GeneralEnvelope ge = new GeneralEnvelope(readEnvelope);
+            ge.setCoordinateReferenceSystem(crs);
             coverage = FactoryFinder.getGridCoverageFactory(null).create(coverageName,
-                    image, crs, readEnvelope, bands, null, null);
+                    image, readEnvelope, bands, null, null);
         } catch (NoSuchElementException e1) {
             throw new IOException(
                 "Error when creating the coverage in world image"

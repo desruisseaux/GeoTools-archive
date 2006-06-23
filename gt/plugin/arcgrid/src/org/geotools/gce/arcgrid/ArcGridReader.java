@@ -431,8 +431,7 @@ public class ArcGridReader implements GridCoverageReader {
                     raster, false, null); //TODO properties????
 
             return FactoryFinder.getGridCoverageFactory(null).create("ArcGrid", //TODO SET THE NAME!!!
-                image, coordinateSystem, envelope,
-                new GridSampleDimension[] { band }, null, null); //TODO SET THE METADATA AS SOON AS POSSIBLE!!!!
+                image, envelope, new GridSampleDimension[] { band }, null, null); //TODO SET THE METADATA AS SOON AS POSSIBLE!!!!
 
   } catch (NoSuchElementException e) {
             // TODO Auto-generated catch block
