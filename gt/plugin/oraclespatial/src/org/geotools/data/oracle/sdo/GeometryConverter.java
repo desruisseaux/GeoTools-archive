@@ -127,7 +127,7 @@ public class GeometryConverter {
         NUMBER SDO_GTYPE = new NUMBER( gtype );
         
         int srid = SDO.SRID( geom );
-        NUMBER SDO_SRID = srid == SDO.SRID_NULL ? null :
+        NUMBER SDO_SRID = (srid == SDO.SRID_NULL || srid == 0) ? null :
                           new NUMBER( srid );
         
         double[] point = SDO.point( geom );
