@@ -119,6 +119,8 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
         try {
             ds = new DB2DataStore(pool, config, connFact.getDbURL());
         } catch (IOException e) {
+            LOGGER.info("Create DB2Datastore failed: "
+                    + e);
             return null;
         }
 

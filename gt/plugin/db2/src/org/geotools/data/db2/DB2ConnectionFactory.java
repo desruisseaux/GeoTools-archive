@@ -41,6 +41,8 @@ public class DB2ConnectionFactory {
     private String dbname = null;
     private String user = null;
     private String pw = null;
+    private String host = null;
+    private String portnum = null;
 
     /**
      * Creates a new DB2ConnectionFactory from a host name, port number, and
@@ -54,6 +56,8 @@ public class DB2ConnectionFactory {
         super();
         this.dbURL = DB2_URL_PREFIX + host + ":" + portnum + "/" + dbname;
         this.dbname = dbname;
+        this.portnum = portnum;
+        this.host = host;
     }
 
     /**
@@ -93,6 +97,9 @@ public class DB2ConnectionFactory {
         // Create a new pool data source if one doesn't already exist.
         if (poolDataSource == null) {
             poolDataSource = new DB2ConnectionPoolDataSource();
+            poolDataSource.setDriverType(4);
+            poolDataSource.setPortNumber(Integer.valueOf(portnum).intValue());
+            poolDataSource.setServerName(host);
             poolDataSource.setDatabaseName(this.dbname);
             poolDataSource.setUser(this.user);
             poolDataSource.setPassword(this.pw);

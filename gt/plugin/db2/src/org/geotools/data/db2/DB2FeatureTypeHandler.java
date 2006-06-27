@@ -22,7 +22,6 @@ import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-
 /**
  * Override methods from FeatureTypeHandler for DB2-specific handling.
  *
