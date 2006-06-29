@@ -152,6 +152,7 @@ public final class ErrorKeys {
     public static final int NO_DATA_SOURCE                         =   156;
     public static final int NO_IMAGE_INPUT                         =    97;
     public static final int NO_IMAGE_READER                        =    98;
+    public static final int NO_IMAGE_WRITER                        =   188;
     public static final int NO_SOURCE_AXIS_$1                      =    99;
     public static final int NO_SUCH_AUTHORITY_CODE_$2              =   100;
     public static final int NO_SUCH_AUTHORITY_CODE_$3              =   162;

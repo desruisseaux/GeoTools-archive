@@ -31,8 +31,6 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
@@ -40,6 +38,8 @@ import java.util.regex.Pattern;
 // Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -180,7 +180,7 @@ public class Arguments {
      * Returns an optional string value from the command line. This method should be called
      * exactly once for each parameter. Second invocation for the same parameter will returns
      * {@code null}, unless the same parameter appears many times on the command line.
-     * <br><br>
+     * <p>
      * Paramater may be instructions like "-encoding cp850" or "-encoding=cp850".
      * Both forms (with or without "=") are accepted. Spaces around the '=' character,
      * if any, are ignored.
@@ -450,11 +450,33 @@ public class Arguments {
     }
 
     /**
+     * Prints a summary of the specified exception, without stack trace. This method
+     * is invoked when a non-fatal (and somewhat expected) error occured, for example
+     * {@link java.io.FileNotFoundException} when the file were specified in argument.
+     *
+     * @param exception An exception with a message describing the user's error.
+     *
+     * @since 2.3
+     */
+    public void printSummary(final Exception exception) {
+        final String type = Utilities.getShortClassName(exception);
+        String message = exception.getLocalizedMessage();
+        if (message == null) {
+            message = Vocabulary.format(VocabularyKeys.NO_DETAILS_$1, type);
+        } else {
+            err.print(type);
+            err.print(": ");
+        }
+        err.println(message);
+        err.flush();
+    }
+
+    /**
      * Invoked when an the user has specified an illegal parameter. The default
      * implementation prints the localized error message to the standard output
      * {@link #out}, and then exit the virtual machine.  User may override this
      * method if they want a different behavior.
-     * <br><br>
+     * <p>
      * This method <em>is not</em> invoked when an anormal error occured (for
      * example an unexpected {@code NullPointerException} in some of developper's
      * module). If such an error occurs, the normal exception mechanism will be used.
@@ -462,21 +484,7 @@ public class Arguments {
      * @param exception An exception with a message describing the user's error.
      */
     protected void illegalArgument(final Exception exception) {
-        err.print(Utilities.getShortClassName(exception));
-        err.print(": ");
-        err.println(exception.getLocalizedMessage());
-        err.flush();
+        printSummary(exception);
         System.exit(1);
-        // We should not get there. But just in case,
-        // throw the exception...
-        if (exception instanceof RuntimeException) {
-            throw (RuntimeException) exception;
-        } else if (exception instanceof UnsupportedEncodingException) {
-            UnsupportedCharsetException e = new UnsupportedCharsetException(exception.getMessage());
-            e.initCause(exception);
-            throw e;
-        } else {
-            throw new UndeclaredThrowableException(exception);
-        }
     }
 }

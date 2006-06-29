@@ -35,6 +35,7 @@ import java.awt.GridBagLayout;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Dimension;
+import java.lang.reflect.Array;
 
 // Image and JAI
 import java.awt.Image;
@@ -608,12 +609,35 @@ public class ImageProperties extends JPanel {
                     if (value == Image.UndefinedProperty) {
                         value = resources.getString(VocabularyKeys.UNDEFINED);
                     }
-                    return value;
+                    return expandArray(value);
                 }
                 default: {
                     throw new IndexOutOfBoundsException(String.valueOf(column));
                 }
             }
+        }
+
+        /**
+         * If the specified object is an array, enumerate the array components.
+         * Otherwise, returns the object unchanged. This method is sligtly different
+         * than {@link java.util.Arrays#toString(Object[])} in that it expands inner
+         * array components recursively.
+         */
+        private static Object expandArray(final Object array) {
+            if (array!=null && array.getClass().isArray()) {
+                final StringBuffer buffer = new StringBuffer();
+                buffer.append('{');
+                final int length = Array.getLength(array);
+                for (int i=0; i<length; i++) {
+                    if (i != 0) {
+                        buffer.append(", ");
+                    }
+                    buffer.append(expandArray(Array.get(array, i)));
+                }
+                buffer.append('}');
+                return buffer.toString();
+            }
+            return array;
         }
 
         /**

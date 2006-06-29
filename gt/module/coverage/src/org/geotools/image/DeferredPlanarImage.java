@@ -628,7 +628,7 @@ public final class DeferredPlanarImage extends PlanarImage
 
     /**
      * Provides a hint that this image will no longer be accessed from a reference in user space.
-     * <strong>NOTE: this method dispose the image given to the constructor as well!</strong>.
+     * <strong>NOTE: this method dispose the image given to the constructor as well.</strong>
      * This is because {@code DeferredPlanarImage} is used as a "view" of an other
      * image, and the user shouldn't know that he is not using directly the other image.
      */

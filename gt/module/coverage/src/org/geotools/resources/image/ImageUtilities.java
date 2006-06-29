@@ -69,6 +69,15 @@ public final class ImageUtilities {
     private static final int MIN_TILE_SIZE = 128;
 
     /**
+     * Maximum tile width or height before to consider a tile as a stripe. It tile width or height
+     * are smaller or equals than this size, then the image will be retiled. That is done because
+     * there are many formats that use stripes as an alternative to tiles, an example is tiff. A
+     * stripe can be a performance black hole, users can have stripes as large as 20000 columns x 8
+     * rows. If we just want to see a chunk of 512x512, this is a lot of uneeded data to load.
+     */
+    private static final int STRIPE_SIZE = 64;
+
+    /**
      * List of valid names. Note: the "Optimal" type is not
      * implemented because currently not provided by JAI.
      */
@@ -117,7 +126,9 @@ public final class ImageUtilities {
             return null;
         }
         ImageLayout layout = initToImage ? new ImageLayout(image) : null;
-        if (image.getNumXTiles()==1 && image.getNumYTiles()==1) {
+        if ((image.getNumXTiles()==1 || image.getTileWidth () <= STRIPE_SIZE) &&
+            (image.getNumYTiles()==1 || image.getTileHeight() <= STRIPE_SIZE))
+        {
             // If the image was already tiled, reuse the same tile size.
             // Otherwise, compute default tile size.  If a default tile
             // size can't be computed, it will be left unset.

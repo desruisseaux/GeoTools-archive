@@ -104,6 +104,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  */
 public class ParameterEditor extends JPanel {
     /** Key for {@link String} node.    */  private static final String STRING  = "String";
+    /** Key for {@link Boolean} node.   */  private static final String BOOLEAN = "Boolean";
     /** Key for {@link Number} node.    */  private static final String NUMBER  = "Number";
     /** Key for {@link Angle} node.     */  private static final String ANGLE   = "Angle";
     /** Key for {@link Date} node.      */  private static final String DATE    = "Date";
@@ -372,6 +373,20 @@ public class ParameterEditor extends JPanel {
             return;
         }
         /*
+         * Boolean  ---  Uses a JTextField editor.
+         */
+        if (value instanceof Boolean) {
+            Singleton editor = (Singleton) getEditor(BOOLEAN);
+            if (editor == null) {
+                editor = new Singleton(null);
+                addEditor(BOOLEAN, editor, false);
+            }
+            editor.setValue(value);
+            this.editor = editor.field;
+            this.model  = editor;
+            return;
+        }
+        /*
          * Number  ---  Uses a JFormattedTextField editor.
          */
         if (value instanceof Number) {
@@ -537,7 +552,7 @@ public class ParameterEditor extends JPanel {
 
     /**
      * An editor panel for editing a single value. The value if usually an instance of
-     * {@link Number}, {@link Date}, {@link Angle} or {@link String}.
+     * {@link Number}, {@link Date}, {@link Angle}, {@link Boolean} or {@link String}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -684,7 +699,7 @@ public class ParameterEditor extends JPanel {
         private final boolean unsigned;
 
         /**
-         * Construct a model for the given table.
+         * Constructs a model for the given table.
          *
          * @param table    The table (usually an instance of {@code double[][]}).
          * @param offset   The offset parameter (a {@link LookupTableJAI} property).
