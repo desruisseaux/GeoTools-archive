@@ -190,7 +190,7 @@ public class WFSTransactionState implements State {
         os.flush();
         os.close();
 
-        InputStream is = hc.getInputStream();
+        InputStream is = this.ds.getInputStream(hc);
 
         hints = new HashMap();
 

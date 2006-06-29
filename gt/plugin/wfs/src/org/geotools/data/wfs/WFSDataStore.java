@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.zip.GZIPInputStream;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -51,10 +52,8 @@ import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.wfs.WFSFilterVisitor.WFSBBoxFilterVisitor;
-import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.FidFilter;
@@ -63,7 +62,7 @@ import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.expression.ExpressionType;
 import org.geotools.filter.expression.LiteralExpression;
-import org.geotools.geometry.JTS;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -107,6 +106,7 @@ public class WFSDataStore extends AbstractDataStore {
     
     private int bufferSize = 10;
     private int timeout = 10000;
+	private final boolean tryGZIP;
 
     /**
      * Construct <code>WFSDataStore</code>.
@@ -115,6 +115,7 @@ public class WFSDataStore extends AbstractDataStore {
      */
     private WFSDataStore() {
     	// not called
+    	tryGZIP=true;
     }
 
     /**
@@ -126,12 +127,13 @@ public class WFSDataStore extends AbstractDataStore {
      * @param password - iff username
      * @param timeout - default 3000 (ms)
      * @param buffer - default 10 (features)
+     * @param tryGZIP - indicates to use GZIP if server supports it.
      * 
      * @throws SAXException
      * @throws IOException
      */
     protected WFSDataStore(URL host, Boolean protocol, String username,
-        String password, int timeout, int buffer)
+        String password, int timeout, int buffer, boolean tryGZIP)
         throws SAXException, IOException {
         super(true);
 
@@ -151,7 +153,7 @@ public class WFSDataStore extends AbstractDataStore {
 
         this.timeout = timeout;
         this.bufferSize = buffer;
-        
+        this.tryGZIP=tryGZIP;
         findCapabilities(host);
     }
     
@@ -164,11 +166,11 @@ public class WFSDataStore extends AbstractDataStore {
         hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
         try{
             HttpURLConnection hc = getConnection(host,auth,false);
-            InputStream is = hc.getInputStream();
+            InputStream is = getInputStream(hc);
             t = DocumentFactory.getInstance(is, hints, WFSDataStoreFactory.logger.getLevel());
         }catch(Throwable e){
             HttpURLConnection hc = getConnection(createGetCapabilitiesRequest(host),auth,false);
-            InputStream is = hc.getInputStream();
+            InputStream is = getInputStream(hc);
             t = DocumentFactory.getInstance(is, hints, WFSDataStoreFactory.logger.getLevel());
         }
         if (t instanceof WFSCapabilities) {
@@ -242,6 +244,7 @@ public class WFSDataStore extends AbstractDataStore {
 
     private String[] typeNames = null;
     private Map featureTypeCache = new HashMap();
+
     /**
      * @see org.geotools.data.AbstractDataStore#getTypeNames()
      */
@@ -332,8 +335,6 @@ public class WFSDataStore extends AbstractDataStore {
         if(ftName!=null){
             try {
             	t = FeatureTypeBuilder.newFeatureType(t.getAttributeTypes(),ftName==null?typeName:ftName,t.getNamespace(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
-            } catch (FactoryConfigurationError e1) {
-                WFSDataStoreFactory.logger.warning(e1.getMessage());
             } catch (SchemaException e1) {
                 WFSDataStoreFactory.logger.warning(e1.getMessage());
             }
@@ -384,7 +385,7 @@ public class WFSDataStore extends AbstractDataStore {
         getUrl = new URL(url);
         HttpURLConnection hc = getConnection(getUrl,auth,false);
 
-        InputStream is = hc.getInputStream();
+        InputStream is = getInputStream(hc);
         Schema schema = SchemaFactory.getInstance(null, is);
         Element[] elements = schema.getElements();
         Element element = null;
@@ -446,7 +447,7 @@ public class WFSDataStore extends AbstractDataStore {
         osw.flush();
         osw.close();
         
-        InputStream is = new BufferedInputStream(hc.getInputStream());
+        InputStream is = getInputStream(hc);
         Schema schema = SchemaFactory.getInstance(null, is);
         Element[] elements = schema.getElements();
 
@@ -547,8 +548,7 @@ public class WFSDataStore extends AbstractDataStore {
         getUrl = new URL(url);
         HttpURLConnection hc = getConnection(getUrl,auth,false);
 
-        InputStream is = hc.getInputStream();
-
+        InputStream is = getInputStream(hc);
         WFSTransactionState ts = null;
 
         if (!(transaction == Transaction.AUTO_COMMIT)) {
@@ -565,6 +565,26 @@ public class WFSDataStore extends AbstractDataStore {
 
         return ft;
     }
+
+    /**
+     * If the field useGZIP is true Adds gzip to the connection accept-encoding property and creates a gzip inputstream 
+     * (if server supports it).  Otherwise returns a normal buffered input stream.  
+     * @param hc the connection to use to create the stream
+     * @return an input steam from the provided connection
+     */
+	InputStream getInputStream(HttpURLConnection hc) throws IOException {
+		if( tryGZIP ){
+		hc.addRequestProperty("Accept-Encoding", "gzip");
+        InputStream is = hc.getInputStream();
+        if (hc.getContentEncoding() != null && hc.getContentEncoding().indexOf("gzip") != -1) {
+            is = new GZIPInputStream(is);
+        } 
+        is=new BufferedInputStream(is);
+		return is;
+		}else{
+	        return new BufferedInputStream(hc.getInputStream());
+		}
+	}
 
     private String printFilter(Filter f) throws IOException, SAXException {
         // ogc filter
@@ -638,7 +658,7 @@ public class WFSDataStore extends AbstractDataStore {
 
         
         HttpURLConnection hc = getConnection(postUrl,auth,true);
-
+        
         OutputStream os = hc.getOutputStream();
 
         // write request
@@ -658,7 +678,8 @@ public class WFSDataStore extends AbstractDataStore {
         os.flush();
         os.close();
 
-        BufferedInputStream is = new BufferedInputStream(hc.getInputStream());
+        // JE: permit possibility for GZipped data.
+        InputStream is = getInputStream(hc);
         
         WFSTransactionState ts = null;
 
@@ -720,7 +741,7 @@ public class WFSDataStore extends AbstractDataStore {
             try {
                 dataCRS = CRS.decode(fsd.getSRS());
                 MathTransform toDataCRS = CRS.transform( DefaultGeographicCRS.WGS84, dataCRS );
-                maxbbox = JTS.transform( fsd.getLatLongBoundingBox(), toDataCRS, 10 );                
+                maxbbox = JTS.transform( fsd.getLatLongBoundingBox(), null, toDataCRS, 10 );                
             } catch (FactoryException e) {
                 WFSDataStoreFactory.logger.warning(e.getMessage());maxbbox = null;
             } catch (MismatchedDimensionException e) {

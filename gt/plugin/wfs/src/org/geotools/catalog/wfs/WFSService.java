@@ -219,7 +219,8 @@ public class WFSService extends AbstractService {
 
             int timeout = 3000;
             int buffer = 10;
-
+            boolean tryGZIP=true;
+            
             if (params.containsKey(TIMEOUT.key)) {
                 Integer i = (Integer) TIMEOUT.lookUp(params);
 
@@ -234,6 +235,12 @@ public class WFSService extends AbstractService {
                 if (i != null) {
                     buffer = i.intValue();
                 }
+            }
+
+            if (params.containsKey(TRY_GZIP.key)) {
+                Boolean b = (Boolean) TRY_GZIP.lookUp(params);
+                if(b!=null)
+                    tryGZIP = b.booleanValue();
             }
 
             if (params.containsKey(USERNAME.key)) {
@@ -253,7 +260,7 @@ public class WFSService extends AbstractService {
 
             try {
                 ds = new MyWFSDataStore(host, protocol, user, pass, timeout,
-                        buffer);
+                        buffer, tryGZIP);
                 cache.put(params, ds);
             } catch (SAXException e) {
                 throw new RuntimeException(e);
@@ -265,9 +272,9 @@ public class WFSService extends AbstractService {
 
     static class MyWFSDataStore extends WFSDataStore {
         MyWFSDataStore(URL host, Boolean protocol, String username,
-            String password, int timeout, int buffer)
+            String password, int timeout, int buffer, boolean tryGZIP)
             throws SAXException, IOException {
-            super(host, protocol, username, password, timeout, buffer);
+            super(host, protocol, username, password, timeout, buffer, tryGZIP);
         }
 
         public WFSCapabilities getCapabilities() {

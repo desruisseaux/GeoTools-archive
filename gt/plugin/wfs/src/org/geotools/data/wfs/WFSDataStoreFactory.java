@@ -89,6 +89,14 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             Integer.class,
             "This allows the user to specify a buffer size in features. This param has a default value of 10 features.",
             false);
+    // use gzip -- optional
+    /**
+     * Boolean
+     */
+    public static final Param TRY_GZIP = new Param("WFSDataStoreFactory:TRY_GZIP",
+            Boolean.class,
+            "Indicates that datastore should use gzip to transfer data if the server supports it.  Default is true",
+            false);
     
     protected Map cache = new HashMap();
     protected static final Logger logger = logger();
@@ -137,6 +145,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
         int timeout = 3000;
         int buffer = 10;
+        boolean tryGZIP=true;
 
         if (params.containsKey(TIMEOUT.key)) {
             Integer i = (Integer) TIMEOUT.lookUp(params);
@@ -148,6 +157,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             Integer i = (Integer) BUFFER_SIZE.lookUp(params);
             if(i!=null)
                 buffer = i.intValue();
+        }
+
+        if (params.containsKey(TRY_GZIP.key)) {
+            Boolean b = (Boolean) TRY_GZIP.lookUp(params);
+            if(b!=null)
+                tryGZIP = b.booleanValue();
         }
 
         if (params.containsKey(USERNAME.key)) {
@@ -164,10 +179,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
                 "Cannot define only one of USERNAME or PASSWORD, muct define both or neither");
         }
 
+        
+        
         DataStore ds = null;
 
         try {
-            ds = new WFSDataStore(host, protocol, user, pass, timeout, buffer);
+            ds = new WFSDataStore(host, protocol, user, pass, timeout, buffer, tryGZIP);
             cache.put(params, ds);
         } catch (SAXException e) {
             logger.warning(e.toString());

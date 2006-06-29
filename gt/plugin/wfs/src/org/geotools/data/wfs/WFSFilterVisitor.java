@@ -33,12 +33,19 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
+ * Determines what queries can be processed server side and which can be processed client side.
+ * 
  * @author dzwiers
  * @source $URL$
  */
 public class WFSFilterVisitor implements FilterVisitor {
 	    private Stack postStack = new Stack();
 	    private Stack preStack = new Stack();
+	    /** 
+	     * Operates similar to postStack.  When a update is determined to affect an attribute expression the update
+	     * filter is pushed on to the stack, then ored with the filter that contains the expression.
+	     */
+	    private Stack changedStack=new Stack();
 	    private FilterCapabilitiesMask fcs = null;
 	    private FeatureType parent = null;
 	    private WFSTransactionState state = null;
@@ -55,15 +62,28 @@ public class WFSFilterVisitor implements FilterVisitor {
 		
 	    Filter getFilterPost() {
 	        if (postStack.isEmpty()) {
-	            return Filter.NONE;
+		        if( changedStack.isEmpty() )
+		        	return Filter.NONE;
+		        
+		        // preStack contains the original filter so return it to ensure that correct features are filtered
+		        return (Filter) preStack.peek();
 	        }
 	
 	        if (postStack.size() > 1) {
-	            WFSDataStoreFactory.logger.warning("Too many stack items after run: "
+	            WFSDataStoreFactory.logger.warning("Too many post stack items after run: "
 	                + postStack.size());
 	        }
-	
-	        Filter f = postStack.isEmpty() ? Filter.NONE : (Filter) postStack.pop();
+	        
+	        if (!postStack.isEmpty() && !changedStack.isEmpty() ){
+	            WFSDataStoreFactory.logger.warning("Shouldn't be items on both changedStack and poststack: ");	        	
+	        }
+	        if (changedStack.size() > 1) {
+	            WFSDataStoreFactory.logger.warning("Too many changed stack items after run: "
+	                + changedStack.size());
+	        }
+	        
+	        // JE:  Changed to peek because get implies that the value can be retrieved multiple times
+	        Filter f = postStack.isEmpty() ? Filter.NONE : (Filter) postStack.peek();
 	        return f;
 	    }
 		
@@ -73,12 +93,22 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        }
 	
 	        if (preStack.size() > 1) {
-	            WFSDataStoreFactory.logger.warning("Too many stack items after run: "
+	            WFSDataStoreFactory.logger.warning("Too many pre stack items after run: "
 	                + preStack.size());
 	        }
+
+	        if (changedStack.size() > 1) {
+	            WFSDataStoreFactory.logger.warning("Too many changed stack items after run: "
+	                + changedStack.size());
+	        }
 	
-	        Filter f = preStack.isEmpty() ? Filter.NONE : (Filter) preStack.pop();
-			return f;
+	        // JE:  Changed to peek because get implies that the value can be retrieved multiple times
+	        Filter f = preStack.isEmpty() ? Filter.NONE : (Filter) preStack.peek();
+	        if( changedStack.isEmpty())
+	        	return f;
+	        
+	        Filter updateFilter=(Filter) changedStack.peek();
+	        return f.or(updateFilter);
 	    }
 	
 	    /**
@@ -233,29 +263,9 @@ public class WFSFilterVisitor implements FilterVisitor {
 	            return;
 	        }
 	
-	        int i = postStack.size();
 	        filter.getLeftValue().accept(this);
-	
-	        if (i < postStack.size()) {
-	        	postStack.pop();
-	            postStack.push(filter);
-	
-	            return;
-	        }
-	
 	        filter.getRightValue().accept(this);
-
-	        if (i < postStack.size()) {
-	        	postStack.pop();
-	        	preStack.pop();
-	            postStack.push(filter);
 	
-	            return;
-	        }
-            
-        	preStack.pop(); // left side
-        	preStack.pop(); // right side
-        	
 	        preStack.push(filter);
 	    }
 	
@@ -358,7 +368,10 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	                return;
 	            }
-	
+	            
+	            // JE: this was missing intentional?  I'm adding it since it make the test work as expected
+	            // see WFSFilterVisitorGeometryTest#testVisitGeometryFilterEquals()
+	            break;
 	        case FilterType.GEOMETRY_INTERSECTS:
 	
 	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.INTERSECT) != FilterCapabilitiesMask.INTERSECT) {
@@ -588,7 +601,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.expression.AttributeExpression)
 	     */
 	    public void visit(AttributeExpression expression) {
-	        if (!parent.hasAttributeType(expression.getAttributePath())) {
+	    	// JE: removed deprecated code
+	        if ( parent.getAttributeType(expression.getAttributePath())==null ) {
 	        	postStack.push(expression);
 	        }
 	        if(state!=null){
@@ -600,7 +614,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        	if(a.getType() == Action.UPDATE){
 	        		UpdateAction ua = (UpdateAction)a;
 	        		if(ua.getProperty(expression.getAttributePath())!=null){
-	        			postStack.push(expression);
+	        			changedStack.push(a.getFilter());
+	        			preStack.push(a.getFilter());
 	        			return;
 	        		}
 	        	}

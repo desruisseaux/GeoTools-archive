@@ -24,10 +24,11 @@ package org.geotools.data.wfs;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.geotools.feature.Feature;
+import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
 
@@ -142,6 +143,25 @@ public interface Action {
         public String getTypeName() {
             return typeName;
         }
+
+		public void update(Feature feature) {
+			if( !filter.contains(feature) )
+				throw new IllegalArgumentException(feature+"is not affected by this update, only call update on features that" +
+						"the Action applies to!");
+            String[] propNames = getPropertyNames();
+
+            for (int j = 0; j < propNames.length;
+                    j++) {
+                try {
+                    feature.setAttribute(propNames[j],
+                        getProperty(propNames[j]));
+                } catch (IllegalAttributeException e) {
+                    NoSuchElementException ee = new NoSuchElementException(e.getMessage());
+                    ee.initCause(e);
+                    throw ee;
+                }
+            }
+		}
     }
 
     /**

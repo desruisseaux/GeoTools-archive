@@ -186,18 +186,7 @@ public class WFSFeatureReader extends FCBuffer {
                                     && a.getFilter().contains(next)) {
                                 // update the feature
                                 UpdateAction ua = (UpdateAction) a;
-                                String[] propNames = ua.getPropertyNames();
-
-                                for (int j = 0; j < propNames.length; j++) {
-                                    try {
-                                        next.setAttribute(propNames[j],
-                                            ua.getProperty(propNames[j]));
-                                    } catch (IllegalAttributeException e) {
-                                        NoSuchElementException ee = new NoSuchElementException(e.getMessage());
-                                        ee.initCause(e);
-                                        throw ee;
-                                    }
-                                }
+                                ua.update(next);
                             }
                         }
                     }
@@ -230,19 +219,7 @@ public class WFSFeatureReader extends FCBuffer {
                                         && a.getFilter().contains(next)) {
                                     // update the feature
                                     UpdateAction ua = (UpdateAction) a;
-                                    String[] propNames = ua.getPropertyNames();
-
-                                    for (int j = 0; j < propNames.length;
-                                            j++) {
-                                        try {
-                                            next.setAttribute(propNames[j],
-                                                ua.getProperty(propNames[j]));
-                                        } catch (IllegalAttributeException e) {
-                                            NoSuchElementException ee = new NoSuchElementException(e.getMessage());
-                                            ee.initCause(e);
-                                            throw ee;
-                                        }
-                                    }
+                                    ua.update(next);
                                 }
                             }
 
