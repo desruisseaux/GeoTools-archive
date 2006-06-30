@@ -153,7 +153,7 @@ public class WFSTransactionState implements State {
             return null;
         }
 
-        HttpURLConnection hc = WFSDataStore.getConnection(postUrl,ds.auth,true);
+        HttpURLConnection hc = ds.getConnection(postUrl,ds.auth,true);
 //System.out.println("connection to commit");
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,

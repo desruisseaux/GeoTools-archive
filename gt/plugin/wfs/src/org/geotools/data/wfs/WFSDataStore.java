@@ -182,7 +182,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
     }
 
-    protected static HttpURLConnection getConnection(URL url, Authenticator auth, boolean isPost) throws IOException{
+    protected HttpURLConnection getConnection(URL url, Authenticator auth, boolean isPost ) throws IOException{
 
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
         if(isPost){
@@ -204,6 +204,10 @@ public class WFSDataStore extends AbstractDataStore {
                     connection.connect();
                     Authenticator.setDefault(null);
             }
+        }
+        
+        if (this.tryGZIP ){
+    		connection.addRequestProperty("Accept-Encoding", "gzip");	
         }
         return connection;
     }
@@ -574,13 +578,12 @@ public class WFSDataStore extends AbstractDataStore {
      */
 	InputStream getInputStream(HttpURLConnection hc) throws IOException {
 		if( tryGZIP ){
-		hc.addRequestProperty("Accept-Encoding", "gzip");
-        InputStream is = hc.getInputStream();
-        if (hc.getContentEncoding() != null && hc.getContentEncoding().indexOf("gzip") != -1) {
-            is = new GZIPInputStream(is);
-        } 
-        is=new BufferedInputStream(is);
-		return is;
+	        InputStream is = hc.getInputStream();
+	        if (hc.getContentEncoding() != null && hc.getContentEncoding().indexOf("gzip") != -1) {
+	            is = new GZIPInputStream(is);
+	        } 
+	        is=new BufferedInputStream(is);
+			return is;
 		}else{
 	        return new BufferedInputStream(hc.getInputStream());
 		}
