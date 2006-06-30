@@ -17,22 +17,20 @@
 package org.geotools.data.wms;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
 
-import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
-import org.geotools.data.ows.AbstractGetCapabilitiesResponse;
-import org.geotools.data.ows.AbstractResponse;
+import org.geotools.data.ows.AbstractOpenWebService;
 import org.geotools.data.ows.CRSEnvelope;
+import org.geotools.data.ows.Capabilities;
 import org.geotools.data.ows.GetCapabilitiesRequest;
+import org.geotools.data.ows.GetCapabilitiesResponse;
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.Request;
+import org.geotools.data.ows.Specification;
 import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.data.ows.WMSRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
@@ -45,7 +43,6 @@ import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.data.wms.response.GetStylesResponse;
 import org.geotools.data.wms.response.PutStylesResponse;
-import org.geotools.data.wms.response.WMSGetCapabilitiesResponse;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
@@ -56,7 +53,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.xml.sax.SAXException;
+
 
 /**
  * WebMapServer is a class representing a WMS. It is used to access the 
@@ -85,13 +82,7 @@ import org.xml.sax.SAXException;
  * @author Richard Gould, Refractions Research
  * @source $URL$
  */
-public class WebMapServer {
-    private final URL serverURL;
-    private WMSCapabilities capabilities;
-
-    /** Contains the specifications that are to be used with this WMS */
-    protected Specification[] specs;
-    private Specification specification;
+public class WebMapServer extends AbstractOpenWebService {
 
     /**
      * Creates a new WebMapServer instance and attempts to retrieve the 
@@ -100,17 +91,9 @@ public class WebMapServer {
      * @param serverURL a URL that points to the capabilities document of a server
      * @throws IOException if there is an error communicating with the server
      * @throws ServiceException if the server responds with an error
-     * @throws SAXException if there is an error while parsing the capabilities, such as bad XML
      */
-    public WebMapServer( final URL serverURL ) throws IOException, ServiceException, SAXException {
-        this.serverURL = serverURL;
-
-        setupSpecifications();
-        
-        capabilities = negotiateVersion();
-        if (capabilities == null) {
-        	throw new ServiceException("Unable to parse capabilities.");
-        }
+    public WebMapServer( final URL serverURL ) throws IOException, ServiceException {
+    	super(serverURL);
     }
 
     /**
@@ -124,204 +107,35 @@ public class WebMapServer {
         specs[2] = new WMS1_1_1();
         specs[3] = new WMS1_3_0();
     }
-
-    /**
-     * <p>
-     * Version number negotiation occurs as follows (credit OGC):
-     * <ul>
-     * <li><b>1) </b> If the server implements the requested version number, the server shall send that version.</li>
-     * <li><b>2a) </b> If a version unknown to the server is requested, the server shall send the highest version less
-     * than the requested version.</li>
-     * <li><b>2b) </b> If the client request is for a version lower than any of those known to the server, then the
-     * server shall send the lowest version it knows.</li>
-     * <li><b>3a) </b> If the client does not understand the new version number sent by the server, it may either cease
-     * communicating with the server or send a new request with a new version number that the client does understand but
-     * which is less than that sent by the server (if the server had responded with a lower version).</li>
-     * <li><b>3b) </b> If the server had responded with a higher version (because the request was for a version lower
-     * than any known to the server), and the client does not understand the proposed higher version, then the client
-     * may send a new request with a version number higher than that sent by the server.</li>
-     * </ul>
-     * </p>
-     * <p>
-     * The OGC tells us to repeat this process (or give up). This means we are 
-     * actually going to come up with a bit of setup cost in figuring out our 
-     * GetCapabilities request. This means that it is possible that we may make
-     * multiple requests before being satisfied with a response. 
-     * 
-     * Also, if we are unable to parse a given version for some reason, 
-     * for example, malformed XML, we will request a lower version until
-     * we have run out of versions to request with. Thus, a server that does
-     * not play nicely may take some time to parse and might not even 
-     * succeed.
-     * 
-     * @return a capabilities object that represents the Capabilities on the server
-     * @throws IOException if there is an error communicating with the server, or the XML cannot be parsed
-     * @throws ServiceException if the server returns a ServiceException
-     * @throws SAXException if there is an error while parsing the capabilities
-     */
-    private WMSCapabilities negotiateVersion() throws IOException, ServiceException, SAXException {
-        List versions = new ArrayList(specs.length);
-        Exception exception = null;
-
-        for( int i = 0; i < specs.length; i++ ) {
-            versions.add(i, specs[i].getVersion());
-        }
-
-        int minClient = 0;
-        int maxClient = specs.length - 1;
-
-        int test = maxClient;
-
-        while( (minClient <= test) && (test <= maxClient) ) {
-            Specification tempSpecification = specs[test];
-            String clientVersion = tempSpecification.getVersion();
-
-            AbstractGetCapabilitiesRequest request = tempSpecification.createGetCapabilitiesRequest(serverURL);
-
-            //Grab document
-            WMSCapabilities tempCapabilities;
-            try {
-                tempCapabilities = (WMSCapabilities) issueRequest(request).getCapabilities();
-            } catch (ServiceException e) {
-            	tempCapabilities = null;
-            	exception = e;
-            } catch (SAXException e) {
-                tempCapabilities = null;
-                exception = e;
-                e.printStackTrace();
-            }
-
-            int compare = -1;
-            String serverVersion = clientVersion; //Ignored if caps is null
-
-            if (tempCapabilities != null) {
-
-                serverVersion = tempCapabilities.getVersion();
-
-                compare = serverVersion.compareTo(clientVersion);
-            }
-
-            if (compare == 0) {
-                //we have an exact match and have capabilities as well!
-                this.specification = tempSpecification;
-
-                return tempCapabilities;
-            }
-
-            if (tempCapabilities != null && versions.contains(serverVersion)) {
-                // we can communicate with this server
-                int index = versions.indexOf(serverVersion);
-                this.specification = specs[index];
-
-                return tempCapabilities;
-
-            } else if (compare < 0) {
-                // server responded lower then we asked - and we don't understand.
-                maxClient = test - 1; // set current version as limit
-
-                // lets try and go one lower?
-                //	           
-                clientVersion = before(versions, serverVersion);
-
-                if (clientVersion == null) {
-                    if (exception != null) {
-                    	if (exception instanceof ServiceException) {
-                    		throw (ServiceException) exception;
-                    	} else if (exception instanceof SAXException) {
-                    		throw (SAXException) exception;
-                    	}
-                        IOException e = new IOException(exception.getMessage());
-                        throw e;
-                    }
-                    return null; // do not know any lower version numbers
-                }
-
-                test = versions.indexOf(clientVersion);
-            } else {
-                // server responsed higher than we asked - and we don't understand
-                minClient = test + 1; // set current version as lower limit
-
-                // lets try and go one higher
-                clientVersion = after(versions, serverVersion);
-
-                if (clientVersion == null) {
-                    if (exception != null) {
-                    	if (exception instanceof ServiceException) {
-                    		throw (ServiceException) exception;
-                    	}
-                        IOException e = new IOException(exception.getMessage());
-                        throw e;
-                    }
-                    return null; // do not know any lower version numbers
-                }
-
-                test = versions.indexOf(clientVersion);
-            }
-        }
-
-        // could not talk to this server
-        if (exception != null) {
-            IOException e = new IOException(exception.getMessage());
-            throw e;
-        }
-        return null;
+    
+    public GetCapabilitiesResponse issueRequest(GetCapabilitiesRequest request) throws IOException, ServiceException {
+    	return (GetCapabilitiesResponse) internalIssueRequest(request);
     }
-
-    /**
-     * Utility method returning the known version, just before the provided version
-     * 
-     * @param known List<String> of all known versions
-     * @param version the boundary condition
-     * @return the version just below the provided boundary version
-     */
-    String before( List known, String version ) {
-        if (known.isEmpty()) {
-            return null;
-        }
-
-        String before = null;
-
-        for( Iterator i = known.iterator(); i.hasNext(); ) {
-            String test = (String) i.next();
-
-            if (test.compareTo(version) < 0) {
-
-                if ((before == null) || (before.compareTo(test) < 0)) {
-                    before = test;
-                }
-            }
-        }
-
-        return before;
+    
+    public GetMapResponse issueRequest(GetMapRequest request) throws IOException, ServiceException {
+        return (GetMapResponse) internalIssueRequest(request);
     }
-
-    /**
-     * Utility method returning the known version, just after the provided version
-     * 
-     * @param known a List<String> of all known versions
-     * @param version the boundary condition
-     * @return a version just after the provided boundary condition
-     */
-    String after( List known, String version ) {
-        if (known.isEmpty()) {
-            return null;
-        }
-
-        String after = null;
-
-        for( Iterator i = known.iterator(); i.hasNext(); ) {
-            String test = (String) i.next();
-
-            if (test.compareTo(version) > 0) {
-                if ((after == null) || (after.compareTo(test) < 0)) {
-                    after = test;
-                }
-            }
-        }
-
-        return after;
+    
+    public GetFeatureInfoResponse issueRequest(GetFeatureInfoRequest request) throws IOException, ServiceException {
+        return (GetFeatureInfoResponse) internalIssueRequest(request);
     }
-
+    
+    public DescribeLayerResponse issueRequest(DescribeLayerRequest request) throws IOException, ServiceException {
+        return (DescribeLayerResponse) internalIssueRequest(request);
+    }
+    
+    public GetLegendGraphicResponse issueRequest(GetLegendGraphicRequest request) throws IOException, ServiceException {
+        return (GetLegendGraphicResponse) internalIssueRequest(request);
+    }
+    
+    public GetStylesResponse issueRequest(GetStylesRequest request) throws IOException, ServiceException {
+        return (GetStylesResponse) internalIssueRequest(request);
+    }
+    
+    public PutStylesResponse issueRequest(PutStylesRequest request) throws IOException, ServiceException {
+        return (PutStylesResponse) internalIssueRequest(request);
+    }
+    
     /**
      * Get the getCapabilities document. If there was an error parsing it
      * during creation, it will return null (and it should have thrown an
@@ -330,79 +144,21 @@ public class WebMapServer {
      * @return a WMSCapabilities object, representing the Capabilities of the server
      */
     public WMSCapabilities getCapabilities() {
-        return capabilities;
-    }
-
-    /**
-     * Issues a request to the server and returns that server's response. 
-     * 
-     * @param request the request to be issued
-     * @return a response from the server, of type GetMapResponse or GetFeatureInfoResponse
-     * @throws IOException
-     * @throws SAXException
-     */
-    private static AbstractResponse internalIssueRequest( Request request ) throws IOException, ServiceException, SAXException {
-        URL finalURL = request.getFinalURL();
-
-        URLConnection connection = finalURL.openConnection();
-        
-        connection.addRequestProperty("Accept-Encoding", "gzip");
-
-        InputStream inputStream = connection.getInputStream();
-        
-        if (connection.getContentEncoding() != null && connection.getContentEncoding().indexOf("gzip") != -1) { //$NON-NLS-1$
-            inputStream = new GZIPInputStream(inputStream);
-        }
-
-        String contentType = connection.getContentType();
-        
-        if (request instanceof GetCapabilitiesRequest) {
-        	return new WMSGetCapabilitiesResponse(contentType, inputStream);
-        } else if (request instanceof GetFeatureInfoRequest) {
-            return new GetFeatureInfoResponse(contentType, inputStream);
-        } else if (request instanceof GetMapRequest) {
-            return new GetMapResponse(contentType, inputStream);
-        } else if (request instanceof DescribeLayerRequest) {
-            return new DescribeLayerResponse(contentType, inputStream);
-        } else if (request instanceof GetLegendGraphicRequest) {
-            return new GetLegendGraphicResponse(contentType, inputStream);
-        } else if (request instanceof GetStylesRequest) {
-            return new GetStylesResponse(contentType, inputStream);
-        } else if (request instanceof PutStylesRequest) {
-            return new PutStylesResponse(contentType, inputStream);
-        } else {
-            throw new RuntimeException("Request is an invalid type. I do not know it.");
-        }
+        return (WMSCapabilities) capabilities;
     }
     
-    public AbstractGetCapabilitiesResponse issueRequest(GetCapabilitiesRequest request) throws IOException, ServiceException, SAXException {
-    	return (AbstractGetCapabilitiesResponse) internalIssueRequest(request);
+    private WMSSpecification getSpecification() {
+    	return (WMSSpecification) specification;
     }
     
-    public GetMapResponse issueRequest(GetMapRequest request) throws IOException, ServiceException, SAXException {
-        return (GetMapResponse) internalIssueRequest(request);
+    
+    private URL findURL(OperationType operation) {
+    	if (operation.getGet() != null) {
+    		return operation.getGet();
+    	}
+    	return serverURL;
     }
     
-    public GetFeatureInfoResponse issueRequest(GetFeatureInfoRequest request) throws IOException, ServiceException, SAXException {
-        return (GetFeatureInfoResponse) internalIssueRequest(request);
-    }
-    
-    public DescribeLayerResponse issueRequest(DescribeLayerRequest request) throws IOException, ServiceException, SAXException {
-        return (DescribeLayerResponse) internalIssueRequest(request);
-    }
-    
-    public GetLegendGraphicResponse issueRequest(GetLegendGraphicRequest request) throws IOException, ServiceException, SAXException {
-        return (GetLegendGraphicResponse) internalIssueRequest(request);
-    }
-    
-    public GetStylesResponse issueRequest(GetStylesRequest request) throws IOException, ServiceException, SAXException {
-        return (GetStylesResponse) internalIssueRequest(request);
-    }
-    
-    public PutStylesResponse issueRequest(PutStylesRequest request) throws IOException, ServiceException, SAXException {
-        return (PutStylesResponse) internalIssueRequest(request);
-    }
-
     /**
      * Creates a GetMapRequest that can be configured and then passed to 
      * issueRequest(). 
@@ -410,17 +166,12 @@ public class WebMapServer {
      * @return a configureable GetMapRequest object
      */
     public GetMapRequest createGetMapRequest() {
-        URL onlineResource = onlineResource = getCapabilities().getRequest().getGetMap().getGet();
-        if (onlineResource == null) { 
-            onlineResource = serverURL;
-        }
+        URL onlineResource = findURL(getCapabilities().getRequest().getGetMap());
 
-        GetMapRequest request = specification.createGetMapRequest(onlineResource);
-
-        return request;
+        return (GetMapRequest) getSpecification().createGetMapRequest(onlineResource);
     }
 
-    /**
+	/**
      * Creates a GetFeatureInfoRequest that can be configured and then passed to
      * issueRequest(). 
      * 
@@ -433,12 +184,9 @@ public class WebMapServer {
             throw new UnsupportedOperationException("This Web Map Server does not support GetFeatureInfo requests");
         }
 
-        URL onlineResource = getCapabilities().getRequest().getGetFeatureInfo().getGet();
-        if (onlineResource == null) {
-            onlineResource = serverURL;
-        }
+        URL onlineResource = findURL(getCapabilities().getRequest().getGetFeatureInfo());
         
-        GetFeatureInfoRequest request = specification.createGetFeatureInfoRequest(onlineResource,
+        GetFeatureInfoRequest request = getSpecification().createGetFeatureInfoRequest(onlineResource,
                 getMapRequest);
 
         return request;
@@ -454,7 +202,7 @@ public class WebMapServer {
             onlineResource = serverURL;
         }
         
-        DescribeLayerRequest request = specification.createDescribeLayerRequest(onlineResource);
+        DescribeLayerRequest request = getSpecification().createDescribeLayerRequest(onlineResource);
         
         return request;
     }
@@ -469,7 +217,7 @@ public class WebMapServer {
             onlineResource = serverURL;
         }
         
-        GetLegendGraphicRequest request = specification.createGetLegendGraphicRequest(onlineResource);
+        GetLegendGraphicRequest request = getSpecification().createGetLegendGraphicRequest(onlineResource);
         
         return request;        
     }
@@ -484,7 +232,7 @@ public class WebMapServer {
             onlineResource = serverURL;
         }
         
-        GetStylesRequest request = specification.createGetStylesRequest(onlineResource);
+        GetStylesRequest request = getSpecification().createGetStylesRequest(onlineResource);
        
         return request;
     }
@@ -499,7 +247,7 @@ public class WebMapServer {
             onlineResource = serverURL;
         }
         
-        PutStylesRequest request = specification.createPutStylesRequest(onlineResource);
+        PutStylesRequest request = getSpecification().createPutStylesRequest(onlineResource);
         return request;
     }
     

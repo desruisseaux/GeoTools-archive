@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.geotools.data.ows.AbstractResponse;
+import org.geotools.data.ows.Response;
 import org.geotools.data.ows.LayerDescription;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.ows.ServiceException;
@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  * @author Richard Gould
  * @source $URL$
  */
-public class DescribeLayerResponse extends AbstractResponse {
+public class DescribeLayerResponse extends Response {
 
     private LayerDescription[] layerDescs;
 

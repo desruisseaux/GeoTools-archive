@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.ows;
 
@@ -28,7 +27,7 @@ import java.util.StringTokenizer;
  * A class that provides functionality for performing basic requests
  *
  * @author Richard Gould
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/plugin/wms/src/org/geotools/data/wms/request/AbstractRequest.java $
+ * @source $URL$
  */
 public abstract class AbstractRequest implements Request{
     /** Represents OGC Exception MIME types */
@@ -150,7 +149,7 @@ public abstract class AbstractRequest implements Request{
     }
 
     /**
-     * Some WebMapServers do not abide by the fact that parameter keys should
+     * Some Open Web Servers do not abide by the fact that parameter keys should
      * be case insensitive. 
      * 
      * This method will allow a specification to determine the way that the
@@ -163,9 +162,6 @@ public abstract class AbstractRequest implements Request{
         return key;
     }
 
-    /**
-     * @see org.geotools.data.wms.request.Request#setProperty(java.lang.String, java.lang.String)
-     */
     public void setProperty(String name, String value) {
     	if (value == null) {
     		properties.remove(name);
@@ -175,7 +171,7 @@ public abstract class AbstractRequest implements Request{
     }
     
     /**
-     * @see org.geotools.data.wms.request.Request#getProperties()
+     * @return a copy of this request's properties
      */
     public Properties getProperties() {
         return (Properties) properties.clone();
@@ -184,7 +180,8 @@ public abstract class AbstractRequest implements Request{
     protected abstract void initRequest();
     
     /**
-     * Sets the SERVICE parameter
+     * Implementing subclass requests must specify their own "SERVICE" value.
+     * Example: setProperty("SERVICE", "WFS");
      */
     protected abstract void initService();
 

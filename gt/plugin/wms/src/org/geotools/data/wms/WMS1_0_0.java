@@ -16,6 +16,8 @@
  */
 package org.geotools.data.wms;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,40 +25,38 @@ import java.util.Map;
 
 import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
 import org.geotools.data.ows.AbstractRequest;
+import org.geotools.data.ows.Response;
+import org.geotools.data.ows.GetCapabilitiesRequest;
+import org.geotools.data.ows.Specification;
 import org.geotools.data.wms.request.AbstractGetFeatureInfoRequest;
 import org.geotools.data.wms.request.AbstractGetMapRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
+import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
+import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.request.GetStylesRequest;
 import org.geotools.data.wms.request.PutStylesRequest;
+import org.geotools.data.wms.response.DescribeLayerResponse;
+import org.geotools.data.wms.response.GetFeatureInfoResponse;
+import org.geotools.data.wms.response.GetLegendGraphicResponse;
+import org.geotools.data.wms.response.GetMapResponse;
+import org.geotools.data.wms.response.GetStylesResponse;
+import org.geotools.data.wms.response.PutStylesResponse;
+import org.geotools.data.wms.response.WMSGetCapabilitiesResponse;
+import org.geotools.ows.ServiceException;
 
 /**
- * Provides support for the Web Map Server 1.0 Specificaiton.
- * <p>
- * This class opperates as a Factory creating the following related objects.
- * <ul>
- * <li>WMS1_0_0.Parser - a WMSParser capable of parsing a Get Capabilities Document
- * <li>WMS1_0_0.Format - a WMSFormat describing required parameters
- * <li>WMS1_0_0.MapRequest - a MapRequest specific to WMS 1.0
- * </ul>
- * </p>
- * <p>
- * The idea is that this class opperates a Toolkit for all things assocated with Web Map Server 1.0.0 Specification. The
- * various objects produced by this toolkit are used as stratagy objects for the top level Web Map Server objects:
- * <ul>
- * <li>Web Map Server - uses WMS1_0_0.Parser to derive a Get Capabilities Document
- * <li>Web Map Server - uses WMS1_0_0 as a WMSFormat factory to generate the correct WMS_1_0_0.Format.
- * </ul>
- * </p>
+ * Provides support for the Web Map Server 1.0 Specification.
  * <p>
  * WMS1_0_0 provides both name and version information that may be checked against a GetCapabilities document during
  * version negotiation.
  * </p>
  * 
  * @author Jody Garnett, Refractions Research
+ * @author rgould
  * @source $URL$
  */
-public class WMS1_0_0 extends Specification {
+public class WMS1_0_0 extends WMSSpecification {
     static final Map formatMimeTypes = new HashMap();
     static final Map exceptionMimeTypes = new HashMap();
     
@@ -186,7 +186,7 @@ public class WMS1_0_0 extends Specification {
      * @param server a URL that points to the 1.0.0 server
      * @return a AbstractGetCapabilitiesRequest object that can provide a valid request
      */
-    public AbstractGetCapabilitiesRequest createGetCapabilitiesRequest( URL server ) {
+    public GetCapabilitiesRequest createGetCapabilitiesRequest( URL server ) {
         return new GetCapsRequest(server);
     }
     
@@ -230,6 +230,10 @@ public class WMS1_0_0 extends Specification {
         protected String processKey( String key ) {
             return WMS1_0_0.processKey(key);
         }
+        
+        public Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
+			return new WMSGetCapabilitiesResponse(contentType, inputStream);
+		}
     }
 
     /**
@@ -286,6 +290,10 @@ public class WMS1_0_0 extends Specification {
         protected String processKey( String key ) {
             return WMS1_0_0.processKey(key);
         }
+
+		public Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
+			return new GetMapResponse(contentType, inputStream);
+		}
     }
 
     /**
@@ -309,6 +317,10 @@ public class WMS1_0_0 extends Specification {
         protected String processKey( String key ) {
             return WMS1_0_0.processKey(key);
         }
+        
+        public Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
+			return new GetFeatureInfoResponse(contentType, inputStream);
+		}
     }
 
     /** 

@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,16 +12,21 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.ows;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
+import org.geotools.ows.ServiceException;
+
 /**
- * This represents a Request to be made against a Web Map Server.
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/plugin/wms/src/org/geotools/data/wms/request/Request.java $
+ * This represents a Request to be made against a Open Web Service.
+ * 
+ * @author rgould
+ * @source $URL$
  */
 public interface Request {
     
@@ -47,9 +52,11 @@ public interface Request {
      * 
      * Note that when using this method, it is up to the programmer to
      * provide their own encoding of <code>value</code> according to the
-     * WMS specifications! The code will not do this for you. Please ensure
-     * that you are familiar with this. See section 6.2.1 of the WMS 1.1.1 spec
-     * and 6.3.2 of the WMS 1.3.0 spec. 
+     * OWS specifications! The code will not do this for you. 
+     * 
+     * Different OWS specifications define different ways to do this. There are 
+     * notorious differences between WMS 1.1.1 (section 6.2.1) and 
+     * WMS 1.3.0 (section 6.3.2) for example.
      * 
      * If value is null, "name" is removed from the properties table.
      * 
@@ -59,7 +66,20 @@ public interface Request {
     public void setProperty(String name, String value);
     
     /**
-     * @return the request's current property map
+     * @return a copy of this request's properties
      */
     public Properties getProperties();
+    
+    /**
+     * Each Request must know how to create it's counterpart Response. 
+     * Given the content type and input stream (containin the response data), 
+     * this method must return an appropriate Response object.
+     * 
+     * @param contentType the MIME type of the data in the inputStream
+     * @param inputStream contains the data from the response
+     * @return
+     * @throws ServiceException
+     * @throws IOException
+     */
+    Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException;
 }

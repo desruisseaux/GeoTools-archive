@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,13 +12,12 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.wms;
 
 import java.net.URL;
 
-import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
+import org.geotools.data.ows.Specification;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
@@ -26,67 +25,7 @@ import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.request.GetStylesRequest;
 import org.geotools.data.wms.request.PutStylesRequest;
 
-
-/**
- * Provides support for the Web Map Server Specificaitons.
- * 
- * <p>
- * This class operates as a Factory creating the following related objects.
- * 
- * <ul>
- * <li>
- * AbstractGetCapabilitiesRequest
- * </li>
- * <li>
- * GetMapRequest
- * </li>
- * <li>
- * GetFeatureInfoRequest
- * </li>
- * </ul>
- * </p>
- * 
- * <p>
- * The idea is that this class operates a Toolkit for all things assocated with
- * a Web Map Server Specification. The various objects produced by this
- * toolkit are used as strategy objects for the top level WebMapServer object:
- * 
- * <ul>
- * <li>
- * WebMapServer - uses a AbstractGetCapabilitiesRequest during version negotiation.
- * </li>
- * </ul>
- * </p>
- * 
- * <p>
- * Both name and version information that may be checked against a
- * GetCapabilities document during version negotiation.
- * </p>
- * 
- * <p>
- * <b>Q:</b> Why are these not static?<br>
- * <b>A:</b> Because we want to place new specifications into a data structure
- * for WebMapServer to search through dynamically
- * </p>
- *
- * @author Jody Garnett, Refractions Reasearch
- * @source $URL$
- */
-public abstract class Specification {
-
-    /**
-     * Expected version attribute for root element.
-     * @return the version as a String
-     */
-    public abstract String getVersion();
-
-    /**
-     * Factory method to create WMSGetCapabilities Request
-     * @param server the URL that points to the server's getCapabilities document
-     * @return a configured AbstractGetCapabilitiesRequest that can be used to access the Document 
-     */
-    public abstract AbstractGetCapabilitiesRequest createGetCapabilitiesRequest(
-        URL server);
+public abstract class WMSSpecification extends Specification {
 
     /**
      * Creates a GetMapRequest for this specification, populating it with valid

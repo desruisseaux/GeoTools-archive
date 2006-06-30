@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.wms.response;
 
 import java.io.IOException;
@@ -6,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.geotools.data.ows.AbstractGetCapabilitiesResponse;
+import org.geotools.data.ows.GetCapabilitiesResponse;
 import org.geotools.data.ows.Capabilities;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.ows.ServiceException;
@@ -14,7 +29,13 @@ import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.handlers.DocumentHandler;
 import org.xml.sax.SAXException;
 
-public class WMSGetCapabilitiesResponse extends AbstractGetCapabilitiesResponse {
+/**
+ * Provides a hook up to parse the capabilties document from inputstream.
+ * 
+ * @author Richard Gould
+ *
+ */
+public class WMSGetCapabilitiesResponse extends GetCapabilitiesResponse {
 
 	public WMSGetCapabilitiesResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
 		super(contentType, inputStream);

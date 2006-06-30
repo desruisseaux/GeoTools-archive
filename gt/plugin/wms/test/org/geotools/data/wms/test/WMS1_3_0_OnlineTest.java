@@ -16,34 +16,22 @@
  */
 package org.geotools.data.wms.test;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
-
-import javax.imageio.ImageIO;
 
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
-import org.geotools.data.ows.LayerDescription;
+import org.geotools.data.ows.Specification;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_3_0;
-import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
-import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.response.DescribeLayerResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
-import org.geotools.data.wms.response.GetLegendGraphicResponse;
-import org.geotools.data.wms.response.GetMapResponse;
 import org.xml.sax.SAXException;
 
 /**

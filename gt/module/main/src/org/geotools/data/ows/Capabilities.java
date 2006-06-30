@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,16 +12,15 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.ows;
 
 import java.util.List;
 
 /**
- * Represents a base object for a WMS getCapabilities response.
+ * Represents a base object for a Capabilities document
  *
- * @author Richard Gould, Refractions Research
+ * @author rgould
  */
 public class Capabilities {
     private Service service;
@@ -47,7 +46,7 @@ public class Capabilities {
     }
 
     /**
-     * The Service contains metadata about the WMS.
+     * The Service contains metadata about the OWS.
      * 
      * @return Returns the service.
      */
@@ -77,6 +76,11 @@ public class Capabilities {
     public void setVersion(String version) {
         this.version = version;
     }
+    
+    /**
+     * Exceptions declare what kind of formats this server can return exceptions
+     * in. They are used during subsequent requests.
+     */
     public String[] getExceptions() {
         return exceptions;
     }

@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,30 +12,28 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.ows;
 
 import java.net.URL;
 
-
 /**
- * DOCUMENT ME!
+ * Each Open Web Service typically defines an operation that describes what 
+ * operations it supports and what data it holds. The document describing this
+ * information is usually called the Capabilities document, and is usually
+ * accessed using the GetCapabilities operation.
+ * 
+ * This class provides a basic building block for clients to implement their
+ * GetCapabilitiesRequest. It automatically sets the REQUEST parameter to
+ * "GetCapabilities".
  *
- * @author Richard Gould
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/plugin/wms/src/org/geotools/data/wms/request/AbstractGetCapabilitiesRequest.java $
+ * @author rgould
+ * @source $URL$
  */
 public abstract class AbstractGetCapabilitiesRequest extends AbstractRequest implements GetCapabilitiesRequest{
     /** Represents the SERVICE parameter */
     public static final String SERVICE = "SERVICE"; //$NON-NLS-1$
 
-    
-    /**
-     * Creates a AbstractGetCapabilitiesRequest and sets the REQUEST, VERSION and
-     * SERVICE parameters.
-     * 
-     * @param serverURL
-     */
     public AbstractGetCapabilitiesRequest(URL serverURL) {
         super(serverURL, null);
     }

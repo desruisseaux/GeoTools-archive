@@ -22,9 +22,10 @@ import org.opengis.metadata.citation.ResponsibleParty;
 
 
 /**
- * This is a data model for the OGC WMS Service metadata. Feel
- *         free to extend it to other OGC services. Name, Title and
- *         OnlineResource are Required. Everything else is optional.
+ * This is a data model for the Open Web Service (OWS) metadata. This should be 
+ * extended while implementing other OWSs. Name, Title and OnlineResource are 
+ * required. Everything else is optional.
+ * 
  * @source $URL$
  */
 public class Service {

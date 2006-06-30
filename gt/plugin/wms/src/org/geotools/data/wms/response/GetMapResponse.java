@@ -19,7 +19,7 @@ package org.geotools.data.wms.response;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.geotools.data.ows.AbstractResponse;
+import org.geotools.data.ows.Response;
 import org.geotools.ows.ServiceException;
 import org.xml.sax.SAXException;
 
@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  * @author Richard Gould, Refractions Research
  * @source $URL$
  */
-public class GetMapResponse extends AbstractResponse {
+public class GetMapResponse extends Response {
     public GetMapResponse(String contentType, InputStream response) throws ServiceException, IOException {
         super(contentType, response);
         

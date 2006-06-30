@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.ows;
 
 import java.io.IOException;
@@ -11,8 +26,26 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
+/**
+ * Utility class that will parse ServiceExceptions out of an inputStream.
+ * 
+ * @author rgould
+ *
+ */
 public class ServiceExceptionParser {
 
+	/**
+	 * Tries to read a ServiceExceptionReport from the input stream, and 
+	 * construct a chain of ServiceExceptions.
+	 * 
+	 * ServiceExceptions beyond the first can be accessed using 
+	 * ServiceException.next();
+	 * 
+	 * @param inputStream
+	 * @return
+	 * @throws JDOMException
+	 * @throws IOException
+	 */
 	public static ServiceException parse(InputStream inputStream) throws JDOMException, IOException {
 		SAXBuilder builder = new SAXBuilder();
 		Document document = builder.build(inputStream);

@@ -19,7 +19,7 @@ package org.geotools.data.wms.response;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.geotools.data.ows.AbstractResponse;
+import org.geotools.data.ows.Response;
 import org.geotools.ows.ServiceException;
 import org.xml.sax.SAXException;
 
@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  * @author Richard Gould
  * @source $URL$
  */
-public class GetLegendGraphicResponse extends AbstractResponse {
+public class GetLegendGraphicResponse extends Response {
 
     /**
      * @param contentType

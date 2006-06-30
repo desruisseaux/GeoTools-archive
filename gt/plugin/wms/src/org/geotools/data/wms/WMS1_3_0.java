@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.wms;
 
@@ -20,13 +19,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
+import org.geotools.data.ows.GetCapabilitiesRequest;
 
 /**
- * @author Richard Gould
+ * @author rgould
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  * @source $URL$
  */
 public class WMS1_3_0 extends WMS1_1_1 {
@@ -44,7 +41,7 @@ public class WMS1_3_0 extends WMS1_1_1 {
 	/* (non-Javadoc)
 	 * @see org.geotools.data.wms.Specification#createGetCapabilitiesRequest(java.net.URL)
 	 */
-	public AbstractGetCapabilitiesRequest createGetCapabilitiesRequest(URL server) {
+	public GetCapabilitiesRequest createGetCapabilitiesRequest(URL server) {
 		return new GetCapsRequest(server);
 	}
 	

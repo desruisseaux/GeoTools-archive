@@ -16,11 +16,16 @@
  */
 package org.geotools.data.wms.test;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
+import org.geotools.data.ows.Response;
+import org.geotools.data.wms.response.WMSGetCapabilitiesResponse;
+import org.geotools.ows.ServiceException;
 
 
 /**
@@ -78,6 +83,10 @@ public class GetCapabilitiesRequestTest extends ServerTestCase {
 
 		protected void initService() {
 			setProperty("SERVICE", "WMS");
+		}
+
+		public Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
+			return new WMSGetCapabilitiesResponse(contentType, inputStream);
 		}
     }
 }

@@ -27,12 +27,13 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
-import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
 import org.geotools.data.ows.CRSEnvelope;
+import org.geotools.data.ows.GetCapabilitiesRequest;
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.Specification;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_0_0;
+import org.geotools.data.wms.WMSSpecification;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.xml.WMSSchema;
@@ -49,7 +50,7 @@ import org.xml.sax.SAXException;
  */
 public class WMS1_0_0_OnlineTest extends ServerTestCase {
     protected URL server;
-    protected Specification spec;
+    protected WMSSpecification spec;
     
     public WMS1_0_0_OnlineTest() throws Exception {
         this.spec = new WMS1_0_0();
@@ -62,7 +63,7 @@ public class WMS1_0_0_OnlineTest extends ServerTestCase {
     }
     
     public void testCreateGetCapabilitiesRequest() throws Exception {
-        AbstractGetCapabilitiesRequest request = spec.createGetCapabilitiesRequest(server);
+        GetCapabilitiesRequest request = spec.createGetCapabilitiesRequest(server);
         
         Properties properties = new Properties();
         

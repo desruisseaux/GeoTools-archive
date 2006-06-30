@@ -32,10 +32,10 @@ import org.geotools.catalog.defaults.DefaultResolveChangeEvent;
 import org.geotools.catalog.defaults.DefaultResolveDelta;
 import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.ows.GetCapabilitiesRequest;
-import org.geotools.data.ows.AbstractGetCapabilitiesResponse;
+import org.geotools.data.ows.GetCapabilitiesResponse;
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.Specification;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_0_0;
 import org.geotools.data.wms.WMS1_1_0;
 import org.geotools.data.wms.WMS1_1_1;
@@ -335,18 +335,18 @@ public class WMSService extends AbstractService {
             }
         }
 
-        public AbstractGetCapabilitiesResponse issueRequest(GetCapabilitiesRequest arg0)
-            throws IOException, ServiceException, SAXException {
+        public GetCapabilitiesResponse issueRequest(GetCapabilitiesRequest arg0)
+            throws IOException, ServiceException {
             return super.issueRequest(arg0);
         }
 
         public GetFeatureInfoResponse issueRequest(GetFeatureInfoRequest arg0)
-            throws IOException, ServiceException, SAXException {
+            throws IOException, ServiceException {
             return super.issueRequest(arg0);
         }
 
         public GetMapResponse issueRequest(GetMapRequest arg0)
-            throws IOException, ServiceException, SAXException {
+            throws IOException, ServiceException {
             return super.issueRequest(arg0);
         }
 

@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,15 +12,17 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.wms;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
+import org.geotools.data.ows.GetCapabilitiesRequest;
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.Response;
 import org.geotools.data.wms.request.AbstractDescribeLayerRequest;
 import org.geotools.data.wms.request.AbstractGetLegendGraphicRequest;
 import org.geotools.data.wms.request.AbstractGetStylesRequest;
@@ -29,6 +31,11 @@ import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetStylesRequest;
 import org.geotools.data.wms.request.PutStylesRequest;
+import org.geotools.data.wms.response.DescribeLayerResponse;
+import org.geotools.data.wms.response.GetLegendGraphicResponse;
+import org.geotools.data.wms.response.GetStylesResponse;
+import org.geotools.data.wms.response.PutStylesResponse;
+import org.geotools.ows.ServiceException;
 
 /**
  * @author Richard Gould
@@ -55,7 +62,7 @@ public class WMS1_1_0 extends WMS1_0_0 {
 	/**
 	 * @see org.geotools.data.wms.Specification#createGetCapabilitiesRequest(java.net.URL)
 	 */
-	public AbstractGetCapabilitiesRequest createGetCapabilitiesRequest(URL server) {
+	public GetCapabilitiesRequest createGetCapabilitiesRequest(URL server) {
 		return new GetCapsRequest(server);
 	}
 	
@@ -181,6 +188,9 @@ public class WMS1_1_0 extends WMS1_0_0 {
         protected void initVersion() {
             setProperty(VERSION, "1.1.0");
         }
+        public Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
+			return new DescribeLayerResponse(contentType, inputStream);
+		}
 	}
 	
 	public static class InternalGetLegendGraphicRequest extends AbstractGetLegendGraphicRequest {
@@ -192,7 +202,10 @@ public class WMS1_1_0 extends WMS1_0_0 {
         protected void initVersion() {
             setProperty(VERSION, "1.0.0");
         }
-	    
+        
+        public Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
+			return new GetLegendGraphicResponse(contentType, inputStream);
+		}	    
 	}
 	
 	public static class InternalGetStylesRequest extends AbstractGetStylesRequest {
@@ -212,6 +225,9 @@ public class WMS1_1_0 extends WMS1_0_0 {
             setProperty(VERSION, "1.1.0");
         }
 	    
+        public Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
+			return new GetStylesResponse(contentType, inputStream);
+		}
 	}
 	
 	public static class InternalPutStylesRequest extends AbstractPutStylesRequest {
@@ -224,6 +240,9 @@ public class WMS1_1_0 extends WMS1_0_0 {
             setProperty(VERSION, "1.1.0");            
         }
 	    
+        public Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
+			return new PutStylesResponse(contentType, inputStream);
+		}
 	}
 
 }

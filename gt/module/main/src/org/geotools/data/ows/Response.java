@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.ows;
 
@@ -21,20 +20,20 @@ import java.io.InputStream;
 
 import org.geotools.ows.ServiceException;
 import org.jdom.JDOMException;
-import org.xml.sax.SAXException;
 
 
 /**
- * DOCUMENT ME!
+ * Provides a base class for Responses from an OWS. Checks the incoming content
+ * for a ServiceException and parses it if it encounters one.
  *
- * @author Richard Gould, Refractions Research
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/plugin/wms/src/org/geotools/data/wms/response/AbstractResponse.java $
+ * @author rgould
+ * @source $URL$
  */
-public abstract class AbstractResponse {
+public abstract class Response {
     protected InputStream inputStream;
     protected String contentType;
 
-    public AbstractResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
+    public Response(String contentType, InputStream inputStream) throws ServiceException, IOException {
         this.inputStream = inputStream;
         this.contentType = contentType;
         
