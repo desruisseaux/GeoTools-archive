@@ -22,9 +22,11 @@ package org.geotools.gui.swing.image;
 // J2SE dependencies
 import java.util.List;
 import java.util.Locale;
+import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
+import javax.swing.ImageIcon;
 import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 import javax.swing.BorderFactory;
@@ -32,6 +34,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import java.awt.image.renderable.ParameterBlock;
@@ -45,6 +48,7 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.RenderableOp;
@@ -54,12 +58,14 @@ import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.LookupTableJAI;
 import javax.media.jai.KernelJAI;
+import javax.media.jai.RegistryElementDescriptor;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.gui.swing.IconFactory;
 import org.geotools.gui.swing.ParameterEditor;
 import org.geotools.gui.swing.tree.TreeNode;
 import org.geotools.gui.swing.tree.NamedTreeNode;
@@ -160,6 +166,7 @@ public class OperationTreeBrowser extends JPanel {
         final Listeners listeners = new Listeners();
         final JTree tree = new JTree(model);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.setCellRenderer(new CellRenderer());
         tree.setBorder(BorderFactory.createEmptyBorder(6,6,0,0));
         tree.addTreeSelectionListener(listeners);
 
@@ -472,6 +479,65 @@ public class OperationTreeBrowser extends JPanel {
                 continue;
             }
             new OperationTreeBrowser(image).showFrame(file.getName());
+        }
+    }
+
+
+
+
+    /**
+     * The tree cell renderer, which select icons according the selected object type.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    private static final class CellRenderer extends DefaultTreeCellRenderer {
+        /** The icon for folder. */
+        private final Icon open, closed;
+
+        /** The icon for images, or {@code null} if none. */
+        private static Icon image;
+
+        /** The icon for parameters, or {@code null} if none. */
+        private static Icon parameter;
+
+        /**
+         * Creates a cell renderer.
+         */
+        private CellRenderer() {
+            open   = getDefaultOpenIcon();
+            closed = getDefaultClosedIcon();
+            if (image == null) {
+                final IconFactory icons = IconFactory.DEFAULT;
+                image     = icons.getIcon("toolbarButtonGraphics/general/Properties16.gif");
+                parameter = icons.getIcon("toolbarButtonGraphics/general/Preferences16.gif");
+            }
+        }
+
+        /**
+         * Configures the renderer based on the passed in components.
+         */
+        public Component getTreeCellRendererComponent(final JTree tree, final Object value,
+                                                      final boolean selelected,
+                                                      final boolean expanded,
+                                                      final boolean leaf, final int row,
+                                                      final boolean hasFocus)
+        {
+            if (((TreeNode) value).getUserObject() instanceof RenderedImage) {
+                if (image != null) {
+                    setOpenIcon  (image);
+                    setClosedIcon(image);
+                    setLeafIcon  (image);
+                } else {
+                    setLeafIcon(null);
+                }
+            } else if (parameter != null) {
+                setOpenIcon  (open);
+                setClosedIcon(closed);
+                setLeafIcon  (parameter);
+            }
+            return super.getTreeCellRendererComponent(tree, value, selected, expanded,
+                                                      leaf, row, hasFocus);
         }
     }
 }

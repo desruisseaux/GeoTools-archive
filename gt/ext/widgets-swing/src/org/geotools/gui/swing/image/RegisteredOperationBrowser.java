@@ -30,21 +30,15 @@ import java.util.ResourceBundle;
 import java.util.MissingResourceException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import java.net.URL;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.BorderLayout;
-import java.awt.image.renderable.ParameterBlock; // For javadoc
-import java.awt.image.renderable.RenderedImageFactory;
-import javax.swing.ImageIcon;
 import javax.swing.Icon;
 import javax.swing.Box;
 import javax.swing.JTree;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
-import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.BorderFactory;
 import javax.swing.tree.TreePath;
@@ -52,9 +46,9 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.text.JTextComponent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import java.awt.image.renderable.ParameterBlock; // For javadoc
 
 // JAI dependencies
 import javax.media.jai.JAI;
@@ -62,15 +56,14 @@ import javax.media.jai.OperationRegistry;
 import javax.media.jai.OperationDescriptor;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.RegistryElementDescriptor;
-import javax.media.jai.registry.RenderedRegistryMode;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
+import org.geotools.gui.swing.IconFactory;
 import org.geotools.gui.swing.tree.Trees;
 import org.geotools.gui.swing.tree.TreeNode;
 import org.geotools.gui.swing.tree.NamedTreeNode;
-import org.geotools.gui.swing.tree.MutableTreeNode;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -386,13 +379,10 @@ public class RegisteredOperationBrowser extends JPanel {
             open   = getDefaultOpenIcon();
             closed = getDefaultClosedIcon();
             if (operation == null) {
-                final ClassLoader loader = CellRenderer.class.getClassLoader();
-                URL url = loader.getResource("toolbarButtonGraphics/general/Information16.gif");
-                if (url!=null) operation = new ImageIcon(url);
-                url = loader.getResource("toolbarButtonGraphics/general/Preferences16.gif");
-                if (url!=null) parameter = new ImageIcon(url);
-                url = loader.getResource("toolbarButtonGraphics/general/About16.gif");
-                if (url!=null) implementation = new ImageIcon(url);
+                final IconFactory icons = IconFactory.DEFAULT;
+                operation      = icons.getIcon("toolbarButtonGraphics/general/Information16.gif");
+                parameter      = icons.getIcon("toolbarButtonGraphics/general/Preferences16.gif");
+                implementation = icons.getIcon("toolbarButtonGraphics/general/About16.gif");
             }
         }
 

@@ -24,7 +24,6 @@ import java.awt.Font;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JButton;
-import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
 import javax.swing.AbstractListModel;
 import java.awt.IllegalComponentStateException;
@@ -38,18 +37,11 @@ import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
-
-// Collections
-import java.util.Set;
 import java.util.List;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-
-// Miscellaneous
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -338,11 +330,10 @@ public class DisjointLists extends JPanel {
         /*
          * Setup buttons
          */
-        final ClassLoader loader = getClass().getClassLoader();
-        final JButton add       = getButton(loader, "StepForward", ">",  "Add selected elements");
-        final JButton remove    = getButton(loader, "StepBack",    "<",  "Remove selected elements");
-        final JButton addAll    = getButton(loader, "FastForward", ">>", "Add all");
-        final JButton removeAll = getButton(loader, "Rewind",      "<<", "Remove all");
+        final JButton add       = getButton("StepForward", ">",  "Add selected elements");
+        final JButton remove    = getButton("StepBack",    "<",  "Remove selected elements");
+        final JButton addAll    = getButton("FastForward", ">>", "Add all");
+        final JButton removeAll = getButton("Rewind",      "<<", "Remove all");
         add      .addActionListener(new Action(left, right, false));
         remove   .addActionListener(new Action(right, left, false));
         addAll   .addActionListener(new Action(left, right,  true));
@@ -374,18 +365,9 @@ public class DisjointLists extends JPanel {
      * @param description a brief description to use for tooltips.
      * @return The button.
      */
-    private static JButton getButton(final ClassLoader loader, final String image,
-                                     final String fallback, final String description)
-    {
-        final URL url = loader.getResource("toolbarButtonGraphics/media/"+image+"16.gif");
-        final JButton button;
-        if (url != null) {
-            button = new JButton(new ImageIcon(url, description));
-        } else {
-            button = new JButton(fallback);
-        }
-        button.setToolTipText(description);
-        return button;
+    private static JButton getButton(String image, final String fallback, final String description) {
+        image = "toolbarButtonGraphics/media/" + image + "16.gif";
+        return IconFactory.DEFAULT.getButton(image, description, fallback);
     }
 
     /**

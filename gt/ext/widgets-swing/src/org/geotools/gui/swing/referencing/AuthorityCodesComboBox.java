@@ -20,7 +20,6 @@
 package org.geotools.gui.swing.referencing;
 
 // J2SE dependencies
-import java.net.URL;
 import java.util.Locale;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -30,7 +29,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -53,6 +51,7 @@ import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
+import org.geotools.gui.swing.IconFactory;
 
 
 /**
@@ -169,15 +168,9 @@ public class AuthorityCodesComboBox extends JComponent {
          */
         JButton button;
         final Dimension size = new Dimension(24, 20);
-        final ClassLoader loader = getClass().getClassLoader();
+        final IconFactory icons = IconFactory.DEFAULT;
         String label = resources.getString(VocabularyKeys.INFORMATIONS);
-        URL url = loader.getResource("toolbarButtonGraphics/general/Information16.gif");
-        if (url != null) {
-            button = new JButton(new ImageIcon(url));
-            button.setToolTipText(label);
-        } else {
-            button = new JButton(label);
-        }
+        button = icons.getButton("toolbarButtonGraphics/general/Information16.gif", label, label);
         button.setFocusable(false);
         button.setPreferredSize(size);
         button.addActionListener(new ActionListener() {
@@ -191,13 +184,7 @@ public class AuthorityCodesComboBox extends JComponent {
          * Adds the "Search" button.
          */
         label = resources.getString(VocabularyKeys.SEARCH);
-        url = loader.getResource("toolbarButtonGraphics/general/Find16.gif");
-        if (url != null) {
-            button = new JButton(new ImageIcon(url));
-            button.setToolTipText(label);
-        } else {
-            button = new JButton(label);
-        }
+        button = icons.getButton("toolbarButtonGraphics/general/Find16.gif", label, label);
         button.setFocusable(false);
         button.setPreferredSize(size);
         button.addActionListener(new ActionListener() {

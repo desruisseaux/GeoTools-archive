@@ -326,8 +326,8 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * <p>
      * If this convenience constructor do not provides suffisient control on axis order or reversal,
      * then an affine transform shall be created explicitly and the grid geometry shall be created
-     * using the {@linkplain #GeneralGridGeometry(GridRange,MathTransform) constructor expecting
-     * a math transform} argument.
+     * using the {@linkplain #GeneralGridGeometry(GridRange,MathTransform,CoordinateReferenceSystem)
+     * constructor expecting a math transform} argument.
      *
      * @param gridRange The valid coordinate range of a grid coverage.
      * @param userRange The corresponding coordinate range in user coordinate. This envelope must
