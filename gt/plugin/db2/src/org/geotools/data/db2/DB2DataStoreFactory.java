@@ -40,7 +40,7 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.db2");
 
-    // The DB2 JDBC type 4 driver class.  isAvailable() uses this to
+    // The DB2 JDBC universal driver class.  isAvailable() uses this to
     // check whether the DB2 JDBC library is in the classpath
     private static final String DRIVER_CLASS = "com.ibm.db2.jcc.DB2Driver";
     private static boolean isAvailable = false;
@@ -71,6 +71,10 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
 
     /**
      * Constructs a DB2 data store using the params.
+     * 
+     * If the port number is zero we will try to use the JDBC type 2 driver
+     * and if the port number is non-zer, we will try to use the JDBC type 4
+     * driver
      *
      * @param params The full set of information needed to construct a live
      *        data source.  Should have  dbtype equal to DB2, as well as host,

@@ -47,6 +47,10 @@ public class DB2ConnectionFactory {
     /**
      * Creates a new DB2ConnectionFactory from a host name, port number, and
      * database name.
+
+     * If the port number is zero we will try to use the JDBC type 2 driver
+     * and if the port number is non-zer, we will try to use the JDBC type 4
+     * driver
      *
      * @param host the DB2 host name
      * @param portnum the TCP/IP port number for the DB2 client connection
@@ -97,8 +101,14 @@ public class DB2ConnectionFactory {
         // Create a new pool data source if one doesn't already exist.
         if (poolDataSource == null) {
             poolDataSource = new DB2ConnectionPoolDataSource();
-            poolDataSource.setDriverType(4);
-            poolDataSource.setPortNumber(Integer.valueOf(portnum).intValue());
+        	int portValue = Integer.valueOf(portnum).intValue();
+        	int driverType = 4;
+            poolDataSource = new DB2ConnectionPoolDataSource();
+            if (portValue == 0 ) {	// If there is no port number, use type 2 driver
+            	driverType = 2;
+            }
+            poolDataSource.setDriverType(driverType);
+            poolDataSource.setPortNumber(portValue);
             poolDataSource.setServerName(host);
             poolDataSource.setDatabaseName(this.dbname);
             poolDataSource.setUser(this.user);
