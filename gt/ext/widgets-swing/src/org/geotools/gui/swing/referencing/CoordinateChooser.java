@@ -97,7 +97,7 @@ import org.geotools.resources.geometry.XDimension2D;
  * was created.
  *
  * <p>&nbsp;</p>
- * <p align="center"><img src="../doc-files/CoordinateChooser.png"></p>
+ * <p align="center"><img src="doc-files/CoordinateChooser.png"></p>
  * <p>&nbsp;</p>
  *
  * @since 2.3

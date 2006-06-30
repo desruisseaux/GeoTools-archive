@@ -865,6 +865,8 @@ public class ImageWorker {
      *
      * @throws HeadlessException if {@code gt2-widgets-swing.jar} is not on the classpath,
      *         or if AWT can't create the window components.
+     *
+     * @see org.geotools.gui.swing.image.OperationTreeBrowser#show(RenderedImage)
      */
     public void show() throws HeadlessException {
         /*
@@ -873,10 +875,13 @@ public class ImageWorker {
          * is simply doing this call:
          *
          *     OperationTreeBrowser.show(image);
+         *
+         * Tip: The @see tag in the above javadoc can be used as a check for the existence
+         *      of class and method referenced below. Check for the javadoc warnings.
          */
         final Class c;
         try {
-            c = Class.forName("org.geotools.gui.swing.OperationTreeBrowser");
+            c = Class.forName("org.geotools.gui.swing.image.OperationTreeBrowser");
         } catch (ClassNotFoundException cause) {
             final HeadlessException e;
             e = new HeadlessException("The \"gt2-widgets-swing.jar\" file is required.");

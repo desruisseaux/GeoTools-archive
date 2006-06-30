@@ -41,6 +41,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JFormattedTextField;
+import javax.swing.BorderFactory;
 import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
 import java.awt.geom.AffineTransform;
@@ -70,6 +71,7 @@ import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.gui.swing.image.KernelEditor;
 
 
 /**
@@ -167,6 +169,13 @@ public class ParameterEditor extends JPanel {
      */
     public ParameterEditor() {
         super(new BorderLayout());
+        description.setBorder(
+                BorderFactory.createCompoundBorder(description.getBorder(),
+                BorderFactory.createCompoundBorder(
+                BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(6, 9, 6, 9),
+                BorderFactory.createEtchedBorder()),
+                BorderFactory.createEmptyBorder(6, 0, 6, 0))));
         add(description, BorderLayout.NORTH );
         add(cards,       BorderLayout.CENTER);
         setPreferredSize(new Dimension(400,250));
@@ -225,12 +234,14 @@ public class ParameterEditor extends JPanel {
     }
 
     /**
-     * Convenience method for setting the parameter description from an operation node.
+     * Convenience method for setting the parameter description from a JAI operation node.
      *
      * @param operation The operation node for the current parameter.
-     * @param index The parameter index, or {@code -1} if unknow.
+     * @param index     The parameter index, or {@code -1} if unknow.
+     *
+     * @since 2.3
      */
-    final void setDescription(final OperationNode operation, final int index) {
+    public void setDescription(final OperationNode operation, final int index) {
         String description = null;
         Class  type        = null;
         Range  range       = null;
@@ -259,7 +270,7 @@ public class ParameterEditor extends JPanel {
                 final OperationDescriptor descriptor = (OperationDescriptor) element;
                 final ResourceBundle resources = descriptor.getResourceBundle(getLocale());
                 if (index >= 0) {
-                    key = "arg"+index+"Desc";
+                    key = "arg" + index + "Desc";
                 } else {
                     key = "Description";
                 }
@@ -378,7 +389,7 @@ public class ParameterEditor extends JPanel {
         if (value instanceof Boolean) {
             Singleton editor = (Singleton) getEditor(BOOLEAN);
             if (editor == null) {
-                editor = new Singleton(null);
+                editor = new Singleton(null); // TODO: we should define some kind of BooleanFormat.
                 addEditor(BOOLEAN, editor, false);
             }
             editor.setValue(value);

@@ -32,10 +32,6 @@ import java.util.Date;
  * are constrained in the range January 1st, 1970 up to the date at the time the widget
  * was created.
  *
- * <p>&nbsp;</p>
- * <p align="center"><img src="doc-files/CoordinateChooser.png"></p>
- * <p>&nbsp;</p>
- *
  * @since 2.0
  * @source $URL$
  * @version $Id$

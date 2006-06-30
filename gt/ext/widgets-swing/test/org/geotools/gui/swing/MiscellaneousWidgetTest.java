@@ -46,6 +46,11 @@ import junit.framework.TestSuite;
 import org.geotools.measure.AngleFormat;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.image.ColorUtilities;
+import org.geotools.gui.swing.referencing.CoordinateChooser;
+import org.geotools.gui.swing.image.OperationTreeBrowser;
+import org.geotools.gui.swing.image.GradientKernelEditor;
+import org.geotools.gui.swing.image.KernelEditor;
+import org.geotools.gui.swing.image.ColorRamp;
 
 
 /**
