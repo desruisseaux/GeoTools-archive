@@ -54,7 +54,6 @@ import org.geotools.data.shapefile.dbf.IndexedDbaseFileReader;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileReader.Record;
-import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -63,7 +62,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.geometry.JTS;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.index.quadtree.StoreException;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
@@ -185,8 +184,6 @@ public class ShapefileRenderer implements GTRenderer {
     private Map decimators = new HashMap();
 
     private Map rendererHints;
-
-    private Graphics2D outputGraphics;
 
     public ShapefileRenderer( MapContext context ) {
         setContext(context);
@@ -339,7 +336,7 @@ public class ShapefileRenderer implements GTRenderer {
                     feature = (Feature) addedIter.next();
                 }
                 
-                if (!query.getFilter().contains(feature))
+                if (!query.getFilter().evaluate(feature))
                     continue;
 
                 if (feature != TransactionStateDiff.NULL) {
@@ -357,7 +354,7 @@ public class ShapefileRenderer implements GTRenderer {
 
                         Filter filter = r.getFilter();
 
-                        if ((filter == null) || filter.contains(feature)) {
+                        if ((filter == null) || filter.evaluate(feature)) {
                             doElse = false;
 
                             if (LOGGER.isLoggable(Level.FINER)) {
@@ -496,7 +493,7 @@ public class ShapefileRenderer implements GTRenderer {
                     }
 
                     Feature feature = createFeature(type, record, dbfreader, nextFid);
-                    if (!query.getFilter().contains(feature))
+                    if (!query.getFilter().evaluate(feature))
                         continue;
 
                     if (renderingStopRequested) {
@@ -530,7 +527,7 @@ public class ShapefileRenderer implements GTRenderer {
 
                         Filter filter = r.getFilter();
 
-                        if ((filter == null) || filter.contains(feature)) {
+                        if ((filter == null) || filter.evaluate(feature)) {
                             doElse = false;
 
                             if (LOGGER.isLoggable(Level.FINER)) {
@@ -666,7 +663,6 @@ public class ShapefileRenderer implements GTRenderer {
      * @param style
      * @param schema DOCUMENT ME!
      * @return
-     * @throws FactoryConfigurationError
      * @throws SchemaException
      */
     FeatureType createFeatureType( Query query, Style style, FeatureType schema )
@@ -1162,7 +1158,6 @@ public class ShapefileRenderer implements GTRenderer {
 
     public void paint( Graphics2D graphics, Rectangle paintArea, Envelope envelope,
             AffineTransform transform ) {
-        this.outputGraphics = graphics;
 
         if (hints != null) {
             graphics.setRenderingHints(hints);
@@ -1235,13 +1230,19 @@ public class ShapefileRenderer implements GTRenderer {
             try {
                 ShapefileDataStore ds = (ShapefileDataStore) currLayer.getFeatureSource()
                         .getDataStore();
-                CoordinateReferenceSystem dataCRS = ds.getSchema().getDefaultGeometry()
+                
+                CoordinateReferenceSystem dataCRS;
+                if( getForceCRSHint()==null )
+                	dataCRS = ds.getSchema().getDefaultGeometry()
                         .getCoordinateSystem();
+                else
+                	dataCRS=getForceCRSHint();
+                
                 MathTransform mt;
 
                 try {
                     mt = CRS.transform(dataCRS, destinationCrs, true);
-                    bbox = JTS.transform(bbox, mt.inverse(), 10);
+                    bbox = JTS.transform(bbox, null, mt.inverse(), 10);
                 } catch (Exception e) {
                     mt = null;
                 }
@@ -1282,5 +1283,17 @@ public class ShapefileRenderer implements GTRenderer {
         LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio() + " , hits "
                 + styleFactory.getHits() + ", requests " + styleFactory.getRequests());
     }
-
+    /**
+     * If the forceCRS hint is set then return the value.
+     * @return the value of the forceCRS hint or null
+     */
+    private CoordinateReferenceSystem getForceCRSHint() {
+    	if ( rendererHints==null )
+    		return null;
+    	Object crs=this.rendererHints.get("forceCRS");
+    	if( crs instanceof CoordinateReferenceSystem )
+    		return (CoordinateReferenceSystem) crs;
+    	
+    	return null;
+	}
 }

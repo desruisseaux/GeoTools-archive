@@ -599,8 +599,13 @@ public class StreamingRenderer implements GTRenderer {
                 // attribute used during the rendering as the feature may have more
                 // than one
                 // and the styles could use non default geometric ones
-                CoordinateReferenceSystem sourceCrs = currLayer.getFeatureSource().getSchema()
-                .getDefaultGeometry().getCoordinateSystem();
+            	CoordinateReferenceSystem sourceCrs;
+            	if( getForceCRSHint() !=null ){
+            		sourceCrs=getForceCRSHint();
+            	}else{
+            		sourceCrs= currLayer.getFeatureSource().getSchema()
+            		.getDefaultGeometry().getCoordinateSystem();
+            	}
                 
                 if (sourceCrs != null && !sourceCrs.equals(destinationCrs)) {
                     // get an unprojected envelope since the feature source is operating on
@@ -716,6 +721,21 @@ public class StreamingRenderer implements GTRenderer {
         
         return results;
     }
+    /**
+     * If the forceCRS hint is set then return the value.
+     * @return the value of the forceCRS hint or null
+     */
+    private CoordinateReferenceSystem getForceCRSHint() {
+    	if ( rendererHints==null )
+    		return null;
+    	Object crs=this.rendererHints.get("forceCRS");
+    	if( crs instanceof CoordinateReferenceSystem )
+    		return (CoordinateReferenceSystem) crs;
+    	
+    	return null;
+	}
+
+
 /**
  *   get the query's filter and looks for a FIDFilter in it.
  *     if it finds one --> false
