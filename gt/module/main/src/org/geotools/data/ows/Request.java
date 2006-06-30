@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,14 +14,14 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.wms.request;
+package org.geotools.data.ows;
 
 import java.net.URL;
 import java.util.Properties;
 
 /**
  * This represents a Request to be made against a Web Map Server.
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/plugin/wms/src/org/geotools/data/wms/request/Request.java $
  */
 public interface Request {
     

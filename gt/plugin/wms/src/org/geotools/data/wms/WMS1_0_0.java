@@ -19,15 +19,12 @@ package org.geotools.data.wms;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.geotools.data.ows.Layer;
-import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
+import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
+import org.geotools.data.ows.AbstractRequest;
 import org.geotools.data.wms.request.AbstractGetFeatureInfoRequest;
 import org.geotools.data.wms.request.AbstractGetMapRequest;
-import org.geotools.data.wms.request.AbstractRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetStylesRequest;

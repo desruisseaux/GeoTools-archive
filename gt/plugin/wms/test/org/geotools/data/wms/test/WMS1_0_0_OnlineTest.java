@@ -27,13 +27,13 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
+import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_0_0;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.resources.TestData;

@@ -19,6 +19,8 @@ package org.geotools.data.wms.request;
 import java.net.URL;
 import java.util.Properties;
 
+import org.geotools.data.ows.AbstractRequest;
+
 /**
  * Describes an abstract DescribeLayer request. Provides everything except
  * the versioning info, which subclasses must implement.
@@ -26,7 +28,7 @@ import java.util.Properties;
  * @author Richard Gould
  * @source $URL$
  */
-public abstract class AbstractDescribeLayerRequest extends AbstractRequest implements DescribeLayerRequest {
+public abstract class AbstractDescribeLayerRequest extends AbstractWMSRequest implements DescribeLayerRequest {
 
     /**
      * Constructs a basic DescribeLayerRequest, without versioning info.
@@ -36,12 +38,13 @@ public abstract class AbstractDescribeLayerRequest extends AbstractRequest imple
      */
     public AbstractDescribeLayerRequest( URL onlineResource, Properties properties ) {
         super(onlineResource, properties);
-        
-        initVersion();
-        setProperty(REQUEST, "DescribeLayer");
     }
+    
+    protected void initRequest() {
+        setProperty(REQUEST, "DescribeLayer");
+	}
 
-    /**
+	/**
      * @see org.geotools.data.wms.request.DescribeLayerRequest#setLayers(java.lang.String)
      */
     public void setLayers( String layers ) {

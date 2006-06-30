@@ -1727,12 +1727,12 @@ public class WFSCapabilitiesComplexTypes {
                                     if (result[1].getFormats() == null) {
                                         result[1].setFormats(t[j].getFormats());
                                     } else {
-                                        List st = (List) result[0].getFormats();
+                                        List st = result[0].getFormats();
 
                                         if (t[j].getFormats() == null) {
                                             t[j].setFormats(st);
                                         } else if (st != null) {
-                                            ((List) t[j].getFormats()).addAll(st);
+                                            t[j].getFormats().addAll(st);
                                         }
                                     }
                                 }

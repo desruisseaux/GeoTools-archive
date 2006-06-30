@@ -16,6 +16,8 @@
  */
 package org.geotools.data.wms.request;
 
+import org.geotools.data.ows.Request;
+
 /**
  * Retrieves information about the layers or feature types available on
  * the Web Map Server. It is used to assist user symbolization.

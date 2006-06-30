@@ -18,7 +18,6 @@ package org.geotools.data.ows;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -27,12 +26,9 @@ import java.util.List;
  * @author Richard Gould, Refractions Research
  * @source $URL$
  */
-public class WMSCapabilities {
-    private Service service;
+public class WMSCapabilities extends Capabilities {
     private WMSRequest request;
     private Layer layer;
-    private String version;
-    private String[] exceptions;
     
     private List layers; //cache
 
@@ -77,43 +73,5 @@ public class WMSCapabilities {
      */
     public void setRequest(WMSRequest request) {
         this.request = request;
-    }
-
-    /**
-     * The Service contains metadata about the WMS.
-     * 
-     * @return Returns the service.
-     */
-    public Service getService() {
-        return service;
-    }
-
-    /**
-     * @param service The service to set.
-     */
-    public void setService(Service service) {
-        this.service = service;
-    }
-
-    /**
-     * The version that this Capabilities is in.
-     * 
-     * @return Returns the version.
-     */
-    public String getVersion() {
-        return version;
-    }
-
-    /**
-     * @param version The version to set.
-     */
-    public void setVersion(String version) {
-        this.version = version;
-    }
-    public String[] getExceptions() {
-        return exceptions;
-    }
-    public void setExceptions( String[] exceptions ) {
-        this.exceptions = exceptions;
     }
 }

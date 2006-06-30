@@ -25,26 +25,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
+import org.geotools.data.ows.AbstractGetCapabilitiesResponse;
+import org.geotools.data.ows.AbstractResponse;
 import org.geotools.data.ows.CRSEnvelope;
+import org.geotools.data.ows.GetCapabilitiesRequest;
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.Request;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.request.GetStylesRequest;
 import org.geotools.data.wms.request.PutStylesRequest;
-import org.geotools.data.wms.request.Request;
-import org.geotools.data.wms.response.AbstractResponse;
 import org.geotools.data.wms.response.DescribeLayerResponse;
-import org.geotools.data.wms.response.GetCapabilitiesResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.data.wms.response.GetStylesResponse;
 import org.geotools.data.wms.response.PutStylesResponse;
+import org.geotools.data.wms.response.WMSGetCapabilitiesResponse;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
@@ -180,7 +181,7 @@ public class WebMapServer {
             //Grab document
             WMSCapabilities tempCapabilities;
             try {
-                tempCapabilities = issueRequest(request).getCapabilities();
+                tempCapabilities = (WMSCapabilities) issueRequest(request).getCapabilities();
             } catch (ServiceException e) {
             	tempCapabilities = null;
             	exception = e;
@@ -356,7 +357,7 @@ public class WebMapServer {
         String contentType = connection.getContentType();
         
         if (request instanceof GetCapabilitiesRequest) {
-        	return new GetCapabilitiesResponse(contentType, inputStream);
+        	return new WMSGetCapabilitiesResponse(contentType, inputStream);
         } else if (request instanceof GetFeatureInfoRequest) {
             return new GetFeatureInfoResponse(contentType, inputStream);
         } else if (request instanceof GetMapRequest) {
@@ -374,8 +375,8 @@ public class WebMapServer {
         }
     }
     
-    public GetCapabilitiesResponse issueRequest(GetCapabilitiesRequest request) throws IOException, ServiceException, SAXException {
-    	return (GetCapabilitiesResponse) internalIssueRequest(request);
+    public AbstractGetCapabilitiesResponse issueRequest(GetCapabilitiesRequest request) throws IOException, ServiceException, SAXException {
+    	return (AbstractGetCapabilitiesResponse) internalIssueRequest(request);
     }
     
     public GetMapResponse issueRequest(GetMapRequest request) throws IOException, ServiceException, SAXException {

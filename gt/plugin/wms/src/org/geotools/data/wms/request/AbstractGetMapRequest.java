@@ -24,6 +24,7 @@ import java.util.Properties;
 import java.util.Stack;
 
 import org.apache.commons.lang.StringUtils;
+import org.geotools.data.ows.AbstractRequest;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
 import org.opengis.layer.Style;
@@ -35,7 +36,7 @@ import org.opengis.layer.Style;
  * Window - Preferences - Java - Code Style - Code Templates
  * @source $URL$
  */
-public abstract class AbstractGetMapRequest extends AbstractRequest implements GetMapRequest {
+public abstract class AbstractGetMapRequest extends AbstractWMSRequest implements GetMapRequest {
 
     Stack layers = new Stack();
     Stack styles = new Stack();
@@ -49,9 +50,6 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
      */
     public AbstractGetMapRequest(URL onlineResource, Properties properties) {
         super(onlineResource, properties);
-
-        initRequest();
-        initVersion();
     }
 
     public URL getFinalURL() {
@@ -96,7 +94,7 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
         setProperty(REQUEST, "GetMap"); //$NON-NLS-1$
     }
 
-    /**
+	/**
      * Sets the version number of the request.
      *
      * @param version A String indicting a WMS Version ("1.0.0", "1.1.0",

@@ -16,12 +16,11 @@
  */
 package org.geotools.data.wms.test;
 
-import junit.framework.TestCase;
-
-import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
+import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
 
 
 /**
@@ -76,5 +75,9 @@ public class GetCapabilitiesRequestTest extends ServerTestCase {
         protected void initVersion() {
             setProperty("VERSION", "1.1.1");
         }
+
+		protected void initService() {
+			setProperty("SERVICE", "WMS");
+		}
     }
 }

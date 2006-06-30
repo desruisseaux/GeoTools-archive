@@ -19,13 +19,15 @@ package org.geotools.data.wms.request;
 import java.net.URL;
 import java.util.Properties;
 
+import org.geotools.data.ows.AbstractRequest;
+
 /**
  * Presents basic functionality for a PutStyles request
  * 
  * @author Richard Gould
  * @source $URL$
  */
-public abstract class AbstractPutStylesRequest extends AbstractRequest implements PutStylesRequest {
+public abstract class AbstractPutStylesRequest extends AbstractWMSRequest implements PutStylesRequest {
 
     /**
      * @param onlineResource
@@ -33,9 +35,6 @@ public abstract class AbstractPutStylesRequest extends AbstractRequest implement
      */
     public AbstractPutStylesRequest( URL onlineResource, Properties properties ) {
         super(onlineResource, properties);
-
-        initRequest();
-        initVersion();
     }
     
     protected void initRequest() {

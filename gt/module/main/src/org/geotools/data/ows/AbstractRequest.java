@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,12 +14,10 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.wms.request;
+package org.geotools.data.ows;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -30,7 +28,7 @@ import java.util.StringTokenizer;
  * A class that provides functionality for performing basic requests
  *
  * @author Richard Gould
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/plugin/wms/src/org/geotools/data/wms/request/AbstractRequest.java $
  */
 public abstract class AbstractRequest implements Request{
     /** Represents OGC Exception MIME types */
@@ -48,7 +46,7 @@ public abstract class AbstractRequest implements Request{
      * This constructor will strip all the query parameters off of
      * onlineResource and put them in the properties map. This allows clients
      * to provide their own parameters and have them saved and used along with
-     * the WMS specific ones.
+     * the OWS specific ones.
      * 
      * However, certain parameters will be over-written by individual requests
      * themselves. Examples of such parameters include, but are not limited to:
@@ -103,7 +101,9 @@ public abstract class AbstractRequest implements Request{
             }
         }
 
-        setProperty(Request.SERVICE, "WMS");
+        initService();
+        initRequest();
+        initVersion();
     }
 
     /**
@@ -181,4 +181,16 @@ public abstract class AbstractRequest implements Request{
         return (Properties) properties.clone();
     }
     
+    protected abstract void initRequest();
+    
+    /**
+     * Sets the SERVICE parameter
+     */
+    protected abstract void initService();
+
+    /**
+     * Sets up the version number for this request. Typically something like
+     * setProperty("VERSION", "1.1.1");
+     */
+    protected abstract void initVersion();
 }

@@ -17,24 +17,19 @@
 package org.geotools.data.wms.test;
 
 import java.net.URL;
-import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.geotools.data.wms.request.AbstractGetMapRequest;
-import org.geotools.data.wms.request.AbstractRequest;
 import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.request.Request;
 
 public class AbstractGetMapRequestTest extends TestCase {
 
 	public void testGetFinalURL() throws Exception {
 		URL badURL = new URL("http://test.com/map.php?LAYERS=Provincial Boundary");
 		
-		GetMapRequest request = new RequestTest(badURL, null);
+		GetMapRequest request = new RequestTestHelp(badURL, null);
 		
 		request.addLayer("Provincial Boundary", "Two words");
 		request.addLayer("Layer2", "");
@@ -47,7 +42,7 @@ public class AbstractGetMapRequestTest extends TestCase {
         assertTrue(processedURL.indexOf("SERVICE=WMS") != -1);
 	}
 	
-	private class RequestTest extends AbstractGetMapRequest {
+	private class RequestTestHelp extends AbstractGetMapRequest {
 
 		/**
 		 * @param onlineResource
@@ -57,7 +52,7 @@ public class AbstractGetMapRequestTest extends TestCase {
 		 * @param availableFormats
 		 * @param availableExceptions
 		 */
-		public RequestTest(URL onlineResource, Properties properties) {
+		public RequestTestHelp(URL onlineResource, Properties properties) {
 			super(onlineResource, properties);
 			// TODO Auto-generated constructor stub
 		}

@@ -16,7 +16,7 @@
  */
 package org.geotools.data.wms.xml;
 
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
+import org.geotools.data.ows.GetCapabilitiesRequest;
 import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.impl.FacetGT;

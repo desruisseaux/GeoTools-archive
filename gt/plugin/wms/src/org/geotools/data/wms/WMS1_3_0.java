@@ -19,10 +19,8 @@ package org.geotools.data.wms;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Set;
 
-import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
+import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
 
 /**
  * @author Richard Gould

@@ -16,8 +16,10 @@
  */
 package org.geotools.data.wms.response;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+import org.geotools.data.ows.AbstractResponse;
 import org.geotools.ows.ServiceException;
 import org.xml.sax.SAXException;
 
@@ -36,7 +38,7 @@ import org.xml.sax.SAXException;
  * @source $URL$
  */
 public class GetMapResponse extends AbstractResponse {
-    public GetMapResponse(String contentType, InputStream response) throws ServiceException, SAXException {
+    public GetMapResponse(String contentType, InputStream response) throws ServiceException, IOException {
         super(contentType, response);
         
         if (contentType.toLowerCase().indexOf("application/vnd.ogc.se_xml") != -1) {

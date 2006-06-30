@@ -16,6 +16,8 @@
  */
 package org.geotools.data.wms.request;
 
+import org.geotools.data.ows.Request;
+
 
 /**
  * Represents a PutStyles request

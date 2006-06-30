@@ -16,6 +16,8 @@
  */
 package org.geotools.data.wms.request;
 
+import org.geotools.data.ows.Request;
+
 /**
  * A request used to get the legend graphic for a given layer
  * 

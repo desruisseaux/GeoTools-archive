@@ -16,11 +16,11 @@
  */
 package org.geotools.data.wms.request;
 
-import java.util.List;
 import java.util.Properties;
-import java.util.Set;
+
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.Request;
 import org.opengis.layer.Style;
 
 

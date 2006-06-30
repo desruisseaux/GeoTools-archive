@@ -16,6 +16,13 @@
  */
 package org.geotools.catalog.wms;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.geotools.catalog.AbstractService;
 import org.geotools.catalog.Catalog;
 import org.geotools.catalog.ResolveChangeEvent;
@@ -24,6 +31,8 @@ import org.geotools.catalog.ServiceInfo;
 import org.geotools.catalog.defaults.DefaultResolveChangeEvent;
 import org.geotools.catalog.defaults.DefaultResolveDelta;
 import org.geotools.catalog.defaults.DefaultServiceInfo;
+import org.geotools.data.ows.GetCapabilitiesRequest;
+import org.geotools.data.ows.AbstractGetCapabilitiesResponse;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.Specification;
@@ -32,22 +41,14 @@ import org.geotools.data.wms.WMS1_1_0;
 import org.geotools.data.wms.WMS1_1_1;
 import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.response.GetCapabilitiesResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.ows.ServiceException;
 import org.geotools.util.ProgressListener;
 import org.xml.sax.SAXException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -334,7 +335,7 @@ public class WMSService extends AbstractService {
             }
         }
 
-        public GetCapabilitiesResponse issueRequest(GetCapabilitiesRequest arg0)
+        public AbstractGetCapabilitiesResponse issueRequest(GetCapabilitiesRequest arg0)
             throws IOException, ServiceException, SAXException {
             return super.issueRequest(arg0);
         }

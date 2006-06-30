@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,17 +14,13 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.wms.response;
+package org.geotools.data.ows;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
 
-import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.ows.ServiceException;
-import org.geotools.xml.DocumentFactory;
-import org.geotools.xml.handlers.DocumentHandler;
+import org.jdom.JDOMException;
 import org.xml.sax.SAXException;
 
 
@@ -32,13 +28,13 @@ import org.xml.sax.SAXException;
  * DOCUMENT ME!
  *
  * @author Richard Gould, Refractions Research
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/plugin/wms/src/org/geotools/data/wms/response/AbstractResponse.java $
  */
-public class AbstractResponse {
+public abstract class AbstractResponse {
     protected InputStream inputStream;
     protected String contentType;
 
-    public AbstractResponse(String contentType, InputStream inputStream) throws ServiceException, SAXException {
+    public AbstractResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
         this.inputStream = inputStream;
         this.contentType = contentType;
         
@@ -58,15 +54,11 @@ public class AbstractResponse {
         return inputStream;
     }
     
-    protected ServiceException parseException(InputStream inputStream) throws SAXException {
-        Map hints = new HashMap();
-        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
-        hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
-
-        Object object = DocumentFactory.getInstance(inputStream, hints, Level.WARNING);
-        if (object instanceof ServiceException) {
-        	return (ServiceException) object;
-        }
-        return null;
+    protected ServiceException parseException(InputStream inputStream) throws IOException {
+    	try {
+			return ServiceExceptionParser.parse(inputStream);
+		} catch (JDOMException e) {
+			throw (IOException) new IOException().initCause(e);
+		} 
     }
 }

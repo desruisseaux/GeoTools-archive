@@ -16,8 +16,10 @@
  */
 package org.geotools.data.wms.response;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+import org.geotools.data.ows.AbstractResponse;
 import org.geotools.ows.ServiceException;
 import org.xml.sax.SAXException;
 
@@ -34,7 +36,7 @@ public class GetLegendGraphicResponse extends AbstractResponse {
      * @throws SAXException 
      * @throws ServiceException 
      */
-    public GetLegendGraphicResponse( String contentType, InputStream inputStream ) throws ServiceException, SAXException {
+    public GetLegendGraphicResponse( String contentType, InputStream inputStream ) throws ServiceException, IOException {
         super(contentType, inputStream);
         
         if (contentType.toLowerCase().indexOf("text/xml") != -1) {

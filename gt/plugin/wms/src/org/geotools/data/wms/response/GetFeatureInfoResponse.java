@@ -16,8 +16,10 @@
  */
 package org.geotools.data.wms.response;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+import org.geotools.data.ows.AbstractResponse;
 import org.geotools.ows.ServiceException;
 import org.xml.sax.SAXException;
 
@@ -55,8 +57,9 @@ public class GetFeatureInfoResponse extends AbstractResponse {
      * @param inputStream
      * @throws SAXException 
      * @throws ServiceException 
+     * @throws IOException 
      */
-    public GetFeatureInfoResponse(String contentType, InputStream inputStream) throws ServiceException, SAXException {
+    public GetFeatureInfoResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
         super(contentType, inputStream);
     }
 }

@@ -16,6 +16,7 @@
 package org.geotools.data.ows;
 
 import java.net.URL;
+import java.util.List;
 
 
 /**
@@ -23,16 +24,17 @@ import java.net.URL;
  * @source $URL$
  */
 public class OperationType {
-    protected Object formats;
-    private URL get;
-    private URL post;
+	protected String name;
+	protected List formats;
+	protected URL get;
+	protected URL post;
 
     /**
      * DOCUMENT ME!
      *
      * @return Returns the formats.
      */
-    public Object getFormats() {
+    public List getFormats() {
         return formats;
     }
 
@@ -41,7 +43,7 @@ public class OperationType {
      *
      * @param formats The formats to set.
      */
-    public void setFormats(Object formats) {
+    public void setFormats(List formats) {
         this.formats = formats;
     }
 
@@ -80,4 +82,12 @@ public class OperationType {
     public void setPost(URL post) {
         this.post = post;
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

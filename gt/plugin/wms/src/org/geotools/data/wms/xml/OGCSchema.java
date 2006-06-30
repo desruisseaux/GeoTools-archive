@@ -16,14 +16,12 @@
  */
 package org.geotools.data.wms.xml;
 
-import java.util.Map;
-import java.util.Collections;
-
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Map;
 
 import org.geotools.xml.gml.GMLSchema;
-import org.geotools.xml.handlers.xsi.SchemaHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;

@@ -17,6 +17,7 @@
 package org.geotools.data.wms.request;
 
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.Request;
 
 /**
  * Represents a GetStyles Request

@@ -19,12 +19,11 @@ package org.geotools.data.wms.request;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.geotools.data.ows.AbstractRequest;
 import org.geotools.data.ows.Layer;
 
 /**
@@ -32,7 +31,7 @@ import org.geotools.data.ows.Layer;
  * functionality.
  * @source $URL$
  */
-public abstract class AbstractGetFeatureInfoRequest extends AbstractRequest implements GetFeatureInfoRequest {
+public abstract class AbstractGetFeatureInfoRequest extends AbstractWMSRequest implements GetFeatureInfoRequest {
     /** A set of type Layer, each of which is to be queried in the request */
     private Set queryLayers;
 
@@ -47,9 +46,6 @@ public abstract class AbstractGetFeatureInfoRequest extends AbstractRequest impl
         super(onlineResource, request.getProperties());
 
         queryLayers = new TreeSet();
-        
-        initRequest();
-        initVersion();
     }
 
     /**

@@ -23,8 +23,12 @@ import junit.framework.TestCase;
 
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.TestData;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 
 
@@ -35,6 +39,22 @@ import org.opengis.spatialschema.geometry.Envelope;
 public class Geot553Test extends TestCase {
     
     public void testGeot553 () throws Exception {
+    	//-247941.17083210908,5334613.737657672,-194536.86526633866,5359024.191696413
+    	double minx = -247941.17083210908;
+    	double miny = 5334613.737657672;
+    	double maxx = -194536.86526633866;
+    	double maxy = 5359024.191696413;
+    	
+    	CoordinateReferenceSystem epsg26591 = CRS.decode("EPSG:26591");
+    	CoordinateReferenceSystem epsg4326 = CRS.decode("EPSG:4326");
+    	
+    	MathTransform transform =CRS.transform(epsg26591, epsg4326, true);
+    	DirectPosition min = transform.transform(new GeneralDirectPosition(minx, miny), null);
+    	DirectPosition max = transform.transform(new GeneralDirectPosition(maxx, maxy), null);
+    	System.out.println(min);
+    	System.out.println(max);
+    	
+    	
         File getCaps = TestData.file(this, "geot553capabilities.xml");
     	
         URL getCapsURL = TestData.getResource(this, "geot553capabilities.xml");

@@ -16,13 +16,16 @@
  */
 package org.geotools.data.wms.response;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.geotools.data.ows.AbstractResponse;
 import org.geotools.data.ows.LayerDescription;
 import org.geotools.data.wms.xml.WMSSchema;
+import org.geotools.ows.ServiceException;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.handlers.DocumentHandler;
 import org.xml.sax.SAXException;
@@ -41,20 +44,24 @@ public class DescribeLayerResponse extends AbstractResponse {
     /**
      * @param contentType
      * @param inputStream
+     * @throws ServiceException 
      * @throws SAXException
      */
-    public DescribeLayerResponse( String contentType, InputStream inputStream ) throws SAXException {
+    public DescribeLayerResponse( String contentType, InputStream inputStream ) throws IOException, ServiceException {
         super(contentType, inputStream);
         
         Map hints = new HashMap();
         hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
 
-        Object object = DocumentFactory.getInstance(inputStream, hints, Level.WARNING);
+        Object object;
+		try {
+			object = DocumentFactory.getInstance(inputStream, hints, Level.WARNING);
+		} catch (SAXException e) {
+			throw (IOException) new IOException().initCause(e);
+		}
         
         layerDescs = (LayerDescription[]) object;
     }
-    
-    
 
     public LayerDescription[] getLayerDescs() {
         return layerDescs;

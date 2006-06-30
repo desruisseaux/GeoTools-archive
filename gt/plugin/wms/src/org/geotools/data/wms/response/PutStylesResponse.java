@@ -16,8 +16,10 @@
  */
 package org.geotools.data.wms.response;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+import org.geotools.data.ows.AbstractResponse;
 import org.geotools.ows.ServiceException;
 import org.xml.sax.SAXException;
 
@@ -38,7 +40,7 @@ public class PutStylesResponse extends AbstractResponse {
      * @param inputStream
      * @throws SAXException
      */
-    public PutStylesResponse( String contentType, InputStream inputStream ) throws ServiceException, SAXException {
+    public PutStylesResponse( String contentType, InputStream inputStream ) throws ServiceException, IOException {
         super(contentType, inputStream);
 
         if ("application/vnd.ogc.success+xml".equals(contentType)) {

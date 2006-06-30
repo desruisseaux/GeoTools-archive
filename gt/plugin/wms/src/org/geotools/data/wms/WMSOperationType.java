@@ -16,6 +16,9 @@
  */
 package org.geotools.data.wms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.geotools.data.ows.OperationType;
 
 
@@ -25,17 +28,33 @@ import org.geotools.data.ows.OperationType;
  *
  * @author Richard Gould
  * @source $URL$
+ * @deprecated Use of OperationType should be sufficient
  */
 public class WMSOperationType extends OperationType {
     public WMSOperationType() {
         super();
     }
 
+    /**
+     * 
+     * @return
+     * @deprecated Use OperationType.getFormats();
+     */
     public String[] getFormatStrings() {
-        return (String[]) formats;
+        return (String[]) formats.toArray(new String[formats.size()]);
     }
 
+    /**
+     * 
+     * @param formats
+     * @deprecated Use OpeartionType.setFormats();
+     */
     public void setFormatStrings(String[] formats) {
-        this.formats = formats;
+    	if (formats == null) {
+    		this.formats = null;
+    	} else {
+    		this.formats = new ArrayList(formats.length);
+    		this.formats.addAll(Arrays.asList(formats));
+    	}    	
     }
 }
