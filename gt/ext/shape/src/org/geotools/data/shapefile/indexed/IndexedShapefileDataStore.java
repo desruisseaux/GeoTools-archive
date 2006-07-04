@@ -517,8 +517,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		IndexedFidReader reader = null;
 		try {
 			if (isLocal()) {
-				if (!(new File(fixURL.getFile()).exists()))
+				if (!(new File(fixURL.getFile()).exists()) && createIndex )
 					FidIndexer.generate(shpURL);
+				else
+					return null;
 			} else {
 				return null;
 			}
