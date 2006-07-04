@@ -70,9 +70,12 @@ public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
             String tableName, Connection conn, ResultSet tableInfo,
             String columnName, int dataType) throws SQLException 
 	{
-    	return super.isAutoIncrement( catalog, schema, "\""+tableName+"\"",conn, tableInfo,
+        String schemaName = null;
+        if (schema != null) {
+            schemaName = "\"" + schema + "\"";
+        }
+    	return super.isAutoIncrement( catalog, schemaName, "\""+tableName+"\"",conn, tableInfo,
     			"\""+columnName+"\"",dataType);
-    
     }
 //
 //    /**

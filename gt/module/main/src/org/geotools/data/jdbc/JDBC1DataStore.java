@@ -1027,7 +1027,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *
 	 * @throws IOException
 	 */
-	FIDMapper buildFIDMapper(String typeName, FIDMapperFactory factory)
+	protected FIDMapper buildFIDMapper(String typeName, FIDMapperFactory factory)
 			throws IOException {
 		Connection conn = null;
 

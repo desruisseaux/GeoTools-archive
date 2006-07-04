@@ -407,7 +407,7 @@
       <dependency>
         <groupId>com.vividsolutions</groupId>
         <artifactId>jts</artifactId>
-        <version>1.7</version>
+        <version>1.7.1</version>
       </dependency>
       <dependency>
         <groupId>batik</groupId>
@@ -478,7 +478,7 @@
       <dependency>
         <groupId>postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>8.1-404.jdbc3</version>
+        <version>8.1-407.jdbc3</version>
       </dependency>
       <dependency>
         <groupId>mysql</groupId>

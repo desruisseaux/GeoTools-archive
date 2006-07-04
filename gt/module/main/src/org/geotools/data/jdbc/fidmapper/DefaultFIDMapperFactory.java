@@ -342,8 +342,12 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
         try {
             statement = conn.createStatement();
             statement.setFetchSize(1);
-            rs = statement.executeQuery("Select " + columnName + " from "
-                    + tableName + " WHERE 0=1"); //DJB: the "where 0=1" will optimize if you have a lot of dead tuples
+            String query = "SELECT " + columnName + " FROM ";
+            if (schema != null) {
+                query = query + schema + "."; //the schema will default to public if not specified
+            }
+            query = query + tableName + " WHERE 0=1"; //DJB: the "where 0=1" will optimize if you have a lot of dead tuples 
+            rs = statement.executeQuery(query);
 
             // if the WHERE 0=1 give any data store problems, just remove it 
             // and put a comment here as to why it caused problems.

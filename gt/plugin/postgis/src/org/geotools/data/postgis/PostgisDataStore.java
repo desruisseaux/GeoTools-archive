@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -286,7 +285,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         Connection dbConnection = null;
 
         try {
-            String sqlStatement = "SELECT  postgis_version();";
+            String sqlStatement = "SELECT postgis_version();";
             dbConnection = getConnection(Transaction.AUTO_COMMIT);
 
             Statement statement = dbConnection.createStatement();
@@ -375,6 +374,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     list.add(tableName);
                 }
             }
+            tables.close();
 
             return (String[]) list.toArray(new String[list.size()]);
         } catch (SQLException sqlException) {
@@ -476,19 +476,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 		    String version = rs.getString(1);
 		    rs.close();
 		    st.close();
-		    
+
 		    Envelope envelope = null;
-		    if (version.trim().startsWith("1.0")) { //$NON-NLS-1$
+            //postgis 1.0+
+		    if (version.trim().startsWith("1.")) { //$NON-NLS-1$
 		    	//try the estimated_extent function
-		    	sql = new StringBuffer();
-		    	
-		    	PreparedStatement pst = conn.prepareStatement(
-	    			"SELECT  AsText(force_2d(envelope(estimated_extent(?,?))))" //$NON-NLS-1$
-				);
-		    	pst.setString(1, typeName );
-		    	pst.setString(2, geomName);
-		    	
-		    	rs = pst.executeQuery();
+	    	    String q = "SELECT AsText(force_2d(envelope(estimated_extent(\""+typeName+"\",\""+geomName+"\"))))";
+                rs = st.executeQuery(q);
 		    	
 		    	if (rs.next()) {
 		    		//parse return value
@@ -506,48 +500,109 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 		    			double deltaY = (maxY - minY)*0.1;
 		    			envelope.expandToInclude(minX - deltaX, minY - deltaY);
 		    			envelope.expandToInclude(maxX + deltaX, maxY + deltaY);
-		    		}
+		    		} else {
+                        LOGGER.info("PostGIS estimated_extent function did not return a result");
+                    }
 		    	}
 		    	
 		    	rs.close();
-		    	pst.close();
+		    	st.close();
 		    }
 		    
 		    if (envelope == null) {
 		    	
-		    	//try to generate an approximation
-		    	envelope = new Envelope();
-		    	st = conn.createStatement();
-		    	int offset = 0;
-		    	for (int i = 0; i < 5; i++,offset+=10000) {
-		    		String q = "SELECT AsText(force_2d(envelope(" + geomName +  //$NON-NLS-1$
-		    			"))) FROM " + typeName + " LIMIT 1 OFFSET " + offset; //$NON-NLS-1$ //$NON-NLS-2$
-		    		rs = st.executeQuery(q);
-		    		if (rs.next()) {
-		    			String wkt = rs.getString(1);
-		    			if (wkt != null && !wkt.trim().equals("")) { //$NON-NLS-1$
-		    				Envelope e = geometryReader.read(wkt)
-		    					.getEnvelopeInternal();
-		    				
-		    				if (envelope.isNull()) 
-		    					envelope.init(e);
-		    				else 
-		    					envelope.expandToInclude(e);
-		    			}
-		    			
-		    		}
-		    	}
+                //try to generate an approximation
+                envelope = new Envelope();
+                st = conn.createStatement();
+                //this is an attempt to grab a handful of envelopes without counting the features
+                final int blockSize = 10; //how many features to grab on each postgis hit
+                final int fetchAllLimit = 99; //if we don't exceed this value, just fetch all features
+                //final int upperLimit = 1000000; //aim for this many features
+                //final int nBlocks = 7; //number of times to hit postgis
+                //int[] offset = new int[nBlocks];
+                //automatic range calculation (for tweaking)
+                //once we hit 100,000 features in our scan, things get really slow
+                //therefore we'll stop around 50k
+                //offset[0] = 1;
+                //double magicNumber = Math.pow(upperLimit, 1.0 / (nBlocks - 1));
+                //for (int i = 1; i < nBlocks; i++) {
+                //    offset[i] = (int) Math.ceil(offset[i-1] * magicNumber);
+                //    System.out.println(offset[i]);
+                //}
+                //offset[0] = 0;
+                int[] offset = new int[] {0,10,100,1000,10000,20000,40000};
+
+                int misses = 0;
+		    	for (int i = 0; i < offset.length; i++) {
+                    String limit = " LIMIT " + blockSize + " OFFSET " + offset[i];;
+                    if (i+1 < offset.length && offset[i+1]-offset[i] <= blockSize) {
+                        limit = " LIMIT " + blockSize * 2 + " OFFSET " + offset[i];
+                        offset[i+1] = offset[i] + blockSize;
+                        i++;
+                    }
+                    String q = "SELECT AsText(force_2d(envelope(" + geomName + "))) FROM " + typeName;
+                    if (offset[i] > -1) {
+                        q = q + limit;
+                    }
+                    rs = st.executeQuery(q);
+                    boolean gotEnvelope = false;
+                    while (rs.next()) {
+                        gotEnvelope = true;
+                        String wkt = rs.getString(1);
+                        if (wkt != null && !wkt.trim().equals("")) { //$NON-NLS-1$
+                            Envelope e = geometryReader.read(wkt)
+                                .getEnvelopeInternal();
+                            
+                            if (envelope.isNull()) 
+                                envelope.init(e);
+                            else 
+                                envelope.expandToInclude(e);
+                        }
+                    }
+                    if (!gotEnvelope) {
+                        misses++;
+                        if (offset[i-1] < fetchAllLimit) { //just fetch everything
+                            offset[i] = -1;
+                        } else {
+                            //went beyond the last feature
+                            //on our first miss, we move back 50% and try again
+                            //on our second miss, we stop guessing and look between last 2 hits
+                            int min = offset[i-1];
+                            int max = offset[i];
+                            if (misses == 2) {
+                                min = offset[i-2];
+                                max = offset[i-1];
+                            }
+                            if (misses < 3) {
+                                offset[i] = (int) ((min + max) / 2.0);
+                                int width = (int) ((max - min) / (double) (offset.length - i));
+                                for (int j = i+1; j < offset.length; j++) {
+                                    offset[j] = min + (width * (j-i));
+                                }
+                            } else {
+                                rs.close();
+                                break;    
+                            }
+                        }
+                        i--;
+                    }
+                    rs.close();
+                    if (offset[i] == -1)
+                        break;
+                }
+                st.close();
 		    	
-		    	// expand generously since this is an approximation
+		    	// expand since this is an approximation
 		    	// Works whether or not the bounds are at the origin
 		    	double minX = envelope.getMinX();
 		    	double minY = envelope.getMinY();
 		    	double maxX = envelope.getMaxX();
 		    	double maxY = envelope.getMaxY();
-		    	double deltaX = (maxX - minX)*3;
-		    	double deltaY = (maxY - minY)*3;
+		    	double deltaX = (maxX - minX)*1.0;
+		    	double deltaY = (maxY - minY)*1.0;
 		    	envelope.expandToInclude(minX - deltaX, minY - deltaY);
 		    	envelope.expandToInclude(maxX + deltaX, maxY + deltaY);
+                
 		    }		    
 		    return envelope;
     	} catch (Exception ignore) {
@@ -607,6 +662,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 						" Possible cause:" + t.getLocalizedMessage();
 				throw new DataSourceException(msg,t);
 			}
+            st.close();
 		} 
     	catch (SQLException e) {
     		JDBCUtils.close(conn, Transaction.AUTO_COMMIT, e);
@@ -636,7 +692,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * </p>
      * 
      * <p>
-     * Currently the is is the only way to retype your features to different
+     * Currently this is the only way to retype your features to different
      * name spaces.
      * </p>
      * (non-Javadoc)
@@ -707,10 +763,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     protected String[] attributeNames(FeatureType featureType, Filter filter)
         throws IOException {
         String typeName = featureType.getTypeName();
-        FeatureType origional = getSchema(typeName);
+        FeatureType original = getSchema(typeName);
         SQLBuilder sqlBuilder = getSqlBuilder(typeName);
 
-        if (featureType.getAttributeCount() == origional.getAttributeCount()) {
+        if (featureType.getAttributeCount() == original.getAttributeCount()) {
             // featureType is complete (so filter must require subset
             return DataUtilities.attributeNames(featureType);
         }
@@ -921,6 +977,21 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     protected FIDMapperFactory buildFIDMapperFactory(JDBCDataStoreConfig config) {
         return new PostgisFIDMapperFactory();
+    }
+
+    protected FIDMapper buildFIDMapper( String typeName, FIDMapperFactory factory ) throws IOException {
+        Connection conn = null;
+
+        try {
+            conn = getConnection(Transaction.AUTO_COMMIT);
+            
+            String dbSchema = config.getDatabaseSchemaName();
+            FIDMapper mapper = factory.getMapper(null, dbSchema, typeName, conn);
+
+            return mapper;
+        } finally {
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
+        }
     }
 
     /**
