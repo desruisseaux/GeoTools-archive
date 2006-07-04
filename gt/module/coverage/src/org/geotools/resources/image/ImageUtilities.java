@@ -468,6 +468,16 @@ public final class ImageUtilities {
      *
      * @throws IOException If an I/O operation were required (in order to check if the image
      *         were tiled on disk) and failed.
+     *
+     * @since 2.3
+     *
+     * @deprecated Usually, the tiling doesn't need to be performed as a separated operation. The
+     *       {@link ImageLayout} hint with tile information can be provided to most JAI operators.
+     *       The {@link #getRenderingHints} method provides such tiling information only if the
+     *       image was not already tiled, so it should not be a cause of tile size mismatch in an
+     *       operation chain. The mean usage for a separated "tile" operation is to tile an image
+     *       before to save it on disk in some format supporting tiling. The proposed replacement
+     *       for this operation is {@link ImageWorker#write}.
      */
     public static RenderedOp tileImage(RenderedOp image) throws IOException {
         // /////////////////////////////////////////////////////////////////////
@@ -544,6 +554,8 @@ public final class ImageUtilities {
      * <li>caching should be more intelligent</li>
      * <li>use <code>ParameterBlockJAI</code> </li>
      * </ol>
+     *
+     * @since 2.3
      */
     public static PlanarImage rescale2Byte(PlanarImage surrogateImage) {
         if (PROPOSED_REPLACEMENT) {
@@ -622,6 +634,8 @@ public final class ImageUtilities {
      * @param sourceImage The image to reduces.
      * 
      * @return The image with index color model.
+     *
+     * @since 2.3
      */
     public static PlanarImage RGBIndexColorModel(PlanarImage sourceImage) {
         if (PROPOSED_REPLACEMENT) {
@@ -684,10 +698,13 @@ public final class ImageUtilities {
      * to blue. Index 3 corresponds to the alpha sample, if present.
      * 
      * @param surrogateImage The image with a direct color model.
-     * 
      * @return The image with a component color model.
-     * 
-     * @task TODO what if the numBits is bigger than 8?
+     * @todo what if the numBits is bigger than 8?
+     *
+     * @since 2.3
+     *
+     * @deprecated This method is similar to {@link #reformatColorModel2ComponentColorModel},
+     *             the later being slightly more general.
      */
     public static final PlanarImage direct2ComponentColorModel(PlanarImage sourceImage) {
         if (PROPOSED_REPLACEMENT) {
@@ -755,6 +772,8 @@ public final class ImageUtilities {
      * @param threshold The threshold value for the "binarize" operation.
      * @param cacheMe   {@code false} if the image should not be cached.
      * @return          The binarized image.
+     *
+     * @since 2.3
      */
     public static final RenderedOp binarizeImageExt(RenderedImage source,
             final double threshold, final boolean cacheMe) {
@@ -807,6 +826,8 @@ public final class ImageUtilities {
      * @param threshold The threshold value for the "binarize" operation.
      * @param cache     {@code false} if the image should not be cached.
      * @return          The binarized image.
+     *
+     * @since 2.3
      */
     public static final ROI roiExt(RenderedOp image, final double threshold, final boolean cache) {
         if (PROPOSED_REPLACEMENT) {
@@ -858,6 +879,8 @@ public final class ImageUtilities {
      * @param image The image to combine.
      * @param cache {@code false} if the image should not be cached.
      * @return The combined image.
+     *
+     * @since 2.3
      */
     public final static RenderedOp bandCombineSimple(RenderedOp image, boolean cache) {
         if (PROPOSED_REPLACEMENT) {
@@ -921,6 +944,12 @@ public final class ImageUtilities {
      * @param image The image where to select a band.
      * @param cache {@code false} if the image should not be cached.
      * @return The image with the selected band.
+     *
+     * @since 2.3
+     *
+     * @deprecated This is a duplicated (actually a special case) of {@link #getBandsFromImage},
+     *             except for the {@code cache} argument and a special processing done for the
+     *             {@link IHSColorSpace}.
      */
     public final static RenderedOp selectBand(RenderedImage image, boolean cache) {
         if (PROPOSED_REPLACEMENT) {
@@ -955,6 +984,12 @@ public final class ImageUtilities {
      * @param image
      * @param cache
      * @return
+     *
+     * @since 2.3
+     *
+     * @deprecated This method is similar to {@link #bandCombineSimple}. The computation performed
+     *             by the later matches the definition of the {@code I} in a {@code IHS} color
+     *             space.
      */
     public final static RenderedOp convertIHS(RenderedImage image, boolean cache) {
         if (PROPOSED_REPLACEMENT) {
@@ -1010,6 +1045,8 @@ public final class ImageUtilities {
      * @param pb
      * 
      * @return
+     *
+     * @since 2.3
      */
     public static PlanarImage addTransparency2IndexColorModel(
             final PlanarImage surrogateImage, final RenderedImage alphaChannel,
@@ -1020,7 +1057,7 @@ public final class ImageUtilities {
             if (optimizeForWritingGIF) {
                 w.setRenderingHint(ImageWorker.TILING_ALLOWED, Boolean.FALSE);
             }
-            w.addTransparencyToIndexColorModel(alphaChannel, 255);
+            w.addTransparencyToIndexColorModel(alphaChannel, false, 255);
             return w.getPlanarImage();
         }
 
@@ -1034,7 +1071,7 @@ public final class ImageUtilities {
         cm.getGreens(rgba[1]);
         cm.getBlues(rgba[2]);
 
-        /**
+        /*
          * Now all the color are opaque except one and the color map has been
          * rebuilt loosing all the tranpsarent colors except the first one. The
          * raster has been rebuilt as well, in order to make it point to the
@@ -1044,7 +1081,7 @@ public final class ImageUtilities {
         final IndexColorModel cm1 = new IndexColorModel(cm.getPixelSize(), 256,
                 rgba[0], rgba[1], rgba[2], 255);
 
-        /**
+        /*
          * 
          * Threshold on the alpha channel to go to 0 -255 values
          * 
@@ -1057,7 +1094,7 @@ public final class ImageUtilities {
         final RenderedOp newAlphaChannel = JAI.create("threshold", pbTheshold,
                 new RenderingHints(JAI.KEY_TILE_CACHE, null));
 
-        /**
+        /*
          * colorspacetype Threshold on the alpha channel to go to 0 -255 values
          * 
          */
@@ -1066,7 +1103,7 @@ public final class ImageUtilities {
         final RenderedOp newInvertedAlphaChannel = JAI.create("Invert",
                 pbTheshold, new RenderingHints(JAI.KEY_TILE_CACHE, null));
 
-        /**
+        /*
          * preparing hints and layout to reuse all over the methid. It worth to
          * remark on that to optimie gif writing we need to untile the gif
          * image.
@@ -1085,7 +1122,7 @@ public final class ImageUtilities {
         hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
         hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
 
-        /**
+        /*
          * Adding to the other image
          * 
          */
@@ -1110,99 +1147,106 @@ public final class ImageUtilities {
      *            image to convert
      * 
      * @return PlanarImage image converted
+     *
+     * @since 2.3
      */
     public static final PlanarImage componentColorModel2IndexColorModel4GIF(
             PlanarImage sourceImage) {
-        {
-            // /////////////////////////////////////////////////////////////////
-            //
-            // checking the color model to see if we need to convert it back to
-            // color model.
-            //
-            // /////////////////////////////////////////////////////////////////
-            if (sourceImage.getColorModel() instanceof DirectColorModel)
-                sourceImage = ImageUtilities
-                        .direct2ComponentColorModel(sourceImage);
 
-            ParameterBlock pb = new ParameterBlock();
-            RenderedImage alphaChannel = null;
+        if (PROPOSED_REPLACEMENT) {
+            ImageWorker w = new ImageWorker(sourceImage);
+            w.forceIndexColorModelForGIF();
+            return w.getPlanarImage();
+        }
 
-            // /////////////////////////////////////////////////////////////////
-            // 
-            // AMPLITUDE RESCALING
-            // I might also need to reformat the image in order to get it to 8
-            // bits samples
-            //
-            // /////////////////////////////////////////////////////////////////
-            if (sourceImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE) {
-                sourceImage = ImageUtilities.rescale2Byte(sourceImage);
+        // /////////////////////////////////////////////////////////////////
+        //
+        // checking the color model to see if we need to convert it back to
+        // color model.
+        //
+        // /////////////////////////////////////////////////////////////////
+        if (sourceImage.getColorModel() instanceof DirectColorModel)
+            sourceImage = ImageUtilities
+                    .direct2ComponentColorModel(sourceImage);
+
+        ParameterBlock pb = new ParameterBlock();
+        RenderedImage alphaChannel = null;
+
+        // /////////////////////////////////////////////////////////////////
+        // 
+        // AMPLITUDE RESCALING
+        // I might also need to reformat the image in order to get it to 8
+        // bits samples
+        //
+        // /////////////////////////////////////////////////////////////////
+        if (sourceImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE) {
+            sourceImage = ImageUtilities.rescale2Byte(sourceImage);
+        }
+
+        // /////////////////////////////////////////////////////////////////
+        // 
+        // ALPHA CHANNEL getting the alpha channel and separating from the
+        // others bands.
+        //
+        // /////////////////////////////////////////////////////////////////
+        if (sourceImage.getColorModel().hasAlpha()) {
+            int numBands = sourceImage.getSampleModel().getNumBands();
+
+            // getting alpha channel
+            alphaChannel = JAI.create("bandSelect", sourceImage,
+                    new int[] { numBands - 1 });
+
+            // getting needed bands
+            sourceImage = getBandsFromImage(sourceImage, numBands);
+        }
+
+        // /////////////////////////////////////////////////////////////////
+        // 
+        // BAND MERGE If we do not have 3 bands we have no way to go to
+        // index color model in a simple way using jai. Therefore we add the
+        // bands we need in order to get there. This trick works fine with
+        // gray scale images. ATTENTION, if the initial image had no alpha
+        // channel we proceed without doing anything since it seems that GIF
+        // encoder in such a case works fine.
+        // /////////////////////////////////////////////////////////////////
+        if ((sourceImage.getSampleModel().getNumBands() == 1)
+                && (alphaChannel != null)) {
+            int numBands = sourceImage.getSampleModel().getNumBands();
+
+            // getting first band
+            final RenderedImage firstBand = JAI.create("bandSelect",
+                    sourceImage, new int[] { 0 });
+
+            // adding to the image
+            for (int i = 0; i < (3 - numBands); i++) {
+                pb.removeParameters();
+                pb.removeSources();
+
+                pb.addSource(sourceImage);
+                pb.addSource(firstBand);
+                sourceImage = JAI.create("bandmerge", pb);
+
+                pb.removeParameters();
+                pb.removeSources();
             }
+        }
 
-            // /////////////////////////////////////////////////////////////////
-            // 
-            // ALPHA CHANNEL getting the alpha channel and separating from the
-            // others bands.
-            //
-            // /////////////////////////////////////////////////////////////////
-            if (sourceImage.getColorModel().hasAlpha()) {
-                int numBands = sourceImage.getSampleModel().getNumBands();
-
-                // getting alpha channel
-                alphaChannel = JAI.create("bandSelect", sourceImage,
-                        new int[] { numBands - 1 });
-
-                // getting needed bands
-                sourceImage = getBandsFromImage(sourceImage, numBands);
-            }
-
-            // /////////////////////////////////////////////////////////////////
-            // 
-            // BAND MERGE If we do not have 3 bands we have no way to go to
-            // index color model in a simple way using jai. Therefore we add the
-            // bands we need in order to get there. This trick works fine with
-            // gray scale images. ATTENTION, if the initial image had no alpha
-            // channel we proceed without doing anything since it seems that GIF
-            // encoder in such a case works fine.
-            // /////////////////////////////////////////////////////////////////
-            if ((sourceImage.getSampleModel().getNumBands() == 1)
-                    && (alphaChannel != null)) {
-                int numBands = sourceImage.getSampleModel().getNumBands();
-
-                // getting first band
-                final RenderedImage firstBand = JAI.create("bandSelect",
-                        sourceImage, new int[] { 0 });
-
-                // adding to the image
-                for (int i = 0; i < (3 - numBands); i++) {
-                    pb.removeParameters();
-                    pb.removeSources();
-
-                    pb.addSource(sourceImage);
-                    pb.addSource(firstBand);
-                    sourceImage = JAI.create("bandmerge", pb);
-
-                    pb.removeParameters();
-                    pb.removeSources();
-                }
-            }
-
-            // /////////////////////////////////////////////////////////////////
-            // 
-            // ERROR DIFFUSION we create a single banded image with index color
-            // model.
-            // /////////////////////////////////////////////////////////////////
-            if (sourceImage.getSampleModel().getNumBands() == 3) {
-                sourceImage = ImageUtilities.RGBIndexColorModel(sourceImage);
-            }
-            // /////////////////////////////////////////////////////////////////
-            // 
-            // TRANSPARENCY Adding transparency if needed, which means using the
-            // alpha channel to build a new color model
-            // /////////////////////////////////////////////////////////////////
-            if (alphaChannel != null) {
-                sourceImage = ImageUtilities.addTransparency2IndexColorModel(
-                        sourceImage, alphaChannel, true);
-            }
+        // /////////////////////////////////////////////////////////////////
+        // 
+        // ERROR DIFFUSION we create a single banded image with index color
+        // model.
+        // /////////////////////////////////////////////////////////////////
+        if (sourceImage.getSampleModel().getNumBands() == 3) {
+            sourceImage = ImageUtilities.RGBIndexColorModel(sourceImage);
+        }
+        // /////////////////////////////////////////////////////////////////
+        // 
+        // TRANSPARENCY Adding transparency if needed, which means using the
+        // alpha channel to build a new color model
+        // /////////////////////////////////////////////////////////////////
+        if (alphaChannel != null) {
+            sourceImage = ImageUtilities.addTransparency2IndexColorModel(
+                    sourceImage, alphaChannel, true);
         }
 
         return sourceImage;
@@ -1215,9 +1259,16 @@ public final class ImageUtilities {
      * @param numBands
      * 
      * @return
+     *
+     * @since 2.3
      */
-    public static PlanarImage getBandsFromImage(PlanarImage surrogateImage,
-            int numBands) {
+    public static PlanarImage getBandsFromImage(PlanarImage surrogateImage, int numBands) {
+        if (PROPOSED_REPLACEMENT) {
+            ImageWorker w = new ImageWorker(surrogateImage);
+            w.retainBands(numBands - 1);
+            return w.getPlanarImage();
+        }
+
         switch (numBands - 1) {
         case 1:
             surrogateImage = JAI.create("bandSelect", surrogateImage,
@@ -1243,9 +1294,14 @@ public final class ImageUtilities {
      * @param surrogateImage
      * 
      * @return
+     *
+     * @since 2.3
      */
-    public static final PlanarImage convertIndexColorModelAlpha4GIF(
-            PlanarImage surrogateImage) {
+    public static final PlanarImage convertIndexColorModelAlpha4GIF(PlanarImage surrogateImage) {
+        if (PROPOSED_REPLACEMENT) {
+            // TODO: this is the last method remaining to be ported.
+        }
+
         // doing nothing if the input color model is correct
         final IndexColorModel cm = (IndexColorModel) surrogateImage
                 .getColorModel();
@@ -1262,7 +1318,7 @@ public final class ImageUtilities {
         cm.getGreens(rgba[1]);
         cm.getBlues(rgba[2]);
 
-        /**
+        /*
          * Now we are going for the first transparent color in the color map.
          * From now on we will reuse this color as the default trasnparent
          * color.
@@ -1291,7 +1347,7 @@ public final class ImageUtilities {
 
         }
 
-        /**
+        /*
          * 
          * Now we need to perform the look up transformation. First of all we
          * create the new color model with a bitmask transparency using the
@@ -1333,10 +1389,17 @@ public final class ImageUtilities {
      * @return
      * 
      * @throws IllegalArgumentException
-     * 
+     *
+     * @since 2.3
      */
     public static RenderedOp reformatColorModel2ComponentColorModel(
             PlanarImage sourceImage) throws IllegalArgumentException {
+
+        if (PROPOSED_REPLACEMENT) {
+            ImageWorker w = new ImageWorker(sourceImage);
+            w.forceComponentColorModel();
+            return w.getRenderedOperation();
+        }
 
         final ColorModel cm = sourceImage.getColorModel();
         final SampleModel sm = sourceImage.getSampleModel();
@@ -1426,6 +1489,5 @@ public final class ImageUtilities {
         final RenderingHints hint = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
                 layout);
         return JAI.create("format", pbjFormat, hint);
-
     }
 }

@@ -21,6 +21,7 @@ package org.geotools.image;
 // J2SE dependencies
 import java.awt.Image;
 import java.awt.image.*;
+import java.awt.Transparency;
 import java.awt.RenderingHints;
 import java.awt.HeadlessException;
 import java.awt.color.ColorSpace;
@@ -491,7 +492,7 @@ public class ImageWorker {
      * Reduces the color model to {@linkplain IndexColorModel index color model}. If the current
      * {@linkplain #image} already uses an {@linkplain IndexColorModel index color model}, then
      * this method do nothing. Otherwise, the current implementation performs a ditering on the
-     * original color model. It currently work only for RGB.
+     * original color model. Note that this operation loose the alpha channel.
      *
      * @see OrderedDitherDescriptor
      */
@@ -501,15 +502,96 @@ public class ImageWorker {
             // Already an index color model - nothing to do.
             return;
         }
-        if (cm.getColorSpace().getType() != ColorSpace.TYPE_RGB) {
-            throw new UnsupportedOperationException("Implemented for RGB type only.");
-        }
+        tileCacheEnabled(false);
+        forceColorSpaceRGB();
+        tileCacheEnabled(true);
         // error dither
         final KernelJAI[]    ditherMask = KernelJAI.DITHER_MASK_443;
         final ColorCube      colorMap   = ColorCube.BYTE_496;
         final RenderingHints hints      = getRenderingHints();
         image = OrderedDitherDescriptor.create(image, colorMap, ditherMask, hints);
         invalidateStatistics();
+    }
+
+    /**
+     * Reduces the color model to {@linkplain IndexColorModel index color model} with
+     * {@linkplain Transparency#BITMASK bitmask} transparency. If the current {@linkplain #image}
+     * already uses a suitable color model, then this method do nothing. Otherwise, the current
+     * implementation invokes {@link #addTransparencyToIndexColorModel} with the alpha channel,
+     * if any.
+     *
+     * @see transparent A pixel value to define as the transparent pixel.
+     *
+     * @see #addTransparencyToIndexColorModel
+     */
+    public void forceBitmaskIndexColorModel(final int transparent) {
+        final ColorModel cm = image.getColorModel();
+        if (cm instanceof IndexColorModel) {
+            final IndexColorModel icm = (IndexColorModel) cm;
+            if (icm.getTransparency() == Transparency.BITMASK &&
+                    icm.getTransparentPixel() == transparent)
+            {
+                // Suitable color model. There is nothing to do.
+                return;
+            }
+        }
+        /*
+         * Getting the alpha channel.
+         */
+        RenderedImage alphaChannel = null;
+        if (cm.hasAlpha()) {
+            tileCacheEnabled(false);
+            int numBands = getNumBands();
+            final RenderingHints hints = getRenderingHints();
+            alphaChannel = BandSelectDescriptor.create(image, new int[] {--numBands}, hints);
+            tileCacheEnabled(true);
+        }
+        /*
+         * Adding transparency if needed, which means using the alpha channel to build
+         * a new color model. The method call below implies 'forceColorSpaceRGB()' and
+         * 'forceIndexColorModel()' method calls.
+         */
+        addTransparencyToIndexColorModel(alphaChannel, false, -1);
+    }
+
+    /**
+     * Converts the image to a GIF-compliant image. This method has been created
+     * in order to convert the input image to a form that is compatible with the
+     * GIF model. It first remove the information about transparency since the
+     * error diffusion and the error dither operations are unable to process
+     * images with more than 3 bands. Afterwards the image is processed with an
+     * error diffusion operator in order to reduce the number of bands from 3 to
+     * 1 and the number of color to 216. A suitable layout is used for the final
+     * image via the {@linkplain #getRenderingHints rendering hints} in order to
+     * take into account the different layout model for the final image.
+     * <p>
+     * <strong>Tip:</strong> For optimizing writting GIF, we need to create the image untiled. This
+     * can be done by invoking <code>{@linkplain #setRenderingHint setRenderingHint}({@linkplain
+     * #TILING_ALLOWED}, Boolean.FALSE)</code> first.
+     */
+    public void forceIndexColorModelForGIF() {
+        /*
+         * Checking the color model to see if we need to convert it back to color model.
+         * We might also need to reformat the image in order to get it to 8 bits samples.
+         */
+        tileCacheEnabled(false);
+        if (image.getColorModel() instanceof PackedColorModel) {
+            forceComponentColorModel();
+        }
+        rescaleToBytes();
+        tileCacheEnabled(true);
+        /*
+         * Getting the alpha channel and separating from the others bands. If the initial image
+         * had no alpha channel (more specifically, if it is neither opaque or a bitmask) we
+         * proceed without doing anything since it seems that GIF encoder in such a case works
+         * fine. If we need to create a bitmask, we will use the last index value allowed (255)
+         * as the transparent pixel value.
+         */
+        if (image.getColorModel().getTransparency() == Transparency.TRANSLUCENT) {
+            forceBitmaskIndexColorModel(255);
+        } else {
+            forceIndexColorModel();
+        }
     }
 
 	/**
@@ -537,6 +619,27 @@ public class ImageWorker {
 	}
 
     /**
+     * Forces the {@linkplain #image} color model to the {@linkplain ColorSpace#CS_sRGB RGB color
+     * space}. If the current color space is already of {@linkplain ColorSpace#TYPE_RGB RGB type},
+     * then this method does nothing. This operation loose the alpha channel.
+     *
+     * @see ColorConvertDescriptor
+     */
+    public void forceColorSpaceRGB() {
+        ColorModel cm = image.getColorModel();
+        if (cm.getColorSpace().getType() != ColorSpace.TYPE_RGB) {
+            cm = new ComponentColorModel(
+                    ColorSpace.getInstance(ColorSpace.CS_sRGB),
+                    false,                  // If true, supports transparency.
+                    false,                  // If true, alpha is premultiplied.
+                    Transparency.OPAQUE,    // What alpha values can be represented.
+                    DataBuffer.TYPE_BYTE);  // Type of primitive array used to represent pixel.
+            image = ColorConvertDescriptor.create(image, cm, getRenderingHints());
+            invalidateStatistics();
+        }
+    }
+
+    /**
      * Creates an image which represents approximatively the intensity of {@linkplain #image}.
      * The result is always a single-banded image. If the image uses an {@linkplain IHSColorSpace
      * IHS color space}, then this method just {@linkplain #retainFirstBand retain the first band}
@@ -545,6 +648,8 @@ public class ImageWorker {
      * in order to come up with a simple estimation of the intensity of the image based on
      * the average value of the color components. It is worthwhile to note that the alpha band
      * is stripped from the image.
+     *
+     * @see BandCombineDescriptor
      */
     public void intensity() {
         /*
@@ -594,8 +699,26 @@ public class ImageWorker {
      * @see BandSelectDescriptor
      */
     public void retainFirstBand() {
-        if (getNumBands() != 1) {
-            image = BandSelectDescriptor.create(image, new int[] {0}, getRenderingHints());
+        retainBands(1);
+    }
+
+    /**
+     * Retains inconditionnaly the first {@code numBands} of {@linkplain #image}.
+     * All other bands (if any) are discarted without any further processing.
+     * This method does nothing if the current {@linkplain #image} does not have
+     * a greater amount of bands than {@code numBands}.
+     *
+     * @param numBands the number of bands to retain.
+     *
+     * @see BandSelectDescriptor
+     */
+    public void retainBands(final int numBands) {
+        if (getNumBands() > numBands) {
+            final int[] bands = new int[numBands];
+            for (int i=0; i<bands.length; i++) {
+                bands[i] = i;
+            }
+            image = BandSelectDescriptor.create(image, bands, getRenderingHints());
         }
     }
 
@@ -683,8 +806,8 @@ public class ImageWorker {
      * corresponding pixel in the {@linkplain #image} will be set to the specified
      * {@code newValue}.
      * <p>
-     * <strong>Note:</strong> current implementation work only for {@linkplain IndexColorModel
-     * index color model}.
+     * <strong>Note:</strong> current implementation force the color model to an
+     * {@linkplain IndexColorModel indexed} one. Future versions may avoid this change.
      *
      * @param mask      The mask to apply, as a {@linkplain #binarize() binarized} image.
      * @param maskValue The mask value to search for ({@code false} for 0 or {@code true} for 1).
@@ -746,52 +869,91 @@ public class ImageWorker {
     /**
      * Adds transparency to a preexisting image whose color model is {@linkplain IndexColorModel
      * index color model}. First, this method creates a new index color model with the specified
-     * {@code transparent} pixel. Then for all pixels with the value {@code false} in the specified
-     * mask, the corresponding pixel in the {@linkplain #image} is set to that transparent value.
-     * All other pixels are left unchanged.
-     * <p>
-     * <strong>Tip:</strong> For optimizing writting GIF, we need to create the image untiled. This
-     * can be done by invoking <code>{@linkplain #setRenderingHint setRenderingHint}({@linkplain
-     * #TILING_ALLOWED}, Boolean.FALSE)</code> first.
+     * {@code transparent} pixel, if needed (this method may skip this step if the specified pixel
+     * is already transparent, i.e. has an {@linkplain IndexColorModel#getAlpha(int) alpha} value
+     * of zero). Then for all pixels with the value {@code false} in the specified mask, the
+     * corresponding pixel in the {@linkplain #image} is set to that transparent value. All other
+     * pixels are left unchanged.
      * 
-     * @param mask        The mask to apply, as a {@linkplain #binarize() binarized} image.
+     * @param mask        The mask to apply as a {@linkplain #binarize() binarized} image,
+     *                    or {@code null} if there is no mask to apply. In such case, this
+     *                    method will only change the {@linkplain ColorModel color model}
+     *                    (if needed).
+     * @param translucent {@code true} if {@linkplain Transparency#TRANSLUCENT translucent}
+     *                    images are allowed, or {@code false} if the resulting images must
+     *                    be a {@linkplain Transparency#BITMASK bitmask}.
      * @param transparent The value for transparent pixels, to be given to every pixels in the
-     *                    {@linkplain #image} corresponding to {@code false} in the mask.
+     *                    {@linkplain #image} corresponding to {@code false} in the mask. The
+     *                    special value {@code -1} maps to the last pixel value allowed for the
+     *                    {@linkplain IndexedColorModel indexed color model}.
+     *
+     * @see #forceBitmaskIndexColorModel
      */
-    public void addTransparencyToIndexColorModel(RenderedImage mask, int transparent) {
+    public void addTransparencyToIndexColorModel(final RenderedImage mask,
+                                                 final boolean translucent, int transparent)
+    {
         tileCacheEnabled(false);
         forceIndexColorModel();
         tileCacheEnabled(true);
         /*
-         * Gets the index color model and replace it by a new one with a transparent pixel defined.
-         * All the colors will be opaque except one. The new color map will loose all the alpha
-         * channel.
-         */
-        IndexColorModel cm = (IndexColorModel) image.getColorModel();
-        final int mapSize = Math.max(cm.getMapSize(), transparent + 1);
-        final byte[][] RGB = new byte[3][mapSize]; // Note: we might use less that 256.
-        cm.getReds  (RGB[0]);
-        cm.getGreens(RGB[1]);
-        cm.getBlues (RGB[2]);
-        cm = new IndexColorModel(cm.getPixelSize(), mapSize, RGB[0], RGB[1], RGB[2], transparent);
-        /*
-         * Prepares hints and layout to reuse for the AND and OR operations.
+         * Prepares hints and layout to use for mask operations. A color model hint
+         * will be set only if the block below is executed.
          */
         final ImageWorker   worker = fork(image);
-        final RenderingHints hints = getRenderingHints();
-        final ImageLayout   layout = getImageLayout(hints);
-        layout.setColorModel(cm);
-        worker.setRenderingHint(JAI.KEY_IMAGE_LAYOUT, layout);
+        final RenderingHints hints = worker.getRenderingHints();
+        /*
+         * Gets the index color model. If the specified 'transparent' value is not fully
+         * transparent, replaces the color model by a new one with the transparent pixel
+         * defined. NOTE: the  "transparent &= (1 << pixelSize)"  instruction below is a
+         * safety for making sure that the transparent index value can hold in the amount
+         * of bits allowed for this color model (the mapSize value may not use all bits).
+         * It work as expected with the -1 special value. It also make sure that
+         * "transparent + 1" do not exeed the maximum map size allowed.
+         */
+        IndexColorModel cm = (IndexColorModel) image.getColorModel();
+        transparent &= (1 << cm.getPixelSize());
+        if ((!translucent && cm.getTransparency() == Transparency.TRANSLUCENT) ||
+                cm.getAlpha(transparent) != 0)
+        {
+            final int mapSize = Math.max(cm.getMapSize(), transparent + 1);
+            final byte[][] RGBA = new byte[translucent ? 4 : 3][mapSize];
+            // Note: we might use less that 256 values.
+            cm.getReds  (RGBA[0]);
+            cm.getGreens(RGBA[1]);
+            cm.getBlues (RGBA[2]);
+            if (translucent) {
+                cm.getAlpha(RGBA[3]);
+                RGBA[3][transparent] = 0;
+                cm = new IndexColorModel(cm.getPixelSize(), mapSize,
+                        RGBA[0], RGBA[1], RGBA[2], RGBA[3]);
+            } else {
+                cm = new IndexColorModel(cm.getPixelSize(), mapSize,
+                        RGBA[0], RGBA[1], RGBA[2], transparent);
+            }
+            /*
+             * Set the color model hint.
+             */
+            final ImageLayout layout = getImageLayout(hints);
+            layout.setColorModel(cm);
+            worker.setRenderingHint(JAI.KEY_IMAGE_LAYOUT, layout);
+        }
+        /*
+         * Applies the mask, maybe with a color model change.
+         */
         worker.setRenderingHint(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
-        worker.mask(mask, false, transparent);
-        image = worker.image;
+        if (mask != null) {
+            worker.mask(mask, false, transparent);
+            image = worker.image;
+        } else {
+            image = FormatDescriptor.create(worker.image, null, worker.getRenderingHints());
+        }
         invalidateStatistics();
 	}
 
     /**
      * If the was not already tiled, tile it. Note that no tiling will
      * be done if 'getRenderingHints()' failed to suggest a tile size.
-     * This method is for internal use by {@link #save} methods only.
+     * This method is for internal use by {@link #write} methods only.
      */
     private void tile() {
         final RenderingHints hints = getRenderingHints();
@@ -815,30 +977,74 @@ public class ImageWorker {
      *       argument is given directly without creating an {@link ImageOutputStream} object.
      *       This is important for some formats like HDF, which work <em>only</em> with files.</li>
      *   <li>If the {@linkplain #image} is not tiled, then it is tiled prior to be written.</li>
+     *   <li>If some special processing is needed for a given format, then the corresponding method
+     *       is invoked. Example: {@link #forceIndexColorModelForGIF}.</li>
      * </ul>
      */
-    public void write(final File file) throws IOException {
-        final String filename = file.getName();
+    public void write(final File output) throws IOException {
+        final String filename = output.getName();
         final int dot = filename.lastIndexOf('.');
-        if (dot >= 0) {
-            final String extension = filename.substring(dot+1).trim();
-            final Iterator it = ImageIO.getImageWritersBySuffix(extension);
-            if (it!=null && it.hasNext()) {
-                final ImageWriter writer = (ImageWriter) it.next();
-                final ImageWriterSpi spi = writer.getOriginatingProvider();
-                final ImageOutputStream output;
-                if (spi!=null && acceptFile(spi.getOutputTypes())) {
-                    writer.setOutput(file);
-                    output = null;
+        if (dot < 0) {
+            throw new IIOException(Errors.format(ErrorKeys.NO_IMAGE_WRITER));
+        }
+        final String extension = filename.substring(dot+1).trim();
+        write(output, ImageIO.getImageWritersBySuffix(extension));
+    }
+
+    /**
+     * Writes the {@linkplain #image} to the specified output, trying all encoders in the
+     * specified iterator in the iteration order.
+     */
+    private void write(final Object output, final Iterator/*<ImageWriter>*/ encoders)
+            throws IOException
+    {
+        if (encoders != null) {
+            while (encoders.hasNext()) {
+                final ImageWriter  writer = (ImageWriter) encoders.next();
+                final ImageWriterSpi  spi = writer.getOriginatingProvider();
+                final Class[] outputTypes;
+                if (spi == null) {
+                    outputTypes = ImageWriterSpi.STANDARD_OUTPUT_TYPE;
                 } else {
-                    output = ImageIO.createImageOutputStream(file);
-                    writer.setOutput(output);
+                    /*
+                     * If the encoder is for some format handled in a special way (e.g. GIF),
+                     * apply the required operation. Note that invoking the same method many
+                     * time (e.g. "forceIndexColorModelForGIF", which could occurs if there
+                     * is more than one GIF encoder registered) should not hurt - all method
+                     * invocation after the first one should be no-op.
+                     */
+                    final String[] formats = spi.getFormatNames();
+                    if (containsFormatName(formats, "gif")) {
+                        forceIndexColorModelForGIF();
+                    }
+                    if (!spi.canEncodeImage(image)) {
+                        continue;
+                    }
+                    outputTypes = spi.getOutputTypes();
                 }
+                /*
+                 * Now try to set the output directly (if possible), or as an ImageOutputStream
+                 * if the encoder doesn't accept directly the specified output. Note that some
+                 * formats like HDF may not support ImageOutputStream.
+                 */
+                final ImageOutputStream stream;
+                if (acceptInputType(outputTypes, output.getClass())) {
+                    writer.setOutput(output);
+                    stream = null;
+                } else if (acceptInputType(outputTypes, ImageOutputStream.class)) {
+                    stream = ImageIO.createImageOutputStream(output);
+                    writer.setOutput(stream);
+                } else {
+                    continue;
+                }
+                /*
+                 * Now save the image.
+                 */
                 tile();
                 writer.write(image);
                 writer.dispose();
-                if (output != null) {
-                    output.close();
+                if (stream != null) {
+                    stream.close();
                 }
                 return;
             }
@@ -847,11 +1053,23 @@ public class ImageWorker {
     }
 
     /**
-     * Returns {@code true} if the specified array contains {@code File.class}.
+     * Returns {@code true} if the specified array contains the specified type.
      */
-    private static boolean acceptFile(final Class[] types) {
+    private static boolean acceptInputType(final Class[] types, final Class searchFor) {
         for (int i=types.length; --i>=0;) {
-            if (File.class.equals(types[i])) {
+            if (searchFor.isAssignableFrom(types[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns {@code true} if the specified array contains the specified string.
+     */
+    private static boolean containsFormatName(final String[] formats, final String searchFor) {
+        for (int i=formats.length; --i>=0;) {
+            if (searchFor.equalsIgnoreCase(formats[i])) {
                 return true;
             }
         }

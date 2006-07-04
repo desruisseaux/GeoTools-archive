@@ -174,7 +174,7 @@ public class ParameterEditor extends JPanel {
                 BorderFactory.createCompoundBorder(
                 BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(6, 9, 6, 9),
-                BorderFactory.createEtchedBorder()),
+                BorderFactory.createLineBorder(description.getForeground())),
                 BorderFactory.createEmptyBorder(6, 0, 6, 0))));
         add(description, BorderLayout.NORTH );
         add(cards,       BorderLayout.CENTER);
