@@ -91,7 +91,6 @@
     <module>graph</module>
     <module>go</module>
     <module>openoffice</module>
-    <module>pickle</module>
     <module>shape</module>
     <module>shaperenderer</module>
     <module>validation</module>
