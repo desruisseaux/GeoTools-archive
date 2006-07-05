@@ -30,8 +30,7 @@ import org.geotools.filter.FilterCapabilitiesMask;
  * @author dzwiers
  * @source $URL$
  */
-public class WFSCapabilities {
-    private Service service; // no contact info provided
+public class WFSCapabilities extends Capabilities {
     private List featureTypes; // FeatureSetDescriptions
     private OperationType describeFeatureType;
     private OperationType getCapabilities;
@@ -108,24 +107,6 @@ public class WFSCapabilities {
      */
     public void setFilterCapabilities(FilterCapabilitiesMask filterCapabilities) {
         this.filterCapabilities = filterCapabilities;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return Returns the service.
-     */
-    public Service getService() {
-        return service;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param service The service to set.
-     */
-    public void setService(Service service) {
-        this.service = service;
     }
 
     /**

@@ -31,6 +31,7 @@ public class WMSCapabilities extends Capabilities {
     private Layer layer;
     
     private List layers; //cache
+	private String[] exceptions;
 
     public Layer getLayer() {
         return layer;
@@ -74,4 +75,16 @@ public class WMSCapabilities extends Capabilities {
     public void setRequest(WMSRequest request) {
         this.request = request;
     }
+
+	/**
+	 * Exceptions declare what kind of formats this server can return exceptions
+	 * in. They are used during subsequent requests.
+	 */
+	public String[] getExceptions() {
+	    return exceptions;
+	}
+
+	public void setExceptions(String[] exceptions) {
+	    this.exceptions = exceptions;
+	}
 }
