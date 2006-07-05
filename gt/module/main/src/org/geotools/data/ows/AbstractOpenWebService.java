@@ -17,8 +17,9 @@ package org.geotools.data.ows;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -275,7 +276,21 @@ public abstract class AbstractOpenWebService {
     protected Response internalIssueRequest( Request request ) throws IOException, ServiceException {
         URL finalURL = request.getFinalURL();
 
-        URLConnection connection = finalURL.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) finalURL.openConnection();
+        
+        if (request.requiresPost()) {
+        	connection.setRequestMethod("POST");
+        	connection.setDoOutput(true);
+        	connection.setRequestProperty("Content-type", request.getPostContentType());
+
+        	OutputStream outputStream = connection.getOutputStream();
+        	request.performPostOutput(outputStream);
+        	
+        	outputStream.flush();
+        	outputStream.close();
+        } else {
+        	connection.setRequestMethod("GET");
+        }
         
         connection.addRequestProperty("Accept-Encoding", "gzip");
 

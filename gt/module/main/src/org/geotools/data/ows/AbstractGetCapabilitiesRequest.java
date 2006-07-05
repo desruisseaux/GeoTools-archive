@@ -47,5 +47,4 @@ public abstract class AbstractGetCapabilitiesRequest extends AbstractRequest imp
     protected void initRequest() {
         setProperty(REQUEST, "GetCapabilities"); //$NON-NLS-1$
     }
-
 }

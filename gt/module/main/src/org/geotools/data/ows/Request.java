@@ -17,6 +17,7 @@ package org.geotools.data.ows;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Properties;
 
@@ -82,4 +83,36 @@ public interface Request {
      * @throws IOException
      */
     Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException;
+    
+    /**
+     * This method indicates whether this request needs to transmit some data
+     * to the server using POST. If this returns true, performPostOutput() will be called
+     * during the connection, allowing the data to be written out to the server.
+     * 
+     * @return true if this request needs POST support, false otherwise.
+     */
+    boolean requiresPost();
+    
+    /**
+     * If this request uses POST, it must specify the content type of the data
+     * that is to be written out during performPostOutput().
+     * 
+     * For open web services, this is usually "application/xml".
+     * 
+     * @return the MIME type of the data to be sent during the request
+     */
+    String getPostContentType();
+    
+    /**
+     * This is called during the connection to the server, allowing this
+     * request to write out data to the server by using the provided
+     * outputStream.
+     * 
+     * Implementors of this method do not need to call outputStream.flush() or 
+     * outputStream.close(). The framework will call them immediately after
+     * calling this method.
+     * 
+     * @param outputStream
+     */
+    void performPostOutput(OutputStream outputStream);
 }

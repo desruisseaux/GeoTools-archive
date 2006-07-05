@@ -15,6 +15,7 @@
  */
 package org.geotools.data.ows;
 
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
@@ -190,4 +191,25 @@ public abstract class AbstractRequest implements Request{
      * setProperty("VERSION", "1.1.1");
      */
     protected abstract void initVersion();
+
+    /**
+     * Default POST content type is xml
+     */
+	public String getPostContentType() {
+		return "application/xml";
+	}    
+	
+    /**
+	 * Default to not requiring POST. Implementors can override if they need to.
+	 */
+	public void performPostOutput(OutputStream outputStream) {
+		
+	}
+
+	/**
+	 * Default to not requiring POST. Implementors can override if they need to.
+	 */
+	public boolean requiresPost() {
+		return false;
+	}
 }

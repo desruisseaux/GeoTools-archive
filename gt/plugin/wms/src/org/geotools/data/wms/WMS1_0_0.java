@@ -25,23 +25,16 @@ import java.util.Map;
 
 import org.geotools.data.ows.AbstractGetCapabilitiesRequest;
 import org.geotools.data.ows.AbstractRequest;
-import org.geotools.data.ows.Response;
 import org.geotools.data.ows.GetCapabilitiesRequest;
-import org.geotools.data.ows.Specification;
+import org.geotools.data.ows.Response;
 import org.geotools.data.wms.request.AbstractGetFeatureInfoRequest;
 import org.geotools.data.wms.request.AbstractGetMapRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
-import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
-import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.request.GetStylesRequest;
 import org.geotools.data.wms.request.PutStylesRequest;
-import org.geotools.data.wms.response.DescribeLayerResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
-import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.geotools.data.wms.response.GetMapResponse;
-import org.geotools.data.wms.response.GetStylesResponse;
-import org.geotools.data.wms.response.PutStylesResponse;
 import org.geotools.data.wms.response.WMSGetCapabilitiesResponse;
 import org.geotools.ows.ServiceException;
 
