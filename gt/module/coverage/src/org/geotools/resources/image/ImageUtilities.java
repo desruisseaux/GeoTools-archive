@@ -1057,7 +1057,8 @@ public final class ImageUtilities {
             if (optimizeForWritingGIF) {
                 w.setRenderingHint(ImageWorker.TILING_ALLOWED, Boolean.FALSE);
             }
-            w.addTransparencyToIndexColorModel(alphaChannel, false, 255);
+            w.forceBitmaskIndexColorModel(255);
+            w.addTransparencyToIndexColorModel(alphaChannel);
             return w.getPlanarImage();
         }
 
@@ -1299,7 +1300,9 @@ public final class ImageUtilities {
      */
     public static final PlanarImage convertIndexColorModelAlpha4GIF(PlanarImage surrogateImage) {
         if (PROPOSED_REPLACEMENT) {
-            // TODO: this is the last method remaining to be ported.
+            ImageWorker w = new ImageWorker(surrogateImage);
+            w.forceBitmaskIndexColorModel();
+            return w.getPlanarImage();
         }
 
         // doing nothing if the input color model is correct

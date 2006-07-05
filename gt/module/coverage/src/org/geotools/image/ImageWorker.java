@@ -142,6 +142,14 @@ public class ImageWorker {
         return worker;
     }
 
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                       ////////
+    ////////            IMAGE, PROPERTIES AND RENDERING HINTS ACCESSORS            ////////
+    ////////                                                                       ////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * Returns the current image.
      *
@@ -327,15 +335,12 @@ public class ImageWorker {
         }
         /*
          * Creates the new color model.
-         *
-         * TODO: Please explain why the ColorSpace is forced to CS_sRGB? This behavior seems
-         *       to be required by rescaleToBytes and forceComponentColorModel, but why?
          */
         ColorModel cm = image.getColorModel();
         cm = new ComponentColorModel(
-                ColorSpace.getInstance(ColorSpace.CS_sRGB),
+                cm.getColorSpace(),
                 cm.hasAlpha(),              // If true, supports transparency.
-                false,                      // If true, alpha is premultiplied.
+                cm.isAlphaPremultiplied(),  // If true, alpha is premultiplied.
                 cm.getTransparency(),       // What alpha values can be represented.
                 type);                      // Type of primitive array used to represent pixel.
         /*
@@ -365,6 +370,9 @@ public class ImageWorker {
      * cancel the last invocation with value {@code false}. If this method was invoking many
      * time with value {@code false}, then this method must be invoked the same amount of time
      * with the value {@code true} for reenabling the cache.
+     * <p>
+     * <strong>Note:</strong> This method name doesn't contain the usual {@code set} prefix
+     * because it doesn't really set a flag. Instead it increments or decrements a counter.
      */
     private void tileCacheEnabled(final boolean status) {
         if (status) {
@@ -381,10 +389,20 @@ public class ImageWorker {
     /**
      * Returns the number of bands in the {@linkplain #image}.
      *
+     * @see #retainBands
+     * @see #retainFirstBand
      * @see SampleModel#getNumBands
      */
-    public int getNumBands() {
+    public final int getNumBands() {
         return image.getSampleModel().getNumBands();
+    }
+
+    /**
+     * Returns the transparent pixel value, or -1 if none.
+     */
+    private final int getTransparentPixel() {
+        final ColorModel cm = image.getColorModel();
+        return (cm instanceof IndexColorModel) ? ((IndexColorModel) cm).getTransparentPixel() : -1;
     }
 
     /**
@@ -453,20 +471,91 @@ public class ImageWorker {
         return getExtremas()[1];
     }
 
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                       ////////
+    ////////            KIND OF IMAGE (BYTES, BINARY, INDEXED, RGB...)             ////////
+    ////////                                                                       ////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Returns {@code true} if the {@linkplain #image} stores its pixel values in 8 bits.
+     *
+     * @see #rescaleToBytes
+     */
+    public final boolean isBytes() {
+        return image.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE;
+    }
+
+    /**
+     * Returns {@code true} if the {@linkplain #image} is binary. Such image usually contains
+     * only two values: 0 and 1.
+     *
+     * @see #binarize()
+     * @see #binarize(double)
+     * @see #binarize(int,int)
+     */
+    public final boolean isBinary() {
+        return ImageUtil.isBinary(image.getSampleModel());
+    }
+
+    /**
+     * Returns {@code true} if the {@linkplain #image} uses an {@linkplain IndexColorModel
+     * index color model}.
+     *
+     * @see #forceIndexColorModel
+     * @see #forceBitmaskIndexColorModel
+     * @see #forceIndexColorModelForGIF
+     */
+    public final boolean isIndexed() {
+        return image.getColorModel() instanceof IndexColorModel;
+    }
+
+    /**
+     * Returns {@code true} if the {@linkplain #image} uses a RGB {@linkplain ColorSpace color
+     * space}. Note that a RGB color space doesn't mean that pixel values are directly stored
+     * as RGB components. The image may be {@linkplain #isIndexed indexed} as well.
+     *
+     * @see #forceColorSpaceRGB
+     */
+    public final boolean isColorSpaceRGB() {
+        return image.getColorModel().getColorSpace().getType() == ColorSpace.TYPE_RGB;
+    }
+
+    /**
+     * Returns {@code true} if the {@linkplain #image} is {@linkplain Transparency#TRANSLUCENT
+     * translucent}.
+     *
+     * @see #forceBitmaskIndexColorModel
+     */
+    public final boolean isTranslucent() {
+        return image.getColorModel().getTransparency() == Transparency.TRANSLUCENT;
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                       ////////
+    ////////                            IMAGE OPERATORS                            ////////
+    ////////                                                                       ////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * Rescales the {@linkplain #image} such that it uses 8 bits. If the image already uses 8 bits,
      * then this method does nothing. Otherwise this method computes the minimum and maximum values
      * for each band, {@linkplain RescaleDescriptor rescale} them in the range {@code [0 .. 255]}
      * and force the resulting image to {@link DataBuffer#TYPE_BYTE TYPE_BYTE}.
      *
+     * @see #isBytes
      * @see RescaleDescriptor
      */
     public void rescaleToBytes() {
-        if (image.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE) {
+        if (isBytes()) {
             // Already using bytes - nothing to do.
             return;
         }
-        if (image.getColorModel() instanceof IndexColorModel) {
+        if (isIndexed()) {
             throw new UnsupportedOperationException(
                     "Rescaling not yet implemented for IndexColorModel.");
         }
@@ -486,6 +575,9 @@ public class ImageWorker {
                 offset,     // The per-band offsets to be added.
                 hints);     // The rendering hints.
         invalidateStatistics(); // Extremas are no longer valid.
+
+        // All post conditions for this method contract.
+        assert isBytes();
     }
 
     /**
@@ -494,6 +586,9 @@ public class ImageWorker {
      * this method do nothing. Otherwise, the current implementation performs a ditering on the
      * original color model. Note that this operation loose the alpha channel.
      *
+     * @see #isIndexed
+     * @see #forceBitmaskIndexColorModel
+     * @see #forceIndexColorModelForGIF
      * @see OrderedDitherDescriptor
      */
     public void forceIndexColorModel() {
@@ -511,47 +606,126 @@ public class ImageWorker {
         final RenderingHints hints      = getRenderingHints();
         image = OrderedDitherDescriptor.create(image, colorMap, ditherMask, hints);
         invalidateStatistics();
+
+        // All post conditions for this method contract.
+        assert isIndexed();
     }
 
     /**
      * Reduces the color model to {@linkplain IndexColorModel index color model} with
-     * {@linkplain Transparency#BITMASK bitmask} transparency. If the current {@linkplain #image}
-     * already uses a suitable color model, then this method do nothing. Otherwise, the current
-     * implementation invokes {@link #addTransparencyToIndexColorModel} with the alpha channel,
-     * if any.
+     * {@linkplain Transparency#OPAQUE opaque} or {@linkplain Transparency#BITMASK bitmask}
+     * transparency. If the current {@linkplain #image} already uses a suitable color model,
+     * then this method do nothing.
      *
-     * @see transparent A pixel value to define as the transparent pixel.
-     *
-     * @see #addTransparencyToIndexColorModel
+     * @see #isIndexed
+     * @see #isTranslucent
+     * @see #forceIndexColorModel
+     * @see #forceIndexColorModelForGIF
      */
-    public void forceBitmaskIndexColorModel(final int transparent) {
+    public void forceBitmaskIndexColorModel() {
+        forceBitmaskIndexColorModel(getTransparentPixel());
+    }
+
+    /**
+     * Reduces the color model to {@linkplain IndexColorModel index color model} with
+     * {@linkplain Transparency#OPAQUE opaque} or {@linkplain Transparency#BITMASK bitmask}
+     * transparency. If the current {@linkplain #image} already uses a suitable color model,
+     * then this method do nothing.
+     *
+     * @param transparent A pixel value to define as the transparent pixel.
+     *
+     * @see #isIndexed
+     * @see #isTranslucent
+     * @see #forceIndexColorModel
+     * @see #forceIndexColorModelForGIF
+     */
+    public void forceBitmaskIndexColorModel(int transparent) {
         final ColorModel cm = image.getColorModel();
         if (cm instanceof IndexColorModel) {
-            final IndexColorModel icm = (IndexColorModel) cm;
-            if (icm.getTransparency() == Transparency.BITMASK &&
-                    icm.getTransparentPixel() == transparent)
-            {
-                // Suitable color model. There is nothing to do.
-                return;
+            final IndexColorModel oldCM = (IndexColorModel) cm;
+            switch (oldCM.getTransparency()) {
+                case Transparency.OPAQUE: {
+                    // Suitable color model. There is nothing to do.
+                    return;
+                }
+                case Transparency.BITMASK: {
+                    if (oldCM.getTransparentPixel() == transparent) {
+                        // Suitable color model. There is nothing to do.
+                        return;
+                    }
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
-        }
-        /*
-         * Getting the alpha channel.
-         */
-        RenderedImage alphaChannel = null;
-        if (cm.hasAlpha()) {
-            tileCacheEnabled(false);
-            int numBands = getNumBands();
+            /*
+             * The index color model need to be replaced. Creates a lookup table mapping from the
+             * old pixel values to new pixels values,   with transparent colors mapped to the new
+             * transparent pixel value. The lookup table uses TYPE_BYTE or TYPE_USHORT, which are
+             * the two only types supported by IndexColorModel.
+             */
+            final int pixelSize = oldCM.getPixelSize();
+            transparent &= (1 << pixelSize) - 1;
+            final int mapSize = oldCM.getMapSize();
+            final int newSize = Math.max(mapSize, transparent + 1);
+            final LookupTableJAI lookupTable;
+            if (newSize <= 0xFF) {
+                final byte[] table = new byte[mapSize];
+                for (int i=0; i<mapSize; i++) {
+                    table[i] = (byte) ((oldCM.getAlpha(i) == 0) ? transparent : i);
+                }
+                lookupTable = new LookupTableJAI(table);
+            } else if (newSize <= 0xFFFF) {
+                final short[] table = new short[mapSize];
+                for (int i=0; i<mapSize; i++) {
+                    table[i] = (short) ((oldCM.getAlpha(i) == 0) ? transparent : i);
+                }
+                lookupTable = new LookupTableJAI(table, true);
+            } else {
+                throw new AssertionError(mapSize); // Should never happen.
+            }
+            /*
+             * Now we need to perform the look up transformation. First of all we
+             * create the new color model with a bitmask transparency using the
+             * transparency index specified to this method. Then we perform the
+             * lookup operation in order to prepare for the gif image.
+             */
+            final byte[][] rgb = new byte[3][newSize];
+            oldCM.getReds  (rgb[0]);
+            oldCM.getGreens(rgb[1]);
+            oldCM.getBlues (rgb[2]);
+            final IndexColorModel newCM = new IndexColorModel(pixelSize,
+                    newSize, rgb[0], rgb[1], rgb[2], transparent);
             final RenderingHints hints = getRenderingHints();
-            alphaChannel = BandSelectDescriptor.create(image, new int[] {--numBands}, hints);
-            tileCacheEnabled(true);
+            final ImageLayout layout = getImageLayout(hints);
+            layout.setColorModel(newCM);
+            hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
+            hints.put(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
+            image = LookupDescriptor.create(image, lookupTable, hints);
+        } else {
+            /*
+             * The image is not indexed. Getting the alpha channel.
+             */
+            RenderedImage alphaChannel = null;
+            if (cm.hasAlpha()) {
+                tileCacheEnabled(false);
+                int numBands = getNumBands();
+                final RenderingHints hints = getRenderingHints();
+                alphaChannel = BandSelectDescriptor.create(image, new int[] {--numBands}, hints);
+                tileCacheEnabled(true);
+            }
+            /*
+             * Adding transparency if needed, which means using the alpha channel to build
+             * a new color model. The method call below implies 'forceColorSpaceRGB()' and
+             * 'forceIndexColorModel()' method calls.
+             */
+            addTransparencyToIndexColorModel(alphaChannel, false, transparent);
         }
-        /*
-         * Adding transparency if needed, which means using the alpha channel to build
-         * a new color model. The method call below implies 'forceColorSpaceRGB()' and
-         * 'forceIndexColorModel()' method calls.
-         */
-        addTransparencyToIndexColorModel(alphaChannel, false, -1);
+
+        // All post conditions for this method contract.
+        assert isIndexed();
+        assert !isTranslucent();
     }
 
     /**
@@ -568,6 +742,10 @@ public class ImageWorker {
      * <strong>Tip:</strong> For optimizing writting GIF, we need to create the image untiled. This
      * can be done by invoking <code>{@linkplain #setRenderingHint setRenderingHint}({@linkplain
      * #TILING_ALLOWED}, Boolean.FALSE)</code> first.
+     *
+     * @see #isIndexed
+     * @see #forceIndexColorModel
+     * @see #forceBitmaskIndexColorModel
      */
     public void forceIndexColorModelForGIF() {
         /*
@@ -582,16 +760,21 @@ public class ImageWorker {
         tileCacheEnabled(true);
         /*
          * Getting the alpha channel and separating from the others bands. If the initial image
-         * had no alpha channel (more specifically, if it is neither opaque or a bitmask) we
+         * had no alpha channel (more specifically, if it is either opaque or a bitmask) we
          * proceed without doing anything since it seems that GIF encoder in such a case works
          * fine. If we need to create a bitmask, we will use the last index value allowed (255)
          * as the transparent pixel value.
          */
-        if (image.getColorModel().getTransparency() == Transparency.TRANSLUCENT) {
+        if (isTranslucent()) {
             forceBitmaskIndexColorModel(255);
         } else {
             forceIndexColorModel();
         }
+
+        // All post conditions for this method contract.
+        assert isBytes();
+        assert isIndexed();
+        assert !isTranslucent();
     }
 
 	/**
@@ -611,24 +794,27 @@ public class ImageWorker {
             return;
         }
         final int type = image.getSampleModel().getTransferType();
-        // Most of the code is adapted from jai-interests is in 'getRenderingHints(int)'.
+        // Most of the code adapted from jai-interests is in 'getRenderingHints(int)'.
         final RenderingHints hints = getRenderingHints((cm instanceof DirectColorModel) ?
                                                         DataBuffer.TYPE_BYTE : type);
         image = FormatDescriptor.create(image, new Integer(type), hints);
         invalidateStatistics();
+
+        // All post conditions for this method contract.
+        assert image.getColorModel() instanceof ComponentColorModel;
 	}
 
     /**
      * Forces the {@linkplain #image} color model to the {@linkplain ColorSpace#CS_sRGB RGB color
      * space}. If the current color space is already of {@linkplain ColorSpace#TYPE_RGB RGB type},
-     * then this method does nothing. This operation loose the alpha channel.
+     * then this method does nothing. This operation may loose the alpha channel.
      *
+     * @see #isColorSpaceRGB
      * @see ColorConvertDescriptor
      */
     public void forceColorSpaceRGB() {
-        ColorModel cm = image.getColorModel();
-        if (cm.getColorSpace().getType() != ColorSpace.TYPE_RGB) {
-            cm = new ComponentColorModel(
+        if (!isColorSpaceRGB()) {
+            final ColorModel cm = new ComponentColorModel(
                     ColorSpace.getInstance(ColorSpace.CS_sRGB),
                     false,                  // If true, supports transparency.
                     false,                  // If true, alpha is premultiplied.
@@ -637,6 +823,9 @@ public class ImageWorker {
             image = ColorConvertDescriptor.create(image, cm, getRenderingHints());
             invalidateStatistics();
         }
+
+        // All post conditions for this method contract.
+        assert isColorSpaceRGB();
     }
 
     /**
@@ -690,16 +879,24 @@ public class ImageWorker {
         Arrays.fill(coeff[0], 0, numColorBands, 1.0/numColorBands);
         image = BandCombineDescriptor.create(image, coeff, getRenderingHints());
         invalidateStatistics();
+
+        // All post conditions for this method contract.
+        assert getNumBands() == 1;
     }
 
     /**
      * Retains inconditionnaly the first band of {@linkplain #image}.
      * All other bands (if any) are discarted without any further processing.
      *
+     * @see #getNumBands
+     * @see #retainBands
      * @see BandSelectDescriptor
      */
     public void retainFirstBand() {
         retainBands(1);
+
+        // All post conditions for this method contract.
+        assert getNumBands() == 1;
     }
 
     /**
@@ -710,6 +907,8 @@ public class ImageWorker {
      *
      * @param numBands the number of bands to retain.
      *
+     * @see #getNumBands
+     * @see #retainFirstBand
      * @see BandSelectDescriptor
      */
     public void retainBands(final int numBands) {
@@ -720,6 +919,9 @@ public class ImageWorker {
             }
             image = BandSelectDescriptor.create(image, bands, getRenderingHints());
         }
+
+        // All post conditions for this method contract.
+        assert getNumBands() <= numBands;
     }
 
     /**
@@ -727,10 +929,16 @@ public class ImageWorker {
      * computes an estimation of its {@linkplain #intensity intensity}. Then, the threshold
      * value is set halfway between the minimal and maximal values found in the image.
      *
+     * @see #isBinary
+     * @see #binarize(double)
+     * @see #binarize(int,int)
      * @see BinarizeDescriptor
      */
     public void binarize() {
         binarize(Double.NaN);
+
+        // All post conditions for this method contract.
+        assert isBinary();
     }
 
     /**
@@ -739,11 +947,14 @@ public class ImageWorker {
      *
      * @param threshold The threshold value.
      *
+     * @see #isBinary
+     * @see #binarize()
+     * @see #binarize(int,int)
      * @see BinarizeDescriptor
      */
     public void binarize(double threshold) {
-        // If the image is already binary and the threshold is >1 then there is no work to do.
-        if (threshold < 1 || !ImageUtil.isBinary(image.getSampleModel())) {
+        // If the image is already binary and the threshold is >=1 then there is no work to do.
+        if (threshold < 1 || !isBinary()) {
             if (Double.isNaN(threshold)) {
                 if (getNumBands() != 1) {
                     tileCacheEnabled(false);
@@ -757,6 +968,9 @@ public class ImageWorker {
             image = BinarizeDescriptor.create(image, new Double(threshold), hints);
             invalidateStatistics();
         }
+
+        // All post conditions for this method contract.
+        assert isBinary();
     }
 
     /**
@@ -765,6 +979,9 @@ public class ImageWorker {
      * using a custom threshold value (instead of the automatic one), invoke
      * {@link #binarize(double)} explicitly before this method.
      *
+     * @see #isBinary
+     * @see #binarize()
+     * @see #binarize(double)
      * @see BinarizeDescriptor
      * @see LookupDescriptor
      */
@@ -868,29 +1085,38 @@ public class ImageWorker {
 
     /**
      * Adds transparency to a preexisting image whose color model is {@linkplain IndexColorModel
-     * index color model}. First, this method creates a new index color model with the specified
-     * {@code transparent} pixel, if needed (this method may skip this step if the specified pixel
-     * is already transparent, i.e. has an {@linkplain IndexColorModel#getAlpha(int) alpha} value
-     * of zero). Then for all pixels with the value {@code false} in the specified mask, the
-     * corresponding pixel in the {@linkplain #image} is set to that transparent value. All other
-     * pixels are left unchanged.
+     * index color model}. For all pixels with the value {@code false} in the specified
+     * transparency mask, the corresponding pixel in the {@linkplain #image} is set to the
+     * transparent pixel value. All other pixels are left unchanged.
      * 
-     * @param mask        The mask to apply as a {@linkplain #binarize() binarized} image,
-     *                    or {@code null} if there is no mask to apply. In such case, this
-     *                    method will only change the {@linkplain ColorModel color model}
-     *                    (if needed).
-     * @param translucent {@code true} if {@linkplain Transparency#TRANSLUCENT translucent}
-     *                    images are allowed, or {@code false} if the resulting images must
-     *                    be a {@linkplain Transparency#BITMASK bitmask}.
-     * @param transparent The value for transparent pixels, to be given to every pixels in the
-     *                    {@linkplain #image} corresponding to {@code false} in the mask. The
-     *                    special value {@code -1} maps to the last pixel value allowed for the
-     *                    {@linkplain IndexedColorModel indexed color model}.
+     * @param alphaChannel The mask to apply as a {@linkplain #binarize() binarized} image.
      *
+     * @see #isTranslucent
      * @see #forceBitmaskIndexColorModel
      */
-    public void addTransparencyToIndexColorModel(final RenderedImage mask,
-                                                 final boolean translucent, int transparent)
+    public void addTransparencyToIndexColorModel(final RenderedImage alphaChannel) {
+        addTransparencyToIndexColorModel(alphaChannel, true, getTransparentPixel());
+    }
+
+    /**
+     * Adds transparency to a preexisting image whose color model is {@linkplain IndexColorModel
+     * index color model}. First, this method creates a new index color model with the specified
+     * {@code transparent} pixel, if needed (this method may skip this step if the specified pixel
+     * is already transparent. Then for all pixels with the value {@code false} in the specified
+     * transparency mask, the corresponding pixel in the {@linkplain #image} is set to that
+     * transparent value. All other pixels are left unchanged.
+     * 
+     * @param alphaChannel The mask to apply as a {@linkplain #binarize() binarized} image.
+     * @param translucent  {@code true} if {@linkplain Transparency#TRANSLUCENT translucent}
+     *                     images are allowed, or {@code false} if the resulting images must
+     *                     be a {@linkplain Transparency#BITMASK bitmask}.
+     * @param transparent  The value for transparent pixels, to be given to every pixels in the
+     *                     {@linkplain #image} corresponding to {@code false} in the mask. The
+     *                     special value {@code -1} maps to the last pixel value allowed for the
+     *                     {@linkplain IndexedColorModel indexed color model}.
+     */
+    private void addTransparencyToIndexColorModel(final RenderedImage alphaChannel,
+                                                  final boolean translucent, int transparent)
     {
         tileCacheEnabled(false);
         forceIndexColorModel();
@@ -904,50 +1130,53 @@ public class ImageWorker {
         /*
          * Gets the index color model. If the specified 'transparent' value is not fully
          * transparent, replaces the color model by a new one with the transparent pixel
-         * defined. NOTE: the  "transparent &= (1 << pixelSize)"  instruction below is a
-         * safety for making sure that the transparent index value can hold in the amount
-         * of bits allowed for this color model (the mapSize value may not use all bits).
-         * It work as expected with the -1 special value. It also make sure that
+         * defined.  NOTE: the  "transparent &= (1 << pixelSize) - 1"  instruction below
+         * is a safety  for making sure that the transparent index value can hold in the
+         * amount of bits allowed for this color model (the mapSize value may not use all
+         * bits). It work as expected with the -1 special value. It also make sure that
          * "transparent + 1" do not exeed the maximum map size allowed.
          */
-        IndexColorModel cm = (IndexColorModel) image.getColorModel();
-        transparent &= (1 << cm.getPixelSize());
-        if ((!translucent && cm.getTransparency() == Transparency.TRANSLUCENT) ||
-                cm.getAlpha(transparent) != 0)
-        {
-            final int mapSize = Math.max(cm.getMapSize(), transparent + 1);
+        final boolean forceBitmask;
+        final IndexColorModel oldCM = (IndexColorModel) image.getColorModel();
+        final int pixelSize = oldCM.getPixelSize();
+        transparent &= (1 << pixelSize) - 1;
+        forceBitmask = !translucent && oldCM.getTransparency() == Transparency.TRANSLUCENT;
+        if (forceBitmask || oldCM.getTransparentPixel() != transparent) {
+            final int mapSize = Math.max(oldCM.getMapSize(), transparent + 1);
             final byte[][] RGBA = new byte[translucent ? 4 : 3][mapSize];
             // Note: we might use less that 256 values.
-            cm.getReds  (RGBA[0]);
-            cm.getGreens(RGBA[1]);
-            cm.getBlues (RGBA[2]);
+            oldCM.getReds  (RGBA[0]);
+            oldCM.getGreens(RGBA[1]);
+            oldCM.getBlues (RGBA[2]);
+            final IndexColorModel newCM;
             if (translucent) {
-                cm.getAlpha(RGBA[3]);
+                oldCM.getAlpha(RGBA[3]);
                 RGBA[3][transparent] = 0;
-                cm = new IndexColorModel(cm.getPixelSize(), mapSize,
+                newCM = new IndexColorModel(pixelSize, mapSize,
                         RGBA[0], RGBA[1], RGBA[2], RGBA[3]);
             } else {
-                cm = new IndexColorModel(cm.getPixelSize(), mapSize,
+                newCM = new IndexColorModel(pixelSize, mapSize,
                         RGBA[0], RGBA[1], RGBA[2], transparent);
             }
             /*
              * Set the color model hint.
              */
             final ImageLayout layout = getImageLayout(hints);
-            layout.setColorModel(cm);
+            layout.setColorModel(newCM);
             worker.setRenderingHint(JAI.KEY_IMAGE_LAYOUT, layout);
         }
         /*
          * Applies the mask, maybe with a color model change.
          */
         worker.setRenderingHint(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
-        if (mask != null) {
-            worker.mask(mask, false, transparent);
-            image = worker.image;
-        } else {
-            image = FormatDescriptor.create(worker.image, null, worker.getRenderingHints());
-        }
+        worker.mask(alphaChannel, false, transparent);
+        image = worker.image;
         invalidateStatistics();
+
+        // All post conditions for this method contract.
+        assert isIndexed();
+        assert translucent || !isTranslucent() : translucent;
+        assert ((IndexColorModel) image.getColorModel()).getAlpha(transparent) == 0;
 	}
 
     /**
@@ -1075,6 +1304,14 @@ public class ImageWorker {
         }
         return false;
     }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                       ////////
+    ////////                             DEBUGING HELP                             ////////
+    ////////                                                                       ////////
+    ///////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Shows the current {@linkplain #image} in a window together with the operation chain as a
