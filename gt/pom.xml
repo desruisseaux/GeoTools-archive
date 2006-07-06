@@ -936,9 +936,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
-        <configuration>
-          <tags>@revisit,@todo,TODO,FIXME</tags>
-        </configuration>
       </plugin>
       
       <!-- SVN activities during the last 30 days -->
