@@ -244,9 +244,38 @@ public final class CRS {
      * If the {@code longitudeFirst} argument value is {@code false} (which is the default value),
      * then the {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER}
      * hint is left unset. This is <strong>not</strong> equivalent to setting the above-cited hint
-     * to {@link Boolean#FALSE FALSE}. The difference is that in the later case, the <code>{@value
-     * org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}</code>
-     * system property would be ignored (since the hint has precedence).
+     * to {@link Boolean#FALSE FALSE}. The following table explain the different meanings:
+     * <p>
+     * <table>
+     * <tr>
+     *   <th>This method argument</th>
+     *   <th>{@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint</th>
+     *   <th>Meaning</th>
+     * </tr>
+     * <tr>
+     *   <td>{@code true}</td>
+     *   <td>{@link Boolean#TRUE TRUE}</td>
+     *   <td>All coordinate reference systems are forced to
+     *       (<var>longitude</var>,<var>latitude</var>) axis order.</td>
+     * </tr>
+     * <tr>
+     *   <td>{@code false}</td>
+     *   <td>{@code null}</td>
+     *   <td>Coordinate reference systems may or may not be forced to
+     *       (<var>longitude</var>,<var>latitude</var>) axis order. The behavior depends on user
+     *       setting, for example the value of the <code>{@value
+     *       org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}</code>
+     *       system property.</td>
+     * </tr>
+     * <tr>
+     *   <td></td>
+     *   <td>{@link Boolean#FALSE FALSE}</td>
+     *   <td>Forcing (<var>longitude</var>,<var>latitude</var>) axis order is not allowed,
+     *       no matter the value of the <code>{@value
+     *       org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}</code>
+     *       system property.</td>
+     * </tr>
+     * </table>
      *
      * @param  code The Coordinate Reference System authority code.
      * @param  longitudeFirst {@code true} if axis order should be forced to

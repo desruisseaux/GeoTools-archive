@@ -1245,6 +1245,8 @@ public class ImageWorker {
                     final String[] formats = spi.getFormatNames();
                     if (containsFormatName(formats, "gif")) {
                         forceIndexColorModelForGIF();
+                    } else {
+                        tile();
                     }
                     if (!spi.canEncodeImage(image)) {
                         continue;
@@ -1269,7 +1271,6 @@ public class ImageWorker {
                 /*
                  * Now save the image.
                  */
-                tile();
                 writer.write(image);
                 writer.dispose();
                 if (stream != null) {
