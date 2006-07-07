@@ -140,8 +140,12 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         } else if (java.util.Date.class.isAssignableFrom(clazz)) {
             return new TemporalAttributeType(name,isNillable,1,1,defaultValue,filter);
         } else if (Geometry.class.isAssignableFrom( clazz )){
-            return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue,null,filter);
-        }        
+            if( metadata instanceof CoordinateReferenceSystem )
+                return new GeometricAttributeType(name,clazz,isNillable,1,1, 
+    	 	    defaultValue,(CoordinateReferenceSystem) metadata,filter);
+	    else
+		return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue,null,filter);
+	}        
         return new DefaultAttributeType(name, clazz, isNillable,1,1,defaultValue,filter);
     }
     
