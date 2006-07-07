@@ -126,7 +126,6 @@
       <pathelement path="ext/go/src"/>
       <pathelement path="ext/graph/src"/>
       <pathelement path="ext/openoffice/src"/>
-      <pathelement path="ext/pickle/src"/>
       <pathelement path="ext/shape/src"/>
       <pathelement path="ext/shaperenderer/src"/>
       <pathelement path="ext/validation/src"/>
