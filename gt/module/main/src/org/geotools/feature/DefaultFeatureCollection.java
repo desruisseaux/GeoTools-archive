@@ -29,6 +29,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
@@ -212,6 +213,13 @@ public class DefaultFeatureCollection implements FeatureCollection {
         if( ID == null ) return false; // ID is required!
         if( contents.containsKey( ID ) ) return false; // feature all ready present
         
+        if ( childType==null ){
+        	childType=feature.getFeatureType();
+        }else{
+        	if( !feature.getFeatureType().equals(childType) )
+        		Logger.getAnonymousLogger("org.geotools.feature.collections").warning("Feature Collection contains a heterogeneous" +
+        				" mix of features");
+        }
         //TODO check inheritance with FeatureType here!!!
         feature.setParent(this);        
         contents.put( ID, feature );

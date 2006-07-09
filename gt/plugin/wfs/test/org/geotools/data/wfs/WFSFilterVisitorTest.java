@@ -8,8 +8,13 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilitiesMask;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.LikeFilter;
 import org.geotools.filter.NullFilter;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.function.FilterFunction_geometryType;
 
 public class WFSFilterVisitorTest extends AbstractWFSFilterVisitorTests {
 
@@ -90,7 +95,20 @@ public class WFSFilterVisitorTest extends AbstractWFSFilterVisitorTests {
 		
 		assertEquals(Filter.NONE, visitor.getFilterPost());
 		assertEquals(filter, visitor.getFilterPre());
-		
 	}
 
+	public void testFunctionFilter() throws Exception{
+		 FilterFactory factory=FilterFactoryFinder.createFilterFactory();
+	        FilterFunction_geometryType geomTypeExpr=new FilterFunction_geometryType();
+	        geomTypeExpr.setArgs(new Expression[]{ factory.createAttributeExpression("geom")});
+
+	        CompareFilter filter = factory.createCompareFilter(FilterType.COMPARE_EQUALS);
+	        filter.addLeftValue(geomTypeExpr);
+	        filter.addRightValue(factory.createLiteralExpression("Polygon"));
+	        
+	        filter.accept(visitor);
+	        
+	        assertEquals( filter, visitor.getFilterPost());
+	        assertEquals( Filter.NONE, visitor.getFilterPre());
+	}
 }
