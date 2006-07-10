@@ -13,11 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-/*
- * SelectedChannelType.java
- *
- * Created on 08 November 2002, 12:48
- */
 package org.geotools.styling;
 
 import org.geotools.event.GTComponent;

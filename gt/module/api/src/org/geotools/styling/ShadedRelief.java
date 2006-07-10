@@ -13,11 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-/*
- * ShadedRelief.java
- *
- * Created on 08 November 2002, 14:49
- */
 package org.geotools.styling;
 
 import org.geotools.event.GTComponent;

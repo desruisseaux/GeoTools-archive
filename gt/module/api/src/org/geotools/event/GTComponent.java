@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -70,8 +70,19 @@ public interface GTComponent {
 //	/** Indicate position used during notification */	
 //	public int getNotificationPosition();
 	
+	/**
+	 * Small stratagy object passed in by our parent so we can call home.
+	 * Used to pass change information "up" to our parent, to root parent
+	 * will broadcast the events out to listeners.
+	 */
 	public GTNote getNote();
 	
+	/**
+	 * Small stratagy object passed in by our parent so we can call home.
+	 * Used to pass change information "up" to our parent, to root parent
+	 * will broadcast the events out to listeners.
+	 * @param container
+	 */
 	public void setNote(GTNote container);
 	
 	/**
