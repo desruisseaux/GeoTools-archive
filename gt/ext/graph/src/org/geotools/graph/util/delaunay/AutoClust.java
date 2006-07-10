@@ -1,13 +1,22 @@
 /*
- * AutoClust.java
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2006, GeoTools Project Managment Committee (PMC)
+ *        
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
- * Created on February 13, 2006, 1:44 PM
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  *
- * This class implements the AUTOCLUST algorithm of Estivill-Castro and Lee (2002)
- * "Argument free clustering for large spatial point-data sets via boundary extraction
- * from Delaunay Diagram" in Computers, Environment and Urban Systems, 26:315-334.
+ *    This class implements the AUTOCLUST algorithm of Estivill-Castro and Lee (2002)
+ *    "Argument free clustering for large spatial point-data sets via boundary extraction
+ *    from Delaunay Diagram" in Computers, Environment and Urban Systems, 26:315-334.
  */
-
 package org.geotools.graph.util.delaunay;
 
 import java.util.Collection;
