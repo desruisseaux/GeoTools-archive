@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-org.geotools.graph.util.delaunay;
+package org.geotools.graph.util.delaunay;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import java.awt.Dimension;
