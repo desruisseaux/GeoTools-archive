@@ -305,18 +305,20 @@ public class StyleGenerator {
     private Symbolizer createSymbolizer(StyleBuilder sb, Geometry geometry,
         Color color, double opacity, Stroke defaultStroke) {
         Symbolizer symb;
+        if (defaultStroke == null) {
+            defaultStroke = sb.createStroke(Color.BLACK, 1, opacity);
+        }
 
         if (geometry instanceof MultiPolygon || geometry instanceof Polygon) {
-            //symb = sb.createPolygonSymbolizer(color);
             Fill fill = sb.createFill(color, opacity);
             symb = sb.createPolygonSymbolizer(defaultStroke, fill);
         } else if (geometry instanceof LineString) {
             symb = sb.createLineSymbolizer(color);
         } else if (geometry instanceof MultiPoint || geometry instanceof Point) {
-            Mark square = sb.createMark(StyleBuilder.MARK_SQUARE, color);
+            Fill fill = sb.createFill(color, opacity);
+            Mark square = sb.createMark(StyleBuilder.MARK_SQUARE, fill, defaultStroke);
             Graphic graphic = sb.createGraphic(null, square, null); //, 1, 4, 0);
             symb = sb.createPointSymbolizer(graphic);
-
             //} else if (geometry instanceof ?Text) {
             //symb = sb.createTextSymbolizer(colors[i], ?, "");
             //} else if (geometry instanceof ?Raster) {

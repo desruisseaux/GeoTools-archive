@@ -20,7 +20,6 @@ import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -506,7 +505,7 @@ public class SLD {
             Stroke stroke = mark.getStroke();
 
             if (stroke == null) {
-                stroke = builder.createStroke(colour);
+                stroke = builder.createStroke(Color.BLACK); //pretty black outline
                 mark.setStroke(stroke);
             }
 
@@ -517,7 +516,6 @@ public class SLD {
                     continue;
                 }
 
-                stroke.setColor(builder.colorExpression(colour));
                 fill.setColor(builder.colorExpression(colour));
             }
         }
