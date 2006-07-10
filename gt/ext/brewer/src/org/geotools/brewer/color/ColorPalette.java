@@ -17,35 +17,34 @@ package org.geotools.brewer.color;
 
 import java.awt.Color;
 
+
 /**
- * A generic palette containing colours.   
+ * A generic palette containing colours.
  * @author Cory Horner, Refractions Research Inc.
  * @source $URL$
  */
 public class ColorPalette {
-    
-	private Color[] colors = new Color[0]; //15
-    
-	/**
-	 * Longer description of the palette 
-	 */
-	private String description;
-	
-	/**
-	 * Very short name describing the palette 
-	 */
-	private String name;
-	
-	private int numColors = 0;
-	
-	/**
-	 * Returns the number of colours contained in the palette.
-	 * @return int
-	 */
-	public int getCount() {
-    	return numColors;
+    private Color[] colors = new Color[0]; //15
+
+    /**
+     * Longer description of the palette
+     */
+    private String description;
+
+    /**
+     * Very short name describing the palette
+     */
+    private String name;
+    private int numColors = 0;
+
+    /**
+     * Returns the number of colours contained in the palette.
+     * @return int
+     */
+    public int getCount() {
+        return numColors;
     }
-    
+
     /**
      * Getter for property name.
      *
@@ -83,9 +82,10 @@ public class ColorPalette {
     }
 
     public void setColors(Color[] colors) {
-    	this.colors = colors;
+        this.colors = colors;
 
         int count = 0;
+
         for (int i = 0; i < colors.length; i++)
             if (colors[i] != null) {
                 count++;
@@ -93,7 +93,7 @@ public class ColorPalette {
 
         this.numColors = count;
     }
-    
+
     public Color[] getColors(int length) {
         if (length < 2) {
             length = 2; //if they ask for 1 colour, give them 2 instead of crashing
@@ -108,14 +108,13 @@ public class ColorPalette {
 
         return result;
     }
-    
+
     /**
      * Returns all colours
-     * 
+     *
      * @return complete colour array
      */
     public Color[] getColors() {
-    	return colors;
+        return colors;
     }
-
 }

@@ -15,8 +15,6 @@
  */
 package org.geotools.brewer.color;
 
-import java.io.IOException;
-
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
@@ -34,6 +32,7 @@ import org.geotools.filter.function.ClassificationFunction;
 import org.geotools.filter.function.EqualIntervalFunction;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
+import java.io.IOException;
 
 
 /**
@@ -44,26 +43,35 @@ public class StyleGeneratorTest extends DataTestCase {
     public StyleGeneratorTest(String arg0) {
         super(arg0);
     }
-    
-    public void checkFilteredResultNotEmpty(Rule[] rule, FeatureSource fs, String attribName) throws IOException {
+
+    public void checkFilteredResultNotEmpty(Rule[] rule, FeatureSource fs,
+        String attribName) throws IOException {
         for (int i = 0; i < rule.length; i++) {
-        	Filter filter = rule[i].getFilter();
-        	FeatureCollection filteredCollection = fs.getFeatures(filter);
-        	assertTrue(filteredCollection.size() > 0); 
-        	String filterInfo = "Filter \""+filter.toString()+"\" contains "+filteredCollection.size()+" element(s) (";
-        	FeatureIterator it = filteredCollection.features();
-        	while (it.hasNext()) {
-        		Feature feature = it.next();
-        		filterInfo+="'"+feature.getAttribute(attribName)+"'";
-        		if (it.hasNext()) filterInfo+=", ";
-        	}
-        	it.close();
-        	System.out.println(filterInfo+")");
+            Filter filter = rule[i].getFilter();
+            FeatureCollection filteredCollection = fs.getFeatures(filter);
+            assertTrue(filteredCollection.size() > 0);
+
+            String filterInfo = "Filter \"" + filter.toString()
+                + "\" contains " + filteredCollection.size() + " element(s) (";
+            FeatureIterator it = filteredCollection.features();
+
+            while (it.hasNext()) {
+                Feature feature = it.next();
+                filterInfo += ("'" + feature.getAttribute(attribName) + "'");
+
+                if (it.hasNext()) {
+                    filterInfo += ", ";
+                }
+            }
+
+            it.close();
+            System.out.println(filterInfo + ")");
         }
     }
-    
+
     public void testComplexExpression() throws Exception {
         System.out.println("Complex Expression (using Sequential)");
+
         ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes();
 
@@ -97,16 +105,19 @@ public class StyleGeneratorTest extends DataTestCase {
         classifier.getValue(0); //recalc classes? (only useful for UniqueInterval) 
 
         //get the fts
-        StyleGenerator sg = new StyleGenerator(brewer.getPalette(paletteName).getColors(2), classifier, "myfts");
-        FeatureTypeStyle fts = sg.createFeatureTypeStyle(roadFeatures[0].getFeatureType().getDefaultGeometry());
+        StyleGenerator sg = new StyleGenerator(brewer.getPalette(paletteName)
+                                                     .getColors(2), classifier,
+                "myfts");
+        FeatureTypeStyle fts = sg.createFeatureTypeStyle(roadFeatures[0].getFeatureType()
+                                                                        .getDefaultGeometry());
         assertNotNull(fts);
-        
+
         //test each filter
         Rule[] rule = fts.getRules();
         assertEquals(2, rule.length);
         //do a preliminary test to make sure each rule's filter returns some results
         checkFilteredResultNotEmpty(rule, fs, attribName);
-        
+
         assertNotNull(StyleGenerator.toStyleExpression(rule[0].getFilter()));
         assertNotNull(StyleGenerator.toStyleExpression(rule[1].getFilter()));
     }

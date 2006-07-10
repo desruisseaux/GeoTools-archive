@@ -29,7 +29,7 @@ public class BrewerPalette extends ColorPalette {
     private PaletteSuitability suitability;
     private SampleScheme sampler;
     private PaletteType type;
-    
+
     /**
      * Creates a new instance of BrewerPalette
      */
@@ -66,7 +66,7 @@ public class BrewerPalette extends ColorPalette {
     public int getMaxColors() {
         int countSampler = sampler.getMaxCount();
         int numColors = getCount();
-        
+
         //return the lesser of countSampler and numColors
         if (countSampler < numColors) {
             return countSampler;
@@ -83,7 +83,7 @@ public class BrewerPalette extends ColorPalette {
     public int getMinColors() {
         return sampler.getMinCount();
     }
-    
+
     /**
      * Obtains a set of colours from the palette.
      */
@@ -103,19 +103,19 @@ public class BrewerPalette extends ColorPalette {
         return result;
     }
 
-	public PaletteSuitability getPaletteSuitability() {
-		return suitability;
-	}
+    public PaletteSuitability getPaletteSuitability() {
+        return suitability;
+    }
 
-	public void setPaletteSuitability(PaletteSuitability suitability) {
-		this.suitability = suitability;
-	}
-	
-	public SampleScheme getColorScheme() {
-		return sampler;
-	}
-	
-	public void setColorScheme(SampleScheme scheme) {
-		this.sampler = scheme;
-	}
+    public void setPaletteSuitability(PaletteSuitability suitability) {
+        this.suitability = suitability;
+    }
+
+    public SampleScheme getColorScheme() {
+        return sampler;
+    }
+
+    public void setColorScheme(SampleScheme scheme) {
+        this.sampler = scheme;
+    }
 }
