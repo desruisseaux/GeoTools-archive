@@ -147,7 +147,8 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
             float size = size();
             float position = 0;            
             progress.started();
-            for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext(); progress.progress( position++/size )){
+            for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext();){
+                if (size > 0) progress.progress( position++/size );
                 try {
                     Feature feature = (Feature) iterator.next();
                     visitor.visit(feature);

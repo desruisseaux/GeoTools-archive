@@ -48,7 +48,7 @@ public class StyleGeneratorTest extends DataTestCase {
     public void checkFilteredResultNotEmpty(Rule[] rule, FeatureSource fs, String attribName) throws IOException {
         for (int i = 0; i < rule.length; i++) {
         	Filter filter = rule[i].getFilter();
-        	FeatureCollection filteredCollection = fs.getFeatures(filter).collection();
+        	FeatureCollection filteredCollection = fs.getFeatures(filter);
         	assertTrue(filteredCollection.size() > 0); 
         	String filterInfo = "Filter \""+filter.toString()+"\" contains "+filteredCollection.size()+" element(s) (";
         	FeatureIterator it = filteredCollection.features();
@@ -98,12 +98,16 @@ public class StyleGeneratorTest extends DataTestCase {
 
         //get the fts
         StyleGenerator sg = new StyleGenerator(brewer.getPalette(paletteName).getColors(2), classifier, "myfts");
-        FeatureTypeStyle fts = sg.createFeatureTypeStyle();
+        FeatureTypeStyle fts = sg.createFeatureTypeStyle(roadFeatures[0].getFeatureType().getDefaultGeometry());
         assertNotNull(fts);
         
         //test each filter
         Rule[] rule = fts.getRules();
+        assertEquals(2, rule.length);
         //do a preliminary test to make sure each rule's filter returns some results
         checkFilteredResultNotEmpty(rule, fs, attribName);
+        
+        assertNotNull(StyleGenerator.toStyleExpression(rule[0].getFilter()));
+        assertNotNull(StyleGenerator.toStyleExpression(rule[1].getFilter()));
     }
 }

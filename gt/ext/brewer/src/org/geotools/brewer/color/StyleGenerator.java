@@ -1,3 +1,4 @@
+
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
@@ -23,10 +24,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.expression.AttributeExpression;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
@@ -52,7 +52,6 @@ import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -206,7 +205,7 @@ public class StyleGenerator {
     	else return null;
     }
     
-    public FeatureTypeStyle createFeatureTypeStyle() throws IllegalFilterException {
+    public FeatureTypeStyle createFeatureTypeStyle(GeometryAttributeType geometryAttrType) throws IllegalFilterException {
     	//answer goes here
     	FeatureTypeStyle fts = sf.createFeatureTypeStyle();
         // update the number of classes
@@ -216,12 +215,6 @@ public class StyleGenerator {
         	numClasses = function.getNumberOfClasses() + 1;
         }
 
-        // determine the geometry
-        FeatureIterator it = collection.features();
-        Feature firstFeature = it.next();
-        Geometry geometry = firstFeature.getDefaultGeometry();
-        it.close();
-        
         //numeric
         if (function instanceof RangedClassificationFunction) {
         	RangedClassificationFunction ranged = (RangedClassificationFunction) function;
@@ -234,7 +227,7 @@ public class StyleGenerator {
                 // obtain min/max values
                 localMin = ranged.getMin(i);
                 localMax = ranged.getMax(i);
-                Rule rule = createRuleRanged(localMin, localMax, geometry, i);
+                Rule rule = createRuleRanged(localMin, localMax, geometryAttrType, i);
                 fts.addRule(rule);
             }
         } else if (function instanceof ExplicitClassificationFunction) {
@@ -242,7 +235,7 @@ public class StyleGenerator {
             // for each class
             for (int i = 0; i < function.getNumberOfClasses(); i++) {
                 Set value = (Set) explicit.getValue(i);
-            	Rule rule = createRuleExplicit(value, geometry, i);
+            	Rule rule = createRuleExplicit(value, geometryAttrType, i);
             	fts.addRule(rule);
             }
         } else if (function instanceof CustomClassifierFunction) {
@@ -252,9 +245,9 @@ public class StyleGenerator {
                 // obtain the set of values for the current bin
                 Rule rule = null;
                 if (custom.hasExplicit(i)) {
-                	rule = createRuleExplicit((Set) custom.getValue(i), geometry, i);
+                	rule = createRuleExplicit((Set) custom.getValue(i), geometryAttrType, i);
                 } else if (custom.hasRanged(i)) {
-                	rule = createRuleRanged(custom.getMin(i), custom.getMax(i), geometry, i);
+                	rule = createRuleRanged(custom.getMin(i), custom.getMax(i), geometryAttrType, i);
                 }
                 if (rule != null)
                 	fts.addRule(rule);
@@ -265,7 +258,7 @@ public class StyleGenerator {
 
     	// add an else rule to capture any missing features?
     	if (elseMode != ELSEMODE_IGNORE) {
-    		Symbolizer symb = createSymbolizer(sb, geometry, getElseColor(), opacity, defaultStroke); 
+    		Symbolizer symb = createSymbolizer(sb, geometryAttrType, getElseColor(), opacity, defaultStroke); 
 	    	Rule elseRule = sb.createRule(symb);
 	    	elseRule.setIsElseFilter(true);
 	    	elseRule.setTitle("Else");
@@ -295,26 +288,26 @@ public class StyleGenerator {
      * Creates a symbolizer for the given geometry
      *
      * @param sb
-     * @param geometry
+     * @param geometryAttrType
      * @param color
      * @param opacity
      * @param defaultStroke stroke used for borders
      *
      * @return
      */
-    private Symbolizer createSymbolizer(StyleBuilder sb, Geometry geometry,
+    private Symbolizer createSymbolizer(StyleBuilder sb, GeometryAttributeType geometryAttrType,
         Color color, double opacity, Stroke defaultStroke) {
         Symbolizer symb;
         if (defaultStroke == null) {
             defaultStroke = sb.createStroke(Color.BLACK, 1, opacity);
         }
 
-        if (geometry instanceof MultiPolygon || geometry instanceof Polygon) {
+        if (geometryAttrType.getType() == MultiPolygon.class || geometryAttrType.getType() == Polygon.class) {
             Fill fill = sb.createFill(color, opacity);
             symb = sb.createPolygonSymbolizer(defaultStroke, fill);
-        } else if (geometry instanceof LineString) {
+        } else if (geometryAttrType.getType() == LineString.class) {
             symb = sb.createLineSymbolizer(color);
-        } else if (geometry instanceof MultiPoint || geometry instanceof Point) {
+        } else if (geometryAttrType.getType() == MultiPoint.class || geometryAttrType.getType() == Point.class) {
             Fill fill = sb.createFill(color, opacity);
             Mark square = sb.createMark(StyleBuilder.MARK_SQUARE, fill, defaultStroke);
             Graphic graphic = sb.createGraphic(null, square, null); //, 1, 4, 0);
@@ -364,7 +357,7 @@ public class StyleGenerator {
         }
     }
 
-    private Rule createRuleRanged(Object localMin, Object localMax, Geometry geometry, int i) throws IllegalFilterException {
+    private Rule createRuleRanged(Object localMin, Object localMax, GeometryAttributeType geometryAttrType, int i) throws IllegalFilterException {
         // 1.0 --> 1
         // (this makes our styleExpressions more readable. Note that the
         // filter always converts to double, so it doesn't care what we
@@ -373,7 +366,10 @@ public class StyleGenerator {
         localMax = chopInteger(localMax);
 
         // generate a title
-        String title = localMin + titleSpacer + localMax;
+        String title = "";
+        if (localMin != null) title = title + localMin;
+        title = title + titleSpacer;
+        if (localMax != null) title = title + localMax;
 
         // construct filters
         Filter filter = null;
@@ -387,32 +383,37 @@ public class StyleGenerator {
         } else {
             // build filter: [min <= x] AND [x < max]
             LogicFilter andFilter = null;
-            CompareFilter lowBoundFilter = null; // less than or
-
-            // equal
+            CompareFilter lowBoundFilter = null; // greater than or equal
             CompareFilter hiBoundFilter = null; // less than
-            lowBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
-            lowBoundFilter.addLeftValue(ff.createLiteralExpression(
-                    localMin)); // min
-            lowBoundFilter.addRightValue(expression); // x
-
-            // if this is the global maximum, include the max value
-            if (i == (function.getNumberOfClasses() - 1)) {
-                hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
-            } else {
-                hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
+            if (localMin != null) {
+	            lowBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_GREATER_THAN_EQUAL);
+	            lowBoundFilter.addLeftValue(expression); // x
+	            lowBoundFilter.addRightValue(ff.createLiteralExpression(localMin)); // min
             }
-
-            hiBoundFilter.addLeftValue(expression); // x
-            hiBoundFilter.addRightValue(ff.createLiteralExpression(
-                    localMax)); // max
-            andFilter = ff.createLogicFilter(lowBoundFilter,
-                    hiBoundFilter, LogicFilter.LOGIC_AND);
-            filter = andFilter;
+            if (localMax != null) {
+	            // if this is the global maximum, include the max value
+	            if (i == (function.getNumberOfClasses() - 1)) {
+	                hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
+	            } else {
+	                hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
+	            }
+	
+	            hiBoundFilter.addLeftValue(expression); // x
+	            hiBoundFilter.addRightValue(ff.createLiteralExpression(localMax)); // max
+            }
+            if (localMin != null && localMax != null) {
+	            andFilter = ff.createLogicFilter(lowBoundFilter,
+	                    hiBoundFilter, LogicFilter.LOGIC_AND);
+	            filter = andFilter;
+            } else if (localMin == null && localMax != null) {
+            	filter = hiBoundFilter;
+            } else if (localMin != null && localMax == null) {
+    			filter = lowBoundFilter;
+            }
         }
 
         // create a symbolizer
-        Symbolizer symb = createSymbolizer(sb, geometry, getColor(i), opacity, defaultStroke);
+        Symbolizer symb = createSymbolizer(sb, geometryAttrType, getColor(i), opacity, defaultStroke);
 
         // create a rule
         Rule rule = sb.createRule(symb);
@@ -422,7 +423,7 @@ public class StyleGenerator {
         return rule;
     }
     
-    private Rule createRuleExplicit(Set value, Geometry geometry, int i) {
+    private Rule createRuleExplicit(Set value, GeometryAttributeType geometryAttrType, int i) {
         // create a sub filter for each unique value, and merge them
         // into the logic filter
         Object[] items = value.toArray();
@@ -467,7 +468,7 @@ public class StyleGenerator {
         }
 
         // create the symbolizer
-        Symbolizer symb = createSymbolizer(sb, geometry, getColor(i), opacity, defaultStroke);
+        Symbolizer symb = createSymbolizer(sb, geometryAttrType, getColor(i), opacity, defaultStroke);
 
         // create the rule
         Rule rule = sb.createRule(symb);
@@ -619,6 +620,7 @@ public class StyleGenerator {
 	 * Examples:<br>
 	 * "1..5", closed=true --> [[1 <= attr] AND [attr <= 5]]<br>
 	 * "1..10", closed=false --> [[1 <= attr] AND [attr < 10]]
+	 * "..10, closed=true --> [attr <= 10]
 	 * </p>
 	 * 
 	 * @param styleExpression
@@ -626,7 +628,7 @@ public class StyleGenerator {
 	 * @param attribute
 	 *            the attributeType the values correspond to
 	 * @param upperBoundClosed
-	 *            is the upper bound include the max value? (true: <=, false: <)
+	 *            does the upper bound include the max value? (true: <=, false: <)
 	 * @return a filter
 	 * @throws IllegalFilterException
 	 */
@@ -664,56 +666,63 @@ public class StyleGenerator {
 	 * <p>Example:<br>
 	 * <code>[[1 <= attr] AND [attr < 5]] --> "1..5"</code></p>
 	 * 
-	 * @param filter A LOGIC_AND filter containing 2 CompareFilters.
+	 * @param filter A LOGIC_AND filter containing 2 CompareFilters or a single CompareFilter.
 	 * @return a styleExpression of the syntax "min..max"
 	 */
-	private static String toRangedStyleExpression(LogicFilter filter) {
-		if (filter.getFilterType() != Filter.LOGIC_AND) {
-			throw new IllegalArgumentException(
-					"Only logic filters constructed using the LOGIC_AND filterType are currently supported by this method.");
+	private static String toRangedStyleExpression(Filter filter) {
+		if (filter instanceof LogicFilter) {
+			LogicFilter lFilter = (LogicFilter) filter;
+			if (lFilter.getFilterType() != Filter.LOGIC_AND) {
+				throw new IllegalArgumentException(
+						"Only logic filters constructed using the LOGIC_AND filterType are currently supported by this method.");
+			}
+			Iterator iterator = lFilter.getFilterIterator();
+			// we're expecting 2 subfilters
+			Filter filter1 = (Filter) iterator.next();
+			Filter filter2 = (Filter) iterator.next();
+			if (iterator.hasNext())
+				throw new IllegalArgumentException(
+					"This method currently only supports logical filters with exactly 2 children.");
+			if (!(filter1 instanceof CompareFilter) || !(filter2 instanceof CompareFilter)) {
+				throw new IllegalArgumentException(
+					"Only compare filters as logical filter children are currently supported by this method.");
+			}
+			//find min and max values
+			short filterType1 = filter1.getFilterType();
+			short filterType2 = filter2.getFilterType();
+			Expression min1; Expression min2;
+			Expression max1; Expression max2;
+			if ((filterType1 == Filter.COMPARE_LESS_THAN) || (filterType1 == Filter.COMPARE_LESS_THAN_EQUAL)) {
+				min1 = ((CompareFilter) filter1).getLeftValue();
+				max1 = ((CompareFilter) filter1).getRightValue();
+			} else if ((filterType1 == Filter.COMPARE_GREATER_THAN) || (filterType1 == Filter.COMPARE_GREATER_THAN_EQUAL)) {
+				min1 = ((CompareFilter) filter1).getRightValue();
+				max1 = ((CompareFilter) filter1).getLeftValue();
+			} else {
+				throw new IllegalArgumentException("Unsupported FilterType");
+			}
+			if ((filterType2 == Filter.COMPARE_LESS_THAN) || (filterType2 == Filter.COMPARE_LESS_THAN_EQUAL)) {
+				min2 = ((CompareFilter) filter2).getLeftValue();
+				max2 = ((CompareFilter) filter2).getRightValue();
+			} else if ((filterType2 == Filter.COMPARE_GREATER_THAN) || (filterType2 == Filter.COMPARE_GREATER_THAN_EQUAL)) {
+				min2 = ((CompareFilter) filter2).getRightValue();
+				max2 = ((CompareFilter) filter2).getLeftValue();
+			} else {
+				throw new IllegalArgumentException("Unsupported FilterType");
+			}
+			//look for 2 equal expressions
+			if (max1.equals(min2)) {
+				return min1.toString()+".."+max2.toString();
+			} else if (max2.equals(min1)) {
+				return min2.toString()+".."+max1.toString();
+			} else {
+				throw new IllegalArgumentException("Couldn't find the expected arrangement of Expressions");
+			}
+		} else if (filter instanceof CompareFilter) {
+			
 		}
-		Iterator iterator = filter.getFilterIterator();
-		// we're expecting 2 subfilters
-		Filter filter1 = (Filter) iterator.next();
-		Filter filter2 = (Filter) iterator.next();
-		if (iterator.hasNext())
-			throw new IllegalArgumentException(
-				"This method currently only supports logical filters with exactly 2 children.");
-		if (!(filter1 instanceof CompareFilter) || !(filter2 instanceof CompareFilter)) {
-			throw new IllegalArgumentException(
-				"Only compare filters as logical filter children are currently supported by this method.");
-		}
-		//find min and max values
-		short filterType1 = filter1.getFilterType();
-		short filterType2 = filter2.getFilterType();
-		Expression min1; Expression min2;
-		Expression max1; Expression max2;
-		if ((filterType1 == Filter.COMPARE_LESS_THAN) || (filterType1 == Filter.COMPARE_LESS_THAN_EQUAL)) {
-			min1 = ((CompareFilter) filter1).getLeftValue();
-			max1 = ((CompareFilter) filter1).getRightValue();
-		} else if ((filterType1 == Filter.COMPARE_GREATER_THAN) || (filterType1 == Filter.COMPARE_GREATER_THAN_EQUAL)) {
-			min1 = ((CompareFilter) filter1).getRightValue();
-			max1 = ((CompareFilter) filter1).getLeftValue();
-		} else {
-			throw new IllegalArgumentException("Unsupported FilterType");
-		}
-		if ((filterType2 == Filter.COMPARE_LESS_THAN) || (filterType1 == Filter.COMPARE_LESS_THAN_EQUAL)) {
-			min2 = ((CompareFilter) filter2).getLeftValue();
-			max2 = ((CompareFilter) filter2).getRightValue();
-		} else if ((filterType2 == Filter.COMPARE_GREATER_THAN) || (filterType2 == Filter.COMPARE_GREATER_THAN_EQUAL)) {
-			min2 = ((CompareFilter) filter2).getRightValue();
-			max2 = ((CompareFilter) filter2).getLeftValue();
-		} else {
-			throw new IllegalArgumentException("Unsupported FilterType");
-		}
-		//look for 2 equal expressions
-		if (max1.equals(min2)) {
-			return min1.toString()+".."+max2.toString();
-		} else if (max2.equals(min1)) {
-			return min2.toString()+".."+max1.toString();
-		} else {
-			throw new IllegalArgumentException("Couldn't find the expected arrangement of Expressions");
-		}
+		
+		throw new UnsupportedOperationException("Don't know how to handle this filter");
 	}
 
 	/**

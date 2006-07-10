@@ -16,16 +16,21 @@
  */
 package org.geotools.feature.visitor;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.TestData;
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.SimpleFeature;
 import org.geotools.feature.visitor.MaxVisitor.MaxResult;
 import org.geotools.feature.visitor.MedianVisitor.MedianResult;
 import org.geotools.feature.visitor.MinVisitor.MinResult;
@@ -36,6 +41,7 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * Purpose: these tests ensure the proper operation of feature visitation, with CalcResult merging too!
@@ -46,6 +52,8 @@ public class VisitorCalculationTest extends DataTestCase {
     FeatureType ft;
     FeatureCollection fc2;
     FeatureType ft2;
+    FeatureCollection fc3;
+    FeatureType ft3;
 
     public VisitorCalculationTest(String arg0) {
         super(arg0);
@@ -57,6 +65,16 @@ public class VisitorCalculationTest extends DataTestCase {
         fc2 = DataUtilities.collection(riverFeatures);
         ft = roadType;
         ft2 = riverType;
+
+        //create our own fc3
+        FeatureType boringType = DataUtilities.createType("fc3.boring","id:0");
+        SimpleFeature[] boringFeatures = new SimpleFeature[100];
+        for (int i = 1; i <= 100; i++) {
+        	boringFeatures[i-1] = (SimpleFeature) boringType.create(new Object[] {new Integer(i)});
+        }
+
+        ft3 = boringType;
+        fc3 = DataUtilities.collection(boringFeatures);
     }
 
     // test only the visitor functions themselves, and try the merge operation
@@ -322,14 +340,25 @@ public class VisitorCalculationTest extends DataTestCase {
     
     public void testQuantileList() throws Exception {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        Expression expr = factory.createAttributeExpression(ft,
-                ft.getAttributeType(0).getName());
+        Expression expr = factory.createAttributeExpression(ft.getAttributeType(0).getName());
         QuantileListVisitor visitor = new QuantileListVisitor(expr, 2);
         fc.accepts(visitor, null);
         List[] qResult = (List[]) visitor.getResult().getValue();
         assertEquals(2, qResult.length);
         assertEquals(2, qResult[0].size());
         assertEquals(1, qResult[1].size());
+    }
+
+    public void testStandardDeviation() throws Exception {
+    	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+    	Expression expr = factory.createAttributeExpression(ft3.getAttributeType(0).getName());
+    	AverageVisitor visit1 = new AverageVisitor(expr);
+    	fc3.accepts(visit1, null);
+    	double average = visit1.getResult().toDouble();
+    	System.out.println("AV="+average);
+    	StandardDeviationVisitor visit2 = new StandardDeviationVisitor(expr, average);
+    	fc3.accepts(visit2, null);
+    	assertEquals(28.86, visit2.getResult().toDouble(), 0.01); //TODO: verify std_dev(1..100) =~ 28.86
     }
     
     //try merging a count and sum to get an average, both count+sum and sum+count 

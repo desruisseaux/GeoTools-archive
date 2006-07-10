@@ -34,7 +34,9 @@ public class QuantileListVisitor implements FeatureCalc {
 	}
 
 	public CalcResult getResult() {
-		// sort the list
+	    if (bins == 0 || count == 0) return null;
+        
+        // sort the list
 		Collections.sort(items);
 
 		if (bins > count) { //resize
