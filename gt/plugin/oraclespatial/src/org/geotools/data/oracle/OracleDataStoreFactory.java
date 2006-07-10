@@ -88,6 +88,9 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
      */
     public boolean canProcess(Map params) {
         if (params != null) {
+            if (params.get("dbtype") == null || !params.get("dbtype").toString().equalsIgnoreCase("oracle")) {
+                return false; //short circuit test
+            }
             Param arrayParameters[] = getParametersInfo();
             for (int i = 0; i < arrayParameters.length; i++) {
             	Param param = arrayParameters[i];
