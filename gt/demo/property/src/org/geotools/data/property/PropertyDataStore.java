@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.property;
 
 import java.io.BufferedReader;
@@ -17,6 +32,12 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 
+/**
+ * Sample DataStore implementation, please see formal tutorial included
+ * with users docs.
+ * 
+ * @author Jody Garnett, Refractions Research Inc.
+ */
 public class PropertyDataStore extends AbstractDataStore {
     protected File directory;
     public PropertyDataStore(File dir) {

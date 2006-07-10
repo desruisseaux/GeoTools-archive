@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.demo.data;
 
@@ -31,8 +30,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
- * Basic reading abilities demo: open a file, get the feature type, read the
- * features and output their contents to the standard output
+ * Basic reprojection abilities demo: open a file, get the feature type, read the
+ * features and output their reprojected contents to the standard output
  *
  * @author aaime
  * @source $URL$

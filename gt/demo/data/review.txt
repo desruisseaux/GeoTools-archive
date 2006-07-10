@@ -1,0 +1,18 @@
+Module Maintainer: Jody Garnett
+IP Review: Jody Garnett, July 9th, 2006
+
+DEMO DATA
+=========
+This module is used to capture working examples of using the geotools data system. It was
+added for GeoTools 2.3 as the start of a user guide documentation project.
+
+Some of the example code come from either the wiki, or previous attempts at demo code.
+I was not paying attention during its creation so am not sure of the details.
+
+org.geotools.demo.data
+----------------------
+
+Initial code written by Andrea Aimmie, unsure as to timeline, header indicates 2002.
+
+IP:
+- headers updated 
