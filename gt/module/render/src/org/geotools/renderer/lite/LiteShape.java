@@ -23,10 +23,8 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
-
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -330,40 +328,8 @@ public class LiteShape implements Shape, Cloneable {
      * @see #getBounds
      */
     public Rectangle2D getBounds2D() {
-        Coordinate[] coords = geometry.getEnvelope().getCoordinates();
-
-        // get out corners. the documentation doens't specify in which
-        // order the bounding box coordinates are returned
-        double x1;
-        double y1;
-        double x2;
-        double y2;
-
-        x1 = x2 = coords[0].x;
-        y1 = y2 = coords[0].y;
-
-        for (int i = 1; i < 3; i++) {
-            double x = coords[i].x;
-            double y = coords[i].y;
-
-            if (x < x1) {
-                x1 = x;
-            }
-
-            if (x > x2) {
-                x2 = x;
-            }
-
-            if (y < y1) {
-                y1 = y;
-            }
-
-            if (y > y2) {
-                y2 = y;
-            }
-        }
-
-        return new Rectangle2D.Double(x1, y1, x2 - x1, y2 - y1);
+        Envelope env = geometry.getEnvelopeInternal();
+        return new Rectangle2D.Double(env.getMinX(), env.getMinY(), env.getWidth(), env.getHeight());
     }
 
     /**
