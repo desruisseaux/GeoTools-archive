@@ -48,18 +48,21 @@ public class MedianVisitor implements FeatureCalc {
 	 */
     private Object median = null;
 
+    public MedianVisitor(String attributeTypeName) {
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        expr = factory.createAttributeExpression(attributeTypeName);
+    }
+    
     public MedianVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type,
-                type.getAttributeType(attributeTypeIndex).getName());
+        expr = factory.createAttributeExpression(type.getAttributeType(attributeTypeIndex).getName());
     }
 
     public MedianVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type,
-                type.getAttributeType(attrName).getName());
+        expr = factory.createAttributeExpression(type.getAttributeType(attrName).getName());
     }
 
     public MedianVisitor(Expression expr) throws IllegalFilterException {

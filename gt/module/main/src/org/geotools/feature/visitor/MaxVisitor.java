@@ -40,18 +40,21 @@ public class MaxVisitor implements FeatureCalc {
     int countNull = 0;
     int countNaN = 0;
     
+    public MaxVisitor(String attributeTypeName) {
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        expr = factory.createAttributeExpression(attributeTypeName);
+    }
+    
     public MaxVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type,
-                type.getAttributeType(attributeTypeIndex).getName());
+        expr = factory.createAttributeExpression(type.getAttributeType(attributeTypeIndex).getName());
     }
 
     public MaxVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type,
-                type.getAttributeType(attrName).getName());
+        expr = factory.createAttributeExpression(type.getAttributeType(attrName).getName());
     }
 
     public MaxVisitor(Expression expr) throws IllegalFilterException {

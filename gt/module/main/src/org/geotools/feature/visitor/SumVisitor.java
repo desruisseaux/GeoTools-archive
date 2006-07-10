@@ -43,7 +43,7 @@ public class SumVisitor implements FeatureCalc {
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         AttributeType attributeType = type.getAttributeType(attributeTypeIndex);
-        expr = factory.createAttributeExpression(type, attributeType.getName());
+        expr = factory.createAttributeExpression(attributeType.getName());
         createStrategy(attributeType.getType());
     }
 
@@ -51,7 +51,7 @@ public class SumVisitor implements FeatureCalc {
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         AttributeType attributeType = type.getAttributeType(attrName);
-        expr = factory.createAttributeExpression(type, attributeType.getName());
+        expr = factory.createAttributeExpression(attributeType.getName());
         createStrategy(attributeType.getType());
     }
 

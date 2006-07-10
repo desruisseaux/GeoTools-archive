@@ -16,16 +16,12 @@
  */
 package org.geotools.feature.visitor;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.TestData;
-import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.FeatureCollection;
@@ -41,7 +37,6 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * Purpose: these tests ensure the proper operation of feature visitation, with CalcResult merging too!
@@ -385,7 +380,7 @@ public class VisitorCalculationTest extends DataTestCase {
     	CountVisitor countVisitor = new CountVisitor();
     	countVisitor.setValue(8);
     	CalcResult countResult = countVisitor.getResult();
-    	MaxVisitor maxVisitor = new MaxVisitor(null);
+    	MaxVisitor maxVisitor = new MaxVisitor((Expression) null);
     	maxVisitor.setValue(new Double(99));
     	CalcResult maxResult = maxVisitor.getResult();
     	try {

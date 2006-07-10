@@ -41,18 +41,21 @@ public class UniqueVisitor implements FeatureCalc {
     private Expression expr;
     Set set = new HashSet();
 
+    public UniqueVisitor(String attributeTypeName) {
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        expr = factory.createAttributeExpression(attributeTypeName);
+    }
+
     public UniqueVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type,
-                type.getAttributeType(attributeTypeIndex).getName());
+        expr = factory.createAttributeExpression(type.getAttributeType(attributeTypeIndex).getName());
     }
 
     public UniqueVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type,
-                type.getAttributeType(attrName).getName());
+        expr = factory.createAttributeExpression(type.getAttributeType(attrName).getName());
     }
 
     public UniqueVisitor(Expression expr) {

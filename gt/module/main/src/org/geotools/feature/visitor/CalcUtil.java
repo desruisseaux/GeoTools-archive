@@ -250,7 +250,7 @@ public class CalcUtil {
     	Class bestClass = bestClass(objects);
     	
         if (bestClass == String.class) {
-            return new String("");
+            return new String(""); //$NON-NLS-1$
         } else if (bestClass == Double.class) {
             return new Double(0);
         } else if (bestClass == Float.class) {

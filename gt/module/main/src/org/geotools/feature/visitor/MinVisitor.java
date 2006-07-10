@@ -38,18 +38,21 @@ public class MinVisitor implements FeatureCalc {
     Comparable curvalue;
     boolean visited = false;
 
+    public MinVisitor(String attributeTypeName) {
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        expr = factory.createAttributeExpression(attributeTypeName);
+    }
+    
     public MinVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type,
-                type.getAttributeType(attributeTypeIndex).getName());
+        expr = factory.createAttributeExpression(type.getAttributeType(attributeTypeIndex).getName());
     }
 
     public MinVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type,
-                type.getAttributeType(attrName).getName());
+        expr = factory.createAttributeExpression(type.getAttributeType(attrName).getName());
     }
 
     public MinVisitor(Expression expr) throws IllegalFilterException {
