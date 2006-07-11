@@ -30,7 +30,7 @@
   <url>http://maven.geotools.fr/reports/build-configs/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/build-configs/</connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/maven/jar-collector/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/maven/build-configs/</url>
   </scm>
   <description>
     Contains the configuration files for a few plugins (for the moment, Jalopy only) so that
