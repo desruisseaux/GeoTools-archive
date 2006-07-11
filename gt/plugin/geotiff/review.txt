@@ -3,65 +3,30 @@ GeoTIFF Module
 Module Maintainer: Bryce
 IP Review Jody Garnett, July 10th, 2006
 
-This module is the cause for some confustion, it contains code that has been 
-placed into the public domain. In addition to code that seems to be licensed
-under the influence of drungs - consider the following headers.
-
-/*
- * NOTICE OF RELEASE TO THE PUBLIC DOMAIN
- *
- * This work was created by employees of the USDA Forest Service's 
- * Fire Science Lab for internal use.  It is therefore ineligible for 
- * copyright under title 17, section 105 of the United States Code.  You 
- * may treat it as you would treat any public domain work: it may be used,
- * changed, copied, or redistributed, with or without permission of the 
- * authors, for free or for compensation.  You may not claim exclusive 
- * ownership of this code because it is already owned by everyone.  Use this 
- * software entirely at your own risk.  No warranty of any kind is given.
- * 
- * A copy of 17-USC-105 should have accompanied this distribution in the file 
- * 17USC105.html.  If not, you may access the law via the US Government's 
- * public websites: 
- *   - http://www.copyright.gov/title17/92chap1.html#105
- *   - http://www.gpoaccess.gov/uscode/  (enter "17USC105" in the search box.)
- */
- 
- /*
- * (c) 2004 Mike Nidel
- *
- * Take, Modify, Distribute freely
- * Buy, Sell, Pass it off as your own
- *
- * Use this code at your own risk, the author makes no guarantee
- * of performance and retains no liability for the failure of this
- * software.
- *
- * If you feel like it, send any suggestions for improvement or
- * bug fixes, or modified source code to mike@gelbin.org
- *
- * Do not taunt Happy Fun Ball.
- *
- */
- 
  org.geotools.gce.geotiff
  ------------------------
  GeoTiff reading code dates back to GeoTools 2.0, current Grid Coverage Exchange interfaces dates to GeoTools 2.1.
+
+ BRYCE - Yup.  I wrote this as the new (19111) CRS stuff was being written.
+ It worked for that brief period of time before new CRS was rolled in.
+ Then, all of GCE was broken for a time.  When GCE was completely ported
+ over to new CRS, I updated GeoTIFF.  For a long time, there was no self
+ consistent release against which to code.
  
  IP:
- - non LGPL Public Domain License
- - non LGPL custom license
+ - non LGPL Public Domain License (OSGEO OK with this)
+ - non LGPL custom license (completely permissive)
  - where possible headers updated to (C) 2003-2006, GeoTools Project Managment Committee (PMC)
-
- org.geotools.gce.referencing.wkt
- --------------------------------
-
-IP:
-- headers updated to (C) 2003-2006, GeoTools Project Managment Committee (PMC)
 
  org.geotools.gce.geotiff (test)
  ------------------------
  IP:
- - non LGPL Public Domain License
+ - non LGPL Public Domain License (OSGEO OK with this)
  - where possible headers updated to (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- - unsure of test data's origion
+ - unsure of test data's origion [BRYCE- The reasonably-sized (<5Mb) test data
+    came from my lab and is PD.  The deleted data, I think, came from Simone,
+    but isn't included anymore.]
  
+[BRYCE - I'm unsure if the current situation is inadequate, and if so, the 
+manner in which it is inadequate.  If action needs to be taken, please 
+contact me via email: bnordgren@fs.fed.us.]
