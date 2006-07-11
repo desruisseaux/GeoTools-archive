@@ -212,6 +212,30 @@ compare:for (int i=0; i<c1.length; i++) {
     }
 
     /**
+     * Invoked when a recoverable error occurs. This exception is similar to
+     * {@link #unexpectedException unexpectedException} except that it doesn't
+     * log the stack trace and uses a lower logging level.
+     *
+     * @param paquet  The package where the error occurred. This information
+     *                may be used to fetch an appropriate {@link Logger} for
+     *                logging the error.
+     * @param classe  The class name where the error occurred.
+     * @param method  The method name where the error occurred.
+     * @param error   The error.
+     */
+    public static void recoverableException(final String   paquet,
+                                            final String   classe,
+                                            final String   method,
+                                            final Throwable error)
+    {
+        final LogRecord record = getLogRecord(error);
+        record.setLevel(Level.FINER);
+        record.setSourceClassName (classe);
+        record.setSourceMethodName(method);
+        Logger.getLogger(paquet).log(record);
+    }
+
+    /**
      * Returns a log record for the specified exception.
      */
     static LogRecord getLogRecord(final Throwable error) {

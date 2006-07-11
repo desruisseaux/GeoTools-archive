@@ -44,6 +44,7 @@ import javax.imageio.IIOException;
 // Geotools dependencies
 import org.geotools.io.DefaultFileFilter;
 import org.geotools.io.LineFormat;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ColorUtilities;
@@ -201,6 +202,32 @@ public class PaletteFactory {
     }
 
     /**
+     * Returns an input stream for reading the specified resource. The default
+     * implementation delegates to the {@link Class#getResourceAsStream(String) Class} or
+     * {@link ClassLoader#getResourceAsStream(String) ClassLoader} method of the same name,
+     * according the {@code loader} argument value given to the constructor. Subclasses may
+     * override this method if a more elaborated mechanism is wanted for fetching resources.
+     * This is sometime required in the context of applications using particular class loaders.
+     *
+     * @param name The name of the resource to load, constructed as {@code directory} + {@code name}
+     *             + {@code extension} where <var>directory</var> and <var>extension</var> were
+     *             specified to the constructor, while {@code name} was given to the
+     *             {@link #getColors(String) getColors} method.
+     * @return The input stream, or {@code null} if the resources was not found.
+     *
+     * @since 2.3
+     */
+    protected InputStream getResourceAsStream(final String path) {
+        if (altLoader != null) {
+            return altLoader.getResourceAsStream(path);
+        }
+        if (loader != null) {
+            return loader.getResourceAsStream(path);
+        }
+        return null;
+    }
+
+    /**
      * Returns the list of available palette names. Any item in this list can be specified as
      * argument to {@link #getColors(String)} or {@link #getIndexColorModel(String)} methods.
      *
@@ -261,16 +288,21 @@ public class PaletteFactory {
         if (extension!=null && !name.endsWith(extension)) {
             name += extension;
         }
-        final File file = new File(directory, name);
-        final InputStream stream;
-        if (loader!=null) {
-            stream = loader.getResourceAsStream(file.getPath());
-        } else if (altLoader != null) {
-            stream = altLoader.getResourceAsStream(file.getPath());
-        } else {
-            stream = file.exists() ? new FileInputStream(file) : null;
-        }
-        if (stream==null) {
+        final File   file = new File(directory, name);
+        final String path = file.getPath().replace(File.separatorChar, '/');
+        InputStream stream;
+        try {
+            stream = getResourceAsStream(path);
+            if (stream == null) {
+                if (file.exists()) {
+                    stream = new FileInputStream(file);
+                } else {
+                    return null;
+                }
+            }
+        } catch (SecurityException e) {
+            // 'getColors' is the public method that invoked this private method.
+            Utilities.recoverableException("org.geotools.image", "PaletteFactory", "getColors", e);
             return null;
         }
         return getReader(stream);
@@ -307,9 +339,9 @@ public class PaletteFactory {
         final List colors       = new ArrayList();
         String line; while ((line=input.readLine())!=null) try {
             line=line.trim();
-            if (line.length()==0)        continue;
-            if (line.charAt(0)=='#')     continue;
-            if (reader.setLine(line)==0) continue;
+            if (line.length() == 0)        continue;
+            if (line.charAt(0) == '#')     continue;
+            if (reader.setLine(line) == 0) continue;
             values = reader.getValues(values);
             colors.add(new Color(byteValue(values[0]), byteValue(values[1]), byteValue(values[2])));
         } catch (ParseException exception) {

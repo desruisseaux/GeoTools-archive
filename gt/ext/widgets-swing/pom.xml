@@ -74,13 +74,24 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>2.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-coverage</artifactId>
       <version>2.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-api</artifactId> <!-- Used for ProgressListener, Feature and FeatureType. -->
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+      <version>2.3-SNAPSHOT</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>javax.mail</groupId>

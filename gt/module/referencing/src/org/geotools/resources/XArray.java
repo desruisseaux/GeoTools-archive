@@ -36,6 +36,9 @@ import java.util.Locale;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Replace all {@code resize} methods by {@code Arrays.copyOf} when we will be allowed to
+ *       compile for JSE 6.0.
  */
 public final class XArray {
     /**

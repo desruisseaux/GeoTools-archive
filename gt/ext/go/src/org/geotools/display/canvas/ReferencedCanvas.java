@@ -340,7 +340,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         final double[] size = new double[objectiveCRS.getCoordinateSystem().getDimension()];
         Arrays.fill(size, Double.POSITIVE_INFINITY);
         if (objectivePosition == null) {
-            objectivePosition = new TransformedDirectPosition(objectiveCRS, hints);
+            objectivePosition = new TransformedDirectPosition(null, objectiveCRS, hints);
         }
         if (position != null) try {
             /*
@@ -399,7 +399,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
                  * cell at the position specified in argument and transform it to this CRS.
                  */
                 GeneralEnvelope cellPrototype = new GeneralEnvelope(graphicCRS);
-                position = objectivePosition.transform(graphicCRS);
+                position = objectivePosition.inverseTransform(graphicCRS);
                 for (int j=position.getDimension(); --j>=0;) {
                     final double center = position.getOrdinate(j);
                     final double width  = (j<cellSize.length) ? cellSize[j] : 0;
@@ -1463,7 +1463,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     {
         assert Thread.holdsLock(this);
         if (objectivePosition == null) {
-            objectivePosition = new TransformedDirectPosition(getObjectiveCRS(), hints);
+            objectivePosition = new TransformedDirectPosition(null, getObjectiveCRS(), hints);
         }
         assert Utilities.equals(objectivePosition.getCoordinateReferenceSystem(), getObjectiveCRS());
         objectivePosition.transform(coordinate);
@@ -1484,7 +1484,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     {
         assert Thread.holdsLock(this);
         if (displayPosition == null) {
-            displayPosition = new TransformedDirectPosition(getDisplayCRS(), hints);
+            displayPosition = new TransformedDirectPosition(null, getDisplayCRS(), hints);
         }
         assert Utilities.equals(displayPosition.getCoordinateReferenceSystem(), getDisplayCRS());
         displayPosition.transform(coordinate);

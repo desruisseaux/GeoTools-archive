@@ -37,7 +37,7 @@ import org.opengis.util.Cloneable;
  * {@linkplain #maximum maximum}, {@linkplain #mean mean}, {@linkplain #rms root mean square}
  * and {@linkplain #standardDeviation standard deviation}. Statistics are computed on the fly;
  * the sample values are never stored in memory.
- *
+ * <p>
  * An instance of {@code Statistics} is initially empty (i.e. all statistical values are set
  * to {@link Double#NaN NaN}). The statistics are updated every time an {@link #add(double)}
  * method is invoked with a non-{@linkplain Double#NaN NaN} value. A typical usage of this

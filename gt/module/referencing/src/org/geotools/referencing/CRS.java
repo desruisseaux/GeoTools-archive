@@ -246,10 +246,11 @@ public final class CRS {
      * hint is left unset. This is <strong>not</strong> equivalent to setting the above-cited hint
      * to {@link Boolean#FALSE FALSE}. The following table explain the different meanings:
      * <p>
-     * <table>
+     * <table border='1'>
      * <tr>
      *   <th>This method argument</th>
-     *   <th>{@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint</th>
+     *   <th>{@linkplain Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER
+     *       Corresponding hint}</th>
      *   <th>Meaning</th>
      * </tr>
      * <tr>
