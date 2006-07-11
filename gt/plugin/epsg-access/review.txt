@@ -16,12 +16,12 @@ IP
 
 org.geotools.referencing.factory.epsg
 -------------------------------------
-Modules created in 2005 to allow for the use of the EPSG access database as available via
+Module created in 2005 to allow for the use of the EPSG access database as available via
 download. The file itself is not included.
 
 IP:
 - Header updated to (C) 2005-2006 GeoTools Project Management Committee (PMC)
-- origional maintained (C) 2005, Institut de Recherche pour le Développement
+- original maintained (C) 2005, Institut de Recherche pour le Développement
 
 QA:
 - added a package.html explaining purpose and linking to provided Access.html instructions

@@ -16,6 +16,10 @@
 
 
 --------------------------------------------------------------------------
+This module requires the HSQL database engine, which is bundled with the
+binary distribution only (there is no HSQL derived work in the Java source
+code). The HSQL license is reproduced below.
+--------------------------------------------------------------------------
 
 Copyright (c) 2001-2004, The HSQL Development Group
 All rights reserved.
@@ -45,3 +49,26 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+--------------------------------------------------------------------------------
+This module is bundled with a copy of the EPSG database. The data may be copied
+and distributed subject to the following conditions:
+--------------------------------------------------------------------------------
+
+1) The user assumes the entire risk as to the accuracy and the use of this data.
+   INFORMATION PROVIDED IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+   EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF
+   MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
+
+2) All data pertinent to a specific coordinate reference system must be copied
+   without modification and all related pages/records must be included;
+
+3) The data may not be distributed for profit by any third party; and
+
+4) The original source [OGP / EPSG] must be acknowledged.
+
+With regard to (3) above, the data may be included within propriatory applications
+distributed on a commercial basis when the commerciality is based on application
+functionality and not on a value ascribed to the freely-distributed OGP data.
