@@ -43,13 +43,19 @@ public class DefaultGeoResourceInfo implements GeoResourceInfo {
     public DefaultGeoResourceInfo(String title, String name,
         String description, URI schema, Envelope bounds,
         CoordinateReferenceSystem crs, String[] keywords, Icon icon) {
-        this.title = title;
+    		this( title, name, description, schema, new ReferencedEnvelope( bounds,crs ), keywords, icon );
+    }
+    
+    public DefaultGeoResourceInfo( String title, String name, String description, 
+    		URI schema, ReferencedEnvelope bounds, String[] keywords, Icon icon
+	) {
+    		this.title = title;
         this.description = description;
         this.name = name;
         this.keywords = keywords;
         this.schema = schema;
         this.icon = icon;
-        this.bounds = new ReferencedEnvelope(bounds, crs);
+        this.bounds = bounds;
     }
 
     /* (non-Javadoc)

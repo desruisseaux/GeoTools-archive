@@ -90,8 +90,13 @@ public class PropertyAttributeReader implements AttributeReader {
         String typeName = typeName(file);
         String namespace = namespace(file);
         reader = new BufferedReader(new FileReader(file));
-        line = reader.readLine();
-
+        
+        //read until "_=";
+        while( ( line = reader.readLine() ) != null ) {
+        		if ( line.startsWith("_=") )
+    				break;
+        }
+        
         if ((line == null) || !line.startsWith("_=")) {
             throw new IOException(typeName + " schema not available");
         }

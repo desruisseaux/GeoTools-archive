@@ -16,6 +16,7 @@
 package org.geotools.catalog;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.geotools.util.ProgressListener;
 
@@ -28,6 +29,10 @@ import org.geotools.util.ProgressListener;
  */
 public abstract class AbstractCatalog implements Catalog {
 	
+	/** user data */
+    private Map userData;
+
+    
     /**
      * Catalogs do not have a parent so null is returned.
      * <p>
@@ -54,6 +59,13 @@ public abstract class AbstractCatalog implements Catalog {
         return (CatalogInfo) resolve(CatalogInfo.class, monitor);
     }
 
+    /**
+     * @return The user / application specific data.
+     */
+    public Map getUserData() {
+    		return userData;
+    }
+    
     /**
      * Indicate class and id.
      * 

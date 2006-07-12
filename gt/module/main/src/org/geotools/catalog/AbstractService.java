@@ -15,6 +15,10 @@
  */
 package org.geotools.catalog;
 
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.geotools.util.ProgressListener;
 
 
@@ -23,9 +27,28 @@ import org.geotools.util.ProgressListener;
  * @source $URL$
  */
 public abstract class AbstractService implements Service {
-    /** parent catalog containing the service */
+	/**
+	 * Logger
+	 */
+	protected static Logger logger = Logger.getLogger( "org.geotools.catalog" );
+	
+    /** 
+     * parent catalog containing the service 
+     */
     private Catalog parent;
-
+    /** 
+     * connection paramters 
+     */
+    private Map params;
+    /** 
+     * error message 
+     */
+    private Throwable msg;
+    /**
+     * cached geo resource members 
+     */
+    private List members;
+    
     /**
      * Creates a new service handle contained within a catalog.
      *
@@ -34,18 +57,110 @@ public abstract class AbstractService implements Service {
     public AbstractService(Catalog parent) {
         this.parent = parent;
     }
+    
+    /**
+     * Creates a new service handle contained within a catalog, with a 
+     * set of connection paramters.
+     * 
+     * @param parent The catalog containing the service.
+     * @param params The connection params used to connect to the service.
+     */
+    public AbstractService( Catalog parent, Map params ) {
+    		this( parent );
+    		this.params = params;
+    }
 
     /**
-     * Returns the parent Catalog.
+     * @param monitor Progress monitor for blocking call.
      *
-     * @param monitor DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @return he parent Catalog.
      */
     public Resolve parent(ProgressListener monitor) {
         return parent;
     }
+    
+    /**
+     * @return Connection parameters, possibly null.
+     */
+    public Map getConnectionParams() {
+    		return params;
+    }
+    
+    /**
+     * Sets the connection params for the service handle.
+     * 
+     * @param params Map of connection paramters.
+     */
+    protected void setConnectionParams( Map params ){
+    		this.params = params;
+    }
 
+    /**
+     * Sets the cached value of the members of the service.
+     * 
+     * @param members List of {@link GeoResource}.
+     */
+    protected void setMembers( List members ) {
+    		this.members = members;
+    }
+    
+    /**
+     * @return The cached members.
+     */
+    protected List getMembers() {
+    		return members;
+    }
+    
+    /**
+     * @return The cached error message.
+     */
+    public Throwable getMessage() {
+    		return msg;
+    }
+    
+    /**
+     * Sets the cached error message.
+     * 
+     * @param msg An exception which occured when connecting to the service.
+     */
+    protected void setMessage( Throwable msg ) {
+    		this.msg = msg;
+    }
+    
+    /**
+     * Default implementation of getStatus.
+     * <p>
+     * The following rules are used to determine the status:
+     * <ol>
+     * 	<li>If {@link #msg} is non-null, then the service handle is 
+     * {@link Status#BROKEN}.
+     * 	<li>If above is false, then if {@link #members} is non-null then the 
+     * service handle is {@link Status#CONNECTED} 
+     *  <li>If non of the above hold, the service handle is {@link Status#NOTCONNECTED}.
+     * </ol>
+     * </p>
+     * 
+     * <p>
+     * Subclasses can control this method by setting the members {@link #msg} 
+     * and {@link #members} with {@link #setMessage(Throwable)} and 
+     * {@link #setMembers(List)} respectivley. Or subclasses may wish to 
+     * override this method entirley.
+     * </p>
+     *
+     */
+    public Status getStatus() {
+    		if ( msg != null ) {
+    			return Status.BROKEN;
+    		}
+    		
+		if ( members != null ) {
+			return Status.CONNECTED;
+		}
+    		
+    		return Status.NOTCONNECTED;
+    }
+    
+    
     /**
      * This should represent the identifier
      *

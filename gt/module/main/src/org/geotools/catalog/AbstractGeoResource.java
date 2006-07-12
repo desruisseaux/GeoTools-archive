@@ -15,9 +15,11 @@
  */
 package org.geotools.catalog;
 
-import org.geotools.util.ProgressListener;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
+
+import org.geotools.util.ProgressListener;
 
 
 /**
@@ -25,7 +27,18 @@ import java.util.List;
  * @source $URL$
  */
 public abstract class AbstractGeoResource implements GeoResource {
-    /**
+    
+	/**
+	 * logger
+	 */
+	protected static Logger logger = Logger.getLogger( "org.geotools.catalog" );
+	
+	/**
+	 * Error message
+	 */
+	private Throwable msg;
+	
+	/**
      * This method is shorthand for
      * <pre>
      * 	<code>
@@ -53,7 +66,23 @@ public abstract class AbstractGeoResource implements GeoResource {
     public List members(ProgressListener monitor) {
         return null;
     }
-
+    
+    /**
+     * @return The cached error message.
+     */
+    public Throwable getMessage() {
+    		return msg;
+    }
+    
+    /**
+     * Sets the cached error message.
+     * 
+     * @param msg An exception which occured when connecting to the service.
+     */
+    protected void setMessage( Throwable msg ) {
+    		this.msg = msg;
+    }
+    
     /**
      * This should represent the identifier
      *

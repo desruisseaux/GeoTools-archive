@@ -47,7 +47,7 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
     //    }    
 
     /** DOCUMENT ME!  */
-    private static final Param DIRECTORY = new Param("directory", File.class,
+    public static final Param DIRECTORY = new Param("directory", File.class,
             "Directory containting property files", true);
 
     /**

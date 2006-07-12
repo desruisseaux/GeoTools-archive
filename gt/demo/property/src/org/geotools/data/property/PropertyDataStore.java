@@ -47,7 +47,6 @@ public class PropertyDataStore extends AbstractDataStore {
         directory = dir;
     }
     public String[] getTypeNames() {
-        FilenameFilter f;
         String list[] = directory.list( new FilenameFilter(){
             public boolean accept(File dir, String name) {
                 return name.endsWith(".properties");
@@ -60,10 +59,17 @@ public class PropertyDataStore extends AbstractDataStore {
     }
     // START SNIPPET: getSchema
     public FeatureType getSchema(String typeName) throws IOException {
-        String typeSpec = property( typeName, "_");
+        
+    		//look for a defined namespace	
+    		String namespace = property( typeName, "namespace" );
+    		if ( namespace == null ) {
+    			namespace = directory.getName();
+    		}
+    		
+    		//look for type name
+    		String typeSpec = property( typeName, "_");
         try {
-            String namespace = directory.getName();
-            return DataUtilities.createType( namespace+"."+typeName,typeSpec );
+        		return DataUtilities.createType( namespace+"."+typeName,typeSpec );
         } catch (SchemaException e) {
             e.printStackTrace();
             throw new DataSourceException( typeName+" schema not available", e);

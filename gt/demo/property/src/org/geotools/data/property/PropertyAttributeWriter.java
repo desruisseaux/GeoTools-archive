@@ -92,7 +92,10 @@ public class PropertyAttributeWriter implements AttributeWriter {
             throw new IOException("Writer has been closed");
         }
         writer.write( position == 0 ? "=" : "|" );
-        if( attribute instanceof Geometry){
+        if( attribute == null ){
+        	// nothing!
+        }
+        else if( attribute instanceof Geometry){
             writer.write( ((Geometry)attribute).toText() );
         }
         else {
