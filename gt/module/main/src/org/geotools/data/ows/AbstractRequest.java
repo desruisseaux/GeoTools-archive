@@ -15,6 +15,7 @@
  */
 package org.geotools.data.ows;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -202,7 +203,7 @@ public abstract class AbstractRequest implements Request{
     /**
 	 * Default to not requiring POST. Implementors can override if they need to.
 	 */
-	public void performPostOutput(OutputStream outputStream) {
+	public void performPostOutput(OutputStream outputStream) throws IOException {
 		
 	}
 

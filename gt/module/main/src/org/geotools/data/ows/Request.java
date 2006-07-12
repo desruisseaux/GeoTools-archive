@@ -114,5 +114,5 @@ public interface Request {
      * 
      * @param outputStream
      */
-    void performPostOutput(OutputStream outputStream);
+    void performPostOutput(OutputStream outputStream) throws IOException;
 }

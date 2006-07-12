@@ -15,14 +15,21 @@
  */
 package org.geotools.data.ows;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import org.geotools.ows.ServiceException;
@@ -47,6 +54,8 @@ public abstract class AbstractOpenWebService {
     /** Contains the specifications that are to be used with this service */
     protected Specification[] specs;
     protected Specification specification;
+    
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.ows");
 
     /**
      * Set up the specifications used and retrieve the Capabilities document
@@ -57,7 +66,11 @@ public abstract class AbstractOpenWebService {
      * @throws ServiceException if the server responds with an error
      */
     public AbstractOpenWebService( final URL serverURL ) throws IOException, ServiceException {
-        this.serverURL = serverURL;
+    	if (serverURL == null) {
+			throw new NullPointerException("ServerURL cannot be null");
+		}
+    	
+    	this.serverURL = serverURL;
 
         setupSpecifications();
         
@@ -67,7 +80,35 @@ public abstract class AbstractOpenWebService {
         }
     }
 
-    /**
+    public AbstractOpenWebService(Capabilities capabilties, URL serverURL) {
+		if (capabilties == null) {
+			throw new NullPointerException("Capabilities cannot be null.");
+		}
+		
+		if (serverURL == null) {
+			throw new NullPointerException("ServerURL cannot be null");
+		}
+		
+		setupSpecifications();
+		
+		for (int i = 0; i < specs.length; i++) {
+			if (specs[i].getVersion().equals(capabilties.getVersion())) {
+				specification = specs[i];
+				break;
+			}
+		}
+		
+		if (specification == null) {
+			specification = specs[specs.length-1];
+			LOGGER.warning("Unable to choose a specification based on cached capabilities. "
+					+"Arbitrarily choosing spec '"+specification.getVersion()+"'.");
+		}
+		
+		this.serverURL = serverURL;
+		this.capabilities = capabilties;
+	}
+
+	/**
      * Sets up the specifications/versions that this server is capable of
      * communicating with.
      */
@@ -278,13 +319,39 @@ public abstract class AbstractOpenWebService {
 
         HttpURLConnection connection = (HttpURLConnection) finalURL.openConnection();
         
+        connection.addRequestProperty("Accept-Encoding", "gzip");
+        
         if (request.requiresPost()) {
         	connection.setRequestMethod("POST");
         	connection.setDoOutput(true);
         	connection.setRequestProperty("Content-type", request.getPostContentType());
 
         	OutputStream outputStream = connection.getOutputStream();
-        	request.performPostOutput(outputStream);
+
+        	if (LOGGER.isLoggable(Level.FINE)) {
+        		ByteArrayOutputStream out = new ByteArrayOutputStream();
+        		request.performPostOutput(out);
+        		
+        		InputStream in = new ByteArrayInputStream(out.toByteArray());
+        		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+        		PrintStream stream = new PrintStream(outputStream);
+        		
+        		String postText = "";
+        		
+        		while (reader.ready()) {
+        			String input = reader.readLine();
+        			postText = postText + input;
+        			stream.println(input);
+        		}
+        		LOGGER.fine(postText);
+        		System.out.println(postText);
+        		
+        		out.close();
+        		in.close();
+        	} else {
+        		request.performPostOutput(outputStream);
+        	}
         	
         	outputStream.flush();
         	outputStream.close();
@@ -292,7 +359,6 @@ public abstract class AbstractOpenWebService {
         	connection.setRequestMethod("GET");
         }
         
-        connection.addRequestProperty("Accept-Encoding", "gzip");
 
         InputStream inputStream = connection.getInputStream();
         
@@ -307,5 +373,9 @@ public abstract class AbstractOpenWebService {
     
     public GetCapabilitiesResponse issueRequest(GetCapabilitiesRequest request) throws IOException, ServiceException {
     	return (GetCapabilitiesResponse) internalIssueRequest(request);
+    }
+    
+    public void setLoggingLevel(Level newLevel) {
+    	LOGGER.setLevel(newLevel);
     }
 }
