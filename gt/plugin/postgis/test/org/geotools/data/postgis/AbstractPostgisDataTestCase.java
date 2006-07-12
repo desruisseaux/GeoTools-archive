@@ -7,8 +7,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import junit.framework.TestCase;
-
 import org.geotools.data.DataTestCase;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
@@ -25,6 +23,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 	PostgisTests.Fixture f;
 	ConnectionPool pool;
 	PostgisDataStore data;
+	PostgisConnectionFactory pcFactory;
 	
 	public AbstractPostgisDataTestCase(String name) {
 		super(name);
@@ -39,9 +38,9 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
         f = PostgisTests.newFixture(getFixtureFile());
         
-        PostgisConnectionFactory factory1 = new PostgisConnectionFactory(f.host,
+        PostgisConnectionFactory pcFactory = new PostgisConnectionFactory(f.host,
                 f.port.intValue(), f.database);
-        pool = factory1.getConnectionPool(f.user, f.password);
+        pool = pcFactory.getConnectionPool(f.user, f.password);
 
         setUpRoadTable();
         setUpRiverTable();
@@ -67,12 +66,11 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
     
     protected void tearDown() throws Exception {
         data = null;
-
-        PostgisConnectionFactory factory1 = new PostgisConnectionFactory("hydra",
-                "5432", "jody");
-        factory1.free(pool);
-
-        //pool.close();
+        if (pcFactory != null && pool != null) {
+        	pcFactory.free(pool);
+        	pcFactory = null;
+        	pool.close();
+        }
         super.tearDown();
     }
     
@@ -202,8 +200,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             for (int i = 0; i < lakeFeatures.length; i++) {
                 Feature feature = lakeFeatures[i];
 
-                //strip out the road. 
-                String fid = feature.getID().substring("lake.".length());
+                //strip out the lake. 
                 String ql = "INSERT INTO " + f.schema + ".lake (id,geom,name) VALUES ("
                     + feature.getAttribute("id") + "," + "GeometryFromText('"
                     + ((Geometry) feature.getAttribute("geom")).toText() + "', 0 ),"

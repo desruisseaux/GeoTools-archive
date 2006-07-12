@@ -18,18 +18,10 @@ package org.geotools.data.postgis;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.NoSuchElementException;
-import java.util.PropertyResourceBundle;
 import java.util.logging.Logger;
 
-import junit.framework.TestCase;
-
-import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
@@ -46,21 +38,16 @@ import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
-import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.data.postgis.fidmapper.OIDFidMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.AbstractFilter;
@@ -69,10 +56,12 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.expression.Expression;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -389,6 +378,35 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(expected, actual);
     }
 
+    public void testCreateSchema() throws Exception {
+    	String featureTypeName = "stuff";
+
+    	//delete the table, if it exists
+    	try {
+	    	Connection conn = pool.getConnection();
+	        conn.setAutoCommit(true);
+	        Statement st = conn.createStatement();
+	        String sql = "DROP TABLE " + featureTypeName + ";";
+	        st.execute(sql);
+	        conn.close();
+    	} catch (Exception e) {
+    		//table didn't exist
+    	}
+	        
+        //create a featureType and write it to PostGIS
+    	CoordinateReferenceSystem crs = CRS.decode("EPSG:4326"); //requires gt2-epsg-wkt
+    	AttributeType at1 = AttributeTypeFactory.newAttributeType("id", Integer.class);
+    	AttributeType at2 = AttributeTypeFactory.newAttributeType("name", String.class, false, 256);
+    	AttributeType at3 = AttributeTypeFactory.newAttributeType("the_geom", Point.class, false, Filter.NONE, null, crs);
+    	AttributeType[] atts = new AttributeType[] {at1, at2, at3};
+
+    	FeatureType newFT = FeatureTypeBuilder.newFeatureType(atts, featureTypeName);
+    	data.createSchema(newFT);
+    	FeatureType newSchema = data.getSchema(featureTypeName);
+    	assertNotNull(newSchema);
+    	assertEquals(3, newSchema.getAttributeCount());
+    }
+    
     static public void assertEquals(String message, String expected,
         String actual) {
         if (expected == actual) {

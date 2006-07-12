@@ -76,6 +76,7 @@ import org.geotools.filter.LengthFunction;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLEncoderPostgisGeos;
 import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.referencing.NamedIdentifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -1015,10 +1016,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         try {
             dbConnection = getConnection(Transaction.AUTO_COMMIT);
-            
+            String dbSchema = config.getDatabaseSchemaName();
             String sqlStatement = "SELECT type FROM GEOMETRY_COLUMNS WHERE "
-                + "f_table_name='" + tableName + "' AND f_geometry_column='"
-                + columnName + "';";
+                + "f_table_schema='" + dbSchema + "' AND f_table_name='"
+                + tableName + "' AND f_geometry_column='" + columnName
+                + "';";
             LOGGER.fine("geometry sql statement is " + sqlStatement);
 
             String geometryType = null;
@@ -1033,9 +1035,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             }
 
             if (geometryType == null) {
-                String msg = " no geometry found in the GEOMETRY_COLUMNS table "
-                    + " for " + tableName + " of the postgis install.  A row "
-                    + "for " + columnName + " is required  "
+                String msg = " no geometry found in the GEOMETRY_COLUMNS table"
+                    + " for " + tableName + " of the postgis install.  A row"
+                    + " for " + columnName + " is required"
                     + " for geotools to work correctly";
                 throw new DataSourceException(msg);
             }
@@ -1086,7 +1088,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         String res = (String) GEOM_CLASS_MAPPINGS.get(type);
 
         if (res == null) {
-            throw new RuntimeException("Uknown type name for class " + type
+            throw new RuntimeException("Unknown type name for class " + type
                 + " please update GEOMETRY_MAPPINGS");
         }
 
@@ -1094,86 +1096,78 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     }
 
     /**
+     * Creates a FeatureType in this instance of the PostgisDataStore.  Since we don't
+     * yet know which attribute in the FeatureType is the primary key, we will create
+     * our own called "fid_tablename", which has its own sequence called 
+     * "tablename_fid_seq".  The user should not interact with this column, although
+     * its value will be the FID.  The FeatureType name will be cast to lower case,
+     * since this is good postgres practice.  This method currently assumes there are
+     * only 2 dimensions. 
+     * 
+     * @throws IOException if something goes horribly wrong or the table already exists
      * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
      */
     public void createSchema(FeatureType featureType) throws IOException {
-        String tableName = featureType.getTypeName();
+        //chorner: imposing our will on the user
+    	String tableName = featureType.getTypeName().toLowerCase();
+    	
+    	if (!tableName.equals(featureType.getTypeName())) {
+    		LOGGER.warning("FeatureType name case was modified to " + tableName);
+    	}
+    	
         AttributeType[] attributeType = featureType.getAttributeTypes();
-
-        FIDMapper fidMapper = typeHandler.getFIDMapper(tableName);
-
+        String dbSchema = config.getDatabaseSchemaName();
+        
+        //the featureType won't tell us who the primary key is, so we'll create
+        //our own "fid_tablename".  Later when we load the featureType, we will
+        //pretend we didn't see fid_tablename when we return the attributes.
+        String fidColumn = tableName + "_fid";
+        //make sure the fid column doesn't already exist
+        for (int i = 0; i < attributeType.length; i++) {
+        	if (attributeType[i].getName().equalsIgnoreCase(fidColumn)) {
+                String message = "The featuretype cannot contain the column "
+                    + fidColumn + ", since this is used as the hidden FID column";
+                throw new IOException(message);
+            }
+        }
+        
         Connection con = this.getConnection(Transaction.AUTO_COMMIT);
-
         Statement st = null;
 
-        //fix from Paolo Rizzi, to print sql used to create table if it was
-        //already present.
         boolean shouldExecute = !tablePresent(tableName, con);
 
         try {
             con.setAutoCommit(false);
             st = con.createStatement();
 
-            StringBuffer statementSQL = new StringBuffer("CREATE TABLE \""
-                    + tableName + "\" (");
+            StringBuffer statementSQL = new StringBuffer("CREATE TABLE \"" + dbSchema
+                + "\".\"" + tableName + "\" (\"" + fidColumn + "\" serial PRIMARY KEY,");
+            statementSQL.append(makeSqlCreate(attributeType) + ");");
 
-            if (!fidMapper.returnFIDColumnsAsAttributes()) {
-                for (int i = 0; i < fidMapper.getColumnCount(); i++) {
-                    //fix from PR, to ignore the auto oid columns
-                    if ("oid".equalsIgnoreCase(fidMapper.getColumnName(i))) {
-                        continue;
-                    }
-
-                    // int val = fidMapper.getColumnType(i);
-                    String typeName = getSQLTypeName(fidMapper.getColumnType(i));
-
-                    if (typeName.equals("VARCHAR")) {
-                        typeName = typeName + "(" + fidMapper.getColumnSize(i)
-                            + ")";
-                    }
-
-                    statementSQL.append("\"" + fidMapper.getColumnName(i)
-                        + "\" " + typeName + ",");
-                }
-            }
-
-            statementSQL.append(makeSqlCreate(attributeType));
-
-            //fix from PR, constraint name must be unique, so add tablename
-            statementSQL.append(" CONSTRAINT PK_" + tableName
-                + " PRIMARY KEY (");
-
-            for (int i = 0; i < fidMapper.getColumnCount(); i++) {
-                statementSQL.append("\"" + fidMapper.getColumnName(i) + "\",");
-            }
-
-            statementSQL.setCharAt(statementSQL.length() - 1, ')');
-            statementSQL.append(")");
-
-            System.out.println(statementSQL.toString());
+            String sql = statementSQL.toString();
+            LOGGER.info(sql);
 
             if (shouldExecute) {
-                st.execute(statementSQL.toString());
+                st.execute(sql);
             }
 
             //fix from pr: it may be that table existed and then was dropped
             //without removing its geometry info from GEOMETRY_COLUMNS.
             //To support this, try to delete before inserting.
-            ////Preserving case for table names gives problems, 
+            //Preserving case for table names gives problems, 
             //so convert to lower case
+            
             statementSQL = new StringBuffer(
-                    "DELETE FROM GEOMETRY_COLUMNS WHERE f_table_catalog=''"
-                    + " AND f_table_schema = 'public'"
-                    + 
-                ////" AND f_table_name = '" + tableName.toLowerCase() + "'");
-                " AND f_table_name = '" + tableName + "';");
+                "DELETE FROM GEOMETRY_COLUMNS WHERE f_table_catalog=''"
+                + " AND f_table_schema = '" + dbSchema
+                + "' AND f_table_name = '" + tableName + "';");
 
-            //SISfixed - prints statement for later reuse
-            String s = statementSQL.toString();
-            System.out.println(s);
+            //prints statement for later reuse
+            sql = statementSQL.toString();
+            LOGGER.info(sql);
 
             if (shouldExecute) {
-                st.execute(s);
+                st.execute(sql);
             }
 
             //Ok, so Paolo Rizzi suggested that we get rid of our hand-adding
@@ -1198,21 +1192,21 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     continue;
                 }
                 GeometryAttributeType geomAttribute = (GeometryAttributeType) attributeType[i];
-
-                //This needs to be improved - I believe we now have
-                //code for a PostGIS authority factory, so we need to
-                //look up from the CRS (maybe its WKT?) to the postgis
-                //spatial_ref_sys table, which will tell us the SRID
-                //for it.  I'm not sure about the exact mechanism for
-                //this, as I don't know how the authorities and crs's
-                //work, but it should be possible -ch
+                String columnName = attributeType[i].getName();
+                
                 CoordinateReferenceSystem refSys = geomAttribute
                     .getCoordinateSystem();
-                int SRID = -1;
+                int SRID;
 
-                //so for now we just use -1
                 if (refSys != null) {
-                    SRID = -1;
+                	try {
+                	    Set ident = refSys.getIdentifiers();
+                	    String code = ((NamedIdentifier) ident.toArray()[0]).getCode();
+                	    SRID = Integer.parseInt(code);
+                	} catch (Exception e) {
+                		LOGGER.warning("SRID could not be determined");
+                		SRID = -1;
+                	}
                 } else {
                     SRID = -1;
                 }
@@ -1226,7 +1220,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
                 String typeName = null;
 
-                //this construct seems unneccesary, since we already would
+                //this construct seems unnecessary, since we already would
                 //pass over if this wasn't a geometry...
                 Class type = geomAttribute.getType();
 
@@ -1237,54 +1231,76 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 }
 
                 if (typeName != null) {
-                    //SISfixed- dbName was used for schema name, force 
-                    //it to 'public' Preserving case for table names 
-                    //gives problems, so convert to lower case
-                    //statementSQL = new StringBuffer(
-                    //"INSERT INTO GEOMETRY_COLUMNS VALUES (" + "'',"
-                    //+ "'" + dbName + "'," + "'" + tableName + "',"
-                    //+ "'" + attributeType[i].getName() + "',"
-                    //+ "2," + SRID + "," + "'"
-                    //+ typeName + "')");
+//                    statementSQL = new StringBuffer(
+//                        "SELECT AddGeometryColumn('" + dbSchema + "','"
+//                        + tableName + "','" + attributeType[i].getName()
+//                        + "','" + SRID + "','" + typeName + "',2);"
+//                    ); //assumes 2-D
+                    
+                	//add a row to the geometry_columns table
                     statementSQL = new StringBuffer(
-                            "INSERT INTO GEOMETRY_COLUMNS VALUES (" + "'',"
-                            ////+ "'" + "public" + "'," + "'" + tableName.toLowerCase() + "',"
-                            + "'" + "public" + "'," + "'" + tableName + "',"
-                            + "'" + attributeType[i].getName() + "'," + "2,"
-                            + SRID + "," + "'" + typeName + "')");
-                    System.out.println(statementSQL);
+                        "INSERT INTO GEOMETRY_COLUMNS VALUES (" + "'',"
+                        + "'" + dbSchema + "'," + "'" + tableName + "',"
+                        + "'" + columnName + "'," + "2," + SRID + ",'"
+                        + typeName + "');");
+                    
+                    sql = statementSQL.toString();
+                    LOGGER.info(sql);
 
                     if (shouldExecute) {
-                        st.execute(statementSQL.toString());
+                        st.execute(sql);
                     }
+                    
+                    //add geometry constaints to the table
+                    if (SRID > -1) {
+	                    sql = "ALTER TABLE \"" + dbSchema + "\".\"" + tableName 
+	                        + "\" ADD CONSTRAINT enforce_srid_" + columnName + " CHECK (SRID("
+	                        + columnName + ") = " + SRID + ");"; 
+	                    LOGGER.info(sql);
+	                    if (shouldExecute) {
+	                        st.execute(sql);
+	                    }
+                    }
+                    
+                    sql = "ALTER TABLE \"" + dbSchema + "\".\"" + tableName
+                        + "\" ADD CONSTRAINT enforce_dims_" + columnName + " CHECK (ndims("
+                        + columnName + ") = 2);"; 
+                    LOGGER.info(sql);
+                    if (shouldExecute) {
+                        st.execute(sql);
+                    }
+
+                    if (!typeName.equals("GEOMETRY")) {
+	                    sql = "ALTER TABLE \"" + dbSchema + "\".\"" + tableName
+	                        + "\" ADD CONSTRAINT enforce_geotype_" + columnName + " CHECK (geometrytype("
+	                        + columnName + ") = '" + typeName + "'::text OR " + columnName
+	                        + " IS NULL);"; 
+	                    LOGGER.info(sql);
+	                    if (shouldExecute) {
+	                        st.execute(sql);
+	                    }
+                    }
+
                 } else {
-                    System.out.println("Error: " + geomAttribute.getName()
-                        + " unknown type!!!");
+                	LOGGER.warning("Error: " + geomAttribute.getName()+ " unknown type!!!");
                 }
 
                 //also build a spatial index on each geometry column.
-                //TODO review!!! Should this be parameterized???
-                //SISfixed - put tablename and fieldname between quotes to preserve case					
-                statementSQL.append("\nCREATE INDEX spatial_"
-                    + tableName.toLowerCase() + "_"
-                    + attributeType[i].getName().toLowerCase() + " ON \""
-                    + tableName + "\" USING GIST (\""
+                statementSQL = new StringBuffer("CREATE INDEX spatial_"
+                    + tableName + "_" + attributeType[i].getName().toLowerCase()
+                    + " ON \"" + dbSchema + "\".\"" + tableName + "\" USING GIST (\""
                     + attributeType[i].getName() + "\");");
 
-                //SISfixed - prints statement for later reuse
-                s = statementSQL.toString();
-                System.out.println(s);
+                sql = statementSQL.toString();
+                LOGGER.info(sql);
 
                 if (shouldExecute) {
-                    st.execute(s);
+                    st.execute(sql);
                 }
             }
 
             con.commit();
 
-            //Paolo Rizzi had a VACUUM ANALYZE here, but I'm not sure that
-            //it's needed, since the table is empty.  Waiting for feedback
-            //from dblasby -ch
         } catch (SQLException e) {
             try {
                 if (con != null) {
@@ -1315,36 +1331,36 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
 
         if (!shouldExecute) {
-            throw new IOException("The table " + tableName + " already exist.");
+            throw new IOException("The table " + tableName + " already exists.");
         }
     }
 
-    /**
-     * Returns the sql type name given the SQL type code
-     *
-     * @param typeCode
-     *
-     * @return
-     *
-     * @throws RuntimeException DOCUMENT ME!
-     */
-    private String getSQLTypeName(int typeCode) {
-        Class typeClass = (Class) TYPE_MAPPINGS.get(new Integer(typeCode));
-
-        if (typeClass == null) {
-            throw new RuntimeException("Uknown type " + typeCode
-                + " please update TYPE_MAPPINGS");
-        }
-
-        String typeName = (String) CLASS_MAPPINGS.get(typeClass);
-
-        if (typeName == null) {
-            throw new RuntimeException("Uknown type name for class "
-                + typeClass.getName() + " please update CLASS_MAPPINGS");
-        }
-
-        return typeName;
-    }
+//    /**
+//     * Returns the sql type name given the SQL type code
+//     *
+//     * @param typeCode
+//     *
+//     * @return
+//     *
+//     * @throws RuntimeException DOCUMENT ME!
+//     */
+//    private String getSQLTypeName(int typeCode) {
+//        Class typeClass = (Class) TYPE_MAPPINGS.get(new Integer(typeCode));
+//
+//        if (typeClass == null) {
+//            throw new RuntimeException("Unknown type " + typeCode
+//                + " please update TYPE_MAPPINGS");
+//        }
+//
+//        String typeName = (String) CLASS_MAPPINGS.get(typeClass);
+//
+//        if (typeName == null) {
+//            throw new RuntimeException("Unknown type name for class "
+//                + typeClass.getName() + " please update CLASS_MAPPINGS");
+//        }
+//
+//        return typeName;
+//    }
 
     private StringBuffer makeSqlCreate(AttributeType[] attributeType)
         throws IOException {
@@ -1352,9 +1368,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         for (int i = 0; i < attributeType.length; i++) {
             String typeName = null;
-
-            if ((typeName = (String) CLASS_MAPPINGS.get(
-                            attributeType[i].getType())) != null) {
+            typeName = (String) CLASS_MAPPINGS.get(attributeType[i].getType());
+            if (typeName == null)
+            	typeName = (String) GEOM_CLASS_MAPPINGS.get(attributeType[i].getType());
+            	
+            if (typeName != null) {
                 if (attributeType[i] instanceof GeometryAttributeType) {
                     typeName = "GEOMETRY";
                 } else if (typeName.equals("VARCHAR")) {
@@ -1376,19 +1394,20 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 	}else{
                 		length = 256;
                 	}
+                	
+                	if (length < 1) {
+                		LOGGER.warning("FeatureType did not specify string length; defaulted to 256");
+                		length = 256;
+                	}
                 		
-                    typeName = typeName + "("
-                        + length + ")";
+                    typeName = typeName + "(" + length + ")";
                 }
 
                 if (!attributeType[i].isNillable()) {
                     typeName = typeName + " NOT NULL";
                 }
 
-                //SISfixed - added support for default values
                 //TODO review!!! Is toString() always OK???
-                //TODO review!!! Brute-force quoting should work for numbers also,
-                //but not sure!!!
                 Object defaultValue = attributeType[i].createDefaultValue();
 
                 if (defaultValue != null) {
@@ -1396,19 +1415,20 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                         + defaultValue.toString() + "'";
                 }
 
-                //SISfixed - put fieldname between quotes to preserve case
-                buf.append("\"" + attributeType[i].getName() + "\" " + typeName
-                    + ",\n");
+                buf.append(" \"" + attributeType[i].getName() + "\" " + typeName + ",");
 
-                buf.append(attributeType[i].getName() + " " + typeName + ",");
-
-                //System.out.println(buf);
             } else {
-                throw (new IOException("Type not supported!"));
+            	String msg;
+            	if (attributeType[i] == null) {
+            		msg = "AttributeType was null!";
+            	} else {
+            		msg = "Type '" + attributeType[i].getType() + "' not supported!";
+            	}
+                throw (new IOException(msg));
             }
         }
 
-        return buf;
+        return buf.deleteCharAt(buf.length()-1);
     }
 
     /**
@@ -1505,8 +1525,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *      org.geotools.feature.FeatureType)
      */
     public void updateSchema(String typeName, FeatureType featureType)
-        throws IOException {
-        // TODO Auto-generated method stub
+        throws IOException { 
+    	throw new IOException("PostgisDataStore.updateSchema not yet implemented");
+    	//TODO: implement updateSchema
     }
 
     /**
@@ -1755,4 +1776,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     public void setByteaEnabled(boolean byteaEnabled) {
         this.byteaEnabled = byteaEnabled;
     }
+
+	public FeatureType getSchema(String arg0) throws IOException {
+		//TODO: use the database schema to obtain the feature type?
+		return super.getSchema(arg0);
+	}
 }
