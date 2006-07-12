@@ -30,7 +30,7 @@ import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WFSCapabilities;
-import org.geotools.filter.FilterCapabilitiesMask;
+import org.geotools.filter.FilterCapabilities;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.filter.FilterSchema;
@@ -2503,7 +2503,7 @@ public class WFSCapabilitiesComplexTypes {
                             if (elements[3].getName().equals(value[i].getElement()
                                                                          .getName())) {
                                 // Filter_Capabilities
-                                result.setFilterCapabilities((FilterCapabilitiesMask) value[i]
+                                result.setFilterCapabilities((FilterCapabilities) value[i]
                                     .getValue());
                             } else {
                                 if(validation){

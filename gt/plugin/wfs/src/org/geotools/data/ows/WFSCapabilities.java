@@ -19,7 +19,7 @@ package org.geotools.data.ows;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.filter.FilterCapabilitiesMask;
+import org.geotools.filter.FilterCapabilities;
 
 
 /**
@@ -39,7 +39,7 @@ public class WFSCapabilities extends Capabilities {
     private OperationType transaction;
     private OperationType lockFeature;
     private String vendorSpecificCapabilities;
-    private FilterCapabilitiesMask filterCapabilities;
+    private FilterCapabilities filterCapabilities;
 
     /**
      * Makes a few assumptions about ":" in the name (prefix:typename). 
@@ -96,7 +96,7 @@ public class WFSCapabilities extends Capabilities {
      *
      * @return Returns the filterCapabilities.
      */
-    public FilterCapabilitiesMask getFilterCapabilities() {
+    public FilterCapabilities getFilterCapabilities() {
         return filterCapabilities;
     }
 
@@ -105,7 +105,7 @@ public class WFSCapabilities extends Capabilities {
      *
      * @param filterCapabilities The filterCapabilities to set.
      */
-    public void setFilterCapabilities(FilterCapabilitiesMask filterCapabilities) {
+    public void setFilterCapabilities(FilterCapabilities filterCapabilities) {
         this.filterCapabilities = filterCapabilities;
     }
 

@@ -51,7 +51,6 @@ import org.geotools.data.Transaction;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
-import org.geotools.data.wfs.WFSFilterVisitor.WFSBBoxFilterVisitor;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.FeatureTypes;
@@ -62,6 +61,8 @@ import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.expression.ExpressionType;
 import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
+import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor.WFSBBoxFilterVisitor;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -580,7 +581,7 @@ public class WFSDataStore extends AbstractDataStore {
 		if( tryGZIP ){
 	        InputStream is = hc.getInputStream();
 	        if (hc.getContentEncoding() != null && hc.getContentEncoding().indexOf("gzip") != -1) {
-	            is = new GZIPInputStream(is);
+	        		is = new GZIPInputStream(is);
 	        } 
 	        is=new BufferedInputStream(is);
 			return is;
@@ -900,8 +901,8 @@ public class WFSDataStore extends AbstractDataStore {
             return new Filter[]{Filter.NONE,q.getFilter()};
         }
         WFSTransactionState state = (t == Transaction.AUTO_COMMIT)?null:(WFSTransactionState)t.getState(this);
-        WFSFilterVisitor wfsfv = new WFSFilterVisitor(capabilities
-                .getFilterCapabilities(), ft, state);
+        PostPreProcessFilterSplittingVisitor wfsfv = new PostPreProcessFilterSplittingVisitor(capabilities
+                .getFilterCapabilities(), ft, new WFSTransactionAccessor(state));
 
         q.getFilter().accept(wfsfv);
 

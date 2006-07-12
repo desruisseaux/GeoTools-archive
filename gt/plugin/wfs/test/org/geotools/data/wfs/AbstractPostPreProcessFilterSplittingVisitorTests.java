@@ -3,12 +3,14 @@ package org.geotools.data.wfs;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
-import org.geotools.filter.FilterCapabilitiesMask;
+import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
@@ -16,16 +18,15 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.expression.Expression;
 import org.geotools.filter.function.FilterFunction_geometryType;
+import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-import junit.framework.TestCase;
-
-public class AbstractWFSFilterVisitorTests extends TestCase {
+public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase {
 	protected FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
 	protected WFSTransactionState transactionState;
-	protected WFSFilterVisitor visitor;
-	protected FilterCapabilitiesMask filterCapabilitiesMask;
+	protected PostPreProcessFilterSplittingVisitor visitor;
+	protected FilterCapabilities filterCapabilitiesMask;
 	protected static final String typeName = "test";
 	protected static final String geomAtt = "geom";
 	protected static final String nameAtt = "name";
@@ -34,13 +35,13 @@ public class AbstractWFSFilterVisitorTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		transactionState = new WFSTransactionState(null);
-		filterCapabilitiesMask = new FilterCapabilitiesMask();
+		filterCapabilitiesMask = new FilterCapabilities();
 		visitor=newVisitor();
 	}
 
-	protected WFSFilterVisitor newVisitor() throws SchemaException {
-		return new WFSFilterVisitor(filterCapabilitiesMask, DataUtilities.createType(typeName,geomAtt+":Point,"+nameAtt+":String," +
-				numAtt+":int"), transactionState);
+	protected PostPreProcessFilterSplittingVisitor newVisitor() throws SchemaException {
+		return new PostPreProcessFilterSplittingVisitor(filterCapabilitiesMask, DataUtilities.createType(typeName,geomAtt+":Point,"+nameAtt+":String," +
+				numAtt+":int"), new WFSTransactionAccessor(transactionState));
 	} 
 	
 	protected CompareFilter createEqualsCompareFilter(String attr, String value) throws IllegalFilterException {
@@ -61,13 +62,13 @@ public class AbstractWFSFilterVisitorTests extends TestCase {
 	 * Runs 3 tests.  1 with out filtercapabilities containing filter type.  1 with filter caps containing filter type
 	 * 1 with an edit to the attribute being queried by filter.
 	 * @param filter filter to process
-	 * @param filterTypeMask the constant in {@link FilterCapabilitiesMask} that is equivalent to the FilterType used in filter
+	 * @param filterTypeMask the constant in {@link FilterCapabilities} that is equivalent to the FilterType used in filter
 	 * @param attToEdit the attribute in filter that is queried.  If null then edit test is not ran.
 	 */
-	protected void runTest(Filter filter, int filterTypeMask, String attToEdit) throws SchemaException {
+	protected void runTest(Filter filter, long filterTypeMask, String attToEdit) throws SchemaException {
 		// initialize fields that might be previously modified in current test
 		visitor=newVisitor(); 
-		filterCapabilitiesMask=new FilterCapabilitiesMask();
+		filterCapabilitiesMask=new FilterCapabilities();
 
 		// Testing when FilterCapabilites indicate that filter type is not supported
 		filter.accept(visitor);
