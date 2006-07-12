@@ -26,7 +26,7 @@ import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
-import org.geotools.filter.FilterCapabilitiesMask;
+import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryDistanceFilter;
@@ -271,9 +271,9 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if ((fc.getScalarOps() & FilterCapabilitiesMask.SIMPLE_COMPARISONS) != FilterCapabilitiesMask.SIMPLE_COMPARISONS) {
+                if ((fc.getScalarOps() & FilterCapabilities.SIMPLE_COMPARISONS) != FilterCapabilities.SIMPLE_COMPARISONS) {
                     return false;
                 }
             }
@@ -482,7 +482,7 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
                 if (fc.getSpatialOps() == 0) {
                     return false;
@@ -646,9 +646,9 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if ((fc.getScalarOps() & FilterCapabilitiesMask.LOGICAL) != FilterCapabilitiesMask.LOGICAL) {
+                if ((fc.getScalarOps() & FilterCapabilities.LOGICAL) != FilterCapabilities.LOGICAL) {
                     return false;
                 }
             }
@@ -783,7 +783,7 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
                 if ((fc.getScalarOps() == 0) && (fc.getSpatialOps() == 0)) {
                     return false;
@@ -1065,12 +1065,12 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
                 if ((fc.getScalarOps()
-                        & (FilterCapabilitiesMask.SIMPLE_COMPARISONS
-                        | FilterCapabilitiesMask.SIMPLE_ARITHMETIC)) != (FilterCapabilitiesMask.SIMPLE_COMPARISONS
-                        | FilterCapabilitiesMask.SIMPLE_ARITHMETIC)) {
+                        & (FilterCapabilities.SIMPLE_COMPARISONS
+                        | FilterCapabilities.SIMPLE_ARITHMETIC)) != (FilterCapabilities.SIMPLE_COMPARISONS
+                        | FilterCapabilities.SIMPLE_ARITHMETIC)) {
                     return false;
                 }
             }
@@ -1215,9 +1215,9 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if ((fc.getScalarOps() & FilterCapabilitiesMask.LIKE) != FilterCapabilitiesMask.LIKE) {
+                if ((fc.getScalarOps() & FilterCapabilities.LIKE) != FilterCapabilities.LIKE) {
                     return false;
                 }
             }
@@ -1338,9 +1338,9 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if ((fc.getScalarOps() & FilterCapabilitiesMask.NULL_CHECK) != FilterCapabilitiesMask.NULL_CHECK) {
+                if ((fc.getScalarOps() & FilterCapabilities.NULL_CHECK) != FilterCapabilities.NULL_CHECK) {
                     return false;
                 }
             }
@@ -1460,9 +1460,9 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if ((fc.getScalarOps() & FilterCapabilitiesMask.BETWEEN) != FilterCapabilitiesMask.BETWEEN) {
+                if ((fc.getScalarOps() & FilterCapabilities.BETWEEN) != FilterCapabilities.BETWEEN) {
                     return false;
                 }
             }
@@ -1552,9 +1552,9 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if (fc.getScalarOps() == FilterCapabilitiesMask.NO_OP) {
+                if (fc.getScalarOps() == FilterCapabilities.NO_OP) {
                     return false;
                 }
             }
@@ -1641,9 +1641,9 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if (fc.getScalarOps() == FilterCapabilitiesMask.NO_OP) {
+                if (fc.getScalarOps() == FilterCapabilities.NO_OP) {
                     return false;
                 }
             }
@@ -1762,8 +1762,8 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
-                int elementkey = FilterCapabilitiesMask.findOperation(element
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
+                long elementkey = FilterCapabilities.findOperation(element
                         .getName());
 
                 if ((elementkey == 0)
@@ -1934,9 +1934,9 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if ((fc.getSpatialOps() & FilterCapabilitiesMask.BBOX) != FilterCapabilitiesMask.BBOX) {
+                if ((fc.getSpatialOps() & FilterCapabilities.SPATIAL_BBOX) != FilterCapabilities.SPATIAL_BBOX) {
                     return false;
                 }
             }
@@ -2070,12 +2070,12 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
                 if ((fc.getSpatialOps()
-                        & (FilterCapabilitiesMask.BEYOND
-                        | FilterCapabilitiesMask.DWITHIN)) != (FilterCapabilitiesMask.BEYOND
-                        | FilterCapabilitiesMask.DWITHIN)) {
+                        & (FilterCapabilities.SPATIAL_BEYOND
+                        | FilterCapabilities.SPATIAL_DWITHIN)) != (FilterCapabilities.SPATIAL_BEYOND
+                        | FilterCapabilities.SPATIAL_DWITHIN)) {
                     return false;
                 }
             }
@@ -2200,12 +2200,12 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
                 if ((fc.getSpatialOps()
-                        & (FilterCapabilitiesMask.BEYOND
-                        | FilterCapabilitiesMask.DWITHIN)) != (FilterCapabilitiesMask.BEYOND
-                        | FilterCapabilitiesMask.DWITHIN)) {
+                        & (FilterCapabilities.SPATIAL_BEYOND
+                        | FilterCapabilities.SPATIAL_DWITHIN)) != (FilterCapabilities.SPATIAL_BEYOND
+                        | FilterCapabilities.SPATIAL_DWITHIN)) {
                     return false;
                 }
             }
@@ -2350,9 +2350,9 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if ((fc.getScalarOps() & FilterCapabilitiesMask.LOGICAL) != FilterCapabilitiesMask.LOGICAL) {
+                if ((fc.getScalarOps() & FilterCapabilities.LOGICAL) != FilterCapabilities.LOGICAL) {
                     return false;
                 }
             }
@@ -2495,9 +2495,9 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if ((fc.getScalarOps() & FilterCapabilitiesMask.LOGICAL) != FilterCapabilitiesMask.LOGICAL) {
+                if ((fc.getScalarOps() & FilterCapabilities.LOGICAL) != FilterCapabilities.LOGICAL) {
                     return false;
                 }
             }

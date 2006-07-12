@@ -22,8 +22,7 @@ import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.FilterCapabilitiesMask;
+import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.expression.AttributeExpression;
@@ -33,7 +32,6 @@ import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.filter.expression.MathExpression;
 import org.geotools.ows.ServiceException;
 import org.geotools.xml.PrintHandler;
-import org.geotools.xml.filter.FilterOpsComplexTypes.ComparisonOpsType;
 import org.geotools.xml.filter.FilterSchema.FilterAttribute;
 import org.geotools.xml.filter.FilterSchema.FilterComplexType;
 import org.geotools.xml.filter.FilterSchema.FilterElement;
@@ -122,15 +120,15 @@ public class FilterComplexTypes {
                 throw new SAXException("Missing child element");
             }
 
-            int t = FilterCapabilitiesMask.NO_OP;
+            long t = FilterCapabilities.NO_OP;
 
             for (int i = 0; i < value.length; i++) {
                 t = t
-                    | FilterCapabilitiesMask.findOperation(value[i].getElement()
+                    | FilterCapabilities.findOperation(value[i].getElement()
                                                                .getName());
             }
 
-            return new Integer(t);
+            return new Long(t);
         }
 
         /**
@@ -217,15 +215,15 @@ public class FilterComplexTypes {
                 throw new SAXException("Missing child element");
             }
 
-            int t = FilterCapabilitiesMask.NO_OP;
+            long t = FilterCapabilities.NO_OP;
 
             for (int i = 0; i < value.length; i++) {
                 t = t
-                    | FilterCapabilitiesMask.findOperation(value[i].getElement()
+                    | FilterCapabilities.findOperation(value[i].getElement()
                                                                .getName());
             }
 
-            return new Integer(t);
+            return new Long(t);
         }
 
         /**
@@ -518,14 +516,14 @@ public class FilterComplexTypes {
 //                    "Either there is an extra child, or too few child elements");
 //            }
 
-            FilterCapabilitiesMask fc = new FilterCapabilitiesMask();
+            FilterCapabilities fc = new FilterCapabilities();
 
             if (elements[0].getName().equals(value[0].getElement().getName())) {
-                fc.addType(((Integer) value[0].getValue()).intValue());
+                fc.addType(((Long) value[0].getValue()).intValue());
 
                 if (value.length > 1) {
 	                if (elements[1].getName().equals(value[1].getElement().getName())) {
-	                    fc.addType( ((Integer) value[1].getValue()).intValue());
+	                    fc.addType( ((Long) value[1].getValue()).intValue());
 	                } else {
 	                    throw new SAXException("Unknown element"
 	                        + value[1].getElement().getName());
@@ -533,12 +531,12 @@ public class FilterComplexTypes {
                 }
             } else {
                 if (elements[1].getName().equals(value[0].getElement().getName())) {
-                    fc.addType( ((Integer) value[0].getValue()).intValue());
+                    fc.addType( ((Long) value[0].getValue()).intValue());
 
                     if (value.length > 1) {
 	                    if (elements[0].getName().equals(value[1].getElement()
 	                                                                 .getName())) {
-	                        fc.addType( ((Integer) value[1].getValue())
+	                        fc.addType( ((Long) value[1].getValue())
 	                            .intValue());
 	                    } else {
 	                        throw new SAXException("Unknown element"
@@ -567,7 +565,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return FilterCapabilitiesMask.class;
+            return FilterCapabilities.class;
         }
 
         /**
@@ -655,23 +653,23 @@ public class FilterComplexTypes {
                 throw new SAXException("Missing child value elements");
             }
 
-            int val = FilterCapabilitiesMask.NO_OP;
+            long val = FilterCapabilities.NO_OP;
 
             for (int i = 0; i < value.length; i++) {
                 if (elements[0].getName().equals(value[i].getElement().getName())) {
                     // logical ops
-                    val = val | FilterCapabilitiesMask.LOGICAL;
+                    val = val | FilterCapabilities.LOGICAL;
                 } else {
                     if (elements[1].getName().equals(value[i].getElement()
                                                                  .getName())) {
                         // comparison ops
-                        val = val | ((Integer) value[i].getValue()).intValue();
+                        val = val | ((Long) value[i].getValue()).intValue();
                     } else {
                         if (elements[2].getName().equals(value[i].getElement()
                                                                      .getName())) {
                             // arithmetic ops
                             val = val
-                                | ((Integer) value[i].getValue()).intValue();
+                                | ((Long) value[i].getValue()).intValue();
                         } else {
                             // error
                             throw new SAXException("Invalid child element: "
@@ -681,7 +679,7 @@ public class FilterComplexTypes {
                 }
             }
 
-            return new Integer(val);
+            return new Long(val);
         }
 
         /**
@@ -759,7 +757,7 @@ public class FilterComplexTypes {
             }
 
             if (elements[0].getName().equals(value[0].getElement().getName())) {
-                return (Integer) value[0].getValue();
+                return (Long) value[0].getValue();
             }
 
             throw new SAXException("Invalid child element: "
@@ -857,15 +855,15 @@ public class FilterComplexTypes {
                 throw new SAXException("Atleast one child element is required");
             }
 
-            int v = FilterCapabilitiesMask.NO_OP;
+            long v = FilterCapabilities.NO_OP;
 
             for (int i = 0; i < value.length; i++) {
                 v = v
-                    | FilterCapabilitiesMask.findOperation(value[i].getElement()
+                    | FilterCapabilities.findOperation(value[i].getElement()
                                                                .getName());
             }
 
-            return new Integer(v);
+            return new Long(v);
         }
 
         /**
@@ -960,9 +958,9 @@ public class FilterComplexTypes {
          */
         public boolean canEncode(Element element, Object value, Map hints) {
             if (hints != null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if (fc.getScalarOps() == FilterCapabilitiesMask.NO_OP) {
+                if (fc.getScalarOps() == FilterCapabilities.NO_OP) {
                     return false;
                 }
             }
@@ -1129,9 +1127,9 @@ public class FilterComplexTypes {
          */
         public boolean canEncode(Element element, Object value, Map hints) {
             if (hints != null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if ((fc.getScalarOps() & FilterCapabilitiesMask.SIMPLE_ARITHMETIC) != FilterCapabilitiesMask.SIMPLE_ARITHMETIC) {
+                if ((fc.getScalarOps() & FilterCapabilities.SIMPLE_ARITHMETIC) != FilterCapabilities.SIMPLE_ARITHMETIC) {
                     return false;
                 }
             }
@@ -1248,9 +1246,9 @@ public class FilterComplexTypes {
          */
         public boolean canEncode(Element element, Object value, Map hints) {
             if (hints != null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
-                FilterCapabilitiesMask fc = (FilterCapabilitiesMask) hints.get(FilterSchema.FILTER_CAP_KEY);
+                FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
-                if ((fc.getScalarOps() & FilterCapabilitiesMask.FUNCTIONS) != FilterCapabilitiesMask.FUNCTIONS) {
+                if ((fc.getScalarOps() & FilterCapabilities.FUNCTIONS) != FilterCapabilities.FUNCTIONS) {
                     return false;
                 }
             }
@@ -1479,15 +1477,12 @@ public class FilterComplexTypes {
         	
         	try {
         		String xpath = (String) value[0].getValue();
-        		AttributeExpression expr = factory.createAttributeExpression( null, xpath );
+        		AttributeExpression expr = factory.createAttributeExpression( xpath );
 				return expr;
 			}
         	catch( ClassCastException expressionRequired ){
         		throw new SAXException("Illegal xpath for property name "+element, expressionRequired );
 			}
-        	catch (IllegalFilterException e) {
-				throw new SAXException("Illegal filter for "+element );
-			} 
         	//return (value == null) ? "" : value[0].toString();
         }
 

@@ -144,9 +144,9 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
 
                         // if the filter is done, pass along to the parent
                         if (isLogicFilter) {
-                            logicFactory.add(filterFactory.create());
+                            addFilterToLogicFactory();
                         } else {
-                            parent.filter(filterFactory.create());
+                            addFilterToParent();
                         }
                     }
                 }
@@ -200,6 +200,16 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
             parent.startElement(namespaceURI, localName, qName, atts);
         }
     }
+
+	private void addFilterToParent() throws IllegalFilterException {
+		parent.filter(filterFactory.create());
+		expressionFactory = new ExpressionSAXParser(schema);
+	}
+
+	private void addFilterToLogicFactory() throws IllegalFilterException {
+		logicFactory.add(filterFactory.create());
+		expressionFactory = new ExpressionSAXParser(schema);
+	}
 
     /**
      * Reads the only internal characters read by filters.  If we are in a
@@ -258,9 +268,9 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
                 // if the filter is done, pass along to the parent
                 try {
                     if (isLogicFilter) {
-                        logicFactory.add(filterFactory.create());
+                        addFilterToLogicFactory();
                     } else {
-                        parent.filter(filterFactory.create());
+                        addFilterToParent();
                     }
                 } catch (IllegalFilterException e) {
                     throw new SAXException(
@@ -280,7 +290,7 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
                     LOGGER.finest("found a logic filter end");
 
                     if (isFidFilter) {
-                        logicFactory.add(filterFactory.create());
+                        addFilterToLogicFactory();
                         isFidFilter = false;
                     }
 
@@ -301,9 +311,9 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
 
                     // if the filter is done, pass along to the parent
                     if (isLogicFilter) {
-                        logicFactory.add(filterFactory.create());
+                        addFilterToLogicFactory();
                     } else {
-                        parent.filter(filterFactory.create());
+                        addFilterToParent();
                     }
                 }
                 // if at the end of an expression, two cases:

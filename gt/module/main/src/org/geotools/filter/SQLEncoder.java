@@ -182,18 +182,11 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     protected FilterCapabilities createFilterCapabilities() {
         FilterCapabilities capabilities = new FilterCapabilities();
 
-        capabilities.addType(AbstractFilter.LOGIC_OR);
-        capabilities.addType(AbstractFilter.LOGIC_AND);
-        capabilities.addType(AbstractFilter.LOGIC_NOT);
-        capabilities.addType(AbstractFilter.COMPARE_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_NOT_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.NULL);
-        capabilities.addType(AbstractFilter.BETWEEN);
-        capabilities.addType(AbstractFilter.FID);
+        capabilities.addType(FilterCapabilities.LOGICAL);
+        capabilities.addType(FilterCapabilities.SIMPLE_COMPARISONS);
+        capabilities.addType(FilterCapabilities.NULL_CHECK);
+        capabilities.addType(FilterCapabilities.BETWEEN);
+        capabilities.addType(FilterCapabilities.FID);
         capabilities.addType((short) 12345);
         capabilities.addType((short) -12345);
 
