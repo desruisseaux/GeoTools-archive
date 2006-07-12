@@ -246,6 +246,14 @@ public class FilterCapabilitiesMask extends FilterCapabilities{
     /*
      * @see org.geotools.filter.FilterCapabilities#addType(short)
      */
+    public void addType( int type ) {
+        ops = ops | type;
+    }    
+    
+    /**
+     * @see org.geotools.filter.FilterCapabilities#addType(short)
+     * @deprecated
+     */
     public void addType( short type ) {
         ops = ops | type;
     }

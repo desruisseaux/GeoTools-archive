@@ -18,13 +18,17 @@ package org.geotools.filter;
 
 
 // Java Topology Suite dependencies
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.expression.AttributeExpression;
 import org.geotools.filter.expression.Expression;
+import org.geotools.filter.expression.FunctionExpression;
 import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.filter.expression.MathExpression;
+import org.w3c.dom.NamedNodeMap;
+import org.xml.sax.Attributes;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -54,7 +58,10 @@ public class ExpressionSAXParser {
      * The current state of the expression. Deterimines if a proper expression
      * can be made..
      */
-    private String currentState = null;
+    private String currentState = null; //DJB: appears this can be leftValue rightValue complete.
+                                        //DJB: added "accumulate" for <Function> 
+    
+    private ArrayList accumalationOfExpressions = new ArrayList(); //DJB: keep a list of the expressions used in a <Function>
 
     /** The type of expression being constructed. */
     private String declaredType = null;
@@ -111,13 +118,21 @@ public class ExpressionSAXParser {
      * @throws IllegalFilterException If there are problems creating
      *         expressions.
      */
-    public void start(String declaredType) throws IllegalFilterException {
+    public void start(String declaredType,Attributes atts) throws IllegalFilterException {
         LOGGER.finer("incoming type: " + declaredType);
         LOGGER.finer("declared type: " + this.declaredType);
         LOGGER.finer("current state: " + currentState);
 
-        if (expFactory == null) {
+        if (expFactory == null) 
+        {
             this.declaredType = declaredType;
+            
+            if (DefaultExpression.isFunctionExpression(convertType(declaredType)))
+            {
+            	 expFactory = new ExpressionSAXParser(schema);
+                 curExprssn = ff.createFunctionExpression( getFunctionName(atts) );
+                 LOGGER.finer("is <function> expression");
+            }
 
             // if the expression is math, then create a factory for its
             // sub expressions, otherwise just instantiate the main expression
@@ -141,7 +156,7 @@ public class ExpressionSAXParser {
             currentState = setInitialState(curExprssn);
             readyFlag = false;
         } else {
-            expFactory.start(declaredType);
+            expFactory.start(declaredType,atts);
         }
     }
 
@@ -185,7 +200,23 @@ public class ExpressionSAXParser {
                     currentState = "complete";
                     expFactory = null;
                     LOGGER.finer("just added right value: " + currentState);
-                } else {
+                } else if (currentState.equals("accumulate")) {
+                        accumalationOfExpressions.add(expFactory.create());
+                        expFactory = null;
+                        // currentState = "accumulate";  //leave unchanged
+                        LOGGER.finer("just added a parameter for a function: " + currentState);
+                                  
+                        if (  ((FunctionExpression) curExprssn).getArgCount() ==   accumalationOfExpressions.size())
+                        {
+                        	//hay, we've parsed all the arguments!
+                        	currentState = "complete";
+                        	((FunctionExpression) curExprssn).setArgs( (Expression[]) accumalationOfExpressions.toArray( new Expression[0] ));
+                        }
+                        else
+                        {
+                        	expFactory = new ExpressionSAXParser(schema); // we're gonna get more expressions
+                        }
+                    } else {
                     throw new IllegalFilterException(
                         "Attempted to add sub expression in a bad state: "
                         + currentState);
@@ -358,7 +389,11 @@ public class ExpressionSAXParser {
         } else if ((expression instanceof AttributeExpression)
                 || (expression instanceof LiteralExpression)) {
             return "";
-        } else {
+        }else if(expression instanceof FunctionExpression)
+        {
+        	return "accumulate";  // start storing values!
+        }
+		else {
             throw new IllegalFilterException("Created illegal expression: "
                 + expression.getClass().toString());
         }
@@ -387,7 +422,33 @@ public class ExpressionSAXParser {
         } else if (expType.equals("Literal")) {
             return DefaultExpression.LITERAL_DOUBLE;
         }
+        else if (expType.equals("Function")) {
+            return DefaultExpression.FUNCTION;
+        }
 
         return DefaultExpression.ATTRIBUTE_UNDECLARED;
     }
+    
+    /**
+     * stolen from the DOM parser -- for a list of attributes, find the "name"
+     * ie. for <Function name="geomLength"> return "geomLength"
+     * NOTE: if someone uses <Function name="geomLength">  or <Function ogc:name="geomLength"> this will work,
+     * if they use a different prefix, it will not. 
+     * @param map
+     * @return
+     */
+    public String getFunctionName(Attributes map)
+    {
+	   String result = map.getValue("name");
+	   if (result == null)
+	   {
+	   	   result = map.getValue("ogc:name"); // highly unlikely for this to happen.  But, it might...  
+	   }
+	   if (result == null)
+	   {
+	   	   result = map.getValue("ows:name"); // highly unlikely for this to happen.  But, it might...  
+	   }
+	   return result;
+    }
 }
+

@@ -14,6 +14,8 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.expression.Expression;
+import org.geotools.filter.function.FilterFunction_geometryType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -62,7 +64,7 @@ public class AbstractWFSFilterVisitorTests extends TestCase {
 	 * @param filterTypeMask the constant in {@link FilterCapabilitiesMask} that is equivalent to the FilterType used in filter
 	 * @param attToEdit the attribute in filter that is queried.  If null then edit test is not ran.
 	 */
-	protected void runTest(Filter filter, short filterTypeMask, String attToEdit) throws SchemaException {
+	protected void runTest(Filter filter, int filterTypeMask, String attToEdit) throws SchemaException {
 		// initialize fields that might be previously modified in current test
 		visitor=newVisitor(); 
 		filterCapabilitiesMask=new FilterCapabilitiesMask();
@@ -98,6 +100,19 @@ public class AbstractWFSFilterVisitorTests extends TestCase {
 			assertEquals(filter, visitor.getFilterPost());
 			assertEquals(filter.or(updateFilter), visitor.getFilterPre());
 		}
+	}
+
+	protected CompareFilter createFunctionFilter() throws Exception {
+		FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+		FilterFunction_geometryType geomTypeExpr = new FilterFunction_geometryType();
+		geomTypeExpr.setArgs(new Expression[] { factory
+				.createAttributeExpression("geom") });
+	
+		CompareFilter filter = factory
+				.createCompareFilter(FilterType.COMPARE_EQUALS);
+		filter.addLeftValue(geomTypeExpr);
+		filter.addRightValue(factory.createLiteralExpression("Polygon"));
+		return filter;
 	}
 	
 

@@ -185,6 +185,11 @@ public abstract class DefaultExpression extends ExpressionAbstract implements Ex
     protected static boolean isExpression(short expressionType) {
         return (isMathExpression(expressionType)
         || isAttributeExpression(expressionType)
-        || isLiteralExpression(expressionType));
+        || isLiteralExpression(expressionType))
+        || isFunctionExpression(expressionType);
     }
+
+	public static boolean isFunctionExpression(short expressionType) {
+		return expressionType==FUNCTION;
+	}
 }

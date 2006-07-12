@@ -8,13 +8,13 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilitiesMask;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
+import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
 import org.geotools.filter.NullFilter;
 import org.geotools.filter.expression.Expression;
 import org.geotools.filter.function.FilterFunction_geometryType;
+
 
 public class WFSFilterVisitorTest extends AbstractWFSFilterVisitorTests {
 
@@ -24,7 +24,7 @@ public class WFSFilterVisitorTest extends AbstractWFSFilterVisitorTests {
 		filter.addRightValue(filterFactory.createLiteralExpression(4));
 		filter.addMiddleValue(filterFactory.createAttributeExpression(numAtt));
 		
-		runTest(filter, (short)FilterCapabilitiesMask.BETWEEN, numAtt);
+		runTest(filter, FilterCapabilitiesMask.BETWEEN, numAtt);
 	}
 
 	public void testVisitLogicalANDFilter() throws Exception{
@@ -38,11 +38,27 @@ public class WFSFilterVisitorTest extends AbstractWFSFilterVisitorTests {
 
 		runTest(f1.not(), (short)(FilterCapabilitiesMask.SIMPLE_COMPARISONS|FilterCapabilitiesMask.LOGICAL), nameAtt);
 	}
+
 	public void testVisitLogicalORFilter() throws Exception{
 		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
-		Filter f2 = createEqualsCompareFilter(nameAtt, "david");
+		Filter f2 = createEqualsCompareFilter("name", "jose");
 
-		runTest(f1.or(f2), (short)(FilterCapabilitiesMask.SIMPLE_COMPARISONS|FilterCapabilitiesMask.LOGICAL), nameAtt);
+		Filter orFilter = f1.or(f2);
+		runTest(orFilter, (short)(FilterCapabilitiesMask.SIMPLE_COMPARISONS|FilterCapabilitiesMask.LOGICAL), nameAtt);
+		
+		filterCapabilitiesMask=new FilterCapabilitiesMask();
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.SIMPLE_COMPARISONS);
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.LOGICAL);
+		
+		visitor=newVisitor();
+		
+		f2=createGeometryFilter(FilterType.GEOMETRY_BBOX);
+		orFilter = f1.or(f2);
+		orFilter.accept(visitor);
+		
+		// f1 could be pre-processed but since f2 can't all the processing has to be done on the client side :-(
+		assertEquals(orFilter, visitor.getFilterPost());
+		assertEquals(Filter.NONE, visitor.getFilterPre());
 	}
 
 
@@ -50,14 +66,14 @@ public class WFSFilterVisitorTest extends AbstractWFSFilterVisitorTests {
 	public void testVisitCompareFilter() throws Exception{
 		CompareFilter f = createEqualsCompareFilter(nameAtt, "david");
 
-		runTest(f, (short)FilterCapabilitiesMask.SIMPLE_COMPARISONS, nameAtt);
+		runTest(f, FilterCapabilitiesMask.SIMPLE_COMPARISONS, nameAtt);
 	}
 
 	/**
 	 * an update is in transaction that modifies an  attribute that NOT is referenced in the query
 	 */
 	public void testVisitCompareFilterWithUpdateDifferentAttribute() throws Exception {
-		filterCapabilitiesMask.addType((short) FilterCapabilitiesMask.SIMPLE_COMPARISONS);
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.SIMPLE_COMPARISONS);
 		CompareFilter f = createEqualsCompareFilter(nameAtt, "david");
 
 		CompareFilter updateFilter = createEqualsCompareFilter(nameAtt, "jose");
@@ -79,14 +95,14 @@ public class WFSFilterVisitorTest extends AbstractWFSFilterVisitorTests {
 		LikeFilter filter = filterFactory.createLikeFilter();
 		filter.setValue(filterFactory.createAttributeExpression(nameAtt));
 		filter.setPattern("j*", "*", "?", "\\");
-		runTest(filter, (short)FilterCapabilitiesMask.LIKE, nameAtt);
+		runTest(filter, FilterCapabilitiesMask.LIKE, nameAtt);
 	}
 
 	public void testVisitNullFilter() throws Exception {
 		NullFilter filter = filterFactory.createNullFilter();
 		
 		filter.nullCheckValue(filterFactory.createAttributeExpression(nameAtt));
-		runTest(filter, (short)FilterCapabilitiesMask.NULL_CHECK, nameAtt);
+		runTest(filter, FilterCapabilitiesMask.NULL_CHECK, nameAtt);
 	}
 
 	public void testVisitFidFilter() throws Exception {
@@ -97,18 +113,95 @@ public class WFSFilterVisitorTest extends AbstractWFSFilterVisitorTests {
 		assertEquals(filter, visitor.getFilterPre());
 	}
 
-	public void testFunctionFilter() throws Exception{
-		 FilterFactory factory=FilterFactoryFinder.createFilterFactory();
-	        FilterFunction_geometryType geomTypeExpr=new FilterFunction_geometryType();
-	        geomTypeExpr.setArgs(new Expression[]{ factory.createAttributeExpression("geom")});
+	public void testFunctionFilter() throws Exception {
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.LOGICAL);
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.SIMPLE_COMPARISONS);
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.BBOX);
+		
+		CompareFilter filter = createFunctionFilter();
 
-	        CompareFilter filter = factory.createCompareFilter(FilterType.COMPARE_EQUALS);
-	        filter.addLeftValue(geomTypeExpr);
-	        filter.addRightValue(factory.createLiteralExpression("Polygon"));
-	        
-	        filter.accept(visitor);
-	        
-	        assertEquals( filter, visitor.getFilterPost());
-	        assertEquals( Filter.NONE, visitor.getFilterPre());
+		filter.accept(visitor);
+
+		assertEquals(filter, visitor.getFilterPost());
+		assertEquals(Filter.NONE, visitor.getFilterPre());
+		
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.FUNCTIONS);
+		visitor=newVisitor();
+		
+		filter.accept(visitor);
+
+		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(filter, visitor.getFilterPre());
+	}
+	
+	public void testFunctionANDGeometryFilter() throws Exception{
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.LOGICAL);
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.SIMPLE_COMPARISONS);
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.BBOX);
+		
+		Filter funtionFilter = createFunctionFilter();
+		GeometryFilter geomFilter= createGeometryFilter(FilterType.GEOMETRY_BBOX);
+		
+		Filter andFilter = funtionFilter.and(geomFilter);
+
+		andFilter.accept(visitor);
+
+		assertEquals(funtionFilter, visitor.getFilterPost());
+		assertEquals(geomFilter, visitor.getFilterPre());
+		
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.FUNCTIONS);
+		visitor=newVisitor();
+		
+		andFilter.accept(visitor);
+
+		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(andFilter, visitor.getFilterPre());
+	}
+
+	public void testFunctionORGeometryFilter() throws Exception{
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.LOGICAL);
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.SIMPLE_COMPARISONS);
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.BBOX);
+		
+		Filter funtionFilter = createFunctionFilter();
+		GeometryFilter geomFilter= createGeometryFilter(FilterType.GEOMETRY_BBOX);
+		
+		Filter orFilter = funtionFilter.or(geomFilter);
+
+		orFilter.accept(visitor);
+
+		assertEquals(Filter.NONE, visitor.getFilterPre());
+		assertEquals(orFilter, visitor.getFilterPost());
+		
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.FUNCTIONS);
+		visitor=newVisitor();
+		
+		orFilter.accept(visitor);
+
+		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(orFilter, visitor.getFilterPre());
+
+	}
+	public void testFunctionNOTFilter() throws Exception {
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.LOGICAL);
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.SIMPLE_COMPARISONS);
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.BBOX);
+		
+		Filter funtionFilter = createFunctionFilter();
+
+		Filter not = funtionFilter.not();
+		not.accept(visitor);
+
+		assertEquals(not, visitor.getFilterPost());
+		assertEquals(Filter.NONE, visitor.getFilterPre());
+		
+		filterCapabilitiesMask.addType(FilterCapabilitiesMask.FUNCTIONS);
+		visitor=newVisitor();
+		
+		not.accept(visitor);
+
+		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(not, visitor.getFilterPre());
+				
 	}
 }

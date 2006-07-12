@@ -521,11 +521,11 @@ public class FilterComplexTypes {
             FilterCapabilitiesMask fc = new FilterCapabilitiesMask();
 
             if (elements[0].getName().equals(value[0].getElement().getName())) {
-                fc.addType((short) ((Integer) value[0].getValue()).intValue());
+                fc.addType(((Integer) value[0].getValue()).intValue());
 
                 if (value.length > 1) {
 	                if (elements[1].getName().equals(value[1].getElement().getName())) {
-	                    fc.addType((short) ((Integer) value[1].getValue()).intValue());
+	                    fc.addType( ((Integer) value[1].getValue()).intValue());
 	                } else {
 	                    throw new SAXException("Unknown element"
 	                        + value[1].getElement().getName());
@@ -533,12 +533,12 @@ public class FilterComplexTypes {
                 }
             } else {
                 if (elements[1].getName().equals(value[0].getElement().getName())) {
-                    fc.addType((short) ((Integer) value[0].getValue()).intValue());
+                    fc.addType( ((Integer) value[0].getValue()).intValue());
 
                     if (value.length > 1) {
 	                    if (elements[0].getName().equals(value[1].getElement()
 	                                                                 .getName())) {
-	                        fc.addType((short) ((Integer) value[1].getValue())
+	                        fc.addType( ((Integer) value[1].getValue())
 	                            .intValue());
 	                    } else {
 	                        throw new SAXException("Unknown element"

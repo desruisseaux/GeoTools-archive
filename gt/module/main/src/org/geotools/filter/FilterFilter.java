@@ -110,6 +110,7 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
             //Should we check to make sure namespace is correct?
             //perhaps let users set namespace aware...
             insideFilter = true;
+            expressionFactory=new ExpressionSAXParser(schema);
         } else if (insideFilter) {
             short filterType = convertType(localName);
             LOGGER.finest("types: (xml): " + localName + "; " + "(internal): "
@@ -175,7 +176,7 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
                     } else if (DefaultExpression.isExpression(filterType)) {
                         // if at an expression start, tell the factory
                         LOGGER.finest("found an expression filter start");
-                        expressionFactory.start(localName);
+                        expressionFactory.start(localName,atts);
                     } else if (localName.equals("Distance")) {  //DJB: this looks like hack
                         LOGGER.finest("inside distance");
 
@@ -246,7 +247,7 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
      */
     public void endElement(String namespaceURI, String localName, String qName)
         throws SAXException {
-        LOGGER.finer("found start element: " + localName);
+        LOGGER.finer("found end element: " + localName);
 
         if (localName.equals("Filter")) {
             //moved by cholmes, bug fix for fid.
@@ -426,6 +427,8 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
             return DefaultExpression.LITERAL_DOUBLE;
         } else if (filterType.equals("Literal")) {
             return DefaultExpression.ATTRIBUTE_DOUBLE;
+        } else if (filterType.equals("Function")) {
+            return DefaultExpression.FUNCTION;
         } else {
             return -1;
         }

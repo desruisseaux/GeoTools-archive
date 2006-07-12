@@ -1,8 +1,10 @@
 
 package org.geotools.data.wfs;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import org.geotools.data.wfs.Action.UpdateAction;
@@ -45,10 +47,11 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * Operates similar to postStack.  When a update is determined to affect an attribute expression the update
 	     * filter is pushed on to the stack, then ored with the filter that contains the expression.
 	     */
-	    private Stack changedStack=new Stack();
+	    private Set changedStack=new HashSet();
 	    private FilterCapabilitiesMask fcs = null;
 	    private FeatureType parent = null;
 	    private WFSTransactionState state = null;
+		private Filter original = null;
 	
 	    private WFSFilterVisitor() {
 	    	// do nothing
@@ -61,25 +64,14 @@ public class WFSFilterVisitor implements FilterVisitor {
 	    }
 		
 	    Filter getFilterPost() {
-	        if (postStack.isEmpty()) {
-		        if( changedStack.isEmpty() )
-		        	return Filter.NONE;
-		        
-		        // preStack contains the original filter so return it to ensure that correct features are filtered
-		        return (Filter) preStack.peek();
-	        }
+			if (!changedStack.isEmpty())
+				// Return the original filter to ensure that
+				// correct features are filtered
+				return original ;
 	
 	        if (postStack.size() > 1) {
 	            WFSDataStoreFactory.logger.warning("Too many post stack items after run: "
 	                + postStack.size());
-	        }
-	        
-	        if (!postStack.isEmpty() && !changedStack.isEmpty() ){
-	            WFSDataStoreFactory.logger.warning("Shouldn't be items on both changedStack and poststack: ");	        	
-	        }
-	        if (changedStack.size() > 1) {
-	            WFSDataStoreFactory.logger.warning("Too many changed stack items after run: "
-	                + changedStack.size());
 	        }
 	        
 	        // JE:  Changed to peek because get implies that the value can be retrieved multiple times
@@ -97,17 +89,16 @@ public class WFSFilterVisitor implements FilterVisitor {
 	                + preStack.size());
 	        }
 
-	        if (changedStack.size() > 1) {
-	            WFSDataStoreFactory.logger.warning("Too many changed stack items after run: "
-	                + changedStack.size());
-	        }
 	
 	        // JE:  Changed to peek because get implies that the value can be retrieved multiple times
 	        Filter f = preStack.isEmpty() ? Filter.NONE : (Filter) preStack.peek();
 	        if( changedStack.isEmpty())
 	        	return f;
 	        
-	        Filter updateFilter=(Filter) changedStack.peek();
+	        Iterator iter=changedStack.iterator();
+	        Filter updateFilter=(Filter) iter.next();
+	        while( iter.hasNext() )
+	        	updateFilter=updateFilter.or((Filter) iter.next());
 	        return f.or(updateFilter);
 	    }
 	
@@ -118,6 +109,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        if (Filter.NONE == filter) {
 	            return;
 	        }
+	        if( original==null )
+	        	original=filter;
 	        if (!postStack.isEmpty()) {
 	        	postStack.push(filter);
                 WFSDataStoreFactory.logger.warning(
@@ -207,6 +200,9 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.BetweenFilter)
 	     */
 	    public void visit(BetweenFilter filter) {
+	        if( original==null )
+	        	original=filter;
+
 	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.BETWEEN) == FilterCapabilitiesMask.BETWEEN) {
 	            int i = postStack.size();
 	            filter.getLeftValue().accept(this);
@@ -257,16 +253,39 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.CompareFilter)
 	     */
 	    public void visit(CompareFilter filter) {
+	        if( original==null )
+	        	original=filter;
+
 	        // supports it as a group -- no need to check the type
 	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.SIMPLE_COMPARISONS) != FilterCapabilitiesMask.SIMPLE_COMPARISONS) {
 	            postStack.push(filter);
 	            return;
 	        }
 	
+	        int i = postStack.size();
 	        filter.getLeftValue().accept(this);
+	
+	        if (i < postStack.size()) {
+	        	postStack.pop();
+	        	postStack.push(filter);
+	
+	            return;
+	        }
+	
 	        filter.getRightValue().accept(this);
 	
+	        if (i < postStack.size()) {
+	        	preStack.pop(); // left
+	        	postStack.pop();
+	        	postStack.push(filter);
+	
+	            return;
+	        }
+            
+        	preStack.pop(); // left side
+        	preStack.pop(); // right side
 	        preStack.push(filter);
+	        
 	    }
 	
 	    /**
@@ -274,43 +293,53 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
 	     */
 	    public void visit(GeometryFilter filter) {
+	        if( original==null )
+	        	original=filter;
+
 	        switch (filter.getFilterType()) {
 	        case FilterType.GEOMETRY_BBOX:
 	
 	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.BBOX) != FilterCapabilitiesMask.BBOX) {
 	
-	                if (filter.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
-	                    LiteralExpression le = (LiteralExpression) filter
-	                        .getLeftGeometry();
-	
-	                    if ((le == null) || (le.getLiteral() == null)
-	                            || !(le.getLiteral() instanceof Geometry)) {
-	                    	postStack.push(filter);
-	
-	                        return;
-	                    }
-	
-	                } else {
-	                    if (filter.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
-	                        LiteralExpression le = (LiteralExpression) filter
-	                            .getRightGeometry();
-	
-	                        if ((le == null) || (le.getLiteral() == null)
-	                                || !(le.getLiteral() instanceof Geometry)) {
-	                        	postStack.push(filter);
-	
-	                            return;
-	                        }
-	                    } else {
-	                    	postStack.push(filter);
-	
-	                        return;
-	                    }
-	                }
+	            	// JE:  This is not documented and I can not figure out why if Filter is not supported that there is
+	            	// any reason that the filter should still be sent to server.
+	            	// Only thing I can think of is that BBox is ALWAYS supported but in that case an exception should
+	            	// be thrown instead.
+//	                if (filter.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
+//	                    LiteralExpression le = (LiteralExpression) filter
+//	                        .getLeftGeometry();
+//	
+//	                    if ((le == null) || (le.getLiteral() == null)
+//	                            || !(le.getLiteral() instanceof Geometry)) {
+//	                    	postStack.push(filter);
+//	
+//	                        return;
+//	                    }
+//	
+//	                } else {
+//	                    if (filter.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
+//	                        LiteralExpression le = (LiteralExpression) filter
+//	                            .getRightGeometry();
+//	
+//	                        if ((le == null) || (le.getLiteral() == null)
+//	                                || !(le.getLiteral() instanceof Geometry)) {
+//	                        	postStack.push(filter);
+//	
+//	                            return;
+//	                        }
+//	                    } else {
+//	                    	postStack.push(filter);
+//	
+//	                        return;
+//	                    }
+//	                }
+	            	
+	            	postStack.push(filter);
+	            	return;
+	            	
 	            }
 	
-	            break;
-	
+            	break;
 	        case FilterType.GEOMETRY_BEYOND:
 	
 	            if ((fcs.getSpatialOps() & FilterCapabilitiesMask.BEYOND) != FilterCapabilitiesMask.BEYOND) {
@@ -450,6 +479,9 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LikeFilter)
 	     */
 	    public void visit(LikeFilter filter) {
+	        if( original==null )
+	        	original=filter;
+
 	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.LIKE) != FilterCapabilitiesMask.LIKE) {
 	        	postStack.push(filter);
 	
@@ -475,6 +507,9 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LogicFilter)
 	     */
 	    public void visit(LogicFilter filter) {
+	        if( original==null )
+	        	original=filter;
+
 	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.LOGICAL) != FilterCapabilitiesMask.LOGICAL) {
 	        	postStack.push(filter);
 	
@@ -489,13 +524,17 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	            if (it.hasNext()) {
 	                ((Filter) it.next()).accept(this);
-	
+	                
 	                if (i < postStack.size()) {
-	                	postStack.pop();
+	                	// since and can split filter into both pre and post parts
+	                	// the parts have to be combined since ~(A^B) == ~A | ~B
+	                	// combining is easy since filter==combined result however both post and pre stacks
+	                	// must be cleared since both may have components of the filter
+	                	popToSize(postStack,i);
+	                	popToSize(preStack, j);
 	                	postStack.push(filter);
-	                }else{
-                        while(preStack.size()>j)
-                            preStack.pop();
+	                }else{ 
+	                	popToSize(preStack,j);
                         preStack.push(filter);
 	                }
 	            }
@@ -507,13 +546,18 @@ public class WFSFilterVisitor implements FilterVisitor {
 	                    orReplacement = translateOr(filter);
 	                    orReplacement.accept(this);
 	                } catch (IllegalFilterException e) {
-	                	while(preStack.size()>j)
-	                		preStack.pop();
+	                	popToSize(preStack,j);
 	                	postStack.push(filter);
 	                    return;
 	                }
-	                while(preStack.size()>j)
-	                	preStack.pop();
+	                if( postStack.size()>i ){
+	                	popToSize(postStack,i);
+	                	postStack.push(filter);
+
+	                	return;
+	                }
+
+	                preStack.pop();
                 	preStack.push(filter);
 	            } else {
 	                // more than one child
@@ -529,42 +573,48 @@ public class WFSFilterVisitor implements FilterVisitor {
 	                        Filter f = (Filter) postStack.pop();
 	
 	                        while (postStack.size() > i)
-	                            f.and((Filter) postStack.pop());
+	                            f=f.and((Filter) postStack.pop());
 	
 	                        postStack.push(f);
 	                        
 	                        if(j<preStack.size()){
 	                        	f = (Filter)preStack.pop();
-
+	                        	
 		                        while (preStack.size() > j)
-		                            f.and((Filter) preStack.pop());
+		                            f=f.and((Filter) preStack.pop());
 		                        preStack.push(f);
 	                        }
 	                    } else {
                             WFSDataStoreFactory.logger.warning(
 	                            "LogicFilter found which is not 'and, or, not");
 
-	                        while (postStack.size() > i)
-	                        	postStack.pop();
-	                        while (preStack.size() > j)
-	                        	preStack.pop();
+                            popToSize(postStack, i);
+                            popToSize(preStack, j);
 	
 	                        postStack.push(filter);
 	                    }
 	                } else {
-                        while(preStack.size()>j)
-                            preStack.pop();
+	                	popToSize(preStack,j);
                         preStack.push(filter);              
 	                }
 	            }
 	        }
 	    }
+
+		private void popToSize(Stack stack, int j) {
+			while( j<stack.size() ){
+				stack.pop();
+			}
+		}
 	
 	    /**
 	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.NullFilter)
 	     */
 	    public void visit(NullFilter filter) {
+	        if( original==null )
+	        	original=filter;
+
 	        if ((fcs.getScalarOps() & FilterCapabilitiesMask.NULL_CHECK) != FilterCapabilitiesMask.NULL_CHECK) {
 	        	postStack.push(filter);
 	
@@ -588,6 +638,9 @@ public class WFSFilterVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FidFilter)
 	     */
 	    public void visit(FidFilter filter) {
+	        if( original==null )
+	        	original=filter;
+
 	        // figure out how to check that this is top level.
 	        // otherwise this is fine
 	        if (!postStack.isEmpty()) {
@@ -614,7 +667,7 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        	if(a.getType() == Action.UPDATE){
 	        		UpdateAction ua = (UpdateAction)a;
 	        		if(ua.getProperty(expression.getAttributePath())!=null){
-	        			changedStack.push(a.getFilter());
+	        			changedStack.add(a.getFilter());
 	        			preStack.push(a.getFilter());
 	        			return;
 	        		}
@@ -713,6 +766,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	                return;
 	            }
 	        }
+            	while(j<preStack.size())
+            		preStack.pop();
 	        preStack.push(expression);
 	    }
 	
