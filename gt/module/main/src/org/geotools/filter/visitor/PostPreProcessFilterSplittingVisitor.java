@@ -676,6 +676,8 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        		preStack.push(updateFilter);
 	        	}else
 	        		preStack.push(expression);
+	        } else{
+	        	preStack.push(expression);
 	        }
 	    }
 

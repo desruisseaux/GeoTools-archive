@@ -1,7 +1,4 @@
-package org.geotools.data.wfs;
-
-import java.util.HashMap;
-import java.util.Map;
+package org.geotools.filter.visitor;
 
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
@@ -24,6 +21,15 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		runTest(filter, FilterCapabilities.BETWEEN, numAtt);
 	}
 
+
+	public void testNullTransactionAccessor() throws Exception {
+		accessor=null;
+		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
+		Filter f2 = createEqualsCompareFilter(nameAtt, "david");
+
+		runTest(f1.and(f2), (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
+	}
+	
 	public void testVisitLogicalANDFilter() throws Exception{
 		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
 		Filter f2 = createEqualsCompareFilter(nameAtt, "david");
@@ -75,10 +81,7 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 
 		CompareFilter updateFilter = createEqualsCompareFilter(nameAtt, "jose");
 
-		Map props = new HashMap();
-		props.put(geomAtt, null);
-		transactionState.addAction(new Action.UpdateAction(typeName,
-				updateFilter, props));
+		accessor.setUpdate(geomAtt, updateFilter);
 
 		f.accept(visitor);
 
@@ -199,6 +202,6 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 
 		assertEquals(Filter.NONE, visitor.getFilterPost());
 		assertEquals(not, visitor.getFilterPre());
-				
 	}
+	
 }

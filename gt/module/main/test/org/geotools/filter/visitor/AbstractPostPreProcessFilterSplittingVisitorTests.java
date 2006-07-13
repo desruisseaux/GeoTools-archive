@@ -1,7 +1,4 @@
-package org.geotools.data.wfs;
-
-import java.util.HashMap;
-import java.util.Map;
+package org.geotools.filter.visitor;
 
 import junit.framework.TestCase;
 
@@ -18,13 +15,35 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.expression.Expression;
 import org.geotools.filter.function.FilterFunction_geometryType;
-import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase {
+	public class TestAccessor implements ClientTransactionAccessor {
+
+		private Filter updateFilter;
+		private String attribute;
+
+		public Filter getDeleteFilter() {
+			return null;
+		}
+
+		public Filter getUpdateFilter(String attributePath) {
+			if( attributePath.equals(attribute) )
+				return updateFilter;
+			else
+				return null;
+		}
+
+		public void setUpdate(String attribute, Filter updateFilter) {
+			this.attribute=attribute;
+			this.updateFilter=updateFilter;
+		}
+
+	}
+
 	protected FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
-	protected WFSTransactionState transactionState;
+	protected TestAccessor accessor;
 	protected PostPreProcessFilterSplittingVisitor visitor;
 	protected FilterCapabilities filterCapabilitiesMask;
 	protected static final String typeName = "test";
@@ -34,14 +53,14 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		transactionState = new WFSTransactionState(null);
+		accessor = new TestAccessor();
 		filterCapabilitiesMask = new FilterCapabilities();
 		visitor=newVisitor();
 	}
 
 	protected PostPreProcessFilterSplittingVisitor newVisitor() throws SchemaException {
 		return new PostPreProcessFilterSplittingVisitor(filterCapabilitiesMask, DataUtilities.createType(typeName,geomAtt+":Point,"+nameAtt+":String," +
-				numAtt+":int"), new WFSTransactionAccessor(transactionState));
+				numAtt+":int"), accessor);
 	} 
 	
 	protected CompareFilter createEqualsCompareFilter(String attr, String value) throws IllegalFilterException {
@@ -69,6 +88,8 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
 		// initialize fields that might be previously modified in current test
 		visitor=newVisitor(); 
 		filterCapabilitiesMask=new FilterCapabilities();
+		if( accessor!=null )
+		accessor.setUpdate("",null);
 
 		// Testing when FilterCapabilites indicate that filter type is not supported
 		filter.accept(visitor);
@@ -85,14 +106,12 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
 		assertEquals(Filter.NONE, visitor.getFilterPost());
 		assertEquals(filter, visitor.getFilterPre());
 		
-		if (attToEdit != null) {
+		if (attToEdit != null && accessor!=null ) {
 			// Test when the an update exists that affects the attribute of a
 			// feature
 			FidFilter updateFilter = filterFactory.createFidFilter("fid");
-			Map props = new HashMap();
-			props.put(attToEdit, "newValue");
-			transactionState.addAction(new Action.UpdateAction(typeName,
-					updateFilter, props));
+
+			accessor.setUpdate(attToEdit, updateFilter);
 
 			visitor = newVisitor();
 

@@ -1,4 +1,4 @@
-package org.geotools.data.wfs;
+package org.geotools.filter.visitor;
 
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
