@@ -76,13 +76,14 @@
   <target name="zip-modules">
     <property name="javadoc.args" value="-quiet"/>
     <path id="sources.path">
-      <pathelement path="module/api/src"/>
-      <pathelement path="module/coverage/src"/>
-      <pathelement path="module/main/src"/>
-      <pathelement path="module/referencing/src"/>
-      <pathelement path="module/render/src"/>
+      <!-- This list must be in reverse order (main modules last) -->
       <pathelement path="module/sample-data/src"/>
       <pathelement path="module/svgsupport/src"/>
+      <pathelement path="module/render/src"/>
+      <pathelement path="module/coverage/src"/>
+      <pathelement path="module/referencing/src"/>
+      <pathelement path="module/main/src"/>
+      <pathelement path="module/api/src"/>
     </path>
   </target>
 
@@ -90,46 +91,47 @@
   <target name="web-modules">
     <property name="javadoc.args" value="-quiet -keywords -linksource"/>
     <path id="sources.path">
-      <pathelement path="module/api/src"/>
-      <pathelement path="module/coverage/src"/>
-      <pathelement path="module/main/src"/>
-      <pathelement path="module/referencing/src"/>
-      <pathelement path="module/render/src"/>
+      <!-- This list must be in reverse order (main modules last) -->
+      <pathelement path="ext/widgets-swing/src"/>
+      <pathelement path="ext/validation/src"/>
+      <pathelement path="ext/shaperenderer/src"/>
+      <pathelement path="ext/shape/src"/>
+      <pathelement path="ext/openoffice/src"/>
+      <pathelement path="ext/graph/src"/>
+      <pathelement path="ext/go/src"/>
+      <pathelement path="ext/brewer/src"/>
+      <pathelement path="plugin/wms/src"/>
+      <pathelement path="plugin/wfs/src"/>
+      <pathelement path="plugin/vpf/src"/>
+      <pathelement path="plugin/tiger/src"/>
+      <pathelement path="plugin/shapefile/src"/>
+      <pathelement path="plugin/referencing3D/src"/>
+      <pathelement path="plugin/postgis/src"/>
+      <pathelement path="plugin/oraclespatial/src"/>
+      <pathelement path="plugin/mysql/src"/>
+      <pathelement path="plugin/mif/src"/>
+      <pathelement path="plugin/image/src"/>
+      <pathelement path="plugin/hsql/src"/>
+      <pathelement path="plugin/gtopo30/src"/>
+      <pathelement path="plugin/gml/src"/>
+      <pathelement path="plugin/geotiff/src"/>
+      <pathelement path="plugin/geometryless/src"/>
+      <pathelement path="plugin/geomedia/src"/>
+      <pathelement path="plugin/epsg-wkt/src"/>
+      <pathelement path="plugin/epsg-postgresql/src"/>
+      <pathelement path="plugin/epsg-hsql/src"/>
+      <pathelement path="plugin/epsg-access/src"/>
+      <pathelement path="plugin/directory/src"/>
+      <pathelement path="plugin/db2/src"/>
+      <pathelement path="plugin/arcsde/src"/>
+      <pathelement path="plugin/arcgrid/src"/>
       <pathelement path="module/sample-data/src"/>
       <pathelement path="module/svgsupport/src"/>
-      <pathelement path="plugin/arcgrid/src"/>
-      <pathelement path="plugin/arcsde/src"/>
-      <pathelement path="plugin/db2/src"/>
-      <pathelement path="plugin/directory/src"/>
-      <pathelement path="plugin/epsg-access/src"/>
-      <pathelement path="plugin/epsg-hsql/src"/>
-      <pathelement path="plugin/epsg-postgresql/src"/>
-      <pathelement path="plugin/epsg-wkt/src"/>
-      <pathelement path="plugin/geomedia/src"/>
-      <pathelement path="plugin/geometryless/src"/>
-      <pathelement path="plugin/geotiff/src"/>
-      <pathelement path="plugin/gml/src"/>
-      <pathelement path="plugin/gtopo30/src"/>
-      <pathelement path="plugin/hsql/src"/>
-      <pathelement path="plugin/image/src"/>
-      <pathelement path="plugin/mif/src"/>
-      <pathelement path="plugin/mysql/src"/>
-      <pathelement path="plugin/oraclespatial/src"/>
-      <pathelement path="plugin/postgis/src"/>
-      <pathelement path="plugin/referencing3D/src"/>
-      <pathelement path="plugin/shapefile/src"/>
-      <pathelement path="plugin/tiger/src"/>
-      <pathelement path="plugin/vpf/src"/>
-      <pathelement path="plugin/wfs/src"/>
-      <pathelement path="plugin/wms/src"/>
-      <pathelement path="ext/brewer/src"/>
-      <pathelement path="ext/go/src"/>
-      <pathelement path="ext/graph/src"/>
-      <pathelement path="ext/openoffice/src"/>
-      <pathelement path="ext/shape/src"/>
-      <pathelement path="ext/shaperenderer/src"/>
-      <pathelement path="ext/validation/src"/>
-      <pathelement path="ext/widgets-swing/src"/>
+      <pathelement path="module/render/src"/>
+      <pathelement path="module/coverage/src"/>
+      <pathelement path="module/referencing/src"/>
+      <pathelement path="module/main/src"/>
+      <pathelement path="module/api/src"/>
     </path>
   </target>
 

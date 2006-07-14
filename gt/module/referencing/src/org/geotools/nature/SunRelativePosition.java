@@ -13,14 +13,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
  *
  *    This package contains formulas and documentation from the
  *    National Oceanic & Atmospheric Administration. NOAA's work
  *    is fully acknowledged here.
+ *
+ *
+ *    NOTE: permission has been given to the JScience project (http://www.jscience.org)
+ *          to distribute this file under BSD-like license.
  */
 package org.geotools.nature;
 

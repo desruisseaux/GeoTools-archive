@@ -249,8 +249,7 @@ public final class CRS {
      * <table border='1'>
      * <tr>
      *   <th>This method argument</th>
-     *   <th>{@linkplain Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER
-     *       Corresponding hint}</th>
+     *   <th>{@linkplain Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER Hint} value</th>
      *   <th>Meaning</th>
      * </tr>
      * <tr>

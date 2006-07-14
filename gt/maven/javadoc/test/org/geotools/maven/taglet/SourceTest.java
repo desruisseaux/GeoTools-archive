@@ -84,5 +84,18 @@ public class SourceTest extends TestCase {
         module   = m.group(2);
         assertEquals("module", category);
         assertEquals("api", module);
+
+        // Try an other URL from a tag.
+        url = "http://svn.geotools.org/geotools/tags/2.2-RC4/module/referencing/src/org/geotools/referencing/CRS.java";
+        tag = Source.SVN_KEYWORD_DELIMITER + "URL: " + url + ' ' + Source.SVN_KEYWORD_DELIMITER;
+        m = s.findURL.matcher(tag);
+        assertTrue(m.matches());
+        assertEquals(url, m.group(1).trim());
+        m = s.findModule.matcher(url);
+        assertTrue(m.matches());
+        category = m.group(1);
+        module   = m.group(2);
+        assertEquals("module", category);
+        assertEquals("referencing", module);
     }
 }

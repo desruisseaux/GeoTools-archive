@@ -50,7 +50,7 @@ public final class Source implements Taglet {
     /**
      * The delimiter for SVN keywords.
      */
-    private static final char SVN_KEYWORD_DELIMITER = '$';
+    static final char SVN_KEYWORD_DELIMITER = '$';
 
     /**
      * The base URL for Maven reports.

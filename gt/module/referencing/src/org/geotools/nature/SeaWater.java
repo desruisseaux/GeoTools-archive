@@ -14,9 +14,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *    NOTE: permission has been given to the JScience project (http://www.jscience.org)
+ *          to distribute this file under BSD-like license.
  */
 package org.geotools.nature;
 
@@ -184,7 +184,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute density as a function of salinity, temperature and pressure.
+     * Computes density as a function of salinity, temperature and pressure.
      *
      * @param S Salinity PSS-78 (0 to 42)
      * @param T Temperature ITS-68 (-2 to 40°C)
@@ -208,7 +208,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute density sigma-T as a function of salinity, temperature and pressure.
+     * Computes density sigma-T as a function of salinity, temperature and pressure.
      * Density Sigma-T is equivalent to the true density minus 1000&nbsp;kg/m³, and
      * has typical values around 35. This computation avoid some rouding errors
      * occuring in the true density computation.
@@ -227,9 +227,9 @@ public final class SeaWater {
         // Specific volume at atmospheric pressure
         final double V_35_0_0    = 1.0/RHO_35_0_0;
         final double SVAN_S_T_0  = -RHO*V_35_0_0/(RHO+RHO_35_0_0);
-        if( P <= 0)
+        if (P <= 0) {
             return RHO + DR_35_0_0;
-
+        }
         // Compression terms, DK = K(S,T,P) - K(35,0,P)
         final double K0 = (polynome(T,EOS80_F) + polynome(T,EOS80_G)*SR)*S + polynome(T,EOS80_E);
         final double DK = K0 + (((EOS80_J*SR+polynome(T,EOS80_I))*S+polynome(T,EOS80_H)) + (polynome(T,EOS80_K) + polynome(T,EOS80_M)*S)*P)*P;
@@ -246,7 +246,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute volume as a function of salinity, temperature and pressure.
+     * Computes volume as a function of salinity, temperature and pressure.
      * This quantity if the inverse of density. This method is equivalent
      * to <code>1/{@link #density density}(S,T,P)</code>.
      *
@@ -264,9 +264,9 @@ public final class SeaWater {
         // Specific volume at atmospheric pressure
         final double V_35_0_0    = 1.0/RHO_35_0_0;
         final double SVAN_S_T_0  = -RHO*V_35_0_0/(RHO+RHO_35_0_0);
-        if( P <= 0)
+        if (P <= 0) {
             return SVAN_S_T_0 + V_35_0_0;
-
+        }
         // Compression terms, DK = K(S,T,P) - K(35,0,P)
         final double K0 = ( polynome(T,EOS80_F) + polynome(T,EOS80_G)*SR )*S + polynome(T,EOS80_E);
         final double DK = K0 + (((EOS80_J*SR+polynome(T,EOS80_I))*S+polynome(T,EOS80_H)) + (polynome(T,EOS80_K) + polynome(T,EOS80_M)*S)*P)*P;
@@ -277,7 +277,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute volumic anomaly as a function of salinity, temperature and pressure.
+     * Computes volumic anomaly as a function of salinity, temperature and pressure.
      * Volumic anomaly is defined as the sea water sample's volume minus a standard
      * sample's volume, where the standard sample is a sample of salinity 35, temperature
      * 0°C and the same pressure. In pseudo-code, {@code volumeAnomaly} is equivalent
@@ -297,9 +297,9 @@ public final class SeaWater {
         // Specific volume at atmospheric pressure
         final double V_35_0_0    = 1.0/RHO_35_0_0;
         final double SVAN_S_T_0  = -RHO*V_35_0_0/(RHO+RHO_35_0_0);
-        if( P <= 0)
+        if (P <= 0) {
             return SVAN_S_T_0;
-
+        }
         // Compression terms, DK = K(S,T,P) - K(35,0,P)
         final double K0 = ( polynome(T,EOS80_F) + polynome(T,EOS80_G)*SR )*S + polynome(T,EOS80_E);
         final double DK = K0 + (((EOS80_J*SR+polynome(T,EOS80_I))*S+polynome(T,EOS80_H)) + (polynome(T,EOS80_K) + polynome(T,EOS80_M)*S)*P)*P;
@@ -326,7 +326,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute salinity as a function of conductivity, temperature and pressure.
+     * Computes salinity as a function of conductivity, temperature and pressure.
      *
      * @param C Conductivity in mS/cm (milli-Siemmens by centimeters). Multiply
      *          par {@link #STANDARD_CONDUCTIVITY} if {@code C} is not a
@@ -359,7 +359,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute conductivity as a function of salinity, temperature and pressure.
+     * Computes conductivity as a function of salinity, temperature and pressure.
      *
      * @param S Salinity PSS-78 (0 to 42)
      * @param T Temperature ITS-68 (-2 to 40°C)
@@ -390,7 +390,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute specific heat as a function of salinity, temperature and pressure.
+     * Computes specific heat as a function of salinity, temperature and pressure.
      *
      * @param S Salinity PSS-78.
      * @param T Temperature (°C).
@@ -407,7 +407,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute fusion temperature (melting point) as a function of salinity and pressure.
+     * Computes fusion temperature (melting point) as a function of salinity and pressure.
      *
      * @param S Salinity PSS-78.
      * @param P Pressure (dbar), not including atmospheric pressure.
@@ -418,7 +418,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute adiabetic temperature gradient as a function of salinity, temperature and pressure.
+     * Computes adiabetic temperature gradient as a function of salinity, temperature and pressure.
      *
      * @param S Salinity PSS-78.
      * @param T Temperature (°C).
@@ -432,7 +432,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute depth as a function of pressure and latitude.
+     * Computes depth as a function of pressure and latitude.
      *
      * @param  P Pressure (dbar), not including atmospheric pressure.
      * @param  lat Latitude in degrees (-90 to 90°)
@@ -446,7 +446,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute sound velocity as a function of salinity, temperature and pressure.
+     * Computes sound velocity as a function of salinity, temperature and pressure.
      *
      * @param S Salinity PSS-78.
      * @param T Temperature (°C).
@@ -471,7 +471,7 @@ public final class SeaWater {
     }
 
     /**
-     * Compute saturation in disolved oxygen as a function of salinity and temperature.
+     * Computes saturation in disolved oxygen as a function of salinity and temperature.
      *
      * @param S Salinity PSS-78.
      * @param T Temperature (°C).
