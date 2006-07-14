@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project>
+ <pomVersion>3</pomVersion>
+ <name>imageio-arcgrid</name>
+ <id>imageio-arcgrid</id>
+ <currentVersion>2.2.x</currentVersion>
+ <package>org.geotools.gce.imageio</package>
+ <shortDescription></shortDescription>
+ <description>
+ </description>
+ <developers>
+  <developer>
+   <name>Daniele Romagnoli</name>
+   <id></id>
+   <email></email>
+   <organization></organization>
+   <roles>
+    <role>Module Maintainer</role>
+    <role>Java Developer</role>
+   </roles>
+  </developer>
+  <developer>
+   <name>Simone Giannecchini</name>
+   <id>simboss</id>
+   <email>simboss1@gmail.com</email>
+   <roles>
+    <role>Java Developer</role>
+   </roles>
+  </developer>
+ </developers>
+ <dependencies>
+  <dependency>
+    <artifactId>referencing</artifactId>
+    <groupId>gt2</groupId>
+    <version>2.2.x</version>
+  </dependency>
+ </dependencies>
+ <build>
+		<sourceDirectory>src</sourceDirectory>
+		<unitTestSourceDirectory>test</unitTestSourceDirectory>
+		<unitTest>
+   <resources>
+    <resource>
+     <directory>${basedir}/test</directory>
+     <includes>
+      <include>**/*.asc</include>
+      <include>**/*.gz</include>
+      <include>**/*.asc.gz</include>
+     </includes>
+    </resource>
+   </resources>
+  </unitTest>
+
+  
+ </build>
+</project>
+
