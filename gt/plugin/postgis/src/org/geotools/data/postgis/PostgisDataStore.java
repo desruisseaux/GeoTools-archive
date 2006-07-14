@@ -42,6 +42,7 @@ import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
@@ -71,11 +72,13 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLEncoderPostgisGeos;
 import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 import org.geotools.referencing.NamedIdentifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -176,6 +179,39 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
+    private final static FilterCapabilities capabilities = new FilterCapabilities();
+
+    static {
+    	capabilities.addType(FilterCapabilities.BETWEEN);
+    	capabilities.addType(FilterCapabilities.COMPARE_EQUALS);
+    	capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN);
+    	capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN_EQUAL);
+    	capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN);
+    	capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN_EQUAL);
+    	capabilities.addType(FilterCapabilities.COMPARE_NOT_EQUALS);
+    	capabilities.addType(FilterCapabilities.FID);
+    	//capabilities.addType(FilterCapabilities.FUNCTIONS); //function support is spotty?
+    	capabilities.addType(FilterCapabilities.LIKE);
+    	capabilities.addType(FilterCapabilities.LOGIC_AND);
+    	capabilities.addType(FilterCapabilities.LOGIC_NOT);
+    	capabilities.addType(FilterCapabilities.LOGIC_OR);
+    	capabilities.addType(FilterCapabilities.NO_OP);
+    	capabilities.addType(FilterCapabilities.NULL_CHECK);
+    	capabilities.addType(FilterCapabilities.SIMPLE_ARITHMETIC);
+    	capabilities.addType(FilterCapabilities.SIMPLE_COMPARISONS);
+    	capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
+    	capabilities.addType(FilterCapabilities.SPATIAL_BEYOND);
+    	capabilities.addType(FilterCapabilities.SPATIAL_CONTAINS);
+    	capabilities.addType(FilterCapabilities.SPATIAL_CROSSES);
+    	capabilities.addType(FilterCapabilities.SPATIAL_DISJOINT);
+    	capabilities.addType(FilterCapabilities.SPATIAL_DWITHIN);
+    	capabilities.addType(FilterCapabilities.SPATIAL_EQUALS);
+    	capabilities.addType(FilterCapabilities.SPATIAL_INTERSECT);
+    	capabilities.addType(FilterCapabilities.SPATIAL_OVERLAPS);
+    	capabilities.addType(FilterCapabilities.SPATIAL_TOUCHES);
+    	capabilities.addType(FilterCapabilities.SPATIAL_WITHIN);
+    }
+    
     /** OPTIMIZE constants */
     public static final int OPTIMIZE_SAFE = 0;
     public static final int OPTIMIZE_SQL = 1;
@@ -731,12 +767,19 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             return new EmptyFeatureReader(requestType);
         }
 
+        Filter[] filters = splitFilters(query,transaction); // [server][post]
+        
+        ((DefaultQuery) query).setFilter(filters[0]); //set pre filter (server)
         FeatureReader reader = getFeatureReader(query, transaction);
-
+        
         if (compare == 1) {
             reader = new ReTypeFeatureReader(reader, requestType);
         }
 
+        if (!filters[1].equals( Filter.NONE ) ) {
+        	reader = new FilteringFeatureReader(reader, filters[1]); //set post filter (client)
+        }
+        
         return reader;
     }
 
@@ -1781,4 +1824,33 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 		//TODO: use the database schema to obtain the feature type?
 		return super.getSchema(arg0);
 	}
+	
+	/**
+	 * The filters postgis is capable of handling.
+	 * @return FilterCapabilities
+	 */
+	public FilterCapabilities getFilterCapabilities() {
+		return capabilities;
+	}
+	
+    private Filter[] splitFilters(Query q, Transaction t) throws IOException{
+    	if(q.getFilter() == null)
+    		return new Filter[]{Filter.NONE,Filter.NONE};
+    	if(q.getTypeName() == null || t == null)
+    		return new Filter[]{Filter.NONE,q.getFilter()};
+    	
+    	FeatureType ft = getSchema(q.getTypeName());
+    	
+        //postgis doesn't need a transaction accessor
+        PostPreProcessFilterSplittingVisitor pfv = new PostPreProcessFilterSplittingVisitor(capabilities, ft, null);
+
+        q.getFilter().accept(pfv);
+
+        Filter[] f = new Filter[2]; 
+        f[0] = pfv.getFilterPre(); //postgis
+        f[1] = pfv.getFilterPost(); //geotools
+
+        return f;
+    }
+
 }

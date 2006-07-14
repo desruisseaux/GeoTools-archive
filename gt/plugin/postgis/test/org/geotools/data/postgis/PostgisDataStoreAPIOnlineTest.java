@@ -55,7 +55,11 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.expression.Expression;
+import org.geotools.filter.function.FilterFunction_geometryType;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -455,6 +459,26 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(3, count(reader("road")));
     }
 
+    public void testGetFeatureReaderFilterPrePost() throws IOException, IllegalFilterException {
+        Transaction t = new DefaultTransaction();
+        FeatureType type = data.getSchema("road");
+        FeatureReader reader;
+
+		FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+		FilterFunction_geometryType geomTypeExpr = new FilterFunction_geometryType();
+		geomTypeExpr.setArgs(new Expression[] { factory
+				.createAttributeExpression("geom") });
+	
+		CompareFilter filter = factory
+				.createCompareFilter(FilterType.COMPARE_EQUALS);
+		filter.addLeftValue(geomTypeExpr);
+		filter.addRightValue(factory.createLiteralExpression("Polygon"));
+
+        reader = data.getFeatureReader(type, filter, t);
+        //if the above statement didn't throw an exception, we're content
+        assertNotNull(reader);
+    }
+    
     public void testGetFeatureReaderMutability()
         throws IOException, IllegalAttributeException {
         FeatureReader reader = reader("road");
