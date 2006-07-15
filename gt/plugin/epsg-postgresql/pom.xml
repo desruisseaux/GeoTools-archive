@@ -32,6 +32,23 @@
     Connection to an EPSG postgreSQL database.
     This database is built from the SQL scripts delivered by EPSG.
   </description>
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-postgresql/LICENSE.html</url>
+      <distribution>repo</distribution>
+    </license>
+    <license>
+      <name>BSD License for PostgreSQL JDBC driver</name>
+      <url>http://svn.geotools.org/geotools/trunk/gt/licenses/PostgreSQL.html</url>
+      <distribution>repo</distribution>
+      <comments>
+        This Geotools module requires the PostgreSQL JDBC driver, which is bundled
+        with the binary distribution only (there is no PostgreSQL derived work in
+        the Java source code).
+      </comments>
+    </license>
+  </licenses>
 
 
 

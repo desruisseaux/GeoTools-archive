@@ -32,6 +32,13 @@
     Provides a GO-1 (Geospatial Object) implementation. This module contains
     geometry implementations optimized for rendering, as well as a renderer.
   </description>
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://svn.geotools.org/geotools/trunk/gt/ext/go/LICENSE.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
 
 

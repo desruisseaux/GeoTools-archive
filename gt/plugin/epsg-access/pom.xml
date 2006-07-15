@@ -34,6 +34,13 @@
     This plugin is very short and contains nothing else than connection parameters.
     The user must install himself the EPSG database on his machine.
   </description>
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-access/LICENSE.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
 
 
