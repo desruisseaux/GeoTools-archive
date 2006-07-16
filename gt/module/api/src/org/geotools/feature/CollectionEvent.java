@@ -30,6 +30,7 @@ public class CollectionEvent extends EventObject {
      * Design Notes:
      *  - Must look at other classes for hints on how to implement nicely.
      */
+
     /** event type constant denoting the adding of a feature */
     public static final int FEATURES_ADDED = 0;
 

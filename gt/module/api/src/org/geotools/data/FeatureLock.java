@@ -15,18 +15,19 @@
  */
 package org.geotools.data;
 
+
 /**
  * Used to lock features when used with LockingDataSource.
- * 
+ *
  * <p>
  * A FeatureLockFactory is used to generate FeatureLocks.
  * </p>
- * 
+ *
  * <p>
  * A FeatureLock representing the Current Transaction has been provided.
  * </p>
  * <h2>
- * 
+ *
  * <p>
  * Jody - I have a slightly more consistent specification of this idea in
  * GeoAPI that should be ported back over.
@@ -50,7 +51,7 @@ package org.geotools.data;
 public interface FeatureLock {
     /**
      * FeatureLock representing Transaction duration locking
-     * 
+     *
      * <p>
      * When this FeatureLock is used locks are expected to last until the
      * current Transasction ends with a commit() or rollback().

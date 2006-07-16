@@ -15,9 +15,9 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.FeatureTypeFactory;
 import java.net.URI;
 
-import org.opengis.feature.FeatureTypeFactory;
 
 /**
  * A metadata template for a Feature of arbitrary complexity.
@@ -152,7 +152,7 @@ import org.opengis.feature.FeatureTypeFactory;
  * it is just the GeometryFactory that controls construction that is in the wrong spot. It should be
  * a hint, not attached to GeomtryAttributeType.
  * </p>
- * 
+ *
  * @author Rob Hranac, VFNY
  * @author Chris Holmes, TOPP
  * @author David Zwiers, Refractions
@@ -182,7 +182,7 @@ public interface FeatureType {
      * associate FeatureType and namespace information. Please note that you may not have duplicate
      * typeNames in the same Namespace.
      * </p>
-     * 
+     *
      * @return Namespace of schema
      */
     URI getNamespace();
@@ -192,7 +192,7 @@ public interface FeatureType {
      * <p>
      * In GML this must be the element name of the Feature.
      * </p>
-     *  
+     *
      * @return The name of this feature type.
      */
     String getTypeName();
@@ -200,12 +200,12 @@ public interface FeatureType {
     /**
      * Test to determine whether this FeatureType is descended from the given FeatureType. Think of
      * this relationship likes the "extends" relationship in java.
-     * 
+     *
      * @param nsURI The namespace URI to use.
      * @param typeName The typeName.
      * @return true if descendant, false otherwise.
      */
-    boolean isDescendedFrom( URI nsURI, String typeName );
+    boolean isDescendedFrom(URI nsURI, String typeName);
 
     /**
      * A convenience method for calling <br>
@@ -217,11 +217,11 @@ public interface FeatureType {
      * <p>
      * Question: this method duplicates the information provided by getAncestors().
      * </p>
-     * 
+     *
      * @param type The type to compare to.
      * @return true if descendant, false otherwise.
      */
-    boolean isDescendedFrom( FeatureType type );
+    boolean isDescendedFrom(FeatureType type);
 
     /**
      * Is this FeatureType an abstract type?
@@ -229,7 +229,7 @@ public interface FeatureType {
      * When true is returned instances of this Feature cannot be created, instead a child
      * FeatureType must use this FeatureType as its ancestor.
      * </p>
-     * 
+     *
      * @return true if abstract, false otherwise.
      */
     boolean isAbstract();
@@ -254,7 +254,7 @@ public interface FeatureType {
      * }
      * </code></pre>
      * </p>
-     * 
+     *
      * @return An array of ancestors.
      */
     FeatureType[] getAncestors();
@@ -270,6 +270,7 @@ public interface FeatureType {
      * </p>
      * @return Get the super type, or null for root.
      */
+
     //FeatureType getSuper();
 
     /**
@@ -283,7 +284,7 @@ public interface FeatureType {
      * This should just be used a convenience method when it is known that the features do not have
      * multiple geometries.
      * </p>
-     * 
+     *
      * @return The attribute type of the default geometry, which will contain the position.
      */
     GeometryAttributeType getDefaultGeometry();
@@ -301,7 +302,7 @@ public interface FeatureType {
      * <li>for FeatureType with no super type this count value is the the
      *     same as getAttributeTypes().length.
      * </p>
-     * 
+     *
      * @return number of distinct attributeTypes available, taking ancestors and taking overrides
      *         into account.
      */
@@ -319,11 +320,11 @@ public interface FeatureType {
      * Perhaps this method should be restricted to a FlatFeatureType? Or should have the option of
      * returning an array of matching AttributeType in order of inheiritence?
      * </p>
-     * 
+     *
      * @param xPath XPath pointer to attribute type.
      * @return AttributeType, or null if unavaialble
      */
-    AttributeType getAttributeType( String xPath );
+    AttributeType getAttributeType(String xPath);
 
     /**
      * Find the position of a given AttributeType.
@@ -334,7 +335,7 @@ public interface FeatureType {
      * @param type The type to search for.
      * @return -1 if not found, a zero-based index if found.
      */
-    int find( AttributeType type );
+    int find(AttributeType type);
 
     /**
      * Find the position of an AttributeType which matches the given String.
@@ -342,11 +343,11 @@ public interface FeatureType {
      * This index may be used with getAttributeType( index ), the search space is the entire schema
      * defined by this FeatureType and its ancestors.
      * </p>
-     * 
+     *
      * @param attName the name to look for
      * @return -1 if not found, zero-based index otherwise
      */
-    int find( String attName );
+    int find(String attName);
 
     /**
      * Gets the schema attributeType at the specified index.
@@ -361,12 +362,12 @@ public interface FeatureType {
      * <li>Feature.getAttribute( index ) - as attributes order may or may not be in sequence
      * </ul>
      * </p>
-     * 
+     *
      * @param index Index into the complete schema represented by this FeatureType and its
      *        ancestors.
      * @return The attribute type at the specified position.
      */
-    AttributeType getAttributeType( int position );
+    AttributeType getAttributeType(int position);
 
     /**
      * AttributeTypes for this FeatureType, all attributes defined by this FeatureType
@@ -379,7 +380,7 @@ public interface FeatureType {
      * Note Well: Client code should not consider the index provided by the find( attName ) method
      * as a valid index into the returned array.
      * </p>
-     * 
+     *
      * @return Array of AttributeType describing this schema, array may be length 0, but should
      *         not be null
      */
@@ -399,13 +400,13 @@ public interface FeatureType {
      * Question: the comment says we are removing this, but it is not depricated? And how the heck
      * can the number of occurances out of a boolean.
      * </p>
-     * 
+     *
      * @deprecated It seems this method is ill concieved, use getAttributeType( xpath ) != null as a
      *             replacement
      * @param xPath XPath pointer to attribute type.
      * @return Number of occurrences.
      */
-    boolean hasAttributeType( String xPath );
+    boolean hasAttributeType(String xPath);
 
     //
     // This is code that was available in Geotools 2.0 as part of the
@@ -419,13 +420,13 @@ public interface FeatureType {
      * The implementation is assumed to make use of AttributeType duplicate as required for a deep
      * copy.
      * </p>
-     * 
+     *
      * //@deprecated This method will be removed in 2.2, please use FeatureFactory obtained from FactoryFinder
      * @param feature
      * @return a deep copy of feature
      * @throws IllegalAttributeException
      */
-    Feature duplicate( Feature feature ) throws IllegalAttributeException;
+    Feature duplicate(Feature feature) throws IllegalAttributeException;
 
     /**
      * Creates a new feature, with a generated unique featureID.
@@ -451,26 +452,27 @@ public interface FeatureType {
      * allowing you to provide application specific FeatureImplementations as an orthogonal
      * concern to definition of type.
      * </p>
-     * 
+     *
      * @param attributes the array of attribute values
      * @return The created feature
      * @throws IllegalAttributeException if the FeatureType does not validate the attributes.
      */
-    Feature create( Object[] attributes ) throws IllegalAttributeException;
+    Feature create(Object[] attributes) throws IllegalAttributeException;
 
     /**
      * Scheduled for removal in Geotools 2.2, please use FeatureFactory.
      * <p>
      * Creates a new feature, with the indicated featureID.
      * </p>
-     * 
+     *
      * @param attributes the array of attribute values.
      * @param featureID the feature ID.
      * @return the created feature.
      * @throws IllegalAttributeException if the FeatureType does not validate the attributes.
      */
-    Feature create( Object[] attributes, String featureID ) throws IllegalAttributeException;
-    
+    Feature create(Object[] attributes, String featureID)
+        throws IllegalAttributeException;
+
     /**
      * FeatureType check based on namespace, typeName, attributes and ancestors.
      * <p>
@@ -498,8 +500,8 @@ public interface FeatureType {
      * application schema and include attributes required by the schema (but not request by the query).
      * This library is more lax in its treatment, and expects you to uses isDecendedFrom as required.
      * </p>
-     */ 
-    public boolean equals( Object arg0 );
+     */
+    public boolean equals(Object arg0);
 
     /**
      * Hascode based on namespace, typeName, attributes and ancestors.
@@ -510,5 +512,4 @@ public interface FeatureType {
      * @see java.lang.Object#hashCode()
      */
     public int hashCode();
-
 }

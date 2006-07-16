@@ -22,7 +22,7 @@ import org.opengis.filter.spatial.BinarySpatialOperator;
 
 /**
  * Implements a geometry filter.
- * 
+ *
  * <p>
  * This filter implements a relationship - of some sort -  between two geometry
  * expressions. Note that this comparison does not attempt to restict its
@@ -32,7 +32,7 @@ import org.opengis.filter.spatial.BinarySpatialOperator;
  * it does not require that one sub-expression be an geometry attribute and
  * the other be a geometry literal.
  * </p>
- * 
+ *
  * <p>
  * In other words, you may use this filter to compare two geometries in the
  * same feature, such as: attributeA inside attributeB?  You may also compare
@@ -79,7 +79,7 @@ public interface GeometryFilter extends Filter, BinarySpatialOperator {
      * @throws IllegalFilterException Filter is not internally consistent.
      *
      * @task REVISIT: make all filters immutable.
-     * 
+     *
      * @deprecated use {@link BinarySpatialOperator#setExpression1(Expression)}
      */
     void addLeftGeometry(Expression leftGeometry) throws IllegalFilterException;
@@ -99,7 +99,7 @@ public interface GeometryFilter extends Filter, BinarySpatialOperator {
      * Retrieves the expression on the right side of the spatial comparison.
      *
      * @return the geometry expression on the right.
-     * 
+     *
      * @deprecated use {@link BinarySpatialOperator#getExpression2()}.
      */
     Expression getRightGeometry();
@@ -108,7 +108,7 @@ public interface GeometryFilter extends Filter, BinarySpatialOperator {
      * Retrieves the expression on the left side of the spatial comparison.
      *
      * @return the geometry expression on the left.
-     * 
+     *
      * @deprecated use {@link BinarySpatialOperator#getExpression1()}.
      */
     Expression getLeftGeometry();

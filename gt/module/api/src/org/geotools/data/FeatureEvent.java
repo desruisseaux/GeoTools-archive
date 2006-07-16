@@ -22,19 +22,19 @@ import java.util.EventObject;
 /**
  * A simple event object to represent all events triggered by DataStore
  * instances (typically change events).
- * 
+ *
  * <p>
  * The "Source" FeatureEvents is taken to be a <code>FeatureSource</code>,
  * rather than <code>DataStore</code>. The is due to FeatureSource having a a
  * hold of Transaction information.
  * </p>
- * 
+ *
  * <p>
  * DataStore implementations will actually keep the list listeners by
  * DataSource, and can report FeatureWriter modifications as required (by
  * filtering the Listener list by typeName and Transaction).
  * </p>
- * 
+ *
  * <p>
  * The commit opperation will also need to provide notification.
  * </p>
@@ -47,27 +47,27 @@ public class FeatureEvent extends EventObject {
 
     /**
      * Event type constant denoting the adding of a feature.
-     * 
+     *
      * <p>
      * This EventType is used when FeatureWriter.write() is called when
      * <code>FeatureWriter.hasNext()</code> has previously returned
      * <code>false</code>. This action represents a newly create Feature being
      * passed to the DataStore.
      * </p>
-     * 
+     *
      * <p>
      * The FeatureWriter making the modification will need to check that
      * <code>typeName</code> it is modifing matches the
      * <code>FeatureSource.getSchema().getTypeName()</code> before sending
      * notification to any listeners on the FeatureSource.
      * </p>
-     * 
+     *
      * <p>
      * If the FeatureWriter is opperating against a Transaction it will need
      * ensure that to check the FeatureSource.getTransaction() for a match
      * before sending notification to any listeners on the FeatureSource.
      * </p>
-     * 
+     *
      * <p>
      * FeatureEvent.getBounds() should reflect the the Bounding Box of the
      * newly created Features.
@@ -78,21 +78,21 @@ public class FeatureEvent extends EventObject {
     /**
      * Event type constant denoting that features in the collection has been
      * modified.
-     * 
+     *
      * <p>
      * This EventType is used when a FeatureWriter.write() is called when
      * <code>FeatureWriter.hasNext()</code> returns <code>true</code> and the
      * current Feature has been changed. This EventType is also used when a
      * Transaction <code>commit()</code> or <code>rolledback</code> is called.
      * </p>
-     * 
+     *
      * <p>
      * The FeatureWriter making the modification will need to check that
      * <code>typeName</code> it is modifing matches the
      * <code>FeatureSource.getSchema().getTypeName()</code> before sending
      * notification to any listeners on the FeatureSource.
      * </p>
-     * 
+     *
      * <p>
      * If the FeatureWriter is opperating against a Transaction it will need
      * ensure that to check the FeatureSource.getTransaction() for a match
@@ -102,7 +102,7 @@ public class FeatureEvent extends EventObject {
      * FeatureSources in the same Transaction will need to be informed of a
      * rollback.
      * </p>
-     * 
+     *
      * <p>
      * FeatureEvent.getBounds() should reflect the the BoundingBox of the
      * FeatureWriter modified Features. This may not be possible during a
@@ -113,25 +113,25 @@ public class FeatureEvent extends EventObject {
 
     /**
      * Event type constant denoting the removal of a feature.
-     * 
+     *
      * <p>
      * This EventType is used when FeatureWriter.remove() is called. This
      * action represents a Feature being removed from the DataStore.
      * </p>
-     * 
+     *
      * <p>
      * The FeatureWriter making the modification will need to check that
      * <code>typeName</code> it is modifing matches the
      * <code>FeatureSource.getSchema().getTypeName()</code> before sending
      * notification to any listeners on the FeatureSource.
      * </p>
-     * 
+     *
      * <p>
      * If the FeatureWriter is opperating against a Transaction it will need
      * ensure that to check the FeatureSource.getTransaction() for a match
      * before sending notification to any listeners on the FeatureSource.
      * </p>
-     * 
+     *
      * <p>
      * FeatureEvent.getBounds() should reflect the the Bounding Box of the
      * removed Features.
@@ -144,7 +144,7 @@ public class FeatureEvent extends EventObject {
 
     /**
      * Indicates the bounds in which the modification occured.
-     * 
+     *
      * <p>
      * This value is allowed to by <code>null</code> if this information is not
      * known.

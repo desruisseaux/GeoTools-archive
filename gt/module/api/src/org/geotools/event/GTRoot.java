@@ -15,9 +15,10 @@
  */
 package org.geotools.event;
 
+
 /**
  * Indicates the "root" of a Geotools data structure with event notification.
- * 
+ *
  * <p>
  * Several of the GeoTools objects are produced in reference to specifications,
  * in particular XML based specifications. Often we try and match the same
@@ -26,7 +27,7 @@ package org.geotools.event;
  * managing a host of listeners we are providing a single set of listeners
  * located at the object matching the document base.
  * </p>
- * 
+ *
  * <p></p>
  *
  * @author Jody Garnett, Refractions Research
@@ -50,14 +51,16 @@ public interface GTRoot extends GTComponent {
             public void removeListener(GTListener listener) {
             }
 
-			public GTNote getNote() {
-				return GTNote.EMPTY;
-			}
-			public void setNote(GTNote container) {
-			}
-			public String toString() {
-				return "NO_PARENT";
-			}
+            public GTNote getNote() {
+                return GTNote.EMPTY;
+            }
+
+            public void setNote(GTNote container) {
+            }
+
+            public String toString() {
+                return "NO_PARENT";
+            }
         };
 
     /**

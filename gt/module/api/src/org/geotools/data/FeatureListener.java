@@ -15,9 +15,10 @@
  */
 package org.geotools.data;
 
+
 /**
  * Interface to be implemented by all listeners of FeatureEvents.
- * 
+ *
  * <p>
  * Event notification is based on p[roviding the Envelope of the modification
  * (if known).
@@ -30,7 +31,7 @@ package org.geotools.data;
 public interface FeatureListener extends java.util.EventListener {
     /**
      * Gets called when a FeatureEvent is fired.
-     * 
+     *
      * <p>
      * Typically fired to signify that a change has occurred in the DataStore
      * backing the FeatureSource.

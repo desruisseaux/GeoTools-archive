@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+
 /**
  * Constants used to communicate Catalog Deltas.
  * <p>
@@ -31,7 +32,7 @@ import java.util.Set;
  * <p>
  * For "bit mask" style interation please use: <code>EnumSet.of(Kind.ADDED, Kind.REPLACED)</code>
  * </p>
- * 
+ *
  * @author Jody Garnett
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.6.0
@@ -42,49 +43,6 @@ public interface ResolveDelta {
     static final List NO_CHILDREN = Collections.EMPTY_LIST;
 
     /**
-     * Kind of Delta, used to indicate change.
-     * 
-     * @author jgarnett
-     * @since 0.9.0
-     */
-    class Kind {
-        /**
-         * Delta kind constant indicating no change.
-         * 
-         * @see getKind()
-         */
-        public static final Kind NO_CHANGE = new Kind();
-
-        /**
-         * The resource has been added to the catalog.
-         * 
-         * @see getKind()
-         */
-        public static final Kind ADDED = new Kind();
-
-        /**
-         * The resource has been removed from the catalog.
-         * 
-         * @see getKind()
-         */
-        public static final Kind REMOVED = new Kind();
-
-        /**
-         * The resource has been changed.
-         * 
-         * @see getKind()
-         */
-        public static final Kind CHANGED = new Kind();
-
-        /**
-         * The resource has been replaced with another entry in the catalog.
-         * 
-         * @see getKind()
-         */
-        public static final Kind REPLACED = new Kind();
-    }
-    
-    /**
      * Returns the kind of this delta.
      * <p>
      * Normally, one of <code>ADDED</code>, <code>REMOVED</code>, <code>CHANGED</code> or
@@ -94,14 +52,14 @@ public interface ResolveDelta {
      * This set is still open, during shutdown we may throw a few more kinds around. Eclipse makes
      * use of PHANTOM, and NON_PHANTOM not sure we care
      * </p>
-     * 
+     *
      * @return the kind of this resource delta
      * @see Kind.ADDED
      * @see Kind.REMOVED
      * @see Kind.CHANGED
      * @see Kind.REPLACED
      */
-     Kind getKind();
+    Kind getKind();
 
     /**
      * Accepts the given visitor.
@@ -111,17 +69,17 @@ public interface ResolveDelta {
      * <p>
      * This is a convenience method, equivalent to accepts( visitor, IService.NONE )
      * </p>
-     * 
+     *
      * @param visitor
      * @throws CoreException
      */
-    void accept( ResolveDeltaVisitor visitor ) throws IOException;
+    void accept(ResolveDeltaVisitor visitor) throws IOException;
 
     /**
      * Resource deltas for all added, removed, changed, or replaced.
      * <p>
      * This is a short cut for:
-     * 
+     *
      * <pre><code>
      *  finally List list = new ArrayList();
      *  accept( IServiceDeltaVisitor() {
@@ -132,27 +90,27 @@ public interface ResolveDelta {
      *          case IDelta.CHANGED :
      *          case IDelta.REPLACED :
      *              list.add( delta );
-     *          default: // ignore    
+     *          default: // ignore
      *          }
      *      return true;
      *      }
      *  });
      *  return list.toArray();
      * </code></pre>
-     * 
+     *
      * </p>
-     * 
+     *
      * @return A list of type ResolveDelta.
      */
     List getChildren();
 
     /**
      * Finds and returns the delta information for a given resource.
-     * 
+     *
      * @kindMask Set of IDelta.Kind
      * @return Array of IGeoResourceDelta
      */
-    List getChildren( Set kindMask );
+    List getChildren(Set kindMask);
 
     /**
      * Returns a handle for the affected handle.
@@ -170,7 +128,7 @@ public interface ResolveDelta {
      * For removals (<code>REPLACE</code>), this handle describes the resource in the "before"
      * state. The new handle can be determined with getNewResolve().
      * <p>
-     * 
+     *
      * @return the affected resource (handle)
      */
     Resolve getResolve();
@@ -179,8 +137,51 @@ public interface ResolveDelta {
      * For replacement (<code>REPLACE</code>), this handle describes the resource in the "after"
      * state. The old handle can be determined with getResolve().
      * <p>
-     * 
+     *
      * @return The new resolve replacing the affected handle.
      */
     Resolve getNewResolve();
+
+    /**
+     * Kind of Delta, used to indicate change.
+     *
+     * @author jgarnett
+     * @since 0.9.0
+     */
+    class Kind {
+        /**
+         * Delta kind constant indicating no change.
+         *
+         * @see getKind()
+         */
+        public static final Kind NO_CHANGE = new Kind();
+
+        /**
+         * The resource has been added to the catalog.
+         *
+         * @see getKind()
+         */
+        public static final Kind ADDED = new Kind();
+
+        /**
+         * The resource has been removed from the catalog.
+         *
+         * @see getKind()
+         */
+        public static final Kind REMOVED = new Kind();
+
+        /**
+         * The resource has been changed.
+         *
+         * @see getKind()
+         */
+        public static final Kind CHANGED = new Kind();
+
+        /**
+         * The resource has been replaced with another entry in the catalog.
+         *
+         * @see getKind()
+         */
+        public static final Kind REPLACED = new Kind();
+    }
 }

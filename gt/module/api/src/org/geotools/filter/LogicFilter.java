@@ -17,7 +17,6 @@ package org.geotools.filter;
 
 import org.geotools.feature.Feature;
 import org.opengis.filter.BinaryLogicOperator;
-
 import java.util.Iterator;
 
 
@@ -40,7 +39,7 @@ public interface LogicFilter extends Filter, BinaryLogicOperator {
      *
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
-     *         
+     *
      * @deprecated use {@link Filter#evaluate(Feature)}.
      */
     boolean contains(Feature feature);

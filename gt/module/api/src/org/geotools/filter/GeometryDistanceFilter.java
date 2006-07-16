@@ -21,25 +21,25 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
 
 /**
  * Defines geometry filters with a distance element.
- * 
+ *
  * <p>
  * These filters are defined in the filter spec by the DistanceBufferType,
  * which contains an additioinal field for a distance.  The two filters that
  * use the distance buffer type are Beyond and DWithin.
  * </p>
- * 
+ *
  * <p>
  * From the spec: The spatial operators DWithin and Beyond test whether the
  * value of a geometric property is within or beyond a specified distance of
  * the specified literal geometric value.  Distance values are expressed using
  * the Distance element.
  * </p>
- * 
+ *
  * <p>
  * For now this code does not take into account the units of distance,  we will
  * assume that the filter units are the same as the geometry being filtered.
  * </p>
- * 
+ *
  * <p></p>
  *
  * @author Chris Holmes, TOPP
@@ -49,7 +49,8 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
  * @task REVISIT: add units for distance.  Should it just be a string?  Or
  *       should it actually resolve the definition?
  */
-public interface GeometryDistanceFilter extends GeometryFilter, DistanceBufferOperator {
+public interface GeometryDistanceFilter extends GeometryFilter,
+    DistanceBufferOperator {
     /**
      * Returns true if the passed in object is the same as this filter.  Checks
      * to make sure the filter types are the same as well as all three of the
@@ -77,9 +78,9 @@ public interface GeometryDistanceFilter extends GeometryFilter, DistanceBufferOp
      *
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
-     *         
-     * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)} 
-     * 
+     *
+     * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
+     *
      */
     boolean contains(Feature feature);
 
@@ -87,7 +88,7 @@ public interface GeometryDistanceFilter extends GeometryFilter, DistanceBufferOp
      * Gets the distance allowed by this filter.
      *
      * @return distance the length beyond which this filter is valid or not.
-     * 
+     *
      * @deprecated use {@link DistanceBufferOperator#getDistance()}
      */
     double getDistance();

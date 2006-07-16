@@ -15,9 +15,10 @@
  */
 package org.geotools.styling;
 
+
 /**
  * A NamedStyle is used to refer to a style that has a name in a WMS.
- * 
+ *
  * <p>
  * A NamedStyle is a Style that has only Name, so all setters other than
  * setName will throw an <code>UnsupportedOperationException</code>

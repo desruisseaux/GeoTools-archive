@@ -25,7 +25,7 @@ import org.geotools.filter.expression.Expression;
 /**
  * The RasterSymbolizer describes how to render raster/matrix-coverage data
  * (e.g., satellite photos, DEMs).
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC

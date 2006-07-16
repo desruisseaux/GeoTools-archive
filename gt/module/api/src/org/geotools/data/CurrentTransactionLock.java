@@ -15,9 +15,10 @@
  */
 package org.geotools.data;
 
+
 /**
  * A request for a Lock that last the duration of a transaction.
- * 
+ *
  * <p>
  * The single instance of this class is available as
  * <code>FeatureLock.TRANSACTION</code>.
@@ -27,7 +28,7 @@ package org.geotools.data;
 class CurrentTransactionLock implements FeatureLock {
     /**
      * Transaction locks do not require Authorization.
-     * 
+     *
      * <p>
      * Authorization is based on being on "holding" the Transaction rather than
      * supplying an authorization id.
@@ -43,7 +44,7 @@ class CurrentTransactionLock implements FeatureLock {
 
     /**
      * Transaciton locks are not held for a duration.
-     * 
+     *
      * <p>
      * Any locking performed against the current Transaction is expected to
      * expire when the transaction finishes with a close or rollback

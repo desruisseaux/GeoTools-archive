@@ -15,15 +15,14 @@
  */
 package org.geotools.data;
 
+import org.geotools.filter.Filter;
 import java.io.IOException;
 import java.util.Set;
-
-import org.geotools.filter.Filter;
 
 
 /**
  * Provides Feature based locking.
- * 
+ *
  * <p>
  * Features from individual shapefiles, database tables, etc. can be protected
  * or reserved from modification through this interface.
@@ -48,18 +47,18 @@ public interface FeatureLocking extends FeatureStore {
     /**
      * All locking operations will operate against the provided
      * <code>lock</code>.
-     * 
+     *
      * <p>
      * This in in keeping with the stateful spirit of DataSource in which
      * operations are against the "current" transaction. If a FeatureLock is
      * not provided lock operations will only be applicable for the current
      * transaction (they will expire on the next commit or rollback).
      * </p>
-     * 
+     *
      * <p>
      * That is lockFeatures() operations will:
      * </p>
-     * 
+     *
      * <ul>
      * <li>
      * Be recorded against the provided FeatureLock.
@@ -69,16 +68,16 @@ public interface FeatureLocking extends FeatureStore {
      * provided.
      * </li>
      * </ul>
-     * 
+     *
      * <p>
      * Calling this method with <code>setFeatureLock( FeatureLock.TRANSACTION
      * )</code> will revert to per transaction operation.
      * </p>
-     * 
+     *
      * <p>
      * This design allows for the following:
      * </p>
-     * 
+     *
      * <ul>
      * <li>
      * cross DataSource FeatureLock usage
@@ -94,7 +93,7 @@ public interface FeatureLocking extends FeatureStore {
 
     /**
      * FeatureLock features described by Query.
-     * 
+     *
      * <p>
      * To implement WFS parcial Locking retrieve your features with a query
      * operation first before trying to lock them individually. If you are not
@@ -111,7 +110,7 @@ public interface FeatureLocking extends FeatureStore {
 
     /**
      * FeatureLock features described by Filter.
-     * 
+     *
      * <p>
      * To implement WFS parcial Locking retrieve your features with a query
      * operation first before trying to lock them individually. If you are not
@@ -128,7 +127,7 @@ public interface FeatureLocking extends FeatureStore {
 
     /**
      * FeatureLock all Features.
-     * 
+     *
      * <p>
      * The method does not prevent addFeatures() from being used (we could add
      * a lockDataSource() method if this functionality is required.
@@ -142,14 +141,14 @@ public interface FeatureLocking extends FeatureStore {
 
     /**
      * Unlocks all Features.
-     * 
+     *
      * <p>
      * Authorization must be provided prior before calling this method.
      * </p>
      * <pre><code>
      * <b>void</b> releaseLock( String lockId, LockingDataSource ds ){
      *    ds.setAuthorization( "LOCK534" );
-     *    ds.unLockFeatures(); 
+     *    ds.unLockFeatures();
      * }
      * </code></pre>
      *
@@ -159,7 +158,7 @@ public interface FeatureLocking extends FeatureStore {
 
     /**
      * Unlock Features denoted by provided filter.
-     * 
+     *
      * <p>
      * Authorization must be provided prior before calling this method.
      * </p>
@@ -172,7 +171,7 @@ public interface FeatureLocking extends FeatureStore {
 
     /**
      * Unlock Features denoted by provided query.
-     * 
+     *
      * <p>
      * Authorization must be provided prior before calling this method.
      * </p>

@@ -21,7 +21,7 @@ import java.io.IOException;
 
 /**
  * Allows processing of resolve deltas.
- * 
+ *
  * <p>
  * Usage:
  * <pre>
@@ -39,7 +39,7 @@ import java.io.IOException;
  *              break;
  *          case IDelta.REPLACED :
  *              // handle replaced handled
- *              break;    
+ *              break;
  *          }
  *          return true;
  *      }
@@ -48,7 +48,7 @@ import java.io.IOException;
  *  rootDelta.accept(new Visitor());
  * </pre>
  * </p>
- * 
+ *
  * <p>
  * Clients may implement this interface.
  * </p>

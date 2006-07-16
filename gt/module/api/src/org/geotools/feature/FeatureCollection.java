@@ -15,15 +15,15 @@
  */
 package org.geotools.feature;
 
-import java.io.IOException;
-import java.util.Iterator;
-
 import org.geotools.data.FeatureResults;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
 import org.geotools.util.ProgressListener;
+import java.io.IOException;
+import java.util.Iterator;
+
 
 /**
  * Represents a collection of features.
@@ -38,7 +38,7 @@ import org.geotools.util.ProgressListener;
  * <li>FeatureCollection.close( iterator ) must be called (see example below)
  * <li>Features are not specifically ordered within the FeatureCollection (see FeatureList)
  * <li>Two instances cannot exist with the same Feature ID (Feature contract)
- * <li>(unsure) the same Instance can be in the collection more then once  
+ * <li>(unsure) the same Instance can be in the collection more then once
  * </ul>
  * In programmer speak a FeatureCollection is a "Bag" with an index based ID.
  * </p>
@@ -74,7 +74,7 @@ import org.geotools.util.ProgressListener;
  * there code will break often enough due to latency - try and close
  * up resources for them when you can detect that an Iterator is not
  * useful anymore.
- * </p> 
+ * </p>
  * <p>
  * Collections are used in two fashions, basically as you see them,
  * and also as "range" for common opperations. You can see this with
@@ -82,7 +82,7 @@ import org.geotools.util.ProgressListener;
  * going towards supporting this kind of use at the FeatureCollection
  * level.
  * </p>
- * 
+ *
  * @see java.util.Collection, org.geotools.Feature
  * @author Ian Turton, CCG
  * @author Rob Hranac, VFNY
@@ -91,8 +91,8 @@ import org.geotools.util.ProgressListener;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureCollection extends ResourceCollection, FeatureResults, Feature {
-    
+public interface FeatureCollection extends ResourceCollection, FeatureResults,
+    Feature {
     /**
      * Obtain a FeatureIterator of the Features within this collection.
      * <p>
@@ -101,10 +101,10 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * resource backed collections, the <code>close( Iterator )</code>
      * method must be called.
      * <p>
-     * 
+     *
      * This is almost equivalent to:
      * <ul>
-     * <li>a Type-Safe call to: 
+     * <li>a Type-Safe call to:
      * <code>getAttribute(getFeatureType().getAttributeType(0).getName()).iterator();</code>.
      * <li>A Java 5:<code>Iterator&lt;Feature&gt;</code>
      * </ul>
@@ -122,17 +122,17 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * }
      * </code></pre>
      * </p>
-     * 
+     *
      * <p>
      * GML Note: The contents of this iterator are considered to be defined by
      * <b>featureMember</b> tags (and/or the single allowed <b>FeatureMembers</b> tag).
      * Please see getFeatureType for more details.
      * </p>
-     * 
+     *
      * @return A FeatureIterator.
-     */    
-    FeatureIterator features();    
-    
+     */
+    FeatureIterator features();
+
     /**
      * Clean up any resources assocaited with this iterator in a manner similar to JDO collections.
      * <p>
@@ -152,8 +152,8 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * </code></pre>
      * </p>
      */
-    public void close( FeatureIterator close );
-    
+    public void close(FeatureIterator close);
+
     /**
      * Clean up after any resources assocaited with this itterator in a manner similar to JDO collections.
      * </p>
@@ -172,14 +172,15 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * </p>
      * @param close
      */
-    public void close( Iterator close );
+    public void close(Iterator close);
+
     /**
      * Adds a listener for collection events.
      * <p>
      * When this collection is backed by live data the event notification
      * will follow the guidelines outlined by FeatureListner.
      * </p>
-     *  
+     *
      * @param listener The listener to add
      * @throws NullPointerException If the listener is null.
      */
@@ -187,11 +188,12 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
 
     /**
      * Removes a listener for collection events.
-     * 
+     *
      * @param listener The listener to remove
      * @throws NullPointerException If the listener is null.
      */
-    void removeListener(CollectionListener listener) throws NullPointerException;
+    void removeListener(CollectionListener listener)
+        throws NullPointerException;
 
     /**
      * Gets a reference to the type of this feature collection.
@@ -213,7 +215,7 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * <li>metaDataProperty 0..*
      * <li>description 0..1
      * <li>name 0..*
-     * <li>boundedBy 1..1 (required) 
+     * <li>boundedBy 1..1 (required)
      * <li>location 0..1
      * </ul>
      * The value of the boundedBy attribute should be derived from the contents
@@ -233,11 +235,11 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      *     of each Feature as it is retrived from the collection
      * </ul>
      * </p>
-     * 
+     *
      * @return A reference to this collections type
      */
     FeatureType getFeatureType();
-    
+
     /**
      * The schema for the child features of this collection.
      * <p>
@@ -255,12 +257,12 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * <p>
      * The method getSchema() is named for compatability with the geotools 2.0 API. In the
      * Geotools 2.2 time frame we should be able to replace this method with a careful check
-     * of getFeatureType() and its attributes. 
+     * of getFeatureType() and its attributes.
      *  </p>
-     * @return FeatureType describing the "common" schema to all child features of this collection 
+     * @return FeatureType describing the "common" schema to all child features of this collection
      */
     FeatureType getSchema();
-        
+
     /**
      * Will visit the contents of the feature collection.
      * <p>
@@ -268,10 +270,11 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * the Filter/Expression/Function API as it may be optimized.
      * </p>
      * @param visitor
-     * @throws IOException 
+     * @throws IOException
      */
-    void accepts( FeatureVisitor visitor, ProgressListener progress ) throws IOException;
-    
+    void accepts(FeatureVisitor visitor, ProgressListener progress)
+        throws IOException;
+
     /**
      * FeatureCollection "view" indicated by provided filter.
      * <p>
@@ -290,7 +293,7 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * collection.subCollection( filter ).clear();
      * </code></pre>
      * The above recommended use is agreement with the Collections API precident of
-     * List.subList( start, end ). 
+     * List.subList( start, end ).
      * <p>
      * The results of subCollection:
      * <ul>
@@ -302,13 +305,13 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults, F
      * @param filter
      * @return FeatureCollection identified as subset.
      */
-    public FeatureCollection subCollection( Filter filter );
-    
+    public FeatureCollection subCollection(Filter filter);
+
     /**
      * collection.subCollection( myFilter ).sort( {"foo","bar"} );
-     * collection.subCollection( myFilter ).sort( "bar" ).sort("foo") 
+     * collection.subCollection( myFilter ).sort( "bar" ).sort("foo")
      * @param order
      * @return
      */
-    public FeatureList sort( SortBy order  );
+    public FeatureList sort(SortBy order);
 }

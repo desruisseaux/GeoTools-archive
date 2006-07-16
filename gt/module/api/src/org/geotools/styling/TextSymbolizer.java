@@ -13,6 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 /*
  *    Geotools - OpenSource mapping toolkit
  *    (C) 2002, Centre for Computational Geography
@@ -38,23 +39,22 @@
 package org.geotools.styling;
 
 import org.geotools.filter.expression.Expression;
-
 import java.util.Map;
 
 
 /**
  * A symbolizer describes how a feature should appear on a map.
- * 
+ *
  * <p>
  * A symbolizer is obtained by specifying one of a small number of different
  * types of symbolizer and then supplying parameters to override its default
  * behaviour.
  * </p>
- * 
+ *
  * <p>
  * The text symbolizer describes how to display text labels and the like.
  * </p>
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -84,17 +84,17 @@ import java.util.Map;
  * &lt;/xsd:element>
  * </code></pre>
  * </p>
- * 
+ *
  * <p>
  * Renderers can use this information when displaying styled features, though
  * it must be remembered that not all renderers will be able to fully
  * represent strokes as set out by this interface.  For example, opacity may
  * not be supported.
  * </p>
- * 
+ *
  * <p>
  * Notes:
- * 
+ *
  * <ul>
  * <li>
  * The graphical parameters and their values are derived from SVG/CSS2

@@ -26,7 +26,6 @@ import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.filter.expression.MathExpression;
 
 
-
 /**
  * This specifies the interface to create filters.
  *
@@ -46,8 +45,7 @@ import org.geotools.filter.expression.MathExpression;
  * @task REVISIT: resolve errors, should all throw errors?
  */
 public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory {
-	
-	/**
+    /**
      * Creates a logic filter from two filters and a type.
      *
      * @param filter1 the first filter to join.
@@ -59,8 +57,8 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @throws IllegalFilterException If there were any problems creating the
      *         filter, including wrong type.
      *  @deprecated use one of {@link org.opengis.filter.FilterFactory#and(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
+     *         {@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
+     *         {@link org.opengis.filter.FilterFactory#not(Filter)}
      */
     public LogicFilter createLogicFilter(Filter filter1, Filter filter2,
         short filterType) throws IllegalFilterException;
@@ -74,10 +72,10 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      *
      * @throws IllegalFilterException If there were any problems creating the
      *         filter, including wrong type.
-     *         
+     *
      * @deprecated use one of {@link org.opengis.filter.FilterFactory#and(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
+     *         {@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
+     *         {@link org.opengis.filter.FilterFactory#not(Filter)}
      */
     public LogicFilter createLogicFilter(short filterType)
         throws IllegalFilterException;
@@ -93,8 +91,8 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @throws IllegalFilterException If there were any problems creating the
      *         filter, including wrong type.
      * @deprecated use one of {@link org.opengis.filter.FilterFactory#and(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
-     * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
+     *         {@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
+     *         {@link org.opengis.filter.FilterFactory#not(Filter)}
      */
     public LogicFilter createLogicFilter(Filter filter, short filterType)
         throws IllegalFilterException;
@@ -126,12 +124,12 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @return The new Math Expression
      *
      * @throws IllegalFilterException if there were creation problems.
-     * 
+     *
      * @deprecated use one of
-     * 	{@link org.opengis.filter.FilterFactory#add(Expression, Expression)}
-     * 	{@link org.opengis.filter.FilterFactory#subtract(Expression, Expression)}
-     * 	{@link org.opengis.filter.FilterFactory#multiply(Expression, Expression)}
-     * 	{@link org.opengis.filter.FilterFactory#divide(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#add(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#subtract(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#multiply(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#divide(Expression, Expression)}
      */
     public MathExpression createMathExpression() throws IllegalFilterException;
 
@@ -144,7 +142,7 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
 
     /**
      * Creates an AttributeExpression using the supplied xpath.
-     * 
+     *
      * <p>
      * The supplied xpath can be used to query a varity of content - most
      * notably Features.
@@ -158,7 +156,7 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
 
     /**
      * Creates a Attribute Expression given a schema and attribute path.
-     * 
+     *
      * <p>
      * If you supply a schema, it will be used as a sanitch check for the
      * provided path.
@@ -212,13 +210,13 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @return The new compare filter.
      *
      * @throws IllegalFilterException if there were creation problems.
-     * 
+     *
      * @deprecated use one of {@link org.opengis.filter.FilterFactory#less(Expression, Expression)}
-     * 	{@link org.opengis.filter.FilterFactory#lessOrEqual(Expression, Expression)
-     * 	{@link org.opengis.filter.FilterFactory#equals(Expression, Expression)
-     * 	{@link org.opengis.filter.FilterFactory#greater(Expression, Expression)
-     * 	{@link org.opengis.filter.FilterFactory#greaterOrEqual(Expression, Expression)
-     * 	{@link org.opengis.filter.FilterFactory#between(Expression, Expression, Expression)
+     *         {@link org.opengis.filter.FilterFactory#lessOrEqual(Expression, Expression)
+     *         {@link org.opengis.filter.FilterFactory#equals(Expression, Expression)
+     *         {@link org.opengis.filter.FilterFactory#greater(Expression, Expression)
+     *         {@link org.opengis.filter.FilterFactory#greaterOrEqual(Expression, Expression)
+     *         {@link org.opengis.filter.FilterFactory#between(Expression, Expression, Expression)
      */
     public CompareFilter createCompareFilter(short type)
         throws IllegalFilterException;
@@ -266,12 +264,12 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @return The new Math Expression.
      *
      * @throws IllegalFilterException if there were creation problems.
-     * 
-     * @deprecated use one of 
+     *
+     * @deprecated use one of
      *  {@link org.opengis.filter.FilterFactory#add(Expression, Expression)}
-     * 	{@link org.opengis.filter.FilterFactory#subtract(Expression, Expression)}
-     * 	{@link org.opengis.filter.FilterFactory#multiply(Expression, Expression)}
-     * 	{@link org.opengis.filter.FilterFactory#divide(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#subtract(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#multiply(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#divide(Expression, Expression)}
      */
     public MathExpression createMathExpression(short expressionType)
         throws IllegalFilterException;
@@ -300,9 +298,9 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @return The new Geometry Filter.
      *
      * @throws IllegalFilterException if the filterType is not a geometry.
-     * 
+     *
      * @deprecated use one of
-     * 	{@link org.opengis.filter.FilterFactory#bbox(String, double, double, double, double, String)}
+     *         {@link org.opengis.filter.FilterFactory#bbox(String, double, double, double, double, String)}
      *  {@link org.opengis.filter.FilterFactory#beyond(String, Geometry, double, String)
      *  {@link org.opengis.filter.FilterFactory#contains(String, Geometry)
      *  {@link org.opengis.filter.FilterFactory#crosses(String, Geometry)
@@ -326,11 +324,11 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      *
      * @throws IllegalFilterException if the filterType is not a geometry
      *         distance type.
-     *         
+     *
      * @deprecated use one of
      *  {@link org.opengis.filter.FilterFactory#beyond(String, Geometry, double, String)
-     * 	{@link org.opengis.filter.FilterFactory#dwithin(String, Geometry, double, String)
-     * 
+     *         {@link org.opengis.filter.FilterFactory#dwithin(String, Geometry, double, String)
+     *
      */
     public GeometryDistanceFilter createGeometryDistanceFilter(short filterType)
         throws IllegalFilterException;
@@ -368,20 +366,19 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @return The new Function Expression.
      */
     public EnvironmentVariable createEnvironmentVariable(String name);
-    
+
     /**
      * @deprecated use {@link org.opengis.filter.FilterFactory#or(org.opengis.filter.Filter, org.opengis.filter.Filter)}
      */
     public Filter or(Filter f1, Filter f2);
-    
+
     /**
      * @deprecated use {@link org.opengis.filter.FilterFactory#and(org.opengis.filter.Filter, org.opengis.filter.Filter)}
      */
     public Filter and(Filter f1, Filter f2);
-    
+
     /**
      * @deprecated use {@link org.opengis.filter.FilterFactory#not(org.opengis.filter.Filter)}
      */
     public Filter not(Filter f);
-    
 }

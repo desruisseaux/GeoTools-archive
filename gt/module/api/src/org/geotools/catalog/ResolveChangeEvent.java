@@ -16,9 +16,10 @@
  */
 package org.geotools.catalog;
 
+
 /**
  * Captures changes to the Catalog.
- * 
+ *
  * <p>
  * For those familiar with IResourceChangeEvent and IResourceDelta from eclipse
  * development there is one <b>important addition</b>. The constant REPLACE

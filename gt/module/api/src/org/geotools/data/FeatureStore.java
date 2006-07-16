@@ -15,21 +15,20 @@
  */
 package org.geotools.data;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.geotools.feature.AttributeType;
 import org.geotools.filter.Filter;
+import java.io.IOException;
+import java.util.Set;
 
 
 /**
  * Provides storage of data for Features.
- * 
+ *
  * <p>
  * Individual shapefiles, database tables, etc. are modified through this
  * interface.
  * </p>
- * 
+ *
  * <p>
  * This is a prototype DataSource replacement please see FeatureSource for more
  * information.
@@ -107,12 +106,12 @@ public interface FeatureStore extends FeatureSource {
 
     /**
      * Provides a transaction for commit/rollback control of this FeatureStore.
-     * 
+     *
      * <p>
      * This method operates as a replacement for setAutoCommitMode.  When a
      * transaction is provided you are no longer automatically committing.
      * </p>
-     * 
+     *
      * <p>
      * In order to return to AutoCommit mode supply the Transaction.AUTO_COMMIT
      * to this method. Since this represents a return to AutoCommit mode the
@@ -126,7 +125,7 @@ public interface FeatureStore extends FeatureSource {
     /**
      * Used to access the Transaction this DataSource is currently opperating
      * against.
-     * 
+     *
      * <p>
      * Example Use: adding features to a road DataSource
      * </p>

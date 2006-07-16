@@ -15,13 +15,12 @@
  */
 package org.geotools.feature;
 
-import java.util.List;
-
 import org.geotools.filter.Filter;
+import java.util.List;
 
 
 /**
- * An ordered List of Features. 
+ * An ordered List of Features.
  * <p>
  * A FeatureList is usually retrived from a FeatureCollection with the
  * subCollection( Filter ) operation. How you ask - make use of Filter
@@ -32,24 +31,22 @@ import org.geotools.filter.Filter;
  * a FeatureList using an instanceof check. This often the case,
  * when using not using sortBy the order is usually based on FID.
  * </p>
- *  
+ *
  * @author Jody Garnett, Refractions Research, Inc.
  * @source $URL$
  */
 public interface FeatureList extends List, FeatureCollection {
-    
-    
-	/**
-	 * Similar to subCollection, explicitly constructs a ordered List.
-	 * <p>
-	 * The list will be ordered:
-	 * <ul>
-	 * <li>As indicated using Filter 1.1 sortBy
-	 * <li>occuring to their appearance in this FeatureList
-	 * </ul>
-	 * </p>
-	 * @param filter
-	 * @return FeatureList based on features selected by filter
-	 */
-    FeatureList subList( Filter filter );    
+    /**
+     * Similar to subCollection, explicitly constructs a ordered List.
+     * <p>
+     * The list will be ordered:
+     * <ul>
+     * <li>As indicated using Filter 1.1 sortBy
+     * <li>occuring to their appearance in this FeatureList
+     * </ul>
+     * </p>
+     * @param filter
+     * @return FeatureList based on features selected by filter
+     */
+    FeatureList subList(Filter filter);
 }

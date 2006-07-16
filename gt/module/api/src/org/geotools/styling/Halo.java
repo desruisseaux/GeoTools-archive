@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2002, Center for Computational Geography
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -26,7 +26,7 @@ import org.geotools.filter.expression.Expression;
 /**
  * A Halo fills an extended area outside the glyphs of a rendered textlabel to
  * make it easier to read over a background.
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -48,17 +48,17 @@ import org.geotools.filter.expression.Expression;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * 
+ *
  * <p>
  * Renderers can use this information when displaying styled features, though
  * it must be remembered that not all renderers will be able to fully
  * represent strokes as set out by this interface.  For example, opacity may
  * not be supported.
  * </p>
- * 
+ *
  * <p>
  * Notes:
- * 
+ *
  * <ul>
  * <li>
  * The graphical parameters and their values are derived from SVG/CSS2

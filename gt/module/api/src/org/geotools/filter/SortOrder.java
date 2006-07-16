@@ -15,27 +15,26 @@
  */
 package org.geotools.filter;
 
+import org.opengis.filter.sort.SortBy;
+import org.opengis.util.CodeList;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.opengis.filter.sort.SortBy;
-import org.opengis.util.CodeList;
 
 /**
  * Captures the SortBy order, ASC or DESC.
- * 
+ *
  * @deprecated Please use org.opengis.filter.sort.SortOrder
- * 
+ *
  * @see http://schemas.opengis.net/filter/1.1.0/sort.xsd
  * @author Jody Garnett, Refractions Research.
  * @since GeoTools 2.2, Filter 1.1
  * @source $URL$
  */
 public final class SortOrder extends Object {
-	/** Can now use the geoapi SortOrder directly */
-	public static final org.opengis.filter.sort.SortOrder ASCENDING  = org.opengis.filter.sort.SortOrder.ASCENDING;
+    /** Can now use the geoapi SortOrder directly */
+    public static final org.opengis.filter.sort.SortOrder ASCENDING = org.opengis.filter.sort.SortOrder.ASCENDING;
 
-	/** Can now use the geoapi SortOrder directly */
-	public static final org.opengis.filter.sort.SortOrder DESCENDING = org.opengis.filter.sort.SortOrder.DESCENDING;		
-	
+    /** Can now use the geoapi SortOrder directly */
+    public static final org.opengis.filter.sort.SortOrder DESCENDING = org.opengis.filter.sort.SortOrder.DESCENDING;
 }

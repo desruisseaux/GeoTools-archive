@@ -16,11 +16,11 @@
  */
 package org.geotools.catalog;
 
+import org.geotools.util.ProgressListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.util.ProgressListener;
 
 /**
  * Represents a geo spatial service handle. Follows the same design as IResource.
@@ -36,7 +36,7 @@ import org.geotools.util.ProgressListener;
  * NOTE: This may be the result of communications with a metadata service, and as such this service
  * handle may not have been validated yet. Remember to check the service status.
  * </p>
- * 
+ *
  * @author David Zwiers, Refractions Research
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.6
@@ -45,11 +45,10 @@ import org.geotools.util.ProgressListener;
  * @source $URL$
  */
 public interface Service extends Resolve {
-	
-	/**
-     * Return list of IGeoResources managed by this service. This method must 
+    /**
+     * Return list of IGeoResources managed by this service. This method must
      * return the same result as the following:
-     * 
+     *
      * <pre>
      *   <code>
      *   (List)resolve(List.class,monitor);
@@ -58,20 +57,20 @@ public interface Service extends Resolve {
      * <p>
      * Many file based serivces will just contain a single IGeoResource.
      * </p>
-     * 
+     *
      * @return A list of type GeoResource.
      */
-    List members( ProgressListener monitor ) throws IOException;
-    
+    List members(ProgressListener monitor) throws IOException;
+
     /**
-     * Will attempt to morph into the adaptee, and return that object. 
+     * Will attempt to morph into the adaptee, and return that object.
      * Required adaptions:
      * <ul>
      * <li>IServiceInfo.class
      * <li>List.class <IGeoResource>
      * </ul>
      * May Block.
-     * 
+     *
      * @param adaptee
      * @param monitor
      * @return instance of adaptee, or null if unavailable (IServiceInfo and List<IGeoResource>
@@ -80,24 +79,24 @@ public interface Service extends Resolve {
      * @see GeoResource
      * @see IResolve#resolve(Class, ProgressListener)
      */
-    Object resolve( Class adaptee, ProgressListener monitor ) throws IOException;
-    
-	 /**
+    Object resolve(Class adaptee, ProgressListener monitor)
+        throws IOException;
+
+    /**
      * Accessor to the set of params used to create this entry. There is no guarantee that these
      * params created a usable service (@see getStatus() ). These params may have been modified
      * within the factory during creation. This method is intended to be used for cloning (@see
      * IServiceFactory) or for persistence between sessions.
-     * 
+     *
      * @see ServiceFinder
-     * 
+     *
      * @return A map with key of type String, and value of type Serializable.
      */
     Map getConnectionParams();
-    
+
     /**
      * @return IServiceInfo resolve(IServiceInfo.class,ProgressListener monitor);
      * @see IService#resolve(Class, ProgressListener)
      */
-    ServiceInfo getInfo( ProgressListener monitor ) throws IOException;
-
+    ServiceInfo getInfo(ProgressListener monitor) throws IOException;
 }

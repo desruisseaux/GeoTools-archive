@@ -13,6 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 /*
  * Symbol.java
  *
@@ -22,6 +23,7 @@ package org.geotools.styling;
 
 import org.geotools.event.GTComponent;
 
+
 /**
  * This an empty interface for styling symbol objects to implement
  *
@@ -29,6 +31,7 @@ import org.geotools.event.GTComponent;
  * @source $URL$
  */
 public interface Symbol extends GTComponent {
-	public static final Symbol[] SYMBOLS_EMPTY = new Symbol[0];
+    public static final Symbol[] SYMBOLS_EMPTY = new Symbol[0];
+
     void accept(StyleVisitor visitor);
 }

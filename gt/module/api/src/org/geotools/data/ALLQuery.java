@@ -24,12 +24,12 @@ import java.util.Arrays;
 
 /**
  * Implementation of Query.ALL.
- * 
+ *
  * <p>
  * This query is used to retrive all Features. Query.ALL is the only instance
  * of this class.
  * </p>
- * 
+ *
  * <p>
  * Example:
  * </p>
@@ -39,8 +39,6 @@ import java.util.Arrays;
  * @source $URL$
  */
 class ALLQuery implements Query {
-	
-	
     public final String[] getPropertyNames() {
         return null;
     }
@@ -96,7 +94,7 @@ class ALLQuery implements Query {
     /**
      * Equality based on propertyNames, maxFeatures, filter, typeName and
      * version.
-     * 
+     *
      * <p>
      * Changing the handle does not change the meaning of the Query.
      * </p>
@@ -161,6 +159,6 @@ class ALLQuery implements Query {
     }
 
     public SortBy[] getSortBy() {
-    	return SortBy.UNSORTED;
+        return SortBy.UNSORTED;
     }
 }

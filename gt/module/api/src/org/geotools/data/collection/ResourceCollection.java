@@ -18,6 +18,7 @@ package org.geotools.data.collection;
 import java.util.Collection;
 import java.util.Iterator;
 
+
 /**
  * Collection supporting close( Iterator ), used to grok resources.
  * <p>
@@ -30,7 +31,6 @@ import java.util.Iterator;
  * @source $URL$
  */
 public interface ResourceCollection extends Collection {
-
     /**
      * An iterator over this collection, which must be closeed after use.
      * <p>
@@ -59,7 +59,7 @@ public interface ResourceCollection extends Collection {
      * @return Iterator
      */
     public Iterator iterator();
-    
+
     /**
      * Clean up after any resources assocaited with this itterator in a manner similar to JDO collections.
      * </p>
@@ -78,8 +78,8 @@ public interface ResourceCollection extends Collection {
      * </p>
      * @param close
      */
-    public void close( Iterator close );    
-    
+    public void close(Iterator close);
+
     /**
      * Close any outstanding resources released by this resources.
      * <p>
@@ -90,9 +90,8 @@ public interface ResourceCollection extends Collection {
      * <p>
      * Example of using a normal Collections utility method:<pre><code>
      * Collections.sort( collection );
-     * collection.purge(); 
+     * collection.purge();
      * </code></pre>
      */
     public void purge();
-	
 }

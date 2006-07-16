@@ -13,6 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 /*
  * Geotools - OpenSource mapping toolkit
  *            (C) 2002, Center for Computational Geography
@@ -43,7 +44,7 @@ import org.geotools.filter.expression.Expression;
 /**
  * The "LinePlacement" specifies where and how a text label should be rendered
  * relative to a line.
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -64,7 +65,7 @@ import org.geotools.filter.expression.Expression;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * 
+ *
  * <p>
  * $Id$
  * </p>

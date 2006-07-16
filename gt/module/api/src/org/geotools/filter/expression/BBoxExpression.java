@@ -15,9 +15,8 @@
  */
 package org.geotools.filter.expression;
 
-import org.geotools.filter.IllegalFilterException;
-
 import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.filter.IllegalFilterException;
 
 
 /**
@@ -27,7 +26,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  * @version $Id$
  */
-public interface BBoxExpression extends LiteralExpression{
+public interface BBoxExpression extends LiteralExpression {
     /**
      * Set the bbox for this expression
      *

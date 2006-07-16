@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * serve as a typing framework.  Rather, multiple implementations of this
  * interface should generally be for performance reasons.
  * </p>
- * 
+ *
  * <p>
  * This interface serves two important purposes.  Most obviously, it gives
  * users of features a unified, consistent framework for accessing and
@@ -56,7 +56,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * highly constrained schema types. For the vast majority of schemas, the
  * generic feature implementation will  work fine.
  * </p>
- * 
+ *
  * <p>
  * <b>Notes for Feature Clients:</b><br>
  * Clients should always use feature accessor methods (getAttribute and
@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * internal state of the feature object!  <i>For this reason, clients should
  * always use the set methods to change feature attribute object states!</i>
  * </p>
- * 
+ *
  * <p>
  * <b>Notes for Feature Implementers:</b><br>
  * It is the responsibility of the implementing class to ensure that the
@@ -79,7 +79,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * conventions of which implementers of this interface must be aware in order
  * to successfully manage a <code>Feature</code>:
  * </p>
- * 
+ *
  * <ol>
  * <li>
  * <b>FeatureType Reference</b><br>
@@ -135,7 +135,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * of geotools will rely on these relations. See java.lang.Object for details.
  * </li>
  * </ol>
- * 
+ *
  *
  * @author James Macgill, CCG
  * @author Rob Hranac, TOPP
@@ -150,7 +150,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public interface Feature {
     /**
      * Gets the feature collection this feature is stored in.
-     * 
+     *
      * @deprecated Please don't use, a Feature can be in more then one collection
      * @return The collection that is the parent of this feature.
      */
@@ -283,7 +283,7 @@ public interface Feature {
 
     /**
      * Gets the default geometry for this feature.
-     * 
+     *
      * <p>
      * This method will return <code>null</code> if no DefaultGeometry has been
      * defined by the schema.
@@ -306,7 +306,7 @@ public interface Feature {
     /**
      * Get the total bounds of this feature which is calculated by doing a
      * union of the bounds of each geometry this feature is associated with.
-     * 
+     *
      * <p>
      * This method will return an empty Envelope if the feature contains no
      * geometry information.

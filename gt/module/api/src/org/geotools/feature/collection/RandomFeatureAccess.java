@@ -15,10 +15,10 @@
  */
 package org.geotools.feature.collection;
 
-import java.util.NoSuchElementException;
-
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import java.util.NoSuchElementException;
+
 
 /**
  * Access Feature content using Feature "Id".
@@ -40,13 +40,13 @@ import org.geotools.feature.FeatureCollection;
 public interface RandomFeatureAccess extends FeatureCollection {
     /**
      * Access Feature content by feature id.
-     * 
+     *
      * @param id
      * @return Feature with the indicated or id
      * @throws NoSuchElementException if a Feature with the indicated id is not present
      */
-    public Feature getFeatureMember( String id ) throws NoSuchElementException;
-    
+    public Feature getFeatureMember(String id) throws NoSuchElementException;
+
     /** Optional Method */
-    public Feature removeFeatureMember( String id );
+    public Feature removeFeatureMember(String id);
 }

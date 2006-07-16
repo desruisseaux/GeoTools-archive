@@ -15,9 +15,10 @@
  */
 package org.geotools.styling;
 
+
 /**
  * A NamedLayer is used to refer to a layer that has a name in a WMS.
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -45,20 +46,18 @@ package org.geotools.styling;
  * @source $URL$
  */
 public interface NamedLayer extends StyledLayer {
+    public FeatureTypeConstraint[] getLayerFeatureConstraints();
 
-	public FeatureTypeConstraint[] getLayerFeatureConstraints();
+    public void setLayerFeatureConstraints(FeatureTypeConstraint[] constraints);
 
-	public void setLayerFeatureConstraints(FeatureTypeConstraint[] constraints);
-	
-	
     public Style[] getStyles();
 
     public void addStyle(Style sl);
-    
+
     /**
      * Used to navigate a Style/SLD.
-     * 
+     *
      * @param visitor
      */
-    void accept(StyleVisitor visitor);    
+    void accept(StyleVisitor visitor);
 }

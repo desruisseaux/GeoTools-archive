@@ -18,7 +18,6 @@ package org.geotools.styling;
 import org.geotools.factory.Factory;
 import org.geotools.filter.Filter;
 import org.geotools.filter.expression.Expression;
-
 import java.net.URL;
 
 
@@ -90,42 +89,40 @@ public interface StyleFactory extends Factory {
 
     /**
      * Creates a new extent.
-     * 
+     *
      * @param name The name of the extent.
      * @param value The value of the extent.
-     * 
+     *
      * @return The new extent.
      */
     public Extent createExtent(String name, String value);
-    
+
     /**
      * Creates a new feature type constraint.
-     *  
+     *
      * @param featureTypeName The feature type name.
      * @param filter The filter.
      * @param extents The extents.
-     * 
+     *
      * @return The new feature type constaint.
      */
     public FeatureTypeConstraint createFeatureTypeConstraint(
-		String featureTypeName, Filter filter, Extent[] extents
-	);
-    
+        String featureTypeName, Filter filter, Extent[] extents);
+
     public LayerFeatureConstraints createLayerFeatureConstraints(
-		FeatureTypeConstraint[] featureTypeConstraints
-    );
-    		
+        FeatureTypeConstraint[] featureTypeConstraints);
+
     public FeatureTypeStyle createFeatureTypeStyle(Rule[] rules);
 
     /**
      * Creates a new ImageOutline.
-     * 
+     *
      * @param symbolizer A line or polygon symbolizer.
-     * 
+     *
      * @return The new image outline.
      */
     public ImageOutline createImageOutline(Symbolizer symbolizer);
-    
+
     public LinePlacement createLinePlacement(Expression offset);
 
     public PolygonSymbolizer createPolygonSymbolizer();
@@ -221,7 +218,7 @@ public interface StyleFactory extends Factory {
         String geometryPropertyName);
 
     public RasterSymbolizer createRasterSymbolizer();
-    
+
     public RasterSymbolizer createRasterSymbolizer(
         String geometryPropertyName, Expression opacity,
         ChannelSelection channel, Expression overlap, ColorMap colorMap,
@@ -233,12 +230,12 @@ public interface StyleFactory extends Factory {
         SelectedChannelType[] channels);
 
     public ContrastEnhancement createContrastEnhancement();
-    
+
     public ContrastEnhancement createContrastEnhancement(Expression gammaValue);
-    
+
     public SelectedChannelType createSelectedChannelType(String name,
-            ContrastEnhancement enhancement);
-    
+        ContrastEnhancement enhancement);
+
     /**
      * @deprecated Use {@link #createSelectedChannelType(String, ContrastEnhancement)
      */
@@ -273,7 +270,7 @@ public interface StyleFactory extends Factory {
     public TextSymbolizer getDefaultTextSymbolizer();
 
     public Graphic createDefaultGraphic();
-    
+
     public Graphic getDefaultGraphic();
 
     public Font getDefaultFont();
@@ -283,10 +280,10 @@ public interface StyleFactory extends Factory {
     public StyledLayerDescriptor createStyledLayerDescriptor();
 
     public UserLayer createUserLayer();
-    
+
     public NamedLayer createNamedLayer();
-    
+
     public RemoteOWS createRemoteOWS(String service, String onlineResource);
- 
+
     public ShadedRelief createShadedRelief(Expression reliefFactor);
 }

@@ -24,57 +24,57 @@ import java.util.Map;
 
 /**
  * Constructs a live DataStore from a set of parameters.
- * 
+ *
  * <p>
  * An instance of this interface should exist for all data stores which want to
  * take advantage of the dynamic plugin system. In addition to implementing
  * this interface datastores should have a services file:
  * </p>
- * 
+ *
  * <p>
  * <code>META-INF/services/org.geotools.data.DataStoreFactorySpi</code>
  * </p>
- * 
+ *
  * <p>
  * The file should contain a single line which gives the full name of the
  * implementing class.
  * </p>
- * 
+ *
  * <p>
  * example:<br/><code>e.g.
  * org.geotools.data.mytype.MyTypeDataSourceFacotry</code>
  * </p>
- * 
+ *
  * <p>
  * The factories are never called directly by client code, instead the
  * DataStoreFinder class is used.
  * </p>
- * 
+ *
  * <p>
  * The following example shows how a user might connect to a PostGIS database,
  * and maintain the resulting datastore in a registry:
  * </p>
- * 
+ *
  * <p>
  * <pre><code>
  * HashMap params = new HashMap();
- * params.put("namespace", "leeds"); 
+ * params.put("namespace", "leeds");
  * params.put("dbtype", "postgis");
  * params.put("host","feathers.leeds.ac.uk");
  * params.put("port", "5432");
  * params.put("database","postgis_test");
  * params.put("user","postgis_ro");
  * params.put("passwd","postgis_ro");
- * 
+ *
  * DefaultRegistry registry = new DefaultRegistry();
  * registry.addDataStore("leeds", params);
- * 
+ *
  * DataStore postgis = registry.getDataStore( "leeds" );
  * FeatureSource = postgis.getFeatureSource( "table" );
  * </code></pre>
  * </p>
  * <h2>
- * 
+ *
  * <ul>
  * <li>
  * Jody - can we please get something better then Param to describe what is
@@ -91,7 +91,7 @@ import java.util.Map;
  * parameters
  * </li>
  * </ul>
- * 
+ *
  *
  * @author Jody Garnett, Refractions Research
  * @source $URL$
@@ -99,16 +99,16 @@ import java.util.Map;
 public interface DataStoreFactorySpi extends Factory {
     /**
      * Construct a live data source using the params specifed.
-     * 
+     *
      * <p>
      * You can think of this as setting up a connection to the back end data
      * source.
      * </p>
-     * 
+     *
      * <p>
      * Magic Params: the following params are magic and are honoured by
      * convention by the GeoServer and uDig application.
-     * 
+     *
      * <ul>
      * <li>
      * "user": is taken to be the user name
@@ -121,7 +121,7 @@ public interface DataStoreFactorySpi extends Factory {
      * sync with GeoServer namespace management.
      * </li>
      * </ul>
-     * 
+     *
      * When we eventually move over to the use of OpperationalParam we will
      * have to find someway to codify this convention.
      * </p>
@@ -160,7 +160,7 @@ public interface DataStoreFactorySpi extends Factory {
 
     /**
      * Name suitable for display to end user.
-     * 
+     *
      * <p>
      * A non localized display name for this data store type.
      * </p>
@@ -171,7 +171,7 @@ public interface DataStoreFactorySpi extends Factory {
 
     /**
      * Describe the nature of the datasource constructed by this factory.
-     * 
+     *
      * <p>
      * A non localized description of this data store type.
      * </p>
@@ -183,11 +183,11 @@ public interface DataStoreFactorySpi extends Factory {
 
     /**
      * MetaData about the required Parameters (for createDataStore).
-     * 
+     *
      * <p>
      * Interpretation of FeatureDescriptor values:
      * </p>
-     * 
+     *
      * <ul>
      * <li>
      * getDisplayName(): Gets the localized display name of this feature.
@@ -200,14 +200,14 @@ public interface DataStoreFactorySpi extends Factory {
      * getShortDescription(): Gets the short description of this feature.
      * </li>
      * </ul>
-     * 
+     *
      * <p>
      * This should be the same as:
      * </p>
      * <pre><code>
      * Object params = factory.getParameters();
      * BeanInfo info = getBeanInfo( params );
-     * 
+     *
      * return info.getPropertyDescriptors();
      * <code></pre>
      *
@@ -218,7 +218,7 @@ public interface DataStoreFactorySpi extends Factory {
     /**
      * Test to see if this factory is suitable for processing the data pointed
      * to by the params map.
-     * 
+     *
      * <p>
      * If this datasource requires a number of parameters then this mehtod
      * should check that they are all present and that they are all valid. If
@@ -257,11 +257,11 @@ public interface DataStoreFactorySpi extends Factory {
 
     /**
      * Data class used to capture Parameter requirements.
-     * 
+     *
      * <p>
      * Subclasses may provide specific setAsText()/getAsText() requirements
      * </p>
-     * 
+     *
      * <p>
      * Warning: We would like to start moving towards a common paraemters
      * framework with GridCoverageExchnage. Param will be maintained as a
@@ -283,7 +283,7 @@ public interface DataStoreFactorySpi extends Factory {
 
         /**
          * Sampel value provided as an example for user input.
-         * 
+         *
          * <p>
          * May be passed to getAsText( sample ) for inital text based user
          * interface default.
@@ -293,7 +293,7 @@ public interface DataStoreFactorySpi extends Factory {
 
         /**
          * Provides support for text representations
-         * 
+         *
          * <p>
          * The parameter type of String is assumed.
          * </p>
@@ -307,7 +307,7 @@ public interface DataStoreFactorySpi extends Factory {
 
         /**
          * Provides support for text representations.
-         * 
+         *
          * <p>
          * You may specify a <code>type</code> for this Param.
          * </p>
@@ -367,13 +367,13 @@ public interface DataStoreFactorySpi extends Factory {
 
         /**
          * Lookup Param in a user supplied map.
-         * 
+         *
          * <p>
          * Type conversion will occur if required, this may result in an
          * IOException. An IOException will be throw in the Param is required
          * and the Map does not contain the Map.
          * </p>
-         * 
+         *
          * <p>
          * The handle method is used to process the user's value.
          * </p>
@@ -430,11 +430,11 @@ public interface DataStoreFactorySpi extends Factory {
 
         /**
          * Handle text in a sensible manner.
-         * 
+         *
          * <p>
          * Performs the most common way of handling text value:
          * </p>
-         * 
+         *
          * <ul>
          * <li>
          * null: If text is null
@@ -449,7 +449,7 @@ public interface DataStoreFactorySpi extends Factory {
          * parse( text ): if type != String.class
          * </li>
          * </ul>
-         * 
+         *
          *
          * @param text
          *
@@ -483,11 +483,11 @@ public interface DataStoreFactorySpi extends Factory {
 
         /**
          * Provides support for text representations
-         * 
+         *
          * <p>
          * Provides basic support for common types using reflection.
          * </p>
-         * 
+         *
          * <p>
          * If needed you may extend this class to handle your own custome
          * types.
@@ -534,19 +534,24 @@ public interface DataStoreFactorySpi extends Factory {
                 throw targetException.getCause();
             }
         }
+
         /**
          * key=Type description
          */
         public String toString() {
-        	StringBuffer buf = new StringBuffer();
-        	buf.append( key );
-        	buf.append( '=' );
-        	buf.append( type.getName() );
-        	buf.append( ' ' );
-        	if( required )
-        		buf.append( "REQUIRED ");
-        	buf.append( description );
-        	return buf.toString();
+            StringBuffer buf = new StringBuffer();
+            buf.append(key);
+            buf.append('=');
+            buf.append(type.getName());
+            buf.append(' ');
+
+            if (required) {
+                buf.append("REQUIRED ");
+            }
+
+            buf.append(description);
+
+            return buf.toString();
         }
     }
 }

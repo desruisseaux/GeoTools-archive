@@ -24,7 +24,7 @@ import org.geotools.filter.expression.Expression;
 /**
  * A Graphic is a "graphical symbol" with an inherent shape, color(s), and
  * possibly size.
- * 
+ *
  * <p>
  * A "graphic" can very informally be defined as "a little picture" and can be
  * of either a raster or vector graphic source type.  The term graphic is used
@@ -37,7 +37,7 @@ import org.geotools.filter.expression.Expression;
  * from the external format or be defined to be the  "central point" of the
  * graphic.
  * </p>
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -63,20 +63,20 @@ import org.geotools.filter.expression.Expression;
  *       &lt;/xsd:sequence&gt;
  *     &lt;/xsd:sequence&gt;
  *   &lt;/xsd:complexType&gt;
- * &lt;/xsd:element&gt; 
+ * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * 
+ *
  * <p>
  * Renderers can ue this information when displaying styled features, though it
  * must be remembered that not all renderers will be able to fully represent
  * strokes as set out by this interface.  For example, opacity may not be
  * supported.
  * </p>
- * 
+ *
  * <p>
  * Notes:
- * 
+ *
  * <ul>
  * <li>
  * The graphical parameters and their values are derived from SVG/CSS2
@@ -90,83 +90,90 @@ import org.geotools.filter.expression.Expression;
  * @source $URL$
  */
 public interface Graphic extends GTComponent {
-	
-	/**
-	 * A default Graphic instance.
-	 * <p>
-	 * For some attributes the standard does not define a default, so a 
-	 * reasonable value is supplied.
-	 * </p>
-	 */
-	public static final Graphic DEFAULT = new ConstantGraphic(){
+    /**
+     * A default Graphic instance.
+     * <p>
+     * For some attributes the standard does not define a default, so a
+     * reasonable value is supplied.
+     * </p>
+     */
+    public static final Graphic DEFAULT = new ConstantGraphic() {
+            public ExternalGraphic[] getExternalGraphics() {
+                return ExternalGraphic.EXTERNAL_GRAPHICS_EMPTY;
+            }
 
-		public ExternalGraphic[] getExternalGraphics() {
-			return ExternalGraphic.EXTERNAL_GRAPHICS_EMPTY;
-		}
-		public Mark[] getMarks() {
-			return Mark.MARKS_EMPTY;
-		}
-		public Symbol[] getSymbols() {
-			return Symbol.SYMBOLS_EMPTY;
-		}
-		public Expression getOpacity() {
-			return ConstantExpression.ONE;
-		}
-		public Expression getSize() {
-			return ConstantExpression.constant(16);
-		}
-		public Displacement getDisplacement() {
-			return Displacement.DEFAULT;
-		}
+            public Mark[] getMarks() {
+                return Mark.MARKS_EMPTY;
+            }
 
-		public Expression getRotation() {
-			return ConstantExpression.ZERO;
-		}
+            public Symbol[] getSymbols() {
+                return Symbol.SYMBOLS_EMPTY;
+            }
 
-		public String getGeometryPropertyName() {
-			return "";
-		}		
-	};
-	
-	/**
-	 * Indicates an absense of graphic.
-	 * <p>
-	 * This value is used to indicate that the Graphics based opperation
-	 * should be skipped. Aka this is used by Stroke.Stroke as place holders
-	 * for GRAPHIC_FILL and GRAPHIC_STROKE.
-	 * </p>
-	 */
-	public static final Graphic NULL = new ConstantGraphic(){
+            public Expression getOpacity() {
+                return ConstantExpression.ONE;
+            }
 
-		public ExternalGraphic[] getExternalGraphics() {
-			return ExternalGraphic.EXTERNAL_GRAPHICS_EMPTY;
-		}
-		public Mark[] getMarks() {
-			return Mark.MARKS_EMPTY;
-		}
-		public Symbol[] getSymbols() {
-			return Symbol.SYMBOLS_EMPTY;
-		}
-		public Expression getOpacity() {
-			return ConstantExpression.NULL;
-		}
-		public Expression getSize() {
-			return ConstantExpression.NULL;
-		}
-		public Displacement getDisplacement() {
-			return Displacement.NULL;
-		}
+            public Expression getSize() {
+                return ConstantExpression.constant(16);
+            }
 
-		public Expression getRotation() {
-			return ConstantExpression.NULL;
-		}
+            public Displacement getDisplacement() {
+                return Displacement.DEFAULT;
+            }
 
-		public String getGeometryPropertyName() {
-			return "";
-		}		
-	};
-	
-	/**
+            public Expression getRotation() {
+                return ConstantExpression.ZERO;
+            }
+
+            public String getGeometryPropertyName() {
+                return "";
+            }
+        };
+
+    /**
+     * Indicates an absense of graphic.
+     * <p>
+     * This value is used to indicate that the Graphics based opperation
+     * should be skipped. Aka this is used by Stroke.Stroke as place holders
+     * for GRAPHIC_FILL and GRAPHIC_STROKE.
+     * </p>
+     */
+    public static final Graphic NULL = new ConstantGraphic() {
+            public ExternalGraphic[] getExternalGraphics() {
+                return ExternalGraphic.EXTERNAL_GRAPHICS_EMPTY;
+            }
+
+            public Mark[] getMarks() {
+                return Mark.MARKS_EMPTY;
+            }
+
+            public Symbol[] getSymbols() {
+                return Symbol.SYMBOLS_EMPTY;
+            }
+
+            public Expression getOpacity() {
+                return ConstantExpression.NULL;
+            }
+
+            public Expression getSize() {
+                return ConstantExpression.NULL;
+            }
+
+            public Displacement getDisplacement() {
+                return Displacement.NULL;
+            }
+
+            public Expression getRotation() {
+                return ConstantExpression.NULL;
+            }
+
+            public String getGeometryPropertyName() {
+                return "";
+            }
+        };
+
+    /**
      * Provides a list of external graphics which can be used to represent this
      * graphic. Each one should be an equivalent representation but in a
      * different format. If none are provided, or if none of the formats are
@@ -236,7 +243,7 @@ public interface Graphic extends GTComponent {
     /**
      * This paramteter gives the absolute size of the graphic in pixels encoded
      * as a floating point number.
-     * 
+     *
      * <p>
      * The default size of an image format (such as GIFD) is the inherent size
      * of the image.  The default size of a format without an inherent size
@@ -293,54 +300,58 @@ public interface Graphic extends GTComponent {
     void accept(StyleVisitor visitor);
 }
 
+
 abstract class ConstantGraphic extends GTConstant implements Graphic {
-	private void cannotModifyConstant(){
-		throw new UnsupportedOperationException("Constant Graphic may not be modified");
-	}	
-	public void setExternalGraphics(ExternalGraphic[] externalGraphics) {
-		cannotModifyConstant();
-	}
+    private void cannotModifyConstant() {
+        throw new UnsupportedOperationException(
+            "Constant Graphic may not be modified");
+    }
 
-	public void addExternalGraphic(ExternalGraphic externalGraphic) {
-		cannotModifyConstant();
-	}
+    public void setExternalGraphics(ExternalGraphic[] externalGraphics) {
+        cannotModifyConstant();
+    }
 
-	public void setMarks(Mark[] marks) {
-		cannotModifyConstant();
-	}
+    public void addExternalGraphic(ExternalGraphic externalGraphic) {
+        cannotModifyConstant();
+    }
 
-	public void addMark(Mark mark) {
-		cannotModifyConstant();
-	}
+    public void setMarks(Mark[] marks) {
+        cannotModifyConstant();
+    }
 
-	public void setSymbols(Symbol[] symbols) {
-		cannotModifyConstant();
-	}
+    public void addMark(Mark mark) {
+        cannotModifyConstant();
+    }
 
-	public void addSymbol(Symbol symbol) {
-		cannotModifyConstant();
-	}
+    public void setSymbols(Symbol[] symbols) {
+        cannotModifyConstant();
+    }
 
-	public void setOpacity(Expression opacity) {
-		cannotModifyConstant();
-	}
+    public void addSymbol(Symbol symbol) {
+        cannotModifyConstant();
+    }
 
-	public void setSize(Expression size) {
-		cannotModifyConstant();
-	}
+    public void setOpacity(Expression opacity) {
+        cannotModifyConstant();
+    }
 
-	public void setDisplacement(Displacement offset) {
-		cannotModifyConstant();
-	}
+    public void setSize(Expression size) {
+        cannotModifyConstant();
+    }
 
-	public void setRotation(Expression rotation) {
-		cannotModifyConstant();
-	}
+    public void setDisplacement(Displacement offset) {
+        cannotModifyConstant();
+    }
 
-	public void setGeometryPropertyName(String geometryPropertyName) {
-		cannotModifyConstant();
-	}	
-	public void accept(StyleVisitor visitor) {
-		visitor.visit( this );
-	}	
+    public void setRotation(Expression rotation) {
+        cannotModifyConstant();
+    }
+
+    public void setGeometryPropertyName(String geometryPropertyName) {
+        cannotModifyConstant();
+    }
+
+    public void accept(StyleVisitor visitor) {
+        visitor.visit(this);
+    }
 }

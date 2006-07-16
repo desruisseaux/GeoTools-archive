@@ -15,27 +15,25 @@
  */
 package org.geotools.data;
 
-import java.io.IOException;
-
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
 
 
 /**
  * Highlevel API for Features from a specific Query.
- * 
+ *
  * <p>
  * The can opperate as as a kind of Prepaired Query. It is a Query that knows
  * enough information to be rerun. We may wish to rename this class as
  * QueryResults.
  * </p>
- * 
+ *
  * <p>
  * Differences from FeatureCollection:
  * </p>
- * 
+ *
  * <ul>
  * <li>
  * This API opperates as a source of FeatureReaders (rather than a source of
@@ -48,11 +46,11 @@ import com.vividsolutions.jts.geom.Envelope;
  * streaming over the generated FeatureReader.
  * </li>
  * </ul>
- * 
+ *
  * <p>
  * Ideas:
  * </p>
- * 
+ *
  * <ul>
  * <li>
  * Chris had the idea of a collection() method that would construct a
@@ -72,7 +70,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Query interface).
  * </li>
  * </ul>
- * 
+ *
  *
  * @author Jody Garnett
  * @author Ray Gallagher
@@ -82,10 +80,9 @@ import com.vividsolutions.jts.geom.Envelope;
  * @version $Id$
  */
 public interface FeatureResults {
-	
     /**
      * Returns the FeatureType of the contents of this collection.
-     * 
+     *
      * <p>
      * Please note that for a collection with a mixed contents the FeatureType
      * may be degenerate (ie very generic). For many applications (like
@@ -114,7 +111,7 @@ public interface FeatureResults {
 
     /**
      * Returns the bounding box of this FeatureResults.
-     * 
+     *
      * <p>
      * This opperation may be expensive. Consider
      * <code>FeatureSource.getBounds( Query )</code> as an alternative.
@@ -126,13 +123,13 @@ public interface FeatureResults {
      *     Envelope newBBox = <b>new</b> Envelope();
      *     Envelope internal;
      *     Feature feature;
-     * 
+     *
      *     <b>for</b> (FeatureReader r = reader(); r.hasNext();) {
      *         feature = r.next();
      *         internal = feature.getDefaultGeometry().getEnvelopeInternal();
      *         newBBox.expandToInclude(internal);
      *     }
-     *     <b>return</b> newBBox;  
+     *     <b>return</b> newBBox;
      * }
      * </code>
      * </pre>
@@ -143,7 +140,7 @@ public interface FeatureResults {
 
     /**
      * Returns the number of Features in this FeatureResults.
-     * 
+     *
      * <p>
      * This opperation may be expensive. Consider <code>FeatureSource.getCount(
      * Query )</code> as an alternative.
@@ -156,7 +153,7 @@ public interface FeatureResults {
      *     <b>for</b> (FeatureReader r = reader(); r.hasNext(); count++) {
      *         r.next();
      *     }
-     *     <b>return</b> count;  
+     *     <b>return</b> count;
      * }
      * </code>
      * </pre>
@@ -168,7 +165,7 @@ public interface FeatureResults {
 
     /**
      * Convert this set of results to a FeatureCollection.
-     * 
+     *
      * <p>
      * This method is logically the same as:
      * <pre><code>
@@ -177,7 +174,7 @@ public interface FeatureResults {
      *     <b>for</b> (FeatureReader r = reader(); r.hasNext();) {
      *         collection.add( r.next() );
      *     }
-     *     <b>return</b> collection;  
+     *     <b>return</b> collection;
      * }
      * </code></pre>
      * </p>

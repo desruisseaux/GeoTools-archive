@@ -15,24 +15,24 @@
  */
 package org.geotools.data;
 
-import java.io.IOException;
-
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
+import java.io.IOException;
+
 
 /**
  * Represents a Physical Store for FeatureTypes.
- * 
+ *
  * <p>
  * The source of data for FeatureTypes. Shapefiles, databases tables, etc. are
  * referenced through this interface.
  * </p>
- * 
+ *
  * <p>
  * Summary of our requirements:
  * </p>
- * 
+ *
  * <ul>
  * <li>
  * Provides lookup of available Feature Types
@@ -53,9 +53,9 @@ import org.geotools.filter.Filter;
  * Provides access of Feature Type Schema information
  * </li>
  * </ul>
- * 
+ *
  * Suggestions:
- * 
+ *
  * <ul>
  * <li>Aadrea - Support for a reprojection based FeautreSource. Needs to be added
  *               to DataStore (rather than a wrapper based) to allow for DataStores
@@ -67,16 +67,15 @@ import org.geotools.filter.Filter;
  *            code this would not be a bad idea.
  * </li>
  * </ul>
- * 
+ *
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  * @version $Id$
  */
-public interface DataStore{
-
+public interface DataStore {
     /**
      * Creates storage for a new <code>featureType</code>.
-     * 
+     *
      * <p>
      * The provided <code>featureType</code> we be accessable by the typeName
      * provided by featureType.getTypeName().
@@ -87,7 +86,7 @@ public interface DataStore{
      * @throws IOException If featureType cannot be created
      */
     void createSchema(FeatureType featureType) throws IOException;
-    
+
     /**
      * Used to force namespace and CS info into a persistent change.
      * <p>
@@ -99,17 +98,18 @@ public interface DataStore{
      * </p>
      * <ul>
      * <li>Sean - don't do this</li>
-     * <li>Jody - Just allow changes to metadata: CS, namespace, and others</li> 
-     * <li>James - Allow change/addition of attribtues</li> 
+     * <li>Jody - Just allow changes to metadata: CS, namespace, and others</li>
+     * <li>James - Allow change/addition of attribtues</li>
      * </ul>
      * @param typeName
      * @throws IOException
      */
-    void updateSchema( String typeName, FeatureType featureType ) throws IOException;
-        
+    void updateSchema(String typeName, FeatureType featureType)
+        throws IOException;
+
     /**
      * Retrieves a list of of the available FeatureTypes.
-     * 
+     *
      * <p>
      * This is simply a list of the FeatureType names as aquiring the actual
      * FeatureType schemas may be expensive.
@@ -119,21 +119,21 @@ public interface DataStore{
      * Warning: this list may not be unique - the types may be
      * in separate namespaces.
      * </p>
-     * 
+     *
      * <p>
      * If you need to worry about such things please consider the use of
      * the Catalog and CatalogEntry interface - many DataStores support this.
      * getTypeNames is really a convience method for a Catalog.iterator() where
      * the name of each entry is returned.
      * </p>
-     * 
+     *
      * @return typeNames for available FeatureTypes.
      */
     String[] getTypeNames() throws IOException;
 
     /**
      * Retrieve FeatureType metadata by <code>typeName</code>.
-     * 
+     *
      * <p>
      * Retrieves the Schema information as a FeatureType object.
      * </p>
@@ -166,23 +166,23 @@ public interface DataStore{
      * Update - GeoServer has an elegatent implementation of this functionality
      * that we could steal. GeoServerFeatureSource, GeoServerFeatureStore and
      * GeoServerFeatureLocking serve as a working prototype.
-     * </p> 
+     * </p>
      * @param Query Query.getTypeName() locates FeatureType being viewed
      *
      * @return FeatureSource providing opperations for featureType
      * @throws IOException If FeatureSource is not available
      * @throws SchemaException If fetureType is not covered by existing schema
      */
-    FeatureSource getView( Query query ) throws IOException, SchemaException;
-    
+    FeatureSource getView(Query query) throws IOException, SchemaException;
+
     /**
      * Access a FeatureSource for typeName providing a high-level API.
-     * 
+     *
      * <p>
      * The resulting FeatureSource may implment more functionality:
      * </p>
      * <pre><code>
-     * 
+     *
      * FeatureSource fsource = dataStore.getFeatureSource( "roads" );
      * FeatureStore fstore = null;
      * if( fsource instanceof FeatureLocking ){
@@ -202,17 +202,17 @@ public interface DataStore{
 
     /**
      * Access a FeatureReader providing access to Feature information.
-     * 
+     *
      * <p>
      * <b>Filter</b> is used as a low-level indication of constraints.
      * (Implementations may resort to using a FilteredFeatureReader, or
      * provide their own optimizations)
      * </p>
-     * 
+     *
      * <p>
      * <b>FeatureType</b> provides a template for the returned FeatureReader
      * </p>
-     * 
+     *
      * <ul>
      * <li>
      * featureType.getTypeName(): used by JDBC as the table reference to query
@@ -228,7 +228,7 @@ public interface DataStore{
      * results (may be different then the one used internally)
      * </li>
      * </ul>
-     * 
+     *
      * <p>
      * <b>Transaction</b> to externalize DataStore state on a per Transaction
      * basis. The most common example is a JDBC datastore saving a Connection
@@ -236,11 +236,11 @@ public interface DataStore{
      * reader may wish to redirect FeatureReader requests to a alternate
      * filename over the course of a Transaction.
      * </p>
-     * 
+     *
      * <p>
      * <b>Notes For Implementing DataStore</b>
      * </p>
-     * 
+     *
      * <p>
      * Subclasses may need to retrieve additional attributes, beyond those
      * requested by featureType.getAttributeTypes(), in order to correctly
@@ -303,34 +303,35 @@ public interface DataStore{
      * <p>
      * Locking support does not need to be provided for FeatureReaders.
      * </p>
-     * 
+     *
      * @param query Requested form of the returned Features and the filter used
      *              to constraints the results
      * @param transaction Transaction this query opperates against
      *
      * @return FeatureReader Allows Sequential Processing of featureType
      */
-    FeatureReader getFeatureReader( Query query, Transaction transaction ) throws IOException;
+    FeatureReader getFeatureReader(Query query, Transaction transaction)
+        throws IOException;
 
     /**
      * Access FeatureWriter for modification of existing DataStore contents.
-     * 
+     *
      * <p>
      * To limit FeatureWriter to the FeatureTypes defined by this DataStore,
-     * typeName is used to indicate FeatureType. The resulting 
+     * typeName is used to indicate FeatureType. The resulting
      * feature writer will allow modifications against the
-     * same FeatureType provided by getSchema( typeName )  
+     * same FeatureType provided by getSchema( typeName )
      * </p>
-     * 
+     *
      * <p>
      * The FeatureWriter will provide access to the existing contents of the
      * FeatureType referenced by typeName. The provided filter will be used
      * to skip over Features as required.
      * </p>
-     * 
+     *
      * <b>Notes For Implementing DataStore</b>
      * </p>
-     * 
+     *
      * <p>
      * The returned FeatureWriter <b>does not</b> support the addition of new
      * Features to FeatureType (it would need to police your modifications to
@@ -338,14 +339,14 @@ public interface DataStore{
      * <code>false</code> for getNext() when it reaches the end of the Query
      * and NoSuchElementException when next() is called.
      * </p>
-     * 
+     *
      * <p>
      * Helper classes for implementing a FeatureWriter (in order):
      * </p>
      * <li>
      * InProcessLockingManager.checkedWriter( writer )
      * - provides a check against locks before allowing modification
-     * 
+     *
      * <li>
      * FilteringFeatureWriter
      * - filtering support for FeatureWriter (does not allow new content)
@@ -359,7 +360,7 @@ public interface DataStore{
      * - provides no content for Filter.ALL optimizations
      * </li>
      * </ul>
-     * 
+     *
      * @param typeName Indicates featureType to be modified
      * @param filter constraints used to limit the modification
      * @param transaction Transaction this query opperates against
@@ -371,13 +372,13 @@ public interface DataStore{
 
     /**
      * Access FeatureWriter for modification of the DataStore typeName.
-     * 
+     *
      * <p>
      * FeatureWriters will need to be limited to the FeatureTypes defined by
      * the DataStore, the easiest way to express this limitation is to the
      * FeatureType by a provided typeName.
      * </p>
-     * 
+     *
      * <p>
      * The returned FeatureWriter will return <code>false</code> for getNext()
      * when it reaches the end of the Query.
@@ -393,7 +394,7 @@ public interface DataStore{
 
     /**
      * Aquire a FeatureWriter for adding new content to a FeatureType.
-     * 
+     *
      * <p>
      * This FeatureWriter will return <code>false</code> for hasNext(), however
      * next() may be used to aquire new Features that may be writen out to add
@@ -412,12 +413,12 @@ public interface DataStore{
 
     /**
      * Retrieve a per featureID based locking service from this DataStore.
-     * 
+     *
      * <p>
      * It is common to return an instanceof InProcessLockingManager for
      * DataStores that do not provide native locking.
      * </p>
-     * 
+     *
      * <p>
      * AbstractFeatureLocking makes use of this service to provide locking
      * support. You are not limitied by this implementation and may simply

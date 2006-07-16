@@ -15,6 +15,7 @@
  */
 package org.geotools.filter.expression;
 
+
 /**
  * The ExpressionType interface lists all the possible type of filter. Should
  * be replaced by a type safe enum when we move to Java 1.5

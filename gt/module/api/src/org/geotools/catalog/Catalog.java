@@ -16,98 +16,98 @@
  */
 package org.geotools.catalog;
 
+import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.util.ProgressListener;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
-import org.geotools.util.ProgressListener;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * Extension of Resolve which represents a local catalog or web registry 
+ * Extension of Resolve which represents a local catalog or web registry
  * service.
  * <p>
- * Conceptually provides a searchable Catalog of "Spatial Data Sources". 
+ * Conceptually provides a searchable Catalog of "Spatial Data Sources".
  * Metadata search is abitrary.
  * </p>
- * 
+ *
  * @author David Zwiers, Refractions Research
  * @author Justin Deoliveira, The Open Planning Project
  * @since 0.7.0
- * 
+ *
  * @source $URL$
  */
 public interface Catalog extends Resolve {
-	 /**
+    /**
      * Will attempt to morph into the adaptee, and return that object. Required adaptions:
      * <ul>
      * <li>ICatalogInfo.class
      * <li>List.class <IService>
      * </ul>
      * May Block.
-     * 
+     *
      * @param adaptee
      * @param monitor May Be Null
      * @return
      * @see CatalogInfo
      * @see IService
      */
-    Object resolve( Class adaptee, ProgressListener monitor ) throws IOException;
-    
-	/**
+    Object resolve(Class adaptee, ProgressListener monitor)
+        throws IOException;
+
+    /**
      * Adds the specified entry to this catalog. In some cases the catalog will be backed onto a
      * server, which may not allow for additions.
      * <p>
      * An IService may belong to more than one Catalog.
      * </p>
-     * 
+     *
      * @param entry
      * @throws UnsupportedOperationException
      */
-    void add( Service service ) throws UnsupportedOperationException;
+    void add(Service service) throws UnsupportedOperationException;
 
     /**
      * Removes the specified entry to this catalog. In some cases the catalog will be backed onto a
      * server, which may not allow for deletions.
-     * 
+     *
      * @param service
      * @throws UnsupportedOperationException
      */
-    void remove( Service service ) throws UnsupportedOperationException;
+    void remove(Service service) throws UnsupportedOperationException;
 
     /**
      * Replaces the specified entry in this catalog. In some cases the catalog will be backed onto a
      * server, which may not allow for deletions.
-     * 
+     *
      * @param id
      * @param service
      * @throws UnsupportedOperationException
      */
-    void replace( URI id, Service service ) throws UnsupportedOperationException;
-    
+    void replace(URI id, Service service) throws UnsupportedOperationException;
+
     /**
      * Find resources matching this id directly from this Catalog.
-     * 
+     *
      * @param id used to match resolves
      * @param monitor used to show the progress of the find.
-     * 
-     * @return List (possibly empty) of resolves (objects implementing the 
+     *
+     * @return List (possibly empty) of resolves (objects implementing the
      * Resolve interface)
      */
-    List find( URI id, ProgressListener monitor );
+    List find(URI id, ProgressListener monitor);
 
     /**
      * Find Service matching this id directly from this Catalog.  This method is guaranteed to be non-blocking.
-     * 
+     *
      * @param id used to match resolves
      * @param monitor monitor used to watch progress
-     * 
-     * @return List (possibly empty) of matching services (objects of type 
+     *
+     * @return List (possibly empty) of matching services (objects of type
      * Service).
      */
-    List findService( URI query, ProgressListener monitor );
-    
+    List findService(URI query, ProgressListener monitor);
+
     /**
      * Performs a search on this catalog based on the specified inputs.
      * <p>
@@ -123,24 +123,24 @@ public interface Catalog extends Resolve {
      * The bbox provided shall be in Lat - Long, or null if the search is not to be contained within
      * a specified area.
      * </p>
-     * 
+     *
      * @param pattern Search pattern (see above)
      * @param bbox The bbox in Lat-Long (ESPG 4269), or null
      * @param monitor for progress, or null if monitoring is not desired
-     * 
+     *
      * @return List containg objects of type Resolve.
      */
-    List search( String pattern, Envelope bbox, ProgressListener monitor )
-            throws IOException;
+    List search(String pattern, Envelope bbox, ProgressListener monitor)
+        throws IOException;
 
     /**
      * Aquire info on this Catalog.
      * <p>
      * This is functionally equivalent to: <core>resolve(ICatalogInfo.class,monitor)</code>
      * </p>
-     * 
+     *
      * @see Catalog#resolve(Class, ProgressListener)
      * @return ICatalogInfo resolve(ICatalogInfo.class,ProgressListener monitor);
      */
-    CatalogInfo getInfo( ProgressListener monitor ) throws IOException;
+    CatalogInfo getInfo(ProgressListener monitor) throws IOException;
 }

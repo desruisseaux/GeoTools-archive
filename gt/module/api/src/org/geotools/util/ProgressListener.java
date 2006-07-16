@@ -13,6 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
@@ -34,6 +35,7 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.geotools.util;
+
 
 /**
  * Monitor the progress of some lengthly operation. This interface makes no
@@ -89,7 +91,7 @@ package org.geotools.util;
  *      }
  * </code></pre>
  * Note the use of try and catch to report exceptions.
- * 
+ *
  * @since 2.0
  * @source $URL$
  * @version $Id$
@@ -144,12 +146,12 @@ public interface ProgressListener {
      * Is this job canceled?
      */
     boolean isCanceled();
-    
+
     /**
      * Indicate that progress should is canceled.
      */
-    void setCanceled(boolean cancel);    
-    
+    void setCanceled(boolean cancel);
+
     /**
      * Reports a warning. This warning may be printed to the {@linkplain System#err standard error
      * stream}, appears in a windows or be ignored, at implementor choice.

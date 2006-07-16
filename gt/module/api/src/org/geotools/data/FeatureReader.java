@@ -15,18 +15,17 @@
  */
 package org.geotools.data;
 
-import java.io.IOException;
-import java.util.NoSuchElementException;
-
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import java.io.IOException;
+import java.util.NoSuchElementException;
 
 
 /**
  * The low-level interface for reading Features. Will use the underlying
  * AttributeReader and the given FeatureType to create new Features.
- * 
+ *
  * <p>
  * Typical use is as follows:
  * <pre><code>
@@ -48,14 +47,14 @@ import org.geotools.feature.IllegalAttributeException;
  *          catch( IOException eek){
  *          }
  *      }
- *   } 
+ *   }
  * </code></pre>
- * 
+ *
  * <h2>Questions and Suggestions</h2>
  * <ul>
  * <li>Q: Should FeatureReader provide access to the AttributeReaders it uses?
  * <br>A:
- *       No, it looks like we will make a lazy Feature in order to cleanly 
+ *       No, it looks like we will make a lazy Feature in order to cleanly
  *       allow for lazy parsing of attribtues.
  * </li>
  * <li>Q:FeatureReader has a close method, but no open method?

@@ -15,6 +15,7 @@
  */
 package org.geotools.event;
 
+
 /**
  * Provides support for Parent/Child relationships for the event system.
  * <p>
@@ -42,87 +43,87 @@ package org.geotools.event;
  * @source $URL$
  */
 public interface GTComponent {
-	
-	/**
-	 * Used to locate our parent.
-	 * <p>
-	 * This method will return a "NULLObject", called GTRoot.NO_PARENT when
-	 * no parent is present, client code should never have to be concerned
-	 * this method return <code>null</code>.
-	 * @deprecated use getNote().getParent()
-	 * @return Parent GTComponent or GTRoot.NO_PARENT if none
-	 */
-	GTComponent getParent(); 
+    /**
+     * Used to locate our parent.
+     * <p>
+     * This method will return a "NULLObject", called GTRoot.NO_PARENT when
+     * no parent is present, client code should never have to be concerned
+     * this method return <code>null</code>.
+     * @deprecated use getNote().getParent()
+     * @return Parent GTComponent or GTRoot.NO_PARENT if none
+     */
+    GTComponent getParent();
 
-//	/**
-//	 * Used to set the parent, and associated placement information.
-//	 * 
-//	 * @param newParent GTComponent or NULLGTRoot if none
-//	 */
-//	void setParent(GTComponent newParent );		
-//	
-//	/** Indicate name used during notification */
-//	public void setNotificationName( String name );
-//	/** Indicate name used during notification */	
-//	public String getNotificationName();
-//	/** Indicate name position used during notification */	
-//	public void setNotificationPosition( int index );
-//	/** Indicate position used during notification */	
-//	public int getNotificationPosition();
-	
-	/**
-	 * Small stratagy object passed in by our parent so we can call home.
-	 * Used to pass change information "up" to our parent, to root parent
-	 * will broadcast the events out to listeners.
-	 */
-	public GTNote getNote();
-	
-	/**
-	 * Small stratagy object passed in by our parent so we can call home.
-	 * Used to pass change information "up" to our parent, to root parent
-	 * will broadcast the events out to listeners.
-	 * @param container
-	 */
-	public void setNote(GTNote container);
-	
-	/**
-	 * A child has been removed, issued before change.
-	 * <p>
-	 * This method is for use by children <b>only</b> it is implementor
-	 * API and should not be called by client code.
-	 * </p>
-	 * Q:Why does it exist then?<br>
-	 * So you can implement your own Symbolizer,
-	 * and still allow the GeoTools Stroke implementation to pass change
-	 * notification onto you.
-	 * </p>
-	 * <p>
-	 * Q:GeoAPI does not support this?
-	 * No they don't, their interface are set up to match specification
-	 * for interoptability between toolkit implementations. By the time
-	 * you pass a GeoAPI object around it should stop wiggling and just be
-	 * viewed as stable data. But yes we should ask them about this...
-	 * </p>
-	 */
-	void removed(GTDelta delta);
-	/**
-	 * A child has been changed (maybe added), issued after change.
-	 * <p>
-	 * This method is for use by children <b>only</b> it is implementor
-	 * API and should not be called by client code.
-	 * </p>
-	 * Q:Why does it exist then?<br>
-	 * So you can implement your own Symbolizer,
-	 * and still allow the GeoTools Stroke implementation to pass change
-	 * notification onto you.
-	 * </p>
-	 * <p>
-	 * Q:GeoAPI does not support this?
-	 * No they don't, their interface are set up to match specification
-	 * for interoptability between toolkit implementations. By the time
-	 * you pass a GeoAPI object around it should stop wiggling and just be
-	 * viewed as stable data. But yes we should ask them about this...
-	 * </p>
-	 */
-	void changed(GTDelta delta); 
+    //	/**
+    //	 * Used to set the parent, and associated placement information.
+    //	 * 
+    //	 * @param newParent GTComponent or NULLGTRoot if none
+    //	 */
+    //	void setParent(GTComponent newParent );		
+    //	
+    //	/** Indicate name used during notification */
+    //	public void setNotificationName( String name );
+    //	/** Indicate name used during notification */	
+    //	public String getNotificationName();
+    //	/** Indicate name position used during notification */	
+    //	public void setNotificationPosition( int index );
+    //	/** Indicate position used during notification */	
+    //	public int getNotificationPosition();
+
+    /**
+     * Small stratagy object passed in by our parent so we can call home.
+     * Used to pass change information "up" to our parent, to root parent
+     * will broadcast the events out to listeners.
+     */
+    public GTNote getNote();
+
+    /**
+     * Small stratagy object passed in by our parent so we can call home.
+     * Used to pass change information "up" to our parent, to root parent
+     * will broadcast the events out to listeners.
+     * @param container
+     */
+    public void setNote(GTNote container);
+
+    /**
+     * A child has been removed, issued before change.
+     * <p>
+     * This method is for use by children <b>only</b> it is implementor
+     * API and should not be called by client code.
+     * </p>
+     * Q:Why does it exist then?<br>
+     * So you can implement your own Symbolizer,
+     * and still allow the GeoTools Stroke implementation to pass change
+     * notification onto you.
+     * </p>
+     * <p>
+     * Q:GeoAPI does not support this?
+     * No they don't, their interface are set up to match specification
+     * for interoptability between toolkit implementations. By the time
+     * you pass a GeoAPI object around it should stop wiggling and just be
+     * viewed as stable data. But yes we should ask them about this...
+     * </p>
+     */
+    void removed(GTDelta delta);
+
+    /**
+     * A child has been changed (maybe added), issued after change.
+     * <p>
+     * This method is for use by children <b>only</b> it is implementor
+     * API and should not be called by client code.
+     * </p>
+     * Q:Why does it exist then?<br>
+     * So you can implement your own Symbolizer,
+     * and still allow the GeoTools Stroke implementation to pass change
+     * notification onto you.
+     * </p>
+     * <p>
+     * Q:GeoAPI does not support this?
+     * No they don't, their interface are set up to match specification
+     * for interoptability between toolkit implementations. By the time
+     * you pass a GeoAPI object around it should stop wiggling and just be
+     * viewed as stable data. But yes we should ask them about this...
+     * </p>
+     */
+    void changed(GTDelta delta);
 }

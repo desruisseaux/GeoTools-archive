@@ -16,13 +16,13 @@
  */
 package org.geotools.styling;
 
-import java.awt.Color;
-
 import org.geotools.event.GTComponent;
 import org.geotools.event.GTConstant;
 import org.geotools.feature.Feature;
 import org.geotools.filter.expression.ConstantExpression;
 import org.geotools.filter.expression.Expression;
+import java.awt.Color;
+
 
 /**
  * The Stroke object encapsulates the graphical-symbolization parameters for
@@ -62,7 +62,7 @@ import org.geotools.filter.expression.Expression;
  *   &lt;/xsd:complexType&gt;
  * &lt;/xsd:element&gt;
  * </code></pre>
- * <p>  
+ * <p>
  * Renderers can use this information when displaying styled features,
  * though it must be remembered that not all renderers will be able to
  * fully represent strokes as set out by this interface.  For example, opacity
@@ -70,7 +70,7 @@ import org.geotools.filter.expression.Expression;
  * <p>
  * Notes:
  * <ul>
- * <li>The graphical parameters and their values are derived from SVG/CSS2 
+ * <li>The graphical parameters and their values are derived from SVG/CSS2
  * standards with names and semantics which are as close as possible.
  * </ul>
  * </p>
@@ -79,104 +79,111 @@ import org.geotools.filter.expression.Expression;
  * @author James Macgill
  */
 public interface Stroke extends GTComponent {
-	
-   /**
-	 * Default Stroke capturing the defaults indicated by the standard.
-	 * <p>
-	 * For some attributes the standard does not define a default, so a 
-	 * reasonable value is supplied.
-	 * </p>
-	 */
-	static final Stroke DEFAULT = new ConstantStroke(){    	
-		public Expression getColor() {
-			return ConstantExpression.BLACK;
-		}
-		public Color getColor(Feature f) {
-			return Color.BLACK;
-		}
-		public Expression getWidth() {
-			return ConstantExpression.ONE;
-		}
-		public Expression getOpacity() {
-			return ConstantExpression.ONE;
-		}
-		public Expression getLineJoin() {
-			return ConstantExpression.constant( "butt" );
-		}
-		public Expression getLineCap() {
-			return ConstantExpression.constant( "miter" );
-		}
-		public float[] getDashArray() {
-			return new float[]{1,0};
-		}
-		public Expression getDashOffset() {
-			return ConstantExpression.ZERO;
-		}
-		public Graphic getGraphicFill() {
-			return Graphic.DEFAULT;
-		}
-		public Graphic getGraphicStroke() {
-			return Graphic.NULL;
-		}
-		public Object clone() {
-			return this; // we are constant
-		}
-    };
-    
     /**
-	 * Null Stroke capturing the defaults indicated by the standard.
-	 * <p>
-	 * This is a NullObject, it purpose is to prevent client code from having 
-	 * to do null checking.
-	 * </p>
-	 */
+     * Default Stroke capturing the defaults indicated by the standard.
+     * <p>
+     * For some attributes the standard does not define a default, so a
+     * reasonable value is supplied.
+     * </p>
+     */
+    static final Stroke DEFAULT = new ConstantStroke() {
+            public Expression getColor() {
+                return ConstantExpression.BLACK;
+            }
+
+            public Color getColor(Feature f) {
+                return Color.BLACK;
+            }
+
+            public Expression getWidth() {
+                return ConstantExpression.ONE;
+            }
+
+            public Expression getOpacity() {
+                return ConstantExpression.ONE;
+            }
+
+            public Expression getLineJoin() {
+                return ConstantExpression.constant("butt");
+            }
+
+            public Expression getLineCap() {
+                return ConstantExpression.constant("miter");
+            }
+
+            public float[] getDashArray() {
+                return new float[] { 1, 0 };
+            }
+
+            public Expression getDashOffset() {
+                return ConstantExpression.ZERO;
+            }
+
+            public Graphic getGraphicFill() {
+                return Graphic.DEFAULT;
+            }
+
+            public Graphic getGraphicStroke() {
+                return Graphic.NULL;
+            }
+
+            public Object clone() {
+                return this; // we are constant
+            }
+        };
+
+    /**
+     * Null Stroke capturing the defaults indicated by the standard.
+     * <p>
+     * This is a NullObject, it purpose is to prevent client code from having
+     * to do null checking.
+     * </p>
+     */
     static final Stroke NULL = new ConstantStroke() {
+            public Expression getColor() {
+                return ConstantExpression.NULL;
+            }
 
-		public Expression getColor() {
-			return ConstantExpression.NULL;
-		}
+            public Color getColor(Feature f) {
+                return Color.BLACK;
+            }
 
-		public Color getColor(Feature f) {
-			return Color.BLACK;
-		}
+            public Expression getWidth() {
+                return ConstantExpression.NULL;
+            }
 
-		public Expression getWidth() {
-			return ConstantExpression.NULL;
-		}
+            public Expression getOpacity() {
+                return ConstantExpression.NULL;
+            }
 
-		public Expression getOpacity() {
-			return ConstantExpression.NULL;
-		}
+            public Expression getLineJoin() {
+                return ConstantExpression.NULL;
+            }
 
-		public Expression getLineJoin() {
-			return ConstantExpression.NULL;
-		}
+            public Expression getLineCap() {
+                return ConstantExpression.NULL;
+            }
 
-		public Expression getLineCap() {
-			return ConstantExpression.NULL;
-		}
+            public float[] getDashArray() {
+                return new float[] {  };
+            }
 
-		public float[] getDashArray() {
-			return new float[]{};
-		}
+            public Expression getDashOffset() {
+                return ConstantExpression.NULL;
+            }
 
-		public Expression getDashOffset() {
-			return ConstantExpression.NULL;
-		}
+            public Graphic getGraphicFill() {
+                return Graphic.NULL;
+            }
 
-		public Graphic getGraphicFill() {
-			return Graphic.NULL;
-		}
+            public Graphic getGraphicStroke() {
+                return Graphic.NULL;
+            }
+        };
 
-		public Graphic getGraphicStroke() {
-			return Graphic.NULL;
-		}
-    	
-    };
-    
     /**
      * This parameter gives the solid color that will be used for a stroke.<br>
-     * The color value is RGB-encoded using two hexidecimal digits per 
+     * The color value is RGB-encoded using two hexidecimal digits per
      * primary-color component in the order Red, Green, Blue, prefixed wih
      * the hash (#) sign.  The hexidecimal digits between A and F may be in
      * either upper or lower case.  For example, full red is encoded as
@@ -188,7 +195,7 @@ public interface Stroke extends GTComponent {
      * @return The color of the stroke encoded as a hexidecimal RGB value.
      **/
     Expression getColor();
-    
+
     /**
      * This parameter gives the solid color that will be used for a stroke.<br>
      * The color value returned here as a Java Color object, this is a convinence method
@@ -200,10 +207,10 @@ public interface Stroke extends GTComponent {
      * @return The color of the stroke as a Color object
      **/
     Color getColor(Feature f);
-    
+
     /**
      * This parameter gives the solid color that will be used for a stroke.<br>
-     * The color value is RGB-encoded using two hexidecimal digits per 
+     * The color value is RGB-encoded using two hexidecimal digits per
      * primary-color component in the order Red, Green, Blue, prefixed wih
      * the hash (#) sign.  The hexidecimal digits between A and F may be in
      * either upper or lower case.  For example, full red is encoded as
@@ -212,18 +219,18 @@ public interface Stroke extends GTComponent {
      * Note: in CSS this parameter is just called Stroke and not Color.
      */
     void setColor(Expression color);
-    
+
     /**
      * This parameter gives the absolute width (thickness) of a stroke in
      * pixels encoded as a float.
      * The default is 1.0.  Fractional numbers are allowed but negative
      * numbers are not.
      *
-     * @return The width of the stroke in pixels.  
+     * @return The width of the stroke in pixels.
      *         This may be fractional but not negative.
      **/
     Expression getWidth();
-    
+
     /**
      * This parameter gives the absolute width (thickness) of a stroke in
      * pixels encoded as a float.
@@ -231,6 +238,7 @@ public interface Stroke extends GTComponent {
      * numbers are not.
      */
     void setWidth(Expression width);
+
     /**
      * This specifies the level of translucency to use when rendering the
      * stroke.<br>
@@ -245,7 +253,7 @@ public interface Stroke extends GTComponent {
      *         and 1.0 is completely opaque.
      */
     Expression getOpacity();
-    
+
     /**
      * This specifies the level of translucency to use when rendering the
      * stroke.<br>
@@ -253,9 +261,10 @@ public interface Stroke extends GTComponent {
      * 1.0 with 0.0 representing totally transparent and 1.0 representing
      * totally opaque.  A linear scale of translucency is used for intermediate
      * values.<br>
-     * For example, "0.65" would represent 65% opacity. 
+     * For example, "0.65" would represent 65% opacity.
      */
     void setOpacity(Expression opacity);
+
     /**
      * This parameter controls how line strings should be joined together.
      *
@@ -263,11 +272,12 @@ public interface Stroke extends GTComponent {
      *         "bevel".  There is no defined default.
      */
     Expression getLineJoin();
+
     /**
      * This parameter controls how line strings should be joined together.
      */
     void setLineJoin(Expression lineJoin);
-    
+
     /**
      * This parameter controls how line strings should be capped.
      *
@@ -275,11 +285,12 @@ public interface Stroke extends GTComponent {
      *         "square".  There is no defined default.
      */
     Expression getLineCap();
+
     /**
      * This parameter controls how line strings should be capped.
      */
     void setLineCap(Expression lineCap);
-    
+
     /**
      * This parameter encodes the dash pattern as a seqeuence of floats.<br>
      * The first number gives the length in pixels of the dash to draw, the
@@ -296,6 +307,7 @@ public interface Stroke extends GTComponent {
      *         "dashlength gaplength ..."
      */
     float[] getDashArray();
+
     /**
      * This parameter encodes the dash pattern as a seqeuence of floats.<br>
      * The first number gives the length in pixels of the dash to draw, the
@@ -308,38 +320,41 @@ public interface Stroke extends GTComponent {
      * --&nbsp;---&nbsp;&nbsp;--&nbsp;---&nbsp;&nbsp;--</code>
      */
     void setDashArray(float[] dashArray);
-   /**
-    * A dash array need not start from the beginning.  This method allows for
-    * an offset into the dash array before starting it.
-    *
-    * @return The distance, in pixels, that any dash array should start from.
-    */
-    Expression getDashOffset();
+
     /**
-    * A dash array need not start from the beginning.  This method allows for
-    * an offset into the dash array before starting it.
-    */
+     * A dash array need not start from the beginning.  This method allows for
+     * an offset into the dash array before starting it.
+     *
+     * @return The distance, in pixels, that any dash array should start from.
+     */
+    Expression getDashOffset();
+
+    /**
+     * A dash array need not start from the beginning.  This method allows for
+     * an offset into the dash array before starting it.
+     */
     void setDashOffset(Expression dashOffset);
-    
+
     /**
      * This parameter indicates that a stipple-fill repeated graphic will be
      * used and specifies the fill graphic to use.
-     * 
-     * @return The graphic to use as a stipple fill.  
+     *
+     * @return The graphic to use as a stipple fill.
      *         If null, then no Stipple fill should be used.
      */
     Graphic getGraphicFill();
+
     /**
      * This parameter indicates that a stipple-fill repeated graphic will be
      * used and specifies the fill graphic to use.
      */
     void setGraphicFill(Graphic graphicFill);
-    
+
     /**
-     * This parameter indicates that a repeated-linear-graphic graphic stroke 
+     * This parameter indicates that a repeated-linear-graphic graphic stroke
      * type will be used and specifies the graphic to use.
-     *  
-     * Proper stroking with a linear graphic requires two "hot-spot" points 
+     *
+     * Proper stroking with a linear graphic requires two "hot-spot" points
      * within the space of the graphic to indicate where the rendering line
      * starts and stops.
      * In the case of raster images with no special mark-up, this line will
@@ -350,11 +365,12 @@ public interface Stroke extends GTComponent {
      *         If null, then no graphic stroke should be used.
      */
     Graphic getGraphicStroke();
+
     /**
-     * This parameter indicates that a repeated-linear-graphic graphic stroke 
+     * This parameter indicates that a repeated-linear-graphic graphic stroke
      * type will be used and specifies the graphic to use.
-     *  
-     * Proper stroking with a linear graphic requires two "hot-spot" points 
+     *
+     * Proper stroking with a linear graphic requires two "hot-spot" points
      * within the space of the graphic to indicate where the rendering line
      * starts and stops.
      * In the case of raster images with no special mark-up, this line will
@@ -362,52 +378,65 @@ public interface Stroke extends GTComponent {
      * first pixel column and ending at the last pixel column.
      */
     void setGraphicStroke(Graphic graphicStroke);
-    
+
     void accept(StyleVisitor visitor);
-    
+
     /** Creates a clone of the Stroke.
-     * 
+     *
      * @return A clone of the stroke object.
      */
     Object clone();
 }
 
-abstract class ConstantStroke extends GTConstant implements Stroke {
-	private void cannotModifyConstant(){
-		throw new UnsupportedOperationException("Constant Stroke may not be modified");
-	}
-	public void setColor(Expression color) {
-		cannotModifyConstant();
-	}
-	public void setWidth(Expression width) {
-		cannotModifyConstant();		;	
-	}
-	public void setOpacity(Expression opacity) {
-		cannotModifyConstant();
-	}
-	public void setLineJoin(Expression lineJoin) {
-		cannotModifyConstant();
-	}
-	public void setLineCap(Expression lineCap) {
-		cannotModifyConstant();
-	}
-	public void setDashArray(float[] dashArray) {
-		cannotModifyConstant();
-	}
-	public void setDashOffset(Expression dashOffset) {
-		cannotModifyConstant();
-	}
-	public void setGraphicFill(Graphic graphicFill) {
-		cannotModifyConstant();
-	}
-	public void setGraphicStroke(Graphic graphicStroke) {
-		cannotModifyConstant();
-	}
-	public void accept(StyleVisitor visitor) {
-		cannotModifyConstant();
-	}
-};
 
+abstract class ConstantStroke extends GTConstant implements Stroke {
+    private void cannotModifyConstant() {
+        throw new UnsupportedOperationException(
+            "Constant Stroke may not be modified");
+    }
+
+    public void setColor(Expression color) {
+        cannotModifyConstant();
+    }
+
+    public void setWidth(Expression width) {
+        cannotModifyConstant();
+        ;
+    }
+
+    public void setOpacity(Expression opacity) {
+        cannotModifyConstant();
+    }
+
+    public void setLineJoin(Expression lineJoin) {
+        cannotModifyConstant();
+    }
+
+    public void setLineCap(Expression lineCap) {
+        cannotModifyConstant();
+    }
+
+    public void setDashArray(float[] dashArray) {
+        cannotModifyConstant();
+    }
+
+    public void setDashOffset(Expression dashOffset) {
+        cannotModifyConstant();
+    }
+
+    public void setGraphicFill(Graphic graphicFill) {
+        cannotModifyConstant();
+    }
+
+    public void setGraphicStroke(Graphic graphicStroke) {
+        cannotModifyConstant();
+    }
+
+    public void accept(StyleVisitor visitor) {
+        cannotModifyConstant();
+    }
+}
+;
 /*
  * $Log: Stroke.java,v $
  * Revision 1.13  2003/08/10 08:33:39  seangeo

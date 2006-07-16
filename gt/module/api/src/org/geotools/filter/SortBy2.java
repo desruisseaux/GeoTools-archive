@@ -17,6 +17,7 @@ package org.geotools.filter;
 
 import org.geotools.filter.expression.Expression;
 
+
 /**
  * GeoTools allows for more pervase use of Expression then is strictly
  * supported by the specification.
@@ -36,20 +37,20 @@ import org.geotools.filter.expression.Expression;
  * @author Jody Garnett, Refractions Research.
  * @source $URL$
  */
-public interface SortBy2 extends SortBy {		
-	/**
-	 * GeoTools allows for more pervase use of Expression then is strictly
-     * supported by the specification.
-     * 
-	 * @return Will return the same Expression as getAttributeExpression.
-	 */
-    public Expression getExpression();
-    
+public interface SortBy2 extends SortBy {
     /**
-	 * GeoTools allows for more pervase use of Expression then is strictly
+     * GeoTools allows for more pervase use of Expression then is strictly
      * supported by the specification.
-     * 
-	 * @return Will return the same Expression as getAttributeExpression.
-	 */
+     *
+     * @return Will return the same Expression as getAttributeExpression.
+     */
+    public Expression getExpression();
+
+    /**
+     * GeoTools allows for more pervase use of Expression then is strictly
+     * supported by the specification.
+     *
+     * @return Will return the same Expression as getAttributeExpression.
+     */
     public void setExpression(Expression expression);
 }

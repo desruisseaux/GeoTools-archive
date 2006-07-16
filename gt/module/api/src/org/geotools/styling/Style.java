@@ -18,6 +18,7 @@ package org.geotools.styling;
 
 import org.geotools.event.GTComponent;
 
+
 /**
  * Indicates how geographical content should be displayed (we call this a style for simplicity; in the spec it is called a UserStyle (user-defined style)).
  * <p>
@@ -42,30 +43,33 @@ import org.geotools.event.GTComponent;
  *     &lt;/xsd:sequence&gt;
  *   &lt;/xsd:complexType&gt;
  * &lt;/xsd:element&gt;
- * </code></pre> 
- * 
+ * </code></pre>
+ *
  * @source $URL$
  * @version $Id$
  * @author James Macgill
  */
 public interface Style extends GTComponent {
-    
-	/** Style name (machine readable, don't show to users) */
+    /** Style name (machine readable, don't show to users) */
     String getName();
+
     void setName(String name);
-    
-    /* Style Title (human readable name for user interfaces) */ 
+
+    /* Style Title (human readable name for user interfaces) */
     String getTitle();
+
     void setTitle(String title);
-    
+
     /** Description of this style */
     String getAbstract();
+
     void setAbstract(String abstractStr);
-    
+
     /**
      * Indicates that this is the default style.
      */
     boolean isDefault();
+
     /**
      * Indicates that this is the default style.
      * <p>
@@ -77,7 +81,7 @@ public interface Style extends GTComponent {
      * @param isDefault
      */
     void setDefault(boolean isDefault);
-    
+
     /**
      * Array of FeatureTypeStyles in portrayal order.
      * <p>
@@ -88,15 +92,16 @@ public interface Style extends GTComponent {
      * <i>Note: We are using a Array here to continue with Java 1.4 deployment.</i>
      * </p>
      */
-    FeatureTypeStyle[] getFeatureTypeStyles();    
-    void setFeatureTypeStyles(FeatureTypeStyle[] types);    
+    FeatureTypeStyle[] getFeatureTypeStyles();
+
+    void setFeatureTypeStyles(FeatureTypeStyle[] types);
+
     void addFeatureTypeStyle(FeatureTypeStyle type);
-    
+
     /**
      * Used to navigate Style information during portrayal.
-     * 
+     *
      * @param visitor
      */
-    void accept(StyleVisitor visitor);    
-    
+    void accept(StyleVisitor visitor);
 }

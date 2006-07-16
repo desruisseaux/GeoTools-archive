@@ -17,6 +17,7 @@ package org.geotools.styling;
 
 import org.geotools.event.GTComponent;
 
+
 /**
  * The ChannelSelection element specifies the false-color channel selection for
  * a multi-spectral raster source  (such as a multi-band satellite-imagery

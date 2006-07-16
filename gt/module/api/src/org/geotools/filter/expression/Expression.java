@@ -28,27 +28,27 @@ import org.geotools.filter.FilterVisitor;
  * @source $URL$
  * @version $Id$
  */
-public interface Expression extends ExpressionType, org.opengis.filter.expression.Expression {
-    
-	/**
+public interface Expression extends ExpressionType,
+    org.opengis.filter.expression.Expression {
+    /**
      * Gets the type of this expression.
      *
      * @return Expression type.
-     * 
+     *
      * @deprecated The enumeration based type system has been replaced by a
      * class based type system.
      */
     short getType();
 
     /**
-	 * Evaluates the expression against an instance of {@link Feature}. 
-	 *
-	 * @param feature The feature being evaluated.
-	 * 
-	 * @return The result.
-	 */
-	Object evaluate(Feature feature);
-    
+     * Evaluates the expression against an instance of {@link Feature}.
+     *
+     * @param feature The feature being evaluated.
+     *
+     * @return The result.
+     */
+    Object evaluate(Feature feature);
+
     /**
      * Returns a value for this expression.  The feature argument is used if a
      * feature is needed to evaluate the expression, as in the case of an
@@ -60,7 +60,7 @@ public interface Expression extends ExpressionType, org.opengis.filter.expressio
      *
      * @return Value of the expression, evaluated with the feature object if
      *         necessary.
-     *         
+     *
      * @deprecated use {@link org.opengis.filter.expression.Expression#evaluate(Feature)}
      */
     Object getValue(Feature feature);
@@ -77,5 +77,4 @@ public interface Expression extends ExpressionType, org.opengis.filter.expressio
      * @deprecated use use {@link org.opengis.filter.expression.Expression#accept(ExpressionVisitor, Object)}
      */
     void accept(FilterVisitor visitor);
-    
 }

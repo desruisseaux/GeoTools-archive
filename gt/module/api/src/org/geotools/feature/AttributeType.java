@@ -21,7 +21,7 @@ import org.geotools.filter.Filter;
 /**
  * <p>
  * Stores metadata about a single attribute object.
- * 
+ *
  * <ol>
  * <li>
  * Name: A string that is used to reference the attribute.
@@ -34,7 +34,7 @@ import org.geotools.filter.Filter;
  * </li>
  * </ol>
  * </p>
- * 
+ *
  * <p>
  * AttributeTypes must also provide the <code>validate(Object obj)</code>
  * method, which determines whether a given object matches the constraints
@@ -45,7 +45,7 @@ import org.geotools.filter.Filter;
  * that the Feature object matches all its constraints, not that it is  just
  * of class Feature.
  * </p>
- * 
+ *
  * <p>
  * Additionally, implementors may use the parse method to convert an object to
  * its preferred storage type.  If an implementor does not choose to provide
@@ -83,6 +83,7 @@ public interface AttributeType {
      * with the concept of xml facets, hopefully we will have time to.
      *
      */
+
     /**
      * Gets the name of this attribute.
      *

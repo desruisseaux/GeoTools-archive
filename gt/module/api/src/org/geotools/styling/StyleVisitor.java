@@ -15,6 +15,7 @@
  */
 package org.geotools.styling;
 
+
 /**
  * An interface for classes that want to perform operations on a Style
  * hierarchy. It forms part of a GoF Visitor Patern implementation. A call to
@@ -31,36 +32,35 @@ package org.geotools.styling;
  * @version $Id$
  */
 public interface StyleVisitor {
-	
-	/**
+    /**
      * Called when accept is called on a StyledLayerDescriptor.
      *
      * @param sld The StyledLayerDescriptor to visit
      */
-	void visit(StyledLayerDescriptor sld);
+    void visit(StyledLayerDescriptor sld);
 
-	/**
+    /**
      * Called when accept is called on a NamedLayer.
      *
      * @param layer The NamedLayer to visit
      */
-	void visit(NamedLayer layer);
+    void visit(NamedLayer layer);
 
-	/**
+    /**
      * Called when accept is called on a UserLayer.
      *
      * @param layer The UserLayer to visit
      */
-	void visit(UserLayer layer);
+    void visit(UserLayer layer);
 
-	/**
+    /**
      * Called when accept is called on a FeatureTypeConstraint.
      *
      * @param ftc The FeatureTypeConstraint to visit
      */
-	void visit(FeatureTypeConstraint ftc);
-	
-	/**
+    void visit(FeatureTypeConstraint ftc);
+
+    /**
      * Called when accept is called on a Style.
      *
      * @param style The style to visit
@@ -193,17 +193,17 @@ public interface StyleVisitor {
      * @param halo the halo to visit
      */
     void visit(Halo halo);
-    
+
     /**
      * Called when accept is called on a raster color map
-     * 
+     *
      * @param colorMap the color map to visit
      */
     void visit(ColorMap colorMap);
-    
+
     /**
      * Called when accept is called on a raster color map entry
-     * 
+     *
      * @param colorMapEntry the color map to visit
      */
     void visit(ColorMapEntry colorMapEntry);

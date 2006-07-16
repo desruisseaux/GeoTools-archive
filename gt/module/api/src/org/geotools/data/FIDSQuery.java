@@ -15,22 +15,21 @@
  */
 package org.geotools.data;
 
-import java.net.URI;
-import java.util.Arrays;
-
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import java.net.URI;
+import java.util.Arrays;
 
 
 /**
  * Implementation for Query.FIDS.
- * 
+ *
  * <p>
  * This query is used to retrive FeatureIds. Query.FIDS is the only instance of
  * this class.
  * </p>
- * 
+ *
  * <p>
  * Example:
  * </p>
@@ -97,7 +96,7 @@ class FIDSQuery implements Query {
     /**
      * Equality based on propertyNames, maxFeatures, filter, typeName and
      * version.
-     * 
+     *
      * <p>
      * Changing the handle does not change the meaning of the Query.
      * </p>
@@ -161,7 +160,7 @@ class FIDSQuery implements Query {
         return null;
     }
 
-	public SortBy[] getSortBy() {
-		return SortBy.UNSORTED;
-	}
+    public SortBy[] getSortBy() {
+        return SortBy.UNSORTED;
+    }
 }

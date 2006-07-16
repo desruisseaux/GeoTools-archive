@@ -15,6 +15,7 @@
  */
 package org.geotools.data;
 
+
 /**
  * Thrown when there is an error in a datasource.
  * <p>
@@ -22,7 +23,7 @@ package org.geotools.data;
  * was available for IOException. Since this class is used to pass on
  * problems from external services, providing the root cause is
  * important.
- * </p> 
+ * </p>
  * @source $URL$
  */
 public class DataSourceException extends java.io.IOException {

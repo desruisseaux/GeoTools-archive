@@ -17,7 +17,6 @@ package org.geotools.filter;
 
 import org.geotools.feature.Feature;
 import org.opengis.filter.FeatureId;
-
 import java.util.Collection;
 
 
@@ -38,7 +37,7 @@ public interface FidFilter extends Filter, FeatureId {
      *
      * @return <tt>true</tt> if the feature's ID matches an fid held by this
      *         filter, <tt>false</tt> otherwise.
-     *         
+     *
      * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
     boolean contains(Feature feature);

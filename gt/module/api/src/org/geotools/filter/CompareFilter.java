@@ -60,7 +60,7 @@ public interface CompareFilter extends Filter, BinaryComparisonOperator {
      * @throws IllegalFilterException Filter is not internally consistent.
      *
      * @task REVISIT: make immutable.
-     * 
+     *
      * @deprecated use {@link BinaryComparisonOperator#setExpression2(Expression)}
      */
     void addRightValue(Expression rightValue) throws IllegalFilterException;
@@ -69,7 +69,7 @@ public interface CompareFilter extends Filter, BinaryComparisonOperator {
      * Gets the left expression.
      *
      * @return The expression on the left of the comparison.
-     * 
+     *
      * @deprecated use {@link BinaryComparisonOperator#getExpression1()}
      */
     Expression getLeftValue();
@@ -78,7 +78,7 @@ public interface CompareFilter extends Filter, BinaryComparisonOperator {
      * Gets the right expression.
      *
      * @return The expression on the right of the comparison.
-     * 
+     *
      * @deprecated use {@link BinaryComparisonOperator#getExpression2()}
      */
     Expression getRightValue();
@@ -89,7 +89,7 @@ public interface CompareFilter extends Filter, BinaryComparisonOperator {
      * @param feature Specified feature to examine.
      *
      * @return Whether or not this feature is inside the filter.
-     * 
+     *
      * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
     boolean contains(Feature feature);

@@ -17,10 +17,11 @@ package org.geotools.styling;
 
 import org.geotools.event.GTComponent;
 
+
 /**
  * 'StyledLayer' is not part of the SLD 1.0 spec. We're currently used it as a
  * parent interface for NamedLayer and UserLayer.
- * 
+ *
  * <p>
  * TODO: investigate why this is here.
  * </p>

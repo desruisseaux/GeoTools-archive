@@ -31,7 +31,7 @@ public interface StyleFactory2 extends StyleFactory {
      * @param halo Describes Halo
      * @param label Expression for label
      * @param labelPlacement Captures label position
-     * @param geometryPropertyName With respect to this geometry 
+     * @param geometryPropertyName With respect to this geometry
      * @param graphic Used to draw a backdrop behind label
      *
      * @return DOCUMENT ME!

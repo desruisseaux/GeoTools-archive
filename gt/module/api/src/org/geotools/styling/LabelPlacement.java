@@ -17,10 +17,11 @@ package org.geotools.styling;
 
 import org.geotools.event.GTComponent;
 
+
 /**
  * The "LabelPlacement" specifies where and how a text label should be rendered
  * relative to a geometry.
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -43,7 +44,7 @@ import org.geotools.event.GTComponent;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * 
+ *
  * <p></p>
  *
  * @author Ian Turton, CCG

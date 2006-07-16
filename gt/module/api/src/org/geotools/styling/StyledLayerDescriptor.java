@@ -22,26 +22,26 @@ import org.geotools.event.GTListener;
 
 /**
  * Holds styling information (from a StyleLayerDescriptor document).
- * 
+ *
  * <p>
  * This interface is bound to version 1.0 of the SLD specification.
  * </p>
- * 
+ *
  * <p>
  * For many of us in geotools this is the reason we came along for the ride - a
  * pretty picture. For documentation on the use of this class please consult
  * the SLD 1.0 specification.
  * </p>
- * 
+ *
  * <p>
  * We may experiment with our own (or SLD 1.1) ideas but will mark such
  * experiments for you. This is only an issue of you are considering writing
  * out these objects for interoptability with other systems.
  * </p>
- * 
+ *
  * <p>
  * General stratagy for supporting multiple SLD versions (and experiments):
- * 
+ *
  * <ul>
  * <li>
  * These interfaces will reflect the current published specification
@@ -130,10 +130,10 @@ public interface StyledLayerDescriptor extends GTComponent {
 
     /**
      * Listens to changes in the Style content.
-     * 
+     *
      * <p>
      * Changes are provided:
-     * 
+     *
      * <ul>
      * <li>
      * Before: deletion
@@ -143,7 +143,7 @@ public interface StyledLayerDescriptor extends GTComponent {
      * </li>
      * </ul>
      * </p>
-     * 
+     *
      * <p>
      * Since the Style data structure can be vast and complicated a trail of
      * breadcrumbs (a delta) is provided to help find your way to the change.
@@ -159,11 +159,11 @@ public interface StyledLayerDescriptor extends GTComponent {
      * @param listener DOCUMENT ME!
      */
     void removeListener(GTListener listener);
-    
+
     /**
      * Used to navigate a Style/SLD.
-     * 
+     *
      * @param visitor
      */
-    void accept(StyleVisitor visitor);    
+    void accept(StyleVisitor visitor);
 }

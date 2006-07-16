@@ -20,17 +20,17 @@ import org.geotools.filter.Filter;
 
 /**
  * A FeatureType aware Feature AttributeType.
- * 
+ *
  * <p>
  * While we could use a plain AttributeType to capture a Feature instance we
  * would miss out one one important aspect: the schema.
  * </p>
- * 
+ *
  * <p>
  * By definition the schema of a Feature is not defined by java interface
  * alone, this interface allows access the the assocaited FeatureType.
  * </p>
- * 
+ *
  * <p>
  * Suggestion: we can look at having this class extend ListFeatureType and
  * exactly specifying how delegation to the getSchema() should occur. (the
@@ -54,7 +54,7 @@ public interface FeatureAttributeType extends AttributeType,
 
     /**
      * Method should return getSchema().duplicate( feature )
-     * 
+     *
      * <p>
      * Exampe implementation:
      * <pre><code>
@@ -69,7 +69,7 @@ public interface FeatureAttributeType extends AttributeType,
 
     /**
      * Method must return type Feature.class.
-     * 
+     *
      * <p>
      * Exampe implementation:
      * <pre><code>
@@ -101,7 +101,7 @@ public interface FeatureAttributeType extends AttributeType,
 
     /**
      * Filter must indicate value is required to be a member of getSchema().
-     * 
+     *
      * <p>
      * TODO: We need a Filter code snipit describing how to enforce the
      * indicated relationship.

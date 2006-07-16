@@ -15,6 +15,7 @@
  */
 package org.geotools.feature;
 
+
 /**
  * Indicates client class has attempted to create an invalid feature.
  * @source $URL$
@@ -22,7 +23,7 @@ package org.geotools.feature;
 public class IllegalAttributeException extends Exception {
     private static final long serialVersionUID = -4964013824521988182L;
 
-	/** The expected attribute type. */
+    /** The expected attribute type. */
     private final AttributeType expected;
 
     /** The object that does not match the expected type. */
@@ -65,14 +66,15 @@ public class IllegalAttributeException extends Exception {
     }
 
     public String toString() {
-    	String message = "IllegalAttribute: " 
-            + ((expected == null) ? "null": expected.getType().getName());
+        String message = "IllegalAttribute: "
+            + ((expected == null) ? "null" : expected.getType().getName());
 
         message += (" , but got "
         + ((invalid == null) ? "null" : invalid.getClass().getName()));
 
         return message;
     }
+
     /**
      * Constructs an error message based on expected and invalid.
      *
@@ -82,8 +84,8 @@ public class IllegalAttributeException extends Exception {
      * @return an error message reporting the problem.
      */
     static String errorMessage(AttributeType expected, Object invalid) {
-        String message = "expected " 
-            + ((expected == null) ? "null": expected.getType().getName());
+        String message = "expected "
+            + ((expected == null) ? "null" : expected.getType().getName());
         message += (" , but got "
         + ((invalid == null) ? "null" : invalid.getClass().getName()));
 

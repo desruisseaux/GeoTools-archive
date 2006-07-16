@@ -15,9 +15,10 @@
  */
 package org.geotools.event;
 
+
 /**
  * Allows for processing of StyleDeltas.
- * 
+ *
  * <p>
  * Example Usage:
  * <pre>

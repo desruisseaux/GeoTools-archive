@@ -15,12 +15,12 @@
  */
 package org.geotools.feature;
 
-//import org.geotools.cs.CoordinateSystem;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
+//import org.geotools.cs.CoordinateSystem;
 import org.geotools.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * A CoordianteSystem aware Geometry AttributeType.
@@ -43,29 +43,29 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * It is recomended that the CoordinateSystem GeometryFactory also
  * supply the CoordinateSystem as the value for Geometry.getUserData().
  * </p>
- * 
+ *
  * @author Jody Garnett, Refractions Research, Inc.
  * @source $URL$
  */
-public interface GeometryAttributeType extends AttributeType, PrimativeAttributeType {
+public interface GeometryAttributeType extends AttributeType,
+    PrimativeAttributeType {
+    /**
+     * Type must be an sub type of Geometry.class.
+     * <p>
+     * If this was java I would say Class<X extends Geometry>.
+     * Warning this will need revisiting for Geotools 2.2 when
+     * GeoAPI Geometry enters use.
+     * </p>
+     * @see org.geotools.feature.AttributeType#getType()
+     */
+    Class getType();
 
-	/**
-	 * Type must be an sub type of Geometry.class.
-	 * <p>
-	 * If this was java I would say Class<X extends Geometry>.
-	 * Warning this will need revisiting for Geotools 2.2 when
-	 * GeoAPI Geometry enters use.
-	 * </p>
-	 * @see org.geotools.feature.AttributeType#getType()
-	 */
-	Class getType();
-
-	/**
-	 * Restriction is assumed to be in agreement with Geometry class indicated.
-	 * 
-	 * @see org.geotools.feature.AttributeType#getRestriction()
-	 */
-	Filter getRestriction();
+    /**
+     * Restriction is assumed to be in agreement with Geometry class indicated.
+     *
+     * @see org.geotools.feature.AttributeType#getRestriction()
+     */
+    Filter getRestriction();
 
     /**
      * Retrieve the CS_CoordinateSystem used by this GeometryAttributeType.
@@ -74,33 +74,32 @@ public interface GeometryAttributeType extends AttributeType, PrimativeAttribute
      * that is used for creating new content. By extension this includes the SRID,
      * PercisionModel and CoordinateSequenceFactory information.
      * </p>
-     * 
+     *
      * @return CS_CoordinateSystem for this GeometryAttributeType
      */
     public CoordinateReferenceSystem getCoordinateSystem();
-    
+
     /**
      * The Geometryfactory used for creating new content.
      * <p>
      * Replace with the following code:<pre><code>
      * Map hints = new HashMap();
-     * hints.put( CoordinateReferneceSystem.class, type.getCoordinateSystem() ); 
+     * hints.put( CoordinateReferneceSystem.class, type.getCoordinateSystem() );
      * GeometryFactory gf = FactoryFinder.getGeometryFactory( Map hints );
-     * 
+     *
      * // You can now use gf create methods
      * </code></pre>
-     * 
+     *
      * @return GeometryFactory used for new Content
      * @deprecated Please use GeometrFactory associated with your FeatureFactory
      * using the hinting system.
      */
-    public GeometryFactory getGeometryFactory();     
-    
+    public GeometryFactory getGeometryFactory();
+
     /**
      * Must return <code>true</code>
      * @deprecated replace with type instnaceof GeometryAttribtueType
-	 * @see org.geotools.feature.AttributeType#isGeometry()
-	 */
-	boolean isGeometry();
-
+     * @see org.geotools.feature.AttributeType#isGeometry()
+     */
+    boolean isGeometry();
 }

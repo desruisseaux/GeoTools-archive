@@ -17,6 +17,7 @@ package org.geotools.data.collection;
 
 import java.util.List;
 
+
 /**
  * List support close( iterator ) used to handle heavyweight resources.
  * <p>
@@ -25,13 +26,13 @@ import java.util.List;
  * @author Jody Garnett, Refractions Research Inc.
  */
 public interface ResourceList extends List, ResourceCollection {
-	/**
-	 * Remove indicated range.
-	 * <p>
-	 * This is used by subList( fromIndex, toIndex ).clear() for
-	 * efficient removal, based on the JDK api for AbstractList.
-	 * @param fromIndex
-	 * @param toIndex
-	 */
-    void removeRange( int fromIndex, int toIndex );
+    /**
+     * Remove indicated range.
+     * <p>
+     * This is used by subList( fromIndex, toIndex ).clear() for
+     * efficient removal, based on the JDK api for AbstractList.
+     * @param fromIndex
+     * @param toIndex
+     */
+    void removeRange(int fromIndex, int toIndex);
 }

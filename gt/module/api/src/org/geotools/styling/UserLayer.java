@@ -21,7 +21,7 @@ import org.geotools.feature.FeatureType;
 
 /**
  * A UserLayer allows a user-defined layer to be built from WFS and WCS data.
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -69,11 +69,11 @@ public interface UserLayer extends StyledLayer {
     public void setUserStyles(Style[] styles);
 
     public void addUserStyle(Style style);
-    
+
     /**
      * Used to navigate a Style/SLD.
-     * 
+     *
      * @param visitor
      */
-    void accept(StyleVisitor visitor);    
+    void accept(StyleVisitor visitor);
 }

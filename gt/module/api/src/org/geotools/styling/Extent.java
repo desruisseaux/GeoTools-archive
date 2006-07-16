@@ -20,7 +20,7 @@ import org.geotools.event.GTComponent;
 
 /**
  * An Extent gives feature/coverage/raster/matrix dimension extent.
- * 
+ *
  * <p>
  * <pre>
  *  <code>
@@ -35,7 +35,7 @@ import org.geotools.event.GTComponent;
  *              &lt;xsd:element ref="sld:Value"/&gt;
  *          &lt;/xsd:sequence&gt;
  *      &lt;/xsd:complexType&gt;
- *  &lt;/xsd:element&gt; 
+ *  &lt;/xsd:element&gt;
  *  </code>
  *  </pre>
  * </p>

@@ -15,9 +15,9 @@
  */
 package org.geotools.styling;
 
+import org.geotools.event.GTComponent;
 import java.util.List;
 
-import org.geotools.event.GTComponent;
 
 /**
  * How to style a feature type.  This is introduced as a convenient package
@@ -60,19 +60,24 @@ import org.geotools.event.GTComponent;
  */
 public interface FeatureTypeStyle extends GTComponent {
     public String getName();
+
     void setName(String name);
+
     public String getTitle();
+
     void setTitle(String title);
+
     public String getAbstract();
+
     void setAbstract(String abstractStr);
-    
+
     /**
      * Only features with the type name returned by this method should
      * be styled by this feature type styler.
      * @return The name of types that this styler applies to
      */
     String getFeatureTypeName();
-    
+
     /**
      * Sets the type name of the features that this styler should be
      * applied to.
@@ -80,10 +85,10 @@ public interface FeatureTypeStyle extends GTComponent {
      * @param name The TypeName of the features to be styled by this instance.
      */
     void setFeatureTypeName(String name);
-    
+
     /**
      * The SemanticTypeIdentifiers is experimental and is intended to be used
-     * to identify, using a community-controlled name(s), what the style is 
+     * to identify, using a community-controlled name(s), what the style is
      * suitable to be used for.
      * For example, a single style may be suitable to use with many
      * different feature types.  The syntax of the SemanticTypeIdentifiers
@@ -91,18 +96,18 @@ public interface FeatureTypeStyle extends GTComponent {
      * "generic:polygon", "generic:point", "generic:text",
      * "generic:raster", and "generic:any" are reserved to indicate
      * that a FeatureTypeStyle may be used with any feature type
-     * with the corresponding default geometry type (i.e., no feature 
+     * with the corresponding default geometry type (i.e., no feature
      * properties are referenced in the feature type style).
-     * 
+     *
      *
      * @return An array of strings representing systematic types which
      *         could be styled by this instance.
      **/
     String[] getSemanticTypeIdentifiers();
-    
-        /**
+
+    /**
      * The SemanticTypeIdentifiers is experimental and is intended to be used
-     * to identify, using a community-controlled name(s), what the style is 
+     * to identify, using a community-controlled name(s), what the style is
      * suitable to be used for.
      * For example, a single style may be suitable to use with many
      * different feature types.  The syntax of the SemanticTypeIdentifiers
@@ -110,15 +115,15 @@ public interface FeatureTypeStyle extends GTComponent {
      * "generic:polygon", "generic:point", "generic:text",
      * "generic:raster", and "generic:any" are reserved to indicate
      * that a FeatureTypeStyle may be used with any feature type
-     * with the corresponding default geometry type (i.e., no feature 
+     * with the corresponding default geometry type (i.e., no feature
      * properties are referenced in the feature type style).
-     * 
+     *
      *
      * @param types An array of strings representing systematic types which
      *         could be styled by this instance.
      **/
     void setSemanticTypeIdentifiers(String[] types);
-    
+
     /**
      * Rules govern the appearance of any given feature to be styled by
      * this styler.  Each rule contains conditions based on scale and
@@ -130,7 +135,7 @@ public interface FeatureTypeStyle extends GTComponent {
      * @return The full set of rules contained in this styler.
      */
     Rule[] getRules();
-    
+
     /**
      * Rules govern the appearance of any given feature to be styled by
      * this styler.  Each rule contains conditions based on scale and
@@ -140,8 +145,9 @@ public interface FeatureTypeStyle extends GTComponent {
      * @param rules The set of rules to be set for this styler.
      */
     void setRules(Rule[] rules);
+
     void addRule(Rule rule);
-    
+
     /**
      * Rules govern the appearance of any given feature to be styled by
      * this styler.
@@ -151,8 +157,6 @@ public interface FeatureTypeStyle extends GTComponent {
      * @since GeoTools 2.2.M3, GeoAPI 2.0
      */
     List rules();
-    
-    void accept(StyleVisitor visitor);
-    
-}
 
+    void accept(StyleVisitor visitor);
+}

@@ -35,7 +35,7 @@ public interface LiteralExpression extends Expression, Literal {
      * @param literal The literal to store inside this expression.
      *
      * @throws IllegalFilterException This literal type is not in scope.
-     * 
+     *
      * @deprecated use {@link Literal#setValue(Object)}
      */
     void setLiteral(Object literal) throws IllegalFilterException;
@@ -47,7 +47,7 @@ public interface LiteralExpression extends Expression, Literal {
      *
      * @return the literal held by this expression.  Ignores the passed in
      *         feature.
-     *         
+     *
      * @deprecated use {@link Expression#evaluate(Feature)}.
      */
     Object getValue(Feature feature);
@@ -63,7 +63,7 @@ public interface LiteralExpression extends Expression, Literal {
      * Retrieves the literal of this expression.
      *
      * @return the literal held by this expression.
-     * 
+     *
      * @deprecated use {@link Literal#getValue()}.
      */
     Object getLiteral();

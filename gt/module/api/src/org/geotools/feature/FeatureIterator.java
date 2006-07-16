@@ -43,7 +43,7 @@ public interface FeatureIterator {
      * @throws java.util.NoSuchElementException If no more Features exist.
      */
     public Feature next() throws java.util.NoSuchElementException;
-    
+
     /**
      * Required so FeatureCollection classes can implement close( FeatureIterator ).
      */

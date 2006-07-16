@@ -18,13 +18,13 @@ package org.geotools.event;
 
 /**
  * Captures changes to Style.
- * 
+ *
  * <p>
  * The "delta" acts as a series of bread crumbs allowing you the listener to
  * figure out what changed where. The <b>Type</b> answers that other peskey
  * question: when.
  * </p>
- * 
+ *
  * <p>
  * You should be warned that deltas may also be "saved up" for a rainy day,
  * this keeps user interfaces from being flooded with a cascade of events. The
@@ -38,7 +38,6 @@ package org.geotools.event;
  * @source $URL$
  */
 public interface GTEvent {
-	
     /**
      * Returns a delta, from the root, describing the set of changes that
      * happened.
@@ -94,7 +93,7 @@ public interface GTEvent {
          * @see #getType()
          */
         public static final Type PRE_DELETE = new Type();
-        
+
         /**
          * Event type indicating a before-the-fact report
          * of the impending closure of a single construct.

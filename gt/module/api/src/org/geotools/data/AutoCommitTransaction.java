@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * This is used to represent the absense of a Transaction and the use of
  * AutoCommit.
- * 
+ *
  * <p>
  * This class serves as the implementation of the constant Transaction.NONE.
  * It is a NullObject and we feel no need to make this class public.
@@ -32,7 +32,7 @@ import java.util.Set;
 class AutoCommitTransaction implements Transaction {
     /**
      * Authorization IDs are not stored by AutoCommit.
-     * 
+     *
      * <p>
      * Authorization IDs are only stored for the duration of a Transaction.
      * </p>
@@ -48,7 +48,7 @@ class AutoCommitTransaction implements Transaction {
 
     /**
      * AutoCommit does not save State.
-     * 
+     *
      * <p>
      * While symetry would be good, state should be commited not stored for
      * later.
@@ -66,7 +66,7 @@ class AutoCommitTransaction implements Transaction {
 
     /**
      * AutoCommit does not save State.
-     * 
+     *
      * <p>
      * While symetry would be good, state should be commited not stored for
      * later.
@@ -83,7 +83,7 @@ class AutoCommitTransaction implements Transaction {
 
     /**
      * I am not sure should AutoCommit be able to save sate?
-     * 
+     *
      * <p>
      * While symetry would be good, state should be commited not stored for
      * later.
@@ -103,7 +103,7 @@ class AutoCommitTransaction implements Transaction {
 
     /**
      * Implemented as a NOP since this Transaction always commits.
-     * 
+     *
      * <p>
      * This allows the following workflow:
      * </p>
@@ -144,7 +144,7 @@ class AutoCommitTransaction implements Transaction {
 
     /**
      * Authorization IDs are not stored by AutoCommit.
-     * 
+     *
      * <p>
      * Authorization IDs are only stored for the duration of a Transaction.
      * </p>
@@ -160,7 +160,7 @@ class AutoCommitTransaction implements Transaction {
 
     /**
      * AutoCommit does not save State.
-     * 
+     *
      * <p>
      * While symetry would be good, state should be commited not stored for
      * later.

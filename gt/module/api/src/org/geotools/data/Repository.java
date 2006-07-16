@@ -23,11 +23,11 @@ import java.util.SortedMap;
 
 /**
  * Provides a Repository of available FeatureTypes allowing Catalog metadata queries.
- * 
+ *
  * <p>
  * Currently GeoServer is providing requirements:
  * </p>
- * 
+ *
  * <ul>
  * <li>
  * Manage cross DataStore concepts (like Locks)
@@ -39,26 +39,25 @@ import java.util.SortedMap;
  * @source $URL$
  */
 public interface Repository {
-	
     /**
-     * All FeatureSources by typeRef ( aka dataStoreId:typeName) 
+     * All FeatureSources by typeRef ( aka dataStoreId:typeName)
      */
     public SortedMap getFeatureSources();
-    
+
     /**
      * Retrieve Set of Namespaces prefixes registered by DataStores in this
      * Catalog.
-     * 
+     *
      * <p>
      * Namespace seems to be the gml prefix used when writing out GML. We may
      * need to promote this to a "first class" object.
      * </p>
-     * 
+     *
      * <p>
      * GeoServer maintains the following information in a  NamespaceInfo
      * object:
      * </p>
-     * 
+     *
      * <ul>
      * <li>
      * prefix: uml prefix representing the namespace
@@ -70,7 +69,7 @@ public interface Repository {
      * default: true if this is the "Default" namespace for the Catalog
      * </li>
      * </ul>
-     * 
+     *
      * <p>
      * GeoServer global.Data implements this interface. You may use the
      * namespace strings returned by this method to look up NamespaceInfo
@@ -85,8 +84,9 @@ public interface Repository {
      * The default Namespace prefix for this Catalog.
      * @return Namespace prefix to be used as a default
      */
+
     //String getDefaultPrefix();    
-    
+
     /**
      * FeatureSoruce access.
      * </p>
@@ -94,39 +94,41 @@ public interface Repository {
      * @param typeName
      * @return
      */
-    FeatureSource source( String dataStoreId, String typeName ) throws IOException;
+    FeatureSource source(String dataStoreId, String typeName)
+        throws IOException;
 
     /**
      * Registers all FeatureTypes provided by dataStore with this catalog
      * service.
-     * 
+     *
      * <p>
      * Catalog can be seen as aggregating multiple DataStores and providing
      * higher level functionality. Such as derived metadata like lat long
      * bounding box information.
      * </p>
-     * 
+     *
      * <p>
      * The Catalog may choose to supplement the information provided by the
      * DataStore with information provided from elsewhere (like config files).
      * </p>
-     * 
+     *
      * <p>
      * The namespace declared by the FeatureTypes will be lazly created if it
      * has not already been provided. There may be no duplication of typeName
      * within one Namespace.
      * </p>
-     * 
+     *
      * @param namespace Catalog namespace
      * @param dataStore Datastore providing FeatureTypes
      *
      * @throws IOException If registration fails such as for namespace conflict
      */
+
     //void register( String dataStoreId, DataStore dataStore) throws IOException;
 
     /**
      * Access to the DataStores registed to this Catalog.
-     * 
+     *
      * @return Map of registered dataStoreId:DataStore
      */
     Map getDataStores();
@@ -134,10 +136,10 @@ public interface Repository {
     //
     // Lock Management
     //
-    
+
     /**
      * Refresh feature lock as indicated by the WFS locking specification.
-     * 
+     *
      * <p>
      * Refresh the indicated locks for each each DataStore managed by this
      * Catalog.
@@ -172,7 +174,7 @@ public interface Repository {
 
     /**
      * Tests if a lock exists in this Catalog.
-     * 
+     *
      * <p>
      * This method will search all the DataStores to see if the indicated lock
      * exists.

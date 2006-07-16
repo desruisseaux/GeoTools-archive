@@ -43,7 +43,7 @@ import org.geotools.filter.Filter;
  * missing MinScale means there is no lower bound to the scale-denominator
  * range (lim[x->0+](x)), and a missing MaxScale means there is no upper bound
  * (infinity).  0.28mm
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC

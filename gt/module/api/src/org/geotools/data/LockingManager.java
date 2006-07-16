@@ -20,12 +20,12 @@ import java.io.IOException;
 
 /**
  * This class describes a featureID based locking service.
- * 
+ *
  * <p>
  * AbstractFeatureLocking, and others, may use this API to request locks on the
  * basis of FeatureID.
  * </p>
- * 
+ *
  * <p>
  * This class is also used as a public api to manage locks.
  * </p>
@@ -36,7 +36,7 @@ import java.io.IOException;
 public interface LockingManager {
     /**
      * Check if any locks exist held by the authorization <code>lockID</code>.
-     * 
+     *
      * <p>
      * (remember that the lock may have expired)
      * </p>
@@ -49,7 +49,7 @@ public interface LockingManager {
 
     /**
      * Release locks held by the authorization <code>lockID</code>.
-     * 
+     *
      * <p>
      * (remember that the lock may have expired)
      * </p>
@@ -66,12 +66,12 @@ public interface LockingManager {
 
     /**
      * Refresh locks held by the authorization <code>lockID</code>.
-     * 
+     *
      * <p>
      * All features locked with the provied <code>lockID</code> will be locked
      * for additional time (the origional duration requested).
      * </p>
-     * 
+     *
      * <p>
      * (remember that the lock may have expired)
      * </p>

@@ -42,9 +42,9 @@ public interface MathExpression extends Expression, BinaryExpression {
      * @param feature Feature to use when return sub expression values.
      *
      * @return Value of this expression.
-     * 
+     *
      * @deprecated use {@link Expression#evaluate(Feature)}.
-     * 
+     *
      */
     Object getValue(Feature feature);
 
@@ -63,7 +63,7 @@ public interface MathExpression extends Expression, BinaryExpression {
      * Gets the type of this expression.
      *
      * @return Expression type.
-     * @deprecated The expression type system has been replaced by an actual 
+     * @deprecated The expression type system has been replaced by an actual
      * class type system.
      */
     short getType();
@@ -90,7 +90,7 @@ public interface MathExpression extends Expression, BinaryExpression {
      * @param leftValue Expression to add to this expression.
      *
      * @throws IllegalFilterException Attempting to add non-math expression.
-     * 
+     *
      * @deprecated use {@link BinaryExpression#setExpression1(Expression)}
      */
     void addLeftValue(Expression leftValue) throws IllegalFilterException;

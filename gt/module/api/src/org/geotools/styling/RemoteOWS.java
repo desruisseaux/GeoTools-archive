@@ -15,9 +15,10 @@
  */
 package org.geotools.styling;
 
+
 /**
  * A RemoteOWS gives a reference to a remote WFS/WCS/other-OWS server.
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -26,7 +27,7 @@ package org.geotools.styling;
  * &lt;xsd:element name="RemoteOWS"&gt;
  *   &lt;xsd:annotation&gt;
  *     &lt;xsd:documentation&gt;
- *       A RemoteOWS gives a reference to a remote WFS/WCS/other-OWS server. 
+ *       A RemoteOWS gives a reference to a remote WFS/WCS/other-OWS server.
  *     &lt;/xsd:documentation&gt;
  *   &lt;/xsd:annotation&gt;
  *   &lt;xsd:complexType&gt;
@@ -38,19 +39,18 @@ package org.geotools.styling;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * 
+ *
  * <p></p>
  *
  * @author James Macgill
  * @source $URL$
  */
 public interface RemoteOWS {
-    
-	String getService();
-    
-	void setService(String service);
-		
+    String getService();
+
+    void setService(String service);
+
     String getOnlineResource();
-    
+
     void setOnlineResource(String onlineResource);
 }

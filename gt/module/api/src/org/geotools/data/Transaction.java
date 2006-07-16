@@ -21,23 +21,23 @@ import java.util.Set;
 
 /**
  * The controller for Transaction with FeatureStore.
- * 
+ *
  * <p>
  * Shapefiles, databases, etc. are safely modified with the assistance of this
  * interface. Transactions are also to provide authorization when working with
  * locked features.
  * </p>
- * 
+ *
  * <p>
  * All opperations are considered to be working against a Transaction.
  * Transaction.AUTO_COMMIT is used to represent an immidiate mode where
  * requests are immidately commited.
  * </p>
- * 
+ *
  * <p>
  * For more information please see DataStore and FeatureStore.
  * </p>
- * 
+ *
  * <p>
  * Example Use:
  * </p>
@@ -47,14 +47,14 @@ import java.util.Set;
  * try {
  *     FeatureStore road = (FeatureStore) store.getFeatureSource("road");
  *     FeatureStore river = (FeatureStore) store.getFeatureSource("river");
- * 
+ *
  *     road.setTransaction( t );
  *     river.setTransaction( t );
- * 
+ *
  *     t.addAuthorization( lockID );  // provide authoriztion
  *     road.removeFeatures( filter ); // opperate against transaction
  *     river.removeFeature( filter ); // opperate against transaction
- * 
+ *
  *     t.commit(); // commit opperations
  * }
  * catch (IOException io){
@@ -85,7 +85,7 @@ import java.util.Set;
  *     <li>InProcessLockingManager.FeatureLock (stored by LockingManger):
  *         Used for per transaction FeatureLocks, used to free locked features
  *         on Transaction commit/rollback.
- *         </li>  
+ *         </li>
  *     </ul>
  *     These instances of Transaction state may make use of any hint provided
  *     to Transaction.putProperty( key, value ) when they are connected with
@@ -94,11 +94,11 @@ import java.util.Set;
  *     addAuthroization(String) callback invoked with the value of lockID</li>
  * <li>FeatureStore.removeFeatures methods are called on the two DataStores.
  *     <ul>
- *     <li>PostgisFeatureStore.removeFeatures(fitler) handles opperation 
+ *     <li>PostgisFeatureStore.removeFeatures(fitler) handles opperation
  *         without delegation.
  *         </li>
  *     <li>Most removeFeature(filter) implementations use the implementation
- *         provided by AbstractFeatureStore which delegates to FeatureWriter. 
+ *         provided by AbstractFeatureStore which delegates to FeatureWriter.
  *         </li>
  *     </ul>
  *     Any of these opperations may make use of the
@@ -108,7 +108,7 @@ import java.util.Set;
  *     to applyDiff maps, or commit various connections.
  *     </li>
  * <li>The transaction is closed, all of the Transaction.State methods have
- *     there Transaction.State.setTransaction( null ) called, giving them a 
+ *     there Transaction.State.setTransaction( null ) called, giving them a
  *     chance to clean up diffMaps, or return connections to the pool.
  *     </li>
  * </ol>
@@ -118,7 +118,6 @@ import java.util.Set;
  * @version $Id$
  */
 public interface Transaction {
-     
     /** Represents AUTO_COMMIT Mode */
     static final Transaction AUTO_COMMIT = new AutoCommitTransaction();
 
@@ -127,26 +126,26 @@ public interface Transaction {
     //
     /**
      * Retrive a Transaction property held by this transaction.
-     * 
+     *
      * <p>
      * This may be used to provide hints to DataStore implementations, it
      * opperates as a blackboard for client, FeatureSource communication.
      * </p>
-     *   
+     *
      * <p>
      * If this proves successful addAuthorization/getAuthorization will be
      * replaced with this mechanism.
-     * </p> 
+     * </p>
      */
-    Object getProperty( Object key );
-    
+    Object getProperty(Object key);
+
     /**
      * List of Authorizations IDs held by this transaction.
-     * 
+     *
      * <p>
      * This list is reset by the next call to commit() or rollback().
      * </p>
-     * 
+     *
      * <p>
      * Authorization IDs are used to provide FeatureLock support.
      * </p>
@@ -158,7 +157,7 @@ public interface Transaction {
     /**
      * Allows FeatureSource to squirel away information( and callbacks ) for
      * later.
-     * 
+     *
      * <p>
      * The most common example is a JDBC DataStore saving the required
      * connection for later opperations.
@@ -171,7 +170,7 @@ public interface Transaction {
      *     public rollback(){ conn.rollback(); }
      * }
      * </code></pre>
-     * 
+     *
      * <p>
      * putState will call State.setTransaction( transaction ) to allow State a
      * chance to configure itself.
@@ -185,12 +184,12 @@ public interface Transaction {
     /**
      * Allows FeatureSources to clean up information ( and callbacks ) they
      * earlier provided.
-     * 
+     *
      * <p>
      * Care should be taken when using shared State to not remove State
      * required by another FeatureSources.
      * </p>
-     * 
+     *
      * <p>
      * removeState will call State.setTransaction( null ) to allow State a
      * chance cleanup after itself.
@@ -203,7 +202,7 @@ public interface Transaction {
     /**
      * Allows DataStores to squirel away information( and callbacks ) for
      * later.
-     * 
+     *
      * <p>
      * The most common example is a JDBC DataStore saving the required
      * connection for later opperations.
@@ -221,7 +220,7 @@ public interface Transaction {
     /**
      * Makes all transactions made since the previous commit/rollback
      * permanent.
-     * 
+     *
      * <p>
      * FeatureSources will need to issue any changes notifications using a
      * FeatureEvent.FEATURES_CHANGED to all FeatureSources with the same
@@ -238,7 +237,7 @@ public interface Transaction {
 
     /**
      * Undoes all transactions made since the last commit or rollback.
-     * 
+     *
      * <p>
      * FeatureSources will need to issue any changes notifications using a
      * FeatureEvent.FEATURES_CHANGED. This will need to be issued to all
@@ -259,21 +258,21 @@ public interface Transaction {
 
     /**
      * Provides an Authorization ID for this Transaction.
-     * 
+     *
      * <p>
      * All proceeding modifyFeatures,removeFeature, unLockFeatures, refreshLock
      * and ReleaseLock operations will make use of the provided authorization.
      * </p>
-     * 
+     *
      * <p>
      * Authorization is only maintained until the this Transaction is commited
      * or rolledback.
      * </p>
-     * 
+     *
      * <p>
      * That is operations will only succeed if affected features either:
      * </p>
-     * 
+     *
      * <ul>
      * <li>
      * not locked
@@ -282,7 +281,7 @@ public interface Transaction {
      * locked with the provided authID
      * </li>
      * </ul>
-     * 
+     *
      * <p>
      * Authorization ID is provided as a String, rather than a FeatureLock, to
      * account for across process lock use.
@@ -294,15 +293,14 @@ public interface Transaction {
 
     /**
      * Provides a Transaction property for this Transasction.
-     * 
+     *
      * <p>
      * All proceeding FeatureSource (for FeatureReader/Writer) opperations may
      * make use of the provided property.
      * </p>
      */
-    void putProperty( Object key, Object value ) throws IOException;
-    
-     
+    void putProperty(Object key, Object value) throws IOException;
+
     /**
      * Provides an oppertunity for a Transaction to free an State it maintains.
      * <p>
@@ -317,11 +315,11 @@ public interface Transaction {
      * @throws IOException
      */
     void close() throws IOException;
-    
+
     /**
      * DataStore implementations can use this interface to externalize the
      * state they require to implement Transaction Support.
-     * 
+     *
      * <p>
      * The commit and rollback methods will be called as required. The
      * intension is that several DataStores can share common transaction state
@@ -337,13 +335,13 @@ public interface Transaction {
     static public interface State {
         /**
          * Provides configuration information for Transaction.State
-         * 
+         *
          * <p>
          * setTransaction is called with non null <code>transaction</code> when
          * Transaction.State is <code>putState</code> into a Transaction. This
          * tranasction will be used to determine correct event notification.
          * </p>
-         * 
+         *
          * <p>
          * setTransaction is called with <code>null</code> when removeState is
          * called (usually during Transaction.close() ).

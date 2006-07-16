@@ -45,7 +45,8 @@ public interface SelectedChannelType extends GTComponent {
     public void setContrastEnhancement(Expression gammaValue);
 
     public void setContrastEnhancement(ContrastEnhancement enhancement);
-    
+
     public ContrastEnhancement getContrastEnhancement();
+
     //public Expression getContrastEnhancement();
 }

@@ -17,6 +17,7 @@ package org.geotools.styling;
 
 import org.geotools.event.GTComponent;
 
+
 /**
  * The ColorMap element defines either the colors of a palette-type raster
  * source or the mapping of  fixed-numeric pixel values to colors.
@@ -54,6 +55,6 @@ public interface ColorMap extends GTComponent {
     public int getType();
 
     public void setType(int type);
-    
+
     void accept(StyleVisitor visitor);
 }

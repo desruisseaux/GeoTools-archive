@@ -21,12 +21,12 @@ import java.util.List;
 
 /**
  * Indicates which style constructs have been changed.
- * 
+ *
  * <p>
  * Acts as a series of breadcrumbs stored up by a StyleEvent to communicate
  * changes.
  * </p>
- * 
+ *
  * <p>
  * This delta is constructed a fashion following the outline of the style
  * document, allowing you to skip over entire branches of changes if you are
@@ -45,7 +45,7 @@ import java.util.List;
  * </code></pre>
  * These roles are allegorical in nature any may be played
  * in real life by arrays, beans, collections, etc..
- * (as example StyleLayerDescriptor is a "Root"). 
+ * (as example StyleLayerDescriptor is a "Root").
  * </p>
  * <p>
  * Example 0: An <b>Child</b> is changed.
@@ -59,7 +59,7 @@ import java.util.List;
  * name of "Child". The oldChild is provided incase you need to
  * un-listen or something. Parent is not considered to have
  * changed itself (it is still has the same structure).
- * </p> 
+ * </p>
  * <p>
  * Example 1: An <b>Element</b> is changed:
  * <pre><code>
@@ -116,7 +116,7 @@ import java.util.List;
  *    +---Delta1 "" -1 CHANGED(Root,null,)
  * </code></pre>
  * Something changed somewhere, similar to "touch".
- * </p> 
+ * </p>
  * <p>
  * Example 7: Shutting Down
  * <pre><code>
@@ -135,16 +135,15 @@ import java.util.List;
  * @source $URL$
  */
 public interface GTDelta {
-	
     /** List indicating no children are present */
     public static final List NO_CHILDREN = Collections.EMPTY_LIST;
-    
+
     /** Index position is not to be considered relevent */
     public static final int NO_INDEX = -1;
-    
+
     /**
      * Returns the kind of this delta.
-     * 
+     *
      * <p>
      * Normally, one of <code>ADDED</code>, <code>REMOVED</code> or
      * <code>CHANGED</code>.
@@ -161,25 +160,25 @@ public interface GTDelta {
     /**
      * Affected construct, getKind & getChildern
      * indicate specific details of the change.
-     * 
+     *
      * @return Affected construct
      */
     public Object getValue();
 
     /**
      * Construct being replaced with a changed, getValue is the replacing value.
-     * 
+     *
      * @return Affected construct
      */
     public Object getOldValue();
-    
+
     /**
      * Position in a "list" where the change occured, or NO_INDEX.
-     * 
+     *
      * @return Position in "list" or NO_INDEX.
      */
     public int getPosition();
-    
+
     /**
      * Name of property being affected.
      * <p>
@@ -194,7 +193,7 @@ public interface GTDelta {
      * @return name of affected Child, or <code>null</code> for root
      */
     public String getName();
-    
+
     /**
      * Finds and returns deltas for specificly changed constructs.
      * <p>
@@ -263,7 +262,7 @@ public interface GTDelta {
          * Since REMOVED deltas are sent before the delete is performed
          * getValue is still valid.
          * </p>
-         * 
+         *
          * @see getKind()
          */
         public static final Kind REMOVED = new Kind();

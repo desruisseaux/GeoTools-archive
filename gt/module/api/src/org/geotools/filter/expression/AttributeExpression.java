@@ -38,13 +38,12 @@ public interface AttributeExpression extends Expression, PropertyName {
      * @param attributePath A string of the path.
      *
      * @throws IllegalFilterException if the path is not valid.
-     * 
+     *
      * @deprecated use {@link PropertyName#setPropertyName(String)}
-     * 
+     *
      */
     void setAttributePath(String attributePath) throws IllegalFilterException;
 
-    
     /**
      * Gets the attribute value at the path held by this expression from the
      * feature.
@@ -52,7 +51,7 @@ public interface AttributeExpression extends Expression, PropertyName {
      * @param feature the feature to get this attribute from.
      *
      * @return the value of the attribute found by this expression.
-     * 
+     *
      * @deprecated use {@link org.opengis.filter.expression.Expression#evaluate(Feature)()}
      */
     Object getValue(Feature feature);
@@ -61,7 +60,7 @@ public interface AttributeExpression extends Expression, PropertyName {
      * Gets the attribute path of this expression.
      *
      * @return the attribute to be queried.
-     * 
+     *
      * @deprecated use {@link PropertyName#getPropertyName()}
      */
     String getAttributePath();

@@ -33,7 +33,7 @@ public interface EnvironmentVariable extends Expression {
      * @param feature the feature to get this attribute from.
      *
      * @return the value of the attribute found by this expression.
-     * 
+     *
      * @deprecated use {@link org.opengis.filter.expression.Expression#evaluate(Object)}
      */
     Object getValue(Feature feature);

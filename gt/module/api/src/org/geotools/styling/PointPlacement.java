@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2002, Center for Computational Geography
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -25,7 +25,7 @@ import org.geotools.filter.expression.Expression;
 /**
  * A PointPlacement specifies how a text label is positioned relative to a
  * geometric point.
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -48,7 +48,7 @@ import org.geotools.filter.expression.Expression;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * 
+ *
  * <p>
  * $Id$
  * </p>

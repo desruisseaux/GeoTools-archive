@@ -15,26 +15,26 @@
  */
 package org.geotools.data;
 
-import java.net.URI;
-
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import java.net.URI;
+
 
 /**
  * Encapsulates a data request.
- * 
+ *
  * <p>
  * The query object is used by the FeatureSource.getFeatures(Query) to
  * encapsulate a request. For this use it the
  * FeatureSource.getSchema().getTypeName() should match the one provided by
  * the Query, or the Query should not provide one.
  * </p>
- * 
+ *
  * <p>
  * Suggested Extensions (Jody):
  * </p>
- * 
+ *
  * <ul>
  * <li>
  * Transient CoordianteSystem override done getCoordianteSystem()
@@ -54,7 +54,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * ready for primetime, see Expr)
  * </li>
  * </ul>
- * 
+ *
  *
  * @author Chris Holmes
  * @source $URL$
@@ -83,7 +83,7 @@ public interface Query {
 
     /**
      * Ask for no properties when used with setPropertyNames.
-     * 
+     *
      * <p>
      * Note the query will still return a result - limited to FeatureIDs.
      * </p>
@@ -96,7 +96,7 @@ public interface Query {
     /**
      * The properties array is used to specify the attributes that should be
      * selected for the return feature collection.
-     * 
+     *
      * <ul>
      * <li>
      * ALL_NAMES: <code>null</code><br>
@@ -109,7 +109,7 @@ public interface Query {
      * return features with no attributes, only their ids.
      * </li>
      * </ul>
-     * 
+     *
      * <p>
      * The available properties can be determined with a getSchema call from
      * the DataSource interface.  A datasource can use {@link
@@ -117,12 +117,12 @@ public interface Query {
      * available properties should be returned (same as checking to see if
      * getProperties is ALL_NAMES, but clearer)
      * </p>
-     * 
+     *
      * <p>
      * If properties that are not part of the datasource's schema are requested
      * then the datasource shall throw an exception.
      * </p>
-     * 
+     *
      * <p>
      * This replaces our funky setSchema method of retrieving select
      * properties.  It makes it easier to understand how to get certain
@@ -159,7 +159,7 @@ public interface Query {
      * The optional maxFeatures can be used to limit the number of features
      * that a query request retrieves.  If no maxFeatures is specified then
      * all features should be returned.
-     * 
+     *
      * <p>
      * This is the only method that is not directly out of the Query element in
      * the WFS spec.  It is instead a part of a GetFeature request, which can
@@ -226,14 +226,14 @@ public interface Query {
 
     /**
      * Temporarily override the coordinate system.
-     * 
+     *
      * <p>
      * This denotes a request to Temporarily to override the coordinate system
      * contained in the FeatureSource being queried. The same coordinate
      * values will be used, but the features created will appear in this
      * Coordinate System.
      * </p>
-     * 
+     *
      * <p>
      * This change is not persistant at all, indeed it is only for the Features
      * returned by this Query.  It may be used in conjunction with the
@@ -248,17 +248,17 @@ public interface Query {
 
     /**
      * Request data reprojection.
-     * 
+     *
      * <p>
      * Gets the coordinate System to reproject the data contained in the
      * backend datastore to.
      * </p>
-     * 
+     *
      * <p>
      * If the DataStore can optimize the reprojection it should, if not then a
      * decorator on the reader should perform the reprojection on the fly.
      * </p>
-     * 
+     *
      * <p>
      * If the datastore has the wrong CS then getOverrideCS() should be set to
      * the CS to be used, this will perform the reprojection on that.
@@ -268,7 +268,7 @@ public interface Query {
      *         be reprojected to.
      */
     CoordinateReferenceSystem getCoordinateSystemReproject();
-    
+
     /**
      * SortBy results according to indicated property and order.
      * <p>
@@ -287,18 +287,18 @@ public interface Query {
      * </code></pre>
      * </p>
      * <p>
-     * 
+     *
      * SortBy should be considered at the same level of abstraction as Filter,
      * and like Filter you may sort using properties not listed in
      * getPropertyNames.
      * </p>
-     * 
+     *
      * <p>
      * At a technical level the interface SortBy2 is used to indicate the
      * additional requirements of a GeoTools implementation. The pure
      * WFS 1.1 specification itself is limited to SortBy.
      * </p>
-     * 
+     *
      * @return SortBy array or order of application
      */
     SortBy[] getSortBy();

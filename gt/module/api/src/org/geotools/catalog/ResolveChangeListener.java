@@ -21,7 +21,7 @@ import java.util.EventListener;
 
 /**
  * Allows client code to notice catalog changes.
- * 
+ *
  * <p>
  * You can use various visitors to explore the changes
  * </p>
@@ -35,18 +35,18 @@ public interface ResolveChangeListener extends EventListener {
     /**
      * Notifies this listener that some changes are happening, or have already
      * happened.
-     * 
+     *
      * <p>
      * The supplied event gives details. This event object (and the resource
      * delta within it) is valid only for the duration of the invocation of
      * this method.
      * </p>
-     * 
+     *
      * <p>
      * Note that during resource change event notification, further changes to
      * resources may be disallowed.
      * </p>
-     * 
+     *
      * <p>
      * Note that this method is not guaranteed to execute in the UI thread, so
      * UI work must be performed with Display.getDefault().asyncExec();

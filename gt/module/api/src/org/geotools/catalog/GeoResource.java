@@ -22,7 +22,7 @@ import java.io.IOException;
 
 /**
  * Represents a handle to a spatial resource.
- * 
+ *
  * <p>
  * The resource is not guaranteed to exist, nor do we guarantee that we can
  * connect with the resource. Some/All potions of this handle may be loaded as
@@ -39,10 +39,10 @@ import java.io.IOException;
 public interface GeoResource extends Resolve {
     /**
      * Blocking operation to resolve into the adaptee, if available.
-     * 
+     *
      * <p>
      * Required adaptions:
-     * 
+     *
      * <ul>
      * <li>
      * IGeoResourceInfo.class
@@ -52,17 +52,17 @@ public interface GeoResource extends Resolve {
      * </li>
      * </ul>
      * </p>
-     * 
+     *
      * <p>
      * Example (no casting required):
      * <pre><code>
      * IGeoResourceInfo info = resovle(IGeoResourceInfo.class);
      * </code></pre>
      * </p>
-     * 
+     *
      * <p>
      * Recommendated adaptions:
-     * 
+     *
      * <ul>
      * <li>
      * ImageDescriptor.class (for icon provided by external service)
@@ -87,7 +87,7 @@ public interface GeoResource extends Resolve {
 
     /**
      * Blocking operation to describe this service.
-     * 
+     *
      * <p>
      * As an example this method is used by LabelDecorators to aquire title,
      * and icon.

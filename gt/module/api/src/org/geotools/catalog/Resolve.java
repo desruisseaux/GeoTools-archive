@@ -24,39 +24,39 @@ import java.util.List;
 
 /**
  * Interface for objects which serve has handles to actual data objects.
- * 
+ *
  * <p>
  * The resolve pattern is based on the IAdaptable pattern used extensivly by
  * the Eclipse framework. Also known as the Extensible Interface pattern,
  * objects implementing the IAdaptable interface morph or adapt themselves
  * into objects implementing a different interface.
  * </p>
- * 
+ *
  * <p>
  * The resolve pattern is slightly different in that morphing or adapting  (ie.
  * resolving) into a different object involves a blocking call in which I/O
  * is being performed, possibly with the local disk, or with a remote service.
  * </p>
- * 
+ *
  * <p>
  * The following code illustrates the use of the resolve pattern:
  * <pre>
- * 	<code>
- * 	Resolve resolve = ....
- * 	ProgressListener listener = ....
- * 
- * 	FeatureSource featureSource = resolve.resolve(FeatureSource.class,listener);
- * 	if (featureSource != null) {
- * 		//do something
- * 	}
- * 	</code>
+ *         <code>
+ *         Resolve resolve = ....
+ *         ProgressListener listener = ....
+ *
+ *         FeatureSource featureSource = resolve.resolve(FeatureSource.class,listener);
+ *         if (featureSource != null) {
+ *                 //do something
+ *         }
+ *         </code>
  * </pre>
  * As a convenience, the {@link Resolve#canResolve(Class)} method is used to
  * determine if a particular type of object is supported, but not to perform
  * the resolve. This method can be useful in situations where it is not
  * desirable to block.
  * </p>
- * 
+ *
  * <p>
  * An implementation of resolve supports the notion of resolving into a parent,
  * or into a list of children, called members. Like any other resolve, these
@@ -74,7 +74,7 @@ public interface Resolve {
     /**
      * Blocking method which is used to resolve into an instance of a
      * particular class.
-     * 
+     *
      * <p>
      * Required adaptions will be listed in Abstract Classes that implement
      * this interface.

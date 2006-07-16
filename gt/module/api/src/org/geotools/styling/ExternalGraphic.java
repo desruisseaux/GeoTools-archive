@@ -13,7 +13,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *    
+ *
  * Contacts:
  *     UNITED KINGDOM: James Macgill.  j.macgill@geog.leeds.ac.uk
  */
@@ -28,9 +28,9 @@ import java.util.Map;
  * Holds a reference to an external graphics file with a URL to its location
  * and its expected MIME type. Knowing the MIME type in advance allows stylers
  * to select best-supported formats from a list of external graphics.
- * 
+ *
  * <p></p>
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -52,17 +52,17 @@ import java.util.Map;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * 
+ *
  * <p>
  * Renderers can use this information when displaying styled features, though
  * it must be remembered that not all renderers will be able to fully
  * represent strokes as set out by this interface.  For example, opacity may
  * not be supported.
  * </p>
- * 
+ *
  * <p>
  * Notes:
- * 
+ *
  * <ul>
  * <li>
  * The graphical parameters and their values are derived from SVG/CSS2
@@ -76,7 +76,8 @@ import java.util.Map;
  * @version $Id$
  */
 public interface ExternalGraphic extends Symbol {
-	public static final ExternalGraphic[] EXTERNAL_GRAPHICS_EMPTY = new ExternalGraphic[0];
+    public static final ExternalGraphic[] EXTERNAL_GRAPHICS_EMPTY = new ExternalGraphic[0];
+
     /**
      * converts a URI in a string to the location URL
      *

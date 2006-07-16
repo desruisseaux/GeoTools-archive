@@ -15,21 +15,23 @@
  */
 package org.geotools.styling;
 
+
 /**
  * Contains label shield hack
  * @source $URL$
  */
 public interface TextSymbolizer2 extends TextSymbolizer {
-	/**
-	 * The nonstandard-SLD graphic element supports putting little graphical-bits onto labels.
+    /**
+     * The nonstandard-SLD graphic element supports putting little graphical-bits onto labels.
      * Useful for things like interstate road shields or labeled logos
      * @return - the Graphic object to be rendered under the label text
      */
     public Graphic getGraphic();
+
     /**
      * The nonstandard-SLD graphic element supports putting little graphical-bits onto labels.
      * Useful for things like interstate road shields or labeled logos
-    * @param g - the Graphic object which will be rendered under the label text
-    */
+     * @param g - the Graphic object which will be rendered under the label text
+     */
     public void setGraphic(Graphic graphic);
 }

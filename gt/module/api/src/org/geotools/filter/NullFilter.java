@@ -39,7 +39,7 @@ public interface NullFilter extends Filter, PropertyIsNull {
      *
      * @task REVISIT: change arg to AttributeExpression?
      * @task REVISIT: change name to setNullCheckValue.
-     * 
+     *
      * @deprecated use {@link PropertyIsNull#setExpression(Expression)}
      */
     void nullCheckValue(Expression nullCheck) throws IllegalFilterException;
@@ -48,7 +48,7 @@ public interface NullFilter extends Filter, PropertyIsNull {
      * Returns the expression being checked for null.
      *
      * @return the Expression to null check.
-     * 
+     *
      * @deprecated use {@link PropertyIsNull#getExpression()}
      */
     Expression getNullCheckValue();
@@ -61,7 +61,7 @@ public interface NullFilter extends Filter, PropertyIsNull {
      *
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
-     *         
+     *
      * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
     boolean contains(Feature feature);

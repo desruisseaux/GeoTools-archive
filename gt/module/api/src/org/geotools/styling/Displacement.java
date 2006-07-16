@@ -31,37 +31,33 @@ import org.geotools.filter.expression.Expression;
  * @source $URL$
  */
 public interface Displacement extends GTComponent {
-     
-	/**
-	 * Default Displacment instance. 
-	 */
+    /**
+     * Default Displacment instance.
+     */
     static final Displacement DEFAULT = new ConstantDisplacement() {
+            public Expression getDisplacementX() {
+                return ConstantExpression.ZERO;
+            }
 
-		public Expression getDisplacementX() {
-			return ConstantExpression.ZERO;
-		}
+            public Expression getDisplacementY() {
+                return ConstantExpression.ZERO;
+            }
+        };
 
-		public Expression getDisplacementY() {
-			return ConstantExpression.ZERO;
-		}
-    	
-    };
-    
     /**
      * Null Displacement instance.
      */
     static final Displacement NULL = new ConstantDisplacement() {
-    
-    	public Expression getDisplacementX() {
-    		return ConstantExpression.NULL;
-    	}
-    	
-    	public Expression getDisplacementY() {
-    		return ConstantExpression.NULL;
-    	}
-    };
-    
-	//TODO: add Displacement to GeoAPI
+            public Expression getDisplacementX() {
+                return ConstantExpression.NULL;
+            }
+
+            public Expression getDisplacementY() {
+                return ConstantExpression.NULL;
+            }
+        };
+
+    //TODO: add Displacement to GeoAPI
     /**
      * Returns an expression that computes a pixel offset from the geometry
      * point.  This offset point is where the text's anchor point gets
@@ -101,21 +97,23 @@ public interface Displacement extends GTComponent {
     void accept(StyleVisitor visitor);
 }
 
+
 abstract class ConstantDisplacement extends GTConstant implements Displacement {
+    private void cannotModifyConstant() {
+        throw new UnsupportedOperationException(
+            "Constant Displacement may not be modified");
+    }
 
-	private void cannotModifyConstant(){
-		throw new UnsupportedOperationException("Constant Displacement may not be modified");
-	}
-	
-	public void setDisplacementX(Expression x) {
-		cannotModifyConstant();
-	}
+    public void setDisplacementX(Expression x) {
+        cannotModifyConstant();
+    }
 
-	public void setDisplacementY(Expression y) {
-		cannotModifyConstant();
-	}
+    public void setDisplacementY(Expression y) {
+        cannotModifyConstant();
+    }
 
-	public void accept(StyleVisitor visitor) {
-		cannotModifyConstant();
-	}
-};
+    public void accept(StyleVisitor visitor) {
+        cannotModifyConstant();
+    }
+}
+;

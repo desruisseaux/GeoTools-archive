@@ -24,7 +24,7 @@ import org.geotools.filter.expression.Expression;
 
 /**
  * A Mark element defines a "shape" which has coloring applied to it.
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -46,17 +46,17 @@ import org.geotools.filter.expression.Expression;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * 
+ *
  * <p>
  * Renderers can use this information when displaying styled features, though
  * it must be remembered that not all renderers will be able to fully
  * represent strokes as set out by this interface.  For example, opacity may
  * not be supported.
  * </p>
- * 
+ *
  * <p>
  * Notes:
- * 
+ *
  * <ul>
  * <li>
  * The graphical parameters and their values are derived from SVG/CSS2
@@ -70,7 +70,8 @@ import org.geotools.filter.expression.Expression;
  * @version $Id$
  */
 public interface Mark extends Symbol {
-	public static final Mark[] MARKS_EMPTY = new Mark[0];
+    public static final Mark[] MARKS_EMPTY = new Mark[0];
+
     /**
      * This parameter gives the well-known name of the shape of the mark.<br>
      * Allowed names include at least "square", "circle", "triangle", "star",

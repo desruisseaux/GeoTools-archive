@@ -17,33 +17,33 @@ package org.geotools.feature;
 
 import org.geotools.filter.Filter;
 
+
 /**
- * Adds the ability to have restrictions on a particular data primitive 
+ * Adds the ability to have restrictions on a particular data primitive
  * in a declarative manner.
- * 
- * Standard expectations include internal validation using the specified 
- * restrictions, and that the restrictions are immutable. 
- * 
+ *
+ * Standard expectations include internal validation using the specified
+ * restrictions, and that the restrictions are immutable.
+ *
  * @author dzwiers
  * @source $URL$
  */
 public interface PrimativeAttributeType extends AttributeType {
-
-	/**
-	 * This provides access to the immutable restriction for this attribute 
-	 * type. This restriction should be applied when real data hits instances 
-	 * of this class. This mapps to the idea of a Facet in xml schema, or 
-	 * restrictions in a database. 
-	 * 
-	 * Examples may include Length <= 20 (VARCHAR 20)
-	 * 
-	 * The Default value is Filter.ALL
-	 * 
-	 * @return the restriction for applied to this attribute type, or 
-	 * Filter.ALL. Mat not be null.
-	 * 
-	 * @see Filter
-	 * @see Filter#ALL
-	 */
-	Filter getRestriction();
+    /**
+     * This provides access to the immutable restriction for this attribute
+     * type. This restriction should be applied when real data hits instances
+     * of this class. This mapps to the idea of a Facet in xml schema, or
+     * restrictions in a database.
+     *
+     * Examples may include Length <= 20 (VARCHAR 20)
+     *
+     * The Default value is Filter.ALL
+     *
+     * @return the restriction for applied to this attribute type, or
+     * Filter.ALL. Mat not be null.
+     *
+     * @see Filter
+     * @see Filter#ALL
+     */
+    Filter getRestriction();
 }

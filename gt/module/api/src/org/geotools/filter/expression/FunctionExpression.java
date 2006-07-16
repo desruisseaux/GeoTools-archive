@@ -18,6 +18,7 @@ package org.geotools.filter.expression;
 import org.geotools.factory.Factory;
 import org.opengis.filter.expression.Function;
 
+
 /**
  * Interface for a function expression implementation
  *
@@ -25,20 +26,19 @@ import org.opengis.filter.expression.Function;
  * @source $URL$
  */
 public interface FunctionExpression extends Expression, Factory, Function {
-	   
-	/**
+    /**
      *   Returns the number of arguments this <Function> requires.
      *
      *   For example <Function name="strCat"> [arg1][arg2]</Function>.
      *   This function must have EXACTLY 2 arguments, so this function
      *   would return 2.
      *
-     *   The parser might use this information to ensure validity, 
+     *   The parser might use this information to ensure validity,
      *   and its also for reporting <Function> capabilities.
      *
      *  NOTE: this was previously javadoc-ed incorrectly, please note
      *        the new definition.
-     *  NOTE: you cannot have a function with a variable number of 
+     *  NOTE: you cannot have a function with a variable number of
      *        arguments.
      *
      * @return the number of args required by this function.

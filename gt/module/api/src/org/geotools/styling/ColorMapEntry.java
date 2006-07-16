@@ -21,7 +21,7 @@ import org.geotools.filter.expression.Expression;
 
 /**
  * A basic interface for objects which can hold color map entries.
- * <pre> 
+ * <pre>
  *  &lt;xs:element name="ColorMapEntry"&gt;
  *  &lt;xs:complexType&gt;
  *  &lt;xs:attribute name="color" type="xs:string" use="required"/&gt;
@@ -49,6 +49,6 @@ public interface ColorMapEntry extends GTComponent {
     void setQuantity(Expression quantity);
 
     Expression getQuantity();
-    
+
     void accept(StyleVisitor visitor);
 }

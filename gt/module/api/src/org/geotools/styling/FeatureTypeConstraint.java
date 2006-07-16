@@ -22,7 +22,7 @@ import org.geotools.filter.Filter;
 /**
  * A FeatureTypeConstraint identifies a specific feature type and supplies
  * fitlering.
- * 
+ *
  * <p>
  * The details of this object are taken from the <a
  * href="https://portal.opengeospatial.org/files/?artifact_id=1188"> OGC
@@ -45,14 +45,13 @@ import org.geotools.filter.Filter;
  * &lt;/xsd:element&gt;
  * </code></pre>
  * </p>
- * 
+ *
  * <p></p>
  *
  * @author James Macgill
  * @source $URL$
  */
 public interface FeatureTypeConstraint extends GTComponent {
-	
     public String getFeatureTypeName();
 
     public void setFeatureTypeName(String name);
@@ -60,10 +59,10 @@ public interface FeatureTypeConstraint extends GTComponent {
     public Filter getFilter();
 
     public void setFilter(Filter filter);
-    
+
     public Extent[] getExtents();
-    
+
     public void setExtents(Extent[] extents);
 
-	public void accept(StyleVisitor visitor);
+    public void accept(StyleVisitor visitor);
 }
