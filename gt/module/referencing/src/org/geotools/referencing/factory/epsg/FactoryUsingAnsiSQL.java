@@ -85,7 +85,7 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
         "[Supersession]",                           "epsg_supersession",
         "[Unit of Measure]",                        "epsg_unitofmeasure",
         "[Version History]",                        "epsg_versionhistory",
-        "[CA.ORDER]",                               "coord_axis_order" //a field in epsg_coordinateaxis
+        "[ORDER]",                                  "coord_axis_order" // a field in epsg_coordinateaxis
     };
 
     /**

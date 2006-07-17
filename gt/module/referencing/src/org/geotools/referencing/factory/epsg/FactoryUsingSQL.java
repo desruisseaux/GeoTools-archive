@@ -122,11 +122,11 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         implements CRSAuthorityFactory, CSAuthorityFactory, DatumAuthorityFactory,
                    CoordinateOperationAuthorityFactory
 {
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    ////////                                                                            ////////
-    ////////      H A R D   C O D E D   V A L U E S    (other than SQL statements)      ////////
-    ////////                                                                            ////////
-    ////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //////                                                                                 ///////
+    //////   HARD CODED VALUES (other than SQL statements) RELATIVE TO THE EPSG DATABASE   ///////
+    //////                                                                                 ///////
+    //////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Returns a hard-coded unit from an EPSG code. We do not need to provide all units here,
      * but we must at least provide all base units declared in the [TARGET_UOM_CODE] column
@@ -334,8 +334,12 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * A pool of prepared statements. Key are {@link String} object related to their
      * originating method name (for example "Ellipsoid" for {@link #createEllipsoid},
      * while values are {@link PreparedStatement} objects.
+     * <p>
+     * <strong>Note:</strong> It is okay to use {@link IdentityHashMap} instead of {@link HashMap}
+     * because the keys will always be the exact same object, namely the hard-coded argument given
+     * to calls to {@link #prepareStatement} in this class.
      */
-    private final Map statements = new IdentityHashMap();
+    private final Map/*<String,PreparedStatement>*/ statements = new IdentityHashMap();
 
     /**
      * The set of authority codes for different types. Keys are {@link Class} or
@@ -346,6 +350,14 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * of closing the stamenents used by the sets.
      */
     private final Map/*<Object,Reference<AuthorityCodes>>*/ authorityCodes = new HashMap();
+
+    /**
+     * Cache for axis names. This service is not provided by {@link BufferedAuthorityFactory}
+     * since {@link AxisName} object are particular to the EPSG database.
+     *
+     * @see #getAxisName
+     */
+    private final Map/*<String,AxisName>*/ axisNames = new HashMap();
 
     /**
      * Pool of naming systems, used for caching.
@@ -758,6 +770,8 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * @param  oldValue The object previously constructed, or {@code null} if none.
      * @param  code The EPSG code (for formatting error message).
      * @throws FactoryException if a duplication has been detected.
+     *
+     * @todo Use generic type when we will be allowed to compile for J2SE 1.5.
      */
     private static Object ensureSingleton(final Object newValue, final Object oldValue, final String code)
             throws FactoryException
@@ -1454,92 +1468,140 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
     }
 
     /**
+     * Returns the name and description for the specified {@linkplain CoordinateSystemAxis
+     * coordinate system axis} code. Many axis share the same name and description, so it
+     * is worth to cache them.
+     */
+    private AxisName getAxisName(final String code) throws FactoryException {
+        assert Thread.holdsLock(this);
+        AxisName returnValue = (AxisName) axisNames.get(code);
+        if (returnValue == null) try {
+            final PreparedStatement stmt;
+            stmt = prepareStatement("AxisName", "SELECT COORD_AXIS_NAME, DESCRIPTION, REMARKS"
+                                    +       " FROM [Coordinate Axis Name]"
+                                    +       " WHERE COORD_AXIS_NAME_CODE = ?");
+            stmt.setString(1, code);
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                final String name  = getString(result, 1, code);
+                String description = result.getString (2);
+                String remarks     = result.getString (3);
+                if (description == null) {
+                    description = remarks;
+                } else if (remarks != null) {
+                    description += System.getProperty("line.separator", "\n") + remarks;
+                }
+                final AxisName axis = new AxisName(name, description);
+                returnValue = (AxisName) ensureSingleton(axis, returnValue, code);
+            }
+            result.close();
+            if (returnValue == null) {
+                throw noSuchAuthorityCode(AxisName.class, code);
+            }
+            axisNames.put(code, returnValue);
+        } catch (SQLException exception) {
+            throw databaseFailure(AxisName.class, code, exception);
+        }
+        return returnValue;
+    }
+
+    /**
      * Returns a {@linkplain CoordinateSystemAxis coordinate system axis} from a code.
      *
      * @param  code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
-     *
-     * @todo Not yet implemented.
      */
-    public CoordinateSystemAxis createCoordinateSystemAxis(final String code)
+    public synchronized CoordinateSystemAxis createCoordinateSystemAxis(final String code)
             throws FactoryException
     {
         ensureNonNull("code", code);
-        throw new FactoryException("Not yet implemented.");
+        CoordinateSystemAxis returnValue = null;
+        try {
+            final String primaryKey = trimAuthority(code);
+            final PreparedStatement stmt;
+            stmt = prepareStatement("Axis", "SELECT COORD_AXIS_CODE,"
+                                    +             " COORD_AXIS_NAME_CODE,"
+                                    +             " COORD_AXIS_ORIENTATION,"
+                                    +             " COORD_AXIS_ABBREVIATION,"
+                                    +             " UOM_CODE"
+                                    +       " FROM [Coordinate Axis]"
+                                    +      " WHERE COORD_AXIS_CODE = ?");
+            stmt.setString(1, code);
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                final String epsg         = getString(result, 1, code);
+                final String nameCode     = getString(result, 2, code);
+                final String orientation  = getString(result, 3, code);
+                final String abbreviation = getString(result, 4, code);
+                final String unit         = getString(result, 5, code);
+                AxisDirection direction;
+                try {
+                    direction = DefaultCoordinateSystemAxis.getDirection(orientation);
+                } catch (NoSuchElementException exception) {
+                    if (orientation.equalsIgnoreCase("Geocentre > equator/PM")) {
+                        direction = AxisDirection.OTHER; // TODO: can we choose a more accurate direction?
+                    } else if (orientation.equalsIgnoreCase("Geocentre > equator/90dE")) {
+                        direction = AxisDirection.EAST;
+                    } else if (orientation.equalsIgnoreCase("Geocentre > north pole")) {
+                        direction = AxisDirection.NORTH;
+                    } else {
+                        throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1,
+                                                                 orientation), exception);
+                    }
+                }
+                final AxisName an = getAxisName(nameCode);
+                final Map properties = createProperties(an.name, epsg, an.description);
+                final CSFactory factory = factories.getCSFactory();
+                final CoordinateSystemAxis axis = factory.createCoordinateSystemAxis(
+                        properties, abbreviation, direction, buffered.createUnit(unit));
+                returnValue = (CoordinateSystemAxis) ensureSingleton(axis, returnValue, code);
+            }
+            result.close();
+        } catch (SQLException exception) {
+            throw databaseFailure(CoordinateSystemAxis.class, code, exception);
+        }
+        if (returnValue == null) {
+            throw noSuchAuthorityCode(CoordinateSystemAxis.class, code);
+        }
+        return returnValue;
     }
 
     /**
      * Returns the coordinate system axis from an EPSG code for a {@link CoordinateSystem}.
+     * <p>
+     * <strong>WARNING:</strong> The EPSG database uses "{@code ORDER}" as a column name.
+     * This is tolerated by Access, but MySQL doesn't accept this name.
      *
      * @param  code the EPSG code for coordinate system owner.
      * @param  dimension of the coordinate system, which is also the size of the returned array.
      * @return An array of coordinate system axis.
      * @throws SQLException if an error occured during database access.
      * @throws FactoryException if the code has not been found.
-     *
-     * @todo WARNING!! The EPSG database use "ORDER" as a column name.
-     *       This is tolerated by Access, but MySQL doesn't accept this name.
      */
-    private CoordinateSystemAxis[] createCoordinateSystemAxis(String code, final int dimension)
+    private CoordinateSystemAxis[] createAxesForCoordinateSystem(final String code, final int dimension)
             throws SQLException, FactoryException
     {
+        assert Thread.holdsLock(this);
         final CoordinateSystemAxis[] axis = new CoordinateSystemAxis[dimension];
         final PreparedStatement stmt;
-        stmt = prepareStatement("Axis", "SELECT CA.COORD_AXIS_CODE,"
-                                +             " CAN.COORD_AXIS_NAME,"
-                                +             " CA.COORD_AXIS_ORIENTATION,"
-                                +             " CA.COORD_AXIS_ABBREVIATION,"
-                                +             " CA.UOM_CODE,"
-                                +             " CAN.DESCRIPTION,"
-                                +             " CAN.REMARKS"
-                                +       " FROM [Coordinate Axis] AS CA"
-                                + " INNER JOIN [Coordinate Axis Name] AS CAN"
-                                +          " ON CA.COORD_AXIS_NAME_CODE = CAN.COORD_AXIS_NAME_CODE"
-                                +       " WHERE CA.COORD_SYS_CODE = ?"
-                                +    " ORDER BY [CA.ORDER]");
+        stmt = prepareStatement("AxisOrder", "SELECT COORD_AXIS_CODE"
+                                +             " FROM [Coordinate Axis]"
+                                +            " WHERE COORD_SYS_CODE = ?"
+                                +         " ORDER BY [ORDER]");
                                 // WARNING: Be careful about the column name :
                                 //          MySQL rejects ORDER as a column name !!!
         stmt.setString(1, code);
         final ResultSet result = stmt.executeQuery();
-        final CSFactory factory = factories.getCSFactory();
         int i = 0;
         while (result.next()) {
-            if (i >= axis.length) {
-                // An exception will be thrown after the loop.
-                ++i;
-                continue;
+            final String axisCode = getString(result, 1, code);
+            if (i < axis.length) {
+                // If 'i' is out of bounds, an exception will be thrown after the loop.
+                // We don't want to thrown an ArrayIndexOutOfBoundsException here.
+                axis[i] = buffered.createCoordinateSystemAxis(axisCode);
             }
-                         code         = getString(result, 1, code);
-            final String name         = getString(result, 2, code);
-            final String orientation  = getString(result, 3, code);
-            final String abbreviation = getString(result, 4, code);
-            final String unit         = getString(result, 5, code);
-                  String description  = result.getString( 6);
-            final String remarks      = result.getString( 7);
-            AxisDirection direction;
-            try {
-                direction = DefaultCoordinateSystemAxis.getDirection(orientation);
-            } catch (NoSuchElementException exception) {
-                if (orientation.equalsIgnoreCase("Geocentre > equator/PM")) {
-                    direction = AxisDirection.OTHER; // TODO: can we choose a more accurate direction?
-                } else if (orientation.equalsIgnoreCase("Geocentre > equator/90dE")) {
-                    direction = AxisDirection.EAST;
-                } else if (orientation.equalsIgnoreCase("Geocentre > north pole")) {
-                    direction = AxisDirection.NORTH;
-                } else {
-                    throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1,
-                                                             orientation), exception);
-                }
-            }
-            if (description == null) {
-                description = remarks;
-            } else if (remarks != null) {
-                description += System.getProperty("line.separator", "\n") + remarks;
-            }
-            final Map properties = createProperties(name, code, description);
-            axis[i++] = factory.createCoordinateSystemAxis(properties, abbreviation, direction,
-                                                           buffered.createUnit(unit));
+            ++i;
         }
         result.close();
         if (i != axis.length) {
@@ -1582,7 +1644,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                 final String    type = getString(result, 3, code).trim().toLowerCase();
                 final int  dimension = getInt   (result, 4, code);
                 final String remarks = result.getString( 5);
-                final CoordinateSystemAxis[] axis = createCoordinateSystemAxis(primaryKey, dimension);
+                final CoordinateSystemAxis[] axis = createAxesForCoordinateSystem(primaryKey, dimension);
                 final Map properties = createProperties(name, epsg, remarks); // Must be after axis
                 final CSFactory factory = factories.getCSFactory();
                 CoordinateSystem cs = null;

@@ -460,12 +460,10 @@ public class DefaultDataSourceTest extends TestCase {
                        /* [10] */ 32601, 32660,
                        /* [12] */ 32701, 32760,
                        /* [14] */  2759,  2930};
-        if (!extensive) {
-            // If we are not running the extensive test suite, uses smaller ranges.
-            crs2_ranges[11] = crs2_ranges[10] + 4;
-            crs2_ranges[13] = crs2_ranges[12] + 4;
-        }
-        for (int irange=0; irange<crs2_ranges.length; irange+=2) {
+
+        // If we are not running the extensive test suite, uses reduced ranges.
+        final int limit = extensive ? crs2_ranges.length : 4;
+        for (int irange=0; irange<limit; irange+=2) {
             int range_start = crs2_ranges[irange  ];
             int range_end   = crs2_ranges[irange+1];
             for (int isystem2=range_start; isystem2<=range_end; isystem2++) {
@@ -612,25 +610,18 @@ public class DefaultDataSourceTest extends TestCase {
          * standard, and Access doesn't seem to understand "CASE ... THEN" clauses).
          */
         final Set all = factory.createFromCoordinateReferenceSystemCodes("4230", "4326");
-        if (extensive) {
-            assertTrue(all.size() >= 3);
-            assertTrue(all.contains(operation1));
-            assertTrue(all.contains(operation2));
-            assertTrue(all.contains(operation3));
-        }
-        final CoordinateOperation first = (CoordinateOperation) all.iterator().next();
-        assertEquals("1612", getIdentifier(first)); // see comment above.
+        assertTrue(all.size() >= 3);
+        assertTrue(all.contains(operation1));
+        assertTrue(all.contains(operation2));
+        assertTrue(all.contains(operation3));
         int count=0;
         for (final Iterator it=all.iterator(); it.hasNext();) {
-            if (++count >= 5 && !extensive) {
-                // If we are not running extensive tests, stop after a few iterations.
-                // It can save a fair amount of time since the iterator is a lazy one
-                // (coordinate operation are really created only when 'next()' is invoked).
-                return;
-            }
             final CoordinateOperation check = (CoordinateOperation) it.next();
             assertSame(sourceCRS, check.getSourceCRS());
             assertSame(targetCRS, check.getTargetCRS());
+            if (count++ == 0) {
+                assertEquals("1612", getIdentifier(check)); // see comment above.
+            }
         }
         assertEquals(all.size(), count);
     }
