@@ -72,7 +72,7 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
-      <version>2.3-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>postgresql</groupId>
@@ -87,7 +87,7 @@
     <dependency>
       <groupId>org.wkb4j</groupId>
       <artifactId>wkb4j</artifactId>
-      <version>1.0-RC1</version>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
       <!-- TODO: this dependency should appears in wkb4j -->
@@ -99,10 +99,9 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-wkt</artifactId>
-      <version>2.2-RC5-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
 </project>
-

@@ -28,6 +28,8 @@ import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.channels.ReadableByteChannel;
+import java.util.logging.Logger;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -49,9 +51,31 @@ import java.nio.channels.ReadableByteChannel;
  */
 public final class TestData extends org.geotools.resources.TestData {
     /**
+     * The {@linkplain System#getProperty(String) system property} key for more extensive test
+     * suite. The value for this key is returned by the {@link #isExtensiveTest} method. Some
+     * test suites will perform more extensive test coverage if this property is set to
+     * {@code true}. The value for this property is typically defined on the command line as a
+     * <code>-D{@value}=true</code> option at Java or Maven starting time.
+     */
+    public static final String EXTENSIVE_TEST_KEY = "org.geotools.test.extensive";
+
+    /**
      * Do not allow instantiation of this class.
      */
     private TestData() {
+    }
+
+    /**
+     * Returns {@code true} if {@value #EXTENSIVE_TEST_KEY} system property is set to {@code true}.
+     * Test suites should check this value before to perform lengthly tests.
+     */
+    public static boolean isExtensiveTest() {
+        try {
+            return Boolean.getBoolean(EXTENSIVE_TEST_KEY);
+        } catch (SecurityException exception) {
+            Logger.getLogger("org.geotools").warning(exception.getLocalizedMessage());
+            return false;
+        }
     }
 
     /**

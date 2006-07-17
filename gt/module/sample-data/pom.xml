@@ -75,7 +75,7 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-referencing</artifactId>
-      <version>2.3-SNAPSHOT</version>
+      <version>${project.version}</version>
       <!-- We don't really need the referencing module, but we use
            org.geotools.resources.TestData which is defined there. -->
     </dependency>

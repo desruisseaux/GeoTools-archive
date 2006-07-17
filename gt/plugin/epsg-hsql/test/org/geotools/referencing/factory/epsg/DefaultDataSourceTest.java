@@ -59,6 +59,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
+import org.geotools.TestData;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
@@ -91,6 +92,11 @@ public class DefaultDataSourceTest extends TestCase {
     private static boolean verbose = false;
 
     /**
+     * Set to {@code true} for more extensive tests.
+     */
+    private static boolean extensive = false;
+
+    /**
      * Small value for parameter value comparaisons.
      */
     private static final double EPS = 1E-6;
@@ -114,6 +120,7 @@ public class DefaultDataSourceTest extends TestCase {
         final boolean gui = arguments.getFlag("-gui");
         final boolean log = arguments.getFlag("-log");
         verbose = arguments.getFlag("-verbose");
+        extensive = true;
         arguments.getRemainingArguments(0);
         MonolineFormatter.initGeotools(log ? Level.CONFIG : null);
         if (gui) {
@@ -147,6 +154,7 @@ public class DefaultDataSourceTest extends TestCase {
         if (factory == null) {
             factory = (DefaultFactory) FactoryFinder.getCRSAuthorityFactory("EPSG",
                         new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class));
+            extensive |= TestData.isExtensiveTest();
         }
         // No 'tearDown()' method: we rely on the DefaultFactory shutdown hook.
     }
@@ -445,14 +453,18 @@ public class DefaultDataSourceTest extends TestCase {
         crs1 = crs2 = null;
         final String crs1_name  = "4326";
         final int crs2_ranges[] = {4326,  4326,
-                                   4322,  4322,
-                                   4269,  4269,
-                                   4267,  4267,
-                                   4230,  4230,
-                                  32601, 32660,
-                                  32701, 32760,
-                                   2759,  2930};
-
+                       /* [ 2] */  4322,  4322,
+                       /* [ 4] */  4269,  4269,
+                       /* [ 6] */  4267,  4267,
+                       /* [ 8] */  4230,  4230,
+                       /* [10] */ 32601, 32660,
+                       /* [12] */ 32701, 32760,
+                       /* [14] */  2759,  2930};
+        if (!extensive) {
+            // If we are not running the extensive test suite, uses smaller ranges.
+            crs2_ranges[11] = crs2_ranges[10] + 4;
+            crs2_ranges[13] = crs2_ranges[12] + 4;
+        }
         for (int irange=0; irange<crs2_ranges.length; irange+=2) {
             int range_start = crs2_ranges[irange  ];
             int range_end   = crs2_ranges[irange+1];
@@ -600,17 +612,27 @@ public class DefaultDataSourceTest extends TestCase {
          * standard, and Access doesn't seem to understand "CASE ... THEN" clauses).
          */
         final Set all = factory.createFromCoordinateReferenceSystemCodes("4230", "4326");
-        assertTrue(all.size() >= 3);
-        assertTrue(all.contains(operation1));
-        assertTrue(all.contains(operation2));
-        assertTrue(all.contains(operation3));
+        if (extensive) {
+            assertTrue(all.size() >= 3);
+            assertTrue(all.contains(operation1));
+            assertTrue(all.contains(operation2));
+            assertTrue(all.contains(operation3));
+        }
         final CoordinateOperation first = (CoordinateOperation) all.iterator().next();
         assertEquals("1612", getIdentifier(first)); // see comment above.
+        int count=0;
         for (final Iterator it=all.iterator(); it.hasNext();) {
+            if (++count >= 5 && !extensive) {
+                // If we are not running extensive tests, stop after a few iterations.
+                // It can save a fair amount of time since the iterator is a lazy one
+                // (coordinate operation are really created only when 'next()' is invoked).
+                return;
+            }
             final CoordinateOperation check = (CoordinateOperation) it.next();
             assertSame(sourceCRS, check.getSourceCRS());
             assertSame(targetCRS, check.getTargetCRS());
         }
+        assertEquals(all.size(), count);
     }
 
     /**
@@ -633,6 +655,10 @@ public class DefaultDataSourceTest extends TestCase {
                 continue;
             }
             ++count;
+            if (!extensive && (count % 20) != 0) {
+                // If the tests are not executed in "extensive" mode, tests only 5% of cases.
+                continue;
+            }
             try {
                 operation = factory.createCoordinateOperation(code);
             } catch (FactoryException exception) {

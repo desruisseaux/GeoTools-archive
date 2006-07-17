@@ -80,22 +80,22 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-directory</artifactId>
-      <version>2.3-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-graph</artifactId>
-      <version>2.3-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-postgis</artifactId>
-      <version>2.3-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-shapefile</artifactId>
-      <version>2.3-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- Adding J-Unit back in due to conflict-->

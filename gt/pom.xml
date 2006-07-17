@@ -11,37 +11,45 @@
 
   <!-- ===================================================================== -->
   <!--     Profiles: modify the build process in certain conditions.         -->
-  <!--     The conditions are trigged by command-line properties.            -->
-  <!--     Available properties are:                                         -->
+  <!--     Available profiles are:                                           -->
   <!--                                                                       -->
-  <!--     site.build     -  The main purpose of this build is to create     -->
-  <!--                       reports. Consequently, a JUnit test failure     -->
-  <!--                       will not stop the build. The failure should     -->
-  <!--                       be reported by the surefire report plugin.      -->
+  <!--     extensive.tests -  Performs more extensive tests that the         -->
+  <!--                        default. Only a few modules check for          -->
+  <!--                        this profile.                                  -->
   <!--                                                                       -->
-  <!--     Example:          mvn -Dsite.build=true site                      -->
+  <!--     site.build      -  The main purpose of this build is to create    -->
+  <!--                        reports. Consequently, a JUnit test failure    -->
+  <!--                        will not stop the build. The failure should    -->
+  <!--                        be reported by the surefire report plugin.     -->
   <!--                                                                       -->
-  <!--     Note that properties like "site.build" are not mandatory for      -->
-  <!--     using the "site" goal. Such properties just modify the build      -->
+  <!--     Example:           mvn -Pextensive.tests install                  -->
+  <!--                        mvn -Psite.build site                          -->
+  <!--                                                                       -->
+  <!--     Note that profiles like "site.build" are not mandatory for        -->
+  <!--     using the "site" goal. Such profiles just modify the build        -->
   <!--     process prior the "site" goal execution in a manner relevant      -->
   <!--     to the purpose of the "site" goal.                                -->
   <!-- ===================================================================== -->
   <properties>
     <allow.test.skip>true</allow.test.skip>
     <allow.test.failure.ignore>false</allow.test.failure.ignore>
+    <extensive.tests>false</extensive.tests>
   </properties>
 
   <!-- Overwrite the above default properties according command-line parameters. -->
   <profiles>
     <profile>
-      <activation>
-        <property>
-          <name>site.build</name>
-        </property>
-      </activation>
+      <id>extensive.tests</id>
+      <properties>
+        <extensive.tests>true</extensive.tests>
+      </properties>
+    </profile>
+    <profile>
+      <id>site.build</id>
       <properties>
         <allow.test.skip>false</allow.test.skip>
         <allow.test.failure.ignore>true</allow.test.failure.ignore>
+        <extensive.tests>true</extensive.tests>
       </properties>
     </profile>
   </profiles>
@@ -410,6 +418,11 @@
         <version>1.7.1</version>
       </dependency>
       <dependency>
+        <groupId>org.wkb4j</groupId>
+        <artifactId>wkb4j</artifactId>
+        <version>1.0-RC1</version>
+      </dependency>
+      <dependency>
         <groupId>batik</groupId>
         <artifactId>batik-transcoder</artifactId>
         <version>1.5</version>
@@ -727,10 +740,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.4</source><!-- The -source argument for the Java compiler.                            -->
-          <target>1.4</target><!-- The -target argument for the Java compiler.                            -->
-          <debug>true</debug><!-- Whether to include debugging information in the compiled class files.  -->
-          <encoding>ISO-8859-1</encoding><!-- The -encoding argument for the Java compiler.                          -->
+          <source>1.4</source>  <!-- The -source argument for the Java compiler.                            -->
+          <target>1.4</target>  <!-- The -target argument for the Java compiler.                            -->
+          <debug>true</debug>   <!-- Whether to include debugging information in the compiled class files.  -->
+          <encoding>ISO-8859-1</encoding> <!-- The -encoding argument for the Java compiler.                -->
         </configuration>
       </plugin>
 
@@ -750,7 +763,7 @@
             <exclude>**/*OnlineTest.java</exclude>
           </excludes>
           <forkMode>once</forkMode>
-          <argLine>-Xmx512M -enableassertions</argLine>
+          <argLine>-Xmx512M -enableassertions -Dorg.geotools.test.extensive=${extensive.tests}</argLine>
           <!-- Ignores test failure only if we are generating a report for publication on
             the web site. See the profiles section at the begining of this pom.xml file. -->
           <testFailureIgnore>
