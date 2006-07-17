@@ -40,17 +40,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author James Macgill
  */
 public interface Renderer {
-
-    /**
-     * Flag which determines if the renderer is interactive or not.
-     * An interactive renderer will return rather than waiting for time
-     * consuming operations to complete (e.g. Image Loading).
-     * A non-interactive renderer (e.g. a SVG or PDF renderer) will block
-     * for these operations.
-     *
-     * @deprecated This flag should not be there.
-     */
-     boolean interactive = true;
     
     /**
      * Renders the provided features using the specified style.
