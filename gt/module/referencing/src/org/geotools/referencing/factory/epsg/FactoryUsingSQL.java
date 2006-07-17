@@ -358,6 +358,23 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * @see #getAxisName
      */
     private final Map/*<String,AxisName>*/ axisNames = new HashMap();
+    
+    /**
+     * Cache for axis numbers. This service is not provided by {@link BufferedAuthorityFactory}
+     * since the number of axis is used internally in this class.
+     *
+     * @see #getAxisName
+     */
+    private final Map/*<String,axisCount>*/ axisCounts = new HashMap();
+    
+    /**
+     * Cache for projection checks. This service is not provided by {@link BufferedAuthorityFactory}
+     * since the check that a transformation is a projection is used internally in this class.
+     *
+     * @see #getAxisName
+     */
+    private final Map/*<String,projection>*/ codeProjection = new HashMap();
+    
 
     /**
      * Pool of naming systems, used for caching.
@@ -2206,15 +2223,23 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      */
     private short getDimensionForCRS(final String code) throws SQLException {
         final PreparedStatement stmt;
-        stmt = prepareStatement("Dimension", "SELECT COUNT(CA.COORD_AXIS_CODE)"
-                                     +       " FROM [Coordinate Axis] AS CA"
-                                     + " INNER JOIN [Coordinate Reference System] AS CRS"
-                                     +       "   ON (CA.COORD_SYS_CODE = CRS.COORD_SYS_CODE)"
-                                     +      " WHERE (CRS.COORD_REF_SYS_CODE = ?)");
-        stmt.setString(1, code);
-        final ResultSet result = stmt.executeQuery();
-        final short dimension = result.next() ? result.getShort(1) : 2;
-        result.close();
+        Short returnValue = (Short) axisCounts.get(code);
+        final short dimension;
+        if (returnValue == null) {
+        	stmt = prepareStatement("Dimension", 
+            		"  SELECT COUNT(COORD_AXIS_CODE)"
+                    + "  FROM [Coordinate Axis]"
+                    + " WHERE COORD_SYS_CODE = (SELECT COORD_SYS_CODE " 
+                    + "                            FROM [Coordinate Reference System]"
+                    + "                           WHERE COORD_REF_SYS_CODE = ?)");
+	        stmt.setString(1, code);
+	        final ResultSet result = stmt.executeQuery();
+	        dimension = result.next() ? result.getShort(1) : 2;
+	        axisCounts.put(code, new Short(dimension));
+	        result.close();
+        } else {
+        	dimension = returnValue.shortValue();
+        }
         return dimension;
     }
 
@@ -2225,15 +2250,20 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      */
     final boolean isProjection(final String code) throws SQLException {
         final PreparedStatement stmt;
-        stmt = prepareStatement("isProjection", "SELECT COORD_REF_SYS_CODE"
-                                              +  " FROM [Coordinate Reference System]"
-                                              + " WHERE PROJECTION_CONV_CODE = ?"
-                                              +   " AND COORD_REF_SYS_KIND LIKE 'projected%'");
-        stmt.setString(1, code);
-        final ResultSet result = stmt.executeQuery();
-        final boolean found = result.next();
-        result.close();
-        return found;
+        Boolean projection = (Boolean) codeProjection.get(code);
+        if(projection == null) {
+	        stmt = prepareStatement("isProjection", "SELECT COORD_REF_SYS_CODE"
+	                                              +  " FROM [Coordinate Reference System]"
+	                                              + " WHERE PROJECTION_CONV_CODE = ?"
+	                                              +   " AND COORD_REF_SYS_KIND LIKE 'projected%'");
+	        stmt.setString(1, code);
+	        final ResultSet result = stmt.executeQuery();
+	        final boolean found = result.next();
+	        result.close();
+	        projection = Boolean.valueOf(found);
+	        codeProjection.put(code, projection);
+        } 
+        return projection.booleanValue();
     }
 
     /**
