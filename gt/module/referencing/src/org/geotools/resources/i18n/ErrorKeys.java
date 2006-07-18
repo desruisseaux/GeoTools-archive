@@ -49,6 +49,10 @@ public final class ErrorKeys {
     public static final int CANT_CONVERT_FROM_TYPE_$1              =    21;
     public static final int CANT_CREATE_FACTORY_$1                 =   184;
     public static final int CANT_CREATE_FROM_TEXT_$1               =    22;
+    public static final int CANT_CROP_$1						   =   185;
+    public static final int CANT_CROP_$2						   =   186;
+    public static final int CANT_CROP_$3                           =   187;
+    public static final int CANT_SCALE_$1                          =   188;    
     public static final int CANT_EVALUATE_$1                       =    23;
     public static final int CANT_GET_DATASOURCE_$1                 =   155;
     public static final int CANT_READ_$1                           =   163;

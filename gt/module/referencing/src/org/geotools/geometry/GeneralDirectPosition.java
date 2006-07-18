@@ -344,7 +344,7 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
      * a lot of position needs to be formatted, it is more efficient to use an
      * other instance of {@link CoordinateFormat}.
      */
-    static synchronized String toString(final DirectPosition position) {
+    public static synchronized String toString(final DirectPosition position) {
         if (format == null) {
             format = new CoordinateFormat();
         }
