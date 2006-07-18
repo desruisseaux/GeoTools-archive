@@ -338,11 +338,13 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
     }
 
     /**
-     * Format the specified position.
+     * Formats the specified position.
      * <strong>NOTE:</strong> This convenience method uses a shared instance of
      * {@link CoordinateFormat}. This is okay for occasional formatting. But if
      * a lot of position needs to be formatted, it is more efficient to use an
      * other instance of {@link CoordinateFormat}.
+     *
+     * @since 2.3
      */
     public static synchronized String toString(final DirectPosition position) {
         if (format == null) {

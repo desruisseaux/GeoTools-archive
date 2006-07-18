@@ -420,19 +420,20 @@ public final class JTS {
             }
         }
     }
+
 	/**
-	 * This method is responsible for converting a JTS 2D envelope in an
-	 * Envelope2D for interoperability with the referencing package.
+	 * Converts a JTS 2D envelope in an {@link Envelope2D} for interoperability with the
+	 * referencing package.
 	 * 
 	 * <p>
-	 * If the provided envelope is a <code>ReferencedEnvelope</code> we check
-	 * that the provided envelope and the implicit envelope envelope are
-	 * similar.
+	 * If the provided envelope is a {@link ReferencedEnvelope} we check
+	 * that the provided CRS and the implicit CRS are similar.
 	 * 
-	 * @param envelope
-	 * @param crs
-	 * @return
-	 * @throws TransformException
+	 * @param envelope The JTS envelope to convert.
+	 * @param crs The coordinate reference system for the specified envelope.
+	 * @return The GeoAPI envelope.
+	 * @throws TransformException if a two-dimensional envelope can't be created from an envelope
+	 *         with the specified CRS.
 	 */
 	public static Envelope2D getEnvelope2D(final Envelope envelope,
 			final CoordinateReferenceSystem crs) throws TransformException {
@@ -442,9 +443,12 @@ public final class JTS {
 		// Initial checks
 		//
 		// //
-		if (envelope == null || crs == null)
-			throw new NullPointerException(
-					"One or both the provided arguments are null");
+        if (envelope == null) {
+            throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "envelope"));
+        }
+        if (crs == null) {
+            throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "crs"));
+        }
 		if (envelope instanceof ReferencedEnvelope) {
 			final CoordinateReferenceSystem implicitCRS = ((ReferencedEnvelope) envelope)
 					.getCoordinateReferenceSystem();
@@ -460,6 +464,5 @@ public final class JTS {
 		final CoordinateReferenceSystem crs2D = CRSUtilities.getCRS2D(crs);
 		return new Envelope2D(crs2D, envelope.getMinX(), envelope.getMinY(),
 				envelope.getWidth(), envelope.getHeight());
-
 	}
 }
