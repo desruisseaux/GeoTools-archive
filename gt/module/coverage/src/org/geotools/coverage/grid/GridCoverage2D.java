@@ -716,7 +716,15 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * The exact appareance of the windows and the tools provided may changes in future versions.
      */
     public void show() {
-        show(gridGeometry.axisDimensionX, gridGeometry.axisDimensionY);
+    	final GridCoverage2D gc= geophysics(false);
+    	final StringBuffer buff= new StringBuffer(gc.getName().toString());
+    	final int visibleBandIndex= CoverageUtilities.getVisibleBand(gc);
+    	final SampleDimension visibleBand=gc.getSampleDimension(visibleBandIndex);
+    	final Unit unit= visibleBand.getUnits();
+    	buff.append(" - ").append(visibleBand.getDescription().toString());
+    	if(unit!=null)
+    		buff.append(" (").append(unit.toString()).append(")");
+        gc.show(buff.toString(),gridGeometry.axisDimensionX, gridGeometry.axisDimensionY);
     }
 
     /**

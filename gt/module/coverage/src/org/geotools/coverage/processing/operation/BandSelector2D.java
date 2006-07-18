@@ -229,7 +229,8 @@ final class BandSelector2D extends GridCoverage2D {
      * Returns {@code true} if the specified array contains increasing values 0, 1, 2...
      */
     private static boolean isIdentity(final int[] bands) {
-        for (int i=0; i<bands.length; i++) {
+		final int length = bands.length;
+		for (int i = 0; i < length; i++) {
             if (bands[i] != i) {
                 return false;
             }

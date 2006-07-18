@@ -130,7 +130,7 @@ public class SampleDimensionTest extends TestCase {
             categories[i] = new Category(CATEGORIES[i], null, NO_DATA[i]);
         }
         categories[CATEGORIES.length] = new Category("SST", null, minimum, maximum, scale, offset);
-        test = new GridSampleDimension(categories, null);
+        test = new GridSampleDimension("A",categories, null);
     }
 
     /**

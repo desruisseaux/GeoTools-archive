@@ -24,6 +24,7 @@ import java.awt.geom.AffineTransform;  // For javadoc
 import java.awt.image.BufferedImage;   // For javadoc
 import java.awt.image.RenderedImage;   // For javadoc
 import java.io.Serializable;
+import java.util.MissingResourceException;
 
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
@@ -165,8 +166,29 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         envelope.setCoordinateReferenceSystem(crs);
     }
 
-    /**
-     * Constructs a new grid geometry from a {@linkplain MathTransform math transform}. This is
+	/**
+	 * Constructs a new grid geometry from a math transform.
+	 * 
+	 * @param gridRange
+	 *            The valid coordinate range of a grid coverage, or {@code null}
+	 *            if none.
+	 * @param gridToCRS
+	 *            The math transform which allows for the transformations from
+	 *            grid coordinates (pixel's <em>center</em>) to real world
+	 *            earth coordinates.
+	 * 
+	 * @deprecated Replaced by
+	 *             <code>{@linkplain #GeneralGridGeometry(GridRange, MathTransform,
+	 *             CoordinateReferenceSystem) GeneralGridGeometry}(gridRange, gridToCRS, null)</code>.
+	 */
+	public GeneralGridGeometry(final GridRange gridRange,
+			final MathTransform gridToCRS) {
+		this(gridRange, gridToCRS, (CoordinateReferenceSystem) null);
+	}
+
+	/**
+	 * Constructs a new grid geometry from a
+	 * {@linkplain MathTransform math transform}. This is the most general
      * the most general constructor, the one that gives the maximal control on the grid geometry
      * to be created.
      *
@@ -191,6 +213,21 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     {
         this.gridRange = gridRange;
         this.gridToCRS = gridToCRS;
+		envelope = getEnvelope(gridRange, gridToCRS, crs, true);
+	}
+
+	/**
+	 * @param gridRange
+	 * @param gridToCRS
+	 * @param crs
+	 * @throws MismatchedDimensionException
+	 * @throws IllegalArgumentException
+	 * @throws MissingResourceException
+	 */
+	public static GeneralEnvelope getEnvelope(final GridRange gridRange,
+			final MathTransform gridToCRS, final CoordinateReferenceSystem crs,
+			final boolean halfPix) throws MismatchedDimensionException,
+			IllegalArgumentException, MissingResourceException {
         if (gridRange!=null && gridToCRS!=null) {
             /*
              * Checks arguments.
@@ -222,12 +259,13 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                 // TODO: uncomment the exception cause when we will be allowed to target J2SE 1.5.
             }
             envelope.setCoordinateReferenceSystem(crs);
-            this.envelope = envelope;
-        } else if (crs != null) {
-            envelope = new GeneralEnvelope(crs);
-            envelope.setToNull();
+            return envelope;
+		} else if (crs != null) {
+			GeneralEnvelope retEnvelope = new GeneralEnvelope(crs);
+			retEnvelope.setToNull();
+			return retEnvelope;
         } else {
-            envelope = null;
+			return null;
         }
     }
 
@@ -278,7 +316,20 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         this(gridRange, userRange, reverse(cs), swapXY(cs));
     }
 
-    /**
+	/**
+	 * Constructs a new grid geometry from an envelope.
+	 * 
+	 * @deprecated Replaced by
+	 *             {@code GeneralGridGeometry(gridRange, userRange, reverse, false)}.
+	 *             Users just need to append the {@code false} argument value,
+	 *             so this constructor will be removed in a future version in
+	 *             order to keep the API lighter.
+	 */
+	public GeneralGridGeometry(final GridRange gridRange,
+			final Envelope userRange, final boolean[] reverse) {
+		this(gridRange, userRange, reverse, false);
+	}
+	/**
      * Constructs a new grid geometry from an {@linkplain Envelope envelope}. An
      * {@linkplain AffineTransform affine transform} will be computed automatically from the
      * specified envelope. The two last arguments ({@code swapXY} and {@code reverse}) are hints
@@ -357,7 +408,23 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     {
         this.gridRange = gridRange;
         this.envelope  = new GeneralEnvelope(userRange);
-        /*
+		gridToCRS = getTransform(gridRange, userRange, reverse, swapXY, true);
+	}
+
+	/**
+	 * @param gridRange
+	 * @param userRange
+	 * @param reverse
+	 * @param swapXY
+	 * @param b
+	 * @return
+	 * @throws MismatchedDimensionException
+	 */
+	public static MathTransform getTransform(final GridRange gridRange,
+			final Envelope userRange, final boolean[] reverse,
+			final boolean swapXY, boolean halfPix)
+			throws MismatchedDimensionException {
+		/*
          * Checks arguments validity. Grid range and envelope dimensions must match.
          * We are more tolerant for the coordinate system dimension (if any), since
          * it is only an optional hint for interchanging axis in a more common order.
@@ -391,14 +458,21 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                 scale  = -scale;
                 offset = userRange.getMaximum(j);
             }
-            offset -= scale * (gridRange.getLower(i)-0.5);
+			offset -= scale * (gridRange.getLower(i) - (halfPix ? 0.5 : 0));
             matrix.setElement(j, j,         0.0   );
             matrix.setElement(j, i,         scale );
             matrix.setElement(j, dimension, offset);
         }
-        gridToCRS = ProjectiveTransform.create(matrix);
+		return ProjectiveTransform.create(matrix);
     }
 
+	public static MathTransform getTransform(final GridRange gridRange,
+			final Envelope userRange, boolean halfPix)
+			throws MismatchedDimensionException {
+		final CoordinateSystem cs = getCoordinateSystem(userRange);
+		return getTransform(gridRange, userRange, reverse(cs), swapXY(cs),
+				halfPix);
+	}
     /**
      * Returns the coordinate system in use with the specified envelope. This method
      * is invoked by the {@link #GeneralGridGeometry(GridRange,Envelope)} constructor.
@@ -422,7 +496,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * Applies heuristic rules in order to determine which axis should be reversed. This
      * method is invoked by the {@link #GeneralGridGeometry(GridRange,Envelope)} constructor.
      */
-    static boolean[] reverse(final CoordinateSystem cs) {
+	static public boolean[] reverse(final CoordinateSystem cs) {
         if (cs == null) {
             return null;
         }
@@ -443,7 +517,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * Applies heuristic rules in order to determine if the two first axis should be interchanged.
      * This method is invoked by the {@link #GeneralGridGeometry(GridRange,Envelope)} constructor.
      */
-    static boolean swapXY(final CoordinateSystem cs) {
+	static public boolean swapXY(final CoordinateSystem cs) {
         boolean swapXY = false;
         if (cs!=null && cs.getDimension() >= 2) {
             swapXY = AxisDirection.NORTH.equals(cs.getAxis(0).getDirection().absolute()) &&

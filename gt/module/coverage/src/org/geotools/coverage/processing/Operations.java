@@ -21,8 +21,10 @@ package org.geotools.coverage.processing;
 
 // J2SE and JAI dependencies
 import java.awt.RenderingHints;
-import javax.media.jai.KernelJAI;
+import java.util.Map;
+import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
+import javax.media.jai.KernelJAI;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -34,7 +36,7 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
+import org.opengis.spatialschema.geometry.Envelope;
 // Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -243,7 +245,20 @@ public class Operations {
         return (GridCoverage) doOperation("Interpolate", source, "Type", types);
     }
 
-    /**
+	/**
+	 * Recolors a coverage to the specified colormaps.
+	 * 
+	 * @param source
+	 *            The source coverage.
+	 * @param colorMaps
+	 *            The color maps to apply
+	 * @see org.geotools.coverage.processing.operation.Recolor
+	 */
+	public GridCoverage recolor(final GridCoverage source, final Map[] colorMaps) {
+		return (GridCoverage) doOperation("Recolor", source, "ColorMaps",
+				colorMaps);
+	}
+	/**
      * Resamples a coverage to the specified coordinate reference system.
      *
      * @param source The source coverage.
@@ -300,21 +315,129 @@ public class Operations {
         return (GridCoverage) doOperation("NodataFilter", source);
     }
 
-    /**
-     * Replaces {@link Float#NaN NaN} values by the weighted average of neighbors values.
-     *
-     * @param source The source coverage.
-     *
-     * @see org.geotools.coverage.processing.operation.NodataFilter
-     */
-    public GridCoverage nodataFilter(final GridCoverage source, final int padding,
-                                     final int validityThreshold)
-    {
-        return (GridCoverage) doOperation("NodataFilter",      source,
-                                          "padding",           new Integer(padding),
-                                          "validityThreshold", new Integer(validityThreshold));
-    }
+	/**
+	 * Replaces {@link Float#NaN NaN} values by the weighted average of
+	 * neighbors values.
+	 * 
+	 * @param source
+	 *            The source coverage.
+	 * 
+	 * @see org.geotools.coverage.processing.operation.NodataFilter
+	 */
+	public GridCoverage nodataFilter(final GridCoverage source,
+			final int padding, final int validityThreshold) {
+		return (GridCoverage) doOperation("NodataFilter", source, "padding",
+				new Integer(padding), "validityThreshold", new Integer(
+						validityThreshold));
+	}
 
+	public GridCoverage scale(final GridCoverage source, final double xScale,
+			final double yScale, final double xTrans, final double yTrans) {
+		final AbstractProcessor processor = getProcessor();
+		final Operation operation = processor.getOperation("Scale");
+		final ParameterValueGroup parameters = operation.getParameters();
+		parameters.parameter("Source").setValue(source);
+		try {
+			parameters.parameter("xScale").setValue(new Float(xScale));
+			parameters.parameter("yScale").setValue(new Float(yScale));
+			parameters.parameter("xTrans").setValue(new Float(xTrans));
+			parameters.parameter("yTrans").setValue(new Float(yTrans));
+		} catch (ParameterNotFoundException cause) {
+			throw invalidParameterName(cause);
+		}
+		return (GridCoverage) processor.doOperation(parameters);
+
+	}
+	
+	public GridCoverage filteredSubsample(final GridCoverage source, final int scaleX,
+			final int scaleY, final float[] qsFilter) {
+		final AbstractProcessor processor = getProcessor();
+		final Operation operation = processor.getOperation("FilteredSubsample");
+		final ParameterValueGroup parameters = operation.getParameters();
+		parameters.parameter("Source").setValue(source);
+		try {
+			parameters.parameter("scaleX").setValue(new Integer(scaleX));
+			parameters.parameter("scaleY").setValue(new Integer(scaleY));
+			parameters.parameter("qsFilterArray").setValue(qsFilter);
+		} catch (ParameterNotFoundException cause) {
+			throw invalidParameterName(cause);
+		}
+		return (GridCoverage) processor.doOperation(parameters);
+
+	}
+	public GridCoverage filteredSubsample(final GridCoverage source, final int scaleX,
+			final int scaleY, final float[] qsFilter,final Interpolation interpolation) {
+		final AbstractProcessor processor = getProcessor();
+		final Operation operation = processor.getOperation("FilteredSubsample");
+		final ParameterValueGroup parameters = operation.getParameters();
+		parameters.parameter("Source").setValue(source);
+		try {
+			parameters.parameter("scaleX").setValue(new Integer(scaleX));
+			parameters.parameter("scaleY").setValue(new Integer(scaleY));
+			parameters.parameter("qsFilterArray").setValue(qsFilter);
+			parameters.parameter("Interpolation").setValue(interpolation);
+		} catch (ParameterNotFoundException cause) {
+			throw invalidParameterName(cause);
+		}
+		return (GridCoverage) processor.doOperation(parameters);
+
+	}
+	public GridCoverage filteredSubsample(final GridCoverage source, final int scaleX,
+			final int scaleY, float[] qsFilter,final Interpolation interpolation,final BorderExtender be) {
+		final AbstractProcessor processor = getProcessor();
+		final Operation operation = processor.getOperation("FilteredSubsample");
+		final ParameterValueGroup parameters = operation.getParameters();
+		parameters.parameter("Source").setValue(source);
+		try {
+			parameters.parameter("scaleX").setValue(new Integer(scaleX));
+			parameters.parameter("scaleY").setValue(new Integer(scaleY));
+			parameters.parameter("qsFilterArray").setValue(qsFilter);
+			parameters.parameter("Interpolation").setValue(interpolation);
+			parameters.parameter("BorderExtender").setValue(be);
+		} catch (ParameterNotFoundException cause) {
+			throw invalidParameterName(cause);
+		}
+		return (GridCoverage) processor.doOperation(parameters);
+
+	}
+	public GridCoverage scale(final GridCoverage source, final double xScale,
+			final double yScale, final double xTrans, final double yTrans,Interpolation interpolation) {
+		final AbstractProcessor processor = getProcessor();
+		final Operation operation = processor.getOperation("Scale");
+		final ParameterValueGroup parameters = operation.getParameters();
+		parameters.parameter("Source").setValue(source);
+		try {
+			parameters.parameter("xScale").setValue(new Float(xScale));
+			parameters.parameter("yScale").setValue(new Float(yScale));
+			parameters.parameter("xTrans").setValue(new Float(xTrans));
+			parameters.parameter("yTrans").setValue(new Float(yTrans));
+			parameters.parameter("Interpolation").setValue(interpolation);
+		} catch (ParameterNotFoundException cause) {
+			throw invalidParameterName(cause);
+		}
+		return (GridCoverage) processor.doOperation(parameters);
+
+	}
+	
+	public GridCoverage scale(final GridCoverage source, final double xScale,
+			final double yScale, final double xTrans, final double yTrans,Interpolation interpolation, final BorderExtender extender) {
+		final AbstractProcessor processor = getProcessor();
+		final Operation operation = processor.getOperation("Scale");
+		final ParameterValueGroup parameters = operation.getParameters();
+		parameters.parameter("Source").setValue(source);
+		try {
+			parameters.parameter("xScale").setValue(new Float(xScale));
+			parameters.parameter("yScale").setValue(new Float(yScale));
+			parameters.parameter("xTrans").setValue(new Float(xTrans));
+			parameters.parameter("yTrans").setValue(new Float(yTrans));
+			parameters.parameter("Interpolation").setValue(interpolation);
+			parameters.parameter("BorderExtender").setValue(extender);
+		} catch (ParameterNotFoundException cause) {
+			throw invalidParameterName(cause);
+		}
+		return (GridCoverage) processor.doOperation(parameters);
+
+	}
     /**
      * Edge detector which computes the magnitude of the image gradient vector in two orthogonal
      * directions. The default masks are the Sobel ones.
@@ -327,6 +450,9 @@ public class Operations {
         return doOperation("GradientMagnitude", source);
     }
 
+	public Coverage crop(final Coverage Source, final Envelope envelope) {
+		return doOperation("CoverageCrop", Source, "Envelope", envelope);
+	}
     /**
      * Edge detector which computes the magnitude of the image gradient vector in two orthogonal
      * directions.

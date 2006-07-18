@@ -49,7 +49,7 @@ public class BilevelOperation extends OperationJAI {
     /**
      * The sample dimension for the resulting image.
      */
-    private static final GridSampleDimension SAMPLE_DIMENSION = new GridSampleDimension(new Category[] {
+    private static final GridSampleDimension SAMPLE_DIMENSION = new GridSampleDimension("Bilevel SampleDimension",new Category[] {
         Category.FALSE,
         Category.TRUE
     }, null);

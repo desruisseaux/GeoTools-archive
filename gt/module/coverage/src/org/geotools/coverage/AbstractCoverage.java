@@ -70,6 +70,9 @@ import javax.media.jai.operator.ImageFunctionDescriptor; // For Javadoc
 import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
 import javax.media.jai.widget.ScrollingImagePanel;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -944,34 +947,54 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
         }
     }
 
-    /**
-     * Display this coverage in a windows. This convenience method is used for debugging purpose.
-     * The exact appareance of the windows and the tools provided may changes in future versions.
-     *
-     * @param  xAxis Dimension to use for the <var>x</var> display axis.
-     * @param  yAxis Dimension to use for the <var>y</var> display axis.
-     */
-    public void show(final int xAxis, final int yAxis) {
-        final RenderedImage image = getRenderableImage(xAxis, yAxis).createDefaultRendering();
-        final Frame frame = new Frame(String.valueOf(getName()));
-        frame.add(new ScrollingImagePanel(image, Math.max(Math.min(image.getWidth(),  640), 24),
-                                                 Math.max(Math.min(image.getHeight(), 640), 24)));
-        frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                frame.dispose();
-            }
-        });
-        frame.pack();
-        frame.setVisible(true);
-    }
+	/**
+	 * Display this coverage in a windows. This convenience method is used for
+	 * debugging purpose. The exact appareance of the windows and the tools
+	 * provided may changes in future versions.
+	 * 
+	 * @param title
+	 * 
+	 * @param xAxis
+	 *            Dimension to use for the <var>x</var> display axis.
+	 * @param yAxis
+	 *            Dimension to use for the <var>y</var> display axis.
+	 */
+	public void show(final String title, final int xAxis, final int yAxis) {
+		final RenderedImage image = getRenderableImage(xAxis, yAxis)
+				.createDefaultRendering();
+		final JFrame frame = new JFrame(String.valueOf(getName()));
+		final ScrollingImagePanel panel = new ScrollingImagePanel(image, 800,
+				600);
+		frame.setTitle(title);
+		frame.getContentPane().add(new JScrollPane(panel));
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		SwingUtilities.invokeLater(new Runnable(){
 
-    /**
-     * Display this coverage in a windows. This convenience method is used for debugging purpose.
-     * The exact appareance of the windows and the tools provided may changes in future versions.
-     */
-    public void show() {
-        show(0,1);
-    }
+			public void run() {
+				frame.pack();
+				frame.setVisible(true);
+				
+			}});
+
+	}
+
+	/**
+	 * Display this coverage in a windows. This convenience method is used for
+	 * debugging purpose. The exact appareance of the windows and the tools
+	 * provided may changes in future versions.
+	 */
+	public void show(final String title) {
+		show(title, 0, 1);
+	}
+
+	/**
+	 * Display this coverage in a windows. This convenience method is used for
+	 * debugging purpose. The exact appareance of the windows and the tools
+	 * provided may changes in future versions.
+	 */
+	public void show() {
+		show("coverage", 0, 1);
+	}
 
     /**
      * List of metadata keywords for a coverage. If no metadata is available, the sequence

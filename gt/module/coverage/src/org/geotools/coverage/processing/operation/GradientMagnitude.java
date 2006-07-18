@@ -280,7 +280,8 @@ public class GradientMagnitude extends OperationJAI {
     private static KernelJAI divide(KernelJAI kernel, final double denominator) {
         if (denominator != 1) {
             final float[] data = kernel.getKernelData();
-            for (int i=0; i<data.length; i++) {
+			final int length = data.length;
+			for (int i = 0; i < length; i++) {
                 data[i] /= denominator;
             }
             kernel = new KernelJAI(kernel.getWidth(),   kernel.getHeight(),

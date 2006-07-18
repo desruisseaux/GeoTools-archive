@@ -23,6 +23,7 @@ package org.geotools.coverage.processing.operation;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.image.DataBuffer;
 import java.awt.image.renderable.ParameterBlock;
 import java.util.List;
 import java.util.Locale;
@@ -168,7 +169,10 @@ final class Resampler2D extends GridCoverage2D {
          */
         boolean sameGG, sameCRS;
         GridGeometry2D            sourceGG;
-        CoordinateReferenceSystem sourceCRS;
+		final Envelope sourceEnvelope;
+		final GeneralEnvelope targetEnvelope;
+		CoordinateReferenceSystem sourceCRS;
+		final JAI processor;
         while (true) {
             sourceGG  = (GridGeometry2D) sourceCoverage.getGridGeometry(); // TODO: remove cast with J2SE 1.5.
             sourceCRS = sourceCoverage.getCoordinateReferenceSystem();
@@ -219,7 +223,6 @@ final class Resampler2D extends GridCoverage2D {
          * The source coverage is now selected and will not change anymore.
          * Gets the JAI instance and factories to use from the rendering hints.
          */
-        final JAI processor;
         if (true) {
             final Object property = (hints!=null) ? hints.get(Hints.JAI_INSTANCE) : null;
             if (property instanceof JAI) {
@@ -274,14 +277,14 @@ final class Resampler2D extends GridCoverage2D {
                     targetGG  = new GridGeometry2D(new GeneralGridRange(gridRange), step1, targetCRS);
                 }
             }
+			targetEnvelope=(GeneralEnvelope) targetGG.getEnvelope();
         } else {
             if (sourceCRS == null) {
                 throw new CannotReprojectException(Errors.format(ErrorKeys.UNSPECIFIED_CRS));
             }
-            final        Envelope sourceEnvelope;
-            final GeneralEnvelope targetEnvelope;
-            step2          = factory.createOperation(targetCRS, sourceCRS).getMathTransform();
-            step3          = sourceGG.getGridToCoordinateSystem().inverse();
+			step2 = factory.createOperation(targetCRS, sourceCRS)
+					.getMathTransform();
+			step3 = sourceGG.getGridToCoordinateSystem().inverse();
             sourceEnvelope = sourceCoverage.getEnvelope();
             targetEnvelope = CRSUtilities.transform(step2.inverse(), sourceEnvelope);
             targetEnvelope.setCoordinateReferenceSystem(targetCRS);
@@ -443,10 +446,7 @@ final class Resampler2D extends GridCoverage2D {
                 if (automaticGG) {
                     // Cheapest approach: just update 'gridToCRS'.
                     GridCoverage2D targetCoverage;
-                    MathTransform  mtr;
-                    mtr            = sourceGG.getGridToCoordinateSystem();
-                    mtr            = mtFactory.createConcatenatedTransform(mtr, allSteps.inverse());
-                    targetGG       = new GridGeometry2D(sourceGG.getGridRange(), mtr, targetCRS);
+					targetGG = new GridGeometry2D(sourceGG.getGridRange(),targetEnvelope);
                     targetCoverage = new Resampler2D(sourceCoverage, sourceImage, targetGG);
                     if (targetGeophysics != null) {
                         targetCoverage = targetCoverage.geophysics(targetGeophysics.booleanValue());
@@ -461,17 +461,53 @@ final class Resampler2D extends GridCoverage2D {
                 }
             }
         }
-        if (operation == null) {
-            /*
-             * General case: construct the warp transform.
-             */
-            operation = "Warp";
-            final Warp warp = WarpTransform2D.getWarp(sourceCoverage.getName(), (MathTransform2D)allSteps2D);
-            paramBlk = paramBlk.add(warp)
-                               .add(interpolation)
-                               .add(background);
-        }
-        final RenderedOp targetImage = processor.createNS(operation, paramBlk, targetHints);
+		if (operation == null) {
+			/*
+			 * General case: construct the warp transform.
+			 */
+			operation = "Warp";
+			final Warp warp = WarpTransform2D.getWarp(sourceCoverage.getName(),
+					(MathTransform2D) allSteps2D);
+			paramBlk = paramBlk.add(warp).add(interpolation).add(background);
+		}
+		if (operation.equalsIgnoreCase("warp")
+				|| operation.equalsIgnoreCase("affine")) {
+			if (sourceCoverage.getRenderedImage().getSampleModel()
+					.getDataType() == DataBuffer.TYPE_FLOAT
+					&& !(interpolation instanceof InterpolationNearest)) {
+				/**
+				 * Disables the native acceleration for the "Affine" operation.
+				 * In JAI 1.1.2, the "Affine" operation on TYPE_FLOAT datatype
+				 * with INTERP_BILINEAR interpolation cause an exception in the
+				 * native code of medialib, which halt the Java Virtual Machine.
+				 * Using the pure Java implementation instead resolve the
+				 * problem.
+				 * 
+				 * @todo Remove this hack when Sun will fix the medialib bug.
+				 *       See
+				 *       http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4906854
+				 */
+
+				Registry.setNativeAccelerationAllowed("Affine", false);
+
+			}
+		}
+		final RenderedOp targetImage = processor.createNS(operation, paramBlk,
+				targetHints);
+		final PlanarImage currentRenderingOfTargetImage = targetImage
+				.createInstance();// force rendering
+		if (operation.equalsIgnoreCase("warp")
+				|| operation.equalsIgnoreCase("affine")) {
+			if (sourceCoverage.getRenderedImage().getSampleModel()
+					.getDataType() == DataBuffer.TYPE_FLOAT
+					&& !(interpolation instanceof InterpolationNearest)) {
+				/**
+				 * see above
+				 */
+				Registry.setNativeAccelerationAllowed("Affine", true);
+
+			}
+		}
         final Locale locale = sourceCoverage.getLocale();  // For logging purpose.
         /*
          * The JAI operation sometime returns an image with a bounding box different than what we
@@ -481,11 +517,11 @@ final class Resampler2D extends GridCoverage2D {
          * reconstruct the target grid geometry.
          */
         final int[] lower = targetGR.getLowers();
-        final int[] upper = targetGR.getUppers();
-        lower[xAxis] = targetImage.getMinX();
-        lower[yAxis] = targetImage.getMinY();
-        upper[xAxis] = targetImage.getMaxX();
-        upper[yAxis] = targetImage.getMaxY();
+		final int[] upper = targetGR.getUppers();
+		lower[xAxis] = currentRenderingOfTargetImage.getMinX();
+		lower[yAxis] = currentRenderingOfTargetImage.getMinY();
+		upper[xAxis] = currentRenderingOfTargetImage.getMaxX();
+		upper[yAxis] = currentRenderingOfTargetImage.getMaxY();
         final GridRange actualGR = new GeneralGridRange(lower, upper);
         if (!targetGR.equals(actualGR)) {
             MathTransform gridToCRS = targetGG.getGridToCoordinateSystem();
@@ -503,33 +539,53 @@ final class Resampler2D extends GridCoverage2D {
          *     is "Warp" with "Nearest" interpolation on geophysics pixels values. Background
          *     value is 255.
          */
-        GridCoverage2D targetCoverage = new Resampler2D(sourceCoverage, targetImage, targetGG);
+		GridCoverage2D targetCoverage = new Resampler2D(sourceCoverage,
+				currentRenderingOfTargetImage, targetGG);
         if (targetGeophysics != null) {
             targetCoverage = targetCoverage.geophysics(targetGeophysics.booleanValue());
         }
-        assert CRSUtilities.equalsIgnoreMetadata(targetCoverage.getCoordinateReferenceSystem(),
-                                                 targetCRS) : targetCoverage;
-        assert ((GridGeometry2D) targetCoverage.getGridGeometry()).getGridRange2D()
-                             .equals(targetImage.getBounds()) : targetGG;
+		assert CRSUtilities.equalsIgnoreMetadata(targetCoverage
+				.getCoordinateReferenceSystem(), targetCRS) : targetCoverage;
+		assert ((GridGeometry2D) targetCoverage.getGridGeometry())
+				.getGridRange2D().equals(
+						currentRenderingOfTargetImage.getBounds()) : targetGG;
 
-        if (AbstractProcessor.LOGGER.isLoggable(LOGGING_LEVEL)) {
-            log(Logging.getResources(locale).getLogRecord(LOGGING_LEVEL,
-                LoggingKeys.APPLIED_RESAMPLE_$11, new Object[] {
-                /*  {0} */ sourceCoverage.getName().toString(locale),
-                /*  {1} */ sourceCoverage.getCoordinateReferenceSystem().getName().getCode(),
-                /*  {2} */ new Integer(sourceImage.getWidth()),
-                /*  {3} */ new Integer(sourceImage.getHeight()),
-                /*  {4} */ targetCoverage.getCoordinateReferenceSystem().getName().getCode(),
-                /*  {5} */ new Integer(targetImage.getWidth()),
-                /*  {6} */ new Integer(targetImage.getHeight()),
-                /*  {7} */ targetImage.getOperationName(),
-                /*  {8} */ new Integer(sourceCoverage == sourceCoverage.geophysics(true) ? 1 : 0),
-                /*  {9} */ ImageUtilities.getInterpolationName(interpolation),
-                /* {10} */ background.length==1 ? (Double.isNaN(background[0]) ? (Object) "NaN" :
-                                                  (Object) new Double(background[0])) :
-                                                  (Object) XArray.toString(background, locale)}));
-        }
-        return targetCoverage;
+		if (AbstractProcessor.LOGGER.isLoggable(LOGGING_LEVEL)) {
+			log(Logging
+					.getResources(locale)
+					.getLogRecord(
+							LOGGING_LEVEL,
+							LoggingKeys.APPLIED_RESAMPLE_$11,
+							new Object[] {
+									/* {0} */sourceCoverage.getName()
+											.toString(locale),
+									/* {1} */sourceCoverage
+											.getCoordinateReferenceSystem()
+											.getName().getCode(),
+									/* {2} */new Integer(sourceImage
+											.getWidth()),
+									/* {3} */new Integer(sourceImage
+											.getHeight()),
+									/* {4} */targetCoverage
+											.getCoordinateReferenceSystem()
+											.getName().getCode(),
+									/* {5} */new Integer(targetImage
+											.getWidth()),
+									/* {6} */new Integer(targetImage
+											.getHeight()),
+									/* {7} */targetImage.getOperationName(),
+									/* {8} */new Integer(
+											sourceCoverage == sourceCoverage
+													.geophysics(true) ? 1 : 0),
+									/* {9} */ImageUtilities
+											.getInterpolationName(interpolation),
+									/* {10} */background.length == 1 ? (Double
+											.isNaN(background[0]) ? (Object) "NaN"
+											: (Object) new Double(background[0]))
+											: (Object) XArray.toString(
+													background, locale) }));
+		}
+		return targetCoverage;
     }
 
     /**

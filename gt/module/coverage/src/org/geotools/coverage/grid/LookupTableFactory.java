@@ -100,7 +100,8 @@ final class LookupTableFactory {
         /*
          * Argument check. Null values are legal but can't be processed by this method.
          */
-        for (int i=0; i<transforms.length; i++) {
+    	final int transformsLength=transforms.length;
+        for (int i=0; i<transformsLength; i++) {
             if (transforms[i] == null) {
                 return null;
             }
@@ -246,7 +247,8 @@ final class LookupTableFactory {
      */
     public int hashCode() {
         int code = sourceType + 37*targetType;
-        for (int i=0; i<transforms.length; i++) {
+        final int length=transforms.length;
+        for (int i=0; i<length; i++) {
             code = code*37 + transforms[i].hashCode();
         }
         return code;

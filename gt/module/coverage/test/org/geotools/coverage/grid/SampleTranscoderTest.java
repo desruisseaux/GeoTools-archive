@@ -102,7 +102,7 @@ public class SampleTranscoderTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        band1 = new GridSampleDimension(new Category[] {
+        band1 = new GridSampleDimension("a",new Category[] {
             new Category("No data",     null, 0),
             new Category("Land",        null, 1),
             new Category("Clouds",      null, 2),
@@ -131,7 +131,7 @@ public class SampleTranscoderTest extends TestCase {
      */
     private RenderedImage testOneBand(final double scale, final double offset) throws TransformException {
         final Category category = new Category("Values", null, 0, 256, scale, offset);
-        return testOneBand(new GridSampleDimension(new Category[] {category}, null));
+        return testOneBand(new GridSampleDimension("a",new Category[] {category}, null));
     }
 
     /**

@@ -122,7 +122,8 @@ final class GeophysicsCategoryList extends CategoryList {
     private static int getFractionDigitCount(final Category[] categories) {
         int ndigits = 0;
         final double EPS = 1E-6;
-        for (int i=0; i<categories.length; i++) {
+        final int length=categories.length;
+        for (int i=0; i<length; i++) {
             final Category geophysics = categories[i].geophysics(true);
             final Category samples    = categories[i].geophysics(false);
             final double ln = XMath.log10((geophysics.maximum - geophysics.minimum)/

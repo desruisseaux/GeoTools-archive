@@ -413,7 +413,8 @@ public final class DeferredPlanarImage extends PlanarImage
     private void fireTileUpdate(final int tileX, final int tileY, final boolean willBeWritable) {
         final TileObserver[] observers = this.observers; // Avoid the need for synchronisation.
         if (observers != null) {
-            for (int i=0; i<observers.length; i++) {
+        	final int length= observers.length;
+            for (int i=0; i<length; i++) {
                 try {
                     observers[i].tileUpdate(this, tileX, tileY, willBeWritable);
                 } catch (RuntimeException cause) {
@@ -599,13 +600,16 @@ public final class DeferredPlanarImage extends PlanarImage
             final int minX = getMinTileX();
             final int minY = getMinTileY();
             final int numX = getNumXTiles();
-            for (int i=0; i<pendings.length; i++) {
+            final int length=pendings.length;
+            int x;
+            int y ;
+            for (int i=0; i<length; i++) {
                 if (pendings[i] != null) {
                     if (indices == null) {
-                        indices = new Point[pendings.length-i];
+                        indices = new Point[length-i];
                     }
-                    final int x = i%numX + minX;
-                    final int y = i/numX + minY;
+                    x = i%numX + minX;
+                    y = i/numX + minY;
                     assert getTileIndice(x,y)==i : i;
                     indices[count++] = new Point(x,y);
                 }
