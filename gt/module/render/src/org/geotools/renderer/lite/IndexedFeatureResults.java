@@ -28,7 +28,7 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  * @author wolf
  * @source $URL$
  */
-public class IndexedFeatureResults implements FeatureResults {
+public final class IndexedFeatureResults implements FeatureResults {
 	STRtree index = new STRtree();
 	FeatureType schema;
 	Envelope bounds;
@@ -47,9 +47,11 @@ public class IndexedFeatureResults implements FeatureResults {
 		count = 0;
 		try {
 			reader = results.reader();
+			Feature f;
+			Envelope env;
 			while (reader.hasNext()) {
-				Feature f = reader.next();
-				Envelope env = f.getDefaultGeometry().getEnvelopeInternal();
+				f = reader.next();
+				env = f.getDefaultGeometry().getEnvelopeInternal();
 				bounds.expandToInclude(env);
 				count++;
 				index.insert(env, f);

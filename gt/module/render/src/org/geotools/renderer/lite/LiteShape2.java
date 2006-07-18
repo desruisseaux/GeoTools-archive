@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  * @version $Id$
  */
-public class LiteShape2 implements Shape, Cloneable {
+public final class LiteShape2 implements Shape, Cloneable {
 
 	/** The wrapped JTS geometry */
 	private Geometry geometry;

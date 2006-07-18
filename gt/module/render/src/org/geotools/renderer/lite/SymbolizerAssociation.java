@@ -8,7 +8,7 @@
  */
 package org.geotools.renderer.lite;
 
-import org.geotools.styling.Symbolizer;
+
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 

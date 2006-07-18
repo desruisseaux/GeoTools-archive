@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * @author Ian Turton
  * @source $URL$
  */
-class ImageLoader implements Runnable {
+public final class ImageLoader implements Runnable {
     /** The logger for the rendering module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
 

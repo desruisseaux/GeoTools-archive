@@ -42,17 +42,19 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author jones
  * 
  * @source $URL$
+ * @deprecated
  */
 public class BoundsExtractor implements FilterVisitor {
 	Envelope clippedbbox;
-	private short logicType=Filter.LOGIC_AND;
+
+	private short logicType = Filter.LOGIC_AND;
 
 	public BoundsExtractor(Envelope bbox) {
 		this.clippedbbox = bbox;
 	}
 
 	public BoundsExtractor(int minx, int maxx, int miny, int maxy) {
-		this.clippedbbox=new Envelope(minx,maxx,miny,maxy);
+		this.clippedbbox = new Envelope(minx, maxx, miny, maxy);
 	}
 
 	public void visit(Filter filter) {
@@ -148,44 +150,42 @@ public class BoundsExtractor implements FilterVisitor {
 	public void visit(GeometryFilter filter) {
 		if (filter != null) {
 
-				LiteralExpression le = null;
-				Envelope bbox=null;
-				if (filter.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
-					le = (LiteralExpression) filter.getLeftGeometry();
+			LiteralExpression le = null;
+			Envelope bbox = null;
+			if (filter.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
+				le = (LiteralExpression) filter.getLeftGeometry();
+				if (le != null && le.getLiteral() != null
+						&& le.getLiteral() instanceof Geometry) {
+					bbox = ((Geometry) le.getLiteral()).getEnvelopeInternal();
+				}
+			} else {
+				if (filter.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
+					le = (LiteralExpression) filter.getRightGeometry();
 					if (le != null && le.getLiteral() != null
 							&& le.getLiteral() instanceof Geometry) {
-						bbox = ((Geometry) le.getLiteral())
-								.getEnvelopeInternal();
-					}
-				} else {
-					if (filter.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
-						le = (LiteralExpression) filter.getRightGeometry();
-						if (le != null && le.getLiteral() != null
-								&& le.getLiteral() instanceof Geometry) {
-							Geometry g = (Geometry) le.getLiteral();
-							bbox = g.getEnvelopeInternal();
-						}
+						Geometry g = (Geometry) le.getLiteral();
+						bbox = g.getEnvelopeInternal();
 					}
 				}
-				
-				if(bbox!=null){
-					switch (logicType) {
-					case Filter.LOGIC_AND:
-						and(bbox, filter.getFilterType());
-						break;
+			}
 
-					case Filter.LOGIC_OR:
-						or(bbox, filter.getFilterType());
-						break;
+			if (bbox != null) {
+				switch (logicType) {
+				case Filter.LOGIC_AND:
+					and(bbox, filter.getFilterType());
+					break;
 
-					default:
-						break;
-					}
-                }
-				
+				case Filter.LOGIC_OR:
+					or(bbox, filter.getFilterType());
+					break;
+
+				default:
+					break;
+				}
+			}
+
 		}
 	}
-
 
 	private void or(Envelope bbox, short s) {
 		switch (s) {
@@ -199,37 +199,37 @@ public class BoundsExtractor implements FilterVisitor {
 		case FilterType.GEOMETRY_OVERLAPS:
 		case FilterType.GEOMETRY_TOUCHES:
 		case FilterType.GEOMETRY_WITHIN:
-			if( !bbox.intersects(clippedbbox) ){
-				if( clippedbbox==null || clippedbbox.isNull() )
-					clippedbbox=bbox;
+			if (!bbox.intersects(clippedbbox)) {
+				if (clippedbbox == null || clippedbbox.isNull())
+					clippedbbox = bbox;
 				else
 					clippedbbox.expandToInclude(bbox);
-			}else{
-			    boolean changed = false;
-			    double minx,miny,maxx,maxy;
-			    minx = clippedbbox.getMinX();
-			    miny = clippedbbox.getMinY();
-			    maxx = clippedbbox.getMaxX();
-			    maxy = clippedbbox.getMaxY();
-			    if(minx > bbox.getMinX()){
-			        minx = bbox.getMinX();
-			        changed = true;
-			    }
-			    if(maxx < bbox.getMaxX()){
-			        maxx = bbox.getMaxX();
-			        changed = true;
-			    }
-			    if(miny > bbox.getMinY()){
-			        miny = bbox.getMinY();
-			        changed = true;
-			    }
-			    if(maxy < bbox.getMaxY()){
-			        maxy = bbox.getMaxY();
-			        changed = true;
-			    }
-			    if(changed){
-			    	clippedbbox = new Envelope(minx,maxx,miny,maxy);
-			    }
+			} else {
+				boolean changed = false;
+				double minx, miny, maxx, maxy;
+				minx = clippedbbox.getMinX();
+				miny = clippedbbox.getMinY();
+				maxx = clippedbbox.getMaxX();
+				maxy = clippedbbox.getMaxY();
+				if (minx > bbox.getMinX()) {
+					minx = bbox.getMinX();
+					changed = true;
+				}
+				if (maxx < bbox.getMaxX()) {
+					maxx = bbox.getMaxX();
+					changed = true;
+				}
+				if (miny > bbox.getMinY()) {
+					miny = bbox.getMinY();
+					changed = true;
+				}
+				if (maxy < bbox.getMaxY()) {
+					maxy = bbox.getMaxY();
+					changed = true;
+				}
+				if (changed) {
+					clippedbbox = new Envelope(minx, maxx, miny, maxy);
+				}
 			}
 			return;
 		case FilterType.GEOMETRY_BEYOND:
@@ -250,35 +250,36 @@ public class BoundsExtractor implements FilterVisitor {
 		case FilterType.GEOMETRY_OVERLAPS:
 		case FilterType.GEOMETRY_TOUCHES:
 		case FilterType.GEOMETRY_WITHIN:
-			if( !bbox.intersects(clippedbbox) ){
-				clippedbbox=new Envelope(clippedbbox.getMinX(),clippedbbox.getMinX(),
-						clippedbbox.getMinY(),clippedbbox.getMinY());
-			}else{
-			    boolean changed = false;
-			    double minx,miny,maxx,maxy;
-			    minx = clippedbbox.getMinX();
-			    miny = clippedbbox.getMinY();
-			    maxx = clippedbbox.getMaxX();
-			    maxy = clippedbbox.getMaxY();
-			    if(minx < bbox.getMinX()){
-			        minx = bbox.getMinX();
-			        changed = true;
-			    }
-			    if(maxx > bbox.getMaxX()){
-			        maxx = bbox.getMaxX();
-			        changed = true;
-			    }
-			    if(miny < bbox.getMinY()){
-			        miny = bbox.getMinY();
-			        changed = true;
-			    }
-			    if(maxy > bbox.getMaxY()){
-			        maxy = bbox.getMaxY();
-			        changed = true;
-			    }
-			    if(changed){
-			        clippedbbox = new Envelope(minx,maxx,miny,maxy);
-			    }
+			if (!bbox.intersects(clippedbbox)) {
+				clippedbbox = new Envelope(clippedbbox.getMinX(), clippedbbox
+						.getMinX(), clippedbbox.getMinY(), clippedbbox
+						.getMinY());
+			} else {
+				boolean changed = false;
+				double minx, miny, maxx, maxy;
+				minx = clippedbbox.getMinX();
+				miny = clippedbbox.getMinY();
+				maxx = clippedbbox.getMaxX();
+				maxy = clippedbbox.getMaxY();
+				if (minx < bbox.getMinX()) {
+					minx = bbox.getMinX();
+					changed = true;
+				}
+				if (maxx > bbox.getMaxX()) {
+					maxx = bbox.getMaxX();
+					changed = true;
+				}
+				if (miny < bbox.getMinY()) {
+					miny = bbox.getMinY();
+					changed = true;
+				}
+				if (maxy > bbox.getMaxY()) {
+					maxy = bbox.getMaxY();
+					changed = true;
+				}
+				if (changed) {
+					clippedbbox = new Envelope(minx, maxx, miny, maxy);
+				}
 			}
 			return;
 		case FilterType.GEOMETRY_BEYOND:
@@ -302,41 +303,44 @@ public class BoundsExtractor implements FilterVisitor {
 	 */
 	public void visit(LogicFilter filter) {
 
-		short oldType=logicType;
+		short oldType = logicType;
 		if (filter != null) {
 			switch (filter.getFilterType()) {
-			case Filter.LOGIC_OR:{
-				Envelope original=clippedbbox;
-				clippedbbox=new Envelope();
-				logicType = logicType==Filter.LOGIC_NOT?logicType:Filter.LOGIC_OR;
+			case Filter.LOGIC_OR: {
+				Envelope original = clippedbbox;
+				clippedbbox = new Envelope();
+				logicType = logicType == Filter.LOGIC_NOT ? logicType
+						: Filter.LOGIC_OR;
 				Iterator i = filter.getFilterIterator();
 				while (i.hasNext()) {
 					Filter tmp = (Filter) i.next();
 					tmp.accept(this);
 				}
-				if( logicType!=Filter.LOGIC_NOT ){
-					logicType=Filter.LOGIC_AND;
-					
-					Envelope newBbox=clippedbbox;
-					clippedbbox=original;		
-	
-					and(newBbox,Filter.GEOMETRY_INTERSECTS);
+				if (logicType != Filter.LOGIC_NOT) {
+					logicType = Filter.LOGIC_AND;
+
+					Envelope newBbox = clippedbbox;
+					clippedbbox = original;
+
+					and(newBbox, Filter.GEOMETRY_INTERSECTS);
 				}
 				break;
 			}
-			case Filter.LOGIC_AND:{
+			case Filter.LOGIC_AND: {
 				Iterator i = filter.getFilterIterator();
-				logicType = logicType==Filter.LOGIC_NOT?logicType:Filter.LOGIC_AND;
+				logicType = logicType == Filter.LOGIC_NOT ? logicType
+						: Filter.LOGIC_AND;
 				while (i.hasNext()) {
 					Filter tmp = (Filter) i.next();
 					tmp.accept(this);
 				}
-				
+
 				break;
 			}
 			case Filter.LOGIC_NOT:
 				Iterator i = filter.getFilterIterator();
-				logicType = logicType==Filter.LOGIC_NOT?Filter.LOGIC_AND:Filter.LOGIC_NOT;
+				logicType = logicType == Filter.LOGIC_NOT ? Filter.LOGIC_AND
+						: Filter.LOGIC_NOT;
 				while (i.hasNext()) {
 					Filter tmp = (Filter) i.next();
 					tmp.accept(this);
@@ -344,8 +348,8 @@ public class BoundsExtractor implements FilterVisitor {
 			default:
 				break;
 			}
-			logicType=oldType;
-			
+			logicType = oldType;
+
 		}
 	}
 

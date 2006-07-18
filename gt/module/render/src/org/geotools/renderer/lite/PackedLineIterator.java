@@ -17,7 +17,7 @@
 package org.geotools.renderer.lite;
 
 import java.awt.geom.AffineTransform;
-
+ 
 import org.opengis.referencing.operation.MathTransform;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -31,10 +31,10 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence.Double;
  * LineString object.
  *
  * @author Andrea Aime
- * @source $URL$
+ * @author simone giannecchini  * @source $URL$
  * @version $Id$
  */
-class PackedLineIterator extends AbstractLiteIterator {
+public final class PackedLineIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */
     private AffineTransform at;
 

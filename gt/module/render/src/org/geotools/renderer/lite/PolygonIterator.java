@@ -33,10 +33,11 @@ import com.vividsolutions.jts.geom.Polygon;
  * objects.
  *
  * @author Andrea Aime
+ * @author simone giannecchini
  * @source $URL$
  * @version $Id$
  */
-class PolygonIterator extends AbstractLiteIterator {
+public final  class PolygonIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */
     private AffineTransform at;
 

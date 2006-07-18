@@ -15,117 +15,235 @@
  */
 package org.geotools.renderer.lite;
 
-import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
+import java.awt.Color;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
 
 import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
+import junit.textui.TestRunner;
 
+import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
-import org.geotools.geometry.Envelope2D;
-import org.geotools.geometry.JTS;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
+import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
+import org.geotools.referencing.operation.DefaultOperationMethod;
+import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.TestData;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
+import org.geotools.util.NumberRange;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Envelope;
-
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.operation.MathTransform;
 
 /**
- *
- * @source $URL$
+ * @author Simone Giannecchini
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/module/render/test/org/geotools/renderer/lite/GridCoverageRendererTest.java $
  */
 public class GridCoverageRendererTest extends TestCase {
-    
-    String FILENAME="TestGridCoverage.jpg";
-    private static final long TIMEOUT = 3000;
-    
-    public void testPaint() throws Exception {
-       
-        FileInputStream inTest = new FileInputStream(TestData.file(this, FILENAME));
-        BufferedImage imageTest = ImageIO.read(inTest);
-        
-        GridSampleDimension[] bands=new GridSampleDimension[imageTest.getColorModel().getNumComponents()];
-        for (int i = 0; i < bands.length; i++) {
-        	bands[i]=new GridSampleDimension();
+
+	public GridCoverageRendererTest(String testName) {
+		super(testName);
+
+	}
+
+	String FILENAME = "TestGridCoverage.jpg";
+
+	/**
+	 * Returns a {@link GridCoverage} which may be used as a "real world"
+	 * example.
+	 * 
+	 * @param number
+	 *            The example number. Numbers are numeroted from 0 to
+	 *            {@link #getNumExamples()} exclusive.
+	 * @return The "real world" grid coverage.
+	 * @throws IOException
+	 *             if an I/O operation was needed and failed.
+	 * @throws ParseException
+	 * @throws IllegalArgumentException
+	 */
+	private final GridCoverage2D getGC() throws IOException,
+			IllegalArgumentException, ParseException {
+		final String path;
+		final Rectangle2D bounds;
+
+		// unit = "°C";
+		path = "TestGridCoverage.tif";
+		final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+
+		// 41°S - 5°N ; 35°E - 80°E (450 x 460 pixels)
+		bounds = new Rectangle2D.Double(35, -41, 45, 46);
+		final Category values = new Category("values",
+				new Color[] { Color.BLACK }, new NumberRange(0, 255),
+				LinearTransform1D.IDENTITY);
+		final GeneralEnvelope envelope = new GeneralEnvelope(bounds);
+		final RenderedImage image = ImageIO.read(TestData.getResource(this,
+				path));
+		final int numBands = image.getSampleModel().getNumBands();
+		final GridSampleDimension[] bands = new GridSampleDimension[numBands];
+		// setting bands names.
+		for (int i = 0; i < numBands; i++) {
+
+			bands[i] = new GridSampleDimension("band " + i,
+					new Category[] { values }, null).geophysics(true);
 		}
-        int width=imageTest.getWidth(), height=imageTest.getHeight();
-        double ratio=((double)width/(double)height);
-        Envelope2D gcEnv = new Envelope2D(DefaultGeographicCRS.WGS84, -128,49, 14, 14*ratio);
-        GridCoverageFactory factory = org.geotools.coverage.FactoryFinder.getGridCoverageFactory(null);
-        GridCoverage2D coverage=factory.create("GridCoverage", imageTest, gcEnv, bands, null, null);
-        
-        MapContext context=new DefaultMapContext();
-        Style style = getStyle();
-        context.addLayer(coverage, style );
-        StreamingRenderer renderer=new StreamingRenderer();
-        renderer.setContext(context);
-        Envelope env = context.getLayerBounds();
-        int boundary=1;
-        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
-                env.getMinY() - boundary, env.getMaxY() + boundary);
-        //Rendering2DTest.INTERACTIVE=true;
-        Rendering2DTest.showRender("testGridCoverage", renderer, TIMEOUT, env);
-    }    
-    
-    public void testReproject() throws Exception {
+		final String filename = new File(path).getName();
+		final GridCoverageFactory factory = org.geotools.coverage.FactoryFinder
+				.getGridCoverageFactory(null);
+		envelope.setCoordinateReferenceSystem(crs);
+		return (GridCoverage2D) factory.create(filename, image, envelope,
+				bands, null, null);
+	}
 
-        FileInputStream inTest = new FileInputStream(TestData.file(this, FILENAME));
+	/**
+	 * Returns a projected CRS for test purpose.
+	 */
+	private static CoordinateReferenceSystem getProjectedCRS(
+			final GridCoverage2D coverage) {
+		try {
+			final GeographicCRS base = (GeographicCRS) coverage
+					.getCoordinateReferenceSystem();
+			final Ellipsoid ellipsoid = ((GeodeticDatum) base.getDatum())
+					.getEllipsoid();
+			final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
+			final ParameterValueGroup parameters = factory
+					.getDefaultParameters("Oblique_Stereographic");
+			parameters.parameter("semi_major").setValue(
+					ellipsoid.getSemiMajorAxis());
+			parameters.parameter("semi_minor").setValue(
+					ellipsoid.getSemiMinorAxis());
+			parameters.parameter("central_meridian").setValue(5);
+			parameters.parameter("latitude_of_origin").setValue(-5);
+			final MathTransform mt;
+			try {
+				mt = factory.createParameterizedTransform(parameters);
+			} catch (FactoryException exception) {
+				fail(exception.getLocalizedMessage());
+				return null;
+			}
+			return new DefaultProjectedCRS("Stereographic",
+					new DefaultOperationMethod(mt), base, mt,
+					DefaultCartesianCS.PROJECTED);
+		} catch (NoSuchIdentifierException exception) {
+			fail(exception.getLocalizedMessage());
+			return null;
+		}
+	}
 
-        BufferedImage imageTest = ImageIO.read(inTest);
+	public void testPaint() throws Exception {
 
-        GridSampleDimension[] bands=new GridSampleDimension[imageTest.getColorModel().getNumComponents()];
-        for (int i = 0; i < bands.length; i++) {
-            bands[i]=new GridSampleDimension();
-        }
-        int width=imageTest.getWidth(), height=imageTest.getHeight();
-        double ratio=((double)width/(double)height);
-        Envelope2D gcEnv = new Envelope2D(DefaultGeographicCRS.WGS84, -128,49, 14, 14*ratio);
-        GridCoverageFactory factory = org.geotools.coverage.FactoryFinder.getGridCoverageFactory(null);
-        GridCoverage2D coverage = factory.create("GridCoverage", imageTest, gcEnv, bands, null, null);
+		//
+		// /////////////////////////////////////////////////////////////////
+		//
+		// CREATING A GRID COVERAGE
+		//
+		//
+		// /////////////////////////////////////////////////////////////////
+		final GridCoverage2D gc = getGC();
 
-        MapContext context=new DefaultMapContext();
-        Style style = getStyle();
-        context.addLayer(coverage, style );
+		//
+		//
+		// /////////////////////////////////////////////////////////////////
+		//
+		// MAP CONTEXT
+		//
+		//
+		// /////////////////////////////////////////////////////////////////
+		final MapContext context = new DefaultMapContext(
+				DefaultGeographicCRS.WGS84);
+		final Style style = getStyle();
+		context.addLayer(gc, style);
 
-        CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
-        "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
+		// /////////////////////////////////////////////////////////////////
+		//
+		// Streaming renderer
+		//
+		//
+		// ///////////////////////////////////////////////////////////////
+		final StreamingRenderer renderer = new StreamingRenderer();
+		renderer.setContext(context);
 
-        context.setAreaOfInterest(context.getLayerBounds(), crs);
+		RendererBaseTest.showRender("testGridCoverage", renderer, 1000, context.getLayerBounds());
 
-        StreamingRenderer renderer=new StreamingRenderer();
-        renderer.setContext(context);
+	}
 
+	public void testReproject() throws Exception {
 
-        Envelope env = context.getLayerBounds();
-        int boundary=1;
+		// ///////////////////////////////////////////////////////////////////
+		//
+		// CREATING A GRID COVERAGE
+		//
+		//
+		// // /////////////////////////////////////////////////////////////////
+		final GridCoverage2D coverage = getGC();
+		//
+		// ///////////////////////////////////////////////////////////////////
+		//
+		// MAP CONTEXT
+		// We want to show the context in a different CRS
+		//
+		//
+		// /////////////////////////////////////////////////////////////////
+		final MapContext context = new DefaultMapContext(
+				DefaultGeographicCRS.WGS84);
+		final Style style = getStyle();
+		context.addLayer(coverage, style);
 
-        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
-        env.getMinY() - boundary, env.getMaxY() + boundary);
+		// transform to a new crs
+		final CoordinateReferenceSystem destCRS = getProjectedCRS(coverage);
 
-        env=JTS.transform(env, CRS.transform(DefaultGeographicCRS.WGS84, crs, true), 10);
-        //Rendering2DTest.INTERACTIVE=true;
-        Rendering2DTest.showRender("testReproject", renderer, TIMEOUT, env);
-    }
+		//
+		// ///////////////////////////////////////////////////////////////////
+		//
+		// Streaming renderer
+		//
+		//
+		// /////////////////////////////////////////////////////////////////
+		final StreamingRenderer renderer = new StreamingRenderer();
+		renderer.setContext(context);
 
-    private Style getStyle() {
-        StyleBuilder sb = new StyleBuilder();
-        Style rasterstyle = sb.createStyle();
-        RasterSymbolizer raster = sb.createRasterSymbolizer();
+		ReferencedEnvelope env = context.getLayerBounds();
+		env = new ReferencedEnvelope(env.getMinX(), env.getMaxX(), env
+				.getMinY(), env.getMaxY(), DefaultGeographicCRS.WGS84);
+		final ReferencedEnvelope newbounds = env.transform(destCRS, true);
 
-        rasterstyle.addFeatureTypeStyle(sb.createFeatureTypeStyle(raster));
-        rasterstyle.getFeatureTypeStyles()[0].setFeatureTypeName("GridCoverage");
-        return rasterstyle;
-    }
+		RendererBaseTest.showRender("testGridCoverageReprojection", renderer, 1000, newbounds);
 
+	}
+
+	private Style getStyle() {
+		StyleBuilder sb = new StyleBuilder();
+		Style rasterstyle = sb.createStyle();
+		RasterSymbolizer raster = sb.createRasterSymbolizer();
+
+		rasterstyle.addFeatureTypeStyle(sb.createFeatureTypeStyle(raster));
+		rasterstyle.getFeatureTypeStyles()[0]
+				.setFeatureTypeName("GridCoverage");
+		return rasterstyle;
+	}
+
+	public static void main(final String[] args) {
+		TestRunner.run(GridCoverageRendererTest.class);
+	}
 }

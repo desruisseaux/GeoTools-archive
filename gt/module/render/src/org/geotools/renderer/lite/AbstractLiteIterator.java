@@ -16,48 +16,34 @@
  */
 package org.geotools.renderer.lite;
 
-import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
-import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
-import org.geotools.geometry.JTS;
-import org.geotools.geometry.coordinatesequence.InPlaceCoordinateSequenceTransformer;
-import org.geotools.geometry.jts.CoordinateSequenceTransformer;
-import org.geotools.geometry.jts.DefaultCoordinateSequenceTransformer;
-import org.geotools.referencing.FactoryFinder;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.referencing.operation.TransformException;
-
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
-
-
 /**
- * Subclass that provides a convenient efficient currentSegment(float[] coords) implementation
- * that reuses always the same double array. This class and the associated subclasses are not
- * thread safe.
- *
+ * Subclass that provides a convenient efficient currentSegment(float[] coords)
+ * implementation that reuses always the same double array. This class and the
+ * associated subclasses are not thread safe.
+ * 
  * @author Andrea Aime
- * @source $URL$
+ * @source $URL:
  */
 public abstract class AbstractLiteIterator implements PathIterator {
 
-    /** The logger for the rendering module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
-    protected double[] dcoords = new double[2];
-    
-    /**
-     * @see java.awt.geom.PathIterator#currentSegment(float[])
-     */
-    public int currentSegment(float[] coords) {
-        int result = currentSegment(dcoords);
-        coords[0] = (float) dcoords[0];
-        coords[1] = (float) dcoords[1];
+	/** The logger for the rendering module. */
+	private static final Logger LOGGER = Logger
+			.getLogger("org.geotools.rendering");
 
-        return result;
-    }
-    
+	protected double[] dcoords = new double[2];
+
+	/**
+	 * @see java.awt.geom.PathIterator#currentSegment(float[])
+	 */
+	public int currentSegment(float[] coords) {
+		int result = currentSegment(dcoords);
+		coords[0] = (float) dcoords[0];
+		coords[1] = (float) dcoords[1];
+
+		return result;
+	}
+
 }

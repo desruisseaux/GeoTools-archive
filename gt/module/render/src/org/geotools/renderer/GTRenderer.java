@@ -6,6 +6,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.Map;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -38,6 +39,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *</pre>
  *
  * @author dblasby
+ * @author simone giannecchini
  *
  * @source $URL$
  */
@@ -86,8 +88,24 @@ public interface GTRenderer {
      */
     public void paint( Graphics2D graphics, Rectangle paintArea, Envelope mapArea );
     
-    
-    /**
+	/**
+	 * Renders features based on the map layers and their styles as specified in
+	 * the map context using <code>setContext</code>. <p/> This version of
+	 * the method assumes that the area of the visible part of the map and the
+	 * size of the output area are known. The transform between the two is
+	 * calculated internally.
+	 * 
+	 * @param graphics
+	 *            The graphics object to draw to.
+	 * @param paintArea
+	 *            The size of the output area in output units (eg: pixels).
+	 * @param envelope
+	 *            the map's visible area (viewport) in map coordinates.
+	 */
+	public void paint(Graphics2D graphics, Rectangle paintArea,
+			ReferencedEnvelope mapArea);
+
+	/**
      * Renders features based on the map layers and their styles as specified
      * in the map context using <code>setContext</code>.
      * <p/>
@@ -103,5 +121,27 @@ public interface GTRenderer {
      */
     public void paint( Graphics2D graphics, Rectangle paintArea,
             Envelope mapArea, AffineTransform worldToScreen);
+
+	/**
+	 * Renders features based on the map layers and their styles as specified in
+	 * the map context using <code>setContext</code>. <p/> This version of
+	 * the method assumes that paint area, enelope and worldToScreen transform
+	 * are already computed and in sync. Use this method to avoid recomputation.
+	 * <b>Note however that no check is performed that they are really
+	 * synchronized!<b/>
+	 * 
+	 * @param graphics
+	 *            The graphics object to draw to.
+	 * @param paintArea
+	 *            The size of the output area in output units (eg: pixels).
+	 * @param envelope
+	 *            the map's visible area (viewport) in map coordinates.
+	 * @param worldToScreen
+	 *            A transform which converts World coordinates to Screen
+	 *            coordinates.
+	 * 
+	 */
+	public void paint(Graphics2D graphics, Rectangle paintArea,
+			ReferencedEnvelope mapArea, AffineTransform worldToScreen);
 }
 

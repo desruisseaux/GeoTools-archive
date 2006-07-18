@@ -42,7 +42,7 @@ package org.geotools.renderer.lite;
  * </p>
  * @source $URL$
  */
-public class ListenerList {
+public final class ListenerList {
     /**
      * The initial capacity of the list. Always >= 1.
      */

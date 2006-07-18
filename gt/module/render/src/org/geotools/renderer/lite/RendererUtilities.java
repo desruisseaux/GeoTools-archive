@@ -1,15 +1,30 @@
 package org.geotools.renderer.lite;
 
 import java.awt.Rectangle;
-import java.awt.geom.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.geotools.factory.Hints;
+import org.geotools.coverage.grid.GeneralGridGeometry;
+import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.resources.CRSUtilities;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -20,187 +35,534 @@ import com.vividsolutions.jts.geom.Envelope;
  * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * version 2.1 of the License. This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. 
  */
 
 /**
- * Class for holding utility functions that are common tasks for people using the  "StreamingRenderer/Renderer".
+ * Class for holding utility functions that are common tasks for people using
+ * the "StreamingRenderer/Renderer".
  * 
  * 
- * @author dblasby
- * @source $URL$
+ * @author dblasby 
+ * @author Simone Giannecchini  * @source $URL$
  */
-public class RendererUtilities
-{
-   /**
-    * Sets up the affine transform <p/>
-    * ((Taken from the old LiteRenderer))
-    * 
-    * @param mapExtent the map extent
-    * @param paintArea the size of the rendering output area
-    * @return a transform that maps from real world coordinates to the screen
-    */
-    public static AffineTransform worldToScreenTransform( Envelope mapExtent, Rectangle paintArea ) {
-        double scaleX = paintArea.getWidth() / mapExtent.getWidth();
-        double scaleY = paintArea.getHeight() / mapExtent.getHeight();
+public final class RendererUtilities {
 
-        double tx = -mapExtent.getMinX() * scaleX ;
-        double ty = (mapExtent.getMinY() * scaleY) + paintArea.getHeight();
-        
-        AffineTransform at = new AffineTransform(scaleX, 0.0d, 0.0d, -scaleY, tx, ty);
-        AffineTransform originTranslation=AffineTransform.getTranslateInstance(paintArea.x, paintArea.y);
-        originTranslation.concatenate(at);
+	private final static Logger LOGGER = Logger
+			.getLogger(RendererUtilities.class.getName());
 
-        return originTranslation!=null?originTranslation:at;
-    }
-    
-    /**
-     * Creates the map's bounding box in real world coordinates <p/>
-     * ((Taken from the old LiteRenderer))
-     * @param worldToScreen a transform which converts World coordinates to
-     *        screen pixel coordinates.
-     * @param paintArea the size of the rendering output area
-     */
-    public static Envelope createMapEnvelope(Rectangle paintArea, AffineTransform worldToScreen)
-            throws NoninvertibleTransformException{
-        AffineTransform pixelToWorld = null;
+	private final static DefaultGeographicCRS GeogCRS = DefaultGeographicCRS.WGS84;;
 
-        //Might throw NoninvertibleTransformException
-        pixelToWorld = worldToScreen.createInverse();
+	/**
+	 * Utilities classes should not be instantiated.
+	 * 
+	 */
+	private RendererUtilities() {
+	};
 
-        Point2D p1 = new Point2D.Double();
-        Point2D p2 = new Point2D.Double();
-        pixelToWorld.transform(new Point2D.Double(paintArea.getMinX(), paintArea.getMinY()), p1);
-        pixelToWorld.transform(new Point2D.Double(paintArea.getMaxX(), paintArea.getMaxY()), p2);
+	/**
+	 * Sets up the affine transform <p/> ((Taken from the old LiteRenderer))
+	 * 
+	 * @param mapExtent
+	 *            the map extent
+	 * @param paintArea
+	 *            the size of the rendering output area
+	 * @return a transform that maps from real world coordinates to the screen
+	 * @deprecated Uses the alternative based on <code>ReferencedEnvelope</code>
+	 *             that doe not assume anything on axes order.
+	 * 
+	 */
+	public static AffineTransform worldToScreenTransform(Envelope mapExtent,
+			Rectangle paintArea) {
+		double scaleX = paintArea.getWidth() / mapExtent.getWidth();
+		double scaleY = paintArea.getHeight() / mapExtent.getHeight();
 
-        double x1 = p1.getX();
-        double y1 = p1.getY();
-        double x2 = p2.getX();
-        double y2 = p2.getY();
-        return new Envelope(
-                Math.min(x1, x2), Math.max(x1, x2),
-                Math.min(y1, y2), Math.max(y1, y2));        
-    }
+		double tx = -mapExtent.getMinX() * scaleX;
+		double ty = (mapExtent.getMinY() * scaleY) + paintArea.getHeight();
 
-    /**
-     * Find the scale denominator of the map.
-     *   Method:
-     *    1. find the diagonal distance (meters)
-     *    2. find the diagonal distance (pixels)
-     *    3. find the diagonal distance (meters) -- use DPI
-     *    4. calculate scale (#1/#2)
-     *
-     *   NOTE: return the scale denominator not the actual scale (1/scale = denominator)
-     *
-     * TODO:  (SLD spec page 28):
-     * Since it is common to integrate the output of multiple servers into a single displayed result in the
-     * web-mapping environment, it is important that different map servers have consistent behaviour with respect to
-     * processing scales, so that all of the independent servers will select or deselect rules at the same scales.
-     * To insure consistent behaviour, scales relative to coordinate spaces must be handled consistently between map
-     * servers. For geographic coordinate systems, which use angular units, the angular coverage of a map should be
-     * converted to linear units for computation of scale by using the circumference of the Earth at the equator and
-     * by assuming perfectly square linear units. For linear coordinate systems, the size of the coordinate space
-     * should be used directly without compensating for distortions in it with respect to the shape of the real Earth.
-     *
-     * NOTE: we are actually doing a a much more exact calculation, and accounting for non-square pixels (which are allowed in WMS)
-     * 
-     * NOTE: I noticed a bug with this -- the distance calculate can wrap "the wrong direction" around the globe. For example, for -180,-90 to 180,90 
-     *       (ie. the whole world) is actually the distance from the north to south pole because +180 and -180 are really the same thing.  This will
-     *       mean that the calculated distance is actually much less than the distance you think you're calculating.  However, this is unlikely to
-     *       actually have a big effect on your scale calculatations.
-     * 
-     *
-     * @param envelope
-     * @param coordinateReferenceSystem
-     * @param imageWidth
-     * @param imageHeight
-     * @param DPI screen dots per inch (OGC standard is 90)
-     * @return
-     */
-    public static double calculateScale(Envelope envelope, CoordinateReferenceSystem coordinateReferenceSystem,int imageWidth,int imageHeight,double DPI)
-    throws Exception 
-	{
-    	//DJB: be much wiser if the requested image is larger than the world (this happens VERY OFTEN)
-        // we first convert to WSG and check to see if we're outside the 'world' bbox
-	       	double[] cs        = new double[4];
-	    	double[] csLatLong = new double[4];
-	    	Coordinate p1 = new Coordinate(envelope.getMinX(),envelope.getMinY());
-	    	Coordinate p2 = new Coordinate(envelope.getMaxX(),envelope.getMaxY());
-	    	cs[0] = p1.x;
-	    	cs[1] = p1.y;
-	    	cs[2] = p2.x;
-	    	cs[3] = p2.y;    	 
-	    	
-	    	Hints hints=new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-	        CoordinateOperationFactory distanceOperationFactory = FactoryFinder.getCoordinateOperationFactory(hints);
-	        
-	         
-	    	MathTransform transform = distanceOperationFactory.createOperation(coordinateReferenceSystem,DefaultGeographicCRS.WGS84).getMathTransform();
-	    	transform.transform(cs, 0, csLatLong, 0, 2);
-	    	
-	    	//in long/lat format
-	    	if  ( (csLatLong[0] <-180) || (csLatLong[0] >180) || (csLatLong[2] <-180) || (csLatLong[2] >180)
-	    			|| (csLatLong[1] <-90) || (csLatLong[1] >90) || (csLatLong[3] <-90) || (csLatLong[3] >90)
-			     )
-	    	{
-	    	      // we have a problem -- the bbox is outside the 'world' so distance will fail	
-	    	      // we handle this by making a new measurement for a smaller portion of the image - the portion thats inside the world.
-	    		  // if the request is outside the world then we need to throw an error
-	    		
-	    		if  ( (csLatLong[0] > csLatLong[2]) || (csLatLong[1] > csLatLong[3]) )
-	    		  throw new Exception ("box is backwards");	
-	    		
-	    		Envelope e_request = new Envelope(csLatLong[0],csLatLong[2],csLatLong[1],csLatLong[3]);//x x   y y
-	    		Envelope e_world   = new Envelope(-180,180,-90,90);
-	    		
-	    		if  (!(e_request.overlaps(e_world)))
-	    			throw new Exception ("world isnt in the requested bbox");
-	    		//okay, all good.  We need to find the world bbox intersect the requested bbox
-	    		// then we're going to convert that back to the original coordinate reference system
-	    		// and from there we can find the (x1,y2) and (x2,y2) of this new bbox.
-	    		// then we can do simple math to find the distance.
-	    		
-	    		double[] newCsLatLong = new double[4]; // intersected with the world bbox
-	    		
-	    		newCsLatLong[0] = Math.min(Math.max(csLatLong[0],-180),180) ;
-	    		newCsLatLong[1] = Math.min(Math.max(csLatLong[1],-90),90) ;
-	    		newCsLatLong[2] = Math.min(Math.max(csLatLong[2],-180),180) ;
-	    		newCsLatLong[3] = Math.min(Math.max(csLatLong[3],-90),90) ;
-	    		
-	    		MathTransform transform2 = distanceOperationFactory.createOperation(DefaultGeographicCRS.WGS84,coordinateReferenceSystem).getMathTransform();
-	    		double[] origProject        = new double[4];
-		    	transform.transform(newCsLatLong, 0, origProject, 0, 2);
-		    	
-		    	//have the truncated bbox in the original projection, so we can find the image (x,y) for the two points.
-		    	
-		    	double image_min_x = (origProject[0] - envelope.getMinX() )/envelope.getWidth() *imageWidth;
-		    	double image_max_x = (origProject[2] - envelope.getMinX() )/envelope.getWidth() *imageWidth;
-		    	
-		    	double image_min_y = (origProject[1] - envelope.getMinY() )/envelope.getHeight() *imageHeight;
-		    	double image_max_y = (origProject[3] - envelope.getMinY() )/envelope.getHeight() *imageHeight;
-		    	
-		    	double distance_ground = JTS.orthodromicDistance(
-		    			         new Coordinate(newCsLatLong[0],newCsLatLong[1] ),
-		    			         new Coordinate(newCsLatLong[2],newCsLatLong[3] ),
-		    			         DefaultGeographicCRS.WGS84
-		    			                        );
-		    	double pixel_distance =  Math.sqrt( (image_max_x-image_min_x) *(image_max_x-image_min_x) + (image_max_y-image_min_y)*(image_max_y-image_min_y));
-		    	double pixel_distance_m = pixel_distance/ DPI * 2.54 / 100.0;
-		    	return distance_ground/ pixel_distance_m; // remember, this is the denominator, not the actual scale;
-	    	}
+		AffineTransform at = new AffineTransform(scaleX, 0.0d, 0.0d, -scaleY,
+				tx, ty);
+		AffineTransform originTranslation = AffineTransform
+				.getTranslateInstance(paintArea.x, paintArea.y);
+		originTranslation.concatenate(at);
 
-    	
-    	
-	        double diagonalGroundDistance = JTS.orthodromicDistance(
-	               p1,p2,	          
-	                coordinateReferenceSystem
-	                );
-	        // pythagorus theorm
-	        double diagonalPixelDistancePixels = Math.sqrt( imageWidth*imageWidth+imageHeight*imageHeight);
-	        double diagonalPixelDistanceMeters = diagonalPixelDistancePixels / DPI * 2.54 / 100; // 2.54 = cm/inch, 100= cm/m
-	        return diagonalGroundDistance/diagonalPixelDistanceMeters; // remember, this is the denominator, not the actual scale;
-    	}
-    	
-        
-     
+		return originTranslation != null ? originTranslation : at;
+	}
+
+	/**
+	 * Sets up the affine transform <p/>
+	 * 
+	 * NOTE It is worth to note that here we do not take into account the half a
+	 * pixel translation stated by ogc for coverages bounds. One reason is that
+	 * WMS 1.1.1 does not follow it!!!
+	 * 
+	 * @param mapExtent
+	 *            the map extent
+	 * @param paintArea
+	 *            the size of the rendering output area
+	 * @return a transform that maps from real world coordinates to the screen
+	 */
+	public static AffineTransform worldToScreenTransform(
+			ReferencedEnvelope mapExtent, Rectangle paintArea) {
+
+		// //
+		//
+		// Convert the JTS envelope and get the transform
+		//
+		// //
+		final Envelope2D genvelope = new Envelope2D(mapExtent);
+
+		// //
+		//
+		// Get the transform
+		//
+		// //
+		try {
+			return new AffineTransform((AffineTransform) GridGeometry2D
+					.getTransform(new GeneralGridRange(paintArea), genvelope,
+							false).inverse());
+		} catch (MismatchedDimensionException e) {
+			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			return null;
+		} catch (org.opengis.referencing.operation.NoninvertibleTransformException e) {
+			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			return null;
+		}
+
+	}
+
+	/**
+	 * Creates the map's bounding box in real world coordinates <p/> ((Taken
+	 * from the old LiteRenderer))
+	 * 
+	 * @param worldToScreen
+	 *            a transform which converts World coordinates to screen pixel
+	 *            coordinates.
+	 * @param paintArea
+	 *            the size of the rendering output area
+	 * @deprecated Uses the alternative using a
+	 *             <code>CoordinateReferenceSystem</code> that doe not assume
+	 *             anything on axes order.
+	 */
+	public static Envelope createMapEnvelope(Rectangle paintArea,
+			AffineTransform worldToScreen)
+			throws NoninvertibleTransformException {
+		AffineTransform pixelToWorld = null;
+
+		// Might throw NoninvertibleTransformException
+		pixelToWorld = worldToScreen.createInverse();
+
+		Point2D p1 = new Point2D.Double();
+		Point2D p2 = new Point2D.Double();
+		pixelToWorld.transform(new Point2D.Double(paintArea.getMinX(),
+				paintArea.getMinY()), p1);
+		pixelToWorld.transform(new Point2D.Double(paintArea.getMaxX(),
+				paintArea.getMaxY()), p2);
+
+		double x1 = p1.getX();
+		double y1 = p1.getY();
+		double x2 = p2.getX();
+		double y2 = p2.getY();
+		return new Envelope(Math.min(x1, x2), Math.max(x1, x2), Math
+				.min(y1, y2), Math.max(y1, y2));
+	}
+
+	/**
+	 * Creates the map's bounding box in real world coordinates <p/>
+	 * 
+	 * NOTE It is worth to note that here we do not take into account the half a
+	 * pixel translation stated by ogc for coverages bounds. One reason is that
+	 * WMS 1.1.1 does not follow it!!!
+	 * 
+	 * @param worldToScreen
+	 *            a transform which converts World coordinates to screen pixel
+	 *            coordinates.
+	 * @param paintArea
+	 *            the size of the rendering output area
+	 */
+	public static ReferencedEnvelope createMapEnvelope(Rectangle paintArea,
+			AffineTransform worldToScreen, final CoordinateReferenceSystem crs)
+			throws NoninvertibleTransformException {
+
+		// //
+		//
+		// Make sure the CRS is 2d
+		//
+		// //
+		final CoordinateReferenceSystem crs2d;
+		try {
+			crs2d = CRSUtilities.getCRS2D(crs);
+		} catch (TransformException e) {
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
+		}
+
+		// //
+		//
+		// build the transform
+		//
+		// //
+		AffineTransform pixelToWorld = worldToScreen.createInverse();
+
+		// //
+		//
+		// tranform corners
+		//
+		// //
+		Point2D p1 = new Point2D.Double();
+		Point2D p2 = new Point2D.Double();
+		pixelToWorld.transform(new Point2D.Double(paintArea.getMinX(),
+				paintArea.getMinY()), p1);
+		pixelToWorld.transform(new Point2D.Double(paintArea.getMaxX(),
+				paintArea.getMaxY()), p2);
+
+		// //
+		//
+		// build the final envelope
+		//
+		// //
+		double x1 = p1.getX();
+		double y1 = p1.getY();
+		double x2 = p2.getX();
+		double y2 = p2.getY();
+		return new ReferencedEnvelope(Math.min(x1, x2), Math.max(x1, x2), Math
+				.min(y1, y2), Math.max(y1, y2), crs2d);
+	}
+
+	/**
+	 * Find the scale denominator of the map. Method: 1. find the diagonal
+	 * distance (meters) 2. find the diagonal distance (pixels) 3. find the
+	 * diagonal distance (meters) -- use DPI 4. calculate scale (#1/#2)
+	 * 
+	 * NOTE: return the scale denominator not the actual scale (1/scale =
+	 * denominator)
+	 * 
+	 * TODO: (SLD spec page 28): Since it is common to integrate the output of
+	 * multiple servers into a single displayed result in the web-mapping
+	 * environment, it is important that different map servers have consistent
+	 * behaviour with respect to processing scales, so that all of the
+	 * independent servers will select or deselect rules at the same scales. To
+	 * insure consistent behaviour, scales relative to coordinate spaces must be
+	 * handled consistently between map servers. For geographic coordinate
+	 * systems, which use angular units, the angular coverage of a map should be
+	 * converted to linear units for computation of scale by using the
+	 * circumference of the Earth at the equator and by assuming perfectly
+	 * square linear units. For linear coordinate systems, the size of the
+	 * coordinate space should be used directly without compensating for
+	 * distortions in it with respect to the shape of the real Earth.
+	 * 
+	 * NOTE: we are actually doing a a much more exact calculation, and
+	 * accounting for non-square pixels (which are allowed in WMS) ADDITIONAL
+	 * NOTE from simboss: I added soe minor fixes. See below.
+	 * 
+	 * @param envelope
+	 * @param coordinateReferenceSystem
+	 * @param imageWidth
+	 * @param imageHeight
+	 * @param DPI
+	 *            screen dots per inch (OGC standard is 90)
+	 * @return
+	 * @throws TransformException
+	 * @throws FactoryException
+	 * 
+	 * @deprecated
+	 */
+	public static double calculateScale(Envelope envelope,
+			CoordinateReferenceSystem coordinateReferenceSystem,
+			int imageWidth, int imageHeight, double DPI)
+			throws TransformException, FactoryException {
+
+		// simboss: TODO TO BE REMOVED
+		// we need to take into account axes swapping. We can do that by
+		// preconcatenating an axes swapping to the transform we perform below
+		final CoordinateReferenceSystem tempCRS = CRSUtilities
+				.getCRS2D(coordinateReferenceSystem);
+		// final CoordinateSystem tempCS = tempCRS.getCoordinateSystem();
+		// final MathTransform preTransform;
+		// if (tempCS.getAxis(0).getDirection().absolute().equals(
+		// AxisDirection.NORTH)) {
+		// preTransform = ProjectiveTransform.create(new AffineTransform(0, 1,
+		// 1, 0, 0, 0));
+		//
+		// } else
+		// preTransform = ProjectiveTransform.create(AffineTransform
+		// .getTranslateInstance(0, 0));
+
+		// DJB: be much wiser if the requested image is larger than the world
+		// (this happens VERY OFTEN)
+		// we first convert to WSG84 and check to see if we're outside the
+		// 'world'
+		// bbox
+		final double[] cs = new double[4];
+		final double[] csLatLong = new double[4];
+		final Coordinate p1 = new Coordinate(envelope.getMinX(), envelope
+				.getMinY());
+		final Coordinate p2 = new Coordinate(envelope.getMaxX(), envelope
+				.getMaxY());
+		cs[0] = p1.x;
+		cs[1] = p1.y;
+		cs[2] = p2.x;
+		cs[3] = p2.y;
+
+		// transform the provided crs to WGS84 lon,lat
+		MathTransform transform = CRS.transform(tempCRS,
+				DefaultGeographicCRS.WGS84, true);
+		// transform = ConcatenatedTransform.create(preTransform, transform);//
+		// TODO
+		// TO
+		// BE
+		// REMOVED
+		transform.transform(cs, 0, csLatLong, 0, 2);
+
+		// in long/lat format
+		if ((csLatLong[0] < -180) || (csLatLong[0] > 180)
+				|| (csLatLong[2] < -180) || (csLatLong[2] > 180)
+				|| (csLatLong[1] < -90) || (csLatLong[1] > 90)
+				|| (csLatLong[3] < -90) || (csLatLong[3] > 90)) {
+			// we have a problem -- the bbox is outside the 'world' so distance
+			// will fail
+			// we handle this by making a new measurement for a smaller portion
+			// of the image - the portion thats inside the world.
+			// if the request is outside the world then we need to throw an
+			// error
+
+			if ((csLatLong[0] > csLatLong[2]) || (csLatLong[1] > csLatLong[3]))
+				throw new IllegalArgumentException("BBox is backwards");
+			if (((csLatLong[0] < -180) || (csLatLong[0] > 180))
+					&& ((csLatLong[2] < -180) || (csLatLong[2] > 180))
+					&& ((csLatLong[1] < -90) || (csLatLong[1] > 90))
+					&& ((csLatLong[3] < -90) || (csLatLong[3] > 90)))
+				throw new IllegalArgumentException(
+						"World isn't in the requested bbox");
+
+			// okay, all good. We need to find the world bbox intersect the
+			// requested bbox then we're going to convert that back to the
+			// original coordinate reference system and from there we can find
+			// the (x1,y2) and (x2,y2) of this new bbox.
+			// At that point we can do simple math to find the distance.
+
+			final double[] newCsLatLong = new double[4]; // intersected with
+			// the world bbox
+
+			newCsLatLong[0] = Math.min(Math.max(csLatLong[0], -180), 180);
+			newCsLatLong[1] = Math.min(Math.max(csLatLong[1], -90), 90);
+			newCsLatLong[2] = Math.min(Math.max(csLatLong[2], -180), 180);
+			newCsLatLong[3] = Math.min(Math.max(csLatLong[3], -90), 90);
+
+			double[] origProject = new double[4];
+			transform.transform(newCsLatLong, 0, origProject, 0, 2);
+
+			// have the truncated bbox in the original projection, so we can
+			// find the image (x,y) for the two points.
+			double image_min_x = (origProject[0] - envelope.getMinX())
+					/ envelope.getWidth() * imageWidth;
+			double image_max_x = (origProject[2] - envelope.getMinX())
+					/ envelope.getWidth() * imageWidth;
+
+			double image_min_y = (origProject[1] - envelope.getMinY())
+					/ envelope.getHeight() * imageHeight;
+			double image_max_y = (origProject[3] - envelope.getMinY())
+					/ envelope.getHeight() * imageHeight;
+
+			double distance_ground = JTS.orthodromicDistance(new Coordinate(
+					newCsLatLong[0], newCsLatLong[1]), new Coordinate(
+					newCsLatLong[2], newCsLatLong[3]),
+					DefaultGeographicCRS.WGS84);
+			double pixel_distance = Math.sqrt((image_max_x - image_min_x)
+					* (image_max_x - image_min_x) + (image_max_y - image_min_y)
+					* (image_max_y - image_min_y));
+			double pixel_distance_m = pixel_distance / DPI * 2.54 / 100.0;
+			return distance_ground / pixel_distance_m;
+			// remember, this is the denominator, not the actual scale;
+		}
+
+		// simboss:
+		// this way we never ran into problems with lat,lon lon,lat
+		double diagonalGroundDistance = JTS.orthodromicDistance(new Coordinate(
+				csLatLong[0], csLatLong[1]), new Coordinate(csLatLong[2],
+				csLatLong[3]), DefaultGeographicCRS.WGS84);
+		// pythagorus theorm
+		double diagonalPixelDistancePixels = Math.sqrt(imageWidth * imageWidth
+				+ imageHeight * imageHeight);
+		double diagonalPixelDistanceMeters = diagonalPixelDistancePixels / DPI
+				* 2.54 / 100; // 2.54 = cm/inch, 100= cm/m
+		return diagonalGroundDistance / diagonalPixelDistanceMeters;
+		// remember, this is the denominator, not the actual scale;
+	}
+
+	/**
+	 * Find the scale denominator of the map. Method: 1. find the diagonal
+	 * distance (meters) 2. find the diagonal distance (pixels) 3. find the
+	 * diagonal distance (meters) -- use DPI 4. calculate scale (#1/#2)
+	 * 
+	 * NOTE: return the scale denominator not the actual scale (1/scale =
+	 * denominator)
+	 * 
+	 * TODO: (SLD spec page 28): Since it is common to integrate the output of
+	 * multiple servers into a single displayed result in the web-mapping
+	 * environment, it is important that different map servers have consistent
+	 * behaviour with respect to processing scales, so that all of the
+	 * independent servers will select or deselect rules at the same scales. To
+	 * insure consistent behaviour, scales relative to coordinate spaces must be
+	 * handled consistently between map servers. For geographic coordinate
+	 * systems, which use angular units, the angular coverage of a map should be
+	 * converted to linear units for computation of scale by using the
+	 * circumference of the Earth at the equator and by assuming perfectly
+	 * square linear units. For linear coordinate systems, the size of the
+	 * coordinate space should be used directly without compensating for
+	 * distortions in it with respect to the shape of the real Earth.
+	 * 
+	 * NOTE: we are actually doing a a much more exact calculation, and
+	 * accounting for non-square pixels (which are allowed in WMS) ADDITIONAL
+	 * NOTE from simboss: I added soe minor fixes. See below.
+	 * 
+	 * @param envelope
+	 * @param coordinateReferenceSystem
+	 * @param imageWidth
+	 * @param imageHeight
+	 * @param DPI
+	 *            screen dots per inch (OGC standard is 90)
+	 * @return
+	 * 
+	 * TODO should I take into account also the destination CRS? Otherwise I am
+	 * just assuming that the final crs is lon,lat that is it maps lon to x (n
+	 * raster space) and lat to y (in raster space).
+	 * @throws TransformException
+	 * @throws FactoryException
+	 * 
+	 */
+	public static double calculateScale(ReferencedEnvelope envelope,
+			int imageWidth, int imageHeight, double DPI)
+			throws TransformException, FactoryException {
+
+		// //
+		//
+		// get CRS2D for this referenced envelope, check that its 2d
+		//
+		// //
+		final CoordinateReferenceSystem tempCRS = CRSUtilities
+				.getCRS2D(envelope.getCoordinateReferenceSystem());
+		// make sure the crs is 2d
+		envelope = new ReferencedEnvelope((Envelope) envelope, tempCRS);
+		MathTransform toWGS84 = StreamingRenderer.getMathTransform(tempCRS,
+				GeogCRS);
+
+		// //
+		//
+		// Make sure it intersect the world in the source projection by
+		// intersecting the provided envelope with the envelope of its crs.
+		//
+		// This will also prevent us from having problems with requests for
+		// images bigger than the world (thanks Dave!!!)
+		//
+		// It is important to note that I also have to update the image width in
+		// case the provided envelope is bigger than the envelope of the source
+		// crs.
+		// //
+		final GeneralEnvelope initialEnvelope = new GeneralEnvelope(envelope);
+		GeneralEnvelope intersectedWithSourceCRSEnvelope = (GeneralEnvelope) CRS
+				.getEnvelope(tempCRS);
+		if (intersectedWithSourceCRSEnvelope == null)
+			intersectedWithSourceCRSEnvelope = CRSUtilities.transform(toWGS84
+					.inverse(), CRS.getEnvelope(GeogCRS));
+		intersectedWithSourceCRSEnvelope.setCoordinateReferenceSystem(tempCRS);
+
+		intersectedWithSourceCRSEnvelope.intersect(initialEnvelope);
+		intersectedWithSourceCRSEnvelope.setCoordinateReferenceSystem(tempCRS);
+		if (intersectedWithSourceCRSEnvelope.isEmpty())
+			throw new IllegalArgumentException(
+					"The provided envelope is outside the world");
+		if (!intersectedWithSourceCRSEnvelope.equals(initialEnvelope)) {
+			final double scale0 = intersectedWithSourceCRSEnvelope.getLength(0)
+					/ initialEnvelope.getLength(0);
+			final double scale1 = intersectedWithSourceCRSEnvelope.getLength(1)
+					/ initialEnvelope.getLength(1);
+			imageWidth *= scale0;
+			imageHeight *= scale1;
+		}
+
+		// //
+		//
+		// Go to WGS84 in order to see how things are there
+		//
+		// //
+		final GeneralEnvelope geographicEnvelope = CRSUtilities.transform(
+				toWGS84, intersectedWithSourceCRSEnvelope);
+		geographicEnvelope.setCoordinateReferenceSystem(GeogCRS);
+
+		// //
+		//
+		// Instantiate a geodetic calculator for GCS WGS84 and get the
+		// orthodromic distance between LLC and UC of the geographic envelope.
+		//
+		// //
+		final GeodeticCalculator calculator = new GeodeticCalculator(GeogCRS);
+		final DirectPosition lowerLeftCorner = geographicEnvelope.getLowerCorner();
+		final DirectPosition upperRightCorner = geographicEnvelope.getUpperCorner();
+		calculator.setStartingGeographicPoint(lowerLeftCorner.getOrdinate(0),lowerLeftCorner.getOrdinate(1));
+		calculator.setDestinationGeographicPoint(upperRightCorner.getOrdinate(0),upperRightCorner.getOrdinate(1));
+		final double diagonalGroundDistance = calculator
+				.getOrthodromicDistance();
+
+		// //
+		//
+		// Compute the distances on the requested image using the provided DPI.
+		//
+		// //
+		// pythagorus theorm
+		double diagonalPixelDistancePixels = Math.sqrt(imageWidth * imageWidth
+				+ imageHeight * imageHeight);
+		double diagonalPixelDistanceMeters = diagonalPixelDistancePixels / DPI
+				* 2.54 / 100; // 2.54 = cm/inch, 100= cm/m
+		return diagonalGroundDistance / diagonalPixelDistanceMeters;
+		// remember, this is the denominator, not the actual scale;
+	}
+
+	/**
+	 * This worldToScreenTransform method makes the assumption that the crs is
+	 * in Lon,Lat or Lat,Lon. If the provided envelope does not carry along a
+	 * crs the assumption that the map extent is in the classic Lon,Lat form. In
+	 * case the provided envelope is of type.
+	 * 
+	 * Note that this method takes into account also the OGC standard with
+	 * respect to the relation between pixels and sample.
+	 * 
+	 * @param mapExtent
+	 *            The envelope of the map in lon,lat
+	 * @param paintArea
+	 *            The area to paint as a rectangle
+	 * @param destinationCrs
+	 * @return TODO add georeferenced envelope check when merge with trunk will
+	 *         be performed
+	 */
+	public static AffineTransform worldToScreenTransform(Envelope mapExtent,
+			Rectangle paintArea, CoordinateReferenceSystem destinationCrs) {
+		try {
+
+			// is the crs also lon,lat?
+			final boolean lonFirst = CRSUtilities.getCRS2D(destinationCrs)
+					.getCoordinateSystem().getAxis(0).getDirection().absolute()
+					.equals(AxisDirection.EAST);
+			final GeneralEnvelope newEnvelope = lonFirst ? new GeneralEnvelope(
+					new double[] { mapExtent.getMinX(), mapExtent.getMinY() },
+					new double[] { mapExtent.getMaxX(), mapExtent.getMaxY() })
+					: new GeneralEnvelope(new double[] { mapExtent.getMinY(),
+							mapExtent.getMinX() }, new double[] {
+							mapExtent.getMaxY(), mapExtent.getMaxX() });
+			newEnvelope.setCoordinateReferenceSystem(destinationCrs);
+
+			//			
+			// with this static method I can build a world to grid transform
+			// wuthout adding half of a pixel translations
+			return (AffineTransform) GeneralGridGeometry.getTransform(
+					new GeneralGridRange(paintArea), newEnvelope, false)
+					.inverse();
+
+		} catch (IndexOutOfBoundsException e) {
+			return null;
+		} catch (TransformException e) {
+			return null;
+		}
+
+	}
 }

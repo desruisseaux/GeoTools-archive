@@ -8,7 +8,6 @@
  */
 package org.geotools.renderer.lite;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -50,8 +49,7 @@ import org.geotools.styling.Rule;
  * @author dblasby
  * @source $URL$
  */
-public class LiteFeatureTypeStyle
-{
+public final class LiteFeatureTypeStyle {
      public BufferedImage         myImage;
      public Rule[]                ruleList;
      public Rule[]                elseRules;
@@ -94,7 +92,7 @@ public class LiteFeatureTypeStyle
 		this.myImage =  null;
 		this.graphics = graphics;
     	this.ruleList =  (Rule[])ruleList.toArray( new Rule[ruleList.size()] );
-    	this.elseRules = (Rule[])elseRuleList.toArray( new Rule[elseRuleList.size()] );;
+    	this.elseRules = (Rule[])elseRuleList.toArray( new Rule[elseRuleList.size()] );
 	}
     
 	

@@ -36,11 +36,12 @@ import com.vividsolutions.jts.geom.LinearRing;
  * A path iterator for the LiteShape class, specialized to iterate over
  * LineString object.
  *
+
  * @author Andrea Aime
- * @source $URL$
+ * @author simone giannecchini  * @source $URL$
  * @version $Id$
  */
-class LineIterator extends AbstractLiteIterator {
+public final class LineIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */
     private AffineTransform at;
 

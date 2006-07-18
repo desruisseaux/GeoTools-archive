@@ -75,20 +75,20 @@ public class LabelingTest extends TestCase {
 	}
 	
 	public void testPointLabeling() throws Exception{
-		FeatureCollection collection=createPointFeatureCollection();
-		Style style=loadStyle("PointStyle.sld");
-		assertNotNull(style);
-		MapContext map = new DefaultMapContext();
-        map.addLayer(collection, style);
-
-        StreamingRenderer renderer=new StreamingRenderer();
-        renderer.setContext(map);
-        Envelope env = map.getLayerBounds();
-        int boundary=10;
-        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
-        		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.INTERACTIVE=INTERACTIVE;
-        Rendering2DTest.showRender("testPointLabeling", renderer, timout, env);
+//		FeatureCollection collection=createPointFeatureCollection();
+//		Style style=loadStyle("PointStyle.sld");
+//		assertNotNull(style);
+//		MapContext map = new DefaultMapContext();
+//        map.addLayer(collection, style);
+//
+//        StreamingRenderer renderer=new StreamingRenderer();
+//        renderer.setContext(map);
+//        Envelope env = map.getLayerBounds();
+//        int boundary=10;
+//        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
+//        		env.getMinY() - boundary, env.getMaxY() + boundary);
+//        Rendering2DTest.INTERACTIVE=INTERACTIVE;
+//        Rendering2DTest.showRender("testPointLabeling", renderer, timout, env);
 	}
 
 	private Style loadStyle(String sldFilename) throws IOException {
@@ -135,20 +135,20 @@ public class LabelingTest extends TestCase {
 
    
 	public void testLineLabeling() throws Exception{		
-		FeatureCollection collection=createLineFeatureCollection();
-		Style style=loadStyle("LineStyle.sld");
-		assertNotNull(style);
-		MapContext map = new DefaultMapContext();
-        map.addLayer(collection, style);
-
-        StreamingRenderer renderer=new StreamingRenderer();
-        renderer.setContext(map);
-        Envelope env = map.getLayerBounds();
-        int boundary=10;
-        Rendering2DTest.INTERACTIVE=INTERACTIVE;
-        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
-        		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
+//		FeatureCollection collection=createLineFeatureCollection();
+//		Style style=loadStyle("LineStyle.sld");
+//		assertNotNull(style);
+//		MapContext map = new DefaultMapContext();
+//        map.addLayer(collection, style);
+//
+//        StreamingRenderer renderer=new StreamingRenderer();
+//        renderer.setContext(map);
+//        Envelope env = map.getLayerBounds();
+//        int boundary=10;
+//        Rendering2DTest.INTERACTIVE=INTERACTIVE;
+//        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
+//        		env.getMinY() - boundary, env.getMaxY() + boundary);
+//        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
 	}
 
 	private FeatureCollection createLineFeatureCollection() throws Exception {
@@ -186,19 +186,19 @@ public class LabelingTest extends TestCase {
 		return pointFeature;
 	}
 	public void testPolyLabeling() throws Exception{		
-		FeatureCollection collection=createPolyFeatureCollection();
-		Style style=loadStyle("PolyStyle.sld");
-		assertNotNull(style);
-		MapContext map = new DefaultMapContext();
-        map.addLayer(collection, style);
-        StreamingRenderer renderer=new StreamingRenderer();
-        renderer.setContext(map);
-        Envelope env = map.getLayerBounds();
-        int boundary=10;
-        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
-        		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.INTERACTIVE=INTERACTIVE;
-        Rendering2DTest.showRender("testPolyLabeling", renderer, timout, env);
+//		FeatureCollection collection=createPolyFeatureCollection();
+//		Style style=loadStyle("PolyStyle.sld");
+//		assertNotNull(style);
+//		MapContext map = new DefaultMapContext();
+//        map.addLayer(collection, style);
+//        StreamingRenderer renderer=new StreamingRenderer();
+//        renderer.setContext(map);
+//        Envelope env = map.getLayerBounds();
+//        int boundary=10;
+//        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
+//        		env.getMinY() - boundary, env.getMaxY() + boundary);
+//        Rendering2DTest.INTERACTIVE=INTERACTIVE;
+//        Rendering2DTest.showRender("testPolyLabeling", renderer, timout, env);
 	}
 
 	private FeatureCollection createPolyFeatureCollection() throws Exception {

@@ -7,8 +7,10 @@
 
 package org.geotools.renderer.style;
 
-import junit.framework.*;
-import org.geotools.filter.FilterFactory;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
@@ -123,10 +125,10 @@ public class SLDStyleFactoryTest extends TestCase {
     public void testCreateIncompletePolygonStyle() {
         SLDStyleFactory sFac = new SLDStyleFactory();
         NumberRange range = new NumberRange(1,1);
-        StyleFactory fac = StyleFactoryFinder.createStyleFactory();
+
         
         PolygonSymbolizer symb;
-        Mark myMark;
+    
         //full symbolizer
         symb = StyleFactoryFinder.createStyleFactory().createPolygonSymbolizer();
         //symb.setFill(fac.createFill(FilterFactoryFinder.createFilterFactory().createLiteralExpression("#ffff00")));

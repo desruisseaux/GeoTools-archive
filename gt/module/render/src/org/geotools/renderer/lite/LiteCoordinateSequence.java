@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
  * @since 2.1.x
  * @source $URL$
  */
-public class LiteCoordinateSequence extends PackedCoordinateSequence{
+public final class LiteCoordinateSequence extends PackedCoordinateSequence{
 
     /**
      * The packed coordinate array
@@ -55,9 +55,10 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
      * @param coordinates
      */
     public LiteCoordinateSequence(float[] coordinates) {
-      this.coords = new double[coordinates.length];
+		final int length = coordinates.length;
+		this.coords = new double[length];
   	this.dimension=2;
-      for (int i = 0; i < coordinates.length; i++) {
+		for (int i = 0; i < length; i++) {
         this.coords[i] = coordinates[i];
       }
     }
@@ -70,15 +71,16 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
     public LiteCoordinateSequence(Coordinate[] coordinates) {
       if (coordinates == null)
         coordinates = new Coordinate[0];
-  	this.dimension=2;
+		final int length = coordinates.length;
+		this.dimension = 2;
 
-      coords = new double[coordinates.length * this.dimension];
-      for (int i = 0; i < coordinates.length; i++) {
-        coords[i * this.dimension] = coordinates[i].x;
-        if (this.dimension >= 2)
-          coords[i * this.dimension + 1] = coordinates[i].y;
-      }
-    }
+		coords = new double[length * this.dimension];
+		for (int i = 0; i < length; i++) {
+			coords[i * this.dimension] = coordinates[i].x;
+			if (this.dimension >= 2)
+				coords[i * this.dimension + 1] = coordinates[i].y;
+		}
+	}
 
     /**
      * Builds a new empty packed coordinate sequence of a given size and dimension
@@ -140,7 +142,8 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
 
     public Envelope expandEnvelope(Envelope env)
     {
-      for (int i = 0; i < coords.length; i += dimension ) {
+		final int length = coords.length;
+		for (int i = 0; i < length; i += dimension) {
         env.expandToInclude(coords[i], coords[i + 1]);
       }
       return env;

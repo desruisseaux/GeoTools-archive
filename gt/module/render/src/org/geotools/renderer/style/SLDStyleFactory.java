@@ -76,7 +76,6 @@ import org.geotools.styling.Mark;
 import org.geotools.styling.PointPlacement;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.StyleAttributeExtractorTruncated;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbol;
@@ -86,9 +85,7 @@ import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.TextSymbolizer2;
 import org.w3c.dom.Document;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -426,10 +423,19 @@ public class SLDStyleFactory {
 
         // Extract the sequence of external graphics and symbols and process them in order
         // to recognize which one will be used for rendering
-        Symbol[] symbols = sldGraphic.getSymbols();
-        boolean flag = false;
-
-        for (int i = 0; i < symbols.length; i++) {
+		Symbol[] symbols = sldGraphic.getSymbols();
+		final int length = symbols.length;
+		ExternalGraphic eg;
+		GlyphRenderer r;
+		BufferedImage img = null;
+		double dsize;
+		AffineTransform scaleTx;
+		AffineTransformOp ato;
+		BufferedImage scaledImage;
+		Mark mark;
+		Shape shape;
+		MarkStyle2D ms2d;
+		for (int i = 0; i < length; i++) {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("trying to render symbol " + i);
             }
@@ -440,12 +446,12 @@ public class SLDStyleFactory {
                     LOGGER.finer("rendering External graphic");
                 }
                 
-                ExternalGraphic eg = (ExternalGraphic) symbols[i];
-                BufferedImage img = null;
+				eg = (ExternalGraphic) symbols[i];
+				img = null;
                 
                 // first see if any glyph renderers can handle this 
                 for(Iterator it = glyphRenderers.iterator(); it.hasNext() && (img == null); ) {
-                    GlyphRenderer r = (GlyphRenderer) it.next();
+					r = (GlyphRenderer) it.next();
 
                     if (r.canRender(eg.getFormat())) {
                         img = r.render(sldGraphic, eg, feature);
@@ -461,13 +467,14 @@ public class SLDStyleFactory {
                     continue;
                 }
 
-                double dsize = (double) size;
-                AffineTransform scaleTx = AffineTransform.getScaleInstance(dsize / img.getWidth(),
-                        dsize / img.getHeight());
-                AffineTransformOp ato = new AffineTransformOp(scaleTx,
-                        AffineTransformOp.TYPE_BILINEAR);
-                BufferedImage scaledImage = ato.createCompatibleDestImage(img, img.getColorModel());
-                img = ato.filter(img, scaledImage);
+				dsize = (double) size;
+				scaleTx = AffineTransform.getScaleInstance(dsize
+						/ img.getWidth(), dsize / img.getHeight());
+				ato = new AffineTransformOp(scaleTx,
+						AffineTransformOp.TYPE_BILINEAR);
+				scaledImage = ato.createCompatibleDestImage(img, img
+						.getColorModel());
+				img = ato.filter(img, scaledImage);
 
                 if (img != null) {
                     retval = new GraphicStyle2D(img, rotation, opacity);
@@ -481,11 +488,11 @@ public class SLDStyleFactory {
                     LOGGER.finer("rendering mark @ PointRenderer " + symbols[i].toString());
                 }
 
-                Mark mark = (Mark) symbols[i];
-                Shape shape = Java2DMark.getWellKnownMark(mark.getWellKnownName().getValue(feature)
-                                                              .toString());
+				mark = (Mark) symbols[i];
+				shape = Java2DMark.getWellKnownMark(mark.getWellKnownName()
+						.getValue(feature).toString());
 
-                MarkStyle2D ms2d = new MarkStyle2D();
+				ms2d = new MarkStyle2D();
                 ms2d.setShape(shape);
                 ms2d.setFill(getPaint(mark.getFill(), feature));
                 ms2d.setFillComposite(getComposite(mark.getFill(), feature));

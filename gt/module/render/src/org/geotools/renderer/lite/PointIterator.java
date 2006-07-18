@@ -18,7 +18,6 @@ package org.geotools.renderer.lite;
 
 import java.awt.geom.AffineTransform;
 
-import org.opengis.referencing.operation.MathTransform;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -29,7 +28,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author Andrea Aime
  * @source $URL$
  */
-public class PointIterator extends AbstractLiteIterator {
+public final class PointIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */
     private AffineTransform at;
     

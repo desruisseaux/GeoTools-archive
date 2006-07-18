@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  * @version $Id$
  */
-class GeomCollectionIterator extends AbstractLiteIterator {
+public final class GeomCollectionIterator extends AbstractLiteIterator {
     /** Transform applied on the coordinates during iteration */
     private AffineTransform at;
 
@@ -73,21 +73,12 @@ class GeomCollectionIterator extends AbstractLiteIterator {
 	 * @param at
 	 */
 	public void init(GeometryCollection gc, AffineTransform at, boolean generalize, double maxDistance) {
-		int numGeometries = gc.getNumGeometries();
-        
-        
         this.gc = gc;
-
-        if (at == null) {
-            at = new AffineTransform();
-        }
-
-        this.at = at;
+        this.at = at==null?new AffineTransform():at;
         this.generalize = generalize;
         this.maxDistance = maxDistance;
         currentGeom = 0;
         done = false;
-
         currentIterator = getIterator(gc.getGeometryN(0));
 	}
 

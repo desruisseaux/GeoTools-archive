@@ -1,5 +1,7 @@
 package org.geotools.renderer.lite;
 
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 
@@ -26,9 +28,11 @@ public class InternalTranscoder extends org.apache.batik.transcoder.image.ImageT
     }
 
 
-    public java.awt.image.BufferedImage createImage(int width, int height) {
-        return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-    }
+	public java.awt.image.BufferedImage createImage(int width, int height) {
+		return GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getDefaultScreenDevice().getDefaultConfiguration()
+				.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+	}
 
 
 

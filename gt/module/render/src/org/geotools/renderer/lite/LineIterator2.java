@@ -18,20 +18,11 @@ package org.geotools.renderer.lite;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
-import java.util.NoSuchElementException;
 
-import org.geotools.geometry.jts.CoordinateSequenceTransformer;
-import org.geotools.geometry.jts.DefaultCoordinateSequenceTransformer;
-import org.geotools.referencing.FactoryFinder;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.referencing.operation.TransformException;
+import org.geotools.util.LiteCoordinateSequence;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import org.geotools.util.LiteCoordinateSequence;
 
 
 /**
@@ -39,11 +30,11 @@ import org.geotools.util.LiteCoordinateSequence;
  * LineString object.
  *
  * @author Andrea Aime
+ * @author simone giannecchini
  * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/module/render/src/org/geotools/renderer/lite/LineIterator.java $
  * @version $Id$
  */
-class LineIterator2 implements PathIterator 
-{
+public final class LineIterator2 implements PathIterator {
 	
 	private double[] allCoords;
 	
@@ -53,6 +44,7 @@ class LineIterator2 implements PathIterator
     /** Current line coordinate */
     private int currentCoord = 0;
     private int actualCoords; // numb coordinates
+
 
     /** True when the iteration is terminated */
     private boolean done = false;

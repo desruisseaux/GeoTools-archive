@@ -14,17 +14,15 @@ import java.util.List;
 import org.geotools.renderer.style.TextStyle2D;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-
+ 
 /**
  * The Labelling information that is put in the label cache.
  * 
  * @author jeichar
  * @author dblasby
- * @source $URL$
+ * @author simone giannecchini  * @source $URL$
  */
-public class LabelCacheItem implements Comparable
-{
+public final class LabelCacheItem implements Comparable {
 	TextStyle2D textStyle;
 	List geoms=new ArrayList();
 	double priority = 0.0;

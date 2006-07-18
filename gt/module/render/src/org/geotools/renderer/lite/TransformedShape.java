@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
  * (C) 2003, Institut de Recherche pour le D�veloppement
@@ -18,6 +18,7 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.geotools.renderer.lite;
+
 
 // J2SE dependencies
 import java.awt.Rectangle;
