@@ -50,15 +50,18 @@ public class FormatFileFilter implements FileFilter {
      * @see java.io.FileFilter#accept(java.io.File)
      */
     public boolean accept(File pathname) {
-        for (int i = 0; i < formats.length; i++) {
-            Format format = formats[i];
+		final int length = formats.length;
+		Format format;
+		for (int i = 0; i < length; i++) {
+			format = formats[i];
 
-            if (((AbstractGridFormat)format).accepts(pathname)||(pathname.isDirectory() && this.recursive)) {
-                return true;
+			if (((AbstractGridFormat) format).accepts(pathname)
+					|| (pathname.isDirectory() && this.recursive)) {
+				return true;
 
-            }
-        }
+			}
+		}
 
-        return false;
+		return false;
     }
 }

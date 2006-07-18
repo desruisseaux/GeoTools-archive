@@ -81,8 +81,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
 
         StyledLayer[] layers = sld.getStyledLayers();
         StyledLayer[] layersCopy = new StyledLayer[layers.length];
-
-        for (int i = 0; i < layers.length; i++) {
+        final int length=layers.length;
+        for (int i = 0; i < length; i++) {
             if (layers[i] instanceof UserLayer) {
                 ((UserLayer) layers[i]).accept(this);
                 layersCopy[i] = (UserLayer) getPages().pop();
@@ -106,8 +106,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
 
         Style[] style = layer.getStyles();
         Style[] styleCopy = new Style[style.length];
-
-        for (int i = 0; i < style.length; i++) {
+        int length=style.length;
+        for (int i = 0; i < length; i++) {
             if (style[i] != null) {
                 style[i].accept(this);
                 styleCopy[i] = (Style) getPages().pop();
@@ -117,7 +117,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         FeatureTypeConstraint[] lfc = layer.getLayerFeatureConstraints();
         FeatureTypeConstraint[] lfcCopy = new FeatureTypeConstraint[lfc.length];
 
-        for (int i = 0; i < lfc.length; i++) {
+        length=lfc.length;
+        for (int i = 0; i < length; i++) {
             if (lfc[i] != null) {
                 lfc[i].accept(this);
                 lfcCopy[i] = (FeatureTypeConstraint) getPages().pop();
@@ -126,8 +127,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
 
         copy = sf.createNamedLayer();
         copy.setName(layer.getName());
-
-        for (int i = 0; i < styleCopy.length; i++) {
+        length=styleCopy.length;
+        for (int i = 0; i < length; i++) {
             copy.addStyle(styleCopy[i]);
         }
 
@@ -138,10 +139,11 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
     public void visit(UserLayer layer) {
         UserLayer copy = null;
 
+       
         Style[] style = layer.getUserStyles();
-        Style[] styleCopy = new Style[style.length];
-
-        for (int i = 0; i < style.length; i++) {
+         int length=style.length;
+        Style[] styleCopy = new Style[length];
+        for (int i = 0; i < length; i++) {
             if (style[i] != null) {
                 style[i].accept(this);
                 styleCopy[i] = (Style) getPages().pop();
@@ -151,7 +153,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         FeatureTypeConstraint[] lfc = layer.getLayerFeatureConstraints();
         FeatureTypeConstraint[] lfcCopy = new FeatureTypeConstraint[lfc.length];
 
-        for (int i = 0; i < lfc.length; i++) {
+        length=lfc.length;
+        for (int i = 0; i < length; i++) {
             if (lfc[i] != null) {
                 lfc[i].accept(this);
                 lfcCopy[i] = (FeatureTypeConstraint) getPages().pop();
@@ -170,9 +173,9 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         Style copy = null;
 
         FeatureTypeStyle[] fts = style.getFeatureTypeStyles();
-        FeatureTypeStyle[] ftsCopy = new FeatureTypeStyle[fts.length];
-
-        for (int i = 0; i < fts.length; i++) {
+        final int length=fts.length;
+        FeatureTypeStyle[] ftsCopy = new FeatureTypeStyle[length];
+        for (int i = 0; i < length; i++) {
             if (fts[i] != null) {
                 fts[i].accept(this);
                 ftsCopy[i] = (FeatureTypeStyle) getPages().pop();
@@ -201,7 +204,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         Graphic[] legendGraphic = rule.getLegendGraphic();
         Graphic[] legendGraphicCopy = new Graphic[legendGraphic.length];
 
-        for (int i = 0; i < legendGraphic.length; i++) {
+        int length=legendGraphic.length;
+        for (int i = 0; i < length; i++) {
             if (legendGraphic[i] != null) {
                 legendGraphic[i].accept(this);
                 legendGraphicCopy[i] = (Graphic) getPages().pop();
@@ -211,7 +215,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         Symbolizer[] symbolizer = rule.getSymbolizers();
         Symbolizer[] symbolizerCopy = new Symbolizer[symbolizer.length];
 
-        for (int i = 0; i < symbolizer.length; i++) {
+        length=symbolizer.length;
+        for (int i = 0; i < length; i++) {
             if (symbolizer[i] != null) {
                 symbolizer[i].accept(this);
                 symbolizerCopy[i] = (Symbolizer) getPages().pop();
@@ -236,9 +241,9 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         FeatureTypeStyle copy = null;
 
         Rule[] rules = fts.getRules();
-        Rule[] rulesCopy = new Rule[rules.length];
-
-        for (int i = 0; i < rules.length; i++) {
+        int length=rules.length;
+        Rule[] rulesCopy = new Rule[length];
+        for (int i = 0; i < length; i++) {
             if (rules[i] != null) {
                 rules[i].accept(this);
                 rulesCopy[i] = (Rule) getPages().pop();
@@ -358,7 +363,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         ExternalGraphic[] externalGraphics = gr.getExternalGraphics();
         ExternalGraphic[] externalGraphicsCopy = new ExternalGraphic[externalGraphics.length];
 
-        for (int i = 0; i < externalGraphics.length; i++) {
+        int length=externalGraphics.length;
+        for (int i = 0; i < length; i++) {
             if (externalGraphics[i] != null) {
                 externalGraphics[i].accept(this);
                 externalGraphicsCopy[i] = (ExternalGraphic) getPages().pop();
@@ -367,8 +373,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
 
         Mark[] marks = gr.getMarks();
         Mark[] marksCopy = new Mark[marks.length];
-
-        for (int i = 0; i < marks.length; i++) {
+        length=marks.length;
+        for (int i = 0; i < length; i++) {
             if (marks[i] != null) {
                 marks[i].accept(this);
                 marksCopy[i] = (Mark) getPages().pop();
@@ -397,9 +403,10 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         }
 
         Symbol[] symbols = gr.getSymbols();
-        Symbol[] symbolCopys = new Symbol[symbols.length];
+        length=symbols.length;
+        Symbol[] symbolCopys = new Symbol[length];
 
-        for (int i = 0; i < symbols.length; i++) {
+        for (int i = 0; i < length; i++) {
             if (symbols[i] != null) {
                 symbols[i].accept(this);
                 symbolCopys[i] = (Symbol) getPages().pop();

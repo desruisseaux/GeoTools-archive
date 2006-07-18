@@ -140,7 +140,7 @@ public class MapContextTest extends TestCase {
     }
 
     private DefaultMapContext buildMapContext() {
-        DefaultMapContext context = new DefaultMapContext();
+        DefaultMapContext context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
         context.addMapBoundsListener(boundsListener);
         context.addMapLayerListListener(layerListListener);
         context.addPropertyChangeListener(propertyChangeListener);
@@ -371,7 +371,7 @@ public class MapContextTest extends TestCase {
 
     public void testOtherProperties() {
         DefaultMapContext context = new DefaultMapContext(new MapLayer[0], "oldTitle",
-                "oldAbstract", "oldCi", new String[] { "oldKeyword" });
+                "oldAbstract", "oldCi", new String[] { "oldKeyword" },DefaultGeographicCRS.WGS84);
         context.addMapBoundsListener(boundsListener);
         context.addMapLayerListListener(layerListListener);
         context.addPropertyChangeListener(propertyChangeListener);
@@ -438,26 +438,26 @@ public class MapContextTest extends TestCase {
         try {
             context.setAreaOfInterest(null);
             fail();
-        } catch (NullPointerException e) {
+        } catch (IllegalArgumentException e) {
         }
 
         try {
             context.setAreaOfInterest(null, null);
             fail();
-        } catch (NullPointerException e) {
+        } catch (IllegalArgumentException e) {
         }
 
         try {
             context.setAreaOfInterest(new Envelope(0, 10, 0, 10), null);
             fail();
-        } catch (NullPointerException e) {
+        } catch (IllegalArgumentException e) {
         }
 
         // test events for simple area set
         clearEventTracking();
 
         Envelope env1 = new Envelope(0, 10, 0, 10);
-        context.setAreaOfInterest(env1);
+        context.setAreaOfInterest(env1,DefaultGeographicCRS.WGS84);
         assertEquals(1, boundsChangedCount);
         assertEquals(0, layerAddedCount);
         assertEquals(0, layerRemovedCount);
@@ -469,13 +469,13 @@ public class MapContextTest extends TestCase {
         assertNull(event.getOldAreaOfInterest());
         assertEquals(env1, context.getAreaOfInterest());
         assertEquals(event.getOldCoordinateReferenceSystem(), context.getCoordinateReferenceSystem());
-        assertEquals(MapBoundsEvent.AREA_OF_INTEREST_MASK, event.getType());
+        assertEquals(MapBoundsEvent.COORDINATE_SYSTEM_MASK|MapBoundsEvent.AREA_OF_INTEREST_MASK, event.getType());
 
         // test events for both area and coordinate system
         clearEventTracking();
 
         Envelope env2 = new Envelope(5, 15, 0, 10);
-        context.setAreaOfInterest(env2, DefaultGeographicCRS.WGS84_3D);
+        context.setAreaOfInterest(env2, DefaultGeographicCRS.WGS84);
         assertEquals(1, boundsChangedCount);
         assertEquals(0, layerAddedCount);
         assertEquals(0, layerRemovedCount);
@@ -486,7 +486,7 @@ public class MapContextTest extends TestCase {
         assertEquals(env1, event.getOldAreaOfInterest());
         assertEquals(env2, context.getAreaOfInterest());
         assertEquals(DefaultGeographicCRS.WGS84, event.getOldCoordinateReferenceSystem());
-        assertEquals(DefaultGeographicCRS.WGS84_3D, context.getCoordinateReferenceSystem());
+        assertEquals(DefaultGeographicCRS.WGS84, context.getCoordinateReferenceSystem());
         assertEquals(MapBoundsEvent.AREA_OF_INTEREST_MASK | MapBoundsEvent.COORDINATE_SYSTEM_MASK,
             event.getType());
 
@@ -494,13 +494,11 @@ public class MapContextTest extends TestCase {
         env2.expandToInclude(50, 50);
         assertNotSame(env2, context.getAreaOfInterest());
 
-        Envelope mapEnvelope = context.getAreaOfInterest();
-        mapEnvelope.expandToInclude(100, 100);
-        assertNotSame(mapEnvelope, context.getAreaOfInterest());
+  
 
         // test transform
         Envelope env3 = new Envelope(5, 10, 5, 10);
-        context.setAreaOfInterest(env3);
+        context.setAreaOfInterest(env3,DefaultGeographicCRS.WGS84);
 
         clearEventTracking();
 
@@ -525,17 +523,16 @@ public class MapContextTest extends TestCase {
         // TODO: fix DataUtilities generated FeatureSource to be a full
         // FeatureCollection wrapper
         
-//        DefaultMapContext context = new DefaultMapContext();
-//        Envelope testEnv1 = new Envelope(0, 10, 0, 10);
-//        context.addLayer(TestUtils.buildLayer(0, "style", "layer1"));
-//        assertEquals(testEnv1, context.getLayerBounds());
-//
-//        Envelope testEnv2 = new Envelope(0, 20, 0, 10);
-//        context.addLayer(TestUtils.buildLayer(10, "style", "layer2"));
-//        assertEquals(testEnv2, context.getLayerBounds());
-//
-//        Envelope testEnv3 = new Envelope(10, 20, 0, 10);
-//        context.removeLayer(1);
-//        assertEquals(testEnv3, context.getLayerBounds());
+        DefaultMapContext context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+        Envelope testEnv1 = new Envelope(0, 10, 0, 10);
+        context.addLayer(TestUtils.buildLayer(0, "style", "layer1"));
+        assertEquals(testEnv1, context.getLayerBounds());
+
+        Envelope testEnv2 = new Envelope(0, 20, 0, 10);
+        context.addLayer(TestUtils.buildLayer(10, "style", "layer2"));
+        assertEquals(testEnv2, context.getLayerBounds());
+
+        context.removeLayer(1);
+        assertEquals(testEnv1, context.getLayerBounds());
     }
 }

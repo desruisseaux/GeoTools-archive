@@ -63,11 +63,11 @@ public final class GridFormatFinder {
      *         factories, and whose available method returns true.
      */
     public static Iterator getAvailableFormats() {
-        Set available = new HashSet();
-        Iterator it = FactoryFinder.factories(GridFormatFactorySpi.class);
-
-        while (it.hasNext()) {
-            GridFormatFactorySpi factory = (GridFormatFactorySpi) it.next();
+		final Set available = new HashSet();
+		final Iterator it = FactoryFinder.factories(GridFormatFactorySpi.class);
+		GridFormatFactorySpi factory;
+		while (it.hasNext()) {
+			factory = (GridFormatFactorySpi) it.next();
 
             if (factory.isAvailable()) {
                 available.add(factory);

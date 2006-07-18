@@ -44,9 +44,10 @@ public class FSCatalogEntry {
     public FSCatalogEntry(File f, org.opengis.coverage.grid.Format[] formats) {
         resource = f;
 
-
-        for (int i = 0; i < formats.length; i++) {
-            Format format = formats[i];
+        final int length=formats.length;
+        Format format;
+        for (int i = 0; i < length; i++) {
+            format = formats[i];
             if( ((AbstractGridFormat)format).accepts(f) )
                 metadata = new FileMetadataImpl(f, format);
         }

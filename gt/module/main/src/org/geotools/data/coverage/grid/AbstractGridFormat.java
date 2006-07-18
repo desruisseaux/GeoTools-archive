@@ -18,21 +18,22 @@ package org.geotools.data.coverage.grid;
 
 import java.util.Map;
 
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.coverage.grid.Format;
-import java.util.Collections;
-import java.util.HashMap;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.geotools.referencing.FactoryFinder;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.coverage.grid.Format;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * AbstractGridFormat is a convenience class so subclasses only need to
- * populate a Map class and set the read and write parameter fields.
- *
- *
- *
+ * AbstractGridFormat is a convenience class so subclasses only need to populate
+ * a Map class and set the read and write parameter fields.
+ * 
+ * 
+ * 
  * For example the ArcGridFormat has the following method which sets up all the
  * required information: <code>private void setInfo(){ HashMap info=new
  * HashMap(); info.put("name", "ArcGrid"); info.put("description", "Arc Grid
@@ -45,126 +46,95 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * writeParameters[0]=ArcGridOperationParameter.getGRASSWriteParam();
  * writeParameters[0]=ArcGridOperationParameter.getCompressWriteParam();
  * }</code>
- *
+ * 
  * @author jeichar
- * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
+ * @author <a href="mailto:simboss1@gmail.com">Simone Giannecchini (simboss)</a>
  * @see AbstractFormatFactory
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/module/main/src/org/geotools/data/coverage/grid/AbstractGridFormat.java $
  */
 public abstract class AbstractGridFormat
     implements Format {
 
   /**
-   * The Map object is used by the information methods(such as getName()) as
-   * a data source. The keys in the Map object (for the associated method)
-   * are as follows:
-   * getName()		key = "name"
-   * 					value type=String
-   * getDescription() key = "description"
-   * 					value type=String
-   * getVendor()  	key = "vendor"
-   * 					value type=String
-   * getDocURL()  	key = "docURL"
-   * 					value type=String
-   * getVersion() 	key = "version"
-   * 					value type=String
-   * Naturally, any methods that are overridden need not have an entry in the Map
-   */
+	 * The Map object is used by the information methods(such as getName()) as a
+	 * data source. The keys in the Map object (for the associated method) are
+	 * as follows: getName() key = "name" value type=String getDescription() key =
+	 * "description" value type=String getVendor() key = "vendor" value
+	 * type=String getDocURL() key = "docURL" value type=String getVersion() key =
+	 * "version" value type=String Naturally, any methods that are overridden
+	 * need not have an entry in the Map
+	 */
   protected Map mInfo;
   protected ParameterValueGroup readParameters;
   protected ParameterValueGroup writeParameters;
-  /**Synchronized map of created CRS Authorities.
-   *
-   * Since creating a CRS Authority Factory is an heavy duty we store them there and we
-   * share them between all gridformats for all threads.
-   */
-  protected static Map CRSAuthorityfactoriesMap = Collections.synchronizedMap(
-      new HashMap());
+	private static CoordinateReferenceSystem crs;
+	static {
+		try {
+			crs = CRS.decode("EPSG:4326");
+		} catch (NoSuchAuthorityCodeException e) {
+			crs = DefaultGeographicCRS.WGS84;
+		} catch (FactoryException e) {
+			crs = DefaultGeographicCRS.WGS84;
+		}
+	}
+	/** Indicates the area to load from */
+	public static final DefaultParameterDescriptor READ_GRIDGEOMETRY2D = new DefaultParameterDescriptor(
+			"ReadGridGeometry2D", GridGeometry2D.class, null, null);
 
-  /**Add an authority factory to the authority map.
-   *
-   * @param code String
-   * @param authorityFactory CRSAuthorityFactory
-   */
-  protected static synchronized void addAuthorityFactory(String code,
-      CRSAuthorityFactory authorityFactory) {
-    if (CRSAuthorityfactoriesMap.containsKey(code) == false) {
-      CRSAuthorityfactoriesMap.put(code, authorityFactory);
-    }
-
-  }
-  /**getAuthorityfactory
-   *
-   * This method retrieves an authority factory with the specified code.
-   * @param code String
-   * @return CRSAuthorityFactory
-   */
-  protected static synchronized CRSAuthorityFactory getAuthorityfactory(String
-      code) {
-    //do we have such an authority factory?
-    if (CRSAuthorityfactoriesMap.containsKey(code)) {
-      return (CRSAuthorityFactory) CRSAuthorityfactoriesMap.get(code);
-    }
-
-    //i'd say No, thus we are going to create it, store it and the retrieve it!!!
-    CRSAuthorityFactory temp = FactoryFinder.getCRSAuthorityFactory(code, null);
-    CRSAuthorityfactoriesMap.put(code, temp);
-    return temp;
-
-  }
 
   /**
-   * @see org.opengis.coverage.grid.Format#getName()
-   */
+	 * @see org.opengis.coverage.grid.Format#getName()
+	 */
   public String getName() {
     return (String) mInfo.get("name");
   }
 
   /**
-   * @see org.opengis.coverage.grid.Format#getDescription()
-   */
+	 * @see org.opengis.coverage.grid.Format#getDescription()
+	 */
   public String getDescription() {
     return (String) mInfo.get("description");
   }
 
   /**
-   * @see org.opengis.coverage.grid.Format#getVendor()
-   */
+	 * @see org.opengis.coverage.grid.Format#getVendor()
+	 */
   public String getVendor() {
     return (String) mInfo.get("vendor");
   }
 
   /**
-   * @see org.opengis.coverage.grid.Format#getDocURL()
-   */
+	 * @see org.opengis.coverage.grid.Format#getDocURL()
+	 */
   public String getDocURL() {
     return (String) mInfo.get("docURL");
   }
 
   /**
-   * @see org.opengis.coverage.grid.Format#getVersion()
-   */
+	 * @see org.opengis.coverage.grid.Format#getVersion()
+	 */
   public String getVersion() {
     return (String) mInfo.get("version");
   }
 
   /**
-   * @todo javadoc
-   */
+	 * @todo javadoc
+	 */
   abstract public org.opengis.coverage.grid.GridCoverageReader getReader(Object
       source);
 
   /**
-   * @todo javadoc
-   */
+	 * @todo javadoc
+	 */
   abstract public org.opengis.coverage.grid.GridCoverageWriter getWriter(Object
       destination);
 
   abstract public boolean accepts(Object input);
 
   /**
-   * @see org.geotools.data.coverage.grid.Format#equals(org.geotools.data.coverage.grid.Format)
-   */
+	 * @see org.geotools.data.coverage.grid.Format#equals(org.geotools.data.coverage.grid.Format)
+	 */
   public boolean equals(Format f) {
     if (f.getClass() == getClass()) {
       return true;
@@ -172,33 +142,30 @@ public abstract class AbstractGridFormat
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see org.opengis.coverage.grid.Format#getReadParameters()
-   */
+  /*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.Format#getReadParameters()
+	 */
   public ParameterValueGroup getReadParameters() {
     return this.readParameters;
   }
 
-  /* (non-Javadoc)
-   * @see org.opengis.coverage.grid.Format#getWriteParameters()
-   */
+  /*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.Format#getWriteParameters()
+	 */
   public ParameterValueGroup getWriteParameters() {
     return this.writeParameters;
   }
 
-  /**getDefaultCRS
-   *
-   * This method provides the user with a default crs WGS84
-   */
-   static public CoordinateReferenceSystem getDefaultCRS() {
-    try {
-      CRSAuthorityFactory factory = getAuthorityfactory("EPSG");
-
-      return factory.createCoordinateReferenceSystem("EPSG:4326");
-
-    }
-    catch (Exception e) {
-      return DefaultGeographicCRS.WGS84;
-    }
-  }
+	/**
+	 * getDefaultCRS
+	 * 
+	 * This method provides the user with a default crs WGS84
+	 */
+	static public CoordinateReferenceSystem getDefaultCRS() {
+		return crs;
+	}
 }

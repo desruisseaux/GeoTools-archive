@@ -27,364 +27,461 @@ import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
+import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.geotools.map.event.MapLayerEvent;
 import org.geotools.styling.Style;
-
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * Default implementation of the MapLayer implementation
- *
+ * 
  * @author wolf
  * @source $URL$
  */
 public class DefaultMapLayer implements MapLayer {
+
+	/** Holds value of property FeatureSource. */
+	protected FeatureSource featureSource;
+
+	/** The style to symbolize the features of this layer */
+	protected Style style;
+
+	/** The query to limit the number of rendered features based on its filter */
+	protected Query query = Query.ALL;
+
+	/** Holds value of property title. */
+	protected String title;
+
+	/** Whether this layer is visible or not. */
+	protected boolean visible;
+
+	/** Utility field used by event firing mechanism. */
+	protected javax.swing.event.EventListenerList listenerList = null;
+
+	/** Listener to forward feature source events as layer events */
+	protected FeatureListener sourceListener = new FeatureListener() {
+		public void changed(FeatureEvent featureEvent) {
+			fireMapLayerListenerLayerChanged(new MapLayerEvent(
+					DefaultMapLayer.this, MapLayerEvent.DATA_CHANGED));
+		}
+	};
+
+	/**
+	 * Creates a new instance of DefaultMapLayer
+	 * 
+	 * @param featureSource
+	 *            the data source for this layer
+	 * @param style
+	 *            the style used to represent this layer
+	 * @param title
+	 *            the layer title
+	 * 
+	 * @throws NullPointerException
+	 *             DOCUMENT ME!
+	 */
+	public DefaultMapLayer(FeatureSource featureSource, Style style,
+			String title) {
+		if ((featureSource == null) || (style == null) || (title == null)) {
+			throw new NullPointerException();
+		}
+
+		// enable data source listening
+		featureSource.addFeatureListener(sourceListener);
+
+		this.featureSource = featureSource;
+		this.style = style;
+		this.title = title;
+		this.visible = true;
+	}
+
+	/**
+	 * Creates a new instance of DefaultMapLayer
+	 * 
+	 * @param featureSource
+	 *            the data source for this layer
+	 * @param style
+	 *            the style used to represent this layer
+	 */
+	public DefaultMapLayer(FeatureSource featureSource, Style style) {
+		this(featureSource, style, "");
+	}
+
+	/**
+	 * Creates a new instance of DefaultMapLayer using a non-emtpy feature
+	 * collection as a parameter
+	 * 
+	 * @param collection
+	 *            the source feature collection
+	 * @param style
+	 *            the style used to represent this layer
+	 * @param title
+	 *            DOCUMENT ME!
+	 */
+	public DefaultMapLayer(FeatureCollection collection, Style style,
+			String title) {
+		this(DataUtilities.source(collection), style, title);
+	}
+
+	/**
+	 * Creates a new instance of DefaultMapLayer using a non-emtpy feature
+	 * collection as a parameter
+	 * 
+	 * @param collection
+	 *            the source feature collection
+	 * @param style
+	 *            the style used to represent this layer
+	 */
+	public DefaultMapLayer(FeatureCollection collection, Style style) {
+		this(DataUtilities.source(collection), style, "");
+	}
+
+	/**
+	 * * Add a new layer and trigger a {@link LayerListEvent}.
+	 * 
+	 * @param coverage
+	 *            The new layer that has been added.
+	 * @param style
+	 * @throws IllegalAttributeException 
+	 * @throws SchemaException 
+	 * @throws FactoryConfigurationError 
+	 * @throws TransformException 
+	 */
+	public DefaultMapLayer(GridCoverage coverage, Style style) throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
+
+		this(DataUtilities.wrapGc(coverage), style, "");
+
+	}
+
+	/**
+	 * * Add a new layer and trigger a {@link LayerListEvent}.
+	 * 
+	 * @param coverage
+	 *            The new layer that has been added.
+	 * @param style
+	 * @param title
+	 * @throws IllegalAttributeException 
+	 * @throws SchemaException 
+	 * @throws FactoryConfigurationError 
+	 * @throws TransformException 
+	 */
+	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style, String title)
+			throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
+
+		this(DataUtilities.wrapGcReader(reader), style, title);
+
+	}
+
 	
-    /** Holds value of property FeatureSource. */
-    protected FeatureSource featureSource;
+	/**
+	 * * Add a new layer and trigger a {@link LayerListEvent}.
+	 * 
+	 * @param coverage
+	 *            The new layer that has been added.
+	 * @param style
+	 * @throws IllegalAttributeException 
+	 * @throws SchemaException 
+	 * @throws FactoryConfigurationError 
+	 * @throws TransformException 
+	 */
+	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style) throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
 
-    /** The style to symbolize the features of this layer */
-    protected Style style;
+		this(DataUtilities.wrapGcReader(reader), style, "");
 
-    /** The query to limit the number of rendered features based on its filter */
-    protected Query query = Query.ALL;
+	}
 
-    /** Holds value of property title. */
-    protected String title;
+	/**
+	 * * Add a new layer and trigger a {@link LayerListEvent}.
+	 * 
+	 * @param coverage
+	 *            The new layer that has been added.
+	 * @param style
+	 * @param title
+	 * @throws IllegalAttributeException 
+	 * @throws SchemaException 
+	 * @throws FactoryConfigurationError 
+	 * @throws TransformException 
+	 */
+	public DefaultMapLayer(GridCoverage coverage, Style style, String title)
+			throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
 
-    /** Whether this layer is visible or not. */
-    protected boolean visible;
+		this(DataUtilities.wrapGc(coverage), style, title);
 
-    /** Utility field used by event firing mechanism. */
-    protected javax.swing.event.EventListenerList listenerList = null;
+	}
+	/**
+	 * Getter for property featureSource.
+	 * 
+	 * @return Value of property featureSource.
+	 */
+	public FeatureSource getFeatureSource() {
+		return this.featureSource;
+	}
 
-    /** Listener to forward feature source events as layer events */
-    protected FeatureListener sourceListener = new FeatureListener() {
-            public void changed(FeatureEvent featureEvent) {
-                fireMapLayerListenerLayerChanged(new MapLayerEvent(
-                        DefaultMapLayer.this, MapLayerEvent.DATA_CHANGED));
-            }
-        };
+	/**
+	 * Getter for property style.
+	 * 
+	 * @return Value of property style.
+	 */
+	public Style getStyle() {
+		return this.style;
+	}
 
-    /**
-     * Creates a new instance of DefaultMapLayer
-     *
-     * @param featureSource the data source for this layer
-     * @param style the style used to represent this layer
-     * @param title the layer title
-     *
-     * @throws NullPointerException DOCUMENT ME!
-     */
-    public DefaultMapLayer(FeatureSource featureSource, Style style,
-        String title) {
-        if ((featureSource == null) || (style == null) || (title == null)) {
-            throw new NullPointerException();
-        }
+	/**
+	 * Setter for property style.
+	 * 
+	 * @param style
+	 *            New value of property style.
+	 * 
+	 * @throws NullPointerException
+	 *             DOCUMENT ME!
+	 */
+	public void setStyle(Style style) {
+		if (style == null) {
+			throw new NullPointerException();
+		}
 
-        // enable data source listening
-        featureSource.addFeatureListener(sourceListener);
+		this.style = style;
+		fireMapLayerListenerLayerChanged(new MapLayerEvent(this,
+				MapLayerEvent.STYLE_CHANGED));
+	}
 
-        this.featureSource = featureSource;
-        this.style = style;
-        this.title = title;
-        this.visible = true;
-    }
+	/**
+	 * Getter for property title.
+	 * 
+	 * @return Value of property title.
+	 */
+	public String getTitle() {
+		return this.title;
+	}
 
-    /**
-     * Creates a new instance of DefaultMapLayer
-     *
-     * @param featureSource the data source for this layer
-     * @param style the style used to represent this layer
-     */
-    public DefaultMapLayer(FeatureSource featureSource, Style style) {
-        this(featureSource, style, "");
-    }
+	/**
+	 * Setter for property title.
+	 * 
+	 * @param title
+	 *            New value of property title.
+	 * 
+	 * @throws NullPointerException
+	 *             DOCUMENT ME!
+	 */
+	public void setTitle(String title) {
+		if (title == null) {
+			throw new NullPointerException();
+		}
 
-    /**
-     * Creates a new instance of DefaultMapLayer using a non-emtpy feature
-     * collection as a parameter
-     *
-     * @param collection the source feature collection
-     * @param style the style used to represent this layer
-     * @param title DOCUMENT ME!
-     */
-    public DefaultMapLayer(FeatureCollection collection, Style style,
-        String title) {
-        this(DataUtilities.source(collection), style, title);
-    }
+		this.title = title;
 
-    /**
-     * Creates a new instance of DefaultMapLayer using a non-emtpy feature
-     * collection as a parameter
-     *
-     * @param collection the source feature collection
-     * @param style the style used to represent this layer
-     */
-    public DefaultMapLayer(FeatureCollection collection, Style style) {
-        this(DataUtilities.source(collection), style, "");
-    }
+		fireMapLayerListenerLayerChanged(new MapLayerEvent(this,
+				MapLayerEvent.METADATA_CHANGED));
+	}
 
-    /**
-     * Getter for property featureSource.
-     *
-     * @return Value of property featureSource.
-     */
-    public FeatureSource getFeatureSource() {
-        return this.featureSource;
-    }
+	/**
+	 * Getter for property visible.
+	 * 
+	 * @return Value of property visible.
+	 */
+	public boolean isVisible() {
+		return this.visible;
+	}
 
-    /**
-     * Getter for property style.
-     *
-     * @return Value of property style.
-     */
-    public Style getStyle() {
-        return this.style;
-    }
+	/**
+	 * Setter for property visible.
+	 * 
+	 * @param visible
+	 *            New value of property visible.
+	 */
+	public void setVisible(boolean visible) {
+		if (this.visible == visible) {
+			return;
+		}
 
-    /**
-     * Setter for property style.
-     *
-     * @param style New value of property style.
-     *
-     * @throws NullPointerException DOCUMENT ME!
-     */
-    public void setStyle(Style style) {
-        if (style == null) {
-            throw new NullPointerException();
-        }
+		// change visibility and fire events
+		this.visible = visible;
 
-        this.style = style;
-        fireMapLayerListenerLayerChanged(new MapLayerEvent(this,
-                MapLayerEvent.STYLE_CHANGED));
-    }
+		MapLayerEvent event = new MapLayerEvent(this,
+				MapLayerEvent.VISIBILITY_CHANGED);
 
-    /**
-     * Getter for property title.
-     *
-     * @return Value of property title.
-     */
-    public String getTitle() {
-        return this.title;
-    }
+		if (visible) {
+			fireMapLayerListenerLayerShown(event);
+		} else {
+			fireMapLayerListenerLayerHidden(event);
+		}
+	}
 
-    /**
-     * Setter for property title.
-     *
-     * @param title New value of property title.
-     *
-     * @throws NullPointerException DOCUMENT ME!
-     */
-    public void setTitle(String title) {
-        if (title == null) {
-            throw new NullPointerException();
-        }
+	/**
+	 * Returns the definition query established for this layer.
+	 * 
+	 * @return the definition query established for this layer. If not set, just
+	 *         returns {@link Query.ALL}, if set, returns a copy of the actual
+	 *         query object to avoid external modification
+	 * 
+	 * @see org.geotools.map.MapLayer#getQuery()
+	 */
+	public Query getQuery() {
+		return (query == Query.ALL) ? query : new DefaultQuery(query
+				.getTypeName(), query.getFilter(), query.getMaxFeatures(),
+				query.getPropertyNames(), query.getHandle());
+	}
 
-        this.title = title;
+	/**
+	 * Sets a definition query for this layer.
+	 * 
+	 * <p>
+	 * If present (other than <code>Query.ALL</code>, a renderer or consumer
+	 * must use it to limit the number of returned features based on the filter
+	 * it holds and the value of the maxFeatures attributes, and also can use it
+	 * as a performance hto limit the number of requested attributes
+	 * </p>
+	 * 
+	 * @param query
+	 *            the full filter for this layer.
+	 * 
+	 * @throws NullPointerException
+	 *             if no query is passed on. If you want to reset a definition
+	 *             query, pass it {@link Query.ALL} instead of <code>null</code>
+	 * 
+	 * @task TODO: test that the query filter is siutable for the layer's
+	 *       <code>FeatureSource</code> schema
+	 * 
+	 * @see org.geotools.map.MapLayer#setQuery(org.geotools.data.Query)
+	 */
+	public void setQuery(final Query query) {
+		if (query == null) {
+			throw new NullPointerException(
+					"must provide a Query. Do you mean Query.ALL?");
+		}
 
-        fireMapLayerListenerLayerChanged(new MapLayerEvent(this,
-                MapLayerEvent.METADATA_CHANGED));
-    }
+		// be prudent
+		this.query = new DefaultQuery(query.getTypeName(), query.getFilter(),
+				query.getMaxFeatures(), query.getPropertyNames(), query
+						.getHandle());
+		fireMapLayerListenerLayerChanged(new MapLayerEvent(this,
+				MapLayerEvent.FILTER_CHANGED));
+	}
 
-    /**
-     * Getter for property visible.
-     *
-     * @return Value of property visible.
-     */
-    public boolean isVisible() {
-        return this.visible;
-    }
+	// ------------------------------------------------------------------------
+	// EVENT HANDLING CODE
+	// ------------------------------------------------------------------------
 
-    /**
-     * Setter for property visible.
-     *
-     * @param visible New value of property visible.
-     */
-    public void setVisible(boolean visible) {
-        if (this.visible == visible) {
-            return;
-        }
+	/**
+	 * Registers MapLayerListener to receive events.
+	 * 
+	 * @param listener
+	 *            The listener to register.
+	 */
+	public synchronized void addMapLayerListener(
+			org.geotools.map.event.MapLayerListener listener) {
+		if (listenerList == null) {
+			listenerList = new javax.swing.event.EventListenerList();
+		}
 
-        // change visibility and fire events
-        this.visible = visible;
+		listenerList.add(org.geotools.map.event.MapLayerListener.class,
+				listener);
+	}
 
-        MapLayerEvent event = new MapLayerEvent(this,
-                MapLayerEvent.VISIBILITY_CHANGED);
+	/**
+	 * Removes MapLayerListener from the list of listeners.
+	 * 
+	 * @param listener
+	 *            The listener to remove.
+	 */
+	public synchronized void removeMapLayerListener(
+			org.geotools.map.event.MapLayerListener listener) {
+		listenerList.remove(org.geotools.map.event.MapLayerListener.class,
+				listener);
+	}
 
-        if (visible) {
-            fireMapLayerListenerLayerShown(event);
-        } else {
-            fireMapLayerListenerLayerHidden(event);
-        }
-    }
+	/**
+	 * Notifies all registered listeners about the event.
+	 * 
+	 * @param event
+	 *            The event to be fired
+	 */
+	private void fireMapLayerListenerLayerChanged(
+			org.geotools.map.event.MapLayerEvent event) {
+		if (listenerList == null) {
+			return;
+		}
 
-    /**
-     * Returns the definition query established for this layer.
-     *
-     * @return the definition query established for this layer. If not set,
-     *         just returns {@link Query.ALL}, if set, returns a copy of the
-     *         actual query object to avoid external modification
-     *
-     * @see org.geotools.map.MapLayer#getQuery()
-     */
-    public Query getQuery() {
-        return (query == Query.ALL) ? query
-                                    : new DefaultQuery(query.getTypeName(),
-            query.getFilter(), query.getMaxFeatures(),
-            query.getPropertyNames(), query.getHandle());
-    }
+		Object[] listeners = listenerList.getListenerList();
+		final int length=listeners.length;
+		for (int i = length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == org.geotools.map.event.MapLayerListener.class) {
+				((org.geotools.map.event.MapLayerListener) listeners[i + 1])
+						.layerChanged(event);
+			}
+		}
+	}
 
-    /**
-     * Sets a definition query for this layer.
-     * 
-     * <p>
-     * If present (other than <code>Query.ALL</code>, a renderer or consumer
-     * must use it to limit the number of returned features based on the
-     * filter it holds and the value of the maxFeatures attributes, and also
-     * can use it as a performance hto limit the number of requested
-     * attributes
-     * </p>
-     *
-     * @param query the full filter for this layer.
-     *
-     * @throws NullPointerException if no query is passed on. If you want to
-     *         reset a definition query, pass it {@link Query.ALL} instead of
-     *         <code>null</code>
-     *
-     * @task TODO: test that the query filter is siutable for the layer's
-     *       <code>FeatureSource</code> schema
-     *
-     * @see org.geotools.map.MapLayer#setQuery(org.geotools.data.Query)
-     */
-    public void setQuery(final Query query) {
-        if (query == null) {
-            throw new NullPointerException(
-                "must provide a Query. Do you mean Query.ALL?");
-        }
+	/**
+	 * Notifies all registered listeners about the event.
+	 * 
+	 * @param event
+	 *            The event to be fired
+	 */
+	private void fireMapLayerListenerLayerShown(
+			org.geotools.map.event.MapLayerEvent event) {
+		if (listenerList == null) {
+			return;
+		}
 
-        //be prudent
-        this.query = new DefaultQuery(query.getTypeName(), query.getFilter(),
-                query.getMaxFeatures(), query.getPropertyNames(),
-                query.getHandle());
-        fireMapLayerListenerLayerChanged(new MapLayerEvent(this,
-                MapLayerEvent.FILTER_CHANGED));
-    }
+		Object[] listeners = listenerList.getListenerList();
+		final int length=listeners.length;
+		for (int i = length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == org.geotools.map.event.MapLayerListener.class) {
+				((org.geotools.map.event.MapLayerListener) listeners[i + 1])
+						.layerShown(event);
+			}
+		}
+	}
 
-    // ------------------------------------------------------------------------
-    // EVENT HANDLING CODE
-    // ------------------------------------------------------------------------
+	/**
+	 * Notifies all registered listeners about the event.
+	 * 
+	 * @param event
+	 *            The event to be fired
+	 */
+	private void fireMapLayerListenerLayerHidden(
+			org.geotools.map.event.MapLayerEvent event) {
+		if (listenerList == null) {
+			return;
+		}
 
-    /**
-     * Registers MapLayerListener to receive events.
-     *
-     * @param listener The listener to register.
-     */
-    public synchronized void addMapLayerListener(
-        org.geotools.map.event.MapLayerListener listener) {
-        if (listenerList == null) {
-            listenerList = new javax.swing.event.EventListenerList();
-        }
+		Object[] listeners = listenerList.getListenerList();
+		final int length=listeners.length;
+		for (int i = length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == org.geotools.map.event.MapLayerListener.class) {
+				((org.geotools.map.event.MapLayerListener) listeners[i + 1])
+						.layerHidden(event);
+			}
+		}
+	}
 
-        listenerList.add(org.geotools.map.event.MapLayerListener.class, listener);
-    }
-
-    /**
-     * Removes MapLayerListener from the list of listeners.
-     *
-     * @param listener The listener to remove.
-     */
-    public synchronized void removeMapLayerListener(
-        org.geotools.map.event.MapLayerListener listener) {
-        listenerList.remove(org.geotools.map.event.MapLayerListener.class,
-            listener);
-    }
-
-    /**
-     * Notifies all registered listeners about the event.
-     *
-     * @param event The event to be fired
-     */
-    private void fireMapLayerListenerLayerChanged(
-        org.geotools.map.event.MapLayerEvent event) {
-        if (listenerList == null) {
-            return;
-        }
-
-        Object[] listeners = listenerList.getListenerList();
-
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == org.geotools.map.event.MapLayerListener.class) {
-                ((org.geotools.map.event.MapLayerListener) listeners[i + 1])
-                .layerChanged(event);
-            }
-        }
-    }
-
-    /**
-     * Notifies all registered listeners about the event.
-     *
-     * @param event The event to be fired
-     */
-    private void fireMapLayerListenerLayerShown(
-        org.geotools.map.event.MapLayerEvent event) {
-        if (listenerList == null) {
-            return;
-        }
-
-        Object[] listeners = listenerList.getListenerList();
-
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == org.geotools.map.event.MapLayerListener.class) {
-                ((org.geotools.map.event.MapLayerListener) listeners[i + 1])
-                .layerShown(event);
-            }
-        }
-    }
-
-    /**
-     * Notifies all registered listeners about the event.
-     *
-     * @param event The event to be fired
-     */
-    private void fireMapLayerListenerLayerHidden(
-        org.geotools.map.event.MapLayerEvent event) {
-        if (listenerList == null) {
-            return;
-        }
-
-        Object[] listeners = listenerList.getListenerList();
-
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == org.geotools.map.event.MapLayerListener.class) {
-                ((org.geotools.map.event.MapLayerListener) listeners[i + 1])
-                .layerHidden(event);
-            }
-        }
-    }
-    public String toString() {
-    	StringBuffer buf = new StringBuffer();
-    	buf.append("DefaultMapLayer[ ");
-    	if( title == null || title.length()==0){
-    		buf.append("UNNAMED");
-    	}
-    	else {
-    		buf.append( title );
-    	}
-    	if( visible ){
-    		buf.append(", VISIBLE");
-    	}
-    	else {
-    		buf.append(", HIDDEN");
-    	}
-    	buf.append(", style=");
-    	buf.append( style );
-    	buf.append( ", data=");
-    	buf.append( featureSource );
-    	if( query != Query.ALL ){
-    		buf.append( ", query=");
-    		buf.append( query );
-    	}
-    	buf.append("]");
-    	return buf.toString();
-    }
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("DefaultMapLayer[ ");
+		if (title == null || title.length() == 0) {
+			buf.append("UNNAMED");
+		} else {
+			buf.append(title);
+		}
+		if (visible) {
+			buf.append(", VISIBLE");
+		} else {
+			buf.append(", HIDDEN");
+		}
+		buf.append(", style=");
+		buf.append(style);
+		buf.append(", data=");
+		buf.append(featureSource);
+		if (query != Query.ALL) {
+			buf.append(", query=");
+			buf.append(query);
+		}
+		buf.append("]");
+		return buf.toString();
+	}
 }

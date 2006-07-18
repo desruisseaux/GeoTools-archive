@@ -19,16 +19,32 @@
 package org.geotools.geometry.jts;
 
 // J2SE dependencies
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 import java.awt.Shape;
-import java.awt.geom.PathIterator;
 import java.awt.geom.IllegalPathStateException;
+import java.awt.geom.PathIterator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-// JTS dependencies
+import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.GeodeticCalculator;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.operation.TransformPathNotFoundException;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.geometry.ShapeUtilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -36,25 +52,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
-
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.geometry.ShapeUtilities;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.GeodeticCalculator;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.operation.TransformPathNotFoundException;
-import org.geotools.geometry.GeneralDirectPosition;
 
 
 /**
@@ -423,4 +420,46 @@ public final class JTS {
             }
         }
     }
+	/**
+	 * This method is responsible for converting a JTS 2D envelope in an
+	 * Envelope2D for interoperability with the referencing package.
+	 * 
+	 * <p>
+	 * If the provided envelope is a <code>ReferencedEnvelope</code> we check
+	 * that the provided envelope and the implicit envelope envelope are
+	 * similar.
+	 * 
+	 * @param envelope
+	 * @param crs
+	 * @return
+	 * @throws TransformException
+	 */
+	public static Envelope2D getEnvelope2D(final Envelope envelope,
+			final CoordinateReferenceSystem crs) throws TransformException {
+
+		// //
+		//
+		// Initial checks
+		//
+		// //
+		if (envelope == null || crs == null)
+			throw new NullPointerException(
+					"One or both the provided arguments are null");
+		if (envelope instanceof ReferencedEnvelope) {
+			final CoordinateReferenceSystem implicitCRS = ((ReferencedEnvelope) envelope)
+					.getCoordinateReferenceSystem();
+			if (!CRSUtilities.equalsIgnoreMetadata(crs, implicitCRS))
+				throw new IllegalArgumentException(
+						"The envelope provided is in a CRS different from the porvided CRS");
+		}
+		// //
+		//
+		// Ensure the CRS is 2D and retrieve the new envelope
+		//
+		// //
+		final CoordinateReferenceSystem crs2D = CRSUtilities.getCRS2D(crs);
+		return new Envelope2D(crs2D, envelope.getMinX(), envelope.getMinY(),
+				envelope.getWidth(), envelope.getHeight());
+
+	}
 }

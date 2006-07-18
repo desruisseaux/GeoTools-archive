@@ -69,19 +69,20 @@ public class StyleImpl extends AbstractGTComponent
         return abstractText;
     }
 
-    public FeatureTypeStyle[] getFeatureTypeStyles() {
-        FeatureTypeStyle[] ret = new FeatureTypeStyleImpl[] {
-                new FeatureTypeStyleImpl()
-            };
+	public FeatureTypeStyle[] getFeatureTypeStyles() {
+		FeatureTypeStyle[] ret = new FeatureTypeStyleImpl[] { new FeatureTypeStyleImpl() };
 
-        if ((featureTypeStyles != null) && (featureTypeStyles.size() != 0)) {
-            LOGGER.fine("number of fts set " + featureTypeStyles.size());
-            ret = (FeatureTypeStyle[]) featureTypeStyles.toArray(new FeatureTypeStyle[] {
-                        
-                    });
-        }
+		if ((featureTypeStyles != null) && (featureTypeStyles.size() != 0)) {
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine("number of fts set " + featureTypeStyles.size());
+			
+			ret = (FeatureTypeStyle[]) featureTypeStyles
+					.toArray(new FeatureTypeStyle[] {
 
-        return ret;
+					});
+		}
+
+		return ret;
     }
 
     public void setFeatureTypeStyles(FeatureTypeStyle[] styles) {

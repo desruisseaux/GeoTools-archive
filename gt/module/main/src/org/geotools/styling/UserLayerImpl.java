@@ -147,13 +147,14 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
         		return false;
         	}
 
-        	if (constraints.length != other.constraints.length) return false;
-        	
-        	for (int i = 0; i < constraints.length; i++) {
-        		if (!Utilities.equals(constraints[i], other.constraints[i]))
-        			return false;
-        	}
-        	return true;
+			final int length = constraints.length;
+			if (length != other.constraints.length)
+				return false;
+			for (int i = 0; i < length; i++) {
+				if (!Utilities.equals(constraints[i], other.constraints[i]))
+					return false;
+			}
+			return true;
         }
         
         return false;

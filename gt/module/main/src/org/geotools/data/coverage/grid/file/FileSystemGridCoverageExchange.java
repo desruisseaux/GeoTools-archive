@@ -82,8 +82,8 @@ public class FileSystemGridCoverageExchange implements GridCoverageExchange {
     private void refresh(File file) {
     	if (file.isDirectory()) {
 			File[] files = file.listFiles(new FormatFileFilter(formats,recursive));
-			
-			for (int j = 0; j < files.length; j++) {
+			final int length=files.length;
+			for (int j = 0; j < length; j++) {
 			    if (files[j].isFile()) {
 			        entries.add(new FSCatalogEntry(files[j],formats));
 			    }
