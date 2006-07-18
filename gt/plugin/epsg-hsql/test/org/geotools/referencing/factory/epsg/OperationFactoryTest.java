@@ -94,11 +94,6 @@ public class OperationFactoryTest extends TestCase {
     /**
      * Tests the creation of an operation from EPSG:4230 to EPSG:4326. They are the same
      * CRS than the one tested in {@link DefaultDataSourceTest#testTransformations}.
-     *
-     * @todo This method spend almost all its time in the {@code createOperation} method.
-     *       We need to profile this method in order to find why it spend so much time there.
-     *       If we can speed it up, consider removing the {@code extensive} check in
-     *       {@link DefaultDataSourceTest#testSerialization}.
      */
     public void testCreate() throws FactoryException {
         final CRSAuthorityFactory       crsFactory;

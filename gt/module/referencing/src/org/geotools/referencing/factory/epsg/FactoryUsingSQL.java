@@ -363,17 +363,17 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * Cache for axis numbers. This service is not provided by {@link BufferedAuthorityFactory}
      * since the number of axis is used internally in this class.
      *
-     * @see #getAxisName
+     * @see #getDimensionForCRS
      */
-    private final Map/*<String,axisCount>*/ axisCounts = new HashMap();
+    private final Map/*<String,Short>*/ axisCounts = new HashMap();
     
     /**
      * Cache for projection checks. This service is not provided by {@link BufferedAuthorityFactory}
      * since the check that a transformation is a projection is used internally in this class.
      *
-     * @see #getAxisName
+     * @see #isProjection
      */
-    private final Map/*<String,projection>*/ codeProjection = new HashMap();
+    private final Map/*<String,Boolean>*/ codeProjection = new HashMap();
     
 
     /**
@@ -2223,22 +2223,22 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      */
     private short getDimensionForCRS(final String code) throws SQLException {
         final PreparedStatement stmt;
-        Short returnValue = (Short) axisCounts.get(code);
+        final Short cached = (Short) axisCounts.get(code);
         final short dimension;
-        if (returnValue == null) {
+        if (cached == null) {
         	stmt = prepareStatement("Dimension", 
             		"  SELECT COUNT(COORD_AXIS_CODE)"
-                    + "  FROM [Coordinate Axis]"
+                    +  " FROM [Coordinate Axis]"
                     + " WHERE COORD_SYS_CODE = (SELECT COORD_SYS_CODE " 
-                    + "                            FROM [Coordinate Reference System]"
-                    + "                           WHERE COORD_REF_SYS_CODE = ?)");
+                    +                           " FROM [Coordinate Reference System]"
+                    +                          " WHERE COORD_REF_SYS_CODE = ?)");
 	        stmt.setString(1, code);
 	        final ResultSet result = stmt.executeQuery();
 	        dimension = result.next() ? result.getShort(1) : 2;
 	        axisCounts.put(code, new Short(dimension));
 	        result.close();
         } else {
-        	dimension = returnValue.shortValue();
+        	dimension = cached.shortValue();
         }
         return dimension;
     }
@@ -2251,7 +2251,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
     final boolean isProjection(final String code) throws SQLException {
         final PreparedStatement stmt;
         Boolean projection = (Boolean) codeProjection.get(code);
-        if(projection == null) {
+        if (projection == null) {
 	        stmt = prepareStatement("isProjection", "SELECT COORD_REF_SYS_CODE"
 	                                              +  " FROM [Coordinate Reference System]"
 	                                              + " WHERE PROJECTION_CONV_CODE = ?"

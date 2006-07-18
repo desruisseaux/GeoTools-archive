@@ -87,7 +87,7 @@ import org.geotools.resources.Arguments;
  */
 public class DefaultDataSourceTest extends TestCase {
     /**
-     * Set to {@code true} for verbose and more extensive tests.
+     * Set to {@code true} for verbose tests.
      */
     private static boolean verbose = false;
 
@@ -461,9 +461,7 @@ public class DefaultDataSourceTest extends TestCase {
                        /* [12] */ 32701, 32760,
                        /* [14] */  2759,  2930};
 
-        // If we are not running the extensive test suite, uses reduced ranges.
-        final int limit = extensive ? crs2_ranges.length : 4;
-        for (int irange=0; irange<limit; irange+=2) {
+        for (int irange=0; irange<crs2_ranges.length; irange+=2) {
             int range_start = crs2_ranges[irange  ];
             int range_end   = crs2_ranges[irange+1];
             for (int isystem2=range_start; isystem2<=range_end; isystem2++) {
@@ -474,6 +472,11 @@ public class DefaultDataSourceTest extends TestCase {
                 crs2 = factory.createCoordinateReferenceSystem(crs2_name);
                 cop = opf.createOperation(crs1, crs2);
                 serialize(cop);
+                if (!extensive) {
+                    // If we are not running in extensive test mode,
+                    // tests only the first CRS from each range.
+                    break;
+                }
             }
         }
     }
