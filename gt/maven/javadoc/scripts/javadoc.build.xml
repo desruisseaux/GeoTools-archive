@@ -130,6 +130,7 @@
       <pathelement path="module/render/src"/>
       <pathelement path="module/coverage/src"/>
       <pathelement path="module/referencing/src"/>
+      <pathelement path="module/main/target/generated-sources/jjtree-javacc"/>
       <pathelement path="module/main/src"/>
       <pathelement path="module/api/src"/>
     </path>
