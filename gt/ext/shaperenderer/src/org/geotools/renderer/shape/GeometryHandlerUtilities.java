@@ -57,8 +57,8 @@ public class GeometryHandlerUtilities {
     public static void transform(ShapeType type, MathTransform mt,
         double[] src, double[] dest) throws TransformException {
         boolean startPointTransformed = true;
-
-        for (int i = 0; i < dest.length; i += 2) {
+        final int length=dest.length;
+        for (int i = 0; i < length; i += 2) {
             try {
                 mt.transform(src, i, dest, i, 1);
 
@@ -74,7 +74,7 @@ public class GeometryHandlerUtilities {
                 if (i == 0) {
                     startPointTransformed = false;
                 } else if (startPointTransformed) {
-                    if ((i == (dest.length - 2))
+                    if ((i == (length - 2))
                             && ((type == ShapeType.POLYGON)
                             || (type == ShapeType.POLYGONZ)
                             || (type == ShapeType.POLYGONM))) {
@@ -107,6 +107,18 @@ public class GeometryHandlerUtilities {
         return span;
     }
 
+    /**
+     * <p>
+     * This method is making the implicit assumption that the envelope is lon,lat
+     * 
+     * 
+     * @param env
+     * @param mt
+     * @param hasOpacity
+     * @return
+     * @throws TransformException
+     * @throws NoninvertibleTransformException
+     */
     public static ScreenMap calculateScreenSize(Envelope env, MathTransform mt,
         boolean hasOpacity)
         throws TransformException, NoninvertibleTransformException {

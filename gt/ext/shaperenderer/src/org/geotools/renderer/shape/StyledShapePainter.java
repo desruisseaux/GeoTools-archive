@@ -103,11 +103,11 @@ public class StyledShapePainter {
             // get the point onto the shape has to be painted
             float[] coords = new float[2];
             MarkStyle2D ms2d = (MarkStyle2D) style;
-
+            Shape transformedShape;
             while (!(citer.isDone())) {
                 citer.currentSegment(coords);
 
-                Shape transformedShape = ms2d.getTransformedShape(coords[0],
+                 transformedShape = ms2d.getTransformedShape(coords[0],
                         coords[1]);
 
                 if (transformedShape != null) {
