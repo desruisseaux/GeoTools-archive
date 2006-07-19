@@ -18,6 +18,7 @@ package org.geotools.data.gml;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
@@ -73,11 +74,11 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
             	if( "file".equals(url.getProtocol() ) ){
             		File file=new File(url.getFile());
             		if( file.isDirectory())
-            			return new GMLDataStore( url.toURI(), buffer.intValue(), timeout.intValue() );
+            			return new GMLDataStore( new URI(url.getPath()), buffer.intValue(), timeout.intValue() );
             		else
-            			return new FileGMLDataStore( url.toURI(), buffer.intValue(), timeout.intValue() );
+            			return new FileGMLDataStore( new URI(url.getPath()), buffer.intValue(), timeout.intValue() );
             	}else{
-        			return new FileGMLDataStore( url.toURI(), buffer.intValue(), timeout.intValue() );
+        				return new FileGMLDataStore( new URI(url.getPath()), buffer.intValue(), timeout.intValue() );
             	}
             	
             }catch(URISyntaxException e){

@@ -84,4 +84,25 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+
+  <!-- ==================================================== -->
+  <!--     Plugins configuration                            -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- This section excludes the tests, comment out if your
+               testData/testparams.properties are set correctly -->
+          <excludes>
+            <exclude>**/GMLDataStoreTest.java</exclude>
+          </excludes>
+          <!-- End exclude tests -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
 </project>
