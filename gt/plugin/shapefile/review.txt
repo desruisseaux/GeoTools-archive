@@ -1,0 +1,37 @@
+PLUGIN SHAPEFILE
+================
+Module Maintainer: Ian and Jesse
+IP Review: Richard Gould, March 2006
+IP Review: Jody Garnett, March 2006
+
+org.geotools.catalog.shapefile
+------------------------------
+IP:
+ShapefileServiceFactory.java - no copyright message, no author. Added copyright.
+
+org.geotools.data.shapefile
+---------------------------
+IP:
+- ShapefileUtilities.java - no copyright message, appears to be written by Ian Schneider. Added copyright.
+- StreamLogging.java - no copyright message, no author. Added copyright.
+
+org.geotools.data.shapefile.dbf
+-------------------------------
+IP:
+- DbaseFileException.java - no copyright message, no author. Added copyright. (Maybe copyright same as below?)
+- DbaseFileHeader.java, DbaseFileReader.java, DbaseFileWriter.java - Copyright for these three files is assigned to Centre for Computation Geography. File is apparnetly based on something from GISToolkit. Header unchanged. *TO_RESOLVE*
+
+org.geotools.data.shapefile.prj
+-------------------------------
+IP:
+- PrjFileReader.java - Copyright for these three files is assigned to Centre for Computation Geography. File is apparnetly based on something from GISToolkit. Header unchanged. *TO_RESOLVE*
+
+org.geotools.data.shapefile.shp
+IP:
+- Copyright for these three files is assigned to Centre for Computation Geography. File is apparnetly based on something from GISToolkit. Header unchanged. *TO_RESOLVE*
+
+org.geotools.data.shapefile.shp.xml
+-----------------------------------
+IP:
+IdInfo.java, ShpXmlFileReader.java - no copyright, no author. Added copyright.
+Metadata.java - no copyright, jgarnett author. Added copyright.
