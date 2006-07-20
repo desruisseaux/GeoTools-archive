@@ -202,7 +202,9 @@ public class OracleDataStore extends JDBCDataStore {
     	}    	
     	catch( SQLException sql ){
     		throw (IOException) new IOException( "No CRS for srid "+srid ).initCause( sql );
-    	}
+    	} finally {
+             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
+      }
     }
         
 	/**

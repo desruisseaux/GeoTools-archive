@@ -17,11 +17,26 @@
 package org.geotools.data.oracle;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import oracle.jdbc.OracleConnection;
+import oracle.sql.STRUCT;
+
+import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
+import org.geotools.data.jdbc.MutableFIDFeature;
 import org.geotools.data.jdbc.QueryData;
+import org.geotools.data.oracle.sdo.GeometryConverter;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.filter.SQLEncoderOracle;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -45,16 +60,143 @@ import com.vividsolutions.jts.geom.Geometry;
 public class OracleFeatureWriter extends JDBCTextFeatureWriter {
 	private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");
 	
-    public OracleFeatureWriter(FeatureReader fReader, QueryData queryData)
+	GeometryConverter converter;
+	
+    public OracleFeatureWriter(FeatureReader fReader, QueryData queryData )
         throws IOException {
         super(fReader, queryData);
+        this.converter = new GeometryConverter( (OracleConnection) queryData.getConnection() );
     }
 
     protected String getGeometryInsertText(Geometry geom, int srid)
         throws IOException {
-    	//return "?"; // Please use a prepaired statement to insert your geometry
+    	return "?"; // Please use a prepaired statement to insert your geometry
     	
-        String geomText = SQLEncoderOracle.toSDOGeom(geom, srid);
-        return geomText;
+        //String geomText = SQLEncoderOracle.toSDOGeom(geom, srid);
+        //return geomText;
+        }
+
+    /**
+     * Override that uses sql statements to perform the operation.
+     *
+     * @see org.geotools.data.jdbc.JDBCFeatureWriter#doUpdate(org.geotools.feature.Feature,
+     *      org.geotools.feature.Feature)
+     */
+    protected void doUpdate(Feature live, Feature current)
+        throws IOException, SQLException {
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("updating postgis feature " + current);
+        }
+
+        PreparedStatement statement = null;
+        Connection conn = null;
+
+        try {
+            conn = queryData.getConnection();
+
+            String sql = makeUpdateSql(live, current);
+            statement = conn.prepareStatement(sql);
+
+            FeatureType schema = current.getFeatureType();
+            int position = 1;
+
+            for (int i = 0; i < current.getNumberOfAttributes(); i++) {
+                AttributeType type = schema.getAttributeType(i);
+
+                if (type instanceof GeometricAttributeType) {
+                    Geometry geometry = (Geometry) current.getAttribute(i);
+
+                    if (geometry == null) {
+                        geometry = current.getDefaultGeometry();
+                    }
+
+                    LOGGER.fine("ORACLE SPATIAL: geometry to be written:"
+                        + geometry);
+
+                    STRUCT struct = converter.toSDO(geometry);
+                    statement.setObject(position, struct);
+                    LOGGER.fine(
+                        "ORACLE SPATIAL: set geometry parameter at position:"
+                        + position);
+                    position++;
+
+                    break;
+                }
+            }
+
+            // System.out.println(sql);
+            LOGGER.fine(sql);
+            statement.execute();
+        } catch (SQLException sqle) {
+            String msg = "SQL Exception writing geometry column"
+                + sqle.getLocalizedMessage();
+            LOGGER.log(Level.SEVERE, msg, sqle);
+            queryData.close(sqle);
+            throw new DataSourceException(msg, sqle);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    String msg = "Error closing JDBC Statement";
+                    LOGGER.log(Level.WARNING, msg, e);
+                }
+            }
+        }
+    }
+
+    
+    /**
+     * Override that uses sql prepaired statements to perform the operation.
+     *
+     * @see org.geotools.data.jdbc.JDBCFeatureWriter#doInsert(org.geotools.data.jdbc.MutableFIDFeature)
+     */
+    protected void doInsert(MutableFIDFeature current)
+        throws IOException, SQLException {
+        LOGGER.fine("inserting into postgis feature " + current);
+
+        PreparedStatement statement = null;
+        Connection conn = null;
+        try {
+            conn = queryData.getConnection();
+            String sql = makeInsertSql(current);
+            statement = conn.prepareStatement( sql );
+            
+            int position = 1;
+            FeatureType schema = current.getFeatureType();
+            for( int i=0; i<current.getNumberOfAttributes();i++){
+            	AttributeType type = schema.getAttributeType( i );
+            	if( type instanceof GeometricAttributeType ){
+            		Geometry geometry = (Geometry) current.getAttribute( i );
+            		STRUCT struct = converter.toSDO( geometry );
+            		statement.setObject( position, struct );
+            		position++;
+            	}
+            }
+            LOGGER.fine(sql);
+            statement.execute();
+
+            // should the ID be generated during an insert, we need to read it back
+            // and set it into the feature
+          if (((mapper.getColumnCount() > 0)
+          && mapper.hasAutoIncrementColumns())) {
+//          if (((mapper.getColumnCount() > 0))) {
+                current.setID(mapper.createID(conn, current, statement));
+            }
+        } catch (SQLException sqle) {
+            String msg = "SQL Exception writing geometry column" + sqle.getLocalizedMessage();
+            LOGGER.log(Level.SEVERE, msg, sqle);
+            queryData.close(sqle);
+            throw new DataSourceException(msg, sqle);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    String msg = "Error closing JDBC Statement";
+                    LOGGER.log(Level.WARNING, msg, e);
+                }
+            }
+        }
     }
 }
