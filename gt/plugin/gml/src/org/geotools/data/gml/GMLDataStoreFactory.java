@@ -17,8 +17,9 @@ package org.geotools.data.gml;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
@@ -116,7 +117,18 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
      */
     public boolean canProcess(Map params) {
         if(params != null && params.containsKey("url")){
-    			URL tempurl = (URL) params.get("url");
+        	Object url = params.get("url");
+    			URL tempurl = null;
+    			if (url instanceof URL)
+    				tempurl = (URL) url;
+    			else if (url instanceof String)
+    			  try {
+    					tempurl = new URL((String)url);
+    				} catch (MalformedURLException e) {
+    					return false;
+    				}
+    			else
+    				return false;
     			if(canProcess(tempurl))
     			    return true;
     			
