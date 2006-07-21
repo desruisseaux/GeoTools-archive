@@ -42,10 +42,11 @@ import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.GeoTiffException;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
+import org.geotools.gce.geotiff.IIOMetadataAdpaters.PixelScale;
+import org.geotools.gce.geotiff.IIOMetadataAdpaters.TiePoint;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffCoordinateTransformationsCodes;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffGCSCodes;
@@ -69,7 +70,6 @@ import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.cs.CSFactory;
-import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.Ellipsoid;
@@ -109,7 +109,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/crs_adapters/GeoTiffMetadata2CRSAdapter.java $
  */
-public class GeoTiffMetadata2CRSAdapter {
+public final class GeoTiffMetadata2CRSAdapter {
 	// code from GeoTIFFWritingUtilities spec section 6.3.2.4
 	private static final String PM_Greenwich = "8901";
 
@@ -161,19 +161,19 @@ public class GeoTiffMetadata2CRSAdapter {
 
 	}
 
-	private synchronized final void initOperationFactory() {
+	private  void initOperationFactory() {
 		if (opFactory == null)
 			opFactory = FactoryFinder.getCoordinateOperationAuthorityFactory(
 					"EPSG", hints);
 	}
 
-	private synchronized final void initCSAuthorityFactory() {
+	private  void initCSAuthorityFactory() {
 		if (csAuthorityFactory == null)
 			csAuthorityFactory = FactoryFinder.getCSAuthorityFactory("EPSG",
 					hints);
 	}
 
-	private synchronized final void initdatumFactory() {
+	private  void initdatumFactory() {
 		if (datumFactory == null)
 			datumFactory = FactoryFinder
 					.getDatumAuthorityFactory("EPSG", hints);
@@ -181,12 +181,12 @@ public class GeoTiffMetadata2CRSAdapter {
 			datumObjFactory = FactoryFinder.getDatumFactory(hints);
 	}
 
-	private synchronized final void initCRSFactory() {
+	private  void initCRSFactory() {
 		if (crsFactory == null)
 			crsFactory = FactoryFinder.getCRSFactory(hints);
 	}
 
-	private synchronized final void initCSFactory() {
+	private  void initCSFactory() {
 		if (csFactory == null)
 			csFactory = FactoryFinder.getCSFactory(hints);
 	}
@@ -330,7 +330,7 @@ public class GeoTiffMetadata2CRSAdapter {
 	 * @return
 	 * @throws IOException
 	 */
-	private final int getGeoKeyAsInt(final int key) {
+	private  int getGeoKeyAsInt(final int key) {
 
 		try {
 			return Integer.parseInt(metadata.getGeoKey(key));
@@ -350,16 +350,15 @@ public class GeoTiffMetadata2CRSAdapter {
 	 * @return
 	 * @throws GeoTiffException
 	 */
-	public final MathTransform getRasterToModel(
-			final CoordinateReferenceSystem crs) throws GeoTiffException {
+	public  MathTransform getRasterToModel() throws GeoTiffException {
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Load initials
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final double[] tiePoints = metadata.getModelTiePoints();
-		final double[] pixScales = metadata.getModelPixelScales();
-		final int numTiePoints = tiePoints.length / 6;
+		final TiePoint[] tiePoints = metadata.getModelTiePoints();
+		final PixelScale pixScales = metadata.getModelPixelScales();
+		final int numTiePoints = tiePoints.length;
 		MathTransform xform = null;
 		rasterType = getGeoKeyAsInt(GeoTiffConstants.RasterPixelIsArea);
 		// @task TODO I do not know if this is correct but it works fine
@@ -376,48 +375,32 @@ public class GeoTiffMetadata2CRSAdapter {
 		// trying to understand the direction of the first axis in order to
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final CoordinateSystem cs = crs.getCoordinateSystem();
-		boolean lonFirst = !GridGeometry2D.swapXY(cs);
 		// latitude index
-		final int latIndex = lonFirst ? 1 : 0;
-
-		// axis reversion
-		/**
-		 * The GridCoverage2D is backed by a PlanarImage whose intrinsic crs2D
-		 * has first axis going east and second axis going south, therefore we
-		 * need to reverse and possibly swap axes accordingly
-		 */
-
-		final boolean[] reverse = GridGeometry2D.reverse(cs);
 
 		if (numTiePoints == 1) {
 
 			final GeneralMatrix gm = new GeneralMatrix(3); // identity
-			final double scaleRaster2ModelLongitude = (reverse[(latIndex + 1) % 2]) ? -pixScales[0]
-					: pixScales[0];
-			final double scaleRaster2ModelLatitude = (reverse[latIndex]) ? -pixScales[1]
-					: pixScales[1];
-			final double tiePointColumn = tiePoints[0]
+			final double scaleRaster2ModelLongitude = pixScales.getScaleX();
+			final double scaleRaster2ModelLatitude = -pixScales.getScaleY();
+			final double tiePointColumn = tiePoints[0].getValueAt(0)
 					+ (rasterType == GeoTiffConstants.RasterPixelIsArea ? 0.5
 							: 0); // "raster" space
 			// coordinates
 			// (indicies)
-			final double tiePointRow = tiePoints[1]
+			final double tiePointRow = tiePoints[0].getValueAt(1)
 					+ (rasterType == GeoTiffConstants.RasterPixelIsArea ? 0.5
 							: 0);
 
 			// compute an "offset and scale" matrix
-			gm.setElement(0, 0, (lonFirst) ? scaleRaster2ModelLongitude : 0);
-			gm.setElement(1, 1, (lonFirst) ? scaleRaster2ModelLatitude : 0);
-			gm.setElement(0, 1, (lonFirst) ? 0 : scaleRaster2ModelLatitude);
-			gm.setElement(1, 0, (lonFirst) ? 0 : scaleRaster2ModelLongitude);
+			gm.setElement(0, 0, scaleRaster2ModelLongitude);
+			gm.setElement(1, 1, scaleRaster2ModelLatitude);
+			gm.setElement(0, 1, 0);
+			gm.setElement(1, 0, 0);
 
-			gm.setElement(0, 2, (lonFirst) ? tiePoints[3]
-					+ (scaleRaster2ModelLongitude * tiePointColumn)
-					: tiePoints[4] + (scaleRaster2ModelLatitude * tiePointRow));
-			gm.setElement(1, 2, (lonFirst) ? tiePoints[4]
-					+ (scaleRaster2ModelLatitude * tiePointRow) : tiePoints[3]
+			gm.setElement(0, 2, tiePoints[0].getValueAt(3)
 					+ (scaleRaster2ModelLongitude * tiePointColumn));
+			gm.setElement(1, 2, tiePoints[0].getValueAt(4)
+					+ (scaleRaster2ModelLatitude * tiePointRow));
 
 			// make it a LinearTransform
 			xform = ProjectiveTransform.create(gm);
@@ -437,7 +420,7 @@ public class GeoTiffMetadata2CRSAdapter {
 	 * @return
 	 * @throws IOException
 	 */
-	private final double getGeoKeyAsDouble(final int key) {
+	private double getGeoKeyAsDouble(final int key) {
 
 		try {
 			return Double.parseDouble(metadata.getGeoKey(key));
@@ -452,7 +435,7 @@ public class GeoTiffMetadata2CRSAdapter {
 	 * 
 	 * @return Value of property metadata.
 	 */
-	public final GeoTiffIIOMetadataDecoder getMetadata() {
+	public  GeoTiffIIOMetadataDecoder getMetadata() {
 		return this.metadata;
 	}
 
@@ -462,7 +445,7 @@ public class GeoTiffMetadata2CRSAdapter {
 	 * @param metadata
 	 *            New value of property metadata.
 	 */
-	public final void setMetadata(final GeoTiffIIOMetadataDecoder metadata) {
+	public  void setMetadata(final GeoTiffIIOMetadataDecoder metadata) {
 		this.metadata = metadata;
 	}
 
@@ -570,14 +553,19 @@ public class GeoTiffMetadata2CRSAdapter {
 	/**
 	 * 
 	 */
-	private synchronized final void initFactoryGroup() {
+	private  void initFactoryGroup() {
 		if (factories == null) {
 			initCSFactory();
 			initdatumFactory();
 			initMTFactory();
 			initCRSFactory();
-			factories = new FactoryGroup(datumObjFactory, FactoryFinder
-					.getCSFactory(hints), crsFactory, mtFactory);
+			final Hints tempHints = (Hints) hints.clone();
+			tempHints.put(Hints.DATUM_FACTORY, datumFactory);
+			tempHints.put(Hints.CS_FACTORY, csFactory);
+			tempHints.put(Hints.CRS_FACTORY, crsFactory);
+			tempHints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
+
+			factories = new FactoryGroup(tempHints);
 		}
 
 	}
@@ -585,7 +573,7 @@ public class GeoTiffMetadata2CRSAdapter {
 	/**
 	 * 
 	 */
-	private final void initMTFactory() {
+	private  void initMTFactory() {
 		if (mtFactory == null)
 			mtFactory = new DefaultMathTransformFactory();
 

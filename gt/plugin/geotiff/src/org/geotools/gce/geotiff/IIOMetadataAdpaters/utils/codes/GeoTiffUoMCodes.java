@@ -20,7 +20,7 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes;
  *
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/IIOMetadataAdpaters/utils/codes/GeoTiffUoMCodes.java $
  */
-public class GeoTiffUoMCodes {
+public final class GeoTiffUoMCodes {
 
 	public static final int Angular_Arc_Minute = 9103;
 	public static final int Angular_Arc_Second = 9104;

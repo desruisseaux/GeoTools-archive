@@ -36,9 +36,11 @@ import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataEncoder;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
 import org.geotools.gce.geotiff.crs_adapters.CRS2GeoTiffMetadataAdapter;
+import org.geotools.resources.CRSUtilities;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -53,24 +55,23 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.operation.TransformException;
 
 import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
 
 /*
- *    GeoTools - OpenSource mapping toolkit
- *    http://geotools.org
- *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
+ * GeoTools - OpenSource mapping toolkit http://geotools.org (C) 2005-2006,
+ * GeoTools Project Managment Committee (PMC)
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; version 2.1 of the License.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 /**
  * 
@@ -79,7 +80,7 @@ import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffWriter.java $
  */
-public class GeoTiffWriter implements GridCoverageWriter {
+public final class GeoTiffWriter implements GridCoverageWriter {
 	private ImageOutputStream destination;
 
 	/**
@@ -162,7 +163,7 @@ public class GeoTiffWriter implements GridCoverageWriter {
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#setCurrentSubname(java.lang.String)
 	 */
 	public void setCurrentSubname(final String arg0) throws IOException {
-	
+
 	}
 
 	/*
@@ -172,7 +173,8 @@ public class GeoTiffWriter implements GridCoverageWriter {
 	 *      org.opengis.parameter.GeneralParameterValue[])
 	 */
 	public void write(final GridCoverage gc, final GeneralParameterValue[] arg1)
-			throws IllegalArgumentException, IOException {
+			throws IllegalArgumentException, IOException,
+			IndexOutOfBoundsException {
 		// getting the coordinate reference system
 		final CoordinateReferenceSystem crs = gc.getCoordinateReferenceSystem();
 
@@ -214,10 +216,13 @@ public class GeoTiffWriter implements GridCoverageWriter {
 	 * @param W
 	 * @param H
 	 * @throws IndexOutOfBoundsException
+	 * @throws IOException
+	 * @throws TransformException
 	 */
 	private void setTiePointAndScale(final CoordinateReferenceSystem crs,
 			final GeoTiffIIOMetadataEncoder metadata,
-			final AffineTransform gridToCoord) throws IndexOutOfBoundsException {
+			final AffineTransform gridToCoord)
+			throws IndexOutOfBoundsException, IOException {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -236,11 +241,15 @@ public class GeoTiffWriter implements GridCoverageWriter {
 		// trying to understand the direction of the first axis in order to
 		//
 		// /////////////////////////////////////////////////////////////////////
-		boolean lonFirst = true;
-		if (crs.getCoordinateSystem().getAxis(0).getDirection().absolute()
-				.equals(AxisDirection.NORTH)) {
-			lonFirst = false;
+		final CoordinateSystem cs;
+		try {
+			cs = CRSUtilities.getCRS2D(crs).getCoordinateSystem();
+		} catch (TransformException e) {
+			final IOException ex = new IOException();
+			ex.initCause(e);
+			throw ex;
 		}
+		boolean lonFirst = !GridGeometry2D.swapXY(cs);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -365,40 +374,4 @@ public class GeoTiffWriter implements GridCoverageWriter {
 		return imageMetadata;
 	}
 
-	// /**
-	// * Prepare this image to be rendered correctly as a tiff. For the momet
-	// what
-	// * we do is a simple check over the color model in order to convert it to
-	// * ComponentColorModel which seems to be well acecepted from the
-	// TIFFEncoder
-	// * in JAi. In the future we will really focus on doing some compression
-	// and
-	// * on to move this code in an utility class inside main for GeoTools.
-	// *
-	// *
-	// * @param renderedImage
-	// * @return
-	// */
-	// private RenderedImage prepareImage4Writing(RenderedImage renderedImage) {
-	// // we have nothing to do
-	// if (renderedImage.getColorModel() instanceof ComponentColorModel) {
-	// return renderedImage;
-	// }
-	//
-	// PlanarImage image = PlanarImage.wrapRenderedImage(renderedImage);
-	//
-	// // going from DirectColorModel to ComponentColorModel
-	// if (image.getColorModel() instanceof DirectColorModel) {
-	// renderedImage = GeoTiffUtils.direct2ComponentColorModel(image);
-	// }
-	//
-	// // going from IndexColorModel to ComponentColorModel
-	// // Are we dealing with IndexColorModel? If so we need to go back to
-	// // ComponentColorModel
-	// if (image.getColorModel() instanceof IndexColorModel) {
-	// image = GeoTiffUtils.reformatColorModel2ComponentColorModel(image);
-	// }
-	//
-	// return image;
-	// }
 }

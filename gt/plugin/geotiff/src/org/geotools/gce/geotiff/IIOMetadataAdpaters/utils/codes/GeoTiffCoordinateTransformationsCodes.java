@@ -36,7 +36,7 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes;
  * @author Simone Giannecchini
  * 
  */
-public class GeoTiffCoordinateTransformationsCodes {
+public final class GeoTiffCoordinateTransformationsCodes {
 
 	public static final short CT_TransverseMercator = 1;
 

@@ -65,12 +65,12 @@ import org.opengis.referencing.operation.OperationMethod;
 /**
  * @author simone giannecchini
  * 
- * 
  * @since 2.2
  * 
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/crs_adapters/CRS2GeoTiffMetadataAdapter.java $
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/crs_adapters/CRS2GeoTiffMetadataAdapter.java $
  */
-public class CRS2GeoTiffMetadataAdapter {
+public final class CRS2GeoTiffMetadataAdapter {
 	/**
 	 * Comment for <code>serialVersionUID</code>
 	 */
@@ -80,12 +80,6 @@ public class CRS2GeoTiffMetadataAdapter {
 	 * Metadata to fill.
 	 */
 	private GeoTiffIIOMetadataEncoder metadata;
-
-	// private CSFactory csObjFactory;
-	//
-	// private CRSFactory crsObjFactory;
-	//
-	// private DatumFactory datumObjFactory;
 
 	private CoordinateReferenceSystem crs;
 
@@ -98,7 +92,7 @@ public class CRS2GeoTiffMetadataAdapter {
 		this.metadata = metadata;
 	}
 
-	private int getEPSGCode(final IdentifiedObject obj) {
+	private static int getEPSGCode(final IdentifiedObject obj) {
 		// looking for an EPSG code
 		final Set identifiers = obj.getIdentifiers();
 		final Iterator it = identifiers.iterator();
@@ -133,10 +127,11 @@ public class CRS2GeoTiffMetadataAdapter {
 	 */
 	public void parseCoordinateReferenceSystem() throws GeoTiffException {
 
-		/**
-		 * CREATING METADATA AND SETTING BASE FIELDS FOR THEM
-		 */
-
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// CREATING METADATA AND SETTING BASE FIELDS FOR THEM
+		//
+		// /////////////////////////////////////////////////////////////////////
 		// model type
 		final int modelType = (crs instanceof ProjectedCRS) ? 1 : 2;
 
@@ -149,18 +144,24 @@ public class CRS2GeoTiffMetadataAdapter {
 				GeoTiffConstants.RasterPixelIsArea);
 
 		switch (modelType) {
-		/**
-		 * PROJECTED COORDINATE REFERENCE SYSTEM
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// GEOGRAPHIC COORDINATE REFERENCE SYSTEMCREATING METADATA AND SETTING
+		// BASE FIELDS FOR THEM
+		//
+		// /////////////////////////////////////////////////////////////////////
 		case GeoTiffGCSCodes.ModelTypeGeographic:
 
 			parseGeoGCS((DefaultGeographicCRS) crs);
 
 			break;
 
-		/**
-		 * GEOGRAPHIC COORDINATE REFERENCE SYSTEM
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// PROJECTED COORDINATE REFERENCE SYSTEMCREATING METADATA AND SETTING
+		// BASE FIELDS FOR THEM
+		//
+		// /////////////////////////////////////////////////////////////////////
 		case GeoTiffPCSCodes.ModelTypeProjected:
 			parseProjCRS((ProjectedCRS) crs);
 
@@ -171,13 +172,7 @@ public class CRS2GeoTiffMetadataAdapter {
 					null,
 					"The supplied grid coverage uses an unsupported crs! You are allowed to use only projected and geographic coordinate reference systems");
 		}
-		// get the tree
-		// parse the tree and set the metadata
 
-		// //
-		// if ("GEOCCS".equals(keyword)) {
-		// parseGeoCCS(element);
-		// }
 		//
 		// if ("VERT_CS".equals(keyword)) {
 		// parseVertCS(element);
@@ -230,16 +225,10 @@ public class CRS2GeoTiffMetadataAdapter {
 		metadata.addGeoAscii(GeoTiffPCSCodes.PCSCitationGeoKey, projectedCRS
 				.getName().getCode());
 
-		/**
-		 * 
-		 * Projection Geo Key
-		 * 
-		 */
-		// projection name and
+		// projection
 		parseProjection(projectedCRS);
 
-		// final GeographicCRS gcs= (GeographicCRS)
-		// projectedCRS.getBaseCRS();
+		// gographic crs
 		parseGeoGCS((DefaultGeographicCRS) (projectedCRS.getBaseCRS()));
 
 	}
@@ -354,12 +343,11 @@ public class CRS2GeoTiffMetadataAdapter {
 
 		final ParameterValueGroup parameters = projTransf.getParameterValues();
 
-		/**
-		 * 
-		 * Transverse Mercator
-		 * 
-		 */
-
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Transverse Mercator
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (projTransf instanceof TransverseMercator
 				&& name.equalsIgnoreCase("transverse_mercator")) {
 			// key 3075
@@ -384,11 +372,12 @@ public class CRS2GeoTiffMetadataAdapter {
 			return;
 		}
 
-		/**
-		 * 
-		 * Mercator_1SP
-		 * 
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// mercator_1SP
+		// Mercator_2SP
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (projTransf instanceof Mercator
 				&& (name.equalsIgnoreCase("mercator_1SP") || name
 						.equalsIgnoreCase("Mercator_2SP"))) {
@@ -414,12 +403,12 @@ public class CRS2GeoTiffMetadataAdapter {
 
 		}
 
-		/**
-		 * 
-		 * Lamber conformal 1sp
-		 * 
-		 * 
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Lamber conformal 1sp
+		// Mercator_2SP
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (projTransf instanceof LambertConformal && name.indexOf("1") != -1) {
 
 			// key 3075
@@ -445,12 +434,12 @@ public class CRS2GeoTiffMetadataAdapter {
 
 		}
 
-		/**
-		 * 
-		 * LAMBERT_CONFORMAT_CONIC_2SP ||
-		 * name.equalsIgnoreCase("lambert_conformal_conic_2SP_Belgium")
-		 * 
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// LAMBERT_CONFORMAT_CONIC_2SP
+		// lambert_conformal_conic_2SP_Belgium
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (projTransf instanceof LambertConformal && name.indexOf("2") != -1) {
 			// key 3075
 			metadata
@@ -502,11 +491,11 @@ public class CRS2GeoTiffMetadataAdapter {
 		// return parameters;
 		// }
 
-		/**
-		 * 
-		 * STEREOGRAPHIC
-		 * 
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// stereographic
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (projTransf instanceof Stereographic
 				&& name.equalsIgnoreCase("stereographic")) {
 
@@ -531,11 +520,11 @@ public class CRS2GeoTiffMetadataAdapter {
 
 		}
 
-		/**
-		 * 
-		 * POLAR_STEREOGRAPHIC. name.equalsIgnoreCase("polar_stereographic")
-		 * 
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// polar_stereographic
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (projTransf instanceof StereographicPolar
 				&& name.equalsIgnoreCase("polar_stereographic")) {
 			// key 3075
@@ -561,12 +550,11 @@ public class CRS2GeoTiffMetadataAdapter {
 			return;
 
 		}
-
-		/**
-		 * 
-		 * OBLIQUE_MERCATOR.
-		 * 
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Transverse Mercator
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (projTransf instanceof ObliqueMercator
 				&& (name.equalsIgnoreCase("oblique_mercator") || name
 						.equalsIgnoreCase("hotine_oblique_mercator"))) {
@@ -593,13 +581,11 @@ public class CRS2GeoTiffMetadataAdapter {
 			return;
 
 		}
-
-		/**
-		 * 
-		 * albers_Conic_Equal_Area
-		 * 
-		 * 
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// albers_Conic_Equal_Area
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (projTransf instanceof AlbersEqualArea
 				&& name.equalsIgnoreCase("albers_Conic_Equal_Area")) {
 
@@ -626,11 +612,11 @@ public class CRS2GeoTiffMetadataAdapter {
 
 		}
 
-		/**
-		 * 
-		 * Orthographic
-		 * 
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Orthographic
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (projTransf instanceof Orthographic
 				&& name.equalsIgnoreCase("Orthographic")) {
 
@@ -677,9 +663,11 @@ public class CRS2GeoTiffMetadataAdapter {
 			return;
 		}
 
-		/**
-		 * User defined GCS.
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// User defined CRS
+		//
+		// /////////////////////////////////////////////////////////////////////
 		// user defined geographic coordinate reference system.
 		metadata.addGeoShortParam(GeoTiffGCSCodes.GeographicTypeGeoKey, 32767);
 
@@ -797,28 +785,11 @@ public class CRS2GeoTiffMetadataAdapter {
 	 */
 	private void parsePrimem(final DefaultPrimeMeridian pm) {
 		// looking for an EPSG code
-		final Set identifiers = pm.getIdentifiers();
-		final Iterator it = identifiers.iterator();
-		String code = "";
-		Citation cite;
-		Identifier identifier;
-		while (it.hasNext()) {
-			identifier = ((Identifier) it.next());
-			cite = (Citation) identifier.getAuthority();
-			if (cite.getIdentifiers().contains("EPSG")) {
-
-				code = identifier.getCode();
-				break;
-
-			}
-		}
-
-		final int numCode;
-		try {
-			numCode = Integer.parseInt(code);
+		final int numCode = getEPSGCode(pm);
+		if (numCode > 0)
 			metadata.addGeoShortParam(GeoTiffGCSCodes.GeogPrimeMeridianGeoKey,
 					numCode);
-		} catch (Exception e) {
+		else {
 			// user defined
 			metadata.addGeoShortParam(GeoTiffGCSCodes.GeogPrimeMeridianGeoKey,
 					32767);

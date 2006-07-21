@@ -20,7 +20,7 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes;
  * @author Simone Giannecchini
  *
  */
-public class GeoTiffPCSCodes {
+public final class GeoTiffPCSCodes {
 
 	/**
 	 * 6.3.3.1 Projected CS Type Codes Ranges: [ 1, 1000] = Obsolete EPSG/POSC

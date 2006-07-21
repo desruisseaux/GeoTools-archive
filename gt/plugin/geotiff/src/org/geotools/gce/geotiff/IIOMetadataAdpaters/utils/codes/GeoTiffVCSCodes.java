@@ -20,7 +20,7 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes;
  * @author Simone Giannecchini
  * 
  */
-public class GeoTiffVCSCodes {
+public final class GeoTiffVCSCodes {
 
 	/**
 	 * VerticalCitationGeoKey Key ID = 4097 Type = ASCII Values = text This key

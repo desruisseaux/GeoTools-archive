@@ -74,7 +74,7 @@ import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/coverages_branch/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffReader.java $
  */
-public class GeoTiffReader extends AbstractGridCoverage2DReader implements
+public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		GridCoverageReader {
 	private Logger LOGGER = Logger.getLogger(GeoTiffReader.class.toString());
 
@@ -109,6 +109,25 @@ public class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	 * @throws DataSourceException
 	 */
 	public GeoTiffReader(Object input, Hints hints) throws DataSourceException {
+		// /////////////////////////////////////////////////////////////////////
+		// 
+		// Forcing longitude first since the geotiff specification seems to
+		// assume that we have first longitude the latitude.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		this.hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
+				Boolean.TRUE);
+		if (hints != null) {
+			// prevent the use from reordering axes
+			hints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
+			this.hints.add(hints);
+		}
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Seting input
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (input == null) {
 
 			final IOException ex = new IOException(
@@ -252,7 +271,7 @@ public class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		} else
 			overViewDimensions = null;
 
-		this.raster2Model = gtcs.getRasterToModel(crs);
+		this.raster2Model = gtcs.getRasterToModel();
 		final AffineTransform tempTransform = new AffineTransform(
 				(AffineTransform) raster2Model);
 		tempTransform.translate(-0.5, -0.5);
@@ -290,7 +309,7 @@ public class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		return null;
 	}
 
-	public synchronized Format getFormat() {
+	public Format getFormat() {
 		if (format == null)
 			format = new GeoTiffFormat();
 		return format;

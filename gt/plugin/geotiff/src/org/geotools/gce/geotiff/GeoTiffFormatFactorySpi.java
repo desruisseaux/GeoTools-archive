@@ -60,7 +60,7 @@ import org.opengis.coverage.grid.Format;
  * @author Simone Giannecchini
  * @source $URL$
  */
-public class GeoTiffFormatFactorySpi implements GridFormatFactorySpi {
+public final class GeoTiffFormatFactorySpi implements GridFormatFactorySpi {
     /**
      * Creates a new instance of GeoTiffFormatFactorySpi
      */

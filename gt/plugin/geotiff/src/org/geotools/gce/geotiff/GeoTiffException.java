@@ -33,11 +33,16 @@
  */
 package org.geotools.gce.geotiff;
 
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoKeyEntry;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
+import org.geotools.gce.geotiff.IIOMetadataAdpaters.PixelScale;
+import org.geotools.gce.geotiff.IIOMetadataAdpaters.TiePoint;
+
 /**
  * This exception is thrown when the problem with reading the GeoTiff file has
  * to do with constructing either the raster to model transform, or the
@@ -57,14 +62,15 @@ import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
  * This exception is expected to be thrown when there is absolutely nothing
  * wrong with the GeoTiff file which produced it. In this case, the exception is
  * reporting an unsupported coordinate system description or raster to model
- * transform, or some other unrecognized configuration of the GeoTIFFWritingUtilities tags. By
- * doing so, it attempts to record enough information so that the maintainers
- * can support it in the future.
+ * transform, or some other unrecognized configuration of the
+ * GeoTIFFWritingUtilities tags. By doing so, it attempts to record enough
+ * information so that the maintainers can support it in the future.
  * </p>
  * 
  * @author Bryce Nordgren / USDA Forest Service
  * @author Simone Giannecchini
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffException.java $
  */
 public class GeoTiffException extends IOException {
 
@@ -75,14 +81,15 @@ public class GeoTiffException extends IOException {
 
 	private GeoTiffIIOMetadataDecoder metadata = null;
 
-	private GeoTiffIIOMetadataDecoder.GeoKeyRecord[] geoKeys = null;
+	private GeoKeyEntry[] geoKeys = null;
 
 	/**
 	 * Creates a new instance of <code>GeoTiffException</code> without detail
 	 * message.
 	 * 
 	 * @param metadata
-	 *            The metadata from the GeoTIFFWritingUtilities image causing the error.
+	 *            The metadata from the GeoTIFFWritingUtilities image causing
+	 *            the error.
 	 */
 	public GeoTiffException(GeoTiffIIOMetadataDecoder metadata) {
 		this(metadata, "");
@@ -93,7 +100,8 @@ public class GeoTiffException extends IOException {
 	 * specified detail message.
 	 * 
 	 * @param metadata
-	 *            The metadata from the GeoTIFFWritingUtilities image causing the error.
+	 *            The metadata from the GeoTIFFWritingUtilities image causing
+	 *            the error.
 	 * @param msg
 	 *            the detail message.
 	 */
@@ -104,7 +112,7 @@ public class GeoTiffException extends IOException {
 		int numGeoKeys = metadata.getNumGeoKeys();
 
 		if (numGeoKeys > 0) {
-			geoKeys = new GeoTiffIIOMetadataDecoder.GeoKeyRecord[numGeoKeys];
+			geoKeys = new GeoKeyEntry[numGeoKeys];
 
 			for (int i = 0; i < numGeoKeys; i++) {
 				geoKeys[i] = metadata.getGeoKeyRecordByIndex(i);
@@ -113,29 +121,11 @@ public class GeoTiffException extends IOException {
 	}
 
 	/**
-	 * Getter for property modelPixelScales.
-	 * 
-	 * @return Value of property modelPixelScales.
-	 */
-	public double[] getModelPixelScales() {
-		return metadata.getModelPixelScales();
-	}
-
-	/**
-	 * Getter for property modelTiePoints.
-	 * 
-	 * @return Value of property modelTiePoints.
-	 */
-	public double[] getModelTiePoints() {
-		return metadata.getModelTiePoints();
-	}
-
-	/**
 	 * Getter for property modelTransformation.
 	 * 
 	 * @return Value of property modelTransformation.
 	 */
-	public double[] getModelTransformation() {
+	public AffineTransform getModelTransformation() {
 		return metadata.getModelTransformation();
 	}
 
@@ -144,7 +134,7 @@ public class GeoTiffException extends IOException {
 	 * 
 	 * @return Value of property geoKeys.
 	 */
-	public GeoTiffIIOMetadataDecoder.GeoKeyRecord[] getGeoKeys() {
+	public GeoKeyEntry[] getGeoKeys() {
 		return this.geoKeys;
 	}
 
@@ -161,11 +151,12 @@ public class GeoTiffException extends IOException {
 		// do the model pixel scale tags
 		message.print("ModelPixelScaleTag: ");
 
-		double[] modelPixelScales = getModelPixelScales();
+		PixelScale modelPixelScales = metadata.getModelPixelScales();
 
 		if (modelPixelScales != null) {
-			message.println("[" + modelPixelScales[0] + ","
-					+ modelPixelScales[1] + "," + modelPixelScales[2] + "]");
+			message.println("[" + modelPixelScales.getScaleX() + ","
+					+ modelPixelScales.getScaleY() + ","
+					+ modelPixelScales.getScaleZ() + "]");
 		} else {
 			message.println("NOT AVAILABLE");
 		}
@@ -173,36 +164,34 @@ public class GeoTiffException extends IOException {
 		// do the model tie point tags
 		message.print("ModelTiePointTag: ");
 
-		double[] modelTiePoints = getModelTiePoints();
+		TiePoint[] modelTiePoints = metadata.getModelTiePoints();
 		int numTiePoints = modelTiePoints.length;
-		message.println("(" + (numTiePoints / 6) + " tie points)");
+		message.println("(" + (numTiePoints) + " tie points)");
 
-		for (int i = 0; i < (numTiePoints / 6); i++) {
-			int j = i * 6;
+		for (int i = 0; i < (numTiePoints); i++) {
 			message.print("TP #" + i + ": ");
-			message.print("[" + modelTiePoints[j]);
-			message.print("," + modelTiePoints[j + 1]);
-			message.print("," + modelTiePoints[j + 2]);
-			message.print("] -> [" + modelTiePoints[j + 3]);
-			message.print("," + modelTiePoints[j + 4]);
-			message.println("," + modelTiePoints[j + 5] + "]");
+			message.print("[" + modelTiePoints[i].getValueAt(0));
+			message.print("," + modelTiePoints[i].getValueAt(1));
+			message.print("," + modelTiePoints[i].getValueAt(2));
+			message.print("] -> [" + modelTiePoints[i].getValueAt(3));
+			message.print("," + modelTiePoints[i].getValueAt(4));
+			message.println("," + modelTiePoints[i].getValueAt(5) + "]");
 		}
 
 		// do the transformation tag
 		message.print("ModelTransformationTag: ");
 
-		double[] modelTransformation = getModelTransformation();
+		AffineTransform modelTransformation = getModelTransformation();
 
 		if (modelTransformation != null) {
 			message.println("[");
 
-			for (int i = 0; i < 4; i++) {
-				int j = i * 4;
-				message.print(" [" + modelTransformation[j]);
-				message.print("," + modelTransformation[j + 1]);
-				message.print("," + modelTransformation[j + 2]);
-				message.println("," + modelTransformation[j + 3] + "]");
-			}
+			message.print(" [" + modelTransformation.getScaleX());
+			message.print("," + modelTransformation.getShearX());
+			message.print("," + modelTransformation.getScaleY());
+			message.print("," + modelTransformation.getShearY());
+			message.print("," + modelTransformation.getTranslateX());
+			message.print("," + modelTransformation.getTranslateY() + "]");
 
 			message.println("]");
 		} else {

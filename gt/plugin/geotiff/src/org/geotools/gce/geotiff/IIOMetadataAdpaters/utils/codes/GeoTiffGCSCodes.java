@@ -27,15 +27,12 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes;
  * EPSG Datum [ 5000, 32766] = Reserved by GeoTIFFWritingUtilities 32767 =
  * user-defined GCS [32768, 65535] = Private User Implementations Values: Note:
  * Geodetic datum using Greenwich PM have codes equal to the corresponding Datum
- * code - 2000. Ellipsoid-Only GCS: Note: the numeric code is equal to the code
- * of the correspoding EPSG ellipsoid, minus 3000. Note: Only a handful of
- * values have been reproduced here, for the remainder see the
- * GeoTIFFWritingUtilities specification.
+ * code - 2000. 
  * 
  * @author Simone Giannecchini
  * 
  */
-public class GeoTiffGCSCodes {
+public final class GeoTiffGCSCodes {
 
 
 	public static final int GCS_NAD27 = 4267;

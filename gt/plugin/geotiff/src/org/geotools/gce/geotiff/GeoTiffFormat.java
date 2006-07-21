@@ -66,7 +66,7 @@ import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
  * @author Simone Giannecchini
  * @source $URL$
  */
-public class GeoTiffFormat extends AbstractGridFormat implements Format {
+public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	/**
 	 * Creates a new instance of GeoTiffFormat
 	 */

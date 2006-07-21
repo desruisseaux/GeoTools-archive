@@ -20,12 +20,12 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils;
  * 
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/IIOMetadataAdpaters/utils/GeoTiffConstants.java $
  */
-public class GeoTiffConstants {
+public final class GeoTiffConstants {
 	public static final short GTUserDefinedGeoKey = 32767;
 
 	static public final String GTUserDefinedGeoKey_String = "32767".intern();
 
-	public static final short ARRAY_ELEM_INCREMENT = 32;
+	public static final short ARRAY_ELEM_INCREMENT = 5;
 
 	public static final String GEOTIFF_IIO_METADATA_FORMAT_NAME = "com_sun_media_imageio_plugins_tiff_image_1.0"
 			.intern();
@@ -54,18 +54,14 @@ public class GeoTiffConstants {
 	/**
 	 * GTRasterTypeGeoKey Key ID = 1025 Type = Section 6.3.1.2 codes This
 	 * establishes the Raster Space coordinate system used; there are currently
-	 * only two, namely RasterPixelIsPoint and RasterPixelIsArea. No
-	 * user-defined raster spaces are currently supported. For variance in
-	 * imaging display parameters, such as pixel aspect-ratios, use the standard
-	 * TIFF 6.0 device-space tags instead.
+	 * only two, namely RasterPixelIsPoint and RasterPixelIsArea. 
 	 */
 	public static final int GTRasterTypeGeoKey = 1025;
 
 	/**
 	 * 6.3.1.2 Raster Type Codes Ranges: 0 = undefined [ 1, 1023] = Raster Type
 	 * Codes (GeoTIFFWritingUtilities Defined) [1024, 32766] = Reserved 32767 =
-	 * user-defined [32768, 65535]= Private User Implementations Note: Use of
-	 * "user-defined" or "undefined" raster codes is not recommended.
+	 * user-defined [32768, 65535]= Private User 
 	 */
 	public static final int RasterPixelIsArea = 1;
 
