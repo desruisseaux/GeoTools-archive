@@ -19,6 +19,7 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.HeadlessException;
 import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
@@ -71,9 +72,8 @@ public class RendererBaseTest {
 		g.fillRect(0, 0, w, h);
 		render(renderer, g, new Rectangle(w, h), bounds);
 
-		if (((System.getProperty("java.awt.headless") == null) || !System
-				.getProperty("java.awt.headless").equals("true"))
-				&& INTERACTIVE) {
+        final String headless = System.getProperty("java.awt.headless", "false");
+		if (!headless.equalsIgnoreCase("true") && INTERACTIVE) try {
 			Frame frame = new Frame(testName);
 			frame.addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
@@ -96,7 +96,10 @@ public class RendererBaseTest {
 
 			Thread.sleep(timeOut);
 			frame.dispose();
-		}
+		} catch (HeadlessException exception) {
+            // The test is running on a machine without X11 display. Ignore.
+            return;
+        }
 
 		boolean hasData = false; // All I can seem to check reliably.
 

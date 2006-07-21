@@ -23,7 +23,6 @@ package org.geotools.gui.swing;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.HeadlessException;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
