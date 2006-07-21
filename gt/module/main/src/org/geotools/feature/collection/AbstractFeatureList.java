@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *    
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.feature.collection;
 
 import java.io.IOException;
@@ -17,6 +32,22 @@ import org.geotools.filter.SortBy;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
+
+/**
+ * Implementation of FeatureList to get you started.
+ * You will need to provide a FeatureState for collection attributes, and
+ * implement the following:
+ * <ul>
+ * <li>features()
+ * <li>close(FeatureIterator)
+ * <li>getSchema()
+ * <li>accepts(FeatureVisitor)
+ * <li>subList(Filter)
+ * <li>subCollection(Filter)
+ * <li>sort(SortBy)
+ * </ul>
+ * @author Jody Garnett, Refractions Research Inc.
+ */
 public abstract class AbstractFeatureList extends AbstractResourceList implements FeatureList {
     FeatureState state;
 

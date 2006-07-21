@@ -1,8 +1,8 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
+ *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -13,11 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  *
- */
-/*
- * FeatureCollectionIterator.java
- *
- * Created on March 26, 2003, 1:53 PM
+ *    Created on March 26, 2003, 1:53 PM
  */
 package org.geotools.feature;
 
