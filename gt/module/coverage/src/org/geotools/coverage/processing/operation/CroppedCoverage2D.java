@@ -80,8 +80,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 			final GridGeometry2D croppedGeometry = getCroppedGridGeometry(
 					intersectionEnvelope, source);
 			if (croppedGeometry == null) {
-				throw new CannotCropException(Errors
-						.format(ErrorKeys.CANT_CROP_$3), null);
+				throw new CannotCropException(Errors.format(ErrorKeys.CANT_CROP));
 			}
 			final GridRange croppedRange = croppedGeometry.getGridRange();
 			final int xAxis = croppedGeometry.gridDimensionX;
@@ -139,10 +138,10 @@ final class CroppedCoverage2D extends GridCoverage2D {
 							croppedGeometry.getEnvelope()), source);
 		} catch (TransformException e) {
 			throw new CannotCropException(
-					Errors.format(ErrorKeys.CANT_CROP_$3), e);
+					Errors.format(ErrorKeys.CANT_CROP), e);
 		} catch (NoninvertibleTransformException e) {
 			throw new CannotCropException(
-					Errors.format(ErrorKeys.CANT_CROP_$3), e);
+					Errors.format(ErrorKeys.CANT_CROP), e);
 		}
 
 		// something bad happened

@@ -71,6 +71,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
  * @version $Id$
  * @author Jody Garnett
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  */
 public final class JTS {
     /**
@@ -97,6 +98,21 @@ public final class JTS {
      * Do not allow instantiation of this class.
      */
     private JTS() {
+    }
+
+    /**
+     * Makes sure that an argument is non-null.
+     *
+     * @param  name   Argument name.
+     * @param  object User argument.
+     * @throws IllegalArgumentException if {@code object} is null.
+     */
+    private static void ensureNonNull(final String name, final Object object)
+        throws IllegalArgumentException
+    {
+        if (object == null) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
+        }
     }
 
     /**
@@ -135,6 +151,8 @@ public final class JTS {
                                      final MathTransform transform, int npoints)
             throws TransformException 
     {
+        ensureNonNull("sourceEnvelope", sourceEnvelope);
+        ensureNonNull("transform",      transform);
         if (transform.getSourceDimensions()!=2 || transform.getTargetDimensions()!=2) {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
                                                    Utilities.getShortClassName(transform)));
@@ -201,9 +219,12 @@ public final class JTS {
      * @return the destination coordinate if not null or a new Coordinate.
      * @throws TransformException if the coordinate can't be transformed.
      */     
-    public static Coordinate transform(Coordinate source, Coordinate dest, MathTransform transform)
+    public static Coordinate transform(final Coordinate source, Coordinate dest,
+                                       final MathTransform transform)
             throws TransformException
     {
+        ensureNonNull("source",    source);
+        ensureNonNull("transform", transform);
         if (dest == null) {
             dest = new Coordinate();
         }
@@ -251,16 +272,17 @@ public final class JTS {
      * Each coordinate is transformed separately. In case of a transform exception then
      * the new value of the coordinate is the last coordinate correctly transformed.
      *
-     * @param mt    The math transform to apply.
-     * @param src   The source coordinates.
-     * @param dest  The destination array for transformed coordinates.
+     * @param transform The math transform to apply.
+     * @param src       The source coordinates.
+     * @param dest      The destination array for transformed coordinates.
      * @throws TransformException if this method failed to transform any of the points.
      */
-    public static void xform(final MathTransform mt, final double[] src, final double[] dest)
+    public static void xform(final MathTransform transform, final double[] src, final double[] dest)
             throws TransformException
     {
-        final int sourceDim = mt.getSourceDimensions();
-        final int targetDim = mt.getTargetDimensions();
+        ensureNonNull("transform", transform);
+        final int sourceDim = transform.getSourceDimensions();
+        final int targetDim = transform.getTargetDimensions();
         if (targetDim != sourceDim) {
             throw new MismatchedDimensionException();
         }
@@ -268,7 +290,7 @@ public final class JTS {
         boolean startPointTransformed = false;
         for (int i=0; i<src.length; i+=sourceDim) {
             try {
-                mt.transform(src, i, dest, i, 1);
+                transform.transform(src, i, dest, i, 1);
                 if (!startPointTransformed) {
                     startPointTransformed = true;
                     for (int j=0; j<i; j++) {
@@ -316,6 +338,9 @@ public final class JTS {
                                                           final CoordinateReferenceSystem crs)
             throws TransformException
     {
+        ensureNonNull("p1",  p1);
+        ensureNonNull("p2",  p2);
+        ensureNonNull("crs", crs);
         /*
          * Need to synchronize because we use a single instance of a Map (CALCULATORS) as well as
          * shared instances of GeodeticCalculator and GeneralDirectPosition (POSITIONS). None of
@@ -346,6 +371,8 @@ public final class JTS {
      * @param ordinates The destination array.
      */
     public static void copy(final Coordinate point, final double[] ordinates) {
+        ensureNonNull("point",     point);
+        ensureNonNull("ordinates", ordinates);
         switch (ordinates.length) {
             default: Arrays.fill(ordinates, 3, ordinates.length, Double.NaN); // Fall through
             case  3: ordinates[2] = point.z; // Fall through
@@ -364,6 +391,8 @@ public final class JTS {
      * @return The JTS geometry.
      */
     public static Geometry shapeToGeometry(final Shape shape, final GeometryFactory factory) {
+        ensureNonNull("shape",   shape);
+        ensureNonNull("factory", factory);
         final PathIterator iterator = shape.getPathIterator(null, ShapeUtilities.getFlatness(shape));
         final double[] buffer = new double[6];
         final List     coords = new ArrayList();
@@ -421,48 +450,51 @@ public final class JTS {
         }
     }
 
-	/**
-	 * Converts a JTS 2D envelope in an {@link Envelope2D} for interoperability with the
-	 * referencing package.
-	 * 
-	 * <p>
-	 * If the provided envelope is a {@link ReferencedEnvelope} we check
-	 * that the provided CRS and the implicit CRS are similar.
-	 * 
-	 * @param envelope The JTS envelope to convert.
-	 * @param crs The coordinate reference system for the specified envelope.
-	 * @return The GeoAPI envelope.
-	 * @throws TransformException if a two-dimensional envelope can't be created from an envelope
-	 *         with the specified CRS.
-	 */
-	public static Envelope2D getEnvelope2D(final Envelope envelope,
-			final CoordinateReferenceSystem crs) throws TransformException {
-
-		// //
-		//
-		// Initial checks
-		//
-		// //
-        if (envelope == null) {
-            throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "envelope"));
+    /**
+     * Converts a JTS 2D envelope in an {@link Envelope2D} for interoperability with the
+     * referencing package.
+     * <p>
+     * If the provided envelope is a {@link ReferencedEnvelope} we check
+     * that the provided CRS and the implicit CRS are similar.
+     * 
+     * @param envelope The JTS envelope to convert.
+     * @param crs The coordinate reference system for the specified envelope.
+     * @return The GeoAPI envelope.
+     * @throws MismatchedDimensionException if a two-dimensional envelope can't be created
+     *         from an envelope with the specified CRS.
+     *
+     * @since 2.3
+     */
+    public static Envelope2D getEnvelope2D(final Envelope envelope,
+            final CoordinateReferenceSystem crs) throws MismatchedDimensionException
+    {
+        // //
+        //
+        // Initial checks
+        //
+        // //
+        ensureNonNull("envelope", envelope);
+        ensureNonNull("crs",      crs);
+        if (envelope instanceof ReferencedEnvelope) {
+            final ReferencedEnvelope referenced = (ReferencedEnvelope) envelope;
+            final CoordinateReferenceSystem implicitCRS = referenced.getCoordinateReferenceSystem();
+            if (crs!=null && !CRSUtilities.equalsIgnoreMetadata(crs, implicitCRS)) {
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_ENVELOPE_CRS_$2,
+                          crs.getName().getCode(), implicitCRS.getName().getCode()));
+            }
         }
-        if (crs == null) {
-            throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "crs"));
+        // //
+        //
+        // Ensure the CRS is 2D and retrieve the new envelope
+        //
+        // //
+        final CoordinateReferenceSystem crs2D;
+        try {
+            crs2D = CRSUtilities.getCRS2D(crs);
+        } catch (TransformException exception) {
+            throw new MismatchedDimensionException(exception.getLocalizedMessage());
         }
-		if (envelope instanceof ReferencedEnvelope) {
-			final CoordinateReferenceSystem implicitCRS = ((ReferencedEnvelope) envelope)
-					.getCoordinateReferenceSystem();
-			if (!CRSUtilities.equalsIgnoreMetadata(crs, implicitCRS))
-				throw new IllegalArgumentException(
-						"The envelope provided is in a CRS different from the porvided CRS");
-		}
-		// //
-		//
-		// Ensure the CRS is 2D and retrieve the new envelope
-		//
-		// //
-		final CoordinateReferenceSystem crs2D = CRSUtilities.getCRS2D(crs);
-		return new Envelope2D(crs2D, envelope.getMinX(), envelope.getMinY(),
-				envelope.getWidth(), envelope.getHeight());
-	}
+        return new Envelope2D(crs2D, envelope.getMinX(), envelope.getMinY(),
+                envelope.getWidth(), envelope.getHeight());
+    }
 }

@@ -212,10 +212,19 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     /**
      * Returns the coordinate reference system from an arbitrary envelope. This method performs
      * some sanity checking for ensuring that the envelope CRS is consistent.
+     * <p>
+     * <strong>NOTE:</strong> This method may be removed in a future version if GeoAPI 2.1
+     * provides a {@code Envelope.getCoordinateReferenceSystem()} method.
      *
-     * @todo See if we can simplify this code with GeoAPI 2.1.
+     * @since 2.3
      */
-    static CoordinateReferenceSystem getCoordinateReferenceSystem(final Envelope envelope) {
+    public static CoordinateReferenceSystem getCoordinateReferenceSystem(final Envelope envelope) {
+        if (envelope instanceof GeneralEnvelope) {
+            return ((GeneralEnvelope) envelope).getCoordinateReferenceSystem();
+        }
+        if (envelope instanceof Envelope2D) {
+            return ((Envelope2D) envelope).getCoordinateReferenceSystem();
+        }
         final DirectPosition lower = envelope.getLowerCorner();
         final DirectPosition upper = envelope.getUpperCorner();
         if (lower.getDimension() == upper.getDimension()) {

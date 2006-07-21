@@ -117,6 +117,7 @@ import org.geotools.util.ScopedName;
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  * @author Matthias Basler
+ * @author Andrea Aime
  */
 public class FactoryUsingSQL extends DirectAuthorityFactory
         implements CRSAuthorityFactory, CSAuthorityFactory, DatumAuthorityFactory,

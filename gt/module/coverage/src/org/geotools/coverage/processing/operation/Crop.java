@@ -18,6 +18,10 @@ import org.opengis.coverage.Coverage;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.Envelope;
+
 
 /**
  * The crop operation is responsible for selecting geographic subareas of the
@@ -60,14 +64,14 @@ public class Crop extends Operation2D {
 		// Checking input parameteres
 		//
 		// ///////////////////////////////////////////////////////////////////
-		if (parameters.parameter("Source") == null
-				|| !(parameters.parameter("Source").getValue() instanceof GridCoverage2D))
-			throw new CannotCropException(Errors.format(ErrorKeys.CANT_CROP_$1,
+        final ParameterValue sourceParameter = parameters.parameter("Source");
+		if (sourceParameter == null	|| !(sourceParameter.getValue() instanceof GridCoverage2D)) {
+			throw new CannotCropException(Errors.format(ErrorKeys.NULL_PARAMETER_$2,
 					"Source", GridCoverage2D.class.toString()));
-
-		if (parameters.parameter("Envelope") == null
-				|| !(parameters.parameter("Envelope").getValue() instanceof GeneralEnvelope))
-			throw new CannotCropException(Errors.format(ErrorKeys.CANT_CROP_$1,
+        }
+        final ParameterValue envelopeParameter = parameters.parameter("Envelope");
+		if (envelopeParameter == null || !(envelopeParameter.getValue() instanceof Envelope))
+			throw new CannotCropException(Errors.format(ErrorKeys.NULL_PARAMETER_$2,
 					"Envelope", GeneralEnvelope.class.toString()));
 
 		// /////////////////////////////////////////////////////////////////////
@@ -75,25 +79,29 @@ public class Crop extends Operation2D {
 		// Initialization
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final GridCoverage2D source = (GridCoverage2D) parameters.parameter(
-				"Source").getValue();
-		final GeneralEnvelope sourceEnvelope = (GeneralEnvelope) source
-				.getEnvelope();
-		final GeneralEnvelope destinationEnvelope = (GeneralEnvelope) parameters
-				.parameter("Envelope").getValue();
-		if (destinationEnvelope.getCoordinateReferenceSystem() == null)
-			destinationEnvelope.setCoordinateReferenceSystem(source
-					.getCoordinateReferenceSystem2D());
+		final GridCoverage2D source = (GridCoverage2D) sourceParameter.getValue();
+		final Envelope sourceEnvelope = source.getEnvelope();
+		Envelope destinationEnvelope = (Envelope) envelopeParameter.getValue();
+        CoordinateReferenceSystem sourceCRS, destinationCRS;
+        sourceCRS = GeneralEnvelope.getCoordinateReferenceSystem(sourceEnvelope);
+        destinationCRS = GeneralEnvelope.getCoordinateReferenceSystem(destinationEnvelope);
+		if (destinationCRS == null) {
+            // Do not change the user provided object - clone it first.
+            final GeneralEnvelope ge = new GeneralEnvelope(destinationEnvelope);
+            destinationCRS = source.getCoordinateReferenceSystem2D();
+			ge.setCoordinateReferenceSystem(destinationCRS);
+            destinationEnvelope = ge;
+        }
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// crs have to be equals
 		//
 		// /////////////////////////////////////////////////////////////////////
-		if (!CRSUtilities.equalsIgnoreMetadata(sourceEnvelope
-				.getCoordinateReferenceSystem(), destinationEnvelope
-				.getCoordinateReferenceSystem()))
-			throw new CannotCropException(Errors.format(ErrorKeys.CANT_CROP_$2));
+		if (!CRSUtilities.equalsIgnoreMetadata(sourceCRS, destinationCRS)) {
+			throw new CannotCropException(Errors.format(ErrorKeys.MISMATCHED_ENVELOPE_CRS_$2,
+                    sourceCRS.getName().getCode(), destinationCRS.getName().getCode()));
+        }
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// check the intersection and, if needed, do the operation.
@@ -110,15 +118,13 @@ public class Crop extends Operation2D {
 		// do we need to do something
 		if (!intersectionEnvelope.equals(sourceEnvelope)) {// TODO @task make
 			// me parametric
-			parameters.parameter("Envelope").setValue(
-					intersectionEnvelope.clone());
+			envelopeParameter.setValue(intersectionEnvelope.clone());
 			return CroppedCoverage2D
 					.create(parameters,
 							(hints instanceof Hints) ? (Hints) hints
 									: new Hints(hints));
-		} else
+		} else {
 			return source;
-
+        }
 	}
-
 }

@@ -139,9 +139,7 @@ public class Scale extends Operation2D {
 									: new Hints(hints));
 		} catch (NoninvertibleTransformException e) {
 			throw new CannotScaleException(Errors
-					.format(ErrorKeys.CANT_SCALE_$1), e);
+					.format(ErrorKeys.NONINVERTIBLE_SCALING_TRANSFORM), e);
 		}
-
 	}
-
 }

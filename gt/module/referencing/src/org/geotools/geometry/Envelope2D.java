@@ -80,16 +80,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
             throw new IllegalStateException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
                                             new Integer(dimension)));
         }
-        // TODO: Code below would be simplier if 'getCoordinateReferenceSystem()'
-        //       method was defined right into the 'Envelope' interface.
-        if (envelope instanceof Envelope2D) {
-            crs = ((Envelope2D) envelope).getCoordinateReferenceSystem();
-        } else if (envelope instanceof GeneralEnvelope) {
-            crs = ((GeneralEnvelope) envelope).getCoordinateReferenceSystem();
-        } else {
-            crs = GeneralEnvelope.getCoordinateReferenceSystem(envelope);
-        }
-        setCoordinateReferenceSystem(crs); // Paranoiac check.
+        setCoordinateReferenceSystem(GeneralEnvelope.getCoordinateReferenceSystem(envelope));
     }
 
     /**

@@ -49,10 +49,7 @@ public final class ErrorKeys {
     public static final int CANT_CONVERT_FROM_TYPE_$1              =    21;
     public static final int CANT_CREATE_FACTORY_$1                 =   184;
     public static final int CANT_CREATE_FROM_TEXT_$1               =    22;
-    public static final int CANT_CROP_$1						   =   185;
-    public static final int CANT_CROP_$2						   =   186;
-    public static final int CANT_CROP_$3                           =   187;
-    public static final int CANT_SCALE_$1                          =   188;    
+    public static final int CANT_CROP                              =   187;
     public static final int CANT_EVALUATE_$1                       =    23;
     public static final int CANT_GET_DATASOURCE_$1                 =   155;
     public static final int CANT_READ_$1                           =   163;
@@ -75,7 +72,7 @@ public final class ErrorKeys {
     public static final int EMPTY_ARRAY                            =    33;
     public static final int EMPTY_ENVELOPE                         =    34;
     public static final int END_OF_DATA_FILE                       =    35;
-    public static final int FACTORY_NOT_FOUND_$1                   =   185;
+    public static final int FACTORY_NOT_FOUND_$1                   =   189;
     public static final int FILE_DOES_NOT_EXIST_$1                 =    36;
     public static final int FILE_HAS_TOO_FEW_DATA                  =    37;
     public static final int GEOTOOLS_EXTENSION_REQUIRED_$1         =   166;
@@ -95,8 +92,8 @@ public final class ErrorKeys {
     public static final int ILLEGAL_ENVELOPE_ORDINATE_$1           =    49;
     public static final int ILLEGAL_IDENTIFIER_$1                  =   169;
     public static final int ILLEGAL_INSTRUCTION_$1                 =   170;
-    public static final int ILLEGAL_KEY_$1                         =   186;
-    public static final int ILLEGAL_MATRIX_SIZE                    =   187;
+    public static final int ILLEGAL_KEY_$1                         =   190;
+    public static final int ILLEGAL_MATRIX_SIZE                    =   191;
     public static final int ILLEGAL_OCCURS_FOR_PARAMETER_$4        =    50;
     public static final int ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1   =    51;
     public static final int INCOMPATIBLE_COORDINATE_SYSTEM_TYPE    =   149;
@@ -121,6 +118,7 @@ public final class ErrorKeys {
     public static final int MISMATCHED_ARRAY_LENGTH                =    67;
     public static final int MISMATCHED_DIMENSION_$2                =    68;
     public static final int MISMATCHED_DIMENSION_$3                =    69;
+    public static final int MISMATCHED_ENVELOPE_CRS_$2             =   186;
     public static final int MISSING_AUTHORITY_$1                   =   182;
     public static final int MISSING_CHARACTER_$1                   =    70;
     public static final int MISSING_PARAMETER_$1                   =    71;
@@ -128,6 +126,7 @@ public final class ErrorKeys {
     public static final int MISSING_WKT_DEFINITION                 =   171;
     public static final int MIXED_CATEGORIES                       =    73;
     public static final int NEGATIVE_COLUMN_$2                     =    74;
+    public static final int NONINVERTIBLE_SCALING_TRANSFORM        =   188;
     public static final int NONINVERTIBLE_TRANSFORM                =    75;
     public static final int NON_AFFINE_TRANSFORM                   =    76;
     public static final int NON_ANGULAR_UNIT_$1                    =    77;
@@ -156,7 +155,7 @@ public final class ErrorKeys {
     public static final int NO_DATA_SOURCE                         =   156;
     public static final int NO_IMAGE_INPUT                         =    97;
     public static final int NO_IMAGE_READER                        =    98;
-    public static final int NO_IMAGE_WRITER                        =   188;
+    public static final int NO_IMAGE_WRITER                        =   192;
     public static final int NO_SOURCE_AXIS_$1                      =    99;
     public static final int NO_SUCH_AUTHORITY_CODE_$2              =   100;
     public static final int NO_SUCH_AUTHORITY_CODE_$3              =   162;
@@ -166,6 +165,7 @@ public final class ErrorKeys {
     public static final int NO_UNIT                                =   104;
     public static final int NULL_ARGUMENT_$1                       =   105;
     public static final int NULL_FORMAT_$2                         =   106;
+    public static final int NULL_PARAMETER_$2                      =   185;
     public static final int NULL_VALUE_$2                          =   107;
     public static final int NUMBER_OF_BANDS_MISMATCH_$3            =   108;
     public static final int ODD_ARRAY_LENGTH_$1                    =   109;
