@@ -1,7 +1,7 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,172 +12,675 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.gce.gtopo30;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.SampleModel;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.ByteOrder;
+import java.text.ParseException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.stream.ImageInputStream;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.RenderedOp;
+import javax.units.Unit;
+import javax.units.UnitFormat;
+
+import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
+import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.parameter.Parameter;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.resources.image.ImageUtilities;
+import org.geotools.util.NumberRange;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.spatialschema.geometry.Envelope;
+
+import com.sun.media.imageio.stream.RawImageInputStream;
 
 /**
- * This class provides a GridCoverageReader for the
- * GTopo30Format.
- *
+ * This class provides a GridCoverageReader for the GTopo30Format.
+ * 
+ * @author Simone Giannecchini
  * @author jeichar
  * @author mkraemer
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/src/org/geotools/gce/gtopo30/GTopo30Reader.java $
  */
-public class GTopo30Reader implements GridCoverageReader {
+public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
+		GridCoverageReader {
+
+	private final static Logger LOGGER = Logger.getLogger(GTopo30Reader.class
+			.toString());
+
+	private final static String dmext = ".dem";
+
+	private final static String dhext = ".hdr";
+
+	private final static String srext = ".src";
+
+	private final static String shext = ".sch";
+
+	private final static String stext = ".stx";
+
+	private final static String prjext = ".prj";
+
+	/** Dem data header URL */
+	private final URL demURL;
+
+	/** Dem statistics file URL */
+	private final URL statsURL;
+
+	/** Projection file. */
+	private URL prjURL;
+
+	private final GT30Header header;
+
+	private final GT30Stats stats;
+
+	private URL urlToUse;
+
+	private final URL demHeaderURL;
+
 	/**
-	 * The GTopo30 format
+	 * GTopo30Reader constructor.
+	 * 
+	 * @param source
+	 *            The source object (can be a File, an URL or a String
+	 *            representing a File or an URL).
+	 * @throws MalformedURLException
+	 *             if the URL does not correspond to one of the GTopo30 files
+	 * @throws IOException
+	 * @throws DataSourceException
+	 *             if the given url points to an unrecognized file
+	 * @throws IllegalArgumentException
+	 *             DOCUMENT ME!
 	 */
-    private Format format = new GTopo30FormatFactory().createFormat();
-    
-    /**
-     * The source object that has been passed to our constructor.
-     * Can be a file, an URL or a String
-     */
-    private Object mSource = null;
-    
-    /**
-     * The GTopo30DataStore which will be instantiated by the constructor
-     */
-    private GTopo30DataSource sourceOfData = null;
+	public GTopo30Reader(final Object source) throws IOException {
+		if (source == null) {
+			throw new DataSourceException(
+					"GTopo30Reader:No source set to read this coverage.");
+		}
+		if (source instanceof File) {
+			urlToUse = ((File) source).toURL();
+		} else if (source instanceof URL) {
+			// we only allow files
+			urlToUse = (URL) source;
+		} else if (source instanceof String) {
+			try {
+				// is it a filename?
+				urlToUse = new File((String) source).toURL();
+			} catch (MalformedURLException e) {
+				// is it a URL
+				urlToUse = new URL((String) source);
+			}
+		} else {
+			throw new IllegalArgumentException("Illegal input argument!");
+		}
 
-    /**
-     * GTopo30Reader constructor.
-     *
-     * @param source The source object (can be a File, an URL or a String representing
-     * a File or an URL).
-     *
-     * @throws MalformedURLException if the URL does not correspond to one of
-     *         the GTopo30 files
-     * @throws DataSourceException if the given url points to an unrecognized
-     *         file
-     */
-    public GTopo30Reader(final Object source)
-        throws MalformedURLException, DataSourceException {
-        URL urlToUse = null;
+		this.source = source;
+		this.format = new GTopo30Format();
+		// ///////////////////////////////////////////////////////////
+		//
+		// decoding source
+		//
+		// ///////////////////////////////////////////////////////////
+		final String filename;
 
-        if (source instanceof GTopo30DataSource) {
-            this.sourceOfData = (GTopo30DataSource)source;
-        } else {
-            if (source instanceof File) {
-                urlToUse = ((File)source).toURL();
-            } else if (source instanceof URL) {
-                //we only allow files
-                urlToUse = (URL)source;
-            } else if (source instanceof String) {
-                try {
-                    //is it a filename?
-                    urlToUse = new File((String)source).toURL();
-                } catch (MalformedURLException e) {
-                    //is it a URL
-                    urlToUse = new URL((String)source);
-                }
-            } else {
-                throw new IllegalArgumentException("Illegal input argument!");
-            }
+		try {
+			filename = URLDecoder.decode(urlToUse.getFile(), "US-ASCII");
+		} catch (UnsupportedEncodingException use) {
+			MalformedURLException exception = new MalformedURLException(
+					new StringBuffer("Unable to decode ").append(urlToUse)
+							.append(" cause ").append(use.getMessage())
+							.toString());
+			exception.initCause(exception);
+			throw exception;
+		}
 
-            this.sourceOfData = new GTopo30DataSource(urlToUse);
-        }
+		boolean recognized = false;
 
-        this.mSource = source;
-    }
-    
-    /**
-     * Sets an envelope that will be used to crop the source data in order to
-     * get fewer data from the file
-     *
-     * @param crop the rectangle that will be used to extract data from the
-     *        file
-     */
-    public void setCropEnvelope(GeneralEnvelope crop) {
-    	this.sourceOfData.setCropEnvelope(crop);
-    }
+		if (filename.endsWith(dmext) || filename.endsWith(dhext)
+				|| filename.endsWith(srext) || filename.endsWith(shext)
+				|| filename.endsWith(stext) || filename.endsWith(prjext)) {
+			recognized = true;
+		} else {
 
-    /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
-     */
-    public Format getFormat() {
-        return this.format;
-    }
+			if (filename.endsWith(dmext.toUpperCase())
+					|| filename.endsWith(dhext.toUpperCase())
+					|| filename.endsWith(srext.toUpperCase())
+					|| filename.endsWith(shext.toUpperCase())
+					|| filename.endsWith(stext.toUpperCase())
+					|| filename.endsWith(prjext.toUpperCase())) {
+				recognized = true;
+			}
+		}
 
-    /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#getSource()
-     */
-    public Object getSource() {
-        return this.mSource;
-    }
+		if (!recognized) {
+			throw new IOException(
+					"Unrecognized file (file extension doesn't match)");
+		}
 
-    /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataNames()
-     */
-    public String[] getMetadataNames() {
-    	throw new UnsupportedOperationException(
-        	"GTopo30 reader doesn't support metadata manipulation yet");
-    }
+		this.coverageName = filename.substring(0, filename.length() - 4);
+		demURL = new URL(urlToUse, this.coverageName + dmext);
+		prjURL = new URL(urlToUse, this.coverageName + prjext);
+		demHeaderURL = new URL(urlToUse, this.coverageName + dhext);
+		statsURL = new URL(urlToUse, this.coverageName + stext);
 
-    /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataValue(java.lang.String)
-     */
-    public String getMetadataValue(String name) throws MetadataNameNotFoundException {
-    	throw new UnsupportedOperationException(
-        	"GTopo30 reader doesn't support metadata manipulation yet: " + name);
-    }
+		// ///////////////////////////////////////////////////////////
+		//
+		// Reading header and statistics
+		//
+		// ///////////////////////////////////////////////////////////
+		header = new GT30Header(demHeaderURL);
+		// get information from the header
+		originalGridRange = new GeneralGridRange(new Rectangle(0, 0, header
+				.getNCols(), header.getNRows()));
+		stats = new GT30Stats(this.statsURL);
 
-    /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#listSubNames()
-     */
-    public String[] listSubNames() {
-        return null;
-    }
+		// ///////////////////////////////////////////////////////////
+		//
+		// Build the coordinate system and the envelope
+		//
+		// ///////////////////////////////////////////////////////////
+		crs = initCRS();
+		longitudeFirst = !GridGeometry2D.swapXY(crs.getCoordinateSystem());
+		this.originalEnvelope = getBounds(crs);
 
-    /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#getCurrentSubname()
-     */
-    public String getCurrentSubname() {
-        return null;
-    }
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Compute source Resolution
+		//
+		// /////////////////////////////////////////////////////////////////////
+		higherRes = getResolution(originalEnvelope, new Rectangle(0, 0, header
+				.getNCols(), header.getNRows()), crs);
 
-    /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
-     */
-    public org.opengis.coverage.grid.GridCoverage read(
-        GeneralParameterValue[] parameters)
-        throws java.lang.IllegalArgumentException, java.io.IOException {
-    	if (parameters != null) {
-    		//unreferenced parameter: parameters
-    	}
+	}
 
-        return this.sourceOfData.getGridCoverage();
-    }
+	/**
+	 * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
+	 */
+	public Format getFormat() {
+		return format;
+	}
 
-    /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#dispose()
-     */
-    public void dispose() {
-        this.sourceOfData = null;
-    }
+	/**
+	 * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataNames()
+	 */
+	public String[] getMetadataNames() {
+		throw new UnsupportedOperationException(
+				"GTopo30 reader doesn't support metadata manipulation yet");
+	}
 
-    /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
-     */
-    public boolean hasMoreGridCoverages() {
-        return false;
-    }
+	/**
+	 * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataValue(java.lang.String)
+	 */
+	public String getMetadataValue(final String name)
+			throws MetadataNameNotFoundException {
+		throw new UnsupportedOperationException(
+				"GTopo30 reader doesn't support metadata manipulation yet: "
+						+ name);
+	}
 
-    /**
-     * @see org.opengis.coverage.grid.GridCoverageReader#skip()
-     */
-    public void skip() {
-    	//nothing to do here
-    }
+	/**
+	 * @see org.opengis.coverage.grid.GridCoverageReader#listSubNames()
+	 */
+	public String[] listSubNames() {
+		return null;
+	}
+
+	/**
+	 * @see org.opengis.coverage.grid.GridCoverageReader#getCurrentSubname()
+	 */
+	public String getCurrentSubname() {
+		return null;
+	}
+
+	/**
+	 * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
+	 */
+	public org.opengis.coverage.grid.GridCoverage read(
+			final GeneralParameterValue[] params)
+			throws java.lang.IllegalArgumentException, java.io.IOException {
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// do we have paramters to use for reading from the specified source
+		//
+		// /////////////////////////////////////////////////////////////////////
+		GeneralEnvelope requestedEnvelope = null;
+		Rectangle dim = null;
+		if (params != null) {
+			// /////////////////////////////////////////////////////////////////////
+			//
+			// Checking params
+			//
+			// /////////////////////////////////////////////////////////////////////
+			if (params != null) {
+				Parameter param;
+				final int length = params.length;
+				for (int i = 0; i < length; i++) {
+					param = (Parameter) params[i];
+
+					if (param.getDescriptor().getName().getCode().equals(
+							AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
+									.toString())) {
+						final GridGeometry2D gg = (GridGeometry2D) param
+								.getValue();
+						requestedEnvelope = new GeneralEnvelope((Envelope) gg
+								.getEnvelope2D());
+						dim = gg.getGridRange2D().getBounds();
+					}
+				}
+			}
+		}
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Building the required coverage
+		//
+		// /////////////////////////////////////////////////////////////////////
+		return getGridCoverage(requestedEnvelope, dim);
+	}
+
+	/**
+	 * @see org.opengis.coverage.grid.GridCoverageReader#dispose()
+	 */
+	public void dispose() {
+	}
+
+	/**
+	 * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
+	 */
+	public boolean hasMoreGridCoverages() {
+		return false;
+	}
+
+	/**
+	 * @see org.opengis.coverage.grid.GridCoverageReader#skip()
+	 */
+	public void skip() {
+		// nothing to do here a gtopo30 as just one band one coverage
+	}
+
+	/**
+	 * Gets the bounding box of this datasource using the default speed of this
+	 * datasource as set by the implementer.
+	 * 
+	 * @param lonFirst
+	 * 
+	 * @return The bounding box of the datasource or null if unknown and too
+	 *         expensive for the method to calculate.
+	 * 
+	 * @throws IOException
+	 * 
+	 */
+	private GeneralEnvelope getBounds(CoordinateReferenceSystem crs)
+			throws IOException {
+		GeneralEnvelope env = new GeneralEnvelope(new double[] { 0, 0 },
+				new double[] { 0, 0 });
+
+		// preparing data for the envelope
+		final double xULC = header.getULXMap();
+		final double yULC = header.getULYMap();
+		final double xDim = header.getXDim();// dx
+		final double yDim = header.getYDim();// dy
+		final int imageWidth = header.getNCols();
+		final int imageHeight = header.getNRows();
+		final double longMin;
+		final double latMax;
+		final double longMax;
+		final double latMin;
+
+		longMin = xULC - xDim / 2.0;
+		latMax = yULC + yDim / 2.0;
+		longMax = longMin + imageWidth * xDim;
+		latMin = latMax - imageHeight * yDim;
+		if (longitudeFirst) {
+			// longitude
+			env.setRange(0, longMin, longMax);
+			// latitude
+			env.setRange(1, latMin, latMax);
+		} else {
+			// longitude
+			env.setRange(1, longMin, longMax);
+			// latitude
+			env.setRange(0, latMin, latMax);
+		}
+		env.setCoordinateReferenceSystem(crs);
+
+		return env;
+	}
+
+	/**
+	 * Retrieves a grid coverage based on the DEM assoicated to this gtopo
+	 * coverage. The color palette is fixed and there is no possibility for the
+	 * final user to change it.
+	 * 
+	 * @param dim
+	 * @param requestedEnvelope
+	 * 
+	 * @return the GridCoverage object
+	 * 
+	 * @throws DataSourceException
+	 *             if an error occurs
+	 */
+	private GridCoverage2D getGridCoverage(GeneralEnvelope requestedEnvelope,
+			Rectangle dim) throws IOException {
+		int hrWidth = originalGridRange.getLength(0);
+		int hrHeight = originalGridRange.getLength(1);
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Compute requested Res
+		//
+		// /////////////////////////////////////////////////////////////////////
+		double requestedRes[] = getResolution(requestedEnvelope, dim, crs);
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Setting subsampling factors with some checkings
+		// 1) the subsampling factors cannot be zero
+		// 2) the subsampling factors cannot be such that the w or h are zero
+		// /////////////////////////////////////////////////////////////////////
+		final ImageReadParam readP = new ImageReadParam();
+		super.decimationOnReadingControl(readP, requestedRes);
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Statistics
+		//
+		// /////////////////////////////////////////////////////////////////////
+
+		final int max = stats.getMax();
+		final int min = stats.getMin();
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Preparing to load
+		//
+		// /////////////////////////////////////////////////////////////////////
+		// trying to create a channel to the file to read
+		final String filePath = URLDecoder.decode(this.demURL.getFile(),
+				"US-ASCII");
+		final ImageInputStream iis = ImageIO.createImageOutputStream(new File(
+				filePath));
+
+		if (header.getByteOrder().compareToIgnoreCase("M") == 0) {
+			iis.setByteOrder(ByteOrder.BIG_ENDIAN);
+		} else {
+			iis.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+		}
+
+		// Prepare temporaray colorModel and sample model, needed to build the
+		// RawImageInputStream
+		final ColorModel cm = new ComponentColorModel(ColorSpace
+				.getInstance(ColorSpace.CS_GRAY), false, false,
+				Transparency.OPAQUE, DataBuffer.TYPE_SHORT);
+		final SampleModel sm = cm
+				.createCompatibleSampleModel(hrWidth, hrHeight);
+		final ImageTypeSpecifier its = new ImageTypeSpecifier(cm, sm);
+		// Finally, build the image input stream
+		final RawImageInputStream raw = new RawImageInputStream(iis, its,
+				new long[] { 0 }, new Dimension[] { new Dimension(hrWidth,
+						hrHeight) });
+
+		// building the final image layout
+		final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
+				hrWidth, hrHeight));
+		final ImageLayout il = new ImageLayout(0, 0, hrWidth
+				/ readP.getSourceXSubsampling(), hrHeight
+				/ readP.getSourceYSubsampling(), 0, 0, (int) tileSize
+				.getWidth(), (int) tileSize.getHeight(), sm, cm);
+		// First operator: read the image
+		final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+				il);
+		final ParameterBlockJAI pbj = new ParameterBlockJAI("ImageRead");
+		pbj.setParameter("Input", raw);
+		pbj.setParameter("ReadParam", readP);
+		RenderedOp image = JAI.create("ImageRead", pbj, hints);
+
+		// sample dimension for this coverage
+		final GridSampleDimension band = getSampleDimension(max, min);
+
+		// setting metadata
+		final Map metadata = new HashMap();
+		metadata.put("maximum", new Double(stats.getMax()));
+		metadata.put("minimum", new Double(stats.getMin()));
+		metadata.put("mean", new Double(stats.getAverage()));
+		metadata.put("std_dev", new Double(stats.getStdDev()));
+		metadata.put("nodata", new Double(-9999.0));
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Creating coverage
+		//
+		// /////////////////////////////////////////////////////////////////////
+		// cleaning name
+		String coverageName = (new File(this.coverageName)).getName();
+		final int extension = coverageName.lastIndexOf(".");
+		if (extension != -1) {
+			String ext = coverageName.substring(extension + 1);
+
+			if ((dmext.compareToIgnoreCase(ext) == 0)
+					|| (dhext.compareToIgnoreCase(ext) == 0)
+					|| (srext.compareToIgnoreCase(ext) == 0)
+					|| (shext.compareToIgnoreCase(ext) == 0)
+					|| (stext.compareToIgnoreCase(ext) == 0)) {
+				coverageName = coverageName.substring(0, extension);
+			}
+		}
+
+		// return the coverage
+		return (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null)
+				.create(coverageName, image,
+						new GeneralEnvelope(originalEnvelope),
+						new GridSampleDimension[] { band }, null, metadata);
+	}
+
+	/**
+	 * This method is responsible for the creation of the CRS for this GTOPO30.
+	 * The possible options are two, EPSG:4326 and POlar Stereographc. Inc ase
+	 * an error occurs the default CRS is chosen.
+	 * 
+	 * @return CoordinateReferenceSystem a CRS for this coverage.
+	 * @throws IOException
+	 * @throws FactoryException
+	 */
+	private CoordinateReferenceSystem initCRS() {
+		try {
+			// getting a reader
+			final BufferedReader reader = new BufferedReader(new FileReader(
+					prjURL.getFile()));
+
+			// reading the first line to see if I need to read it all
+			final StringBuffer buffer = new StringBuffer(reader.readLine());
+
+			if (buffer != null) {
+				String line = buffer.toString().trim();
+
+				if (!line.endsWith("POLAR") && !line.endsWith("GEOGRAPHIC")) {
+					// in case I have a wkt string a need to read it all
+					while ((line = reader.readLine()) != null)
+						buffer.append(line);
+				}
+			}
+			// closing the reader
+			reader.close();
+			// getting the content
+			final String crsDescription = buffer.toString().trim();
+			final DefaultGeographicCRS geoCRS = (DefaultGeographicCRS) CRS
+					.decode("EPSG:4326", true);
+			if (crsDescription != null) {
+				if (crsDescription.endsWith("POLAR")) {
+					// we need to build a polar stereographic crs based on wgs
+					// 84. I am not so sure about the parameters I used. we
+					// should check them again
+
+					final CartesianCS cartCS = org.geotools.referencing.cs.DefaultCartesianCS.PROJECTED;
+					final MathTransformFactory mtFactory = org.geotools.referencing.FactoryFinder
+							.getMathTransformFactory(null);
+					final ParameterValueGroup parameters = mtFactory
+							.getDefaultParameters("Polar_Stereographic");
+					parameters.parameter("central_meridian").setValue(0.0);
+					parameters.parameter("latitude_of_origin").setValue(-71.0);
+					parameters.parameter("scale_factor").setValue(1);
+					parameters.parameter("false_easting").setValue(0.0);
+					parameters.parameter("false_northing").setValue(0.0);
+					final FactoryGroup factories = FactoryGroup
+							.createInstance(null);
+					final Map properties = Collections.singletonMap("name",
+							"WGS 84 / Antartic Polar Stereographic");
+
+					return factories.createProjectedCRS(properties, geoCRS,
+							null, parameters, cartCS);
+				}
+
+				if (crsDescription.endsWith("GEOGRAPHIC")) {
+					// in case I do not have a polar stereographic I build my
+					// own CRS using either the supplied wkt
+					// description or, in case none is supplied, a custom
+					// Geographic WGS84 with lon, lat axes.
+					return geoCRS;
+				}
+				return CRS.parseWKT(crsDescription);
+			}
+		} catch (IOException e) {
+			// do nothing and return a default CRS but write down a message
+			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+
+		} catch (FactoryException e) {
+			// do nothing and return a default CRS but write down a message
+			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+		}
+
+		final CoordinateReferenceSystem crs = AbstractGridFormat
+				.getDefaultCRS();
+		LOGGER.info(new StringBuffer(
+				"PRJ file not found, proceeding with EPSG:4326 as follows: ")
+				.append(crs.toWKT()).toString());
+		return crs;
+	}
+
+	/**
+	 * This method was implemented in order to reformat the input data to double
+	 * to introduce NaN as NoData instead of using -9999 since such a value for
+	 * NoData is automatically recognized from the SampleDimension code in order
+	 * to build the No Data category. This method has been used during tests in
+	 * order to try the creation of a GTOPO30 file from a floating point
+	 * coverage.
+	 * 
+	 * @param max
+	 *            Max value in the input data
+	 * @param min
+	 *            Min Value in the input data
+	 * 
+	 * @return the reformatted image.
+	 */
+
+	// final private RenderedOp reFormat2Float(RenderedOp image, int min, int
+	// max) {
+	//
+	// //number of elements in the lookup table
+	// final int numElem=max+9999+1;
+	// //offset is -9999
+	// final double lookup[]=new double[numElem];
+	// //changing NaN
+	// lookup[0]=Double.NaN;
+	// for(int i=min+9999;i<=max+9999;i++){
+	// lookup[i]=i-9999;
+	// }
+	//		
+	// //building the lookup table jai
+	// final LookupTableJAI lt= new LookupTableJAI(lookup,-9999);
+	// final ParameterBlockJAI pbj= new ParameterBlockJAI("lookup");
+	// pbj.addSource(image);
+	// pbj.setParameter("table",lt);
+	// return JAI.create("lookup",pbj,new
+	// RenderingHints(JAI.KEY_IMAGE_LAYOUT,new ImageLayout(image)));
+	//		
+	//
+	// }
+	/**
+	 * The purpose of this method is to build the sample dimensions for this
+	 * coverage.
+	 * 
+	 * @param max
+	 *            Maximum value for this coverage.
+	 * @param min
+	 *            Minimum value for this coverage.
+	 * 
+	 * @return The newly created sample dimensions.
+	 */
+	final private GridSampleDimension getSampleDimension(final int max,
+			final int min) {
+		// Create the SampleDimension, with colors and byte transformation
+		// needed for visualization
+		UnitFormat unitFormat = UnitFormat.getStandardInstance();
+		Unit uom = null;
+
+		try {
+			// unit of measure is meter
+			uom = unitFormat.parseUnit("m");
+		} catch (ParseException ex1) {
+			uom = null;
+		}
+
+		final Category values = new Category("values", demColors,
+				new NumberRange(1, 255), new NumberRange((short) min,
+						(short) max));
+		final Category nan =
+		// new Category("No data",
+		// new Color(0, 0, 0, 0),0);
+		new Category("No data", new Color[] { new Color(0, 0, 0, 0) },
+				new NumberRange(0, 0), new NumberRange((short) -9999,
+						(short) -9999));
+		final GridSampleDimension band = new GridSampleDimension(
+				"digital elevation", new Category[] { values, nan }, uom);
+
+		return band.geophysics(true);
+	}
+
 }

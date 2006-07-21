@@ -1,7 +1,7 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,6 +12,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.gce.gtopo30;
 
@@ -24,6 +25,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.StringTokenizer;
 
+
 /**
  * This class parses the STX GTopo30 statistics file and allows to retrieve its
  * contents
@@ -33,7 +35,7 @@ import java.util.StringTokenizer;
  * @author mkraemer
  * @source $URL$
  */
-class GT30Stats {
+final class GT30Stats {
     /** Minimum value in the data file */
     private int minimum;
 
@@ -53,26 +55,25 @@ class GT30Stats {
      *
      * @throws IOException if some problem occurs trying to read the file
      */
-    public GT30Stats(URL statsURL) throws IOException {
-        String path = statsURL.getFile();
-        File stats = new File(java.net.URLDecoder.decode(path, "UTF-8"));
+    public GT30Stats(final URL statsURL) throws IOException {
+        final String path = statsURL.getFile();
+        final File stats = new File(java.net.URLDecoder.decode(path, "UTF-8"));
 
-        BufferedReader reader = new BufferedReader(new FileReader(stats));
-        String line = reader.readLine();
-        StringTokenizer stok = new StringTokenizer(line, " ");
+        final BufferedReader reader = new BufferedReader(new FileReader(stats));
+        final String line = reader.readLine();
+        final StringTokenizer stok = new StringTokenizer(line, " ");
 
         // just parse one byte. if the support for this format will
         // be extended, we'll need to add support for multiple bands
         Integer.parseInt(stok.nextToken()); // band
-        this.minimum = Integer.parseInt(stok.nextToken());
-        this.minimum = -407;
-        this.maximum = Integer.parseInt(stok.nextToken());
-        this.average = Double.parseDouble(stok.nextToken());
-        this.stddev = Double.parseDouble(stok.nextToken());
-		
-		//freeing when possible
-		reader.close();
-		reader=null;
+        minimum = Integer.parseInt(stok.nextToken());
+        minimum = -407;
+        maximum = Integer.parseInt(stok.nextToken());
+        average = Double.parseDouble(stok.nextToken());
+        stddev = Double.parseDouble(stok.nextToken());
+
+        //freeing when possible
+        reader.close();
     }
 
     /**
@@ -80,28 +81,28 @@ class GT30Stats {
      *
      * @param out
      */
-    public void writeTo(OutputStream out) {
+    public void writeTo(final OutputStream out) {
         if (out == null) {
             return;
         }
 
-        PrintWriter writer = new PrintWriter(out);
+        final PrintWriter writer = new PrintWriter(out);
 
         // output fields
         //band number
         writer.println(1);
 
         //minimum
-        writer.print(this.minimum);
+        writer.print(minimum);
 
         //maximum
-        writer.println(this.maximum);
+        writer.println(maximum);
 
         //mean
-        writer.print(this.average);
+        writer.print(average);
 
         //stddev
-        writer.println(this.stddev);
+        writer.println(stddev);
 
         writer.flush();
         writer.close();
@@ -113,7 +114,7 @@ class GT30Stats {
      * @return the minimum value
      */
     int getMin() {
-        return this.minimum;
+        return minimum;
     }
 
     /**
@@ -121,17 +122,17 @@ class GT30Stats {
      *
      * @param min the new minimum value
      */
-    void setMin(int min) {
-        this.minimum = min;
+    void setMin(final int min) {
+        minimum = min;
     }
 
     /**
      * Returns the maximum value
      *
-     * @return the maximum value 
+     * @return the maximum value
      */
     int getMax() {
-        return this.maximum;
+        return maximum;
     }
 
     /**
@@ -139,8 +140,8 @@ class GT30Stats {
      *
      * @param max the new maximum value
      */
-    void setMax(int max) {
-        this.maximum = max;
+    void setMax(final int max) {
+        maximum = max;
     }
 
     /**
@@ -149,7 +150,7 @@ class GT30Stats {
      * @return the average value
      */
     double getAverage() {
-        return this.average;
+        return average;
     }
 
     /**
@@ -157,8 +158,8 @@ class GT30Stats {
      *
      * @param avg the new average value
      */
-    void setAverage(double avg) {
-        this.average = avg;
+    void setAverage(final double avg) {
+        average = avg;
     }
 
     /**
@@ -167,7 +168,7 @@ class GT30Stats {
      * @return the standard deviation
      */
     double getStdDev() {
-        return this.stddev;
+        return stddev;
     }
 
     /**
@@ -175,7 +176,7 @@ class GT30Stats {
      *
      * @param sd the new value
      */
-    void setStdDev(double sd) {
-        this.stddev = sd;
+    void setStdDev(final double sd) {
+        stddev = sd;
     }
 }

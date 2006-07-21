@@ -402,7 +402,7 @@ class GTopo30DataSource {
                 new Color[] { new Color(0, 0, 0, 0) }, new NumberRange(0, 0),
                 new NumberRange((short)-9999, (short)-9999));
         GridSampleDimension band =
-        	new GridSampleDimension(new Category[] { values, nan }, uom);
+        	new GridSampleDimension("GTOPO_values",new Category[] { values, nan }, uom);
 		band = band.geophysics(true);
 		return band;
 	}
