@@ -1,5 +1,5 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *
@@ -12,13 +12,15 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.gce.arcgrid;
 
-import org.geotools.data.coverage.grid.GridFormatFactorySpi;
-import org.opengis.coverage.grid.Format;
 import java.util.Collections;
 import java.util.Map;
+
+import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+import org.opengis.coverage.grid.Format;
 
 
 /**
@@ -26,6 +28,7 @@ import java.util.Map;
  * grid files.
  *
  * @author aaime
+ * @author Simone Giannecchini (simboss)
  * @source $URL$
  */
 public class ArcGridFormatFactory implements GridFormatFactorySpi {

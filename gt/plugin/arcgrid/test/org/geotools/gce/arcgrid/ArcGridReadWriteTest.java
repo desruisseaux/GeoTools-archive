@@ -1,5 +1,5 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *
@@ -12,226 +12,182 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.gce.arcgrid;
 
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.resources.TestData;
-import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.ParameterValueGroup;
-import java.awt.image.Raster;
-import java.io.File;
-import java.net.URL;
-
 
 /**
  * Test reading and writing arcgrid grid coverages.
- *
+ * 
  * @author rschulz
  * @source $URL$
  */
-public class ArcGridReadWriteTest extends TestCaseSupport {
-    private Format f = null;
+public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
+	private final Random generator = new Random();
 
-    /** ArcGrid files (and associated parameters) to test */
-    final TestParams[] params = new TestParams[] {
-            new TestParams("spearfish_dem.asc.gz", true, true),
-            new TestParams("ArcGrid.asc", false, false),
-            new TestParams("vandem.asc.gz", true, false)
-        };
+	/**
+	 * Creates a new instance of ArcGridReadWriteTest
+	 * 
+	 * @param name
+	 *            DOCUMENT ME!
+	 */
+	public ArcGridReadWriteTest(String name) {
+		super(name);
+	}
 
-    /**
-     * Creates a new instance of ArcGridReadWriteTest
-     *
-     * @param name DOCUMENT ME!
-     */
-    public ArcGridReadWriteTest(String name) {
-        super(name);
-    }
+	/**
+	 * 
+	 * @param testParam
+	 * @throws Exception
+	 */
+	public void test(final File testFile) throws Exception {
+		testStandardReadWrite(testFile);
+		directReadWrite(testFile);
+	}
 
-    protected void setUp() throws Exception {
-        f = new org.geotools.gce.arcgrid.ArcGridFormat();
-    }
+	private void testStandardReadWrite(final File testFile) throws Exception {
+		/* Read the grid coverate */
+		GridCoverageReader reader = new ArcGridReader(testFile);
+		final GridCoverage2D origin = (GridCoverage2D) reader.read(null);
+		reader.dispose();
 
-    public void testAll() throws Exception {
-        StringBuffer errors = new StringBuffer();
+		writeAndRead(origin, false, false);
+		writeAndRead(origin, true, false);
+		writeAndRead(origin, false, true);
+		writeAndRead(origin, true, true);
+	}
 
-        for (int i = 0; i < params.length; i++) {
-            try {
-                test(params[i]);
-            } catch (Exception e) {
-                e.printStackTrace();
-                errors.append("\nFile " + params[i].fileName + " : "
-                    + e.getMessage());
-            }
-        }
+	private void directReadWrite(final File testFile) throws Exception {
+		if (testFile.getName().indexOf("spearfish")!=-1) {
+			/* Read the grid coverate */
+			GRASSArcGridRaster raster = new GRASSArcGridRaster(testFile.toURL());
+			raster.toString(); // only to assess it doesn't crashes
+			WritableRaster wr1 = raster.readRaster();
 
-        if (errors.length() > 0) {
-            fail(errors.toString());
-        }
-    }
+			File tmpFile = File.createTempFile(testFile.getName(), Double
+					.toString(generator.nextDouble()));
+			GRASSArcGridRaster raster2 = new GRASSArcGridRaster(tmpFile.toURL());
+			raster2.writeRaster(wr1, raster.getXlCorner(),
+					raster.getYlCorner(), raster.getCellSize(), false);
 
-    void test(TestParams testParam) throws Exception {
-        //create a temporary output file
-        //temporary file to use
-        File tmpFile = null;
+			WritableRaster wr2 = raster.readRaster();
+			compareRasters(wr1, wr2);
+		} else {
+			/* Read the grid coverate */
+			ArcGridRaster raster = new ArcGridRaster(testFile.toURL());
+			raster.toString(); // only to assess it doesn't crashes
+			WritableRaster wr1 = raster.readRaster();
 
-        if (testParam.compressed) {
-            tmpFile = File.createTempFile("temp", ".gz");
-        } else {
-            tmpFile = File.createTempFile("temp", ".asc");
-        }
+			File tmpFile = File.createTempFile(testFile.getName(), Double
+					.toString(generator.nextDouble()));
+			ArcGridRaster raster2 = new ArcGridRaster(tmpFile.toURL());
+			raster2.writeRaster(wr1, raster.getXlCorner(),
+					raster.getYlCorner(), raster.getCellSize(), false);
 
-        tmpFile.deleteOnExit();
+			WritableRaster wr2 = raster.readRaster();
+			compareRasters(wr1, wr2);
+		}
+	}
 
-        //file to use
-        URL file = TestData.getResource(this, testParam.fileName);
+	private void writeAndRead(final GridCoverage2D origin,
+			final boolean compressed, final boolean grass) throws IOException,
+			Exception {
+		// create a temporary output file
+		final File tmpFile;
+		tmpFile = File.createTempFile(origin.getName().toString(), Double
+				.toString(generator.nextDouble()));
 
-        //arcgridformat
-        Format f = new ArcGridFormat();
+		GridCoverageReader reader;
+		/* write it */
+		final GridCoverageWriter writer = new ArcGridWriter(tmpFile);
+		ParameterValueGroup params = writer.getFormat().getWriteParameters();
+		params.parameter("Compressed").setValue(compressed);
+		params.parameter("GRASS").setValue(grass);
+		writer.write(origin, null);
 
-        //setting general format parameteres to be used later on
-        ParameterValueGroup params = f.getReadParameters();
+		/* read it again and compared them */
+		reader = new ArcGridReader(tmpFile);
+		params = reader.getFormat().getReadParameters();
+		params.parameter("Compressed").setValue(compressed);
+		params.parameter("GRASS").setValue(grass);
+		final GridCoverage2D created = (GridCoverage2D) reader.read(null);
 
-        params.parameter("Compressed").setValue(testParam.compressed);
-        params.parameter("GRASS").setValue(testParam.grass);
-        params = f.getWriteParameters();
-        params.parameter("Compressed").setValue(testParam.compressed);
-        params.parameter("GRASS").setValue(testParam.grass);
+		// check that the original and temporary grid are the same
+		compare(origin, created);
+	}
 
-        /*Step 1 read it*/
+	/**
+	 * Compares 2 grid covareages, throws an exception if they are not the same.
+	 * 
+	 * @param gc1
+	 * @param gc2
+	 * @throws Exception
+	 */
+	void compare(GridCoverage gc1, GridCoverage gc2) throws Exception {
+		final GeneralEnvelope e1 = (GeneralEnvelope) gc1.getEnvelope();
+		final GeneralEnvelope e2 = (GeneralEnvelope) gc2.getEnvelope();
 
-        //read in the grid coverage
-        GridCoverageReader reader = new ArcGridReader((TestData.getResource(
-                    this, testParam.fileName)));
+		if ((e1.getLowerCorner().getOrdinate(0) != e1.getLowerCorner()
+				.getOrdinate(0))
+				|| (e1.getLowerCorner().getOrdinate(1) != e1.getLowerCorner()
+						.getOrdinate(1))
+				|| (e1.getUpperCorner().getOrdinate(0) != e1.getUpperCorner()
+						.getOrdinate(0))
+				|| (e1.getUpperCorner().getOrdinate(1) != e1.getUpperCorner()
+						.getOrdinate(1))) {
+			throw new Exception("GridCoverage Envelopes are not equal"
+					+ e1.toString() + e2.toString());
+		}
 
-        params = reader.getFormat().getReadParameters();
+		if (e1.getCoordinateReferenceSystem().toWKT().compareToIgnoreCase(
+				e2.getCoordinateReferenceSystem().toWKT()) != 0) {
+			throw new Exception("GridCoverage Envelopes are not equal"
+					+ e1.getCoordinateReferenceSystem().toWKT()
+					+ e2.getCoordinateReferenceSystem().toWKT());
+		}
 
-        //setting params
-        params.parameter("Compressed").setValue(f.getReadParameters()
-                                                 .parameter("Compressed")
-                                                 .booleanValue());
-        params.parameter("GRASS").setValue(f.getReadParameters()
-                                            .parameter("GRASS").booleanValue());
+		final Raster r1 = ((GridCoverage2D) gc1).getRenderedImage().getData();
+		final Raster r2 = ((GridCoverage2D) gc2).getRenderedImage().getData();
+		compareRasters(r1, r2);
+	}
 
-        //reading the coverage
-        GridCoverage gc1 = reader.read(null); //
+	private void compareRasters(final Raster r1, final Raster r2)
+			throws Exception {
+		final int width = r1.getWidth();
+		final int height = r1.getHeight();
+		double[] values1 = null;
+		double[] values2 = null;
+		for (int i = r1.getMinX(); i < width; i++) {
+			for (int j = r1.getMinY(); j < height; j++) {
+				values1 = r1.getPixel(i, j, values1);
+				values2 = r2.getPixel(i, j, values2);
+				final int length = values1.length;
+				for (int k = 0; k < length; k++) {
+					if (!(Double.isNaN(values1[k]) && Double.isNaN(values2[k]))
+							&& (values1[k] != values2[k])) {
+						throw new Exception(
+								"GridCoverage Values are not equal: "
+										+ values1[k] + ", " + values2[k]);
+					}
+				}
+			}
+		}
+	}
 
-        //            (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[params.values().size()])
-        //            );
-
-        /*step 2 write it*/
-
-        //write grid coverage out to temp file
-        GridCoverageWriter writer = new ArcGridWriter(tmpFile);
-
-        //setting write parameters
-        params = writer.getFormat().getWriteParameters();
-        params.parameter("Compressed").setValue(f.getWriteParameters()
-                                                 .parameter("Compressed")
-                                                 .booleanValue());
-        params.parameter("GRASS").setValue(f.getWriteParameters()
-                                            .parameter("GRASS").booleanValue());
-        writer.write(gc1, null); //
-
-        //                   (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[
-        //        params.values().size()]));
-        /*step 3 read it again and compared them*/
-        //read the grid coverage back in from temp file
-        reader = new ArcGridReader(tmpFile);
-
-        //setting params
-        params = reader.getFormat().getReadParameters();
-        params.parameter("Compressed").setValue(f.getReadParameters()
-                                                 .parameter("Compressed")
-                                                 .booleanValue());
-        params.parameter("GRASS").setValue(f.getReadParameters()
-                                            .parameter("GRASS").booleanValue());
-
-        //read it
-        GridCoverage gc2 = reader.read(null); // (GeneralParameterValue[]) params.values().
-
-        //                                     toArray(new GeneralParameterValue[params.
-        //                                            values().size()]));
-        //check that the original and temporary grid are the same
-        compare(gc1, gc2);
-    }
-
-    /**
-     * Compares 2 grid covareages, throws an exception if they are not the
-     * same.
-     *
-     * @param gc1 DOCUMENT ME!
-     * @param gc2 DOCUMENT ME!
-     *
-     * @throws Exception DOCUMENT ME!
-     */
-    void compare(GridCoverage gc1, GridCoverage gc2) throws Exception {
-        GeneralEnvelope e1 = (GeneralEnvelope) gc1.getEnvelope();
-        GeneralEnvelope e2 = (GeneralEnvelope) gc2.getEnvelope();
-
-        if ((e1.getLowerCorner().getOrdinate(0) != e1.getLowerCorner()
-                                                         .getOrdinate(0))
-                || (e1.getLowerCorner().getOrdinate(1) != e1.getLowerCorner()
-                                                                .getOrdinate(1))
-                || (e1.getUpperCorner().getOrdinate(0) != e1.getUpperCorner()
-                                                                .getOrdinate(0))
-                || (e1.getUpperCorner().getOrdinate(1) != e1.getUpperCorner()
-                                                                .getOrdinate(1))) {
-            throw new Exception("GridCoverage Envelopes are not equal"
-                + e1.toString() + e2.toString());
-        }
-
-        if (e1.getCoordinateReferenceSystem().toWKT().compareToIgnoreCase(e2.getCoordinateReferenceSystem()
-                                                                                .toWKT()) != 0) {
-            throw new Exception("GridCoverage Envelopes are not equal"
-                + e1.getCoordinateReferenceSystem().toWKT()
-                + e2.getCoordinateReferenceSystem().toWKT());
-        }
-
-        double[] values1 = null;
-        double[] values2 = null;
-        Raster r1 = ((GridCoverage2D) gc1).getRenderedImage().getData();
-        Raster r2 = ((GridCoverage2D) gc2).getRenderedImage().getData();
-
-        for (int i = r1.getMinX(); i < r1.getWidth(); i++) {
-            for (int j = r1.getMinY(); j < r1.getHeight(); j++) {
-                values1 = r1.getPixel(i, j, values1);
-                values2 = r2.getPixel(i, j, values2);
-
-                for (int k = 0; k < values1.length; k++) {
-                    if (!(Double.isNaN(values1[k]) && Double.isNaN(values2[k]))
-                            && (values1[k] != values2[k])) {
-                        throw new Exception(
-                            "GridCoverage Values are not equal: " + values1[k]
-                            + ", " + values2[k]);
-                    }
-                }
-            }
-        }
-    }
-
-    public static final void main(String[] args) throws Exception {
-        junit.textui.TestRunner.run(suite(ArcGridReadWriteTest.class));
-    }
-}
-
-
-/**
- * Simple class to hold parameters for tests.
- */
-class TestParams {
-    public String fileName;
-    public boolean compressed;
-    public boolean grass;
-
-    TestParams(String fileName, boolean compressed, boolean grass) {
-        this.fileName = fileName;
-        this.compressed = compressed;
-        this.grass = grass;
-    }
+	public static final void main(String[] args) throws Exception {
+		junit.textui.TestRunner.run(ArcGridReadWriteTest.class);
+	}
 }
