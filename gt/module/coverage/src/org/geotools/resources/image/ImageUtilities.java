@@ -68,12 +68,12 @@ public final class ImageUtilities {
      * The default tile size. This default tile size can be
      * overriden with a call to {@link JAI#setDefaultTileSize}.
      */
-    private static final Dimension DEFAULT_TILE_SIZE = new Dimension(512,512);
+    private static final Dimension GEOTOOLS_DEFAULT_TILE_SIZE = new Dimension(512,512);
 
     /**
      * The minimum tile size.
      */
-    private static final int MIN_TILE_SIZE = 128;
+    private static final int GEOTOOLS_MIN_TILE_SIZE = 256;
 
     /**
      * Maximum tile width or height before to consider a tile as a stripe. It tile width or height
@@ -144,7 +144,7 @@ public final class ImageUtilities {
             }
             Dimension defaultSize = JAI.getDefaultTileSize();
             if (defaultSize == null) {
-                defaultSize = DEFAULT_TILE_SIZE;
+                defaultSize = GEOTOOLS_DEFAULT_TILE_SIZE;
             }
             int s;
             if ((s=toTileSize(image.getWidth(), defaultSize.width)) != 0) {
@@ -188,7 +188,7 @@ public final class ImageUtilities {
      * This method it aimed to computing a tile size such that the tile grid would have overlapped
      * the image bound in order to avoid having tiles crossing the image bounds and being therefore
      * partially empty. This method will never returns a tile size smaller than
-     * {@value #MIN_TILE_SIZE}. If this method can't suggest a size, then it left the corresponding
+     * {@value #GEOTOOLS_MIN_TILE_SIZE}. If this method can't suggest a size, then it left the corresponding
      * {@code size} field ({@link Dimension#width width} or {@link Dimension#height height})
      * unchanged.
      * <p>
@@ -216,7 +216,7 @@ public final class ImageUtilities {
     public static Dimension toTileSize(final Dimension size) {
         Dimension defaultSize = JAI.getDefaultTileSize();
         if (defaultSize == null) {
-            defaultSize = DEFAULT_TILE_SIZE;
+            defaultSize = GEOTOOLS_DEFAULT_TILE_SIZE;
         }
         int s;
         if ((s=toTileSize(size.width,  defaultSize.width )) != 0) size.width  = s;
@@ -229,18 +229,18 @@ public final class ImageUtilities {
      * This method it aimed to computing a tile size such that the tile grid would have
      * overlapped the image bound in order to avoid having tiles crossing the image bounds
      * and being therefore partially empty. This method will never returns a tile size smaller
-     * than {@value #MIN_TILE_SIZE}. If this method can't suggest a size, then it returns 0.
+     * than {@value #GEOTOOLS_MIN_TILE_SIZE}. If this method can't suggest a size, then it returns 0.
      *
      * @param imageSize The image size.
-     * @param tileSize  The preferred tile size, which is often {@value #DEFAULT_TILE_SIZE}.
+     * @param tileSize  The preferred tile size, which is often {@value #GEOTOOLS_DEFAULT_TILE_SIZE}.
      */
     private static int toTileSize(final int imageSize, final int tileSize) {
         final int MAX_TILE_SIZE = Math.min(tileSize*2, imageSize);
-        final int stop = Math.max(tileSize-MIN_TILE_SIZE, MAX_TILE_SIZE-tileSize);
+        final int stop = Math.max(tileSize-GEOTOOLS_MIN_TILE_SIZE, MAX_TILE_SIZE-tileSize);
         int sopt = 0;  // An "optimal" tile size, to be used if no exact dividor is found.
         int rmax = 0;  // The remainder of 'imageSize / sopt'. We will try to maximize this value.
         /*
-         * Inspects all tile sizes in the range [MIN_TILE_SIZE .. MAX_TIME_SIZE]. We will begin
+         * Inspects all tile sizes in the range [GEOTOOLS_MIN_TILE_SIZE .. MAX_TIME_SIZE]. We will begin
          * with a tile size equals to the specified 'tileSize'. Next we will try tile sizes of
          * 'tileSize+1', 'tileSize-1', 'tileSize+2', 'tileSize-2', 'tileSize+3', 'tileSize-3',
          * etc. until a tile size if found suitable.
@@ -249,7 +249,7 @@ public final class ImageUtilities {
          * 'stop' constant was computed assuming that MIN_TIME_SIZE < tileSize < MAX_TILE_SIZE.
          * If a tile size is found which is a dividor of the image size, than that tile size (the
          * closest one to 'tileSize') is returned. Otherwise, the loop continue until all values
-         * in the range [MIN_TILE_SIZE .. MAX_TIME_SIZE] were tested. In this process, we remind
+         * in the range [GEOTOOLS_MIN_TILE_SIZE .. MAX_TIME_SIZE] were tested. In this process, we remind
          * the tile size that gave the greatest reminder (rmax). In other words, this is the tile
          * size with the smallest amount of empty pixels.
          */
@@ -266,7 +266,7 @@ public final class ImageUtilities {
                     sopt = s;
                 }
             }
-            if ((s=tileSize-i) >= MIN_TILE_SIZE) {
+            if ((s=tileSize-i) >= GEOTOOLS_MIN_TILE_SIZE) {
                 final int r = imageSize % s;
                 if (r == 0) {
                     // Found a size <= to 'tileSize' which is a dividor of image size.
@@ -279,7 +279,7 @@ public final class ImageUtilities {
             }
         }
         /*
-         * No dividor were found in the range [MIN_TILE_SIZE .. MAX_TIME_SIZE]. At this point
+         * No dividor were found in the range [GEOTOOLS_MIN_TILE_SIZE .. MAX_TIME_SIZE]. At this point
          * 'sopt' is an "optimal" tile size (the one that left as few empty pixel as possible),
          * and 'rmax' is the amount of non-empty pixels using this tile size. We will use this
          * "optimal" tile size only if it fill at least 75% of the tile. Otherwise, we arbitrarily
@@ -371,7 +371,8 @@ public final class ImageUtilities {
             return (Interpolation) type;
         } else if (type instanceof CharSequence) {
             final String name = type.toString();
-            for (int i=0; i<INTERPOLATION_NAMES.length; i++) {
+            final int length= INTERPOLATION_NAMES.length;
+            for (int i=0; i<length; i++) {
                 if (INTERPOLATION_NAMES[i].equalsIgnoreCase(name)) {
                     return Interpolation.getInstance(INTERPOLATION_TYPES[i]);
                 }
@@ -465,19 +466,21 @@ public final class ImageUtilities {
 
     /**
      * Tiles the specified image.
+     * 
+     * <p>
+     * Usually, the tiling doesn't need to be performed as a separated operation. The
+     * {@link ImageLayout} hint with tile information can be provided to most JAI operators.
+     * The {@link #getRenderingHints} method provides such tiling information only if the
+     * image was not already tiled, so it should not be a cause of tile size mismatch in an
+     * operation chain. The mean usage for a separated "tile" operation is to tile an image
+     * before to save it on disk in some format supporting tiling. 
      *
      * @throws IOException If an I/O operation were required (in order to check if the image
      *         were tiled on disk) and failed.
      *
      * @since 2.3
      *
-     * @deprecated Usually, the tiling doesn't need to be performed as a separated operation. The
-     *       {@link ImageLayout} hint with tile information can be provided to most JAI operators.
-     *       The {@link #getRenderingHints} method provides such tiling information only if the
-     *       image was not already tiled, so it should not be a cause of tile size mismatch in an
-     *       operation chain. The mean usage for a separated "tile" operation is to tile an image
-     *       before to save it on disk in some format supporting tiling. The proposed replacement
-     *       for this operation is {@link ImageWorker#write}.
+     *  
      */
     public static RenderedOp tileImage(RenderedOp image) throws IOException {
         // /////////////////////////////////////////////////////////////////////
@@ -511,7 +514,7 @@ public final class ImageUtilities {
         // If the original image has tileW==W &&tileH==H it is untiled.
         //
         // /////////////////////////////////////////////////////////////////////
-        if (tileWidth == width && tileHeight <= height)
+        if (!needToTile&&tileWidth == width && tileHeight <= height)
             needToTile = true;
 
         // /////////////////////////////////////////////////////////////////////
@@ -521,7 +524,7 @@ public final class ImageUtilities {
         // /////////////////////////////////////////////////////////////////////
         if (needToTile) {
 
-            // tiling the original image
+            // tiling the original image by providing a suitable layout
             final ImageLayout layout = getImageLayout(image);
             layout.unsetValid(ImageLayout.COLOR_MODEL_MASK|ImageLayout.SAMPLE_MODEL_MASK);
 
@@ -542,436 +545,436 @@ public final class ImageUtilities {
         return image;
     }
 
-    /**
-     * Rescale the image such that it uses 8 bit.
-     * 
-     * @param surrogateImage The image to rescale.
-     * 
-     * @return The rescaled image.
-     * 
-     * @todo
-     * <ol>
-     * <li>caching should be more intelligent</li>
-     * <li>use <code>ParameterBlockJAI</code> </li>
-     * </ol>
-     *
-     * @since 2.3
-     */
-    public static PlanarImage rescale2Byte(PlanarImage surrogateImage) {
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(surrogateImage);
-            w.rescaleToBytes();
-            return w.getPlanarImage();
-        }
+//    /**
+//     * Rescale the image such that it uses 8 bit.
+//     * 
+//     * @param surrogateImage The image to rescale.
+//     * 
+//     * @return The rescaled image.
+//     * 
+//     * @todo
+//     * <ol>
+//     * <li>caching should be more intelligent</li>
+//     * <li>use <code>ParameterBlockJAI</code> </li>
+//     * </ol>
+//     *
+//     * @since 2.3
+//     */
+//    public static PlanarImage rescale2Byte(PlanarImage surrogateImage) {
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(surrogateImage);
+//            w.rescaleToBytes();
+//            return w.getPlanarImage();
+//        }
+//
+//        // rescale the initial image in order
+//        // to expand the dynamic
+//
+//        // /////////////////////////////////////////////////////////////////////
+//        //
+//        // EXTREMA
+//        //
+//        // /////////////////////////////////////////////////////////////////////
+//        // Set up the parameter block for the source image and
+//        // the constants
+//        final ParameterBlock pb = new ParameterBlock();
+//        pb.addSource(surrogateImage); // The source image
+//        pb.add(null); // The region of the image to scan
+//        pb.add(1); // The horizontal sampling rate
+//        pb.add(1); // The vertical sampling rate
+//
+//        // Perform the extrema operation on the source image
+//        // Retrieve both the maximum and minimum pixel value
+//        final double[][] extrema = (double[][]) JAI.create("extrema", pb)
+//                .getProperty("extrema");
+//
+//        // /////////////////////////////////////////////////////////////////////
+//        //
+//        // RESCALE
+//        //
+//        // /////////////////////////////////////////////////////////////////////
+//        pb.removeSources();
+//        pb.removeParameters();
+//
+//        // set the levels for the dynamic
+//        pb.addSource(surrogateImage);
+//
+//        // rescaling each band to 8 bits
+//        final double[] scale = new double[extrema[0].length];
+//        final double[] offset = new double[extrema[0].length];
+//        final int length = extrema[0].length;
+//        for (int i = 0; i < length; i++) {
+//            scale[i] = 255 / (extrema[1][i] - extrema[0][i]);
+//            offset[i] = -((255 * extrema[0][i]) / (extrema[1][i] - extrema[0][i]));
+//        }
+//        pb.add(scale);
+//        pb.add(offset);
+//
+//        final RenderedOp image2return = JAI.create("rescale", pb);
+//
+//        // setting up the right layout for this image
+//        ImageLayout layout = new ImageLayout(image2return);
+//        final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
+//                image2return.getWidth(), image2return.getHeight()));
+//        layout.setTileGridXOffset(0);
+//        layout.setTileGridYOffset(0);
+//        layout.setTileHeight((int) tileSize.getWidth());
+//        layout.setTileWidth((int) tileSize.getHeight());
+//        pb.removeParameters();
+//        pb.removeSources();
+//        pb.addSource(image2return);
+//        pb.add(DataBuffer.TYPE_BYTE);
+//
+//        final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+//                layout);
+//        return JAI.create("format", pb, hints);
+//    }
 
-        // rescale the initial image in order
-        // to expand the dynamic
+//    /**
+//     * Reducing the color model to index color model. This should world only for
+//     * RGB since it performs a ditering on the original color model.
+//     * 
+//     * @param sourceImage The image to reduces.
+//     * 
+//     * @return The image with index color model.
+//     *
+//     * @since 2.3
+//     */
+//    public static PlanarImage RGBIndexColorModel(PlanarImage sourceImage) {
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(sourceImage);
+//            w.forceIndexColorModel();
+//            return w.getPlanarImage();
+//        }
+//
+//        if (sourceImage.getColorModel() instanceof IndexColorModel)
+//            return sourceImage;
+//        // error dither
+//        final KernelJAI[] ditherMask = KernelJAI.DITHER_MASK_443;// KernelJAI.ERROR_FILTER_STUCKI;
+//        // //
+//        final ColorCube colorMap = ColorCube.BYTE_496;
+//
+//        // PARAMETER BLOCK
+//        final ParameterBlock pb = new ParameterBlock();
+//        // color map
+//        pb.addSource(sourceImage);
+//        pb.add(colorMap);
+//        pb.add(ditherMask);
+//
+//        // final layout
+//        final ImageLayout layout = ImageUtilities.getImageLayout(sourceImage);
+//        layout.unsetValid(ImageLayout.COLOR_MODEL_MASK);
+//        layout.unsetValid(ImageLayout.SAMPLE_MODEL_MASK);
+//
+//        return JAI.create("OrderedDither", pb, new RenderingHints(
+//                JAI.KEY_IMAGE_LAYOUT, layout));
+//    }
 
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // EXTREMA
-        //
-        // /////////////////////////////////////////////////////////////////////
-        // Set up the parameter block for the source image and
-        // the constants
-        final ParameterBlock pb = new ParameterBlock();
-        pb.addSource(surrogateImage); // The source image
-        pb.add(null); // The region of the image to scan
-        pb.add(1); // The horizontal sampling rate
-        pb.add(1); // The vertical sampling rate
+//    /**
+//     * This method allows me to go from DirectColorModel to ComponentColorModel
+//     * which seems to be well accepted from PNGEncoder and TIFFEncoder.
+//     * 
+//     * This comes from the sun javadocs of the DirectColorModel class.
+//     * 
+//     * The DirectColorModel class is a ColorModel class that works with pixel
+//     * values that represent RGB color and alpha information as separate samples
+//     * and that pack all samples for a single pixel into a single int, short, or
+//     * byte quantity. This class can be used only with ColorSpaces of type
+//     * ColorSpace.TYPE_RGB. In addition, for each component of the ColorSpace,
+//     * the minimum normalized component value obtained via the getMinValue()
+//     * method of ColorSpace must be 0.0, and the maximum value obtained via the
+//     * getMaxValue() method must be 1.0 (these min/max values are typical for
+//     * RGB spaces). There must be three color samples in the pixel values and
+//     * there can be a single alpha sample. For those methods that use a
+//     * primitive array pixel representation of type transferType, the array
+//     * length is always one. The transfer types supported are
+//     * DataBuffer.TYPE_BYTE, DataBuffer.TYPE_USHORT, and DataBuffer.TYPE_INT.
+//     * Color and alpha samples are stored in the single element of the array in
+//     * bits indicated by bit masks. Each bit mask must be contiguous and masks
+//     * must not overlap. The same masks apply to the single int pixel
+//     * representation used by other methods. The correspondence of masks and
+//     * color/alpha samples is as follows:
+//     * 
+//     * Masks are identified by indices running from 0 through 2 if no alpha is
+//     * present, or 3 if an alpha is present. The first three indices refer to
+//     * color samples; index 0 corresponds to red, index 1 to green, and index 2
+//     * to blue. Index 3 corresponds to the alpha sample, if present.
+//     * 
+//     * @param surrogateImage The image with a direct color model.
+//     * @return The image with a component color model.
+//     * @todo what if the numBits is bigger than 8?
+//     *
+//     * @since 2.3
+//     *
+//     * @deprecated This method is similar to {@link #reformatColorModel2ComponentColorModel},
+//     *             the later being slightly more general.
+//     */
+//    public static final PlanarImage direct2ComponentColorModel(PlanarImage sourceImage) {
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(sourceImage);
+//            w.forceComponentColorModel();
+//            return w.getPlanarImage();
+//        }
+//
+//        final ColorModel cm = sourceImage.getColorModel();
+//        if (!(cm instanceof DirectColorModel))
+//            return null;
+//        final ParameterBlockJAI pb = new ParameterBlockJAI("Format");
+//        pb.addSource(sourceImage);
+//
+//        // final int numBits = cm.getComponentSize(0);
+//        // final int transferType= DataBuffer.TYPE_BYTE;
+//        // if(numBits<=8)
+//        // transferType= DataBuffer.TYPE_BYTE;
+//        // if (numBits == 32) {
+//        // transferType=DataBuffer.TYPE_BYTE ;
+//        // } else if ((DataBuffer.TYPE_USHORT == transferType)
+//        // || (DataBuffer.TYPE_SHORT == transferType)) {
+//        // numBits = 16;
+//        // } else if (DataBuffer.TYPE_FLOAT == transferType) {
+//        // numBits = 32;
+//        // } else if (DataBuffer.TYPE_DOUBLE == transferType) {
+//        // numBits = 64;
+//        // }
+//
+//        // /////////////////////////////////////////////////////////////////////
+//        //
+//        // Creating a component color model.
+//        //
+//        // /////////////////////////////////////////////////////////////////////
+//        final ComponentColorModel colorModel = new ComponentColorModel(
+//                ColorSpace.getInstance(ColorSpace.CS_sRGB), cm.hasAlpha(), cm
+//                        .isAlphaPremultiplied(), cm.getTransparency(),
+//                DataBuffer.TYPE_BYTE);
+//        pb.setParameter("dataType", DataBuffer.TYPE_BYTE);
+//
+//        // /////////////////////////////////////////////////////////////////////
+//        //
+//        // Creating a right layout with color model and sample model.
+//        //
+//        // /////////////////////////////////////////////////////////////////////
+//        final ImageLayout layout = ImageUtilities.getImageLayout(sourceImage);
+//        layout.setColorModel(colorModel);
+//        layout.setSampleModel(colorModel.createCompatibleSampleModel(
+//                sourceImage.getWidth(), sourceImage.getHeight()));
+//        final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+//                layout);
+//
+//        // /////////////////////////////////////////////////////////////////////
+//        //
+//        // Creating the operation.
+//        //
+//        // /////////////////////////////////////////////////////////////////////
+//        return JAI.create("Format", pb, hints);
+//    }
 
-        // Perform the extrema operation on the source image
-        // Retrieve both the maximum and minimum pixel value
-        final double[][] extrema = (double[][]) JAI.create("extrema", pb)
-                .getProperty("extrema");
+//    /**
+//     * Bnarize an image with caching control.
+//     * 
+//     * @param source    The image to binarize.
+//     * @param threshold The threshold value for the "binarize" operation.
+//     * @param cacheMe   {@code false} if the image should not be cached.
+//     * @return          The binarized image.
+//     *
+//     * @since 2.3
+//     */
+//    public static final RenderedOp binarizeImageExt(RenderedImage source,
+//            final double threshold, final boolean cacheMe) {
+//
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(source);
+//            if (!cacheMe) {
+//                w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
+//            }
+//            w.binarize(threshold);
+//            return w.getRenderedOperation();
+//        }
+//
+//        final SampleModel sm = source.getSampleModel();
+//
+//        if (sm.getNumBands() != 1) {
+//            final ParameterBlockJAI pbjBandSelect = new ParameterBlockJAI(
+//                    "BandSelect");
+//            pbjBandSelect.addSource(source);
+//            pbjBandSelect.setParameter("bandIndices", new int[] { 0 });
+//            source = JAI.create("BandSelect", pbjBandSelect,
+//                    new RenderingHints(JAI.KEY_TILE_CACHE, null));
+//
+//        }
+//
+//        // If the image is already binary and the threshold is >1
+//        // then there is no work to do.
+//        if ((threshold >= 1) && ImageUtil.isBinary(sm)) {
+//            return NullDescriptor.create(source, cacheMe ? null
+//                    : new RenderingHints(JAI.KEY_TILE_CACHE, null));
+//
+//            // Otherwise binarize the image for efficiency.
+//        } else {
+//
+//            final ParameterBlockJAI pbj = new ParameterBlockJAI("binarize");
+//            pbj.addSource(source);
+//            pbj.setParameter("threshold", threshold);
+//
+//            return JAI.create("binarize", pbj, cacheMe ? null
+//                    : new RenderingHints(JAI.KEY_TILE_CACHE, null));
+//        }
+//    }
 
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // RESCALE
-        //
-        // /////////////////////////////////////////////////////////////////////
-        pb.removeSources();
-        pb.removeParameters();
+//    /**
+//     * Extended version of the JAI ROI operation which allows you to have much
+//     * more control than the original operation. It also works with muti bands
+//     * images through a conversion to IHS.
+//     * 
+//     * @param image     The image to binarize.
+//     * @param threshold The threshold value for the "binarize" operation.
+//     * @param cache     {@code false} if the image should not be cached.
+//     * @return          The binarized image.
+//     *
+//     * @since 2.3
+//     */
+//    public static ROI roiExt(RenderedOp image, final double threshold, final boolean cache) {
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(image);
+//            if (!cache) {
+//                w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
+//            }
+//            w.binarize(threshold);
+//            return w.getImageAsROI();
+//        }
+//
+//        // going to IHS and geting Intensity band
+//        final RenderedOp ihs = bandCombineSimple(image, cache);
+//        final RenderedOp i = selectBand(ihs, cache);
+//        final RenderedOp bin = binarizeImageExt(i, threshold, cache);
+//        // building up ROI using image with no intensity
+//        return new ROI(bin, (int) threshold);
+//    }
 
-        // set the levels for the dynamic
-        pb.addSource(surrogateImage);
+//    /**
+//     * This method is responsible for doing a simple bandcombine on the provided
+//     * image in order to come up with a simple estimation of the intensity of
+//     * the image based on the average value of the color compnents. It is
+//     * worthwhile to note that the alpha band is stripped from the provided
+//     * image.
+//     * 
+//     * 
+//     * Citing from <code>ComponentColorModel</code>:
+//     * 
+//     * "For those methods that use a primitive array pixel representation of
+//     * type transferType, the array length is the same as the number of color
+//     * and alpha samples. Color samples are stored first in the array followed
+//     * by the alpha sample, if present. The order of the color samples is
+//     * specified by the ColorSpace. Typically, this order reflects the name of
+//     * the color space type. For example, for TYPE_RGB, index 0 corresponds to
+//     * red, index 1 to green, and index 2 to blue."
+//     * 
+//     * Therefore for component color model alpha is always the last component.
+//     * 
+//     * 
+//     * Citing from <code>PackedColorModel</code>: " Masks are identified by
+//     * indices running from 0 through getNumComponents - 1. The first
+//     * getNumColorComponents indices refer to color samples. If an alpha sample
+//     * is present, it corresponds the last index. The order of the color indices
+//     * is specified by the ColorSpace. Typically, this reflects the name of the
+//     * color space type (for example, TYPE_RGB), index 0 corresponds to red,
+//     * index 1 to green, and index 2 to blue. "
+//     * 
+//     * @param image The image to combine.
+//     * @param cache {@code false} if the image should not be cached.
+//     * @return The combined image.
+//     *
+//     * @since 2.3
+//     */
+//    public final static RenderedOp bandCombineSimple(RenderedOp image, boolean cache) {
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(image);
+//            if (!cache) {
+//                w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
+//            }
+//            w.intensity();
+//            return w.getRenderedOperation();
+//        }
+//
+//        // /////////////////////////////////////////////////////////////////////
+//        //
+//        // I need a component color model to be sure to understand what I am
+//        // doing.
+//        //
+//        // /////////////////////////////////////////////////////////////////////
+//        ColorModel cm = image.getColorModel();
+//        if (cm instanceof IndexColorModel) {
+//            image = reformatColorModel2ComponentColorModel(image);
+//            cm = image.getColorModel();
+//        }
+//
+//        // number of color componenents
+//        final int numBands = cm.getNumComponents();
+//        final int numColorBands = cm.getNumColorComponents();
+//        final boolean hasAlpha = cm.hasAlpha()
+//                && (numColorBands - numBands > 0);
+//
+//        // one band, nothing to combine
+//        if (numBands == 1)
+//            return image;
+//
+//        // one band plus alpha, let's remove alpha
+//        if (numColorBands == 1 && hasAlpha)
+//            return BandSelectDescriptor
+//                    .create(image, new int[] { 0 }, cache ? null
+//                            : new RenderingHints(JAI.KEY_TILE_CACHE, null));
+//        // I have more than one band
+//
+//        // remove alpha band
+//        if (hasAlpha) {
+//            final int bands[] = new int[numColorBands];
+//            for (int i = 0; i < numColorBands; i++)
+//                bands[i] = i;
+//            image = BandSelectDescriptor.create(image, bands, null);
+//        }
+//
+//        // compute the coefficients
+//        final double[][] coeff = new double[1][numColorBands + 1];
+//        for (int i = 0; i < numColorBands; i++)
+//            coeff[0][i] = 1.0 / numColorBands;
+//        return BandCombineDescriptor.create(image, coeff, cache ? null
+//                : new RenderingHints(JAI.KEY_TILE_CACHE, null));
+//    }
 
-        // rescaling each band to 8 bits
-        final double[] scale = new double[extrema[0].length];
-        final double[] offset = new double[extrema[0].length];
-        final int length = extrema[0].length;
-        for (int i = 0; i < length; i++) {
-            scale[i] = 255 / (extrema[1][i] - extrema[0][i]);
-            offset[i] = -((255 * extrema[0][i]) / (extrema[1][i] - extrema[0][i]));
-        }
-        pb.add(scale);
-        pb.add(offset);
-
-        final RenderedOp image2return = JAI.create("rescale", pb);
-
-        // setting up the right layout for this image
-        ImageLayout layout = new ImageLayout(image2return);
-        final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
-                image2return.getWidth(), image2return.getHeight()));
-        layout.setTileGridXOffset(0);
-        layout.setTileGridYOffset(0);
-        layout.setTileHeight((int) tileSize.getWidth());
-        layout.setTileWidth((int) tileSize.getHeight());
-        pb.removeParameters();
-        pb.removeSources();
-        pb.addSource(image2return);
-        pb.add(DataBuffer.TYPE_BYTE);
-
-        final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
-                layout);
-        return JAI.create("format", pb, hints);
-    }
-
-    /**
-     * Reducing the color model to index color model. This should world only for
-     * RGB since it performs a ditering on the original color model.
-     * 
-     * @param sourceImage The image to reduces.
-     * 
-     * @return The image with index color model.
-     *
-     * @since 2.3
-     */
-    public static PlanarImage RGBIndexColorModel(PlanarImage sourceImage) {
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(sourceImage);
-            w.forceIndexColorModel();
-            return w.getPlanarImage();
-        }
-
-        if (sourceImage.getColorModel() instanceof IndexColorModel)
-            return sourceImage;
-        // error dither
-        final KernelJAI[] ditherMask = KernelJAI.DITHER_MASK_443;// KernelJAI.ERROR_FILTER_STUCKI;
-        // //
-        final ColorCube colorMap = ColorCube.BYTE_496;
-
-        // PARAMETER BLOCK
-        final ParameterBlock pb = new ParameterBlock();
-        // color map
-        pb.addSource(sourceImage);
-        pb.add(colorMap);
-        pb.add(ditherMask);
-
-        // final layout
-        final ImageLayout layout = ImageUtilities.getImageLayout(sourceImage);
-        layout.unsetValid(ImageLayout.COLOR_MODEL_MASK);
-        layout.unsetValid(ImageLayout.SAMPLE_MODEL_MASK);
-
-        return JAI.create("OrderedDither", pb, new RenderingHints(
-                JAI.KEY_IMAGE_LAYOUT, layout));
-    }
-
-    /**
-     * This method allows me to go from DirectColorModel to ComponentColorModel
-     * which seems to be well accepted from PNGEncoder and TIFFEncoder.
-     * 
-     * This comes from the sun javadocs of the DirectColorModel class.
-     * 
-     * The DirectColorModel class is a ColorModel class that works with pixel
-     * values that represent RGB color and alpha information as separate samples
-     * and that pack all samples for a single pixel into a single int, short, or
-     * byte quantity. This class can be used only with ColorSpaces of type
-     * ColorSpace.TYPE_RGB. In addition, for each component of the ColorSpace,
-     * the minimum normalized component value obtained via the getMinValue()
-     * method of ColorSpace must be 0.0, and the maximum value obtained via the
-     * getMaxValue() method must be 1.0 (these min/max values are typical for
-     * RGB spaces). There must be three color samples in the pixel values and
-     * there can be a single alpha sample. For those methods that use a
-     * primitive array pixel representation of type transferType, the array
-     * length is always one. The transfer types supported are
-     * DataBuffer.TYPE_BYTE, DataBuffer.TYPE_USHORT, and DataBuffer.TYPE_INT.
-     * Color and alpha samples are stored in the single element of the array in
-     * bits indicated by bit masks. Each bit mask must be contiguous and masks
-     * must not overlap. The same masks apply to the single int pixel
-     * representation used by other methods. The correspondence of masks and
-     * color/alpha samples is as follows:
-     * 
-     * Masks are identified by indices running from 0 through 2 if no alpha is
-     * present, or 3 if an alpha is present. The first three indices refer to
-     * color samples; index 0 corresponds to red, index 1 to green, and index 2
-     * to blue. Index 3 corresponds to the alpha sample, if present.
-     * 
-     * @param surrogateImage The image with a direct color model.
-     * @return The image with a component color model.
-     * @todo what if the numBits is bigger than 8?
-     *
-     * @since 2.3
-     *
-     * @deprecated This method is similar to {@link #reformatColorModel2ComponentColorModel},
-     *             the later being slightly more general.
-     */
-    public static final PlanarImage direct2ComponentColorModel(PlanarImage sourceImage) {
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(sourceImage);
-            w.forceComponentColorModel();
-            return w.getPlanarImage();
-        }
-
-        final ColorModel cm = sourceImage.getColorModel();
-        if (!(cm instanceof DirectColorModel))
-            return null;
-        final ParameterBlockJAI pb = new ParameterBlockJAI("Format");
-        pb.addSource(sourceImage);
-
-        // final int numBits = cm.getComponentSize(0);
-        // final int transferType= DataBuffer.TYPE_BYTE;
-        // if(numBits<=8)
-        // transferType= DataBuffer.TYPE_BYTE;
-        // if (numBits == 32) {
-        // transferType=DataBuffer.TYPE_BYTE ;
-        // } else if ((DataBuffer.TYPE_USHORT == transferType)
-        // || (DataBuffer.TYPE_SHORT == transferType)) {
-        // numBits = 16;
-        // } else if (DataBuffer.TYPE_FLOAT == transferType) {
-        // numBits = 32;
-        // } else if (DataBuffer.TYPE_DOUBLE == transferType) {
-        // numBits = 64;
-        // }
-
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // Creating a component color model.
-        //
-        // /////////////////////////////////////////////////////////////////////
-        final ComponentColorModel colorModel = new ComponentColorModel(
-                ColorSpace.getInstance(ColorSpace.CS_sRGB), cm.hasAlpha(), cm
-                        .isAlphaPremultiplied(), cm.getTransparency(),
-                DataBuffer.TYPE_BYTE);
-        pb.setParameter("dataType", DataBuffer.TYPE_BYTE);
-
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // Creating a right layout with color model and sample model.
-        //
-        // /////////////////////////////////////////////////////////////////////
-        final ImageLayout layout = ImageUtilities.getImageLayout(sourceImage);
-        layout.setColorModel(colorModel);
-        layout.setSampleModel(colorModel.createCompatibleSampleModel(
-                sourceImage.getWidth(), sourceImage.getHeight()));
-        final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
-                layout);
-
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // Creating the operation.
-        //
-        // /////////////////////////////////////////////////////////////////////
-        return JAI.create("Format", pb, hints);
-    }
-
-    /**
-     * Bnarize an image with caching control.
-     * 
-     * @param source    The image to binarize.
-     * @param threshold The threshold value for the "binarize" operation.
-     * @param cacheMe   {@code false} if the image should not be cached.
-     * @return          The binarized image.
-     *
-     * @since 2.3
-     */
-    public static final RenderedOp binarizeImageExt(RenderedImage source,
-            final double threshold, final boolean cacheMe) {
-
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(source);
-            if (!cacheMe) {
-                w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
-            }
-            w.binarize(threshold);
-            return w.getRenderedOperation();
-        }
-
-        final SampleModel sm = source.getSampleModel();
-
-        if (sm.getNumBands() != 1) {
-            final ParameterBlockJAI pbjBandSelect = new ParameterBlockJAI(
-                    "BandSelect");
-            pbjBandSelect.addSource(source);
-            pbjBandSelect.setParameter("bandIndices", new int[] { 0 });
-            source = JAI.create("BandSelect", pbjBandSelect,
-                    new RenderingHints(JAI.KEY_TILE_CACHE, null));
-
-        }
-
-        // If the image is already binary and the threshold is >1
-        // then there is no work to do.
-        if ((threshold >= 1) && ImageUtil.isBinary(sm)) {
-            return NullDescriptor.create(source, cacheMe ? null
-                    : new RenderingHints(JAI.KEY_TILE_CACHE, null));
-
-            // Otherwise binarize the image for efficiency.
-        } else {
-
-            final ParameterBlockJAI pbj = new ParameterBlockJAI("binarize");
-            pbj.addSource(source);
-            pbj.setParameter("threshold", threshold);
-
-            return JAI.create("binarize", pbj, cacheMe ? null
-                    : new RenderingHints(JAI.KEY_TILE_CACHE, null));
-        }
-    }
-
-    /**
-     * Extended version of the JAI ROI operation which allows you to have much
-     * more control than the original operation. It also works with muti bands
-     * images through a conversion to IHS.
-     * 
-     * @param image     The image to binarize.
-     * @param threshold The threshold value for the "binarize" operation.
-     * @param cache     {@code false} if the image should not be cached.
-     * @return          The binarized image.
-     *
-     * @since 2.3
-     */
-    public static final ROI roiExt(RenderedOp image, final double threshold, final boolean cache) {
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(image);
-            if (!cache) {
-                w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
-            }
-            w.binarize(threshold);
-            return w.getImageAsROI();
-        }
-
-        // going to IHS and geting Intensity band
-        final RenderedOp ihs = bandCombineSimple(image, cache);
-        final RenderedOp i = selectBand(ihs, cache);
-        final RenderedOp bin = binarizeImageExt(i, threshold, cache);
-        // building up ROI using image with no intensity
-        return new ROI(bin, (int) threshold);
-    }
-
-    /**
-     * This method is responsible for doing a simple bandcombine on the provided
-     * image in order to come up with a simple estimation of the intensity of
-     * the image based on the average value of the color compnents. It is
-     * worthwhile to note that the alpha band is stripped from the provided
-     * image.
-     * 
-     * 
-     * Citing from <code>ComponentColorModel</code>:
-     * 
-     * "For those methods that use a primitive array pixel representation of
-     * type transferType, the array length is the same as the number of color
-     * and alpha samples. Color samples are stored first in the array followed
-     * by the alpha sample, if present. The order of the color samples is
-     * specified by the ColorSpace. Typically, this order reflects the name of
-     * the color space type. For example, for TYPE_RGB, index 0 corresponds to
-     * red, index 1 to green, and index 2 to blue."
-     * 
-     * Therefore for component color model alpha is always the last component.
-     * 
-     * 
-     * Citing from <code>PackedColorModel</code>: " Masks are identified by
-     * indices running from 0 through getNumComponents - 1. The first
-     * getNumColorComponents indices refer to color samples. If an alpha sample
-     * is present, it corresponds the last index. The order of the color indices
-     * is specified by the ColorSpace. Typically, this reflects the name of the
-     * color space type (for example, TYPE_RGB), index 0 corresponds to red,
-     * index 1 to green, and index 2 to blue. "
-     * 
-     * @param image The image to combine.
-     * @param cache {@code false} if the image should not be cached.
-     * @return The combined image.
-     *
-     * @since 2.3
-     */
-    public final static RenderedOp bandCombineSimple(RenderedOp image, boolean cache) {
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(image);
-            if (!cache) {
-                w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
-            }
-            w.intensity();
-            return w.getRenderedOperation();
-        }
-
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // I need a component color model to be sure to understand what I am
-        // doing.
-        //
-        // /////////////////////////////////////////////////////////////////////
-        ColorModel cm = image.getColorModel();
-        if (cm instanceof IndexColorModel) {
-            image = reformatColorModel2ComponentColorModel(image);
-            cm = image.getColorModel();
-        }
-
-        // number of color componenents
-        final int numBands = cm.getNumComponents();
-        final int numColorBands = cm.getNumColorComponents();
-        final boolean hasAlpha = cm.hasAlpha()
-                && (numColorBands - numBands > 0);
-
-        // one band, nothing to combine
-        if (numBands == 1)
-            return image;
-
-        // one band plus alpha, let's remove alpha
-        if (numColorBands == 1 && hasAlpha)
-            return BandSelectDescriptor
-                    .create(image, new int[] { 0 }, cache ? null
-                            : new RenderingHints(JAI.KEY_TILE_CACHE, null));
-        // I have more than one band
-
-        // remove alpha band
-        if (hasAlpha) {
-            final int bands[] = new int[numColorBands];
-            for (int i = 0; i < numColorBands; i++)
-                bands[i] = i;
-            image = BandSelectDescriptor.create(image, bands, null);
-        }
-
-        // compute the coefficients
-        final double[][] coeff = new double[1][numColorBands + 1];
-        for (int i = 0; i < numColorBands; i++)
-            coeff[0][i] = 1.0 / numColorBands;
-        return BandCombineDescriptor.create(image, coeff, cache ? null
-                : new RenderingHints(JAI.KEY_TILE_CACHE, null));
-    }
-
-    /**
-     * Performing the bandselect on the input image in case it has more than one
-     * band.
-     * 
-     * @param image The image where to select a band.
-     * @param cache {@code false} if the image should not be cached.
-     * @return The image with the selected band.
-     *
-     * @since 2.3
-     *
-     * @deprecated This is a duplicated (actually a special case) of {@link #getBandsFromImage},
-     *             except for the {@code cache} argument and a special processing done for the
-     *             {@link IHSColorSpace}.
-     */
-    public final static RenderedOp selectBand(RenderedImage image, boolean cache) {
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(image);
-            if (!cache) {
-                w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
-            }
-            w.retainFirstBand();
-            return w.getRenderedOperation();
-        }
-
-        final ColorModel cm = image.getColorModel();
-        if ((cm.getNumComponents() <= 1)
-                || !(cm.getColorSpace() instanceof IHSColorSpace))
-            return image instanceof RenderedOp ? (RenderedOp) image
-                    : NullDescriptor.create(image, null);
-
-        if (cache)
-            return BandSelectDescriptor.create(image, new int[] { 0 }, null);
-        return BandSelectDescriptor.create(image, new int[] { 0 },
-                new RenderingHints(JAI.KEY_TILE_CACHE, null));
-    }
+//    /**
+//     * Performing the bandselect on the input image in case it has more than one
+//     * band.
+//     * 
+//     * @param image The image where to select a band.
+//     * @param cache {@code false} if the image should not be cached.
+//     * @return The image with the selected band.
+//     *
+//     * @since 2.3
+//     *
+//     * @deprecated This is a duplicated (actually a special case) of {@link #getBandsFromImage},
+//     *             except for the {@code cache} argument and a special processing done for the
+//     *             {@link IHSColorSpace}.
+//     */
+//    public final static RenderedOp selectBand(RenderedImage image, boolean cache) {
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(image);
+//            if (!cache) {
+//                w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
+//            }
+//            w.retainFirstBand();
+//            return w.getRenderedOperation();
+//        }
+//
+//        final ColorModel cm = image.getColorModel();
+//        if ((cm.getNumComponents() <= 1)
+//                || !(cm.getColorSpace() instanceof IHSColorSpace))
+//            return image instanceof RenderedOp ? (RenderedOp) image
+//                    : NullDescriptor.create(image, null);
+//
+//        if (cache)
+//            return BandSelectDescriptor.create(image, new int[] { 0 }, null);
+//        return BandSelectDescriptor.create(image, new int[] { 0 },
+//                new RenderingHints(JAI.KEY_TILE_CACHE, null));
+//    }
 
     /**
      * Converting the input image to an IHS color model in order to be able to
@@ -987,25 +990,18 @@ public final class ImageUtilities {
      *
      * @since 2.3
      *
-     * @deprecated This method is similar to {@link #bandCombineSimple}. The computation performed
-     *             by the later matches the definition of the {@code I} in a {@code IHS} color
-     *             space.
      */
-    public final static RenderedOp convertIHS(RenderedImage image, boolean cache) {
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(image);
-            if (!cache) {
-                w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
-            }
-            w.intensity();
-            return w.getRenderedOperation();
-        }
+    public static RenderedOp convertIHS(RenderedImage image, boolean cache) {
+
 
         ColorModel cm = image.getColorModel();
-        if (cm instanceof IndexColorModel) {
-            image = reformatColorModel2ComponentColorModel(PlanarImage
-                    .wrapRenderedImage(image));
-            cm = image.getColorModel();
+        if (!(cm instanceof ComponentColorModel )) {
+            final ImageWorker worker= new ImageWorker(image);
+            if(!cache)
+            	worker.setRenderingHint(
+                JAI.KEY_TILE_CACHE, null);
+            worker.forceComponentColorModel();
+            image=worker.getRenderedImage();
         }
         final ColorSpace cs = cm.getColorSpace();
         final int colorSpaceType = cs.getType();
@@ -1026,362 +1022,362 @@ public final class ImageUtilities {
                 JAI.KEY_TILE_CACHE, null));
     }
 
-    /**
-     * This method is used to add transparency to a preexisting image whose
-     * color model is indexcolormodel. There are quite a few step to perform
-     * here. 1>Creating a new IndexColorModel which supports transparency, using
-     * the given image's colormodel 2>creating a suitable sample model 3>copying
-     * the old sample model to the new sample model. 4>looping through the
-     * alphaChannel and setting the corresponding pixels in the new sample model
-     * to the index for transparency 5>creating a bufferedimage 6>creating a
-     * planar image to be returned
-     * 
-     * NOTE For optimizing writing GIF we need to create this image UNTILED!!.
-     * 
-     * @todo Extensive testing should is required.
-     * 
-     * @param surrogateImage
-     * @param alphaChannel
-     * @param pb
-     * 
-     * @return
-     *
-     * @since 2.3
-     */
-    public static PlanarImage addTransparency2IndexColorModel(
-            final PlanarImage surrogateImage, final RenderedImage alphaChannel,
-            final boolean optimizeForWritingGIF) {
+//    /**
+//     * This method is used to add transparency to a preexisting image whose
+//     * color model is indexcolormodel. There are quite a few step to perform
+//     * here. 1>Creating a new IndexColorModel which supports transparency, using
+//     * the given image's colormodel 2>creating a suitable sample model 3>copying
+//     * the old sample model to the new sample model. 4>looping through the
+//     * alphaChannel and setting the corresponding pixels in the new sample model
+//     * to the index for transparency 5>creating a bufferedimage 6>creating a
+//     * planar image to be returned
+//     * 
+//     * NOTE For optimizing writing GIF we need to create this image UNTILED!!.
+//     * 
+//     * @todo Extensive testing should is required.
+//     * 
+//     * @param surrogateImage
+//     * @param alphaChannel
+//     * @param pb
+//     * 
+//     * @return
+//     *
+//     * @since 2.3
+//     */
+//    public static PlanarImage addTransparency2IndexColorModel(
+//            final PlanarImage surrogateImage, final RenderedImage alphaChannel,
+//            final boolean optimizeForWritingGIF) {
+//
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(surrogateImage);
+//            if (optimizeForWritingGIF) {
+//                w.setRenderingHint(ImageWorker.TILING_ALLOWED, Boolean.FALSE);
+//            }
+//            w.forceBitmaskIndexColorModel(255);
+//            w.addTransparencyToIndexColorModel(alphaChannel);
+//            return w.getPlanarImage();
+//        }
+//
+//        final IndexColorModel cm = (IndexColorModel) surrogateImage
+//                .getColorModel();
+//
+//        final byte[][] rgba = new byte[3][256]; // WE MIGHT USE LESS THAN 256
+//        // COLORS
+//        // get the r g b a components
+//        cm.getReds(rgba[0]);
+//        cm.getGreens(rgba[1]);
+//        cm.getBlues(rgba[2]);
+//
+//        /*
+//         * Now all the color are opaque except one and the color map has been
+//         * rebuilt loosing all the tranpsarent colors except the first one. The
+//         * raster has been rebuilt as well, in order to make it point to the
+//         * right color in the color map. We have to create the new image to be
+//         * returned.
+//         */
+//        final IndexColorModel cm1 = new IndexColorModel(cm.getPixelSize(), 256,
+//                rgba[0], rgba[1], rgba[2], 255);
+//
+//        /*
+//         * 
+//         * Threshold on the alpha channel to go to 0 -255 values
+//         * 
+//         */
+//        final ParameterBlockJAI pbTheshold = new ParameterBlockJAI("Threshold");
+//        pbTheshold.addSource(alphaChannel);
+//        pbTheshold.setParameter("low", new double[] { 1 });
+//        pbTheshold.setParameter("high", new double[] { 254 });
+//        pbTheshold.setParameter("constants", new double[] { 0 });
+//        final RenderedOp newAlphaChannel = JAI.create("threshold", pbTheshold,
+//                new RenderingHints(JAI.KEY_TILE_CACHE, null));
+//
+//        /*
+//         * colorspacetype Threshold on the alpha channel to go to 0 -255 values
+//         * 
+//         */
+//        final ParameterBlockJAI pbInvert = new ParameterBlockJAI("Invert");
+//        pbInvert.addSource(newAlphaChannel);
+//        final RenderedOp newInvertedAlphaChannel = JAI.create("Invert",
+//                pbTheshold, new RenderingHints(JAI.KEY_TILE_CACHE, null));
+//
+//        /*
+//         * preparing hints and layout to reuse all over the methid. It worth to
+//         * remark on that to optimie gif writing we need to untile the gif
+//         * image.
+//         */
+//        final ImageLayout layout = new ImageLayout(surrogateImage);
+//        layout.setColorModel(cm1);
+//        if (optimizeForWritingGIF) {
+//            layout.setTileGridXOffset(surrogateImage.getMinX());
+//            layout.setTileGridYOffset(surrogateImage.getMinY());
+//            layout.setTileWidth(surrogateImage.getWidth());
+//            layout.setTileHeight(surrogateImage.getHeight());
+//        }
+//
+//        final RenderingHints hints = new RenderingHints(
+//                JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
+//        hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
+//        hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
+//
+//        /*
+//         * Adding to the other image
+//         * 
+//         */
+//        final ParameterBlockJAI pbjAdd = new ParameterBlockJAI("add");
+//        pbjAdd.addSource(surrogateImage);
+//        pbjAdd.addSource(newInvertedAlphaChannel);
+//        return JAI.create("add", pbjAdd, hints);
+//    }
 
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(surrogateImage);
-            if (optimizeForWritingGIF) {
-                w.setRenderingHint(ImageWorker.TILING_ALLOWED, Boolean.FALSE);
-            }
-            w.forceBitmaskIndexColorModel(255);
-            w.addTransparencyToIndexColorModel(alphaChannel);
-            return w.getPlanarImage();
-        }
+//    /**
+//     * Convert the image to a GIF-compliant image. This method has been created
+//     * in order to convert the input image to a form that is compatible with the
+//     * GIF model. It first remove the information about transparency since the
+//     * error diffusion and the error dither operations are unable to process
+//     * images with more than 3 bands. Sfterwards the image is processed with an
+//     * error diffusion operator in order to reduce the number of bands from 3 to
+//     * 1 and the number of color to 216. A suitable layout is used for the final
+//     * image via the RenderingHints in order to take into account the different
+//     * layout model for the final image.
+//     * 
+//     * @param surrogateImage
+//     *            image to convert
+//     * 
+//     * @return PlanarImage image converted
+//     *
+//     * @since 2.3
+//     */
+//    public static final PlanarImage componentColorModel2IndexColorModel4GIF(
+//            PlanarImage sourceImage) {
+//
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(sourceImage);
+//            w.forceIndexColorModelForGIF();
+//            return w.getPlanarImage();
+//        }
+//
+//        // /////////////////////////////////////////////////////////////////
+//        //
+//        // checking the color model to see if we need to convert it back to
+//        // color model.
+//        //
+//        // /////////////////////////////////////////////////////////////////
+//        if (sourceImage.getColorModel() instanceof DirectColorModel)
+//            sourceImage = ImageUtilities
+//                    .direct2ComponentColorModel(sourceImage);
+//
+//        ParameterBlock pb = new ParameterBlock();
+//        RenderedImage alphaChannel = null;
+//
+//        // /////////////////////////////////////////////////////////////////
+//        // 
+//        // AMPLITUDE RESCALING
+//        // I might also need to reformat the image in order to get it to 8
+//        // bits samples
+//        //
+//        // /////////////////////////////////////////////////////////////////
+//        if (sourceImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE) {
+//            sourceImage = ImageUtilities.rescale2Byte(sourceImage);
+//        }
+//
+//        // /////////////////////////////////////////////////////////////////
+//        // 
+//        // ALPHA CHANNEL getting the alpha channel and separating from the
+//        // others bands.
+//        //
+//        // /////////////////////////////////////////////////////////////////
+//        if (sourceImage.getColorModel().hasAlpha()) {
+//            int numBands = sourceImage.getSampleModel().getNumBands();
+//
+//            // getting alpha channel
+//            alphaChannel = JAI.create("bandSelect", sourceImage,
+//                    new int[] { numBands - 1 });
+//
+//            // getting needed bands
+//            sourceImage = getBandsFromImage(sourceImage, numBands);
+//        }
+//
+//        // /////////////////////////////////////////////////////////////////
+//        // 
+//        // BAND MERGE If we do not have 3 bands we have no way to go to
+//        // index color model in a simple way using jai. Therefore we add the
+//        // bands we need in order to get there. This trick works fine with
+//        // gray scale images. ATTENTION, if the initial image had no alpha
+//        // channel we proceed without doing anything since it seems that GIF
+//        // encoder in such a case works fine.
+//        // /////////////////////////////////////////////////////////////////
+//        if ((sourceImage.getSampleModel().getNumBands() == 1)
+//                && (alphaChannel != null)) {
+//            int numBands = sourceImage.getSampleModel().getNumBands();
+//
+//            // getting first band
+//            final RenderedImage firstBand = JAI.create("bandSelect",
+//                    sourceImage, new int[] { 0 });
+//
+//            // adding to the image
+//            for (int i = 0; i < (3 - numBands); i++) {
+//                pb.removeParameters();
+//                pb.removeSources();
+//
+//                pb.addSource(sourceImage);
+//                pb.addSource(firstBand);
+//                sourceImage = JAI.create("bandmerge", pb);
+//
+//                pb.removeParameters();
+//                pb.removeSources();
+//            }
+//        }
+//
+//        // /////////////////////////////////////////////////////////////////
+//        // 
+//        // ERROR DIFFUSION we create a single banded image with index color
+//        // model.
+//        // /////////////////////////////////////////////////////////////////
+//        if (sourceImage.getSampleModel().getNumBands() == 3) {
+//            sourceImage = ImageUtilities.RGBIndexColorModel(sourceImage);
+//        }
+//        // /////////////////////////////////////////////////////////////////
+//        // 
+//        // TRANSPARENCY Adding transparency if needed, which means using the
+//        // alpha channel to build a new color model
+//        // /////////////////////////////////////////////////////////////////
+//        if (alphaChannel != null) {
+//            sourceImage = ImageUtilities.addTransparency2IndexColorModel(
+//                    sourceImage, alphaChannel, true);
+//        }
+//
+//        return sourceImage;
+//    }
 
-        final IndexColorModel cm = (IndexColorModel) surrogateImage
-                .getColorModel();
+//    /**
+//     * Remove the alpha band and keeps the others.
+//     * 
+//     * @param surrogateImage
+//     * @param numBands
+//     * 
+//     * @return
+//     *
+//     * @since 2.3
+//     */
+//    public static PlanarImage getBandsFromImage(PlanarImage surrogateImage, int numBands) {
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(surrogateImage);
+//            w.retainBands(numBands - 1);
+//            return w.getPlanarImage();
+//        }
+//
+//        switch (numBands - 1) {
+//        case 1:
+//            surrogateImage = JAI.create("bandSelect", surrogateImage,
+//                    new int[] { 0 });
+//
+//            break;
+//
+//        case 3:
+//            surrogateImage = JAI.create("bandSelect", surrogateImage,
+//                    new int[] { 0, 1, 2 });
+//
+//            break;
+//        }
+//
+//        return surrogateImage;
+//    }
 
-        final byte[][] rgba = new byte[3][256]; // WE MIGHT USE LESS THAN 256
-        // COLORS
-        // get the r g b a components
-        cm.getReds(rgba[0]);
-        cm.getGreens(rgba[1]);
-        cm.getBlues(rgba[2]);
-
-        /*
-         * Now all the color are opaque except one and the color map has been
-         * rebuilt loosing all the tranpsarent colors except the first one. The
-         * raster has been rebuilt as well, in order to make it point to the
-         * right color in the color map. We have to create the new image to be
-         * returned.
-         */
-        final IndexColorModel cm1 = new IndexColorModel(cm.getPixelSize(), 256,
-                rgba[0], rgba[1], rgba[2], 255);
-
-        /*
-         * 
-         * Threshold on the alpha channel to go to 0 -255 values
-         * 
-         */
-        final ParameterBlockJAI pbTheshold = new ParameterBlockJAI("Threshold");
-        pbTheshold.addSource(alphaChannel);
-        pbTheshold.setParameter("low", new double[] { 1 });
-        pbTheshold.setParameter("high", new double[] { 254 });
-        pbTheshold.setParameter("constants", new double[] { 0 });
-        final RenderedOp newAlphaChannel = JAI.create("threshold", pbTheshold,
-                new RenderingHints(JAI.KEY_TILE_CACHE, null));
-
-        /*
-         * colorspacetype Threshold on the alpha channel to go to 0 -255 values
-         * 
-         */
-        final ParameterBlockJAI pbInvert = new ParameterBlockJAI("Invert");
-        pbInvert.addSource(newAlphaChannel);
-        final RenderedOp newInvertedAlphaChannel = JAI.create("Invert",
-                pbTheshold, new RenderingHints(JAI.KEY_TILE_CACHE, null));
-
-        /*
-         * preparing hints and layout to reuse all over the methid. It worth to
-         * remark on that to optimie gif writing we need to untile the gif
-         * image.
-         */
-        final ImageLayout layout = new ImageLayout(surrogateImage);
-        layout.setColorModel(cm1);
-        if (optimizeForWritingGIF) {
-            layout.setTileGridXOffset(surrogateImage.getMinX());
-            layout.setTileGridYOffset(surrogateImage.getMinY());
-            layout.setTileWidth(surrogateImage.getWidth());
-            layout.setTileHeight(surrogateImage.getHeight());
-        }
-
-        final RenderingHints hints = new RenderingHints(
-                JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
-        hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
-        hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
-
-        /*
-         * Adding to the other image
-         * 
-         */
-        final ParameterBlockJAI pbjAdd = new ParameterBlockJAI("add");
-        pbjAdd.addSource(surrogateImage);
-        pbjAdd.addSource(newInvertedAlphaChannel);
-        return JAI.create("add", pbjAdd, hints);
-    }
-
-    /**
-     * Convert the image to a GIF-compliant image. This method has been created
-     * in order to convert the input image to a form that is compatible with the
-     * GIF model. It first remove the information about transparency since the
-     * error diffusion and the error dither operations are unable to process
-     * images with more than 3 bands. Sfterwards the image is processed with an
-     * error diffusion operator in order to reduce the number of bands from 3 to
-     * 1 and the number of color to 216. A suitable layout is used for the final
-     * image via the RenderingHints in order to take into account the different
-     * layout model for the final image.
-     * 
-     * @param surrogateImage
-     *            image to convert
-     * 
-     * @return PlanarImage image converted
-     *
-     * @since 2.3
-     */
-    public static final PlanarImage componentColorModel2IndexColorModel4GIF(
-            PlanarImage sourceImage) {
-
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(sourceImage);
-            w.forceIndexColorModelForGIF();
-            return w.getPlanarImage();
-        }
-
-        // /////////////////////////////////////////////////////////////////
-        //
-        // checking the color model to see if we need to convert it back to
-        // color model.
-        //
-        // /////////////////////////////////////////////////////////////////
-        if (sourceImage.getColorModel() instanceof DirectColorModel)
-            sourceImage = ImageUtilities
-                    .direct2ComponentColorModel(sourceImage);
-
-        ParameterBlock pb = new ParameterBlock();
-        RenderedImage alphaChannel = null;
-
-        // /////////////////////////////////////////////////////////////////
-        // 
-        // AMPLITUDE RESCALING
-        // I might also need to reformat the image in order to get it to 8
-        // bits samples
-        //
-        // /////////////////////////////////////////////////////////////////
-        if (sourceImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE) {
-            sourceImage = ImageUtilities.rescale2Byte(sourceImage);
-        }
-
-        // /////////////////////////////////////////////////////////////////
-        // 
-        // ALPHA CHANNEL getting the alpha channel and separating from the
-        // others bands.
-        //
-        // /////////////////////////////////////////////////////////////////
-        if (sourceImage.getColorModel().hasAlpha()) {
-            int numBands = sourceImage.getSampleModel().getNumBands();
-
-            // getting alpha channel
-            alphaChannel = JAI.create("bandSelect", sourceImage,
-                    new int[] { numBands - 1 });
-
-            // getting needed bands
-            sourceImage = getBandsFromImage(sourceImage, numBands);
-        }
-
-        // /////////////////////////////////////////////////////////////////
-        // 
-        // BAND MERGE If we do not have 3 bands we have no way to go to
-        // index color model in a simple way using jai. Therefore we add the
-        // bands we need in order to get there. This trick works fine with
-        // gray scale images. ATTENTION, if the initial image had no alpha
-        // channel we proceed without doing anything since it seems that GIF
-        // encoder in such a case works fine.
-        // /////////////////////////////////////////////////////////////////
-        if ((sourceImage.getSampleModel().getNumBands() == 1)
-                && (alphaChannel != null)) {
-            int numBands = sourceImage.getSampleModel().getNumBands();
-
-            // getting first band
-            final RenderedImage firstBand = JAI.create("bandSelect",
-                    sourceImage, new int[] { 0 });
-
-            // adding to the image
-            for (int i = 0; i < (3 - numBands); i++) {
-                pb.removeParameters();
-                pb.removeSources();
-
-                pb.addSource(sourceImage);
-                pb.addSource(firstBand);
-                sourceImage = JAI.create("bandmerge", pb);
-
-                pb.removeParameters();
-                pb.removeSources();
-            }
-        }
-
-        // /////////////////////////////////////////////////////////////////
-        // 
-        // ERROR DIFFUSION we create a single banded image with index color
-        // model.
-        // /////////////////////////////////////////////////////////////////
-        if (sourceImage.getSampleModel().getNumBands() == 3) {
-            sourceImage = ImageUtilities.RGBIndexColorModel(sourceImage);
-        }
-        // /////////////////////////////////////////////////////////////////
-        // 
-        // TRANSPARENCY Adding transparency if needed, which means using the
-        // alpha channel to build a new color model
-        // /////////////////////////////////////////////////////////////////
-        if (alphaChannel != null) {
-            sourceImage = ImageUtilities.addTransparency2IndexColorModel(
-                    sourceImage, alphaChannel, true);
-        }
-
-        return sourceImage;
-    }
-
-    /**
-     * Remove the alpha band and keeps the others.
-     * 
-     * @param surrogateImage
-     * @param numBands
-     * 
-     * @return
-     *
-     * @since 2.3
-     */
-    public static PlanarImage getBandsFromImage(PlanarImage surrogateImage, int numBands) {
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(surrogateImage);
-            w.retainBands(numBands - 1);
-            return w.getPlanarImage();
-        }
-
-        switch (numBands - 1) {
-        case 1:
-            surrogateImage = JAI.create("bandSelect", surrogateImage,
-                    new int[] { 0 });
-
-            break;
-
-        case 3:
-            surrogateImage = JAI.create("bandSelect", surrogateImage,
-                    new int[] { 0, 1, 2 });
-
-            break;
-        }
-
-        return surrogateImage;
-    }
-
-    /**
-     * GIF does not support full alpha channel we need to reduce it in order to
-     * provide a simple transparency index to a unique fully transparent color.
-     * 
-     * @todo Extensive testing is required.
-     * @param surrogateImage
-     * 
-     * @return
-     *
-     * @since 2.3
-     */
-    public static final PlanarImage convertIndexColorModelAlpha4GIF(PlanarImage surrogateImage) {
-        if (PROPOSED_REPLACEMENT) {
-            ImageWorker w = new ImageWorker(surrogateImage);
-            w.forceBitmaskIndexColorModel();
-            return w.getPlanarImage();
-        }
-
-        // doing nothing if the input color model is correct
-        final IndexColorModel cm = (IndexColorModel) surrogateImage
-                .getColorModel();
-
-        if (cm.getTransparency() != Transparency.TRANSLUCENT) {
-            return surrogateImage;
-        }
-
-        final byte[][] rgba = new byte[4][256]; // WE MIGHT USE LESS THAN 256
-        // COLORS
-
-        // getting all the colors
-        cm.getReds(rgba[0]);
-        cm.getGreens(rgba[1]);
-        cm.getBlues(rgba[2]);
-
-        /*
-         * Now we are going for the first transparent color in the color map.
-         * From now on we will reuse this color as the default trasnparent
-         * color.
-         */
-        int transparencyIndex = -1;
-        int index = -1;
-        final int length = cm.getMapSize();
-
-        final byte lookupTable[] = new byte[256];
-        for (int i = 0; i < length; i++) {
-
-            // check for transparency
-            if ((cm.getAlpha(i) & 0xff) == 0) {
-                // FULLY TRANSPARENT PIXEL
-
-                // setting transparent color to this one
-                // the other tranpsarent bits will point to this one
-                if (transparencyIndex == -1)
-                    transparencyIndex = cm.getAlpha(index);
-
-                lookupTable[i] = (byte) (transparencyIndex & 0xff);
-
-            } else
-                // non transparent pixel
-                lookupTable[i] = (byte) (i & 0xff);
-
-        }
-
-        /*
-         * 
-         * Now we need to perform the look up transformation. First of all we
-         * create the new color model with a bitmask transparency using the
-         * transparency index we just found. Then we perform the lookup
-         * operation in order to prepare for the gif image.
-         * 
-         */
-        // color model
-        final IndexColorModel cm1 = new IndexColorModel(cm.getComponentSize(0),
-                256, rgba[0], rgba[1], rgba[2], transparencyIndex);
-
-        // look up table
-        final LookupTableJAI lookUpTableJAI = new LookupTableJAI(lookupTable);
-        final ParameterBlockJAI pbjLookUp = new ParameterBlockJAI("LookUp");
-        pbjLookUp.setParameter("table", lookUpTableJAI);
-        pbjLookUp.addSource(surrogateImage);
-        final ImageLayout layout = new ImageLayout(surrogateImage);
-        layout.setColorModel(cm1);
-        layout.setTileGridXOffset(0);
-        layout.setTileGridYOffset(0);
-        final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
-                surrogateImage.getWidth(), surrogateImage.getHeight()));
-        layout.setTileHeight((int) tileSize.getHeight());
-        layout.setTileWidth((int) tileSize.getWidth());
-        final RenderingHints hints = new RenderingHints(
-                JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
-        hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
-        hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
-        return JAI.create("LookUp", pbjLookUp, hints);
-
-    }
+//    /**
+//     * GIF does not support full alpha channel we need to reduce it in order to
+//     * provide a simple transparency index to a unique fully transparent color.
+//     * 
+//     * @todo Extensive testing is required.
+//     * @param surrogateImage
+//     * 
+//     * @return
+//     *
+//     * @since 2.3
+//     */
+//    public static final PlanarImage convertIndexColorModelAlpha4GIF(PlanarImage surrogateImage) {
+//        if (PROPOSED_REPLACEMENT) {
+//            ImageWorker w = new ImageWorker(surrogateImage);
+//            w.forceBitmaskIndexColorModel();
+//            return w.getPlanarImage();
+//        }
+//
+//        // doing nothing if the input color model is correct
+//        final IndexColorModel cm = (IndexColorModel) surrogateImage
+//                .getColorModel();
+//
+//        if (cm.getTransparency() != Transparency.TRANSLUCENT) {
+//            return surrogateImage;
+//        }
+//
+//        final byte[][] rgba = new byte[4][256]; // WE MIGHT USE LESS THAN 256
+//        // COLORS
+//
+//        // getting all the colors
+//        cm.getReds(rgba[0]);
+//        cm.getGreens(rgba[1]);
+//        cm.getBlues(rgba[2]);
+//
+//        /*
+//         * Now we are going for the first transparent color in the color map.
+//         * From now on we will reuse this color as the default trasnparent
+//         * color.
+//         */
+//        int transparencyIndex = -1;
+//        int index = -1;
+//        final int length = cm.getMapSize();
+//
+//        final byte lookupTable[] = new byte[256];
+//        for (int i = 0; i < length; i++) {
+//
+//            // check for transparency
+//            if ((cm.getAlpha(i) & 0xff) == 0) {
+//                // FULLY TRANSPARENT PIXEL
+//
+//                // setting transparent color to this one
+//                // the other tranpsarent bits will point to this one
+//                if (transparencyIndex == -1)
+//                    transparencyIndex = cm.getAlpha(index);
+//
+//                lookupTable[i] = (byte) (transparencyIndex & 0xff);
+//
+//            } else
+//                // non transparent pixel
+//                lookupTable[i] = (byte) (i & 0xff);
+//
+//        }
+//
+//        /*
+//         * 
+//         * Now we need to perform the look up transformation. First of all we
+//         * create the new color model with a bitmask transparency using the
+//         * transparency index we just found. Then we perform the lookup
+//         * operation in order to prepare for the gif image.
+//         * 
+//         */
+//        // color model
+//        final IndexColorModel cm1 = new IndexColorModel(cm.getComponentSize(0),
+//                256, rgba[0], rgba[1], rgba[2], transparencyIndex);
+//
+//        // look up table
+//        final LookupTableJAI lookUpTableJAI = new LookupTableJAI(lookupTable);
+//        final ParameterBlockJAI pbjLookUp = new ParameterBlockJAI("LookUp");
+//        pbjLookUp.setParameter("table", lookUpTableJAI);
+//        pbjLookUp.addSource(surrogateImage);
+//        final ImageLayout layout = new ImageLayout(surrogateImage);
+//        layout.setColorModel(cm1);
+//        layout.setTileGridXOffset(0);
+//        layout.setTileGridYOffset(0);
+//        final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
+//                surrogateImage.getWidth(), surrogateImage.getHeight()));
+//        layout.setTileHeight((int) tileSize.getHeight());
+//        layout.setTileWidth((int) tileSize.getWidth());
+//        final RenderingHints hints = new RenderingHints(
+//                JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
+//        hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
+//        hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
+//        return JAI.create("LookUp", pbjLookUp, hints);
+//
+//    }
 
     /**
      * Reformat the color model to a component color model preserving

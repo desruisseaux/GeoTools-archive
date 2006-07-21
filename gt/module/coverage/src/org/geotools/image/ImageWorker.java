@@ -26,6 +26,7 @@ import java.awt.RenderingHints;
 import java.awt.HeadlessException;
 import java.awt.color.ColorSpace;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
@@ -40,6 +41,8 @@ import java.lang.reflect.InvocationTargetException;
 // Image I/O and JAI dependencies
 import javax.media.jai.*;
 import javax.media.jai.operator.*;
+
+import com.sun.media.jai.operator.ImageReadDescriptor;
 import com.sun.media.jai.util.ImageUtil;
 
 // Geotools dependencies
@@ -120,6 +123,39 @@ public class ImageWorker {
     public ImageWorker(final RenderedImage image) {
         inheritanceStopPoint = this.image = image;
     }
+    
+    /**
+     * Loads an image using the provided file name and the provided hints, which 
+     * are used to control caching and layout.
+     * 
+     * @param source The source image.
+     * @param hints The hints to use.
+     * @param imageChoice For multipage images.
+     * @return The loaded image.
+     */
+    static public PlanarImage loadPlanarImageImage(final File source,final RenderingHints hints,final int imageChoice,final boolean readMetadata){
+    	
+    	
+    	///////////////////////////////////////////////////////////////////////
+    	//
+    	// Creating the parameters for the read operation
+    	//
+    	///////////////////////////////////////////////////////////////////////
+    	final ParameterBlockJAI pbj= new ParameterBlockJAI("ImageRead");
+    	pbj.setParameter("Input",source);
+    	pbj.setParameter("ImageChoice",new Integer(imageChoice));
+    	pbj.setParameter("ReadMetadata",new Boolean(readMetadata));
+    	pbj.setParameter("VerifyInput",Boolean.TRUE);
+    	
+    	
+    	///////////////////////////////////////////////////////////////////////
+    	//
+    	// reading
+    	//
+    	///////////////////////////////////////////////////////////////////////
+		return JAI.create("ImageRead",pbj,hints).createInstance();
+    	
+    }
 
     /**
      * Creates a new builder for an image read from the specified file.
@@ -129,6 +165,17 @@ public class ImageWorker {
      */
     public ImageWorker(final File input) throws IOException {
         this(ImageIO.read(input));
+    }
+    
+    /**
+     * Creates a new uninitialized builder for an image read.
+     *
+     * @param  image The file to read.
+     * @throws IOException if the file can't be read.
+     */
+    public ImageWorker()  {
+    	inheritanceStopPoint = this.image = null;
+       
     }
 
     /**
@@ -251,7 +298,7 @@ public class ImageWorker {
         if (commonHints == null) {
             commonHints = new RenderingHints(null);
         }
-        commonHints.put(key, value);
+        commonHints.add(new RenderingHints(key,value));
     }
 
     /**
@@ -739,7 +786,7 @@ public class ImageWorker {
      * image via the {@linkplain #getRenderingHints rendering hints} in order to
      * take into account the different layout model for the final image.
      * <p>
-     * <strong>Tip:</strong> For optimizing writting GIF, we need to create the image untiled. This
+     * <strong>Tip:</strong> For optimizing writing GIF, we need to create the image untiled. This
      * can be done by invoking <code>{@linkplain #setRenderingHint setRenderingHint}({@linkplain
      * #TILING_ALLOWED}, Boolean.FALSE)</code> first.
      *
@@ -842,7 +889,7 @@ public class ImageWorker {
      */
     public void intensity() {
         /*
-         * If the color model already use a IHS color space, keep only the intensity band.
+         * If the color model already uses a IHS color space or a Gray color space, keep only the intensity band.
          * Otherwise, we need a component color model to be sure to understand what we are doing.
          */
         ColorModel cm = image.getColorModel();
@@ -914,7 +961,8 @@ public class ImageWorker {
     public void retainBands(final int numBands) {
         if (getNumBands() > numBands) {
             final int[] bands = new int[numBands];
-            for (int i=0; i<bands.length; i++) {
+            final int length=bands.length;
+            for (int i=0; i<length; i++) {
                 bands[i] = i;
             }
             image = BandSelectDescriptor.create(image, bands, getRenderingHints());
@@ -1184,7 +1232,7 @@ public class ImageWorker {
      * be done if 'getRenderingHints()' failed to suggest a tile size.
      * This method is for internal use by {@link #write} methods only.
      */
-    private void tile() {
+    public  void tile() {
         final RenderingHints hints = getRenderingHints();
         final ImageLayout layout = getImageLayout(hints);
         if (layout.isValid(ImageLayout.TILE_WIDTH_MASK) ||
@@ -1219,6 +1267,8 @@ public class ImageWorker {
         final String extension = filename.substring(dot+1).trim();
         write(output, ImageIO.getImageWritersBySuffix(extension));
     }
+    
+
 
     /**
      * Writes the {@linkplain #image} to the specified output, trying all encoders in the
@@ -1286,7 +1336,8 @@ public class ImageWorker {
      * Returns {@code true} if the specified array contains the specified type.
      */
     private static boolean acceptInputType(final Class[] types, final Class searchFor) {
-        for (int i=types.length; --i>=0;) {
+    	final int length=types.length;
+        for (int i=length; --i>=0;) {
             if (searchFor.isAssignableFrom(types[i])) {
                 return true;
             }
@@ -1298,7 +1349,8 @@ public class ImageWorker {
      * Returns {@code true} if the specified array contains the specified string.
      */
     private static boolean containsFormatName(final String[] formats, final String searchFor) {
-        for (int i=formats.length; --i>=0;) {
+    	final int length=formats.length;
+        for (int i=length; --i>=0;) {
             if (searchFor.equalsIgnoreCase(formats[i])) {
                 return true;
             }

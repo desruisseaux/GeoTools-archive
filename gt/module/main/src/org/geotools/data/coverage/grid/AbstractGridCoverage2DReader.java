@@ -494,7 +494,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @return
 	 * @throws IOException
 	 */
-	protected GridCoverage createImageDEMCoverage(RenderedOp image)
+	protected GridCoverage createImageCoverage(RenderedOp image)
 			throws IOException {
 
 		// deciding the number range
@@ -524,7 +524,7 @@ public abstract class AbstractGridCoverage2DReader implements
 					originalEnvelope));
 		default:
 			throw new DataSourceException(
-					"GeoTiffReader::createCoverage:Data buffer type not supported by this world image reader! Use byte, ushort or int");
+					"createImageCoverage:Data buffer type not supported by this world image reader! Use byte, ushort or int");
 		}
 
 		/**

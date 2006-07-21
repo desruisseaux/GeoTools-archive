@@ -572,7 +572,8 @@ public final class DeferredPlanarImage extends PlanarImage
     public boolean hasTileWriters() {
         final Raster[] pendings = this.pendings; // Avoid the need for synchronisation.
         if (pendings != null) {
-            for (int i=0; i<pendings.length; i++) {
+        	final int length=pendings.length;
+            for (int i=0; i<length; i++) {
                 if (pendings[i] != null) {
                     return true;
                 }
